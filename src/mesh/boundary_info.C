@@ -886,9 +886,9 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
 #endif
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_edge_id.equal_range(searched_elem);
 
   // elem not in the data structure
@@ -954,9 +954,9 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
 #endif
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_edge_id.equal_range(searched_elem);
 
   unsigned int n_ids = 0;
@@ -984,9 +984,9 @@ std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem* c
     return ids;
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_edge_id.equal_range(elem);
 
   // Check any occurrences
@@ -1040,9 +1040,9 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
     }
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem not in the data structure
@@ -1089,9 +1089,9 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
     }
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem is there, maybe multiple occurrences
@@ -1133,9 +1133,9 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
     }
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem not in the data structure
@@ -1180,9 +1180,9 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
     }
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   unsigned int n_ids = 0;
@@ -1210,9 +1210,9 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const 
     return ids;
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(elem);
 
   // Check any occurrences
@@ -1238,9 +1238,9 @@ void BoundaryInfo::remove_edge (const Elem* elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator >
     e = _boundary_edge_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1271,9 +1271,9 @@ void BoundaryInfo::remove_edge (const Elem* elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator >
     e = _boundary_edge_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1302,9 +1302,9 @@ void BoundaryInfo::remove_side (const Elem* elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator >
     e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1335,9 +1335,9 @@ void BoundaryInfo::remove_side (const Elem* elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator >
     e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1366,9 +1366,9 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
     searched_elem = elem->top_parent();
 
   std::pair<std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator,
-    std::multimap<const Elem*,
-    std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem may have zero or multiple occurrences
@@ -1457,8 +1457,8 @@ std::size_t BoundaryInfo::n_boundary_conds () const
   std::size_t nbcs=0;
 
   std::multimap<const Elem*,
-    std::pair<unsigned short int,
-    boundary_id_type> >::const_iterator pos;
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
 
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
     if (pos->first->processor_id() == this->processor_id())
@@ -1482,8 +1482,8 @@ std::size_t BoundaryInfo::n_edge_conds () const
   std::size_t n_edge_bcs=0;
 
   std::multimap<const Elem*,
-    std::pair<unsigned short int,
-    boundary_id_type> >::const_iterator pos;
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
 
   for (pos=_boundary_edge_id.begin(); pos != _boundary_edge_id.end(); ++pos)
     if (pos->first->processor_id() == this->processor_id())
@@ -1542,8 +1542,8 @@ void
 BoundaryInfo::build_node_list_from_side_list()
 {
   std::multimap<const Elem*,
-    std::pair<unsigned short int,
-    boundary_id_type> >::const_iterator pos;
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
 
   //Loop over the side list
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
@@ -1653,8 +1653,8 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type>&        el,
   il.reserve (_boundary_side_id.size());
 
   std::multimap<const Elem*,
-    std::pair<unsigned short int,
-    boundary_id_type> >::const_iterator pos;
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
 
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end();
        ++pos)
@@ -1670,8 +1670,8 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type>&        el,
                                            std::vector<boundary_id_type>&   il) const
 {
   std::multimap<const Elem*,
-    std::pair<unsigned short int,
-    boundary_id_type> >::const_iterator pos;
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
 
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end();
        ++pos)
@@ -1709,8 +1709,8 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type>&        el,
   il.reserve (_boundary_side_id.size());
 
   std::multimap<const Elem*,
-    std::pair<unsigned short int,
-    boundary_id_type> >::const_iterator pos;
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
 
   for (pos=_boundary_edge_id.begin(); pos != _boundary_edge_id.end();
        ++pos)
@@ -1757,9 +1757,9 @@ void BoundaryInfo::print_info(std::ostream& out_stream) const
       //    PrintSideInfo());
 
       std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_edge_id.begin();
+                    std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_edge_id.begin();
       const std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_edge_id.end();
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_edge_id.end();
 
       for (; it != end; ++it)
         out_stream << "  (" << (*it).first->id()
@@ -1781,9 +1781,9 @@ void BoundaryInfo::print_info(std::ostream& out_stream) const
       //    PrintSideInfo());
 
       std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_side_id.begin();
+                    std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_side_id.begin();
       const std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_side_id.end();
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_side_id.end();
 
       for (; it != end; ++it)
         out_stream << "  (" << (*it).first->id()
@@ -1832,9 +1832,9 @@ void BoundaryInfo::print_summary(std::ostream& out_stream) const
       std::map<boundary_id_type, std::size_t> ID_counts;
 
       std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_edge_id.begin();
+                    std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_edge_id.begin();
       const std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_edge_id.end();
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_edge_id.end();
 
       for (; it != end; ++it)
         ID_counts[(*it).second.second]++;
@@ -1859,9 +1859,9 @@ void BoundaryInfo::print_summary(std::ostream& out_stream) const
       std::map<boundary_id_type, std::size_t> ID_counts;
 
       std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_side_id.begin();
+                    std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_side_id.begin();
       const std::multimap<const Elem*,
-        std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_side_id.end();
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_side_id.end();
 
       for (; it != end; ++it)
         ID_counts[(*it).second.second]++;

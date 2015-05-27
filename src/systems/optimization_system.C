@@ -87,57 +87,50 @@ void OptimizationSystem::reinit ()
 }
 
 
-void OptimizationSystem::initialize_equality_constraints_storage(
-  const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity)
+void OptimizationSystem::
+initialize_equality_constraints_storage(const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity)
 {
   unsigned int n_eq_constraints = constraint_jac_sparsity.size();
 
   // Assign rows to each processor as evenly as possible
   unsigned int n_procs = comm().size();
   unsigned int n_local_rows = n_eq_constraints / n_procs;
-  if(comm().rank() < (n_eq_constraints % n_procs))
-  {
+  if (comm().rank() < (n_eq_constraints % n_procs))
     n_local_rows++;
-  }
 
   C_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
   lambda_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
 
   // Get the maximum number of non-zeros per row
   unsigned int max_nnz = 0;
-  for(unsigned int i=0; i<n_eq_constraints; i++)
-  {
-    unsigned int nnz = constraint_jac_sparsity[i].size();
-    if(nnz > max_nnz)
+  for (unsigned int i=0; i<n_eq_constraints; i++)
     {
-      max_nnz = nnz;
+      unsigned int nnz = constraint_jac_sparsity[i].size();
+      if (nnz > max_nnz)
+        max_nnz = nnz;
     }
-  }
 
-  C_eq_jac->init(
-    n_eq_constraints,
-    get_dof_map().n_dofs(),
-    n_local_rows,
-    get_dof_map().n_local_dofs(),
-    max_nnz,
-    max_nnz);
+  C_eq_jac->init(n_eq_constraints,
+                 get_dof_map().n_dofs(),
+                 n_local_rows,
+                 get_dof_map().n_local_dofs(),
+                 max_nnz,
+                 max_nnz);
 
   eq_constraint_jac_sparsity = constraint_jac_sparsity;
 }
 
 
-void OptimizationSystem::initialize_inequality_constraints_storage(
-  const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity)
+void OptimizationSystem::
+initialize_inequality_constraints_storage(const std::vector<std::set<numeric_index_type> >& constraint_jac_sparsity)
 {
   unsigned int n_ineq_constraints = constraint_jac_sparsity.size();
 
   // Assign rows to each processor as evenly as possible
   unsigned int n_procs = comm().size();
   unsigned int n_local_rows = n_ineq_constraints / n_procs;
-  if(comm().rank() < (n_ineq_constraints % n_procs))
-  {
+  if (comm().rank() < (n_ineq_constraints % n_procs))
     n_local_rows++;
-  }
 
   C_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
   lambda_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
@@ -145,21 +138,18 @@ void OptimizationSystem::initialize_inequality_constraints_storage(
   // Get the maximum number of non-zeros per row
   unsigned int max_nnz = 0;
   for(unsigned int i=0; i<n_ineq_constraints; i++)
-  {
-    unsigned int nnz = constraint_jac_sparsity[i].size();
-    if(nnz > max_nnz)
     {
-      max_nnz = nnz;
+      unsigned int nnz = constraint_jac_sparsity[i].size();
+      if (nnz > max_nnz)
+        max_nnz = nnz;
     }
-  }
 
-  C_ineq_jac->init(
-    n_ineq_constraints,
-    get_dof_map().n_dofs(),
-    n_local_rows,
-    get_dof_map().n_local_dofs(),
-    max_nnz,
-    max_nnz);
+  C_ineq_jac->init(n_ineq_constraints,
+                   get_dof_map().n_dofs(),
+                   n_local_rows,
+                   get_dof_map().n_local_dofs(),
+                   max_nnz,
+                   max_nnz);
 
   ineq_constraint_jac_sparsity = constraint_jac_sparsity;
 }

@@ -610,7 +610,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
           // does this set of vertices already has a mid-node added?
           std::pair<std::map<std::vector<dof_id_type>, Node*>::iterator,
-            std::map<std::vector<dof_id_type>, Node*>::iterator>
+                    std::map<std::vector<dof_id_type>, Node*>::iterator>
             pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
           // no, not added yet

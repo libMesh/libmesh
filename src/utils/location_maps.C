@@ -131,7 +131,7 @@ T* LocationMap<T>::find(const Point& p,
 
   // Look for the exact key first
   std::pair<typename map_type::iterator,
-    typename map_type::iterator>
+            typename map_type::iterator>
     pos = _map.equal_range(pointkey);
 
   while (pos.first != pos.second)
@@ -152,7 +152,7 @@ T* LocationMap<T>::find(const Point& p,
           for (int zoffset = -1; zoffset != 2; ++zoffset)
             {
               std::pair<typename map_type::iterator,
-                typename map_type::iterator>
+                        typename map_type::iterator>
                 key_pos = _map.equal_range(pointkey +
                                            xoffset*chunkmax*chunkmax +
                                            yoffset*chunkmax +

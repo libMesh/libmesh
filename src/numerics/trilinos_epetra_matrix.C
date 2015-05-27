@@ -287,10 +287,10 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 
 
 template <typename T>
-EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm)
-  : SparseMatrix<T>(comm),
-    _destroy_mat_on_exit(true),
-    _use_transpose(false)
+EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm) :
+  SparseMatrix<T>(comm),
+  _destroy_mat_on_exit(true),
+  _use_transpose(false)
 {}
 
 
@@ -298,10 +298,10 @@ EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm)
 
 template <typename T>
 EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m,
-                              const Parallel::Communicator &comm)
-  : SparseMatrix<T>(comm),
-    _destroy_mat_on_exit(false),
-    _use_transpose(false) // dumb guess is the best we can do...
+                              const Parallel::Communicator &comm) :
+  SparseMatrix<T>(comm),
+  _destroy_mat_on_exit(false),
+  _use_transpose(false) // dumb guess is the best we can do...
 {
   this->_mat = m;
   this->_is_initialized = true;

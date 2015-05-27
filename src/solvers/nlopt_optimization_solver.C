@@ -37,74 +37,74 @@ double __libmesh_nlopt_objective(unsigned n,
                                  const double * x,
                                  double * gradient,
                                  void *data)
-  {
-    START_LOG("objective()", "NloptOptimizationSolver");
+{
+  START_LOG("objective()", "NloptOptimizationSolver");
 
-    // ctx should be a pointer to the solver (it was passed in as void*)
-    NloptOptimizationSolver<Number>* solver =
-      static_cast<NloptOptimizationSolver<Number>*> (data);
+  // ctx should be a pointer to the solver (it was passed in as void*)
+  NloptOptimizationSolver<Number>* solver =
+    static_cast<NloptOptimizationSolver<Number>*> (data);
 
-    OptimizationSystem &sys = solver->system();
+  OptimizationSystem &sys = solver->system();
 
-    // We'll use current_local_solution below, so let's ensure that it's consistent
-    // with the vector x that was passed in.
-    for (unsigned int i=sys.solution->first_local_index();
-         i<sys.solution->last_local_index(); i++)
-      sys.solution->set(i, x[i]);
+  // We'll use current_local_solution below, so let's ensure that it's consistent
+  // with the vector x that was passed in.
+  for (unsigned int i=sys.solution->first_local_index();
+       i<sys.solution->last_local_index(); i++)
+    sys.solution->set(i, x[i]);
 
-    // Make sure the solution vector is parallel-consistent
-    sys.solution->close();
+  // Make sure the solution vector is parallel-consistent
+  sys.solution->close();
 
-    // Impose constraints on X
-    sys.get_dof_map().enforce_constraints_exactly(sys);
+  // Impose constraints on X
+  sys.get_dof_map().enforce_constraints_exactly(sys);
 
-    // Update sys.current_local_solution based on X
-    sys.update();
+  // Update sys.current_local_solution based on X
+  sys.update();
 
-    Real objective;
-    if (solver->objective_object != NULL)
+  Real objective;
+  if (solver->objective_object != NULL)
     {
       objective =
         solver->objective_object->objective(
-          *(sys.current_local_solution), sys);
+                                            *(sys.current_local_solution), sys);
     }
-    else
+  else
     {
       libmesh_error_msg("Objective function not defined in __libmesh_nlopt_objective");
     }
 
-    // If the gradient has been requested, fill it in
-    if (gradient)
+  // If the gradient has been requested, fill it in
+  if (gradient)
     {
       if (solver->gradient_object != NULL)
-      {
-        solver->gradient_object->gradient(
-          *(sys.current_local_solution), *(sys.rhs), sys);
+        {
+          solver->gradient_object->gradient(
+                                            *(sys.current_local_solution), *(sys.rhs), sys);
 
-        // we've filled up sys.rhs with the gradient data, now copy it
-        // to the nlopt data structure
-        libmesh_assert(sys.rhs->size() == n);
+          // we've filled up sys.rhs with the gradient data, now copy it
+          // to the nlopt data structure
+          libmesh_assert(sys.rhs->size() == n);
 
-        std::vector<double> grad;
-        sys.rhs->localize_to_one(grad);
-        for (unsigned i=0; i<n; ++i)
-          gradient[i] = grad[i];
-      }
+          std::vector<double> grad;
+          sys.rhs->localize_to_one(grad);
+          for (unsigned i=0; i<n; ++i)
+            gradient[i] = grad[i];
+        }
       else
         libmesh_error_msg("Gradient function not defined in __libmesh_nlopt_objective");
     }
 
-    STOP_LOG("objective()", "NloptOptimizationSolver");
+  STOP_LOG("objective()", "NloptOptimizationSolver");
 
-    // Increment the iteration count.
-    solver->get_iteration_count()++;
+  // Increment the iteration count.
+  solver->get_iteration_count()++;
 
-    // Possibly print the current value of the objective function
-    if (solver->verbose)
-      libMesh::out << objective << std::endl;
+  // Possibly print the current value of the objective function
+  if (solver->verbose)
+    libMesh::out << objective << std::endl;
 
-    return objective;
-  }
+  return objective;
+}
 
 
 
@@ -186,7 +186,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
                 }
             }
           else
-              libmesh_error_msg("Jacobian function not defined in __libmesh_nlopt_equality_constraints");
+            libmesh_error_msg("Jacobian function not defined in __libmesh_nlopt_equality_constraints");
         }
 
     }
@@ -277,7 +277,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
                 }
             }
           else
-              libmesh_error_msg("Jacobian function not defined in __libmesh_nlopt_inequality_constraints");
+            libmesh_error_msg("Jacobian function not defined in __libmesh_nlopt_inequality_constraints");
         }
 
     }
@@ -318,11 +318,11 @@ template <typename T>
 void NloptOptimizationSolver<T>::clear ()
 {
   if (this->initialized())
-  {
-    this->_is_initialized = false;
+    {
+      this->_is_initialized = false;
 
-    nlopt_destroy(_opt);
-  }
+      nlopt_destroy(_opt);
+    }
 }
 
 
@@ -332,26 +332,26 @@ void NloptOptimizationSolver<T>::init ()
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
-  {
-    this->_is_initialized = true;
+    {
+      this->_is_initialized = true;
 
-    // By default, use the LD_SLSQP solver
-    std::string nlopt_algorithm_name = "LD_SLSQP";
+      // By default, use the LD_SLSQP solver
+      std::string nlopt_algorithm_name = "LD_SLSQP";
 
-    if (libMesh::on_command_line("--nlopt-algorithm"))
-      nlopt_algorithm_name = libMesh::command_line_next ("--nlopt-algorithm",
-                                                         nlopt_algorithm_name);
+      if (libMesh::on_command_line("--nlopt-algorithm"))
+        nlopt_algorithm_name = libMesh::command_line_next ("--nlopt-algorithm",
+                                                           nlopt_algorithm_name);
 
-    // Convert string to an nlopt algorithm type
-    std::map<std::string, nlopt_algorithm>::iterator it =
-      _nlopt_algorithms.find(nlopt_algorithm_name);
+      // Convert string to an nlopt algorithm type
+      std::map<std::string, nlopt_algorithm>::iterator it =
+        _nlopt_algorithms.find(nlopt_algorithm_name);
 
-    if (it == _nlopt_algorithms.end())
-      libmesh_error_msg("Invalid nlopt algorithm requested on command line: " \
-                        << nlopt_algorithm_name);
+      if (it == _nlopt_algorithms.end())
+        libmesh_error_msg("Invalid nlopt algorithm requested on command line: " \
+                          << nlopt_algorithm_name);
 
-    _opt = nlopt_create(it->second, this->system().solution->size());
-  }
+      _opt = nlopt_create(it->second, this->system().solution->size());
+    }
 }
 
 
@@ -379,58 +379,58 @@ void NloptOptimizationSolver<T>::solve ()
   }
 
   if (this->lower_and_upper_bounds_object)
-  {
-    // Need to actually compute the bounds vectors first
-    this->lower_and_upper_bounds_object->lower_and_upper_bounds(this->system());
-
-    std::vector<Real> nlopt_lb(nlopt_size);
-    std::vector<Real> nlopt_ub(nlopt_size);
-    for(unsigned int i=0; i<nlopt_size; i++)
     {
-      nlopt_lb[i] = this->system().get_vector("lower_bounds")(i);
-      nlopt_ub[i] = this->system().get_vector("upper_bounds")(i);
-    }
+      // Need to actually compute the bounds vectors first
+      this->lower_and_upper_bounds_object->lower_and_upper_bounds(this->system());
 
-    nlopt_set_lower_bounds(_opt, &nlopt_lb[0]);
-    nlopt_set_upper_bounds(_opt, &nlopt_ub[0]);
-  }
+      std::vector<Real> nlopt_lb(nlopt_size);
+      std::vector<Real> nlopt_ub(nlopt_size);
+      for(unsigned int i=0; i<nlopt_size; i++)
+        {
+          nlopt_lb[i] = this->system().get_vector("lower_bounds")(i);
+          nlopt_ub[i] = this->system().get_vector("upper_bounds")(i);
+        }
+
+      nlopt_set_lower_bounds(_opt, &nlopt_lb[0]);
+      nlopt_set_upper_bounds(_opt, &nlopt_ub[0]);
+    }
 
   // If we have an equality constraints object, tell NLopt about it.
   if (this->equality_constraints_object)
-  {
-    // NLopt requires a vector to specify the tolerance for each constraint.
-    // NLopt makes a copy of this vector internally, so it's safe for us to
-    // let it go out of scope.
-    std::vector<double> equality_constraints_tolerances(
-      this->system().C_eq->size(), _constraints_tolerance);
+    {
+      // NLopt requires a vector to specify the tolerance for each constraint.
+      // NLopt makes a copy of this vector internally, so it's safe for us to
+      // let it go out of scope.
+      std::vector<double> equality_constraints_tolerances(this->system().C_eq->size(),
+                                                          _constraints_tolerance);
 
-    // It would be nice to call the C interface directly, at least it should return an error
-    // code we could parse... unfortunately, there does not seem to be a way to extract
-    // the underlying nlopt_opt object from the nlopt::opt class!
-    nlopt_result ierr =
-      nlopt_add_equality_mconstraint(_opt,
-                                     equality_constraints_tolerances.size(),
-                                     __libmesh_nlopt_equality_constraints,
-                                     this,
-                                     &equality_constraints_tolerances[0]);
+      // It would be nice to call the C interface directly, at least it should return an error
+      // code we could parse... unfortunately, there does not seem to be a way to extract
+      // the underlying nlopt_opt object from the nlopt::opt class!
+      nlopt_result ierr =
+        nlopt_add_equality_mconstraint(_opt,
+                                       equality_constraints_tolerances.size(),
+                                       __libmesh_nlopt_equality_constraints,
+                                       this,
+                                       &equality_constraints_tolerances[0]);
 
-    if (ierr < 0)
-      libmesh_error_msg("NLopt failed to add equality constraint: " << ierr);
-  }
+      if (ierr < 0)
+        libmesh_error_msg("NLopt failed to add equality constraint: " << ierr);
+    }
 
   // If we have an inequality constraints object, tell NLopt about it.
   if (this->inequality_constraints_object)
-  {
-    // NLopt requires a vector to specify the tolerance for each constraint
-    std::vector<double> inequality_constraints_tolerances(
-      this->system().C_ineq->size(), _constraints_tolerance);
+    {
+      // NLopt requires a vector to specify the tolerance for each constraint
+      std::vector<double> inequality_constraints_tolerances(this->system().C_ineq->size(),
+                                                            _constraints_tolerance);
 
-    nlopt_add_inequality_mconstraint(_opt,
-                                     inequality_constraints_tolerances.size(),
-                                     __libmesh_nlopt_inequality_constraints,
-                                     this,
-                                     &inequality_constraints_tolerances[0]);
-  }
+      nlopt_add_inequality_mconstraint(_opt,
+                                       inequality_constraints_tolerances.size(),
+                                       __libmesh_nlopt_inequality_constraints,
+                                       this,
+                                       &inequality_constraints_tolerances[0]);
+    }
 
   // Set a relative tolerance on the optimization parameters
   nlopt_set_ftol_rel(_opt, this->objective_function_relative_tolerance);

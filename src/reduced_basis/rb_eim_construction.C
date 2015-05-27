@@ -555,9 +555,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
       if (assert_convergence)
-      {
         check_convergence(*inner_product_solver);
-      }
     }
 
   if(plot_solution > 0)

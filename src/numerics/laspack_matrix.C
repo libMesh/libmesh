@@ -447,7 +447,7 @@ numeric_index_type LaspackMatrix<T>::pos (const numeric_index_type i,
 
   // note this requires the _csr to be
   std::pair<std::vector<numeric_index_type>::const_iterator,
-    std::vector<numeric_index_type>::const_iterator> p =
+            std::vector<numeric_index_type>::const_iterator> p =
     std::equal_range (_row_start[i],
                       _row_start[i+1],
                       j);

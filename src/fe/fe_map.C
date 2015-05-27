@@ -426,106 +426,106 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (compute_second_derivatives)
           {
 #if LIBMESH_DIM == 1
-        // Compute inverse map second derivatives for 1D-element-living-in-1D case
-        this->compute_inverse_map_second_derivs(p);
+            // Compute inverse map second derivatives for 1D-element-living-in-1D case
+            this->compute_inverse_map_second_derivs(p);
 #elif LIBMESH_DIM == 2
-        // Compute inverse map second derivatives for 1D-element-living-in-2D case
-        // See JWP notes for details
+            // Compute inverse map second derivatives for 1D-element-living-in-2D case
+            // See JWP notes for details
 
-        // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi}
-        Real numer =
-          dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
-          dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1);
+            // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi}
+            Real numer =
+              dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
+              dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1);
 
-        // denom = (x_xi)^2 + (y_xi)^2 must be >= 0.0
-        Real denom =
-          dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
-          dxyzdxi_map[p](1)*dxyzdxi_map[p](1);
+            // denom = (x_xi)^2 + (y_xi)^2 must be >= 0.0
+            Real denom =
+              dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
+              dxyzdxi_map[p](1)*dxyzdxi_map[p](1);
 
-        if (denom <= 0.0)
-          {
-            // Don't call print_info() recursively if we're already
-            // failing.  print_info() calls Elem::volume() which may
-            // call FE::reinit() and trigger the same failure again.
-            static bool failing = false;
-            if (!failing)
+            if (denom <= 0.0)
               {
-                failing = true;
-                elem->print_info();
-                libmesh_error_msg("Encountered invalid 1D element!");
+                // Don't call print_info() recursively if we're already
+                // failing.  print_info() calls Elem::volume() which may
+                // call FE::reinit() and trigger the same failure again.
+                static bool failing = false;
+                if (!failing)
+                  {
+                    failing = true;
+                    elem->print_info();
+                    libmesh_error_msg("Encountered invalid 1D element!");
+                  }
+                else
+                  {
+                    // We were already failing when we called this, so just
+                    // stop the current computation and return with
+                    // incomplete results.
+                    return;
+                  }
               }
-            else
-              {
-                // We were already failing when we called this, so just
-                // stop the current computation and return with
-                // incomplete results.
-                return;
-              }
-          }
 
-        // xi_{x x}
-        d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
+            // xi_{x x}
+            d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
 
-        // xi_{x y}
-        d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
+            // xi_{x y}
+            d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
 
-        // xi_{y y}
-        d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
+            // xi_{y y}
+            d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
 
 #elif LIBMESH_DIM == 3
-        // Compute inverse map second derivatives for 1D-element-living-in-3D case
-        // See JWP notes for details
+            // Compute inverse map second derivatives for 1D-element-living-in-3D case
+            // See JWP notes for details
 
-        // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi} + z_xi*z_{xi xi}
-        Real numer =
-          dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
-          dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1) +
-          dxyzdxi_map[p](2)*d2xyzdxi2_map[p](2);
+            // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi} + z_xi*z_{xi xi}
+            Real numer =
+              dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
+              dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1) +
+              dxyzdxi_map[p](2)*d2xyzdxi2_map[p](2);
 
-        // denom = (x_xi)^2 + (y_xi)^2 + (z_xi)^2 must be >= 0.0
-        Real denom =
-          dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
-          dxyzdxi_map[p](1)*dxyzdxi_map[p](1) +
-          dxyzdxi_map[p](2)*dxyzdxi_map[p](2);
+            // denom = (x_xi)^2 + (y_xi)^2 + (z_xi)^2 must be >= 0.0
+            Real denom =
+              dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
+              dxyzdxi_map[p](1)*dxyzdxi_map[p](1) +
+              dxyzdxi_map[p](2)*dxyzdxi_map[p](2);
 
-        if (denom <= 0.0)
-          {
-            // Don't call print_info() recursively if we're already
-            // failing.  print_info() calls Elem::volume() which may
-            // call FE::reinit() and trigger the same failure again.
-            static bool failing = false;
-            if (!failing)
+            if (denom <= 0.0)
               {
-                failing = true;
-                elem->print_info();
-                libmesh_error_msg("Encountered invalid 1D element!");
+                // Don't call print_info() recursively if we're already
+                // failing.  print_info() calls Elem::volume() which may
+                // call FE::reinit() and trigger the same failure again.
+                static bool failing = false;
+                if (!failing)
+                  {
+                    failing = true;
+                    elem->print_info();
+                    libmesh_error_msg("Encountered invalid 1D element!");
+                  }
+                else
+                  {
+                    // We were already failing when we called this, so just
+                    // stop the current computation and return with
+                    // incomplete results.
+                    return;
+                  }
               }
-            else
-              {
-                // We were already failing when we called this, so just
-                // stop the current computation and return with
-                // incomplete results.
-                return;
-              }
-          }
 
-        // xi_{x x}
-        d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
+            // xi_{x x}
+            d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
 
-        // xi_{x y}
-        d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
+            // xi_{x y}
+            d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
 
-        // xi_{x z}
-        d2xidxyz2_map[p][2] = -numer * dxidx_map[p]*dxidz_map[p] / denom;
+            // xi_{x z}
+            d2xidxyz2_map[p][2] = -numer * dxidx_map[p]*dxidz_map[p] / denom;
 
-        // xi_{y y}
-        d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
+            // xi_{y y}
+            d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
 
-        // xi_{y z}
-        d2xidxyz2_map[p][4] = -numer * dxidy_map[p]*dxidz_map[p] / denom;
+            // xi_{y z}
+            d2xidxyz2_map[p][4] = -numer * dxidy_map[p]*dxidz_map[p] / denom;
 
-        // xi_{z z}
-        d2xidxyz2_map[p][5] = -numer * dxidz_map[p]*dxidz_map[p] / denom;
+            // xi_{z z}
+            d2xidxyz2_map[p][5] = -numer * dxidz_map[p]*dxidz_map[p] / denom;
 #endif
           } // compute_second_derivatives
 
@@ -728,72 +728,72 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (compute_second_derivatives)
           {
-        // Compute inverse map second derivative values for
-        // 2D-element-living-in-3D case.  We pursue a least-squares
-        // solution approach for this "non-square" case, see JWP notes
-        // for details.
+            // Compute inverse map second derivative values for
+            // 2D-element-living-in-3D case.  We pursue a least-squares
+            // solution approach for this "non-square" case, see JWP notes
+            // for details.
 
-        // A = [ x_{xi xi} x_{eta eta} ]
-        //     [ y_{xi xi} y_{eta eta} ]
-        //     [ z_{xi xi} z_{eta eta} ]
-        DenseMatrix<Real> A(3,2);
-        A(0,0) = d2xyzdxi2_map[p](0);  A(0,1) = d2xyzdeta2_map[p](0);
-        A(1,0) = d2xyzdxi2_map[p](1);  A(1,1) = d2xyzdeta2_map[p](1);
-        A(2,0) = d2xyzdxi2_map[p](2);  A(2,1) = d2xyzdeta2_map[p](2);
+            // A = [ x_{xi xi} x_{eta eta} ]
+            //     [ y_{xi xi} y_{eta eta} ]
+            //     [ z_{xi xi} z_{eta eta} ]
+            DenseMatrix<Real> A(3,2);
+            A(0,0) = d2xyzdxi2_map[p](0);  A(0,1) = d2xyzdeta2_map[p](0);
+            A(1,0) = d2xyzdxi2_map[p](1);  A(1,1) = d2xyzdeta2_map[p](1);
+            A(2,0) = d2xyzdxi2_map[p](2);  A(2,1) = d2xyzdeta2_map[p](2);
 
-        // J^T, the transpose of the Jacobian matrix
-        DenseMatrix<Real> JT(2,3);
-        JT(0,0) = dx_dxi;   JT(0,1) = dy_dxi;   JT(0,2) = dz_dxi;
-        JT(1,0) = dx_deta;  JT(1,1) = dy_deta;  JT(1,2) = dz_deta;
+            // J^T, the transpose of the Jacobian matrix
+            DenseMatrix<Real> JT(2,3);
+            JT(0,0) = dx_dxi;   JT(0,1) = dy_dxi;   JT(0,2) = dz_dxi;
+            JT(1,0) = dx_deta;  JT(1,1) = dy_deta;  JT(1,2) = dz_deta;
 
-        // (J^T J)^(-1), this has already been computed for us above...
-        DenseMatrix<Real> JTJinv(2,2);
-        JTJinv(0,0) = g11inv;  JTJinv(0,1) = g12inv;
-        JTJinv(1,0) = g21inv;  JTJinv(1,1) = g22inv;
+            // (J^T J)^(-1), this has already been computed for us above...
+            DenseMatrix<Real> JTJinv(2,2);
+            JTJinv(0,0) = g11inv;  JTJinv(0,1) = g12inv;
+            JTJinv(1,0) = g21inv;  JTJinv(1,1) = g22inv;
 
-        // Some helper variables
-        RealVectorValue
-          dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
-          deta (detadx_map[p],  detady_map[p],  detadz_map[p]);
+            // Some helper variables
+            RealVectorValue
+              dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
+              deta (detadx_map[p],  detady_map[p],  detadz_map[p]);
 
-        // To be filled in below
-        DenseVector<Real> tmp1(2);
-        DenseVector<Real> tmp2(3);
-        DenseVector<Real> tmp3(2);
+            // To be filled in below
+            DenseVector<Real> tmp1(2);
+            DenseVector<Real> tmp2(3);
+            DenseVector<Real> tmp3(2);
 
-        // For (s,t) in {(x,x), (x,y), (x,z), (y,y), (y,z), (z,z)}, compute the
-        // vector of inverse map second derivatives [xi_{s t}, eta_{s t}]
-        unsigned ctr=0;
-        for (unsigned s=0; s<3; ++s)
-          for (unsigned t=s; t<3; ++t)
-            {
-              // Construct tmp1 = [xi_s*xi_t, eta_s*eta_t]
-              tmp1(0) = dxi(s)*dxi(t);
-              tmp1(1) = deta(s)*deta(t);
+            // For (s,t) in {(x,x), (x,y), (x,z), (y,y), (y,z), (z,z)}, compute the
+            // vector of inverse map second derivatives [xi_{s t}, eta_{s t}]
+            unsigned ctr=0;
+            for (unsigned s=0; s<3; ++s)
+              for (unsigned t=s; t<3; ++t)
+                {
+                  // Construct tmp1 = [xi_s*xi_t, eta_s*eta_t]
+                  tmp1(0) = dxi(s)*dxi(t);
+                  tmp1(1) = deta(s)*deta(t);
 
-              // Compute tmp2 = A * tmp1
-              A.vector_mult(tmp2, tmp1);
+                  // Compute tmp2 = A * tmp1
+                  A.vector_mult(tmp2, tmp1);
 
-              // Compute scalar value "alpha"
-              Real alpha = dxi(s)*deta(t) + deta(s)*dxi(t);
+                  // Compute scalar value "alpha"
+                  Real alpha = dxi(s)*deta(t) + deta(s)*dxi(t);
 
-              // Compute tmp2 <- tmp2 + alpha * x_{xi eta}
-              for (unsigned i=0; i<3; ++i)
-                tmp2(i) += alpha*d2xyzdxideta_map[p](i);
+                  // Compute tmp2 <- tmp2 + alpha * x_{xi eta}
+                  for (unsigned i=0; i<3; ++i)
+                    tmp2(i) += alpha*d2xyzdxideta_map[p](i);
 
-              // Compute tmp3 = J^T * tmp2
-              JT.vector_mult(tmp3, tmp2);
+                  // Compute tmp3 = J^T * tmp2
+                  JT.vector_mult(tmp3, tmp2);
 
-              // Compute tmp1 = (J^T J)^(-1) * tmp3.  tmp1 is available for us to reuse.
-              JTJinv.vector_mult(tmp1, tmp3);
+                  // Compute tmp1 = (J^T J)^(-1) * tmp3.  tmp1 is available for us to reuse.
+                  JTJinv.vector_mult(tmp1, tmp3);
 
-              // Fill in appropriate entries, don't forget to multiply by -1!
-              d2xidxyz2_map[p][ctr]  = -tmp1(0);
-              d2etadxyz2_map[p][ctr] = -tmp1(1);
+                  // Fill in appropriate entries, don't forget to multiply by -1!
+                  d2xidxyz2_map[p][ctr]  = -tmp1(0);
+                  d2etadxyz2_map[p][ctr] = -tmp1(1);
 
-              // Increment the counter
-              ctr++;
-            }
+                  // Increment the counter
+                  ctr++;
+                }
           }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES

@@ -174,19 +174,15 @@ void XdrIO::write (const std::string& name)
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
-  header_id_type
-    n_elem     = mesh.n_elem(),
-    n_nodes    = mesh.n_nodes();
+  header_id_type n_elem  = mesh.n_elem();
+  header_id_type n_nodes = mesh.n_nodes();
 
   libmesh_assert(n_elem == mesh.n_elem());
   libmesh_assert(n_nodes == mesh.n_nodes());
 
-  header_id_type n_bcs =
-    cast_int<header_id_type>(mesh.get_boundary_info().n_boundary_conds());
-  header_id_type n_nodesets =
-    cast_int<header_id_type>(mesh.get_boundary_info().n_nodeset_conds());
-  unsigned int
-    n_p_levels = MeshTools::n_p_levels (mesh);
+  header_id_type n_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_boundary_conds());
+  header_id_type n_nodesets = cast_int<header_id_type>(mesh.get_boundary_info().n_nodeset_conds());
+  unsigned int n_p_levels = MeshTools::n_p_levels (mesh);
 
   bool write_parallel_files = this->write_parallel();
 
@@ -1435,7 +1431,7 @@ void XdrIO::read_serialized_nodes (Xdr &io, const dof_id_type n_nodes)
   // Get the nodes in blocks.
   std::vector<Real> coords;
   std::pair<std::vector<dof_id_type>::iterator,
-    std::vector<dof_id_type>::iterator> pos;
+            std::vector<dof_id_type>::iterator> pos;
   pos.first = needed_nodes.begin();
 
   for (std::size_t blk=0, first_node=0, last_node=0; last_node<n_nodes; blk++)

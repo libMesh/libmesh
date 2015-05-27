@@ -587,9 +587,9 @@ Real TransientRBConstruction::truth_solve(int write_interval)
       linear_solver->reuse_preconditioner(true);
 
       if (assert_convergence)
-      {
-        check_convergence(*get_linear_solver());
-      }
+        {
+          check_convergence(*get_linear_solver());
+        }
 
       // Now compute the truth outputs
       for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
@@ -1100,9 +1100,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
           solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
           if (assert_convergence)
-          {
             check_convergence(*inner_product_solver);
-          }
 
           if (!is_quiet())
             {

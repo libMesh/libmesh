@@ -394,7 +394,7 @@ void MeshData::write_xdr (const std::string& name,
 
 
   std::map<const Node*,
-    std::vector<Number> >::const_iterator nit = _node_data.begin ();
+           std::vector<Number> >::const_iterator nit = _node_data.begin ();
 
   for (; nit != _node_data.end(); ++nit)
     {
@@ -442,7 +442,7 @@ void MeshData::write_xdr (const std::string& name,
 
 
   std::map<const Elem*,
-    std::vector<Number> >::const_iterator eit = _elem_data.begin ();
+           std::vector<Number> >::const_iterator eit = _elem_data.begin ();
 
   for (; eit != _elem_data.end(); ++eit)
     {

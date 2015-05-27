@@ -607,11 +607,8 @@ void RBEIMEvaluation::read_in_interpolation_points_elem
     std::ifstream interpolation_elem_ids_in
       ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ifstream::in);
 
-    if(!interpolation_elem_ids_in)
-    {
-      libmesh_error_msg("RB data missing: " +
-        directory_name + "/interpolation_elem_ids.dat");
-    }
+    if (!interpolation_elem_ids_in)
+      libmesh_error_msg("RB data missing: " + directory_name + "/interpolation_elem_ids.dat");
 
     for(unsigned int i=0; i<n_bfs; i++)
       {

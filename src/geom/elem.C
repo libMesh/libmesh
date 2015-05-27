@@ -1793,7 +1793,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
   // Indexed first by embedding matrix type, then by child id, then by
   // child node, then by bracketing pair
   std::vector<std::vector<std::vector<std::vector<
-    std::pair<unsigned char, unsigned char> > > > > &
+                                        std::pair<unsigned char, unsigned char> > > > > &
     cached_bracketing_nodes = this->_get_bracketing_node_cache();
 
   const unsigned int em_vers = this->embedding_matrix_version();
@@ -1817,9 +1817,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
       // equivalent full-order element and make a copy of its cache to
       // use.
       if (this->default_order() != FIRST &&
-          second_order_equivalent_type
-            (this->type(), /*full_ordered=*/ true) !=
-          this->type())
+          second_order_equivalent_type(this->type(), /*full_ordered=*/ true) != this->type())
         {
           // Check that we really are the non-full-order type
           libmesh_assert_equal_to
@@ -1828,8 +1826,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
 
           // Build the full-order type
           ElemType full_type =
-            second_order_equivalent_type
-              (this->type(), /*full_ordered=*/ true);
+            second_order_equivalent_type(this->type(), /*full_ordered=*/ true);
           UniquePtr<Elem> full_elem = Elem::build(full_type);
 
           // This won't work for elements with multiple
@@ -2019,8 +2016,7 @@ Elem::bracketing_nodes(unsigned int child,
 
           // Build the full-order type
           ElemType full_type =
-            second_order_equivalent_type
-              (this->type(), /*full_ordered=*/ true);
+            second_order_equivalent_type(this->type(), /*full_ordered=*/ true);
           UniquePtr<Elem> full_elem = Elem::build(full_type);
 
           dof_id_type pt1 = DofObject::invalid_id;
