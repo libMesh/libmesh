@@ -208,7 +208,7 @@ public:
 
         for (unsigned int d=0; d != LIBMESH_DIM; ++d)
           {
-            std::string gradname = std::string("grad_") + 
+            std::string gradname = std::string("grad_") +
               "xyz"[d] + '_' + varname;
             std::size_t gradname_i = find_name(gradname, _expression);
 

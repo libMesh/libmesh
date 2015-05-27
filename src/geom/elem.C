@@ -1827,7 +1827,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
              this->type());
 
           // Build the full-order type
-          ElemType full_type = 
+          ElemType full_type =
             second_order_equivalent_type
               (this->type(), /*full_ordered=*/ true);
           UniquePtr<Elem> full_elem = Elem::build(full_type);
@@ -2018,7 +2018,7 @@ Elem::bracketing_nodes(unsigned int child,
           // And that's a shame, because this is a nasty search:
 
           // Build the full-order type
-          ElemType full_type = 
+          ElemType full_type =
             second_order_equivalent_type
               (this->type(), /*full_ordered=*/ true);
           UniquePtr<Elem> full_elem = Elem::build(full_type);
