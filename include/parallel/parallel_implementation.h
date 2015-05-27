@@ -1260,7 +1260,7 @@ inline bool Communicator::semiverify(const T *r) const
         }
       this->min(tempmin);
       this->max(tempmax);
-      bool invalid = r && ((*r != tempmin) &&
+      bool invalid = r && ((*r != tempmin) ||
                            (*r != tempmax));
       this->max(invalid);
       return !invalid;
@@ -1297,7 +1297,7 @@ inline bool Communicator::semiverify(const std::vector<T> *r) const
         }
       this->min(tempmin);
       this->max(tempmax);
-      bool invalid = r && ((*r != tempmin) &&
+      bool invalid = r && ((*r != tempmin) ||
                            (*r != tempmax));
       this->max(invalid);
       return !invalid;
