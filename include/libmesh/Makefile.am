@@ -368,6 +368,7 @@ BUILT_SOURCES = \
         nonlinear_implicit_system.h \
         optimization_system.h \
         parameter_accessor.h \
+        parameter_multiaccessor.h \
         parameter_multipointer.h \
         parameter_pointer.h \
         parameter_vector.h \
@@ -1586,6 +1587,9 @@ optimization_system.h: $(top_srcdir)/include/systems/optimization_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_accessor.h: $(top_srcdir)/include/systems/parameter_accessor.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parameter_multiaccessor.h: $(top_srcdir)/include/systems/parameter_multiaccessor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_multipointer.h: $(top_srcdir)/include/systems/parameter_multipointer.h
