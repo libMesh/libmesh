@@ -493,7 +493,6 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -528,7 +527,6 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -634,7 +632,6 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -794,7 +791,6 @@ void FEMContext::point_value(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -843,7 +839,6 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -895,7 +890,6 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -932,7 +926,6 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (this->_elem_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
@@ -1135,7 +1128,6 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
@@ -1184,7 +1176,6 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
@@ -1236,7 +1227,6 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
 
   // Get current local coefficients
   libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
-  libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
