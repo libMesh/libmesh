@@ -842,7 +842,7 @@ Number MeshData::operator() (const Node* node,
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-    std::vector<Number> >::const_iterator pos = _node_data.find(node);
+           std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   if (pos == _node_data.end())
     return libMesh::zero;
@@ -861,7 +861,7 @@ bool MeshData::has_data (const Node* node) const
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-    std::vector<Number> >::const_iterator pos = _node_data.find(node);
+           std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   return (pos != _node_data.end());
 }
@@ -875,7 +875,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-    std::vector<Number> >::const_iterator pos = _node_data.find(node);
+           std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
 #ifdef DEBUG
   if (pos == _node_data.end())
@@ -922,7 +922,7 @@ Number MeshData::operator() (const Elem* elem,
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   if (pos == _elem_data.end())
     return libMesh::zero;
@@ -941,7 +941,7 @@ bool MeshData::has_data (const Elem* elem) const
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   return (pos != _elem_data.end());
 }
@@ -955,7 +955,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
 #ifdef DEBUG
   if (pos == _elem_data.end())

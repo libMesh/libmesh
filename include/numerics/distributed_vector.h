@@ -440,12 +440,12 @@ private:
 template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
-                                         const ParallelType ptype)
-  : NumericVector<T>(comm_in, ptype),
-    _global_size      (0),
-    _local_size       (0),
-    _first_local_index(0),
-    _last_local_index (0)
+                                         const ParallelType ptype) :
+  NumericVector<T>(comm_in, ptype),
+  _global_size      (0),
+  _local_size       (0),
+  _first_local_index(0),
+  _last_local_index (0)
 {
   this->_type = ptype;
 }

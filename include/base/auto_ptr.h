@@ -41,8 +41,8 @@
 #  include <memory>
 namespace libMesh
 {
-  template<typename T>
-  using UniquePtr = std::unique_ptr<T>;
+template<typename T>
+using UniquePtr = std::unique_ptr<T>;
 }
 #elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
 // As per Roy's suggestion, use a combination of a macro and a 'using'

@@ -97,7 +97,7 @@ protected:
               && !_need_var_grad[v*LIBMESH_DIM+2]
 #endif
 #endif
-             )
+              )
             continue;
 
           Gradient g;
@@ -130,22 +130,22 @@ protected:
               && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+8]
 #endif
 #endif
-             )
+              )
             continue;
 
-        Tensor h;
-        c.point_hessian(v, p, h);
+          Tensor h;
+          c.point_hessian(v, p, h);
 
-        for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
-          for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
-            {
-              if (!_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2])
-                continue;
+          for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
+            for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
+              {
+                if (!_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2])
+                  continue;
 
-              _spacetime[LIBMESH_DIM+1+request_index] = h(d1,d2);
-              request_index++;
-            }
-      }
+                _spacetime[LIBMESH_DIM+1+request_index] = h(d1,d2);
+                request_index++;
+              }
+        }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
@@ -172,8 +172,7 @@ public:
       _need_var(_n_vars, false),
       _need_var_grad(_n_vars*LIBMESH_DIM, false)
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      ,
-      _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false)
+    , _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false)
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   {
@@ -275,7 +274,7 @@ public:
             // Note: The initial_vals vector can be shorter than the additional_vars vector
             _spacetime[offset + i] =
               (initial_vals && i < initial_vals->size()) ?
-                (*initial_vals)[i] : 0;
+              (*initial_vals)[i] : 0;
           }
       }
 
@@ -442,9 +441,9 @@ private:
   const System& _sys;
   std::string _expression;
   unsigned int _n_vars,
-               _n_requested_vars,
-               _n_requested_grad_components,
-               _n_requested_hess_components;
+    _n_requested_vars,
+    _n_requested_grad_components,
+    _n_requested_hess_components;
 #ifdef LIBMESH_HAVE_FPARSER
   std::vector<FunctionParserBase<Output> > parsers;
 #endif

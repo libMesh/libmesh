@@ -178,28 +178,28 @@ private:
   // See the full list of algorithms at:
   // http://ab-initio.mit.edu/wiki/index.php/NLopt_Algorithms
   static std::map<std::string, nlopt_algorithm> build_map()
-    {
-      std::map<std::string, nlopt_algorithm> ret;
-      ret["LD_SLSQP"]                   = NLOPT_LD_SLSQP;
-      ret["LD_MMA"]                     = NLOPT_LD_MMA;
-      ret["LD_CCSAQ"]                   = NLOPT_LD_CCSAQ;
-      ret["LD_LBFGS"]                   = NLOPT_LD_LBFGS;
-      ret["LD_LBFGS_NOCEDAL"]           = NLOPT_LD_LBFGS_NOCEDAL;
-      ret["LD_TNEWTON"]                 = NLOPT_LD_TNEWTON;
-      ret["LD_TNEWTON_RESTART"]         = NLOPT_LD_TNEWTON_RESTART;
-      ret["LD_TNEWTON_PRECOND"]         = NLOPT_LD_TNEWTON_PRECOND;
-      ret["LD_TNEWTON_PRECOND_RESTART"] = NLOPT_LD_TNEWTON_PRECOND_RESTART;
-      ret["LD_AUGLAG"]                  = NLOPT_LD_AUGLAG;
-      ret["LD_VAR1"]                    = NLOPT_LD_VAR1;
-      ret["LD_VAR2"]                    = NLOPT_LD_VAR2;
-      ret["LN_COBYLA"]                  = NLOPT_LN_COBYLA;
-      ret["LN_BOBYQA"]                  = NLOPT_LN_BOBYQA;
-      ret["LN_PRAXIS"]                  = NLOPT_LN_PRAXIS;
-      ret["LN_NELDERMEAD"]              = NLOPT_LN_NELDERMEAD;
-      ret["LN_SBPLX"]                   = NLOPT_LN_SBPLX;
-      ret["GN_ISRES"]                   = NLOPT_GN_ISRES;
-      return ret;
-    }
+  {
+    std::map<std::string, nlopt_algorithm> ret;
+    ret["LD_SLSQP"]                   = NLOPT_LD_SLSQP;
+    ret["LD_MMA"]                     = NLOPT_LD_MMA;
+    ret["LD_CCSAQ"]                   = NLOPT_LD_CCSAQ;
+    ret["LD_LBFGS"]                   = NLOPT_LD_LBFGS;
+    ret["LD_LBFGS_NOCEDAL"]           = NLOPT_LD_LBFGS_NOCEDAL;
+    ret["LD_TNEWTON"]                 = NLOPT_LD_TNEWTON;
+    ret["LD_TNEWTON_RESTART"]         = NLOPT_LD_TNEWTON_RESTART;
+    ret["LD_TNEWTON_PRECOND"]         = NLOPT_LD_TNEWTON_PRECOND;
+    ret["LD_TNEWTON_PRECOND_RESTART"] = NLOPT_LD_TNEWTON_PRECOND_RESTART;
+    ret["LD_AUGLAG"]                  = NLOPT_LD_AUGLAG;
+    ret["LD_VAR1"]                    = NLOPT_LD_VAR1;
+    ret["LD_VAR2"]                    = NLOPT_LD_VAR2;
+    ret["LN_COBYLA"]                  = NLOPT_LN_COBYLA;
+    ret["LN_BOBYQA"]                  = NLOPT_LN_BOBYQA;
+    ret["LN_PRAXIS"]                  = NLOPT_LN_PRAXIS;
+    ret["LN_NELDERMEAD"]              = NLOPT_LN_NELDERMEAD;
+    ret["LN_SBPLX"]                   = NLOPT_LN_SBPLX;
+    ret["GN_ISRES"]                   = NLOPT_GN_ISRES;
+    return ret;
+  }
 };
 
 

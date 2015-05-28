@@ -174,7 +174,7 @@ public:
     FirstOrder order;
 
     std::pair<typename vectormap<Key,Tp>::const_iterator,
-      typename vectormap<Key,Tp>::const_iterator>
+              typename vectormap<Key,Tp>::const_iterator>
       bounds = std::equal_range (this->begin(), this->end(), to_find, order);
 
     return std::distance (bounds.first, bounds.second);

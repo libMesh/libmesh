@@ -152,14 +152,14 @@ private:
    * Static function used to initialize _covergence_reasons map
    */
   static std::map<Eigen::ComputationInfo, LinearConvergenceReason> build_map()
-    {
-      std::map<Eigen::ComputationInfo, LinearConvergenceReason> ret;
-      ret[Eigen::Success]        = CONVERGED_ITS;
-      ret[Eigen::NumericalIssue] = DIVERGED_BREAKDOWN;
-      ret[Eigen::NoConvergence]  = DIVERGED_ITS;
-      ret[Eigen::InvalidInput]   = DIVERGED_NULL;
-      return ret;
-    }
+  {
+    std::map<Eigen::ComputationInfo, LinearConvergenceReason> ret;
+    ret[Eigen::Success]        = CONVERGED_ITS;
+    ret[Eigen::NumericalIssue] = DIVERGED_BREAKDOWN;
+    ret[Eigen::NoConvergence]  = DIVERGED_ITS;
+    ret[Eigen::InvalidInput]   = DIVERGED_NULL;
+    return ret;
+  }
 };
 
 

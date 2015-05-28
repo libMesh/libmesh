@@ -336,29 +336,14 @@ extern bool warned_about_auto_ptr;
 #endif
 
 
-#define libmesh_assert(asserted)                                        \
-  libmesh_assert_msg(asserted, "")
-
-#define libmesh_exceptionless_assert(asserted)                          \
-  libmesh_exceptionless_assert_msg(asserted, "")
-
-#define libmesh_assert_equal_to(expr1,expr2)                            \
-  libmesh_assert_equal_to_msg(expr1,expr2, "")
-
-#define libmesh_assert_not_equal_to(expr1,expr2)                        \
-  libmesh_assert_not_equal_to_msg(expr1,expr2, "")
-
-#define libmesh_assert_less(expr1,expr2)                                \
-  libmesh_assert_less_msg(expr1,expr2, "")
-
-#define libmesh_assert_greater(expr1,expr2)                             \
-  libmesh_assert_greater_msg(expr1,expr2, "")
-
-#define libmesh_assert_less_equal(expr1,expr2)                          \
-  libmesh_assert_less_equal_msg(expr1,expr2, "")
-
-#define libmesh_assert_greater_equal(expr1,expr2)                       \
-  libmesh_assert_greater_equal_msg(expr1,expr2, "")
+#define libmesh_assert(asserted) libmesh_assert_msg(asserted, "")
+#define libmesh_exceptionless_assert(asserted) libmesh_exceptionless_assert_msg(asserted, "")
+#define libmesh_assert_equal_to(expr1,expr2) libmesh_assert_equal_to_msg(expr1,expr2, "")
+#define libmesh_assert_not_equal_to(expr1,expr2) libmesh_assert_not_equal_to_msg(expr1,expr2, "")
+#define libmesh_assert_less(expr1,expr2) libmesh_assert_less_msg(expr1,expr2, "")
+#define libmesh_assert_greater(expr1,expr2) libmesh_assert_greater_msg(expr1,expr2, "")
+#define libmesh_assert_less_equal(expr1,expr2) libmesh_assert_less_equal_msg(expr1,expr2, "")
+#define libmesh_assert_greater_equal(expr1,expr2) libmesh_assert_greater_equal_msg(expr1,expr2, "")
 
 // The libmesh_error() macro prints a message and throws a LogicError
 // exception
@@ -378,18 +363,16 @@ extern bool warned_about_auto_ptr;
     LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
-#define libmesh_error()                                                 \
-  libmesh_error_msg("")
+#define libmesh_error() libmesh_error_msg("")
 
-#define libmesh_exceptionless_error_msg(msg)                                          \
+#define libmesh_exceptionless_error_msg(msg)                            \
   do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     libMesh::err << msg << std::endl;                                   \
     std::terminate();                                                   \
   } while(0)
 
-#define libmesh_exceptionless_error()                                   \
-  libmesh_exceptionless_error_msg("")
+#define libmesh_exceptionless_error() libmesh_exceptionless_error_msg("")
 
 #define libmesh_not_implemented_msg(msg)                                \
   do {                                                                  \
@@ -398,18 +381,16 @@ extern bool warned_about_auto_ptr;
     LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
-#define libmesh_not_implemented()                                       \
-  libmesh_not_implemented_msg("")
+#define libmesh_not_implemented() libmesh_not_implemented_msg("")
 
 #define libmesh_file_error_msg(filename, msg)                           \
   do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
-    libMesh::err << msg << std::endl;                                      \
+    libMesh::err << msg << std::endl;                                   \
     LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
 
-#define libmesh_file_error(filename)                                    \
-  libmesh_file_error_msg(filename,"")
+#define libmesh_file_error(filename) libmesh_file_error_msg(filename,"")
 
 #define libmesh_convergence_failure()                   \
   do {                                                  \

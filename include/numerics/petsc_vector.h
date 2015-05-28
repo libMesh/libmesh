@@ -598,15 +598,15 @@ private:
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in, const ParallelType ptype)
-  : NumericVector<T>(comm_in, ptype),
-    _array_is_present(false),
-    _first(0),
-    _last(0),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in, const ParallelType ptype) :
+  NumericVector<T>(comm_in, ptype),
+  _array_is_present(false),
+  _first(0),
+  _last(0),
+  _local_form(NULL),
+  _values(NULL),
+  _global_to_local_map(),
+  _destroy_vec_on_exit(true)
 {
   this->_type = ptype;
 }
@@ -617,13 +617,13 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
                              const numeric_index_type n,
-                             const ParallelType ptype)
-  : NumericVector<T>(comm_in, ptype),
-    _array_is_present(false),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+                             const ParallelType ptype) :
+  NumericVector<T>(comm_in, ptype),
+  _array_is_present(false),
+  _local_form(NULL),
+  _values(NULL),
+  _global_to_local_map(),
+  _destroy_vec_on_exit(true)
 {
   this->init(n, n, false, ptype);
 }
@@ -635,13 +635,13 @@ inline
 PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
                              const numeric_index_type n,
                              const numeric_index_type n_local,
-                             const ParallelType ptype)
-  : NumericVector<T>(comm_in, ptype),
-    _array_is_present(false),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+                             const ParallelType ptype) :
+  NumericVector<T>(comm_in, ptype),
+  _array_is_present(false),
+  _local_form(NULL),
+  _values(NULL),
+  _global_to_local_map(),
+  _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -654,13 +654,13 @@ PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
                              const numeric_index_type n,
                              const numeric_index_type n_local,
                              const std::vector<numeric_index_type>& ghost,
-                             const ParallelType ptype)
-  : NumericVector<T>(comm_in, ptype),
-    _array_is_present(false),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+                             const ParallelType ptype) :
+  NumericVector<T>(comm_in, ptype),
+  _array_is_present(false),
+  _local_form(NULL),
+  _values(NULL),
+  _global_to_local_map(),
+  _destroy_vec_on_exit(true)
 {
   this->init(n, n_local, ghost, false, ptype);
 }
@@ -672,13 +672,13 @@ PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
 template <typename T>
 inline
 PetscVector<T>::PetscVector (Vec v,
-                             const Parallel::Communicator &comm_in)
-  : NumericVector<T>(comm_in, AUTOMATIC),
-    _array_is_present(false),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(false)
+                             const Parallel::Communicator &comm_in) :
+  NumericVector<T>(comm_in, AUTOMATIC),
+  _array_is_present(false),
+  _local_form(NULL),
+  _values(NULL),
+  _global_to_local_map(),
+  _destroy_vec_on_exit(false)
 {
   this->_vec = v;
   this->_is_closed = true;
