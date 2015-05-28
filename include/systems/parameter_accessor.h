@@ -24,6 +24,7 @@
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h" // remove_const
+#include "libmesh/auto_ptr.h"
 
 namespace libMesh
 {
@@ -81,6 +82,13 @@ public:
   ParameterProxy<T> operator* () { return ParameterProxy<T>(*this); }
 
   ConstParameterProxy<T> operator* () const { return ConstParameterProxy<T>(*this); }
+
+  /**
+   * Returns a new copy of the accessor.  The new copy should probably
+   * be as shallow as possible, but should still access the same
+   * parameter.
+   */
+  virtual UniquePtr<ParameterAccessor<T> > clone() const = 0;
 };
 
 template <typename T=Number>

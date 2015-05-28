@@ -372,6 +372,7 @@ include_HEADERS =  \
         systems/nonlinear_implicit_system.h \
         systems/optimization_system.h \
         systems/parameter_accessor.h \
+        systems/parameter_multiaccessor.h \
         systems/parameter_multipointer.h \
         systems/parameter_pointer.h \
         systems/parameter_vector.h \

@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_PARAMETER_MULTIPOINTER_H
-#define LIBMESH_PARAMETER_MULTIPOINTER_H
+#ifndef LIBMESH_PARAMETER_MULTIACCESSOR_H
+#define LIBMESH_PARAMETER_MULTIACCESSOR_H
 
 
 // Local Includes -----------------------------------
@@ -35,26 +35,35 @@ namespace libMesh
  * Accessor object allowing reading and modification of the
  * independent variables in a parameter sensitivity calculation.
  *
- * This is a slightly flexible ParameterAccessor subclass: it stores
- * all user-provided pointers to copies of the parameter, and modifies
- * the value at each location in memory.
+ * This is the "default" ParameterAccessor subclass: it simply stores
+ * a user-provided pointer to the parameter, and modifies the value at
+ * that location in memory.
  */
 template <typename T=Number>
-class ParameterMultiPointer : public ParameterAccessor<T>
+class ParameterMultiAccessor : public ParameterAccessor<T>
 {
 public:
   /**
    * Constructor: no parameters attached yet
    */
-  ParameterMultiPointer() {}
+  ParameterMultiAccessor() {}
 
   /**
-   * Constructor: take the first raw pointer to the parameter
+   * Constructor: take the first sub-accessor for the parameter
    */
-  ParameterMultiPointer(T * param_ptr) : _ptrs(1, param_ptr) {}
+  ParameterMultiAccessor(const ParameterAccessor<T>& param_accessor) :
+    _accessors(1, param_accessor.clone()) {}
+
+  /*
+   * Destructor: delete our clones of sub-accessors
+   */
+  ~ParameterMultiAccessor() {
+    for (unsigned int i=0; i != _accessors.size(); ++i)
+      delete _accessors[i];
+  }
 
   /**
-   * A simple reseater won't work with a multipointer
+   * A simple reseater won't work with a multi-accessor
    */
   virtual ParameterAccessor<T> &
   operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
@@ -64,16 +73,16 @@ public:
    */
   virtual void set (const T & new_value)
   {
-    libmesh_assert(!_ptrs.empty());
+    libmesh_assert(!_accessors.empty());
 #ifndef NDEBUG
-    T& val = *_ptrs[0];
+    T& val = _accessors[0]->get();
 #endif
-    for (unsigned int i=0; i != _ptrs.size(); ++i)
+    for (unsigned int i=0; i != _accessors.size(); ++i)
       {
         // If you're already using inconsistent parameters we can't
         // help you.
-        libmesh_assert_equal_to(*_ptrs[i], val);
-        *_ptrs[i] = new_value;
+        libmesh_assert_equal_to(_accessors[i]->get(), val);
+        _accessors[i]->set(new_value);
       }
   }
 
@@ -82,13 +91,13 @@ public:
    */
   virtual const T& get () const
   {
-    libmesh_assert(!_ptrs.empty());
-    T& val = *_ptrs[0];
+    libmesh_assert(!_accessors.empty());
+    const T& val = _accessors[0]->get();
 #ifndef NDEBUG
     // If you're already using inconsistent parameters we can't help
     // you.
-    for (unsigned int i=1; i < _ptrs.size(); ++i)
-      libmesh_assert_equal_to(*_ptrs[i], val);
+    for (unsigned int i=1; i < _accessors.size(); ++i)
+      libmesh_assert_equal_to(_accessors[i]->get(), val);
 #endif
     return val;
   }
@@ -97,24 +106,29 @@ public:
    * Returns a new copy of the accessor.
    */
   virtual UniquePtr<ParameterAccessor<T> > clone() const {
-    ParameterMultiPointer *pmp = new ParameterMultiPointer<T>();
-    pmp->_ptrs = _ptrs;
+    ParameterMultiAccessor *pmp = new ParameterMultiAccessor<T>();
+    for (unsigned int i=0; i != _accessors.size(); ++i)
+      pmp->_accessors.push_back(_accessors[i]->clone().release());
 
     return UniquePtr<ParameterAccessor<T> >(pmp);
   }
 
-  void push_back (T* new_ptr) { _ptrs.push_back(new_ptr); }
+
+  void push_back (const ParameterAccessor<T> & new_accessor) {
+    _accessors.push_back(new_accessor.clone().release());
+  }
 
   /**
-   * Returns the number of data associated with this parameter.
-   * Useful for testing if the multipointer is empty/invalid.
+   * Returns the number of sub-accessors associated with this
+   * parameter.  Useful for testing if the multi-accessor is
+   * empty/invalid.
    */
-  std::size_t size() const { return _ptrs.size(); }
+  std::size_t size() const { return _accessors.size(); }
 
 private:
-  std::vector<T*> _ptrs;
+  std::vector<ParameterAccessor<T> *> _accessors;
 };
 
 } // namespace libMesh
 
-#endif // LIBMESH_PARAMETER_MULTIPOINTER_H
+#endif // LIBMESH_PARAMETER_MULTIACCESSOR_H
