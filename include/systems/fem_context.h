@@ -811,27 +811,26 @@ protected:
    * Helper nested class for C++03-compatible "template typedef"
    */
   template <typename OutputType>
-  struct FENeeded {
-    typedef typename TensorTools::MakeReal
-      <OutputType>::type value_shape;
+  struct FENeeded
+  {
+    // Rank decrementer helper types
+    typedef typename TensorTools::DecrementRank<OutputType>::type Rank1Decrement;
+    typedef typename TensorTools::DecrementRank<Rank1Decrement>::type Rank2Decrement;
+
+    // Typedefs for "Value getter" function pointer
+    typedef typename TensorTools::MakeReal<OutputType>::type value_shape;
     typedef FEGenericBase<value_shape> value_base;
-    typedef void (FEMContext::*value_getter)
-      (unsigned int, value_base *&) const;
+    typedef void (FEMContext::*value_getter) (unsigned int, value_base *&) const;
 
-    typedef typename TensorTools::MakeReal
-      <typename TensorTools::DecrementRank
-        <OutputType>::type>::type grad_shape;
+    // Typedefs for "Grad getter" function pointer
+    typedef typename TensorTools::MakeReal<Rank1Decrement>::type grad_shape;
     typedef FEGenericBase<grad_shape> grad_base;
-    typedef void (FEMContext::*grad_getter)
-      (unsigned int, grad_base *&) const;
+    typedef void (FEMContext::*grad_getter) (unsigned int, grad_base *&) const;
 
-    typedef typename TensorTools::MakeReal
-      <typename TensorTools::DecrementRank
-        <typename TensorTools::DecrementRank
-          <OutputType>::type>::type>::type hess_shape;
+    // Typedefs for "Hessian getter" function pointer
+    typedef typename TensorTools::MakeReal<Rank2Decrement>::type hess_shape;
     typedef FEGenericBase<hess_shape> hess_base;
-    typedef void (FEMContext::*hess_getter)
-      (unsigned int, hess_base *&) const;
+    typedef void (FEMContext::*hess_getter) (unsigned int, hess_base *&) const;
   };
 
 
