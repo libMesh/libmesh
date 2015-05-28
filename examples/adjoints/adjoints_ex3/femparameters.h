@@ -66,7 +66,8 @@ public:
     analytic_jacobians(true), verify_analytic_jacobians(0.0),
     print_solution_norms(false), print_solutions(false),
     print_residual_norms(false), print_residuals(false),
-    print_jacobian_norms(false), print_jacobians(false) {}
+    print_jacobian_norms(false), print_jacobians(false),
+    print_element_solutions(false), print_element_residuals(false) {}
 
   void read(GetPot &input);
 
@@ -136,7 +137,8 @@ public:
 
   bool print_solution_norms, print_solutions,
     print_residual_norms, print_residuals,
-    print_jacobian_norms, print_jacobians;
+    print_jacobian_norms, print_jacobians,
+    print_element_solutions, print_element_residuals;
 };
 
 #endif // __fem_parameters_h__

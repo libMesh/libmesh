@@ -167,6 +167,8 @@ void FEMParameters::read(GetPot &input)
   GETPOT_INPUT(print_residuals);
   GETPOT_INPUT(print_jacobian_norms);
   GETPOT_INPUT(print_jacobians);
+  GETPOT_INPUT(print_element_solutions);
+  GETPOT_INPUT(print_element_residuals);
 
 
   // std::vector<std::string> bad_variables =

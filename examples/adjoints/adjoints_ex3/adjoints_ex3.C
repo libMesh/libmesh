@@ -441,6 +441,9 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
   system.print_jacobian_norms = param.print_jacobian_norms;
   system.print_jacobians      = param.print_jacobians;
 
+  system.print_element_solutions = param.print_element_solutions;
+  system.print_element_residuals = param.print_element_residuals;
+
   // Solve this as a time-dependent or steady system
   if (param.transient)
     {
