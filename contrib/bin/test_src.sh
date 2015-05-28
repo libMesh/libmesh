@@ -88,7 +88,7 @@ for i in $inc_line_nums; do
   fi
 
   # Reset the colors
-  echo -e -n $colorreset;    
+  echo -e -n $colorreset;
   
   # Clean up temporary file(s)
   rm $temp_file.C

@@ -32,10 +32,10 @@ EXTRA_DIST = rebuild_makefile.sh
 
 EOF
 
-echo -n "BUILT_SOURCES =" >> Makefile.am
+printf '%s' "BUILT_SOURCES =" >> Makefile.am
 for built_src in $built_sources ; do
     echo " \\" >> Makefile.am
-    echo -n "        "$built_src >> Makefile.am
+    printf '%s' "        "$built_src >> Makefile.am
 done
 
 echo >> Makefile.am

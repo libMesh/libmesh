@@ -19,10 +19,10 @@ echo "# These are headers we need to compile the libMesh library but should" >> 
 echo "# not be installed.  These header files may have implementation" >> include_HEADERS
 echo "# details which are not required for the public interface" >> include_HEADERS
 
-echo -n "noinst_HEADERS = " >> include_HEADERS
+printf '%s' "noinst_HEADERS = " >> include_HEADERS
 for header_with_path in $noinst_blacklist ; do
     echo " \\" >> include_HEADERS
-    echo -n "        "$header_with_path >> include_HEADERS
+    printf '%s' "        "$header_with_path >> include_HEADERS
 done
 echo >> include_HEADERS
 echo >> include_HEADERS
@@ -35,7 +35,7 @@ headers="libmesh_config.h $headers"
 echo "# These are the headers we actually want to install and make available" >> include_HEADERS
 echo "# to a user.  Consider these the public interface of libMesh." >> include_HEADERS
 echo "# will get installed into '\$(prefix)/include/libmesh'" >> include_HEADERS
-echo -n "include_HEADERS = " >> include_HEADERS
+printf '%s' "include_HEADERS = " >> include_HEADERS
 for header_with_path in $headers ; do
     add_header=1
     for blacklist in $noinst_blacklist ; do
@@ -45,10 +45,7 @@ for header_with_path in $headers ; do
     done
     if (test $add_header -eq 1); then
 	echo " \\" >> include_HEADERS
-	echo -n "        "$header_with_path >> include_HEADERS
+        printf '%s' "        "$header_with_path >> include_HEADERS
     fi
 done
 echo " " >> include_HEADERS
-
-
-

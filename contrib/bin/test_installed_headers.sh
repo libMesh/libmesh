@@ -65,19 +65,23 @@ function test_header()
     errlog=$app_file.log
     stdout=$app_file.stdout
 
-    echo -n "Testing Header $header_to_test ... " > $stdout
-
-
+    printf '%s' "Testing Header $header_to_test ... " > $stdout
     echo "#include \"libmesh/$header_name\"" >> $source_file
     echo "int foo () { return 0; }" >> $source_file
 
     #echo $CXX $test_CXXFLAGS $source_file -o $app_file
     if $CXX $test_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
-        echo -e $gotocolumn $white"["$green"   OK   "$white"]" >> $stdout
-        echo -e -n $colorreset >> $stdout
+        # See color codes above.  We:
+        # .) skip to column 65
+        # .) print [ in white
+        # .) print OK in green
+        # .) print ] in white
+        # .) reset the terminal color
+        # .) print a newline
+        printf '\e[65G\e[1;37m[\e[1;32m%s\e[1;37m]\e[m\e[m\n' "   OK   " >> $stdout
     else
-        echo -e $gotocolumn $white"["$red" FAILED "$white"]" >> $stdout
-        echo -e -n $colorreset >> $stdout
+        # See comment above for OK status
+        printf '\e[65G\e[1;37m[\e[1;31m%s\e[1;37m]\e[m\e[m\n' " FAILED " >> $stdout
         echo "Source file:" >> $stdout
         cat $source_file  >> $stdout
         echo ""  >> $stdout

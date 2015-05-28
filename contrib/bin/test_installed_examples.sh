@@ -60,17 +60,21 @@ function test_example()
 
     stdout=`mktemp -t stdout.XXXXXXXXXX`
 
-    echo -n "Testing example installation $exdir ... " > $stdout
+    printf '%s' "Testing example installation $exdir ... " > $stdout
     cd $examples_install_path/$exdir
 
     if $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS > $errlog 2>&1 ; then
-
- 	echo -e $gotocolumn $white"["$green"   OK   "$white"]" >> $stdout
-	echo -e -n $colorreset >> $stdout
-
+        # See color codes above.  We:
+        # .) skip to column 65
+        # .) print [ in white
+        # .) print OK in green
+        # .) print ] in white
+        # .) reset the terminal color
+        # .) print a newline
+        printf '\e[65G\e[1;37m[\e[1;32m%s\e[1;37m]\e[m\e[m\n' "   OK   " >> $stdout
     else
- 	echo -e $gotocolumn $white"["$red" FAILED "$white"]" >> $stdout
-	echo -e -n $colorreset >> $stdout
+        # See comment above for OK status
+        printf '\e[65G\e[1;37m[\e[1;31m%s\e[1;37m]\e[m\e[m\n' " FAILED " >> $stdout
 	echo "Compile line:"  >> $stdout
 	echo $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS >> $stdout
 	echo ""  >> $stdout
