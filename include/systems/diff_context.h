@@ -176,6 +176,40 @@ public:
     return *(_elem_subsolution_rates[var]);
   }
 
+  /**
+   * Accessor for element solution accel of change w.r.t. time.
+   */
+  const DenseVector<Number>& get_elem_solution_accel() const
+  { return _elem_solution_accel; }
+
+  /**
+   * Non-const accessor for element solution accel of change w.r.t.
+   * time.
+   */
+  DenseVector<Number>& get_elem_solution_accel()
+  { return _elem_solution_accel; }
+
+  /**
+   * Accessor for element solution accel for a particular variable
+   * corresponding to the variable index argument.
+   */
+  const DenseSubVector<Number>& get_elem_solution_accel( unsigned int var ) const
+  {
+    libmesh_assert_greater(_elem_subsolution_accels.size(), var);
+    libmesh_assert(_elem_subsolution_accels[var]);
+    return *(_elem_subsolution_accels[var]);
+  }
+
+  /**
+   * Accessor for element solution accel for a particular variable
+   * corresponding to the variable index argument.
+   */
+  DenseSubVector<Number>& get_elem_solution_accel( unsigned int var )
+  {
+    libmesh_assert_greater(_elem_subsolution_accels.size(), var);
+    libmesh_assert(_elem_subsolution_accels[var]);
+    return *(_elem_subsolution_accels[var]);
+  }
 
   /**
    * Accessor for element fixed solution.
