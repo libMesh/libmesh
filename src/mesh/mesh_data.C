@@ -379,7 +379,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
       libmesh_assert (_node_id_map_closed);
 
       std::map<unsigned int,
-        const Node*>::const_iterator pos = _id_node.find(fid);
+               const Node*>::const_iterator pos = _id_node.find(fid);
 
       if (pos == _id_node.end())
         libmesh_error_msg("ERROR: Have no Node* associated with the foreign id = " << fid);
@@ -412,7 +412,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 
       // look it up in the map
       std::map<const Node*,
-        unsigned int>::const_iterator pos = _node_id.find(n);
+               unsigned int>::const_iterator pos = _node_id.find(n);
 
       if (pos == _node_id.end())
         libmesh_error_msg("ERROR: No foreign id stored for the node with the libMesh id = " << n->id());
@@ -444,7 +444,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
       libmesh_assert (_elem_id_map_closed);
 
       std::map<unsigned int,
-        const Elem*>::const_iterator pos = _id_elem.find(fid);
+               const Elem*>::const_iterator pos = _id_elem.find(fid);
 
       if (pos == _id_elem.end())
         libmesh_error_msg("ERROR: Have no Elem* associated with the foreign id = " << fid);
@@ -476,7 +476,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 
       // look it up in the map
       std::map<const Elem*,
-        unsigned int>::const_iterator pos = _elem_id.find(e);
+               unsigned int>::const_iterator pos = _elem_id.find(e);
 
       if (pos == _elem_id.end())
         libmesh_error_msg("ERROR: No foreign id stored for the element with the libMesh id = " << e->id());
@@ -514,9 +514,9 @@ void MeshData::insert_node_data (std::map<const Node*,
 
 #ifdef DEBUG
   std::map<const Node*,
-    std::vector<Number> >::const_iterator nd_pos = nd.begin();
+           std::vector<Number> >::const_iterator nd_pos = nd.begin();
   std::map<const Node*,
-    std::vector<Number> >::const_iterator nd_end = nd.end();
+           std::vector<Number> >::const_iterator nd_end = nd.end();
 
   // Compare entity-by-entity that the
   // sizes of the std::vector's are identical.
@@ -570,9 +570,9 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
 #ifdef DEBUG
   std::map<const Elem*,
-    std::vector<Number> >::const_iterator ed_pos = ed.begin();
+           std::vector<Number> >::const_iterator ed_pos = ed.begin();
   std::map<const Elem*,
-    std::vector<Number> >::const_iterator ed_end = ed.end();
+           std::vector<Number> >::const_iterator ed_end = ed.end();
 
   // Compare entity-by-entity that the
   // sizes of the std::vector's are identical.
@@ -613,7 +613,7 @@ unsigned int MeshData::n_val_per_node () const
   if (!this->_node_data.empty())
     {
       std::map<const Node*,
-        std::vector<Number> >::const_iterator pos = _node_data.begin();
+               std::vector<Number> >::const_iterator pos = _node_data.begin();
       libmesh_assert (pos != _node_data.end());
       return cast_int<unsigned int>(pos->second.size());
     }
@@ -643,7 +643,7 @@ unsigned int MeshData::n_val_per_elem () const
   if (!_elem_data.empty())
     {
       std::map<const Elem*,
-        std::vector<Number> >::const_iterator pos = _elem_data.begin();
+               std::vector<Number> >::const_iterator pos = _elem_data.begin();
       libmesh_assert (pos != _elem_data.end());
       return cast_int<unsigned int>(pos->second.size());
     }

@@ -248,15 +248,13 @@ public:
    * and n_dofs_per_constraint[i] gives the indices that are non-zero
    * in row i of the Jacobian.
    */
-  void initialize_equality_constraints_storage(
-    const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity);
+  void initialize_equality_constraints_storage(const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity);
 
   /**
    * Initialize storage for the inequality constraints, as per
    * initialize_equality_constraints_storage.
    */
-  void initialize_inequality_constraints_storage(
-    const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity);
+  void initialize_inequality_constraints_storage(const std::vector< std::set<numeric_index_type> >& constraint_jac_sparsity);
 
   /**
    * @returns \p "Optimization".  Helps in identifying

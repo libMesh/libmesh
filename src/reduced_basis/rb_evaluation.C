@@ -901,10 +901,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
 
 void RBEvaluation::assert_file_exists(const std::string& file_name)
 {
-  if(!std::ifstream(file_name.c_str()))
-  {
+  if (!std::ifstream(file_name.c_str()))
     libmesh_error_msg("File missing: " + file_name);
-  }
 }
 
 void RBEvaluation::write_out_basis_functions(System& sys,
@@ -1100,11 +1098,8 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
         {
           // vectors should all be NULL, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.
-          if(vectors[i])
-            {
-              libmesh_error_msg(
-                "Non-NULL vector passed to read_in_vectors_from_multiple_files");
-            }
+          if (vectors[i])
+            libmesh_error_msg("Non-NULL vector passed to read_in_vectors_from_multiple_files");
 
           vectors[i] = NumericVector<Number>::build(sys.comm()).release();
 

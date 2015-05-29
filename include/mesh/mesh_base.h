@@ -1088,9 +1088,7 @@ private:
  * The definition of the element_iterator struct.
  */
 struct
-MeshBase::element_iterator :
-variant_filter_iterator<MeshBase::Predicate,
-                        Elem*>
+MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -1109,11 +1107,10 @@ variant_filter_iterator<MeshBase::Predicate,
  * iterator above, but also provides an additional conversion-to-const ctor.
  */
 struct
-MeshBase::const_element_iterator :
-variant_filter_iterator<MeshBase::Predicate,
-                        Elem* const,
-                        Elem* const&,
-                        Elem* const*>
+MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
+                                                           Elem* const,
+                                                           Elem* const&,
+                                                           Elem* const*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -1148,9 +1145,7 @@ variant_filter_iterator<MeshBase::Predicate,
  * The definition of the node_iterator struct.
  */
 struct
-MeshBase::node_iterator :
-variant_filter_iterator<MeshBase::Predicate,
-                        Node*>
+MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -1169,11 +1164,10 @@ variant_filter_iterator<MeshBase::Predicate,
  * iterator above, but also provides an additional conversion-to-const ctor.
  */
 struct
-MeshBase::const_node_iterator :
-variant_filter_iterator<MeshBase::Predicate,
-                        Node* const,
-                        Node* const &,
-                        Node* const *>
+MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
+                                                        Node* const,
+                                                        Node* const &,
+                                                        Node* const *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>

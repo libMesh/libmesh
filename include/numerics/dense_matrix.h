@@ -631,16 +631,16 @@ using namespace DenseMatrices;
 template<typename T>
 inline
 DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
-                            const unsigned int new_n)
-  : DenseMatrixBase<T>(new_m,new_n),
+                            const unsigned int new_n) :
+  DenseMatrixBase<T>(new_m,new_n),
 #if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
-    use_blas_lapack(true),
+  use_blas_lapack(true),
 #else
-    use_blas_lapack(false),
+  use_blas_lapack(false),
 #endif
-    _val(),
-    _decomposition_type(NONE),
-    _pivots()
+  _val(),
+  _decomposition_type(NONE),
+  _pivots()
 {
   this->resize(new_m,new_n);
 }

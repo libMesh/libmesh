@@ -2549,7 +2549,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
                       // See if jg is in the sorted range
                       std::pair<SparsityPattern::Row::iterator,
-                        SparsityPattern::Row::iterator>
+                                SparsityPattern::Row::iterator>
                         pos = std::equal_range (low, high, jg);
 
                       // Must add jg if it wasn't found
@@ -2606,7 +2606,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
                               // See if jg is in the sorted range
                               std::pair<SparsityPattern::Row::iterator,
-                                SparsityPattern::Row::iterator>
+                                        SparsityPattern::Row::iterator>
                                 pos = std::equal_range (row->begin(), row->end(), jg);
 
                               // Insert jg if it wasn't found
@@ -2734,7 +2734,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
                                   // See if jg is in the sorted range
                                   std::pair<SparsityPattern::Row::iterator,
-                                    SparsityPattern::Row::iterator>
+                                            SparsityPattern::Row::iterator>
                                     pos = std::equal_range (low, high, jg);
 
                                   // Must add jg if it wasn't found
@@ -2792,7 +2792,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
                                           // See if jg is in the sorted range
                                           std::pair<SparsityPattern::Row::iterator,
-                                            SparsityPattern::Row::iterator>
+                                                    SparsityPattern::Row::iterator>
                                             pos = std::equal_range (row->begin(), row->end(), jg);
 
                                           // Insert jg if it wasn't found

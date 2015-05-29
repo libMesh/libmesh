@@ -80,10 +80,9 @@ public:
    * Assembles & solves the linear system A*x=b for the specified
    * matrix \p input_matrix and right-hand side \p rhs.
    */
-  virtual void solve_for_matrix_and_rhs (
-    LinearSolver<Number>& input_solver,
-    SparseMatrix<Number>& input_matrix,
-    NumericVector<Number>& input_rhs);
+  virtual void solve_for_matrix_and_rhs (LinearSolver<Number>& input_solver,
+                                         SparseMatrix<Number>& input_matrix,
+                                         NumericVector<Number>& input_rhs);
 
   /**
    * Set the RBEvaluation object.

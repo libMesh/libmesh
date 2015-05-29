@@ -154,10 +154,9 @@ std::string RBConstruction::system_type () const
   return "RBConstruction";
 }
 
-void RBConstruction::solve_for_matrix_and_rhs(
-  LinearSolver<Number>& input_solver,
-  SparseMatrix<Number>& input_matrix,
-  NumericVector<Number>& input_rhs)
+void RBConstruction::solve_for_matrix_and_rhs(LinearSolver<Number>& input_solver,
+                                              SparseMatrix<Number>& input_matrix,
+                                              NumericVector<Number>& input_rhs)
 {
   // This is similar to LinearImplicitSysmte::solve()
 
@@ -1131,26 +1130,22 @@ Real RBConstruction::truth_solve(int plot_solution)
   truth_assembly();
 
   // truth_assembly assembles into matrix and rhs, so use those for the solve
-  if(extra_linear_solver)
-  {
-    // If extra_linear_solver has been initialized, then we use it for the
-    // truth solves.
-    solve_for_matrix_and_rhs(*extra_linear_solver, *matrix, *rhs);
-
-    if (assert_convergence)
+  if (extra_linear_solver)
     {
-      check_convergence(*extra_linear_solver);
+      // If extra_linear_solver has been initialized, then we use it for the
+      // truth solves.
+      solve_for_matrix_and_rhs(*extra_linear_solver, *matrix, *rhs);
+
+      if (assert_convergence)
+        check_convergence(*extra_linear_solver);
     }
-  }
   else
-  {
-    solve_for_matrix_and_rhs(*get_linear_solver(), *matrix, *rhs);
-
-    if (assert_convergence)
     {
-      check_convergence(*get_linear_solver());
+      solve_for_matrix_and_rhs(*get_linear_solver(), *matrix, *rhs);
+
+      if (assert_convergence)
+        check_convergence(*get_linear_solver());
     }
-  }
 
 
 
@@ -1460,9 +1455,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
           solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
           if (assert_convergence)
-          {
             check_convergence(*inner_product_solver);
-          }
 
           if (!is_quiet())
             {
@@ -1580,9 +1573,7 @@ void RBConstruction::compute_output_dual_innerprods()
               linear_solver->reuse_preconditioner(true);
 
               if (assert_convergence)
-              {
                 check_convergence(*get_linear_solver());
-              }
 
               if (!is_quiet())
                 {
@@ -1670,9 +1661,7 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
           solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
           if (assert_convergence)
-          {
             check_convergence(*inner_product_solver);
-          }
 
           if (!is_quiet())
             {
@@ -2145,9 +2134,9 @@ void RBConstruction::check_convergence(LinearSolver<Number>& input_solver)
   conv_flag = input_solver.get_converged_reason();
 
   if (conv_flag < 0)
-  {
-    libmesh_error_msg("Error, conv_flag < 0!");
-  }
+    {
+      libmesh_error_msg("Error, conv_flag < 0!");
+    }
 }
 
 bool RBConstruction::get_convergence_assertion_flag() const

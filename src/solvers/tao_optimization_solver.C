@@ -77,15 +77,9 @@ extern "C"
     X.swap(X_sys);
 
     if (solver->objective_object != NULL)
-    {
-      (*objective) =
-        solver->objective_object->objective(
-          *(sys.current_local_solution), sys);
-    }
+      (*objective) = solver->objective_object->objective(*(sys.current_local_solution), sys);
     else
-    {
       libmesh_error_msg("Objective function not defined in __libmesh_tao_objective");
-    }
 
     STOP_LOG("objective()", "TaoOptimizationSolver");
 
@@ -135,14 +129,9 @@ extern "C"
     gradient.zero();
 
     if (solver->gradient_object != NULL)
-    {
-      solver->gradient_object->gradient(
-        *(sys.current_local_solution), gradient, sys);
-    }
+      solver->gradient_object->gradient(*(sys.current_local_solution), gradient, sys);
     else
-    {
       libmesh_error_msg("Gradient function not defined in __libmesh_tao_gradient");
-    }
 
     gradient.close();
 
@@ -192,16 +181,13 @@ extern "C"
     hessian.attach_dof_map(sys.get_dof_map());
 
     if (solver->hessian_object != NULL)
-    {
-      // Following PetscNonlinearSolver by passing in PC. It's not clear
-      // why we pass in PC and not hessian though?
-      solver->hessian_object->hessian(
-        *(sys.current_local_solution), PC, sys);
-    }
+      {
+        // Following PetscNonlinearSolver by passing in PC. It's not clear
+        // why we pass in PC and not hessian though?
+        solver->hessian_object->hessian(*(sys.current_local_solution), PC, sys);
+      }
     else
-    {
       libmesh_error_msg("Hessian function not defined in __libmesh_tao_hessian");
-    }
 
     PC.close();
     hessian.close();
@@ -253,14 +239,9 @@ extern "C"
     eq_constraints.zero();
 
     if (solver->equality_constraints_object != NULL)
-    {
-      solver->equality_constraints_object->equality_constraints(
-        *(sys.current_local_solution), eq_constraints, sys);
-    }
+      solver->equality_constraints_object->equality_constraints(*(sys.current_local_solution), eq_constraints, sys);
     else
-    {
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_equality_constraints");
-    }
 
     eq_constraints.close();
 
@@ -308,14 +289,9 @@ extern "C"
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
     if (solver->equality_constraints_jacobian_object != NULL)
-    {
-      solver->equality_constraints_jacobian_object->equality_constraints_jacobian(
-        *(sys.current_local_solution), J_petsc, sys);
-    }
+      solver->equality_constraints_jacobian_object->equality_constraints_jacobian(*(sys.current_local_solution), J_petsc, sys);
     else
-    {
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_equality_constraints_jacobian");
-    }
 
     J_petsc.close();
     Jpre_petsc.close();
@@ -366,14 +342,9 @@ extern "C"
     ineq_constraints.zero();
 
     if (solver->inequality_constraints_object != NULL)
-    {
-      solver->inequality_constraints_object->inequality_constraints(
-        *(sys.current_local_solution), ineq_constraints, sys);
-    }
+      solver->inequality_constraints_object->inequality_constraints(*(sys.current_local_solution), ineq_constraints, sys);
     else
-    {
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_inequality_constraints");
-    }
 
     ineq_constraints.close();
 
@@ -421,14 +392,9 @@ extern "C"
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
     if (solver->inequality_constraints_jacobian_object != NULL)
-    {
-      solver->inequality_constraints_jacobian_object->inequality_constraints_jacobian(
-        *(sys.current_local_solution), J_petsc, sys);
-    }
+      solver->inequality_constraints_jacobian_object->inequality_constraints_jacobian(*(sys.current_local_solution), J_petsc, sys);
     else
-    {
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_inequality_constraints_jacobian");
-    }
 
     J_petsc.close();
     Jpre_petsc.close();
@@ -467,14 +433,14 @@ template <typename T>
 void TaoOptimizationSolver<T>::clear ()
 {
   if (this->initialized())
-  {
-    this->_is_initialized = false;
+    {
+      this->_is_initialized = false;
 
-    PetscErrorCode ierr=0;
+      PetscErrorCode ierr=0;
 
-    ierr = TaoDestroy(&_tao);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+      ierr = TaoDestroy(&_tao);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 }
 
 
@@ -484,14 +450,14 @@ void TaoOptimizationSolver<T>::init ()
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
-  {
-    this->_is_initialized = true;
+    {
+      this->_is_initialized = true;
 
-    PetscErrorCode ierr=0;
+      PetscErrorCode ierr=0;
 
-    ierr = TaoCreate(this->comm().get(),&_tao);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+      ierr = TaoCreate(this->comm().get(),&_tao);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 }
 
 template <typename T>
@@ -564,61 +530,61 @@ void TaoOptimizationSolver<T>::solve ()
   LIBMESH_CHKERRABORT(ierr);
 
   if ( this->gradient_object )
-  {
-    ierr = TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      ierr = TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   if ( this->hessian_object )
-  {
-    ierr = TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      ierr = TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   if ( this->lower_and_upper_bounds_object )
-  {
-    // Need to actually compute the bounds vectors first
-    this->lower_and_upper_bounds_object->lower_and_upper_bounds(this->system());
+    {
+      // Need to actually compute the bounds vectors first
+      this->lower_and_upper_bounds_object->lower_and_upper_bounds(this->system());
 
-    ierr = TaoSetVariableBounds(_tao,
-                                lb->vec(),
-                                ub->vec());
-    LIBMESH_CHKERRABORT(ierr);
-  }
+      ierr = TaoSetVariableBounds(_tao,
+                                  lb->vec(),
+                                  ub->vec());
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   if ( this->equality_constraints_object )
-  {
-    ierr = TaoSetEqualityConstraintsRoutine(_tao, ceq->vec(), __libmesh_tao_equality_constraints, this);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      ierr = TaoSetEqualityConstraintsRoutine(_tao, ceq->vec(), __libmesh_tao_equality_constraints, this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   if ( this->equality_constraints_jacobian_object )
-  {
-    ierr = TaoSetJacobianEqualityRoutine(_tao,
-                                         ceq_jac->mat(),
-                                         ceq_jac->mat(),
-                                         __libmesh_tao_equality_constraints_jacobian,
-                                         this);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      ierr = TaoSetJacobianEqualityRoutine(_tao,
+                                           ceq_jac->mat(),
+                                           ceq_jac->mat(),
+                                           __libmesh_tao_equality_constraints_jacobian,
+                                           this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   // Optionally set inequality constraints
   if ( this->inequality_constraints_object )
-  {
-    ierr = TaoSetInequalityConstraintsRoutine(_tao, cineq->vec(), __libmesh_tao_inequality_constraints, this);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      ierr = TaoSetInequalityConstraintsRoutine(_tao, cineq->vec(), __libmesh_tao_inequality_constraints, this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   // Optionally set inequality constraints Jacobian
   if ( this->inequality_constraints_jacobian_object )
-  {
-    ierr = TaoSetJacobianInequalityRoutine(_tao,
-                                           cineq_jac->mat(),
-                                           cineq_jac->mat(),
-                                           __libmesh_tao_inequality_constraints_jacobian,
-                                           this);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      ierr = TaoSetJacobianInequalityRoutine(_tao,
+                                             cineq_jac->mat(),
+                                             cineq_jac->mat(),
+                                             __libmesh_tao_inequality_constraints_jacobian,
+                                             this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   // Check for Tao command line options
   ierr = TaoSetFromOptions(_tao);

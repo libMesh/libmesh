@@ -93,9 +93,9 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-PetscMatrix<T>::PetscMatrix(const Parallel::Communicator &comm_in)
-  : SparseMatrix<T>(comm_in),
-    _destroy_mat_on_exit(true)
+PetscMatrix<T>::PetscMatrix(const Parallel::Communicator &comm_in) :
+  SparseMatrix<T>(comm_in),
+  _destroy_mat_on_exit(true)
 {}
 
 
@@ -104,9 +104,9 @@ PetscMatrix<T>::PetscMatrix(const Parallel::Communicator &comm_in)
 // for destroying it
 template <typename T>
 PetscMatrix<T>::PetscMatrix(Mat mat_in,
-                            const Parallel::Communicator &comm_in)
-  : SparseMatrix<T>(comm_in),
-    _destroy_mat_on_exit(false)
+                            const Parallel::Communicator &comm_in) :
+  SparseMatrix<T>(comm_in),
+  _destroy_mat_on_exit(false)
 {
   this->_mat = mat_in;
   this->_is_initialized = true;

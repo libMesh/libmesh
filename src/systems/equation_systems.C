@@ -164,10 +164,10 @@ void EquationSystems::reinit ()
     }
 
 
-// We used to assert that all nodes and elements *already* had
-// n_systems() properly set; however this is false in the case where
-// user code has manually added nodes and/or elements to an
-// already-initialized system.
+  // We used to assert that all nodes and elements *already* had
+  // n_systems() properly set; however this is false in the case where
+  // user code has manually added nodes and/or elements to an
+  // already-initialized system.
 
   // Make sure all the \p DofObject entities know how many systems
   // there are.

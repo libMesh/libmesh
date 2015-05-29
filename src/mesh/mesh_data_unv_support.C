@@ -539,7 +539,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
    * Write the foreign node number and the respective data.
    */
   std::map<const Node*,
-    std::vector<Number> >::const_iterator nit = _node_data.begin();
+           std::vector<Number> >::const_iterator nit = _node_data.begin();
 
   char buf[27];
   for (; nit != _node_data.end(); ++nit)

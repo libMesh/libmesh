@@ -166,7 +166,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       // will tell us which nodes should receive boundary
       // conditions (to form the std::vector<const Node*>)
       std::set< std::pair<dof_id_type,
-        unsigned int> > inner_faces;
+                          unsigned int> > inner_faces;
 
 
       // build infinite elements

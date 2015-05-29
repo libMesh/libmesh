@@ -1063,8 +1063,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             libmesh_assert(std::abs(ui) < TOLERANCE ||
                            std::abs(ui - Uedge(i)) < TOLERANCE);
             ui = Uedge(i);
-            dof_is_fixed[new_side_dofs[free_dof[i]]] =
-              true;
+            dof_is_fixed[new_side_dofs[free_dof[i]]] = true;
           }
       }
 
@@ -1206,8 +1205,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             libmesh_assert(std::abs(ui) < TOLERANCE ||
                            std::abs(ui - Uside(i)) < TOLERANCE);
             ui = Uside(i);
-            dof_is_fixed[new_side_dofs[free_dof[i]]] =
-              true;
+            dof_is_fixed[new_side_dofs[free_dof[i]]] = true;
           }
       }
 

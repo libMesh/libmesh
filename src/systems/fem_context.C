@@ -203,7 +203,7 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType& u) co
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
-    <typename FENeeded<OutputType>::value_shape> > &phi = fe->get_phi();
+                    <typename FENeeded<OutputType>::value_shape> > &phi = fe->get_phi();
 
   // Accumulate solution value
   u = 0.;
@@ -233,7 +233,7 @@ void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType& du
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
-    <typename FENeeded<OutputType>::grad_base::OutputGradient> >
+                    <typename FENeeded<OutputType>::grad_base::OutputGradient> >
     &dphi = fe->get_dphi();
 
   // Accumulate solution derivatives
@@ -267,7 +267,7 @@ void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType& d2u
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
-    <typename FENeeded<OutputType>::hess_base::OutputTensor> >
+                    <typename FENeeded<OutputType>::hess_base::OutputTensor> >
     &d2phi = fe->get_d2phi();
 
   // Accumulate solution second derivatives
@@ -295,12 +295,9 @@ template<typename OutputType>
 void FEMContext::interior_value(unsigned int var, unsigned int qp,
                                 OutputType& u) const
 {
-  this->some_value
-    <OutputType,
-     &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal<OutputType>::type>,
-     &DiffContext::get_elem_solution>
-    (var, qp, u);
+  this->some_value<OutputType,
+                   &FEMContext::get_element_fe<typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_solution>(var, qp, u);
 }
 
 
@@ -356,14 +353,11 @@ template<typename OutputType>
 void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
                                    OutputType& du) const
 {
-  this->some_gradient
-    <OutputType,
-     &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <OutputType>::type>::type>,
-     &DiffContext::get_elem_solution>
-    (var, qp, du);
+  this->some_gradient<OutputType,
+                      &FEMContext::get_element_fe<typename TensorTools::MakeReal
+                                                  <typename TensorTools::DecrementRank
+                                                   <OutputType>::type>::type>,
+                      &DiffContext::get_elem_solution>(var, qp, du);
 }
 
 
@@ -422,15 +416,13 @@ template<typename OutputType>
 void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
                                   OutputType& d2u) const
 {
-  this->some_hessian
-    <OutputType,
-     &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <typename TensorTools::DecrementRank
-             <OutputType>::type>::type>::type>,
-     &DiffContext::get_elem_solution>
-    (var, qp, d2u);
+  this->some_hessian<OutputType,
+                     &FEMContext::get_element_fe
+                     <typename TensorTools::MakeReal
+                      <typename TensorTools::DecrementRank
+                       <typename TensorTools::DecrementRank
+                        <OutputType>::type>::type>::type>,
+                     &DiffContext::get_elem_solution>(var, qp, d2u);
 }
 
 
@@ -442,8 +434,8 @@ void FEMContext::interior_hessians
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-    typename TensorTools::DecrementRank<
-    OutputType>::type>::type>::type
+      typename TensorTools::DecrementRank<
+        OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -560,12 +552,9 @@ template<typename OutputType>
 void FEMContext::side_value(unsigned int var, unsigned int qp,
                             OutputType& u) const
 {
-  this->some_value
-    <OutputType,
-     &FEMContext::get_side_fe
-       <typename TensorTools::MakeReal<OutputType>::type>,
-     &DiffContext::get_elem_solution>
-    (var, qp, u);
+  this->some_value<OutputType,
+                   &FEMContext::get_side_fe<typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_solution>(var, qp, u);
 }
 
 
@@ -708,15 +697,13 @@ template<typename OutputType>
 void FEMContext::side_hessian(unsigned int var, unsigned int qp,
                               OutputType& d2u) const
 {
-  this->some_hessian
-    <OutputType,
-     &FEMContext::get_side_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <typename TensorTools::DecrementRank
-             <OutputType>::type>::type>::type>,
-     &DiffContext::get_elem_solution>
-    (var, qp, d2u);
+  this->some_hessian<OutputType,
+                     &FEMContext::get_side_fe
+                     <typename TensorTools::MakeReal
+                      <typename TensorTools::DecrementRank
+                       <typename TensorTools::DecrementRank
+                        <OutputType>::type>::type>::type>,
+                     &DiffContext::get_elem_solution>(var, qp, d2u);
 }
 
 
@@ -729,8 +716,8 @@ void FEMContext::side_hessians
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-    typename TensorTools::DecrementRank<
-    OutputType>::type>::type>::type
+      typename TensorTools::DecrementRank<
+        OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -879,8 +866,8 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-    typename TensorTools::DecrementRank<
-    OutputType>::type>::type>::type
+      typename TensorTools::DecrementRank<
+        OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -963,12 +950,10 @@ template<typename OutputType>
 void FEMContext::fixed_interior_value(unsigned int var, unsigned int qp,
                                       OutputType& u) const
 {
-  this->some_value
-    <OutputType,
-     &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal<OutputType>::type>,
-     &DiffContext::get_elem_fixed_solution>
-    (var, qp, u);
+  this->some_value<OutputType,
+                   &FEMContext::get_element_fe
+                   <typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_fixed_solution>(var, qp, u);
 }
 
 
@@ -990,9 +975,9 @@ void FEMContext::FEMContext::fixed_interior_gradient(unsigned int var, unsigned 
   this->some_gradient
     <OutputType,
      &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <OutputType>::type>::type>,
+     <typename TensorTools::MakeReal
+      <typename TensorTools::DecrementRank
+       <OutputType>::type>::type>,
      &DiffContext::get_elem_fixed_solution>
     (var, qp, du);
 }
@@ -1014,15 +999,13 @@ template<typename OutputType>
 void FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp,
                                         OutputType& d2u) const
 {
-  this->some_hessian
-    <OutputType,
-     &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <typename TensorTools::DecrementRank
-             <OutputType>::type>::type>::type>,
-     &DiffContext::get_elem_fixed_solution>
-    (var, qp, d2u);
+  this->some_hessian<OutputType,
+                     &FEMContext::get_element_fe
+                     <typename TensorTools::MakeReal
+                      <typename TensorTools::DecrementRank
+                       <typename TensorTools::DecrementRank
+                        <OutputType>::type>::type>::type>,
+                     &DiffContext::get_elem_fixed_solution>(var, qp, d2u);
 }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -1045,7 +1028,7 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
   this->some_value
     <OutputType,
      &FEMContext::get_side_fe
-       <typename TensorTools::MakeReal<OutputType>::type>,
+     <typename TensorTools::MakeReal<OutputType>::type>,
      &DiffContext::get_elem_fixed_solution>
     (var, qp, u);
 }
@@ -1066,14 +1049,12 @@ template<typename OutputType>
 void FEMContext::FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
                                                  OutputType& du) const
 {
-  this->some_gradient
-    <OutputType,
-     &FEMContext::get_side_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <OutputType>::type>::type>,
-     &DiffContext::get_elem_fixed_solution>
-    (var, qp, du);
+  this->some_gradient<OutputType,
+                      &FEMContext::get_side_fe
+                      <typename TensorTools::MakeReal
+                       <typename TensorTools::DecrementRank
+                        <OutputType>::type>::type>,
+                      &DiffContext::get_elem_fixed_solution>(var, qp, du);
 }
 
 
@@ -1092,15 +1073,13 @@ template<typename OutputType>
 void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
                                     OutputType& d2u) const
 {
-  this->some_hessian
-    <OutputType,
-     &FEMContext::get_side_fe
-       <typename TensorTools::MakeReal
-         <typename TensorTools::DecrementRank
-           <typename TensorTools::DecrementRank
-             <OutputType>::type>::type>::type>,
-     &DiffContext::get_elem_fixed_solution>
-    (var, qp, d2u);
+  this->some_hessian<OutputType,
+                     &FEMContext::get_side_fe
+                     <typename TensorTools::MakeReal
+                      <typename TensorTools::DecrementRank
+                       <typename TensorTools::DecrementRank
+                        <OutputType>::type>::type>::type>,
+                     &DiffContext::get_elem_fixed_solution>(var, qp, d2u);
 }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -1216,8 +1195,8 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-    typename TensorTools::DecrementRank<
-    OutputType>::type>::type>::type
+      typename TensorTools::DecrementRank<
+        OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -1255,12 +1234,10 @@ template<typename OutputType>
 void FEMContext::interior_rate(unsigned int var, unsigned int qp,
                                OutputType& u) const
 {
-  this->some_value
-    <OutputType,
-     &FEMContext::get_element_fe
-       <typename TensorTools::MakeReal<OutputType>::type>,
-     &DiffContext::get_elem_solution_rate>
-    (var, qp, u);
+  this->some_value<OutputType,
+                   &FEMContext::get_element_fe
+                   <typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_solution_rate>(var, qp, u);
 }
 
 
@@ -1269,12 +1246,10 @@ template<typename OutputType>
 void FEMContext::side_rate(unsigned int var, unsigned int qp,
                            OutputType& u) const
 {
-  this->some_value
-    <OutputType,
-     &FEMContext::get_side_fe
-       <typename TensorTools::MakeReal<OutputType>::type>,
-     &DiffContext::get_elem_solution_rate>
-    (var, qp, u);
+  this->some_value<OutputType,
+                   &FEMContext::get_side_fe
+                   <typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_solution_rate>(var, qp, u);
 }
 
 

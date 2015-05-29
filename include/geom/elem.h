@@ -1264,8 +1264,7 @@ protected:
   std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > &
   _get_bracketing_node_cache() const
   {
-    static std::vector<std::vector<std::vector<std::vector<
-      std::pair<unsigned char, unsigned char> > > > > c;
+    static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > c;
     libmesh_error();
     return c;
   }
@@ -2257,9 +2256,7 @@ Elem::SideIter Elem::_last_side()
  * The definition of the struct used for iterating over sides.
  */
 struct
-Elem::side_iterator :
-variant_filter_iterator<Elem::Predicate,
-                        Elem*>
+Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -2281,8 +2278,7 @@ variant_filter_iterator<Elem::Predicate,
   std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > & \
   _get_bracketing_node_cache() const                                    \
   {                                                                     \
-    static std::vector<std::vector<std::vector<std::vector<             \
-      std::pair<unsigned char, unsigned char> > > > > c;                \
+    static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > c; \
     return c;                                                           \
   }                                                                     \
                                                                         \

@@ -39,14 +39,14 @@ const float PostscriptIO::_bezier_transform[3][3] =
   };
 
 
-PostscriptIO::PostscriptIO (const MeshBase& mesh_in)
-  : MeshOutput<MeshBase> (mesh_in),
-    shade_value(0.0),
-    line_width(0.5),
-    //_M(3,3),
-    _offset(0., 0.),
-    _scale(1.0),
-    _current_point(0., 0.)
+PostscriptIO::PostscriptIO (const MeshBase& mesh_in) :
+  MeshOutput<MeshBase> (mesh_in),
+  shade_value(0.0),
+  line_width(0.5),
+  //_M(3,3),
+  _offset(0., 0.),
+  _scale(1.0),
+  _current_point(0., 0.)
 {
   // This code is still undergoing some development.
   libmesh_experimental();

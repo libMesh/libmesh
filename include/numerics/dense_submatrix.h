@@ -175,9 +175,9 @@ DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& new_parent,
                                   const unsigned int ioff,
                                   const unsigned int joff,
                                   const unsigned int new_m,
-                                  const unsigned int new_n)
-  : DenseMatrixBase<T>(new_m,new_n),
-    _parent_matrix(new_parent)
+                                  const unsigned int new_n) :
+  DenseMatrixBase<T>(new_m,new_n),
+  _parent_matrix(new_parent)
 {
   this->reposition (ioff, joff, new_m, new_n);
 }
@@ -186,9 +186,9 @@ DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& new_parent,
 // Copy Constructor
 template<typename T>
 inline
-DenseSubMatrix<T>::DenseSubMatrix(const DenseSubMatrix<T>& other_matrix)
-  : DenseMatrixBase<T>(other_matrix._m, other_matrix._n),
-    _parent_matrix(other_matrix._parent_matrix)
+DenseSubMatrix<T>::DenseSubMatrix(const DenseSubMatrix<T>& other_matrix) :
+  DenseMatrixBase<T>(other_matrix._m, other_matrix._n),
+  _parent_matrix(other_matrix._parent_matrix)
 {
   _i_off = other_matrix._i_off;
   _j_off = other_matrix._j_off;

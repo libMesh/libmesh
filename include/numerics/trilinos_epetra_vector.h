@@ -598,19 +598,19 @@ private:
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-                               const ParallelType type)
-  : NumericVector<T>(comm, type),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+                               const ParallelType type) :
+  NumericVector<T>(comm, type),
+  _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  last_edit(0),
+  ignoreNonLocalEntries_(false)
 {
   this->_type = type;
 }
@@ -621,19 +621,19 @@ template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
                                const numeric_index_type n,
-                               const ParallelType type)
-  : NumericVector<T>(comm, type),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+                               const ParallelType type) :
+  NumericVector<T>(comm, type),
+  _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  last_edit(0),
+  ignoreNonLocalEntries_(false)
 
 {
   this->init(n, n, false, type);
@@ -646,19 +646,19 @@ inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
                                const numeric_index_type n,
                                const numeric_index_type n_local,
-                               const ParallelType type)
-  : NumericVector<T>(comm, type),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+                               const ParallelType type) :
+  NumericVector<T>(comm, type),
+  _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  last_edit(0),
+  ignoreNonLocalEntries_(false)
 {
   this->init(n, n_local, false, type);
 }
@@ -669,19 +669,19 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector(Epetra_Vector & v,
-                              const Parallel::Communicator &comm)
-  : NumericVector<T>(comm, AUTOMATIC),
-    _destroy_vec_on_exit(false),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+                              const Parallel::Communicator &comm) :
+  NumericVector<T>(comm, AUTOMATIC),
+  _destroy_vec_on_exit(false),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  last_edit(0),
+  ignoreNonLocalEntries_(false)
 {
   _vec = &v;
 
@@ -712,19 +712,19 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
                                const numeric_index_type n,
                                const numeric_index_type n_local,
                                const std::vector<numeric_index_type>& ghost,
-                               const ParallelType type)
-  : NumericVector<T>(comm, AUTOMATIC),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+                               const ParallelType type) :
+  NumericVector<T>(comm, AUTOMATIC),
+  _destroy_vec_on_exit(true),
+  myFirstID_(0),
+  myNumIDs_(0),
+  myCoefs_(NULL),
+  nonlocalIDs_(NULL),
+  nonlocalElementSize_(NULL),
+  numNonlocalIDs_(0),
+  allocatedNonlocalLength_(0),
+  nonlocalCoefs_(NULL),
+  last_edit(0),
+  ignoreNonLocalEntries_(false)
 {
   this->init(n, n_local, ghost, false, type);
 }
