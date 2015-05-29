@@ -23,11 +23,8 @@
 
 // Local includes
 #include "libmesh/libmesh_config.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/gmsh_io.h"
-#include "libmesh/mesh_base.h"
 
 
 // anonymous namespace to hold local data

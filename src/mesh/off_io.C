@@ -20,7 +20,6 @@
 
 // Local includes
 #include "libmesh/off_io.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
 

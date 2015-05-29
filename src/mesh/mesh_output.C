@@ -19,9 +19,7 @@
 // Local includes
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh_output.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_mesh.h"
-#include "libmesh/unstructured_mesh.h"
 
 namespace libMesh
 {

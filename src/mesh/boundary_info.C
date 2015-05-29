@@ -26,8 +26,6 @@
 #include "libmesh/elem.h"
 #include "libmesh/mesh_data.h"
 #include "libmesh/mesh_serializer.h"
-#include "libmesh/parallel.h"
-#include "libmesh/partitioner.h"
 #include "libmesh/unstructured_mesh.h"
 
 namespace libMesh

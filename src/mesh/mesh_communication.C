@@ -21,24 +21,14 @@
 #include <numeric>
 
 // Local Includes -----------------------------------
-#include "libmesh/boundary_info.h"
-#include "libmesh/elem.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_inserter_iterator.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_elem.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/parallel_node.h"
 #include "libmesh/parallel_ghost_sync.h"
-#include "libmesh/utility.h"
-#include "libmesh/remote_elem.h"
-
-
 
 //-----------------------------------------------
 // anonymous namespace for implementation details

@@ -24,7 +24,6 @@
 #include "libmesh/boundary_mesh.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/elem.h"
-#include "libmesh/boundary_info.h"
 
 namespace libMesh
 {

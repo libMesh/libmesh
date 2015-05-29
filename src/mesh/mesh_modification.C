@@ -25,15 +25,11 @@
 #include <map>
 
 // Local includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/function_base.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_modification.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/unstructured_mesh.h"

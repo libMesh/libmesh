@@ -28,7 +28,6 @@
 #include "libmesh/mesh_smoother_vsmoother.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/elem.h"
-#include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h"
 
 namespace libMesh

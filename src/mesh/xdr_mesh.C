@@ -18,7 +18,6 @@
 // Local includes
 #include "libmesh/xdr_mesh.h"
 #include "libmesh/xdr_mhead.h"
-#include "libmesh/enum_elem_type.h" // for ElemType
 
 namespace libMesh
 {

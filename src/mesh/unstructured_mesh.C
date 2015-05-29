@@ -27,12 +27,8 @@
 #include <unistd.h>    // for getpid(), unlink()
 
 // Local includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
 #include "libmesh/mesh_tools.h" // For n_levels
-#include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
 
 // For most I/O

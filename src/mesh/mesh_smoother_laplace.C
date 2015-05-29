@@ -24,9 +24,7 @@
 // Local includes
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_tools.h"
-#include "libmesh/elem.h"
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h" // sync_dofobject_data_by_id()
 #include "libmesh/parallel_algebra.h" // StandardType<Point>
 

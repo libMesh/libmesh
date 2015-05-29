@@ -25,7 +25,6 @@
 // Local includes
 #include "libmesh/mesh_generation.h"
 #include "libmesh/unstructured_mesh.h"
-// #include "libmesh/elem.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_edge3.h"
@@ -43,13 +42,10 @@
 #include "libmesh/cell_prism18.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_pyramid5.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/boundary_info.h"
 #include "libmesh/sphere.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/node_elem.h"
-#include "libmesh/vector_value.h"
 
 namespace libMesh
 {
