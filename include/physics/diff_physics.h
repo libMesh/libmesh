@@ -303,6 +303,53 @@ public:
   virtual bool nonlocal_mass_residual (bool request_jacobian,
                                        DiffContext &c);
 
+  /**
+   * Subtracts a damping vector contribution on \p elem from
+   * elem_residual.
+   *
+   * If this method receives request_jacobian = true, then it
+   * should compute elem_jacobian and return true if possible.  If
+   * elem_jacobian has not been computed then the method should
+   * return false.
+   *
+   */
+  virtual bool damping_residual (bool request_jacobian,
+                              DiffContext &) {
+    return request_jacobian;
+  }
+
+  /**
+   * Subtracts a damping vector contribution on \p side of \p elem from
+   * elem_residual.
+   * If this method receives request_jacobian = true, then it
+   * should compute elem_jacobian and return true if possible.  If
+   * elem_jacobian has not been computed then the method should
+   * return false.
+   *
+   * For most problems, the default implementation of "do nothing"
+   * is correct; users with boundary conditions including first time
+   * derivatives may need to reimplement this themselves.
+   */
+  virtual bool side_damping_residual (bool request_jacobian,
+                                      DiffContext &) {
+    return request_jacobian;
+  }
+
+  /**
+   * Subtracts any nonlocal damping vector contributions (e.g. any
+   * first time derivative coefficients in scalar variable equations) from
+   * elem_residual
+   *
+   * If this method receives request_jacobian = true, then it
+   * should also modify elem_jacobian and return true if possible.  If
+   * the Jacobian changes have not been computed then the method
+   * should return false.
+   */
+  virtual bool nonlocal_damping_residual (bool request_jacobian,
+                                          DiffContext &) {
+    return request_jacobian;
+  }
+
   /*
    * Prepares the result of a build_context() call for use.
    *
