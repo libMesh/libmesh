@@ -541,7 +541,7 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	eigen_sparse_linear_solver.h eigen_time_solver.h \
 	euler2_solver.h euler_solver.h laspack_linear_solver.h \
 	linear.h linear_solver.h memory_solution_history.h \
-	newton_solver.h nlopt_optimization_solver.h \
+	newmark_solver.h newton_solver.h nlopt_optimization_solver.h \
 	no_solution_history.h nonlinear_solver.h optimization_solver.h \
 	petsc_auto_fieldsplit.h petsc_diff_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
@@ -1776,6 +1776,9 @@ linear_solver.h: $(top_srcdir)/include/solvers/linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 memory_solution_history.h: $(top_srcdir)/include/solvers/memory_solution_history.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+newmark_solver.h: $(top_srcdir)/include/solvers/newmark_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 newton_solver.h: $(top_srcdir)/include/solvers/newton_solver.h
