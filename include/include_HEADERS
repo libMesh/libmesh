@@ -333,6 +333,7 @@ include_HEADERS =  \
         solvers/linear.h \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
+        solvers/newmark_solver.h \
         solvers/newton_solver.h \
         solvers/nlopt_optimization_solver.h \
         solvers/no_solution_history.h \

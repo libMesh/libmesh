@@ -355,6 +355,7 @@ libmesh_SOURCES =  \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \
         src/solvers/memory_solution_history.C \
+        src/solvers/newmark_solver.C \
         src/solvers/newton_solver.C \
         src/solvers/nlopt_optimization_solver.C \
         src/solvers/no_solution_history.C \
