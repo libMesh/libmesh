@@ -29,6 +29,7 @@ DiffContext::DiffContext (const System& sys) :
   system_time(sys.time),
   elem_solution_derivative(1.),
   elem_solution_rate_derivative(1.),
+  elem_solution_accel_derivative(1.),
   fixed_solution_derivative(0.),
   _dof_indices_var(sys.n_vars()),
   _deltat(NULL),

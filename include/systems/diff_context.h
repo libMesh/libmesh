@@ -484,6 +484,13 @@ public:
   Real elem_solution_rate_derivative;
 
   /**
+   * The derivative of elem_solution_accel with respect to the current
+   * nonlinear solution, for use by systems with non default
+   * mass_residual terms.
+   */
+  Real elem_solution_accel_derivative;
+
+  /**
    * The derivative of elem_fixed_solution with respect to the nonlinear
    * solution, for use by systems constructing jacobians with
    * elem_fixed_solution based methods
