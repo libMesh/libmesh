@@ -42,6 +42,7 @@ DiffContext::DiffContext (const System& sys) :
   _elem_subresiduals.reserve(nv);
   _elem_subjacobians.resize(nv);
   _elem_subsolution_rates.reserve(nv);
+  _elem_subsolution_accels.reserve(nv);
   if (sys.use_fixed_solution)
     _elem_fixed_subsolutions.reserve(nv);
 
@@ -61,6 +62,7 @@ DiffContext::DiffContext (const System& sys) :
         _elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(_elem_qoi_derivative[q]));
       _elem_subjacobians[i].reserve(nv);
       _elem_subsolution_rates.push_back(new DenseSubVector<Number>(_elem_solution_rate));
+      _elem_subsolution_accels.push_back(new DenseSubVector<Number>(_elem_solution_accel));
 
       if (sys.use_fixed_solution)
         _elem_fixed_subsolutions.push_back
@@ -85,6 +87,7 @@ DiffContext::~DiffContext ()
       for (std::size_t q=0; q != _elem_qoi_subderivatives.size(); ++q)
         delete _elem_qoi_subderivatives[q][i];
       delete _elem_subsolution_rates[i];
+      delete _elem_subsolution_accels[i];
       if (!_elem_fixed_subsolutions.empty())
         delete _elem_fixed_subsolutions[i];
 

@@ -525,6 +525,13 @@ protected:
   std::vector<DenseSubVector<Number> *> _elem_subsolution_rates;
 
   /**
+   * Element by element components of du/dt
+   * as adjusted by a time_solver
+   */
+  DenseVector<Number> _elem_solution_accel;
+  std::vector<DenseSubVector<Number> *> _elem_subsolution_accels;
+
+  /**
    * Element by element components of nonlinear_solution
    * at a fixed point in a timestep, for optional use by e.g.
    * stabilized methods
