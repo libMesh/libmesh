@@ -432,6 +432,15 @@ public:
   { return elem_solution_rate_derivative; }
 
   /**
+   * The derivative of the current elem_solution_accel w.r.t. the
+   * unknown solution.  Corresponding Jacobian contributions should be
+   * multiplied by this amount, or may be skipped if
+   * get_elem_solution_accel_derivative() is 0.
+   */
+  Real get_elem_solution_accel_derivative() const
+  { return elem_solution_accel_derivative; }
+
+  /**
    * The derivative of the current fixed_elem_solution w.r.t. the
    * unknown solution.  Corresponding Jacobian contributions should be
    * multiplied by this amount, or may be skipped if
