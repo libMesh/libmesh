@@ -18,6 +18,7 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/newmark_solver.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/diff_solver.h"
 
 namespace libMesh
 {
@@ -160,6 +161,29 @@ namespace libMesh
     libmesh_not_implemented();
   }
 
+  void NewmarkSolver::solve()
+  {
+    // We need to compute the initial acceleration based off of
+    // the initial position and velocity and, thus, acceleration
+    // is the unknown in diff_solver and not the displacement. So,
+    // We swap solution and acceleration. NewarkSolver::_general_residual
+    // will check if this is the first solve and provide the correct
+    // values to the FEMContext assuming this swap was made.
+    if(this->first_solve)
+      {
+        //solution->accel, accel->solution
+        _system.solution->swap(_system.get_vector("_old_solution_accel"));
+
+        this->_diff_solver->solve();
+
+        // solution->solution, accel->accel
+        _system.solution->swap(_system.get_vector("_old_solution_accel"));
+      }
+
+    // Now proceed as normal
+    UnsteadySolver::solve();
+  }
+
   Number NewmarkSolver::old_solution_rate(const dof_id_type global_dof_number)
   const
   {
@@ -232,49 +256,90 @@ namespace libMesh
     if (request_jacobian)
       old_elem_jacobian.swap(context.get_elem_jacobian());
 
-    // Local displacement at old timestep
-    DenseVector<Number> old_elem_solution(n_dofs);
-    for (unsigned int i=0; i != n_dofs; ++i)
-      old_elem_solution(i) =
-        old_nonlinear_solution(context.get_dof_indices()[i]);
-
     // Local velocity at old time step
     DenseVector<Number> old_elem_solution_rate(n_dofs);
     for (unsigned int i=0; i != n_dofs; ++i)
       old_elem_solution_rate(i) =
         old_solution_rate(context.get_dof_indices()[i]);
 
-    // Local acceleration at old time step
-    DenseVector<Number> old_elem_solution_accel(n_dofs);
-    for (unsigned int i=0; i != n_dofs; ++i)
-      old_elem_solution_accel(i) =
-        old_solution_accel(context.get_dof_indices()[i]);
+    // The first time step is actually solving for the initial acceleration
+    // So upstream we've swapped _system.solution and _old_local_solution_accel
+    // So we need to give the context the correct entries since we're solving for
+    // acceleration here.
+    if( first_solve )
+      {
+        // System._solution is actually the acceleration right now so we need
+        // to reset the elem_solution to the right thing, which in this case
+        // is the initial guess for displacement, which got swapped into
+        // _old_solution_accel vector
+        DenseVector<Number> old_elem_solution(n_dofs);
+        for (unsigned int i=0; i != n_dofs; ++i)
+          old_elem_solution(i) =
+            old_solution_accel(context.get_dof_indices()[i]);
 
-    // Local velocity at current time step
-    /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
-                 - ((gamma/beta)-1)*v_n
-                 - (gamma/(2*beta)-1)*(Delta t)*a_n */
-    context.elem_solution_rate_derivative = (_gamma/(_beta*_system.deltat));
+        context.elem_solution_derivative = 0.0;
+        context.elem_solution_rate_derivative = 0.0;
+        context.elem_solution_accel_derivative = 1.0;
 
-    context.get_elem_solution_rate()  = context.get_elem_solution();
-    context.get_elem_solution_rate() -= old_elem_solution;
-    context.get_elem_solution_rate() *= context.elem_solution_rate_derivative;
-    context.get_elem_solution_rate().add( -(_gamma/_beta - 1.0), old_elem_solution_rate);
-    context.get_elem_solution_rate().add( -(_gamma/(2.0*_beta)-1.0)*_system.deltat, old_elem_solution_accel);
+        // Acceleration is currently the unknown so it's already sitting
+        // in elem_solution()
+        context.get_elem_solution_accel() = context.get_elem_solution();
+
+        // Now reset elem_solution() to what the user is expecting
+        context.get_elem_solution() = old_elem_solution;
+
+        context.get_elem_solution_rate() = old_elem_solution_rate;
+
+        // The user's Jacobians will be targeting derivatives w.r.t. u_{n+1}
+        // Although the vast majority of cases will have the correct analytic
+        // Jacobians in this first iteration, since we reset elem_solution_derivative*,
+        // if there are coupled/overlapping problems, there could be
+        // mismatches in the Jacobian. So we force finite differencing for
+        // the first iteration.
+        request_jacobian = false;
+      }
+    // Otherwise, the unknowns are the displacements and everything is straight
+    // foward and is what you think it is
+    else
+      {
+        // Local displacement at old timestep
+        DenseVector<Number> old_elem_solution(n_dofs);
+        for (unsigned int i=0; i != n_dofs; ++i)
+          old_elem_solution(i) =
+            old_nonlinear_solution(context.get_dof_indices()[i]);
+
+        // Local acceleration at old time step
+        DenseVector<Number> old_elem_solution_accel(n_dofs);
+        for (unsigned int i=0; i != n_dofs; ++i)
+          old_elem_solution_accel(i) =
+            old_solution_accel(context.get_dof_indices()[i]);
+
+        // Local velocity at current time step
+        /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
+           - ((gamma/beta)-1)*v_n
+           - (gamma/(2*beta)-1)*(Delta t)*a_n */
+        context.elem_solution_rate_derivative = (_gamma/(_beta*_system.deltat));
+
+        context.get_elem_solution_rate()  = context.get_elem_solution();
+        context.get_elem_solution_rate() -= old_elem_solution;
+        context.get_elem_solution_rate() *= context.elem_solution_rate_derivative;
+        context.get_elem_solution_rate().add( -(_gamma/_beta - 1.0), old_elem_solution_rate);
+        context.get_elem_solution_rate().add( -(_gamma/(2.0*_beta)-1.0)*_system.deltat, old_elem_solution_accel);
 
 
 
-    // Local acceleration at current time step
-    /* a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
-                - 1/(beta*Delta t)*v_n
-                - (1-1/(2*beta))*a_n */
-    context.elem_solution_accel_derivative = 1.0/(_beta*_system.deltat*_system.deltat);
+        // Local acceleration at current time step
+        /* a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
+           - 1/(beta*Delta t)*v_n
+           - (1-1/(2*beta))*a_n */
+        context.elem_solution_accel_derivative = 1.0/(_beta*_system.deltat*_system.deltat);
 
-    context.get_elem_solution_accel()  = context.get_elem_solution();
-    context.get_elem_solution_accel() -= old_elem_solution;
-    context.get_elem_solution_accel() *= context.elem_solution_accel_derivative;
-    context.get_elem_solution_accel().add(-1.0/(_beta*_system.deltat), old_elem_solution_rate);
-    context.get_elem_solution_accel().add(-(1.0-1.0/(2*_beta)), old_elem_solution_accel);
+        context.get_elem_solution_accel()  = context.get_elem_solution();
+        context.get_elem_solution_accel() -= old_elem_solution;
+        context.get_elem_solution_accel() *= context.elem_solution_accel_derivative;
+        context.get_elem_solution_accel().add(-1.0/(_beta*_system.deltat), old_elem_solution_rate);
+        context.get_elem_solution_accel().add(-(1.0-1.0/(2*_beta)), old_elem_solution_accel);
+      }
 
     // If a fixed solution is requested, we'll use x_{n+1}
     if (_system.use_fixed_solution)

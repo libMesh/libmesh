@@ -101,6 +101,8 @@ public:
    */
   virtual void retrieve_timestep ();
 
+  virtual void solve();
+
   /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
    */
