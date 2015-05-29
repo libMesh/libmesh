@@ -23,10 +23,8 @@
 // only compile these functions if the user requests AMR support
 #ifdef LIBMESH_ENABLE_AMR
 
-#include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
-#include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
 
 namespace libMesh

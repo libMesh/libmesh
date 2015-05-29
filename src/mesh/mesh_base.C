@@ -25,15 +25,9 @@
 #include <map>       // for std::multimap
 #include <sstream>   // for std::ostringstream
 
-
 // Local includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"
-#include "libmesh/partitioner.h"
-#include "libmesh/point_locator_base.h"
-#include "libmesh/threads.h"
 
 namespace libMesh
 {

@@ -22,8 +22,6 @@
 
 // Local includes
 #include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/gnuplot_io.h"
 
 namespace libMesh

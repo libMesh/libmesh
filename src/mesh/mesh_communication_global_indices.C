@@ -22,7 +22,6 @@
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"

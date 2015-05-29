@@ -21,7 +21,6 @@
 
 // Local includes
 #include "libmesh/matlab_io.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/face_tri3.h"
 
 namespace libMesh

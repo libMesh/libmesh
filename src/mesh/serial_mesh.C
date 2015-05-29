@@ -18,9 +18,7 @@
 
 
 // Local includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/serial_mesh.h"
 #include "libmesh/utility.h"

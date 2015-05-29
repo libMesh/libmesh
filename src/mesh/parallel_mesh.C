@@ -18,12 +18,9 @@
 
 
 // Local includes
-#include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_mesh.h"
-#include "libmesh/parallel.h"
 #include "libmesh/parmetis_partitioner.h"
 
 namespace libMesh

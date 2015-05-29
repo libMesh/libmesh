@@ -25,12 +25,8 @@
 #include <unistd.h>
 
 // Local includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
-
 #include "libmesh/namebased_io.h"
-
 #include "libmesh/diva_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"

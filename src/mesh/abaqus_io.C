@@ -23,11 +23,8 @@
 
 // Local includes
 #include "libmesh/abaqus_io.h"
-#include "libmesh/point.h"
 #include "libmesh/elem.h"
 #include "libmesh/string_to_enum.h"
-#include "libmesh/boundary_info.h"
-#include "libmesh/utility.h"
 
 // Anonymous namespace to hold mapping Data for Abaqus/libMesh element types
 namespace

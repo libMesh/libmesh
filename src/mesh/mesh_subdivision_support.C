@@ -22,7 +22,6 @@
 // Local includes
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_subdivision_support.h"
-#include "libmesh/boundary_info.h"
 
 namespace libMesh
 {
