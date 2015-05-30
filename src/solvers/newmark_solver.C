@@ -116,27 +116,32 @@ namespace libMesh
     NumericVector<Number> &old_solution_accel =
       _system.get_vector("_old_solution_accel");
 
-    // We need to cache the new solution_rate before updating the old_solution_rate
-    // so we can update acceleration with the proper old_solution_rate
-    /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
-                 - ((gamma/beta)-1)*v_n
-                 - (gamma/(2*beta)-1)*(Delta t)*a_n */
-    UniquePtr<NumericVector<Number> > new_solution_rate = nonlinear_solution.clone();
-    (*new_solution_rate) -= old_nonlinear_soln;
-    (*new_solution_rate) *= (_gamma/(_beta*_system.deltat));
-    new_solution_rate->add( -(_gamma/_beta - 1.0), old_solution_rate );
-    new_solution_rate->add( -(_gamma/(2.0*_beta)-1.0)*_system.deltat, old_solution_accel );
+    if( !first_solve )
+      {
+        // We need to cache the new solution_rate before updating the old_solution_rate
+        // so we can update acceleration with the proper old_solution_rate
+        /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
+           - ((gamma/beta)-1)*v_n
+           - (gamma/(2*beta)-1)*(Delta t)*a_n */
+        UniquePtr<NumericVector<Number> > new_solution_rate = nonlinear_solution.clone();
+        (*new_solution_rate) -= old_nonlinear_soln;
+        (*new_solution_rate) *= (_gamma/(_beta*_system.deltat));
+        new_solution_rate->add( -(_gamma/_beta - 1.0), old_solution_rate );
+        new_solution_rate->add( -(_gamma/(2.0*_beta)-1.0)*_system.deltat, old_solution_accel );
 
-    /* a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
-                - 1/(beta*Delta t)*v_n
-                - (1-1/(2*beta))*a_n */
-    old_solution_accel.add( -(1.0-1.0/(2.0*_beta)), old_solution_accel);
-    old_solution_accel.add( -1.0/(_beta*_system.deltat), old_solution_rate );
-    old_solution_accel.add( 1.0/(_beta*_system.deltat*_system.deltat), nonlinear_solution );
-    old_solution_accel.add( -1.0/(_beta*_system.deltat*_system.deltat), old_nonlinear_soln );
+        /* a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
+           - 1/(beta*Delta t)*v_n
+           - (1-1/(2*beta))*a_n */
+        UniquePtr<NumericVector<Number> > new_solution_accel = old_solution_accel.clone();
+        (*new_solution_accel) *=  -(1.0-1.0/(2.0*_beta));
+        new_solution_accel->add( -1.0/(_beta*_system.deltat), old_solution_rate );
+        new_solution_accel->add( 1.0/(_beta*_system.deltat*_system.deltat), nonlinear_solution );
+        new_solution_accel->add( -1.0/(_beta*_system.deltat*_system.deltat), old_nonlinear_soln );
 
-    // Now update old_solution_rate
-    old_solution_rate = (*new_solution_rate);
+        // Now update old_solution_rate
+        old_solution_rate = (*new_solution_rate);
+        old_solution_accel = (*new_solution_accel);
+      }
 
     // Localize updated vectors
     old_solution_rate.localize
