@@ -454,6 +454,31 @@ public:
                   OutputType& u) const;
 
   /**
+   * Returns the second time derivative (acceleration) of the solution variable
+   * \p var at the quadrature point \p qp on the current element
+   * interior.
+   */
+  template<typename OutputType>
+  void interior_accel(unsigned int var, unsigned int qp,
+                      OutputType& u) const;
+
+  /**
+   * Returns the second time derivative (acceleration) of the solution variable
+   * \p var at the quadrature point \p qp on the current element side.
+   */
+  template<typename OutputType>
+  void side_accel(unsigned int var, unsigned int qp,
+                  OutputType& u) const;
+
+  /**
+   * Returns the second time derivative (acceleration) of the solution variable
+   * \p var at the physical point \p p on the current element.
+   */
+  template<typename OutputType>
+  void point_accel(unsigned int var, const Point &p,
+                   OutputType& u) const;
+
+  /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
