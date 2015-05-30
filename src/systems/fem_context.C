@@ -1554,6 +1554,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   if (sys.use_fixed_solution)
     this->get_elem_fixed_solution().resize(n_dofs);
   this->get_elem_solution_rate().resize(n_dofs);
+  this->get_elem_solution_accel().resize(n_dofs);
 
   // These resize calls also zero out the residual and jacobian
   this->get_elem_residual().resize(n_dofs);
@@ -1583,6 +1584,9 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
           (sub_dofs, n_dofs_var);
 
         this->get_elem_solution_rate(i).reposition
+          (sub_dofs, n_dofs_var);
+
+        this->get_elem_solution_accel(i).reposition
           (sub_dofs, n_dofs_var);
 
         if (sys.use_fixed_solution)
