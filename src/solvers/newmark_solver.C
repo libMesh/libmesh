@@ -173,11 +173,13 @@ namespace libMesh
       {
         //solution->accel, accel->solution
         _system.solution->swap(_system.get_vector("_old_solution_accel"));
+        _system.update();
 
         this->_diff_solver->solve();
 
         // solution->solution, accel->accel
         _system.solution->swap(_system.get_vector("_old_solution_accel"));
+        _system.update();
       }
 
     // Now proceed as normal
