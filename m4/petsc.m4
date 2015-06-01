@@ -101,7 +101,6 @@ AC_DEFUN([CONFIGURE_PETSC],
 
         AC_SUBST(PETSC_ARCH) # Note: may be empty...
         AC_SUBST(PETSC_DIR)
-        AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
 
         # Check for snoopable MPI
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
@@ -196,6 +195,42 @@ EOF
           AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])
           AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
         fi
+
+        # Try to compile a trivial PETSc program to check our
+        # configuration... this should handle cases where we slipped
+        # by the tests above with an invalid PETSCINCLUDEDIRS
+        # variable, which happened when PETSc 3.6 came out.
+        AC_MSG_CHECKING(whether we can compile a trivial PETSc program)
+        AC_LANG_PUSH([C])
+
+        # Save the original CFLAGS contents
+        saveCFLAGS="$CFLAGS"
+
+        # Append PETSc include paths to the CFLAGS variables
+        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+
+        AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+        @%:@include <petsc.h>
+        static char help[]="";
+
+        int main(int argc, char **argv)
+        {
+          PetscInitialize(&argc, &argv, (char*)0,help);
+          PetscFinalize();
+          return 0;
+        }
+        ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
+        ],[
+          AC_MSG_RESULT(no)
+        ])
+
+        # Return C flags to their original state.
+        CFLAGS="$saveCFLAGS"
+
+        AC_LANG_POP([C])
+
 
         # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
         AC_MSG_CHECKING(for TAO support via PETSc)
