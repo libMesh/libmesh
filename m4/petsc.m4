@@ -6,12 +6,12 @@ AC_DEFUN([CONFIGURE_PETSC],
   AC_ARG_ENABLE(petsc,
                 AS_HELP_STRING([--disable-petsc],
                                [build without PETSc iterative solver suppport]),
-		[case "${enableval}" in
-		  yes)  enablepetsc=yes ;;
-		   no)  enablepetsc=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-petsc) ;;
-		 esac],
-		 [enablepetsc=$enableoptional])
+                [case "${enableval}" in
+                  yes)  enablepetsc=yes ;;
+                   no)  enablepetsc=no ;;
+                    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-petsc) ;;
+                 esac],
+                [enablepetsc=$enableoptional])
 
   # Trump --enable-petsc with --disable-mpi
   if (test "x$enablempi" = xno); then
@@ -37,9 +37,9 @@ AC_DEFUN([CONFIGURE_PETSC],
       if (test "x$PETSCARCH" != x); then
         export PETSC_DIR=/usr/lib/petsc
         export PETSC_ARCH=`$PETSCARCH`
-	if (test -d $PETSC_DIR); then
-  	  AC_MSG_RESULT([using system-provided PETSC_DIR $PETSC_DIR])
-	  AC_MSG_RESULT([using system-provided PETSC_ARCH $PETSC_ARCH])
+        if (test -d $PETSC_DIR); then
+          AC_MSG_RESULT([using system-provided PETSC_DIR $PETSC_DIR])
+          AC_MSG_RESULT([using system-provided PETSC_ARCH $PETSC_ARCH])
         fi
       fi
     fi
@@ -101,20 +101,18 @@ AC_DEFUN([CONFIGURE_PETSC],
 
         AC_SUBST(PETSC_ARCH) # Note: may be empty...
         AC_SUBST(PETSC_DIR)
-        AC_DEFINE(HAVE_PETSC, 1,
-    	      [Flag indicating whether or not PETSc is available])
+        AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
 
         # Check for snoopable MPI
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
-        	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni`
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni`
         elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
-        	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
         elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
-        	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
         fi
         if test "x$PETSC_MPI" != x ; then
-          AC_DEFINE(HAVE_MPI, 1,
-    	        [Flag indicating whether or not MPI is available])
+          AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
           MPI_IMPL="petsc_snooped"
           AC_MSG_RESULT(<<< Configuring library with MPI from PETSC config >>>)
         else
@@ -128,13 +126,13 @@ AC_DEFUN([CONFIGURE_PETSC],
 
         # If we have a full petsc distro with a makefile query it for
         # what we can
-	if (test -r $PETSC_DIR/makefile); then
+        if (test -r $PETSC_DIR/makefile); then
           PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
           PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 
-	# create a simple makefile to provide other targets we want,
-	# then query it.
- 	  cat <<EOF >Makefile_config_petsc
+          # create a simple makefile to provide other targets we want,
+          # then query it.
+          cat <<EOF >Makefile_config_petsc
 include $PETSC_DIR/conf/variables
 
 getPETSC_CC_INCLUDES:
@@ -143,12 +141,13 @@ getPETSC_CC_INCLUDES:
 getPETSC_FC_INCLUDES:
 	echo \$(PETSC_FC_INCLUDES)
 EOF
+
           PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
           PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
-	  rm -f Makefile_config_petsc
+          rm -f Makefile_config_petsc
 
-  	elif (test -r $PETSC_DIR/conf/variables); then
- 	  cat <<EOF >Makefile_config_petsc
+        elif (test -r $PETSC_DIR/conf/variables); then
+          cat <<EOF >Makefile_config_petsc
 include $PETSC_DIR/conf/variables
 getincludedirs:
 	echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)
@@ -166,8 +165,8 @@ EOF
           PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
           PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
           PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
-	  rm -f Makefile_config_petsc
-	fi
+          rm -f Makefile_config_petsc
+        fi
         #echo ""
         #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
         #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
@@ -186,16 +185,16 @@ EOF
 
         # Check for Hypre
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
-        	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
+          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
         elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
-        	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
         elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
-           HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
+          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
         fi
 
         if test "x$HYPRE_LIB" != x ; then
           AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])
-  	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
+          AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
         fi
 
         # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
@@ -235,12 +234,11 @@ EOF
 
     else
         # PETSc config failed.  Try MPI, unless directed otherwise
-	if (test "$enablempi" != no); then
-          AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
-          ACX_MPI
-	fi
+    if (test "$enablempi" != no); then
+      AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
+      ACX_MPI
     fi
-
+  fi
 
   else # --disable-petsc
     if (test "$enablempi" != no) ; then
