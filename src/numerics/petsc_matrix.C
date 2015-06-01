@@ -30,10 +30,14 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
-#if !PETSC_VERSION_LESS_THAN(3,5,0)
-#include "libmesh/ignore_warnings.h"
-#include "petsc-private/matimpl.h"
-#include "libmesh/restore_warnings.h"
+#if !PETSC_RELEASE_LESS_THAN(3,6,0)
+# include "libmesh/ignore_warnings.h"
+# include "petsc/private/matimpl.h"
+# include "libmesh/restore_warnings.h"
+#elif !PETSC_VERSION_LESS_THAN(3,5,0)
+# include "libmesh/ignore_warnings.h"
+# include "petsc-private/matimpl.h"
+# include "libmesh/restore_warnings.h"
 #endif
 
 // For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earier.
