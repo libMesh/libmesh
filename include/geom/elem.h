@@ -350,7 +350,7 @@ public:
   /**
    * This function finds all active elements in the same manifold as
    * this element which touch the current active element along the
-   * specified edge defined by the two points \p p1 and \p p2
+   * whole edge defined by the two points \p p1 and \p p2
    */
   void find_edge_neighbors(const Point& p1,
                            const Point& p2,
@@ -360,6 +360,9 @@ public:
    * This function finds all active elements in the same manifold as
    * this element which touch the current active element along any
    * edge (more precisely, at at least two points).
+   *
+   * In this case, elements are included even if they do not touch a
+   * *whole* edge of this element.
    */
   void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
 
