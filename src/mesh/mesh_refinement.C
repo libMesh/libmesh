@@ -66,6 +66,8 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
   _face_level_mismatch_limit(1),
   _edge_level_mismatch_limit(0),
   _node_level_mismatch_limit(0),
+  _overrefined_boundary_limit(0),
+  _underrefined_boundary_limit(0),
   _enforce_mismatch_limit_prior_to_refinement(false)
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(NULL)
@@ -1620,6 +1622,14 @@ void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
           if (_node_level_mismatch_limit)
             smoothing_satisfied = smoothing_satisfied &&
               !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+
+          if (_overrefined_boundary_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_overrefined_boundary(_overrefined_boundary_limit);
+
+          if (_underrefined_boundary_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_underrefined_boundary(_underrefined_boundary_limit);
 
           satisfied = (coarsening_satisfied &&
                        refinement_satisfied &&
