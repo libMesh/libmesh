@@ -342,10 +342,18 @@ public:
 
   /**
    * This function finds all active elements (including this one) in
-   * the same manifold as this element which touch this element at any
-   * point
+   * the same manifold as this element which touch this active element
+   * at any point
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
+
+  /**
+   * This function finds all active elements (including this one) in
+   * the same manifold as start_elem (which must be active and must
+   * touch this element) which touch this element at any point
+   */
+  void find_point_neighbors(std::set<const Elem *> &neighbor_set,
+                            const Elem * start_elem) const;
 
   /**
    * This function finds all active elements in the same manifold as
@@ -368,8 +376,8 @@ public:
 
   /**
    * This function finds all active elements (*not* including this
-   * one) in the parent manifold of this element which contain all
-   * vertices of this boundary element.
+   * one) in the parent manifold of this element whose intersection
+   * with this element has non-zero measure.
    */
   void find_interior_neighbors(std::set<const Elem *> &neighbor_set) const;
 

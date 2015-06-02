@@ -695,13 +695,24 @@ void Elem::find_point_neighbors(const Point &p,
 
 void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 {
-  libmesh_assert(this->active());
+  this->find_point_neighbors(neighbor_set, this);
+}
+
+
+
+void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set,
+                                const Elem * start_elem) const
+{
+  libmesh_assert(start_elem);
+  libmesh_assert(start_elem->active());
+  libmesh_assert(start_elem->contains_vertex_of(this) ||
+                 this->contains_vertex_of(start_elem));
 
   neighbor_set.clear();
-  neighbor_set.insert(this);
+  neighbor_set.insert(start_elem);
 
   std::set<const Elem *> untested_set, next_untested_set;
-  untested_set.insert(this);
+  untested_set.insert(start_elem);
 
   while (!untested_set.empty())
     {
@@ -882,25 +893,68 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
     return;
 
   const Elem *ip = this->interior_parent();
+  libmesh_assert (ip->contains_vertex_of(this) ||
+                  this->contains_vertex_of(ip));
 
-  ip->find_point_neighbors(this->point(0), neighbor_set);
+  libmesh_assert (!ip->subactive());
 
+  while (!ip->active())
+    {
+      for (unsigned int c = 0; c != ip->n_children(); ++c)
+        {
+          const Elem *child = ip->child(c);
+          if (child->contains_vertex_of(this) ||
+              this->contains_vertex_of(child))
+            {
+              ip = child;
+              break;
+            }
+        }
+    }
+
+  this->find_point_neighbors(neighbor_set, ip);
+
+  // Now we have all point neighbors from the interior manifold, but
+  // we need to weed out any neighbors that *only* intersect us at one
+  // point (or at one edge, if we're a 1-D element in 3D).
+  //
+  // The refinement hierarchy helps us here: if the interior element
+  // has a lower or equal refinement level then we can discard it iff
+  // it doesn't contain all our vertices.  If it has a higher
+  // refinement level then we can discard it iff we don't contain at
+  // least dim()+1 of its vertices
   std::set<const Elem*>::iterator        it = neighbor_set.begin();
   const std::set<const Elem*>::iterator end = neighbor_set.end();
 
   while(it != end)
     {
       std::set<const Elem*>::iterator current = it++;
-
       const Elem* elem = *current;
+
       // This won't invalidate iterator it, because it is already
       // pointing to the next element
-      for (unsigned int p=1; p < this->n_nodes(); ++p)
-        if (!elem->contains_point(this->point(p)))
-          {
-            neighbor_set.erase(current);
-            continue;
-          }
+      if (elem->level() > this->level())
+        {
+          unsigned int vertices_contained = 0;
+          for (unsigned int p=1; p < elem->n_nodes(); ++p)
+            if (this->contains_point(elem->point(p)))
+              vertices_contained++;
+
+          if (vertices_contained <= this->dim())
+            {
+              neighbor_set.erase(current);
+              continue;
+            }
+        }
+      else
+        {
+          for (unsigned int p=1; p < this->n_nodes(); ++p)
+            if (!elem->contains_point(this->point(p)))
+              {
+                neighbor_set.erase(current);
+                continue;
+              }
+        }
     }
 }
 
