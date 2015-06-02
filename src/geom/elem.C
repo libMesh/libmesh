@@ -872,6 +872,40 @@ void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
     }
 }
 
+
+void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
+{
+  neighbor_set.clear();
+
+  if ((this->dim() >= LIBMESH_DIM) ||
+      !this->interior_parent())
+    return;
+
+  const Elem *ip = this->interior_parent();
+
+  ip->find_point_neighbors(this->point(0), neighbor_set);
+
+  std::set<const Elem*>::iterator        it = neighbor_set.begin();
+  const std::set<const Elem*>::iterator end = neighbor_set.end();
+
+  while(it != end)
+    {
+      std::set<const Elem*>::iterator current = it++;
+
+      const Elem* elem = *current;
+      // This won't invalidate iterator it, because it is already
+      // pointing to the next element
+      for (unsigned int p=1; p < this->n_nodes(); ++p)
+        if (!elem->contains_point(this->point(p)))
+          {
+            neighbor_set.erase(current);
+            continue;
+          }
+    }
+}
+
+
+
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 Elem* Elem::topological_neighbor (const unsigned int i,

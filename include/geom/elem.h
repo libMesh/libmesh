@@ -367,6 +367,13 @@ public:
   void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
+   * This function finds all active elements (*not* including this
+   * one) in the parent manifold of this element which contain all
+   * vertices of this boundary element.
+   */
+  void find_interior_neighbors(std::set<const Elem *> &neighbor_set) const;
+
+  /**
    * Resets this element's neighbors' appropriate neighbor pointers
    * and its parent's and children's appropriate pointers
    * to point to the global remote_elem instead of this.
