@@ -238,7 +238,7 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
-  // Yes, this is necesarry. Somewhere in those macros is a protected/private
+  // Yes, this is necessary. Somewhere in those macros is a protected/private
 public:
 
   void setUp()
