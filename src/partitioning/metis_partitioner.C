@@ -259,6 +259,15 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
                         // Get all the active children (& grandchildren, etc...)
                         // of the neighbor.
+
+                        // FIXME - this is the wrong thing, since we
+                        // should be getting the active family tree on
+                        // our side only.  But adding too many graph
+                        // links may cause hanging nodes to tend to be
+                        // on partition interiors, which would reduce
+                        // communication overhead for constraint
+                        // equations, so we'll leave it.
+
                         neighbor->active_family_tree (neighbors_offspring);
 
                         // Get all the neighbor's children that
