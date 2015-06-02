@@ -201,11 +201,11 @@ void pack (const Elem* elem,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-  // use parent_ID of -1 to indicate a level 0 element
+  // use parent_ID of invalid_id to indicate a level 0 element
   if (elem->level() == 0)
     {
-      data.push_back(-1);
-      data.push_back(-1);
+      data.push_back(DofObject::invalid_id);
+      data.push_back(DofObject::invalid_id);
     }
   else
     {
@@ -213,15 +213,15 @@ void pack (const Elem* elem,
       data.push_back(elem->parent()->which_child_am_i(elem));
     }
 #else
-  data.push_back (-1);
-  data.push_back (-1);
+  data.push_back (DofObject::invalid_id);
+  data.push_back (DofObject::invalid_id);
 #endif
 
   if ((elem->dim() < LIBMESH_DIM) &&
       elem->interior_parent())
     data.push_back(elem->interior_parent()->id());
   else
-    data.push_back(-1);
+    data.push_back(DofObject::invalid_id);
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     data.push_back (elem->node(n));
@@ -232,7 +232,7 @@ void pack (const Elem* elem,
       if (neigh)
         data.push_back (neigh->id());
       else
-        data.push_back (-1);
+        data.push_back (DofObject::invalid_id);
     }
 
 #ifndef NDEBUG
@@ -361,7 +361,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 
 #ifdef LIBMESH_ENABLE_AMR
   // int 9: parent dof object id.
-  // Note: If level==0, then (*in) == (unsigned long long)(-1).  In
+  // Note: If level==0, then (*in) == invalid_id.  In
   // this case, the equality check in cast_int<unsigned>(*in) will
   // never succeed.  Therefore, we should only attempt the more
   // rigorous cast verification in cases where level != 0.
@@ -476,11 +476,8 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       // to update them, but we can check for some inconsistencies.
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
         {
-          // We can't cast_int here, since NULL neighbors have an ID
-          // of (unsigned long long)(-1) which doesn't fit in an
-          // unsigned.
           const dof_id_type neighbor_id =
-            static_cast<dof_id_type>(*in++);
+            cast_int<dof_id_type>(*in++);
 
           // If the sending processor sees a domain boundary here,
           // we'd better agree.
@@ -550,7 +547,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
         }
       // Or assert that the sending processor sees no parent
       else
-        libmesh_assert_equal_to (parent_id, static_cast<dof_id_type>(-1));
+        libmesh_assert_equal_to (parent_id, DofObject::invalid_id);
 #else
       // No non-level-0 elements without AMR
       libmesh_assert_equal_to (level, 0);
@@ -612,7 +609,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
             elem->set_interior_parent
               (const_cast<RemoteElem*>(remote_elem));
           }
-        else
+        else if (interior_parent_id != DofObject::invalid_id)
           {
             // If we don't have the interior parent element, then it's
             // a remote_elem until we get it.
@@ -627,11 +624,8 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
-          // We can't cast_int here, since NULL neighbors have an ID
-          // of (unsigned long long)(-1) which doesn't fit in an
-          // unsigned.
           const dof_id_type neighbor_id =
-            static_cast<dof_id_type>(*in++);
+            cast_int<dof_id_type>(*in++);
 
           if (neighbor_id == DofObject::invalid_id)
             continue;
