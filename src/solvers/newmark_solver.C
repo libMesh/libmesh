@@ -168,7 +168,7 @@ namespace libMesh
     libmesh_not_implemented();
   }
 
-  void NewmarkSolver::compute_initial_acceleration()
+  void NewmarkSolver::compute_initial_accel()
   {
     // We need to compute the initial acceleration based off of
     // the initial position and velocity and, thus, acceleration

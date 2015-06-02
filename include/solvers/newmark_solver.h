@@ -107,8 +107,9 @@ public:
    * default $\f\gamma\f$ and \f$\beta\f$ values, if the initial
    * displacement and velocity are both zero, this method should
    * not be called as the Newmark iteration will be stagnant.
+   * Should be called before solve().
    */
-  virtual void compute_initial_acceleration();
+  virtual void compute_initial_accel();
 
   /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
