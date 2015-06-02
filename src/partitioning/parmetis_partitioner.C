@@ -46,6 +46,12 @@ extern "C" {
 #endif
 
 
+// Hash maps for interior->boundary element lookups
+#include LIBMESH_INCLUDE_UNORDERED_MAP
+#include LIBMESH_INCLUDE_HASH
+LIBMESH_DEFINE_HASH_POINTERS
+
+
 namespace libMesh
 {
 
@@ -410,6 +416,52 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
   // face neighbors
   const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
 
+  // If we have boundary elements in this mesh, we want to account for
+  // the connectivity between them and interior elements.  We can find
+  // interior elements from boundary elements, but we need to build up
+  // a lookup map to do the reverse.
+
+  typedef LIBMESH_BEST_UNORDERED_MAP<const Elem *, const Elem *>
+    map_type;
+  map_type interior_to_boundary_map;
+
+  {
+    MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+        const Elem* elem = *elem_it;
+
+        // If we don't have an interior_parent then there's nothing to look us
+        // up.
+        if ((elem->dim() >= LIBMESH_DIM) ||
+            !elem->interior_parent())
+          continue;
+
+        // get all relevant interior elements
+        std::set<const Elem*> neighbor_set;
+        elem->find_interior_neighbors(neighbor_set);
+
+        std::set<const Elem*>::iterator n_it = neighbor_set.begin();
+        for (; n_it != neighbor_set.end(); ++n_it)
+          {
+            // FIXME - non-const versions of the Elem set methods
+            // would be nice
+            Elem* neighbor = const_cast<Elem*>(*n_it);
+
+#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
+            interior_to_boundary_map.insert
+              (std::make_pair(neighbor, elem));
+#else
+            interior_to_boundary_map.insert
+              (interior_to_boundary_map.begin(),
+               std::make_pair(neighbor, elem));
+#endif
+          }
+      }
+  }
+
 #ifdef LIBMESH_ENABLE_AMR
   std::vector<const Elem*> neighbors_offspring;
 #endif
@@ -479,7 +531,7 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
                   // on partition interiors, which would reduce
                   // communication overhead for constraint
                   // equations, so we'll leave it.
-.
+
                   neighbor->active_family_tree (neighbors_offspring);
 
                   // Get all the neighbor's children that
@@ -510,6 +562,44 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 
 
             }
+        }
+
+      if ((elem->dim() < LIBMESH_DIM) &&
+          elem->interior_parent())
+        {
+          // get all relevant interior elements
+          std::set<const Elem*> neighbor_set;
+          elem->find_interior_neighbors(neighbor_set);
+
+          std::set<const Elem*>::iterator n_it = neighbor_set.begin();
+          for (; n_it != neighbor_set.end(); ++n_it)
+            {
+              // FIXME - non-const versions of the Elem set methods
+              // would be nice
+              Elem* neighbor = const_cast<Elem*>(*n_it);
+
+              const dof_id_type neighbor_global_index_by_pid =
+                _global_index_by_pid_map[neighbor->id()];
+
+              graph_row.push_back(neighbor_global_index_by_pid);
+              graph_size++;
+            }
+        }
+
+      // Check for any boundary neighbors
+      typedef map_type::iterator map_it_type;
+      std::pair<map_it_type, map_it_type>
+        bounds = interior_to_boundary_map.equal_range(elem);
+
+      for (map_it_type it = bounds.first; it != bounds.second; ++it)
+        {
+          const Elem* neighbor = it->second;
+
+          const dof_id_type neighbor_global_index_by_pid =
+            _global_index_by_pid_map[neighbor->id()];
+
+          graph_row.push_back(neighbor_global_index_by_pid);
+          graph_size++;
         }
     }
 
