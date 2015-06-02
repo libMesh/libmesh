@@ -180,6 +180,9 @@ inline
 Hex::Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
   Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata)
 {
+  // Make sure the interior parent isn't undefined
+  if (LIBMESH_DIM > 3)
+    this->set_interior_parent(NULL);
 }
 
 } // namespace libMesh

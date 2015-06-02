@@ -200,6 +200,9 @@ Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
   Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata)
   , _diagonal_selection(INVALID_DIAG)
 {
+  // Make sure the interior parent isn't undefined
+  if (LIBMESH_DIM > 3)
+    this->set_interior_parent(NULL);
 }
 
 } // namespace libMesh

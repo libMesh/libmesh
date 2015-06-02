@@ -48,8 +48,7 @@ public:
         Elem* p,
         Elem** elemlinkdata,
         Node** nodelinkdata) :
-    Elem (nn, ns, p, elemlinkdata, nodelinkdata)
-  {}
+    Elem (nn, ns, p, elemlinkdata, nodelinkdata) {}
 
   /**
    * @returns 3, the dimensionality of the object.
