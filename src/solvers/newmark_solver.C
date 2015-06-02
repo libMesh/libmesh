@@ -104,11 +104,6 @@ namespace libMesh
     // We need to update velocity and acceleration before
     // we update the nonlinear solution (displacement) and
     // delta_t
-    NumericVector<Number> &old_nonlinear_soln =
-    _system.get_vector("_old_nonlinear_solution");
-
-    NumericVector<Number> &nonlinear_solution =
-    *(_system.solution);
 
     NumericVector<Number> &old_solution_rate =
       _system.get_vector("_old_solution_rate");
@@ -118,6 +113,12 @@ namespace libMesh
 
     if( !first_solve )
       {
+        NumericVector<Number> &old_nonlinear_soln =
+          _system.get_vector("_old_nonlinear_solution");
+
+        NumericVector<Number> &nonlinear_solution =
+          *(_system.solution);
+
         // We need to cache the new solution_rate before updating the old_solution_rate
         // so we can update acceleration with the proper old_solution_rate
         /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
