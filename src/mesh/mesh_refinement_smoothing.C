@@ -135,8 +135,6 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
 
 
-//-----------------------------------------------------------------
-// Mesh refinement methods
 bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismatch)
 {
   // This function must be run on all processors at once
@@ -276,6 +274,134 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
   return flags_changed;
 }
 
+
+
+bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  bool flags_changed = false;
+
+  // Loop over all the active elements & look for mismatches to fix.
+  {
+    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+        Elem* elem = *elem_it;
+
+        // If we don't have an interior_parent then there's nothing to
+        // be mismatched with.
+        if ((elem->dim() >= LIBMESH_DIM) ||
+            !elem->interior_parent())
+          continue;
+
+        const unsigned char elem_level =
+          cast_int<unsigned char>(elem->level() +
+                                  ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
+        const unsigned char elem_p_level =
+          cast_int<unsigned char>(elem->p_level() +
+                                  ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+
+        // get all relevant interior elements
+        std::set<const Elem*> neighbor_set;
+        elem->find_interior_neighbors(neighbor_set);
+
+        std::set<const Elem*>::iterator n_it = neighbor_set.begin();
+        for (; n_it != neighbor_set.end(); ++n_it)
+          {
+            // FIXME - non-const versions of the Elem set methods
+            // would be nice
+            Elem* neighbor = const_cast<Elem*>(*n_it);
+
+            if (((elem_level - max_mismatch) >
+                 neighbor->level()) &&
+                (neighbor->refinement_flag() != Elem::REFINE))
+              {
+                neighbor->set_refinement_flag(Elem::REFINE);
+                flags_changed = true;
+              }
+            if (((elem_p_level + 1 - max_mismatch) >
+                 neighbor->p_level()) &&
+                (neighbor->p_refinement_flag() != Elem::REFINE))
+              {
+                neighbor->set_p_refinement_flag(Elem::REFINE);
+                flags_changed = true;
+              }
+          } // loop over interior neighbors
+      }
+  }
+
+  return flags_changed;
+}
+
+
+
+bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch)
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  bool flags_changed = false;
+
+  // Loop over all the active elements & look for mismatches to fix.
+  {
+    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+        Elem* elem = *elem_it;
+
+        // If we don't have an interior_parent then there's nothing to
+        // be mismatched with.
+        if ((elem->dim() >= LIBMESH_DIM) ||
+            !elem->interior_parent())
+          continue;
+
+        // get all relevant interior elements
+        std::set<const Elem*> neighbor_set;
+        elem->find_interior_neighbors(neighbor_set);
+
+        std::set<const Elem*>::iterator n_it = neighbor_set.begin();
+        for (; n_it != neighbor_set.end(); ++n_it)
+          {
+            // FIXME - non-const versions of the Elem set methods
+            // would be nice
+            const Elem* neighbor = *n_it;
+
+            const unsigned char neighbor_level =
+              cast_int<unsigned char>
+                (neighbor->level() + 
+                 ((neighbor->refinement_flag() == Elem::REFINE) ? 1 : 0));
+            const unsigned char neighbor_p_level =
+              cast_int<unsigned char>
+                (neighbor->p_level() +
+                 ((neighbor->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+
+
+            if (((neighbor_level + 1 - max_mismatch) >
+                 elem->level()) &&
+                (elem->refinement_flag() != Elem::REFINE))
+              {
+                elem->set_refinement_flag(Elem::REFINE);
+                flags_changed = true;
+              }
+            if (((neighbor_p_level + 1 - max_mismatch) >
+                 elem->p_level()) &&
+                (elem->p_refinement_flag() != Elem::REFINE))
+              {
+                elem->set_p_refinement_flag(Elem::REFINE);
+                flags_changed = true;
+              }
+          } // loop over interior neighbors
+      }
+  }
+
+  return flags_changed;
+}
 
 
 
@@ -455,8 +581,8 @@ bool MeshRefinement::enforce_mismatch_limit_prior_to_refinement(Elem* elem,
   if (_enforce_mismatch_limit_prior_to_refinement
       && elem->refinement_flag() == Elem::REFINE)
     {
-      // get all the POINT neighbors since we may have to refine
-      // elements off the corner as well
+      // get all the relevant neighbors since we may have to refine
+      // elements off edges or corners as well
       std::set<const Elem*> neighbor_set;
 
       if (nt == POINT)

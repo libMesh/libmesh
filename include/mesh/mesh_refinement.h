@@ -426,6 +426,43 @@ public:
   unsigned char& node_level_mismatch_limit();
 
   /**
+   * If \p overrefined_boundary_limit is set to a nonnegative value,
+   * then refinement and coarsening will produce meshes in which the
+   * refinement level of a boundary element is no more than that many
+   * levels greater than the level of any of its interior neighbors.
+   *
+   * This may be counter-intuitive in the 1D-embedded-in-3D case: an
+   * edge has *more* interior neighbors than a face containing that
+   * edge.
+   *
+   * If \p overrefined_boundary_limit is negative, then level
+   * differences will be unlimited.
+   *
+   * \p overrefined_boundary_limit is 0 by default.  This implies that
+   * adaptive coarsening can only be done on an interior element if
+   * any boundary elements on its sides are simultaneously coarsened.
+   */
+  signed char& overrefined_boundary_limit();
+
+  /**
+   * If \p underrefined_boundary_limit is set to a nonnegative value,
+   * then refinement and coarsening will produce meshes in which the
+   * refinement level of an element is no more than that many
+   * levels greater than the level of any boundary elements on its
+   * sides.
+   *
+   * If \p underrefined_boundary_limit is negative, then level
+   * differences will be unlimited.
+   *
+   * \p underrefined_boundary_limit is 0 by default.  This implies that
+   * adaptive coarsening can only be done on a boundary element if
+   * any interior elements it is on the side of are simultaneously
+   * coarsened.
+   */
+  signed char& underrefined_boundary_limit();
+
+
+  /**
    * Copy refinement flags on ghost elements from their
    * local processors.  Return true if any flags changed.
    */
@@ -564,6 +601,20 @@ private:
    */
   bool limit_level_mismatch_at_edge (const unsigned int max_mismatch);
 
+  /*
+   * This algorithm flags interior elements for refinement as needed
+   * to prevent corresponding boundary element refinement mismatch
+   * from exceeding the given limit.
+   */
+  bool limit_overrefined_boundary (const unsigned int max_mismatch);
+
+  /*
+   * This algorithm flags boundary elements for refinement as needed
+   * to prevent corresponding interior element refinement mismatch
+   * from exceeding the given limit.
+   */
+  bool limit_underrefined_boundary (const unsigned int max_mismatch);
+
   /**
    * This algorithm selects an element for refinement
    * if all of its neighbors are (or will be) refined.
@@ -701,6 +752,9 @@ private:
 
   unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
     _node_level_mismatch_limit;
+
+  signed char _overrefined_boundary_limit,
+              _underrefined_boundary_limit;
 
   /**
    * This option enforces the mismatch level prior to refinement by checking
@@ -850,6 +904,16 @@ inline unsigned char& MeshRefinement::edge_level_mismatch_limit()
 inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 {
   return _node_level_mismatch_limit;
+}
+
+inline signed char& MeshRefinement::overrefined_boundary_limit()
+{
+  return _overrefined_boundary_limit;
+}
+
+inline signed char& MeshRefinement::underrefined_boundary_limit()
+{
+  return _underrefined_boundary_limit;
 }
 
 inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
