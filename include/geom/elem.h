@@ -788,6 +788,10 @@ public:
    * were extracted.  We can easily do that for the level-0 manifold elements
    * by storing the D-dimensional parent.  This method provides access to that
    * element.
+   *
+   * This method is not safe to call if this->dim() == LIBMESH_DIM; in
+   * such cases no data storage for an interior parent pointer has
+   * been allocated.
    */
   const Elem* interior_parent () const;
 
@@ -1830,7 +1834,9 @@ const Elem* Elem::interior_parent () const
   // interior parents make no sense for full-dimensional elements.
   libmesh_assert_less (this->dim(), LIBMESH_DIM);
 
-  // // and they [USED TO BE] only good for level-0 elements
+  // they USED TO BE only good for level-0 elements, but we now
+  // support keeping interior_parent() valid on refined boundary
+  // elements.
   // if (this->level() != 0)
   // return this->parent()->interior_parent();
 
@@ -1838,10 +1844,14 @@ const Elem* Elem::interior_parent () const
   // neighbor and neighbor pointers
   Elem *interior_p = _elemlinks[1+this->n_sides()];
 
-  // If we have an interior_parent, it had better be the
-  // one-higher-dimensional interior element we are looking for.
+  // If we have an interior_parent, we USED TO assume it was a
+  // one-higher-dimensional interior element, but we now allow e.g.
+  // edge elements to have a 3D interior_parent with no
+  // intermediate 2D element.
+  // libmesh_assert (!interior_p ||
+  //                interior_p->dim() == (this->dim()+1));
   libmesh_assert (!interior_p ||
-                  interior_p->dim() == (this->dim()+1));
+                 interior_p->dim() > this->dim());
 
   return interior_p;
 }
