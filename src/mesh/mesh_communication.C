@@ -1020,6 +1020,18 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
 
   // We don't want to delete any element that shares a node
   // with or is an ancestor of a local element.
+
+  // Using the local_nodes vector rather than e.g. point_neighbors()
+  // gives us correct results even in corner cases, such as where two
+  // elements meet only at a corner.  ;-)  Links between boundary and
+  // interior elements on mixed dimensional meshes also give us
+  // correct ghosting in this way.
+
+  // We also preserve neighbors of local elements - in most cases this
+  // is redundant with the node check, but for non-conforming Tet4
+  // meshes and non-level-one-conforming 2D+3D meshes it is possible
+  // for an element and its coarse neighbor to not share any vertices.
+
   MeshBase::const_element_iterator l_elem_it = mesh.local_elements_begin(),
     l_end     = mesh.local_elements_end();
   for (; l_elem_it != l_end; ++l_elem_it)
@@ -1031,6 +1043,14 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
           libmesh_assert_less (nodeid, local_nodes.size());
           local_nodes[nodeid] = true;
         }
+
+      for (unsigned int s=0; s != elem->n_sides(); ++s)
+        {
+          const Elem *neighbor = elem->neighbor(s);
+          if (neighbor)
+            semilocal_elems[neighbor->id()] = true;
+        }
+
       while (elem)
         {
           dof_id_type elemid = elem->id();
