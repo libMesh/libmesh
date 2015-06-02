@@ -270,7 +270,7 @@ namespace libMesh
       old_elem_solution_rate(i) =
         old_solution_rate(context.get_dof_indices()[i]);
 
-    // The first time step is actually solving for the initial acceleration
+    // The user is computing the initial acceleration
     // So upstream we've swapped _system.solution and _old_local_solution_accel
     // So we need to give the context the correct entries since we're solving for
     // acceleration here.
@@ -290,7 +290,7 @@ namespace libMesh
         context.elem_solution_accel_derivative = 1.0;
 
         // Acceleration is currently the unknown so it's already sitting
-        // in elem_solution()
+        // in elem_solution() thanks to FEMContext::pre_fe_reinit
         context.get_elem_solution_accel() = context.get_elem_solution();
 
         // Now reset elem_solution() to what the user is expecting
@@ -298,9 +298,9 @@ namespace libMesh
 
         context.get_elem_solution_rate() = old_elem_solution_rate;
 
-        // The user's Jacobians will be targeting derivatives w.r.t. u_{n+1}
+        // The user's Jacobians will be targeting derivatives w.r.t. u_{n+1}.
         // Although the vast majority of cases will have the correct analytic
-        // Jacobians in this first iteration, since we reset elem_solution_derivative*,
+        // Jacobians in this iteration, since we reset elem_solution_derivative*,
         // if there are coupled/overlapping problems, there could be
         // mismatches in the Jacobian. So we force finite differencing for
         // the first iteration.
