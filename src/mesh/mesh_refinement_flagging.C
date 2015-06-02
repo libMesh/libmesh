@@ -275,7 +275,8 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   this->clean_refinement_flags();
 
   // The target number of elements to add or remove
-  const std::ptrdiff_t n_elem_new = _nelem_target - n_active_elem;
+  const std::ptrdiff_t n_elem_new =
+    std::ptrdiff_t(_nelem_target) - std::ptrdiff_t(n_active_elem);
 
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
