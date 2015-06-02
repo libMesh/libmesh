@@ -102,6 +102,24 @@ public:
   virtual void retrieve_timestep ();
 
   /**
+   * Specify non-zero initial velocity. Should be called before solve().
+   * The function value f and its gradient g are user-provided cloneable functors.
+   * A gradient g is only required/used for projecting onto finite element spaces
+   * with continuous derivatives.
+   */
+  void project_initial_rate( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
+
+  /**
+   * Specify non-zero initial acceleration. Should be called before solve().
+   * This is an alternative to compute_initial_acceleration() if the
+   * initial acceleration is actually known.
+   * The function value f and its gradient g are user-provided cloneable functors.
+   * A gradient g is only required/used for projecting onto finite element spaces
+   * with continuous derivatives.
+   */
+  void project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
+
+  /**
    * This method uses the specified initial displacement and velocity
    * to compute the initial acceleration \f$a_0\f$. Note that for the
    * default $\f\gamma\f$ and \f$\beta\f$ values, if the initial

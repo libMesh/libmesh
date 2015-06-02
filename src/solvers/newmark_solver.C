@@ -168,6 +168,22 @@ namespace libMesh
     libmesh_not_implemented();
   }
 
+  void NewmarkSolver::project_initial_rate( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
+  {
+    NumericVector<Number> &old_solution_rate =
+      _system.get_vector("_old_solution_rate");
+
+    _system.project_vector( old_solution_rate, f, g );
+  }
+
+  void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
+  {
+    NumericVector<Number> &old_solution_accel =
+      _system.get_vector("_old_solution_accel");
+
+    _system.project_vector( old_solution_accel, f, g );
+  }
+
   void NewmarkSolver::compute_initial_accel()
   {
     // We need to compute the initial acceleration based off of
