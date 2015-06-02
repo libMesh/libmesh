@@ -128,6 +128,10 @@ public:
        the same global ids as the top edge of the bottom QUAD4 element */
     CPPUNIT_ASSERT_EQUAL( _mesh->elem(0)->node(0), _mesh->elem(1)->node(3) );
     CPPUNIT_ASSERT_EQUAL( _mesh->elem(0)->node(1), _mesh->elem(1)->node(2) );
+
+    // We didn't set an interior_parent on the edge element, so it
+    // should default to NULL
+    CPPUNIT_ASSERT( !_mesh->elem(2)->interior_parent() );
   }
 
   void testDofOrdering()
@@ -261,6 +265,10 @@ public:
 
      */
     this->build_mesh();
+
+    // Let's set an interior_parent() this time for testing
+    _mesh->elem(2)->set_interior_parent(0);
+
 #ifdef LIBMESH_ENABLE_AMR
     MeshRefinement(*_mesh).uniformly_refine(1);
 #endif
@@ -294,6 +302,14 @@ public:
 
     // Shared node between the EDGE2 elements should have the same global id
     CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(1), _mesh->elem(12)->node(0) );
+
+    // EDGE2 child elements should have the correct parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->parent(), _mesh->elem(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->parent(), _mesh->elem(2) );
+
+    // EDGE2 child elements should have the correct interior_parent
+    // CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->interior_parent(), _mesh->elem(3) );
+    // CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->interior_parent(), _mesh->elem(4) );
 #endif
   }
 
