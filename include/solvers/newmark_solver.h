@@ -30,7 +30,9 @@ namespace libMesh
  * second order (in time) DifferentiableSystems.
  * There are two parameters
  * \f$\gamma\f$ and \f$\beta\f$ (defaulting to 0.5 and 0.25,
- * respectively.
+ * respectively). Note that projectors are included for the
+ * initial velocity and acceleration; the initial displacement
+ * can be set by calling System::project_solution().
  *
  * This class is part of the new DifferentiableSystem framework,
  * which is still experimental.  Users of this framework should
