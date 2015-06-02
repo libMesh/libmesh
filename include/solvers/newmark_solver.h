@@ -101,7 +101,14 @@ public:
    */
   virtual void retrieve_timestep ();
 
-  virtual void solve();
+  /**
+   * This method uses the specified initial displacement and velocity
+   * to compute the initial acceleration \f$a_0\f$. Note that for the
+   * default $\f\gamma\f$ and \f$\beta\f$ values, if the initial
+   * displacement and velocity are both zero, this method should
+   * not be called as the Newmark iteration will be stagnant.
+   */
+  virtual void compute_initial_acceleration();
 
   /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
@@ -162,6 +169,12 @@ protected:
    * is 2nd order iff \f$\gamma=0.5\f$.
    */
   Real _gamma;
+
+  /**
+   * Need to be able to indicate to _general_residual if we
+   * are doing an acceleration solve or not.
+   */
+  bool _is_accel_solve;
 
   /**
    * Serial vector of previous time step velocity \f$ \dot{u}_n \f$

@@ -26,6 +26,7 @@ namespace libMesh
     : UnsteadySolver(s),
       _beta(0.25),
       _gamma(0.5),
+      _is_accel_solve(false),
       _old_local_solution_rate(NumericVector<Number>::build(s.comm())),
       _old_local_solution_accel(NumericVector<Number>::build(s.comm()))
   {}
@@ -167,29 +168,28 @@ namespace libMesh
     libmesh_not_implemented();
   }
 
-  void NewmarkSolver::solve()
+  void NewmarkSolver::compute_initial_acceleration()
   {
     // We need to compute the initial acceleration based off of
     // the initial position and velocity and, thus, acceleration
     // is the unknown in diff_solver and not the displacement. So,
     // We swap solution and acceleration. NewarkSolver::_general_residual
-    // will check if this is the first solve and provide the correct
+    // will check _is_accel_solve and provide the correct
     // values to the FEMContext assuming this swap was made.
-    if(this->first_solve)
-      {
-        //solution->accel, accel->solution
-        _system.solution->swap(_system.get_vector("_old_solution_accel"));
-        _system.update();
+    this->_is_accel_solve = true;
 
-        this->_diff_solver->solve();
+    //solution->accel, accel->solution
+    _system.solution->swap(_system.get_vector("_old_solution_accel"));
+    _system.update();
 
-        // solution->solution, accel->accel
-        _system.solution->swap(_system.get_vector("_old_solution_accel"));
-        _system.update();
-      }
+    this->_diff_solver->solve();
 
-    // Now proceed as normal
-    UnsteadySolver::solve();
+    // solution->solution, accel->accel
+    _system.solution->swap(_system.get_vector("_old_solution_accel"));
+    _system.update();
+
+    // We're done, so no longer doing an acceleration solve
+    this->_is_accel_solve = false;
   }
 
   Number NewmarkSolver::old_solution_rate(const dof_id_type global_dof_number)
@@ -274,7 +274,7 @@ namespace libMesh
     // So upstream we've swapped _system.solution and _old_local_solution_accel
     // So we need to give the context the correct entries since we're solving for
     // acceleration here.
-    if( first_solve )
+    if( _is_accel_solve )
       {
         // System._solution is actually the acceleration right now so we need
         // to reset the elem_solution to the right thing, which in this case
