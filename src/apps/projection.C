@@ -32,6 +32,7 @@
 #include "libmesh/mesh_function.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/point.h"
+#include "libmesh/serial_mesh.h"
 
 
 using namespace libMesh;
@@ -115,8 +116,10 @@ int main(int argc, char** argv)
   const unsigned char requested_dim =
     cast_int<unsigned char>(cl.follow(3, "--dim"));
 
-  // Load the old mesh from --inmesh filename
-  Mesh old_mesh(init.comm(), requested_dim);
+  // Load the old mesh from --inmesh filename.
+  // Keep it serialized; we don't want elements on the new mesh to be
+  // looking for data on old mesh elements that live off-processor.
+  SerialMesh old_mesh(init.comm(), requested_dim);
 
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string("mesh.xda"));
