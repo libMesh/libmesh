@@ -218,16 +218,16 @@ public:
 
   /**
    * Refines and coarsens user-requested elements. Will also
-   * refine/coarsen additional elements to satisy level-one rule.
+   * refine/coarsen additional elements to satisfy level-one rule.
    * It is possible that for a given set of refinement flags there
    * is actually no change upon calling this member function.  Consequently,
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool refine_and_coarsen_elements (const bool maintain_level_one=true);
+  bool refine_and_coarsen_elements ();
 
   /**
    * Only coarsens the user-requested elements. Some elements
@@ -237,10 +237,10 @@ public:
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool coarsen_elements (const bool maintain_level_one=true);
+  bool coarsen_elements ();
 
   /**
    * Only refines the user-requested elements.
@@ -249,10 +249,10 @@ public:
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool refine_elements (const bool maintain_level_one=true);
+  bool refine_elements ();
 
   /**
    * Uniformly refines the mesh \p n times.
@@ -479,7 +479,15 @@ private:
    */
   bool _refine_elements ();
 
-
+  /**
+   * Smooths refinement flags according to current settings.
+   *
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the flags actually changed (hence
+   * data needs to be projected) and \p false otherwise.
+   */
+  void _smooth_flags (bool refining, bool coarsening);
 
   //------------------------------------------------------
   // "Smoothing" algorthms for refined meshes

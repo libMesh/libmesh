@@ -476,24 +476,13 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 
 
 
-bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
+bool MeshRefinement::refine_and_coarsen_elements ()
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
   // We can't yet turn a non-level-one mesh into a level-one mesh
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
@@ -536,45 +525,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
                    << "Correcting and continuing.";
     }
 
-  // Repeat until flag changes match on every processor
-  do
-    {
-      // Repeat until coarsening & refinement flags jive
-      bool satisfied = false;
-      do
-        {
-          const bool coarsening_satisfied =
-            this->make_coarsening_compatible(maintain_level_one);
-
-          const bool refinement_satisfied =
-            this->make_refinement_compatible(maintain_level_one);
-
-          bool smoothing_satisfied =
-            !this->eliminate_unrefined_patches();
-
-          if (_edge_level_mismatch_limit)
-            smoothing_satisfied = smoothing_satisfied &&
-              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
-
-          if (_node_level_mismatch_limit)
-            smoothing_satisfied = smoothing_satisfied &&
-              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
-
-          satisfied = (coarsening_satisfied &&
-                       refinement_satisfied &&
-                       smoothing_satisfied);
-#ifdef DEBUG
-          bool max_satisfied = satisfied,
-            min_satisfied = satisfied;
-          this->comm().max(max_satisfied);
-          this->comm().min(min_satisfied);
-          libmesh_assert_equal_to (satisfied, max_satisfied);
-          libmesh_assert_equal_to (satisfied, min_satisfied);
-#endif
-        }
-      while (!satisfied);
-    }
-  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
+  // Smooth refinement and coarsening flags
+  _smooth_flags(true, true);
 
   // First coarsen the flagged elements.
   const bool coarsening_changed_mesh =
@@ -612,11 +564,11 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
       _mesh.prepare_for_use (/*skip_renumber =*/false);
 
-      if (_maintain_level_one)
+      if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
       libmesh_assert(test_unflagged(true));
-      libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
-      libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+      libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
+      libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
       // FIXME: This won't pass unless we add a redundant find_neighbors()
       // call or replace find_neighbors() with on-the-fly neighbor updating
       // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -625,11 +577,11 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
     }
   else
     {
-      if (_maintain_level_one)
+      if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
       libmesh_assert(test_unflagged(true));
-      libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
-      libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+      libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
+      libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
     }
 
   // Otherwise there was no change in the mesh,
@@ -645,24 +597,13 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 
 
 
-bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
+bool MeshRefinement::coarsen_elements ()
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
   // We can't yet turn a non-level-one mesh into a level-one mesh
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
@@ -706,49 +647,16 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
                    << "Correcting and continuing.";
     }
 
-  // Repeat until flag changes match on every processor
-  do
-    {
-      // Repeat until the flags form a conforming mesh.
-      bool satisfied = false;
-      do
-        {
-          const bool coarsening_satisfied =
-            this->make_coarsening_compatible(maintain_level_one);
-
-          bool smoothing_satisfied =
-            !this->eliminate_unrefined_patches();// &&
-
-          if (_edge_level_mismatch_limit)
-            smoothing_satisfied = smoothing_satisfied &&
-              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
-
-          if (_node_level_mismatch_limit)
-            smoothing_satisfied = smoothing_satisfied &&
-              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
-
-          satisfied = (coarsening_satisfied &&
-                       smoothing_satisfied);
-#ifdef DEBUG
-          bool max_satisfied = satisfied,
-            min_satisfied = satisfied;
-          this->comm().max(max_satisfied);
-          this->comm().min(min_satisfied);
-          libmesh_assert_equal_to (satisfied, max_satisfied);
-          libmesh_assert_equal_to (satisfied, min_satisfied);
-#endif
-        }
-      while (!satisfied);
-    }
-  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
+  // Smooth coarsening flags
+  _smooth_flags(false, true);
 
   // Coarsen the flagged elements.
   const bool mesh_changed =
     this->_coarsen_elements ();
 
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
+  libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -770,23 +678,12 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 
 
 
-bool MeshRefinement::refine_elements (const bool maintain_level_one)
+bool MeshRefinement::refine_elements ()
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
@@ -832,50 +729,17 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
                    << "Correcting and continuing.";
     }
 
-  // Repeat until flag changes match on every processor
-  do
-    {
-      // Repeat until coarsening & refinement flags jive
-      bool satisfied = false;
-      do
-        {
-          const bool refinement_satisfied =
-            this->make_refinement_compatible(maintain_level_one);
-
-          bool smoothing_satisfied =
-            !this->eliminate_unrefined_patches();// &&
-
-          if (_edge_level_mismatch_limit)
-            smoothing_satisfied = smoothing_satisfied &&
-              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
-
-          if (_node_level_mismatch_limit)
-            smoothing_satisfied = smoothing_satisfied &&
-              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
-
-          satisfied = (refinement_satisfied &&
-                       smoothing_satisfied);
-#ifdef DEBUG
-          bool max_satisfied = satisfied,
-            min_satisfied = satisfied;
-          this->comm().max(max_satisfied);
-          this->comm().min(min_satisfied);
-          libmesh_assert_equal_to (satisfied, max_satisfied);
-          libmesh_assert_equal_to (satisfied, min_satisfied);
-#endif
-        }
-      while (!satisfied);
-    }
-  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
-
   // Now refine the flagged elements.  This will
   // take up some space, maybe more than what was freed.
   const bool mesh_changed =
     this->_refine_elements();
 
-  if (_maintain_level_one)
+  // Smooth refinement flags
+  _smooth_flags(true, false);
+
+  if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+  libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -1292,7 +1156,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 
   // If all the children of a parent are set to be coarsened
-  // then flag the parent so that they can kill thier kids...
+  // then flag the parent so that they can kill their kids...
   MeshBase::element_iterator       all_el     = _mesh.elements_begin();
   const MeshBase::element_iterator all_el_end = _mesh.elements_end();
   for (; all_el != all_el_end; ++all_el)
@@ -1726,6 +1590,53 @@ bool MeshRefinement::_refine_elements ()
   return mesh_changed;
 }
 
+
+void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
+{
+  // Repeat until flag changes match on every processor
+  do
+    {
+      // Repeat until coarsening & refinement flags jive
+      bool satisfied = false;
+      do
+        {
+          // If we're refining or coarsening, hit the corresponding
+          // face level test code.  Short-circuiting || is our friend
+          const bool coarsening_satisfied =
+            !coarsening ||
+            this->make_coarsening_compatible(_face_level_mismatch_limit);
+
+          const bool refinement_satisfied =
+            !refining ||
+            this->make_refinement_compatible(_face_level_mismatch_limit);
+
+          bool smoothing_satisfied =
+            !this->eliminate_unrefined_patches();// &&
+
+          if (_edge_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_edge (_edge_level_mismatch_limit);
+
+          if (_node_level_mismatch_limit)
+            smoothing_satisfied = smoothing_satisfied &&
+              !this->limit_level_mismatch_at_node (_node_level_mismatch_limit);
+
+          satisfied = (coarsening_satisfied &&
+                       refinement_satisfied &&
+                       smoothing_satisfied);
+#ifdef DEBUG
+          bool max_satisfied = satisfied,
+            min_satisfied = satisfied;
+          this->comm().max(max_satisfied);
+          this->comm().min(min_satisfied);
+          libmesh_assert_equal_to (satisfied, max_satisfied);
+          libmesh_assert_equal_to (satisfied, min_satisfied);
+#endif
+        }
+      while (!satisfied);
+    }
+  while (!_mesh.is_serial() && !this->make_flags_parallel_consistent());
+}
 
 
 void MeshRefinement::uniformly_p_refine (unsigned int n)
