@@ -2,7 +2,12 @@
 // This only works with petsc-3.3 and above.
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 
-#include <petsc-private/petscimpl.h>
+#if !PETSC_RELEASE_LESS_THAN(3,6,0)
+# include <petsc/private/petscimpl.h>
+#else
+# include <petsc-private/petscimpl.h>
+#endif
+
 #include "libmesh/petscdmlibmesh.h"
 
 #undef  __FUNCT__

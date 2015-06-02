@@ -5,7 +5,11 @@
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 
 // PETSc includes
-#include <petsc-private/dmimpl.h>
+#if !PETSC_RELEASE_LESS_THAN(3,6,0)
+# include <petsc/private/dmimpl.h>
+#else
+# include <petsc-private/dmimpl.h>
+#endif
 
 // Local Includes
 #include "libmesh/libmesh_common.h"

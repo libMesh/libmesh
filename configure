@@ -29952,10 +29952,10 @@ ac_config_files="$ac_config_files contrib/unique_ptr/Makefile"
   # Check whether --enable-petsc was given.
 if test "${enable_petsc+set}" = set; then :
   enableval=$enable_petsc; case "${enableval}" in
-		  yes)  enablepetsc=yes ;;
-		   no)  enablepetsc=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-petsc" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablepetsc=yes ;;
+                   no)  enablepetsc=no ;;
+                    *)  as_fn_error $? "bad value ${enableval} for --enable-petsc" "$LINENO" 5 ;;
+                 esac
 else
   enablepetsc=$enableoptional
 fi
@@ -30024,10 +30024,10 @@ fi
       if (test "x$PETSCARCH" != x); then
         export PETSC_DIR=/usr/lib/petsc
         export PETSC_ARCH=`$PETSCARCH`
-	if (test -d $PETSC_DIR); then
-  	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_DIR $PETSC_DIR" >&5
+        if (test -d $PETSC_DIR); then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_DIR $PETSC_DIR" >&5
 $as_echo "using system-provided PETSC_DIR $PETSC_DIR" >&6; }
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_ARCH $PETSC_ARCH" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: using system-provided PETSC_ARCH $PETSC_ARCH" >&5
 $as_echo "using system-provided PETSC_ARCH $PETSC_ARCH" >&6; }
         fi
       fi
@@ -30120,24 +30120,29 @@ $as_echo "<<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. 
          # Note: may be empty...
 
 
-$as_echo "#define HAVE_PETSC 1" >>confdefs.h
-
-
         # Check for snoopable MPI
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
-        	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni`
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni`
+
         elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
-        	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
         elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
-        	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
+
+        elif (test -r $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables) ; then # 3.6.x
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
+        elif (test -r $PETSC_DIR/lib/petsc/conf/petscvariables) ; then # 3.6.x
+          PETSC_MPI=`grep MPIEXEC $PETSC_DIR/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
         fi
+
+        # If we couldn't snoop MPI from PETSc, fall back on ACX_MPI.
         if test "x$PETSC_MPI" != x ; then
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
 
           MPI_IMPL="petsc_snooped"
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with MPI from PETSC config >>>" >&5
-$as_echo "<<< Configuring library with MPI from PETSC config >>>" >&6; }
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Attempting to configure library with MPI from PETSC config... >>>" >&5
+$as_echo "<<< Attempting to configure library with MPI from PETSC config... >>>" >&6; }
         else
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc did not define MPIEXEC.  Will try configuring MPI now... >>>" >&5
 $as_echo "<<< PETSc did not define MPIEXEC.  Will try configuring MPI now... >>>" >&6; }
@@ -30657,61 +30662,92 @@ fi
         fi
 
         # Print informative message about the version of PETSc we detected
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with PETSc version $petscversion support >>>" >&5
-$as_echo "<<< Configuring library with PETSc version $petscversion support >>>" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Found PETSc $petscversion installation in $PETSC_DIR ... >>>" >&5
+$as_echo "<<< Found PETSc $petscversion installation in $PETSC_DIR ... >>>" >&6; }
 
+        # Figure out whether this PETSC_DIR is a PETSc source tree or an installed PETSc.
+        if (test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/${PETSC_ARCH}/conf/variables); then # pre-3.6.0 non-installed PETSc
+          PREFIX_INSTALLED_PETSC=no
+          PETSC_VARS_FILE=${PETSC_DIR}/${PETSC_ARCH}/conf/variables
+        elif (test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables); then # 3.6.0+ non-installed PETSc
+          PREFIX_INSTALLED_PETSC=no
+          PETSC_VARS_FILE=${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables
+        elif (test -r ${PETSC_DIR}/conf/variables); then # pre 3.6.0 prefix-installed PETSc
+          PREFIX_INSTALLED_PETSC=yes
+          PETSC_VARS_FILE=${PETSC_DIR}/conf/variables
+        elif (test -r ${PETSC_DIR}/lib/petsc/conf/variables); then # 3.6.0 prefix-installed PETSc
+          PREFIX_INSTALLED_PETSC=yes
+          PETSC_VARS_FILE=${PETSC_DIR}/lib/petsc/conf/variables
+        # Support having a non-prefix-installed PETSc with an
+        # *incorrectly* set PETSC_ARCH environment variable.  This is
+        # a less desirable configuration, but we need to support it
+        # for backwards compatibility.
+        elif (test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/conf/variables); then # pre-3.6.0 non-installed PETSc with invalid $PETSC_ARCH
+          PREFIX_INSTALLED_PETSC=no
+          PETSC_VARS_FILE=${PETSC_DIR}/conf/variables
+        elif (test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/lib/petsc/conf/variables); then # 3.6.0+ non-installed PETSc with invalid $PETSC_ARCH
+          PREFIX_INSTALLED_PETSC=no
+          PETSC_VARS_FILE=${PETSC_DIR}/lib/petsc/conf/variables
+        else
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Could not find a viable PETSc Makefile to determine PETSC_CC_INCLUDES, etc. >>>" >&5
+$as_echo "<<< Could not find a viable PETSc Makefile to determine PETSC_CC_INCLUDES, etc. >>>" >&6; }
+          enablepetsc=no
+        fi
 
-        # If we have a full petsc distro with a makefile query it for
-        # what we can
-	if (test -r $PETSC_DIR/makefile); then
-          PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
-          PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
+        # We can skip the rest of the tests because they aren't going to pass
+        if (test $enablepetsc != no) ; then
+          if (test $PREFIX_INSTALLED_PETSC = no) ; then
+            PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
+            PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 
-	# create a simple makefile to provide other targets we want,
-	# then query it.
- 	  cat <<EOF >Makefile_config_petsc
-include $PETSC_DIR/conf/variables
+            printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
 
-getPETSC_CC_INCLUDES:
-	echo \$(PETSC_CC_INCLUDES)
+            printf '%s\n' "getPETSC_CC_INCLUDES:" >> Makefile_config_petsc
+            printf '\t%s\n' "echo \$(PETSC_CC_INCLUDES)" >> Makefile_config_petsc
 
-getPETSC_FC_INCLUDES:
-	echo \$(PETSC_FC_INCLUDES)
-EOF
-          PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
-          PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
-	  rm -f Makefile_config_petsc
+            printf '%s\n' "getPETSC_FC_INCLUDES:" >> Makefile_config_petsc
+            printf '\t%s\n' "echo \$(PETSC_FC_INCLUDES)" >> Makefile_config_petsc
 
-  	elif (test -r $PETSC_DIR/conf/variables); then
- 	  cat <<EOF >Makefile_config_petsc
-include $PETSC_DIR/conf/variables
-getincludedirs:
-	echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)
+            PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
+            PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
+            rm -f Makefile_config_petsc
+          else
+            printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
 
-getPETSC_CC_INCLUDES:
-	echo \$(PETSC_CC_INCLUDES)
+            printf '%s\n' "getincludedirs:" >> Makefile_config_petsc
+            printf '\t%s\n' "echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)" >> Makefile_config_petsc
 
-getPETSC_FC_INCLUDES:
-	echo \$(PETSC_FC_INCLUDES)
+            printf '%s\n'  "getPETSC_CC_INCLUDES:" >> Makefile_config_petsc
+            printf '\t%s\n' "echo \$(PETSC_CC_INCLUDES)" >> Makefile_config_petsc
 
-getlinklibs:
-	echo \$(PETSC_SNES_LIB)
-EOF
-          PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
-          PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
-          PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
-          PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
-	  rm -f Makefile_config_petsc
-	fi
-        #echo ""
-        #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
-        #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
-        #echo ""
+            printf '%s\n' "getPETSC_FC_INCLUDES:" >> Makefile_config_petsc
+            printf '\t%s\n' "echo \$(PETSC_FC_INCLUDES)" >> Makefile_config_petsc
+
+            printf '%s\n' "getlinklibs:" >> Makefile_config_petsc
+            printf '\t%s\n' "echo \$(PETSC_SNES_LIB)" >> Makefile_config_petsc
+
+            PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
+            PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
+            PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
+            PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
+            rm -f Makefile_config_petsc
+          fi
+        fi
+
+        # We can skip the rest of the tests because they aren't going to pass
+        if (test $enablepetsc != no) ; then
+
+        # Debugging: see what actually got set for PETSCINCLUDEDIRS
+        # echo ""
+        # echo "PETSCLINKLIBS=$PETSCLINKLIBS"
+        # echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
+        # echo ""
 
         # We sometimes need the full CC_INCLUDES to access a
         # PETSc-snooped MPI
         PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
 
+        # FIXME: Don't do AC_SUBST if PETSc test program fails to compile?
 
 
 
@@ -30721,20 +30757,80 @@ EOF
 
         # Check for Hypre
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
-        	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
+          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
         elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
-        	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
         elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
-           HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
+          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
         fi
 
         if test "x$HYPRE_LIB" != x ; then
 
 $as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
 
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Hypre support >>>" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Hypre support >>>" >&5
 $as_echo "<<< Configuring library with Hypre support >>>" >&6; }
         fi
+
+        # Try to compile a trivial PETSc program to check our
+        # configuration... this should handle cases where we slipped
+        # by the tests above with an invalid PETSCINCLUDEDIRS
+        # variable, which happened when PETSc 3.6 came out.
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can compile a trivial PETSc program" >&5
+$as_echo_n "checking whether we can compile a trivial PETSc program... " >&6; }
+        ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+        # Save the original CFLAGS contents
+        saveCFLAGS="$CFLAGS"
+
+        # Append PETSc include paths to the CFLAGS variables
+        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <petsc.h>
+        static char help[]="";
+
+        int main(int argc, char **argv)
+        {
+          PetscInitialize(&argc, &argv, (char*)0,help);
+          PetscFinalize();
+          return 0;
+        }
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_PETSC 1" >>confdefs.h
+
+
+else
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        # Return C flags to their original state.
+        CFLAGS="$saveCFLAGS"
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
 
         # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TAO support via PETSc" >&5
@@ -30795,10 +30891,10 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    else
-        # PETSc config failed.  Try MPI, unless directed otherwise
-	if (test "$enablempi" != no); then
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc disabled.  Will try configuring MPI now... >>>" >&5
+        else
+          # PETSc config failed.  Try MPI, unless directed otherwise
+          if (test "$enablempi" != no); then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc disabled.  Will try configuring MPI now... >>>" >&5
 $as_echo "<<< PETSc disabled.  Will try configuring MPI now... >>>" >&6; }
 
 
@@ -31313,9 +31409,528 @@ fi
 
 
 
-	fi
-    fi
+          fi
+        fi # if (test $enablepetsc != no)
+    else
+        # PETSc config failed.  Try MPI, unless directed otherwise
+    if (test "$enablempi" != no); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc disabled.  Will try configuring MPI now... >>>" >&5
+$as_echo "<<< PETSc disabled.  Will try configuring MPI now... >>>" >&6; }
 
+
+# if MPIHOME is empty, set it to /usr
+if (test "x$MPIHOME" = x) ; then
+  MPIHOME="/usr"
+fi
+
+
+# Check whether --with-mpi was given.
+if test "${with_mpi+set}" = set; then :
+  withval=$with_mpi; MPI="$withval"
+else
+
+              echo "note: MPI library path not given... trying prefix=$MPIHOME"
+	      MPI=$MPIHOME
+
+fi
+
+
+if test -z "$MPI"; then
+	MPI="/usr"
+fi
+
+
+
+MPI_LIBS_PATH="$MPI/lib"
+MPI_INCLUDES_PATH="$MPI/include"
+
+# Check that the compiler uses the library we specified...
+
+# look for LAM or other MPI implementation
+if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
+	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
+
+
+	# Ensure the comiler finds the library...
+	tmpLIBS=$LIBS
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# look for lam_version_show in liblam.(a/so)
+	# (this is needed in addition to libmpi.(a/so) for
+        # LAM MPI
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
+$as_echo_n "checking for lam_show_version in -llam... " >&6; }
+if ${ac_cv_lib_lam_lam_show_version+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llam  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lam_show_version ();
+int
+main ()
+{
+return lam_show_version ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_lam_lam_show_version=yes
+else
+  ac_cv_lib_lam_lam_show_version=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lam_lam_show_version" >&5
+$as_echo "$ac_cv_lib_lam_lam_show_version" >&6; }
+if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
+
+                       LIBS="-llam $LIBS"
+                       MPI_LIBS="-llam $MPI_LIBS"
+
+fi
+
+
+	# Quadricss MPI requires the elan library to be included too
+	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
+	  echo "note: MPI found to use Quadrics switch, looking for elan library"
+		 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
+$as_echo_n "checking for elan_init in -lelan... " >&6; }
+if ${ac_cv_lib_elan_elan_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lelan  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char elan_init ();
+int
+main ()
+{
+return elan_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_elan_elan_init=yes
+else
+  ac_cv_lib_elan_elan_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_elan_elan_init" >&5
+$as_echo "$ac_cv_lib_elan_elan_init" >&6; }
+if test "x$ac_cv_lib_elan_elan_init" = xyes; then :
+
+                                LIBS="-lelan $LIBS"
+                                MPI_LIBS="-lelan $MPI_LIBS"
+
+else
+  as_fn_error $? "Could not find elan library... exiting " "$LINENO" 5
+fi
+
+	fi
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
+$as_echo_n "checking for MPI_Init in -lmpi... " >&6; }
+if ${ac_cv_lib_mpi_MPI_Init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpi  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_mpi_MPI_Init=yes
+else
+  ac_cv_lib_mpi_MPI_Init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpi_MPI_Init" >&5
+$as_echo "$ac_cv_lib_mpi_MPI_Init" >&6; }
+if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
+
+		       MPI_LIBS="-lmpi $MPI_LIBS"
+	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+	               MPI_IMPL="mpi"
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
+$as_echo "Found valid MPI installlaion..." >&6; }
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+fi
+
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LIBS=$tmpLIBS
+fi
+
+if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
+	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
+
+	# Ensure the comiler finds the library...
+	tmpLIBS=$LIBS
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LIBS="-L$MPI_LIBS_PATH $LIBS"
+
+	# Myricomm MPICH requires the gm library to be included too
+	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
+	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+
+          if (test "x$GMHOME" = x) ; then
+            GMHOME="/usr"
+          fi
+
+# Check whether --with-gm was given.
+if test "${with_gm+set}" = set; then :
+  withval=$with_gm; GM="$withval"
+else
+
+                        echo "note: GM library path not given... trying prefix=$MPIHOME"
+	                GM=$GMHOME
+
+fi
+
+
+          LIBS="-L$GM/lib $LIBS"
+          MPI_LIBS="-L$GM/lib $MPI_LIBS"
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gm_open in -lgm" >&5
+$as_echo_n "checking for gm_open in -lgm... " >&6; }
+if ${ac_cv_lib_gm_gm_open+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gm_open ();
+int
+main ()
+{
+return gm_open ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_gm_gm_open=yes
+else
+  ac_cv_lib_gm_gm_open=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gm_gm_open" >&5
+$as_echo "$ac_cv_lib_gm_gm_open" >&6; }
+if test "x$ac_cv_lib_gm_gm_open" = xyes; then :
+
+                         LIBS="$LIBS -lgm"
+                         MPI_LIBS="$MPI_LIBS -lgm"
+
+else
+  as_fn_error $? "Could not find gm library... exiting " "$LINENO" 5
+fi
+
+	fi
+
+	# look for MPI_Init in libmpich.(a/so)
+        # try adding libmpl if we see it there; some MPICH2 versions
+        # require it.
+	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+$as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
+if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpich  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_mpich_MPI_Init=yes
+else
+  ac_cv_lib_mpich_MPI_Init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpich_MPI_Init" >&5
+$as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
+if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
+
+			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+$as_echo "Found valid MPICH installation with libmpl..." >&6; }
+
+else
+
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+
+fi
+
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+$as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
+if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpich  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_mpich_MPI_Init=yes
+else
+  ac_cv_lib_mpich_MPI_Init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpich_MPI_Init" >&5
+$as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
+if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
+
+			       MPI_LIBS="-lmpich $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+$as_echo "Found valid MPICH installation..." >&6; }
+
+else
+
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+
+fi
+
+	fi
+
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LIBS=$tmpLIBS
+fi
+
+if (test "x$MPI_IMPL" != x) ; then
+
+	# Ensure the comiler finds the header file...
+	if test -e $MPI_INCLUDES_PATH/mpi.h; then
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+if test "x$ac_cv_header_mpi_h" = xyes; then :
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
+$as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
+fi
+
+
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS=$tmpCPPFLAGS
+	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+if test "x$ac_cv_header_mpi_h" = xyes; then :
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
+$as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
+fi
+
+
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS=$tmpCPPFLAGS
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
+$as_echo "Could not find MPI header <mpi.h>..." >&6; }
+                enablempi=no
+	fi
+else
+
+	# no MPI install found, see if the compiler supports it
+      	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+	                 MPI_IMPL="built-in"
+                         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
+$as_echo "$CXX Compiler Supports MPI " >&6; }
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
+$as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+# Save variables...
+
+
+
+
+
+
+
+
+    fi
+  fi
 
   else # --disable-petsc
     if (test "$enablempi" != no) ; then
