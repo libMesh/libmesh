@@ -619,6 +619,7 @@ void Elem::find_point_neighbors(const Point &p,
                                 std::set<const Elem *> &neighbor_set) const
 {
   libmesh_assert(this->contains_point(p));
+  libmesh_assert(this->active());
 
   neighbor_set.clear();
   neighbor_set.insert(this);
@@ -694,6 +695,8 @@ void Elem::find_point_neighbors(const Point &p,
 
 void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 {
+  libmesh_assert(this->active());
+
   neighbor_set.clear();
   neighbor_set.insert(this);
 

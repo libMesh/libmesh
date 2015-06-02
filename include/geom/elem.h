@@ -322,32 +322,44 @@ public:
   bool contains_edge_of(const Elem *e) const;
 
   /**
-   * This function finds all elements (including this one) which
-   * touch the current active element at the specified point, which
-   * should be a point in the current element.
+   * This function finds all active elements (including this one)
+   * which are in the same manifold as this element and which touch
+   * the current active element at the specified point, which should
+   * be a point in the current element.
+   *
+   * Elements which are not "in the same manifold" (e.g. the
+   * interior_parent of a boundary element) will not be found with
+   * this method.
+   *
+   * Elements which overlap the specified point but which are only
+   * connected to the current element via elements which do not
+   * overlap that point (e.g. in a folded or tangled mesh) are not
+   * considered to "touch" the current element and will not be found
+   * with this method.
    */
   void find_point_neighbors(const Point &p,
                             std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all elements (including this one) which
-   * touch the current element at any point
+   * This function finds all active elements (including this one) in
+   * the same manifold as this element which touch this element at any
+   * point
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all active elements which touch the current
-   * active element along the specified edge defined by the two points
-   * \p p1 and \p p2
+   * This function finds all active elements in the same manifold as
+   * this element which touch the current active element along the
+   * specified edge defined by the two points \p p1 and \p p2
    */
   void find_edge_neighbors(const Point& p1,
                            const Point& p2,
                            std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all active elements which touch the current
-   * active element along any edge (more precisely, at at least two
-   * points).
+   * This function finds all active elements in the same manifold as
+   * this element which touch the current active element along any
+   * edge (more precisely, at at least two points).
    */
   void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
 
