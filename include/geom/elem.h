@@ -813,6 +813,8 @@ public:
    */
   const Elem* interior_parent () const;
 
+  Elem* interior_parent ();
+
   /**
    * Sets the pointer to the element's interior_parent.
    * Dangerous to use in high-level code.
@@ -1868,6 +1870,21 @@ const Elem* Elem::interior_parent () const
   // intermediate 2D element.
   // libmesh_assert (!interior_p ||
   //                interior_p->dim() == (this->dim()+1));
+  libmesh_assert (!interior_p ||
+                 interior_p->dim() > this->dim());
+
+  return interior_p;
+}
+
+
+
+inline
+Elem* Elem::interior_parent ()
+{
+  // See the const version for comments
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  Elem *interior_p = _elemlinks[1+this->n_sides()];
+
   libmesh_assert (!interior_p ||
                  interior_p->dim() > this->dim());
 
