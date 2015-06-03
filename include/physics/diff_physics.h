@@ -42,6 +42,33 @@ template <typename T> class NumericVector;
  * This class provides a specific system class.  It aims
  * to generalize any system, linear or nonlinear, which
  * provides both a residual and a Jacobian.
+ * For first order (in time) systems, the (nonlinear)
+ * residual computed at each time step is
+ * \f[ F(u) + G(u) - M(u,\dot{u})\dot{u} = 0 \f]
+ * for unsteady TimeSolver and \f$ F(u) = 0\f$ for steady
+ * TimeSolver. \f$F(u)\f$ is computed by element/side_time_derivative,
+ * \f$ G(u) \f$ is computed using element/side_constraint, and
+ * \f$ M(u,\dot{u})\dot{u} \f$ is computed using the mass_residual
+ * methods.
+ *
+ * For second order (in time) systems, the (nonlinear)
+ * residual computed at each time step is
+ * \f[ M(u,\ddot{u})\ddot{u} + C(u,\dot{u})\dot{u} + F(u) + G(u) = 0 \f]
+ * for unsteady TimeSolver and \f$ F(u) = 0\f$ for steady
+ * TimeSolver. \f$F(u)\f$ is computed by element/side_time_derivative,
+ * \f$G(u)\f$ is computed using element/side_constraint,
+ * \f$C(u,\dot{u})\dot{u}\f$ is computed using the dampling_residual methods
+ * and \f$ M(u,\ddot{u})\ddot{u}\f$ is computed using the mass_residual
+ * methods.
+ *
+ * FEMContext provides methods for querying values of the solution \f${u}\f$,
+ * its "rate" \f$\dot{u}\f$ and its "acceleration" \f$\ddot{u}\f$. Furthermore,
+ * derivatives of each of these w.r.t the nonlinear iteration unknown (e.g. in
+ * EulerSolver, the solution at the next time step \f$ u_{n+1} \f$) are provided
+ * through DiffContext::get_elem_solution_derivative(),
+ * DiffContext::get_elem_solution_rate_derivative(), and
+ * DiffContext::get_elem_solution_accel_derivative(). The should be incorporated
+ * into the Jacobian evaluations, if the Jacobian is being provided.
  *
  * @author Roy H. Stogner 2006
  */
@@ -250,17 +277,22 @@ public:
 
   /**
    * Subtracts a mass vector contribution on \p elem from
-   * elem_residual.
+   * elem_residual. For first-order-in-time problems, this
+   * is the \f$ M(u,\dot{u})\dot{u} \f$ term. For
+   * second-order-in-time problems, this is the
+   * \f$ M(u,\ddot{u})\ddot{u} \f$ term. This method is only
+   * called for UnsteadySolver-based TimeSolvers.
    *
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
    * elem_jacobian has not been computed then the method should
    * return false.
    *
-   * Many problems can use the reimplementation in
+   * Many first-order-in-time problems can use the reimplementation in
    * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
    * transient variable u; users with more complicated transient
-   * problems will need to reimplement this themselves.
+   * problems or second-order-in-time problems will need to reimplement
+   * this themselves.
    */
   virtual bool mass_residual (bool request_jacobian,
                               DiffContext &) {
@@ -305,13 +337,18 @@ public:
 
   /**
    * Subtracts a damping vector contribution on \p elem from
-   * elem_residual.
+   * elem_residual. This method is not used in first-order-in-time
+   * problems. For second-order-in-time problems, this is the
+   * \f$ C(u,\ddot{u})\ddot{u} \f$ term. This method is only
+   * called for UnsteadySolver-based TimeSolvers.
    *
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
    * elem_jacobian has not been computed then the method should
    * return false.
    *
+   * If the problem has no damping, the default "do-nothing" is correct.
+   * Otherwise, this must be reimplemented.
    */
   virtual bool damping_residual (bool request_jacobian,
                               DiffContext &) {

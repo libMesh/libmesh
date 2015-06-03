@@ -124,7 +124,7 @@ public:
   /**
    * This method uses the specified initial displacement and velocity
    * to compute the initial acceleration \f$a_0\f$. Note that for the
-   * default $\f\gamma\f$ and \f$\beta\f$ values, if the initial
+   * default \f$\gamma\f$ and \f$\beta\f$ values, if the initial
    * displacement and velocity are both zero, this method should
    * not be called as the Newmark iteration will be stagnant.
    * Should be called before solve().
