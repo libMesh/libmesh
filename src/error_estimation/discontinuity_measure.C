@@ -39,16 +39,31 @@ namespace libMesh
 {
 
 void
-DiscontinuityMeasure::initialize(const System& system,
-                                 ErrorVector&,
-                                 bool)
+DiscontinuityMeasure::init_context(FEMContext& c)
 {
-  // Hang onto the system - we may need it for variable names later.
-  my_system = &system;
+  const unsigned int n_vars = c.n_vars();
+  for (unsigned int v=0; v<n_vars; v++)
+    {
+      // Possibly skip this variable
+      if (error_norm.weight(v) == 0.0) continue;
 
-  // We'll need values for jump computation
-  fe_fine->get_phi();
-  fe_coarse->get_phi();
+      // FIXME: Need to generalize this to vector-valued elements. [PB]
+      FEBase* side_fe = NULL;
+
+      const std::set<unsigned char>& elem_dims =
+        c.elem_dimensions();
+
+      for (std::set<unsigned char>::const_iterator dim_it =
+             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+        {
+          const unsigned char dim = *dim_it;
+
+          fine_context->get_side_fe( v, side_fe, dim );
+
+          // We'll need values on both sides for discontinuity computation
+          side_fe->get_phi();
+        }
+    }
 }
 
 
@@ -56,10 +71,17 @@ DiscontinuityMeasure::initialize(const System& system,
 void
 DiscontinuityMeasure::internal_side_integration ()
 {
+  const Elem& coarse_elem = coarse_context->get_elem();
+  const Elem& fine_elem = fine_context->get_elem();
+
+  FEBase* fe_fine = NULL;
+  fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
+
+  FEBase* fe_coarse = NULL;
+  coarse_context->get_side_fe( var, fe_coarse, fine_elem.dim() );
+
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
-  unsigned int n_fine_dofs = Ufine.size();
-  unsigned int n_coarse_dofs = Ucoarse.size();
 
   std::vector<std::vector<Real> > phi_coarse = fe_coarse->get_phi();
   std::vector<std::vector<Real> > phi_fine = fe_fine->get_phi();
@@ -69,12 +91,8 @@ DiscontinuityMeasure::internal_side_integration ()
     {
       // Calculate solution values on fine and coarse elements
       // at this quadrature point
-      Number u_fine = 0., u_coarse = 0.;
-      for (unsigned int i=0; i != n_coarse_dofs; ++i)
-        u_coarse += phi_coarse[i][qp] * Ucoarse(i);
-
-      for (unsigned int i=0; i != n_fine_dofs; ++i)
-        u_fine += phi_fine[i][qp] * Ufine(i);
+      Number u_fine   = fine_context->side_value(var, qp),
+             u_coarse = coarse_context->side_value(var, qp);
 
       // Find the jump in the value
       // at this quadrature point
@@ -86,16 +104,22 @@ DiscontinuityMeasure::internal_side_integration ()
 
   // Add the h-weighted jump integral to each error term
   fine_error =
-    error * fine_elem->hmax() * error_norm.weight(var);
+    error * fine_elem.hmax() * error_norm.weight(var);
   coarse_error =
-    error * coarse_elem->hmax() * error_norm.weight(var);
+    error * coarse_elem.hmax() * error_norm.weight(var);
 }
 
 
 bool
 DiscontinuityMeasure::boundary_side_integration ()
 {
-  const std::string &var_name = my_system->variable_name(var);
+  const Elem& fine_elem = fine_context->get_elem();
+
+  FEBase* fe_fine = NULL;
+  fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
+
+  const std::string &var_name =
+    fine_context->get_system().variable_name(var);
 
   std::vector<std::vector<Real> > phi_fine = fe_fine->get_phi();
   std::vector<Real> JxW_face = fe_fine->get_JxW();
@@ -107,9 +131,10 @@ DiscontinuityMeasure::boundary_side_integration ()
   // for a particular variable, we will determine if the whole
   // element is on an essential boundary (assuming quadrature points
   // are strictly contained in the side).
-  if (this->_bc_function(*my_system, qface_point[0], var_name).first)
+  if (this->_bc_function(fine_context->get_system(),
+                         qface_point[0], var_name).first)
     {
-      const Real h = fine_elem->hmax();
+      const Real h = fine_elem.hmax();
 
       // The number of quadrature points
       const unsigned int n_qp = fe_fine->n_quadrature_points();
@@ -122,18 +147,15 @@ DiscontinuityMeasure::boundary_side_integration ()
         {
           // Value of the imposed essential BC at this quadrature point.
           const std::pair<bool,Real> essential_bc =
-            this->_bc_function(*my_system, qface_point[qp], var_name);
+            this->_bc_function(fine_context->get_system(), qface_point[qp],
+                               var_name);
 
           // Be sure the BC function still thinks we're on the
           // essential boundary.
           libmesh_assert_equal_to (essential_bc.first, true);
 
-          // The solution gradient from each element
-          Number u_fine = 0.;
-
-          // Compute the solution gradient on element e
-          for (unsigned int i=0; i != Ufine.size(); i++)
-            u_fine += phi_fine[i][qp] * Ufine(i);
+          // The solution value on each point
+          Number u_fine = fine_context->side_value(var, qp);
 
           // The difference between the desired BC and the approximate solution.
           const Number jump = essential_bc.second - u_fine;

@@ -69,9 +69,7 @@ protected:
    * An initialization function, for requesting specific data from the FE
    * objects
    */
-  virtual void initialize(const System& system,
-                          ErrorVector& error_per_cell,
-                          bool estimate_parent_error);
+  virtual void init_context(FEMContext &c);
 
   /**
    * The function which calculates a laplacian jump based error
