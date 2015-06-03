@@ -129,6 +129,13 @@ public:
   void resize (const unsigned int n);
 
   /**
+   * Append additional entries to (resizing, but unchanging) the
+   * vector.
+   */
+  template <typename T2>
+  void append (const DenseVector<T2>& other_vector);
+
+  /**
    * Multiplies every element in the vector by \p factor.
    */
   void scale (const T factor);
@@ -328,6 +335,19 @@ void DenseVector<T>::resize(const unsigned int n)
   _val.resize(n);
 
   zero();
+}
+
+
+
+template<typename T>
+template<typename T2>
+inline
+void DenseVector<T>::append (const DenseVector<T2>& other_vector)
+{
+  const std::vector<T2> &other_vals = other_vector.get_values();
+
+  _val.reserve(this->size() + other_vals.size());
+  _val.insert(_val.end(), other_vals.begin(), other_vals.end());
 }
 
 
