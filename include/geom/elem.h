@@ -1899,9 +1899,14 @@ void Elem::set_interior_parent (Elem *p)
   // interior parents make no sense for full-dimensional elements.
   libmesh_assert_less (this->dim(), LIBMESH_DIM);
 
-  // this had better be a one-higher-dimensional interior element
+  // If we have an interior_parent, we USED TO assume it was a
+  // one-higher-dimensional interior element, but we now allow e.g.
+  // edge elements to have a 3D interior_parent with no
+  // intermediate 2D element.
+  // libmesh_assert (!p ||
+  //                 p->dim() == (this->dim()+1));
   libmesh_assert (!p ||
-                  p->dim() == (this->dim()+1));
+                  p->dim() > this->dim());
 
   _elemlinks[1+this->n_sides()] = p;
 }
