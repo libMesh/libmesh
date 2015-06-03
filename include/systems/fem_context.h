@@ -820,17 +820,17 @@ protected:
     // Typedefs for "Value getter" function pointer
     typedef typename TensorTools::MakeReal<OutputType>::type value_shape;
     typedef FEGenericBase<value_shape> value_base;
-    typedef void (FEMContext::*value_getter) (unsigned int, value_base *&) const;
+    typedef void (FEMContext::*value_getter) (unsigned int, value_base *&, unsigned char) const;
 
     // Typedefs for "Grad getter" function pointer
     typedef typename TensorTools::MakeReal<Rank1Decrement>::type grad_shape;
     typedef FEGenericBase<grad_shape> grad_base;
-    typedef void (FEMContext::*grad_getter) (unsigned int, grad_base *&) const;
+    typedef void (FEMContext::*grad_getter) (unsigned int, grad_base *&, unsigned char) const;
 
     // Typedefs for "Hessian getter" function pointer
     typedef typename TensorTools::MakeReal<Rank2Decrement>::type hess_shape;
     typedef FEGenericBase<hess_shape> hess_base;
-    typedef void (FEMContext::*hess_getter) (unsigned int, hess_base *&) const;
+    typedef void (FEMContext::*hess_getter) (unsigned int, hess_base *&, unsigned char) const;
   };
 
 
