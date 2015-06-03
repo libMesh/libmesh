@@ -70,6 +70,8 @@ FEMParameters::FEMParameters(const Parallel::Communicator &comm_in) :
       print_solution_norms(false), print_solutions(false),
       print_residual_norms(false), print_residuals(false),
       print_jacobian_norms(false), print_jacobians(false),
+      print_element_solutions(false),
+      print_element_residuals(false),
       print_element_jacobians(false),
 
       use_petsc_snes(false),
@@ -79,6 +81,7 @@ FEMParameters::FEMParameters(const Parallel::Communicator &comm_in) :
       min_step_length(1e-5),
       max_linear_iterations(200000), max_nonlinear_iterations(20),
       relative_step_tolerance(1.e-7), relative_residual_tolerance(1.e-10),
+      absolute_residual_tolerance(1.e-10),
       initial_linear_tolerance(1.e-3), minimum_linear_tolerance(TOLERANCE*TOLERANCE),
       linear_tolerance_multiplier(1.e-3),
 
@@ -666,6 +669,8 @@ void FEMParameters::read(GetPot &input,
     GETPOT_INPUT(print_residuals);
     GETPOT_INPUT(print_jacobian_norms);
     GETPOT_INPUT(print_jacobians);
+    GETPOT_INPUT(print_element_solutions);
+    GETPOT_INPUT(print_element_residuals);
     GETPOT_INPUT(print_element_jacobians);
 
 
@@ -680,6 +685,7 @@ void FEMParameters::read(GetPot &input,
     GETPOT_INT_INPUT(max_nonlinear_iterations);
     GETPOT_INPUT(relative_step_tolerance);
     GETPOT_INPUT(relative_residual_tolerance);
+    GETPOT_INPUT(absolute_residual_tolerance);
     GETPOT_INPUT(initial_linear_tolerance);
     GETPOT_INPUT(minimum_linear_tolerance);
     GETPOT_INPUT(linear_tolerance_multiplier);

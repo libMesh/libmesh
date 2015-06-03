@@ -113,6 +113,8 @@ public:
     bool print_solution_norms, print_solutions,
          print_residual_norms, print_residuals,
          print_jacobian_norms, print_jacobians,
+         print_element_solutions,
+         print_element_residuals,
          print_element_jacobians;
 
     //   Solver options
@@ -123,6 +125,7 @@ public:
     libMesh::Real min_step_length;
     unsigned int max_linear_iterations, max_nonlinear_iterations;
     libMesh::Real relative_step_tolerance, relative_residual_tolerance,
+                  absolute_residual_tolerance,
                   initial_linear_tolerance, minimum_linear_tolerance,
                   linear_tolerance_multiplier;
 
