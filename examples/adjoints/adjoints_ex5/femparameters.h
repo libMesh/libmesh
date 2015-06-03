@@ -1,22 +1,3 @@
-/* The libMesh Finite Element Library. */
-/* Copyright (C) 2002-2013 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner */
-
-/* This library is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
-
-/* This library is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
-
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
-
-
-
 
 #ifndef __fem_parameters_h__
 #define __fem_parameters_h__
@@ -27,124 +8,142 @@
 #include "libmesh/function_base.h"
 #include "libmesh/getpot.h"
 #include "libmesh/id_types.h"
+#include "libmesh/parallel_object.h"
 #include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
 
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
 
-// Bring in everything from the libMesh namespace
-using namespace libMesh;
 
-class FEMParameters
+
+class FEMParameters : public libMesh::ParallelObject
 {
 public:
-  FEMParameters();
+    FEMParameters(const libMesh::Parallel::Communicator &comm_in);
 
-  ~FEMParameters();
+    ~FEMParameters();
 
-  void read(GetPot &input);
+    void read(GetPot &input,
+              const std::vector<std::string>* other_variable_names = NULL);
 
-  // Parameters applicable to entire EquationSystems:
+    // Parameters applicable to entire EquationSystems:
 
-  unsigned int initial_timestep, n_timesteps;
-  bool transient;
-  unsigned int deltat_reductions;
-  std::string timesolver_core;
-  Real end_time, deltat, timesolver_theta,
-    timesolver_maxgrowth, timesolver_tolerance,
-    timesolver_upper_tolerance, steadystate_tolerance;
-  std::vector<FEMNormType> timesolver_norm;
+    unsigned int initial_timestep, n_timesteps;
+    bool transient;
+    unsigned int deltat_reductions;
+    std::string timesolver_core;
+    libMesh::Real end_time, deltat, timesolver_theta,
+                  timesolver_maxgrowth, timesolver_tolerance,
+                  timesolver_upper_tolerance, steadystate_tolerance;
+    std::vector<libMesh::FEMNormType> timesolver_norm;
 
-  //   Mesh generation
+    //   Mesh generation
 
-  unsigned int dimension;
-  std::string domaintype, domainfile, elementtype;
-  Real elementorder;
-  Real domain_xmin, domain_ymin, domain_zmin;
-  Real domain_edge_width, domain_edge_length, domain_edge_height;
-  unsigned int coarsegridx, coarsegridy, coarsegridz;
-  unsigned int coarserefinements, extrarefinements;
+    unsigned int dimension;
+    std::string domaintype, domainfile, elementtype;
+    libMesh::Real elementorder;
+    libMesh::Real domain_xmin, domain_ymin, domain_zmin;
+    libMesh::Real domain_edge_width, domain_edge_length, domain_edge_height;
+    unsigned int coarsegridx, coarsegridy, coarsegridz;
+    unsigned int coarserefinements, extrarefinements;
+    std::string mesh_redistribute_func;
 
-  //   Mesh refinement
+    //   Mesh refinement
 
-  unsigned int nelem_target;
-  Real global_tolerance;
-  Real refine_fraction, coarsen_fraction, coarsen_threshold;
-  unsigned int max_adaptivesteps;
-  unsigned int initial_adaptivesteps;
+    unsigned int nelem_target;
+    libMesh::Real global_tolerance;
+    libMesh::Real refine_fraction, coarsen_fraction, coarsen_threshold;
+    unsigned int max_adaptivesteps;
+    unsigned int initial_adaptivesteps;
 
-  //   Output
+    //   Output
 
-  unsigned int write_interval;
-  bool write_gmv_error, write_tecplot_error, output_xda, output_xdr,
-    output_bz2, output_gz, output_gmv, output_tecplot;
+    unsigned int write_interval;
+    bool write_gmv_error, write_tecplot_error,
+         write_exodus_error,
+         output_xda, output_xdr,
+         output_bz2, output_gz,
+         output_gmv, output_tecplot,
+         output_exodus, output_nemesis;
 
-  // Types of Systems to create
+    // Types of Systems to create
 
-  std::vector<std::string> system_types;
+    std::vector<std::string> system_types;
 
-  // Parameters applicable to each system:
+    // Parameters applicable to each system:
 
-  //   Boundary and initial conditions
+    //   Boundary and initial conditions
 
-  //std::vector<PeriodicBoundary> periodic_boundaries;
+    std::vector<libMesh::PeriodicBoundary> periodic_boundaries;
 
-  std::map<subdomain_id_type, FunctionBase<Number> *> initial_conditions;
-  std::map<boundary_id_type, FunctionBase<Number> *>  dirichlet_conditions,
-    neumann_conditions;
-  std::map<boundary_id_type, std::vector<unsigned int> > dirichlet_condition_variables,
-    neumann_condition_variables;
-  std::map<int, std::map<subdomain_id_type, FunctionBase<Number> *> >
-  other_interior_functions;
-  std::map<int, std::map<boundary_id_type, FunctionBase<Number> *> >
-  other_boundary_functions;
+    std::map<libMesh::subdomain_id_type, libMesh::FunctionBase<libMesh::Number> *>
+      initial_conditions;
+    std::map<libMesh::boundary_id_type, libMesh::FunctionBase<libMesh::Number> *>
+      dirichlet_conditions,
+      neumann_conditions;
+    std::map<libMesh::boundary_id_type, std::vector<unsigned int> >
+      dirichlet_condition_variables,
+      neumann_condition_variables;
+    std::map<int, std::map<libMesh::subdomain_id_type,
+                           libMesh::FunctionBase<libMesh::Number> *> >
+      other_interior_functions;
+    std::map<int, std::map<libMesh::boundary_id_type,
+                           libMesh::FunctionBase<libMesh::Number> *> >
+      other_boundary_functions;
 
-  //   Execution type
+    //   Execution type
 
-  bool run_simulation, run_postprocess;
+    bool run_simulation, run_postprocess;
 
-  //   Approximation type
+    //   Approximation type
 
-  std::vector<std::string> fe_family;
-  std::vector<unsigned int> fe_order;
-  int extra_quadrature_order;
+    std::vector<std::string> fe_family;
+    std::vector<unsigned int> fe_order;
+    int extra_quadrature_order;
 
-  //   Assembly options
+    //   Assembly options
 
-  bool analytic_jacobians;
-  Real verify_analytic_jacobians;
-  Real numerical_jacobian_h;
+    bool analytic_jacobians;
+    libMesh::Real verify_analytic_jacobians;
+    libMesh::Real numerical_jacobian_h;
 
-  bool print_solution_norms, print_solutions,
-    print_residual_norms, print_residuals,
-    print_jacobian_norms, print_jacobians,
-    print_element_jacobians, print_element_residuals;
+    bool print_solution_norms, print_solutions,
+         print_residual_norms, print_residuals,
+         print_jacobian_norms, print_jacobians,
+         print_element_solutions,
+         print_element_residuals,
+         print_element_jacobians;
 
-  //   Solver options
+    //   Solver options
 
-  bool use_petsc_snes;
-  bool time_solver_quiet, solver_quiet, solver_verbose, require_residual_reduction;
-  Real min_step_length;
-  unsigned int max_linear_iterations, max_nonlinear_iterations;
-  Real relative_step_tolerance, relative_residual_tolerance,
-    initial_linear_tolerance, minimum_linear_tolerance,
-    linear_tolerance_multiplier;
+    bool use_petsc_snes;
+    bool time_solver_quiet, solver_quiet, solver_verbose,
+         reuse_preconditioner, require_residual_reduction;
+    libMesh::Real min_step_length;
+    unsigned int max_linear_iterations, max_nonlinear_iterations;
+    libMesh::Real relative_step_tolerance, relative_residual_tolerance,
+                  absolute_residual_tolerance,
+                  initial_linear_tolerance, minimum_linear_tolerance,
+                  linear_tolerance_multiplier;
 
-  // Initialization
+    // Initialization
 
-  unsigned int initial_sobolev_order;
-  unsigned int initial_extra_quadrature;
+    unsigned int initial_sobolev_order;
+    unsigned int initial_extra_quadrature;
 
-  //   Error indicators
+    //   Error indicators
 
-  std::string indicator_type;
-  unsigned int sobolev_order;
+    bool refine_uniformly;
+    std::string indicator_type;
+    bool patch_reuse;
+    unsigned int sobolev_order;
 
-  //   System-specific parameters file
+    //   System-specific parameters file
 
-  std::string system_config_file;
+    std::string system_config_file;
 };
 
 #endif // __fem_parameters_h__
