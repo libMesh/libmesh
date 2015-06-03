@@ -383,6 +383,13 @@ void libmesh_assert_valid_elem_ids (const MeshBase &mesh);
 void libmesh_assert_valid_amr_elem_ids (const MeshBase &mesh);
 
 /**
+ * A function for verifying that any interior_parent pointers on
+ * elements are consistent with AMR (parents' interior_parents are
+ * interior_parents' parents)
+ */
+void libmesh_assert_valid_amr_interior_parents (const MeshBase &mesh);
+
+/**
  * A function for verifying that all nodes are connected to at least
  * one element.
  *
