@@ -91,23 +91,11 @@ refine_uniformly = false
 # Type of indicator, refine_uniformly must be set to false for this to work
 indicator_type = 'adjoint_residual'
 
-## If using adjoint_residual based indicators, specify the weighting error indicators
-adjoint_residual_type = 'patchpatch' 
-
 # Reuse patches (only for patch recovery)
 patch_reuse = false
 
 # Reuse preconditioners
 reuse_preconditioner = true
-
-# Should we alternate with uniform steps ?
-alternate_with_uniform_steps = false
-
-# If alternating, what steps should be adaptive
-alternate_step_number = 10
-
-# Do you want to compute and plot component wise errors ? (Only works for adjoint residual)
-component_wise_error = true
 
 # Type of error to be looked at
 sobolev_order = 1;
