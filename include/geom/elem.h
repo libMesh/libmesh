@@ -1875,7 +1875,8 @@ const Elem* Elem::interior_parent () const
 
   // We require consistency between AMR of interior and of boundary
   // elements
-  libmesh_assert_less_equal (interior_p->level(), this->level());
+  if (interior_p)
+    libmesh_assert_less_equal (interior_p->level(), this->level());
 
   return interior_p;
 }
