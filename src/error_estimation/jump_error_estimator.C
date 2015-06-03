@@ -195,9 +195,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
         {
           // Compute a projection onto the parent
           DenseVector<Number> Uparent;
-          FEBase::coarsened_dof_values(*(system.solution),
-                                       dof_map, parent, Uparent,
-                                       var, false);
+          FEBase::coarsened_dof_values
+            (*(system.solution), dof_map, parent, Uparent, false);
 
           // Loop over the neighbors of the parent
           for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
@@ -220,6 +219,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
                         {
                           fine_context->pre_fe_reinit(system, f);
                           coarse_context->pre_fe_reinit(system, parent);
+                          libmesh_assert_equal_to
+                            (coarse_context->get_elem_solution().size(),
+                             Uparent.size());
                           coarse_context->get_elem_solution() = Uparent;
 
                           this->reinit_sides();
@@ -245,6 +247,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
               else if (integrate_boundary_sides)
                 {
                   fine_context->pre_fe_reinit(system, parent);
+                  libmesh_assert_equal_to
+                    (fine_context->get_elem_solution().size(),
+                     Uparent.size());
                   fine_context->get_elem_solution() = Uparent;
                   fine_context->side = n_p;
                   fine_context->side_fe_reinit();
