@@ -199,7 +199,7 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType& u) co
 
   // Get finite element object
   typename FENeeded<OutputType>::value_base* fe = NULL;
-  (this->*fe_getter)( var, fe );
+  (this->*fe_getter)( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
@@ -229,7 +229,7 @@ void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType& du
 
   // Get finite element object
   typename FENeeded<OutputType>::grad_base* fe = NULL;
-  (this->*fe_getter)( var, fe );
+  (this->*fe_getter)( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
@@ -263,7 +263,7 @@ void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType& d2u
 
   // Get finite element object
   typename FENeeded<OutputType>::hess_base* fe = NULL;
-  (this->*fe_getter)( var, fe );
+  (this->*fe_getter)( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
@@ -318,7 +318,7 @@ void FEMContext::interior_values (unsigned int var,
 
   // Get the finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<OutputShape> > &phi = fe->get_phi();
@@ -382,7 +382,7 @@ void FEMContext::interior_gradients
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = fe->get_dphi();
@@ -448,7 +448,7 @@ void FEMContext::interior_hessians
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = fe->get_d2phi();
@@ -489,7 +489,7 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> > &curl_phi = fe->get_curl_phi();
@@ -523,7 +523,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > &div_phi = fe->get_div_phi();
@@ -576,7 +576,7 @@ void FEMContext::side_values
 
   // Get the finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, the_side_fe );
+  this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<OutputShape> > &phi = the_side_fe->get_phi();
@@ -625,7 +625,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, the_side_fe );
+  this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector< typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = the_side_fe->get_dphi();
@@ -661,7 +661,7 @@ void FEMContext::side_gradients
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, the_side_fe );
+  this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = the_side_fe->get_dphi();
@@ -730,7 +730,7 @@ void FEMContext::side_hessians
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, the_side_fe );
+  this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = the_side_fe->get_d2phi();
@@ -782,7 +782,7 @@ void FEMContext::point_value(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
@@ -830,7 +830,7 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
@@ -881,7 +881,7 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
@@ -917,7 +917,7 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
@@ -1111,7 +1111,7 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
@@ -1159,7 +1159,7 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
@@ -1210,7 +1210,7 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
-  this->get_element_fe<OutputShape>( var, fe );
+  this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
   UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
