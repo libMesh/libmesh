@@ -1341,6 +1341,27 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
 
 template <typename OutputType>
 void
+FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old_vector,
+                                                const DofMap &dof_map,
+                                                const Elem *elem,
+                                                DenseVector<Number> &Ue,
+                                                const bool use_old_dof_indices)
+{
+  for (unsigned int v=0; v != dof_map.n_variables(); ++v)
+    {
+      DenseVector<Number> Usub;
+
+      coarsened_dof_values(old_vector, dof_map, elem, Usub,
+                           use_old_dof_indices);
+
+      Ue.append (Usub);
+    }
+}
+
+
+
+template <typename OutputType>
+void
 FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints,
                                                      DofMap &dof_map,
                                                      const unsigned int variable_number,

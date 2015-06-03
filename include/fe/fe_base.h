@@ -174,7 +174,9 @@ public:
 
   /**
    * Creates a local projection on \p coarse_elem, based on the
-   * DoF values in \p global_vector for it's children.
+   * DoF values in \p global_vector for it's children.  Computes a
+   * vector of coefficients corresponding to dof_indices for only the
+   * single given \p var
    */
 
   static void coarsened_dof_values(const NumericVector<Number> &global_vector,
@@ -182,6 +184,18 @@ public:
                                    const Elem *coarse_elem,
                                    DenseVector<Number> &coarse_dofs,
                                    const unsigned int var,
+                                   const bool use_old_dof_indices = false);
+
+  /**
+   * Creates a local projection on \p coarse_elem, based on the
+   * DoF values in \p global_vector for it's children.  Computes a
+   * vector of coefficients corresponding to all dof_indices.
+   */
+
+  static void coarsened_dof_values(const NumericVector<Number> &global_vector,
+                                   const DofMap &dof_map,
+                                   const Elem *coarse_elem,
+                                   DenseVector<Number> &coarse_dofs,
                                    const bool use_old_dof_indices = false);
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
