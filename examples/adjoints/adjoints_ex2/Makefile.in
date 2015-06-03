@@ -120,7 +120,8 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = adjoints_ex2.C \
 	../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in \
-	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C
+	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C \
+	femparameters.h
 am__objects_1 = example_dbg-adjoints_ex2.$(OBJEXT) \
 	example_dbg-L-shaped.$(OBJEXT) example_dbg-L-qoi.$(OBJEXT) \
 	example_dbg-femparameters.$(OBJEXT)
@@ -138,7 +139,8 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = adjoints_ex2.C \
 	../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in \
-	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C
+	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C \
+	femparameters.h
 am__objects_3 = example_devel-adjoints_ex2.$(OBJEXT) \
 	example_devel-L-shaped.$(OBJEXT) example_devel-L-qoi.$(OBJEXT) \
 	example_devel-femparameters.$(OBJEXT)
@@ -153,7 +155,8 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	-o $@
 am__example_oprof_SOURCES_DIST = adjoints_ex2.C \
 	../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in \
-	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C
+	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C \
+	femparameters.h
 am__objects_5 = example_oprof-adjoints_ex2.$(OBJEXT) \
 	example_oprof-L-shaped.$(OBJEXT) example_oprof-L-qoi.$(OBJEXT) \
 	example_oprof-femparameters.$(OBJEXT)
@@ -168,7 +171,8 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	-o $@
 am__example_opt_SOURCES_DIST = adjoints_ex2.C \
 	../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in \
-	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C
+	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C \
+	femparameters.h
 am__objects_7 = example_opt-adjoints_ex2.$(OBJEXT) \
 	example_opt-L-shaped.$(OBJEXT) example_opt-L-qoi.$(OBJEXT) \
 	example_opt-femparameters.$(OBJEXT)
@@ -182,7 +186,8 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = adjoints_ex2.C \
 	../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in \
-	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C
+	l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C \
+	femparameters.h
 am__objects_9 = example_prof-adjoints_ex2.$(OBJEXT) \
 	example_prof-L-shaped.$(OBJEXT) example_prof-L-qoi.$(OBJEXT) \
 	example_prof-femparameters.$(OBJEXT)
@@ -622,7 +627,7 @@ CLEANFILES = lshaped.xda primal.out.* adjoint_0.out.* $(am__append_2) \
 example_name = adjoints_ex2
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/adjoints/ex2
-data = adjoints_ex2.C ../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C # femparameters.h
+data = adjoints_ex2.C ../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C femparameters.h
 sources = $(data) run.sh
 
 ######################################################################
