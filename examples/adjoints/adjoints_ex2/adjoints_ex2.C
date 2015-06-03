@@ -253,7 +253,7 @@ int main (int argc, char** argv)
   GetPot infile("general.in");
 
   // Read in parameters from the input file
-  FEMParameters param;
+  FEMParameters param(init.comm());
   param.read(infile);
 
   // Skip this default-2D example if libMesh was compiled as 1D-only.
