@@ -267,7 +267,7 @@ public:
     this->build_mesh();
 
     // Let's set an interior_parent() this time for testing
-    _mesh->elem(2)->set_interior_parent(0);
+    _mesh->elem(2)->set_interior_parent(_mesh->elem(0));
 
 #ifdef LIBMESH_ENABLE_AMR
     MeshRefinement(*_mesh).uniformly_refine(1);
@@ -308,8 +308,8 @@ public:
     CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->parent(), _mesh->elem(2) );
 
     // EDGE2 child elements should have the correct interior_parent
-    // CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->interior_parent(), _mesh->elem(3) );
-    // CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->interior_parent(), _mesh->elem(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->interior_parent(), _mesh->elem(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->interior_parent(), _mesh->elem(4) );
 #endif
   }
 
