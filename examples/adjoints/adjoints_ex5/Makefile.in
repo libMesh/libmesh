@@ -51,17 +51,20 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = general.in heat.in .linkstamp
+
+# also need links for VPATH builds
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = general.in heat.in .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
-@LIBMESH_DBG_MODE_TRUE@am__append_2 = example-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = example-devel
-@LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
-@LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
+@LIBMESH_DBG_MODE_TRUE@am__append_3 = example-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = example-devel
+@LIBMESH_OPT_MODE_TRUE@am__append_5 = example-opt
+@LIBMESH_PROF_MODE_TRUE@am__append_6 = example-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_7 = example-oprof
 subdir = examples/adjoints/adjoints_ex5
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -627,6 +630,11 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
+BUILT_SOURCES = femparameters.C $(am__append_1)
+DISTCLEANFILES = $(BUILT_SOURCES)
+
+#femparameters.h: $(top_srcdir)/examples/adjoints/adjoints_ex1/femparameters.h
+#	$(AM_V_GEN)$(LN_S) -f $< .
 example_name = adjoints_ex5
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/adjoints/ex5
@@ -637,10 +645,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = *.gmv.* $(am__append_1) $(example_name).html stdout.log
-
-# also need links for VPATH builds
-@LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
+CLEANFILES = *.gmv.* $(am__append_2) $(example_name).html stdout.log
 
 ######################################################################
 #
@@ -1571,6 +1576,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1661,6 +1667,9 @@ uninstall-am: uninstall-dataDATA
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-dataDATA
 
+
+femparameters.C: $(top_srcdir)/examples/adjoints/adjoints_ex1/femparameters.C
+	$(AM_V_GEN)$(LN_S) -f $< $@
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f general.in  && $(LN_S) -f $(srcdir)/general.in .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f heat.in && $(LN_S) -f $(srcdir)/heat.in .
