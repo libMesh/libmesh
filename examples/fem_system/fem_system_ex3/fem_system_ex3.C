@@ -162,6 +162,18 @@ int main (int argc, char** argv)
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
 
+  ExplicitSystem & v_system =
+    equation_systems.add_system<ExplicitSystem> ("Velocity");
+  v_system.add_variable("u_vel", FIRST, LAGRANGE);
+  v_system.add_variable("v_vel", FIRST, LAGRANGE);
+  v_system.add_variable("w_vel", FIRST, LAGRANGE);
+
+  ExplicitSystem & a_system =
+    equation_systems.add_system<ExplicitSystem> ("Acceleration");
+  a_system.add_variable("u_accel", FIRST, LAGRANGE);
+  a_system.add_variable("v_accel", FIRST, LAGRANGE);
+  a_system.add_variable("w_accel", FIRST, LAGRANGE);
+
   // Solve this as a time-dependent or steady system
   if (transient)
     system.time_solver =
@@ -204,6 +216,26 @@ int main (int argc, char** argv)
   NewmarkSolver* newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
   newmark->compute_initial_accel();
 
+  (*v_system.solution) = system.get_vector("_old_solution_rate");
+  (*a_system.solution) = system.get_vector("_old_solution_accel");
+  {
+    std::ostringstream file_name;
+
+    // We write the file in the ExodusII format.
+    file_name << "out.e-s."
+              << std::setw(3)
+              << std::setfill('0')
+              << std::right
+              << 0;
+
+    ExodusII_IO(mesh).write_timestep(file_name.str(),
+                                     equation_systems,
+                                     1, /* This number indicates how many time steps
+                                           are being written to the file */
+                                     system.time);
+
+  }
+
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
@@ -216,6 +248,9 @@ int main (int argc, char** argv)
 
       // Advance to the next timestep in a transient problem
       system.time_solver->advance_timestep();
+
+      (*v_system.solution) = system.get_vector("_old_solution_rate");
+      (*a_system.solution) = system.get_vector("_old_solution_accel");
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out this timestep if we're requested to
