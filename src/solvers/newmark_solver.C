@@ -128,8 +128,8 @@ namespace libMesh
         UniquePtr<NumericVector<Number> > new_solution_rate = nonlinear_solution.clone();
         (*new_solution_rate) -= old_nonlinear_soln;
         (*new_solution_rate) *= (_gamma/(_beta*_system.deltat));
-        new_solution_rate->add( -(_gamma/_beta - 1.0), old_solution_rate );
-        new_solution_rate->add( -(_gamma/(2.0*_beta)-1.0)*_system.deltat, old_solution_accel );
+        new_solution_rate->add( (1.0-_gamma/_beta), old_solution_rate );
+        new_solution_rate->add( (1.0-_gamma/(2.0*_beta))*_system.deltat, old_solution_accel );
 
         // a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
         //         - 1/(beta*Delta t)*v_n
@@ -343,15 +343,15 @@ namespace libMesh
 
         // Local velocity at current time step
         // v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
-        //         - ((gamma/beta)-1)*v_n
-        //         - (gamma/(2*beta)-1)*(Delta t)*a_n
+        //         + (1-(gamma/beta))*v_n
+        //         + (1-gamma/(2*beta))*(Delta t)*a_n
         context.elem_solution_rate_derivative = (_gamma/(_beta*dt));
 
         context.get_elem_solution_rate()  = context.get_elem_solution();
         context.get_elem_solution_rate() -= old_elem_solution;
         context.get_elem_solution_rate() *= context.elem_solution_rate_derivative;
-        context.get_elem_solution_rate().add( -(_gamma/_beta - 1.0), old_elem_solution_rate);
-        context.get_elem_solution_rate().add( -(_gamma/(2.0*_beta)-1.0)*dt, old_elem_solution_accel);
+        context.get_elem_solution_rate().add( (1.0-_gamma/_beta), old_elem_solution_rate);
+        context.get_elem_solution_rate().add( (1.0-_gamma/(2.0*_beta))*dt, old_elem_solution_accel);
 
 
 
