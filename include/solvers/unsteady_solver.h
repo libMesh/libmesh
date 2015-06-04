@@ -119,6 +119,13 @@ public:
   virtual Real error_order () const = 0;
 
   /**
+   * Returns the maximum order of time derivatives for which the
+   * UnsteadySolver subclass is capable of handling. E.g. EulerSolver
+   * will have time_order = 1 and NewmarkSolver will have time_order = 2
+   */
+  virtual Real time_order () const = 0;
+
+  /**
    * @returns the old nonlinear solution for the specified global
    * DOF.
    */
