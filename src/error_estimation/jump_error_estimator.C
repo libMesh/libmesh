@@ -119,7 +119,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // of the error.  Use floats instead of ints since in case 2 (above)
   // f gets 1/2 of a flux face contribution from each of his
   // neighbors
-  std::vector<float> n_flux_faces (error_per_cell.size());
+  std::vector<float> n_flux_faces;
+  if (scale_by_n_flux_faces)
+    n_flux_faces.resize(error_per_cell.size(), 0);
 
   // Prepare current_local_solution to localize a non-standard
   // solution vector if necessary
@@ -229,18 +231,23 @@ void JumpErrorEstimator::estimate_error (const System& system,
                           // Loop over all significant variables in the system
                           for (var=0; var<n_vars; var++)
                             if (error_norm.weight(var) != 0.0)
-                              this->internal_side_integration();
+                              {
+                                this->internal_side_integration();
 
-                          error_per_cell[fine_context->get_elem().id()] +=
-                            static_cast<ErrorVectorReal>(fine_error);
-                          error_per_cell[coarse_context->get_elem().id()] +=
-                            static_cast<ErrorVectorReal>(coarse_error);
+                                error_per_cell[fine_context->get_elem().id()] +=
+                                  static_cast<ErrorVectorReal>(fine_error);
+                                error_per_cell[coarse_context->get_elem().id()] +=
+                                  static_cast<ErrorVectorReal>(coarse_error);
+                              }
 
                           // Keep track of the number of internal flux
                           // sides found on each element
-                          n_flux_faces[fine_context->get_elem().id()]++;
-                          n_flux_faces[coarse_context->get_elem().id()] +=
-                            this->coarse_n_flux_faces_increment();
+                          if (scale_by_n_flux_faces)
+                            {
+                              n_flux_faces[fine_context->get_elem().id()]++;
+                              n_flux_faces[coarse_context->get_elem().id()] +=
+                                this->coarse_n_flux_faces_increment();
+                            }
                         }
                     }
                 }
@@ -254,12 +261,26 @@ void JumpErrorEstimator::estimate_error (const System& system,
                   fine_context->side = n_p;
                   fine_context->side_fe_reinit();
 
-                  if (this->boundary_side_integration())
-                    {
-                      error_per_cell[fine_context->get_elem().id()] +=
-                        static_cast<ErrorVectorReal>(fine_error);
-                      n_flux_faces[fine_context->get_elem().id()]++;
-                    }
+                  // If we find a boundary flux for any variable,
+                  // let's just count it as a flux face for all
+                  // variables.  Otherwise we'd need to keep track of
+                  // a separate n_flux_faces and error_per_cell for
+                  // every single var.
+                  bool found_boundary_flux = false;
+
+                  for (var=0; var<n_vars; var++)
+                    if (error_norm.weight(var) != 0.0)
+                      {
+                        if (this->boundary_side_integration())
+                          {
+                            error_per_cell[fine_context->get_elem().id()] +=
+                              static_cast<ErrorVectorReal>(fine_error);
+                            found_boundary_flux = true;
+                          }
+                      }
+
+                  if (scale_by_n_flux_faces && found_boundary_flux)
+                    n_flux_faces[fine_context->get_elem().id()]++;
                 }
             }
         }
@@ -295,18 +316,23 @@ void JumpErrorEstimator::estimate_error (const System& system,
                   // Loop over all significant variables in the system
                   for (var=0; var<n_vars; var++)
                     if (error_norm.weight(var) != 0.0)
-                      this->internal_side_integration();
+                      {
+                        this->internal_side_integration();
 
-                  error_per_cell[fine_context->get_elem().id()] +=
-                    static_cast<ErrorVectorReal>(fine_error);
-                  error_per_cell[coarse_context->get_elem().id()] +=
-                    static_cast<ErrorVectorReal>(coarse_error);
+                        error_per_cell[fine_context->get_elem().id()] +=
+                          static_cast<ErrorVectorReal>(fine_error);
+                        error_per_cell[coarse_context->get_elem().id()] +=
+                          static_cast<ErrorVectorReal>(coarse_error);
+                      }
 
                   // Keep track of the number of internal flux
                   // sides found on each element
-                  n_flux_faces[fine_context->get_elem().id()]++;
-                  n_flux_faces[coarse_context->get_elem().id()] +=
-                    this->coarse_n_flux_faces_increment();
+                  if (scale_by_n_flux_faces)
+                    {
+                      n_flux_faces[fine_context->get_elem().id()]++;
+                      n_flux_faces[coarse_context->get_elem().id()] +=
+                        this->coarse_n_flux_faces_increment();
+                    }
                 } // end if (case1 || case2)
             } // if (e->neigbor(n_e) != NULL)
 
@@ -320,14 +346,19 @@ void JumpErrorEstimator::estimate_error (const System& system,
           // BC function.
           else if (integrate_boundary_sides)
             {
+              bool found_boundary_flux = false;
+
               for (var=0; var<n_vars; var++)
                 if (error_norm.weight(var) != 0.0)
                   if (this->boundary_side_integration())
                     {
                       error_per_cell[fine_context->get_elem().id()] +=
                         static_cast<ErrorVectorReal>(fine_error);
-                      n_flux_faces[fine_context->get_elem().id()]++;
+                      found_boundary_flux = true;
                     }
+
+              if (scale_by_n_flux_faces && found_boundary_flux)
+                n_flux_faces[fine_context->get_elem().id()]++;
             } // end if (e->neighbor(n_e) == NULL)
         } // end loop over neighbors
     } // End loop over active local elements
