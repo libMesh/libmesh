@@ -1347,6 +1347,8 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                                                 DenseVector<Number> &Ue,
                                                 const bool use_old_dof_indices)
 {
+  Ue.resize(0);
+
   for (unsigned int v=0; v != dof_map.n_variables(); ++v)
     {
       DenseVector<Number> Usub;
