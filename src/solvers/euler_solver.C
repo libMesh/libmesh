@@ -25,7 +25,7 @@ namespace libMesh
 
 
 EulerSolver::EulerSolver (sys_type& s)
-  : UnsteadySolver(s), theta(1.)
+  : FirstOrderUnsteadySolver(s), theta(1.)
 {
 }
 

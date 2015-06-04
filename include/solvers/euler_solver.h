@@ -21,7 +21,7 @@
 #define LIBMESH_EULER_SOLVER_H
 
 // Local includes
-#include "libmesh/unsteady_solver.h"
+#include "libmesh/first_order_unsteady_solver.h"
 
 // C++ includes
 
@@ -42,13 +42,13 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Solver class definition
-class EulerSolver : public UnsteadySolver
+class EulerSolver : public FirstOrderUnsteadySolver
 {
 public:
   /**
    * The parent class
    */
-  typedef UnsteadySolver Parent;
+  typedef FirstOrderUnsteadySolver Parent;
 
   /**
    * Constructor. Requires a reference to the system

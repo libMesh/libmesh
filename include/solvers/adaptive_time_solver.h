@@ -22,7 +22,7 @@
 
 // Local includes
 #include "libmesh/system_norm.h"
-#include "libmesh/unsteady_solver.h"
+#include "libmesh/first_order_unsteady_solver.h"
 
 // C++ includes
 
@@ -48,13 +48,13 @@ class System;
 
 // ------------------------------------------------------------
 // Solver class definition
-class AdaptiveTimeSolver : public UnsteadySolver
+class AdaptiveTimeSolver : public FirstOrderUnsteadySolver
 {
 public:
   /**
    * The parent class
    */
-  typedef UnsteadySolver Parent;
+  typedef FirstOrderUnsteadySolver Parent;
 
   /**
    * Constructor. Requires a reference to the system
