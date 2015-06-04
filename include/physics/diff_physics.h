@@ -58,8 +58,10 @@ template <typename T> class NumericVector;
  * TimeSolver. \f$F(u)\f$ is computed by element/side_time_derivative,
  * \f$G(u)\f$ is computed using element/side_constraint,
  * \f$C(u,\dot{u})\dot{u}\f$ is computed using the dampling_residual methods
- * and \f$ M(u,\ddot{u})\ddot{u}\f$ is computed using the mass_residual
- * methods.
+ * and \f$ -M(u,\ddot{u})\ddot{u}\f$ is computed using the mass_residual
+ * methods. This is the sign convention used by the default implementation;
+ * if the method is overridden, the user can choose any self-consistent sign
+ * convention they wish.
  *
  * FEMContext provides methods for querying values of the solution \f${u}\f$,
  * its "rate" \f$\dot{u}\f$ and its "acceleration" \f$\ddot{u}\f$. Furthermore,
