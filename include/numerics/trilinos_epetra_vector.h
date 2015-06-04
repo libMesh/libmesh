@@ -1030,5 +1030,5 @@ void EpetraVector<T>::swap (NumericVector<T> &other)
 } // namespace libMesh
 
 
-#endif // #ifdef HAVE_EPETRA
+#endif // #ifdef LIBMESH_HAVE_TRILINOS
 #endif // LIBMESH_TRILINOS_EPETRA_VECTOR_H
