@@ -59,8 +59,10 @@ public:
     : ErrorEstimator(),
       scale_by_n_flux_faces(false),
       integrate_boundary_sides(false),
-      fine_context(NULL), coarse_context(NULL),
-      fine_error(0), coarse_error(0) {}
+      fine_context(),
+      coarse_context(),
+      fine_error(0),
+      coarse_error(0) {}
 
   /**
    * Destructor.
