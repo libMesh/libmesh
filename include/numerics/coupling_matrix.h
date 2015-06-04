@@ -36,6 +36,8 @@ namespace libMesh
 class ConstCouplingAccessor;
 class CouplingAccessor;
 
+class ConstCouplingRow;
+
 /**
  * This class defines a coupling matrix.  A coupling
  * matrix is simply a matrix of ones and zeros describing
@@ -92,6 +94,7 @@ private:
 
   friend class ConstCouplingAccessor;
   friend class CouplingAccessor;
+  friend class ConstCouplingRow;
 
   /**
    * Coupling matrices are typically either full or very sparse, and
@@ -101,7 +104,7 @@ private:
    * is the location of the first non-zero, and the second is the
    * location of the last subsequent non-zero (*not* the next
    * subsequent zero; we drop empty ranges).
-   * 
+   *
    * We store locations (i,j) as long integers i*_size+j
    */
   typedef std::pair<std::size_t, std::size_t> range_type;
@@ -312,6 +315,200 @@ private:
 
   CouplingMatrix& _my_mat;
 };
+
+
+
+/**
+ * This proxy class acts like a container of indices from a single
+ * coupling row
+ */
+class ConstCouplingRow
+{
+public:
+  ConstCouplingRow(unsigned int row_in,
+                   const CouplingMatrix& mat_in) :
+    _row_i(row_in), _mat(mat_in)
+  {
+    libmesh_assert_less(_row_i, _mat.size());
+
+    // Location for i,N
+    _begin_location = _row_i*_mat.size()+_mat.size()-1;
+
+    const std::size_t max_size = std::numeric_limits<std::size_t>::max();
+
+    // Find the range that might contain i,N
+    // lower_bound isn't *quite* what we want
+    _begin_it = std::upper_bound
+      (_mat._ranges.begin(), _mat._ranges.end(),
+       std::make_pair(_begin_location, max_size));
+    if (_begin_it !=_mat._ranges.begin())
+      --_begin_it;
+    else
+      _begin_it=_mat._ranges.end();
+
+    // If that range doesn't exist then we're an empty row
+    if (_begin_it == _mat._ranges.end())
+      _begin_location = max_size;
+    else
+      {
+        const std::size_t firstloc = _begin_it->first;
+        const std::size_t lastloc  = _begin_it->second;
+        libmesh_assert_less_equal(firstloc, lastloc);
+
+        // If that range ends before i,0 then we're an empty row
+        std::size_t zero_location = _row_i*_mat.size();
+        if (zero_location > lastloc)
+          {
+            _begin_location = max_size;
+            _begin_it = _mat._ranges.end();
+          }
+        else
+        // We have *some* entry(s) in this row, we just need to find
+        // the earliest
+          {
+            while (_begin_it != _mat._ranges.begin())
+              {
+                CouplingMatrix::rc_type::const_iterator prev =
+                  _begin_it;
+                --prev;
+
+                if (prev->second < zero_location)
+                  break;
+
+                _begin_it = prev;
+              }
+            if (_begin_it->first < zero_location)
+              _begin_location = zero_location;
+            else
+              _begin_location = _begin_it->first;
+          }
+      }
+  }
+
+  class const_iterator
+  {
+  public:
+    const_iterator(const ConstCouplingRow& row_in,
+                   std::size_t loc_in,
+                   CouplingMatrix::rc_type::const_iterator it_in) :
+      _location(loc_in),
+      _row(row_in),
+      _it(it_in)
+    {
+#ifndef NDEBUG
+      if (_it != _row._mat._ranges.end())
+        {
+          libmesh_assert_less_equal(_it->first, _location);
+          libmesh_assert_less_equal(_location, _it->second);
+        }
+      else
+        {
+          libmesh_assert_equal_to
+            (_location, std::numeric_limits<size_t>::max());
+        }
+#endif
+    }
+
+    unsigned int operator* ()
+    {
+      libmesh_assert_not_equal_to
+        (_location, std::numeric_limits<std::size_t>::max());
+      return _location % _row._mat.size();
+    }
+
+    const_iterator& operator++ ()
+    {
+      libmesh_assert_not_equal_to
+        (_location, std::numeric_limits<std::size_t>::max());
+
+      if (_location == _it->second)
+      {
+        ++_it;
+
+        // Are we past the end of the matrix?
+        if (_it == _row._mat._ranges.end())
+          _location = std::numeric_limits<std::size_t>::max();
+        else
+          {
+            _location = _it->first;
+            // Are we past the end of the row?
+            if (_location >= _row._mat.size()*(_row._row_i+1))
+              {
+                _location = std::numeric_limits<std::size_t>::max();
+                _it = _row._mat._ranges.end();
+              }
+          }
+      }
+      else
+        ++_location;
+
+      return *this;
+    }
+
+    bool operator== (const const_iterator& other) const
+    {
+      // Thinking that iterators from different row objects are equal
+      // is not even wrong
+      libmesh_assert(_row == other._row);
+
+      return ((_location == other._location) &&
+              (_it == other._it));
+    }
+
+    bool operator!= (const const_iterator& other) const
+    {
+      return !(*this == other);
+    }
+
+  private:
+    // The location (i*size+j) corresponding to this iterator, or
+    // numeric_limits<size_t>::max() to signify end()
+    std::size_t _location;
+    const ConstCouplingRow &_row;
+    // The range containing this iterator location, or
+    // _row._mat._ranges.end() if no range contains this location
+    CouplingMatrix::rc_type::const_iterator _it;
+  };
+
+  const_iterator begin() {
+    return const_iterator (*this, _begin_location, _begin_it);
+  }
+
+  const_iterator end() {
+    return const_iterator
+      (*this, std::numeric_limits<std::size_t>::max(),
+       _mat._ranges.end());
+  }
+
+  bool operator== (const ConstCouplingRow& other) const
+  {
+    // Thinking that rows from different matrix objects are equal is
+    // not even wrong
+    libmesh_assert(&_mat == &other._mat);
+
+    return ((_begin_location == other._begin_location) &&
+            (_begin_it == other._begin_it));
+  }
+
+  bool operator!= (const ConstCouplingRow& other) const
+  {
+    return !(*this == other);
+  }
+protected:
+
+  unsigned int _row_i;
+  const CouplingMatrix& _mat;
+
+  // The location (i*size+j) corresponding to the first entry in this
+  // row, or numeric_limits<size_t>::max() for an empty row.
+  std::size_t _begin_location;
+
+  // Iterator to the range containing the first row element, or
+  // _row._mat._ranges.end() if no CouplingMatrix values are true for
+  // this row
+  CouplingMatrix::rc_type::const_iterator _begin_it;
+};
+
 
 //--------------------------------------------------
 // CouplingMatrix inline methods
