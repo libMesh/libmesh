@@ -1252,6 +1252,28 @@ void FEMContext::side_rate(unsigned int var, unsigned int qp,
                    &DiffContext::get_elem_solution_rate>(var, qp, u);
 }
 
+template<typename OutputType>
+void FEMContext::interior_accel(unsigned int var, unsigned int qp,
+                                OutputType& u) const
+{
+  this->some_value<OutputType,
+                   &FEMContext::get_element_fe
+                   <typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_solution_accel>(var, qp, u);
+}
+
+
+
+template<typename OutputType>
+void FEMContext::side_accel(unsigned int var, unsigned int qp,
+                            OutputType& u) const
+{
+  this->some_value<OutputType,
+                   &FEMContext::get_side_fe
+                   <typename TensorTools::MakeReal<OutputType>::type>,
+                   &DiffContext::get_elem_solution_accel>(var, qp, u);
+}
+
 
 
 void FEMContext::elem_reinit(Real theta)
@@ -1532,6 +1554,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   if (sys.use_fixed_solution)
     this->get_elem_fixed_solution().resize(n_dofs);
   this->get_elem_solution_rate().resize(n_dofs);
+  this->get_elem_solution_accel().resize(n_dofs);
 
   // These resize calls also zero out the residual and jacobian
   this->get_elem_residual().resize(n_dofs);
@@ -1561,6 +1584,9 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
           (sub_dofs, n_dofs_var);
 
         this->get_elem_solution_rate(i).reposition
+          (sub_dofs, n_dofs_var);
+
+        this->get_elem_solution_accel(i).reposition
           (sub_dofs, n_dofs_var);
 
         if (sys.use_fixed_solution)
@@ -1793,6 +1819,12 @@ template void FEMContext::interior_rate<Gradient>(unsigned int, unsigned int, Gr
 
 template void FEMContext::side_rate<Number>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::side_rate<Gradient>(unsigned int, unsigned int, Gradient&) const;
+
+template void FEMContext::interior_accel<Number>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::interior_accel<Gradient>(unsigned int, unsigned int, Gradient&) const;
+
+template void FEMContext::side_accel<Number>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::side_accel<Gradient>(unsigned int, unsigned int, Gradient&) const;
 
 template UniquePtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
 template UniquePtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;

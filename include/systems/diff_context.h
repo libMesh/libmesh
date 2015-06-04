@@ -176,6 +176,40 @@ public:
     return *(_elem_subsolution_rates[var]);
   }
 
+  /**
+   * Accessor for element solution accel of change w.r.t. time.
+   */
+  const DenseVector<Number>& get_elem_solution_accel() const
+  { return _elem_solution_accel; }
+
+  /**
+   * Non-const accessor for element solution accel of change w.r.t.
+   * time.
+   */
+  DenseVector<Number>& get_elem_solution_accel()
+  { return _elem_solution_accel; }
+
+  /**
+   * Accessor for element solution accel for a particular variable
+   * corresponding to the variable index argument.
+   */
+  const DenseSubVector<Number>& get_elem_solution_accel( unsigned int var ) const
+  {
+    libmesh_assert_greater(_elem_subsolution_accels.size(), var);
+    libmesh_assert(_elem_subsolution_accels[var]);
+    return *(_elem_subsolution_accels[var]);
+  }
+
+  /**
+   * Accessor for element solution accel for a particular variable
+   * corresponding to the variable index argument.
+   */
+  DenseSubVector<Number>& get_elem_solution_accel( unsigned int var )
+  {
+    libmesh_assert_greater(_elem_subsolution_accels.size(), var);
+    libmesh_assert(_elem_subsolution_accels[var]);
+    return *(_elem_subsolution_accels[var]);
+  }
 
   /**
    * Accessor for element fixed solution.
@@ -398,6 +432,15 @@ public:
   { return elem_solution_rate_derivative; }
 
   /**
+   * The derivative of the current elem_solution_accel w.r.t. the
+   * unknown solution.  Corresponding Jacobian contributions should be
+   * multiplied by this amount, or may be skipped if
+   * get_elem_solution_accel_derivative() is 0.
+   */
+  Real get_elem_solution_accel_derivative() const
+  { return elem_solution_accel_derivative; }
+
+  /**
    * The derivative of the current fixed_elem_solution w.r.t. the
    * unknown solution.  Corresponding Jacobian contributions should be
    * multiplied by this amount, or may be skipped if
@@ -448,6 +491,13 @@ public:
    * mass_residual terms.
    */
   Real elem_solution_rate_derivative;
+
+  /**
+   * The derivative of elem_solution_accel with respect to the current
+   * nonlinear solution, for use by systems with non default
+   * mass_residual terms.
+   */
+  Real elem_solution_accel_derivative;
 
   /**
    * The derivative of elem_fixed_solution with respect to the nonlinear
@@ -523,6 +573,13 @@ protected:
    */
   DenseVector<Number> _elem_solution_rate;
   std::vector<DenseSubVector<Number> *> _elem_subsolution_rates;
+
+  /**
+   * Element by element components of du/dt
+   * as adjusted by a time_solver
+   */
+  DenseVector<Number> _elem_solution_accel;
+  std::vector<DenseSubVector<Number> *> _elem_subsolution_accels;
 
   /**
    * Element by element components of nonlinear_solution
