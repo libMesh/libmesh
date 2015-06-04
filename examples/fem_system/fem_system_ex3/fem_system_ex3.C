@@ -201,6 +201,9 @@ int main (int argc, char** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
+  NewmarkSolver* newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
+  newmark->compute_initial_accel();
+
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
