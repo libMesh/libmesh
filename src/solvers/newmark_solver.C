@@ -135,7 +135,7 @@ namespace libMesh
         //         - 1/(beta*Delta t)*v_n
         //         - (1-1/(2*beta))*a_n
         UniquePtr<NumericVector<Number> > new_solution_accel = old_solution_accel.clone();
-        (*new_solution_accel) *=  -(1.0-1.0/(2.0*_beta));
+        (*new_solution_accel) *=  -(1.0/(2.0*_beta)-1.0);
         new_solution_accel->add( -1.0/(_beta*_system.deltat), old_solution_rate );
         new_solution_accel->add( 1.0/(_beta*_system.deltat*_system.deltat), nonlinear_solution );
         new_solution_accel->add( -1.0/(_beta*_system.deltat*_system.deltat), old_nonlinear_soln );
@@ -358,14 +358,14 @@ namespace libMesh
         // Local acceleration at current time step
         // a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
         //         - 1/(beta*Delta t)*v_n
-        //         - (1-1/(2*beta))*a_n
+        //         - (1/(2*beta)-1)*a_n
         context.elem_solution_accel_derivative = 1.0/(_beta*dt*dt);
 
         context.get_elem_solution_accel()  = context.get_elem_solution();
         context.get_elem_solution_accel() -= old_elem_solution;
         context.get_elem_solution_accel() *= context.elem_solution_accel_derivative;
         context.get_elem_solution_accel().add(-1.0/(_beta*dt), old_elem_solution_rate);
-        context.get_elem_solution_accel().add(-(1.0-1.0/(2*_beta)), old_elem_solution_accel);
+        context.get_elem_solution_accel().add(-(1.0/(2.0*_beta)-1.0), old_elem_solution_accel);
       }
 
     // If a fixed solution is requested, we'll use x_{n+1}
