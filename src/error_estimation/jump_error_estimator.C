@@ -26,13 +26,14 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/jump_error_estimator.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/quadrature_gauss.h"
+#include "libmesh/fem_context.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/quadrature_gauss.h"
 #include "libmesh/system.h"
 
 #include "libmesh/dense_vector.h"
@@ -43,9 +44,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // JumpErrorEstimator implementations
-void JumpErrorEstimator::initialize (const System&,
-                                     ErrorVector&,
-                                     bool)
+void JumpErrorEstimator::init_context (FEMContext&)
 {
 }
 
@@ -97,9 +96,6 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
 
-  // The dimensionality of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
-
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();
 
@@ -123,7 +119,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // of the error.  Use floats instead of ints since in case 2 (above)
   // f gets 1/2 of a flux face contribution from each of his
   // neighbors
-  std::vector<float> n_flux_faces (error_per_cell.size());
+  std::vector<float> n_flux_faces;
+  if (scale_by_n_flux_faces)
+    n_flux_faces.resize(error_per_cell.size(), 0);
 
   // Prepare current_local_solution to localize a non-standard
   // solution vector if necessary
@@ -136,232 +134,234 @@ void JumpErrorEstimator::estimate_error (const System& system,
       sys.update();
     }
 
-  // Loop over all the variables in the system
+  fine_context.reset(new FEMContext(system));
+  coarse_context.reset(new FEMContext(system));
+
+  // Loop over all the variables we've been requested to find jumps in, to
+  // pre-request
   for (var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
       if (error_norm.weight(var) == 0.0) continue;
 
-      // The type of finite element to use for this variable
-      const FEType& fe_type = dof_map.variable_type (var);
+      // FIXME: Need to generalize this to vector-valued elements. [PB]
+      FEBase* side_fe = NULL;
 
-      // Finite element objects for the same face from
-      // different sides
-      fe_fine = FEBase::build (dim, fe_type);
-      fe_coarse = FEBase::build (dim, fe_type);
+      const std::set<unsigned char>& elem_dims =
+        fine_context->elem_dimensions();
 
-      // Build an appropriate Gaussian quadrature rule
-      QGauss qrule (dim-1, fe_type.default_quadrature_order());
-
-      // Tell the finite element for the fine element about the quadrature
-      // rule.  The finite element for the coarse element need not know about it
-      fe_fine->attach_quadrature_rule (&qrule);
-
-      // By convention we will always do the integration
-      // on the face of element e.  We'll need its Jacobian values and
-      // physical point locations, at least
-      fe_fine->get_JxW();
-      fe_fine->get_xyz();
-
-      // Our derived classes may want to do some initialization here
-      this->initialize(system, error_per_cell, estimate_parent_error);
-
-      // The global DOF indices for elements e & f
-      std::vector<dof_id_type> dof_indices_fine;
-      std::vector<dof_id_type> dof_indices_coarse;
-
-
-
-      // Iterate over all the active elements in the mesh
-      // that live on this processor.
-      MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-      for (; elem_it != elem_end; ++elem_it)
+      for (std::set<unsigned char>::const_iterator dim_it =
+             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
         {
-          // e is necessarily an active element on the local processor
-          const Elem* e = *elem_it;
-          const dof_id_type e_id = e->id();
+          const unsigned char dim = *dim_it;
+
+          fine_context->get_side_fe( var, side_fe, dim );
+
+          libmesh_assert_not_equal_to(side_fe->get_fe_type().family, SCALAR);
+
+          side_fe->get_xyz();
+        }
+    }
+
+  this->init_context(*fine_context);
+  this->init_context(*coarse_context);
+
+  // Iterate over all the active elements in the mesh
+  // that live on this processor.
+  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      // e is necessarily an active element on the local processor
+      const Elem* e = *elem_it;
+      const dof_id_type e_id = e->id();
 
 #ifdef LIBMESH_ENABLE_AMR
-          // See if the parent of element e has been examined yet;
-          // if not, we may want to compute the estimator on it
-          const Elem* parent = e->parent();
+      // See if the parent of element e has been examined yet;
+      // if not, we may want to compute the estimator on it
+      const Elem* parent = e->parent();
 
-          // We only can compute and only need to compute on
-          // parents with all active children
-          bool compute_on_parent = true;
-          if (!parent || !estimate_parent_error)
+      // We only can compute and only need to compute on
+      // parents with all active children
+      bool compute_on_parent = true;
+      if (!parent || !estimate_parent_error)
+        compute_on_parent = false;
+      else
+        for (unsigned int c=0; c != parent->n_children(); ++c)
+          if (!parent->child(c)->active())
             compute_on_parent = false;
-          else
-            for (unsigned int c=0; c != parent->n_children(); ++c)
-              if (!parent->child(c)->active())
-                compute_on_parent = false;
 
-          if (compute_on_parent &&
-              !error_per_cell[parent->id()])
+      if (compute_on_parent &&
+          !error_per_cell[parent->id()])
+        {
+          // Compute a projection onto the parent
+          DenseVector<Number> Uparent;
+          FEBase::coarsened_dof_values
+            (*(system.solution), dof_map, parent, Uparent, false);
+
+          // Loop over the neighbors of the parent
+          for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
             {
-              // Compute a projection onto the parent
-              DenseVector<Number> Uparent;
-              FEBase::coarsened_dof_values(*(system.solution),
-                                           dof_map, parent, Uparent,
-                                           var, false);
-
-              // Loop over the neighbors of the parent
-              for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
+              if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
                 {
-                  if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
+                  // Find the active neighbors in this direction
+                  std::vector<const Elem*> active_neighbors;
+                  parent->neighbor(n_p)->
+                    active_family_tree_by_neighbor(active_neighbors,
+                                                   parent);
+                  // Compute the flux to each active neighbor
+                  for (unsigned int a=0;
+                       a != active_neighbors.size(); ++a)
                     {
-                      // Find the active neighbors in this direction
-                      std::vector<const Elem*> active_neighbors;
-                      parent->neighbor(n_p)->
-                        active_family_tree_by_neighbor(active_neighbors,
-                                                       parent);
-                      // Compute the flux to each active neighbor
-                      for (unsigned int a=0;
-                           a != active_neighbors.size(); ++a)
+                      const Elem *f = active_neighbors[a];
+                      // FIXME - what about when f->level <
+                      // parent->level()??
+                      if (f->level() >= parent->level())
                         {
-                          const Elem *f = active_neighbors[a];
-                          // FIXME - what about when f->level <
-                          // parent->level()??
-                          if (f->level() >= parent->level())
+                          fine_context->pre_fe_reinit(system, f);
+                          coarse_context->pre_fe_reinit(system, parent);
+                          libmesh_assert_equal_to
+                            (coarse_context->get_elem_solution().size(),
+                             Uparent.size());
+                          coarse_context->get_elem_solution() = Uparent;
+
+                          this->reinit_sides();
+
+                          // Loop over all significant variables in the system
+                          for (var=0; var<n_vars; var++)
+                            if (error_norm.weight(var) != 0.0)
+                              {
+                                this->internal_side_integration();
+
+                                error_per_cell[fine_context->get_elem().id()] +=
+                                  static_cast<ErrorVectorReal>(fine_error);
+                                error_per_cell[coarse_context->get_elem().id()] +=
+                                  static_cast<ErrorVectorReal>(coarse_error);
+                              }
+
+                          // Keep track of the number of internal flux
+                          // sides found on each element
+                          if (scale_by_n_flux_faces)
                             {
-                              fine_elem = f;
-                              coarse_elem = parent;
-                              Ucoarse = Uparent;
-
-                              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-                              const unsigned int n_dofs_fine =
-                                cast_int<unsigned int>(dof_indices_fine.size());
-                              Ufine.resize(n_dofs_fine);
-
-                              for (unsigned int i=0; i<n_dofs_fine; i++)
-                                Ufine(i) = system.current_solution(dof_indices_fine[i]);
-                              this->reinit_sides();
-                              this->internal_side_integration();
-
-                              error_per_cell[fine_elem->id()] +=
-                                static_cast<ErrorVectorReal>(fine_error);
-                              error_per_cell[coarse_elem->id()] +=
-                                static_cast<ErrorVectorReal>(coarse_error);
-
-                              // Keep track of the number of internal flux
-                              // sides found on each element
-                              n_flux_faces[fine_elem->id()]++;
-                              n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
+                              n_flux_faces[fine_context->get_elem().id()]++;
+                              n_flux_faces[coarse_context->get_elem().id()] +=
+                                this->coarse_n_flux_faces_increment();
                             }
                         }
                     }
-                  else if (integrate_boundary_sides)
-                    {
-                      fine_elem = parent;
-                      Ufine = Uparent;
+                }
+              else if (integrate_boundary_sides)
+                {
+                  fine_context->pre_fe_reinit(system, parent);
+                  libmesh_assert_equal_to
+                    (fine_context->get_elem_solution().size(),
+                     Uparent.size());
+                  fine_context->get_elem_solution() = Uparent;
+                  fine_context->side = n_p;
+                  fine_context->side_fe_reinit();
 
-                      // Reinitialize shape functions on the fine element side
-                      fe_fine->reinit (fine_elem, fine_side);
+                  // If we find a boundary flux for any variable,
+                  // let's just count it as a flux face for all
+                  // variables.  Otherwise we'd need to keep track of
+                  // a separate n_flux_faces and error_per_cell for
+                  // every single var.
+                  bool found_boundary_flux = false;
 
-                      if (this->boundary_side_integration())
-                        {
-                          error_per_cell[fine_elem->id()] +=
-                            static_cast<ErrorVectorReal>(fine_error);
-                          n_flux_faces[fine_elem->id()]++;
-                        }
-                    }
+                  for (var=0; var<n_vars; var++)
+                    if (error_norm.weight(var) != 0.0)
+                      {
+                        if (this->boundary_side_integration())
+                          {
+                            error_per_cell[fine_context->get_elem().id()] +=
+                              static_cast<ErrorVectorReal>(fine_error);
+                            found_boundary_flux = true;
+                          }
+                      }
+
+                  if (scale_by_n_flux_faces && found_boundary_flux)
+                    n_flux_faces[fine_context->get_elem().id()]++;
                 }
             }
+        }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-          // If we do any more flux integration, e will be the fine element
-          fine_elem = e;
+      // If we do any more flux integration, e will be the fine element
+      fine_context->pre_fe_reinit(system, e);
 
-          // Loop over the neighbors of element e
-          for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+      // Loop over the neighbors of element e
+      for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+        {
+          if ((e->neighbor(n_e) != NULL) ||
+              integrate_boundary_sides)
             {
-              fine_side = n_e;
+              fine_context->side = n_e;
+              fine_context->side_fe_reinit();
+            }
 
-              if (e->neighbor(n_e) != NULL) // e is not on the boundary
+          if (e->neighbor(n_e) != NULL) // e is not on the boundary
+            {
+              const Elem* f           = e->neighbor(n_e);
+              const dof_id_type f_id = f->id();
+
+              // Compute flux jumps if we are in case 1 or case 2.
+              if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
+                  || (f->level() < e->level()))
                 {
-                  const Elem* f           = e->neighbor(n_e);
-                  const dof_id_type f_id = f->id();
+                  // f is now the coarse element
+                  coarse_context->pre_fe_reinit(system, f);
 
-                  // Compute flux jumps if we are in case 1 or case 2.
-                  if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
-                      || (f->level() < e->level()))
+                  this->reinit_sides();
+
+                  // Loop over all significant variables in the system
+                  for (var=0; var<n_vars; var++)
+                    if (error_norm.weight(var) != 0.0)
+                      {
+                        this->internal_side_integration();
+
+                        error_per_cell[fine_context->get_elem().id()] +=
+                          static_cast<ErrorVectorReal>(fine_error);
+                        error_per_cell[coarse_context->get_elem().id()] +=
+                          static_cast<ErrorVectorReal>(coarse_error);
+                      }
+
+                  // Keep track of the number of internal flux
+                  // sides found on each element
+                  if (scale_by_n_flux_faces)
                     {
-                      // f is now the coarse element
-                      coarse_elem = f;
+                      n_flux_faces[fine_context->get_elem().id()]++;
+                      n_flux_faces[coarse_context->get_elem().id()] +=
+                        this->coarse_n_flux_faces_increment();
+                    }
+                } // end if (case1 || case2)
+            } // if (e->neigbor(n_e) != NULL)
 
-                      // Get the DOF indices for the two elements
-                      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-                      dof_map.dof_indices (coarse_elem, dof_indices_coarse, var);
+          // Otherwise, e is on the boundary.  If it happens to
+          // be on a Dirichlet boundary, we need not do anything.
+          // On the other hand, if e is on a Neumann (flux) boundary
+          // with grad(u).n = g, we need to compute the additional residual
+          // (h * \int |g - grad(u_h).n|^2 dS)^(1/2).
+          // We can only do this with some knowledge of the boundary
+          // conditions, i.e. the user must have attached an appropriate
+          // BC function.
+          else if (integrate_boundary_sides)
+            {
+              bool found_boundary_flux = false;
 
-                      // The number of DOFS on each element
-                      const unsigned int n_dofs_fine =
-                        cast_int<unsigned int>(dof_indices_fine.size());
-                      const unsigned int n_dofs_coarse =
-                        cast_int<unsigned int>(dof_indices_coarse.size());
-                      Ufine.resize(n_dofs_fine);
-                      Ucoarse.resize(n_dofs_coarse);
-
-                      // The local solutions on each element
-                      for (unsigned int i=0; i<n_dofs_fine; i++)
-                        Ufine(i) = system.current_solution(dof_indices_fine[i]);
-                      for (unsigned int i=0; i<n_dofs_coarse; i++)
-                        Ucoarse(i) = system.current_solution(dof_indices_coarse[i]);
-
-                      this->reinit_sides();
-                      this->internal_side_integration();
-
-                      error_per_cell[fine_elem->id()] +=
+              for (var=0; var<n_vars; var++)
+                if (error_norm.weight(var) != 0.0)
+                  if (this->boundary_side_integration())
+                    {
+                      error_per_cell[fine_context->get_elem().id()] +=
                         static_cast<ErrorVectorReal>(fine_error);
-                      error_per_cell[coarse_elem->id()] +=
-                        static_cast<ErrorVectorReal>(coarse_error);
+                      found_boundary_flux = true;
+                    }
 
-                      // Keep track of the number of internal flux
-                      // sides found on each element
-                      n_flux_faces[fine_elem->id()]++;
-                      n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
-                    } // end if (case1 || case2)
-                } // if (e->neigbor(n_e) != NULL)
-
-              // Otherwise, e is on the boundary.  If it happens to
-              // be on a Dirichlet boundary, we need not do anything.
-              // On the other hand, if e is on a Neumann (flux) boundary
-              // with grad(u).n = g, we need to compute the additional residual
-              // (h * \int |g - grad(u_h).n|^2 dS)^(1/2).
-              // We can only do this with some knowledge of the boundary
-              // conditions, i.e. the user must have attached an appropriate
-              // BC function.
-              else
-                {
-                  if (integrate_boundary_sides)
-                    {
-                      // Reinitialize shape functions on the fine element side
-                      fe_fine->reinit (fine_elem, fine_side);
-
-                      // Get the DOF indices
-                      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-
-                      // The number of DOFS on each element
-                      const unsigned int n_dofs_fine =
-                        cast_int<unsigned int>(dof_indices_fine.size());
-                      Ufine.resize(n_dofs_fine);
-
-                      for (unsigned int i=0; i<n_dofs_fine; i++)
-                        Ufine(i) = system.current_solution(dof_indices_fine[i]);
-
-                      if (this->boundary_side_integration())
-                        {
-                          error_per_cell[fine_elem->id()] +=
-                            static_cast<ErrorVectorReal>(fine_error);
-                          n_flux_faces[fine_elem->id()]++;
-                        }
-                    } // end if _bc_function != NULL
-                } // end if (e->neighbor(n_e) == NULL)
-            } // end loop over neighbors
-        } // End loop over active local elements
-    } // End loop over variables
-
+              if (scale_by_n_flux_faces && found_boundary_flux)
+                n_flux_faces[fine_context->get_elem().id()]++;
+            } // end if (e->neighbor(n_e) == NULL)
+        } // end loop over neighbors
+    } // End loop over active local elements
 
 
   // Each processor has now computed the error contribuions
@@ -423,21 +423,37 @@ void JumpErrorEstimator::estimate_error (const System& system,
 void
 JumpErrorEstimator::reinit_sides ()
 {
-  // The master quadrature point locations on the coarse element
-  std::vector<Point> qp_coarse;
+  fine_context->side_fe_reinit();
 
-  // Reinitialize shape functions on the fine element side
-  fe_fine->reinit (fine_elem, fine_side);
+  unsigned int dim = fine_context->get_elem().dim();
+  libmesh_assert_equal_to(dim, coarse_context->get_elem().dim());
+
+  FEBase* fe_fine = NULL;
+  fine_context->get_side_fe( 0, fe_fine, dim );
 
   // Get the physical locations of the fine element quadrature points
   std::vector<Point> qface_point = fe_fine->get_xyz();
 
-  // Find their locations on the coarse element
-  FEInterface::inverse_map (coarse_elem->dim(), fe_coarse->get_fe_type(),
-                            coarse_elem, qface_point, qp_coarse);
+  // Find the master quadrature point locations on the coarse element
+  FEBase* fe_coarse = NULL;
+  coarse_context->get_side_fe( 0, fe_coarse, dim );
 
-  // Calculate the coarse element shape functions at those locations
-  fe_coarse->reinit (coarse_elem, &qp_coarse);
+  std::vector<Point> qp_coarse;
+
+  FEInterface::inverse_map
+    (coarse_context->get_elem().dim(), fe_coarse->get_fe_type(),
+     &coarse_context->get_elem(), qface_point, qp_coarse);
+
+  // The number of variables in the system
+  const unsigned int n_vars = fine_context->n_vars();
+
+  // Calculate all coarse element shape functions at those locations
+  for (unsigned int v=0; v<n_vars; v++)
+    if (error_norm.weight(v) != 0.0)
+      {
+        coarse_context->get_side_fe( v, fe_coarse, dim );
+        fe_coarse->reinit (&coarse_context->get_elem(), &qp_coarse);
+      }
 }
 
 
@@ -446,10 +462,11 @@ float JumpErrorEstimator::coarse_n_flux_faces_increment ()
 {
   // Keep track of the number of internal flux sides found on each
   // element
-  unsigned int dim = coarse_elem->dim();
+  unsigned int dim = coarse_context->get_elem().dim();
 
   const unsigned int divisor =
-    1 << (dim-1)*(fine_elem->level() - coarse_elem->level());
+    1 << (dim-1)*(fine_context->get_elem().level() -
+                  coarse_context->get_elem().level());
 
   // With a difference of n levels between fine and coarse elements,
   // we compute a fractional flux face for the coarse element by adding:

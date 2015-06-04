@@ -24,7 +24,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/error_estimator.h"
-#include "libmesh/fe_base.h"
+#include "libmesh/fem_context.h"
 
 // C++ includes
 #include <cstddef>
@@ -59,11 +59,10 @@ public:
     : ErrorEstimator(),
       scale_by_n_flux_faces(false),
       integrate_boundary_sides(false),
-      fine_elem(NULL), coarse_elem(NULL),
-      fine_error(0), coarse_error(0),
-      fine_side(libMesh::invalid_uint),
-      var(libMesh::invalid_uint),
-      fe_fine(), fe_coarse() {}
+      fine_context(),
+      coarse_context(),
+      fine_error(0),
+      coarse_error(0) {}
 
   /**
    * Destructor.
@@ -108,9 +107,7 @@ protected:
    * An initialization function, to give derived classes a chance to
    * request specific data from the FE objects
    */
-  virtual void initialize(const System& system,
-                          ErrorVector& error_per_cell,
-                          bool estimate_parent_error);
+  virtual void init_context(FEMContext &c);
 
   /**
    * The function, to be implemented by derived classes, which calculates an error
@@ -132,9 +129,10 @@ protected:
   bool integrate_boundary_sides;
 
   /**
-   * The fine and coarse elements sharing a face
+   * Context objects for integrating on the fine and coarse elements
+   * sharing a face
    */
-  const Elem *fine_elem, *coarse_elem;
+  UniquePtr<FEMContext> fine_context, coarse_context;
 
   /**
    * The fine and coarse error values to be set by each side_integration();
@@ -142,24 +140,9 @@ protected:
   Real fine_error, coarse_error;
 
   /**
-   * Which side of the fine element is this?
-   */
-  unsigned int fine_side;
-
-  /**
    * The variable number currently being evaluated
    */
   unsigned int var;
-
-  /**
-   * The local degree of freedom values on fine and coarse elements
-   */
-  DenseVector<Number> Ufine, Ucoarse;
-
-  /**
-   * The finite element objects for fine and coarse elements
-   */
-  UniquePtr<FEBase> fe_fine, fe_coarse;
 };
 
 

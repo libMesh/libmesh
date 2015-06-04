@@ -40,17 +40,35 @@ namespace libMesh
 
 
 void
-KellyErrorEstimator::initialize(const System& system,
-                                ErrorVector&,
-                                bool)
+KellyErrorEstimator::init_context(FEMContext& c)
 {
-  // Hang onto the system - we may need it for variable names later.
-  my_system = &system;
+  const unsigned int n_vars = c.n_vars();
+  for (unsigned int v=0; v<n_vars; v++)
+    {
+      // Possibly skip this variable
+      if (error_norm.weight(v) == 0.0) continue;
 
-  // We'll need gradients and normal vectors for flux jump computation
-  fe_fine->get_dphi();
-  fe_fine->get_normals();
-  fe_coarse->get_dphi();
+      // FIXME: Need to generalize this to vector-valued elements. [PB]
+      FEBase* side_fe = NULL;
+
+      const std::set<unsigned char>& elem_dims =
+        c.elem_dimensions();
+
+      for (std::set<unsigned char>::const_iterator dim_it =
+             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+        {
+          const unsigned char dim = *dim_it;
+
+          fine_context->get_side_fe( v, side_fe, dim );
+
+          // We'll need gradients on both sides for flux jump computation
+          side_fe->get_dphi();
+
+          // But we only need normal vectors from one side
+          if (&c != coarse_context.get())
+            side_fe->get_normals();
+        }
+    }
 }
 
 
@@ -58,10 +76,17 @@ KellyErrorEstimator::initialize(const System& system,
 void
 KellyErrorEstimator::internal_side_integration ()
 {
+  const Elem& coarse_elem = coarse_context->get_elem();
+  const Elem& fine_elem = fine_context->get_elem();
+
+  FEBase* fe_fine = NULL;
+  fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
+
+  FEBase* fe_coarse = NULL;
+  coarse_context->get_side_fe( var, fe_coarse, fine_elem.dim() );
+
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
-  unsigned int n_fine_dofs = Ufine.size();
-  unsigned int n_coarse_dofs = Ucoarse.size();
 
   std::vector<std::vector<RealGradient> > dphi_coarse = fe_coarse->get_dphi();
   std::vector<std::vector<RealGradient> > dphi_fine = fe_fine->get_dphi();
@@ -72,12 +97,8 @@ KellyErrorEstimator::internal_side_integration ()
     {
       // Calculate solution gradients on fine and coarse elements
       // at this quadrature point
-      Gradient grad_fine, grad_coarse;
-      for (unsigned int i=0; i != n_coarse_dofs; ++i)
-        grad_coarse.add_scaled (dphi_coarse[i][qp], Ucoarse(i));
-
-      for (unsigned int i=0; i != n_fine_dofs; ++i)
-        grad_fine.add_scaled (dphi_fine[i][qp], Ufine(i));
+      Gradient grad_fine   =   fine_context->side_gradient(var, qp),
+               grad_coarse = coarse_context->side_gradient(var, qp);
 
       // Find the jump in the normal derivative
       // at this quadrature point
@@ -90,17 +111,22 @@ KellyErrorEstimator::internal_side_integration ()
 
   // Add the h-weighted jump integral to each error term
   fine_error =
-    error * fine_elem->hmax() * error_norm.weight(var);
+    error * fine_elem.hmax() * error_norm.weight(var);
   coarse_error =
-    error * coarse_elem->hmax() * error_norm.weight(var);
+    error * coarse_elem.hmax() * error_norm.weight(var);
 }
 
 
 bool
 KellyErrorEstimator::boundary_side_integration ()
 {
-  const std::string &var_name = my_system->variable_name(var);
-  const unsigned int n_fine_dofs = Ufine.size();
+  const Elem& fine_elem = fine_context->get_elem();
+
+  FEBase* fe_fine = NULL;
+  fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
+
+  const std::string &var_name =
+    fine_context->get_system().variable_name(var);
 
   std::vector<std::vector<RealGradient> > dphi_fine = fe_fine->get_dphi();
   std::vector<Point> face_normals = fe_fine->get_normals();
@@ -113,9 +139,10 @@ KellyErrorEstimator::boundary_side_integration ()
   // for a particular variable, we will determine if the whole
   // element is on a flux boundary (assuming quadrature points
   // are strictly contained in the side).
-  if (this->_bc_function(*my_system, qface_point[0], var_name).first)
+  if (this->_bc_function(fine_context->get_system(),
+                         qface_point[0], var_name).first)
     {
-      const Real h = fine_elem->hmax();
+      const Real h = fine_elem.hmax();
 
       // The number of quadrature points
       const unsigned int n_qp = fe_fine->n_quadrature_points();
@@ -128,18 +155,15 @@ KellyErrorEstimator::boundary_side_integration ()
         {
           // Value of the imposed flux BC at this quadrature point.
           const std::pair<bool,Real> flux_bc =
-            this->_bc_function(*my_system, qface_point[qp], var_name);
+            this->_bc_function(fine_context->get_system(),
+                               qface_point[qp], var_name);
 
           // Be sure the BC function still thinks we're on the
           // flux boundary.
           libmesh_assert_equal_to (flux_bc.first, true);
 
           // The solution gradient from each element
-          Gradient grad_fine;
-
-          // Compute the solution gradient on element e
-          for (unsigned int i=0; i != n_fine_dofs; i++)
-            grad_fine.add_scaled (dphi_fine[i][qp], Ufine(i));
+          Gradient grad_fine = fine_context->side_gradient(var, qp);
 
           // The difference between the desired BC and the approximate solution.
           const Number jump = flux_bc.second - grad_fine*face_normals[qp];
