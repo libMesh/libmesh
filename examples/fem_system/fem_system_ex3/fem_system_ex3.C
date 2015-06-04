@@ -162,12 +162,14 @@ int main (int argc, char** argv)
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
 
+  // Create ExplicitSystem to help output velocity
   ExplicitSystem & v_system =
     equation_systems.add_system<ExplicitSystem> ("Velocity");
   v_system.add_variable("u_vel", FIRST, LAGRANGE);
   v_system.add_variable("v_vel", FIRST, LAGRANGE);
   v_system.add_variable("w_vel", FIRST, LAGRANGE);
 
+  // Create ExplicitSystem to help output acceleration
   ExplicitSystem & a_system =
     equation_systems.add_system<ExplicitSystem> ("Acceleration");
   a_system.add_variable("u_accel", FIRST, LAGRANGE);
@@ -216,8 +218,13 @@ int main (int argc, char** argv)
   NewmarkSolver* newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
   newmark->compute_initial_accel();
 
+  // Copy over initial velocity and acceleration for output.
+  // Note we can do this because of the matching variables/FE spaces
   (*v_system.solution) = system.get_vector("_old_solution_rate");
   (*a_system.solution) = system.get_vector("_old_solution_accel");
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+  // Output initial state
   {
     std::ostringstream file_name;
 
@@ -235,6 +242,7 @@ int main (int argc, char** argv)
                                      system.time);
 
   }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
@@ -249,6 +257,8 @@ int main (int argc, char** argv)
       // Advance to the next timestep in a transient problem
       system.time_solver->advance_timestep();
 
+      // Copy over updated velocity and acceleration for output.
+      // Note we can do this because of the matching variables/FE spaces
       (*v_system.solution) = system.get_vector("_old_solution_rate");
       (*a_system.solution) = system.get_vector("_old_solution_accel");
 
