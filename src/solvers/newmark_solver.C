@@ -23,12 +23,10 @@
 namespace libMesh
 {
   NewmarkSolver::NewmarkSolver (sys_type& s)
-    : UnsteadySolver(s),
+    : SecondOrderUnsteadySolver(s),
       _beta(0.25),
       _gamma(0.5),
-      _is_accel_solve(false),
-      _old_local_solution_rate(NumericVector<Number>::build(s.comm())),
-      _old_local_solution_accel(NumericVector<Number>::build(s.comm()))
+      _is_accel_solve(false)
   {}
 
   NewmarkSolver::~NewmarkSolver ()
@@ -39,65 +37,6 @@ namespace libMesh
     if (_gamma == 0.5)
       return 2.;
     return 1.;
-  }
-
-  void NewmarkSolver::init ()
-  {
-    UnsteadySolver::init();
-
-    _system.add_vector("_old_solution_rate");
-    _system.add_vector("_old_solution_accel");
-  }
-
-  void NewmarkSolver::init_data()
-  {
-    UnsteadySolver::init_data();
-
-#ifdef LIBMESH_ENABLE_GHOSTED
-    _old_local_solution_rate->init (_system.n_dofs(), _system.n_local_dofs(),
-                                    _system.get_dof_map().get_send_list(), false,
-                                    GHOSTED);
-
-    _old_local_solution_accel->init (_system.n_dofs(), _system.n_local_dofs(),
-                                     _system.get_dof_map().get_send_list(), false,
-                                     GHOSTED);
-#else
-    _old_local_solution_rate->init (_system.n_dofs(), false, SERIAL);
-    _old_local_solution_accel->init (_system.n_dofs(), false, SERIAL);
-#endif
-  }
-
-  void NewmarkSolver::reinit ()
-  {
-    UnsteadySolver::reinit();
-
-#ifdef LIBMESH_ENABLE_GHOSTED
-    _old_local_solution_rate->init (_system.n_dofs(), _system.n_local_dofs(),
-                                    _system.get_dof_map().get_send_list(), false,
-                                    GHOSTED);
-
-    _old_local_solution_accel->init (_system.n_dofs(), _system.n_local_dofs(),
-                                     _system.get_dof_map().get_send_list(), false,
-                                     GHOSTED);
-#else
-    _old_local_solution_rate->init (_system.n_dofs(), false, SERIAL);
-    _old_local_solution_accel->init (_system.n_dofs(), false, SERIAL);
-#endif
-
-    // localize the old solutions
-    NumericVector<Number> &old_solution_rate =
-      _system.get_vector("_old_solution_rate");
-
-    NumericVector<Number> &old_solution_accel =
-      _system.get_vector("_old_solution_accel");
-
-    old_solution_rate.localize
-      (*_old_local_solution_rate,
-       _system.get_dof_map().get_send_list());
-
-    old_solution_accel.localize
-      (*_old_local_solution_accel,
-       _system.get_dof_map().get_send_list());
   }
 
   void NewmarkSolver::advance_timestep ()
@@ -163,27 +102,6 @@ namespace libMesh
     libmesh_not_implemented();
   }
 
-  void NewmarkSolver::retrieve_timestep()
-  {
-    libmesh_not_implemented();
-  }
-
-  void NewmarkSolver::project_initial_rate( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
-  {
-    NumericVector<Number> &old_solution_rate =
-      _system.get_vector("_old_solution_rate");
-
-    _system.project_vector( old_solution_rate, f, g );
-  }
-
-  void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
-  {
-    NumericVector<Number> &old_solution_accel =
-      _system.get_vector("_old_solution_accel");
-
-    _system.project_vector( old_solution_accel, f, g );
-  }
-
   void NewmarkSolver::compute_initial_accel()
   {
     // We need to compute the initial acceleration based off of
@@ -208,22 +126,12 @@ namespace libMesh
     this->_is_accel_solve = false;
   }
 
-  Number NewmarkSolver::old_solution_rate(const dof_id_type global_dof_number)
-  const
+  void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
   {
-    libmesh_assert_less (global_dof_number, _system.get_dof_map().n_dofs());
-    libmesh_assert_less (global_dof_number, _old_local_solution_rate->size());
+    NumericVector<Number> &old_solution_accel =
+      _system.get_vector("_old_solution_accel");
 
-    return (*_old_local_solution_rate)(global_dof_number);
-  }
-
-  Number NewmarkSolver::old_solution_accel(const dof_id_type global_dof_number)
-  const
-  {
-    libmesh_assert_less (global_dof_number, _system.get_dof_map().n_dofs());
-    libmesh_assert_less (global_dof_number, _old_local_solution_accel->size());
-
-    return (*_old_local_solution_accel)(global_dof_number);
+    _system.project_vector( old_solution_accel, f, g );
   }
 
   bool NewmarkSolver::element_residual (bool request_jacobian,

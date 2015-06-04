@@ -103,14 +103,6 @@ namespace libMesh
     _system.project_vector( old_solution_rate, f, g );
   }
 
-  void SecondOrderUnsteadySolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
-  {
-    NumericVector<Number> &old_solution_accel =
-      _system.get_vector("_old_solution_accel");
-
-    _system.project_vector( old_solution_accel, f, g );
-  }
-
   Number SecondOrderUnsteadySolver::old_solution_rate(const dof_id_type global_dof_number)
   const
   {
