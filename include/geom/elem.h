@@ -322,34 +322,64 @@ public:
   bool contains_edge_of(const Elem *e) const;
 
   /**
-   * This function finds all elements (including this one) which
-   * touch the current active element at the specified point, which
-   * should be a point in the current element.
+   * This function finds all active elements (including this one)
+   * which are in the same manifold as this element and which touch
+   * the current active element at the specified point, which should
+   * be a point in the current element.
+   *
+   * Elements which are not "in the same manifold" (e.g. the
+   * interior_parent of a boundary element) will not be found with
+   * this method.
+   *
+   * Elements which overlap the specified point but which are only
+   * connected to the current element via elements which do not
+   * overlap that point (e.g. in a folded or tangled mesh) are not
+   * considered to "touch" the current element and will not be found
+   * with this method.
    */
   void find_point_neighbors(const Point &p,
                             std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all elements (including this one) which
-   * touch the current element at any point
+   * This function finds all active elements (including this one) in
+   * the same manifold as this element which touch this active element
+   * at any point
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all active elements which touch the current
-   * active element along the specified edge defined by the two points
-   * \p p1 and \p p2
+   * This function finds all active elements (including this one) in
+   * the same manifold as start_elem (which must be active and must
+   * touch this element) which touch this element at any point
+   */
+  void find_point_neighbors(std::set<const Elem *> &neighbor_set,
+                            const Elem * start_elem) const;
+
+  /**
+   * This function finds all active elements in the same manifold as
+   * this element which touch the current active element along the
+   * whole edge defined by the two points \p p1 and \p p2
    */
   void find_edge_neighbors(const Point& p1,
                            const Point& p2,
                            std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all active elements which touch the current
-   * active element along any edge (more precisely, at at least two
-   * points).
+   * This function finds all active elements in the same manifold as
+   * this element which touch the current active element along any
+   * edge (more precisely, at at least two points).
+   *
+   * In this case, elements are included even if they do not touch a
+   * *whole* edge of this element.
    */
   void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
+
+  /**
+   * This function finds all active elements (*not* including this
+   * one) in the parent manifold of this element whose intersection
+   * with this element has non-zero measure.
+   */
+  void find_interior_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
@@ -776,8 +806,14 @@ public:
    * were extracted.  We can easily do that for the level-0 manifold elements
    * by storing the D-dimensional parent.  This method provides access to that
    * element.
+   *
+   * This method is not safe to call if this->dim() == LIBMESH_DIM; in
+   * such cases no data storage for an interior parent pointer has
+   * been allocated.
    */
   const Elem* interior_parent () const;
+
+  Elem* interior_parent ();
 
   /**
    * Sets the pointer to the element's interior_parent.
@@ -1818,7 +1854,9 @@ const Elem* Elem::interior_parent () const
   // interior parents make no sense for full-dimensional elements.
   libmesh_assert_less (this->dim(), LIBMESH_DIM);
 
-  // // and they [USED TO BE] only good for level-0 elements
+  // they USED TO BE only good for level-0 elements, but we now
+  // support keeping interior_parent() valid on refined boundary
+  // elements.
   // if (this->level() != 0)
   // return this->parent()->interior_parent();
 
@@ -1826,10 +1864,36 @@ const Elem* Elem::interior_parent () const
   // neighbor and neighbor pointers
   Elem *interior_p = _elemlinks[1+this->n_sides()];
 
-  // If we have an interior_parent, it had better be the
-  // one-higher-dimensional interior element we are looking for.
+  // If we have an interior_parent, we USED TO assume it was a
+  // one-higher-dimensional interior element, but we now allow e.g.
+  // edge elements to have a 3D interior_parent with no
+  // intermediate 2D element.
+  // libmesh_assert (!interior_p ||
+  //                interior_p->dim() == (this->dim()+1));
   libmesh_assert (!interior_p ||
-                  interior_p->dim() == (this->dim()+1));
+                 interior_p->dim() > this->dim());
+
+  // We require consistency between AMR of interior and of boundary
+  // elements
+  if (interior_p)
+    libmesh_assert_less_equal (interior_p->level(), this->level());
+
+  return interior_p;
+}
+
+
+
+inline
+Elem* Elem::interior_parent ()
+{
+  // See the const version for comments
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  Elem *interior_p = _elemlinks[1+this->n_sides()];
+
+  libmesh_assert (!interior_p ||
+                 interior_p->dim() > this->dim());
+  if (interior_p)
+    libmesh_assert_less_equal (interior_p->level(), this->level());
 
   return interior_p;
 }
@@ -1842,9 +1906,14 @@ void Elem::set_interior_parent (Elem *p)
   // interior parents make no sense for full-dimensional elements.
   libmesh_assert_less (this->dim(), LIBMESH_DIM);
 
-  // this had better be a one-higher-dimensional interior element
+  // If we have an interior_parent, we USED TO assume it was a
+  // one-higher-dimensional interior element, but we now allow e.g.
+  // edge elements to have a 3D interior_parent with no
+  // intermediate 2D element.
+  // libmesh_assert (!p ||
+  //                 p->dim() == (this->dim()+1));
   libmesh_assert (!p ||
-                  p->dim() == (this->dim()+1));
+                  p->dim() > this->dim());
 
   _elemlinks[1+this->n_sides()] = p;
 }

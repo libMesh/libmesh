@@ -218,16 +218,16 @@ public:
 
   /**
    * Refines and coarsens user-requested elements. Will also
-   * refine/coarsen additional elements to satisy level-one rule.
+   * refine/coarsen additional elements to satisfy level-one rule.
    * It is possible that for a given set of refinement flags there
    * is actually no change upon calling this member function.  Consequently,
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool refine_and_coarsen_elements (const bool maintain_level_one=true);
+  bool refine_and_coarsen_elements ();
 
   /**
    * Only coarsens the user-requested elements. Some elements
@@ -237,10 +237,10 @@ public:
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool coarsen_elements (const bool maintain_level_one=true);
+  bool coarsen_elements ();
 
   /**
    * Only refines the user-requested elements.
@@ -249,10 +249,10 @@ public:
    * this function returns \p true if the mesh actually changed (hence
    * data needs to be projected) and \p false otherwise.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool refine_elements (const bool maintain_level_one=true);
+  bool refine_elements ();
 
   /**
    * Uniformly refines the mesh \p n times.
@@ -426,6 +426,43 @@ public:
   unsigned char& node_level_mismatch_limit();
 
   /**
+   * If \p overrefined_boundary_limit is set to a nonnegative value,
+   * then refinement and coarsening will produce meshes in which the
+   * refinement level of a boundary element is no more than that many
+   * levels greater than the level of any of its interior neighbors.
+   *
+   * This may be counter-intuitive in the 1D-embedded-in-3D case: an
+   * edge has *more* interior neighbors than a face containing that
+   * edge.
+   *
+   * If \p overrefined_boundary_limit is negative, then level
+   * differences will be unlimited.
+   *
+   * \p overrefined_boundary_limit is 0 by default.  This implies that
+   * adaptive coarsening can only be done on an interior element if
+   * any boundary elements on its sides are simultaneously coarsened.
+   */
+  signed char& overrefined_boundary_limit();
+
+  /**
+   * If \p underrefined_boundary_limit is set to a nonnegative value,
+   * then refinement and coarsening will produce meshes in which the
+   * refinement level of an element is no more than that many
+   * levels greater than the level of any boundary elements on its
+   * sides.
+   *
+   * If \p underrefined_boundary_limit is negative, then level
+   * differences will be unlimited.
+   *
+   * \p underrefined_boundary_limit is 0 by default.  This implies that
+   * adaptive coarsening can only be done on a boundary element if
+   * any interior elements it is on the side of are simultaneously
+   * coarsened.
+   */
+  signed char& underrefined_boundary_limit();
+
+
+  /**
    * Copy refinement flags on ghost elements from their
    * local processors.  Return true if any flags changed.
    */
@@ -479,7 +516,15 @@ private:
    */
   bool _refine_elements ();
 
-
+  /**
+   * Smooths refinement flags according to current settings.
+   *
+   * It is possible that for a given set of refinement flags there
+   * is actually no change upon calling this member function.  Consequently,
+   * this function returns \p true if the flags actually changed (hence
+   * data needs to be projected) and \p false otherwise.
+   */
+  void _smooth_flags (bool refining, bool coarsening);
 
   //------------------------------------------------------
   // "Smoothing" algorthms for refined meshes
@@ -555,6 +600,20 @@ private:
    * limit_level_mismatch_at_node, and pretend they're hexes.
    */
   bool limit_level_mismatch_at_edge (const unsigned int max_mismatch);
+
+  /*
+   * This algorithm flags interior elements for refinement as needed
+   * to prevent corresponding boundary element refinement mismatch
+   * from exceeding the given limit.
+   */
+  bool limit_overrefined_boundary (const unsigned int max_mismatch);
+
+  /*
+   * This algorithm flags boundary elements for refinement as needed
+   * to prevent corresponding interior element refinement mismatch
+   * from exceeding the given limit.
+   */
+  bool limit_underrefined_boundary (const unsigned int max_mismatch);
 
   /**
    * This algorithm selects an element for refinement
@@ -693,6 +752,9 @@ private:
 
   unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
     _node_level_mismatch_limit;
+
+  signed char _overrefined_boundary_limit,
+              _underrefined_boundary_limit;
 
   /**
    * This option enforces the mismatch level prior to refinement by checking
@@ -842,6 +904,16 @@ inline unsigned char& MeshRefinement::edge_level_mismatch_limit()
 inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 {
   return _node_level_mismatch_limit;
+}
+
+inline signed char& MeshRefinement::overrefined_boundary_limit()
+{
+  return _overrefined_boundary_limit;
+}
+
+inline signed char& MeshRefinement::underrefined_boundary_limit()
+{
+  return _underrefined_boundary_limit;
 }
 
 inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()

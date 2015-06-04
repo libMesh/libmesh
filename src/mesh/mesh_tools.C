@@ -1207,6 +1207,44 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase &mesh)
 
 
 
+void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase &mesh)
+{
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el =
+         mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+
+      // We can skip to the next element if we're full-dimension
+      // and therefore don't have any interior parents
+      if (elem->dim() >= LIBMESH_DIM)
+        continue;
+
+      const Elem* ip = elem->interior_parent();
+  
+      const Elem* parent = elem->parent();
+
+      if (ip && parent)
+        {
+          libmesh_assert_equal_to (ip->top_parent(),
+                                   elem->top_parent()->interior_parent());
+
+          if (ip->level() == elem->level())
+            libmesh_assert_equal_to (ip->parent(),
+                                     parent->interior_parent());
+          else
+            {
+              libmesh_assert_less (ip->level(), elem->level());
+              libmesh_assert_equal_to (ip, parent->interior_parent());
+            }
+        }
+    }
+}
+
+
+
 void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
 {
   std::set<const Node*> used_nodes;

@@ -50,7 +50,12 @@ public:
   Edge (const unsigned int nn,
         Elem* p,
         Node** nodelinkdata) :
-    Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata) {}
+    Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 1)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns 1, the dimensionality of the object.
