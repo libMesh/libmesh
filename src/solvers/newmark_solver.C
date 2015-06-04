@@ -122,18 +122,18 @@ namespace libMesh
 
         // We need to cache the new solution_rate before updating the old_solution_rate
         // so we can update acceleration with the proper old_solution_rate
-        /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
-           - ((gamma/beta)-1)*v_n
-           - (gamma/(2*beta)-1)*(Delta t)*a_n */
+        // v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
+        //         - ((gamma/beta)-1)*v_n
+        //         - (gamma/(2*beta)-1)*(Delta t)*a_n
         UniquePtr<NumericVector<Number> > new_solution_rate = nonlinear_solution.clone();
         (*new_solution_rate) -= old_nonlinear_soln;
         (*new_solution_rate) *= (_gamma/(_beta*_system.deltat));
         new_solution_rate->add( -(_gamma/_beta - 1.0), old_solution_rate );
         new_solution_rate->add( -(_gamma/(2.0*_beta)-1.0)*_system.deltat, old_solution_accel );
 
-        /* a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
-           - 1/(beta*Delta t)*v_n
-           - (1-1/(2*beta))*a_n */
+        // a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
+        //         - 1/(beta*Delta t)*v_n
+        //         - (1-1/(2*beta))*a_n
         UniquePtr<NumericVector<Number> > new_solution_accel = old_solution_accel.clone();
         (*new_solution_accel) *=  -(1.0-1.0/(2.0*_beta));
         new_solution_accel->add( -1.0/(_beta*_system.deltat), old_solution_rate );
@@ -342,9 +342,9 @@ namespace libMesh
         libMesh::Real dt = _system.deltat;
 
         // Local velocity at current time step
-        /* v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
-           - ((gamma/beta)-1)*v_n
-           - (gamma/(2*beta)-1)*(Delta t)*a_n */
+        // v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
+        //         - ((gamma/beta)-1)*v_n
+        //         - (gamma/(2*beta)-1)*(Delta t)*a_n
         context.elem_solution_rate_derivative = (_gamma/(_beta*dt));
 
         context.get_elem_solution_rate()  = context.get_elem_solution();
@@ -356,9 +356,9 @@ namespace libMesh
 
 
         // Local acceleration at current time step
-        /* a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
-           - 1/(beta*Delta t)*v_n
-           - (1-1/(2*beta))*a_n */
+        // a_{n+1} = (1/(beta*(Delta t)^2))*(x_{n+1}-x_n)
+        //         - 1/(beta*Delta t)*v_n
+        //         - (1-1/(2*beta))*a_n
         context.elem_solution_accel_derivative = 1.0/(_beta*dt*dt);
 
         context.get_elem_solution_accel()  = context.get_elem_solution();
