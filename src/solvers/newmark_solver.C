@@ -341,6 +341,8 @@ namespace libMesh
         // Convenience
         libMesh::Real dt = _system.deltat;
 
+        context.elem_solution_derivative = 1.0;
+
         // Local velocity at current time step
         // v_{n+1} = gamma/(beta*Delta t)*(x_{n+1}-x_n)
         //         + (1-(gamma/beta))*v_n
