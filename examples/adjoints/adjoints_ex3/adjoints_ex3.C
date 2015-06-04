@@ -699,7 +699,7 @@ int main (int argc, char** argv)
   GetPot infile("general.in");
 
   // Read in parameters from the input file
-  FEMParameters param;
+  FEMParameters param(init.comm());
   param.read(infile);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build

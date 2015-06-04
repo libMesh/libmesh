@@ -1,7 +1,4 @@
 #include "femparameters.h"
-#include "libmesh/mesh.h"
+#include "libmesh/mesh_base.h"
 
-// Bring in everything from the libMesh namespace
-class FEMParameters;
-
-void build_domain (MeshBase &mesh, FEMParameters &param);
+void build_domain (libMesh::MeshBase &mesh, FEMParameters &param);

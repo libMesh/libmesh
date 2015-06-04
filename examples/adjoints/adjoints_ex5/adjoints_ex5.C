@@ -261,7 +261,7 @@ int main (int argc, char** argv)
   GetPot infile("general.in");
 
   // Read in parameters from the input file
-  FEMParameters param;
+  FEMParameters param(init.comm());
   param.read(infile);
 
   // Create a mesh with the given dimension, distributed

@@ -1,3 +1,12 @@
+BUILT_SOURCES = femparameters.C # femparameters.h
+DISTCLEANFILES = $(BUILT_SOURCES)
+
+femparameters.C: $(top_srcdir)/examples/adjoints/adjoints_ex1/femparameters.C
+	$(AM_V_GEN)$(LN_S) -f $< $@
+
+#femparameters.h: $(top_srcdir)/examples/adjoints/adjoints_ex1/femparameters.h
+#	$(AM_V_GEN)$(LN_S) -f $< .
+
 example_name  = adjoints_ex3
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adjoints/ex3
@@ -8,7 +17,7 @@ CLEANFILES = primal.out.gmv.000.05 primal.out.gmv.000.04 primal.out.gmv.000.03 p
 
 # also need links for VPATH builds
 if LIBMESH_VPATH_BUILD
-  BUILT_SOURCES = .linkstamp
+  BUILT_SOURCES += .linkstamp
 .linkstamp:
 	-rm -f general.in          && $(LN_S) -f $(srcdir)/general.in .
 	-rm -f coupled_system.in   && $(LN_S) -f $(srcdir)/coupled_system.in .
