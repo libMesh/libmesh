@@ -227,7 +227,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const bool write_data_during_training_in = infile("write_data_during_training",
                                                     write_data_during_training);
   unsigned int training_parameters_random_seed_in =
-    static_cast<int>(-1);
+    static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
                                               training_parameters_random_seed_in);
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
