@@ -18,7 +18,7 @@
 
 #include "libmesh/diff_context.h"
 #include "libmesh/diff_system.h"
-#include "libmesh/fem_system.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/unsteady_solver.h"
 
 namespace libMesh
@@ -66,18 +66,18 @@ DiffContext::DiffContext (const System& sys) :
         _elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(_elem_qoi_derivative[q]));
       _elem_subjacobians[i].reserve(nv);
 
-      // Only make space for these if we're using FEMSystem
-      // This is assuming *only* FEMSystem is using elem_solution_rate/accel
-      const FEMSystem* fem_system = dynamic_cast<const FEMSystem*>(&sys);
-      if(fem_system)
+      // Only make space for these if we're using DiffSystem
+      // This is assuming *only* DiffSystem is using elem_solution_rate/accel
+      const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
+      if(diff_system)
         {
           // Now, we only need these if the solver is unsteady
-          if( !fem_system->get_time_solver().is_steady() )
+          if( !diff_system->get_time_solver().is_steady() )
             {
               _elem_subsolution_rates.push_back(new DenseSubVector<Number>(_elem_solution_rate));
 
               // We only need accel space if the TimeSolver is second order
-              const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(fem_system->get_time_solver());
+              const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
 
               if( time_solver.time_order() >= 2 )
                 _elem_subsolution_accels.push_back(new DenseSubVector<Number>(_elem_solution_accel));
