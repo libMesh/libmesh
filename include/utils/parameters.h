@@ -442,7 +442,8 @@ const T& Parameters::get (const std::string& name) const
       oss << ' ' << demangle(typeid(T).name());
 #endif
       oss << " parameter named \""
-          << name << "\":\n"
+          << name << "\" found.\n\n"
+          << "Known parameters:\n"
           << *this;
 
       libmesh_error_msg(oss.str());
