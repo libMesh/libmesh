@@ -66,7 +66,10 @@ public:
 class TopologyMap
 {
   // We need to supply our own hash function if we're hashing
-#if defined(LIBMESH_HAVE_STD_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
+#if defined(LIBMESH_HAVE_STD_UNORDERED_MAP) || \
+    defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || \
+    defined(LIBMESH_HAVE_EXT_HASH_MAP) || \
+    defined(LIBMESH_HAVE_HASH_MAP) 
 #  define MYHASH ,myhash
 #else
 #  define MYHASH
