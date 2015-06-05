@@ -91,12 +91,11 @@ public:
   void clear ();
 
   /**
-   * Close the data structures and prepare for use.
-   * Synchronizes the \p boundary_mesh
-   * data structures with the \p mesh data structures.
-   * Allows the \p boundary_mesh to be used like any other mesh.
-   * Before this is called the \p boundary_mesh data structure is
-   * empty.
+   * Generates \p boundary_mesh data structures corresponding to the
+   * \p mesh data structures.  Allows the \p boundary_mesh to be used
+   * like any other mesh, except with interior_parent() values defined
+   * for algorithms which couple boundary and interior mesh
+   * information.  Any pre-existing \p boundary_mesh data is cleared.
    *
    * If you are using a MeshData class with this Mesh, you can
    * pass a pointer to both the boundary_mesh's MeshData object,
@@ -107,13 +106,12 @@ public:
              MeshData* this_mesh_data=NULL);
 
   /**
-   * Close the data structures and prepare for use.
-   * Synchronizes the \p boundary_mesh
-   * data structures with the \p mesh data structures.
-   * Allows the \p boundary_mesh to be used like any other mesh.
-   * Before this is called the \p boundary_mesh data structure is
-   * empty.  Only boundary elements with the specified ids are
-   * extracted.
+   * Generates \p boundary_mesh data structures corresponding to the
+   * \p mesh data structures.  Allows the \p boundary_mesh to be used
+   * like any other mesh, except with interior_parent() values defined
+   * for algorithms which couple boundary and interior mesh
+   * information.  Any pre-existing \p boundary_mesh data is cleared.
+   * Only boundary elements with the specified ids are extracted.
    *
    * If you are using a MeshData class with this Mesh, you can
    * pass a pointer to both the boundary_mesh's MeshData object,
@@ -123,6 +121,20 @@ public:
              UnstructuredMesh& boundary_mesh,
              MeshData* boundary_mesh_data=NULL,
              MeshData* this_mesh_data=NULL);
+
+
+  /**
+   * Generates \p elements along the boundary of our _mesh, which
+   * use pre-existing nodes on the boundary_mesh, and which have
+   * interior_parent values properly defined.
+   *
+   * The \p boundary_mesh may be the *same* as the interior mesh; this
+   * generates a mesh with elements of mixed dimension.
+   *
+   * Only boundary elements with the specified ids are created. 
+   */
+  void add_elements (const std::set<boundary_id_type> &requested_boundary_ids,
+                     UnstructuredMesh& boundary_mesh);
 
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
@@ -498,6 +510,15 @@ public:
 
 private:
 
+  /**
+   * Helper method for finding consistent maps of interior to boundary
+   * dof_object ids.  Either node_id_map or side_id_map can be NULL,
+   * in which case it will not be filled.
+   */
+  void _find_id_maps
+    (const std::set<boundary_id_type> &requested_boundary_ids,
+     std::map<dof_id_type, dof_id_type> * node_id_map,
+     std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map);
 
   /**
    * The Mesh this boundary info pertains to.
