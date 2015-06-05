@@ -50,8 +50,8 @@ public:
    */
   virtual ~FirstOrderUnsteadySolver (){}
 
-  virtual Real time_order() const
-  { return 1.0; }
+  virtual unsigned int time_order() const
+  { return 1; }
 };
 
 } // end namespace libMesh

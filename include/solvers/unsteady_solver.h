@@ -123,7 +123,7 @@ public:
    * UnsteadySolver subclass is capable of handling. E.g. EulerSolver
    * will have time_order = 1 and NewmarkSolver will have time_order = 2
    */
-  virtual Real time_order () const = 0;
+  virtual unsigned int time_order () const = 0;
 
   /**
    * @returns the old nonlinear solution for the specified global

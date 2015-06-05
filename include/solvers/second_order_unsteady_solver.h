@@ -49,8 +49,8 @@ public:
    */
   virtual ~SecondOrderUnsteadySolver ();
 
-  virtual Real time_order() const
-  { return 2.0; }
+  virtual unsigned int time_order() const
+  { return 2; }
 
   /**
    * The initialization function.  This method is used to
