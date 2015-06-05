@@ -203,7 +203,8 @@ void init_eletypes ()
         eledef.dim     = 3;
         eledef.nnodes  = 27;
         eledef.exptype = 12;
-        const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,15,16,19,17,18,20,21,24,22,23,25,26};
+        const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,
+                                      15,16,19,17,18,20,21,24,22,23,25,26};
         std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
         eletypes_exp[HEX27] = eledef;
@@ -266,7 +267,8 @@ void init_eletypes ()
         eledef.dim     = 3;
         eledef.nnodes  = 18;
         eledef.exptype = 13;
-        const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,12,14,13,15,17,16};
+        const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,
+                                      12,14,13,15,17,16};
         std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
         eletypes_exp[PRISM18] = eledef;
@@ -833,7 +835,6 @@ void GmshIO::write_mesh (std::ostream& out_stream)
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
     // loop over the elements
-    it  = mesh.active_elements_begin();
     for ( ; it != end; ++it)
       {
         const Elem* elem = *it;
@@ -850,7 +851,7 @@ void GmshIO::write_mesh (std::ostream& out_stream)
         libmesh_assert_less_equal (eletype.nodes.size(), elem->n_nodes());
 
         // elements ids are 1 based in Gmsh
-        out_stream << (e_id+1) << " ";
+        out_stream << e_id+1 << " ";
         // element type
         out_stream << eletype.exptype;
 
@@ -864,11 +865,11 @@ void GmshIO::write_mesh (std::ostream& out_stream)
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out_stream << (elem->node(eletype.nodes[i])+1) << " "; // gmsh is 1-based
+            out_stream << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out_stream << (elem->node(i)+1) << " ";                // gmsh is 1-based
+            out_stream << elem->node(i)+1 << " ";                  // gmsh is 1-based
         out_stream << "\n";
 
         // increment this index too...
