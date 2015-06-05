@@ -828,6 +828,7 @@ include_HEADERS = \
         solvers/eigen_time_solver.h \
         solvers/euler2_solver.h \
         solvers/euler_solver.h \
+        solvers/first_order_unsteady_solver.h \
         solvers/linear.h \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
@@ -842,6 +843,7 @@ include_HEADERS = \
         solvers/petsc_linear_solver.h \
         solvers/petsc_nonlinear_solver.h \
         solvers/petscdmlibmesh.h \
+        solvers/second_order_unsteady_solver.h \
         solvers/slepc_eigen_solver.h \
         solvers/slepc_macro.h \
         solvers/solution_history.h \

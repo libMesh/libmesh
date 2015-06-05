@@ -325,6 +325,7 @@ BUILT_SOURCES = \
         eigen_time_solver.h \
         euler2_solver.h \
         euler_solver.h \
+        first_order_unsteady_solver.h \
         laspack_linear_solver.h \
         linear.h \
         linear_solver.h \
@@ -340,6 +341,7 @@ BUILT_SOURCES = \
         petsc_linear_solver.h \
         petsc_nonlinear_solver.h \
         petscdmlibmesh.h \
+        second_order_unsteady_solver.h \
         slepc_eigen_solver.h \
         slepc_macro.h \
         solution_history.h \
@@ -1461,6 +1463,9 @@ euler2_solver.h: $(top_srcdir)/include/solvers/euler2_solver.h
 euler_solver.h: $(top_srcdir)/include/solvers/euler_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+first_order_unsteady_solver.h: $(top_srcdir)/include/solvers/first_order_unsteady_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 laspack_linear_solver.h: $(top_srcdir)/include/solvers/laspack_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1504,6 +1509,9 @@ petsc_nonlinear_solver.h: $(top_srcdir)/include/solvers/petsc_nonlinear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petscdmlibmesh.h: $(top_srcdir)/include/solvers/petscdmlibmesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+second_order_unsteady_solver.h: $(top_srcdir)/include/solvers/second_order_unsteady_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 slepc_eigen_solver.h: $(top_srcdir)/include/solvers/slepc_eigen_solver.h

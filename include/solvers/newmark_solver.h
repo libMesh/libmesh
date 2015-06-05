@@ -21,7 +21,7 @@
 #define LIBMESH_NEWMARK_SOLVER_H
 
 // Local includes
-#include "libmesh/unsteady_solver.h"
+#include "libmesh/second_order_unsteady_solver.h"
 
 namespace libMesh
 {
@@ -43,7 +43,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Solver class definition
-class NewmarkSolver : public UnsteadySolver
+class NewmarkSolver : public SecondOrderUnsteadySolver
 {
 public:
   /**
@@ -64,25 +64,6 @@ public:
   virtual ~NewmarkSolver ();
 
   /**
-   * The initialization function.  This method is used to
-   * initialize internal data structures before a simulation begins.
-   */
-  virtual void init ();
-
-  /**
-   * The data initialization function.  This method is used to
-   * initialize internal data structures after the underlying System
-   * has been initialized
-   */
-  virtual void init_data ();
-
-  /**
-   * The reinitialization function.  This method is used to
-   * resize internal data vectors after a mesh change.
-   */
-  virtual void reinit ();
-
-  /**
    * This method advances the solution to the next timestep, after a
    * solve() has been performed.  Often this will be done after every
    * UnsteadySolver::solve(), but adaptive mesh refinement and/or adaptive
@@ -98,18 +79,10 @@ public:
   virtual void adjoint_advance_timestep ();
 
   /**
-   * This method retrieves all the stored solutions at the current
-   * system.time
+   * This method uses the specified initial displacement and velocity
+   * to compute the initial acceleration \f$a_0\f$.
    */
-  virtual void retrieve_timestep ();
-
-  /**
-   * Specify non-zero initial velocity. Should be called before solve().
-   * The function value f and its gradient g are user-provided cloneable functors.
-   * A gradient g is only required/used for projecting onto finite element spaces
-   * with continuous derivatives.
-   */
-  void project_initial_rate( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
+  virtual void compute_initial_accel();
 
   /**
    * Specify non-zero initial acceleration. Should be called before solve().
@@ -122,15 +95,16 @@ public:
   void project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
 
   /**
-   * This method uses the specified initial displacement and velocity
-   * to compute the initial acceleration \f$a_0\f$.
-   */
-  virtual void compute_initial_accel();
-
-  /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
    */
   virtual Real error_order() const;
+
+  /**
+   * This method solves for the solution at the next timestep.
+   * Usually we will only need to solve one (non)linear system per timestep,
+   * but more complex subclasses may override this.
+   */
+  virtual void solve ();
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -159,18 +133,6 @@ public:
   virtual bool nonlocal_residual (bool request_jacobian,
                                   DiffContext&);
 
-  /**
-   * @returns the solution rate at the previous time step, \f$\dot{u}_n\f$,
-   * for the specified global DOF.
-   */
-  Number old_solution_rate (const dof_id_type global_dof_number) const;
-
-  /**
-   * @returns the solution acceleration at the previous time step, \f$\ddot{u}_n\f$,
-   * for the specified global DOF.
-   */
-  Number old_solution_accel (const dof_id_type global_dof_number) const;
-
 
 protected:
 
@@ -193,15 +155,13 @@ protected:
    */
   bool _is_accel_solve;
 
-  /**
-   * Serial vector of previous time step velocity \f$ \dot{u}_n \f$
-   */
-  UniquePtr<NumericVector<Number> > _old_local_solution_rate;
 
   /**
-   * Serial vector of previous time step accleration \f$ \ddot{u}_n \f$
+   * This method requires an initial acceleration. So, we force the
+   * user to call either compute_initial_accel or project_initial_accel
+   * to set the initial acceleration.
    */
-  UniquePtr<NumericVector<Number> > _old_local_solution_accel;
+  bool _initial_accel_set;
 
   /**
    * This method is the underlying implementation of the public

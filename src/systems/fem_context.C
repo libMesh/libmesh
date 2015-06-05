@@ -27,6 +27,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/unsteady_solver.h" // For euler_residual
 
@@ -1553,8 +1554,24 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
 
   if (sys.use_fixed_solution)
     this->get_elem_fixed_solution().resize(n_dofs);
-  this->get_elem_solution_rate().resize(n_dofs);
-  this->get_elem_solution_accel().resize(n_dofs);
+
+  // Only make space for these if we're using DiffSystem
+  // This is assuming *only* DiffSystem is using elem_solution_rate/accel
+  const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
+  if(diff_system)
+    {
+      // Now, we only need these if the solver is unsteady
+      if( !diff_system->get_time_solver().is_steady() )
+        {
+          this->get_elem_solution_rate().resize(n_dofs);
+
+          // We only need accel space if the TimeSolver is second order
+          const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
+
+          if( time_solver.time_order() >= 2 )
+            this->get_elem_solution_accel().resize(n_dofs);
+        }
+    }
 
   // These resize calls also zero out the residual and jacobian
   this->get_elem_residual().resize(n_dofs);
@@ -1583,11 +1600,25 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
         this->get_elem_solution(i).reposition
           (sub_dofs, n_dofs_var);
 
-        this->get_elem_solution_rate(i).reposition
-          (sub_dofs, n_dofs_var);
+        // Only make space for these if we're using DiffSystem
+        // This is assuming *only* DiffSystem is using elem_solution_rate/accel
+        const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
+        if(diff_system)
+          {
+            // Now, we only need these if the solver is unsteady
+            if( !diff_system->get_time_solver().is_steady() )
+              {
+                this->get_elem_solution_rate(i).reposition
+                  (sub_dofs, n_dofs_var);
 
-        this->get_elem_solution_accel(i).reposition
-          (sub_dofs, n_dofs_var);
+                // We only need accel space if the TimeSolver is second order
+                const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
+
+                if( time_solver.time_order() >= 2 )
+                  this->get_elem_solution_accel(i).reposition
+                    (sub_dofs, n_dofs_var);
+              }
+          }
 
         if (sys.use_fixed_solution)
           this->get_elem_fixed_solution(i).reposition
