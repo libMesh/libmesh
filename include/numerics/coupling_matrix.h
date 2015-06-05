@@ -38,6 +38,8 @@ class CouplingAccessor;
 
 class ConstCouplingRow;
 
+class ConstCouplingRowConstIterator;
+
 /**
  * This class defines a coupling matrix.  A coupling
  * matrix is simply a matrix of ones and zeros describing
@@ -95,6 +97,7 @@ private:
   friend class ConstCouplingAccessor;
   friend class CouplingAccessor;
   friend class ConstCouplingRow;
+  friend class ConstCouplingRowConstIterator;
 
   /**
    * Coupling matrices are typically either full or very sparse, and
@@ -385,100 +388,21 @@ public:
       }
   }
 
-  class const_iterator
-  {
-  public:
-    const_iterator(const ConstCouplingRow& row_in,
-                   std::size_t loc_in,
-                   CouplingMatrix::rc_type::const_iterator it_in) :
-      _location(loc_in),
-      _row(row_in),
-      _it(it_in)
-    {
-#ifndef NDEBUG
-      if (_it != _row._mat._ranges.end())
-        {
-          libmesh_assert_less_equal(_it->first, _location);
-          libmesh_assert_less_equal(_location, _it->second);
-        }
-      else
-        {
-          libmesh_assert_equal_to
-            (_location, std::numeric_limits<size_t>::max());
-        }
-#endif
-    }
+  /*
+   * A forward iterator type for looping over indices in this row
+   */
+  typedef ConstCouplingRowConstIterator const_iterator;
 
-    unsigned int operator* ()
-    {
-      libmesh_assert_not_equal_to
-        (_location, std::numeric_limits<std::size_t>::max());
-      return _location % _row._mat.size();
-    }
+  /*
+   * An iterator to the first index in this row, or to end() for an
+   * empty row
+   */
+  const_iterator begin() const;
 
-    const_iterator& operator++ ()
-    {
-      libmesh_assert_not_equal_to
-        (_location, std::numeric_limits<std::size_t>::max());
-
-      if (_location == _it->second)
-      {
-        ++_it;
-
-        // Are we past the end of the matrix?
-        if (_it == _row._mat._ranges.end())
-          _location = std::numeric_limits<std::size_t>::max();
-        else
-          {
-            _location = _it->first;
-            // Are we past the end of the row?
-            if (_location >= _row._mat.size()*(_row._row_i+1))
-              {
-                _location = std::numeric_limits<std::size_t>::max();
-                _it = _row._mat._ranges.end();
-              }
-          }
-      }
-      else
-        ++_location;
-
-      return *this;
-    }
-
-    bool operator== (const const_iterator& other) const
-    {
-      // Thinking that iterators from different row objects are equal
-      // is not even wrong
-      libmesh_assert(_row == other._row);
-
-      return ((_location == other._location) &&
-              (_it == other._it));
-    }
-
-    bool operator!= (const const_iterator& other) const
-    {
-      return !(*this == other);
-    }
-
-  private:
-    // The location (i*size+j) corresponding to this iterator, or
-    // numeric_limits<size_t>::max() to signify end()
-    std::size_t _location;
-    const ConstCouplingRow &_row;
-    // The range containing this iterator location, or
-    // _row._mat._ranges.end() if no range contains this location
-    CouplingMatrix::rc_type::const_iterator _it;
-  };
-
-  const_iterator begin() {
-    return const_iterator (*this, _begin_location, _begin_it);
-  }
-
-  const_iterator end() {
-    return const_iterator
-      (*this, std::numeric_limits<std::size_t>::max(),
-       _mat._ranges.end());
-  }
+  /*
+   * An iterator representing past-the-end of this row
+   */
+  const_iterator end() const;
 
   bool operator== (const ConstCouplingRow& other) const
   {
@@ -496,6 +420,8 @@ public:
   }
 protected:
 
+  friend class ConstCouplingRowConstIterator;
+
   unsigned int _row_i;
   const CouplingMatrix& _mat;
 
@@ -508,6 +434,111 @@ protected:
   // this row
   CouplingMatrix::rc_type::const_iterator _begin_it;
 };
+
+
+
+class ConstCouplingRowConstIterator
+{
+public:
+  ConstCouplingRowConstIterator
+    (const ConstCouplingRow& row_in,
+     std::size_t loc_in,
+     CouplingMatrix::rc_type::const_iterator it_in) :
+    _location(loc_in),
+    _row(row_in),
+    _it(it_in)
+  {
+#ifndef NDEBUG
+    if (_it != _row._mat._ranges.end())
+      {
+        libmesh_assert_less_equal(_it->first, _location);
+        libmesh_assert_less_equal(_location, _it->second);
+      }
+    else
+      {
+        libmesh_assert_equal_to
+          (_location, std::numeric_limits<size_t>::max());
+      }
+#endif
+  }
+
+  unsigned int operator* ()
+  {
+    libmesh_assert_not_equal_to
+      (_location, std::numeric_limits<std::size_t>::max());
+    return _location % _row._mat.size();
+  }
+
+  ConstCouplingRowConstIterator& operator++ ()
+  {
+    libmesh_assert_not_equal_to
+      (_location, std::numeric_limits<std::size_t>::max());
+
+    if (_location == _it->second)
+    {
+      ++_it;
+
+      // Are we past the end of the matrix?
+      if (_it == _row._mat._ranges.end())
+        _location = std::numeric_limits<std::size_t>::max();
+      else
+        {
+          _location = _it->first;
+          // Are we past the end of the row?
+          if (_location >= _row._mat.size()*(_row._row_i+1))
+            {
+              _location = std::numeric_limits<std::size_t>::max();
+              _it = _row._mat._ranges.end();
+            }
+        }
+    }
+    else
+      ++_location;
+
+    return *this;
+  }
+
+  bool operator== (const ConstCouplingRowConstIterator& other) const
+  {
+    // Thinking that iterators from different row objects are equal
+    // is not even wrong
+    libmesh_assert(_row == other._row);
+
+    return ((_location == other._location) &&
+            (_it == other._it));
+  }
+
+  bool operator!= (const ConstCouplingRowConstIterator& other) const
+  {
+    return !(*this == other);
+  }
+
+private:
+  // The location (i*size+j) corresponding to this iterator, or
+  // numeric_limits<size_t>::max() to signify end()
+  std::size_t _location;
+  const ConstCouplingRow &_row;
+  // The range containing this iterator location, or
+  // _row._mat._ranges.end() if no range contains this location
+  CouplingMatrix::rc_type::const_iterator _it;
+};
+
+
+
+//--------------------------------------------------
+// ConstCouplingRow inline methods
+inline
+ConstCouplingRow::const_iterator ConstCouplingRow::begin() const {
+  return const_iterator (*this, _begin_location, _begin_it);
+}
+
+inline
+ConstCouplingRow::const_iterator ConstCouplingRow::end() const {
+  return const_iterator
+    (*this, std::numeric_limits<std::size_t>::max(),
+     _mat._ranges.end());
+}
+
 
 
 //--------------------------------------------------
