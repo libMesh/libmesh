@@ -876,4 +876,4 @@ template class EpetraVector<Number>;
 
 } // namespace libMesh
 
-#endif // #ifdef HAVE_EPETRA
+#endif // #ifdef LIBMESH_HAVE_TRILINOS

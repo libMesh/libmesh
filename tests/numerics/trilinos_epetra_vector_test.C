@@ -1,6 +1,6 @@
 #include <libmesh/trilinos_epetra_vector.h>
 
-#ifdef HAVE_TRILINOS
+#ifdef LIBMESH_HAVE_TRILINOS
 
 #include "numeric_vector_test.h"
 
@@ -20,5 +20,5 @@ public:
 
 CPPUNIT_TEST_SUITE_REGISTRATION( EpetraVectorTest );
 
-#endif // #ifdef HAVE_TRILINOS
+#endif // #ifdef LIBMESH_HAVE_TRILINOS
 

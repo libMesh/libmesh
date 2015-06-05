@@ -109,10 +109,10 @@ public:
 
 
 private:
-  AutoPtr<UnstructuredMesh> mesh;
-  AutoPtr<EquationSystems> es;
+  UniquePtr<UnstructuredMesh> mesh;
+  UniquePtr<EquationSystems> es;
   System * sys;
-  AutoPtr<FEMContext> c;
+  UniquePtr<FEMContext> c;
 
   void testValues()
   {
