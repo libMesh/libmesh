@@ -103,6 +103,11 @@ public:
    */
   bool & binary ();
 
+  /**
+   * Access to the flag which controls whether boundary elements are
+   * written to the Mesh file.
+   */
+  bool & write_lower_dimensional_elements ();
 
 private:
   /**
@@ -131,6 +136,12 @@ private:
    * Flag to write binary data.
    */
   bool _binary;
+
+  /**
+   * If true, lower-dimensional elements representing the Mesh
+   * boundary get written to the output file.
+   */
+  bool _write_lower_dimensional_elements;
 };
 
 

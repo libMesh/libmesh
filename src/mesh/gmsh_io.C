@@ -300,7 +300,8 @@ namespace libMesh
 
 GmshIO::GmshIO (const MeshBase& mesh) :
   MeshOutput<MeshBase>(mesh),
-  _binary(false)
+  _binary(false),
+  _write_lower_dimensional_elements(false)
 {
 }
 
@@ -309,7 +310,8 @@ GmshIO::GmshIO (const MeshBase& mesh) :
 GmshIO::GmshIO (MeshBase& mesh) :
   MeshInput<MeshBase>  (mesh),
   MeshOutput<MeshBase> (mesh),
-  _binary (false)
+  _binary (false),
+  _write_lower_dimensional_elements(false)
 {
 }
 
@@ -318,6 +320,13 @@ GmshIO::GmshIO (MeshBase& mesh) :
 bool & GmshIO::binary ()
 {
   return _binary;
+}
+
+
+
+bool & GmshIO::write_lower_dimensional_elements ()
+{
+  return _write_lower_dimensional_elements;
 }
 
 
@@ -795,7 +804,7 @@ void GmshIO::write_mesh (std::ostream& out_stream)
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   unsigned int n_boundary_faces = 0;
-  if (mesh.mesh_dimension() != 1)
+  if (this->write_lower_dimensional_elements() && mesh.mesh_dimension() != 1)
     {
       MeshBase::const_element_iterator
         it = mesh.active_elements_begin(),
@@ -856,12 +865,15 @@ void GmshIO::write_mesh (std::ostream& out_stream)
         // element type
         out_stream << eletype.exptype;
 
-        // write the number of tags and
-        // tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
+        // write the number of tags (3) and their values:
+        // 1 (physical entity)
+        // 2 (geometric entity)
+        // 3 (partition entity)
         out_stream << " 3 "
                    << static_cast<unsigned int>(elem->subdomain_id())
                    << " 0 "
-                   << (elem->processor_id()+1) << " ";
+                   << elem->processor_id()+1
+                   << " ";
 
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
