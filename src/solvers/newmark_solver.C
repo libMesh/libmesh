@@ -26,7 +26,8 @@ namespace libMesh
     : SecondOrderUnsteadySolver(s),
       _beta(0.25),
       _gamma(0.5),
-      _is_accel_solve(false)
+      _is_accel_solve(false),
+      _initial_accel_set(false)
   {}
 
   NewmarkSolver::~NewmarkSolver ()
@@ -124,6 +125,8 @@ namespace libMesh
 
     // We're done, so no longer doing an acceleration solve
     this->_is_accel_solve = false;
+
+    _initial_accel_set = true;
   }
 
   void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
@@ -132,6 +135,23 @@ namespace libMesh
       _system.get_vector("_old_solution_accel");
 
     _system.project_vector( old_solution_accel, f, g );
+
+    _initial_accel_set = true;
+  }
+
+  void NewmarkSolver::solve ()
+  {
+    // First, check that the initial accel was set one way or another
+    if( !_initial_accel_set )
+      {
+        std::string error = "ERROR: Must first set initial acceleration using one of:\n";
+        error += "NewmarkSolver::compute_initial_accel()\n";
+        error += "NewmarkSolver::project_initial_accel()\n";
+        libmesh_error_msg(error);
+      }
+
+    // That satisfied, now we can solve
+    UnsteadySolver::solve();
   }
 
   bool NewmarkSolver::element_residual (bool request_jacobian,

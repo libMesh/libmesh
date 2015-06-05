@@ -100,6 +100,13 @@ public:
   virtual Real error_order() const;
 
   /**
+   * This method solves for the solution at the next timestep.
+   * Usually we will only need to solve one (non)linear system per timestep,
+   * but more complex subclasses may override this.
+   */
+  virtual void solve ();
+
+  /**
    * This method uses the DifferentiablePhysics'
    * element_time_derivative() and element_constraint()
    * to build a full residual on an element.  What combination
@@ -149,6 +156,12 @@ protected:
   bool _is_accel_solve;
 
 
+  /**
+   * This method requires an initial acceleration. So, we force the
+   * user to call either compute_initial_accel or project_initial_accel
+   * to set the initial acceleration.
+   */
+  bool _initial_accel_set;
 
   /**
    * This method is the underlying implementation of the public
