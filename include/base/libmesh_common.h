@@ -358,8 +358,8 @@ extern bool warned_about_auto_ptr;
 // throws a ConvergenceFailure exception
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     libMesh::err << msg << std::endl;                                   \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
@@ -367,8 +367,8 @@ extern bool warned_about_auto_ptr;
 
 #define libmesh_exceptionless_error_msg(msg)                            \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     libMesh::err << msg << std::endl;                                   \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     std::terminate();                                                   \
   } while(0)
 
@@ -376,8 +376,8 @@ extern bool warned_about_auto_ptr;
 
 #define libmesh_not_implemented_msg(msg)                                \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     libMesh::err << msg << std::endl;                                   \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
