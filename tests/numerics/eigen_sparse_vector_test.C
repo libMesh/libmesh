@@ -15,7 +15,7 @@ public:
   {
     // Eigen doesn't support distributed parallel vectors, but we can
     // build a serial vector on each processor
-    my_comm = new Communicator();
+    my_comm = new Parallel::Communicator();
   }
 
   void tearDown()
