@@ -745,23 +745,27 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
             {
               // Otherwise we should only add the relevant submatrices
               for(unsigned int var1=0; var1<n_vars(); var1++)
-                for(unsigned int var2=0; var2<n_vars(); var2++)
-                  {
-                    if( coupling_matrix->operator()(var1,var2) )
-                      {
-                        unsigned int sub_m = context.get_elem_jacobian( var1, var2 ).m();
-                        unsigned int sub_n = context.get_elem_jacobian( var1, var2 ).n();
-                        DenseMatrix<Number> sub_jac(sub_m, sub_n);
-                        for(unsigned int row=0; row<sub_m; row++)
-                          for(unsigned int col=0; col<sub_n; col++)
-                            {
-                              sub_jac(row,col) = context.get_elem_jacobian( var1, var2 ).el(row,col);
-                            }
-                        input_matrix->add_matrix (sub_jac,
-                                                  context.get_dof_indices(var1),
-                                                  context.get_dof_indices(var2) );
-                      }
-                  }
+                {
+                  ConstCouplingRow ccr(var1, *coupling_matrix);
+                  ConstCouplingRow::const_iterator end = ccr.end();
+                  for (ConstCouplingRow::const_iterator it =
+                       ccr.begin(); it != end; ++it)
+                    {
+                      unsigned int var2 = *it;
+
+                      unsigned int sub_m = context.get_elem_jacobian( var1, var2 ).m();
+                      unsigned int sub_n = context.get_elem_jacobian( var1, var2 ).n();
+                      DenseMatrix<Number> sub_jac(sub_m, sub_n);
+                      for(unsigned int row=0; row<sub_m; row++)
+                        for(unsigned int col=0; col<sub_n; col++)
+                          {
+                            sub_jac(row,col) = context.get_elem_jacobian( var1, var2 ).el(row,col);
+                          }
+                      input_matrix->add_matrix (sub_jac,
+                                                context.get_dof_indices(var1),
+                                                context.get_dof_indices(var2) );
+                    }
+                }
             }
 
         }
