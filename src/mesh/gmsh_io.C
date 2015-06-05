@@ -827,9 +827,6 @@ void GmshIO::write_mesh (std::ostream& out_stream)
                << mesh.node(v)(2) << '\n';
   out_stream << "$EndNodes\n";
 
-  // A counter for writing elements to the Gmsh file sequentially.
-  unsigned int e_id = 0;
-
   {
     // write the connectivity
     out_stream << "$Elements\n";
@@ -855,7 +852,7 @@ void GmshIO::write_mesh (std::ostream& out_stream)
         libmesh_assert_less_equal (eletype.nodes.size(), elem->n_nodes());
 
         // elements ids are 1 based in Gmsh
-        out_stream << e_id+1 << " ";
+        out_stream << elem->id()+1 << " ";
         // element type
         out_stream << eletype.exptype;
 
@@ -875,13 +872,19 @@ void GmshIO::write_mesh (std::ostream& out_stream)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
             out_stream << elem->node(i)+1 << " ";                  // gmsh is 1-based
         out_stream << "\n";
-
-        // increment this index too...
-        ++e_id;
       } // element loop
   }
 
   {
+    // A counter for writing surface elements to the Gmsh file
+    // sequentially.  We start numbering them with a number strictly
+    // larger than the largest element ID in the mesh.  Note: the
+    // MeshBase docs say "greater than or equal to" the maximum
+    // element id in the mesh, so technically we might need a +1 here,
+    // but all of the implementations return an ID strictly greater
+    // than the largest element ID in the Mesh.
+    unsigned int e_id = mesh.max_elem_id();
+
     // loop over the elements, writing out boundary faces
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
