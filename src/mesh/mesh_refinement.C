@@ -731,13 +731,13 @@ bool MeshRefinement::refine_elements ()
                    << "Correcting and continuing.";
     }
 
+  // Smooth refinement flags
+  _smooth_flags(true, false);
+
   // Now refine the flagged elements.  This will
   // take up some space, maybe more than what was freed.
   const bool mesh_changed =
     this->_refine_elements();
-
-  // Smooth refinement flags
-  _smooth_flags(true, false);
 
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
@@ -1595,6 +1595,11 @@ bool MeshRefinement::_refine_elements ()
 
 void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
 {
+  // Smoothing can break in weird ways on a mesh with broken topology
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_neighbors(_mesh);
+#endif
+
   // Repeat until flag changes match on every processor
   do
     {
