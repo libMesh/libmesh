@@ -149,17 +149,15 @@ void init_eletypes ()
       }
 
       // QUAD8
-      // TODO: what should be done with this on writing?
       {
         eledef.type    = QUAD8;
         eledef.dim     = 2;
         eledef.nnodes  = 8;
-        eledef.exptype = 100;
-        const unsigned int nodes[] = {1,2,3,4,5,6,7,8};
-        std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+        eledef.exptype = 16;
+        eledef.nodes.clear();
 
         eletypes_exp[QUAD8] = eledef;
-        eletypes_imp[10]    = eledef;
+        eletypes_imp[16]    = eledef;
       }
 
       // QUAD9
@@ -187,17 +185,16 @@ void init_eletypes ()
       }
 
       // HEX20
-      // TODO: what should be done with this on writing?
       {
         eledef.type    = HEX20;
         eledef.dim     = 3;
         eledef.nnodes  = 20;
-        eledef.exptype = 101;
-        const unsigned int nodes[] = {1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,16};
+        eledef.exptype = 17;
+        const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,15,16,19,17,18};
         std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
         eletypes_exp[HEX20] = eledef;
-        eletypes_imp[12]    = eledef;
+        eletypes_imp[17]    = eledef;
       }
 
       // HEX27
@@ -206,8 +203,7 @@ void init_eletypes ()
         eledef.dim     = 3;
         eledef.nnodes  = 27;
         eledef.exptype = 12;
-        const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,
-                                      15,16,19,17,18,20,21,24,22,23,25,26};
+        const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,15,16,19,17,18,20,21,24,22,23,25,26};
         std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
         eletypes_exp[HEX27] = eledef;
@@ -234,6 +230,7 @@ void init_eletypes ()
         eledef.exptype = 11;
         const unsigned int nodes[] = {0,1,2,3,4,5,6,7,9,8};
         std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+
         eletypes_exp[TET10] = eledef;
         eletypes_imp[11]    = eledef;
       }
@@ -269,8 +266,7 @@ void init_eletypes ()
         eledef.dim     = 3;
         eledef.nnodes  = 18;
         eledef.exptype = 13;
-        const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,
-                                      12,14,13,15,17,16};
+        const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,12,14,13,15,17,16};
         std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
         eletypes_exp[PRISM18] = eledef;
@@ -796,6 +792,18 @@ void GmshIO::write_mesh (std::ostream& out_stream)
   // Get a const reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  unsigned int n_faces = 0;
+  if ( mesh.mesh_dimension() != 1 )
+  {
+    for (MeshBase::const_element_iterator it=mesh.active_elements_begin(); it!=mesh.active_elements_end(); ++it)
+      {
+        const Elem *elem = (*it);
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          {
+            if ( elem->neighbor(s) == NULL ) ++n_faces;
+          }
+      }
+  }
   // Note: we are using version 2.0 of the gmsh output format.
 
   // Write the file header.
@@ -817,12 +825,15 @@ void GmshIO::write_mesh (std::ostream& out_stream)
   {
     // write the connectivity
     out_stream << "$Elements\n";
-    out_stream << mesh.n_active_elem() << '\n';
+    out_stream << mesh.n_active_elem() + n_faces << '\n';
+
+    unsigned int e_id = 0;
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
     // loop over the elements
+    it  = mesh.active_elements_begin();
     for ( ; it != end; ++it)
       {
         const Elem* elem = *it;
@@ -839,8 +850,7 @@ void GmshIO::write_mesh (std::ostream& out_stream)
         libmesh_assert_less_equal (eletype.nodes.size(), elem->n_nodes());
 
         // elements ids are 1 based in Gmsh
-        out_stream << elem->id()+1 << " ";
-
+        out_stream << (e_id+1) << " ";
         // element type
         out_stream << eletype.exptype;
 
@@ -848,19 +858,65 @@ void GmshIO::write_mesh (std::ostream& out_stream)
         // tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
         out_stream << " 3 "
                    << static_cast<unsigned int>(elem->subdomain_id())
-                   << " 1 "
+                   << " 0 "
                    << (elem->processor_id()+1) << " ";
 
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out_stream << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
+            out_stream << (elem->node(eletype.nodes[i])+1) << " "; // gmsh is 1-based
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out_stream << elem->node(i)+1 << " ";                  // gmsh is 1-based
+            out_stream << (elem->node(i)+1) << " ";                // gmsh is 1-based
         out_stream << "\n";
+
+        // increment this index too...
+        ++e_id;
       } // element loop
+
+    // loop over the elements
+    it  = mesh.active_elements_begin();
+    if ( n_faces )
+    for ( ; it != end; ++it)
+      {
+        const Elem* elem = *it;
+        // loop over element sides
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          {
+            if ( elem->neighbor(s) != NULL ) continue;
+            //
+            AutoPtr<Elem> side = elem->build_side(s);
+            // Make sure we have a valid entry for the current element type.
+            libmesh_assert (eletypes_exp.count(side->type()));
+            // consult the export element table
+            const elementDefinition& eletype = eletypes_exp[side->type()];
+            // The element mapper better not require any more nodes
+            // than are present in the current element!
+            libmesh_assert_less_equal (eletype.nodes.size(), side->n_nodes());
+            // elements ids are 1 based in Gmsh
+            out_stream << (e_id+1) << " ";
+            // element type
+            out_stream << eletype.exptype;
+            // write the number of tags: tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
+            out_stream << " 3 "
+                       << static_cast<unsigned int>(mesh.boundary_info->boundary_id(elem, s)) << " 0 " << (elem->processor_id()+1) << " ";
+            // if there is a node translation table, use it
+            if (eletype.nodes.size() > 0)
+              for (unsigned int i=0; i < side->n_nodes(); i++)
+                out_stream << (side->node(eletype.nodes[i])+1) << " "; // gmsh is 1-based
+            // otherwise keep the same node order
+            else
+              for (unsigned int i=0; i < side->n_nodes(); i++)
+                out_stream << (side->node(i)+1) << " ";                // gmsh is 1-based
+            out_stream << "\n";
+
+            // increment this index too...
+            ++e_id;
+          } // element side loop
+      } // element loop
+
+    libmesh_assert (e_id==mesh.n_active_elem()+n_faces);
     out_stream << "$EndElements\n";
   }
 }
