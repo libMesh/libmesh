@@ -83,6 +83,8 @@ AC_DEFUN([CONFIGURE_EIGEN],
     # Check to make sure the external header files are sufficiently up
     # to date - this fixes our Eigen detection on Scientific Linux 6
     if (test x$externaleigenincFound = xyes); then
+        enableeigenincFound=yes
+
         ac_eigen_save_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
