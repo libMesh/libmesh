@@ -814,7 +814,10 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     num_vecs   = cast_int<unsigned int>(vecs.size());
   const dof_id_type
     io_blksize = cast_int<dof_id_type>(std::min(max_io_blksize, static_cast<std::size_t>(n_objs))),
-    num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
+    num_blks =
+      cast_int<unsigned int>
+        (std::ceil(static_cast<double>(n_objs)/
+                   static_cast<double>(io_blksize)));
 
   libmesh_assert_less_equal (_written_var_indices.size(), this->n_vars());
 
@@ -1836,7 +1839,10 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
   const unsigned int
     sys_num    = this->number(),
     num_vecs   = cast_int<unsigned int>(vecs.size()),
-    num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
+    num_blks =
+      cast_int<unsigned int>
+        (std::ceil(static_cast<double>(n_objs)/
+                   static_cast<double>(io_blksize)));
 
   // libMesh::out << "io_blksize = "    << io_blksize
   //     << ", num_objects = " << n_objs
@@ -2237,7 +2243,7 @@ std::size_t System::read_serialized_vectors (Xdr &io,
     n_nodes = this->get_mesh().n_nodes(),
     n_elem  = this->get_mesh().n_elem();
 
-  std::size_t read_length = 0.;
+  std::size_t read_length = 0;
 
   //---------------------------------
   // Collect the values for all nodes
@@ -2296,7 +2302,7 @@ std::size_t System::write_serialized_vectors (Xdr &io,
     n_nodes       = this->get_mesh().n_nodes(),
     n_elem        = this->get_mesh().n_elem();
 
-  std::size_t written_length = 0.;
+  std::size_t written_length = 0;
 
   if (this->processor_id() == 0)
     {
