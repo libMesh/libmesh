@@ -138,8 +138,8 @@ private:
   bool _binary;
 
   /**
-   * If true, lower-dimensional elements representing the Mesh
-   * boundary get written to the output file.
+   * If true, lower-dimensional elements based on the boundary
+   * conditions get written to the output file.
    */
   bool _write_lower_dimensional_elements;
 

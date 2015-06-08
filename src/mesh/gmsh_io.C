@@ -47,7 +47,7 @@ GmshIO::ElementMaps GmshIO::build_element_maps()
   // POINT (import only)
   em.in.insert(std::make_pair(15, ElementDefinition(NODEELEM, 15, 0, 1)));
 
-  // Add elements with non-trivial node mappings
+  // Add elements with trivial node mappings
   em.add_def(ElementDefinition(EDGE2, 1, 1, 2));
   em.add_def(ElementDefinition(EDGE3, 8, 1, 3));
   em.add_def(ElementDefinition(TRI3, 2, 2, 3));
@@ -104,7 +104,7 @@ GmshIO::ElementMaps GmshIO::build_element_maps()
 GmshIO::GmshIO (const MeshBase& mesh) :
   MeshOutput<MeshBase>(mesh),
   _binary(false),
-  _write_lower_dimensional_elements(false)
+  _write_lower_dimensional_elements(true)
 {
 }
 
@@ -114,7 +114,7 @@ GmshIO::GmshIO (MeshBase& mesh) :
   MeshInput<MeshBase>  (mesh),
   MeshOutput<MeshBase> (mesh),
   _binary (false),
-  _write_lower_dimensional_elements(false)
+  _write_lower_dimensional_elements(true)
 {
 }
 
@@ -600,21 +600,12 @@ void GmshIO::write_mesh (std::ostream& out_stream)
   // Get a const reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  // If requested, write out lower-dimensional elements for
+  // element-side-based boundary conditions.
   unsigned int n_boundary_faces = 0;
-  if (this->write_lower_dimensional_elements() && mesh.mesh_dimension() != 1)
-    {
-      MeshBase::const_element_iterator
-        it = mesh.active_elements_begin(),
-        it_end = mesh.active_elements_end();
+  if (this->write_lower_dimensional_elements())
+    n_boundary_faces = mesh.boundary_info->n_boundary_conds();
 
-      for (; it != it_end; ++it)
-        {
-          const Elem *elem = *it;
-          for (unsigned int s=0; s<elem->n_sides(); s++)
-            if (elem->neighbor(s) == NULL)
-              ++n_boundary_faces;
-        }
-    }
   // Note: we are using version 2.0 of the gmsh output format.
 
   // Write the file header.
@@ -655,7 +646,8 @@ void GmshIO::write_mesh (std::ostream& out_stream)
           _element_maps.out.find(elem->type());
 
         // Assert that we found it
-        libmesh_assert(def_it != _element_maps.out.end());
+        if (def_it == _element_maps.out.end())
+          libmesh_error_msg("Element type " << elem->type() << " not found in _element_maps.");
 
         // Get a reference to the ElementDefinition object
         const ElementDefinition& eletype = def_it->second;
@@ -706,64 +698,73 @@ void GmshIO::write_mesh (std::ostream& out_stream)
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
     if (n_boundary_faces)
-      for ( ; it != end; ++it)
-        {
-          const Elem* elem = *it;
+      {
+        // Construct the list of boundary sides
+        std::vector<dof_id_type> element_id_list;
+        std::vector<unsigned short int> side_list;
+        std::vector<boundary_id_type> bc_id_list;
 
-          // loop over element sides
-          for (unsigned int s=0; s<elem->n_sides(); s++)
-            {
-              if (elem->neighbor(s) != NULL)
-                continue;
+        mesh.boundary_info->build_side_list(element_id_list, side_list, bc_id_list);
 
-              UniquePtr<Elem> side = elem->build_side(s);
+        // Loop over these lists, writing data to the file.
+        for (unsigned idx=0; idx<element_id_list.size(); ++idx)
+          {
+            const Elem * elem = mesh.elem(element_id_list[idx]);
 
-              std::map<ElemType, ElementDefinition>::iterator def_it =
-                _element_maps.out.find(side->type());
+            if (!elem)
+              libmesh_error_msg("Mesh returned a NULL pointer for element " << element_id_list[idx]);
 
-              // Assert that we found it
-              libmesh_assert(def_it != _element_maps.out.end());
+            UniquePtr<Elem> side = elem->build_side(side_list[idx]);
 
-              // consult the export element table
-              const GmshIO::ElementDefinition& eletype = def_it->second;
+            // Map from libmesh elem type to gmsh elem type.
+            std::map<ElemType, ElementDefinition>::iterator def_it =
+              _element_maps.out.find(side->type());
 
-              // The element mapper better not require any more nodes
-              // than are present in the current element!
-              libmesh_assert_less_equal (eletype.nodes.size(), side->n_nodes());
+            // If we didn't find it, that's an error
+            if (def_it == _element_maps.out.end())
+              libmesh_error_msg("Element type " << side->type() << " not found in _element_maps.");
 
-              // elements ids are 1 based in Gmsh
-              out_stream << e_id+1 << " ";
+            // consult the export element table
+            const GmshIO::ElementDefinition& eletype = def_it->second;
 
-              // element type
-              out_stream << eletype.gmsh_type;
+            // The element mapper better not require any more nodes
+            // than are present in the current element!
+            libmesh_assert_less_equal (eletype.nodes.size(), side->n_nodes());
 
-              // write the number of tags:
-              // 1 (physical entity)
-              // 2 (geometric entity)
-              // 3 (partition entity)
-              out_stream << " 3 "
-                         << static_cast<unsigned int>(mesh.boundary_info->boundary_id(elem, s))
-                         << " 0 "
-                         << elem->processor_id()+1
-                         << " ";
+            // elements ids are 1-based in Gmsh
+            out_stream << e_id+1 << " ";
 
-              // if there is a node translation table, use it
-              if (eletype.nodes.size() > 0)
-                for (unsigned int i=0; i < side->n_nodes(); i++)
-                  out_stream << side->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
+            // element type
+            out_stream << eletype.gmsh_type;
 
-              // otherwise keep the same node order
-              else
-                for (unsigned int i=0; i < side->n_nodes(); i++)
-                  out_stream << side->node(i)+1 << " ";                // gmsh is 1-based
-              out_stream << "\n";
+            // write the number of tags:
+            // 1 (physical entity)
+            // 2 (geometric entity)
+            // 3 (partition entity)
+            out_stream << " 3 "
+                       << bc_id_list[idx]
+                       << " 0 "
+                       << elem->processor_id()+1
+                       << " ";
 
-              // increment this index too...
-              ++e_id;
-            } // element side loop
-        } // element loop
+            // if there is a node translation table, use it
+            if (eletype.nodes.size() > 0)
+              for (unsigned int i=0; i < side->n_nodes(); i++)
+                out_stream << side->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
 
-    libmesh_assert (e_id == mesh.n_active_elem() + n_boundary_faces);
+            // otherwise keep the same node order
+            else
+              for (unsigned int i=0; i < side->n_nodes(); i++)
+                out_stream << side->node(i)+1 << " ";                // gmsh is 1-based
+
+            // Go to the next line
+            out_stream << "\n";
+
+            // increment this index too...
+            ++e_id;
+          }
+      }
+
     out_stream << "$EndElements\n";
   }
 }
