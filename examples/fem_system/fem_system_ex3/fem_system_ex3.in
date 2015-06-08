@@ -4,8 +4,9 @@ transient = true
 # The interval between our timesteps
 deltat = 0.25
 
-# And the number of timesteps to take
-n_timesteps = 25 
+# And the number of timesteps to take.
+# Note: Use 25 timesteps to simulate approximately three periods of oscillation.
+n_timesteps = 5
 
 # Write out every nth timestep to file.
 write_interval = 1
