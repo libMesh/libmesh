@@ -171,15 +171,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
     (const_cast<MeshBase&>(_mesh), boundary_mesh.is_serial());
 
   /**
-   * The boundary mesh elements will be one lower dimension than the
-   * interior mesh elements.
-   *
-   * We no longer need to set_mesh_dimension() explicitly here,
-   * though: prepare_for_use() will call cache_elem_dims(), which will
-   * also be correct in the multi-dimensional case.
-   */
-
-  /**
    * Re-create the boundary mesh.
    */
 
@@ -188,176 +179,9 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
   std::map<dof_id_type, dof_id_type> node_id_map;
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  // We'll do the same modulus trick that ParallelMesh uses to avoid
-  // id conflicts between different processors
-  dof_id_type next_node_id = this->processor_id(),
-    next_elem_id = this->processor_id();
+  this->_find_id_maps(requested_boundary_ids, &node_id_map, &side_id_map);
 
-  // We'll pass through the mesh once first to build
-  // the maps and count boundary nodes and elements
-  // We have to examine all elements here rather than just local
-  // elements, because it's possible to have a local boundary node
-  // that's not on a local boundary element, e.g. at the tip of a
-  // triangle.
-  const MeshBase::const_element_iterator end_el = _mesh.elements_end();
-  for (MeshBase::const_element_iterator el = _mesh.elements_begin();
-       el != end_el; ++el)
-    {
-      const Elem *elem = *el;
-
-      for (unsigned char s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) == NULL) // on the boundary
-          {
-            // Get the top-level parent for this element
-            const Elem* top_parent = elem->top_parent();
-
-            // A convenient typedef
-            typedef
-              std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
-              const_iterator Iter;
-
-            // Find the right id number for that side
-            std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
-
-            bool add_this_side = false;
-            boundary_id_type this_bcid = invalid_id;
-
-            for (; pos.first != pos.second; ++pos.first)
-              {
-                this_bcid = pos.first->second.second;
-
-                // if this side is flagged with a boundary condition
-                // and the user wants this id
-                if ((pos.first->second.first == s) &&
-                    (requested_boundary_ids.count(this_bcid)))
-                  {
-                    add_this_side = true;
-                    break;
-                  }
-              }
-
-            // if side s wasn't found or doesn't have a boundary
-            // condition we may still want to add it
-            if (pos.first == pos.second)
-              {
-                this_bcid = invalid_id;
-                if (requested_boundary_ids.count(this_bcid))
-                  add_this_side = true;
-              }
-
-            if (add_this_side)
-              {
-                std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
-                libmesh_assert (!side_id_map.count(side_pair));
-                side_id_map[side_pair] = next_elem_id;
-                next_elem_id += this->n_processors() + 1;
-
-                // Use a proxy element for the side to query nodes
-                UniquePtr<Elem> side (elem->build_side(s));
-                for (unsigned int n = 0; n != side->n_nodes(); ++n)
-                  {
-                    Node *node = side->get_node(n);
-                    libmesh_assert(node);
-
-                    // In parallel we only know enough to number our own nodes.
-                    if (node->processor_id() != this->processor_id())
-                      continue;
-
-                    dof_id_type node_id = node->id();
-                    if (!node_id_map.count(node_id))
-                      {
-                        node_id_map[node_id] = next_node_id;
-                        next_node_id += this->n_processors() + 1;
-                      }
-                  }
-              }
-          }
-    }
-
-  // Join up the results from other processors
-  this->comm().set_union(side_id_map);
-  this->comm().set_union(node_id_map);
-
-  // Finally we'll pass through any unpartitioned elements to add them
-  // to the maps and counts.
-  next_node_id = this->n_processors();
-  next_elem_id = this->n_processors();
-
-  const MeshBase::const_element_iterator end_unpartitioned_el =
-    _mesh.pid_elements_end(DofObject::invalid_processor_id);
-  for (MeshBase::const_element_iterator el =
-         _mesh.pid_elements_begin(DofObject::invalid_processor_id);
-       el != end_unpartitioned_el; ++el)
-    {
-      const Elem *elem = *el;
-
-      for (unsigned char s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) == NULL) // on the boundary
-          {
-            // Get the top-level parent for this element
-            const Elem* top_parent = elem->top_parent();
-
-            // A convenient typedef
-            typedef
-              std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
-              const_iterator Iter;
-
-            // Find the right id number for that side
-            std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
-
-            bool add_this_side = false;
-            boundary_id_type this_bcid = invalid_id;
-
-            for (; pos.first != pos.second; ++pos.first)
-              {
-                this_bcid = pos.first->second.second;
-                // if this side is flagged with a boundary condition
-                // and the user wants this id
-                if ((pos.first->second.first == s) &&
-                    (requested_boundary_ids.count(this_bcid)))
-                  {
-                    add_this_side = true;
-                    break;
-                  }
-              }
-
-            // if side s doesn't have a boundary condition we may
-            // still want to add it
-            if (pos.first == pos.second)
-              {
-                this_bcid = invalid_id;
-                if (requested_boundary_ids.count(this_bcid))
-                  add_this_side = true;
-              }
-
-            if (add_this_side)
-              {
-                std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
-                libmesh_assert (!side_id_map.count(side_pair));
-                side_id_map[side_pair] = next_elem_id;
-                next_elem_id += this->n_processors() + 1;
-
-                // Use a proxy element for the side to query nodes
-                UniquePtr<Elem> side (elem->build_side(s));
-                for (unsigned int n = 0; n != side->n_nodes(); ++n)
-                  {
-                    Node *node = side->get_node(n);
-                    libmesh_assert(node);
-                    dof_id_type node_id = node->id();
-                    if (!node_id_map.count(node_id))
-                      {
-                        node_id_map[node_id] = next_node_id;
-                        next_node_id += this->n_processors() + 1;
-                      }
-                  }
-              }
-          }
-    }
-
-  // FIXME: ought to renumber side/node_id_map image to be contiguous
-  // to save memory, also ought to reserve memory
-
-  // Let's add all the nodes to the boundary mesh
+  // Let's add all the boundary nodes we found to the boundary mesh
 
   MeshBase::const_node_iterator n_end  = _mesh.nodes_end();
 
@@ -370,10 +194,78 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
         boundary_mesh.add_point(*node, node_id_map[node_id], node->processor_id());
     }
 
+  // Let's add the elements
+  this->add_elements (requested_boundary_ids, boundary_mesh);
 
-  // Finally let's add the elements
+  // The new elements are currently using the interior mesh's nodes;
+  // we want them to use the boundary mesh's nodes instead.
+
+  // This side's Node pointers still point to the nodes of the original mesh.
+  // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
+  // the original mesh's nodes over, we should be guaranteed to have the same ordering.
+
+  const MeshBase::element_iterator end_bdy_el =
+    boundary_mesh.elements_end();
+
+  for (MeshBase::element_iterator el = boundary_mesh.elements_begin();
+       el != end_bdy_el; ++el)
+    {
+      Elem* new_elem = *el;
+
+      for (unsigned int nn=0; nn<new_elem->n_nodes(); ++nn)
+        {
+          // Get the correct node pointer, based on the id()
+          Node* new_node =
+            boundary_mesh.node_ptr(node_id_map[new_elem->node(nn)]);
+
+          // sanity check: be sure that the new Node exists and its
+          // global id really matches
+          libmesh_assert (new_node);
+          libmesh_assert_equal_to (new_node->id(),
+                                   node_id_map[new_elem->node(nn)]);
+
+          // Assign the new node pointer
+          new_elem->set_node(nn) = new_node;
+        }
+    }
+
+  // When desired, copy the MeshData
+  // to the boundary_mesh
+  if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
+    boundary_mesh_data->assign(*this_mesh_data);
+
+  // Don't repartition this mesh; we want it to stay in sync with the
+  // interior partitioning.
+  boundary_mesh.partitioner().reset(NULL);
+
+  // Make boundary_mesh nodes and elements contiguous
+  boundary_mesh.prepare_for_use(/*skip_renumber =*/ false);
+
+  // and finally distribute element partitioning to the nodes
+  Partitioner::set_node_processor_ids(boundary_mesh);
+
+  STOP_LOG("sync()", "BoundaryInfo");
+}
 
 
+
+void BoundaryInfo::add_elements
+  (const std::set<boundary_id_type> &requested_boundary_ids,
+   UnstructuredMesh& boundary_mesh)
+{
+  START_LOG("add_elements()", "BoundaryInfo");
+
+  /**
+   * We're not prepared to mix serial and distributed meshes in this
+   * method, so make sure they match from the start.
+   */
+  libmesh_assert_equal_to(_mesh.is_serial(),
+                          boundary_mesh.is_serial());
+
+  std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
+  this->_find_id_maps(requested_boundary_ids, NULL, &side_id_map);
+
+  const MeshBase::const_element_iterator end_el = _mesh.elements_end();
   for (MeshBase::const_element_iterator el = _mesh.elements_begin();
        el != end_el; ++el)
     {
@@ -437,23 +329,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                 // Add the side
                 Elem* new_elem = boundary_mesh.add_elem(side.release());
 
-                // This side's Node pointers still point to the nodes of the original mesh.
-                // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
-                // the original mesh's nodes over, we should be guaranteed to have the same ordering.
-                for (unsigned int nn=0; nn<new_elem->n_nodes(); ++nn)
-                  {
-                    // Get the correct node pointer, based on the id()
-                    Node* new_node = boundary_mesh.node_ptr(node_id_map[new_elem->node(nn)]);
-
-                    // sanity check: be sure that the new Node exists
-                    // and its global id really matches
-                    libmesh_assert (new_node);
-                    libmesh_assert_equal_to (new_node->id(), node_id_map[new_elem->node(nn)]);
-
-                    // Assign the new node pointer
-                    new_elem->set_node(nn) = new_node;
-                  }
-
 #ifdef LIBMESH_ENABLE_AMR
                 // Finally, set the parent and interior_parent links
                 if (elem->parent())
@@ -499,22 +374,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
           }
     }
 
-  // When desired, copy the MeshData
-  // to the boundary_mesh
-  if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
-    boundary_mesh_data->assign(*this_mesh_data);
-
-  // Don't repartition this mesh; we want it to stay in sync with the
-  // interior partitioning.
-  boundary_mesh.partitioner().reset(NULL);
-
-  // Make boundary_mesh nodes and elements contiguous
-  boundary_mesh.prepare_for_use(/*skip_renumber =*/ false);
-
-  // and finally distribute element partitioning to the nodes
-  Partitioner::set_node_processor_ids(boundary_mesh);
-
-  STOP_LOG("sync()", "BoundaryInfo");
+  STOP_LOG("add_elements()", "BoundaryInfo");
 }
 
 
@@ -1932,5 +1792,138 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
   // nodeset by the requested name, so return invalid_id
   return invalid_id;
 }
+
+
+
+void BoundaryInfo::_find_id_maps
+  (const std::set<boundary_id_type> &requested_boundary_ids,
+   std::map<dof_id_type, dof_id_type> * node_id_map,
+   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
+{
+  // We'll do the same modulus trick that ParallelMesh uses to avoid
+  // id conflicts between different processors
+  dof_id_type next_node_id = this->processor_id(),
+    next_elem_id = this->processor_id();
+
+  // We'll pass through the mesh once first to build
+  // the maps and count boundary nodes and elements.
+  // To find local boundary nodes, we have to examine all elements
+  // here rather than just local elements, because it's possible to
+  // have a local boundary node that's not on a local boundary
+  // element, e.g. at the tip of a triangle.
+
+  // We'll loop through two different ranges here: first all elements,
+  // looking for local nodes, and second through unpartitioned
+  // elements, looking for all remaining nodes.
+  const MeshBase::const_element_iterator end_el = _mesh.elements_end();
+  bool hit_end_el = false;
+  const MeshBase::const_element_iterator end_unpartitioned_el =
+    _mesh.pid_elements_end(DofObject::invalid_processor_id);
+
+  for (MeshBase::const_element_iterator el = _mesh.elements_begin();
+       !hit_end_el || (el != end_unpartitioned_el); ++el)
+    {
+      if ((el == end_el) && !hit_end_el)
+        {
+          // Note that we're done with local nodes and just looking
+          // for remaining unpartitioned nodes
+          hit_end_el = true;
+
+          // Join up the local results from other processors
+          if (side_id_map)
+            this->comm().set_union(*side_id_map);
+          if (node_id_map)
+            this->comm().set_union(*node_id_map);
+
+          // Finally we'll pass through any unpartitioned elements to add them
+          // to the maps and counts.
+          next_node_id = this->n_processors();
+          next_elem_id = this->n_processors();
+
+          el = _mesh.pid_elements_begin(DofObject::invalid_processor_id);
+          if (el == end_unpartitioned_el)
+            break;
+        }
+
+      const Elem *elem = *el;
+
+      for (unsigned char s=0; s<elem->n_sides(); s++)
+        if (elem->neighbor(s) == NULL) // on the boundary
+          {
+            // Get the top-level parent for this element
+            const Elem* top_parent = elem->top_parent();
+
+            // A convenient typedef
+            typedef
+              std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+              const_iterator Iter;
+
+            // Find the right id number for that side
+            std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
+
+            bool add_this_side = false;
+            boundary_id_type this_bcid = invalid_id;
+
+            for (; pos.first != pos.second; ++pos.first)
+              {
+                this_bcid = pos.first->second.second;
+
+                // if this side is flagged with a boundary condition
+                // and the user wants this id
+                if ((pos.first->second.first == s) &&
+                    (requested_boundary_ids.count(this_bcid)))
+                  {
+                    add_this_side = true;
+                    break;
+                  }
+              }
+
+            // if side s wasn't found or doesn't have a boundary
+            // condition we may still want to add it
+            if (pos.first == pos.second)
+              {
+                this_bcid = invalid_id;
+                if (requested_boundary_ids.count(this_bcid))
+                  add_this_side = true;
+              }
+
+            if (add_this_side)
+              {
+                if (side_id_map)
+                  {
+                    std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
+                    libmesh_assert (!side_id_map->count(side_pair));
+                    (*side_id_map)[side_pair] = next_elem_id;
+                    next_elem_id += this->n_processors() + 1;
+                  }
+
+                // Use a proxy element for the side to query nodes
+                UniquePtr<Elem> side (elem->build_side(s));
+                for (unsigned int n = 0; n != side->n_nodes(); ++n)
+                  {
+                    Node *node = side->get_node(n);
+                    libmesh_assert(node);
+
+                    // In parallel we don't know enough to number
+                    // others' nodes ourselves.
+                    if (!hit_end_el &&
+                        (node->processor_id() != this->processor_id()))
+                      continue;
+
+                    dof_id_type node_id = node->id();
+                    if (node_id_map && !node_id_map->count(node_id))
+                      {
+                        (*node_id_map)[node_id] = next_node_id;
+                        next_node_id += this->n_processors() + 1;
+                      }
+                  }
+              }
+          }
+    }
+
+  // FIXME: ought to renumber side/node_id_map image to be contiguous
+  // to save memory, also ought to reserve memory
+}
+
 
 } // namespace libMesh

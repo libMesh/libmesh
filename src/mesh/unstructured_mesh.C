@@ -496,6 +496,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
               continue;
             }
 
+          // For node comparisons we'll need a sensible tolerance
+          Real node_tolerance = current_elem->hmin() * TOLERANCE;
+
           // Otherwise our interior_parent should be a child of our
           // parent's interior_parent.
           for (unsigned int c=0; c != pip->n_children(); ++c)
@@ -513,8 +516,16 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
               for (unsigned int n=0; n != current_elem->n_nodes();
                    ++n)
                 {
-                  if (child->local_node(current_elem->node(n)) ==
-                      libMesh::invalid_uint)
+                  bool child_contains_this_node = false;
+                  for (unsigned int cn=0; cn != current_elem->n_nodes();
+                       ++cn)
+                    if (child->point(cn).absolute_fuzzy_equals
+                          (current_elem->point(n), node_tolerance))
+                      {
+                        child_contains_this_node = true;
+                        break;
+                      }
+                  if (!child_contains_this_node)
                     {
                       child_contains_our_nodes = false;
                       break;
