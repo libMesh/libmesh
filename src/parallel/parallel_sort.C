@@ -228,14 +228,20 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 
-      MPI_Gatherv((_data.size() > local_offset) ?
-                  &_data[local_offset] :
-                  NULL,                            // Points to the beginning of the bin to be sent
+      // Points to the beginning of the bin to be sent
+      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : NULL;
+
+      // Enough storage to hold all bin contributions
+      void * recvbuf = (dest.empty()) ? NULL : &dest[0];
+
+      // If the sendbuf is NULL, make sure we aren't claiming to send something.
+      if (sendbuf == NULL && _local_bin_sizes[i] != 0)
+        libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
+
+      MPI_Gatherv(sendbuf,
                   _local_bin_sizes[i],               // How much data is in the bin being sent.
                   Parallel::StandardType<KeyType>(), // The data type we are sorting
-                  (dest.empty()) ?
-                  NULL :
-                  &dest[0],                        // Enough storage to hold all bin contributions
+                  recvbuf,
                   &proc_bin_size[0],          // How much is to be received from each processor
                   &displacements[0],          // Offsets into the receive buffer
                   Parallel::StandardType<KeyType>(), // The data type we are sorting
@@ -316,14 +322,20 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 
-      MPI_Gatherv((_data.size() > local_offset) ?
-                  &_data[local_offset] :
-                  NULL,                   // Points to the beginning of the bin to be sent
+      // Points to the beginning of the bin to be sent
+      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : NULL;
+
+      // Enough storage to hold all bin contributions
+      void * recvbuf = (dest.empty()) ? NULL : &dest[0];
+
+      // If the sendbuf is NULL, make sure we aren't claiming to send something.
+      if (sendbuf == NULL && _local_bin_sizes[i] != 0)
+        libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
+
+      MPI_Gatherv(sendbuf,
                   _local_bin_sizes[i],      // How much data is in the bin being sent.
                   Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
-                  (dest.empty()) ?
-                  NULL :
-                  &dest[0],               // Enough storage to hold all bin contributions
+                  recvbuf,
                   &proc_bin_size[0], // How much is to be received from each processor
                   &displacements[0], // Offsets into the receive buffer
                   Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
