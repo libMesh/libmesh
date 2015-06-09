@@ -220,7 +220,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<IdxType> displacements(_n_procs);
+      std::vector<int> displacements(_n_procs);
       for (processor_id_type j=1; j<_n_procs; ++j)
         displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
@@ -236,7 +236,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
                   NULL :
                   &dest[0],                        // Enough storage to hold all bin contributions
                   (int*) &proc_bin_size[0],          // How much is to be received from each processor
-                  (int*) &displacements[0],          // Offsets into the receive buffer
+                  &displacements[0],          // Offsets into the receive buffer
                   Parallel::StandardType<KeyType>(), // The data type we are sorting
                   i,                                 // The root process (we do this once for each proc)
                   this->comm().get());
@@ -308,7 +308,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<unsigned int> displacements(_n_procs);
+      std::vector<int> displacements(_n_procs);
       for (unsigned int j=1; j<_n_procs; ++j)
         displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
@@ -324,7 +324,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
                   NULL :
                   &dest[0],               // Enough storage to hold all bin contributions
                   (int*) &proc_bin_size[0], // How much is to be received from each processor
-                  (int*) &displacements[0], // Offsets into the receive buffer
+                  &displacements[0], // Offsets into the receive buffer
                   Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
                   i,                        // The root process (we do this once for each proc)
                   this->comm().get());
