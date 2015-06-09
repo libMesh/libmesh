@@ -701,9 +701,13 @@ void ExodusII_IO_Helper::close()
   // we call close on all processors...
   if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
-      ex_err = exII::ex_close(ex_id);
-      EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
-      message("Exodus file closed successfully.");
+      // Don't close the file if it was never opened, this raises an Exodus error
+      if (opened_for_writing || opened_for_reading)
+        {
+          ex_err = exII::ex_close(ex_id);
+          EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
+          message("Exodus file closed successfully.");
+        }
     }
 }
 
