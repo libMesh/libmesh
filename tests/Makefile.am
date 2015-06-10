@@ -16,6 +16,7 @@ unit_tests_sources = \
 	geom/node_test.C \
 	geom/point_test.C \
 	geom/point_test.h \
+	mesh/boundary_mesh.C \
 	mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C \
 	numerics/composite_function_test.C \
