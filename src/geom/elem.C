@@ -898,8 +898,9 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
 
   libmesh_assert (!ip->subactive());
 
-  while (!ip->active())
-    {
+#ifdef LIBMESH_ENABLE_AMR
+  while (!ip->active()) // only possible with AMR, be careful because
+    {                   // ip->child(c) is only good with AMR.
       for (unsigned int c = 0; c != ip->n_children(); ++c)
         {
           const Elem *child = ip->child(c);
@@ -911,6 +912,7 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
             }
         }
     }
+#endif
 
   this->find_point_neighbors(neighbor_set, ip);
 
