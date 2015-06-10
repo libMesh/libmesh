@@ -960,6 +960,78 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
 
 
 
+const Elem* Elem::interior_parent () const
+{
+  // interior parents make no sense for full-dimensional elements.
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+
+  // they USED TO BE only good for level-0 elements, but we now
+  // support keeping interior_parent() valid on refined boundary
+  // elements.
+  // if (this->level() != 0)
+  // return this->parent()->interior_parent();
+
+  // We store the interior_parent pointer after both the parent
+  // neighbor and neighbor pointers
+  Elem *interior_p = _elemlinks[1+this->n_sides()];
+
+  // If we have an interior_parent, we USED TO assume it was a
+  // one-higher-dimensional interior element, but we now allow e.g.
+  // edge elements to have a 3D interior_parent with no
+  // intermediate 2D element.
+  // libmesh_assert (!interior_p ||
+  //                interior_p->dim() == (this->dim()+1));
+  libmesh_assert (!interior_p ||
+                  (interior_p == remote_elem) ||
+                  (interior_p->dim() > this->dim()));
+
+  // We require consistency between AMR of interior and of boundary
+  // elements
+  if (interior_p && (interior_p != remote_elem))
+    libmesh_assert_less_equal (interior_p->level(), this->level());
+
+  return interior_p;
+}
+
+
+
+Elem* Elem::interior_parent ()
+{
+  // See the const version for comments
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  Elem *interior_p = _elemlinks[1+this->n_sides()];
+
+  libmesh_assert (!interior_p ||
+                  (interior_p == remote_elem) ||
+                  (interior_p->dim() > this->dim()));
+  if (interior_p && (interior_p != remote_elem))
+    libmesh_assert_less_equal (interior_p->level(), this->level());
+
+  return interior_p;
+}
+
+
+
+void Elem::set_interior_parent (Elem *p)
+{
+  // interior parents make no sense for full-dimensional elements.
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+
+  // If we have an interior_parent, we USED TO assume it was a
+  // one-higher-dimensional interior element, but we now allow e.g.
+  // edge elements to have a 3D interior_parent with no
+  // intermediate 2D element.
+  // libmesh_assert (!p ||
+  //                 p->dim() == (this->dim()+1));
+  libmesh_assert (!p ||
+                  (p == remote_elem) ||
+                  (p->dim() > this->dim()));
+
+  _elemlinks[1+this->n_sides()] = p;
+}
+
+
+
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 Elem* Elem::topological_neighbor (const unsigned int i,
