@@ -517,7 +517,9 @@ private:
    */
   void _find_id_maps
     (const std::set<boundary_id_type> &requested_boundary_ids,
+     dof_id_type first_free_node_id,
      std::map<dof_id_type, dof_id_type> * node_id_map,
+     dof_id_type first_free_elem_id,
      std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map);
 
   /**

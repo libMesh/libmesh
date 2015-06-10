@@ -27,6 +27,7 @@
 #include "libmesh/mesh_data.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/unstructured_mesh.h"
 
@@ -179,7 +180,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
   std::map<dof_id_type, dof_id_type> node_id_map;
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  this->_find_id_maps(requested_boundary_ids, &node_id_map, &side_id_map);
+  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map);
 
   // Let's add all the boundary nodes we found to the boundary mesh
 
@@ -263,7 +264,8 @@ void BoundaryInfo::add_elements
                           boundary_mesh.is_serial());
 
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
-  this->_find_id_maps(requested_boundary_ids, NULL, &side_id_map);
+  this->_find_id_maps(requested_boundary_ids, 0, NULL,
+                      boundary_mesh.max_elem_id(), &side_id_map);
 
   const MeshBase::const_element_iterator end_el = _mesh.elements_end();
   for (MeshBase::const_element_iterator el = _mesh.elements_begin();
@@ -373,6 +375,15 @@ void BoundaryInfo::add_elements
               }
           }
     }
+
+  // Make sure we didn't add ids inconsistently
+#ifdef DEBUG
+# ifdef LIBMESH_HAVE_RTTI
+  ParallelMesh *parmesh = dynamic_cast<ParallelMesh*>(&boundary_mesh);
+  if (parmesh)
+    parmesh->libmesh_assert_valid_parallel_ids();
+# endif
+#endif
 
   STOP_LOG("add_elements()", "BoundaryInfo");
 }
@@ -1797,13 +1808,16 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
 
 void BoundaryInfo::_find_id_maps
   (const std::set<boundary_id_type> &requested_boundary_ids,
+   dof_id_type first_free_node_id,
    std::map<dof_id_type, dof_id_type> * node_id_map,
+   dof_id_type first_free_elem_id,
    std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
 {
   // We'll do the same modulus trick that ParallelMesh uses to avoid
   // id conflicts between different processors
-  dof_id_type next_node_id = this->processor_id(),
-    next_elem_id = this->processor_id();
+  dof_id_type
+    next_node_id = first_free_node_id + this->processor_id(),
+    next_elem_id = first_free_elem_id + this->processor_id();
 
   // We'll pass through the mesh once first to build
   // the maps and count boundary nodes and elements.
@@ -1837,8 +1851,8 @@ void BoundaryInfo::_find_id_maps
 
           // Finally we'll pass through any unpartitioned elements to add them
           // to the maps and counts.
-          next_node_id = this->n_processors();
-          next_elem_id = this->n_processors();
+          next_node_id = first_free_node_id + this->n_processors();
+          next_elem_id = first_free_elem_id + this->n_processors();
 
           el = _mesh.pid_elements_begin(DofObject::invalid_processor_id);
           if (el == end_unpartitioned_el)
@@ -1889,7 +1903,12 @@ void BoundaryInfo::_find_id_maps
 
             if (add_this_side)
               {
-                if (side_id_map)
+                // We only assign ids for our own and for
+                // unpartitioned elements
+                if (side_id_map &&
+                    ((elem->processor_id() == this->processor_id()) ||
+                     (elem->processor_id() ==
+                      DofObject::invalid_processor_id)))
                   {
                     std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
                     libmesh_assert (!side_id_map->count(side_pair));
