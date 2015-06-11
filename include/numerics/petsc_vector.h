@@ -746,8 +746,6 @@ PetscVector<T>::PetscVector (Vec v,
     }
   else
     this->_type = SERIAL;
-
-  this->close();
 }
 
 

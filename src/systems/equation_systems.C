@@ -790,7 +790,13 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       // Update the current_local_solution
       {
         System & non_const_sys = const_cast<System &>(system);
-        non_const_sys.solution->close();
+        // We used to simply call non_const_sys.solution->close()
+        // here, but that is not allowed when the solution vector is
+        // locked read-only, for example when printing the solution
+        // during during the middle of a solve...  So try to be a bit
+        // more careful about calling close() unnecessarily.
+        if (!non_const_sys.solution->closed())
+          non_const_sys.solution->close();
         non_const_sys.update();
       }
 
@@ -952,7 +958,13 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
       // Update the current_local_solution
       {
         System & non_const_sys = const_cast<System &>(system);
-        non_const_sys.solution->close();
+        // We used to simply call non_const_sys.solution->close()
+        // here, but that is not allowed when the solution vector is
+        // locked read-only, for example when printing the solution
+        // during during the middle of a solve...  So try to be a bit
+        // more careful about calling close() unnecessarily.
+        if (!non_const_sys.solution->closed())
+          non_const_sys.solution->close();
         non_const_sys.update();
       }
 

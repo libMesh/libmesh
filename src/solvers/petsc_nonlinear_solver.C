@@ -148,7 +148,6 @@ extern "C"
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
     R.close();
-    X_global.close();
 
     STOP_LOG("residual()", "PetscNonlinearSolver");
 
@@ -243,7 +242,6 @@ extern "C"
 
     PC.close();
     Jac.close();
-    X_global.close();
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
     *msflag = SAME_NONZERO_PATTERN;
 #endif
