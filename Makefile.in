@@ -105,7 +105,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
-	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/compiler.m4 \
+	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/capnproto.m4 \
+	$(top_srcdir)/m4/compiler.m4 \
 	$(top_srcdir)/m4/config_environment.m4 \
 	$(top_srcdir)/m4/config_summary.m4 \
 	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
@@ -4245,6 +4246,8 @@ BUILD_USER = @BUILD_USER@
 BUILD_VERSION = @BUILD_VERSION@
 BUNZIP2 = @BUNZIP2@
 BZIP2 = @BZIP2@
+CAPNPROTO_INCLUDE = @CAPNPROTO_INCLUDE@
+CAPNPROTO_LIBRARY = @CAPNPROTO_LIBRARY@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@

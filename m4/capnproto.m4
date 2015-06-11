@@ -61,7 +61,7 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
 
        # Check for existence of a header file in the specified location
        capnprotoincFound=no;
-       AC_CHECK_HEADERS($CAPNPROTO_INC/capnproto.h, capnprotoincFound=yes)
+       AC_CHECK_FILE($CAPNPROTO_INC/capnp/common.h, capnprotoincFound=yes)
 
        if (test $capnprotoincFound = no); then
          AC_MSG_RESULT(CAPNPROTO header files not found!)
@@ -71,7 +71,7 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
        # If both the header file and the required libs were found, continue.
        if (test x$enablecapnproto = xyes); then
          CAPNPROTO_INCLUDE="-I$CAPNPROTO_INC"
-         CAPNPROTO_LIBRARY="-L$CAPNPROTO_LIB -lcapnproto -lkj"
+         CAPNPROTO_LIBRARY="-L$CAPNPROTO_LIB -lcapnp -lkj"
 
           # add the CAPNPROTO_LIB dir to the linker run path if it is a directory
           if (test "x$RPATHFLAG" != "x" -a -d $CAPNPROTO_LIB); then

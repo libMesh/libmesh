@@ -711,6 +711,10 @@ HDF5_LIBS
 HDF5_CPPFLAGS
 HDF5_CFLAGS
 HDF5_DIR
+LIBMESH_ENABLE_CAPNPROTO_FALSE
+LIBMESH_ENABLE_CAPNPROTO_TRUE
+CAPNPROTO_LIBRARY
+CAPNPROTO_INCLUDE
 LIBMESH_ENABLE_NLOPT_FALSE
 LIBMESH_ENABLE_NLOPT_TRUE
 NLOPT_LIBRARY
@@ -1167,6 +1171,9 @@ with_glpk_lib
 enable_nlopt
 with_nlopt_include
 with_nlopt_lib
+enable_capnproto
+with_capnproto_include
+with_capnproto_lib
 enable_hdf5
 with_hdf5
 enable_netcdf
@@ -1943,6 +1950,7 @@ Optional Features:
   --disable-eigen         build without Eigen linear algebra support
   --disable-glpk          build without GLPK support
   --disable-nlopt         build without NLOPT support
+  --disable-capnproto     build without Cap'n Proto support
   --disable-hdf5          build without HDF5 support
   --disable-netcdf        build without netCDF binary I/O
   --disable-exodus        build without ExodusII API support
@@ -2018,6 +2026,10 @@ Optional Packages:
   --with-nlopt-include=PATH
                           Specify the path for NLOPT header files
   --with-nlopt-lib=PATH   Specify the path for NLOPT libs
+  --with-capnproto-include=PATH
+                          Specify the path for CAPNPROTO header files
+  --with-capnproto-lib=PATH
+                          Specify the path for CAPNPROTO libs
   --with-hdf5=DIR         root directory of HDF5 installation (default =
                           HDF5_DIR)
   --with-fparser=<release|none|devel>
@@ -36431,6 +36443,137 @@ fi
 # -------------------------------------------------------------
 
 
+# -------------------------------------------------------------
+# CAPNPROTO -- Serialization library.
+# -------------------------------------------------------------
+
+  # Check whether --enable-capnproto was given.
+if test "${enable_capnproto+set}" = set; then :
+  enableval=$enable_capnproto; case "${enableval}" in
+		  yes)  enablecapnproto=yes ;;
+		   no)  enablecapnproto=no ;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-capnproto" "$LINENO" 5 ;;
+		 esac
+else
+  enablecapnproto=$enableoptional
+fi
+
+
+
+  if (test $enablecapnproto = yes); then
+
+    # User-specific include path
+
+# Check whether --with-capnproto-include was given.
+if test "${with_capnproto_include+set}" = set; then :
+  withval=$with_capnproto_include; withcapnprotoinc=$withval
+else
+  withcapnprotoinc=no
+fi
+
+
+    # User-specific library path
+
+# Check whether --with-capnproto-lib was given.
+if test "${with_capnproto_lib+set}" = set; then :
+  withval=$with_capnproto_lib; withcapnprotolib=$withval
+else
+  withcapnprotolib=no
+fi
+
+
+    # Use CAPNPROTO_DIR/include if it exists.
+    if (test $withcapnprotoinc != no); then
+      CAPNPROTO_INC="$withcapnprotoinc"
+    elif test "x$CAPNPROTO_DIR" != x -a -f $CAPNPROTO_DIR/include/capnproto.h; then
+      CAPNPROTO_INC="$CAPNPROTO_DIR/include"
+    else
+      CAPNPROTO_INC=""
+    fi
+
+    # Use CAPNPROTO_DIR/lib if it exists.
+    if (test $withcapnprotolib != no); then
+      CAPNPROTO_LIB="$withcapnprotolib"
+    elif test "x$CAPNPROTO_DIR" != x; then
+      CAPNPROTO_LIB="$CAPNPROTO_DIR/lib"
+    else
+      CAPNPROTO_LIB=""
+    fi
+
+    # Initialize Makefile/config.h substitution variables
+    CAPNPROTO_INCLUDE=""
+    CAPNPROTO_LIBRARY=""
+
+    # Properly let the substitution variables
+    if (test $enablecapnproto = yes); then
+
+       # Check for existence of a header file in the specified location
+       capnprotoincFound=no;
+       as_ac_File=`$as_echo "ac_cv_file_$CAPNPROTO_INC/capnp/common.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CAPNPROTO_INC/capnp/common.h" >&5
+$as_echo_n "checking for $CAPNPROTO_INC/capnp/common.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$CAPNPROTO_INC/capnp/common.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  capnprotoincFound=yes
+fi
+
+
+       if (test $capnprotoincFound = no); then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: CAPNPROTO header files not found!" >&5
+$as_echo "CAPNPROTO header files not found!" >&6; }
+         enablecapnproto=no;
+       fi
+
+       # If both the header file and the required libs were found, continue.
+       if (test x$enablecapnproto = xyes); then
+         CAPNPROTO_INCLUDE="-I$CAPNPROTO_INC"
+         CAPNPROTO_LIBRARY="-L$CAPNPROTO_LIB -lcapnp -lkj"
+
+          # add the CAPNPROTO_LIB dir to the linker run path if it is a directory
+          if (test "x$RPATHFLAG" != "x" -a -d $CAPNPROTO_LIB); then
+            CAPNPROTO_LIBRARY="${RPATHFLAG}${CAPNPROTO_LIB} $CAPNPROTO_LIBRARY"
+          fi
+
+
+$as_echo "#define HAVE_CAPNPROTO 1" >>confdefs.h
+
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with CAPNPROTO support >>>" >&5
+$as_echo "<<< Configuring library with CAPNPROTO support >>>" >&6; }
+       fi
+    fi
+  fi
+
+  # Substitute the substitution variables
+
+
+
+if (test x$enablenlopt = xyes); then
+  libmesh_optional_INCLUDES="$CAPNPROTO_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$CAPNPROTO_LIBRARY $libmesh_optional_LIBS"
+fi
+ if test x$enablenlopt = xyes; then
+  LIBMESH_ENABLE_CAPNPROTO_TRUE=
+  LIBMESH_ENABLE_CAPNPROTO_FALSE='#'
+else
+  LIBMESH_ENABLE_CAPNPROTO_TRUE='#'
+  LIBMESH_ENABLE_CAPNPROTO_FALSE=
+fi
+
+# -------------------------------------------------------------
+
 
 # --------------------------------------------------------------
 # HDF5 -- enabled by default
@@ -38231,6 +38374,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NLOPT_TRUE}" && test -z "${LIBMESH_ENABLE_NLOPT_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NLOPT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_CAPNPROTO_TRUE}" && test -z "${LIBMESH_ENABLE_CAPNPROTO_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_CAPNPROTO\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_HDF5_TRUE}" && test -z "${LIBMESH_ENABLE_HDF5_FALSE}"; then
@@ -41736,6 +41883,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo
   echo Optional Packages:
   echo '  'boost............................ : $enableboost
+  echo '  'capnproto........................ : $enablecapnproto
   echo '  'cppunit.......................... : $enablecppunit
 #  if (test "x$enablecppunit" = "xyes"); then
 #  echo '     'CPPUNIT_CFLAGS................ : $CPPUNIT_CFLAGS
