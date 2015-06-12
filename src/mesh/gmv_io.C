@@ -618,21 +618,23 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       out_stream << n_active_elem;
     out_stream << '\n';
 
+    // The same temporary storage will be used for each element
+    std::vector<dof_id_type> conn;
+
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-    switch (mesh.mesh_dimension())
+    for ( ; it != end; ++it)
       {
-      case 1:
-        {
-          // The same temporary storage will be used for each element
-          std::vector<dof_id_type> conn;
+        const Elem* elem = *it;
 
-          for ( ; it != end; ++it)
+        mesh_max_p_level = std::max(mesh_max_p_level,
+                                    elem->p_level());
+
+        switch (elem->dim())
+          {
+          case 1:
             {
-              mesh_max_p_level = std::max(mesh_max_p_level,
-                                          (*it)->p_level());
-
               if (this->subdivide_second_order())
                 for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
                   {
@@ -660,20 +662,12 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
                   out_stream << '\n';
                 }
+
+                break;
             }
-          break;
-        }
 
-      case 2:
-        {
-          // The same temporary storage will be used for each element
-          std::vector<dof_id_type> conn;
-
-          for ( ; it != end; ++it)
+          case 2:
             {
-              mesh_max_p_level = std::max(mesh_max_p_level,
-                                          (*it)->p_level());
-
               if (this->subdivide_second_order())
                 for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
                   {
@@ -756,22 +750,12 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
                   out_stream << '\n';
                 }
+
+                break;
             }
 
-          break;
-        }
-
-
-      case 3:
-        {
-          // The same temporary storage will be used for each element
-          std::vector<dof_id_type> conn;
-
-          for ( ; it != end; ++it)
+          case 3:
             {
-              mesh_max_p_level = std::max(mesh_max_p_level,
-                                          (*it)->p_level());
-
               if (this->subdivide_second_order())
                 for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
                   {
@@ -925,13 +909,14 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
                   out_stream << '\n';
                 }
+
+                break;
             }
 
-          break;
-        }
-
-      default:
-        libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
+          default:
+            libmesh_error_msg("Unsupported element dimension: " <<
+                              elem->dim());
+          }
       }
 
     out_stream << '\n';
@@ -1268,15 +1253,18 @@ void GMVIO::write_binary (const std::string& fname,
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-    switch (mesh.mesh_dimension())
+    for ( ; it != end; ++it)
       {
+        const Elem* elem = *it;
 
-      case 1:
-        for ( ; it != end; ++it)
+        mesh_max_p_level = std::max(mesh_max_p_level,
+                                    (*it)->p_level());
+
+        switch (elem->dim())
           {
-            mesh_max_p_level = std::max(mesh_max_p_level,
-                                        (*it)->p_level());
 
+          case 1:
+            {
             for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
               {
                 std::strcpy(buf, "line    ");
@@ -1291,15 +1279,12 @@ void GMVIO::write_binary (const std::string& fname,
 
                 out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
               }
-          }
-        break;
 
-      case 2:
-        for ( ; it != end; ++it)
-          {
-            mesh_max_p_level = std::max(mesh_max_p_level,
-                                        (*it)->p_level());
+            break;
+            }
 
+          case 2:
+            {
             for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
               {
                 std::strcpy(buf, "quad    ");
@@ -1311,14 +1296,10 @@ void GMVIO::write_binary (const std::string& fname,
                 (*it)->connectivity(se,TECPLOT,conn);
                 out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
               }
-          }
-        break;
-      case 3:
-        for ( ; it != end; ++it)
-          {
-            mesh_max_p_level = std::max(mesh_max_p_level,
-                                        (*it)->p_level());
-
+            break;
+            }
+          case 3:
+            {
             for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
               {
                 std::strcpy(buf, "phex8   ");
@@ -1330,10 +1311,11 @@ void GMVIO::write_binary (const std::string& fname,
                 (*it)->connectivity(se,TECPLOT,conn);
                 out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
               }
+              break;
+            }
+          default:
+            libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
           }
-        break;
-      default:
-        libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
 
       }
   }
