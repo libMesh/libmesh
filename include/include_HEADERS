@@ -296,6 +296,10 @@ include_HEADERS =  \
         reduced_basis/rb_assembly_expansion.h \
         reduced_basis/rb_construction.h \
         reduced_basis/rb_construction_base.h \
+        reduced_basis/rb_data_complex.capnp.h \
+        reduced_basis/rb_data_deserialization.h \
+        reduced_basis/rb_data_real.capnp.h \
+        reduced_basis/rb_data_serialization.h \
         reduced_basis/rb_eim_assembly.h \
         reduced_basis/rb_eim_construction.h \
         reduced_basis/rb_eim_evaluation.h \

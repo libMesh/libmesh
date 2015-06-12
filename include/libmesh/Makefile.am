@@ -291,6 +291,10 @@ BUILT_SOURCES = \
         rb_assembly_expansion.h \
         rb_construction.h \
         rb_construction_base.h \
+        rb_data_complex.capnp.h \
+        rb_data_deserialization.h \
+        rb_data_real.capnp.h \
+        rb_data_serialization.h \
         rb_eim_assembly.h \
         rb_eim_construction.h \
         rb_eim_evaluation.h \
@@ -1359,6 +1363,18 @@ rb_construction.h: $(top_srcdir)/include/reduced_basis/rb_construction.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_construction_base.h: $(top_srcdir)/include/reduced_basis/rb_construction_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_complex.capnp.h: $(top_srcdir)/include/reduced_basis/rb_data_complex.capnp.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_deserialization.h: $(top_srcdir)/include/reduced_basis/rb_data_deserialization.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_real.capnp.h: $(top_srcdir)/include/reduced_basis/rb_data_real.capnp.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_serialization.h: $(top_srcdir)/include/reduced_basis/rb_data_serialization.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_assembly.h: $(top_srcdir)/include/reduced_basis/rb_eim_assembly.h

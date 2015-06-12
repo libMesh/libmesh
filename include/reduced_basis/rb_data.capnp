@@ -10,14 +10,14 @@ $Cxx.namespace("RBData");
 using Integer = UInt32;
 using Real = Float64;
 
-struct Complex {
+struct Complex @0xda65bfa81ea2ce0b {
   real @0 :Real;
   imag @1 :Real;
 }
 
 using Number = <NUMBER>;
 
-struct RBParameter @@0xb73e071e0a405648 {
+struct RBParameter @0xb73e071e0a405648 {
   name  @0 :Text;
   value @1 :Real;
 }
@@ -52,7 +52,7 @@ struct RBEvaluation @0xa459b0816a4ad3e3 {
 }
 
 struct TransientRBEvaluation @0xf0ee71757fa42963 {
-  rbEvaluation      @0  :RBEvaluation
+  rbEvaluation      @0  :RBEvaluation;
   deltaT            @1  :Real;
   eulerTheta        @2  :Real;
   nTimeSteps        @3  :Integer;
@@ -79,7 +79,7 @@ struct MeshElem @0xcd01b7bd6045605d {
 }
 
 struct RBEIMEvaluation @0xf8121d2237427a80 {
-  rbEvaluation                @0 :RBEvaluation
+  rbEvaluation                @0 :RBEvaluation;
   interpolationElemIds        @1 :List(Integer);
   interpolationMatrix         @2 :List(Number);
   interpolationPointsElems    @3 :List(MeshElem);

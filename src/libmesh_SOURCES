@@ -321,6 +321,10 @@ libmesh_SOURCES =  \
         src/reduced_basis/rb_assembly_expansion.C \
         src/reduced_basis/rb_construction.C \
         src/reduced_basis/rb_construction_base.C \
+        src/reduced_basis/rb_data_complex.capnp.C \
+        src/reduced_basis/rb_data_deserialization.C \
+        src/reduced_basis/rb_data_real.capnp.C \
+        src/reduced_basis/rb_data_serialization.C \
         src/reduced_basis/rb_eim_assembly.C \
         src/reduced_basis/rb_eim_construction.C \
         src/reduced_basis/rb_eim_evaluation.C \
