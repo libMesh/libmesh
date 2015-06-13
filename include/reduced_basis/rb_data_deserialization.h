@@ -2,7 +2,10 @@
 #define RB_DATA_DESERIALIZATION_H
 
 // libMesh/reduced_basis includes
-#include "libmesh/rb_evaluation.h"
+#include "libmesh/transient_rb_evaluation.h"
+#include "libmesh/rb_eim_evaluation.h"
+#include "libmesh/rb_scm_evaluation.h"
+#include "libmesh/rb_data_real.capnp.h"
 
 // Cap'n'Proto includes
 #include "capnp/common.h"
@@ -37,7 +40,7 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void read_from_file(const std::string& path);
+  void read_from_file(const std::string& path, bool read_error_bound_data);
 
 private:
 
@@ -70,7 +73,7 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void read_from_file(const std::string& path);
+  void read_from_file(const std::string& path, bool read_error_bound_data);
 
 private:
 
@@ -103,7 +106,7 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void read_from_file(const std::string& path);
+  void read_from_file(const std::string& path, bool read_error_bound_data);
 
 private:
 
@@ -136,7 +139,7 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void read_from_file(const std::string& path);
+  void read_from_file(const std::string& path, bool read_error_bound_data);
 
 private:
 
@@ -152,7 +155,7 @@ private:
  */
 void load_rb_evaluation_data(
   RBEvaluation& rb_evaluation,
-  RBEvaluationReader& rb_evaluation_reader,
+  RBData::RBEvaluation::Reader& rb_evaluation_reader,
   bool read_error_bound_data);
 
 /**
@@ -160,8 +163,8 @@ void load_rb_evaluation_data(
  */
 void load_transient_rb_evaluation_data(
   TransientRBEvaluation& trans_rb_eval,
-  RBEvaluationReader& rb_evaluation_reader,
-  TransientRBEvaluationReader& trans_rb_eval_reader,
+  RBData::RBEvaluation::Reader& rb_evaluation_reader,
+  RBData::TransientRBEvaluation::Reader& trans_rb_eval_reader,
   bool read_error_bound_data);
 
 /**
@@ -169,8 +172,8 @@ void load_transient_rb_evaluation_data(
  */
 void load_rb_eim_evaluation_data(
   RBEIMEvaluation& rb_eim_eval,
-  RBEvaluationReader& rb_evaluation_reader,
-  RBEIMEvaluationReader& rb_eim_eval_reader,
+  RBData::RBEvaluation::Reader& rb_evaluation_reader,
+  RBData::RBEIMEvaluation::Reader& rb_eim_eval_reader,
   bool read_error_bound_data);
 
 /**
@@ -178,7 +181,7 @@ void load_rb_eim_evaluation_data(
  */
 void load_rb_scm_evaluation_data(
   RBSCMEvaluation& rb_scm_eval,
-  RBSCMEvaluationReader& rb_scm_eval_reader,
+  RBData::RBSCMEvaluation::Reader& rb_scm_eval_reader,
   bool read_error_bound_data);
 
 /**

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # Copyright (C) 2015 Akselos
 
+JUST RUN ../../../libmesh_install/capnp/bin/capnp compile -oc++ rb_data.capnp
+
 import os
 import subprocess as sp
 import shutil

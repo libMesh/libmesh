@@ -12,8 +12,11 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
+#include <fcntl.h>
 
 using namespace libMesh;
+
+using namespace RBDataDeserialization;
 
 // ---- Helper functions (BEGIN) ----
 
@@ -47,7 +50,7 @@ void load_point(RBData::Point3D::Reader point_reader, Point& point)
 
 
 void load_elem_into_mesh(
-  RBComponentData::MeshElem::Reader mesh_elem_reader,
+  RBData::MeshElem::Reader mesh_elem_reader,
   libMesh::Elem* elem,
   libMesh::SerialMesh& mesh)
 {
@@ -89,7 +92,9 @@ RBEvaluationDeserialization::RBEvaluationDeserialization(RBEvaluation& rb_eval)
 RBEvaluationDeserialization::~RBEvaluationDeserialization()
 {}
 
-void RBEvaluationDeserialization::read_from_file(const std::string& path)
+void RBEvaluationDeserialization::read_from_file(
+  const std::string& path,
+  bool read_error_bound_data)
 {
   START_LOG("read_from_file()", "RBEvaluationDeserialization");
 
@@ -108,7 +113,7 @@ void RBEvaluationDeserialization::read_from_file(const std::string& path)
   RBData::RBEvaluation::Reader rb_eval_reader =
     message.getRoot<RBData::RBEvaluation>();
 
-  load_rb_evaluation_data(_rb_eval, rb_eval_reader);
+  load_rb_evaluation_data(_rb_eval, rb_eval_reader, read_error_bound_data);
 
   STOP_LOG("read_from_file()", "RBEvaluationDeserialization");
 }
@@ -127,7 +132,9 @@ TransientRBEvaluationDeserialization::TransientRBEvaluationDeserialization(
 TransientRBEvaluationDeserialization::~TransientRBEvaluationDeserialization()
 {}
 
-void TransientRBEvaluationDeserialization::read_from_file(const std::string& path)
+void TransientRBEvaluationDeserialization::read_from_file(
+  const std::string& path,
+  bool read_error_bound_data)
 {
   START_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
 
@@ -149,7 +156,7 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string& pat
     trans_rb_eval_reader.getRbEvaluation();
 
   load_transient_rb_evaluation_data(
-    _trans_rb_eval, rb_eval_reader, trans_rb_eval_reader);
+    _trans_rb_eval, rb_eval_reader, trans_rb_eval_reader, read_error_bound_data);
 
   STOP_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
 }
@@ -168,7 +175,9 @@ RBEIMEvaluationDeserialization::RBEIMEvaluationDeserialization(
 RBEIMEvaluationDeserialization::~RBEIMEvaluationDeserialization()
 {}
 
-void RBEIMEvaluationDeserialization::read_from_file(const std::string& path)
+void RBEIMEvaluationDeserialization::read_from_file(
+  const std::string& path,
+  bool read_error_bound_data)
 {
   START_LOG("read_from_file()", "RBEIMEvaluationDeserialization");
 
@@ -189,7 +198,8 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string& path)
   RBData::RBEvaluation::Builder rb_eval_reader =
     rb_eim_eval_reader.getRbEvaluation();
 
-  load_rb_eim_evaluation_data(_rb_eim_eval, rb_eval_reader, rb_eim_eval_reader);
+  load_rb_eim_evaluation_data(
+    _rb_eim_eval, rb_eval_reader, rb_eim_eval_reader, read_error_bound_data);
 
   STOP_LOG("read_from_file()", "RBEIMEvaluationDeserialization");
 }
@@ -208,7 +218,9 @@ RBSCMEvaluationDeserialization::RBSCMEvaluationDeserialization(
 RBSCMEvaluationDeserialization::~RBSCMEvaluationDeserialization()
 {}
 
-void RBSCMEvaluationDeserialization::read_from_file(const std::string& path)
+void RBSCMEvaluationDeserialization::read_from_file(
+  const std::string& path,
+  bool read_error_bound_data)
 {
   START_LOG("read_from_file()", "RBSCMEvaluationDeserialization");
 
@@ -227,7 +239,8 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string& path)
   RBData::RBEIMEvaluation::Reader rb_scm_eval_reader =
     message.getRoot<RBData::RBSCMEvaluation>();
 
-  load_rb_scm_evaluation_data(_rb_scm_eval, rb_scm_eval_reader);
+  load_rb_scm_evaluation_data(
+    _rb_scm_eval, rb_scm_eval_reader, read_error_bound_data);
 
   STOP_LOG("read_from_file()", "RBSCMEvaluationDeserialization");
 }
@@ -239,7 +252,7 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string& path)
 
 void load_rb_evaluation_data(
   RBEvaluation& rb_evaluation,
-  RBEvaluationReader& rb_evaluation_reader,
+  RBData::RBEvaluation::Reader& rb_evaluation_reader,
   bool read_error_bound_data)
 {
   // Set number of basis functions
@@ -610,8 +623,8 @@ void RBDataSerialization::load_transient_rb_evaluation(
 
 void load_rb_eim_evaluation_data(
   RBEIMEvaluation& rb_eim_evaluation,
-  RBEvaluationReader& rb_evaluation_reader,
-  RBEIMEvaluationReader& rb_eim_evaluation_reader,
+  RBData::RBEvaluation::Reader& rb_evaluation_reader,
+  RBData::RBEIMEvaluation::Reader& rb_eim_evaluation_reader,
   bool read_error_bound_data)
 {
   load_rb_evaluation_data(
@@ -750,7 +763,7 @@ void load_rb_eim_evaluation_data(
 
 void load_rb_scm_evaluation_data(
   RBSCMEvaluation& rb_scm_evaluation,
-  RBSCMEvaluationReader& rb_scm_evaluation_reader,
+  RBData::RBSCMEvaluation::Reader& rb_scm_evaluation_reader,
   bool read_error_bound_data)
 {
   auto parameter_ranges =

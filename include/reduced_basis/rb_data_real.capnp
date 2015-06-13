@@ -51,7 +51,7 @@ struct RBEvaluation @0xa459b0816a4ad3e3 {
   rbInnerProductMatrix @9 :List(Number);
 }
 
-struct TransientRBEvaluation @0xf0ee71757fa42963 {
+struct TransientRBEvaluation(Number) @0xf0ee71757fa42963 {
   rbEvaluation      @0  :RBEvaluation;
   deltaT            @1  :Real;
   eulerTheta        @2  :Real;
