@@ -53,6 +53,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/getpot.h"
 #include "libmesh/elem.h"
+#include "libmesh/rb_data_serialization.h"
 
 // local includes
 #include "rb_classes.h"
@@ -148,6 +149,9 @@ int main (int argc, char** argv)
 
       // Write out the data that will subsequently be required for the Evaluation stage
       rb_con.get_rb_evaluation().write_offline_data_to_files();
+      
+      RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_con.get_rb_evaluation());
+      rb_eval_writer.write_to_file("rb_eval.bin");
 
       // If requested, write out the RB basis functions for visualization purposes
       if(store_basis_functions)

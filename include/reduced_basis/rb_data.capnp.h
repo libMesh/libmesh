@@ -21,8 +21,6 @@ CAPNP_DECLARE_SCHEMA(c7c5f4dfa33dfb27);
 CAPNP_DECLARE_SCHEMA(de7dfcf8ecccaa90);
 CAPNP_DECLARE_SCHEMA(cd01b7bd6045605d);
 CAPNP_DECLARE_SCHEMA(b8dd038628a64b16);
-CAPNP_DECLARE_SCHEMA(eb6a19346114773a);
-CAPNP_DECLARE_SCHEMA(9f33ded848cf4cc2);
 CAPNP_DECLARE_SCHEMA(a459b0816a4ad3e3);
 CAPNP_DECLARE_SCHEMA(9a82baf67396076d);
 CAPNP_DECLARE_SCHEMA(f0ee71757fa42963);
@@ -140,36 +138,6 @@ struct RBSCMEvaluation {
   };
 };
 
-struct OutputReal {
-  OutputReal() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(eb6a19346114773a, 0, 2)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand = &schema->defaultBrand;
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct OutputComplex {
-  OutputComplex() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(9f33ded848cf4cc2, 0, 2)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand = &schema->defaultBrand;
-    #endif  // !CAPNP_LITE
-  };
-};
-
 struct RBEvaluationReal {
   RBEvaluationReal() = delete;
 
@@ -178,7 +146,7 @@ struct RBEvaluationReal {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(a459b0816a4ad3e3, 1, 9)
+    CAPNP_DECLARE_STRUCT_HEADER(a459b0816a4ad3e3, 1, 10)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand = &schema->defaultBrand;
     #endif  // !CAPNP_LITE
@@ -193,7 +161,7 @@ struct RBEvaluationComplex {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(9a82baf67396076d, 1, 9)
+    CAPNP_DECLARE_STRUCT_HEADER(9a82baf67396076d, 1, 10)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand = &schema->defaultBrand;
     #endif  // !CAPNP_LITE
@@ -956,191 +924,6 @@ private:
 };
 #endif  // !CAPNP_LITE
 
-class OutputReal::Reader {
-public:
-  typedef OutputReal Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand);
-  }
-#endif  // !CAPNP_LITE
-
-  inline bool hasOutputDualInnerprods() const;
-  inline  ::capnp::List<double>::Reader getOutputDualInnerprods() const;
-
-  inline bool hasOutputVectors() const;
-  inline  ::capnp::List< ::capnp::List<double>>::Reader getOutputVectors() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class OutputReal::Builder {
-public:
-  typedef OutputReal Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline bool hasOutputDualInnerprods();
-  inline  ::capnp::List<double>::Builder getOutputDualInnerprods();
-  inline void setOutputDualInnerprods( ::capnp::List<double>::Reader value);
-  inline void setOutputDualInnerprods(::kj::ArrayPtr<const double> value);
-  inline  ::capnp::List<double>::Builder initOutputDualInnerprods(unsigned int size);
-  inline void adoptOutputDualInnerprods(::capnp::Orphan< ::capnp::List<double>>&& value);
-  inline ::capnp::Orphan< ::capnp::List<double>> disownOutputDualInnerprods();
-
-  inline bool hasOutputVectors();
-  inline  ::capnp::List< ::capnp::List<double>>::Builder getOutputVectors();
-  inline void setOutputVectors( ::capnp::List< ::capnp::List<double>>::Reader value);
-  inline void setOutputVectors(::kj::ArrayPtr<const  ::capnp::List<double>::Reader> value);
-  inline  ::capnp::List< ::capnp::List<double>>::Builder initOutputVectors(unsigned int size);
-  inline void adoptOutputVectors(::capnp::Orphan< ::capnp::List< ::capnp::List<double>>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>> disownOutputVectors();
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class OutputReal::Pipeline {
-public:
-  typedef OutputReal Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class OutputComplex::Reader {
-public:
-  typedef OutputComplex Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand);
-  }
-#endif  // !CAPNP_LITE
-
-  inline bool hasOutputDualInnerprods() const;
-  inline  ::capnp::List< ::RBData::Complex>::Reader getOutputDualInnerprods() const;
-
-  inline bool hasOutputVectors() const;
-  inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader getOutputVectors() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class OutputComplex::Builder {
-public:
-  typedef OutputComplex Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline bool hasOutputDualInnerprods();
-  inline  ::capnp::List< ::RBData::Complex>::Builder getOutputDualInnerprods();
-  inline void setOutputDualInnerprods( ::capnp::List< ::RBData::Complex>::Reader value);
-  inline  ::capnp::List< ::RBData::Complex>::Builder initOutputDualInnerprods(unsigned int size);
-  inline void adoptOutputDualInnerprods(::capnp::Orphan< ::capnp::List< ::RBData::Complex>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::RBData::Complex>> disownOutputDualInnerprods();
-
-  inline bool hasOutputVectors();
-  inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder getOutputVectors();
-  inline void setOutputVectors( ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader value);
-  inline void setOutputVectors(::kj::ArrayPtr<const  ::capnp::List< ::RBData::Complex>::Reader> value);
-  inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder initOutputVectors(unsigned int size);
-  inline void adoptOutputVectors(::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>> disownOutputVectors();
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class OutputComplex::Pipeline {
-public:
-  typedef OutputComplex Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
 class RBEvaluationReal::Reader {
 public:
   typedef RBEvaluationReal Reads;
@@ -1181,11 +964,14 @@ public:
   inline bool hasRbAqMatrices() const;
   inline  ::capnp::List< ::capnp::List<double>>::Reader getRbAqMatrices() const;
 
-  inline bool hasOutputs() const;
-  inline  ::capnp::List< ::RBData::OutputReal>::Reader getOutputs() const;
-
   inline bool hasRbInnerProductMatrix() const;
   inline  ::capnp::List<double>::Reader getRbInnerProductMatrix() const;
+
+  inline bool hasOutputDualInnerprods() const;
+  inline  ::capnp::List< ::capnp::List<double>>::Reader getOutputDualInnerprods() const;
+
+  inline bool hasOutputVectors() const;
+  inline  ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Reader getOutputVectors() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1272,13 +1058,6 @@ public:
   inline void adoptRbAqMatrices(::capnp::Orphan< ::capnp::List< ::capnp::List<double>>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>> disownRbAqMatrices();
 
-  inline bool hasOutputs();
-  inline  ::capnp::List< ::RBData::OutputReal>::Builder getOutputs();
-  inline void setOutputs( ::capnp::List< ::RBData::OutputReal>::Reader value);
-  inline  ::capnp::List< ::RBData::OutputReal>::Builder initOutputs(unsigned int size);
-  inline void adoptOutputs(::capnp::Orphan< ::capnp::List< ::RBData::OutputReal>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::RBData::OutputReal>> disownOutputs();
-
   inline bool hasRbInnerProductMatrix();
   inline  ::capnp::List<double>::Builder getRbInnerProductMatrix();
   inline void setRbInnerProductMatrix( ::capnp::List<double>::Reader value);
@@ -1286,6 +1065,22 @@ public:
   inline  ::capnp::List<double>::Builder initRbInnerProductMatrix(unsigned int size);
   inline void adoptRbInnerProductMatrix(::capnp::Orphan< ::capnp::List<double>>&& value);
   inline ::capnp::Orphan< ::capnp::List<double>> disownRbInnerProductMatrix();
+
+  inline bool hasOutputDualInnerprods();
+  inline  ::capnp::List< ::capnp::List<double>>::Builder getOutputDualInnerprods();
+  inline void setOutputDualInnerprods( ::capnp::List< ::capnp::List<double>>::Reader value);
+  inline void setOutputDualInnerprods(::kj::ArrayPtr<const  ::capnp::List<double>::Reader> value);
+  inline  ::capnp::List< ::capnp::List<double>>::Builder initOutputDualInnerprods(unsigned int size);
+  inline void adoptOutputDualInnerprods(::capnp::Orphan< ::capnp::List< ::capnp::List<double>>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>> disownOutputDualInnerprods();
+
+  inline bool hasOutputVectors();
+  inline  ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Builder getOutputVectors();
+  inline void setOutputVectors( ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Reader value);
+  inline void setOutputVectors(::kj::ArrayPtr<const  ::capnp::List< ::capnp::List<double>>::Reader> value);
+  inline  ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Builder initOutputVectors(unsigned int size);
+  inline void adoptOutputVectors(::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List<double>>>> disownOutputVectors();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1355,11 +1150,14 @@ public:
   inline bool hasRbAqMatrices() const;
   inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader getRbAqMatrices() const;
 
-  inline bool hasOutputs() const;
-  inline  ::capnp::List< ::RBData::OutputComplex>::Reader getOutputs() const;
-
   inline bool hasRbInnerProductMatrix() const;
   inline  ::capnp::List< ::RBData::Complex>::Reader getRbInnerProductMatrix() const;
+
+  inline bool hasOutputDualInnerprods() const;
+  inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader getOutputDualInnerprods() const;
+
+  inline bool hasOutputVectors() const;
+  inline  ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Reader getOutputVectors() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1443,19 +1241,28 @@ public:
   inline void adoptRbAqMatrices(::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>> disownRbAqMatrices();
 
-  inline bool hasOutputs();
-  inline  ::capnp::List< ::RBData::OutputComplex>::Builder getOutputs();
-  inline void setOutputs( ::capnp::List< ::RBData::OutputComplex>::Reader value);
-  inline  ::capnp::List< ::RBData::OutputComplex>::Builder initOutputs(unsigned int size);
-  inline void adoptOutputs(::capnp::Orphan< ::capnp::List< ::RBData::OutputComplex>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::RBData::OutputComplex>> disownOutputs();
-
   inline bool hasRbInnerProductMatrix();
   inline  ::capnp::List< ::RBData::Complex>::Builder getRbInnerProductMatrix();
   inline void setRbInnerProductMatrix( ::capnp::List< ::RBData::Complex>::Reader value);
   inline  ::capnp::List< ::RBData::Complex>::Builder initRbInnerProductMatrix(unsigned int size);
   inline void adoptRbInnerProductMatrix(::capnp::Orphan< ::capnp::List< ::RBData::Complex>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::RBData::Complex>> disownRbInnerProductMatrix();
+
+  inline bool hasOutputDualInnerprods();
+  inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder getOutputDualInnerprods();
+  inline void setOutputDualInnerprods( ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader value);
+  inline void setOutputDualInnerprods(::kj::ArrayPtr<const  ::capnp::List< ::RBData::Complex>::Reader> value);
+  inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder initOutputDualInnerprods(unsigned int size);
+  inline void adoptOutputDualInnerprods(::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>> disownOutputDualInnerprods();
+
+  inline bool hasOutputVectors();
+  inline  ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Builder getOutputVectors();
+  inline void setOutputVectors( ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Reader value);
+  inline void setOutputVectors(::kj::ArrayPtr<const  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader> value);
+  inline  ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Builder initOutputVectors(unsigned int size);
+  inline void adoptOutputVectors(::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>> disownOutputVectors();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2813,146 +2620,6 @@ inline ::capnp::Orphan< ::capnp::List<double>> RBSCMEvaluation::Builder::disownS
       _builder.getPointerField(6 * ::capnp::POINTERS));
 }
 
-inline bool OutputReal::Reader::hasOutputDualInnerprods() const {
-  return !_reader.getPointerField(0 * ::capnp::POINTERS).isNull();
-}
-inline bool OutputReal::Builder::hasOutputDualInnerprods() {
-  return !_builder.getPointerField(0 * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List<double>::Reader OutputReal::Reader::getOutputDualInnerprods() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
-      _reader.getPointerField(0 * ::capnp::POINTERS));
-}
-inline  ::capnp::List<double>::Builder OutputReal::Builder::getOutputDualInnerprods() {
-  return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
-      _builder.getPointerField(0 * ::capnp::POINTERS));
-}
-inline void OutputReal::Builder::setOutputDualInnerprods( ::capnp::List<double>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
-      _builder.getPointerField(0 * ::capnp::POINTERS), value);
-}
-inline void OutputReal::Builder::setOutputDualInnerprods(::kj::ArrayPtr<const double> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
-      _builder.getPointerField(0 * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List<double>::Builder OutputReal::Builder::initOutputDualInnerprods(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List<double>>::init(
-      _builder.getPointerField(0 * ::capnp::POINTERS), size);
-}
-inline void OutputReal::Builder::adoptOutputDualInnerprods(
-    ::capnp::Orphan< ::capnp::List<double>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List<double>>::adopt(
-      _builder.getPointerField(0 * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List<double>> OutputReal::Builder::disownOutputDualInnerprods() {
-  return ::capnp::_::PointerHelpers< ::capnp::List<double>>::disown(
-      _builder.getPointerField(0 * ::capnp::POINTERS));
-}
-
-inline bool OutputReal::Reader::hasOutputVectors() const {
-  return !_reader.getPointerField(1 * ::capnp::POINTERS).isNull();
-}
-inline bool OutputReal::Builder::hasOutputVectors() {
-  return !_builder.getPointerField(1 * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::capnp::List<double>>::Reader OutputReal::Reader::getOutputVectors() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::get(
-      _reader.getPointerField(1 * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::capnp::List<double>>::Builder OutputReal::Builder::getOutputVectors() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::get(
-      _builder.getPointerField(1 * ::capnp::POINTERS));
-}
-inline void OutputReal::Builder::setOutputVectors( ::capnp::List< ::capnp::List<double>>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::set(
-      _builder.getPointerField(1 * ::capnp::POINTERS), value);
-}
-inline void OutputReal::Builder::setOutputVectors(::kj::ArrayPtr<const  ::capnp::List<double>::Reader> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::set(
-      _builder.getPointerField(1 * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::capnp::List<double>>::Builder OutputReal::Builder::initOutputVectors(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::init(
-      _builder.getPointerField(1 * ::capnp::POINTERS), size);
-}
-inline void OutputReal::Builder::adoptOutputVectors(
-    ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::adopt(
-      _builder.getPointerField(1 * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>> OutputReal::Builder::disownOutputVectors() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::disown(
-      _builder.getPointerField(1 * ::capnp::POINTERS));
-}
-
-inline bool OutputComplex::Reader::hasOutputDualInnerprods() const {
-  return !_reader.getPointerField(0 * ::capnp::POINTERS).isNull();
-}
-inline bool OutputComplex::Builder::hasOutputDualInnerprods() {
-  return !_builder.getPointerField(0 * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::RBData::Complex>::Reader OutputComplex::Reader::getOutputDualInnerprods() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::get(
-      _reader.getPointerField(0 * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::RBData::Complex>::Builder OutputComplex::Builder::getOutputDualInnerprods() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::get(
-      _builder.getPointerField(0 * ::capnp::POINTERS));
-}
-inline void OutputComplex::Builder::setOutputDualInnerprods( ::capnp::List< ::RBData::Complex>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::set(
-      _builder.getPointerField(0 * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::RBData::Complex>::Builder OutputComplex::Builder::initOutputDualInnerprods(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::init(
-      _builder.getPointerField(0 * ::capnp::POINTERS), size);
-}
-inline void OutputComplex::Builder::adoptOutputDualInnerprods(
-    ::capnp::Orphan< ::capnp::List< ::RBData::Complex>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::adopt(
-      _builder.getPointerField(0 * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::RBData::Complex>> OutputComplex::Builder::disownOutputDualInnerprods() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::disown(
-      _builder.getPointerField(0 * ::capnp::POINTERS));
-}
-
-inline bool OutputComplex::Reader::hasOutputVectors() const {
-  return !_reader.getPointerField(1 * ::capnp::POINTERS).isNull();
-}
-inline bool OutputComplex::Builder::hasOutputVectors() {
-  return !_builder.getPointerField(1 * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader OutputComplex::Reader::getOutputVectors() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::get(
-      _reader.getPointerField(1 * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder OutputComplex::Builder::getOutputVectors() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::get(
-      _builder.getPointerField(1 * ::capnp::POINTERS));
-}
-inline void OutputComplex::Builder::setOutputVectors( ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::set(
-      _builder.getPointerField(1 * ::capnp::POINTERS), value);
-}
-inline void OutputComplex::Builder::setOutputVectors(::kj::ArrayPtr<const  ::capnp::List< ::RBData::Complex>::Reader> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::set(
-      _builder.getPointerField(1 * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder OutputComplex::Builder::initOutputVectors(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::init(
-      _builder.getPointerField(1 * ::capnp::POINTERS), size);
-}
-inline void OutputComplex::Builder::adoptOutputVectors(
-    ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::adopt(
-      _builder.getPointerField(1 * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>> OutputComplex::Builder::disownOutputVectors() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::disown(
-      _builder.getPointerField(1 * ::capnp::POINTERS));
-}
-
 inline  ::uint32_t RBEvaluationReal::Reader::getNBfs() const {
   return _reader.getDataField< ::uint32_t>(
       0 * ::capnp::ELEMENTS);
@@ -3221,72 +2888,112 @@ inline ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>> RBEvaluationReal:
       _builder.getPointerField(6 * ::capnp::POINTERS));
 }
 
-inline bool RBEvaluationReal::Reader::hasOutputs() const {
+inline bool RBEvaluationReal::Reader::hasRbInnerProductMatrix() const {
   return !_reader.getPointerField(7 * ::capnp::POINTERS).isNull();
 }
-inline bool RBEvaluationReal::Builder::hasOutputs() {
-  return !_builder.getPointerField(7 * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::RBData::OutputReal>::Reader RBEvaluationReal::Reader::getOutputs() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputReal>>::get(
-      _reader.getPointerField(7 * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::RBData::OutputReal>::Builder RBEvaluationReal::Builder::getOutputs() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputReal>>::get(
-      _builder.getPointerField(7 * ::capnp::POINTERS));
-}
-inline void RBEvaluationReal::Builder::setOutputs( ::capnp::List< ::RBData::OutputReal>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputReal>>::set(
-      _builder.getPointerField(7 * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::RBData::OutputReal>::Builder RBEvaluationReal::Builder::initOutputs(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputReal>>::init(
-      _builder.getPointerField(7 * ::capnp::POINTERS), size);
-}
-inline void RBEvaluationReal::Builder::adoptOutputs(
-    ::capnp::Orphan< ::capnp::List< ::RBData::OutputReal>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputReal>>::adopt(
-      _builder.getPointerField(7 * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::RBData::OutputReal>> RBEvaluationReal::Builder::disownOutputs() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputReal>>::disown(
-      _builder.getPointerField(7 * ::capnp::POINTERS));
-}
-
-inline bool RBEvaluationReal::Reader::hasRbInnerProductMatrix() const {
-  return !_reader.getPointerField(8 * ::capnp::POINTERS).isNull();
-}
 inline bool RBEvaluationReal::Builder::hasRbInnerProductMatrix() {
-  return !_builder.getPointerField(8 * ::capnp::POINTERS).isNull();
+  return !_builder.getPointerField(7 * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List<double>::Reader RBEvaluationReal::Reader::getRbInnerProductMatrix() const {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
-      _reader.getPointerField(8 * ::capnp::POINTERS));
+      _reader.getPointerField(7 * ::capnp::POINTERS));
 }
 inline  ::capnp::List<double>::Builder RBEvaluationReal::Builder::getRbInnerProductMatrix() {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
-      _builder.getPointerField(8 * ::capnp::POINTERS));
+      _builder.getPointerField(7 * ::capnp::POINTERS));
 }
 inline void RBEvaluationReal::Builder::setRbInnerProductMatrix( ::capnp::List<double>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
-      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+      _builder.getPointerField(7 * ::capnp::POINTERS), value);
 }
 inline void RBEvaluationReal::Builder::setRbInnerProductMatrix(::kj::ArrayPtr<const double> value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
-      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+      _builder.getPointerField(7 * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List<double>::Builder RBEvaluationReal::Builder::initRbInnerProductMatrix(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::init(
-      _builder.getPointerField(8 * ::capnp::POINTERS), size);
+      _builder.getPointerField(7 * ::capnp::POINTERS), size);
 }
 inline void RBEvaluationReal::Builder::adoptRbInnerProductMatrix(
     ::capnp::Orphan< ::capnp::List<double>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::adopt(
-      _builder.getPointerField(8 * ::capnp::POINTERS), kj::mv(value));
+      _builder.getPointerField(7 * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List<double>> RBEvaluationReal::Builder::disownRbInnerProductMatrix() {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::disown(
+      _builder.getPointerField(7 * ::capnp::POINTERS));
+}
+
+inline bool RBEvaluationReal::Reader::hasOutputDualInnerprods() const {
+  return !_reader.getPointerField(8 * ::capnp::POINTERS).isNull();
+}
+inline bool RBEvaluationReal::Builder::hasOutputDualInnerprods() {
+  return !_builder.getPointerField(8 * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::List<double>>::Reader RBEvaluationReal::Reader::getOutputDualInnerprods() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::get(
+      _reader.getPointerField(8 * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::List<double>>::Builder RBEvaluationReal::Builder::getOutputDualInnerprods() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::get(
       _builder.getPointerField(8 * ::capnp::POINTERS));
+}
+inline void RBEvaluationReal::Builder::setOutputDualInnerprods( ::capnp::List< ::capnp::List<double>>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::set(
+      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+}
+inline void RBEvaluationReal::Builder::setOutputDualInnerprods(::kj::ArrayPtr<const  ::capnp::List<double>::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::set(
+      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::List<double>>::Builder RBEvaluationReal::Builder::initOutputDualInnerprods(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::init(
+      _builder.getPointerField(8 * ::capnp::POINTERS), size);
+}
+inline void RBEvaluationReal::Builder::adoptOutputDualInnerprods(
+    ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::adopt(
+      _builder.getPointerField(8 * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::List<double>>> RBEvaluationReal::Builder::disownOutputDualInnerprods() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List<double>>>::disown(
+      _builder.getPointerField(8 * ::capnp::POINTERS));
+}
+
+inline bool RBEvaluationReal::Reader::hasOutputVectors() const {
+  return !_reader.getPointerField(9 * ::capnp::POINTERS).isNull();
+}
+inline bool RBEvaluationReal::Builder::hasOutputVectors() {
+  return !_builder.getPointerField(9 * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Reader RBEvaluationReal::Reader::getOutputVectors() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::get(
+      _reader.getPointerField(9 * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Builder RBEvaluationReal::Builder::getOutputVectors() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::get(
+      _builder.getPointerField(9 * ::capnp::POINTERS));
+}
+inline void RBEvaluationReal::Builder::setOutputVectors( ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::set(
+      _builder.getPointerField(9 * ::capnp::POINTERS), value);
+}
+inline void RBEvaluationReal::Builder::setOutputVectors(::kj::ArrayPtr<const  ::capnp::List< ::capnp::List<double>>::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::set(
+      _builder.getPointerField(9 * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::List< ::capnp::List<double>>>::Builder RBEvaluationReal::Builder::initOutputVectors(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::init(
+      _builder.getPointerField(9 * ::capnp::POINTERS), size);
+}
+inline void RBEvaluationReal::Builder::adoptOutputVectors(
+    ::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::adopt(
+      _builder.getPointerField(9 * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List<double>>>> RBEvaluationReal::Builder::disownOutputVectors() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List<double>>>>::disown(
+      _builder.getPointerField(9 * ::capnp::POINTERS));
 }
 
 inline  ::uint32_t RBEvaluationComplex::Reader::getNBfs() const {
@@ -3545,68 +3252,108 @@ inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>> RBEva
       _builder.getPointerField(6 * ::capnp::POINTERS));
 }
 
-inline bool RBEvaluationComplex::Reader::hasOutputs() const {
+inline bool RBEvaluationComplex::Reader::hasRbInnerProductMatrix() const {
   return !_reader.getPointerField(7 * ::capnp::POINTERS).isNull();
 }
-inline bool RBEvaluationComplex::Builder::hasOutputs() {
-  return !_builder.getPointerField(7 * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::RBData::OutputComplex>::Reader RBEvaluationComplex::Reader::getOutputs() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputComplex>>::get(
-      _reader.getPointerField(7 * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::RBData::OutputComplex>::Builder RBEvaluationComplex::Builder::getOutputs() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputComplex>>::get(
-      _builder.getPointerField(7 * ::capnp::POINTERS));
-}
-inline void RBEvaluationComplex::Builder::setOutputs( ::capnp::List< ::RBData::OutputComplex>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputComplex>>::set(
-      _builder.getPointerField(7 * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::RBData::OutputComplex>::Builder RBEvaluationComplex::Builder::initOutputs(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputComplex>>::init(
-      _builder.getPointerField(7 * ::capnp::POINTERS), size);
-}
-inline void RBEvaluationComplex::Builder::adoptOutputs(
-    ::capnp::Orphan< ::capnp::List< ::RBData::OutputComplex>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputComplex>>::adopt(
-      _builder.getPointerField(7 * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::RBData::OutputComplex>> RBEvaluationComplex::Builder::disownOutputs() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::OutputComplex>>::disown(
-      _builder.getPointerField(7 * ::capnp::POINTERS));
-}
-
-inline bool RBEvaluationComplex::Reader::hasRbInnerProductMatrix() const {
-  return !_reader.getPointerField(8 * ::capnp::POINTERS).isNull();
-}
 inline bool RBEvaluationComplex::Builder::hasRbInnerProductMatrix() {
-  return !_builder.getPointerField(8 * ::capnp::POINTERS).isNull();
+  return !_builder.getPointerField(7 * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::RBData::Complex>::Reader RBEvaluationComplex::Reader::getRbInnerProductMatrix() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::get(
-      _reader.getPointerField(8 * ::capnp::POINTERS));
+      _reader.getPointerField(7 * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::RBData::Complex>::Builder RBEvaluationComplex::Builder::getRbInnerProductMatrix() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::get(
-      _builder.getPointerField(8 * ::capnp::POINTERS));
+      _builder.getPointerField(7 * ::capnp::POINTERS));
 }
 inline void RBEvaluationComplex::Builder::setRbInnerProductMatrix( ::capnp::List< ::RBData::Complex>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::set(
-      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+      _builder.getPointerField(7 * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::RBData::Complex>::Builder RBEvaluationComplex::Builder::initRbInnerProductMatrix(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::init(
-      _builder.getPointerField(8 * ::capnp::POINTERS), size);
+      _builder.getPointerField(7 * ::capnp::POINTERS), size);
 }
 inline void RBEvaluationComplex::Builder::adoptRbInnerProductMatrix(
     ::capnp::Orphan< ::capnp::List< ::RBData::Complex>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::adopt(
-      _builder.getPointerField(8 * ::capnp::POINTERS), kj::mv(value));
+      _builder.getPointerField(7 * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::RBData::Complex>> RBEvaluationComplex::Builder::disownRbInnerProductMatrix() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::RBData::Complex>>::disown(
+      _builder.getPointerField(7 * ::capnp::POINTERS));
+}
+
+inline bool RBEvaluationComplex::Reader::hasOutputDualInnerprods() const {
+  return !_reader.getPointerField(8 * ::capnp::POINTERS).isNull();
+}
+inline bool RBEvaluationComplex::Builder::hasOutputDualInnerprods() {
+  return !_builder.getPointerField(8 * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader RBEvaluationComplex::Reader::getOutputDualInnerprods() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::get(
+      _reader.getPointerField(8 * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder RBEvaluationComplex::Builder::getOutputDualInnerprods() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::get(
       _builder.getPointerField(8 * ::capnp::POINTERS));
+}
+inline void RBEvaluationComplex::Builder::setOutputDualInnerprods( ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::set(
+      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+}
+inline void RBEvaluationComplex::Builder::setOutputDualInnerprods(::kj::ArrayPtr<const  ::capnp::List< ::RBData::Complex>::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::set(
+      _builder.getPointerField(8 * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Builder RBEvaluationComplex::Builder::initOutputDualInnerprods(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::init(
+      _builder.getPointerField(8 * ::capnp::POINTERS), size);
+}
+inline void RBEvaluationComplex::Builder::adoptOutputDualInnerprods(
+    ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::adopt(
+      _builder.getPointerField(8 * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::RBData::Complex>>> RBEvaluationComplex::Builder::disownOutputDualInnerprods() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::disown(
+      _builder.getPointerField(8 * ::capnp::POINTERS));
+}
+
+inline bool RBEvaluationComplex::Reader::hasOutputVectors() const {
+  return !_reader.getPointerField(9 * ::capnp::POINTERS).isNull();
+}
+inline bool RBEvaluationComplex::Builder::hasOutputVectors() {
+  return !_builder.getPointerField(9 * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Reader RBEvaluationComplex::Reader::getOutputVectors() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::get(
+      _reader.getPointerField(9 * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Builder RBEvaluationComplex::Builder::getOutputVectors() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::get(
+      _builder.getPointerField(9 * ::capnp::POINTERS));
+}
+inline void RBEvaluationComplex::Builder::setOutputVectors( ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::set(
+      _builder.getPointerField(9 * ::capnp::POINTERS), value);
+}
+inline void RBEvaluationComplex::Builder::setOutputVectors(::kj::ArrayPtr<const  ::capnp::List< ::capnp::List< ::RBData::Complex>>::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::set(
+      _builder.getPointerField(9 * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>::Builder RBEvaluationComplex::Builder::initOutputVectors(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::init(
+      _builder.getPointerField(9 * ::capnp::POINTERS), size);
+}
+inline void RBEvaluationComplex::Builder::adoptOutputVectors(
+    ::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::adopt(
+      _builder.getPointerField(9 * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>> RBEvaluationComplex::Builder::disownOutputVectors() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::List< ::capnp::List< ::RBData::Complex>>>>::disown(
+      _builder.getPointerField(9 * ::capnp::POINTERS));
 }
 
 inline bool TransientRBEvaluationReal::Reader::hasRbEvaluation() const {

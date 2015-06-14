@@ -53,38 +53,31 @@ struct RBSCMEvaluation @0xb8dd038628a64b16 {
   scmUbVectors       @6 :List(Real);
 }
 
-struct OutputReal @0xeb6a19346114773a {
-  outputDualInnerprods @0 :List(Real);
-  outputVectors        @1 :List(List(Real));
-}
-struct OutputComplex @0x9f33ded848cf4cc2 {
-  outputDualInnerprods @0 :List(Complex);
-  outputVectors        @1 :List(List(Complex));
-}
-
 struct RBEvaluationReal @0xa459b0816a4ad3e3 {
-  nBfs                 @0 :Integer;
-  parameterRanges      @1 :ParameterRanges;
-  discreteParameters   @2 :DiscreteParameterList;
-  aqAqInnerprods       @3 :List(Real);
-  fqAqInnerprods       @4 :List(Real);
-  fqInnerprods         @5 :List(Real);
-  rbFqVectors          @6 :List(List(Real));
-  rbAqMatrices         @7 :List(List(Real));
-  outputs              @8 :List(OutputReal);
-  rbInnerProductMatrix @9 :List(Real);
+  nBfs                 @0  :Integer;
+  parameterRanges      @1  :ParameterRanges;
+  discreteParameters   @2  :DiscreteParameterList;
+  aqAqInnerprods       @3  :List(Real);
+  fqAqInnerprods       @4  :List(Real);
+  fqInnerprods         @5  :List(Real);
+  rbFqVectors          @6  :List(List(Real));
+  rbAqMatrices         @7  :List(List(Real));
+  rbInnerProductMatrix @8  :List(Real);
+  outputDualInnerprods @9  :List(List(Real));
+  outputVectors        @10 :List(List(List(Real)));
 }
 struct RBEvaluationComplex @0x9a82baf67396076d {
-  nBfs                 @0 :Integer;
-  parameterRanges      @1 :ParameterRanges;
-  discreteParameters   @2 :DiscreteParameterList;
-  aqAqInnerprods       @3 :List(Complex);
-  fqAqInnerprods       @4 :List(Complex);
-  fqInnerprods         @5 :List(Complex);
-  rbFqVectors          @6 :List(List(Complex));
-  rbAqMatrices         @7 :List(List(Complex));
-  outputs              @8 :List(OutputComplex);
-  rbInnerProductMatrix @9 :List(Complex);
+  nBfs                 @0  :Integer;
+  parameterRanges      @1  :ParameterRanges;
+  discreteParameters   @2  :DiscreteParameterList;
+  aqAqInnerprods       @3  :List(Complex);
+  fqAqInnerprods       @4  :List(Complex);
+  fqInnerprods         @5  :List(Complex);
+  rbFqVectors          @6  :List(List(Complex));
+  rbAqMatrices         @7  :List(List(Complex));
+  rbInnerProductMatrix @8  :List(Complex);
+  outputDualInnerprods @9  :List(List(Complex));
+  outputVectors        @10 :List(List(List(Complex)));
 }
 
 struct TransientRBEvaluationReal @0xf0ee71757fa42963 {
