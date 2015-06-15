@@ -509,15 +509,18 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
               // interior_parent.  We'll set it provisionally now and
               // keep trying to find something better.
               if (child == remote_elem)
-                current_elem->set_interior_parent
-                  (const_cast<RemoteElem*>(remote_elem));
+                {
+                  current_elem->set_interior_parent
+                    (const_cast<RemoteElem*>(remote_elem));
+                  continue;
+                }
 
               bool child_contains_our_nodes = true;
               for (unsigned int n=0; n != current_elem->n_nodes();
                    ++n)
                 {
                   bool child_contains_this_node = false;
-                  for (unsigned int cn=0; cn != current_elem->n_nodes();
+                  for (unsigned int cn=0; cn != child->n_nodes();
                        ++cn)
                     if (child->point(cn).absolute_fuzzy_equals
                           (current_elem->point(n), node_tolerance))

@@ -27,7 +27,9 @@
 #include "libmesh/mesh_data.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 
 namespace libMesh
@@ -179,7 +181,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
   std::map<dof_id_type, dof_id_type> node_id_map;
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  this->_find_id_maps(requested_boundary_ids, &node_id_map, &side_id_map);
+  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map);
 
   // Let's add all the boundary nodes we found to the boundary mesh
 
@@ -255,15 +257,22 @@ void BoundaryInfo::add_elements
 {
   START_LOG("add_elements()", "BoundaryInfo");
 
-  /**
-   * We're not prepared to mix serial and distributed meshes in this
-   * method, so make sure they match from the start.
-   */
+  // We're not prepared to mix serial and distributed meshes in this
+  // method, so make sure they match from the start.
   libmesh_assert_equal_to(_mesh.is_serial(),
                           boundary_mesh.is_serial());
 
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
-  this->_find_id_maps(requested_boundary_ids, NULL, &side_id_map);
+  this->_find_id_maps(requested_boundary_ids, 0, NULL,
+                      boundary_mesh.max_elem_id(), &side_id_map);
+
+  // We have to add sides *outside* any element loop, because if
+  // boundary_mesh and _mesh are the same then those additions can
+  // invalidate our element iterators.  So we just use the element
+  // loop to make a list of sides to add.
+  typedef std::vector<std::pair<dof_id_type, unsigned char> >
+    side_container;
+  side_container sides_to_add;
 
   const MeshBase::const_element_iterator end_el = _mesh.elements_end();
   for (MeshBase::const_element_iterator el = _mesh.elements_begin();
@@ -312,67 +321,150 @@ void BoundaryInfo::add_elements
               }
 
             if (add_this_side)
-              {
-                // Build the side - do not use a "proxy" element here:
-                // This will be going into the boundary_mesh and needs to
-                // stand on its own.
-                UniquePtr<Elem> side (elem->build_side(s, false));
-
-                side->processor_id() = elem->processor_id();
-
-                const std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
-
-                libmesh_assert(side_id_map.count(side_pair));
-
-                side->set_id(side_id_map[side_pair]);
-
-                // Add the side
-                Elem* new_elem = boundary_mesh.add_elem(side.release());
-
-#ifdef LIBMESH_ENABLE_AMR
-                // Finally, set the parent and interior_parent links
-                if (elem->parent())
-                  {
-                    const std::pair<dof_id_type, unsigned char> parent_side_pair(elem->parent()->id(), s);
-
-                    libmesh_assert(side_id_map.count(parent_side_pair));
-
-                    Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
-
-                    libmesh_assert(side_parent);
-
-                    new_elem->set_parent(side_parent);
-
-                    side_parent->set_refinement_flag(Elem::INACTIVE);
-
-                    // Figuring out which child we are of our parent
-                    // is a trick.  Due to libMesh child numbering
-                    // conventions, if we are an element on a vertex,
-                    // then we share that vertex with our parent, with
-                    // the same local index.
-                    bool found_child = false;
-                    for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
-                      if (new_elem->get_node(v) == side_parent->get_node(v))
-                        {
-                          side_parent->add_child(new_elem, v);
-                          found_child = true;
-                        }
-
-                    // If we don't share any vertex with our parent,
-                    // then we're the fourth child (index 3) of a
-                    // triangle.
-                    if (!found_child)
-                      {
-                        libmesh_assert_equal_to (new_elem->n_vertices(), 3);
-                        side_parent->add_child(new_elem, 3);
-                      }
-                  }
-#endif
-
-                new_elem->set_interior_parent (const_cast<Elem*>(elem));
-              }
+              sides_to_add.push_back
+                (std::make_pair(elem->id(), s));
           }
     }
+
+  for (side_container::const_iterator it = sides_to_add.begin();
+       it != sides_to_add.end(); ++it)
+    {
+      const dof_id_type elem_id = it->first;
+      const unsigned char s = it->second;
+      const Elem * elem = _mesh.elem(elem_id);
+
+      // Build the side - do not use a "proxy" element here:
+      // This will be going into the boundary_mesh and needs to
+      // stand on its own.
+      UniquePtr<Elem> side (elem->build_side(s, false));
+
+      side->processor_id() = elem->processor_id();
+
+      const std::pair<dof_id_type, unsigned char> side_pair(elem_id, s);
+
+      libmesh_assert(side_id_map.count(side_pair));
+
+      side->set_id(side_id_map[side_pair]);
+
+      // Add the side
+      Elem* new_elem = boundary_mesh.add_elem(side.release());
+
+#ifdef LIBMESH_ENABLE_AMR
+      // Set parent links
+      if (elem->parent())
+        {
+          const std::pair<dof_id_type, unsigned char> parent_side_pair(elem->parent()->id(), s);
+
+          libmesh_assert(side_id_map.count(parent_side_pair));
+
+          Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
+
+          libmesh_assert(side_parent);
+
+          new_elem->set_parent(side_parent);
+
+          side_parent->set_refinement_flag(Elem::INACTIVE);
+
+          // Figuring out which child we are of our parent
+          // is a trick.  Due to libMesh child numbering
+          // conventions, if we are an element on a vertex,
+          // then we share that vertex with our parent, with
+          // the same local index.
+          bool found_child = false;
+          for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
+            if (new_elem->get_node(v) == side_parent->get_node(v))
+              {
+                side_parent->add_child(new_elem, v);
+                found_child = true;
+              }
+
+          // If we don't share any vertex with our parent,
+          // then we're the fourth child (index 3) of a
+          // triangle.
+          if (!found_child)
+            {
+              libmesh_assert_equal_to (new_elem->n_vertices(), 3);
+              side_parent->add_child(new_elem, 3);
+            }
+        }
+#endif
+
+      new_elem->set_interior_parent (const_cast<Elem*>(elem));
+
+      // On non-local elements on ParallelMesh we might have
+      // RemoteElem neighbor links to construct
+      if (!_mesh.is_serial() &&
+          (elem->processor_id() != this->processor_id()))
+        {
+          // Check every interior side for a RemoteElem
+          for (unsigned int interior_side = 0;
+               interior_side != elem->n_sides();
+               ++interior_side)
+            {
+              // Might this interior side have a RemoteElem that
+              // needs a corresponding Remote on a boundary side?
+              if (elem->neighbor(interior_side) != remote_elem)
+                continue;
+
+              // Which boundary side?
+              for (unsigned int boundary_side = 0;
+                   boundary_side != new_elem->n_sides();
+                   ++boundary_side)
+                {
+                  // Look for matching node points.  This is safe in
+                  // *this* context.
+                  bool found_all_nodes = true;
+                  for (unsigned int boundary_node = 0;
+                       boundary_node != new_elem->n_nodes();
+                       ++boundary_node)
+                    {
+                      if (!new_elem->is_node_on_side(boundary_node,
+                                                     boundary_side))
+                        continue;
+
+                      bool found_this_node = false;
+                      for (unsigned int interior_node = 0;
+                           interior_node != elem->n_nodes();
+                           ++interior_node)
+                        {
+                          if (!elem->is_node_on_side(interior_node,
+                                                     interior_side))
+                            continue;
+
+                          if (new_elem->point(boundary_node) ==
+                              elem->point(interior_node))
+                            {
+                              found_this_node = true;
+                              break;
+                            }
+                        }
+                      if (!found_this_node)
+                        {
+                          found_all_nodes = false;
+                          break;
+                        }
+                    }
+
+                  if (found_all_nodes)
+                    {
+                      new_elem->set_neighbor
+                        (boundary_side,
+                         const_cast<RemoteElem*>(remote_elem));
+                      break;
+                    }
+                }
+            }
+        }
+    }
+
+  // Make sure we didn't add ids inconsistently
+#ifdef DEBUG
+# ifdef LIBMESH_HAVE_RTTI
+  ParallelMesh *parmesh = dynamic_cast<ParallelMesh*>(&boundary_mesh);
+  if (parmesh)
+    parmesh->libmesh_assert_valid_parallel_ids();
+# endif
+#endif
 
   STOP_LOG("add_elements()", "BoundaryInfo");
 }
@@ -1797,13 +1889,16 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
 
 void BoundaryInfo::_find_id_maps
   (const std::set<boundary_id_type> &requested_boundary_ids,
+   dof_id_type first_free_node_id,
    std::map<dof_id_type, dof_id_type> * node_id_map,
+   dof_id_type first_free_elem_id,
    std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
 {
   // We'll do the same modulus trick that ParallelMesh uses to avoid
   // id conflicts between different processors
-  dof_id_type next_node_id = this->processor_id(),
-    next_elem_id = this->processor_id();
+  dof_id_type
+    next_node_id = first_free_node_id + this->processor_id(),
+    next_elem_id = first_free_elem_id + this->processor_id();
 
   // We'll pass through the mesh once first to build
   // the maps and count boundary nodes and elements.
@@ -1837,8 +1932,8 @@ void BoundaryInfo::_find_id_maps
 
           // Finally we'll pass through any unpartitioned elements to add them
           // to the maps and counts.
-          next_node_id = this->n_processors();
-          next_elem_id = this->n_processors();
+          next_node_id = first_free_node_id + this->n_processors();
+          next_elem_id = first_free_elem_id + this->n_processors();
 
           el = _mesh.pid_elements_begin(DofObject::invalid_processor_id);
           if (el == end_unpartitioned_el)
@@ -1889,7 +1984,12 @@ void BoundaryInfo::_find_id_maps
 
             if (add_this_side)
               {
-                if (side_id_map)
+                // We only assign ids for our own and for
+                // unpartitioned elements
+                if (side_id_map &&
+                    ((elem->processor_id() == this->processor_id()) ||
+                     (elem->processor_id() ==
+                      DofObject::invalid_processor_id)))
                   {
                     std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
                     libmesh_assert (!side_id_map->count(side_pair));
