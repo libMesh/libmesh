@@ -29,6 +29,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 
 namespace libMesh
@@ -349,7 +350,7 @@ void BoundaryInfo::add_elements
       Elem* new_elem = boundary_mesh.add_elem(side.release());
 
 #ifdef LIBMESH_ENABLE_AMR
-      // Finally, set the parent and interior_parent links
+      // Set parent links
       if (elem->parent())
         {
           const std::pair<dof_id_type, unsigned char> parent_side_pair(elem->parent()->id(), s);
@@ -389,6 +390,71 @@ void BoundaryInfo::add_elements
 #endif
 
       new_elem->set_interior_parent (const_cast<Elem*>(elem));
+
+      // On non-local elements on ParallelMesh we might have
+      // RemoteElem neighbor links to construct
+      if (!_mesh.is_serial() &&
+          (elem->processor_id() != this->processor_id()))
+        {
+          // Check every interior side for a RemoteElem
+          for (unsigned int interior_side = 0;
+               interior_side != elem->n_sides();
+               ++interior_side)
+            {
+              // Might this interior side have a RemoteElem that
+              // needs a corresponding Remote on a boundary side?
+              if (elem->neighbor(interior_side) != remote_elem)
+                continue;
+
+              // Which boundary side?
+              for (unsigned int boundary_side = 0;
+                   boundary_side != new_elem->n_sides();
+                   ++boundary_side)
+                {
+                  // Look for matching node points.  This is safe in
+                  // *this* context.
+                  bool found_all_nodes = true;
+                  for (unsigned int boundary_node = 0;
+                       boundary_node != new_elem->n_nodes();
+                       ++boundary_node)
+                    {
+                      if (!new_elem->is_node_on_side(boundary_node,
+                                                     boundary_side))
+                        continue;
+
+                      bool found_this_node = false;
+                      for (unsigned int interior_node = 0;
+                           interior_node != elem->n_nodes();
+                           ++interior_node)
+                        {
+                          if (!elem->is_node_on_side(interior_node,
+                                                     interior_side))
+                            continue;
+
+                          if (new_elem->point(boundary_node) ==
+                              elem->point(interior_node))
+                            {
+                              found_this_node = true;
+                              break;
+                            }
+                        }
+                      if (!found_this_node)
+                        {
+                          found_all_nodes = false;
+                          break;
+                        }
+                    }
+
+                  if (found_all_nodes)
+                    {
+                      new_elem->set_neighbor
+                        (boundary_side,
+                         const_cast<RemoteElem*>(remote_elem));
+                      break;
+                    }
+                }
+            }
+        }
     }
 
   // Make sure we didn't add ids inconsistently
