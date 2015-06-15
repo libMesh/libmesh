@@ -256,16 +256,22 @@ void BoundaryInfo::add_elements
 {
   START_LOG("add_elements()", "BoundaryInfo");
 
-  /**
-   * We're not prepared to mix serial and distributed meshes in this
-   * method, so make sure they match from the start.
-   */
+  // We're not prepared to mix serial and distributed meshes in this
+  // method, so make sure they match from the start.
   libmesh_assert_equal_to(_mesh.is_serial(),
                           boundary_mesh.is_serial());
 
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
   this->_find_id_maps(requested_boundary_ids, 0, NULL,
                       boundary_mesh.max_elem_id(), &side_id_map);
+
+  // We have to add sides *outside* any element loop, because if
+  // boundary_mesh and _mesh are the same then those additions can
+  // invalidate our element iterators.  So we just use the element
+  // loop to make a list of sides to add.
+  typedef std::vector<std::pair<dof_id_type, unsigned char> >
+    side_container;
+  side_container sides_to_add;
 
   const MeshBase::const_element_iterator end_el = _mesh.elements_end();
   for (MeshBase::const_element_iterator el = _mesh.elements_begin();
@@ -314,66 +320,75 @@ void BoundaryInfo::add_elements
               }
 
             if (add_this_side)
-              {
-                // Build the side - do not use a "proxy" element here:
-                // This will be going into the boundary_mesh and needs to
-                // stand on its own.
-                UniquePtr<Elem> side (elem->build_side(s, false));
+              sides_to_add.push_back
+                (std::make_pair(elem->id(), s));
+          }
+    }
 
-                side->processor_id() = elem->processor_id();
+  for (side_container::const_iterator it = sides_to_add.begin();
+       it != sides_to_add.end(); ++it)
+    {
+      const dof_id_type elem_id = it->first;
+      const unsigned char s = it->second;
+      const Elem * elem = _mesh.elem(elem_id);
 
-                const std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
+      // Build the side - do not use a "proxy" element here:
+      // This will be going into the boundary_mesh and needs to
+      // stand on its own.
+      UniquePtr<Elem> side (elem->build_side(s, false));
 
-                libmesh_assert(side_id_map.count(side_pair));
+      side->processor_id() = elem->processor_id();
 
-                side->set_id(side_id_map[side_pair]);
+      const std::pair<dof_id_type, unsigned char> side_pair(elem_id, s);
 
-                // Add the side
-                Elem* new_elem = boundary_mesh.add_elem(side.release());
+      libmesh_assert(side_id_map.count(side_pair));
+
+      side->set_id(side_id_map[side_pair]);
+
+      // Add the side
+      Elem* new_elem = boundary_mesh.add_elem(side.release());
 
 #ifdef LIBMESH_ENABLE_AMR
-                // Finally, set the parent and interior_parent links
-                if (elem->parent())
-                  {
-                    const std::pair<dof_id_type, unsigned char> parent_side_pair(elem->parent()->id(), s);
+      // Finally, set the parent and interior_parent links
+      if (elem->parent())
+        {
+          const std::pair<dof_id_type, unsigned char> parent_side_pair(elem->parent()->id(), s);
 
-                    libmesh_assert(side_id_map.count(parent_side_pair));
+          libmesh_assert(side_id_map.count(parent_side_pair));
 
-                    Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
+          Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
 
-                    libmesh_assert(side_parent);
+          libmesh_assert(side_parent);
 
-                    new_elem->set_parent(side_parent);
+          new_elem->set_parent(side_parent);
 
-                    side_parent->set_refinement_flag(Elem::INACTIVE);
+          side_parent->set_refinement_flag(Elem::INACTIVE);
 
-                    // Figuring out which child we are of our parent
-                    // is a trick.  Due to libMesh child numbering
-                    // conventions, if we are an element on a vertex,
-                    // then we share that vertex with our parent, with
-                    // the same local index.
-                    bool found_child = false;
-                    for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
-                      if (new_elem->get_node(v) == side_parent->get_node(v))
-                        {
-                          side_parent->add_child(new_elem, v);
-                          found_child = true;
-                        }
+          // Figuring out which child we are of our parent
+          // is a trick.  Due to libMesh child numbering
+          // conventions, if we are an element on a vertex,
+          // then we share that vertex with our parent, with
+          // the same local index.
+          bool found_child = false;
+          for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
+            if (new_elem->get_node(v) == side_parent->get_node(v))
+              {
+                side_parent->add_child(new_elem, v);
+                found_child = true;
+              }
 
-                    // If we don't share any vertex with our parent,
-                    // then we're the fourth child (index 3) of a
-                    // triangle.
-                    if (!found_child)
-                      {
-                        libmesh_assert_equal_to (new_elem->n_vertices(), 3);
-                        side_parent->add_child(new_elem, 3);
-                      }
-                  }
+          // If we don't share any vertex with our parent,
+          // then we're the fourth child (index 3) of a
+          // triangle.
+          if (!found_child)
+            {
+              libmesh_assert_equal_to (new_elem->n_vertices(), 3);
+              side_parent->add_child(new_elem, 3);
+            }
+        }
 #endif
 
-                new_elem->set_interior_parent (const_cast<Elem*>(elem));
-              }
-          }
+      new_elem->set_interior_parent (const_cast<Elem*>(elem));
     }
 
   // Make sure we didn't add ids inconsistently
