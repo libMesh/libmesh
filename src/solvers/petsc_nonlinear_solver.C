@@ -105,20 +105,21 @@ extern "C"
     NonlinearImplicitSystem &sys = solver->system();
 
     PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscVector<Number>& R_sys = *cast_ptr<PetscVector<Number>*>(sys.rhs);
     PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
 
-    // Use the systems update() to get a good local version of the parallel solution
+    // Use the system's update() to get a good local version of the
+    // parallel solution.  This operation does not modify the incoming
+    // "x" vector, it only localizes information from "x" into
+    // sys.current_local_solution.
     X_global.swap(X_sys);
-    R.swap(R_sys);
-
-    sys.get_dof_map().enforce_constraints_exactly(sys);
-
     sys.update();
-
-    //Swap back
     X_global.swap(X_sys);
-    R.swap(R_sys);
+
+    // Enforce constraints (if any) exactly on the
+    // current_local_solution.  This is the solution vector that is
+    // actually used in the computation of the residual below, and is
+    // not locked by debug-enabled PETSc the way that "x" is.
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     if (solver->_zero_out_residual)
       R.zero();
@@ -196,7 +197,6 @@ extern "C"
     PetscMatrix<Number> Jac(jac, sys.comm());
 #endif
     PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscMatrix<Number>& Jac_sys = *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
     PetscVector<Number> X_global(x, sys.comm());
 
     // Set the dof maps
@@ -205,13 +205,14 @@ extern "C"
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
-    Jac.swap(Jac_sys);
-
-    sys.get_dof_map().enforce_constraints_exactly(sys);
     sys.update();
-
     X_global.swap(X_sys);
-    Jac.swap(Jac_sys);
+
+    // Enforce constraints (if any) exactly on the
+    // current_local_solution.  This is the solution vector that is
+    // actually used in the computation of the residual below, and is
+    // not locked by debug-enabled PETSc the way that "x" is.
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     if (solver->_zero_out_jacobian)
       PC.zero();
@@ -585,6 +586,12 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   LIBMESH_CHKERRABORT(ierr);
 
 #endif
+
+  // Enforce constraints exactly now that the solve is done.  We have
+  // been enforcing them on the current_local_solution during the
+  // solve, but now need to be sure they are enforced on the parallel
+  // solution vector as well.
+  this->system().get_dof_map().enforce_constraints_exactly(this->system());
 
   // SNESGetFunction has been around forever and should work on all
   // versions of PETSc.  This is also now the recommended approach
