@@ -189,14 +189,18 @@ void compute_jacobian (const NumericVector<Number>& soln,
           for (unsigned int i=0; i<phi.size(); i++)
             grad_u += dphi[i][qp]*soln(dof_indices[i]);
 
-          const Number K = 1./std::sqrt(1. + grad_u*grad_u);
+          const Number
+            sa = 1. + grad_u*grad_u,
+            K  = 1. / std::sqrt(sa),
+            dK = -K / sa;
 
           for (unsigned int i=0; i<phi.size(); i++)
             for (unsigned int j=0; j<phi.size(); j++)
-              Ke(i,j) += JxW[qp]*(
-                                  K*(dphi[i][qp]*dphi[j][qp]) +
-                                  kappa*phi[i][qp]*phi[j][qp]
-                                  );
+                Ke(i,j) += JxW[qp]*(
+                                    K * (dphi[i][qp]*dphi[j][qp]) +
+                                    dK * (grad_u*dphi[j][qp]) * (grad_u*dphi[i][qp]) +
+                                    kappa * phi[i][qp] * phi[j][qp]
+                                    );
         }
 
       dof_map.constrain_element_matrix (Ke, dof_indices);
