@@ -363,7 +363,6 @@ public:
                                       unsigned int n_training_samples_in,
                                       bool deterministic_training_in,
                                       bool use_relative_bound_in_greedy_in,
-                                      bool write_data_during_training_in,
                                       unsigned int training_parameters_random_seed_in,
                                       bool quiet_mode_in,
                                       unsigned int Nmax_in,
@@ -502,13 +501,6 @@ public:
    * typically due to numerical rounding effects.
    */
   bool exit_on_repeated_greedy_parameters;
-
-  /**
-   * Boolean flag to indicate whether train_reduced_basis writes
-   * out offline data after each truth solve (to allow continuing
-   * in case the code crashes or something).
-   */
-  bool write_data_during_training;
 
   /**
    * Boolean flag to indicate whether we impose "fluxes"

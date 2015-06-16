@@ -3,6 +3,8 @@
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/string_to_enum.h"
 
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+
 // Cap'n'Proto includes
 #include <capnp/serialize.h>
 
@@ -46,9 +48,13 @@ void add_point_to_builder(const Point& point, RBData::Point3D::Builder point_bui
 {
   point_builder.setX(point(0));
   if(LIBMESH_DIM >= 2)
+  {
     point_builder.setY(point(1));
+  }
   if(LIBMESH_DIM >= 3)
+  {
     point_builder.setZ(point(2));
+  }
 }
 
 void add_elem_to_builder(const libMesh::Elem& elem, RBData::MeshElem::Builder mesh_elem_builder)
@@ -87,32 +93,35 @@ void RBEvaluationSerialization::write_to_file(
 {
   START_LOG("write_to_file()", "RBEvaluationSerialization");
 
-  capnp::MallocMessageBuilder message;
-
-#ifndef LIBMESH_USE_COMPLEX_NUMBERS
-  RBData::RBEvaluationReal::Builder rb_eval_builder =
-    message.initRoot<RBData::RBEvaluationReal>();
-#else
-  RBData::RBEvaluationComplex::Builder rb_eval_builder =
-    message.initRoot<RBData::RBEvaluationComplex>();
-#endif
-
-  add_rb_evaluation_data_to_builder(_rb_eval, rb_eval_builder);
-
   libMesh::out << "Writing RBEvaluation capnp buffer to " <<  path << std::endl;
 
-  int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-  if(!fd)
+  if(_rb_eval.comm().rank() == 0)
   {
-    libmesh_error_msg("Error opening a write-only file descriptor to " + path);
-  }
+    capnp::MallocMessageBuilder message;
 
-  capnp::writeMessageToFd(fd, message);
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+    RBData::RBEvaluationReal::Builder rb_eval_builder =
+      message.initRoot<RBData::RBEvaluationReal>();
+#else
+    RBData::RBEvaluationComplex::Builder rb_eval_builder =
+      message.initRoot<RBData::RBEvaluationComplex>();
+#endif
 
-  int error = close(fd);
-  if(error)
-  {
-    libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+    add_rb_evaluation_data_to_builder(_rb_eval, rb_eval_builder);
+
+    int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    if(!fd)
+    {
+      libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+    }
+
+    capnp::writeMessageToFd(fd, message);
+
+    int error = close(fd);
+    if(error)
+    {
+      libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+    }
   }
 
   STOP_LOG("write_to_file()", "RBEvaluationSerialization");
@@ -218,53 +227,60 @@ void RBEvaluationSerialization::write_to_file(
 //}
 //
 //// ---- RBEIMEvaluationSerialization (END) ----
-//
-//
-//// ---- RBSCMEvaluationSerialization (BEGIN) ----
-//
-//RBSCMEvaluationSerialization::RBSCMEvaluationSerialization(
-//  RBSCMEvaluation& rb_scm_eval)
-//  :
-//  _rb_scm_eval(rb_scm_eval)
-//{
-//}
-//
-//RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization()
-//{
-//}
-//
-//void RBSCMEvaluationSerialization::write_to_file(
-//  const std::string& path)
-//{
-//  START_LOG("write_to_file()", "RBSCMEvaluationSerialization");
-//
-//  capnp::MallocMessageBuilder message;
-//
-//  RBData::RBSCMEvaluation::Builder rb_scm_eval_builder =
-//    message.initRoot<RBData::RBSCMEvaluation>();
-//
-//  add_rb_scm_evaluation_data_to_builder(_rb_scm_eval, rb_scm_eval_builder);
-//
-//  libMesh::out << "Writing RBSCMEvaluationSerialization capnp buffer to " <<  path << std::endl;
-//
-//  int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-//  if(!fd)
-//  {
-//    libmesh_error_msg("Error opening a write-only file descriptor to " + path);
-//  }
-//
-//  capnp::writeMessageToFd(fd, message);
-//
-//  int error = close(fd);
-//  if(error)
-//  {
-//    libmesh_error_msg("Error closing a write-only file descriptor to " + path);
-//  }
-//
-//  STOP_LOG("write_to_file()", "RBSCMEvaluationSerialization");
-//}
-//
-//// ---- RBSCMEvaluationSerialization (END) ----
+
+
+// ---- RBSCMEvaluationSerialization (BEGIN) ----
+
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+
+RBSCMEvaluationSerialization::RBSCMEvaluationSerialization(
+  RBSCMEvaluation& rb_scm_eval)
+  :
+  _rb_scm_eval(rb_scm_eval)
+{
+}
+
+RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization()
+{
+}
+
+void RBSCMEvaluationSerialization::write_to_file(
+  const std::string& path)
+{
+  START_LOG("write_to_file()", "RBSCMEvaluationSerialization");
+
+  libMesh::out << "Writing RBSCMEvaluationSerialization capnp buffer to " <<  path << std::endl;
+
+  if(_rb_scm_eval.comm().rank() == 0)
+  {
+    capnp::MallocMessageBuilder message;
+
+    RBData::RBSCMEvaluation::Builder rb_scm_eval_builder =
+      message.initRoot<RBData::RBSCMEvaluation>();
+
+    add_rb_scm_evaluation_data_to_builder(_rb_scm_eval, rb_scm_eval_builder);
+
+    int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    if(!fd)
+    {
+      libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+    }
+
+    capnp::writeMessageToFd(fd, message);
+
+    int error = close(fd);
+    if(error)
+    {
+      libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+    }
+  }
+
+  STOP_LOG("write_to_file()", "RBSCMEvaluationSerialization");
+}
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
+
+// ---- RBSCMEvaluationSerialization (END) ----
 
 
 // ---- Helper functions for adding data to capnp Builders (BEGIN) ----
@@ -277,9 +293,9 @@ void add_parameter_ranges_to_builder(
   // Continuous parameters
   {
     unsigned int n_continuous_parameters = rb_evaluation.get_n_continuous_params();
-    auto names = parameter_ranges_list.initName(n_continuous_parameters);
-    auto mins = parameter_ranges_list.initMinValue(n_continuous_parameters);
-    auto maxs = parameter_ranges_list.initMaxValue(n_continuous_parameters);
+    auto names = parameter_ranges_list.initNames(n_continuous_parameters);
+    auto mins = parameter_ranges_list.initMinValues(n_continuous_parameters);
+    auto maxs = parameter_ranges_list.initMaxValues(n_continuous_parameters);
 
     std::set<std::string> parameter_names = rb_evaluation.get_parameter_names();
     const RBParameters& parameters_min = rb_evaluation.get_parameters_min();
@@ -304,7 +320,7 @@ void add_parameter_ranges_to_builder(
   // Discrete parameters
   {
     unsigned int n_discrete_parameters = rb_evaluation.get_n_discrete_params();
-    auto names = discrete_parameters_list.initName(n_discrete_parameters);
+    auto names = discrete_parameters_list.initNames(n_discrete_parameters);
     auto values_outer = discrete_parameters_list.initValues(n_discrete_parameters);
 
     const std::map< std::string, std::vector<Real> >& discrete_parameters = 
@@ -697,79 +713,98 @@ void add_rb_evaluation_data_to_builder(
 //      extra_interpolation_point_elem_builder);
 //  }
 //}
-//
-//void add_rb_scm_evaluation_data_to_builder(
-//  RBSCMEvaluation& rb_scm_eval,
-//  RBData::RBSCMEvaluation::Builder& rb_scm_eval_builder)
-//{
-//  auto parameter_ranges_list =
-//    rb_scm_eval_builder.initParameterRanges(n_parameters);
-//  auto discrete_parameters_list =
-//    rb_scm_eval_builder.initDiscreteParameters(n_discrete_parameters);
-//  add_parameter_ranges_to_builder(
-//    rb_eval, parameter_ranges_list, discrete_parameters_list);
-//
-//  {
-//    auto b_min_list = rb_scm_eval_builder.initBMin( rb_scm_eval.B_min.size() );
-//    for(unsigned int i=0; i<B_min.size(); i++)
-//    {
-//      b_min_list.set(i, rb_scm_eval.get_B_min(i));
-//    }
-//  }
-//
-//  {
-//    auto b_max_list = rb_scm_eval_builder.initBMax( rb_scm_eval.B_max.size() );
-//    for(unsigned int i=0; i<B_max.size(); i++)
-//    {
-//      b_max_list.set(i, rb_scm_eval.get_B_max(i));
-//    }
-//  }
-//
-//  {
-//    auto cj_stability_vector =
-//      rb_scm_eval_builder.initCJStabilityVector( rb_scm_eval.C_J_stability_vector.size() );
-//    for(unsigned int i=0; i<C_J_stability_vector.size(); i++)
-//    {
-//      cj_stability_vector.set(i, rb_scm_eval.get_C_J_stability_constraint(i));
-//    }
-//  }
-//
-//  {
-//    auto cj_parameters_outer =
-//      rb_scm_eval_builder.initCJ( rb_scm_eval.C_J.size() );
-//
-//    for(unsigned int i=0; i<C_J.size(); i++)
-//    {
-//      auto cj_parameters_inner =
-//        cj_parameters_outer.init(i, rb_scm_eval.C_J[i].get_n_parameters());
-//
-//      RBParameters::const_iterator it     = rb_scm_eval.C_J[i].begin();
-//      RBParameters::const_iterator it_end = rb_scm_eval.C_J[i].end();
-//      for( ; it != it_end; ++it)
-//      {
-//        cj_parameters_inner[i].setName( it->first );
-//        cj_parameters_inner[i].setValue( it->second );
-//      }
-//    }
-//  }
-//
-//  {
-//    unsigned int n_A_terms = rb_scm_eval.get_rb_theta_expansion().get_n_A_terms();
-//    unsigned int n_values = SCM_UB_vectors.size()*n_A_terms;
-//    auto scm_ub_vectors =
-//      rb_scm_eval_builder.initScmUbVectors( n_values );
-//
-//    for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
-//      for(unsigned int j=0; j<n_A_terms; j++)
-//      {
-//        unsigned int offset = i*n_A_terms + j;
-//        scm_ub_vectors.set(offset, rb_scm_eval.get_SCM_UB_vector(i,j));
-//      }
-//  }
-//}
+
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+void add_rb_scm_evaluation_data_to_builder(
+  RBSCMEvaluation& rb_scm_eval,
+  RBData::RBSCMEvaluation::Builder& rb_scm_eval_builder)
+{
+  auto parameter_ranges_list =
+    rb_scm_eval_builder.initParameterRanges();
+  auto discrete_parameters_list =
+    rb_scm_eval_builder.initDiscreteParameters();
+  add_parameter_ranges_to_builder(
+    rb_scm_eval, parameter_ranges_list, discrete_parameters_list);
+
+  {
+    if( rb_scm_eval.B_min.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms())
+    {
+      libmesh_error_msg(
+        "Size error while writing B_min");
+    }
+    auto b_min_list = rb_scm_eval_builder.initBMin( rb_scm_eval.B_min.size() );
+    for(unsigned int i=0; i<rb_scm_eval.B_min.size(); i++)
+    {
+      b_min_list.set(i, rb_scm_eval.get_B_min(i));
+    }
+  }
+
+  {
+    if( rb_scm_eval.B_max.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms())
+    {
+      libmesh_error_msg(
+        "Size error while writing B_max");
+    }
+    auto b_max_list = rb_scm_eval_builder.initBMax( rb_scm_eval.B_max.size() );
+    for(unsigned int i=0; i<rb_scm_eval.B_max.size(); i++)
+    {
+      b_max_list.set(i, rb_scm_eval.get_B_max(i));
+    }
+  }
+
+  {
+    auto cj_stability_vector =
+      rb_scm_eval_builder.initCJStabilityVector( rb_scm_eval.C_J_stability_vector.size() );
+    for(unsigned int i=0; i<rb_scm_eval.C_J_stability_vector.size(); i++)
+    {
+      cj_stability_vector.set(i, rb_scm_eval.get_C_J_stability_constraint(i));
+    }
+  }
+
+  {
+    auto cj_parameters_outer =
+      rb_scm_eval_builder.initCJ( rb_scm_eval.C_J.size() );
+
+    for(unsigned int i=0; i<rb_scm_eval.C_J.size(); i++)
+    {
+      auto cj_parameters_inner =
+        cj_parameters_outer.init(i, rb_scm_eval.C_J[i].n_parameters());
+
+      RBParameters::const_iterator it     = rb_scm_eval.C_J[i].begin();
+      RBParameters::const_iterator it_end = rb_scm_eval.C_J[i].end();
+
+      unsigned int count = 0;
+      for( ; it != it_end; ++it)
+      {
+        cj_parameters_inner[count].setName( it->first );
+        cj_parameters_inner[count].setValue( it->second );
+        count++;
+      }
+
+    }
+  }
+
+  {
+    unsigned int n_C_J_values = rb_scm_eval.C_J.size();
+    unsigned int n_A_terms = rb_scm_eval.get_rb_theta_expansion().get_n_A_terms();
+    unsigned int n_values = n_C_J_values*n_A_terms;
+    auto scm_ub_vectors =
+      rb_scm_eval_builder.initScmUbVectors( n_values );
+
+    for(unsigned int i=0; i<n_C_J_values; i++)
+      for(unsigned int j=0; j<n_A_terms; j++)
+      {
+        unsigned int offset = i*n_A_terms + j;
+        scm_ub_vectors.set(offset, rb_scm_eval.get_SCM_UB_vector(i,j));
+      }
+  }
+}
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 // ---- Helper functions for adding data to capnp Builders (END) ----
 
 } // namespace RBDataSerialization
 
 } // namespace libMesh
+
+#endif // #if defined(LIBMESH_HAVE_CAPNPROTO)

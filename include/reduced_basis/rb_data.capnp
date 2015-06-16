@@ -21,13 +21,13 @@ struct RBParameter @0xb73e071e0a405648 {
 }
 
 struct ParameterRanges @0xeccae95c5c74616e {
-  name     @0 :List(Text);
-  minValue @1 :List(Real);
-  maxValue @2 :List(Real);
+  names     @0 :List(Text);
+  minValues @1 :List(Real);
+  maxValues @2 :List(Real);
 }
 
 struct DiscreteParameterList @0xc7c5f4dfa33dfb27 {
-  name   @0 :List(Text);
+  names  @0 :List(Text);
   values @1 :List(List(Real));
 }
 

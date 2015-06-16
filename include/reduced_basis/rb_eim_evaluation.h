@@ -147,17 +147,19 @@ public:
   /**
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage.
+   * Note: This is a legacy method, use RBDataSerialization instead.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const bool write_binary_data=true);
+  virtual void legacy_write_offline_data_to_files(const std::string& directory_name = "offline_data",
+                                                  const bool write_binary_data=true);
 
   /**
    * Read in the saved Offline reduced basis data
    * to initialize the system for Online solves.
+   * Note: This is a legacy method, use RBDataSerialization instead.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            bool read_error_bound_data=true,
-                                            const bool read_binary_data=true);
+  virtual void legacy_read_offline_data_from_files(const std::string& directory_name = "offline_data",
+                                                   bool read_error_bound_data=true,
+                                                   const bool read_binary_data=true);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -206,12 +208,12 @@ private:
    * Write out interpolation_points_elem by putting the elements into
    * a mesh and writing out the mesh.
    */
-  void write_out_interpolation_points_elem(const std::string& directory_name);
+  void legacy_write_out_interpolation_points_elem(const std::string& directory_name);
 
   /**
    * Read int interpolation_points_elem from a mesh.
    */
-  void read_in_interpolation_points_elem(const std::string& directory_name);
+  void legacy_read_in_interpolation_points_elem(const std::string& directory_name);
 
   /**
    * This vector stores the parametrized functions

@@ -414,14 +414,14 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasName() const;
-  inline  ::capnp::List< ::capnp::Text>::Reader getName() const;
+  inline bool hasNames() const;
+  inline  ::capnp::List< ::capnp::Text>::Reader getNames() const;
 
-  inline bool hasMinValue() const;
-  inline  ::capnp::List<double>::Reader getMinValue() const;
+  inline bool hasMinValues() const;
+  inline  ::capnp::List<double>::Reader getMinValues() const;
 
-  inline bool hasMaxValue() const;
-  inline  ::capnp::List<double>::Reader getMaxValue() const;
+  inline bool hasMaxValues() const;
+  inline  ::capnp::List<double>::Reader getMaxValues() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -451,29 +451,29 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasName();
-  inline  ::capnp::List< ::capnp::Text>::Builder getName();
-  inline void setName( ::capnp::List< ::capnp::Text>::Reader value);
-  inline void setName(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text>::Builder initName(unsigned int size);
-  inline void adoptName(::capnp::Orphan< ::capnp::List< ::capnp::Text>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> disownName();
+  inline bool hasNames();
+  inline  ::capnp::List< ::capnp::Text>::Builder getNames();
+  inline void setNames( ::capnp::List< ::capnp::Text>::Reader value);
+  inline void setNames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text>::Builder initNames(unsigned int size);
+  inline void adoptNames(::capnp::Orphan< ::capnp::List< ::capnp::Text>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> disownNames();
 
-  inline bool hasMinValue();
-  inline  ::capnp::List<double>::Builder getMinValue();
-  inline void setMinValue( ::capnp::List<double>::Reader value);
-  inline void setMinValue(::kj::ArrayPtr<const double> value);
-  inline  ::capnp::List<double>::Builder initMinValue(unsigned int size);
-  inline void adoptMinValue(::capnp::Orphan< ::capnp::List<double>>&& value);
-  inline ::capnp::Orphan< ::capnp::List<double>> disownMinValue();
+  inline bool hasMinValues();
+  inline  ::capnp::List<double>::Builder getMinValues();
+  inline void setMinValues( ::capnp::List<double>::Reader value);
+  inline void setMinValues(::kj::ArrayPtr<const double> value);
+  inline  ::capnp::List<double>::Builder initMinValues(unsigned int size);
+  inline void adoptMinValues(::capnp::Orphan< ::capnp::List<double>>&& value);
+  inline ::capnp::Orphan< ::capnp::List<double>> disownMinValues();
 
-  inline bool hasMaxValue();
-  inline  ::capnp::List<double>::Builder getMaxValue();
-  inline void setMaxValue( ::capnp::List<double>::Reader value);
-  inline void setMaxValue(::kj::ArrayPtr<const double> value);
-  inline  ::capnp::List<double>::Builder initMaxValue(unsigned int size);
-  inline void adoptMaxValue(::capnp::Orphan< ::capnp::List<double>>&& value);
-  inline ::capnp::Orphan< ::capnp::List<double>> disownMaxValue();
+  inline bool hasMaxValues();
+  inline  ::capnp::List<double>::Builder getMaxValues();
+  inline void setMaxValues( ::capnp::List<double>::Reader value);
+  inline void setMaxValues(::kj::ArrayPtr<const double> value);
+  inline  ::capnp::List<double>::Builder initMaxValues(unsigned int size);
+  inline void adoptMaxValues(::capnp::Orphan< ::capnp::List<double>>&& value);
+  inline ::capnp::Orphan< ::capnp::List<double>> disownMaxValues();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -518,8 +518,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasName() const;
-  inline  ::capnp::List< ::capnp::Text>::Reader getName() const;
+  inline bool hasNames() const;
+  inline  ::capnp::List< ::capnp::Text>::Reader getNames() const;
 
   inline bool hasValues() const;
   inline  ::capnp::List< ::capnp::List<double>>::Reader getValues() const;
@@ -552,13 +552,13 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasName();
-  inline  ::capnp::List< ::capnp::Text>::Builder getName();
-  inline void setName( ::capnp::List< ::capnp::Text>::Reader value);
-  inline void setName(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text>::Builder initName(unsigned int size);
-  inline void adoptName(::capnp::Orphan< ::capnp::List< ::capnp::Text>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> disownName();
+  inline bool hasNames();
+  inline  ::capnp::List< ::capnp::Text>::Builder getNames();
+  inline void setNames( ::capnp::List< ::capnp::Text>::Reader value);
+  inline void setNames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text>::Builder initNames(unsigned int size);
+  inline void adoptNames(::capnp::Orphan< ::capnp::List< ::capnp::Text>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> disownNames();
 
   inline bool hasValues();
   inline  ::capnp::List< ::capnp::List<double>>::Builder getValues();
@@ -2066,146 +2066,146 @@ inline void RBParameter::Builder::setValue(double value) {
       0 * ::capnp::ELEMENTS, value);
 }
 
-inline bool ParameterRanges::Reader::hasName() const {
+inline bool ParameterRanges::Reader::hasNames() const {
   return !_reader.getPointerField(0 * ::capnp::POINTERS).isNull();
 }
-inline bool ParameterRanges::Builder::hasName() {
+inline bool ParameterRanges::Builder::hasNames() {
   return !_builder.getPointerField(0 * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text>::Reader ParameterRanges::Reader::getName() const {
+inline  ::capnp::List< ::capnp::Text>::Reader ParameterRanges::Reader::getNames() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::get(
       _reader.getPointerField(0 * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text>::Builder ParameterRanges::Builder::getName() {
+inline  ::capnp::List< ::capnp::Text>::Builder ParameterRanges::Builder::getNames() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::get(
       _builder.getPointerField(0 * ::capnp::POINTERS));
 }
-inline void ParameterRanges::Builder::setName( ::capnp::List< ::capnp::Text>::Reader value) {
+inline void ParameterRanges::Builder::setNames( ::capnp::List< ::capnp::Text>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::set(
       _builder.getPointerField(0 * ::capnp::POINTERS), value);
 }
-inline void ParameterRanges::Builder::setName(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+inline void ParameterRanges::Builder::setNames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::set(
       _builder.getPointerField(0 * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text>::Builder ParameterRanges::Builder::initName(unsigned int size) {
+inline  ::capnp::List< ::capnp::Text>::Builder ParameterRanges::Builder::initNames(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::init(
       _builder.getPointerField(0 * ::capnp::POINTERS), size);
 }
-inline void ParameterRanges::Builder::adoptName(
+inline void ParameterRanges::Builder::adoptNames(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::adopt(
       _builder.getPointerField(0 * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> ParameterRanges::Builder::disownName() {
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> ParameterRanges::Builder::disownNames() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::disown(
       _builder.getPointerField(0 * ::capnp::POINTERS));
 }
 
-inline bool ParameterRanges::Reader::hasMinValue() const {
+inline bool ParameterRanges::Reader::hasMinValues() const {
   return !_reader.getPointerField(1 * ::capnp::POINTERS).isNull();
 }
-inline bool ParameterRanges::Builder::hasMinValue() {
+inline bool ParameterRanges::Builder::hasMinValues() {
   return !_builder.getPointerField(1 * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List<double>::Reader ParameterRanges::Reader::getMinValue() const {
+inline  ::capnp::List<double>::Reader ParameterRanges::Reader::getMinValues() const {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
       _reader.getPointerField(1 * ::capnp::POINTERS));
 }
-inline  ::capnp::List<double>::Builder ParameterRanges::Builder::getMinValue() {
+inline  ::capnp::List<double>::Builder ParameterRanges::Builder::getMinValues() {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
       _builder.getPointerField(1 * ::capnp::POINTERS));
 }
-inline void ParameterRanges::Builder::setMinValue( ::capnp::List<double>::Reader value) {
+inline void ParameterRanges::Builder::setMinValues( ::capnp::List<double>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
       _builder.getPointerField(1 * ::capnp::POINTERS), value);
 }
-inline void ParameterRanges::Builder::setMinValue(::kj::ArrayPtr<const double> value) {
+inline void ParameterRanges::Builder::setMinValues(::kj::ArrayPtr<const double> value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
       _builder.getPointerField(1 * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List<double>::Builder ParameterRanges::Builder::initMinValue(unsigned int size) {
+inline  ::capnp::List<double>::Builder ParameterRanges::Builder::initMinValues(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::init(
       _builder.getPointerField(1 * ::capnp::POINTERS), size);
 }
-inline void ParameterRanges::Builder::adoptMinValue(
+inline void ParameterRanges::Builder::adoptMinValues(
     ::capnp::Orphan< ::capnp::List<double>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::adopt(
       _builder.getPointerField(1 * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List<double>> ParameterRanges::Builder::disownMinValue() {
+inline ::capnp::Orphan< ::capnp::List<double>> ParameterRanges::Builder::disownMinValues() {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::disown(
       _builder.getPointerField(1 * ::capnp::POINTERS));
 }
 
-inline bool ParameterRanges::Reader::hasMaxValue() const {
+inline bool ParameterRanges::Reader::hasMaxValues() const {
   return !_reader.getPointerField(2 * ::capnp::POINTERS).isNull();
 }
-inline bool ParameterRanges::Builder::hasMaxValue() {
+inline bool ParameterRanges::Builder::hasMaxValues() {
   return !_builder.getPointerField(2 * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List<double>::Reader ParameterRanges::Reader::getMaxValue() const {
+inline  ::capnp::List<double>::Reader ParameterRanges::Reader::getMaxValues() const {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
       _reader.getPointerField(2 * ::capnp::POINTERS));
 }
-inline  ::capnp::List<double>::Builder ParameterRanges::Builder::getMaxValue() {
+inline  ::capnp::List<double>::Builder ParameterRanges::Builder::getMaxValues() {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::get(
       _builder.getPointerField(2 * ::capnp::POINTERS));
 }
-inline void ParameterRanges::Builder::setMaxValue( ::capnp::List<double>::Reader value) {
+inline void ParameterRanges::Builder::setMaxValues( ::capnp::List<double>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
       _builder.getPointerField(2 * ::capnp::POINTERS), value);
 }
-inline void ParameterRanges::Builder::setMaxValue(::kj::ArrayPtr<const double> value) {
+inline void ParameterRanges::Builder::setMaxValues(::kj::ArrayPtr<const double> value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::set(
       _builder.getPointerField(2 * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List<double>::Builder ParameterRanges::Builder::initMaxValue(unsigned int size) {
+inline  ::capnp::List<double>::Builder ParameterRanges::Builder::initMaxValues(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::init(
       _builder.getPointerField(2 * ::capnp::POINTERS), size);
 }
-inline void ParameterRanges::Builder::adoptMaxValue(
+inline void ParameterRanges::Builder::adoptMaxValues(
     ::capnp::Orphan< ::capnp::List<double>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List<double>>::adopt(
       _builder.getPointerField(2 * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List<double>> ParameterRanges::Builder::disownMaxValue() {
+inline ::capnp::Orphan< ::capnp::List<double>> ParameterRanges::Builder::disownMaxValues() {
   return ::capnp::_::PointerHelpers< ::capnp::List<double>>::disown(
       _builder.getPointerField(2 * ::capnp::POINTERS));
 }
 
-inline bool DiscreteParameterList::Reader::hasName() const {
+inline bool DiscreteParameterList::Reader::hasNames() const {
   return !_reader.getPointerField(0 * ::capnp::POINTERS).isNull();
 }
-inline bool DiscreteParameterList::Builder::hasName() {
+inline bool DiscreteParameterList::Builder::hasNames() {
   return !_builder.getPointerField(0 * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text>::Reader DiscreteParameterList::Reader::getName() const {
+inline  ::capnp::List< ::capnp::Text>::Reader DiscreteParameterList::Reader::getNames() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::get(
       _reader.getPointerField(0 * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text>::Builder DiscreteParameterList::Builder::getName() {
+inline  ::capnp::List< ::capnp::Text>::Builder DiscreteParameterList::Builder::getNames() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::get(
       _builder.getPointerField(0 * ::capnp::POINTERS));
 }
-inline void DiscreteParameterList::Builder::setName( ::capnp::List< ::capnp::Text>::Reader value) {
+inline void DiscreteParameterList::Builder::setNames( ::capnp::List< ::capnp::Text>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::set(
       _builder.getPointerField(0 * ::capnp::POINTERS), value);
 }
-inline void DiscreteParameterList::Builder::setName(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+inline void DiscreteParameterList::Builder::setNames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::set(
       _builder.getPointerField(0 * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text>::Builder DiscreteParameterList::Builder::initName(unsigned int size) {
+inline  ::capnp::List< ::capnp::Text>::Builder DiscreteParameterList::Builder::initNames(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::init(
       _builder.getPointerField(0 * ::capnp::POINTERS), size);
 }
-inline void DiscreteParameterList::Builder::adoptName(
+inline void DiscreteParameterList::Builder::adoptNames(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::adopt(
       _builder.getPointerField(0 * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> DiscreteParameterList::Builder::disownName() {
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text>> DiscreteParameterList::Builder::disownNames() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text>>::disown(
       _builder.getPointerField(0 * ::capnp::POINTERS));
 }

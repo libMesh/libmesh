@@ -6,7 +6,11 @@
 
 // libMesh/reduced_basis includes
 #include "libmesh/rb_evaluation.h"
+#include "libmesh/rb_scm_evaluation.h"
 #include "libmesh/rb_data.capnp.h"
+#include "libmesh/libmesh_config.h"
+
+#if defined(LIBMESH_HAVE_CAPNPROTO)
 
 // Cap'n'Proto includes
 #include "capnp/message.h"
@@ -115,39 +119,45 @@ private:
 //  RBEIMEvaluation& _rb_eim_eval;
 //
 //};
-//
-///**
-// * This class serializes an RBSCMEvaluation object
-// * using the Cap'n Proto library.
-// */ 
-//class RBSCMEvaluationSerialization
-//{
-//public:
-//
-//  /**
-//   * Initialize a new buffer using the structure from the Cap'n'Proto schema
-//   * described in rb_data.capnp.
-//   */
-//  RBSCMEvaluationSerialization(RBSCMEvaluation& rb_eval);
-//
-//  /**
-//   * Destructor.
-//   */
-//  virtual ~RBSCMEvaluationSerialization();
-//  
-//  /**
-//   * Write the Cap'n'Proto buffer to disk.
-//   */
-//  void write_to_file(const std::string& path);
-//
-//private:
-//
-//  /**
-//   * The RBEvaluation object that will be written to disk.
-//   */
-//  RBEIMEvaluation& _rb_scm_eval;
-//
-//};
+
+// RBSCMEvaluation should only be available
+// if SLEPc and GLPK support is enabled.
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+
+/**
+ * This class serializes an RBSCMEvaluation object
+ * using the Cap'n Proto library.
+ */ 
+class RBSCMEvaluationSerialization
+{
+public:
+
+  /**
+   * Initialize a new buffer using the structure from the Cap'n'Proto schema
+   * described in rb_data.capnp.
+   */
+  RBSCMEvaluationSerialization(RBSCMEvaluation& rb_eval);
+
+  /**
+   * Destructor.
+   */
+  virtual ~RBSCMEvaluationSerialization();
+  
+  /**
+   * Write the Cap'n'Proto buffer to disk.
+   */
+  void write_to_file(const std::string& path);
+
+private:
+
+  /**
+   * The RBEvaluation object that will be written to disk.
+   */
+  RBSCMEvaluation& _rb_scm_eval;
+
+};
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 /**
  * Add parameter ranges for continuous and discrete parameters.
@@ -180,16 +190,20 @@ void add_rb_evaluation_data_to_builder(
 //  RBEIMEvaluation& rb_eim_eval,
 //  RBData::RBEvaluation::Builder& rb_eval_builder,
 //  RBData::RBEIMEvaluation::Builder& rb_eim_eval_builder);
-//
-///**
-// * Add data for an RBSCMEvaluation to the builder.
-// */
-//void add_rb_scm_evaluation_data_to_builder(
-//  SCMRBEvaluation& rb_scm_eval,
-//  RBData::RBSCMEvaluation::Builder& rb_scm_eval_builder);
+
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+/**
+ * Add data for an RBSCMEvaluation to the builder.
+ */
+void add_rb_scm_evaluation_data_to_builder(
+  RBSCMEvaluation& rb_scm_eval,
+  RBData::RBSCMEvaluation::Builder& rb_scm_eval_builder);
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 } // namespace RBDataSerialization
 
 } // namespace libMesh
+
+#endif // #if defined(LIBMESH_HAVE_CAPNPROTO)
 
 #endif // RB_DATA_SERIALIZATION_H

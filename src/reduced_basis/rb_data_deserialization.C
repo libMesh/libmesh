@@ -1,126 +1,141 @@
-////libMesh includes
-//#include "libmesh/rb_eim_evaluation.h"
-//#include "libmesh/string_to_enum.h"
-//#include "libmesh/elem.h"
-//#include "libmesh/mesh.h"
-//#include "libmesh/rb_data_deserialization.h"
-//
-//// Cap'n'Proto includes
-//#include "capnp/serialize.h"
-//
-//// C++ includes
-//#include <unistd.h>
-//#include <iostream>
-//#include <fstream>
-//#include <fcntl.h>
-//
-//using namespace libMesh;
-//
-//using namespace RBDataDeserialization;
-//
-//// ---- Helper functions (BEGIN) ----
-//
-//// anonymous namespace for helper functions
-//namespace
-//{
-//
-///**
-// * Helper function that reads either real or complex numbers, based on
-// * the libMesh config options.
-// */
-//template <typename T>
-//inline Number load_scalar_value(const T& value)
-//{
-//#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-//  return Number(value.getReal(), value.getImag());
-//#else
-//  return value;
-//#endif
-//}
-//
-//
-//void load_point(RBData::Point3D::Reader point_reader, Point& point)
-//{
-//  point(0) = point_reader.getX();
-//  if(LIBMESH_DIM >= 2)
-//  point(1) = point_reader.getY();
-//  if(LIBMESH_DIM >= 3)
-//  point(2) = point_reader.getZ();
-//}
-//
-//
-//void load_elem_into_mesh(
-//  RBData::MeshElem::Reader mesh_elem_reader,
-//  libMesh::Elem* elem,
-//  libMesh::SerialMesh& mesh)
-//{
-//  auto mesh_elem_point_list = mesh_elem_reader.getPoints();
-//  unsigned int n_points = mesh_elem_point_list.size();
-//
-//  if(n_points != elem->n_nodes())
-//  {
-//    libmesh_error_msg("Wrong number of nodes for element type");
-//  }
-//
-//  for(unsigned int i=0; i < n_points; ++i)
-//  {
-//    libMesh::Node* node = new libMesh::Node(mesh_elem_point_list[i].getX(),
-//                                            mesh_elem_point_list[i].getY(),
-//                                            mesh_elem_point_list[i].getZ());
-//
-//    mesh.add_node(node);
-//
-//    elem->set_node(i) = node;
-//  }
-//  
-//  elem->subdomain_id() = mesh_elem_reader.getSubdomainId();
-//  
-//  mesh.add_elem(elem);
-//}
-//
-//}
-//
-//// ---- Helper functions (END) ----
-//
-//// ---- RBEvaluationDeserialization (BEGIN) ----
-//
-//RBEvaluationDeserialization::RBEvaluationDeserialization(RBEvaluation& rb_eval)
-//  :
-//  _rb_eval(rb_eval)
-//{}
-//
-//RBEvaluationDeserialization::~RBEvaluationDeserialization()
-//{}
-//
-//void RBEvaluationDeserialization::read_from_file(
-//  const std::string& path,
-//  bool read_error_bound_data)
-//{
-//  START_LOG("read_from_file()", "RBEvaluationDeserialization");
-//
-//  int fd = open(path.c_str(), O_RDONLY);
-//  if(!fd)
-//  {
-//    libmesh_error_msg("Couldn't open the buffer file: " + path);
-//  }
-//
-//  // Turn off the limit to the amount of data we can read in
-//  capnp::ReaderOptions reader_options;
-//  reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
-//
-//  capnp::FdMessageReader message(fd, reader_options);
-//
-//  RBData::RBEvaluation::Reader rb_eval_reader =
-//    message.getRoot<RBData::RBEvaluation>();
-//
-//  load_rb_evaluation_data(_rb_eval, rb_eval_reader, read_error_bound_data);
-//
-//  STOP_LOG("read_from_file()", "RBEvaluationDeserialization");
-//}
-//
-//// ---- RBEvaluationDeserialization (END) ----
-//
-//
+//libMesh includes
+#include "libmesh/rb_eim_evaluation.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh.h"
+#include "libmesh/rb_data_deserialization.h"
+
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+
+// Cap'n'Proto includes
+#include "capnp/serialize.h"
+
+// C++ includes
+#include <unistd.h>
+#include <iostream>
+#include <fstream>
+#include <fcntl.h>
+
+namespace libMesh
+{
+
+namespace RBDataDeserialization
+{
+
+// ---- Helper functions (BEGIN) ----
+
+// anonymous namespace for helper functions
+namespace
+{
+
+/**
+ * Helper function that reads either real or complex numbers, based on
+ * the libMesh config options.
+ */
+template <typename T>
+inline Number load_scalar_value(const T& value)
+{
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  return Number(value.getReal(), value.getImag());
+#else
+  return value;
+#endif
+}
+
+
+void load_point(RBData::Point3D::Reader point_reader, Point& point)
+{
+  point(0) = point_reader.getX();
+  if(LIBMESH_DIM >= 2)
+  {
+    point(1) = point_reader.getY();
+  }
+  if(LIBMESH_DIM >= 3)
+  {
+    point(2) = point_reader.getZ();
+  }
+}
+
+
+void load_elem_into_mesh(
+  RBData::MeshElem::Reader mesh_elem_reader,
+  libMesh::Elem* elem,
+  libMesh::SerialMesh& mesh)
+{
+  auto mesh_elem_point_list = mesh_elem_reader.getPoints();
+  unsigned int n_points = mesh_elem_point_list.size();
+
+  if(n_points != elem->n_nodes())
+  {
+    libmesh_error_msg("Wrong number of nodes for element type");
+  }
+
+  for(unsigned int i=0; i < n_points; ++i)
+  {
+    libMesh::Node* node = new libMesh::Node(mesh_elem_point_list[i].getX(),
+                                            mesh_elem_point_list[i].getY(),
+                                            mesh_elem_point_list[i].getZ());
+
+    mesh.add_node(node);
+
+    elem->set_node(i) = node;
+  }
+  
+  elem->subdomain_id() = mesh_elem_reader.getSubdomainId();
+  
+  mesh.add_elem(elem);
+}
+
+}
+
+// ---- Helper functions (END) ----
+
+// ---- RBEvaluationDeserialization (BEGIN) ----
+
+RBEvaluationDeserialization::RBEvaluationDeserialization(RBEvaluation& rb_eval)
+  :
+  _rb_eval(rb_eval)
+{}
+
+RBEvaluationDeserialization::~RBEvaluationDeserialization()
+{}
+
+void RBEvaluationDeserialization::read_from_file(
+  const std::string& path,
+  bool read_error_bound_data)
+{
+  START_LOG("read_from_file()", "RBEvaluationDeserialization");
+
+  libMesh::out << "Reading RBEvaluation capnp buffer from " <<  path << std::endl;
+
+  int fd = open(path.c_str(), O_RDONLY);
+  if(!fd)
+  {
+    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  }
+
+  // Turn off the limit to the amount of data we can read in
+  capnp::ReaderOptions reader_options;
+  reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
+
+  capnp::StreamFdMessageReader message(fd, reader_options);
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+  RBData::RBEvaluationReal::Reader rb_eval_reader =
+    message.getRoot<RBData::RBEvaluationReal>();
+#else
+  RBData::RBEvaluationComplex::Reader rb_eval_reader =
+    message.getRoot<RBData::RBEvaluationComplex>();
+#endif
+
+  load_rb_evaluation_data(_rb_eval, rb_eval_reader, read_error_bound_data);
+
+  STOP_LOG("read_from_file()", "RBEvaluationDeserialization");
+}
+
+// ---- RBEvaluationDeserialization (END) ----
+
+
 //// ---- TransientRBEvaluationDeserialization (BEGIN) ----
 //
 //TransientRBEvaluationDeserialization::TransientRBEvaluationDeserialization(
@@ -138,6 +153,7 @@
 //{
 //  START_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
 //
+//  libMesh::out << "Reading TransientRBEvaluation capnp buffer from " <<  path << std::endl;
 //  int fd = open(path.c_str(), O_RDONLY);
 //  if(!fd)
 //  {
@@ -181,6 +197,8 @@
 //{
 //  START_LOG("read_from_file()", "RBEIMEvaluationDeserialization");
 //
+//  libMesh::out << "Reading RBEIMEvaluation capnp buffer from " <<  path << std::endl;
+//
 //  int fd = open(path.c_str(), O_RDONLY);
 //  if(!fd)
 //  {
@@ -205,250 +223,309 @@
 //}
 //
 //// ---- RBEIMEvaluationDeserialization (END) ----
-//
-//
-//// ---- RBSCMEvaluationDeserialization (BEGIN) ----
-//
-//RBSCMEvaluationDeserialization::RBSCMEvaluationDeserialization(
-//  RBSCMEvaluation& rb_scm_eval)
-//  :
-//  _rb_scm_eval(rb_scm_eval)
-//{}
-//
-//RBSCMEvaluationDeserialization::~RBSCMEvaluationDeserialization()
-//{}
-//
-//void RBSCMEvaluationDeserialization::read_from_file(
-//  const std::string& path,
-//  bool read_error_bound_data)
-//{
-//  START_LOG("read_from_file()", "RBSCMEvaluationDeserialization");
-//
-//  int fd = open(path.c_str(), O_RDONLY);
-//  if(!fd)
-//  {
-//    libmesh_error_msg("Couldn't open the buffer file: " + path);
-//  }
-//
-//  // Turn off the limit to the amount of data we can read in
-//  capnp::ReaderOptions reader_options;
-//  reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
-//
-//  capnp::FdMessageReader message(fd, reader_options);
-//
-//  RBData::RBEIMEvaluation::Reader rb_scm_eval_reader =
-//    message.getRoot<RBData::RBSCMEvaluation>();
-//
-//  load_rb_scm_evaluation_data(
-//    _rb_scm_eval, rb_scm_eval_reader, read_error_bound_data);
-//
-//  STOP_LOG("read_from_file()", "RBSCMEvaluationDeserialization");
-//}
-//
-//// ---- RBSCMEvaluationDeserialization (END) ----
-//
-//
-//// ---- Helper functions for adding data to capnp Builders (BEGIN) ----
-//
-//void load_rb_evaluation_data(
-//  RBEvaluation& rb_evaluation,
-//  RBData::RBEvaluation::Reader& rb_evaluation_reader,
-//  bool read_error_bound_data)
-//{
-//  // Set number of basis functions
-//  unsigned int n_bfs = rb_evaluation_reader.getNBfs();
-//  rb_evaluation.set_n_basis_functions(n_bfs);
-//
-//  rb_evaluation.resize_data_structures(n_bfs, read_error_bound_data);
-//
-//  auto parameter_ranges =
-//    rb_evaluation_reader.getParameterRanges();
-//  auto discrete_parameters_list =
-//    rb_evaluation_reader.getDiscreteParameters();
-//  load_parameter_ranges(
-//    rb_evaluation, parameter_ranges, discrete_parameters_list);
-//
-//  const RBThetaExpansion& rb_theta_expansion = rb_evaluation.get_rb_theta_expansion();
-//
-//  unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
-//  unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
-//
-//  if(read_error_bound_data)
-//  {
-//
-//    // Fq representor inner-product data
-//    {
-//      unsigned int Q_f_hat = n_F_terms*(n_F_terms+1)/2;
-//
-//      auto fq_innerprods_list = rb_evaluation_reader.getFqInnerprods();
-//      if(fq_innerprods_list.size() != Q_f_hat)
-//      {
-//        libmesh_error_msg("Size error while reading Fq representor norm data from buffer.");
-//      }
-//
-//      for(unsigned int i=0; i < Q_f_hat; ++i)
-//        rb_evaluation.Fq_representor_innerprods[i] = load_scalar_value(fq_innerprods_list[i]);
-//    }
-//
-//    // Fq_Aq representor inner-product data
-//    {
-//      auto fq_aq_innerprods_list = rb_evaluation_reader.getFqAqInnerprods();
-//      if(fq_aq_innerprods_list.size() != n_F_terms*n_A_terms*n_bfs)
-//      {
-//        libmesh_error_msg("Size error while reading Fq-Aq representor norm data from buffer.");
-//      }
-//
-//      for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
-//        for(unsigned int q_a=0; q_a<n_A_terms; ++q_a)
-//          for(unsigned int i=0; i<n_bfs; ++i)
-//          {
-//            unsigned int offset = q_f*n_A_terms*n_bfs + q_a*n_bfs + i;
-//            rb_evaluation.Fq_Aq_representor_innerprods[q_f][q_a][i] =
-//              load_scalar_value(fq_aq_innerprods_list[offset]);
-//          }
-//    }
-//
-//    // Aq_Aq representor inner-product data
-//    {
-//      unsigned int Q_a_hat = n_A_terms*(n_A_terms+1)/2;
-//      auto aq_aq_innerprods_list = rb_evaluation_reader.getAqAqInnerprods();
-//      if(aq_aq_innerprods_list.size() != Q_a_hat*n_bfs*n_bfs)
-//      {
-//        libmesh_error_msg("Size error while reading Aq-Aq representor norm data from buffer.");
-//      }
-//      
-//      for(unsigned int i=0; i<Q_a_hat; ++i)
-//        for(unsigned int j=0; j<n_bfs; ++j)
-//          for(unsigned int l=0; l<n_bfs; ++l)
-//          {
-//            unsigned int offset = i*n_bfs*n_bfs + j*n_bfs + l;
-//            rb_evaluation.Aq_Aq_representor_innerprods[i][j][l] =
-//              load_scalar_value(aq_aq_innerprods_list[offset]);
-//          }
-//    }
-//  
-//  }
-//
-//  // Output data
-//  {
-//    unsigned int n_outputs = rb_theta_expansion.get_n_outputs();
-//    
-//    auto output_list = rb_evaluation_reader.getOutputs();
-//    if(output_list.size() != n_outputs)
-//    {
-//      libmesh_error_msg("Incorrect number of outputs detected in the buffer");
-//    }
-//
-//    for(unsigned int output_id=0; output_id<n_outputs; ++output_id)
-//    {
-//      unsigned int n_output_terms = rb_theta_expansion.get_n_output_terms(output_id);
-//      unsigned int Q_l_hat = n_output_terms*(n_output_terms+1)/2;
-//
-//      auto output_dual_innerprods_list = output_list[output_id].getOutputDualInnerprods();
-//      if(output_dual_innerprods_list.size() != Q_l_hat)
-//      {
-//        libmesh_error_msg("Incorrect number of output terms detected in the buffer");
-//      }
-//      
-//      for(unsigned int q=0; q<Q_l_hat; ++q)
-//      {
-//        rb_evaluation.output_dual_innerprods[output_id][q] =
-//          load_scalar_value(output_dual_innerprods_list[q]);
-//      }
-//        
-//      auto output_vectors_outer_list = output_list[output_id].getOutputVectors();
-//      if(output_vectors_outer_list.size() != n_output_terms)
-//      {
-//        libmesh_error_msg("Incorrect number of output vectors detected in the buffer");
-//      }
-//
-//      for(unsigned int q_l=0; q_l<n_output_terms; ++q_l)
-//      {
-//        auto output_vectors_inner_list = output_vectors_outer_list[q_l];
-//
-//        if(output_vectors_inner_list.size() != n_bfs)
-//        {
-//          libmesh_error_msg("Incorrect output vector size detected in the buffer");
-//        }
-//
-//        for(unsigned int j=0; j < n_bfs; ++j)
-//        {
-//          rb_evaluation.RB_output_vectors[output_id][q_l](j) =
-//            load_scalar_value(output_vectors_inner_list[j]);
-//        }
-//      }
-//    }
-//  }
-//
-//  // Fq vectors and Aq matrices
-//  {    
-//    auto rb_fq_vectors_outer_list = rb_evaluation_reader.getRbFqVectors();
-//    if(rb_fq_vectors_outer_list.size() != n_F_terms)
-//    {
-//      libmesh_error_msg("Incorrect number of Fq vectors detected in the buffer");
-//    }
-//
-//    for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
-//    {
-//      auto rb_fq_vectors_inner_list = rb_fq_vectors_outer_list[q_f];
-//      if(rb_fq_vectors_inner_list.size() != n_bfs)
-//      {
-//        libmesh_error_msg("Incorrect Fq vector size detected in the buffer");
-//      }
-//
-//      for(unsigned int i=0; i < n_bfs; ++i)
-//      {
-//        rb_evaluation.RB_Fq_vector[q_f](i) =
-//          load_scalar_value(rb_fq_vectors_inner_list[i]);
-//      }
-//    }
-//
-//    auto rb_Aq_matrices_outer_list = rb_evaluation_reader.getRbAqMatrices();
-//    if(rb_Aq_matrices_outer_list.size() != n_A_terms)
-//    {
-//      libmesh_error_msg("Incorrect number of Aq matrices detected in the buffer");
-//    }
-//
-//    for(unsigned int q_a=0; q_a<n_A_terms; ++q_a)
-//    {
-//      auto rb_Aq_matrices_inner_list = rb_Aq_matrices_outer_list[q_a];
-//      if(rb_Aq_matrices_inner_list.size() != n_bfs*n_bfs)
-//      {
-//        libmesh_error_msg("Incorrect Aq matrix size detected in the buffer");
-//      }
-//
-//      for(unsigned int i=0; i<n_bfs; ++i)
-//        for(unsigned int j=0; j<n_bfs; ++j)
-//        {
-//          unsigned int offset = i*n_bfs+j;
-//          rb_evaluation.RB_Aq_vector[q_a](i,j) =
-//            load_scalar_value(rb_Aq_matrices_inner_list[offset]);
-//        }
-//    }
-//  }
-//
-//  // Inner-product matrix
-//  if(rb_evaluation.compute_RB_inner_product)
-//  {
-//    auto rb_inner_product_matrix_list =
-//      rb_evaluation_reader.getRbInnerProductMatrix();
-//
-//    if(rb_inner_product_matrix_list.size() != n_bfs*n_bfs)
-//    {
-//      libmesh_error_msg("Size error while reading the inner product matrix.");
-//    }
-//
-//    for(unsigned int i=0; i<n_bfs; ++i)
-//      for(unsigned int j=0; j<n_bfs; ++j)
-//      {
-//        unsigned int offset = i*n_bfs + j;
-//        rb_evaluation.RB_inner_product_matrix(i,j) =
-//          load_scalar_value(rb_inner_product_matrix_list[offset]);
-//      }
-//  }
-//}
-//
-//
+
+
+// ---- RBSCMEvaluationDeserialization (BEGIN) ----
+
+RBSCMEvaluationDeserialization::RBSCMEvaluationDeserialization(
+  RBSCMEvaluation& rb_scm_eval)
+  :
+  _rb_scm_eval(rb_scm_eval)
+{}
+
+RBSCMEvaluationDeserialization::~RBSCMEvaluationDeserialization()
+{}
+
+void RBSCMEvaluationDeserialization::read_from_file(
+  const std::string& path)
+{
+  START_LOG("read_from_file()", "RBSCMEvaluationDeserialization");
+
+  libMesh::out << "Reading RBSCMEvaluation capnp buffer from " <<  path << std::endl;
+
+  int fd = open(path.c_str(), O_RDONLY);
+  if(!fd)
+  {
+    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  }
+
+  // Turn off the limit to the amount of data we can read in
+  capnp::ReaderOptions reader_options;
+  reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
+
+  capnp::StreamFdMessageReader message(fd, reader_options);
+
+  RBData::RBSCMEvaluation::Reader rb_scm_eval_reader =
+    message.getRoot<RBData::RBSCMEvaluation>();
+
+  load_rb_scm_evaluation_data(
+    _rb_scm_eval, rb_scm_eval_reader);
+
+  STOP_LOG("read_from_file()", "RBSCMEvaluationDeserialization");
+}
+
+// ---- RBSCMEvaluationDeserialization (END) ----
+
+
+// ---- Helper functions for loading data from buffers (BEGIN) ----
+
+void load_parameter_ranges(
+  RBParametrized& rb_evaluation,
+  RBData::ParameterRanges::Reader& parameter_ranges,
+  RBData::DiscreteParameterList::Reader& discrete_parameters_list)
+{
+  // Continuous parameters
+  RBParameters parameters_min;
+  RBParameters parameters_max;
+  {
+    unsigned int n_parameter_ranges = parameter_ranges.getNames().size();
+
+    for(unsigned int i=0; i<n_parameter_ranges; ++i)
+    {
+      std::string parameter_name = parameter_ranges.getNames()[i];
+      Real min_value = parameter_ranges.getMinValues()[i];
+      Real max_value = parameter_ranges.getMaxValues()[i];
+
+      parameters_min.set_value(parameter_name, min_value);
+      parameters_max.set_value(parameter_name, max_value);
+    }
+  }
+
+  // Discrete parameters
+  std::map< std::string, std::vector<Real> > discrete_parameter_values;
+  {
+    unsigned int n_discrete_parameters = discrete_parameters_list.getNames().size();
+
+    for(unsigned int i=0; i<n_discrete_parameters; ++i)
+    {
+      std::string parameter_name = discrete_parameters_list.getNames()[i];
+
+      auto value_list = discrete_parameters_list.getValues()[i];
+      unsigned int n_values = value_list.size();
+      std::vector<Real> values(n_values);
+      for(unsigned int j=0; j<n_values; ++j)
+      {
+        values[j] = value_list[j];
+      }
+
+      discrete_parameter_values[parameter_name] = values;
+    }
+  }
+
+  rb_evaluation.initialize_parameters(
+    parameters_min,
+    parameters_max,
+    discrete_parameter_values);
+}
+
+template <typename RBEvaluationReaderNumber>
+void load_rb_evaluation_data(
+  RBEvaluation& rb_evaluation,
+  RBEvaluationReaderNumber& rb_evaluation_reader,
+  bool read_error_bound_data)
+{
+  // Set number of basis functions
+  unsigned int n_bfs = rb_evaluation_reader.getNBfs();
+  rb_evaluation.set_n_basis_functions(n_bfs);
+
+  rb_evaluation.resize_data_structures(n_bfs, read_error_bound_data);
+
+  auto parameter_ranges =
+    rb_evaluation_reader.getParameterRanges();
+  auto discrete_parameters_list =
+    rb_evaluation_reader.getDiscreteParameters();
+
+  load_parameter_ranges(
+    rb_evaluation, parameter_ranges, discrete_parameters_list);
+
+  const RBThetaExpansion& rb_theta_expansion = rb_evaluation.get_rb_theta_expansion();
+
+  unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
+  unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
+
+  if(read_error_bound_data)
+  {
+
+    // Fq representor inner-product data
+    {
+      unsigned int Q_f_hat = n_F_terms*(n_F_terms+1)/2;
+
+      auto fq_innerprods_list = rb_evaluation_reader.getFqInnerprods();
+      if(fq_innerprods_list.size() != Q_f_hat)
+      {
+        libmesh_error_msg("Size error while reading Fq representor norm data from buffer.");
+      }
+
+      for(unsigned int i=0; i < Q_f_hat; ++i)
+        rb_evaluation.Fq_representor_innerprods[i] = load_scalar_value(fq_innerprods_list[i]);
+    }
+
+    // Fq_Aq representor inner-product data
+    {
+      auto fq_aq_innerprods_list = rb_evaluation_reader.getFqAqInnerprods();
+      if(fq_aq_innerprods_list.size() != n_F_terms*n_A_terms*n_bfs)
+      {
+        libmesh_error_msg("Size error while reading Fq-Aq representor norm data from buffer.");
+      }
+
+      for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
+        for(unsigned int q_a=0; q_a<n_A_terms; ++q_a)
+          for(unsigned int i=0; i<n_bfs; ++i)
+          {
+            unsigned int offset = q_f*n_A_terms*n_bfs + q_a*n_bfs + i;
+            rb_evaluation.Fq_Aq_representor_innerprods[q_f][q_a][i] =
+              load_scalar_value(fq_aq_innerprods_list[offset]);
+          }
+    }
+
+    // Aq_Aq representor inner-product data
+    {
+      unsigned int Q_a_hat = n_A_terms*(n_A_terms+1)/2;
+      auto aq_aq_innerprods_list = rb_evaluation_reader.getAqAqInnerprods();
+      if(aq_aq_innerprods_list.size() != Q_a_hat*n_bfs*n_bfs)
+      {
+        libmesh_error_msg("Size error while reading Aq-Aq representor norm data from buffer.");
+      }
+      
+      for(unsigned int i=0; i<Q_a_hat; ++i)
+        for(unsigned int j=0; j<n_bfs; ++j)
+          for(unsigned int l=0; l<n_bfs; ++l)
+          {
+            unsigned int offset = i*n_bfs*n_bfs + j*n_bfs + l;
+            rb_evaluation.Aq_Aq_representor_innerprods[i][j][l] =
+              load_scalar_value(aq_aq_innerprods_list[offset]);
+          }
+    }
+  
+  }
+
+  // Output dual inner-product data, and output vectors
+  {
+    unsigned int n_outputs = rb_theta_expansion.get_n_outputs();
+    auto output_innerprod_outer = rb_evaluation_reader.getOutputDualInnerprods();
+    auto output_vector_outer = rb_evaluation_reader.getOutputVectors();
+
+    if( (output_innerprod_outer.size() != n_outputs) ||
+        (output_vector_outer.size() != n_outputs) )
+    {
+      libmesh_error_msg("Incorrect number of outputs detected in the buffer");
+    }
+
+    for(unsigned int output_id=0; output_id<n_outputs; ++output_id)
+    {
+      unsigned int n_output_terms = rb_theta_expansion.get_n_output_terms(output_id);
+      
+      {
+        unsigned int Q_l_hat = n_output_terms*(n_output_terms+1)/2;
+        auto output_innerprod_inner = output_innerprod_outer[output_id];
+
+        if(output_innerprod_inner.size() != Q_l_hat)
+        {
+          libmesh_error_msg("Incorrect number of output terms detected in the buffer");
+        }
+
+        for(unsigned int q=0; q<Q_l_hat; ++q)
+        {
+          rb_evaluation.output_dual_innerprods[output_id][q] =
+            load_scalar_value(output_innerprod_inner[q]);
+        }
+      }
+
+      {
+        auto output_vector_middle = output_vector_outer[output_id];
+        if(output_vector_middle.size() != n_output_terms)
+        {
+          libmesh_error_msg("Incorrect number of output terms detected in the buffer");
+        }
+
+        for(unsigned int q_l=0; q_l<n_output_terms; ++q_l)
+        {
+          auto output_vectors_inner_list = output_vector_middle[q_l];
+
+          if(output_vectors_inner_list.size() != n_bfs)
+          {
+            libmesh_error_msg("Incorrect number of output terms detected in the buffer");
+          }
+
+          for(unsigned int j=0; j < n_bfs; ++j)
+          {
+            rb_evaluation.RB_output_vectors[output_id][q_l](j) =
+              load_scalar_value(output_vectors_inner_list[j]);
+          }
+        }
+      }
+    }
+  }
+
+  // Fq vectors and Aq matrices
+  {    
+    auto rb_fq_vectors_outer_list = rb_evaluation_reader.getRbFqVectors();
+    if(rb_fq_vectors_outer_list.size() != n_F_terms)
+    {
+      libmesh_error_msg("Incorrect number of Fq vectors detected in the buffer");
+    }
+
+    for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
+    {
+      auto rb_fq_vectors_inner_list = rb_fq_vectors_outer_list[q_f];
+      if(rb_fq_vectors_inner_list.size() != n_bfs)
+      {
+        libmesh_error_msg("Incorrect Fq vector size detected in the buffer");
+      }
+
+      for(unsigned int i=0; i < n_bfs; ++i)
+      {
+        rb_evaluation.RB_Fq_vector[q_f](i) =
+          load_scalar_value(rb_fq_vectors_inner_list[i]);
+      }
+    }
+
+    auto rb_Aq_matrices_outer_list = rb_evaluation_reader.getRbAqMatrices();
+    if(rb_Aq_matrices_outer_list.size() != n_A_terms)
+    {
+      libmesh_error_msg("Incorrect number of Aq matrices detected in the buffer");
+    }
+
+    for(unsigned int q_a=0; q_a<n_A_terms; ++q_a)
+    {
+      auto rb_Aq_matrices_inner_list = rb_Aq_matrices_outer_list[q_a];
+      if(rb_Aq_matrices_inner_list.size() != n_bfs*n_bfs)
+      {
+        libmesh_error_msg("Incorrect Aq matrix size detected in the buffer");
+      }
+
+      for(unsigned int i=0; i<n_bfs; ++i)
+        for(unsigned int j=0; j<n_bfs; ++j)
+        {
+          unsigned int offset = i*n_bfs+j;
+          rb_evaluation.RB_Aq_vector[q_a](i,j) =
+            load_scalar_value(rb_Aq_matrices_inner_list[offset]);
+        }
+    }
+  }
+
+  // Inner-product matrix
+  if(rb_evaluation.compute_RB_inner_product)
+  {
+    auto rb_inner_product_matrix_list =
+      rb_evaluation_reader.getRbInnerProductMatrix();
+
+    if(rb_inner_product_matrix_list.size() != n_bfs*n_bfs)
+    {
+      libmesh_error_msg("Size error while reading the inner product matrix.");
+    }
+
+    for(unsigned int i=0; i<n_bfs; ++i)
+      for(unsigned int j=0; j<n_bfs; ++j)
+      {
+        unsigned int offset = i*n_bfs + j;
+        rb_evaluation.RB_inner_product_matrix(i,j) =
+          load_scalar_value(rb_inner_product_matrix_list[offset]);
+      }
+  }
+}
+
+
 //void RBDataSerialization::load_transient_rb_evaluation(
 //  TransientRBEvaluation& trans_rb_eval,
 //  RBData::RBEvaluation::Reader& rb_eval_reader,
@@ -760,157 +837,115 @@
 //    rb_eim_evaluation.extra_interpolation_point_elem = elem;
 //  }
 //}
-//
-//void load_rb_scm_evaluation_data(
-//  RBSCMEvaluation& rb_scm_evaluation,
-//  RBData::RBSCMEvaluation::Reader& rb_scm_evaluation_reader,
-//  bool read_error_bound_data)
-//{
-//  auto parameter_ranges =
-//    rb_scm_evaluation_reader.getParameterRanges();
-//  auto discrete_parameters_list =
-//    rb_evaluation_reader.getDiscreteParameters();
-//  load_parameter_ranges(
-//    rb_scm_evaluation, parameter_ranges, discrete_parameters_list);
-//
-//  unsigned int n_A_terms = rb_scm_eval.get_rb_theta_expansion().get_n_A_terms();
-//
-//  {
-//    auto b_min_list = rb_scm_evaluation_reader.getBMin();
-//
-//    if(b_min_list.size() != n_A_terms)
-//    {
-//      libmesh_error_msg(
-//        "Size error while reading B_min");
-//    }
-//
-//    rb_scm_eval.B_min.clear();
-//    for(unsigned int i=0; i<B_min.size(); i++)
-//    {
-//      rb_scm_eval.B_min.push_back(b_min_list[i]);
-//    }
-//  }
-//
-//  {
-//    auto b_max_list = rb_scm_evaluation_reader.getBMax();
-//
-//    if(b_max_list.size() != n_A_terms)
-//    {
-//      libmesh_error_msg(
-//        "Size error while reading B_max");
-//    }
-//
-//    rb_scm_eval.B_max.clear();
-//    for(unsigned int i=0; i<B_max.size(); i++)
-//    {
-//      rb_scm_eval.B_max.push_back(b_max_list[i]);
-//    }
-//  }
-//
-//  {
-//    auto cJ_stability_vector =
-//      rb_scm_eval_reader.getCJStabilityVector();
-//
-//    rb_scm_eval.C_J_stability_vector.clear();
-//    for(unsigned int i=0; i<C_J_stability_vector.size(); i++)
-//    {
-//      rb_scm_eval.C_J_stability_vector.push_back( cJ_stability_vector[i] );
-//    }
-//  }
-//
-//  {
-//    auto cJ_parameters_outer =
-//      rb_scm_eval_reader.getCJ();
-//
-//    rb_scm_eval.C_J.clear();
-//    for(unsigned int i=0; i<rb_scm_eval.C_J.size(); i++)
-//    {
-//      auto cJ_parameters_inner =
-//        cJ_parameters_outer[i];
-//
-//      for(unsigned int j=0; j<cJ_parameters_inner.size(); j++)
-//      {
-//        std::string param_name = cJ_parameters_inner[j].getName();
-//        Real param_value = cJ_parameters_inner[j].getValue();
-//        rb_scm_eval.C_J[i].set_value(param_name, param_value);
-//      }
-//    }
-//  }
-//
-//  {
-//    auto scm_ub_vectors =
-//      rb_scm_eval_reader.scmUbVectors();
-//
-//    SCM_UB_vectors.resize( C_J_stability_vector.size() );
-//    for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
-//    {
-//      SCM_UB_vectors[i].resize(n_A_terms);
-//      for(unsigned int j=0; j<n_A_terms; j++)
-//      {
-//        unsigned int offset = i*n_A_terms + j;
-//        rb_scm_eval.SCM_UB_vectors[i][j] = scm_ub_vectors[offset];
-//      }
-//    }
-//  }
-//}
-//
-//void load_parameter_ranges(
-//  RBParametrized& rb_evaluation,
-//  RBData::ParameterRanges::Reader& parameter_ranges,
-//  RBData::DiscreteParameterList::Reader& discrete_parameters_list)
-//{
-//  // Continuous parameters
-//  RBParameters parameters_min;
-//  RBParameters parameters_max;
-//  {
-//    unsigned int n_parameter_ranges = parameter_ranges.size();
-//    
-//    if(rb_evaluation.get_n_params() != n_parameter_ranges)
-//    {
-//      libmes_error_msg("Mismatch in number of parameters");
-//    }
-//
-//    for(unsigned int i=0; i<n_parameter_ranges; ++i)
-//    {
-//      std::string parameter_name = parameter_ranges[i].getName();
-//      Real min_value = parameter_ranges[i].getMinValue();
-//      Real max_value = parameter_ranges[i].getMaxValue();
-//
-//      parameters_min.set_value(parameter_name, min_value);
-//      parameters_max.set_value(parameter_name, max_value);
-//    }
-//  }
-//
-//  // Discrete parameters
-//  std::map< std::string, std::vector<Real> > discrete_parameter_values;
-//  {
-//    unsigned int n_discrete_parameters = discrete_parameters_list.size();
-//
-//    if(rb_evaluation.get_n_discrete_params() != n_discrete_parameters)
-//    {
-//      libmes_error_msg("Mismatch in number of discrete parameters");
-//    }
-//
-//    for(unsigned int i=0; i<n_discrete_parameters; ++i)
-//    {
-//      std::string parameter_name = discrete_parameters_list[i].getName();
-//
-//      auto value_list = discrete_parameter_reader.getValues();
-//      unsigned int n_values = value_list.size();
-//      std::vector<Real> values(n_values);
-//      for(unsigned int j=0; j<n_values; ++j)
-//      {
-//        values[j] = value_list[j];
-//      }
-//
-//      discrete_parameter_values[parameter_name] = values;
-//    }
-//  }
-//
-//  rb_evaluation.initialize_parameters(
-//    parameters_min,
-//    parameters_max,
-//    discrete_parameter_values);
-//}
-//
-//// ---- Helper functions for adding data to capnp Builders (END) ----
+
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+void load_rb_scm_evaluation_data(
+  RBSCMEvaluation& rb_scm_eval,
+  RBData::RBSCMEvaluation::Reader& rb_scm_evaluation_reader)
+{
+  auto parameter_ranges =
+    rb_scm_evaluation_reader.getParameterRanges();
+  auto discrete_parameters_list =
+    rb_scm_evaluation_reader.getDiscreteParameters();
+  load_parameter_ranges(
+    rb_scm_eval, parameter_ranges, discrete_parameters_list);
+
+  unsigned int n_A_terms = rb_scm_eval.get_rb_theta_expansion().get_n_A_terms();
+
+  {
+    auto b_min_list = rb_scm_evaluation_reader.getBMin();
+
+    if(b_min_list.size() != n_A_terms)
+    {
+      libmesh_error_msg(
+        "Size error while reading B_min");
+    }
+
+    rb_scm_eval.B_min.clear();
+    for(unsigned int i=0; i<n_A_terms; i++)
+    {
+      rb_scm_eval.B_min.push_back(b_min_list[i]);
+    }
+  }
+
+  {
+    auto b_max_list = rb_scm_evaluation_reader.getBMax();
+
+    if(b_max_list.size() != n_A_terms)
+    {
+      libmesh_error_msg(
+        "Size error while reading B_max");
+    }
+
+    rb_scm_eval.B_max.clear();
+    for(unsigned int i=0; i<n_A_terms; i++)
+    {
+      rb_scm_eval.B_max.push_back(b_max_list[i]);
+    }
+  }
+
+  {
+    auto cJ_stability_vector =
+      rb_scm_evaluation_reader.getCJStabilityVector();
+
+    rb_scm_eval.C_J_stability_vector.clear();
+    for(unsigned int i=0; i<cJ_stability_vector.size(); i++)
+    {
+      rb_scm_eval.C_J_stability_vector.push_back( cJ_stability_vector[i] );
+    }
+  }
+
+  {
+    auto cJ_parameters_outer =
+      rb_scm_evaluation_reader.getCJ();
+
+    rb_scm_eval.C_J.resize(cJ_parameters_outer.size());
+    for(unsigned int i=0; i<cJ_parameters_outer.size(); i++)
+    {
+      auto cJ_parameters_inner =
+        cJ_parameters_outer[i];
+
+      for(unsigned int j=0; j<cJ_parameters_inner.size(); j++)
+      {
+        std::string param_name = cJ_parameters_inner[j].getName();
+        Real param_value = cJ_parameters_inner[j].getValue();
+        rb_scm_eval.C_J[i].set_value(param_name, param_value);
+      }
+    }
+  }
+
+  {
+    auto scm_ub_vectors =
+      rb_scm_evaluation_reader.getScmUbVectors();
+
+    // The number of UB vectors is the same as the number of C_J values
+    unsigned int n_C_J_values = rb_scm_evaluation_reader.getCJ().size();
+
+    if(scm_ub_vectors.size() != n_C_J_values*n_A_terms)
+    {
+      libmesh_error_msg("Size mismatch in SCB UB vectors");
+    }
+
+    rb_scm_eval.SCM_UB_vectors.resize( n_C_J_values );
+    for(unsigned int i=0; i<n_C_J_values; i++)
+    {
+      rb_scm_eval.SCM_UB_vectors[i].resize(n_A_terms);
+      for(unsigned int j=0; j<n_A_terms; j++)
+      {
+        unsigned int offset = i*n_A_terms + j;
+        rb_scm_eval.SCM_UB_vectors[i][j] = scm_ub_vectors[offset];
+
+      }
+    }
+  }
+
+}
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
+
+// ---- Helper functions for adding data to capnp Builders (END) ----
+
+} // namespace RBDataSerialization
+
+} // namespace libMesh
+
+#endif // #if defined(LIBMESH_HAVE_CAPNPROTO)
