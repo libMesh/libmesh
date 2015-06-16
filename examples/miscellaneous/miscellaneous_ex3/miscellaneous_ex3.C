@@ -72,21 +72,17 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// A reference to our equation system
-EquationSystems *_equation_system = NULL;
-
 // Let-s define the physical parameters of the equation
 const Real kappa = 1.;
 const Real sigma = 0.2;
 
-
 // This function computes the Jacobian K(x)
 void compute_jacobian (const NumericVector<Number>& soln,
-                       SparseMatrix<Number>&  jacobian,
-                       NonlinearImplicitSystem& /*sys*/)
+                       SparseMatrix<Number>& jacobian,
+                       NonlinearImplicitSystem& sys)
 {
   // Get a reference to the equation system.
-  EquationSystems &es = *_equation_system;
+  EquationSystems &es = sys.get_equation_systems();
 
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -217,9 +213,9 @@ void compute_jacobian (const NumericVector<Number>& soln,
 // x is passed in the soln vector
 void compute_residual (const NumericVector<Number>& soln,
                        NumericVector<Number>& residual,
-                       NonlinearImplicitSystem& /*sys*/)
+                       NonlinearImplicitSystem& sys)
 {
-  EquationSystems &es = *_equation_system;
+  EquationSystems &es = sys.get_equation_systems();
 
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -486,7 +482,6 @@ int main (int argc, char** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  _equation_system = &equation_systems;
 
   // Declare the system and its variables.
 
