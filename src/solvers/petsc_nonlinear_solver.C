@@ -251,8 +251,115 @@ extern "C"
     return ierr;
   }
 
+  // This function gets called by PETSc after the SNES linesearch is
+  // complete.  We use it to exactly enforce any constraints on the
+  // solution which may have drifted during the linear solve.  In the
+  // PETSc nomenclature:
+  // * "x" is the old solution vector,
+  // * "y" is the search direction (Newton step) vector,
+  // * "w" is the candidate solution vector, and
+  // the user is responsible for setting changed_y and changed_w
+  // appropriately, depending on whether or not the search
+  // direction or solution vector was changed, respectively.
+  PetscErrorCode __libmesh_petsc_snes_postcheck(
+#if PETSC_VERSION_LESS_THAN(3,3,0)
+                                                SNES, Vec x, Vec y, Vec w, void *context, PetscBool *changed_y, PetscBool *changed_w
+#else
+                                                SNESLineSearch, Vec x, Vec y, Vec w, PetscBool *changed_y, PetscBool *changed_w, void *context
+#endif
+                                                )
+  {
+    START_LOG("postcheck()", "PetscNonlinearSolver");
+
+    PetscErrorCode ierr = 0;
+
+    // PETSc almost certainly initializes these to false already, but
+    // it doesn't hurt to be explicit.
+    *changed_w = PETSC_FALSE;
+    *changed_y = PETSC_FALSE;
+
+    libmesh_assert(context);
+
+    // Cast the context to a NonlinearSolver object.
+    PetscNonlinearSolver<Number>* solver =
+      static_cast<PetscNonlinearSolver<Number>*> (context);
+
+    // If the user has provided both postcheck function pointer and
+    // object, this is ambiguous, so throw an error.
+    if (solver->postcheck && solver->postcheck_object)
+      libmesh_error_msg("ERROR: cannot specify both a function and object for performing the solve postcheck!");
+
+    // It's also possible that we don't need to do anything at all, in
+    // that case return early...
+    NonlinearImplicitSystem & sys = solver->system();
+    DofMap & dof_map = sys.get_dof_map();
+
+    if (!dof_map.n_constrained_dofs() && !solver->postcheck && !solver->postcheck_object)
+      return ierr;
+
+    // We definitely need to wrap at least "w"
+    PetscVector<Number> petsc_w(w, sys.comm());
+
+    // The user sets these flags in his/her postcheck function to
+    // indicate whether they changed something.
+    bool
+      changed_search_direction = false,
+      changed_new_soln = false;
+
+    if (solver->postcheck || solver->postcheck_object)
+      {
+        PetscVector<Number> petsc_x(x, sys.comm());
+        PetscVector<Number> petsc_y(y, sys.comm());
+
+        if (solver->postcheck)
+          solver->postcheck(petsc_x,
+                            petsc_y,
+                            petsc_w,
+                            changed_search_direction,
+                            changed_new_soln,
+                            sys);
+
+        else if (solver->postcheck_object)
+          solver->postcheck_object->postcheck(petsc_x,
+                                              petsc_y,
+                                              petsc_w,
+                                              changed_search_direction,
+                                              changed_new_soln,
+                                              sys);
+      }
+
+    // Record whether the user changed the solution or the search direction.
+    if (changed_search_direction)
+      *changed_y = PETSC_TRUE;
+
+    if (changed_new_soln)
+      *changed_w = PETSC_TRUE;
+
+    if (dof_map.n_constrained_dofs())
+      {
+        PetscVector<Number> & system_soln = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+
+        // ... and swap it in before enforcing the constraints.
+        petsc_w.swap(system_soln);
+
+        dof_map.enforce_constraints_exactly(sys);
+
+        // If we have constraints, we'll assume that we did change the
+        // solution w (hopefully slightly).  Enforcing constraints
+        // does not change the search direction, y, but the user may
+        // have, so we leave it alone.
+        *changed_w = PETSC_TRUE;
+
+        // Swap back
+        petsc_w.swap(system_soln);
+      }
+
+    STOP_LOG("postcheck()", "PetscNonlinearSolver");
+
+    return ierr;
+  }
+
 } // end extern "C"
-//---------------------------------------------------------------------
 
 
 
@@ -387,6 +494,34 @@ void PetscNonlinearSolver<T>::init (const char* name)
           PCShellSetSetUp(pc,__libmesh_petsc_preconditioner_setup);
           PCShellSetApply(pc,__libmesh_petsc_preconditioner_apply);
         }
+    }
+
+
+  // Tell PETSc about our linesearch "post-check" function, but only
+  // if the user has provided one.  There seem to be extra,
+  // unnecessary residual calculations if a postcheck function is
+  // attached for no reason.
+  if (this->postcheck || this->postcheck_object)
+    {
+#if PETSC_VERSION_LESS_THAN(3,3,0)
+      PetscErrorCode ierr = SNESLineSearchSetPostCheck(_snes, __libmesh_petsc_snes_postcheck, this);
+      LIBMESH_CHKERRABORT(ierr);
+
+#else
+      // Pick the right version of the function name
+#if PETSC_VERSION_LESS_THAN(3,4,0)
+#  define SNESGETLINESEARCH SNESGetSNESLineSearch
+#else
+#  define SNESGETLINESEARCH SNESGetLineSearch
+#endif
+
+      SNESLineSearch linesearch;
+      PetscErrorCode ierr = SNESGETLINESEARCH(_snes, &linesearch);
+      LIBMESH_CHKERRABORT(ierr);
+
+      ierr = SNESLineSearchSetPostCheck(linesearch, __libmesh_petsc_snes_postcheck, this);
+      LIBMESH_CHKERRABORT(ierr);
+#endif
     }
 }
 
