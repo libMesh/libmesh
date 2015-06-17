@@ -43,7 +43,7 @@ void set_scalar_in_list(T list, unsigned int i, U value)
 }  
 
 /**
- * Helper function that add point data.
+ * Helper function that adds point data.
  */
 void add_point_to_builder(const Point& point, RBData::Point3D::Builder point_builder)
 {
