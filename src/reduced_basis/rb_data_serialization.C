@@ -192,52 +192,63 @@ void TransientRBEvaluationSerialization::write_to_file(
 // ---- TransientRBEvaluationSerialization (END) ----
 
 
-//// ---- RBEIMEvaluationSerialization (BEGIN) ----
-//
-//RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eim_eval)
-//  :
-//  _rb_eim_eval(rb_eim_eval)
-//{
-//}
-//
-//RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization()
-//{
-//}
-//
-//void RBEIMEvaluationSerialization::write_to_file(
-//  const std::string& path)
-//{
-//  START_LOG("write_to_file()", "RBEIMEvaluationSerialization");
-//
-//  capnp::MallocMessageBuilder message;
-//
-//  RBData::RBEIMEvaluation::Builder rb_eim_eval_builder =
-//    message.initRoot<RBData::RBEIMEvaluation>();
-//  RBData::RBEvaluation::Builder rb_eval_builder =
-//    rb_eim_eval_builder.initRbEvaluation();
-//
-//  add_rb_eim_evaluation_data_to_builder(_rb_eim_eval, rb_eval_builder, rb_eim_eval_builder);
-//
-//  libMesh::out << "Writing RBEIMEvaluation capnp buffer to " <<  path << std::endl;
-//
-//  int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-//  if(!fd)
-//  {
-//    libmesh_error_msg("Error opening a write-only file descriptor to " + path);
-//  }
-//
-//  capnp::writeMessageToFd(fd, messagemessage);
-//
-//  int error = close(fd);
-//  if(error)
-//  {
-//    libmesh_error_msg("Error closing a write-only file descriptor to " + path);
-//  }
-//
-//  STOP_LOG("write_to_file()", "RBEIMEvaluationSerialization");
-//}
-//
-//// ---- RBEIMEvaluationSerialization (END) ----
+// ---- RBEIMEvaluationSerialization (BEGIN) ----
+
+RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eim_eval)
+  :
+  _rb_eim_eval(rb_eim_eval)
+{
+}
+
+RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization()
+{
+}
+
+void RBEIMEvaluationSerialization::write_to_file(
+  const std::string& path)
+{
+  START_LOG("write_to_file()", "RBEIMEvaluationSerialization");
+
+  libMesh::out << "Writing RBEIMEvaluation capnp buffer to " <<  path << std::endl;
+
+  if(_rb_eim_eval.comm().rank() == 0)
+  {
+    capnp::MallocMessageBuilder message;
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+    RBData::RBEIMEvaluationReal::Builder rb_eim_eval_builder =
+      message.initRoot<RBData::RBEIMEvaluationReal>();
+    RBData::RBEvaluationReal::Builder rb_eval_builder =
+      rb_eim_eval_builder.initRbEvaluation();
+#else
+    RBData::RBEIMEvaluationComplex::Builder rb_eim_eval_builder =
+      message.initRoot<RBData::RBEIMEvaluationComplex>();
+    RBData::RBEvaluationComplex::Builder rb_eval_builder =
+      rb_eim_eval_builder.initRbEvaluation();
+#endif
+
+    add_rb_eim_evaluation_data_to_builder(
+      _rb_eim_eval, rb_eval_builder, rb_eim_eval_builder);
+
+    int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    if(!fd)
+    {
+      libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+    }
+
+    capnp::writeMessageToFd(fd, message);
+
+    int error = close(fd);
+    if(error)
+    {
+      libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+    }
+  }
+
+  STOP_LOG("write_to_file()", "RBEIMEvaluationSerialization");
+}
+
+// ---- RBEIMEvaluationSerialization (END) ----
 
 
 // ---- RBSCMEvaluationSerialization (BEGIN) ----
@@ -638,98 +649,99 @@ void add_transient_rb_evaluation_data_to_builder(
 
 }
 
-//void RBDataSerialization::add_rb_eim_evaluation_data_to_builder(
-//  RBEIMEvaluation& rb_eim_evaluation,
-//  RBData::RBEvaluation::Builder& rb_eim_evaluation_builder,
-//  RBData::RBEIMEvaluation::Builder& rb_eim_evaluation_builder)
-//{
-//  add_rb_evaluation_data_to_builder(rb_eim_evaluation, rb_eval_builder);
-//
-//  unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
-//
-//  // EIM interpolation matrix (with extra row for EIM error bound)
-//  {
-//    // We store the lower triangular part of an NxN matrix, the size of which is given by
-//    // (N(N + 1))/2
-//    unsigned int half_matrix_size = n_bfs*(n_bfs+1)/2;
-//
-//    auto interpolation_matrix_list =
-//      rb_eim_evaluation_builder.initInterpolationMatrix(half_matrix_size);
-//    for(unsigned int i=0; i < n_bfs; ++i)
-//      for(unsigned int j=0; j <= i; ++j)
-//      {
-//        unsigned int offset = i*(i+1)/2 + j;
-//        set_scalar_in_list(
-//          interpolation_matrix_list,
-//          offset,
-//          rb_eim_evaluation.interpolation_matrix(i,j));
-//      }
-//
-//    auto extra_interpolation_matrix_row_list =
-//      rb_eim_evaluation_builder.initExtraInterpolationMatrixRow(n_bfs);
-//    for(unsigned int j=0; j < n_bfs; ++j)
-//      set_scalar_in_list(
-//        extra_interpolation_matrix_row_list,
-//        j,
-//        rb_eim_evaluation.extra_interpolation_matrix_row(j));
-//  }
-//
-//  // Interpolation points (including the extra point)
-//  {
-//    auto interpolation_points_list =
-//      rb_eim_evaluation_builder.initInterpolationPoints(n_bfs);
-//    for(unsigned int i=0; i < n_bfs; ++i)
-//      add_point_to_builder(
-//        rb_eim_evaluation.interpolation_points[i],
-//        interpolation_points_list[i]);
-//
-//    auto extra_interpolation_point_builder =
-//      rb_eim_evaluation_builder.initExtraInterpolationPoint();
-//    add_point_to_builder(
-//      rb_eim_evaluation.extra_interpolation_point,
-//      extra_interpolation_point_builder);
-//  }
-//
-//  // Interpolation points variables (including the "extra one")
-//  {
-//    auto interpolation_points_var_list =
-//      rb_eim_evaluation_builder.initInterpolationPointsVar(n_bfs);
-//    for(unsigned int i=0; i<n_bfs; ++i)
-//      interpolation_points_var_list.set(
-//        i,
-//        rb_eim_evaluation.interpolation_points_var[i]);
-//
-//    rb_eim_evaluation_builder.setExtraInterpolationPointVar(
-//      rb_eim_evaluation.extra_interpolation_point_var);
-//  }
-//
-//  // Interpolation elements (including the "extra one")
-//  {
-//    unsigned int n_interpolation_elems =
-//      rb_eim_evaluation.interpolation_points_elem.size();
-//    auto interpolation_points_elem_list =
-//      rb_eim_evaluation_builder.initInterpolationPointsElems(n_interpolation_elems);
-//
-//    if(n_interpolation_elems != n_bfs)
-//    {
-//      libmesh_error_msg(
-//        "The number of elements should match the number of basis functions");
-//    }
-//
-//    for(unsigned int i=0; i<n_interpolation_elems; ++i)
-//    {
-//      const libMesh::Elem& elem = *rb_eim_evaluation.interpolation_points_elem[i];
-//      auto mesh_elem_builder = interpolation_points_elem_list[i];
-//      add_elem_to_builder(elem, mesh_elem_builder);
-//    }
-//
-//    auto extra_interpolation_point_elem_builder =
-//      rb_eim_evaluation_builder.initExtraInterpolationPointElem();
-//    add_elem_to_builder(
-//      *rb_eim_evaluation.extra_interpolation_point_elem,
-//      extra_interpolation_point_elem_builder);
-//  }
-//}
+template <typename RBEvaluationBuilderNumber, typename RBEIMEvaluationBuilderNumber>
+void add_rb_eim_evaluation_data_to_builder(
+  RBEIMEvaluation& rb_eim_evaluation,
+  RBEvaluationBuilderNumber& rb_evaluation_builder,
+  RBEIMEvaluationBuilderNumber& rb_eim_evaluation_builder)
+{
+  add_rb_evaluation_data_to_builder(rb_eim_evaluation, rb_evaluation_builder);
+
+  unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
+
+  // EIM interpolation matrix (with extra row for EIM error bound)
+  {
+    // We store the lower triangular part of an NxN matrix, the size of which is given by
+    // (N(N + 1))/2
+    unsigned int half_matrix_size = n_bfs*(n_bfs+1)/2;
+
+    auto interpolation_matrix_list =
+      rb_eim_evaluation_builder.initInterpolationMatrix(half_matrix_size);
+    for(unsigned int i=0; i < n_bfs; ++i)
+      for(unsigned int j=0; j <= i; ++j)
+      {
+        unsigned int offset = i*(i+1)/2 + j;
+        set_scalar_in_list(
+          interpolation_matrix_list,
+          offset,
+          rb_eim_evaluation.interpolation_matrix(i,j));
+      }
+
+    auto extra_interpolation_matrix_row_list =
+      rb_eim_evaluation_builder.initExtraInterpolationMatrixRow(n_bfs);
+    for(unsigned int j=0; j < n_bfs; ++j)
+      set_scalar_in_list(
+        extra_interpolation_matrix_row_list,
+        j,
+        rb_eim_evaluation.extra_interpolation_matrix_row(j));
+  }
+
+  // Interpolation points (including the extra point)
+  {
+    auto interpolation_points_list =
+      rb_eim_evaluation_builder.initInterpolationPoints(n_bfs);
+    for(unsigned int i=0; i < n_bfs; ++i)
+      add_point_to_builder(
+        rb_eim_evaluation.interpolation_points[i],
+        interpolation_points_list[i]);
+
+    auto extra_interpolation_point_builder =
+      rb_eim_evaluation_builder.initExtraInterpolationPoint();
+    add_point_to_builder(
+      rb_eim_evaluation.extra_interpolation_point,
+      extra_interpolation_point_builder);
+  }
+
+  // Interpolation points variables (including the "extra one")
+  {
+    auto interpolation_points_var_list =
+      rb_eim_evaluation_builder.initInterpolationPointsVar(n_bfs);
+    for(unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_var_list.set(
+        i,
+        rb_eim_evaluation.interpolation_points_var[i]);
+
+    rb_eim_evaluation_builder.setExtraInterpolationPointVar(
+      rb_eim_evaluation.extra_interpolation_point_var);
+  }
+
+  // Interpolation elements (including the "extra one")
+  {
+    unsigned int n_interpolation_elems =
+      rb_eim_evaluation.interpolation_points_elem.size();
+    auto interpolation_points_elem_list =
+      rb_eim_evaluation_builder.initInterpolationPointsElems(n_interpolation_elems);
+
+    if(n_interpolation_elems != n_bfs)
+    {
+      libmesh_error_msg(
+        "The number of elements should match the number of basis functions");
+    }
+
+    for(unsigned int i=0; i<n_interpolation_elems; ++i)
+    {
+      const libMesh::Elem& elem = *rb_eim_evaluation.interpolation_points_elem[i];
+      auto mesh_elem_builder = interpolation_points_elem_list[i];
+      add_elem_to_builder(elem, mesh_elem_builder);
+    }
+
+    auto extra_interpolation_point_elem_builder =
+      rb_eim_evaluation_builder.initExtraInterpolationPointElem();
+    add_elem_to_builder(
+      *rb_eim_evaluation.extra_interpolation_point_elem,
+      extra_interpolation_point_elem_builder);
+  }
+}
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 void add_rb_scm_evaluation_data_to_builder(

@@ -87,38 +87,38 @@ private:
 
 };
 
-///**
-// * This class de-serializes a RBEIMEvaluation object
-// * using the Cap'n Proto library.
-// */
-//class RBEIMEvaluationDeserialization
-//{
-//public:
-//
-//  /**
-//   * Initialize a new buffer using the structure from the Cap'n'Proto schema
-//   * described in rb_data.capnp.
-//   */
-//  RBEIMEvaluationDeserialization(RBEIMEvaluation& trans_rb_eval);
-//
-//  /**
-//   * Destructor.
-//   */
-//  virtual ~RBEIMEvaluationDeserialization();
-//  
-//  /**
-//   * Write the Cap'n'Proto buffer to disk.
-//   */
-//  void read_from_file(const std::string& path, bool read_error_bound_data);
-//
-//private:
-//
-//  /**
-//   * The RBEIMEvaluation object we will read into.
-//   */
-//  RBEIMEvaluation& _rb_eim_eval;
-//
-//};
+/**
+ * This class de-serializes a RBEIMEvaluation object
+ * using the Cap'n Proto library.
+ */
+class RBEIMEvaluationDeserialization
+{
+public:
+
+  /**
+   * Initialize a new buffer using the structure from the Cap'n'Proto schema
+   * described in rb_data.capnp.
+   */
+  RBEIMEvaluationDeserialization(RBEIMEvaluation& trans_rb_eval);
+
+  /**
+   * Destructor.
+   */
+  virtual ~RBEIMEvaluationDeserialization();
+  
+  /**
+   * Write the Cap'n'Proto buffer to disk.
+   */
+  void read_from_file(const std::string& path);
+
+private:
+
+  /**
+   * The RBEIMEvaluation object we will read into.
+   */
+  RBEIMEvaluation& _rb_eim_eval;
+
+};
 
 // RBSCMEvaluation should only be available
 // if SLEPc and GLPK support is enabled.
@@ -178,6 +178,7 @@ void load_rb_evaluation_data(
 
 /**
  * Load an RB evaluation from a corresponding reader structure in the buffer.
+ * Templated to deal with both Real and Complex numbers.
  */
 template <typename RBEvaluationReaderNumber, typename TransRBEvaluationReaderNumber>
 void load_transient_rb_evaluation_data(
@@ -186,18 +187,23 @@ void load_transient_rb_evaluation_data(
   TransRBEvaluationReaderNumber& trans_rb_eval_reader,
   bool read_error_bound_data);
 
-///**
-// * Load an EIM RB evaluation from a corresponding reader structure in the buffer.
-// */
-//void load_rb_eim_evaluation_data(
-//  RBEIMEvaluation& rb_eim_eval,
-//  RBData::RBEvaluation::Reader& rb_evaluation_reader,
-//  RBData::RBEIMEvaluation::Reader& rb_eim_eval_reader,
-//  bool read_error_bound_data);
+/**
+ * Load an EIM RB evaluation from a corresponding reader structure in the buffer.
+ * Templated to deal with both Real and Complex numbers.
+ */
+template <typename RBEvaluationReaderNumber, typename RBEIMEvaluationReaderNumber>
+void load_rb_eim_evaluation_data(
+  RBEIMEvaluation& rb_eim_eval,
+  RBEvaluationReaderNumber& rb_evaluation_reader,
+  RBEIMEvaluationReaderNumber& rb_eim_eval_reader);
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 /**
  * Load an SCM RB evaluation from a corresponding reader structure in the buffer.
+ * Unlike the other functions above, this does not need
+ * to be templated because an RBSCMEvaluation only stores
+ * Real values, and hence doesn't depend on whether we're
+ * using complex numbers or not.
  */
 void load_rb_scm_evaluation_data(
   RBSCMEvaluation& rb_scm_eval,

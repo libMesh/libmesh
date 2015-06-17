@@ -7,6 +7,7 @@
 // libMesh/reduced_basis includes
 #include "libmesh/rb_evaluation.h"
 #include "libmesh/transient_rb_evaluation.h"
+#include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
 #include "libmesh/rb_data.capnp.h"
 #include "libmesh/libmesh_config.h"
@@ -88,38 +89,38 @@ private:
 
 };
 
-///**
-// * This class serializes an RBEIMEvaluation object
-// * using the Cap'n Proto library.
-// */ 
-//class RBEIMEvaluationSerialization
-//{
-//public:
-//
-//  /**
-//   * Initialize a new buffer using the structure from the Cap'n'Proto schema
-//   * described in rb_data.capnp.
-//   */
-//  RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eval);
-//
-//  /**
-//   * Destructor.
-//   */
-//  virtual ~RBEIMEvaluationSerialization();
-//  
-//  /**
-//   * Write the Cap'n'Proto buffer to disk.
-//   */
-//  void write_to_file(const std::string& path);
-//
-//private:
-//
-//  /**
-//   * The RBEvaluation object that will be written to disk.
-//   */
-//  RBEIMEvaluation& _rb_eim_eval;
-//
-//};
+/**
+ * This class serializes an RBEIMEvaluation object
+ * using the Cap'n Proto library.
+ */ 
+class RBEIMEvaluationSerialization
+{
+public:
+
+  /**
+   * Initialize a new buffer using the structure from the Cap'n'Proto schema
+   * described in rb_data.capnp.
+   */
+  RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eval);
+
+  /**
+   * Destructor.
+   */
+  virtual ~RBEIMEvaluationSerialization();
+  
+  /**
+   * Write the Cap'n'Proto buffer to disk.
+   */
+  void write_to_file(const std::string& path);
+
+private:
+
+  /**
+   * The RBEvaluation object that will be written to disk.
+   */
+  RBEIMEvaluation& _rb_eim_eval;
+
+};
 
 // RBSCMEvaluation should only be available
 // if SLEPc and GLPK support is enabled.
@@ -157,7 +158,6 @@ private:
   RBSCMEvaluation& _rb_scm_eval;
 
 };
-
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 /**
@@ -178,6 +178,7 @@ void add_rb_evaluation_data_to_builder(
 
 /**
  * Add data for a TransientRBEvaluation to the builder.
+ * Templated to deal with both Real and Complex numbers.
  */
 template <typename RBEvaluationBuilderNumber, typename TransRBEvaluationBuilderNumber>
 void add_transient_rb_evaluation_data_to_builder(
@@ -185,17 +186,23 @@ void add_transient_rb_evaluation_data_to_builder(
   RBEvaluationBuilderNumber& rb_eval_builder,
   TransRBEvaluationBuilderNumber& trans_rb_eval_builder);
 
-///**
-// * Add data for an RBEIMEvaluation to the builder.
-// */
-//void add_rb_eim_evaluation_data_to_builder(
-//  RBEIMEvaluation& rb_eim_eval,
-//  RBData::RBEvaluation::Builder& rb_eval_builder,
-//  RBData::RBEIMEvaluation::Builder& rb_eim_eval_builder);
+/**
+ * Add data for an RBEIMEvaluation to the builder.
+ * Templated to deal with both Real and Complex numbers.
+ */
+template <typename RBEvaluationBuilderNumber, typename RBEIMEvaluationBuilderNumber>
+void add_rb_eim_evaluation_data_to_builder(
+  RBEIMEvaluation& rb_eim_eval,
+  RBEvaluationBuilderNumber& rb_eval_builder,
+  RBEIMEvaluationBuilderNumber& rb_eim_eval_builder);
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 /**
  * Add data for an RBSCMEvaluation to the builder.
+ * Unlike the other functions above, this does not need
+ * to be templated because an RBSCMEvaluation only stores
+ * Real values, and hence doesn't depend on whether we're
+ * using complex numbers or not.
  */
 void add_rb_scm_evaluation_data_to_builder(
   RBSCMEvaluation& rb_scm_eval,
