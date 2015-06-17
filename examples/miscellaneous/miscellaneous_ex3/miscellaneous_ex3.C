@@ -73,12 +73,14 @@ using namespace libMesh;
  */
 class LaplaceYoung :
   public NonlinearImplicitSystem::ComputeResidual,
-  public NonlinearImplicitSystem::ComputeJacobian
+  public NonlinearImplicitSystem::ComputeJacobian,
+  public NonlinearImplicitSystem::ComputePostCheck
 {
 public:
   LaplaceYoung() :
     _kappa(1.),
-    _sigma(0.2)
+    _sigma(0.2),
+    _gamma(1.0)
   {}
 
   /**
@@ -95,9 +97,39 @@ public:
                          SparseMatrix<Number>& J,
                          NonlinearImplicitSystem& S);
 
+  /**
+   * Function which performs a postcheck on the solution.  In this
+   * example, we take a "damped" Newton step defined by:
+   *
+   * u_new = u_old + gamma*delta_u
+   *
+   * where delta_u is the search direction, and 0 < gamma <= 1 is a
+   * damping parameter.  gamma=1 corresponds to a full Newton step.
+   * We can rewrite this in a slightly more convenient way as:
+   *
+   * u_new <-- u_old + gamma*delta_u
+   *       <-- u_old + gamma*delta_u + delta_u - delta_u    (add/subtract delta_u)
+   *       <-- u_old + delta_u + (gamma-1)*delta_u
+   *       <-- u_old + (u_new - u_old) + (gamma-1)*delta_u
+   *       <-- u_new + (gamma-1)*delta_u
+   *
+   * This is really for demonstration purposes only, as it just
+   * degrades the rate of nonlinear convergence in this particular
+   * example.
+   */
+  virtual void postcheck (const NumericVector<Number> & old_soln,
+                          NumericVector<Number> & search_direction,
+                          NumericVector<Number> & new_soln,
+                          bool & changed_search_direction,
+                          bool & changed_new_soln,
+                          NonlinearImplicitSystem & S);
+
 private:
   Real _kappa;
   Real _sigma;
+
+  // Damping factor used for the solve postcheck
+  Real _gamma;
 };
 
 
@@ -223,6 +255,7 @@ int main (int argc, char** argv)
   LaplaceYoung laplace_young;
   system.nonlinear_solver->residual_object = &laplace_young;
   system.nonlinear_solver->jacobian_object = &laplace_young;
+  system.nonlinear_solver->postcheck_object = &laplace_young;
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -561,4 +594,21 @@ void LaplaceYoung::jacobian (const NumericVector<Number>& soln,
     }
 
   // That's it.
+}
+
+
+
+// Jacobian assembly function for the Laplace-Young system
+void LaplaceYoung::postcheck (const NumericVector<Number> & /*old_soln*/,
+                              NumericVector<Number> & search_direction,
+                              NumericVector<Number> & new_soln,
+                              bool & /*changed_search_direction*/,
+                              bool & changed_new_soln,
+                              NonlinearImplicitSystem & /*S*/)
+{
+  // Back up along the search direction by some amount.  Since Newton
+  // already works well for this problem, the only affect of this is
+  // to degrade the rate of convergence.
+  new_soln.add(_gamma - 1., search_direction);
+  changed_new_soln = true;
 }
