@@ -1,6 +1,9 @@
 #ifndef RB_DATA_SERIALIZATION_H
 #define RB_DATA_SERIALIZATION_H
 
+#include "libmesh/libmesh_config.h"
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+
 // C++ includes
 #include <string>
 
@@ -10,9 +13,6 @@
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
 #include "libmesh/rb_data.capnp.h"
-#include "libmesh/libmesh_config.h"
-
-#if defined(LIBMESH_HAVE_CAPNPROTO)
 
 // Cap'n'Proto includes
 #include "capnp/message.h"

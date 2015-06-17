@@ -1,10 +1,11 @@
+#include "libmesh/libmesh_config.h"
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+
 //libMesh includes
 #include "libmesh/rb_data_serialization.h"
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/transient_rb_theta_expansion.h"
-
-#if defined(LIBMESH_HAVE_CAPNPROTO)
 
 // Cap'n'Proto includes
 #include <capnp/serialize.h>

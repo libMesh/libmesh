@@ -1,6 +1,10 @@
 #ifndef RB_DATA_DESERIALIZATION_H
 #define RB_DATA_DESERIALIZATION_H
 
+// This class is only available if we have Cap'n Proto
+#include "libmesh/libmesh_config.h"
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+
 // libMesh/reduced_basis includes
 #include "libmesh/transient_rb_evaluation.h"
 #include "libmesh/rb_eim_evaluation.h"
@@ -11,9 +15,6 @@
 #include "capnp/message.h"
 
 // C++ includes
-
-// This class is only available if we have Cap'n Proto
-#if defined(LIBMESH_HAVE_CAPNPROTO)
 
 namespace libMesh
 {
