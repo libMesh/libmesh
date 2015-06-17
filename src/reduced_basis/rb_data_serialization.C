@@ -2,6 +2,7 @@
 #include "libmesh/rb_data_serialization.h"
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/transient_rb_theta_expansion.h"
 
 #if defined(LIBMESH_HAVE_CAPNPROTO)
 
@@ -130,57 +131,67 @@ void RBEvaluationSerialization::write_to_file(
 // ---- RBEvaluationSerialization (END) ----
 
 
-//// ---- TransientRBEvaluationSerialization (BEGIN) ----
-//
-//TransientRBEvaluationSerialization::TransientRBEvaluationSerialization(
-//  TransientRBEvaluation& trans_rb_eim_eval)
-//  :
-//  _trans_rb_eim_eval(trans_rb_eim_eval)
-//{
-//}
-//
-//TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization()
-//{
-//}
-//
-//void TransientRBEvaluationSerialization::write_to_file(
-//  const std::string& path)
-//{
-//  START_LOG("write_to_file()", "TransientRBEvaluationSerialization");
-//
-//  capnp::MallocMessageBuilder message;
-//
-//  RBData::TransientRBEvaluation::Builder trans_rb_eval_builder =
-//    message.initRoot<RBData::TransientRBEvaluation>();
-//  RBData::RBEvaluation::Builder rb_eval_builder =
-//    trans_rb_eval_builder.initRbEvaluation();
-//
-//  add_transient_rb_evaluation_data_to_builder(
-//    _trans_rb_eval, rb_eval_builder, rb_eim_eval_builder);
-//
-//  libMesh::out << "Writing TransientRBEvaluation capnp buffer to "
-//    <<  path << std::endl;
-//
-//  int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
-//  if(!fd)
-//  {
-//    libmesh_error_msg("Error opening a write-only file descriptor to " + path);
-//  }
-//
-//  capnp::writeMessageToFd(fd, message);
-//
-//  int error = close(fd);
-//  if(error)
-//  {
-//    libmesh_error_msg("Error closing a write-only file descriptor to " + path);
-//  }
-//
-//  STOP_LOG("write_to_file()", "TransientRBEvaluationSerialization");
-//}
-//
-//// ---- TransientRBEvaluationSerialization (END) ----
-//
-//
+// ---- TransientRBEvaluationSerialization (BEGIN) ----
+
+TransientRBEvaluationSerialization::TransientRBEvaluationSerialization(
+  TransientRBEvaluation& trans_rb_eval)
+  :
+  _trans_rb_eval(trans_rb_eval)
+{
+}
+
+TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization()
+{
+}
+
+void TransientRBEvaluationSerialization::write_to_file(
+  const std::string& path)
+{
+  START_LOG("write_to_file()", "TransientRBEvaluationSerialization");
+
+  libMesh::out << "Writing TransientRBEvaluation capnp buffer to "
+    <<  path << std::endl;
+
+  if(_trans_rb_eval.comm().rank() == 0)
+  {
+    capnp::MallocMessageBuilder message;
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+    RBData::TransientRBEvaluationReal::Builder trans_rb_eval_builder =
+      message.initRoot<RBData::TransientRBEvaluationReal>();
+    RBData::RBEvaluationReal::Builder rb_eval_builder =
+      trans_rb_eval_builder.initRbEvaluation();
+#else
+    RBData::TransientRBEvaluationComplex::Builder trans_rb_eval_builder =
+      message.initRoot<RBData::TransientRBEvaluationComplex>();
+    RBData::RBEvaluationComplex::Builder rb_eval_builder =
+      trans_rb_eval_builder.initRbEvaluation();
+#endif
+
+    add_transient_rb_evaluation_data_to_builder(
+      _trans_rb_eval, rb_eval_builder, trans_rb_eval_builder);
+
+    int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    if(!fd)
+    {
+      libmesh_error_msg("Error opening a write-only file descriptor to " + path);
+    }
+
+    capnp::writeMessageToFd(fd, message);
+
+    int error = close(fd);
+    if(error)
+    {
+      libmesh_error_msg("Error closing a write-only file descriptor to " + path);
+    }
+  }
+
+  STOP_LOG("write_to_file()", "TransientRBEvaluationSerialization");
+}
+
+// ---- TransientRBEvaluationSerialization (END) ----
+
+
 //// ---- RBEIMEvaluationSerialization (BEGIN) ----
 //
 //RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eim_eval)
@@ -496,131 +507,137 @@ void add_rb_evaluation_data_to_builder(
     rb_eval, parameter_ranges_list, discrete_parameters_list);
 }
 
-//void RBDataSerialization::add_transient_rb_evaluation_to_builder(
-//  TransientRBEvaluation& trans_rb_eval,
-//  RBData::RBEvaluation::Builder& rb_eval_builder,
-//  RBData::TransientRBEvaluation::Builder& trans_rb_eval_builder)
-//{
-//  add_rb_evaluation_data_to_builder(trans_rb_eval, rb_eval_builder);
-//
-//  trans_rb_eval_builder.setDeltaT(trans_rb_eval.get_delta_t());
-//  trans_rb_eval_builder.setEulerTheta(trans_rb_eval.get_euler_theta());
-//  trans_rb_eval_builder.setNTimeSteps(trans_rb_eval.get_n_time_steps());
-//  trans_rb_eval_builder.setTimeStep(trans_rb_eval.get_time_step());
-//
-//  unsigned int n_bfs = trans_rb_eval.get_n_basis_functions();
-//
-//  // L2-inner-product matrix
-//  {
-//    auto rb_L2_matrix_list =
-//      trans_rb_eval_builder.initRbL2Matrix(n_bfs*n_bfs);
-//    
-//    for(unsigned int i=0; i<n_bfs; ++i)
-//      for(unsigned int j=0; j<n_bfs; ++j)
-//      {
-//        unsigned int offset = i*n_bfs + j;
-//        set_scalar_in_list(
-//          rb_L2_matrix_list,
-//          offset,
-//          trans_rb_eval.RB_L2_matrix(i,j));
-//      }
-//  }
-//
-//  // Mq matrices
-//  {
-//    unsigned int n_M_terms = rb_theta_expansion.get_n_M_terms();
-//
-//    auto rb_Mq_matrices_outer_list = trans_rb_eval_builder.initRbMqMatrices(n_M_terms);
-//    for(unsigned int q_m=0; q_m < n_M_terms; ++q_m)
-//    {
-//      auto rb_Mq_matrices_inner_list = rb_Mq_matrices_outer_list.init(q_m, n_bfs*n_bfs);
-//      for(unsigned int i=0; i < n_bfs; ++i)
-//        for(unsigned int j=0; j < n_bfs; ++j)
-//        {
-//          unsigned int offset = i*n_bfs+j;
-//          set_scalar_in_list(rb_Mq_matrices_inner_list, offset, rb_eval.RB_Mq_vector[q_m](i,j));
-//        }
-//    }
-//  }
-//
-//  // The initial condition and L2 error at t=0.
-//  // We store the values for each RB space of dimension (0,...,n_basis_functions).
-//  {
-//    auto initial_l2_errors_builder =
-//      trans_rb_eval_builder.initInitialL2Errors(n_bfs);
-//    auto initial_conditions_outer_list =
-//      trans_rb_eval_builder.initInitialCondition(n_M_terms);
-//
-//    for(unsigned int i=0; i<n_bfs; i++)
-//    {
-//      initial_l2_errors_builder.set(i, trans_rb_eval.initial_L2_error_all_N[i]);
-//
-//      auto initial_conditions_inner_list =
-//        initial_conditions_outer_list.init(i, i+1);
-//      for(unsigned int j=0; j<=i; j++)
-//      {
-//        set_scalar_in_list(
-//          initial_conditions_inner_list,
-//          j,
-//          trans_rb_eval.RB_initial_condition_all_N[i](j));
-//      }
-//    }
-//  }
-//
-//  // FqMq representor inner-product data
-//  {
-//    auto fq_mq_innerprods_list =
-//      rb_evaluation_builder.initFqMqInnerprods(n_F_terms*n_M_terms*n_bfs);
-//
-//    for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
-//      for(unsigned int q_m=0; q_m<n_M_terms; ++q_m)
-//        for(unsigned int i=0; i<n_bfs; ++i)
-//        {
-//          unsigned int offset = q_f*n_M_terms*n_bfs + q_m*n_bfs + i;
-//          set_scalar_in_list(
-//            fq_mq_innerprods_list, offset,
-//            trans_rb_eval.Fq_Mq_representor_innerprods[q_f][q_m][i]);
-//        }
-//  }
-//
-//  // MqMq representor inner-product data
-//  {
-//    unsigned int Q_m_hat = n_M_terms*(n_M_terms+1)/2;
-//    auto mq_mq_innerprods_list =
-//      rb_evaluation_builder.initMqMqInnerprods(Q_m_hat*n_bfs*n_bfs);
-//    
-//    for(unsigned int i=0; i < Q_m_hat; ++i)
-//      for(unsigned int j=0; j < n_bfs; ++j)
-//        for(unsigned int l=0; l < n_bfs; ++l)
-//        {
-//          unsigned int offset = i*n_bfs*n_bfs + j*n_bfs + l;
-//          set_scalar_in_list(
-//            mq_mq_innerprods_list,
-//            offset,
-//            trans_rb_eval.Mq_Mq_representor_innerprods[i][j][l]);
-//        }
-//  }
-//
-//  // AqMq representor inner-product data
-//  {
-//    auto aq_mq_innerprods_list =
-//      rb_evaluation_builder.initAqMqInnerprods(n_A_terms*n_M_terms*n_bfs*n_bfs);
-//
-//    for(unsigned int q_a=0; q_a<n_A_terms; q_a++)
-//      for(unsigned int q_m=0; q_m<n_M_terms; q_m++)
-//        for(unsigned int i=0; i<n_bfs; i++)
-//          for(unsigned int j=0; j<n_bfs; j++)
-//          {
-//            unsigned int offset =
-//              q_a*(n_M_terms*n_bfs*n_bfs) + q_m*(n_bfs*n_bfs) + i*n_bfs + j;
-//            set_scalar_in_list(
-//              aq_mq_innerprods_list,
-//              offset,
-//              trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j]);
-//          }
-//  }
-//}
-//
+template <typename RBEvaluationBuilderNumber, typename TransRBEvaluationBuilderNumber>
+void add_transient_rb_evaluation_data_to_builder(
+  TransientRBEvaluation& trans_rb_eval,
+  RBEvaluationBuilderNumber& rb_eval_builder,
+  TransRBEvaluationBuilderNumber& trans_rb_eval_builder)
+{
+  add_rb_evaluation_data_to_builder(trans_rb_eval, rb_eval_builder);
+
+  trans_rb_eval_builder.setDeltaT(trans_rb_eval.get_delta_t());
+  trans_rb_eval_builder.setEulerTheta(trans_rb_eval.get_euler_theta());
+  trans_rb_eval_builder.setNTimeSteps(trans_rb_eval.get_n_time_steps());
+  trans_rb_eval_builder.setTimeStep(trans_rb_eval.get_time_step());
+
+  unsigned int n_bfs = trans_rb_eval.get_n_basis_functions();
+
+  // L2-inner-product matrix
+  {
+    auto rb_L2_matrix_list =
+      trans_rb_eval_builder.initRbL2Matrix(n_bfs*n_bfs);
+    
+    for(unsigned int i=0; i<n_bfs; ++i)
+      for(unsigned int j=0; j<n_bfs; ++j)
+      {
+        unsigned int offset = i*n_bfs + j;
+        set_scalar_in_list(
+          rb_L2_matrix_list,
+          offset,
+          trans_rb_eval.RB_L2_matrix(i,j));
+      }
+  }
+
+  TransientRBThetaExpansion& trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion&>(trans_rb_eval.get_rb_theta_expansion());
+  unsigned int n_M_terms = trans_theta_expansion.get_n_M_terms();
+  // Mq matrices
+  {
+    auto rb_Mq_matrices_outer_list = trans_rb_eval_builder.initRbMqMatrices(n_M_terms);
+    for(unsigned int q_m=0; q_m < n_M_terms; ++q_m)
+    {
+      auto rb_Mq_matrices_inner_list = rb_Mq_matrices_outer_list.init(q_m, n_bfs*n_bfs);
+      for(unsigned int i=0; i < n_bfs; ++i)
+        for(unsigned int j=0; j < n_bfs; ++j)
+        {
+          unsigned int offset = i*n_bfs+j;
+          set_scalar_in_list(rb_Mq_matrices_inner_list, offset, trans_rb_eval.RB_M_q_vector[q_m](i,j));
+        }
+    }
+  }
+
+  // The initial condition and L2 error at t=0.
+  // We store the values for each RB space of dimension (0,...,n_basis_functions).
+  {
+    auto initial_l2_errors_builder =
+      trans_rb_eval_builder.initInitialL2Errors(n_bfs);
+    auto initial_conditions_outer_list =
+      trans_rb_eval_builder.initInitialConditions(n_bfs);
+
+    for(unsigned int i=0; i<n_bfs; i++)
+    {
+      initial_l2_errors_builder.set(i, trans_rb_eval.initial_L2_error_all_N[i]);
+
+      auto initial_conditions_inner_list =
+        initial_conditions_outer_list.init(i, i+1);
+      for(unsigned int j=0; j<=i; j++)
+      {
+        set_scalar_in_list(
+          initial_conditions_inner_list,
+          j,
+          trans_rb_eval.RB_initial_condition_all_N[i](j));
+      }
+    }
+  }
+
+  // FqMq representor inner-product data
+  {
+    unsigned int n_F_terms = trans_theta_expansion.get_n_F_terms();
+    auto fq_mq_innerprods_list =
+      trans_rb_eval_builder.initFqMqInnerprods(n_F_terms*n_M_terms*n_bfs);
+
+    for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
+      for(unsigned int q_m=0; q_m<n_M_terms; ++q_m)
+        for(unsigned int i=0; i<n_bfs; ++i)
+        {
+          unsigned int offset = q_f*n_M_terms*n_bfs + q_m*n_bfs + i;
+          set_scalar_in_list(
+            fq_mq_innerprods_list, offset,
+            trans_rb_eval.Fq_Mq_representor_innerprods[q_f][q_m][i]);
+        }
+  }
+
+  // MqMq representor inner-product data
+  {
+    unsigned int Q_m_hat = n_M_terms*(n_M_terms+1)/2;
+    auto mq_mq_innerprods_list =
+      trans_rb_eval_builder.initMqMqInnerprods(Q_m_hat*n_bfs*n_bfs);
+    
+    for(unsigned int i=0; i < Q_m_hat; ++i)
+      for(unsigned int j=0; j < n_bfs; ++j)
+        for(unsigned int l=0; l < n_bfs; ++l)
+        {
+          unsigned int offset = i*n_bfs*n_bfs + j*n_bfs + l;
+          set_scalar_in_list(
+            mq_mq_innerprods_list,
+            offset,
+            trans_rb_eval.Mq_Mq_representor_innerprods[i][j][l]);
+        }
+  }
+
+  // AqMq representor inner-product data
+  {
+    unsigned int n_A_terms = trans_theta_expansion.get_n_A_terms();
+
+    auto aq_mq_innerprods_list =
+      trans_rb_eval_builder.initAqMqInnerprods(n_A_terms*n_M_terms*n_bfs*n_bfs);
+
+    for(unsigned int q_a=0; q_a<n_A_terms; q_a++)
+      for(unsigned int q_m=0; q_m<n_M_terms; q_m++)
+        for(unsigned int i=0; i<n_bfs; i++)
+          for(unsigned int j=0; j<n_bfs; j++)
+          {
+            unsigned int offset =
+              q_a*(n_M_terms*n_bfs*n_bfs) + q_m*(n_bfs*n_bfs) + i*n_bfs + j;
+            set_scalar_in_list(
+              aq_mq_innerprods_list,
+              offset,
+              trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j]);
+          }
+  }
+
+}
+
 //void RBDataSerialization::add_rb_eim_evaluation_data_to_builder(
 //  RBEIMEvaluation& rb_eim_evaluation,
 //  RBData::RBEvaluation::Builder& rb_eim_evaluation_builder,

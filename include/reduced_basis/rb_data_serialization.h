@@ -6,6 +6,7 @@
 
 // libMesh/reduced_basis includes
 #include "libmesh/rb_evaluation.h"
+#include "libmesh/transient_rb_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
 #include "libmesh/rb_data.capnp.h"
 #include "libmesh/libmesh_config.h"
@@ -54,39 +55,39 @@ private:
 
 };
 
-///**
-// * This class serializes a TransientRBEvaluation object
-// * using the Cap'n Proto library.
-// */ 
-//class TransientRBEvaluationSerialization
-//{
-//public:
-//
-//  /**
-//   * Initialize a new buffer using the structure from the Cap'n'Proto schema
-//   * described in rb_data.capnp.
-//   */
-//  TransientRBEvaluationSerialization(TransientRBEvaluation& rb_eval);
-//
-//  /**
-//   * Destructor.
-//   */
-//  virtual ~TransientRBEvaluationSerialization();
-//  
-//  /**
-//   * Write the Cap'n'Proto buffer to disk.
-//   */
-//  void write_to_file(const std::string& path);
-//
-//private:
-//
-//  /**
-//   * The RBEvaluation object that will be written to disk.
-//   */
-//  TransientRBEvaluation& _trans_rb_eval;
-//
-//};
-//
+/**
+ * This class serializes a TransientRBEvaluation object
+ * using the Cap'n Proto library.
+ */ 
+class TransientRBEvaluationSerialization
+{
+public:
+
+  /**
+   * Initialize a new buffer using the structure from the Cap'n'Proto schema
+   * described in rb_data.capnp.
+   */
+  TransientRBEvaluationSerialization(TransientRBEvaluation& rb_eval);
+
+  /**
+   * Destructor.
+   */
+  virtual ~TransientRBEvaluationSerialization();
+  
+  /**
+   * Write the Cap'n'Proto buffer to disk.
+   */
+  void write_to_file(const std::string& path);
+
+private:
+
+  /**
+   * The RBEvaluation object that will be written to disk.
+   */
+  TransientRBEvaluation& _trans_rb_eval;
+
+};
+
 ///**
 // * This class serializes an RBEIMEvaluation object
 // * using the Cap'n Proto library.
@@ -175,14 +176,15 @@ void add_rb_evaluation_data_to_builder(
   RBEvaluation& rb_eval,
   RBEvaluationBuilderNumber& rb_eval_builder);
 
-///**
-// * Add data for a TransientRBEvaluation to the builder.
-// */
-//void add_transient_rb_evaluation_data_to_builder(
-//  TransientRBEvaluation& trans_rb_eval,
-//  RBData::RBEvaluation::Builder& rb_eval_builder,
-//  RBData::TransientRBEvaluation::Builder& trans_rb_eval_builder);
-//
+/**
+ * Add data for a TransientRBEvaluation to the builder.
+ */
+template <typename RBEvaluationBuilderNumber, typename TransRBEvaluationBuilderNumber>
+void add_transient_rb_evaluation_data_to_builder(
+  TransientRBEvaluation& trans_rb_eval,
+  RBEvaluationBuilderNumber& rb_eval_builder,
+  TransRBEvaluationBuilderNumber& trans_rb_eval_builder);
+
 ///**
 // * Add data for an RBEIMEvaluation to the builder.
 // */

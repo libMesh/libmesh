@@ -54,39 +54,39 @@ private:
 
 };
 
-///**
-// * This class de-serializes a TransientRBEvaluation object
-// * using the Cap'n Proto library.
-// */
-//class TransientRBEvaluationDeserialization
-//{
-//public:
-//
-//  /**
-//   * Initialize a new buffer using the structure from the Cap'n'Proto schema
-//   * described in rb_data.capnp.
-//   */
-//  TransientRBEvaluationDeserialization(TransientRBEvaluation& trans_rb_eval);
-//
-//  /**
-//   * Destructor.
-//   */
-//  virtual ~TransientRBEvaluationDeserialization();
-//  
-//  /**
-//   * Write the Cap'n'Proto buffer to disk.
-//   */
-//  void read_from_file(const std::string& path, bool read_error_bound_data);
-//
-//private:
-//
-//  /**
-//   * The TransientRBEvaluation object that we will read into.
-//   */
-//  TransientRBEvaluation& _trans_rb_eval;
-//
-//};
-//
+/**
+ * This class de-serializes a TransientRBEvaluation object
+ * using the Cap'n Proto library.
+ */
+class TransientRBEvaluationDeserialization
+{
+public:
+
+  /**
+   * Initialize a new buffer using the structure from the Cap'n'Proto schema
+   * described in rb_data.capnp.
+   */
+  TransientRBEvaluationDeserialization(TransientRBEvaluation& trans_rb_eval);
+
+  /**
+   * Destructor.
+   */
+  virtual ~TransientRBEvaluationDeserialization();
+  
+  /**
+   * Write the Cap'n'Proto buffer to disk.
+   */
+  void read_from_file(const std::string& path, bool read_error_bound_data);
+
+private:
+
+  /**
+   * The TransientRBEvaluation object that we will read into.
+   */
+  TransientRBEvaluation& _trans_rb_eval;
+
+};
+
 ///**
 // * This class de-serializes a RBEIMEvaluation object
 // * using the Cap'n Proto library.
@@ -176,15 +176,16 @@ void load_rb_evaluation_data(
   RBEvaluationReaderNumber& rb_evaluation_reader,
   bool read_error_bound_data);
 
-///**
-// * Load an RB evaluation from a corresponding reader structure in the buffer.
-// */
-//void load_transient_rb_evaluation_data(
-//  TransientRBEvaluation& trans_rb_eval,
-//  RBData::RBEvaluation::Reader& rb_evaluation_reader,
-//  RBData::TransientRBEvaluation::Reader& trans_rb_eval_reader,
-//  bool read_error_bound_data);
-//
+/**
+ * Load an RB evaluation from a corresponding reader structure in the buffer.
+ */
+template <typename RBEvaluationReaderNumber, typename TransRBEvaluationReaderNumber>
+void load_transient_rb_evaluation_data(
+  TransientRBEvaluation& trans_rb_eval,
+  RBEvaluationReaderNumber& rb_evaluation_reader,
+  TransRBEvaluationReaderNumber& trans_rb_eval_reader,
+  bool read_error_bound_data);
+
 ///**
 // * Load an EIM RB evaluation from a corresponding reader structure in the buffer.
 // */

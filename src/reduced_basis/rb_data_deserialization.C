@@ -4,6 +4,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/mesh.h"
 #include "libmesh/rb_data_deserialization.h"
+#include "libmesh/transient_rb_theta_expansion.h"
 
 #if defined(LIBMESH_HAVE_CAPNPROTO)
 
@@ -136,50 +137,58 @@ void RBEvaluationDeserialization::read_from_file(
 // ---- RBEvaluationDeserialization (END) ----
 
 
-//// ---- TransientRBEvaluationDeserialization (BEGIN) ----
-//
-//TransientRBEvaluationDeserialization::TransientRBEvaluationDeserialization(
-//  TransientRBEvaluation& trans_rb_eval)
-//  :
-//  _trans_rb_eval(trans_rb_eval)
-//{}
-//
-//TransientRBEvaluationDeserialization::~TransientRBEvaluationDeserialization()
-//{}
-//
-//void TransientRBEvaluationDeserialization::read_from_file(
-//  const std::string& path,
-//  bool read_error_bound_data)
-//{
-//  START_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
-//
-//  libMesh::out << "Reading TransientRBEvaluation capnp buffer from " <<  path << std::endl;
-//  int fd = open(path.c_str(), O_RDONLY);
-//  if(!fd)
-//  {
-//    libmesh_error_msg("Couldn't open the buffer file: " + path);
-//  }
-//
-//  // Turn off the limit to the amount of data we can read in
-//  capnp::ReaderOptions reader_options;
-//  reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
-//
-//  capnp::FdMessageReader message(fd, reader_options);
-//
-//  RBData::TransientRBEvaluation::Reader trans_rb_eval_reader =
-//    message.getRoot<RBData::TransientRBEvaluation>();
-//  RBData::RBEvaluation::Builder rb_eval_reader =
-//    trans_rb_eval_reader.getRbEvaluation();
-//
-//  load_transient_rb_evaluation_data(
-//    _trans_rb_eval, rb_eval_reader, trans_rb_eval_reader, read_error_bound_data);
-//
-//  STOP_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
-//}
-//
-//// ---- TransientRBEvaluationDeserialization (END) ----
-//
-//
+// ---- TransientRBEvaluationDeserialization (BEGIN) ----
+
+TransientRBEvaluationDeserialization::TransientRBEvaluationDeserialization(
+  TransientRBEvaluation& trans_rb_eval)
+  :
+  _trans_rb_eval(trans_rb_eval)
+{}
+
+TransientRBEvaluationDeserialization::~TransientRBEvaluationDeserialization()
+{}
+
+void TransientRBEvaluationDeserialization::read_from_file(
+  const std::string& path,
+  bool read_error_bound_data)
+{
+  START_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
+
+  libMesh::out << "Reading TransientRBEvaluation capnp buffer from " <<  path << std::endl;
+
+  int fd = open(path.c_str(), O_RDONLY);
+  if(!fd)
+  {
+    libmesh_error_msg("Couldn't open the buffer file: " + path);
+  }
+
+  // Turn off the limit to the amount of data we can read in
+  capnp::ReaderOptions reader_options;
+  reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
+
+  capnp::StreamFdMessageReader message(fd, reader_options);
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+  RBData::TransientRBEvaluationReal::Reader trans_rb_eval_reader =
+    message.getRoot<RBData::TransientRBEvaluationReal>();
+  RBData::RBEvaluationReal::Reader rb_eval_reader =
+    trans_rb_eval_reader.getRbEvaluation();
+#else
+  RBData::TransientRBEvaluationComplex::Reader trans_rb_eval_reader =
+    message.getRoot<RBData::TransientRBEvaluationComplex>();
+  RBData::RBEvaluationComplex::Reader rb_eval_reader =
+    trans_rb_eval_reader.getRbEvaluation();
+#endif
+
+  load_transient_rb_evaluation_data(
+    _trans_rb_eval, rb_eval_reader, trans_rb_eval_reader, read_error_bound_data);
+
+  STOP_LOG("read_from_file()", "TransientRBEvaluationDeserialization");
+}
+
+// ---- TransientRBEvaluationDeserialization (END) ----
+
+
 //// ---- RBEIMEvaluationDeserialization (BEGIN) ----
 //
 //RBEIMEvaluationDeserialization::RBEIMEvaluationDeserialization(
@@ -525,179 +534,182 @@ void load_rb_evaluation_data(
   }
 }
 
+template <typename RBEvaluationReaderNumber, typename TransRBEvaluationReaderNumber>
+void load_transient_rb_evaluation_data(
+  TransientRBEvaluation& trans_rb_eval,
+  RBEvaluationReaderNumber& rb_eval_reader,
+  TransRBEvaluationReaderNumber& trans_rb_eval_reader,
+  bool read_error_bound_data)
+{
+  load_rb_evaluation_data(
+    trans_rb_eval, rb_eval_reader, read_error_bound_data);
 
-//void RBDataSerialization::load_transient_rb_evaluation(
-//  TransientRBEvaluation& trans_rb_eval,
-//  RBData::RBEvaluation::Reader& rb_eval_reader,
-//  RBData::TransientRBEvaluation::Reader& trans_rb_eval_reader,
-//  bool read_error_bound_data)
-//{
-//  load_rb_evaluation_data(
-//    trans_rb_eval, rb_eval_builder, read_error_bound_data);
-//
-//  trans_rb_eval.set_delta_t( trans_rb_eval_reader.getDeltaT() );
-//  trans_rb_eval.set_euler_theta( trans_rb_eval_reader.getEulerTheta() );
-//  trans_rb_eval.set_n_time_steps( trans_rb_eval_reader.getNTimeSteps() );
-//  trans_rb_eval.set_time_step( trans_rb_eval_reader.getTimeStep() );
-//
-//  // L2 matrix
-//  {
-//    auto rb_L2_matrix_list =
-//      rb_evaluation_reader.getRbL2Matrix();
-//
-//    if(rb_L2_matrix_list.size() != n_bfs*n_bfs)
-//    {
-//      libmesh_error_msg("Size error while reading the L2 matrix.");
-//    }
-//
-//    for(unsigned int i=0; i<n_bfs; ++i)
-//      for(unsigned int j=0; j<n_bfs; ++j)
-//      {
-//        unsigned int offset = i*n_bfs + j;
-//        trans_rb_eval.RB_L2_matrix(i,j) =
-//          load_scalar_value(rb_inner_product_matrix_list[offset]);
-//      }
-//  }
-//
-//  // Mq matrices
-//  {
-//    unsigned int n_M_terms = rb_theta_expansion.get_n_M_terms();
-//
-//    auto rb_Mq_matrices_outer_list = trans_rb_eval_builder.getRbMqMatrices();
-//
-//    if(rb_Mq_matrices_outer_list.size() != n_M_terms)
-//    {
-//      libmesh_error_msg("Incorrect number of Mq matrices detected in the buffer");
-//    }
-//
-//    for(unsigned int q_m=0; q_m < n_M_terms; ++q_m)
-//    {
-//      auto rb_Mq_matrices_inner_list = rb_Mq_matrices_outer_list[q_m];
-//      if(rb_Mq_matrices_inner_list.size() != n_bfs*n_bfs)
-//      {
-//        libmesh_error_msg("Incorrect Mq matrix size detected in the buffer");
-//      }
-//
-//      for(unsigned int i=0; i<n_bfs; ++i)
-//        for(unsigned int j=0; j<n_bfs; ++j)
-//        {
-//          unsigned int offset = i*n_bfs+j;
-//          trans_rb_eval.RB_M_q_vector[q_m](i,j) =
-//            load_scalar_value(rb_Mq_matrices_inner_list[offset]);
-//        }
-//    }
-//  }
-//
-//  // The initial condition and L2 error at t=0.
-//  {
-//    auto initial_l2_errors_reader =
-//      trans_rb_eval_builder.getInitialL2Errors();
-//    if(initial_l2_errors_reader.size() != n_bfs)
-//    {
-//      libmesh_error_msg("Incorrect number of initial L2 error terms detected in the buffer");
-//    }
-//
-//    auto initial_conditions_outer_list =
-//      trans_rb_eval_builder.initInitialCondition();
-//    if(initial_conditions_outer_list.size() != n_bfs)
-//    {
-//      libmesh_error_msg("Incorrect number of outer initial conditions detected in the buffer");
-//    }
-//
-//    for(unsigned int i=0; i<n_bfs; i++)
-//    {
-//      trans_rb_eval.initial_L2_error_all_N[i] =
-//        initial_l2_errors_reader[i];
-//
-//      auto initial_conditions_inner_list =
-//        initial_conditions_outer_list.get(i, i+1);
-//
-//      auto initial_conditions_inner_list = initial_conditions_outer_list[i];
-//      if(initial_conditions_inner_list.size() != (i+1))
-//      {
-//        libmesh_error_msg(
-//          "Incorrect number of inner initial conditions detected in the buffer");
-//      }
-//
-//      for(unsigned int j=0; j<=i; j++)
-//      {
-//        trans_rb_eval.RB_initial_condition_all_N[i](j) =
-//          load_scalar_value(initial_conditions_inner_list[j]);
-//      }
-//    }
-//  }
-//
-//
-//  if(read_error_bound_data)
-//  {
-//
-//    // Fq_Mq data
-//    {
-//      auto fq_mq_innerprods_list = rb_evaluation_reader.getFqMqInnerprods();
-//      if(fq_aq_innerprods_list.size() != n_F_terms*n_M_terms*n_bfs)
-//      {
-//        libmesh_error_msg(
-//          "Size error while reading Fq-Mq representor data from buffer.");
-//      }
-//
-//      for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
-//        for(unsigned int q_m=0; q_m<n_M_terms; ++q_m)
-//          for(unsigned int i=0; i<n_bfs; ++i)
-//          {
-//            unsigned int offset = q_f*n_M_terms*n_bfs + q_m*n_bfs + i;
-//            trans_rb_eval.Fq_Aq_representor_innerprods[q_f][q_m][i] =
-//              load_scalar_value(fq_mq_innerprods_list[offset]);
-//          }
-//    }
-//
-//
-//    // Mq_Mq representor inner-product data
-//    {
-//      unsigned int Q_m_hat = n_M_terms*(n_M_terms+1)/2;
-//      auto mq_mq_innerprods_list = rb_evaluation_reader.getMqMqInnerprods();
-//      if(mq_mq_innerprods_list.size() != Q_M_hat*n_bfs*n_bfs)
-//      {
-//        libmesh_error_msg(
-//          "Size error while reading Mq-Mq representor data from buffer.");
-//      }
-//
-//      for(unsigned int i=0; i<Q_m_hat; ++i)
-//        for(unsigned int j=0; j<n_bfs; ++j)
-//          for(unsigned int l=0; l<n_bfs; ++l)
-//          {
-//            unsigned int offset = i*n_bfs*n_bfs + j*n_bfs + l;
-//            trans_rb_eval.Mq_Mq_representor_innerprods[i][j][l] =
-//              load_scalar_value(mq_mq_innerprods_list[offset]);
-//          }
-//    }
-//
-//    // Aq_Mq representor inner-product data
-//    {
-//      auto aq_mq_innerprods_list =
-//        rb_evaluation_builder.getAqMqInnerprods();
-//      if(aq_mq_innerprods_list.size() != n_A_terms*n_M_terms*n_bfs*n_bfs)
-//      {
-//        libmesh_error_msg(
-//          "Size error while reading Aq-Mq representor data from buffer.");
-//      }
-//
-//      for(unsigned int q_a=0; q_a<n_A_terms; q_a++)
-//        for(unsigned int q_m=0; q_m<n_M_terms; q_m++)
-//          for(unsigned int i=0; i<n_bfs; i++)
-//            for(unsigned int j=0; j<n_bfs; j++)
-//            {
-//              unsigned int offset =
-//                q_a*(n_M_terms*n_bfs*n_bfs) + q_m*(n_bfs*n_bfs) + i*n_bfs + j;
-//
-//              trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j] =
-//                load_scalar_value(aq_mq_innerprods_list[offset]);
-//            }
-//    }
-//
-//  }
-//}
-//
-//
+  trans_rb_eval.set_delta_t( trans_rb_eval_reader.getDeltaT() );
+  trans_rb_eval.set_euler_theta( trans_rb_eval_reader.getEulerTheta() );
+  trans_rb_eval.set_n_time_steps( trans_rb_eval_reader.getNTimeSteps() );
+  trans_rb_eval.set_time_step( trans_rb_eval_reader.getTimeStep() );
+
+  unsigned int n_bfs = rb_eval_reader.getNBfs();
+  unsigned int n_F_terms = trans_rb_eval.get_rb_theta_expansion().get_n_F_terms();
+  unsigned int n_A_terms = trans_rb_eval.get_rb_theta_expansion().get_n_A_terms();
+
+  TransientRBThetaExpansion& trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion&>(trans_rb_eval.get_rb_theta_expansion());
+  unsigned int n_M_terms = trans_theta_expansion.get_n_M_terms();
+
+  // L2 matrix
+  {
+    auto rb_L2_matrix_list =
+      trans_rb_eval_reader.getRbL2Matrix();
+
+    if(rb_L2_matrix_list.size() != n_bfs*n_bfs)
+    {
+      libmesh_error_msg("Size error while reading the L2 matrix.");
+    }
+
+    for(unsigned int i=0; i<n_bfs; ++i)
+      for(unsigned int j=0; j<n_bfs; ++j)
+      {
+        unsigned int offset = i*n_bfs + j;
+        trans_rb_eval.RB_L2_matrix(i,j) =
+          load_scalar_value(rb_L2_matrix_list[offset]);
+      }
+  }
+
+  // Mq matrices
+  {
+    auto rb_Mq_matrices_outer_list = trans_rb_eval_reader.getRbMqMatrices();
+
+    if(rb_Mq_matrices_outer_list.size() != n_M_terms)
+    {
+      libmesh_error_msg("Incorrect number of Mq matrices detected in the buffer");
+    }
+
+    for(unsigned int q_m=0; q_m < n_M_terms; ++q_m)
+    {
+      auto rb_Mq_matrices_inner_list = rb_Mq_matrices_outer_list[q_m];
+      if(rb_Mq_matrices_inner_list.size() != n_bfs*n_bfs)
+      {
+        libmesh_error_msg("Incorrect Mq matrix size detected in the buffer");
+      }
+
+      for(unsigned int i=0; i<n_bfs; ++i)
+        for(unsigned int j=0; j<n_bfs; ++j)
+        {
+          unsigned int offset = i*n_bfs+j;
+          trans_rb_eval.RB_M_q_vector[q_m](i,j) =
+            load_scalar_value(rb_Mq_matrices_inner_list[offset]);
+        }
+    }
+  }
+
+  // The initial condition and L2 error at t=0.
+  {
+    auto initial_l2_errors_reader =
+      trans_rb_eval_reader.getInitialL2Errors();
+    if(initial_l2_errors_reader.size() != n_bfs)
+    {
+      libmesh_error_msg("Incorrect number of initial L2 error terms detected in the buffer");
+    }
+
+    auto initial_conditions_outer_list =
+      trans_rb_eval_reader.getInitialConditions();
+    if(initial_conditions_outer_list.size() != n_bfs)
+    {
+      libmesh_error_msg("Incorrect number of outer initial conditions detected in the buffer");
+    }
+
+    for(unsigned int i=0; i<n_bfs; i++)
+    {
+      trans_rb_eval.initial_L2_error_all_N[i] =
+        initial_l2_errors_reader[i];
+
+      auto initial_conditions_inner_list = initial_conditions_outer_list[i];
+      if(initial_conditions_inner_list.size() != (i+1))
+      {
+        libmesh_error_msg(
+          "Incorrect number of inner initial conditions detected in the buffer");
+      }
+
+      for(unsigned int j=0; j<=i; j++)
+      {
+        trans_rb_eval.RB_initial_condition_all_N[i](j) =
+          load_scalar_value(initial_conditions_inner_list[j]);
+      }
+    }
+  }
+
+
+  if(read_error_bound_data)
+  {
+
+    // Fq_Mq data
+    {
+      auto fq_mq_innerprods_list = trans_rb_eval_reader.getFqMqInnerprods();
+      if(fq_mq_innerprods_list.size() != n_F_terms*n_M_terms*n_bfs)
+      {
+        libmesh_error_msg(
+          "Size error while reading Fq-Mq representor data from buffer.");
+      }
+
+      for(unsigned int q_f=0; q_f<n_F_terms; ++q_f)
+        for(unsigned int q_m=0; q_m<n_M_terms; ++q_m)
+          for(unsigned int i=0; i<n_bfs; ++i)
+          {
+            unsigned int offset = q_f*n_M_terms*n_bfs + q_m*n_bfs + i;
+            trans_rb_eval.Fq_Mq_representor_innerprods[q_f][q_m][i] =
+              load_scalar_value(fq_mq_innerprods_list[offset]);
+          }
+    }
+
+
+    // Mq_Mq representor inner-product data
+    {
+      unsigned int Q_m_hat = n_M_terms*(n_M_terms+1)/2;
+      auto mq_mq_innerprods_list = trans_rb_eval_reader.getMqMqInnerprods();
+      if(mq_mq_innerprods_list.size() != Q_m_hat*n_bfs*n_bfs)
+      {
+        libmesh_error_msg(
+          "Size error while reading Mq-Mq representor data from buffer.");
+      }
+
+      for(unsigned int i=0; i<Q_m_hat; ++i)
+        for(unsigned int j=0; j<n_bfs; ++j)
+          for(unsigned int l=0; l<n_bfs; ++l)
+          {
+            unsigned int offset = i*n_bfs*n_bfs + j*n_bfs + l;
+            trans_rb_eval.Mq_Mq_representor_innerprods[i][j][l] =
+              load_scalar_value(mq_mq_innerprods_list[offset]);
+          }
+    }
+
+    // Aq_Mq representor inner-product data
+    {
+      auto aq_mq_innerprods_list =
+        trans_rb_eval_reader.getAqMqInnerprods();
+      if(aq_mq_innerprods_list.size() != n_A_terms*n_M_terms*n_bfs*n_bfs)
+      {
+        libmesh_error_msg(
+          "Size error while reading Aq-Mq representor data from buffer.");
+      }
+
+      for(unsigned int q_a=0; q_a<n_A_terms; q_a++)
+        for(unsigned int q_m=0; q_m<n_M_terms; q_m++)
+          for(unsigned int i=0; i<n_bfs; i++)
+            for(unsigned int j=0; j<n_bfs; j++)
+            {
+              unsigned int offset =
+                q_a*(n_M_terms*n_bfs*n_bfs) + q_m*(n_bfs*n_bfs) + i*n_bfs + j;
+
+              trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j] =
+                load_scalar_value(aq_mq_innerprods_list[offset]);
+            }
+    }
+
+  }
+}
+
+
 //void load_rb_eim_evaluation_data(
 //  RBEIMEvaluation& rb_eim_evaluation,
 //  RBData::RBEvaluation::Reader& rb_evaluation_reader,
