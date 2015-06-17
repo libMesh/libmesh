@@ -67,7 +67,7 @@ public:
     libmesh_assert(!_ptrs.empty());
 #ifndef NDEBUG
     // Compare other values to the last one we'll change
-    T& val = *_ptrs[_ptrs.size()-1];
+    T& val = *_ptrs.back();
 #endif
     for (unsigned int i=0; i != _ptrs.size(); ++i)
       {
