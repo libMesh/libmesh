@@ -75,7 +75,8 @@ public:
   {
     libmesh_assert(!_accessors.empty());
 #ifndef NDEBUG
-    T& val = _accessors[0]->get();
+    // Compare other values to the last one we'll change
+    T& val = _accessors[_accessors.size()-1]->get();
 #endif
     for (unsigned int i=0; i != _accessors.size(); ++i)
       {
