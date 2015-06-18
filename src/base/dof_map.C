@@ -2632,7 +2632,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
       std::vector<dof_id_type>
         element_dofs_i,
         element_dofs_j,
-        neighbor_dofs,
+        neighbor_dofs_j,
         dofs_to_add;
 
 
@@ -2783,16 +2783,20 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
                                   {
                                     const Elem *neighbor = active_neighbors[a];
 
-                                    dof_map.dof_indices (neighbor, neighbor_dofs);
+                                    dof_map.dof_indices
+                                      (neighbor, neighbor_dofs_j, vj);
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-                                    dof_map.find_connected_dofs (neighbor_dofs);
+                                    dof_map.find_connected_dofs
+                                      (neighbor_dofs_j);
 #endif
                                     const unsigned int n_dofs_on_neighbor =
-                                      cast_int<unsigned int>(neighbor_dofs.size());
+                                      cast_int<unsigned int>
+                                        (neighbor_dofs_j.size());
 
                                     for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
                                       {
-                                        const dof_id_type jg = neighbor_dofs[j];
+                                        const dof_id_type jg =
+                                          neighbor_dofs_j[j];
 
                                         // See if jg is in the sorted range
                                         std::pair<SparsityPattern::Row::iterator,
