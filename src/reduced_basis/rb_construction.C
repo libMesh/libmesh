@@ -62,7 +62,6 @@ RBConstruction::RBConstruction (EquationSystems& es,
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
-    write_data_during_training(false),
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
@@ -224,8 +223,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const bool deterministic_training = infile("deterministic_training",false);
   const bool use_relative_bound_in_greedy_in = infile("use_relative_bound_in_greedy",
                                                       use_relative_bound_in_greedy);
-  const bool write_data_during_training_in = infile("write_data_during_training",
-                                                    write_data_during_training);
   unsigned int training_parameters_random_seed_in =
     static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
@@ -289,7 +286,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   set_rb_construction_parameters(n_training_samples,
                                  deterministic_training,
                                  use_relative_bound_in_greedy_in,
-                                 write_data_during_training_in,
                                  training_parameters_random_seed_in,
                                  quiet_mode_in,
                                  Nmax_in,
@@ -304,7 +300,6 @@ void RBConstruction::set_rb_construction_parameters(
                                                     unsigned int n_training_samples_in,
                                                     bool deterministic_training_in,
                                                     bool use_relative_bound_in_greedy_in,
-                                                    bool write_data_during_training_in,
                                                     unsigned int training_parameters_random_seed_in,
                                                     bool quiet_mode_in,
                                                     unsigned int Nmax_in,
@@ -317,11 +312,6 @@ void RBConstruction::set_rb_construction_parameters(
   // Tell the system whether or not to use a relative error bound
   // in the Greedy algorithm
   use_relative_bound_in_greedy = use_relative_bound_in_greedy_in;
-
-  // Tell the system whether or not to write out offline data during
-  // train_reduced_basis. This allows us to continue from where the
-  // training left off in case the computation stops for some reason.
-  write_data_during_training = write_data_during_training_in;
 
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -382,7 +372,6 @@ void RBConstruction::print_info()
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
-  libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
   libMesh::out << std::endl;
 }
@@ -1041,14 +1030,6 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
 
           libMesh::out << "Maximum " << (use_relative_bound_in_greedy ? "(relative)" : "(absolute)")
                        << " error bound is " << training_greedy_error << std::endl << std::endl;
-
-          if(write_data_during_training)
-            {
-              std::stringstream new_dir_name;
-              new_dir_name << directory_name << "_" << get_rb_evaluation().get_n_basis_functions();
-              libMesh::out << "Writing out RB data to " << new_dir_name.str() << std::endl;
-              get_rb_evaluation().write_offline_data_to_files(new_dir_name.str());
-            }
 
           // Break out of training phase if we have reached Nmax
           // or if the training_tolerance is satisfied.

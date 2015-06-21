@@ -425,10 +425,10 @@ void RBEvaluation::clear_riesz_representors()
 
 }
 
-void RBEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                               const bool write_binary_data)
+void RBEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+                                                      const bool write_binary_data)
 {
-  START_LOG("write_offline_data_to_files()", "RBEvaluation");
+  START_LOG("legacy_write_offline_data_to_files()", "RBEvaluation");
 
   // Get the number of basis functions
   unsigned int n_bfs = get_n_basis_functions();
@@ -653,14 +653,14 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
 
     }
 
-  STOP_LOG("write_offline_data_to_files()", "RBEvaluation");
+  STOP_LOG("legacy_write_offline_data_to_files()", "RBEvaluation");
 }
 
-void RBEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                bool read_error_bound_data,
-                                                const bool read_binary_data)
+void RBEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+                                                       bool read_error_bound_data,
+                                                       const bool read_binary_data)
 {
-  START_LOG("read_offline_data_from_files()", "RBEvaluation");
+  START_LOG("legacy_read_offline_data_from_files()", "RBEvaluation");
 
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
@@ -896,7 +896,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       basis_functions[i] = NULL;
     }
 
-  STOP_LOG("read_offline_data_from_files()", "RBEvaluation");
+  STOP_LOG("legacy_read_offline_data_from_files()", "RBEvaluation");
 }
 
 void RBEvaluation::assert_file_exists(const std::string& file_name)

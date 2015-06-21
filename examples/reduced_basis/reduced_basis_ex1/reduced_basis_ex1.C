@@ -53,6 +53,8 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/getpot.h"
 #include "libmesh/elem.h"
+#include "libmesh/rb_data_serialization.h"
+#include "libmesh/rb_data_deserialization.h"
 
 // local includes
 #include "rb_classes.h"
@@ -147,7 +149,12 @@ int main (int argc, char** argv)
       rb_con.train_reduced_basis();
 
       // Write out the data that will subsequently be required for the Evaluation stage
-      rb_con.get_rb_evaluation().write_offline_data_to_files();
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+      RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_con.get_rb_evaluation());
+      rb_eval_writer.write_to_file("rb_eval.bin");
+#else
+      rb_con.get_rb_evaluation().legacy_write_offline_data_to_files();
+#endif
 
       // If requested, write out the RB basis functions for visualization purposes
       if(store_basis_functions)
@@ -163,7 +170,12 @@ int main (int argc, char** argv)
   else // Perform the Online stage of the RB method
     {
       // Read in the reduced basis data
-      rb_eval.read_offline_data_from_files();
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+      RBDataDeserialization::RBEvaluationDeserialization rb_eval_reader(rb_eval);
+      rb_eval_reader.read_from_file("rb_eval.bin", /*read_error_bound_data*/ true);
+#else
+      rb_eval.legacy_read_offline_data_from_files();
+#endif
 
       // Read in online_N and initialize online parameters
       unsigned int online_N = infile("online_N",1);

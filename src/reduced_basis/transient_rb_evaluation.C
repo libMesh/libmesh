@@ -765,12 +765,12 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
-void TransientRBEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                                        const bool write_binary_data)
+void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+                                                               const bool write_binary_data)
 {
-  START_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
+  START_LOG("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
 
-  Parent::write_offline_data_to_files(directory_name);
+  Parent::legacy_write_offline_data_to_files(directory_name);
 
   TransientRBThetaExpansion& trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -916,16 +916,16 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       RB_Aq_Mq_terms_out.close();
     }
 
-  STOP_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
+  STOP_LOG("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
 }
 
-void TransientRBEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                         bool read_error_bound_data,
-                                                         const bool read_binary_data)
+void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+                                                                bool read_error_bound_data,
+                                                                const bool read_binary_data)
 {
-  START_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
+  START_LOG("legacy_read_offline_data_from_files()", "TransientRBEvaluation");
 
-  Parent::read_offline_data_from_files(directory_name);
+  Parent::legacy_read_offline_data_from_files(directory_name);
 
   TransientRBThetaExpansion& trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -1096,7 +1096,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
       RB_Aq_Mq_terms_in.close();
     }
 
-  STOP_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
+  STOP_LOG("legacy_read_offline_data_from_files()", "TransientRBEvaluation");
 
 }
 
