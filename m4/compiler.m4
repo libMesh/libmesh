@@ -181,6 +181,14 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     # find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *gcc\ version\ 6.*)
+        AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
+        GXX_VERSION=gcc6
+        ;;
+      *gcc\ version\ 5.*)
+        AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
+        GXX_VERSION=gcc5
+        ;;
       *4.9.*)
         AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
         GXX_VERSION=gcc4.9
@@ -703,17 +711,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
       #
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
-      gcc4.4 | gcc4.5 | gcc4.6)
-         CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
-
-         if (test "x$enableglibcxxdebugging" = "xyes"); then
-           CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-         fi
-	 ;;
-
-      gcc3.* | gcc4.*)
+      gcc3.* | gcc4.* | gcc5 | gcc6)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
