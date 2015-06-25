@@ -1617,6 +1617,14 @@ public:
    */
   void zero_variable (NumericVector<Number>& v, unsigned int var_num) const;
 
+
+  /**
+   * Returns a writeable reference to a boolean that determines if this system
+   * can be written to to file or not.  If set to \p true, then
+   * \p EquationSystems::write will ignore this system.
+   */
+  bool & hide_output() {return _hide_output;}
+
 protected:
 
   /**
@@ -1935,6 +1943,12 @@ private:
    * it again.
    */
   bool adjoint_already_solved;
+
+  /**
+   * Are we allowed to write this system to file?  If \p _hide_output is
+   * \p true, then \p EquationSystems::write will ignore this system.
+   */
+  bool _hide_output;
 };
 
 

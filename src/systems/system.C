@@ -85,7 +85,8 @@ System::System (EquationSystems& es,
   _is_initialized                   (false),
   _identify_variable_groups         (true),
   _additional_data_written          (false),
-  adjoint_already_solved            (false)
+  adjoint_already_solved            (false),
+  _hide_output                      (false)
 {
 }
 
