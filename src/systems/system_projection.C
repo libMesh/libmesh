@@ -121,6 +121,137 @@ public:
 };
 
 
+class OldSolutionValue : public FEMFunctionBase<Number>
+{
+public:
+  OldSolutionValue(const libMesh::System &sys_in,
+                   const NumericVector<Number> & old_sol) :
+  last_elem(NULL),
+  sys(sys_in),
+  old_context(sys_in),
+  old_solution(old_sol)
+  {
+    old_context.set_algebraic_type(FEMContext::OLD);
+    old_context.set_custom_solution(&old_solution);
+  }
+
+  virtual UniquePtr<FEMFunctionBase<Number> > clone () const
+  {
+    return UniquePtr<FEMFunctionBase<Number> >
+      (new OldSolutionValue(*this));
+  }
+
+  // Integrating on new mesh elements, we won't yet have an up to date
+  // current_local_solution.
+  //
+  // Obviously this method should have taken a non-const reference,
+  // but I don't see any easy way to fix that while maintaining
+  // backwards compatibility.
+  virtual void init_context (const FEMContext &c)
+  {
+    FEMContext &context = const_cast<FEMContext &>(c);
+    context.set_algebraic_type(FEMContext::DOFS_ONLY);
+  }
+
+  virtual Number operator() (const FEMContext& c, const Point& p,
+                             const Real /* time */ = 0.)
+  {
+    if (!this->check_old_context(c, p))
+      return 0;
+
+    Number n;
+    old_context.point_value(0, p, n);
+    return n;
+  }
+
+  virtual void operator() (const FEMContext& c, const Point& p,
+                           const Real /* time */,
+                           DenseVector<Number>& output)
+  {
+    if (!this->check_old_context(c, p))
+      {
+        output.zero();
+        return;
+      }
+
+    const unsigned int size = output.size();
+
+    for (unsigned int v=0; v != size; ++v)
+      old_context.point_value(v, p, output(v));
+  }
+
+  virtual Number component(const FEMContext& c, unsigned int i,
+                           const Point& p,
+                           Real /* time */ =0.)
+  {
+    if (!this->check_old_context(c, p))
+      return 0;
+
+    Number n;
+    // FIXME - this breaks in the presence of SCALAR and vector-valued
+    // types?
+    old_context.point_value(i, p, n);
+    return n;
+  }
+
+protected:
+  bool check_old_context (const FEMContext& c, const Point& p)
+  {
+    const Elem & elem = c.get_elem();
+    if (last_elem != &elem)
+      {
+        if (!elem.old_dof_object)
+          return false;
+
+        last_elem = &elem;
+
+        if (elem.refinement_flag() == Elem::JUST_REFINED)
+          old_context.pre_fe_reinit(sys, elem.parent());
+        else if (elem.refinement_flag() == Elem::JUST_COARSENED)
+          {
+            for (unsigned int c=0; c != elem.n_children(); ++c)
+              if (elem.child(c)->contains_point(p))
+                {
+                  old_context.pre_fe_reinit(sys, elem.child(c));
+                  break;
+                }
+
+            libmesh_assert(old_context.get_elem().contains_point(p));
+          }
+        else
+          old_context.pre_fe_reinit(sys, &elem);
+      }
+    else
+      {
+        libmesh_assert(old_context.has_elem());
+
+        if (!old_context.get_elem().contains_point(p))
+          {
+            libmesh_assert_equal_to
+              (elem.refinement_flag(), Elem::JUST_COARSENED);
+
+            for (unsigned int c=0; c != elem.n_children(); ++c)
+              if (elem.child(c)->contains_point(p))
+                {
+                  old_context.pre_fe_reinit(sys, elem.child(c));
+                  break;
+                }
+
+            libmesh_assert(old_context.get_elem().contains_point(p));
+          }
+      }
+
+    return true;
+  }
+
+private:
+  const Elem *last_elem;
+  const System &sys;
+  FEMContext old_context;
+  const NumericVector<Number> & old_solution;
+};
+
+
 
 /**
  * This class implements projecting a vector from
