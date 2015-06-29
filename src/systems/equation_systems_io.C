@@ -484,10 +484,13 @@ void EquationSystems::write(const std::string& name,
     START_LOG("write()","EquationSystems");
 
     const unsigned int proc_id = this->processor_id();
-    unsigned int n_sys         = this->n_systems();
 
-    std::map<std::string, System*>::const_iterator
-      pos = _systems.begin();
+    unsigned int n_sys = 0;
+    for (std::map<std::string, System*>::const_iterator pos = _systems.begin();
+         pos != _systems.end(); ++pos)
+      {
+        if (! pos->second->hide_output()) n_sys++;
+      }
 
     // set the version number in the Xdr object
     io.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
@@ -515,8 +518,12 @@ void EquationSystems::write(const std::string& name,
         // Write the number of equation systems
         io.data (n_sys, "# No. of Equation Systems");
 
-        while (pos != _systems.end())
+        for (std::map<std::string, System*>::const_iterator
+             pos = _systems.begin(); pos != _systems.end(); ++pos)
           {
+            // Ignore this system if it has been marked as hidden
+            if (pos->second->hide_output()) continue;
+
             // 3.)
             // Write the name of the sys_num-th system
             {
@@ -546,8 +553,6 @@ void EquationSystems::write(const std::string& name,
             // 5.) - 9.)
             // Let System::write_header() do the job
             pos->second->write_header (io, version, write_additional_data);
-
-            ++pos;
           }
       }
 
@@ -558,8 +563,12 @@ void EquationSystems::write(const std::string& name,
         // open a parallel buffer if warranted.
         Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-        for (pos = _systems.begin(); pos != _systems.end(); ++pos)
+        for (std::map<std::string, System*>::const_iterator
+             pos = _systems.begin(); pos != _systems.end(); ++pos)
           {
+            // Ignore this system if it has been marked as hidden
+            if (pos->second->hide_output()) continue;
+
             // 10.) + 11.)
             if (write_parallel_files)
               pos->second->write_parallel_data (local_io,write_additional_data);
