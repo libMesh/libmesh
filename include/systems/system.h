@@ -1620,10 +1620,10 @@ public:
 
   /**
    * Returns a writeable reference to a boolean that determines if this system
-   * can be written to to file or not.  If set to \p true, then
+   * can be written to file or not.  If set to \p true, then
    * \p EquationSystems::write will ignore this system.
    */
-  bool & hide_output() {return _hide_output;}
+  bool & hide_output() { return _hide_output; }
 
 protected:
 
