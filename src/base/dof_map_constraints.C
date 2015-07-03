@@ -351,7 +351,7 @@ private:
 
     const FEContinuity cont = fe->get_continuity();
 
-    if (cont == C_ONE)
+    if ( (cont == C_ONE) && (fe_type.family != SUBDIVISION) )
       {
         // We'll need gradient data for a C1 projection
         libmesh_assert(g || g_fem);
@@ -528,7 +528,7 @@ private:
               }
             // Assume that C_ZERO elements have a single nodal
             // value shape function
-            else if (cont == C_ZERO)
+            else if ( (cont == C_ZERO) || (fe_type.family == SUBDIVISION) )
               {
                 libmesh_assert_equal_to (nc, n_vec_dim);
                 for( unsigned int c = 0; c < n_vec_dim; c++ )

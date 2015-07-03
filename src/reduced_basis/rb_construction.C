@@ -40,6 +40,8 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/coupling_matrix.h"
+#include "libmesh/face_tri3_subdivision.h"
+#include "libmesh/quadrature.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -673,6 +675,29 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   for ( ; el != end_el; ++el)
     {
+      // Subdivision elements need special care: 
+      // - skip ghost elements
+      // - init special quadrature rule
+      const Elem* elem = *el;
+      UniquePtr<QBase> qrule;
+      if (elem->type() == TRI3SUBDIVISION)
+      {
+        const Tri3Subdivision* gh_elem = static_cast<const Tri3Subdivision*> (elem);
+        if (gh_elem->is_ghost())
+          continue ;
+        // A Gauss quadrature rule for numerical integration.
+        // For subdivision shell elements, a single Gauss point per
+        // element is sufficient, hence we use extraorder = 0.
+        const int extraorder = 0;
+        FEBase* elem_fe = NULL;
+        context.get_element_fe( 0, elem_fe );
+
+        qrule = elem_fe->get_fe_type().default_quadrature_rule (2, extraorder);
+
+        // Tell the finite element object to use our quadrature rule.
+        elem_fe->attach_quadrature_rule (qrule.get());
+      }
+
       context.pre_fe_reinit(*this, *el);
       context.elem_fe_reinit();
       elem_assembly->interior_assembly(context);
