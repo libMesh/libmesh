@@ -675,7 +675,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   for ( ; el != end_el; ++el)
     {
-      // Subdivision elements need special care: 
+      // Subdivision elements need special care:
       // - skip ghost elements
       // - init special quadrature rule
       const Elem* elem = *el;

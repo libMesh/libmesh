@@ -131,7 +131,7 @@ public:
    * The \p boundary_mesh may be the *same* as the interior mesh; this
    * generates a mesh with elements of mixed dimension.
    *
-   * Only boundary elements with the specified ids are created. 
+   * Only boundary elements with the specified ids are created.
    */
   void add_elements (const std::set<boundary_id_type> &requested_boundary_ids,
                      UnstructuredMesh& boundary_mesh);
