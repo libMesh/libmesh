@@ -886,8 +886,8 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 
   // fetch function pointer
   *(void **) (&compiledFunction) = dlsym(lib, fnname.c_str());
-  char * error;
-  if ((error = dlerror()) != NULL)  {
+  const char * error = dlerror();
+  if (error != NULL)  {
     std::cerr << "Error binding JIT compiled function\n" << error << '\n';
     compiledFunction = NULL;
     std::remove(object_so.c_str());
