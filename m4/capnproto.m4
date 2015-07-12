@@ -1,10 +1,8 @@
 # ----------------------------------------------------------------
-# The Reduced Basis code uses Cap'n Proto to write training data to disk.
-# By default we check for the Capn'n Proto installation files in
-# --with-capnproto-include=xxx and --with-capnproto-lib=yyy arguments
-# provided to configure, or if those don't exist in $CAPNPROTO_INC and
-# $CAPNPROTO_LIB directories, or in $CAPNPROTO_DIR/include and
-# $CAPNPROTO_DIR/lib directories, or in /usr/local, or in /usr.
+# The Reduced Basis code uses Cap'n Proto to write training data to
+# disk.  By default, we check for the Capn'n Proto installation files
+# in the directory provided to configure via --with-capnproto=xxx,
+# which is superceded by $CAPNPROTO_DIR if it is set.
 # ----------------------------------------------------------------
 
 AC_DEFUN([CONFIGURE_CAPNPROTO],
@@ -47,7 +45,7 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
     fi
 
     # Initialize Makefile/config.h substitution variables.  These will
-    #  include flags and library names where necessary.
+    # include flags and library names where necessary.
     CAPNPROTO_INCLUDE=""
     CAPNPROTO_LIBRARY=""
 
