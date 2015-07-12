@@ -711,6 +711,11 @@ HDF5_LIBS
 HDF5_CPPFLAGS
 HDF5_CFLAGS
 HDF5_DIR
+LIBMESH_ENABLE_CAPNPROTO_FALSE
+LIBMESH_ENABLE_CAPNPROTO_TRUE
+CAPNPROTO_LIBRARY
+CAPNPROTO_INCLUDE
+CAPNP_BINARY
 LIBMESH_ENABLE_NLOPT_FALSE
 LIBMESH_ENABLE_NLOPT_TRUE
 NLOPT_LIBRARY
@@ -1167,6 +1172,8 @@ with_glpk_lib
 enable_nlopt
 with_nlopt_include
 with_nlopt_lib
+enable_capnproto
+with_capnproto
 enable_hdf5
 with_hdf5
 enable_netcdf
@@ -1943,6 +1950,7 @@ Optional Features:
   --disable-eigen         build without Eigen linear algebra support
   --disable-glpk          build without GLPK support
   --disable-nlopt         build without NLOPT support
+  --disable-capnproto     build without Cap'n Proto support
   --disable-hdf5          build without HDF5 support
   --disable-netcdf        build without netCDF binary I/O
   --disable-exodus        build without ExodusII API support
@@ -2018,6 +2026,7 @@ Optional Packages:
   --with-nlopt-include=PATH
                           Specify the path for NLOPT header files
   --with-nlopt-lib=PATH   Specify the path for NLOPT libs
+  --with-capnproto=PATH   Specify location of the CAPNPROTO installation
   --with-hdf5=DIR         root directory of HDF5 installation (default =
                           HDF5_DIR)
   --with-fparser=<release|none|devel>
@@ -36431,6 +36440,194 @@ fi
 # -------------------------------------------------------------
 
 
+# -------------------------------------------------------------
+# CAPNPROTO -- Serialization library.
+# -------------------------------------------------------------
+
+  # Check whether --enable-capnproto was given.
+if test "${enable_capnproto+set}" = set; then :
+  enableval=$enable_capnproto; case "${enableval}" in
+                  yes) enablecapnproto=yes ;;
+                   no) enablecapnproto=no ;;
+                    *) as_fn_error $? "bad value ${enableval} for --enable-capnproto" "$LINENO" 5 ;;
+                 esac
+else
+  enablecapnproto=$enableoptional
+fi
+
+
+  # Cap'n Proto code uses 'auto', and therefore requires C++11 support.
+  if (test "x$HAVE_CXX11" = "x" -o "x$HAVE_CXX11" = "x0"); then
+    enablecapnproto=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Cap'n Proto disabled -- C++11 support (auto keyword) is required. >>>" >&5
+$as_echo "<<< Cap'n Proto disabled -- C++11 support (auto keyword) is required. >>>" >&6; }
+  fi
+
+  if (test $enablecapnproto = yes); then
+    # The Cap'n Proto include and library paths
+    CAPNPROTO_INC=""
+    CAPNPROTO_LIB=""
+
+    # The user can specify the location of their capnproto installation by configuring with
+    # --with-capnproto=/path/to/capnproto/installation
+
+# Check whether --with-capnproto was given.
+if test "${with_capnproto+set}" = set; then :
+  withval=$with_capnproto;
+                  CAPNPROTO_INC="$withval/include"
+                  CAPNPROTO_LIB="$withval/lib"
+
+fi
+
+
+    # Let CAPNPROTO_DIR possibly override the user's --with-capnproto setting.
+    if test "x$CAPNPROTO_DIR" != x; then
+      CAPNPROTO_INC="$CAPNPROTO_DIR/include"
+      CAPNPROTO_LIB="$CAPNPROTO_DIR/lib"
+    fi
+
+    # Initialize Makefile/config.h substitution variables.  These will
+    #  include flags and library names where necessary.
+    CAPNPROTO_INCLUDE=""
+    CAPNPROTO_LIBRARY=""
+
+    # Check for existence of a header file in the specified location
+    if (test -r $CAPNPROTO_INC/capnp/common.h) ; then
+      enablecapnproto=yes
+    else
+      enablecapnproto=no
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Required header files not found, Cap'n Proto support disabled. >>>" >&5
+$as_echo "<<< Required header files not found, Cap'n Proto support disabled. >>>" >&6; }
+    fi
+
+    # If the header file was found, continue.
+    if (test x$enablecapnproto = xyes); then
+      #             Var,           look for,   name if found,   name if not, where
+      # Extract the first word of "capnp", so it can be a program name with args.
+set dummy capnp; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_CAPNP_BINARY+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$CAPNP_BINARY"; then
+  ac_cv_prog_CAPNP_BINARY="$CAPNP_BINARY" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CAPNP_BINARY="capnp"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_CAPNP_BINARY" && ac_cv_prog_CAPNP_BINARY="none"
+fi
+fi
+CAPNP_BINARY=$ac_cv_prog_CAPNP_BINARY
+if test -n "$CAPNP_BINARY"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CAPNP_BINARY" >&5
+$as_echo "$CAPNP_BINARY" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+      if test "$CAPNP_BINARY" = capnp; then
+        enablecapnproto=yes
+      else
+        enablecapnproto=no
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< The 'capnp' utility is not in your PATH, Cap'n Proto support disabled. >>>" >&5
+$as_echo "<<< The 'capnp' utility is not in your PATH, Cap'n Proto support disabled. >>>" >&6; }
+      fi
+    fi
+
+    # If the required programs were found in $PATH, continue.
+    if (test x$enablecapnproto = xyes); then
+      # Create a simple capnp schema file, make sure we can process it
+      # with the capnp utility.  This will only work if $CAPNPROTO_DIR/bin is
+      # in the user's PATH.
+      printf '%s\n' "@0xdbb9ad1f14bf0b36;" > example.capnp
+      printf '%s\n' "struct Person {" >> example.capnp
+      printf '%s\n' "name @0 :Text;" >> example.capnp
+      printf '%s\n' "birthdate @3 :Date;" >> example.capnp
+      printf '%s\n' "email @1 :Text;" >> example.capnp
+      printf '%s\n' "phones @2 :List(PhoneNumber);" >> example.capnp
+      printf '%s\n' "struct PhoneNumber {" >> example.capnp
+      printf '%s\n' "number @0 :Text;" >> example.capnp
+      printf '%s\n' "type @1 :Type;" >> example.capnp
+      printf '%s\n' "enum Type {" >> example.capnp
+      printf '%s\n' "mobile @0;" >> example.capnp
+      printf '%s\n' "home @1;" >> example.capnp
+      printf '%s\n' "work @2;" >> example.capnp
+      printf '%s\n' "} } }" >> example.capnp
+      printf '%s\n' "struct Date {" >> example.capnp
+      printf '%s\n' "year @0 :Int16;" >> example.capnp
+      printf '%s\n' "month @1 :UInt8;" >> example.capnp
+      printf '%s\n' "day @2 :UInt8;" >> example.capnp
+      printf '%s\n' "}" >> example.capnp
+
+      # Call the capnp utility
+      capnp compile -oc++ example.capnp
+
+      if (test "x$?" = "x0"); then
+        enablecapnproto=yes
+      else
+        enablecapnproto=no
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< The 'capnp' utility function failed, Cap'n Proto support disabled. >>>" >&5
+$as_echo "<<< The 'capnp' utility function failed, Cap'n Proto support disabled. >>>" >&6; }
+      fi
+
+      # Remove temporary files
+      rm -f example.capnp example.capnp.h example.capnp.c++
+    fi
+
+    # If calling the capnp utility worked, continue.
+    if (test x$enablecapnproto = xyes); then
+      CAPNPROTO_INCLUDE="-I$CAPNPROTO_INC"
+      CAPNPROTO_LIBRARY="-L$CAPNPROTO_LIB -lcapnp -lkj"
+
+      # add the CAPNPROTO_LIB dir to the linker run path if it is a directory
+      if (test "x$RPATHFLAG" != "x" -a -d $CAPNPROTO_LIB); then
+        CAPNPROTO_LIBRARY="${RPATHFLAG}${CAPNPROTO_LIB} $CAPNPROTO_LIBRARY"
+      fi
+
+
+$as_echo "#define HAVE_CAPNPROTO 1" >>confdefs.h
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with CAPNPROTO support >>>" >&5
+$as_echo "<<< Configuring library with CAPNPROTO support >>>" >&6; }
+    fi
+  fi
+
+  # Substitute the substitution variables
+
+
+
+if (test x$enablecapnproto = xyes); then
+  libmesh_optional_INCLUDES="$CAPNPROTO_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$CAPNPROTO_LIBRARY $libmesh_optional_LIBS"
+fi
+ if test x$enablecapnproto = xyes; then
+  LIBMESH_ENABLE_CAPNPROTO_TRUE=
+  LIBMESH_ENABLE_CAPNPROTO_FALSE='#'
+else
+  LIBMESH_ENABLE_CAPNPROTO_TRUE='#'
+  LIBMESH_ENABLE_CAPNPROTO_FALSE=
+fi
+
+ac_config_files="$ac_config_files contrib/capnproto/Makefile"
+
+# -------------------------------------------------------------
+
 
 # --------------------------------------------------------------
 # HDF5 -- enabled by default
@@ -38233,6 +38430,10 @@ if test -z "${LIBMESH_ENABLE_NLOPT_TRUE}" && test -z "${LIBMESH_ENABLE_NLOPT_FAL
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NLOPT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_ENABLE_CAPNPROTO_TRUE}" && test -z "${LIBMESH_ENABLE_CAPNPROTO_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_CAPNPROTO\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_HDF5_TRUE}" && test -z "${LIBMESH_ENABLE_HDF5_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_HDF5\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -39494,6 +39695,7 @@ do
     "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
     "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
+    "contrib/capnproto/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/capnproto/Makefile" ;;
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/Makefile" ;;
@@ -41736,6 +41938,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo
   echo Optional Packages:
   echo '  'boost............................ : $enableboost
+  echo '  'capnproto........................ : $enablecapnproto
   echo '  'cppunit.......................... : $enablecppunit
 #  if (test "x$enablecppunit" = "xyes"); then
 #  echo '     'CPPUNIT_CFLAGS................ : $CPPUNIT_CFLAGS
