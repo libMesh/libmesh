@@ -301,12 +301,10 @@ void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembl
     }
 }
 
-Real TransientRBConstruction::train_reduced_basis(const std::string& directory_name,
-                                                  const bool resize_rb_eval_data)
+Real TransientRBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 {
   compute_truth_projection_error = true;
-  Real value = Parent::train_reduced_basis(directory_name,
-                                           resize_rb_eval_data);
+  Real value = Parent::train_reduced_basis(resize_rb_eval_data);
   compute_truth_projection_error = false;
 
   return value;

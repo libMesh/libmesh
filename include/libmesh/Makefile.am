@@ -291,6 +291,8 @@ BUILT_SOURCES = \
         rb_assembly_expansion.h \
         rb_construction.h \
         rb_construction_base.h \
+        rb_data_deserialization.h \
+        rb_data_serialization.h \
         rb_eim_assembly.h \
         rb_eim_construction.h \
         rb_eim_evaluation.h \
@@ -493,6 +495,16 @@ unique_ptr.hpp: $(top_srcdir)/contrib/unique_ptr/unique_ptr.hpp
 
   BUILT_SOURCES  += unique_ptr.hpp
   DISTCLEANFILES += unique_ptr.hpp
+
+endif
+
+if LIBMESH_ENABLE_CAPNPROTO
+
+rb_data.capnp.h:
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $(top_builddir)/contrib/capnproto/rb_data.capnp.h $@
+
+  BUILT_SOURCES  += rb_data.capnp.h
+  DISTCLEANFILES += rb_data.capnp.h
 
 endif
 
@@ -1359,6 +1371,12 @@ rb_construction.h: $(top_srcdir)/include/reduced_basis/rb_construction.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_construction_base.h: $(top_srcdir)/include/reduced_basis/rb_construction_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_deserialization.h: $(top_srcdir)/include/reduced_basis/rb_data_deserialization.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_serialization.h: $(top_srcdir)/include/reduced_basis/rb_data_serialization.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_assembly.h: $(top_srcdir)/include/reduced_basis/rb_eim_assembly.h

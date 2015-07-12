@@ -238,12 +238,12 @@ UniquePtr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
   return UniquePtr<RBTheta>( new RBEIMTheta(*this, index) );
 }
 
-void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                                  const bool read_binary_data)
+void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+                                                         const bool read_binary_data)
 {
-  START_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
+  START_LOG("legacy_write_offline_data_to_files()", "RBEIMEvaluation");
 
-  Parent::write_offline_data_to_files(directory_name);
+  Parent::legacy_write_offline_data_to_files(directory_name);
 
   // Get the number of basis functions
   unsigned int n_bfs = get_n_basis_functions();
@@ -336,12 +336,12 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 
   // Write out the elements associated with the interpolation points.
   // This uses mesh I/O, hence we have to do it on all processors.
-  write_out_interpolation_points_elem(directory_name);
+  legacy_write_out_interpolation_points_elem(directory_name);
 
-  STOP_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
+  STOP_LOG("legacy_write_offline_data_to_files()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::write_out_interpolation_points_elem
+void RBEIMEvaluation::legacy_write_out_interpolation_points_elem
 (const std::string& directory_name)
 {
   _interpolation_points_mesh.clear();
@@ -457,13 +457,13 @@ void RBEIMEvaluation::write_out_interpolation_points_elem
     }
 }
 
-void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                   bool read_error_bound_data,
-                                                   const bool read_binary_data)
+void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+                                                          bool read_error_bound_data,
+                                                          const bool read_binary_data)
 {
-  START_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
+  START_LOG("legacy_read_offline_data_from_files()", "RBEIMEvaluation");
 
-  Parent::read_offline_data_from_files(directory_name, read_error_bound_data);
+  Parent::legacy_read_offline_data_from_files(directory_name, read_error_bound_data);
 
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files
@@ -587,12 +587,12 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   extra_interpolation_point_var_in.close();
 
   // Read in the elements corresponding to the interpolation points
-  read_in_interpolation_points_elem(directory_name);
+  legacy_read_in_interpolation_points_elem(directory_name);
 
-  STOP_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
+  STOP_LOG("legacy_read_offline_data_from_files()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::read_in_interpolation_points_elem
+void RBEIMEvaluation::legacy_read_in_interpolation_points_elem
 (const std::string& directory_name)
 {
   _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");

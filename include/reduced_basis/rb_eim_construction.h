@@ -109,8 +109,7 @@ public:
   /**
    * Override train_reduced_basis to first initialize _parametrized_functions_in_training_set.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
-                                   const bool resize_rb_eval_data=true);
+  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
 
   /**
    * Load the truth representation of the parametrized function

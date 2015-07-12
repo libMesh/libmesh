@@ -104,8 +104,7 @@ public:
    * projection error. Other calls to truth_solve generally do not
    * need to perform these projection calculations.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
-                                   const bool resize_rb_eval_data=true);
+  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
 
   /**
    * Read in the parameters from file and set up the system

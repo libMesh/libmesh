@@ -193,13 +193,12 @@ void RBEIMConstruction::initialize_rb_construction(bool skip_matrix_assembly,
   inner_product_solver->reuse_preconditioner(true);
 }
 
-Real RBEIMConstruction::train_reduced_basis(const std::string& directory_name,
-                                            const bool resize_rb_eval_data)
+Real RBEIMConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 {
   // precompute all the parametrized functions that we'll use in the greedy
   initialize_parametrized_functions_in_training_set();
 
-  return Parent::train_reduced_basis(directory_name, resize_rb_eval_data);
+  return Parent::train_reduced_basis(resize_rb_eval_data);
 }
 
 Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
