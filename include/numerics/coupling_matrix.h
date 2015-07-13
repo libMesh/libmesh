@@ -152,12 +152,13 @@ public:
     if (lb == _mat._ranges.end())
       return false;
 
-    const std::size_t firstloc = lb->first;
     const std::size_t lastloc  = lb->second;
+
+#ifdef DEBUG
+    const std::size_t firstloc = lb->first;
     libmesh_assert_less_equal(firstloc, lastloc);
     libmesh_assert_less_equal(firstloc, _location);
 
-#ifdef DEBUG
     CouplingMatrix::rc_type::const_iterator next = lb;
     next++;
     if (next != _mat._ranges.end())
@@ -354,9 +355,11 @@ public:
       _begin_location = max_size;
     else
       {
-        const std::size_t firstloc = _begin_it->first;
         const std::size_t lastloc  = _begin_it->second;
+#ifdef DEBUG
+        const std::size_t firstloc = _begin_it->first;
         libmesh_assert_less_equal(firstloc, lastloc);
+#endif
 
         // If that range ends before i,0 then we're an empty row
         std::size_t zero_location = _row_i*_mat.size();
