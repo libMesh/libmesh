@@ -503,6 +503,18 @@ AM_CONDITIONAL(LIBMESH_ENABLE_NLOPT, test x$enablenlopt = xyes)
 # -------------------------------------------------------------
 
 
+# -------------------------------------------------------------
+# CAPNPROTO -- Serialization library.
+# -------------------------------------------------------------
+CONFIGURE_CAPNPROTO
+if (test x$enablecapnproto = xyes); then
+  libmesh_optional_INCLUDES="$CAPNPROTO_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$CAPNPROTO_LIBRARY $libmesh_optional_LIBS"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_CAPNPROTO, test x$enablecapnproto = xyes)
+AC_CONFIG_FILES([contrib/capnproto/Makefile])
+# -------------------------------------------------------------
+
 
 # --------------------------------------------------------------
 # HDF5 -- enabled by default

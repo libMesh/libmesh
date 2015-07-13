@@ -186,6 +186,10 @@
    files */
 #undef HAVE_BZIP
 
+/* Flag indicating whether the library will be compiled with CAPNPROTO support
+   */
+#undef HAVE_CAPNPROTO
+
 /* Define to 1 if you have the <csignal> header file. */
 #undef HAVE_CSIGNAL
 

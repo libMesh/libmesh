@@ -105,7 +105,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
-	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/compiler.m4 \
+	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/capnproto.m4 \
+	$(top_srcdir)/m4/compiler.m4 \
 	$(top_srcdir)/m4/config_environment.m4 \
 	$(top_srcdir)/m4/config_summary.m4 \
 	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
@@ -394,6 +395,8 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
+	src/reduced_basis/rb_data_deserialization.C \
+	src/reduced_basis/rb_data_serialization.C \
 	src/reduced_basis/rb_eim_assembly.C \
 	src/reduced_basis/rb_eim_construction.C \
 	src/reduced_basis/rb_eim_evaluation.C \
@@ -791,6 +794,8 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_construction.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_construction_base.lo \
+	src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo \
+	src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_eim_assembly.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_eim_construction.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_eim_evaluation.lo \
@@ -1112,6 +1117,8 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
+	src/reduced_basis/rb_data_deserialization.C \
+	src/reduced_basis/rb_data_serialization.C \
 	src/reduced_basis/rb_eim_assembly.C \
 	src/reduced_basis/rb_eim_construction.C \
 	src/reduced_basis/rb_eim_evaluation.C \
@@ -1508,6 +1515,8 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/reduced_basis/libmesh_devel_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_devel_la-rb_construction.lo \
 	src/reduced_basis/libmesh_devel_la-rb_construction_base.lo \
+	src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo \
+	src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo \
 	src/reduced_basis/libmesh_devel_la-rb_eim_assembly.lo \
 	src/reduced_basis/libmesh_devel_la-rb_eim_construction.lo \
 	src/reduced_basis/libmesh_devel_la-rb_eim_evaluation.lo \
@@ -1826,6 +1835,8 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
+	src/reduced_basis/rb_data_deserialization.C \
+	src/reduced_basis/rb_data_serialization.C \
 	src/reduced_basis/rb_eim_assembly.C \
 	src/reduced_basis/rb_eim_construction.C \
 	src/reduced_basis/rb_eim_evaluation.C \
@@ -2222,6 +2233,8 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_construction.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_construction_base.lo \
+	src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo \
+	src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_eim_assembly.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_eim_construction.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_eim_evaluation.lo \
@@ -2540,6 +2553,8 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
+	src/reduced_basis/rb_data_deserialization.C \
+	src/reduced_basis/rb_data_serialization.C \
 	src/reduced_basis/rb_eim_assembly.C \
 	src/reduced_basis/rb_eim_construction.C \
 	src/reduced_basis/rb_eim_evaluation.C \
@@ -2936,6 +2951,8 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/reduced_basis/libmesh_opt_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_opt_la-rb_construction.lo \
 	src/reduced_basis/libmesh_opt_la-rb_construction_base.lo \
+	src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo \
+	src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo \
 	src/reduced_basis/libmesh_opt_la-rb_eim_assembly.lo \
 	src/reduced_basis/libmesh_opt_la-rb_eim_construction.lo \
 	src/reduced_basis/libmesh_opt_la-rb_eim_evaluation.lo \
@@ -3253,6 +3270,8 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
+	src/reduced_basis/rb_data_deserialization.C \
+	src/reduced_basis/rb_data_serialization.C \
 	src/reduced_basis/rb_eim_assembly.C \
 	src/reduced_basis/rb_eim_construction.C \
 	src/reduced_basis/rb_eim_evaluation.C \
@@ -3649,6 +3668,8 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/reduced_basis/libmesh_prof_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_prof_la-rb_construction.lo \
 	src/reduced_basis/libmesh_prof_la-rb_construction_base.lo \
+	src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo \
+	src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo \
 	src/reduced_basis/libmesh_prof_la-rb_eim_assembly.lo \
 	src/reduced_basis/libmesh_prof_la-rb_eim_construction.lo \
 	src/reduced_basis/libmesh_prof_la-rb_eim_evaluation.lo \
@@ -4245,6 +4266,9 @@ BUILD_USER = @BUILD_USER@
 BUILD_VERSION = @BUILD_VERSION@
 BUNZIP2 = @BUNZIP2@
 BZIP2 = @BZIP2@
+CAPNPROTO_INCLUDE = @CAPNPROTO_INCLUDE@
+CAPNPROTO_LIBRARY = @CAPNPROTO_LIBRARY@
+CAPNP_BINARY = @CAPNP_BINARY@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -4941,6 +4965,8 @@ libmesh_SOURCES = \
         src/reduced_basis/rb_assembly_expansion.C \
         src/reduced_basis/rb_construction.C \
         src/reduced_basis/rb_construction_base.C \
+        src/reduced_basis/rb_data_deserialization.C \
+        src/reduced_basis/rb_data_serialization.C \
         src/reduced_basis/rb_eim_assembly.C \
         src/reduced_basis/rb_eim_construction.C \
         src/reduced_basis/rb_eim_evaluation.C \
@@ -6189,6 +6215,12 @@ src/reduced_basis/libmesh_dbg_la-rb_construction.lo:  \
 src/reduced_basis/libmesh_dbg_la-rb_construction_base.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_dbg_la-rb_eim_assembly.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -7239,6 +7271,12 @@ src/reduced_basis/libmesh_devel_la-rb_construction.lo:  \
 src/reduced_basis/libmesh_devel_la-rb_construction_base.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_devel_la-rb_eim_assembly.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -8265,6 +8303,12 @@ src/reduced_basis/libmesh_oprof_la-rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_oprof_la-rb_construction_base.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_oprof_la-rb_eim_assembly.lo:  \
@@ -9294,6 +9338,12 @@ src/reduced_basis/libmesh_opt_la-rb_construction.lo:  \
 src/reduced_basis/libmesh_opt_la-rb_construction_base.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_opt_la-rb_eim_assembly.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -10317,6 +10367,12 @@ src/reduced_basis/libmesh_prof_la-rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_prof_la-rb_construction_base.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo:  \
+	src/reduced_basis/$(am__dirstamp) \
+	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
+src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_prof_la-rb_eim_assembly.lo:  \
@@ -12618,6 +12674,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_construction_base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_deserialization.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_serialization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_eim_assembly.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_eim_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_eim_evaluation.Plo@am__quote@
@@ -12636,6 +12694,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_construction_base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_deserialization.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_serialization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_eim_assembly.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_eim_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_eim_evaluation.Plo@am__quote@
@@ -12654,6 +12714,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_construction_base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_deserialization.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_serialization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_eim_assembly.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_eim_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_eim_evaluation.Plo@am__quote@
@@ -12672,6 +12734,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_construction_base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_deserialization.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_serialization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_eim_assembly.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_eim_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_eim_evaluation.Plo@am__quote@
@@ -12690,6 +12754,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_construction_base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_deserialization.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_serialization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_eim_assembly.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_eim_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_eim_evaluation.Plo@am__quote@
@@ -15392,6 +15458,20 @@ src/reduced_basis/libmesh_dbg_la-rb_construction_base.lo: src/reduced_basis/rb_c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_construction_base.C' object='src/reduced_basis/libmesh_dbg_la-rb_construction_base.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-rb_construction_base.lo `test -f 'src/reduced_basis/rb_construction_base.C' || echo '$(srcdir)/'`src/reduced_basis/rb_construction_base.C
+
+src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo: src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_deserialization.Tpo -c -o src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_deserialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_deserialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_deserialization.C' object='src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+
+src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo: src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_serialization.Tpo -c -o src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_serialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_data_serialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_serialization.C' object='src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
 
 src/reduced_basis/libmesh_dbg_la-rb_eim_assembly.lo: src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-rb_eim_assembly.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_eim_assembly.Tpo -c -o src/reduced_basis/libmesh_dbg_la-rb_eim_assembly.lo `test -f 'src/reduced_basis/rb_eim_assembly.C' || echo '$(srcdir)/'`src/reduced_basis/rb_eim_assembly.C
@@ -18333,6 +18413,20 @@ src/reduced_basis/libmesh_devel_la-rb_construction_base.lo: src/reduced_basis/rb
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-rb_construction_base.lo `test -f 'src/reduced_basis/rb_construction_base.C' || echo '$(srcdir)/'`src/reduced_basis/rb_construction_base.C
 
+src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo: src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_deserialization.Tpo -c -o src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_deserialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_deserialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_deserialization.C' object='src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+
+src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo: src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_serialization.Tpo -c -o src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_serialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_data_serialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_serialization.C' object='src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+
 src/reduced_basis/libmesh_devel_la-rb_eim_assembly.lo: src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-rb_eim_assembly.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_eim_assembly.Tpo -c -o src/reduced_basis/libmesh_devel_la-rb_eim_assembly.lo `test -f 'src/reduced_basis/rb_eim_assembly.C' || echo '$(srcdir)/'`src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_eim_assembly.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_eim_assembly.Plo
@@ -21272,6 +21366,20 @@ src/reduced_basis/libmesh_oprof_la-rb_construction_base.lo: src/reduced_basis/rb
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_construction_base.C' object='src/reduced_basis/libmesh_oprof_la-rb_construction_base.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-rb_construction_base.lo `test -f 'src/reduced_basis/rb_construction_base.C' || echo '$(srcdir)/'`src/reduced_basis/rb_construction_base.C
+
+src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo: src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_deserialization.Tpo -c -o src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_deserialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_deserialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_deserialization.C' object='src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+
+src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo: src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_serialization.Tpo -c -o src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_serialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_data_serialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_serialization.C' object='src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
 
 src/reduced_basis/libmesh_oprof_la-rb_eim_assembly.lo: src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-rb_eim_assembly.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_eim_assembly.Tpo -c -o src/reduced_basis/libmesh_oprof_la-rb_eim_assembly.lo `test -f 'src/reduced_basis/rb_eim_assembly.C' || echo '$(srcdir)/'`src/reduced_basis/rb_eim_assembly.C
@@ -24213,6 +24321,20 @@ src/reduced_basis/libmesh_opt_la-rb_construction_base.lo: src/reduced_basis/rb_c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-rb_construction_base.lo `test -f 'src/reduced_basis/rb_construction_base.C' || echo '$(srcdir)/'`src/reduced_basis/rb_construction_base.C
 
+src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo: src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_deserialization.Tpo -c -o src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_deserialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_deserialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_deserialization.C' object='src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+
+src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo: src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_serialization.Tpo -c -o src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_serialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_data_serialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_serialization.C' object='src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+
 src/reduced_basis/libmesh_opt_la-rb_eim_assembly.lo: src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-rb_eim_assembly.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_eim_assembly.Tpo -c -o src/reduced_basis/libmesh_opt_la-rb_eim_assembly.lo `test -f 'src/reduced_basis/rb_eim_assembly.C' || echo '$(srcdir)/'`src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_eim_assembly.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_eim_assembly.Plo
@@ -27152,6 +27274,20 @@ src/reduced_basis/libmesh_prof_la-rb_construction_base.lo: src/reduced_basis/rb_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_construction_base.C' object='src/reduced_basis/libmesh_prof_la-rb_construction_base.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-rb_construction_base.lo `test -f 'src/reduced_basis/rb_construction_base.C' || echo '$(srcdir)/'`src/reduced_basis/rb_construction_base.C
+
+src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo: src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_deserialization.Tpo -c -o src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_deserialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_deserialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_deserialization.C' object='src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-rb_data_deserialization.lo `test -f 'src/reduced_basis/rb_data_deserialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_deserialization.C
+
+src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo: src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_serialization.Tpo -c -o src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_serialization.Tpo src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_data_serialization.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_data_serialization.C' object='src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-rb_data_serialization.lo `test -f 'src/reduced_basis/rb_data_serialization.C' || echo '$(srcdir)/'`src/reduced_basis/rb_data_serialization.C
 
 src/reduced_basis/libmesh_prof_la-rb_eim_assembly.lo: src/reduced_basis/rb_eim_assembly.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-rb_eim_assembly.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_eim_assembly.Tpo -c -o src/reduced_basis/libmesh_prof_la-rb_eim_assembly.lo `test -f 'src/reduced_basis/rb_eim_assembly.C' || echo '$(srcdir)/'`src/reduced_basis/rb_eim_assembly.C

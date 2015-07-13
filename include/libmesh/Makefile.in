@@ -69,6 +69,8 @@ target_triplet = @target@
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_12 = netcdf.h
 @LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@am__append_13 = unique_ptr.hpp
 @LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@am__append_14 = unique_ptr.hpp
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_15 = rb_data.capnp.h
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_16 = rb_data.capnp.h
 subdir = include/libmesh
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -79,7 +81,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
-	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/compiler.m4 \
+	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/capnproto.m4 \
+	$(top_srcdir)/m4/compiler.m4 \
 	$(top_srcdir)/m4/config_environment.m4 \
 	$(top_srcdir)/m4/config_summary.m4 \
 	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
@@ -158,6 +161,9 @@ BUILD_USER = @BUILD_USER@
 BUILD_VERSION = @BUILD_VERSION@
 BUNZIP2 = @BUNZIP2@
 BZIP2 = @BZIP2@
+CAPNPROTO_INCLUDE = @CAPNPROTO_INCLUDE@
+CAPNPROTO_LIBRARY = @CAPNPROTO_LIBRARY@
+CAPNP_BINARY = @CAPNP_BINARY@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -525,25 +531,26 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_rules.h \
 	quadrature_simpson.h quadrature_trap.h rb_assembly_expansion.h \
-	rb_construction.h rb_construction_base.h rb_eim_assembly.h \
-	rb_eim_construction.h rb_eim_evaluation.h rb_eim_theta.h \
-	rb_evaluation.h rb_parameters.h rb_parametrized.h \
-	rb_parametrized_function.h rb_scm_construction.h \
-	rb_scm_evaluation.h rb_temporal_discretization.h rb_theta.h \
-	rb_theta_expansion.h transient_rb_assembly_expansion.h \
-	transient_rb_construction.h transient_rb_evaluation.h \
-	transient_rb_theta_expansion.h direct_solution_transfer.h \
-	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
-	meshfree_interpolation.h meshfree_solution_transfer.h \
-	meshfunction_solution_transfer.h radial_basis_functions.h \
-	radial_basis_interpolation.h solution_transfer.h \
-	adaptive_time_solver.h diff_solver.h eigen_solver.h \
-	eigen_sparse_linear_solver.h eigen_time_solver.h \
-	euler2_solver.h euler_solver.h first_order_unsteady_solver.h \
-	laspack_linear_solver.h linear.h linear_solver.h \
-	memory_solution_history.h newmark_solver.h newton_solver.h \
-	nlopt_optimization_solver.h no_solution_history.h \
-	nonlinear_solver.h optimization_solver.h \
+	rb_construction.h rb_construction_base.h \
+	rb_data_deserialization.h rb_data_serialization.h \
+	rb_eim_assembly.h rb_eim_construction.h rb_eim_evaluation.h \
+	rb_eim_theta.h rb_evaluation.h rb_parameters.h \
+	rb_parametrized.h rb_parametrized_function.h \
+	rb_scm_construction.h rb_scm_evaluation.h \
+	rb_temporal_discretization.h rb_theta.h rb_theta_expansion.h \
+	transient_rb_assembly_expansion.h transient_rb_construction.h \
+	transient_rb_evaluation.h transient_rb_theta_expansion.h \
+	direct_solution_transfer.h dtk_adapter.h dtk_evaluator.h \
+	dtk_solution_transfer.h meshfree_interpolation.h \
+	meshfree_solution_transfer.h meshfunction_solution_transfer.h \
+	radial_basis_functions.h radial_basis_interpolation.h \
+	solution_transfer.h adaptive_time_solver.h diff_solver.h \
+	eigen_solver.h eigen_sparse_linear_solver.h \
+	eigen_time_solver.h euler2_solver.h euler_solver.h \
+	first_order_unsteady_solver.h laspack_linear_solver.h linear.h \
+	linear_solver.h memory_solution_history.h newmark_solver.h \
+	newton_solver.h nlopt_optimization_solver.h \
+	no_solution_history.h nonlinear_solver.h optimization_solver.h \
 	petsc_auto_fieldsplit.h petsc_diff_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h second_order_unsteady_solver.h \
@@ -572,10 +579,11 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	vectormap.h xdr_cxx.h parallel_communicator_specializations \
 	$(am__append_1) $(am__append_3) $(am__append_5) \
 	$(am__append_7) $(am__append_9) $(am__append_11) \
-	$(am__append_13) libmesh_config.h
+	$(am__append_13) $(am__append_15) libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
-	$(am__append_12) $(am__append_14) libmesh_config.h
+	$(am__append_12) $(am__append_14) $(am__append_16) \
+	libmesh_config.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -802,6 +810,9 @@ uninstall-am:
 
 @LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@unique_ptr.hpp: $(top_srcdir)/contrib/unique_ptr/unique_ptr.hpp
 @LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@rb_data.capnp.h:
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $(top_builddir)/contrib/capnproto/rb_data.capnp.h $@
 
 #
 # libmesh_config.h rule
@@ -1663,6 +1674,12 @@ rb_construction.h: $(top_srcdir)/include/reduced_basis/rb_construction.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_construction_base.h: $(top_srcdir)/include/reduced_basis/rb_construction_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_deserialization.h: $(top_srcdir)/include/reduced_basis/rb_data_deserialization.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+rb_data_serialization.h: $(top_srcdir)/include/reduced_basis/rb_data_serialization.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_assembly.h: $(top_srcdir)/include/reduced_basis/rb_eim_assembly.h

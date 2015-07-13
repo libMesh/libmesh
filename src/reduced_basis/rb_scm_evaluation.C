@@ -20,8 +20,8 @@
 // Configuration data
 #include "libmesh/libmesh_config.h"
 
-// Currently, the RBSCMEvaluation should only be available
-// if SLEPc support is enabled.
+// RBSCMEvaluation should only be available
+// if SLEPc and GLPK support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 // rbOOmit includes
@@ -330,10 +330,10 @@ void RBSCMEvaluation::reload_current_parameters()
   set_parameters(saved_parameters);
 }
 
-void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                                  const bool write_binary_data)
+void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+                                                         const bool write_binary_data)
 {
-  START_LOG("write_offline_data_to_files()", "RBSCMEvaluation");
+  START_LOG("legacy_write_offline_data_to_files()", "RBSCMEvaluation");
 
   if(this->processor_id() == 0)
     {
@@ -448,14 +448,14 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
       SCM_UB_vectors_out.close();
     }
 
-  STOP_LOG("write_offline_data_to_files()", "RBSCMEvaluation");
+  STOP_LOG("legacy_write_offline_data_to_files()", "RBSCMEvaluation");
 }
 
 
-void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                   const bool read_binary_data)
+void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+                                                          const bool read_binary_data)
 {
-  START_LOG("read_offline_data_from_files()", "RBSCMEvaluation");
+  START_LOG("legacy_read_offline_data_from_files()", "RBSCMEvaluation");
 
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
@@ -571,7 +571,7 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
     }
   SCM_UB_vectors_in.close();
 
-  STOP_LOG("read_offline_data_from_files()", "RBSCMEvaluation");
+  STOP_LOG("legacy_read_offline_data_from_files()", "RBSCMEvaluation");
 }
 
 } // namespace libMesh

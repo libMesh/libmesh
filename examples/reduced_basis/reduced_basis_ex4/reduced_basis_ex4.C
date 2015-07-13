@@ -36,6 +36,8 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/getpot.h"
+#include "libmesh/rb_data_serialization.h"
+#include "libmesh/rb_data_deserialization.h"
 
 #include "eim_classes.h"
 #include "rb_classes.h"
@@ -120,7 +122,13 @@ int main (int argc, char** argv)
       // Perform the EIM Greedy and write out the data
       eim_construction.initialize_rb_construction();
       eim_construction.train_reduced_basis();
-      eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
+
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+      RBDataSerialization::RBEIMEvaluationSerialization rb_eim_eval_writer(eim_rb_eval);
+      rb_eim_eval_writer.write_to_file("rb_eim_eval.bin");
+#else
+      eim_construction.get_rb_evaluation().legacy_write_offline_data_to_files("eim_data");
+#endif
 
       // Read data from input file and print state
       rb_construction.process_parameters_file(rb_parameters);
@@ -140,7 +148,13 @@ int main (int argc, char** argv)
       // the system knows how many affine terms there are
       rb_construction.initialize_rb_construction();
       rb_construction.train_reduced_basis();
-      rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
+
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+      RBDataSerialization::RBEvaluationSerialization rb_eval_writer(rb_construction.get_rb_evaluation());
+      rb_eval_writer.write_to_file("rb_eval.bin");
+#else
+      rb_construction.get_rb_evaluation().legacy_write_offline_data_to_files("rb_data");
+#endif
 
       // Write out the basis functions, if requested
       if(store_basis_functions)
@@ -152,14 +166,24 @@ int main (int argc, char** argv)
     }
   else
     {
-      eim_rb_eval.read_offline_data_from_files("eim_data");
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+      RBDataDeserialization::RBEIMEvaluationDeserialization rb_eim_eval_reader(eim_rb_eval);
+      rb_eim_eval_reader.read_from_file("rb_eim_eval.bin");
+#else
+      eim_rb_eval.legacy_read_offline_data_from_files("eim_data");
+#endif
 
       // attach the EIM theta objects to rb_eval objects
       eim_rb_eval.initialize_eim_theta_objects();
       rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
 
       // Read in the offline data for rb_eval
-      rb_eval.read_offline_data_from_files("rb_data");
+#if defined(LIBMESH_HAVE_CAPNPROTO)
+      RBDataDeserialization::RBEvaluationDeserialization rb_eval_reader(rb_eval);
+      rb_eval_reader.read_from_file("rb_eval.bin", /*read_error_bound_data*/ true);
+#else
+      rb_eval.legacy_read_offline_data_from_files("rb_data");
+#endif
 
       // Get the parameters at which we will do a reduced basis solve
       Real online_center_x = infile("online_center_x", 0.);

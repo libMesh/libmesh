@@ -64,7 +64,6 @@ RBConstruction::RBConstruction (EquationSystems& es,
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
-    write_data_during_training(false),
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
@@ -226,8 +225,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const bool deterministic_training = infile("deterministic_training",false);
   const bool use_relative_bound_in_greedy_in = infile("use_relative_bound_in_greedy",
                                                       use_relative_bound_in_greedy);
-  const bool write_data_during_training_in = infile("write_data_during_training",
-                                                    write_data_during_training);
   unsigned int training_parameters_random_seed_in =
     static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
@@ -291,7 +288,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   set_rb_construction_parameters(n_training_samples,
                                  deterministic_training,
                                  use_relative_bound_in_greedy_in,
-                                 write_data_during_training_in,
                                  training_parameters_random_seed_in,
                                  quiet_mode_in,
                                  Nmax_in,
@@ -306,7 +302,6 @@ void RBConstruction::set_rb_construction_parameters(
                                                     unsigned int n_training_samples_in,
                                                     bool deterministic_training_in,
                                                     bool use_relative_bound_in_greedy_in,
-                                                    bool write_data_during_training_in,
                                                     unsigned int training_parameters_random_seed_in,
                                                     bool quiet_mode_in,
                                                     unsigned int Nmax_in,
@@ -319,11 +314,6 @@ void RBConstruction::set_rb_construction_parameters(
   // Tell the system whether or not to use a relative error bound
   // in the Greedy algorithm
   use_relative_bound_in_greedy = use_relative_bound_in_greedy_in;
-
-  // Tell the system whether or not to write out offline data during
-  // train_reduced_basis. This allows us to continue from where the
-  // training left off in case the computation stops for some reason.
-  write_data_during_training = write_data_during_training_in;
 
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -384,7 +374,6 @@ void RBConstruction::print_info()
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
-  libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
   libMesh::out << std::endl;
 }
@@ -681,22 +670,22 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       const Elem* elem = *el;
       UniquePtr<QBase> qrule;
       if (elem->type() == TRI3SUBDIVISION)
-      {
-        const Tri3Subdivision* gh_elem = static_cast<const Tri3Subdivision*> (elem);
-        if (gh_elem->is_ghost())
-          continue ;
-        // A Gauss quadrature rule for numerical integration.
-        // For subdivision shell elements, a single Gauss point per
-        // element is sufficient, hence we use extraorder = 0.
-        const int extraorder = 0;
-        FEBase* elem_fe = NULL;
-        context.get_element_fe( 0, elem_fe );
+        {
+          const Tri3Subdivision* gh_elem = static_cast<const Tri3Subdivision*> (elem);
+          if (gh_elem->is_ghost())
+            continue ;
+          // A Gauss quadrature rule for numerical integration.
+          // For subdivision shell elements, a single Gauss point per
+          // element is sufficient, hence we use extraorder = 0.
+          const int extraorder = 0;
+          FEBase* elem_fe = NULL;
+          context.get_element_fe( 0, elem_fe );
 
-        qrule = elem_fe->get_fe_type().default_quadrature_rule (2, extraorder);
+          qrule = elem_fe->get_fe_type().default_quadrature_rule (2, extraorder);
 
-        // Tell the finite element object to use our quadrature rule.
-        elem_fe->attach_quadrature_rule (qrule.get());
-      }
+          // Tell the finite element object to use our quadrature rule.
+          elem_fe->attach_quadrature_rule (qrule.get());
+        }
 
       context.pre_fe_reinit(*this, *el);
       context.elem_fe_reinit();
@@ -774,7 +763,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                   ConstCouplingRow ccr(var1, *coupling_matrix);
                   ConstCouplingRow::const_iterator end = ccr.end();
                   for (ConstCouplingRow::const_iterator it =
-                       ccr.begin(); it != end; ++it)
+                         ccr.begin(); it != end; ++it)
                     {
                       unsigned int var2 = *it;
 
@@ -1010,8 +999,7 @@ void RBConstruction::assemble_all_output_vectors()
     }
 }
 
-Real RBConstruction::train_reduced_basis(const std::string& directory_name,
-                                         const bool resize_rb_eval_data)
+Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 {
   START_LOG("train_reduced_basis()", "RBConstruction");
 
@@ -1066,14 +1054,6 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
 
           libMesh::out << "Maximum " << (use_relative_bound_in_greedy ? "(relative)" : "(absolute)")
                        << " error bound is " << training_greedy_error << std::endl << std::endl;
-
-          if(write_data_during_training)
-            {
-              std::stringstream new_dir_name;
-              new_dir_name << directory_name << "_" << get_rb_evaluation().get_n_basis_functions();
-              libMesh::out << "Writing out RB data to " << new_dir_name.str() << std::endl;
-              get_rb_evaluation().write_offline_data_to_files(new_dir_name.str());
-            }
 
           // Break out of training phase if we have reached Nmax
           // or if the training_tolerance is satisfied.
