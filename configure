@@ -36487,7 +36487,7 @@ fi
     fi
 
     # Initialize Makefile/config.h substitution variables.  These will
-    #  include flags and library names where necessary.
+    # include flags and library names where necessary.
     CAPNPROTO_INCLUDE=""
     CAPNPROTO_LIBRARY=""
 
