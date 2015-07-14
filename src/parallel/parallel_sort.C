@@ -210,33 +210,40 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // Vector to receive the total bin size for each
       // processor.  Processor i's bin size will be
       // held in proc_bin_size[i]
-      std::vector<IdxType> proc_bin_size;
+      std::vector<int> proc_bin_size;
 
       // Find the number of contributions coming from each
       // processor for this bin.  Note: allgather combines
       // the MPI_Gather and MPI_Bcast operations into one.
-      this->comm().allgather(_local_bin_sizes[i], proc_bin_size);
+      this->comm().allgather(static_cast<int>(_local_bin_sizes[i]),
+                             proc_bin_size);
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<IdxType> displacements(_n_procs);
+      std::vector<int> displacements(_n_procs);
       for (processor_id_type j=1; j<_n_procs; ++j)
         displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 
-      MPI_Gatherv((_data.size() > local_offset) ?
-                  &_data[local_offset] :
-                  NULL,                            // Points to the beginning of the bin to be sent
+      // Points to the beginning of the bin to be sent
+      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : NULL;
+
+      // Enough storage to hold all bin contributions
+      void * recvbuf = (dest.empty()) ? NULL : &dest[0];
+
+      // If the sendbuf is NULL, make sure we aren't claiming to send something.
+      if (sendbuf == NULL && _local_bin_sizes[i] != 0)
+        libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
+
+      MPI_Gatherv(sendbuf,
                   _local_bin_sizes[i],               // How much data is in the bin being sent.
                   Parallel::StandardType<KeyType>(), // The data type we are sorting
-                  (dest.empty()) ?
-                  NULL :
-                  &dest[0],                        // Enough storage to hold all bin contributions
-                  (int*) &proc_bin_size[0],          // How much is to be received from each processor
-                  (int*) &displacements[0],          // Offsets into the receive buffer
+                  recvbuf,
+                  &proc_bin_size[0],          // How much is to be received from each processor
+                  &displacements[0],          // Offsets into the receive buffer
                   Parallel::StandardType<KeyType>(), // The data type we are sorting
                   i,                                 // The root process (we do this once for each proc)
                   this->comm().get());
@@ -290,7 +297,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
       // Vector to receive the total bin size for each
       // processor.  Processor i's bin size will be
       // held in proc_bin_size[i]
-      std::vector<unsigned int> proc_bin_size(_n_procs);
+      std::vector<int> proc_bin_size(_n_procs);
 
       // Find the number of contributions coming from each
       // processor for this bin.  Note: Allgather combines
@@ -302,29 +309,35 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
                     MPI_UNSIGNED,
                     &proc_bin_size[0],    // Destination: Total # of entries in bin i
                     1,
-                    MPI_UNSIGNED,
+                    MPI_INT,
                     this->comm().get());
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<unsigned int> displacements(_n_procs);
+      std::vector<int> displacements(_n_procs);
       for (unsigned int j=1; j<_n_procs; ++j)
         displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 
-      MPI_Gatherv((_data.size() > local_offset) ?
-                  &_data[local_offset] :
-                  NULL,                   // Points to the beginning of the bin to be sent
+      // Points to the beginning of the bin to be sent
+      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : NULL;
+
+      // Enough storage to hold all bin contributions
+      void * recvbuf = (dest.empty()) ? NULL : &dest[0];
+
+      // If the sendbuf is NULL, make sure we aren't claiming to send something.
+      if (sendbuf == NULL && _local_bin_sizes[i] != 0)
+        libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
+
+      MPI_Gatherv(sendbuf,
                   _local_bin_sizes[i],      // How much data is in the bin being sent.
                   Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
-                  (dest.empty()) ?
-                  NULL :
-                  &dest[0],               // Enough storage to hold all bin contributions
-                  (int*) &proc_bin_size[0], // How much is to be received from each processor
-                  (int*) &displacements[0], // Offsets into the receive buffer
+                  recvbuf,
+                  &proc_bin_size[0], // How much is to be received from each processor
+                  &displacements[0], // Offsets into the receive buffer
                   Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
                   i,                        // The root process (we do this once for each proc)
                   this->comm().get());
