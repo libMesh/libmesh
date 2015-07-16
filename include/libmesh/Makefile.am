@@ -501,8 +501,8 @@ endif
 if LIBMESH_ENABLE_CAPNPROTO
 
 rb_data.capnp.h:
- 	$(MAKE) -C $(top_builddir)/contrib/capnproto rb_data.capnp.h
- 	$(AM_V_GEN)rm -f $@ && $(LN_S) $(top_builddir)/contrib/capnproto/rb_data.capnp.h $@
+	$(MAKE) -C $(top_builddir)/contrib/capnproto rb_data.capnp.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $(top_builddir)/contrib/capnproto/rb_data.capnp.h $@
 
   BUILT_SOURCES  += rb_data.capnp.h
   DISTCLEANFILES += rb_data.capnp.h

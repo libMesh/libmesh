@@ -493,11 +493,6 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 
-# This header file is generated from the capnp executable.  See also
-# include/libmesh/rebuild_makefile.sh for getting this header linked
-# into the libmesh include directory.
-#include_HEADERS = rb_data.capnp.h
-
 # Description of the BUILT_SOURCES variable:
 # A source file listed in BUILT_SOURCES is made on 'make all' or 'make
 # check' (or even 'make install') before other targets are
@@ -506,6 +501,9 @@ vtkversion = @vtkversion@
 # variable.
 @LIBMESH_ENABLE_CAPNPROTO_TRUE@BUILT_SOURCES = $(builddir)/rb_data.capnp.c++ $(builddir)/rb_data.capnp.h
 @LIBMESH_ENABLE_CAPNPROTO_TRUE@pkg_cppflags = $(CAPNPROTO_INCLUDE)
+
+# placing this here, unconditionally based on LIBMESH_ENABLE_CAPNPROTO,
+# ensures that it will be bundled up by 'make dist' & 'make distcheck'
 pkg_sources = rb_data.capnp
 
 ######################################################################

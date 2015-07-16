@@ -812,8 +812,8 @@ uninstall-am:
 @LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 @LIBMESH_ENABLE_CAPNPROTO_TRUE@rb_data.capnp.h:
-@LIBMESH_ENABLE_CAPNPROTO_TRUE@ 	$(MAKE) -C $(top_builddir)/contrib/capnproto rb_data.capnp.h
-@LIBMESH_ENABLE_CAPNPROTO_TRUE@ 	$(AM_V_GEN)rm -f $@ && $(LN_S) $(top_builddir)/contrib/capnproto/rb_data.capnp.h $@
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@	$(MAKE) -C $(top_builddir)/contrib/capnproto rb_data.capnp.h
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $(top_builddir)/contrib/capnproto/rb_data.capnp.h $@
 
 #
 # libmesh_config.h rule
