@@ -1,5 +1,9 @@
 includedir = $(prefix)/include/libmesh
 
+# placing this here, unconditionally based on LIBMESH_ENABLE_CAPNPROTO,
+# ensures that it will be bundled up by 'make dist' & 'make distcheck'
+pkg_sources = rb_data.capnp
+
 if LIBMESH_ENABLE_CAPNPROTO
 
 # Description of the BUILT_SOURCES variable:
@@ -30,11 +34,10 @@ $(builddir)/rb_data.capnp.c++: $(builddir)/rb_data.capnp.h
 
 pkg_cppflags = $(CAPNPROTO_INCLUDE)
 
+# Add more files to the list of pkg_sources so Automake knows to build them.
+pkg_sources += rb_data.capnp.c++ rb_data.capnp.h
 endif
 
-# placing this here, unconditionally based on LIBMESH_ENABLE_CAPNPROTO,
-# ensures that it will be bundled up by 'make dist' & 'make distcheck'
-pkg_sources = rb_data.capnp
 
 # Make.common is another automake file that handles compiling/linking flags and METHODs stuff.
 include $(top_srcdir)/contrib/Make.common
