@@ -1,10 +1,6 @@
 includedir = $(prefix)/include/libmesh
 
 if LIBMESH_ENABLE_CAPNPROTO
-# This header file is generated from the capnp executable.  See also
-# include/libmesh/rebuild_makefile.sh for getting this header linked
-# into the libmesh include directory.
-include_HEADERS = rb_data.capnp.h
 
 # Description of the BUILT_SOURCES variable:
 # A source file listed in BUILT_SOURCES is made on 'make all' or 'make
@@ -32,12 +28,13 @@ $(builddir)/rb_data.capnp.h: $(srcdir)/rb_data.capnp
 # "generated", and makes the whole thing work with "make -j" runs.
 $(builddir)/rb_data.capnp.c++: $(builddir)/rb_data.capnp.h
 
-# If we tell Automake what the pkg_sources are, it will compile them
-# into a library for us.  See also contrib/gmv/Makefile.am.
-pkg_sources = rb_data.capnp.c++ rb_data.capnp.h
 pkg_cppflags = $(CAPNPROTO_INCLUDE)
 
 endif
+
+# placing this here, unconditionally based on LIBMESH_ENABLE_CAPNPROTO,
+# ensures that it will be bundled up by 'make dist' & 'make distcheck'
+pkg_sources = rb_data.capnp
 
 # Make.common is another automake file that handles compiling/linking flags and METHODs stuff.
 include $(top_srcdir)/contrib/Make.common
