@@ -34,6 +34,11 @@ rb_data-capnp.c++: rb_data.capnp.h
 
 pkg_cppflags = $(CAPNPROTO_INCLUDE)
 
+# These are the headers we actually want to install and make available
+# to a user.  Consider these the public interface of libMesh.
+# will get installed into '$(prefix)/include/libmesh'
+include_HEADERS = rb_data.capnp.h
+
 else
 rb_data.capnp.h:
 	$(AM_V_GEN)echo "// nothing needed without LIBMESH_ENABLE_CAPNPROTO" > $@
