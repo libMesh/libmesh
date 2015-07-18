@@ -874,6 +874,9 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
+	  dist-hook
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
@@ -990,7 +993,7 @@ uninstall-am: uninstall-includeHEADERS
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libtool clean-noinstLTLIBRARIES cscopelist ctags \
-	distclean distclean-compile distclean-generic \
+	dist-hook distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
@@ -1034,6 +1037,11 @@ uninstall-am: uninstall-includeHEADERS
 # End:
 
 # Make.common is another automake file that handles compiling/linking flags and METHODs stuff.
+
+# Ensure these don't get packaged up, with or without Cap'N Proto we want to make sure thet are rebuilt
+dist-hook:
+	rm -f $(distdir)/rb_data.capnp.h \
+	      $(distdir)/rb_data-capnp.c++
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

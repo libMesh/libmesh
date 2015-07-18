@@ -39,7 +39,7 @@ pkg_cppflags = $(CAPNPROTO_INCLUDE)
 # will get installed into '$(prefix)/include/libmesh'
 include_HEADERS = rb_data.capnp.h
 
-else
+else !LIBMESH_ENABLE_CAPNPROTO
 rb_data.capnp.h:
 	$(AM_V_GEN)echo "// nothing needed without LIBMESH_ENABLE_CAPNPROTO" > $@
 
@@ -49,3 +49,8 @@ endif
 
 # Make.common is another automake file that handles compiling/linking flags and METHODs stuff.
 include $(top_srcdir)/contrib/Make.common
+
+# Ensure these don't get packaged up, with or without Cap'N Proto we want to make sure thet are rebuilt
+dist-hook:
+	rm -f $(distdir)/rb_data.capnp.h \
+	      $(distdir)/rb_data-capnp.c++
