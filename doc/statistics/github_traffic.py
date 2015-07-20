@@ -975,7 +975,8 @@ month_intervals = ['2014-Feb-17',
                    '2015-Mar-17',
                    '2015-Apr-17',
                    '2015-May-17',
-                   '2015-Jun-17',]
+                   '2015-Jun-17',
+                   '2015-Jul-17']
 
 # Find the indexes of each date
 month_indexes = []
