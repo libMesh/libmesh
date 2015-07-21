@@ -238,13 +238,13 @@ AC_DEFUN([CONFIGURE_PETSC],
         # by the tests above with an invalid PETSCINCLUDEDIRS
         # variable, which happened when PETSc 3.6 came out.
         AC_MSG_CHECKING(whether we can compile a trivial PETSc program)
-        AC_LANG_PUSH([C])
+        AC_LANG_PUSH([C++])
 
-        # Save the original CFLAGS contents
-        saveCFLAGS="$CFLAGS"
+        # Save the original CXXFLAGS contents
+        saveCXXFLAGS="$CXXFLAGS"
 
-        # Append PETSc include paths to the CFLAGS variables
-        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+        # Append PETSc include paths to the CXXFLAGS variables
+        CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS"
 
         AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
         @%:@include <petsc.h>
@@ -263,10 +263,10 @@ AC_DEFUN([CONFIGURE_PETSC],
           AC_MSG_RESULT(no)
         ])
 
-        # Return C flags to their original state.
-        CFLAGS="$saveCFLAGS"
+        # Return CXXFLAGS to their original state.
+        CXXFLAGS="$saveCXXFLAGS"
 
-        AC_LANG_POP([C])
+        AC_LANG_POP([C++])
 
 
         # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
