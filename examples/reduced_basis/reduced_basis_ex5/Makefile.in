@@ -606,7 +606,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = RB_sol.e offline_data/* $(am__append_1) \
+CLEANFILES = RB_sol.e offline_data/* rb_eval.bin $(am__append_1) \
 	$(example_name).html stdout.log
 
 # also need to link files for VPATH builds

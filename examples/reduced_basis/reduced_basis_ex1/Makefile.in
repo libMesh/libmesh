@@ -623,8 +623,8 @@ CLEANFILES = RB_sol.e offline_data/RB_F_000.xdr \
 	offline_data/bf13.xdr offline_data/bf12.xdr \
 	offline_data/bf11.xdr offline_data/bf10.xdr \
 	offline_data/bf1.xdr offline_data/bf0.xdr \
-	offline_data/Aq_Aq_innerprods.xdr bf0.e $(am__append_1) \
-	$(example_name).html stdout.log
+	offline_data/Aq_Aq_innerprods.xdr bf0.e rb_eval.bin \
+	$(am__append_1) $(example_name).html stdout.log
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
