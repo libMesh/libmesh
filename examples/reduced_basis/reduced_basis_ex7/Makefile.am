@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/reduced_basis/ex7
 data          = assembly.h horn.geo horn.msh rb_classes.h reduced_basis_ex7.C reduced_basis_ex7.in run.sh
 sources       = $(data) run.sh
 
-CLEANFILES =
+CLEANFILES = rb_eval.bin
 
 clean-local:
 	-rm -rf rb_data eim_data

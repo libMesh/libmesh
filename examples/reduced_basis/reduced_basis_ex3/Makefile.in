@@ -600,8 +600,8 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = bf0.e offline_data/* RB_sol.e $(am__append_1) \
-	$(example_name).html stdout.log
+CLEANFILES = bf0.e offline_data/* RB_sol.e trans_rb_eval.bin \
+	$(am__append_1) $(example_name).html stdout.log
 
 # conditionally enable this test
 @LIBMESH_ENABLE_SLEPC_TRUE@check_SCRIPTS = run.sh

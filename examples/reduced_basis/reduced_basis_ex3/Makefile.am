@@ -3,7 +3,7 @@ install_dir  = $(examples_install_path)/reduced_basis/ex3
 data         = reduced_basis_ex3.C assembly.h rb_classes.h reduced_basis_ex3.in run.sh
 sources      = $(data) run.sh
 
-CLEANFILES = bf0.e offline_data/* RB_sol.e
+CLEANFILES = bf0.e offline_data/* RB_sol.e trans_rb_eval.bin
 
 # conditionally enable this test
 if LIBMESH_ENABLE_SLEPC

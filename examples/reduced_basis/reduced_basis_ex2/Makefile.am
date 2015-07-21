@@ -4,7 +4,7 @@ data         = reduced_basis_ex2.C assembly.h rb_classes.h reduced_basis_ex2.in 
 sources      = $(data) run.sh
 
 
-CLEANFILES = bf0.e RB_sol.e rb_data/* scm_data/*
+CLEANFILES = bf0.e RB_sol.e rb_data/* scm_data/* rb_eval.bin rb_scm_eval.bin
 
 clean-local:
 	-rm -rf rb_data scm_data
