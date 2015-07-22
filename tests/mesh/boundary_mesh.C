@@ -194,6 +194,10 @@ public:
 
 };
 
+CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryMeshTest );
+
+#ifdef LIBMESH_ENABLE_AMR
+
 class BoundaryRefinedMeshTest : public BoundaryMeshTest {
   /**
    * The goal of this test is the same as the previous, but now we do a
@@ -215,13 +219,11 @@ public:
   {
     this->build_mesh();
 
-#ifdef LIBMESH_ENABLE_AMR
     // Need to refine interior mesh before separate boundary meshes,
     // if we want to get interior_parent links right.
     MeshRefinement(*_mesh).uniformly_refine(1);
     MeshRefinement(*_left_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_all_boundary_mesh).uniformly_refine(1);
-#endif
   }
 
   void testMesh()
@@ -261,5 +263,6 @@ public:
 
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryRefinedMeshTest );
+
+#endif
