@@ -9,7 +9,7 @@
 
 using namespace libMesh;
 
-class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<Real> > {
+class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<libMesh::Number> > {
 public:
   void setUp()
   {
@@ -33,4 +33,3 @@ public:
 CPPUNIT_TEST_SUITE_REGISTRATION( EigenSparseVectorTest );
 
 #endif // #ifdef LIBMESH_HAVE_EIGEN
-
