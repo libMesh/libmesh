@@ -259,7 +259,7 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      libMesh::Real u_ddot, v_ddot, w_ddot;
+      libMesh::Number u_ddot, v_ddot, w_ddot;
       c.interior_accel( u_var, qp, u_ddot );
       c.interior_accel( v_var, qp, v_ddot );
       c.interior_accel( w_var, qp, w_ddot );
