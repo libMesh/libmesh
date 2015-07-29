@@ -291,7 +291,7 @@ int main (int argc, char** argv)
   // Print out the error value
   std::cout << "L2-Error is: " << err << std::endl;
 
-  libmesh_assert_less(err, 2e-3);
+  libmesh_assert_less(libmesh_real(err), 2e-3);
 
 #endif // #ifdef LIBMESH_HAVE_FPARSER
 

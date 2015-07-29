@@ -210,9 +210,10 @@ Number AssembleOptimization::objective (
   UniquePtr< NumericVector<Number> > AxU = soln.zero_clone();
 
   A_matrix->vector_mult(*AxU, soln);
-  Real UTxAxU = AxU->dot(soln);
 
-  Real UTxF = F_vector->dot(soln);
+  Number
+    UTxAxU = AxU->dot(soln),
+    UTxF   = F_vector->dot(soln);
 
   return 0.5 * UTxAxU - UTxF;
 }
@@ -349,4 +350,3 @@ int main (int argc, char** argv)
 
   return 0;
 }
-

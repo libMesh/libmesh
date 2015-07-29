@@ -91,7 +91,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   const std::vector<std::vector<RealGradient> > &dphi = fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.get_dof_indices(T_var).size(); 
+  const unsigned int n_T_dofs = c.get_dof_indices(T_var).size();
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &K = c.get_elem_jacobian(T_var, T_var);
@@ -122,7 +122,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 
       // Only apply forcing to interior elements
       const Number forcing = (dim == mesh_dim) ?
-        -k * dim * libMesh::pi * libMesh::pi * u_exact : 0;
+        -k * u_exact * (dim * libMesh::pi * libMesh::pi) : 0;
 
       const Number JxWxNK = JxW[qp] * -k;
 
@@ -138,6 +138,6 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
               K(i,j) += JxWxNKxD * (dphi[i][qp] * dphi[j][qp]);
         }
     } // end of the quadrature point qp-loop
-  
+
   return request_jacobian;
 }
