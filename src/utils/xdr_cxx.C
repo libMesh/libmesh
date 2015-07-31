@@ -392,6 +392,20 @@ bool Xdr::is_open() const
 }
 
 
+
+bool Xdr::is_eof()
+{
+  int next = in->peek();
+  if (next == EOF)
+    {
+      libmesh_assert(in->eof());
+      return true;
+    }
+  return false;
+}
+
+
+
 #ifdef LIBMESH_HAVE_XDR
 
 // Anonymous namespace for Xdr::data helper functions
