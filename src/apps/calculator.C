@@ -31,11 +31,11 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh.h"
-#include "libmesh/mesh_function.h"
+#include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/point.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/steady_solver.h"
 
 
 using namespace libMesh;
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
   // Load the old mesh from --inmesh filename.
   // Keep it serialized; we don't want elements on the new mesh to be
   // looking for data on old mesh elements that live off-processor.
-  SerialMesh old_mesh(init.comm(), requested_dim);
+  Mesh old_mesh(init.comm(), requested_dim);
 
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string("mesh.xda"));
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
   const unsigned int n_systems = old_es.n_systems();
 
   const unsigned int sysnum =
-    assert_argument(cl, "--insys", argv[0], 0);
+    cl.follow(0, "--insys");
 
   libmesh_assert_less(sysnum, n_systems);
 
@@ -141,6 +141,9 @@ int main(int argc, char** argv)
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
 
   L2System &new_sys = new_es.add_system<L2System>(current_sys_name);
+
+  new_sys.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(new_sys));
   
   new_sys.fe_family() =
     cl.follow(std::string("LAGRANGE"), "--family");
@@ -154,6 +157,14 @@ int main(int argc, char** argv)
   ParsedFEMFunction<Number> goal_function(old_sys, calcfunc);
 
   new_sys.goal_func = goal_function.clone();
+  new_sys.input_system = &old_sys;
+
+  new_es.init();
+
+  DiffSolver& solver = *(new_sys.time_solver->diff_solver().get());
+  solver.quiet = false;
+  solver.verbose = true;
+  solver.relative_step_tolerance = 1e-10;
 
   new_sys.solve();
 

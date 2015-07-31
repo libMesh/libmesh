@@ -10,6 +10,17 @@
 
 using namespace libMesh;
 
+L2System::~L2System ()
+{
+  for (std::map<FEMContext *, FEMContext *>::const_iterator
+         it = input_contexts.begin();
+       it != input_contexts.end(); ++it)
+    {
+      FEMContext *c = it->second;
+      delete c;
+    }
+}
+
 void L2System::init_data ()
 {
   this->add_variable ("u", static_cast<Order>(_fe_order),
@@ -26,10 +37,22 @@ void L2System::init_context(DiffContext &context)
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
   // Now make sure we have requested all the data
-  // we need to build the linear system.
+  // we need to build the L2 system.
   c.get_element_fe(0)->get_JxW();
   c.get_element_fe(0)->get_phi();
   c.get_element_fe(0)->get_xyz();
+
+  // Build a corresponding context for the input system if we haven't
+  // already
+  FEMContext *& input_context = input_contexts[&c];
+  if (!input_context)
+    {
+      libmesh_assert(input_system);
+      input_context = new FEMContext(*input_system);
+
+      libmesh_assert(goal_func.get());
+      goal_func->init_context(*input_context);
+    }
 
   FEMSystem::init_context(context);
 }
@@ -59,11 +82,17 @@ bool L2System::element_time_derivative (bool request_jacobian,
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  libmesh_assert (input_contexts.find(&c) != input_contexts.end());
+
+  FEMContext &input_c = *input_contexts[&c];
+  input_c.pre_fe_reinit(*input_system, &c.get_elem());
+  input_c.elem_fe_reinit();
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       Number u = c.interior_value(0, qp);
 
-      Number ufunc = (*goal_func)(c, xyz[qp]);
+      Number ufunc = (*goal_func)(input_c, xyz[qp]);
 
       for (unsigned int i=0; i != n_u_dofs; i++)
         F(i) += JxW[qp] * ((u - ufunc) * phi[i][qp]);
