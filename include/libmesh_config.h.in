@@ -565,6 +565,10 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Flag indicating whether or not PETSc was configured with debugging enabled
+   */
+#undef PETSC_USE_DEBUG
+
 /* size of processor_id */
 #undef PROCESSOR_ID_BYTES
 
