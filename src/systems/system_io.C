@@ -743,8 +743,9 @@ void System::read_serialized_data (Xdr& io,
   }
 
   // 11.)
-  // Only read additional vectors if wanted
-  if (read_additional_data)
+  // Only read additional vectors if the user requested them and
+  // data is available
+  if (read_additional_data && !io.is_eof())
     {
       std::map<std::string, NumericVector<Number>* >::const_iterator
         pos = _vectors.begin();
