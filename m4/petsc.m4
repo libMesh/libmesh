@@ -89,6 +89,13 @@ AC_DEFUN([CONFIGURE_PETSC],
         fi
       fi
 
+      # Determine if PETSc has been built with debugging enabled.
+      # Note that this token will appear as LIBMESH_PETSC_USE_DEBUG in
+      # our header, so it won't collide with PETSc's.
+      petsc_use_debug=`grep -c PETSC_USE_DEBUG $PETSC_DIR/include/petscconf.h`
+      if (test $petsc_use_debug -gt 0); then
+        AC_DEFINE(PETSC_USE_DEBUG, 1, [Flag indicating whether or not PETSc was configured with debugging enabled])
+      fi
     else # petscversion.h was not readable
         enablepetsc=no
     fi
