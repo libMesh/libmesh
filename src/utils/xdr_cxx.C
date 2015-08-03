@@ -395,12 +395,33 @@ bool Xdr::is_open() const
 
 bool Xdr::is_eof()
 {
-  int next = in->peek();
-  if (next == EOF)
+  switch (mode)
     {
-      libmesh_assert(in->eof());
-      return true;
+    case ENCODE:
+    case DECODE:
+      {
+        libmesh_assert(fp);
+        int next = fgetc(fp);
+        if (next == EOF)
+          return true;
+        ungetc(next, fp);
+        break;
+      }
+    case READ:
+      {
+        libmesh_assert(in.get());
+        int next = in->peek();
+        if (next == EOF)
+          {
+            libmesh_assert(in->eof());
+            return true;
+          }
+        break;
+      }
+    default:
+      libmesh_error();
     }
+
   return false;
 }
 
