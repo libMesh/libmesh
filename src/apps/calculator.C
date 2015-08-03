@@ -156,7 +156,7 @@ int main(int argc, char** argv)
   
   ParsedFEMFunction<Number> goal_function(old_sys, calcfunc);
 
-  new_sys.goal_func = goal_function.clone();
+  new_sys.goal_func.reset(goal_function.clone().release());
   new_sys.input_system = &old_sys;
 
   new_es.init();
