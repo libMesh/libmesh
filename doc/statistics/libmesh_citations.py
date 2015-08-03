@@ -34,9 +34,9 @@ data = [
     '\'12', 50,
     '\'13', 78,
     '\'14', 62,
-    '\'15', 29,
+    '\'15', 33,
     'P',     7, # Preprints
-    'T',    39  # Theses
+    'T',    41  # Theses
     ]
 
 # Extract the x-axis labels from the data array
