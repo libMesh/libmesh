@@ -516,8 +516,11 @@ int main (int argc, char** argv)
       // Print it out
       std::cout<<"Sensitivity of QoI 0 w.r.t parameter 0 is: " << sensitivity_0_0 << std::endl;
 
-      // Hard coded assert to ensure that the actual numbers we are getting are what they should be
-      libmesh_assert_less(std::abs(sensitivity_0_0 - (-5.37173)), 1.e-5);
+      // Hard coded assert to ensure that the actual numbers we are
+      // getting are what they should be
+      // The 2e-4 tolerance is chosen to ensure success even with
+      // 32-bit floats
+      libmesh_assert_less(std::abs(sensitivity_0_0 - (-5.37173)), 2.e-4);
 
 #ifdef NDEBUG
     }
