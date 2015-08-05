@@ -401,19 +401,50 @@ bool Xdr::is_eof()
     case DECODE:
       {
         libmesh_assert(fp);
+
+        // If we're failing, was it due to eof?
+        if (ferror(fp))
+          return feof(fp);
+
         int next = fgetc(fp);
         if (next == EOF)
-          return true;
+          {
+            // We should *only* be at EOF, not otherwise broken
+            libmesh_assert(feof(fp));
+            libmesh_assert(!ferror(fp));
+
+            // Reset the EOF indicator
+            clearerr(fp);
+            libmesh_assert(!ferror(fp));
+
+            // We saw EOF
+            return true;
+          }
+
+        // We didn't see EOF; restore whatever we did see.
         ungetc(next, fp);
         break;
       }
     case READ:
       {
         libmesh_assert(in.get());
+
+        // If we're failing, was it due to eof?
+        if (!in->good())
+          return in->eof();
+
         int next = in->peek();
         if (next == EOF)
           {
+            // We should *only* be at EOF, not otherwise broken
             libmesh_assert(in->eof());
+            libmesh_assert(!in->fail());
+
+            // Reset the EOF indicator
+            in->clear();
+            libmesh_assert(in->good());
+
+            // We saw EOF
             return true;
           }
         break;
