@@ -79,12 +79,16 @@ protected:
    * Constructor-from-scalars.  By default sets higher dimensional
    * entries to 0.
    */
-  template <typename Scalar>
-  TypeVector (const Scalar x,
-              const Scalar y=0,
+  template <typename Scalar1, typename Scalar2, typename Scalar3>
+  TypeVector (typename
+              boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+              const Scalar1>::type x,
               typename
-              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-              const Scalar>::type z=0);
+              boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+              const Scalar2>::type y,
+              typename
+              boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+              const Scalar3>::type z=0);
 
 public:
 
@@ -394,13 +398,17 @@ TypeVector<T>::TypeVector (const T x,
 
 
 template <typename T>
-template <typename Scalar>
+template <typename Scalar1, typename Scalar2, typename Scalar3>
 inline
-TypeVector<T>::TypeVector (const Scalar x,
-                           const Scalar y,
+TypeVector<T>::TypeVector (typename
+                           boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+                           const Scalar1>::type x,
                            typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                           const Scalar>::type z)
+                           boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+                           const Scalar2>::type y,
+                           typename
+                           boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+                           const Scalar3>::type z)
 {
   _coords[0] = x;
 
