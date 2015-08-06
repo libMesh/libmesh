@@ -402,10 +402,11 @@ bool Xdr::is_eof()
       {
         libmesh_assert(fp);
 
-        // If we're failing, was it due to eof?
-        if (ferror(fp))
-          return feof(fp);
+        // Are we already at eof?
+        if (feof(fp))
+          return true;
 
+        // Or about to reach eof?
         int next = fgetc(fp);
         if (next == EOF)
           {
@@ -429,10 +430,11 @@ bool Xdr::is_eof()
       {
         libmesh_assert(in.get());
 
-        // If we're failing, was it due to eof?
-        if (!in->good())
-          return in->eof();
+        // Are we already at eof?
+        if (in->eof())
+          return true;
 
+        // Or about to reach eof?
         int next = in->peek();
         if (next == EOF)
           {
