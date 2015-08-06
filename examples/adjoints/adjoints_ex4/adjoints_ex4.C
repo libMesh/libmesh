@@ -532,9 +532,20 @@ int main (int argc, char** argv)
           std::abs(QoI_1_computed - QoI_1_exact) << std::endl << std::endl;
 
         // Hard coded assert to ensure that the actual numbers we are getting are what they should be
-        libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact) - 0.84010976704434637), 1.e-5);
-        libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact) - 0.48294428289950514), 1.e-5);
 
+	// The effectivity index isn't exactly reproduceable at single precision
+        // libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact) - 0.84010976704434637), 1.e-5);
+        // libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact) - 0.48294428289950514), 1.e-5);
+
+        // But the effectivity indices should always be sane
+        libmesh_assert_less(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact), 2.5);
+        libmesh_assert_greater(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact), .4);
+        libmesh_assert_less(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact), 2.5);
+        libmesh_assert_greater(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact), .4);
+
+        // And the computed errors should still be low
+        libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact), 2e-4);
+        libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact), 2e-4);
       }
   }
 

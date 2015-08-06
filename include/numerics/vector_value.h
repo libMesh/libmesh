@@ -59,12 +59,16 @@ public:
    * Constructor-from-scalars.  By default sets higher dimensional
    * entries to 0.
    */
-  template <typename Scalar>
-  VectorValue (const Scalar x,
-               const Scalar y=0,
+  template <typename Scalar1, typename Scalar2, typename Scalar3>
+  VectorValue (typename
+               boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+               const Scalar1>::type x,
                typename
-               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-               const Scalar>::type z=0);
+               boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+               const Scalar2>::type y,
+               typename
+               boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+               const Scalar3>::type z = 0);
 
   /**
    * Copy-constructor.
@@ -140,13 +144,17 @@ VectorValue<T>::VectorValue (const T x,
 
 
 template <typename T>
-template <typename Scalar>
+template <typename Scalar1, typename Scalar2, typename Scalar3>
 inline
-VectorValue<T>::VectorValue (const Scalar x,
-                             const Scalar y,
+VectorValue<T>::VectorValue (typename
+                             boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+                             const Scalar1>::type x,
                              typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                             const Scalar>::type z) :
+                             boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+                             const Scalar2>::type y,
+                             typename
+                             boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+                             const Scalar3>::type z) :
   TypeVector<T> (x,y,z)
 {
 }

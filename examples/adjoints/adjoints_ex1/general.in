@@ -8,6 +8,7 @@ coarserefinements = 3
 
 # Should the nonlinear solver produce verbose messages?
 solver_quiet = false
+solver_verbose = true
 
 # Should PETSc reuse the forward preconditioner for the adjoint ?
 reuse_preconditioner = true
@@ -22,10 +23,10 @@ max_linear_iterations = 10000
 max_nonlinear_iterations = 1
 
 # How much step size reduction should indicate convergence?
-relative_step_tolerance = 1.e-8
+relative_step_tolerance = 1.e-7
 
 # How much residual reduction should indicate convergence?
-relative_residual_tolerance = 1.e-9
+relative_residual_tolerance = 1.e-7
 
 # What should the largest relative linear tolerance be?
 initial_linear_tolerance = 1.e-16

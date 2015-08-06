@@ -251,7 +251,7 @@ void VTKIO::cells_to_vtk()
                 libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
 
               // InsertNextPoint accepts either a double or float array of length 3.
-              Real pt[3] = {0., 0., 0.};
+              double pt[3] = {0., 0., 0.};
               for (unsigned int d=0; d<LIBMESH_DIM; ++d)
                 pt[d] = (*the_node)(d);
 
