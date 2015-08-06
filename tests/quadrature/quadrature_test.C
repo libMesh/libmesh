@@ -34,6 +34,8 @@ using namespace libMesh;
   TEST_ONE_ORDER(qtype, EIGHTH, mymin(8,maxorder)); \
   TEST_ONE_ORDER(qtype, NINTH, mymin(9,maxorder));
 
+#define LIBMESH_ASSERT_REALS_EQUAL(first, second, tolerance) \
+  CPPUNIT_ASSERT (std::abs(first-second) < tolerance)
 
 class QuadratureTest : public CppUnit::TestCase {
 public:
@@ -147,9 +149,20 @@ public:
                     Real exact = exact_x*exact_y*exact_z;
 
                     // std::cout << "Exact solution is " << exact << std::endl;
+                    //
+if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
+{
+  std::cerr << "i = " << i << std::endl;
+  std::cerr << "order = " << order << std::endl;
+  std::cerr << "x_power = " << x_power << std::endl;
+  std::cerr << "y_power = " << y_power << std::endl;
+  std::cerr << "z_power = " << z_power << std::endl;
+  std::cerr << "exact = " << std::setprecision(30) << exact << std::endl;
+  std::cerr << "sumq = " << sumq << std::endl;
+}
 
                     // Make sure that the quadrature solution matches the exact solution
-                    CPPUNIT_ASSERT_DOUBLES_EQUAL(exact, sumq, TOLERANCE*TOLERANCE);
+                    LIBMESH_ASSERT_REALS_EQUAL(exact, sumq, TOLERANCE*TOLERANCE);
                   }
           } // end for (order)
       } // end for (i)
@@ -176,7 +189,7 @@ public:
             sumw += qrule->w(qp);
 
           // Make sure that the weights add up to the value we expect
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1./6., sumw, TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_REALS_EQUAL(1./6., sumw, TOLERANCE*TOLERANCE);
 
           // Test integrating different polynomial powers
           for (int x_power=0; x_power<=order; ++x_power)
@@ -232,7 +245,7 @@ public:
                   // std::cout << "analytical = " << analytical << std::endl;
 
                   // Make sure that the computed integral agrees with the "true" value
-                  CPPUNIT_ASSERT_DOUBLES_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
+                  LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
                 } // end for(testpower)
         } // end for(order)
   }
@@ -257,7 +270,7 @@ public:
             sumw += qrule->w(qp);
 
           // Make sure that the weights add up to the value we expect
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, sumw, TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_REALS_EQUAL(0.5, sumw, TOLERANCE*TOLERANCE);
 
           // Test integrating different polynomial powers
           for (int x_power=0; x_power<=order; ++x_power)
@@ -303,7 +316,7 @@ public:
                 // std::cout << "analytical = " << analytical << std::endl;
 
                 // Make sure that the computed integral agrees with the "true" value
-                CPPUNIT_ASSERT_DOUBLES_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
               } // end for(testpower)
         } // end for(order)
   }
@@ -359,7 +372,7 @@ public:
               sumw += qrule->w(qp);
 
             // Make sure that the weights add up to the value we expect
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(initial_sum_weights[qt], sumw, TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_REALS_EQUAL(initial_sum_weights[qt], sumw, TOLERANCE*TOLERANCE);
 
             // Test integrating different polynomial powers
             for (int testpower=0; testpower<=order; ++testpower)
@@ -373,7 +386,7 @@ public:
                   sumq += qrule->w(qp) * std::pow(qrule->qp(qp)(0), testpower);
 
                 // Make sure that the computed integral agrees with the "true" value
-                CPPUNIT_ASSERT_DOUBLES_EQUAL(true_integrals[qt][testpower], sumq, TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_REALS_EQUAL(true_integrals[qt][testpower], sumq, TOLERANCE*TOLERANCE);
               } // end for(testpower)
           } // end for(order)
       } // end for(qt)
@@ -427,7 +440,7 @@ public:
             std::cout << "sum = " << sum << std::endl << std::endl;
           }
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
       }
   }
 
@@ -458,7 +471,7 @@ public:
 
           const Real exact = exactx*exacty;
 
-          CPPUNIT_ASSERT_DOUBLES_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
+          LIBMESH_ASSERT_REALS_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
         }
 
     // We may eventually support Gauss-Lobatto type quadrature on triangles...
@@ -471,7 +484,7 @@ public:
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5 , sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( 0.5 , sum , TOLERANCE*TOLERANCE );
       }
   }
 
@@ -507,7 +520,7 @@ public:
 
             const Real exact = exactx*exacty*exactz;
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
+            LIBMESH_ASSERT_REALS_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
           }
 
     // We may eventually support Gauss-Lobatto type quadrature on tets and prisms...
@@ -520,7 +533,7 @@ public:
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 1./6., sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( 1./6., sum , TOLERANCE*TOLERANCE );
 
         qrule->init (PRISM15);
 
@@ -529,7 +542,7 @@ public:
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 1., sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( 1., sum , TOLERANCE*TOLERANCE );
       }
   }
 };
