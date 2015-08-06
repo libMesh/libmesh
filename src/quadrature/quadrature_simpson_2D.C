@@ -86,9 +86,9 @@ void QSimpson::init_2D(const ElemType type_in,
         _points[5](0) = 0.5;
         _points[5](1) = 0.5;
 
-        _weights[0] = 0.041666666666666666666666666667; // 1./24.
-        _weights[1] = 0.041666666666666666666666666667; // 1./24.
-        _weights[2] = 0.041666666666666666666666666667; // 1./24.
+        _weights[0] = Real(1)/24;
+        _weights[1] = Real(1)/24;
+        _weights[2] = Real(1)/24;
         _weights[3] = 0.125;                            // 1./8.
         _weights[4] = 0.125;                            // 1./8.
         _weights[5] = 0.125;                            // 1./8.

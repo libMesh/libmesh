@@ -61,7 +61,7 @@ void QGrid::init_3D(const ElemType type_in,
         const unsigned int np = (_order+1)*(_order+2)*(_order+3)/6;
         // Master tet has 1x1 triangle base, height 1, so volume = 1/6
         const Real weight = Real(1)/Real(6)/np;
-        const Real dx = 1.0/(_order+1);
+        const Real dx = Real(1)/(_order+1);
         _points.resize(np);
         _weights.resize(np);
 
@@ -118,8 +118,8 @@ void QGrid::init_3D(const ElemType type_in,
         _weights.resize(np);
         // Master pyramid has 2x2 base, height 1, so volume = 4/3
         const Real weight = Real(4)/Real(3)/np;
-        const Real dx = 2.0/(_order+1);
-        const Real dz = 1.0/(_order+1);
+        const Real dx = Real(2)/(_order+1);
+        const Real dz = Real(1)/(_order+1);
 
         unsigned int pt = 0;
         for (int k = 0; k != _order + 1; ++k)

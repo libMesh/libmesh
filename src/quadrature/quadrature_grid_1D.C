@@ -37,10 +37,10 @@ void QGrid::init_1D(const ElemType,
 
   _points.resize(_order + 1);
   _weights.resize(_order + 1);
-  const Real dx = 2.0/(_order+1);
+  const Real dx = Real(2)/(_order+1);
   for (int i = 0; i != _order + 1; ++i)
     {
-      _points[i](0) = (i+0.5)*dx-1.0;
+      _points[i](0) = (i+0.5)*dx-1;
       _weights[i] = dx;
     }
   return;

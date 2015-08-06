@@ -59,8 +59,8 @@ void QGrid::init_2D(const ElemType type_in,
     case TRI6:
       {
         const unsigned int np = (_order + 1)*(_order + 2)/2;
-        const Real weight = 0.5/np;
-        const Real dx = 1.0/(_order+1);
+        const Real weight = Real(0.5)/np;
+        const Real dx = Real(1)/(_order+1);
         _points.resize(np);
         _weights.resize(np);
 
