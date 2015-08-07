@@ -954,7 +954,7 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
             if (!elem->contains_point(this->point(p)))
               {
                 neighbor_set.erase(current);
-                continue;
+                break;
               }
         }
     }
