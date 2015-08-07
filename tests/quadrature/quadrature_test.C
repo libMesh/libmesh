@@ -35,6 +35,13 @@ using namespace libMesh;
   TEST_ONE_ORDER(qtype, NINTH, mymin(9,maxorder));
 
 #define LIBMESH_ASSERT_REALS_EQUAL(first, second, tolerance) \
+  if (std::abs(first-second) >= tolerance) \
+    { \
+      std::cerr << "first = " << first << std::endl; \
+      std::cerr << "second = " << second << std::endl; \
+      std::cerr << "error = " << std::abs(first-second) << std::endl; \
+      std::cerr << "tolerance = " << tolerance << std::endl; \
+    } \
   CPPUNIT_ASSERT (std::abs(first-second) < tolerance)
 
 class QuadratureTest : public CppUnit::TestCase {
@@ -88,10 +95,12 @@ public:
 
 private:
 
+  Real quadrature_tolerance;
+
 
 public:
   void setUp ()
-  {}
+  { quadrature_tolerance = TOLERANCE * std::sqrt(TOLERANCE); }
 
   void tearDown ()
   {}
@@ -148,21 +157,8 @@ public:
 
                     Real exact = exact_x*exact_y*exact_z;
 
-                    // std::cout << "Exact solution is " << exact << std::endl;
-                    //
-if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
-{
-  std::cerr << "i = " << i << std::endl;
-  std::cerr << "order = " << order << std::endl;
-  std::cerr << "x_power = " << x_power << std::endl;
-  std::cerr << "y_power = " << y_power << std::endl;
-  std::cerr << "z_power = " << z_power << std::endl;
-  std::cerr << "exact = " << std::setprecision(30) << exact << std::endl;
-  std::cerr << "sumq = " << sumq << std::endl;
-}
-
                     // Make sure that the quadrature solution matches the exact solution
-                    LIBMESH_ASSERT_REALS_EQUAL(exact, sumq, TOLERANCE*TOLERANCE);
+                    LIBMESH_ASSERT_REALS_EQUAL(exact, sumq, quadrature_tolerance);
                   }
           } // end for (order)
       } // end for (i)
@@ -189,7 +185,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
             sumw += qrule->w(qp);
 
           // Make sure that the weights add up to the value we expect
-          LIBMESH_ASSERT_REALS_EQUAL(1./6., sumw, TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_REALS_EQUAL(1./6., sumw, quadrature_tolerance);
 
           // Test integrating different polynomial powers
           for (int x_power=0; x_power<=order; ++x_power)
@@ -245,7 +241,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
                   // std::cout << "analytical = " << analytical << std::endl;
 
                   // Make sure that the computed integral agrees with the "true" value
-                  LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
+                  LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, quadrature_tolerance);
                 } // end for(testpower)
         } // end for(order)
   }
@@ -270,7 +266,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
             sumw += qrule->w(qp);
 
           // Make sure that the weights add up to the value we expect
-          LIBMESH_ASSERT_REALS_EQUAL(0.5, sumw, TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_REALS_EQUAL(0.5, sumw, quadrature_tolerance);
 
           // Test integrating different polynomial powers
           for (int x_power=0; x_power<=order; ++x_power)
@@ -316,7 +312,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
                 // std::cout << "analytical = " << analytical << std::endl;
 
                 // Make sure that the computed integral agrees with the "true" value
-                LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, quadrature_tolerance);
               } // end for(testpower)
         } // end for(order)
   }
@@ -372,7 +368,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
               sumw += qrule->w(qp);
 
             // Make sure that the weights add up to the value we expect
-            LIBMESH_ASSERT_REALS_EQUAL(initial_sum_weights[qt], sumw, TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_REALS_EQUAL(initial_sum_weights[qt], sumw, quadrature_tolerance);
 
             // Test integrating different polynomial powers
             for (int testpower=0; testpower<=order; ++testpower)
@@ -386,7 +382,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
                   sumq += qrule->w(qp) * std::pow(qrule->qp(qp)(0), testpower);
 
                 // Make sure that the computed integral agrees with the "true" value
-                LIBMESH_ASSERT_REALS_EQUAL(true_integrals[qt][testpower], sumq, TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_REALS_EQUAL(true_integrals[qt][testpower], sumq, quadrature_tolerance);
               } // end for(testpower)
           } // end for(order)
       } // end for(qt)
@@ -430,7 +426,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
         const Real exact = (mode % 2) ?
           0 : (Real(2.0) / (mode+1));
 
-        if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
+        if (std::abs(exact - sum) >= quadrature_tolerance)
           {
             std::cout << "qtype = " << qtype << std::endl;
             std::cout << "order = " << order << std::endl;
@@ -440,7 +436,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
             std::cout << "sum = " << sum << std::endl << std::endl;
           }
 
-        LIBMESH_ASSERT_REALS_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( exact , sum , quadrature_tolerance );
       }
   }
 
@@ -471,7 +467,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
 
           const Real exact = exactx*exacty;
 
-          LIBMESH_ASSERT_REALS_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
+          LIBMESH_ASSERT_REALS_EQUAL( exact , sum , quadrature_tolerance );
         }
 
     // We may eventually support Gauss-Lobatto type quadrature on triangles...
@@ -484,7 +480,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        LIBMESH_ASSERT_REALS_EQUAL( 0.5 , sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( 0.5 , sum , quadrature_tolerance );
       }
   }
 
@@ -520,7 +516,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
 
             const Real exact = exactx*exacty*exactz;
 
-            LIBMESH_ASSERT_REALS_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
+            LIBMESH_ASSERT_REALS_EQUAL( exact , sum , quadrature_tolerance );
           }
 
     // We may eventually support Gauss-Lobatto type quadrature on tets and prisms...
@@ -533,7 +529,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        LIBMESH_ASSERT_REALS_EQUAL( 1./6., sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( 1./6., sum , quadrature_tolerance );
 
         qrule->init (PRISM15);
 
@@ -542,7 +538,7 @@ if (std::abs(exact - sumq) >= TOLERANCE*TOLERANCE)
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           sum += qrule->w(qp);
 
-        LIBMESH_ASSERT_REALS_EQUAL( 1., sum , TOLERANCE*TOLERANCE );
+        LIBMESH_ASSERT_REALS_EQUAL( 1., sum , quadrature_tolerance );
       }
   }
 };
