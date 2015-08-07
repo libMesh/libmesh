@@ -3129,6 +3129,39 @@ inline void Communicator::broadcast (T &data, const unsigned int root_id) const
 }
 
 
+template <>
+inline void Communicator::broadcast (bool &data, const unsigned int root_id) const
+{
+  if (this->size() == 1)
+    {
+      libmesh_assert (!this->rank());
+      libmesh_assert (!root_id);
+      return;
+    }
+
+  libmesh_assert_less (root_id, this->size());
+
+  START_LOG("broadcast()", "Parallel");
+
+  // We don't want to depend on MPI-2 or C++ MPI, so we don't have
+  // MPI::BOOL available
+  char char_data = data;
+
+  // Spread data to remote processors.
+#ifndef NDEBUG
+  // Only catch the return value when asserts are active.
+  const int ierr =
+#endif
+    MPI_Bcast (&char_data, 1, StandardType<char>(&char_data), root_id, this->get());
+
+  libmesh_assert (ierr == MPI_SUCCESS);
+
+  data = char_data;
+
+  STOP_LOG("broadcast()", "Parallel");
+}
+
+
 template <typename T>
 inline void Communicator::broadcast (std::basic_string<T> &data,
                                      const unsigned int root_id) const
