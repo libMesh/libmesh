@@ -34,8 +34,8 @@ public:
   void testVariables()
   {
     CPPUNIT_ASSERT( input.have_variable("Section1/var1") );
-    libMesh::Real var1 = input("Section1/var1", 1.0);
-    CPPUNIT_ASSERT_EQUAL( var1, 5.0);
+    Real var1 = input("Section1/var1", 1.0);
+    CPPUNIT_ASSERT_EQUAL( var1, Real(5));
 
     CPPUNIT_ASSERT( input.have_variable("Section1/SubSection1/var2") );
     std::string var2 = input("Section1/SubSection1/var2", "DIE!");
@@ -51,8 +51,8 @@ public:
     CPPUNIT_ASSERT_EQUAL( var4, false );
 
     CPPUNIT_ASSERT( input.have_variable("Section2/Subsection2/Subsection3/var5") );
-    libMesh::Real var5 = input("Section2/Subsection2/Subsection3/var5", 3.1415);
-    CPPUNIT_ASSERT_EQUAL( var5, 6.02e23);
+    Real var5 = input("Section2/Subsection2/Subsection3/var5", 3.1415);
+    CPPUNIT_ASSERT_EQUAL( var5, Real(6.02e23));
 
     CPPUNIT_ASSERT( input.have_variable("Section2/Subsection4/var6") );
     unsigned int var6 = input("Section2/Subsection4/var6", 21);
