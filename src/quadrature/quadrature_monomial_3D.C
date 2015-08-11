@@ -54,7 +54,7 @@ void QMonomial::init_3D(const ElemType type_in,
               // would be a 2x2x2 Gauss product rule.
               const Real data[1][4] =
                 {
-                  {1.0L, 0.0L, 0.0L, static_cast<Real>(4.0L/3.0L)}
+                  {1.0L, 0.0L, 0.0L, Real(4)/3}
                 };
 
               const unsigned int rule_id[1] = {
@@ -176,6 +176,11 @@ void QMonomial::init_3D(const ElemType type_in,
               //       return;
             } // end case FOURTH,FIFTH
 
+
+// Tabulated-in-double-precision rules aren't accurate enough for
+// higher precision, so fall back on Gauss
+#if !defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
+    !defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
           case SIXTH:
           case SEVENTH:
             {
@@ -303,6 +308,7 @@ void QMonomial::init_3D(const ElemType type_in,
               kim_rule(data, rule_id, 5);
               return;
             } // end case EIGHTH
+#endif
 
 
             // By default: construct and use a Gauss quadrature rule

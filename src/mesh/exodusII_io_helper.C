@@ -299,8 +299,9 @@ void ExodusII_IO_Helper::open(const char* filename, bool read_only)
   float ex_version = 0.;
 
   // Word size in bytes of the floating point variables used in the
-  // application program (0, 4, or 8)
-  int comp_ws = sizeof(Real);
+  // application program.  Exodus only supports 4-byte and 8-byte
+  // floats.
+  int comp_ws = std::min(sizeof(Real), std::size_t(8));
 
   // Word size in bytes of the floating point data as they are stored
   // in the ExodusII file.  "If this argument is 0, the word size of the

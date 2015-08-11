@@ -95,12 +95,12 @@ void QSimpson::init_3D(const ElemType type_in,
         _points[4](2) = 0.;   _points[9](2) = .5;
 
 
-        _weights[0] = .0052083333333333333333333333333333333333333333; // 1./192.
+        _weights[0] = Real(1)/192;
         _weights[1] = _weights[0];
         _weights[2] = _weights[0];
         _weights[3] = _weights[0];
 
-        _weights[4] = .0243055555555555555555555555555555555555555555; // 14./576.
+        _weights[4] = Real(14)/576;
         _weights[5] = _weights[4];
         _weights[6] = _weights[4];
         _weights[7] = _weights[4];

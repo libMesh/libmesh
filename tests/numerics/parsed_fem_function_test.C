@@ -122,12 +122,12 @@ private:
         ParsedFEMFunction<Number> x2(*sys, "x2");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(x2(*c,Point(0.5,0.5,0.5))), 1.0, 1.e-12);
+          (libmesh_real(x2(*c,Point(0.5,0.5,0.5))), 1.0, TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(xy8(*c,Point(0.5,0.5,0.5))), 2.0, 1.e-12);
+          (libmesh_real(xy8(*c,Point(0.5,0.5,0.5))), 2.0, TOLERANCE*TOLERANCE);
       }
   }
 
@@ -140,17 +140,17 @@ private:
         ParsedFEMFunction<Number> c2(*sys, "grad_x_x2");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(c2(*c,Point(0.35,0.45,0.55))), 2.0, 1.e-12);
+          (libmesh_real(c2(*c,Point(0.35,0.45,0.55))), 2.0, TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xz(*sys, "grad_y_xyz");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(xz(*c,Point(0.25,0.35,0.75))), 0.1875, 1.e-12);
+          (libmesh_real(xz(*c,Point(0.25,0.35,0.75))), 0.1875, TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xyz(*sys, "grad_y_xyz*grad_x_xy");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(xyz(*c,Point(0.25,0.5,0.75))), 0.09375, 1.e-12);
+          (libmesh_real(xyz(*c,Point(0.25,0.5,0.75))), 0.09375, TOLERANCE*TOLERANCE);
       }
   }
 
@@ -163,17 +163,17 @@ private:
         ParsedFEMFunction<Number> c1(*sys, "hess_xy_xy");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(c1(*c,Point(0.35,0.45,0.55))), 1.0, 1.e-12);
+          (libmesh_real(c1(*c,Point(0.35,0.45,0.55))), 1.0, TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> x(*sys, "hess_yz_xyz");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(x(*c,Point(0.25,0.35,0.55))), 0.25, 1.e-12);
+          (libmesh_real(x(*c,Point(0.25,0.35,0.55))), 0.25, TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xz(*sys, "hess_yz_xyz*grad_y_yz");
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(xz(*c,Point(0.25,0.4,0.75))), 0.1875, 1.e-12);
+          (libmesh_real(xz(*c,Point(0.25,0.4,0.75))), 0.1875, TOLERANCE*TOLERANCE);
       }
   }
 

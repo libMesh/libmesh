@@ -68,6 +68,10 @@ int main (int argc, char** argv)
 #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
   // XDR binary support requires double precision
   libmesh_example_requires(false, "--disable-singleprecision");
+#elif defined(LIBMESH_DEFAULT_TRIPLE_PRECISION)
+  // long double doesn't work on the previous examples, don't try it
+  // here
+  libmesh_example_requires(false, "double precision");
 #endif
   // FIXME: This example currently segfaults with Trilinos?
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");

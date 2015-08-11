@@ -37,9 +37,9 @@ void QSimpson::init_1D(const ElemType,
   _points[1](0) =  0.;
   _points[2](0) =  1.;
 
-  _weights[0] = 0.333333333333333333333333333333;
-  _weights[1] = 1.333333333333333333333333333333;
-  _weights[2] = 0.333333333333333333333333333333;
+  _weights[0] = Real(1)/3;
+  _weights[1] = Real(4)/3;
+  _weights[2] = Real(1)/3;
 
   return;
 }

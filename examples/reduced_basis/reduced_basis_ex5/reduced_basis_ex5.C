@@ -80,6 +80,9 @@ int main(int argc, char** argv) {
 #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
   // XDR binary support requires double precision
   libmesh_example_requires(false, "--disable-singleprecision");
+#elif defined(LIBMESH_DEFAULT_TRIPLE_PRECISION)
+  // I have no idea why long double isn't working here... [RHS]
+  libmesh_example_requires(false, "double precision");
 #endif
 
   // This example only works if libMesh was compiled for 3D

@@ -52,8 +52,8 @@ void QMonomial::init_2D(const ElemType type_in,
               // Luckily it's fairly easy to derive, which is what I've done
               // here [JWP].
               const Real
-                s=std::sqrt(1./3.),
-                t=std::sqrt(2./3.);
+                s=std::sqrt(Real(1)/3.),
+                t=std::sqrt(Real(2)/3.);
 
               const Real data[2][3] =
                 {
@@ -76,6 +76,10 @@ void QMonomial::init_2D(const ElemType type_in,
             //   {
             //   }  // end case THIRD
 
+// Tabulated-in-double-precision rules aren't accurate enough for
+// higher precision, so fall back on Gauss
+#if !defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
+    !defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
           case FOURTH:
             {
               // A pair of degree=4 rules for the QUAD "C2" due to
@@ -109,6 +113,7 @@ void QMonomial::init_2D(const ElemType type_in,
 
               return;
             } // end case FOURTH
+#endif
 
 
 
@@ -146,6 +151,10 @@ void QMonomial::init_2D(const ElemType type_in,
 
 
 
+// Tabulated-in-double-precision rules aren't accurate enough for
+// higher precision, so fall back on Gauss
+#if !defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
+    !defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
           case SIXTH:
             {
               // A pair of degree=6 rules for the QUAD "C2" due to
@@ -183,6 +192,7 @@ void QMonomial::init_2D(const ElemType type_in,
 
               return;
             } // end case SIXTH
+#endif
 
 
 
@@ -228,6 +238,10 @@ void QMonomial::init_2D(const ElemType type_in,
 
 
 
+// Tabulated-in-double-precision rules aren't accurate enough for
+// higher precision, so fall back on Gauss
+#if !defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
+    !defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
           case EIGHTH:
             {
               // A pair of degree=8 rules for the QUAD "C2" due to
@@ -496,6 +510,7 @@ void QMonomial::init_2D(const ElemType type_in,
 
               return;
             } // end case FOURTEENTH through SEVENTEENTH
+#endif
 
 
 
