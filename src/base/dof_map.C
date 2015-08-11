@@ -2165,12 +2165,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
   // Clear the DOF indices vector.
   di.clear();
-
-  // Create a vector to indicate which
-  // SCALAR variables have been requested
-  std::vector<unsigned int> SCALAR_var_numbers;
-  SCALAR_var_numbers.clear();
-
+  
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
   if (elem->type() == TRI3SUBDIVISION)
