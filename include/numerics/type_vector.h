@@ -85,7 +85,7 @@ protected:
               const Scalar1>::type x,
               typename
               boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
-              const Scalar2>::type y,
+              const Scalar2>::type y=0,
               typename
               boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
               const Scalar3>::type z=0);
