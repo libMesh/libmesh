@@ -714,13 +714,13 @@ void ExactSolution::_compute_error(const std::string& sys_name,
           // Real u_h = 0.;
           // RealGradient grad_u_h;
 
-          typename FEGenericBase<OutputShape>::OutputNumber u_h = 0.;
+          typename FEGenericBase<OutputShape>::OutputNumber u_h(0.);
 
           typename FEGenericBase<OutputShape>::OutputNumberGradient grad_u_h;
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_u_h;
 #endif
-          typename FEGenericBase<OutputShape>::OutputNumber curl_u_h = 0.0;
+          typename FEGenericBase<OutputShape>::OutputNumber curl_u_h(0.0);
           typename FEGenericBase<OutputShape>::OutputNumberDivergence div_u_h = 0.0;
 
           // Compute solution values at the current
@@ -743,7 +743,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
             }
 
           // Compute the value of the error at this quadrature point
-          typename FEGenericBase<OutputShape>::OutputNumber exact_val = 0;
+          typename FEGenericBase<OutputShape>::OutputNumber exact_val(0);
           RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, dim );
           if (_exact_values.size() > sys_num && _exact_values[sys_num])
             {
@@ -799,7 +799,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
             {
               // Compute the value of the error in the curl at this
               // quadrature point
-              typename FEGenericBase<OutputShape>::OutputNumber exact_curl = 0.0;
+              typename FEGenericBase<OutputShape>::OutputNumber exact_curl(0.0);
               if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
                 {
                   exact_curl = TensorTools::curl_from_grad( exact_grad );
