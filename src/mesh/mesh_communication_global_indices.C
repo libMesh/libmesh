@@ -597,14 +597,10 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase& mesh) cons
 {
   START_LOG ("check_for_duplicate_global_indices()", "MeshCommunication");
 
-  const Parallel::Communicator &communicator (mesh.comm());
-
   // Global bounding box
   MeshTools::BoundingBox bbox =
     MeshTools::bounding_box (mesh);
 
-  //-------------------------------------------------------------
-  // (1) compute Hilbert keys
   std::vector<Hilbert::HilbertIndices>
     node_keys, elem_keys;
 
@@ -681,7 +677,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase& mesh) cons
             }
         }
     }
-  } // done computing Hilbert keys
+  } // done checking Hilbert keys
 
   STOP_LOG ("check_for_duplicate_global_indices()", "MeshCommunication");
 }
