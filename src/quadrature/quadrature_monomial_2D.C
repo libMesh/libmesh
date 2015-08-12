@@ -52,8 +52,8 @@ void QMonomial::init_2D(const ElemType type_in,
               // Luckily it's fairly easy to derive, which is what I've done
               // here [JWP].
               const Real
-                s=std::sqrt(Real(1)/3.),
-                t=std::sqrt(Real(2)/3.);
+                s=std::sqrt(1.L/3.L),
+                t=std::sqrt(2.L/3.L);
 
               const Real data[2][3] =
                 {
