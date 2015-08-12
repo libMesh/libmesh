@@ -177,10 +177,6 @@ void QMonomial::init_3D(const ElemType type_in,
             } // end case FOURTH,FIFTH
 
 
-// Tabulated-in-double-precision rules aren't accurate enough for
-// higher precision, so fall back on Gauss
-#if !defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
-    !defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
           case SIXTH:
           case SEVENTH:
             {
@@ -308,7 +304,6 @@ void QMonomial::init_3D(const ElemType type_in,
               kim_rule(data, rule_id, 5);
               return;
             } // end case EIGHTH
-#endif
 
 
             // By default: construct and use a Gauss quadrature rule
