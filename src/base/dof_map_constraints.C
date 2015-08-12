@@ -279,7 +279,7 @@ private:
         if (c)
           return g_fem->component(*c, i, p, time);
         else
-          return std::numeric_limits<Real>::quiet_NaN();
+          return std::numeric_limits<Number>::quiet_NaN();
       }
     return g->component(i, p, time);
   }
@@ -702,7 +702,7 @@ private:
               for (unsigned int qp=0; qp<n_qp; qp++)
                 {
                   // solution at the quadrature point
-                  OutputNumber fineval = 0;
+                  OutputNumber fineval(0);
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
                   for( unsigned int c = 0; c < n_vec_dim; c++)
@@ -824,7 +824,7 @@ private:
               for (unsigned int qp=0; qp<n_qp; qp++)
                 {
                   // solution at the quadrature point
-                  OutputNumber fineval = 0;
+                  OutputNumber fineval(0);
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
                   for( unsigned int c = 0; c < n_vec_dim; c++)
