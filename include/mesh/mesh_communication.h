@@ -155,6 +155,11 @@ public:
    */
   void assign_global_indices (MeshBase &) const;
 
+  /**
+   * Throw an error if we have any index clashes in the numbering used by
+   * assign_global_indices.
+   */
+  void check_for_duplicate_global_indices (MeshBase & ) const;
 
   /**
    * This method determines a globally unique, partition-agnostic
