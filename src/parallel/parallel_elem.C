@@ -179,7 +179,18 @@ void pack (const Elem* elem,
 #ifdef LIBMESH_ENABLE_AMR
   data.push_back (static_cast<largest_id_type>(elem->level()));
   data.push_back (static_cast<largest_id_type>(elem->p_level()));
-  data.push_back (static_cast<largest_id_type>(elem->refinement_flag()));
+
+  // Encode both the refinement flag and whether the element has
+  // children together.  This coding is unambiguous because our
+  // refinement state encoding starts at 0 and ends at
+  // INVALID_REFINEMENTSTATE
+  largest_id_type refinement_info =
+    static_cast<largest_id_type>(elem->refinement_flag());
+  if (elem->has_children())
+    refinement_info +=
+      static_cast<largest_id_type>(Elem::INVALID_REFINEMENTSTATE) + 1;
+  data.push_back (refinement_info);
+
   data.push_back (static_cast<largest_id_type>(elem->p_refinement_flag()));
 #else
   data.push_back (0);
@@ -311,12 +322,19 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
   const unsigned int p_level =
     cast_int<unsigned int>(*in++);
 
-  // int 2: refinement flag
+  // int 2: refinement flag and encoded has_children
   const int rflag = cast_int<int>(*in++);
+  const int invalid_rflag =
+    cast_int<int>(Elem::INVALID_REFINEMENTSTATE);
   libmesh_assert_greater_equal (rflag, 0);
-  libmesh_assert_less (rflag, Elem::INVALID_REFINEMENTSTATE);
-  const Elem::RefinementState refinement_flag =
-    cast_int<Elem::RefinementState>(rflag);
+
+  libmesh_assert_less (rflag, invalid_rflag*2+1);
+
+  const bool has_children = (rflag > invalid_rflag);
+
+  const Elem::RefinementState refinement_flag = has_children ?
+      cast_int<Elem::RefinementState>(rflag - invalid_rflag - 1) :
+      cast_int<Elem::RefinementState>(rflag);
 
   // int 3: p refinement flag
   const int pflag = cast_int<int>(*in++);
@@ -419,6 +437,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 #ifdef LIBMESH_ENABLE_AMR
       libmesh_assert_equal_to (elem->p_level(), p_level);
       libmesh_assert_equal_to (elem->refinement_flag(), refinement_flag);
+      libmesh_assert_equal_to (elem->has_children(), has_children);
       libmesh_assert_equal_to (elem->p_refinement_flag(), p_refinement_flag);
 
       libmesh_assert (!level || elem->parent() != NULL);
@@ -572,10 +591,10 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       elem->set_p_refinement_flag(p_refinement_flag);
       libmesh_assert_equal_to (elem->level(), level);
 
-      // If this element definitely should have children, assign
-      // remote_elem to all of them for now, for consistency.  Later
-      // unpacked elements may overwrite that.
-      if (!elem->active())
+      // If this element should have children, assign remote_elem to
+      // all of them for now, for consistency.  Later unpacked
+      // elements may overwrite that.
+      if (has_children)
         for (unsigned int c=0; c != elem->n_children(); ++c)
           elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
 
