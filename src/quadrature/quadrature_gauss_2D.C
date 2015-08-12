@@ -79,8 +79,8 @@ void QGauss::init_2D(const ElemType type_in,
               _points.resize(1);
               _weights.resize(1);
 
-              _points[0](0) = 1.0L/3.0L;
-              _points[0](1) = 1.0L/3.0L;
+              _points[0](0) = Real(1)/3;
+              _points[0](1) = Real(1)/3;
 
               _weights[0] = 0.5;
 
@@ -102,19 +102,19 @@ void QGauss::init_2D(const ElemType type_in,
               // _points[2](0) = .5;
               // _points[2](1) = .0;
 
-              _points[0](0) = 2.0L/3.0L;
-              _points[0](1) = 1.0L/6.0L;
+              _points[0](0) = Real(2)/3;
+              _points[0](1) = Real(1)/6;
 
-              _points[1](0) = 1.0L/6.0L;
-              _points[1](1) = 2.0L/3.0L;
+              _points[1](0) = Real(1)/6;
+              _points[1](1) = Real(2)/3;
 
-              _points[2](0) = 1.0L/6.0L;
-              _points[2](1) = 1.0L/6.0L;
+              _points[2](0) = Real(1)/6;
+              _points[2](1) = Real(1)/6;
 
 
-              _weights[0] = 1.0L/6.0L;
-              _weights[1] = 1.0L/6.0L;
-              _weights[2] = 1.0L/6.0L;
+              _weights[0] = Real(1)/6;
+              _weights[1] = Real(1)/6;
+              _weights[2] = Real(1)/6;
 
               return;
             }
@@ -230,16 +230,16 @@ void QGauss::init_2D(const ElemType type_in,
               const unsigned int n_wts = 3;
               const Real wts[n_wts] =
                 {
-                  static_cast<Real>(9.0L/80.0L),
-                  static_cast<Real>(31.0L/480.0L + std::sqrt(15.0L)/2400.0L),
-                  static_cast<Real>(31.0L/480.0L - std::sqrt(15.0L)/2400.0L)
+                  Real(9)/80,
+                  static_cast<Real>(Real(31)/480 + std::sqrt(15.0L)/2400),
+                  static_cast<Real>(Real(31)/480 - std::sqrt(15.0L)/2400)
                 };
 
               const Real a[n_wts] =
                 {
                   0., // 'a' parameter not used for origin permutation
-                  static_cast<Real>(2.0L/7.0L + std::sqrt(15.0L)/21.0L),
-                  static_cast<Real>(2.0L/7.0L - std::sqrt(15.0L)/21.0L)
+                  static_cast<Real>(Real(2)/7 + std::sqrt(15.0L)/21),
+                  static_cast<Real>(Real(2)/7 - std::sqrt(15.0L)/21)
                 };
 
               const Real b[n_wts] = {0., 0., 0.}; // not used
