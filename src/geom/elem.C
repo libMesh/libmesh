@@ -1496,15 +1496,28 @@ bool Elem::ancestor() const
 {
 #ifdef LIBMESH_ENABLE_AMR
 
-  if (this->active())
-    return false;
+// Use a fast, ParallelMesh-safe definition
+  const bool is_ancestor =
+    !this->active() && !this->subactive();
 
-  if (!this->has_children())
-    return false;
-  if (this->child(0)->active())
-    return true;
+// But check for inconsistencies if we have time
+#ifdef DEBUG
+  if (!is_ancestor && this->has_children())
+    {
+      for (unsigned int c=0; c != this->n_children(); ++c)
+        {
+          const Elem* kid = this->child(c);
+          if (kid != remote_elem)
+            {
+              libmesh_assert(!kid->active());
+              libmesh_assert(!kid->ancestor());
+            }
+        }
+    }
+#endif // DEBUG
 
-  return this->child(0)->ancestor();
+  return is_ancestor;
+
 #else
   return false;
 #endif
