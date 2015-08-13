@@ -276,21 +276,21 @@ meshtool_dbg_LDADD      = libmesh_dbg.la
 # compare
 opt_programs          += calculator-opt
 calculator_opt_SOURCES    = src/apps/calculator.C
-calculator_opt_SOURCES   += src/apps/L2system.C
+calculator_opt_SOURCES   += src/apps/L2system.C src/apps/L2system.h
 calculator_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 calculator_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
 calculator_opt_LDADD      = libmesh_opt.la
 
 devel_programs        += calculator-devel
 calculator_devel_SOURCES  = src/apps/calculator.C
-calculator_devel_SOURCES += src/apps/L2system.C
+calculator_devel_SOURCES += src/apps/L2system.C src/apps/L2system.h
 calculator_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 calculator_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
 calculator_devel_LDADD    = libmesh_devel.la
 
 dbg_programs          += calculator-dbg
 calculator_dbg_SOURCES    = src/apps/calculator.C
-calculator_dbg_SOURCES   += src/apps/L2system.C
+calculator_dbg_SOURCES   += src/apps/L2system.C src/apps/L2system.h
 calculator_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 calculator_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 calculator_dbg_LDADD      = libmesh_dbg.la
