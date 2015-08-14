@@ -167,7 +167,17 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
                 if (connected_nodes.count(elem->get_node(n)))
-                  elements_to_send.insert (elem);
+                  {
+                    elements_to_send.insert (elem);
+
+                    // The remote processor needs all its semilocal
+                    // elements' ancestors, and it's possible that
+                    // they might not all be connected to the remote
+                    // processor's nodes.
+                    for (const Elem* parent = elem->parent(); parent;
+                         parent = parent->parent())
+                      elements_to_send.insert(parent);
+                  }
             }
         }
 
