@@ -86,6 +86,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
       elif (test -r ${SLEPC_DIR}/conf/slepc_variables) ; then
          includefile=${SLEPC_DIR}/conf/slepc_variables
       else
+         AC_MSG_RESULT([<<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>])
          enableslepc=no
       fi
 
