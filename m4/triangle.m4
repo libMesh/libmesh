@@ -6,14 +6,12 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
   AC_ARG_ENABLE(triangle,
                 AS_HELP_STRING([--disable-triangle],
                                [build without Triangle Delaunay triangulation library support]),
-		[case "${enableval}" in
-		  yes)  enabletriangle=yes ;;
-		   no)  enabletriangle=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-triangle) ;;
-		 esac],
-		 [enabletriangle=$enableoptional])
-
-
+                [case "${enableval}" in
+                  yes)  enabletriangle=yes ;;
+                  no)  enabletriangle=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-triangle) ;;
+                esac],
+                [enabletriangle=$enableoptional])
 
   dnl The TRIANGLE API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...

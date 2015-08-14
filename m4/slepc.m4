@@ -6,12 +6,12 @@ AC_DEFUN([CONFIGURE_SLEPC],
   AC_ARG_ENABLE(slepc,
                 AS_HELP_STRING([--disable-slepc],
                                [build without SLEPc eigen solver support]),
-                               [case "${enableval}" in
-                                 yes)  enableslepc=yes ;;
-                                 no)  enableslepc=no ;;
-                                 *)  AC_MSG_ERROR(bad value ${enableval} for --enable-slepc) ;;
-                               esac],
-                               [enableslepc=$enablepetsc]) # if unspecified, infer from what's up with PETSc
+                [case "${enableval}" in
+                  yes)  enableslepc=yes ;;
+                  no)  enableslepc=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-slepc) ;;
+                esac],
+                [enableslepc=$enablepetsc]) # if unspecified, infer from what's up with PETSc
 
   AC_ARG_VAR([SLEPC_DIR], [path to SLEPc installation])
 

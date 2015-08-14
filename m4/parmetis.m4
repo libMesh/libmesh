@@ -6,18 +6,17 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   AC_ARG_ENABLE(parmetis,
                 AS_HELP_STRING([--disable-parmetis],
                                [build without Parmetis parallel graph partitioning suppport]),
-		[case "${enableval}" in
-		  yes)  enableparmetis=yes ;;
-		   no)  enableparmetis=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-parmetis) ;;
-		 esac],
-		 [enableparmetis=$enableoptional])
+                [case "${enableval}" in
+                  yes)  enableparmetis=yes ;;
+                  no)  enableparmetis=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-parmetis) ;;
+                esac],
+                [enableparmetis=$enableoptional])
 
   dnl Trump --enable-parmetis with --disable-mpi
   if (test "x$enablempi" = xno); then
     enableparmetis=no
   fi
-
 
   dnl The PARMETIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...

@@ -42,8 +42,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h],
                                                          [enableaztecoo=yes],
                                                          [enableaztecoo=no])
-					])
-		       ])
+                                                         ])])
 
        if test "$enableaztecoo" != no ; then
           AC_DEFINE(HAVE_AZTECOO, 1,
@@ -60,9 +59,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enablenox=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/nox/src/NOX_Config.h],
                                                          [enablenox=yes],
-                                                         [enablenox=no])
-					])
-		       ])
+                                                         [enablenox=no])])])
 
        if test "$enablenox" != no ; then
           AC_DEFINE(HAVE_NOX, 1,
@@ -108,9 +105,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enabletpetra=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/tpetra/src/Tpetra_config.h],
                                                          [enabletpetra=yes],
-                                                         [enabletpetra=no])
-					])
-		       ])
+                                                         [enabletpetra=no])])])
 
        if test "$enabletpetra" != no ; then
           AC_DEFINE(HAVE_TPETRA, 1,
@@ -127,9 +122,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enabledtk=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/DataTransferKit/src/DataTransferKit_config.hpp],
                                                          [enabledtk=yes],
-                                                         [enabledtk=no])
-					])
-		       ])
+                                                         [enabledtk=no])])])
 
        if test "$enabledtk" != no ; then
           AC_DEFINE(HAVE_DTK, 1,
@@ -451,12 +444,12 @@ AC_DEFUN([CONFIGURE_TRILINOS],
   AC_ARG_ENABLE(trilinos,
                 AS_HELP_STRING([--disable-trilinos],
                                [build without Trilinos support]),
-		[case "${enableval}" in
-		  yes)  enabletrilinos=yes ;;
-		   no)  enabletrilinos=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos) ;;
-		 esac],
-		 [enabletrilinos=$enableoptional])
+                               [case "${enableval}" in
+                                 yes)  enabletrilinos=yes ;;
+                                 no)  enabletrilinos=no ;;
+                                 *)  AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos) ;;
+                               esac],
+                               [enabletrilinos=$enableoptional])
 
   # Trump --enable-trilinos with --disable-mpi
   if (test "x$enablempi" = xno); then
@@ -466,18 +459,16 @@ AC_DEFUN([CONFIGURE_TRILINOS],
   AC_ARG_VAR([TRILINOS_DIR],  [path to Trilinos installation])
 
   if test "$enablecomplex" = no ; then
-      if test "$enabletrilinos" != no ; then
-          # -- try Trilinos 10 first
-	  CONFIGURE_TRILINOS_10
-          # -- then Trilinos 9
-	  if test "$enabletrilinos10" = no ; then
-              CONFIGURE_TRILINOS_9
-             if test "$enabletrilinos9" = no; then
-	       enabletrilinos=no
-	     fi
-	  fi
+    if test "$enabletrilinos" != no ; then
+      # -- try Trilinos 10 first
+      CONFIGURE_TRILINOS_10
+      # -- then Trilinos 9
+      if test "$enabletrilinos10" = no ; then
+        CONFIGURE_TRILINOS_9
+        if test "$enabletrilinos9" = no; then
+          enabletrilinos=no
+        fi
       fi
+    fi
   fi
-
 ])
-dnl -------------------------------------------------------------

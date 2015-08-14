@@ -6,12 +6,12 @@ AC_DEFUN([CONFIGURE_QHULL],
   AC_ARG_ENABLE(qhull,
                 AS_HELP_STRING([--enable-qhull],
                                [build with Qhull API support]),
-		[case "${enableval}" in
-		  yes)  enableqhull=yes;;
-		   no)  enableqhull=no;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-qhull) ;;
-		 esac],
-		 [enableqhull=$enableoptional]) # if unspecified, depend on enableoptional
+                [case "${enableval}" in
+                  yes)  enableqhull=yes;;
+                  no)  enableqhull=no;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-qhull) ;;
+                esac],
+                [enableqhull=$enableoptional]) # if unspecified, depend on enableoptional
 
   QHULL_INCLUDE=""
   QHULL_LIBS=""

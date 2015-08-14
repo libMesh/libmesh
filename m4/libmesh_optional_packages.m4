@@ -37,11 +37,11 @@ libmesh_installed_LIBS=""
 AC_ARG_ENABLE(optional,
               AS_HELP_STRING([--disable-optional],
                              [build without most optional external libraries]),
-	      [case "${enableval}" in
-	      	  yes) enableoptional=yes ;;
-		   no) enableoptional=no ;;
- 		    *) AC_MSG_ERROR(bad value ${enableval} for --enable-optional) ;;
-	       esac],
+              [case "${enableval}" in
+                yes) enableoptional=yes ;;
+                no) enableoptional=no ;;
+                *) AC_MSG_ERROR(bad value ${enableval} for --enable-optional) ;;
+              esac],
               [enableoptional=yes])
 
 # Note that even when optional packages are disabled we need to
@@ -78,11 +78,11 @@ AC_ARG_ENABLE(strict-lgpl,
 AC_ARG_ENABLE(nested,
               AS_HELP_STRING([--disable-nested],
                              [Do not use nested autoconf subpackages]),
-	      [case "${enableval}" in
-	      	  yes) enablenested=yes ;;
-		   no) enablenested=no ;;
- 		    *) AC_MSG_ERROR(bad value ${enableval} for --enable-nested) ;;
-	       esac],
+              [case "${enableval}" in
+                yes) enablenested=yes ;;
+                no) enablenested=no ;;
+                *) AC_MSG_ERROR(bad value ${enableval} for --enable-nested) ;;
+              esac],
               [enablenested=$enableoptional])
 
 # -------------------------------------------------------------
@@ -160,12 +160,12 @@ fi
 AC_ARG_ENABLE(pthreads,
               AS_HELP_STRING([--disable-pthreads],
                              [build without POSIX threading (pthreads) support]),
-		[case "${enableval}" in
-		  yes)  enablepthreads=yes ;;
-		   no)  enablepthreads=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-pthreads) ;;
-		 esac],
-		 [enablepthreads=$enableoptional])
+              [case "${enableval}" in
+                yes)  enablepthreads=yes ;;
+                no)  enablepthreads=no ;;
+                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-pthreads) ;;
+              esac],
+              [enablepthreads=$enableoptional])
 
 if (test "$enablepthreads" != no) ; then
   AX_PTHREAD
@@ -600,14 +600,14 @@ AC_CONFIG_FILES([contrib/fparser/extrasrc/Makefile])
 # cppunit C++ unit testing -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(cppunit,
-             AS_HELP_STRING([--disable-cppunit],
-                            [Build without cppunit C++ unit testing support]),
-		[case "${enableval}" in
-		  yes)  enablecppunit=yes ;;
-		   no)  enablecppunit=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-cppunit) ;;
-		 esac],
-		 [enablecppunit=$enableoptional])
+              AS_HELP_STRING([--disable-cppunit],
+                             [Build without cppunit C++ unit testing support]),
+              [case "${enableval}" in
+                yes)  enablecppunit=yes ;;
+                no)  enablecppunit=no ;;
+                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-cppunit) ;;
+              esac],
+              [enablecppunit=$enableoptional])
 if (test "$enablecppunit" = yes) ; then
   AM_PATH_CPPUNIT([1.10.0],[enablecppunit=yes],[enablecppunit=no])
 fi

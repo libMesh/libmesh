@@ -6,24 +6,25 @@ AC_DEFUN([CONFIGURE_METIS],
   AC_ARG_ENABLE(metis,
                 AS_HELP_STRING([--disable-metis],
                                [build without Metis graph partitioning suppport]),
-		[case "${enableval}" in
-		  yes)  enablemetis=yes ;;
-		   no)  enablemetis=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-metis) ;;
-		 esac],
-		 [enablemetis=$enableoptional])
+                [case "${enableval}" in
+                  yes)  enablemetis=yes ;;
+                  no)  enablemetis=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-metis) ;;
+                esac],
+                [enablemetis=$enableoptional])
 
  AC_ARG_WITH(metis,
              AS_HELP_STRING([--with-metis=<internal,PETSc>],
-                            [metis to use.
-			      interal: build from contrib.
-			      PETSc: rely on PETSc]),
+                            [metis to use. interal: build from contrib, PETSc: rely on PETSc]),
              [case "${withval}" in
-                  internal)   build_metis=yes ;;
-		  PETSc)      build_metis=no ;;
-                      *) AC_MSG_ERROR(bad value ${withval} for --with-metis) ;;
-                  esac],
-                 [build_metis=yes])
+               internal)
+                 build_metis=yes ;;
+               PETSc)
+                 build_metis=no ;;
+               *)
+                 AC_MSG_ERROR(bad value ${withval} for --with-metis) ;;
+              esac],
+              [build_metis=yes])
 
   dnl The METIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...

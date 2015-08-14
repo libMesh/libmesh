@@ -6,12 +6,12 @@ AC_DEFUN([CONFIGURE_TECPLOT],
   AC_ARG_ENABLE(tecplot,
                 AS_HELP_STRING([--enable-tecplot],
                                [build with Tecplot binary file I/O support (using distributed libraries)]),
-		[case "${enableval}" in
-		  yes)  enabletecplot=yes ;;
-		   no)  enabletecplot=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecplot) ;;
-		 esac],
-		 [enabletecplot=no])
+                [case "${enableval}" in
+                  yes)  enabletecplot=yes ;;
+                  no)  enabletecplot=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecplot) ;;
+                esac],
+                [enabletecplot=no])
 
   # Can't support both vendor-provided libraries and building from source, and we prefer the latter
   if (test "x$enabletecplot" = "xyes" -a "x$enabletecio" = "xyes"); then
@@ -27,10 +27,10 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       # now we just see if the file exists, without using AC_CHECK_FILE!
       TECPLOT_LIBRARY_PATH=""
       if (test -r $top_srcdir/contrib/tecplot/binary/lib/$host/tecio.a) ; then
-	  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
+        TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
       else
-         AC_MSG_RESULT([>>> Configuring Tecplot failed, no tecio exists for $host <<<])
-         enabletecplot=no
+        AC_MSG_RESULT([>>> Configuring Tecplot failed, no tecio exists for $host <<<])
+        enabletecplot=no
       fi
 
       # Note: AC_CHECK_HEADER seems to fail if the path to the header
@@ -40,10 +40,8 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       CPPFLAGS="$CPPFLAGS -I$top_srcdir/contrib/tecplot/binary/include"
 
       AC_CHECK_HEADER(TECIO.h,
-	  [
-	      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/binary/include
-	      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/binary/include"
-          ])
+                      [TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/binary/include
+                       TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/binary/include"])
 
       # Reset CPPFLAGS
       CPPFLAGS="$old_CPPFLAGS"
@@ -76,7 +74,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                                [Flag indicating tecplot API understands newer features])
                      AC_MSG_RESULT(<<< Configuring library with Tecplot API support (v11.2) >>>)
                   ],
-		  [
+                  [
                      AC_LINK_IFELSE(
                                  [
                                     AC_LANG_PROGRAM([@%:@include <TECIO.h>],
@@ -89,9 +87,9 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                                  ],
                                  [
                                     AC_MSG_RESULT( [WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it!] )
-               		            enabletecplot=no
-                                 ] )
-	          ] )
+                                    enabletecplot=no
+                                 ])
+                  ])
 
       LIBS=$save_LIBS
       CPPFLAGS=$save_CPPFLAGS

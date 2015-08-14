@@ -6,14 +6,12 @@ AC_DEFUN([CONFIGURE_GMV],
   AC_ARG_ENABLE(gmv,
                 AS_HELP_STRING([--disable-gmv],
                                [build without GMV file I/O support]),
-		[case "${enableval}" in
-		  yes)  enablegmv=yes ;;
-		   no)  enablegmv=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gmv) ;;
-		 esac],
-		 [enablegmv=$enableoptional])
-
-
+                [case "${enableval}" in
+                  yes)  enablegmv=yes ;;
+                  no)  enablegmv=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gmv) ;;
+                esac],
+                [enablegmv=$enableoptional])
 
   dnl The GMV API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...

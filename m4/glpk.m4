@@ -12,13 +12,12 @@ AC_DEFUN([CONFIGURE_GLPK],
   AC_ARG_ENABLE(glpk,
                 AS_HELP_STRING([--disable-glpk],
                                [build without GLPK support]),
-		[case "${enableval}" in
-		  yes)  enableglpk=yes ;;
-		   no)  enableglpk=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glpk) ;;
-		 esac],
-		 [enableglpk=$enableoptional])
-
+                [case "${enableval}" in
+                  yes)  enableglpk=yes ;;
+                  no)  enableglpk=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glpk) ;;
+                esac],
+                [enableglpk=$enableoptional])
 
   if (test $enableglpk = yes); then
 
@@ -115,11 +114,11 @@ AC_DEFUN([CONFIGURE_GLPK],
        if (test x$enableglpk = xyes); then
          GLPK_INCLUDE="-I$GLPK_INC"
          GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
-	 if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
-	   if (test "$GLPK_LIB" != "/usr/lib" -a "$GLPK_LIB" != "/usr/lib64"); then
-	      GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
-	   fi
-	 fi
+         if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
+           if (test "$GLPK_LIB" != "/usr/lib" -a "$GLPK_LIB" != "/usr/lib64"); then
+             GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
+           fi
+         fi
          AC_DEFINE(HAVE_GLPK, 1, [Flag indicating whether the library will be compiled with GLPK support])
          AC_MSG_RESULT(<<< Configuring library with GLPK support >>>)
        fi

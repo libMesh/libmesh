@@ -45,7 +45,7 @@ if test "x$enable_coverage" = "xyes"; then
       gcov coverage testing tool not found. Please install or update
       your PATH accordingly prior to enabling code coverage features.
 
-      	   ])
+         ])
    fi
 
    # ----------------------------------
