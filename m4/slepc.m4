@@ -6,17 +6,14 @@ AC_DEFUN([CONFIGURE_SLEPC],
   AC_ARG_ENABLE(slepc,
                 AS_HELP_STRING([--disable-slepc],
                                [build without SLEPc eigen solver support]),
-		[case "${enableval}" in
-		  yes)  enableslepc=yes ;;
-		   no)  enableslepc=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-slepc) ;;
-		 esac],
-		 [enableslepc=$enablepetsc]) # if unspecified, infer from what's up with PETSc
-
-
+                               [case "${enableval}" in
+                                 yes)  enableslepc=yes ;;
+                                 no)  enableslepc=no ;;
+                                 *)  AC_MSG_ERROR(bad value ${enableval} for --enable-slepc) ;;
+                               esac],
+                               [enableslepc=$enablepetsc]) # if unspecified, infer from what's up with PETSc
 
   AC_ARG_VAR([SLEPC_DIR], [path to SLEPc installation])
-
 
   if (test "$enableslepc" !=  no) ; then
 
@@ -54,8 +51,8 @@ AC_DEFUN([CONFIGURE_SLEPC],
       # should be pretty safe... from what I can tell it just
       # #defines a few things.
       if (test "x$PETSC_ARCH" != "x"); then
-	  AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
-                          [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])
+        AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
+                        [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])
       fi
     fi
 
@@ -94,27 +91,21 @@ AC_DEFUN([CONFIGURE_SLEPC],
       fi
 
       if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x"); then
-	  AC_MSG_RESULT(<<< Querying SLEPc configuration from $includefile >>>)
-	  cat <<EOF >Makefile_config_slepc
+        AC_MSG_RESULT(<<< Querying SLEPc configuration from $includefile >>>)
+        cat <<EOF >Makefile_config_slepc
 include $includefile
 getSLEPC_LIBS:
 	echo \$(SLEPC_LIB) \$(ARPACK_LIB)
 EOF
-	SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
+        SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
         if (test x$? = x0); then
-	  rm -f Makefile_config_slepc
+          rm -f Makefile_config_slepc
 
-	  #echo " "
-	  #echo "SLEPC_INCLUDE=$SLEPC_INCLUDE"
-	  #echo "SLEPC_LIBS=$SLEPC_LIBS"
-	  #echo " "
+          AC_DEFINE(HAVE_SLEPC, 1, [Flag indicating whether or not SLEPc is available])
+          AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
 
-	  AC_DEFINE(HAVE_SLEPC, 1,
-                   [Flag indicating whether or not SLEPc is available])
-	  AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
-
-	  AC_SUBST(SLEPC_INCLUDE)
-	  AC_SUBST(SLEPC_LIBS)
+          AC_SUBST(SLEPC_INCLUDE)
+          AC_SUBST(SLEPC_LIBS)
         else
           enableslepc=no
           AC_MSG_RESULT(<<< SLEPc configuration query failed. SLEPc disabled. >>>)
