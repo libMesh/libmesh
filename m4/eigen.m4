@@ -156,12 +156,12 @@ AC_DEFUN([CONFIGURE_EIGEN],
         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include "Eigen/Core"
             ]], [[
-            #if EIGEN_WORLD_VERSION > $MAJOR_VER
-            #elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION > $MINOR_VER)
-            #elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION >= $MINOR_VER) && (EIGEN_MINOR_VERSION >= $MICRO_VER)
-            #else
-            #  error version is too old
-            #endif
+            @%:@if EIGEN_WORLD_VERSION > $MAJOR_VER
+            @%:@elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION > $MINOR_VER)
+            @%:@elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION >= $MINOR_VER) && (EIGEN_MINOR_VERSION >= $MICRO_VER)
+            @%:@else
+            @%:@  error version is too old
+            @%:@endif
         ]])],[
             AC_MSG_RESULT(yes)
         ],[
