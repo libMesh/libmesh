@@ -92,11 +92,10 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
       if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x"); then
         AC_MSG_RESULT(<<< Querying SLEPc configuration from $includefile >>>)
-        cat <<EOF >Makefile_config_slepc
-include $includefile
-getSLEPC_LIBS:
-	echo \$(SLEPC_LIB) \$(ARPACK_LIB)
-EOF
+        printf '%s\n' "include $includefile" > Makefile_config_slepc
+        printf '%s\n' "getSLEPC_LIBS:" >> Makefile_config_slepc
+        printf '\t%s\n' "echo \$(SLEPC_LIB) \$(ARPACK_LIB)" >> Makefile_config_slepc
+
         SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
         if (test x$? = x0); then
           rm -f Makefile_config_slepc
