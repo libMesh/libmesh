@@ -98,8 +98,6 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
         SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
         if (test x$? = x0); then
-          rm -f Makefile_config_slepc
-
           AC_DEFINE(HAVE_SLEPC, 1, [Flag indicating whether or not SLEPc is available])
           AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
 
@@ -109,6 +107,9 @@ AC_DEFUN([CONFIGURE_SLEPC],
           enableslepc=no
           AC_MSG_RESULT(<<< SLEPc configuration query failed. SLEPc disabled. >>>)
         fi
+
+        # rm temporary Makefile
+        rm -f Makefile_config_slepc
       fi
     fi
   fi
