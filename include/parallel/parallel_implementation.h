@@ -2526,6 +2526,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
   buf.resize(stat.size());
 
+  // Use stat.source() and stat.tag() in the receive - if
+  // src_processor_id is or tag is "any" then we want to be sure we
+  // try to receive the same message we just probed.
 #ifndef NDEBUG
   // Only catch the return value when asserts are active.
   const int ierr =
@@ -2533,8 +2536,8 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
     MPI_Recv (buf.empty() ? NULL : &buf[0],
               cast_int<int>(buf.size()),
               type,
-              src_processor_id,
-              tag.value(),
+              stat.source(),
+              stat.tag(),
               this->get(),
               stat.get());
   libmesh_assert_mpi_success (ierr);
@@ -2585,13 +2588,17 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 
   // Receive serialized variable size objects as sequences of buffer_t
   std::size_t total_buffer_size = 0;
-  this->receive(src_processor_id, total_buffer_size, tag);
+  Status stat = this->receive(src_processor_id, total_buffer_size, tag);
+
+  // Use stat.source() and stat.tag() in subsequent receives - if
+  // src_processor_id is or tag is "any" then we want to be sure we
+  // try to receive messages all corresponding to the same send.
 
   std::size_t received_buffer_size = 0;
   while (received_buffer_size < total_buffer_size)
     {
       std::vector<buffer_t> buffer;
-      this->receive(src_processor_id, buffer, tag);
+      this->receive(stat.source(), buffer, MessageTag(stat.tag()));
       received_buffer_size += buffer.size();
       Parallel::unpack_range(buffer, context, out);
     }
