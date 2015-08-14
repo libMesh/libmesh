@@ -113,12 +113,46 @@ AC_DEFUN([CONFIGURE_SLEPC],
         printf '\t%s\n' "echo \$(SLEPC_LIB) \$(ARPACK_LIB)" >> Makefile_config_slepc
 
         SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
-        if (test x$? = x0); then
-          AC_DEFINE(HAVE_SLEPC, 1, [Flag indicating whether or not SLEPc is available])
-          AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
 
-          AC_SUBST(SLEPC_INCLUDE)
-          AC_SUBST(SLEPC_LIBS)
+        # If calling make worked, try to compile a trivial SLEPc
+        # program to check our configuration...
+        if (test x$? = x0); then
+          AC_MSG_CHECKING(whether we can compile a trivial SLEPc program)
+          AC_LANG_PUSH([C++])
+
+          # Save the original CXXFLAGS contents
+          saveCXXFLAGS="$CXXFLAGS"
+
+          # Append both PETSc and SLEPc include paths to the CXXFLAGS variable.
+          CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS $SLEPC_INCLUDE"
+
+          AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+          @%:@include <slepc.h>
+          static char help[]="";
+
+          int main(int argc, char **argv)
+          {
+            SlepcInitialize(&argc, &argv, (char*)0, help);
+            SlepcFinalize();
+            return 0;
+          }
+          ]])],[
+            AC_MSG_RESULT(yes)
+            AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
+
+            AC_DEFINE(HAVE_SLEPC, 1, [Flag indicating whether or not SLEPc is available])
+            AC_SUBST(SLEPC_INCLUDE)
+            AC_SUBST(SLEPC_LIBS)
+          ],[
+            AC_MSG_RESULT(no)
+            AC_MSG_RESULT(<<< Compiling trivial SLEPc program failed. SLEPc disabled. >>>)
+            enableslepc=no
+          ])
+
+          # Return CXXFLAGS and LANG to their original state.
+          CXXFLAGS="$saveCXXFLAGS"
+          AC_LANG_POP([C++])
+
         else
           enableslepc=no
           AC_MSG_RESULT(<<< SLEPc configuration query failed. SLEPc disabled. >>>)
