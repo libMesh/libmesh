@@ -140,14 +140,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
   if (test $enabletrilinos10 != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $TRILINOS_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)
-
-echo_include:
-	@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)
-EOF
+    printf '%s\n' "include $TRILINOS_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -332,14 +329,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   #
   # AztecOO
   if (test $enableaztecoo != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $AZTECOO_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(AZTECOO_LIBS)
-
-echo_include:
-	@echo \$(AZTECOO_INCLUDES)
-EOF
+    printf '%s\n' "include $AZTECOO_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(AZTECOO_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(AZTECOO_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -355,14 +349,11 @@ EOF
   #
   # Nox
   if (test $enablenox != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $NOX_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(NOX_LIBS)
-
-echo_include:
-	@echo \$(NOX_INCLUDES)
-EOF
+    printf '%s\n' "include $NOX_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(NOX_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(NOX_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -378,14 +369,11 @@ EOF
   #
   # ML
   if (test $enableml != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $ML_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(ML_LIBS)
-
-echo_include:
-	@echo \$(ML_INCLUDES)
-EOF
+    printf '%s\n' "include $ML_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(ML_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(ML_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -403,14 +391,11 @@ EOF
   #
   # Tpetra
   if (test $enabletpetra != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $TPETRA_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(TPETRA_LIBS)
-
-echo_include:
-	@echo \$(TPETRA_INCLUDES)
-EOF
+    printf '%s\n' "include $TPETRA_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(TPETRA_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(TPETRA_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
