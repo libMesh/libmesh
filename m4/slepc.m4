@@ -65,9 +65,25 @@ AC_DEFUN([CONFIGURE_SLEPC],
       slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
 
-      if (test $slepcversion != $petscversion) ; then
-        AC_MSG_RESULT(WARNING:)
-        AC_MSG_RESULT(<<< Different version numbers for SLEPc and PETSc >>>)
+      # Older PETSc (3.3 and earlier) might not work if the version numbers don't match exactly.
+      oldpetsc=no
+
+      if (test $petscmajor -lt 3) ; then
+        oldpetsc=yes
+      fi
+
+      if (test $petscmajor == 3 -a $petscminor -lt 4) ; then
+        oldpetsc=yes
+      fi
+
+      # If PETSc is old, warn if the full version numbers (including the subminor version number) don't match exactly.
+      if (test "$oldpetsc" = "yes" -a $slepcversion != $petscversion) ; then
+        AC_MSG_RESULT([<<< WARNING: PETSc version $petscversion does not match SLEPc version $slepcversion >>>])
+      fi
+
+      # For any PETSc version, warn if the major and minor version numbers don't match.
+      if (test $slepcmajor != $petscmajor -o $slepcminor != $petscminor) ; then
+        AC_MSG_RESULT([<<< WARNING: PETSc version $petscmajor.$petscminor does not match SLEPc version $slepcmajor.$slepcminor >>>])
       fi
 
       # OK, now we will create a temporary makefile to query SLEPc libs
