@@ -68,7 +68,8 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        fi
 
        dnl ------------------------------------------------------
-       dnl ML - prevent ML from keying on our 'HAVE_PETSC'
+       dnl ML - prevent ML from keying on our 'HAVE_PETSC' by
+       dnl undefining it using the fourth argument to AC_CHECK_HEADER.
        dnl ------------------------------------------------------
        AC_CHECK_HEADER([$withtrilinosdir/include/ml_include.h],
                        [enableml=yes],
@@ -77,18 +78,21 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/ml/src/ml_config.h],
                                                          [enableml=yes],
                                                          [enableml=no],
-[#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
-])],
-[#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
-])],
-[#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
-])
+                                                         [
+                                                         @%:@ifdef HAVE_PETSC
+                                                         @%:@undef HAVE_PETSC
+                                                         @%:@endif
+                                                         ])],
+                                        [
+                                        @%:@ifdef HAVE_PETSC
+                                        @%:@undef HAVE_PETSC
+                                        @%:@endif
+                                        ])],
+                       [
+                       @%:@ifdef HAVE_PETSC
+                       @%:@undef HAVE_PETSC
+                       @%:@endif
+                       ])
 
        if test "$enableml" != no ; then
           AC_DEFINE(HAVE_ML, 1,
