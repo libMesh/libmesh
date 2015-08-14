@@ -32488,17 +32488,14 @@ fi
   # Check whether --enable-slepc was given.
 if test "${enable_slepc+set}" = set; then :
   enableval=$enable_slepc; case "${enableval}" in
-		  yes)  enableslepc=yes ;;
-		   no)  enableslepc=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-slepc" "$LINENO" 5 ;;
-		 esac
+                                 yes)  enableslepc=yes ;;
+                                 no)  enableslepc=no ;;
+                                 *)  as_fn_error $? "bad value ${enableval} for --enable-slepc" "$LINENO" 5 ;;
+                               esac
 else
   enableslepc=$enablepetsc
 fi
  # if unspecified, infer from what's up with PETSc
-
-
-
 
 
 
@@ -32546,7 +32543,7 @@ fi
       # should be pretty safe... from what I can tell it just
       # #defines a few things.
       if (test "x$PETSC_ARCH" != "x"); then
-	  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" | $as_tr_sh`
+        as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"
@@ -32584,31 +32581,28 @@ $as_echo "<<< Different version numbers for SLEPc and PETSc >>>" >&6; }
          includefile=${SLEPC_DIR}/conf/slepc_common_variables
       elif (test -r ${SLEPC_DIR}/conf/slepc_variables) ; then
          includefile=${SLEPC_DIR}/conf/slepc_variables
+      # 3.6.0
+      elif (test -r ${SLEPC_DIR}/lib/slepc/conf/slepc_variables) ; then
+        includefile=${SLEPC_DIR}/lib/slepc/conf/slepc_variables
       else
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>" >&5
+$as_echo "<<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>" >&6; }
          enableslepc=no
       fi
 
       if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x"); then
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Querying SLEPc configuration from $includefile >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Querying SLEPc configuration from $includefile >>>" >&5
 $as_echo "<<< Querying SLEPc configuration from $includefile >>>" >&6; }
-	  cat <<EOF >Makefile_config_slepc
-include $includefile
-getSLEPC_LIBS:
-	echo \$(SLEPC_LIB) \$(ARPACK_LIB)
-EOF
-	SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
+        printf '%s\n' "include $includefile" > Makefile_config_slepc
+        printf '%s\n' "getSLEPC_LIBS:" >> Makefile_config_slepc
+        printf '\t%s\n' "echo \$(SLEPC_LIB) \$(ARPACK_LIB)" >> Makefile_config_slepc
+
+        SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
         if (test x$? = x0); then
-	  rm -f Makefile_config_slepc
-
-	  #echo " "
-	  #echo "SLEPC_INCLUDE=$SLEPC_INCLUDE"
-	  #echo "SLEPC_LIBS=$SLEPC_LIBS"
-	  #echo " "
-
 
 $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
 $as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
 
 
@@ -32618,6 +32612,9 @@ $as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc configuration query failed. SLEPc disabled. >>>" >&5
 $as_echo "<<< SLEPc configuration query failed. SLEPc disabled. >>>" >&6; }
         fi
+
+        # rm temporary Makefile
+        rm -f Makefile_config_slepc
       fi
     fi
   fi
