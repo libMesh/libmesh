@@ -433,6 +433,8 @@ void libmesh_assert_valid_refinement_tree (const MeshBase &mesh);
 /**
  * A function for verifying that neighbor connectivity is correct (each
  * element is a neighbor of or descendant of a neighbor of its neighbors)
+ * and consistent (each neighbor link goes to either the same neighbor
+ * or to a RemoteElem on each processor)
  */
 void libmesh_assert_valid_neighbors (const MeshBase &mesh);
 #endif

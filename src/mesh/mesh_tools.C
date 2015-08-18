@@ -1554,6 +1554,35 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
       libmesh_assert (elem);
       elem->libmesh_assert_valid_neighbors();
     }
+
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  for (dof_id_type i=0; i != mesh.max_elem_id(); ++i)
+    {
+      const Elem *elem = mesh.query_elem(i);
+
+      const unsigned int my_n_neigh = elem ? elem->n_neighbors() : 0;
+      unsigned int n_neigh = my_n_neigh;
+      mesh.comm().max(n_neigh);
+      if (elem)
+        libmesh_assert_equal_to (my_n_neigh, n_neigh);
+
+      for (unsigned int n = 0; n != n_neigh; ++n)
+        {
+          dof_id_type my_neighbor = DofObject::invalid_id; // NULL
+          dof_id_type* p_my_neighbor = NULL;
+          if (elem && elem->neighbor(n) != remote_elem)
+            {
+              p_my_neighbor = &my_neighbor;
+              if (elem->neighbor(n))
+                my_neighbor = elem->neighbor(n)->id();
+            }
+          mesh.comm().semiverify(p_my_neighbor);
+        }
+    }
 }
 
 
