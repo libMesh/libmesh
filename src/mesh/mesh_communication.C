@@ -67,6 +67,82 @@ struct CompareElemIdsByLevel
     return (al == bl) ? aid < bid : al < bl;
   }
 };
+
+struct SyncNeighbors
+{
+  typedef std::vector<dof_id_type> datum;
+
+  SyncNeighbors(MeshBase &_mesh) :
+    mesh(_mesh) {}
+
+  MeshBase &mesh;
+
+  // Find the neighbor ids for each requested element
+  void gather_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& neighbors)
+  {
+    neighbors.resize(ids.size());
+
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        // Look for this element in the mesh
+        // We'd better find every element we're asked for
+        const Elem *elem = mesh.elem(ids[i]);
+
+        // Return the element's neighbors
+        const unsigned int n_neigh = elem->n_neighbors();
+        neighbors[i].resize(n_neigh);
+        for (unsigned int n = 0; n != n_neigh; ++n)
+          {
+            const Elem *neigh = elem->neighbor(n);
+            if (neigh)
+              {
+                libmesh_assert_not_equal_to(neigh, remote_elem);
+                neighbors[i][n] = neigh->id();
+              }
+            else
+              neighbors[i][n] = DofObject::invalid_id;
+          }
+      }
+  }
+
+  void act_on_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& neighbors)
+  {
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        Elem *elem = mesh.elem(ids[i]);
+
+        datum &new_neigh = neighbors[i];
+
+        const unsigned int n_neigh = elem->n_neighbors();
+        libmesh_assert_equal_to (n_neigh, new_neigh.size());
+
+        for (unsigned int n = 0; n != n_neigh; ++n)
+          {
+            const dof_id_type new_neigh_id = new_neigh[n];
+            const Elem *old_neigh = elem->neighbor(n);
+            if (old_neigh && old_neigh != remote_elem)
+              {
+                libmesh_assert_equal_to(old_neigh->id(), new_neigh_id);
+              }
+            else if (new_neigh_id == DofObject::invalid_id)
+              {
+                libmesh_assert (!old_neigh);
+              }
+            else
+              {
+                Elem *neigh = mesh.query_elem(new_neigh_id);
+                if (neigh)
+                  elem->set_neighbor(n, neigh);
+                else
+                  elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
+              }
+          }
+      }
+  }
+};
+
 }
 
 
@@ -360,8 +436,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // Let's begin with finding consistent neighbor data information
   // for all the elements we currently have.  We'll use a clean
   // slate here - clear any existing information, including RemoteElem's.
-  //  mesh.find_neighbors (/* reset_remote_elements = */ true,
-  //       /* reset_current_list    = */ true);
+  mesh.find_neighbors (/* reset_remote_elements = */ true,
+                       /* reset_current_list    = */ true);
 
   // Get a unique message tag to use in communications; we'll default
   // to some numbers around pi*10000
@@ -664,6 +740,14 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
   // allow any pending requests to complete
   Parallel::wait (send_requests);
+
+  // Ghost elements may not have correct neighbor links, and we may
+  // not be able to locally infer correct neighbor links to remote
+  // elements.  So we synchronize ghost element neighbor links.
+  SyncNeighbors nsync(mesh);
+
+  Parallel::sync_dofobject_data_by_id
+    (mesh.comm(), mesh.elements_begin(), mesh.elements_end(), nsync);
 
   STOP_LOG("gather_neighboring_elements()","MeshCommunication");
 }
