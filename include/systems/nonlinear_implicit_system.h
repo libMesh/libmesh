@@ -41,10 +41,6 @@ template<typename T> class NonlinearSolver;
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p ExplicitSystem.
  */
-
-// ------------------------------------------------------------
-// NonlinearImplicitSystem class definition
-
 class NonlinearImplicitSystem : public ImplicitSystem
 {
 public:
@@ -168,6 +164,35 @@ public:
                                         NumericVector<Number>* R,
                                         SparseMatrix<Number>*  J,
                                         sys_type& S) = 0;
+  };
+
+  /**
+   * Abstract base class to be used for applying user modifications to
+   * the solution vector and/or Newton update step after each
+   * nonlinear step. A user should inherit from this class and define
+   * a custom version of the postcheck() function.
+   */
+  class ComputePostCheck
+  {
+  public:
+    virtual ~ComputePostCheck () {}
+
+    /**
+     * This interface, which is inspired by PETSc's, passes the user:
+     * .) A constant reference to the "old" solution vector (previous Newton iterate),
+     * .) A pointer to the search direction (update) vector, and
+     * .) The "proposed" new solution vector.
+     * The user can then modify either the search direction or the new
+     * solution vector according to their own application-specific
+     * criteria.  If they do, they must set the associated boolean
+     * references appropriately.
+     */
+    virtual void postcheck (const NumericVector<Number> & old_soln,
+                            NumericVector<Number> & search_direction,
+                            NumericVector<Number> & new_soln,
+                            bool & changed_search_direction,
+                            bool & changed_new_soln,
+                            sys_type & S) = 0;
   };
 
   /**
