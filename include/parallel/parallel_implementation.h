@@ -34,6 +34,22 @@ namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
+#ifndef NDEBUG
+#define libmesh_assert_mpi_success(error_code) \
+  do { \
+    if (error_code != MPI_SUCCESS) \
+      { \
+        char error_string[MPI_MAX_ERROR_STRING+1]; \
+        int resultlen; \
+        MPI_Error_string(error_code, error_string, &resultlen); \
+        libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS, error_string); \
+      } \
+    } \
+  while(0)
+#else
+#define libmesh_assert_mpi_success(error_code)  ((void) 0)
+#endif
+
 #define STANDARD_TYPE(cxxtype,mpitype)                                  \
   template<>                                                            \
   class StandardType<cxxtype> : public DataType                         \
@@ -1963,7 +1979,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                             tag.value(),
                             this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("send()", "Parallel");
 }
@@ -1993,7 +2009,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                               this->get(),
                               req.get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2021,7 +2037,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                             tag.value(),
                             this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2051,7 +2067,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                               this->get(),
                               req.get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2165,7 +2181,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                             tag.value(),
                             this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2194,7 +2210,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                               this->get(),
                               req.get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2360,7 +2376,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
               tag.value(),
               this->get(),
               stat.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("receive()", "Parallel");
 
@@ -2388,7 +2404,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                tag.value(),
                this->get(),
                req.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("receive()", "Parallel");
 }
@@ -2510,6 +2526,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
   buf.resize(stat.size());
 
+  // Use stat.source() and stat.tag() in the receive - if
+  // src_processor_id is or tag is "any" then we want to be sure we
+  // try to receive the same message we just probed.
 #ifndef NDEBUG
   // Only catch the return value when asserts are active.
   const int ierr =
@@ -2517,11 +2536,13 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
     MPI_Recv (buf.empty() ? NULL : &buf[0],
               cast_int<int>(buf.size()),
               type,
-              src_processor_id,
-              tag.value(),
+              stat.source(),
+              stat.tag(),
               this->get(),
               stat.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
+
+  libmesh_assert_equal_to (stat.size(), buf.size());
 
   STOP_LOG("receive()", "Parallel");
 
@@ -2550,7 +2571,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                tag.value(),
                this->get(),
                req.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("receive()", "Parallel");
 }
@@ -2567,13 +2588,17 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 
   // Receive serialized variable size objects as sequences of buffer_t
   std::size_t total_buffer_size = 0;
-  this->receive(src_processor_id, total_buffer_size, tag);
+  Status stat = this->receive(src_processor_id, total_buffer_size, tag);
+
+  // Use stat.source() and stat.tag() in subsequent receives - if
+  // src_processor_id is or tag is "any" then we want to be sure we
+  // try to receive messages all corresponding to the same send.
 
   std::size_t received_buffer_size = 0;
   while (received_buffer_size < total_buffer_size)
     {
       std::vector<buffer_t> buffer;
-      this->receive(src_processor_id, buffer, tag);
+      this->receive(stat.source(), buffer, MessageTag(stat.tag()));
       received_buffer_size += buffer.size();
       Parallel::unpack_range(buffer, context, out);
     }
@@ -2883,7 +2908,7 @@ inline void Communicator::gather(const unsigned int root_id,
                  root_id,
                  this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("gather()", "Parallel");
 }
@@ -2991,7 +3016,7 @@ inline void Communicator::allgather
                     &r[0], &sendlengths[0],
                     &displacements[0], send_type, this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("allgather()", "Parallel");
 }
@@ -3095,7 +3120,7 @@ inline void Communicator::alltoall(std::vector<T> &buf) const
                   size_per_proc,
                   send_type,
                   this->get());
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("alltoall()", "Parallel");
 }
@@ -3123,7 +3148,7 @@ inline void Communicator::broadcast (T &data, const unsigned int root_id) const
 #endif
     MPI_Bcast (&data, 1, StandardType<T>(&data), root_id, this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("broadcast()", "Parallel");
 }
@@ -3154,7 +3179,7 @@ inline void Communicator::broadcast (bool &data, const unsigned int root_id) con
 #endif
     MPI_Bcast (&char_data, 1, StandardType<char>(&char_data), root_id, this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   data = char_data;
 
@@ -3229,7 +3254,7 @@ inline void Communicator::broadcast (std::vector<T> &data,
     MPI_Bcast (data_ptr, cast_int<int>(data.size()),
                StandardType<T>(data_ptr), root_id, this->get());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  libmesh_assert_mpi_success (ierr);
 
   STOP_LOG("broadcast()", "Parallel");
 }

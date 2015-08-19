@@ -439,7 +439,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       neigh = const_cast<RemoteElem*>(remote_elem);
                     }
 
-                  current_elem->set_neighbor(s, neigh);
+                  if (!current_elem->subactive())
+                    current_elem->set_neighbor(s, neigh);
 #ifdef DEBUG
                   if (neigh != NULL && neigh != remote_elem)
                     // We ignore subactive elements here because

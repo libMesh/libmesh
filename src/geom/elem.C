@@ -954,7 +954,7 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
             if (!elem->contains_point(this->point(p)))
               {
                 neighbor_set.erase(current);
-                continue;
+                break;
               }
         }
     }
@@ -1270,7 +1270,7 @@ void Elem::make_links_to_me_local(unsigned int n)
 #ifdef LIBMESH_ENABLE_AMR
   if (this->active())
     neigh->family_tree_by_side(neigh_family, nn);
-  else
+  else if (neigh->subactive())
 #endif
     neigh_family.push_back(neigh);
 
@@ -1287,11 +1287,13 @@ void Elem::make_links_to_me_local(unsigned int n)
       // neighbor links, we might have an out of date neighbor
       // link to elem's parent instead.
 #ifdef LIBMESH_ENABLE_AMR
-      libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
-                     (neigh_family_member->neighbor(nn) == remote_elem)
-                     || ((this->refinement_flag() == JUST_REFINED) &&
-                         (this->parent() != NULL) &&
-                         (neigh_family_member->neighbor(nn) == this->parent())));
+      libmesh_assert((neigh_family_member->neighbor(nn) &&
+                      (neigh_family_member->neighbor(nn)->active()) ||
+                       neigh_family_member->neighbor(nn)->is_ancestor_of(this)) ||
+                     (neigh_family_member->neighbor(nn) == remote_elem) ||
+                     ((this->refinement_flag() == JUST_REFINED) &&
+                      (this->parent() != NULL) &&
+                      (neigh_family_member->neighbor(nn) == this->parent())));
 #else
       libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
                      (neigh_family_member->neighbor(nn) == remote_elem));
@@ -1495,15 +1497,28 @@ bool Elem::ancestor() const
 {
 #ifdef LIBMESH_ENABLE_AMR
 
-  if (this->active())
-    return false;
+// Use a fast, ParallelMesh-safe definition
+  const bool is_ancestor =
+    !this->active() && !this->subactive();
 
-  if (!this->has_children())
-    return false;
-  if (this->child(0)->active())
-    return true;
+// But check for inconsistencies if we have time
+#ifdef DEBUG
+  if (!is_ancestor && this->has_children())
+    {
+      for (unsigned int c=0; c != this->n_children(); ++c)
+        {
+          const Elem* kid = this->child(c);
+          if (kid != remote_elem)
+            {
+              libmesh_assert(!kid->active());
+              libmesh_assert(!kid->ancestor());
+            }
+        }
+    }
+#endif // DEBUG
 
-  return this->child(0)->ancestor();
+  return is_ancestor;
+
 #else
   return false;
 #endif

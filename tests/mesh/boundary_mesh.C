@@ -41,6 +41,16 @@ protected:
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.1, 0.9, 0.1, 0.9, QUAD9);
 
+    // We'll need to skip repartitioning with ParallelMesh for now;
+    // otherwise the boundary meshes' interior parents might get
+    // shuffled off to different processors.
+    if (!_mesh->is_serial())
+      {
+        _mesh->skip_partitioning(true);
+        _left_boundary_mesh->skip_partitioning(true);
+        _all_boundary_mesh->skip_partitioning(true);
+      }
+
     // Get the border of the square
     _mesh->boundary_info->sync(*_all_boundary_mesh);
 
