@@ -741,9 +741,14 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // allow any pending requests to complete
   Parallel::wait (send_requests);
 
-  // Ghost elements may not have correct neighbor links, and we may
-  // not be able to locally infer correct neighbor links to remote
-  // elements.  So we synchronize ghost element neighbor links.
+  // We can now find neighbor information for the interfaces between
+  // local elements and ghost elements.
+  mesh.find_neighbors (/* reset_remote_elements = */ true,
+                       /* reset_current_list    = */ false);
+
+  // Ghost elements may not have correct remote_elem neighbor links,
+  // and we may not be able to locally infer correct neighbor links to
+  // remote elements.  So we synchronize ghost element neighbor links.
   SyncNeighbors nsync(mesh);
 
   Parallel::sync_dofobject_data_by_id
