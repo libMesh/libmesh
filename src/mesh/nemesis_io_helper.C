@@ -2185,33 +2185,36 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       // Get pointer to current Elem
       const Elem* elem = mesh.elem(bndry_elem_list[i]);
 
-      // If element is local, process it
-      if (elem->processor_id() == this->processor_id())
-        {
-          std::vector<const Elem*> family;
+      std::vector<const Elem*> family;
 #ifdef LIBMESH_ENABLE_AMR
-          // We need to build up active elements if AMR is enabled and add
-          // them to the exodus sidesets instead of the potentially inactive "parent" elements
-          // Technically we don't need to "reset" the tree since the vector was just created.
-          elem->active_family_tree_by_side(family, bndry_side_list[i], /*reset tree=*/false);
+      // We need to build up active elements if AMR is enabled and add
+      // them to the exodus sidesets instead of the potentially inactive "parent" elements
+      // Technically we don't need to "reset" the tree since the vector was just created.
+      elem->active_family_tree_by_side(family, bndry_side_list[i], /*reset tree=*/false);
 #else
-          // If AMR is not even enabled, just push back the element itself
-          family.push_back( elem );
+      // If AMR is not even enabled, just push back the element itself
+      family.push_back( elem );
 #endif
 
-          // Loop over all the elements in the family tree, store their converted IDs
-          // and side IDs to the map's vectors.  TODO: Somehow reserve enough space for these
-          // push_back's...
-          for (unsigned int j=0; j<family.size(); ++j)
+      // Loop over all the elements in the family tree, store their converted IDs
+      // and side IDs to the map's vectors.  TODO: Somehow reserve enough space for these
+      // push_back's...
+      for (unsigned int j=0; j<family.size(); ++j)
+        {
+          const dof_id_type f_id = family[j]->id();
+          const Elem *f = mesh.elem(f_id);
+
+          // If element is local, process it
+          if (f->processor_id() == this->processor_id())
             {
-              const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(family[j]->id())->type());
+              const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(f->type());
 
               // Use the libmesh to exodus datastructure map to get the proper sideset IDs
               // The datastructure contains the "collapsed" contiguous ids.
               //
               // We know the parent element is local, but let's be absolutely sure that all the children have been
               // actually mapped to Exodus IDs before we blindly try to add them...
-              std::map<int,int>::iterator it = this->libmesh_elem_num_to_exodus.find( family[j]->id() );
+              std::map<int,int>::iterator it = this->libmesh_elem_num_to_exodus.find( f_id );
               if (it != this->libmesh_elem_num_to_exodus.end())
                 {
                   local_elem_boundary_id_lists[ bndry_id_list[i] ].push_back( (*it).second );
@@ -2219,7 +2222,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
                 }
               else
                 libmesh_error_msg("Error, no Exodus mapping for Elem " \
-                                  << family[j]->id()                  \
+                                  << f_id                              \
                                   << " on processor "                 \
                                   << this->processor_id());
             }
