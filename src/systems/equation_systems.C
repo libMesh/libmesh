@@ -795,6 +795,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
         // locked read-only, for example when printing the solution
         // during during the middle of a solve...  So try to be a bit
         // more careful about calling close() unnecessarily.
+        libmesh_assert(this->comm().verify(non_const_sys.solution->closed()));
         if (!non_const_sys.solution->closed())
           non_const_sys.solution->close();
         non_const_sys.update();
@@ -963,6 +964,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
         // locked read-only, for example when printing the solution
         // during during the middle of a solve...  So try to be a bit
         // more careful about calling close() unnecessarily.
+        libmesh_assert(this->comm().verify(non_const_sys.solution->closed()));
         if (!non_const_sys.solution->closed())
           non_const_sys.solution->close();
         non_const_sys.update();
