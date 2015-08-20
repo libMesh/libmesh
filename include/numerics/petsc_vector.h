@@ -771,6 +771,8 @@ void PetscVector<T>::init (const numeric_index_type n,
                            const bool fast,
                            const ParallelType ptype)
 {
+  parallel_object_only();
+
   PetscErrorCode ierr=0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
   PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
@@ -851,6 +853,8 @@ void PetscVector<T>::init (const numeric_index_type n,
                            const bool fast,
                            const ParallelType libmesh_dbg_var(ptype))
 {
+  parallel_object_only();
+
   PetscErrorCode ierr=0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
   PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
@@ -908,6 +912,8 @@ inline
 void PetscVector<T>::init (const NumericVector<T>& other,
                            const bool fast)
 {
+  parallel_object_only();
+
   // Clear initialized vectors
   if (this->initialized())
     this->clear();
@@ -944,6 +950,8 @@ template <typename T>
 inline
 void PetscVector<T>::close ()
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscErrorCode ierr=0;
@@ -970,6 +978,8 @@ template <typename T>
 inline
 void PetscVector<T>::clear ()
 {
+  parallel_object_only();
+
   if (this->initialized())
     this->_restore_array();
 
@@ -992,6 +1002,8 @@ template <typename T>
 inline
 void PetscVector<T>::zero ()
 {
+  parallel_object_only();
+
   libmesh_assert(this->closed());
 
   this->_restore_array();
@@ -1250,6 +1262,8 @@ template <typename T>
 inline
 Real PetscVector<T>::min () const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscErrorCode ierr=0;
@@ -1269,6 +1283,8 @@ template <typename T>
 inline
 Real PetscVector<T>::max() const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscErrorCode ierr=0;
@@ -1288,6 +1304,8 @@ template <typename T>
 inline
 void PetscVector<T>::swap (NumericVector<T> &other)
 {
+  parallel_object_only();
+
   NumericVector<T>::swap(other);
 
   PetscVector<T>& v = cast_ref<PetscVector<T>&>(other);

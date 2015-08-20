@@ -1256,7 +1256,22 @@ inline bool Communicator::verify(const T &r) const
       this->min(verified);
       return verified;
     }
+
+#ifdef LIBMESH_HAVE_CXX11
+  static_assert(Attributes<T>::has_min_max,
+                "Tried to verify an unverifiable type");
+#endif
+
   return true;
+}
+
+
+
+template <>
+inline bool Communicator::verify(const bool &r) const
+{
+  const unsigned char rnew = r;
+  return this->verify(rnew);
 }
 
 
@@ -1281,7 +1296,28 @@ inline bool Communicator::semiverify(const T *r) const
       this->max(invalid);
       return !invalid;
     }
+
+#ifdef LIBMESH_HAVE_CXX11
+  static_assert(Attributes<T>::has_min_max,
+                "Tried to semiverify an unverifiable type");
+#endif
+
   return true;
+}
+
+
+
+template <>
+inline bool Communicator::semiverify(const bool *r) const
+{
+  if (r)
+    {
+      const unsigned char rnew = *r;
+      return this->semiverify(&rnew);
+    }
+
+  const unsigned char *rptr = NULL;
+  return this->semiverify(rptr);
 }
 
 
@@ -1318,6 +1354,12 @@ inline bool Communicator::semiverify(const std::vector<T> *r) const
       this->max(invalid);
       return !invalid;
     }
+
+#ifdef LIBMESH_HAVE_CXX11
+  static_assert(Attributes<T>::has_min_max,
+                "Tried to semiverify a vector of an unverifiable type");
+#endif
+
   return true;
 }
 
@@ -2972,7 +3014,7 @@ inline void Communicator::allgather
                      cast_int<int>(r_src.size()),
                      send_type,
                      this->get());
-      libmesh_assert(this->verify(r));
+      // libmesh_assert(this->verify(r));
       STOP_LOG("allgather()", "Parallel");
       return;
     }

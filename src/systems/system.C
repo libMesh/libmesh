@@ -1994,7 +1994,13 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->comm().verify(p);
+  this->comm().verify(p(0));
+#if LIBMESH_DIM > 1
+  this->comm().verify(p(1));
+#endif
+#if LIBMESH_DIM > 2
+  this->comm().verify(p(2));
+#endif
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2091,7 +2097,13 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->comm().verify(p);
+  this->comm().verify(p(0));
+#if LIBMESH_DIM > 1
+  this->comm().verify(p(1));
+#endif
+#if LIBMESH_DIM > 2
+  this->comm().verify(p(2));
+#endif
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2190,7 +2202,13 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->comm().verify(p);
+  this->comm().verify(p(0));
+#if LIBMESH_DIM > 1
+  this->comm().verify(p(1));
+#endif
+#if LIBMESH_DIM > 2
+  this->comm().verify(p(2));
+#endif
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function

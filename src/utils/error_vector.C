@@ -257,6 +257,8 @@ void ErrorVector::plot_error(const std::string& filename,
       error_system.solution->set(solution_index, (*this)[elem_id]);
     }
 
+  error_system.solution->close();
+
   // We may have to renumber if the original numbering was not
   // contiguous.  Since this is just a temporary mesh, that's probably
   // fine.
