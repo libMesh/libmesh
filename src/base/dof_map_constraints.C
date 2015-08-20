@@ -2443,11 +2443,11 @@ void DofMap::build_constraint_matrix_and_vector
       if ((C.n() == Cnew.m()) &&          // If the constraint matrix
           (Cnew.n() == elem_dofs.size())) // is constrained...
         {
-          C.right_multiply(Cnew);
-
           // If x = Cy + h and y = Dz + g
           // Then x = (CD)z + (Cg + h)
           C.vector_mult_add(H, 1, Hnew);
+
+          C.right_multiply(Cnew);
         }
 
       libmesh_assert_equal_to (C.n(), elem_dofs.size());
