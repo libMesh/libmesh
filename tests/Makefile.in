@@ -138,9 +138,9 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/type_tensor_test.C \
-	parallel/parallel_test.C quadrature/quadrature_test.C \
-	systems/equation_systems_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C systems/equation_systems_test.C \
+	utils/vectormap_test.C fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
@@ -160,6 +160,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	numerics/unit_tests_dbg-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_test.$(OBJEXT) \
+	parallel/unit_tests_dbg-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
@@ -188,9 +189,9 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/type_tensor_test.C \
-	parallel/parallel_test.C quadrature/quadrature_test.C \
-	systems/equation_systems_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C systems/equation_systems_test.C \
+	utils/vectormap_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
@@ -209,6 +210,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_devel-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_test.$(OBJEXT) \
+	parallel/unit_tests_devel-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT) \
 	systems/unit_tests_devel-equation_systems_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
@@ -235,9 +237,9 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/type_tensor_test.C \
-	parallel/parallel_test.C quadrature/quadrature_test.C \
-	systems/equation_systems_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C systems/equation_systems_test.C \
+	utils/vectormap_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
@@ -256,6 +258,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_test.$(OBJEXT) \
+	parallel/unit_tests_oprof-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT) \
 	systems/unit_tests_oprof-equation_systems_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
@@ -282,9 +285,9 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/type_tensor_test.C \
-	parallel/parallel_test.C quadrature/quadrature_test.C \
-	systems/equation_systems_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C systems/equation_systems_test.C \
+	utils/vectormap_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
@@ -303,6 +306,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_opt-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_test.$(OBJEXT) \
+	parallel/unit_tests_opt-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT) \
 	systems/unit_tests_opt-equation_systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_7)
@@ -327,9 +331,9 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/type_tensor_test.C \
-	parallel/parallel_test.C quadrature/quadrature_test.C \
-	systems/equation_systems_test.C utils/vectormap_test.C \
-	fparser/autodiff.C
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C systems/equation_systems_test.C \
+	utils/vectormap_test.C fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
@@ -348,6 +352,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_prof-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_test.$(OBJEXT) \
+	parallel/unit_tests_prof-parallel_point_test.$(OBJEXT) \
 	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT) \
 	systems/unit_tests_prof-equation_systems_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
@@ -767,9 +772,9 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/type_tensor_test.C \
-	parallel/parallel_test.C quadrature/quadrature_test.C \
-	systems/equation_systems_test.C utils/vectormap_test.C \
-	$(am__append_1)
+	parallel/parallel_test.C parallel/parallel_point_test.C \
+	quadrature/quadrature_test.C systems/equation_systems_test.C \
+	utils/vectormap_test.C $(am__append_1)
 EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
@@ -913,6 +918,8 @@ parallel/$(DEPDIR)/$(am__dirstamp):
 	@: > parallel/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_dbg-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_dbg-parallel_point_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/$(am__dirstamp):
 	@$(MKDIR_P) quadrature
 	@: > quadrature/$(am__dirstamp)
@@ -981,6 +988,8 @@ numerics/unit_tests_devel-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_devel-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_devel-parallel_point_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_devel-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -1024,6 +1033,8 @@ numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT):  \
 numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_oprof-parallel_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_oprof-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
@@ -1069,6 +1080,8 @@ numerics/unit_tests_opt-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_opt-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_opt-parallel_point_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_opt-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -1112,6 +1125,8 @@ numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT):  \
 numerics/unit_tests_prof-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_prof-parallel_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_prof-parallel_point_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_prof-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
@@ -1226,10 +1241,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_dbg-quadrature_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po@am__quote@
@@ -1508,6 +1528,20 @@ parallel/unit_tests_dbg-parallel_test.obj: parallel/parallel_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_dbg-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+parallel/unit_tests_dbg-parallel_point_test.o: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_dbg-parallel_point_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Tpo -c -o parallel/unit_tests_dbg-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_dbg-parallel_point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+
+parallel/unit_tests_dbg-parallel_point_test.obj: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_dbg-parallel_point_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Tpo -c -o parallel/unit_tests_dbg-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_dbg-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_dbg-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_dbg-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
 
 quadrature/unit_tests_dbg-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_dbg-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_dbg-quadrature_test.Tpo -c -o quadrature/unit_tests_dbg-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
@@ -1803,6 +1837,20 @@ parallel/unit_tests_devel-parallel_test.obj: parallel/parallel_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
 
+parallel/unit_tests_devel-parallel_point_test.o: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_point_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Tpo -c -o parallel/unit_tests_devel-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_devel-parallel_point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+
+parallel/unit_tests_devel-parallel_point_test.obj: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_point_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Tpo -c -o parallel/unit_tests_devel-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_devel-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+
 quadrature/unit_tests_devel-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_devel-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo -c -o quadrature/unit_tests_devel-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po
@@ -2096,6 +2144,20 @@ parallel/unit_tests_oprof-parallel_test.obj: parallel/parallel_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_oprof-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+parallel/unit_tests_oprof-parallel_point_test.o: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_point_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Tpo -c -o parallel/unit_tests_oprof-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_oprof-parallel_point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+
+parallel/unit_tests_oprof-parallel_point_test.obj: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_point_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Tpo -c -o parallel/unit_tests_oprof-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_oprof-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_oprof-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
 
 quadrature/unit_tests_oprof-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_oprof-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Tpo -c -o quadrature/unit_tests_oprof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
@@ -2391,6 +2453,20 @@ parallel/unit_tests_opt-parallel_test.obj: parallel/parallel_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
 
+parallel/unit_tests_opt-parallel_point_test.o: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_point_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Tpo -c -o parallel/unit_tests_opt-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_opt-parallel_point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+
+parallel/unit_tests_opt-parallel_point_test.obj: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_point_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Tpo -c -o parallel/unit_tests_opt-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_opt-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+
 quadrature/unit_tests_opt-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_opt-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo -c -o quadrature/unit_tests_opt-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Po
@@ -2684,6 +2760,20 @@ parallel/unit_tests_prof-parallel_test.obj: parallel/parallel_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_prof-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+parallel/unit_tests_prof-parallel_point_test.o: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_point_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Tpo -c -o parallel/unit_tests_prof-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_prof-parallel_point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_point_test.o `test -f 'parallel/parallel_point_test.C' || echo '$(srcdir)/'`parallel/parallel_point_test.C
+
+parallel/unit_tests_prof-parallel_point_test.obj: parallel/parallel_point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_point_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Tpo -c -o parallel/unit_tests_prof-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Tpo parallel/$(DEPDIR)/unit_tests_prof-parallel_point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_point_test.C' object='parallel/unit_tests_prof-parallel_point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_point_test.obj `if test -f 'parallel/parallel_point_test.C'; then $(CYGPATH_W) 'parallel/parallel_point_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_point_test.C'; fi`
 
 quadrature/unit_tests_prof-quadrature_test.o: quadrature/quadrature_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_prof-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo -c -o quadrature/unit_tests_prof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
