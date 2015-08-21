@@ -31,6 +31,7 @@ unit_tests_sources = \
 	numerics/type_vector_test.h \
 	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
+	parallel/parallel_point_test.C \
 	quadrature/quadrature_test.C \
         systems/equation_systems_test.C \
 	utils/vectormap_test.C
@@ -55,10 +56,16 @@ endif
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
-# others segfault and/or hang.
+# others segfault and/or hang.  By default we will not run
+# GLIBCXX-debugging builds with cppunit unless specificallly
+# configured to.
 if LIBMESH_DBG_MODE
 if LIBMESH_ENABLE_GLIBCXX_DEBUGGING
+if LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT
+  check_PROGRAMS         += unit_tests-dbg
+else
   noinst_PROGRAMS        += unit_tests-dbg
+endif
 else
   check_PROGRAMS         += unit_tests-dbg
 endif

@@ -5,26 +5,23 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/parallel.h>
+#include <libmesh/parallel_algebra.h>
 
 #include "test_comm.h"
 
 using namespace libMesh;
 
-class ParallelTest : public CppUnit::TestCase {
+class ParallelPointTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParallelTest );
+  CPPUNIT_TEST_SUITE( ParallelPointTest );
 
-  CPPUNIT_TEST( testGather );
-  CPPUNIT_TEST( testAllGather );
-  CPPUNIT_TEST( testBroadcast );
-  CPPUNIT_TEST( testBarrier );
-  CPPUNIT_TEST( testMin );
-  CPPUNIT_TEST( testMax );
-  CPPUNIT_TEST( testInfinityMin );
-  CPPUNIT_TEST( testInfinityMax );
+  CPPUNIT_TEST( testAllGatherPoint );
+  CPPUNIT_TEST( testAllGatherPairRealPoint );
+  CPPUNIT_TEST( testBroadcastVectorValueInt );
+  CPPUNIT_TEST( testBroadcastVectorValueReal );
+  CPPUNIT_TEST( testBroadcastPoint );
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
-  CPPUNIT_TEST( testSemiVerify );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -39,108 +36,106 @@ public:
 
 
 
-  void testGather()
+  void testAllGatherPoint()
   {
-    std::vector<processor_id_type> vals;
-    TestCommWorld->gather(0,cast_int<processor_id_type>(TestCommWorld->rank()),vals);
+    std::vector<Point> vals;
+    Real myrank = TestCommWorld->rank();
+    TestCommWorld->allgather(Point(myrank, myrank+0.25, myrank+0.5),vals);
 
-    if (TestCommWorld->rank() == 0)
-      for (processor_id_type i=0; i<vals.size(); i++)
-        CPPUNIT_ASSERT_EQUAL( i , vals[i] );
+    const std::size_t comm_size = TestCommWorld->size();
+    const std::size_t vec_size  = vals.size();
+    CPPUNIT_ASSERT_EQUAL( comm_size, vec_size );
+    for (processor_id_type i=0; i<vals.size(); i++)
+      {
+        Real theirrank = i;
+        CPPUNIT_ASSERT_EQUAL( theirrank,      vals[i](0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.25, vals[i](1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,  vals[i](2) );
+      }
   }
 
 
 
-  void testAllGather()
+  void testAllGatherPairRealPoint()
   {
-    std::vector<processor_id_type> vals;
-    TestCommWorld->allgather(cast_int<processor_id_type>(TestCommWorld->rank()),vals);
+    std::vector<std::pair<Real, Point> > vals;
+    Real myrank = TestCommWorld->rank();
+    TestCommWorld->allgather
+      (std::make_pair(myrank+0.75, Point(myrank, myrank+0.25, myrank+0.5)), vals);
+
+    const std::size_t comm_size = TestCommWorld->size();
+    const std::size_t vec_size  = vals.size();
+    CPPUNIT_ASSERT_EQUAL( comm_size, vec_size );
 
     for (processor_id_type i=0; i<vals.size(); i++)
-      CPPUNIT_ASSERT_EQUAL( i , vals[i] );
+      {
+        Real theirrank = i;
+        CPPUNIT_ASSERT_EQUAL( theirrank,      vals[i].second(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.25, vals[i].second(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,  vals[i].second(2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.75, vals[i].first );
+      }
   }
 
 
 
-  void testBroadcast()
+  template <typename T>
+  void testBroadcastVectorValue()
   {
-    std::vector<unsigned int> src(3), dest(3);
+    std::vector<VectorValue<T> > src(3), dest(3);
 
-    src[0]=0;
-    src[1]=1;
-    src[2]=2;
+    {
+      T val=T(0);
+      for (unsigned int i=0; i<3; i++)
+        for (unsigned int j=0; j<LIBMESH_DIM; j++)
+          src[i](j) = val++;
 
-    if (TestCommWorld->rank() == 0)
-      dest = src;
+      if (TestCommWorld->rank() == 0)
+        dest = src;
+    }
 
     TestCommWorld->broadcast(dest);
 
-    for (unsigned int i=0; i<src.size(); i++)
-      CPPUNIT_ASSERT_EQUAL( src[i] , dest[i] );
+    for (unsigned int i=0; i<3; i++)
+      for (unsigned int j=0; j<LIBMESH_DIM; j++)
+        CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
   }
 
 
 
-  void testBarrier()
+  void testBroadcastVectorValueInt()
   {
-    TestCommWorld->barrier();
+    this->testBroadcastVectorValue<int>();
   }
 
 
 
-  void testMin ()
+  void testBroadcastVectorValueReal()
   {
-    unsigned int min = TestCommWorld->rank();
-
-    TestCommWorld->min(min);
-
-    CPPUNIT_ASSERT_EQUAL (min, static_cast<unsigned int>(0));
+    this->testBroadcastVectorValue<Real>();
   }
 
 
 
-  void testMax ()
+  void testBroadcastPoint()
   {
-    processor_id_type max = TestCommWorld->rank();
+    std::vector<Point> src(3), dest(3);
 
-    TestCommWorld->max(max);
+    {
+      Real val=0.;
+      for (unsigned int i=0; i<3; i++)
+        for (unsigned int j=0; j<LIBMESH_DIM; j++)
+          src[i](j) = val++;
 
-    CPPUNIT_ASSERT_EQUAL (cast_int<processor_id_type>(max+1),
-                          cast_int<processor_id_type>(TestCommWorld->size()));
-  }
+      if (TestCommWorld->rank() == 0)
+        dest = src;
+    }
 
+    TestCommWorld->broadcast(dest);
 
-
-  void testInfinityMin ()
-  {
-    double min = std::numeric_limits<double>::infinity();
-
-    TestCommWorld->min(min);
-
-    CPPUNIT_ASSERT_EQUAL (min, std::numeric_limits<double>::infinity());
-
-    min = -std::numeric_limits<double>::infinity();
-
-    TestCommWorld->min(min);
-
-    CPPUNIT_ASSERT_EQUAL (min, -std::numeric_limits<double>::infinity());
-  }
-
-
-
-  void testInfinityMax ()
-  {
-    double max = std::numeric_limits<double>::infinity();
-
-    TestCommWorld->max(max);
-
-    CPPUNIT_ASSERT_EQUAL (max, std::numeric_limits<double>::infinity());
-
-    max = -std::numeric_limits<double>::infinity();
-
-    TestCommWorld->max(max);
-
-    CPPUNIT_ASSERT_EQUAL (max, -std::numeric_limits<double>::infinity());
+    for (unsigned int i=0; i<3; i++)
+      for (unsigned int j=0; j<LIBMESH_DIM; j++)
+        CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
   }
 
 
@@ -267,20 +262,7 @@ public:
 
 
 
-  void testSemiVerify ()
-  {
-    double inf = std::numeric_limits<double>::infinity();
-
-    double *infptr = TestCommWorld->rank()%2 ? NULL : &inf;
-
-    CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
-
-    inf = -std::numeric_limits<double>::infinity();
-
-    CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
-  }
-
 
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( ParallelTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( ParallelPointTest );
