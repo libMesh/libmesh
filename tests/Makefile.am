@@ -56,10 +56,16 @@ endif
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
-# others segfault and/or hang.
+# others segfault and/or hang.  By default we will not run
+# GLIBCXX-debugging builds with cppunit unless specificallly
+# configured to.
 if LIBMESH_DBG_MODE
 if LIBMESH_ENABLE_GLIBCXX_DEBUGGING
+if LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT
+  check_PROGRAMS         += unit_tests-dbg
+else
   noinst_PROGRAMS        += unit_tests-dbg
+endif
 else
   check_PROGRAMS         += unit_tests-dbg
 endif
