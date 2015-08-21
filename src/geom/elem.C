@@ -1288,8 +1288,8 @@ void Elem::make_links_to_me_local(unsigned int n)
       // link to elem's parent instead.
 #ifdef LIBMESH_ENABLE_AMR
       libmesh_assert((neigh_family_member->neighbor(nn) &&
-                      (neigh_family_member->neighbor(nn)->active()) ||
-                       neigh_family_member->neighbor(nn)->is_ancestor_of(this)) ||
+                      (neigh_family_member->neighbor(nn)->active() ||
+                       neigh_family_member->neighbor(nn)->is_ancestor_of(this))) ||
                      (neigh_family_member->neighbor(nn) == remote_elem) ||
                      ((this->refinement_flag() == JUST_REFINED) &&
                       (this->parent() != NULL) &&
