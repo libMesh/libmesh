@@ -6,14 +6,12 @@ AC_DEFUN([CONFIGURE_HDF5],
   AC_ARG_ENABLE(hdf5,
                 AS_HELP_STRING([--disable-hdf5],
                                [build without HDF5 support]),
-		[case "${enableval}" in
-		  yes)  enablehdf5=yes ;;
-		   no)  enablehdf5=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-hdf5) ;;
-		 esac],
-		 [enablehdf5=$enableoptional])
-
-
+                [case "${enableval}" in
+                  yes)  enablehdf5=yes ;;
+                  no)  enablehdf5=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-hdf5) ;;
+                esac],
+                [enablehdf5=$enableoptional])
 
   if (test $enablehdf5 = yes); then
     AX_PATH_HDF5(1.8.0,no)
@@ -140,10 +138,10 @@ if test "${with_hdf5}" != no ; then
     AC_LANG_PUSH([C])
 
     if test "x${found_header}" = "xyes" ; then
-        version_succeeded=no
+      version_succeeded=no
 
-    	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-       	@%:@include <hdf5.h>
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <hdf5.h>
             ]], [[
             #if H5_VERS_MAJOR > $MAJOR_VER
             /* Sweet nibblets */
@@ -159,35 +157,29 @@ if test "${with_hdf5}" != no ; then
             AC_MSG_RESULT(no)
         ])
 
-    	AC_LANG_POP([C])
+      AC_LANG_POP([C])
 
-    	if test "$version_succeeded" != "yes";then
-       	   if test "$is_package_required" = yes; then
-              AC_MSG_ERROR([
-
-   Your HDF5 library version does not meet the minimum versioning
-   requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
-   of an updated installation or consider upgrading the system version.
-
-       	 	 ])
-           fi
+      if test "$version_succeeded" != "yes";then
+        if test "$is_package_required" = yes; then
+          AC_MSG_ERROR([Your HDF5 library version does not meet the minimum versioning
+                        requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
+                        of an updated installation or consider upgrading the system version.])
         fi
+      fi
 
-    # Library availability
+      # Library availability
+      AC_CHECK_LIB([hdf5],[H5Fopen],[found_library=yes],[found_library=no])
+      AC_LANG_POP([C])
 
-    AC_CHECK_LIB([hdf5],[H5Fopen],[found_library=yes],[found_library=no])
-    AC_LANG_POP([C])
-
-    succeeded=no
-    if test "$found_header" = yes; then
+      succeeded=no
+      if test "$found_header" = yes; then
         if test "$version_succeeded" = yes; then
-	   if test "$found_library" = yes; then
-              succeeded=yes
-	   fi
+          if test "$found_library" = yes; then
+            succeeded=yes
+          fi
         fi
-    fi
-
-    fi   dnl end test if header if available
+      fi
+    fi dnl end test if header if available
 
     CFLAGS="$ac_HDF5_save_CFLAGS"
     CPPFLAGS="$ac_HDF5_save_CPPFLAGS"
@@ -195,31 +187,29 @@ if test "${with_hdf5}" != no ; then
     LIBS="$ac_HDF5_save_LIBS"
 
     if test "$succeeded" = no; then
-       if test "$is_package_required" = yes; then
-          AC_MSG_ERROR([HDF5 not found.  Try either --with-hdf5 or setting HDF5_DIR.])
-       else
-	  AC_MSG_NOTICE([optional HDF5 library not found, or does not meet version requirements])
-       fi
+      if test "$is_package_required" = yes; then
+        AC_MSG_ERROR([HDF5 not found.  Try either --with-hdf5 or setting HDF5_DIR.])
+      else
+         AC_MSG_NOTICE([optional HDF5 library not found, or does not meet version requirements])
+      fi
 
-       HDF5_CFLAGS=""
-       HDF5_CPPFLAGS=""
-       HDF5_LIBS=""
-       HDF5_FLIBS=""
-       HDF5_CXXLIBS=""
-       HDF5_PREFIX=""
+      HDF5_CFLAGS=""
+      HDF5_CPPFLAGS=""
+      HDF5_LIBS=""
+      HDF5_FLIBS=""
+      HDF5_CXXLIBS=""
+      HDF5_PREFIX=""
     else
-        HAVE_HDF5=1
-        AC_DEFINE(HAVE_HDF5,1,[Define if HDF5 is available])
-        AC_SUBST(HDF5_CFLAGS)
-        AC_SUBST(HDF5_CPPFLAGS)
-        AC_SUBST(HDF5_LIBS)
-        AC_SUBST(HDF5_FLIBS)
-        AC_SUBST(HDF5_CXXLIBS)
-	AC_SUBST(HDF5_PREFIX)
+      HAVE_HDF5=1
+      AC_DEFINE(HAVE_HDF5,1,[Define if HDF5 is available])
+      AC_SUBST(HDF5_CFLAGS)
+      AC_SUBST(HDF5_CPPFLAGS)
+      AC_SUBST(HDF5_LIBS)
+      AC_SUBST(HDF5_FLIBS)
+      AC_SUBST(HDF5_CXXLIBS)
+      AC_SUBST(HDF5_PREFIX)
     fi
-
     #AC_SUBST(HAVE_HDF5)
-
 fi
 
 #AM_CONDITIONAL(HDF5_ENABLED,test x$HAVE_HDF5 = x1)

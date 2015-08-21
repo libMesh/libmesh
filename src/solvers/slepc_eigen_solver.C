@@ -242,7 +242,11 @@ SlepcEigenSolver<T>::_solve_standard_helper
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
       LIBMESH_CHKERRABORT(ierr);
 
+#if SLEPC_VERSION_LESS_THAN(3,6,0)
       ierr = EPSComputeRelativeError(_eps, i, &error);
+#else
+      ierr = EPSComputeError(_eps, i, EPS_ERROR_RELATIVE, &error);
+#endif
       LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -526,7 +530,11 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
       LIBMESH_CHKERRABORT(ierr);
 
+#if SLEPC_VERSION_LESS_THAN(3,6,0)
       ierr = EPSComputeRelativeError(_eps, i, &error);
+#else
+      ierr = EPSComputeError(_eps, i, EPS_ERROR_RELATIVE, &error);
+#endif
       LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -729,7 +737,11 @@ Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
   PetscErrorCode ierr=0;
   PetscReal error;
 
+#if SLEPC_VERSION_LESS_THAN(3,6,0)
   ierr = EPSComputeRelativeError(_eps, i, &error);
+#else
+  ierr = EPSComputeError(_eps, i, EPS_ERROR_RELATIVE, &error);
+#endif
   LIBMESH_CHKERRABORT(ierr);
 
   return error;

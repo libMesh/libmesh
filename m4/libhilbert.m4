@@ -6,14 +6,12 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
   AC_ARG_ENABLE(libHilbert,
                 AS_HELP_STRING([--disable-libHilbert],
                                [build without Chris Hamilton's libHilbert]),
-		[case "${enableval}" in
-		  yes)  enablelibhilbert=yes ;;
-		   no)  enablelibhilbert=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-libHilbert) ;;
-		 esac],
-		 [enablelibhilbert=$enableoptional])
-
-
+                [case "${enableval}" in
+                  yes)  enablelibhilbert=yes ;;
+                  no)  enablelibhilbert=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-libHilbert) ;;
+                esac],
+                [enablelibhilbert=$enableoptional])
 
   dnl The LIBHILBERT API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...

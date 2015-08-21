@@ -7,11 +7,11 @@ AC_DEFUN([CONFIGURE_BOOST],
   AC_ARG_ENABLE(boost,
                 AS_HELP_STRING([--disable-boost],
                                [build without either external or built-in BOOST support]),
-   	        [case "${enableval}" in
-  	      	  yes)  enableboost=yes ;;
-  		   no)  enableboost=no ;;
-   		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-boost) ;;
-  	        esac],
+                [case "${enableval}" in
+                  yes)  enableboost=yes ;;
+                  no)  enableboost=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-boost) ;;
+                esac],
                 enableboost=$enableoptional)
 
   install_internal_boost=no
@@ -40,7 +40,7 @@ AC_DEFUN([CONFIGURE_BOOST],
 
       if test "$internal_boost_found" = "no" ; then
         AC_MSG_RESULT(<<< Libmesh boost installation *not* found >>>)
-	enableboost=no
+        enableboost=no
       else
         install_internal_boost=yes
         BOOST_INCLUDE="-I\$(top_srcdir)/contrib/boost/include"

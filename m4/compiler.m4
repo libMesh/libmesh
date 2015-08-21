@@ -13,12 +13,12 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
      AC_ARG_ENABLE(mpi,
                    AS_HELP_STRING([--disable-mpi],
                                   [build without MPI message passing support]),
-   		   [case "${enableval}" in
-   		     yes)  enablempi=yes ;;
-   		      no)  enablempi=no ;;
-    		       *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
-   		    esac],
-   		    [enablempi=yes])
+                   [case "${enableval}" in
+                     yes)  enablempi=yes ;;
+                     no)  enablempi=no ;;
+                     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
+                   esac],
+                   [enablempi=yes])
 
   if  (test "$enablempi" != no) ; then
     CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
@@ -27,10 +27,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   fi
 
   AC_ARG_WITH([cxx],
-  	    AS_HELP_STRING([--with-cxx=CXX],
-                             [C++ compiler to use]),
-  	    [CXX="$withval"],
-  	    [])
+              AS_HELP_STRING([--with-cxx=CXX], [C++ compiler to use]),
+              [CXX="$withval"],
+              [])
 
   # --------------------------------------------------------------
   # Determines a C++ compiler to use.  First checks if the variable CXX is
@@ -57,10 +56,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
     CC_TRY_LIST="mpicc $CC_TRY_LIST"
   fi
   AC_ARG_WITH([cc],
-  	    AS_HELP_STRING([--with-cc=CC],
-                             [C compiler to use]),
-  	    [CC="$withval"],
-  	    [])
+              AS_HELP_STRING([--with-cc=CC], [C compiler to use]),
+              [CC="$withval"],
+              [])
 
   # --------------------------------------------------------------
   # Determine a C compiler to use.  If CC is not already set, checks for
@@ -85,13 +83,12 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   AC_ARG_ENABLE(fortran,
                 AS_HELP_STRING([--disable-fortran],
                                [build without Fortran language support]),
-		[case "${enableval}" in
-		  yes)  enablefortran=yes ;;
-		   no)  enablefortran=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fortran) ;;
-		 esac],
-		 [enablefortran=yes])
-
+                [case "${enableval}" in
+                  yes)  enablefortran=yes ;;
+                  no)  enablefortran=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fortran) ;;
+                esac],
+                [enablefortran=yes])
 
   if (test "x$enablefortran" = xyes); then
 
@@ -101,10 +98,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
       FC_TRY_LIST="mpif90 $FC_TRY_LIST"
     fi
     AC_ARG_WITH([fc],
-    	    AS_HELP_STRING([--with-fc=FC],
-                               [Fortran compiler to use]),
-    	    [FC="$withval"],
-    	    [])
+                AS_HELP_STRING([--with-fc=FC], [Fortran compiler to use]),
+                [FC="$withval"],
+                [])
 
     # --------------------------------------------------------------
     # Determine a F90+ compiler to use.
@@ -127,10 +123,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
       F77_TRY_LIST="mpif77 $F77_TRY_LIST"
     fi
     AC_ARG_WITH([f77],
-    	    AS_HELP_STRING([--with-f77=F77],
-                               [Fortran compiler to use]),
-    	    [F77="$withval"],
-    	    [])
+                AS_HELP_STRING([--with-f77=F77], [Fortran compiler to use]),
+                [F77="$withval"],
+                [])
 
     # --------------------------------------------------------------
     # Determine a F77 compiler to use.
@@ -194,95 +189,93 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
         GXX_VERSION=gcc4.9
         ;;
       *4.8.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
-  	GXX_VERSION=gcc4.8
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
+        GXX_VERSION=gcc4.8
+        ;;
       *4.7.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
-  	GXX_VERSION=gcc4.7
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
+        GXX_VERSION=gcc4.7
+        ;;
       *4.6.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
-  	GXX_VERSION=gcc4.6
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
+        GXX_VERSION=gcc4.6
+        ;;
       *4.5.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.5 >>>)
-  	GXX_VERSION=gcc4.5
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.5 >>>)
+        GXX_VERSION=gcc4.5
+        ;;
       *4.4.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.4 >>>)
-  	GXX_VERSION=gcc4.4
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.4 >>>)
+        GXX_VERSION=gcc4.4
+        ;;
       *4.3.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.3 >>>)
-  	GXX_VERSION=gcc4.3
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.3 >>>)
+        GXX_VERSION=gcc4.3
+        ;;
       *4.2.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.2 >>>)
-  	GXX_VERSION=gcc4.2
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.2 >>>)
+        GXX_VERSION=gcc4.2
+        ;;
       *4.1.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.1 >>>)
-  	GXX_VERSION=gcc4.1
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.1 >>>)
+        GXX_VERSION=gcc4.1
+        ;;
       *4.0.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.0 >>>)
-  	GXX_VERSION=gcc4.0
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-4.0 >>>)
+        GXX_VERSION=gcc4.0
+        ;;
       *3.4.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
-  	GXX_VERSION=gcc3.4
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
+        GXX_VERSION=gcc3.4
+        ;;
       *3.3.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
-  	GXX_VERSION=gcc3.3
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
+        GXX_VERSION=gcc3.3
+        ;;
       *3.2.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
-  	GXX_VERSION=gcc3.2
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
+        GXX_VERSION=gcc3.2
+        ;;
       *3.1.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.1 >>>)
-  	GXX_VERSION=gcc3.1
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-3.1 >>>)
+        GXX_VERSION=gcc3.1
+        ;;
       *3.0.*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-3.0 >>>)
-  	GXX_VERSION=gcc3.0
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-3.0 >>>)
+        GXX_VERSION=gcc3.0
+        ;;
       *2.97*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.97 >>>)
-  	GXX_VERSION=gcc2.97
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-2.97 >>>)
+        GXX_VERSION=gcc2.97
+        ;;
       *2.96*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.96 >>>)
-  	GXX_VERSION=gcc2.96
-	AC_DEFINE(BROKEN_IOSTREAM, 1,
-             [This compiler is known not to support some iostream
-              functionality])
-         AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-2.96 >>>)
+        GXX_VERSION=gcc2.96
+        AC_DEFINE(BROKEN_IOSTREAM, 1,
+                  [This compiler is known not to support some iostream functionality])
+        AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
+        ;;
       *2.95*)
-  	AC_MSG_RESULT(<<< C++ compiler is gcc-2.95 >>>)
-  	GXX_VERSION=gcc2.95
-	AC_DEFINE(BROKEN_IOSTREAM, 1,
-             [This compiler is known not to support some iostream
-              functionality])
-         AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is gcc-2.95 >>>)
+        GXX_VERSION=gcc2.95
+        AC_DEFINE(BROKEN_IOSTREAM, 1,
+                  [This compiler is known not to support some iostream functionality])
+        AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
+        ;;
       *"egcs-1.1"*)
-  	AC_MSG_RESULT(<<< C++ compiler is egcs-1.1 >>>)
-  	GXX_VERSION=egcs1.1
-  	;;
+        AC_MSG_RESULT(<<< C++ compiler is egcs-1.1 >>>)
+        GXX_VERSION=egcs1.1
+        ;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-  	# These compilers are too old to support a useful subset
-  	# of modern C++, so we don't support them
-  	AC_MSG_RESULT(<<< C++ compiler is $GXX_VERSION_STRING >>>)
-  	AC_MSG_ERROR(<<< C++ compiler is not supported >>>)
-  	;;
+        # These compilers are too old to support a useful subset
+        # of modern C++, so we don't support them
+        AC_MSG_RESULT(<<< C++ compiler is $GXX_VERSION_STRING >>>)
+        AC_MSG_ERROR(<<< C++ compiler is not supported >>>)
+        ;;
       *)
-  	AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
-  	GXX_VERSION=gcc-other
-  	;;
+  AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
+  GXX_VERSION=gcc-other
+  ;;
     esac
     # Check for Apple compilers
     case "$GXX_VERSION_STRING" in
@@ -327,35 +320,35 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
           case "$GXX_VERSION_STRING" in
             *10.1*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 10.1 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v10.1
+              GXX_VERSION=intel_itanium_icc_v10.1
               ;;
             *10.0*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 10.0 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v10.0
+              GXX_VERSION=intel_itanium_icc_v10.0
               ;;
             *9.1*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.1 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v9.1
+              GXX_VERSION=intel_itanium_icc_v9.1
               ;;
             *9.0*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.0 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v9.0
+              GXX_VERSION=intel_itanium_icc_v9.0
               ;;
             *8.1*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.1 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v8.1
+              GXX_VERSION=intel_itanium_icc_v8.1
               ;;
             *8.0*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.0 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v8.0
+              GXX_VERSION=intel_itanium_icc_v8.0
               ;;
             *7.1*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.1 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v7.1
+              GXX_VERSION=intel_itanium_icc_v7.1
               ;;
             *7.0*)
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.0 >>>)
-  	      GXX_VERSION=intel_itanium_icc_v7.0
+              GXX_VERSION=intel_itanium_icc_v7.0
               ;;
           esac
         else
@@ -379,92 +372,92 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
                 ;;
               *12.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12.1 >>>)
-  	        GXX_VERSION=intel_icc_v12.x
+                GXX_VERSION=intel_icc_v12.x
                 ;;
               *12.*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12 >>>)
-  	        GXX_VERSION=intel_icc_v12.x
+                GXX_VERSION=intel_icc_v12.x
                 ;;
               *11.*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 11 >>>)
-  	        GXX_VERSION=intel_icc_v11.x
+                GXX_VERSION=intel_icc_v11.x
                 ;;
               *10.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 10.1 >>>)
-  	        GXX_VERSION=intel_icc_v10.1
+                GXX_VERSION=intel_icc_v10.1
                 ;;
               *10.0*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 10.0 >>>)
-  	        GXX_VERSION=intel_icc_v10.0
+                GXX_VERSION=intel_icc_v10.0
                 ;;
               *9.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 9.1 >>>)
-  	        GXX_VERSION=intel_icc_v9.1
+                GXX_VERSION=intel_icc_v9.1
                 ;;
               *9.0*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 9.0 >>>)
-  	        GXX_VERSION=intel_icc_v9.0
+                GXX_VERSION=intel_icc_v9.0
                 ;;
               *8.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 8.1 >>>)
-  	        GXX_VERSION=intel_icc_v8.1
+                GXX_VERSION=intel_icc_v8.1
                 ;;
               *8.0*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 8.0 >>>)
-  	        GXX_VERSION=intel_icc_v8.0
+                GXX_VERSION=intel_icc_v8.0
                 ;;
               *7.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 7.1 >>>)
-  	        GXX_VERSION=intel_icc_v7.1
+                GXX_VERSION=intel_icc_v7.1
                 ;;
               *7.0*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 7.0 >>>)
-  	        GXX_VERSION=intel_icc_v7.0
+                GXX_VERSION=intel_icc_v7.0
                 ;;
             esac
           else
 
-            # Or Compaq's cxx compiler?
-            is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
-            if test "x$is_dec_cxx" != "x" ; then
-              AC_MSG_RESULT(<<< C++ compiler is Compaq cxx >>>)
-              GXX_VERSION=compaq_cxx
+          # Or Compaq's cxx compiler?
+          is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
+          if test "x$is_dec_cxx" != "x" ; then
+            AC_MSG_RESULT(<<< C++ compiler is Compaq cxx >>>)
+            GXX_VERSION=compaq_cxx
+          else
+
+            # Sun Studio?
+            is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
+            if test "x$is_sun_cc" != "x" ; then
+              AC_MSG_RESULT(<<< C++ compiler is Sun Studio compiler >>>)
+              GXX_VERSION=sun_studio
             else
 
-  	      # Sun Studio?
-              is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
-              if test "x$is_sun_cc" != "x" ; then
-                AC_MSG_RESULT(<<< C++ compiler is Sun Studio compiler >>>)
-                GXX_VERSION=sun_studio
+              # Sun Forte?
+              is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
+              if test "x$is_sun_forte_cc" != "x" ; then
+                AC_MSG_RESULT(<<< C++ compiler is Sun Forte compiler >>>)
+                GXX_VERSION=sun_forte
               else
 
-  	        # Sun Forte?
-                is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
-                if test "x$is_sun_forte_cc" != "x" ; then
-                  AC_MSG_RESULT(<<< C++ compiler is Sun Forte compiler >>>)
-                  GXX_VERSION=sun_forte
+                # Cray C++?
+                is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
+                if test "x$is_cray_cc" != "x" ; then
+                  AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
+                  GXX_VERSION=cray_cc
                 else
 
-  	          # Cray C++?
-  	          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
-  	          if test "x$is_cray_cc" != "x" ; then
-  	            AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
-  	            GXX_VERSION=cray_cc
-  	          else
+                  # Portland Group C++?
+                  is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+                  if test "x$is_pgcc" != "x" ; then
+                    AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
+                    GXX_VERSION=portland_group
+                  else
 
-  	            # Portland Group C++?
-  	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-  	            if test "x$is_pgcc" != "x" ; then
-  	              AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
-  	              GXX_VERSION=portland_group
-  	            else
-
-                      # HP-UX 11.11 aCC?
-                      is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
-  	              if test "x$is_hpux_acc" != "x" ; then
-  	                AC_MSG_RESULT(<<< C++ compiler is HP-UX C++ >>>)
-    	                GXX_VERSION=hpux_acc
-  	              else
+                    # HP-UX 11.11 aCC?
+                    is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
+                    if test "x$is_hpux_acc" != "x" ; then
+                      AC_MSG_RESULT(<<< C++ compiler is HP-UX C++ >>>)
+                      GXX_VERSION=hpux_acc
+                    else
 
                       # Clang/LLVM C++?
                       clang_version="`($CXX --version 2>&1)`"
@@ -509,7 +502,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
                   fi
                 fi
               fi
-  	    fi
+            fi
           fi
         fi
       fi
@@ -647,14 +640,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
   AC_ARG_ENABLE(glibcxx-debugging,
-	 [AS_HELP_STRING([--disable-glibcxx-debugging],
-	                 [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
-	 [case "${enableval}" in
-	   yes)  enableglibcxxdebugging=yes ;;
-	    no)  enableglibcxxdebugging=no ;;
- 	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
-	  esac],
-	[enableglibcxxdebugging=yes])
+                [AS_HELP_STRING([--disable-glibcxx-debugging],
+                                [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
+                [case "${enableval}" in
+                  yes)  enableglibcxxdebugging=yes ;;
+                  no)  enableglibcxxdebugging=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
+                esac],
+                [enableglibcxxdebugging=yes])
 
   # GLIBCXX debugging causes untold woes on mac machines - so disable it
   if (test `uname` = "Darwin"); then
@@ -712,16 +705,16 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
       gcc3.* | gcc4.* | gcc5 | gcc6)
-	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
-	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
+        CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
+        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
+        CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 
-         if (test "x$enableglibcxxdebugging" = "xyes"); then
-	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-	 fi
-  	 ;;
+        if (test "x$enableglibcxxdebugging" = "xyes"); then
+          CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+        fi
+        ;;
       *)
-         ;;
+        ;;
     esac
 
 
@@ -747,7 +740,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
       ibm_xlc)
           CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
           CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGS_DBG="-qansialias -g"
@@ -757,7 +750,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
       MIPSpro)
           CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
           CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O2 -w"
           CFLAGS_DBG="-g"
@@ -767,10 +760,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           # linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
 
-	  # Augment CXXFLAGS to include -LANG:std if not there.  This is
+          # Augment CXXFLAGS to include -LANG:std if not there.  This is
           # needed to compile the remaining configure tests
           if test "x`echo $CXXFLAGS | grep 'LANG:std'`" = "x" ; then
-	    CXXFLAGS="$CXXFLAGS -LANG:std"
+            CXXFLAGS="$CXXFLAGS -LANG:std"
           fi
           ;;
 
@@ -786,14 +779,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
         # Intel options for annotated assembly
         ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
-	# The -g flag is all OProfile needs to produce annotations
+        # The -g flag is all OProfile needs to produce annotations
         OPROFILE_FLAGS="-g"
 
         # Specific flags for specific versions
         case "$GXX_VERSION" in
 
           # Intel ICC >= v11.x
- 	  intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x)
+          intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x)
               # Disable some warning messages:
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
@@ -816,6 +809,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
+
           intel_icc_v10.1)
               # Disable some warning messages:
               # #175: 'subscript out of range'
@@ -963,7 +957,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               ;;
 
           *)
-	      AC_MSG_RESULT(Unknown Intel complier, "$GXX_VERSION")
+              AC_MSG_RESULT(Unknown Intel complier, "$GXX_VERSION")
               ;;
         esac
       ;;
@@ -1006,10 +1000,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
           CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
           CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
           CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
-  	  CFLAGS_DEVEL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
 
           NODEPRECATEDFLAG=""
 
@@ -1027,7 +1021,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
       sun_studio | sun_forte)
           CXXFLAGS_DBG="-library=stlport4 -g"
           CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
@@ -1038,20 +1032,20 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           ;;
 
       portland_group)
-	  CXXFLAGS_DBG="-g --no_using_std"
+          CXXFLAGS_DBG="-g --no_using_std"
           CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
           # PG C++ definitely doesn't understand -Wno-deprecated...
           NODEPRECATEDFLAG=""
 
-	  CFLAGS_DBG="-g"
+          CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
           CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # Disable exception handling if we don't use it
           if test "$enableexceptions" = no ; then
-	    CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
             CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
           fi
           ;;
@@ -1072,9 +1066,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           #  -Ae turns on ANSI C with some HP extensions
           CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
           CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
-	  CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
+          CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
           CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
           CFLAGS_DEVEL="$CFLAGS_DBG"
           LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
@@ -1083,14 +1077,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           ;;
 
       cray_cc)
-	  CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
- 	  CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
- 	  CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
           NODEPRECATEDFLAG=""
-	  CFLAGS_DBG="-G n"
-	  CFLAGS_OPT="-G n"
-	  CFLAGS_DEVEL="-G n"
-	  ;;
+          CFLAGS_DBG="-G n"
+          CFLAGS_OPT="-G n"
+          CFLAGS_DEVEL="-G n"
+          ;;
 
       clang)
           CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments"
@@ -1101,19 +1095,19 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_OPT="-O2 -Qunused-arguments"
           CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit"
           CFLAGS_DBG="-g -Wimplicit -Qunused-arguments"
-	  ;;
+          ;;
 
       *)
           AC_MSG_RESULT(No specific options for this C++ compiler known)
-	  CXXFLAGS_DBG="$CXXFLAGS"
-	  CXXFLAGS_OPT="$CXXFLAGS"
-	  CXXFLAGS_DEVEL="$CXXFLAGS"
+          CXXFLAGS_DBG="$CXXFLAGS"
+          CXXFLAGS_OPT="$CXXFLAGS"
+          CXXFLAGS_DEVEL="$CXXFLAGS"
           NODEPRECATEDFLAG=""
 
-	  CFLAGS_DBG="$CFLAGS"
-	  CFLAGS_OPT="$CFLAGS"
-	  CFLAGS_DEVEL="$CFLAGS"
-	  ;;
+          CFLAGS_DBG="$CFLAGS"
+          CFLAGS_OPT="$CFLAGS"
+          CFLAGS_DEVEL="$CFLAGS"
+          ;;
     esac
   fi
 ])

@@ -6,14 +6,12 @@ AC_DEFUN([CONFIGURE_GZ],
   AC_ARG_ENABLE(gzstreams,
                 AS_HELP_STRING([--disable-gzstreams],
                                [build without gzstreams compressed I/O suppport]),
-		[case "${enableval}" in
-		  yes)  enablegz=yes ;;
-		   no)  enablegz=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gz) ;;
-		 esac],
-		 [enablegz=$enableoptional])
-
-
+                [case "${enableval}" in
+                  yes)  enablegz=yes ;;
+                  no)  enablegz=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gz) ;;
+                  esac],
+                [enablegz=$enableoptional])
 
 if (test $enablegz = yes); then
   # First check for the required system headers and libraries

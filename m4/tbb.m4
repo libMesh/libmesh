@@ -6,13 +6,12 @@ AC_DEFUN([CONFIGURE_TBB],
   AC_ARG_ENABLE(tbb,
                 AS_HELP_STRING([--disable-tbb],
                                [build without threading support via Threading Building Blocks]),
-		[case "${enableval}" in
-		  yes)  enabletbb=yes ;;
-		   no)  enabletbb=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tbb) ;;
-		 esac],
-		 [enabletbb=$enableoptional])
-
+                [case "${enableval}" in
+                  yes)  enabletbb=yes ;;
+                  no)  enabletbb=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tbb) ;;
+                esac],
+                [enabletbb=$enableoptional])
 
   if (test $enabletbb = yes); then
 

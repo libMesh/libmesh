@@ -42,8 +42,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h],
                                                          [enableaztecoo=yes],
                                                          [enableaztecoo=no])
-					])
-		       ])
+                                                         ])])
 
        if test "$enableaztecoo" != no ; then
           AC_DEFINE(HAVE_AZTECOO, 1,
@@ -60,9 +59,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enablenox=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/nox/src/NOX_Config.h],
                                                          [enablenox=yes],
-                                                         [enablenox=no])
-					])
-		       ])
+                                                         [enablenox=no])])])
 
        if test "$enablenox" != no ; then
           AC_DEFINE(HAVE_NOX, 1,
@@ -71,7 +68,8 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        fi
 
        dnl ------------------------------------------------------
-       dnl ML - prevent ML from keying on our 'HAVE_PETSC'
+       dnl ML - prevent ML from keying on our 'HAVE_PETSC' by
+       dnl undefining it using the fourth argument to AC_CHECK_HEADER.
        dnl ------------------------------------------------------
        AC_CHECK_HEADER([$withtrilinosdir/include/ml_include.h],
                        [enableml=yes],
@@ -80,18 +78,21 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/ml/src/ml_config.h],
                                                          [enableml=yes],
                                                          [enableml=no],
-[#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
-])],
-[#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
-])],
-[#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
-])
+                                                         [
+                                                         @%:@ifdef HAVE_PETSC
+                                                         @%:@undef HAVE_PETSC
+                                                         @%:@endif
+                                                         ])],
+                                        [
+                                        @%:@ifdef HAVE_PETSC
+                                        @%:@undef HAVE_PETSC
+                                        @%:@endif
+                                        ])],
+                       [
+                       @%:@ifdef HAVE_PETSC
+                       @%:@undef HAVE_PETSC
+                       @%:@endif
+                       ])
 
        if test "$enableml" != no ; then
           AC_DEFINE(HAVE_ML, 1,
@@ -108,9 +109,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enabletpetra=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/tpetra/src/Tpetra_config.h],
                                                          [enabletpetra=yes],
-                                                         [enabletpetra=no])
-					])
-		       ])
+                                                         [enabletpetra=no])])])
 
        if test "$enabletpetra" != no ; then
           AC_DEFINE(HAVE_TPETRA, 1,
@@ -127,9 +126,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enabledtk=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/DataTransferKit/src/DataTransferKit_config.hpp],
                                                          [enabledtk=yes],
-                                                         [enabledtk=no])
-					])
-		       ])
+                                                         [enabledtk=no])])])
 
        if test "$enabledtk" != no ; then
           AC_DEFINE(HAVE_DTK, 1,
@@ -147,14 +144,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
   if (test $enabletrilinos10 != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $TRILINOS_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)
-
-echo_include:
-	@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)
-EOF
+    printf '%s\n' "include $TRILINOS_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -339,14 +333,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   #
   # AztecOO
   if (test $enableaztecoo != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $AZTECOO_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(AZTECOO_LIBS)
-
-echo_include:
-	@echo \$(AZTECOO_INCLUDES)
-EOF
+    printf '%s\n' "include $AZTECOO_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(AZTECOO_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(AZTECOO_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -362,14 +353,11 @@ EOF
   #
   # Nox
   if (test $enablenox != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $NOX_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(NOX_LIBS)
-
-echo_include:
-	@echo \$(NOX_INCLUDES)
-EOF
+    printf '%s\n' "include $NOX_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(NOX_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(NOX_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -385,14 +373,11 @@ EOF
   #
   # ML
   if (test $enableml != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $ML_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(ML_LIBS)
-
-echo_include:
-	@echo \$(ML_INCLUDES)
-EOF
+    printf '%s\n' "include $ML_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(ML_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(ML_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -410,14 +395,11 @@ EOF
   #
   # Tpetra
   if (test $enabletpetra != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $TPETRA_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(TPETRA_LIBS)
-
-echo_include:
-	@echo \$(TPETRA_INCLUDES)
-EOF
+    printf '%s\n' "include $TPETRA_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(TPETRA_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(TPETRA_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -451,12 +433,12 @@ AC_DEFUN([CONFIGURE_TRILINOS],
   AC_ARG_ENABLE(trilinos,
                 AS_HELP_STRING([--disable-trilinos],
                                [build without Trilinos support]),
-		[case "${enableval}" in
-		  yes)  enabletrilinos=yes ;;
-		   no)  enabletrilinos=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos) ;;
-		 esac],
-		 [enabletrilinos=$enableoptional])
+                               [case "${enableval}" in
+                                 yes)  enabletrilinos=yes ;;
+                                 no)  enabletrilinos=no ;;
+                                 *)  AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos) ;;
+                               esac],
+                               [enabletrilinos=$enableoptional])
 
   # Trump --enable-trilinos with --disable-mpi
   if (test "x$enablempi" = xno); then
@@ -466,18 +448,16 @@ AC_DEFUN([CONFIGURE_TRILINOS],
   AC_ARG_VAR([TRILINOS_DIR],  [path to Trilinos installation])
 
   if test "$enablecomplex" = no ; then
-      if test "$enabletrilinos" != no ; then
-          # -- try Trilinos 10 first
-	  CONFIGURE_TRILINOS_10
-          # -- then Trilinos 9
-	  if test "$enabletrilinos10" = no ; then
-              CONFIGURE_TRILINOS_9
-             if test "$enabletrilinos9" = no; then
-	       enabletrilinos=no
-	     fi
-	  fi
+    if test "$enabletrilinos" != no ; then
+      # -- try Trilinos 10 first
+      CONFIGURE_TRILINOS_10
+      # -- then Trilinos 9
+      if test "$enabletrilinos10" = no ; then
+        CONFIGURE_TRILINOS_9
+        if test "$enabletrilinos9" = no; then
+          enabletrilinos=no
+        fi
       fi
+    fi
   fi
-
 ])
-dnl -------------------------------------------------------------

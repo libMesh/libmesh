@@ -125,7 +125,7 @@ if test "x$want_boost" = "xyes"; then
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
-		dnl Matching end-of-line would work better, if I could ever
+                dnl Matching end-of-line would work better, if I could ever
                 dnl figure out how to escape the $ properly
                 dnl ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp/include{/boost*,}/boost/" 2>/dev/null | sed 's#boost/`$'##'`
                 ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp"/include{/boost*,}/boost/shared_ptr.hpp 2>/dev/null | sed 's#boost/shared_ptr.hpp##'`

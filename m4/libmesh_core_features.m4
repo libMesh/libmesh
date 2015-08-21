@@ -148,30 +148,23 @@ fi
 # size of boundary_id_type -- default 2 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([boundary_id_bytes],
-	    AS_HELP_STRING([--with-boundary-id-bytes=<1|2|4|8>],
+            AS_HELP_STRING([--with-boundary-id-bytes=<1|2|4|8>],
                            [bytes used per boundary side per boundary_id [2]]),
-	    [boundary_bytes="$withval"],
-	    [boundary_bytes=2])
+            [boundary_bytes="$withval"],
+            [boundary_bytes=2])
 
 case "$boundary_bytes" in
-    1)
-	AC_DEFINE(BOUNDARY_ID_BYTES, 1, [size of boundary_id])
-	;;
-    2)
-	AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
-	;;
-    4)
-	AC_DEFINE(BOUNDARY_ID_BYTES, 4, [size of boundary_id])
-	;;
-    8)
-	AC_DEFINE(BOUNDARY_ID_BYTES, 8, [size of boundary_id])
-	;;
+    1) AC_DEFINE(BOUNDARY_ID_BYTES, 1, [size of boundary_id]) ;;
+    2) AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id]) ;;
+    4) AC_DEFINE(BOUNDARY_ID_BYTES, 4, [size of boundary_id]) ;;
+    8) AC_DEFINE(BOUNDARY_ID_BYTES, 8, [size of boundary_id]) ;;
     *)
-	AC_MSG_RESULT([>>> unrecognized boundary_id size: $boundary_bytes - configuring size...2])
-	AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
-	boundary_bytes=2
-	;;
+      AC_MSG_RESULT([>>> unrecognized boundary_id size: $boundary_bytes - configuring size...2])
+      AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
+      boundary_bytes=2
+      ;;
 esac
+
 AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
 # -------------------------------------------------------------
 
@@ -181,30 +174,23 @@ AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
 # size of dof_id_type -- default 4 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([dof_id_bytes],
-	    AS_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
+            AS_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
                            [bytes used per dof object id, dof index [4]]),
-	    [dof_bytes="$withval"],
-	    [dof_bytes=4])
+            [dof_bytes="$withval"],
+            [dof_bytes=4])
 
 case "$dof_bytes" in
-    1)
-	AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id])
-	;;
-    2)
-	AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])
-	;;
-    4)
-	AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
-	;;
-    8)
-	AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])
-	;;
+    1) AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id]) ;;
+    2) AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id]) ;;
+    4) AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id]) ;;
+    8) AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id]) ;;
     *)
-	AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
-	AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
-	dof_bytes=4
-	;;
+      AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
+      AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
+      dof_bytes=4
+      ;;
 esac
+
 AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
 # -------------------------------------------------------------
 
@@ -214,30 +200,23 @@ AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
 # size of processor_id_type -- default 4 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([processor_id_bytes],
-	    AS_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
+            AS_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
                            [bytes used for processor id [4]]),
-	    [processor_bytes="$withval"],
-	    [processor_bytes=2])
+            [processor_bytes="$withval"],
+            [processor_bytes=2])
 
 case "$processor_bytes" in
-    1)
-	AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id])
-	;;
-    2)
-	AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
-	;;
-    4)
-	AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])
-	;;
-    8)
-	AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id])
-	;;
+    1) AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id]) ;;
+    2) AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id]) ;;
+    4) AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id]) ;;
+    8) AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id]) ;;
     *)
-	AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...2])
-	AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
-	processor_bytes=2
-	;;
+      AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...2])
+      AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
+      processor_bytes=2
+      ;;
 esac
+
 AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
 # -------------------------------------------------------------
 
@@ -247,30 +226,23 @@ AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
 # size of subdomain_id_type -- default 2 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([subdomain_id_bytes],
-	    AS_HELP_STRING([--with-subdomain-id-bytes=<1|2|4|8>],
+            AS_HELP_STRING([--with-subdomain-id-bytes=<1|2|4|8>],
                            [bytes of storage per element used to store the subdomain_id [2]]),
-	    [subdomain_bytes="$withval"],
-	    [subdomain_bytes=2])
+            [subdomain_bytes="$withval"],
+            [subdomain_bytes=2])
 
 case "$subdomain_bytes" in
-    1)
-	AC_DEFINE(SUBDOMAIN_ID_BYTES, 1, [size of subdomain_id])
-	;;
-    2)
-	AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
-	;;
-    4)
-	AC_DEFINE(SUBDOMAIN_ID_BYTES, 4, [size of subdomain_id])
-	;;
-    8)
-	AC_DEFINE(SUBDOMAIN_ID_BYTES, 8, [size of subdomain_id])
-	;;
+    1) AC_DEFINE(SUBDOMAIN_ID_BYTES, 1, [size of subdomain_id]) ;;
+    2) AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id]) ;;
+    4) AC_DEFINE(SUBDOMAIN_ID_BYTES, 4, [size of subdomain_id]) ;;
+    8) AC_DEFINE(SUBDOMAIN_ID_BYTES, 8, [size of subdomain_id]) ;;
     *)
-	AC_MSG_RESULT([>>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2])
-	AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
-	subdomain_bytes=2
-	;;
+      AC_MSG_RESULT([>>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2])
+      AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
+      subdomain_bytes=2
+      ;;
 esac
+
 AC_MSG_RESULT([configuring size of subdomain_id... $subdomain_bytes])
 # -------------------------------------------------------------
 
@@ -303,12 +275,12 @@ AC_ARG_ENABLE(everything,
 AC_ARG_ENABLE(unique-id,
               AS_HELP_STRING([--enable-unique-id],
                              [build with unique id suppport]),
-	      [case "${enableval}" in
-	          yes)  enableuniqueid=yes ;;
-		   no)	enableuniqueid=no ;;
-		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-unique-id) ;;
-	       esac],
-	       [enableuniqueid=$enableeverything])
+              [case "${enableval}" in
+                yes)  enableuniqueid=yes ;;
+                no) enableuniqueid=no ;;
+                *) AC_MSG_ERROR(bad value ${enableval} for --enable-unique-id) ;;
+              esac],
+              [enableuniqueid=$enableeverything])
 
 if test "$enableuniqueid" = yes ; then
   AC_DEFINE(ENABLE_UNIQUE_ID, 1,
@@ -323,29 +295,21 @@ fi
 # size of unique_id_type -- default 8 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([unique_id_bytes],
-	    AS_HELP_STRING([--with-unique-id-bytes=<1|2|4|8>],
+            AS_HELP_STRING([--with-unique-id-bytes=<1|2|4|8>],
                            [bytes used per unique id [4]]),
-	    [unique_bytes="$withval"],
-	    [unique_bytes=8])
+            [unique_bytes="$withval"],
+            [unique_bytes=8])
 
 case "$unique_bytes" in
-    1)
-	AC_DEFINE(UNIQUE_ID_BYTES, 1, [size of unique_id])
-	;;
-    2)
-	AC_DEFINE(UNIQUE_ID_BYTES, 2, [size of unique_id])
-	;;
-    4)
-	AC_DEFINE(UNIQUE_ID_BYTES, 4, [size of unique_id])
-	;;
-    8)
-	AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
-	;;
+    1) AC_DEFINE(UNIQUE_ID_BYTES, 1, [size of unique_id]) ;;
+    2) AC_DEFINE(UNIQUE_ID_BYTES, 2, [size of unique_id]) ;;
+    4) AC_DEFINE(UNIQUE_ID_BYTES, 4, [size of unique_id]) ;;
+    8) AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id]) ;;
     *)
-	AC_MSG_RESULT([>>> unrecognized unique_id size: $unique_bytes - configuring size...8])
-	AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
-	unique_bytes=8
-	;;
+      AC_MSG_RESULT([>>> unrecognized unique_id size: $unique_bytes - configuring size...8])
+      AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
+      unique_bytes=8
+      ;;
 esac
 
 if test "$enableuniqueid" = yes ; then
@@ -473,8 +437,7 @@ AC_ARG_ENABLE(parmesh,
 
 if test "$enableparmesh" != no ; then
   AC_DEFINE(ENABLE_PARMESH, 1,
-	   [Flag indicating if the library should use the experimental
-ParallelMesh as its default Mesh type])
+            [Flag indicating if the library should use the experimental ParallelMesh as its default Mesh type])
   AC_MSG_RESULT(<<< Configuring library to use ParallelMesh >>>)
 fi
 # -------------------------------------------------------------
@@ -492,7 +455,7 @@ AC_ARG_ENABLE(ghosted,
 
 if test "$enableghosted" != no ; then
   AC_DEFINE(ENABLE_GHOSTED, 1,
-	   [Flag indicating if the library should use ghosted local vectors])
+            [Flag indicating if the library should use ghosted local vectors])
   AC_MSG_RESULT(<<< Configuring library to use ghosted local vectors >>>)
 fi
 # -------------------------------------------------------------
@@ -511,7 +474,7 @@ AC_ARG_ENABLE(node-valence,
 
 if test "$enablenodevalence" != no ; then
   AC_DEFINE(ENABLE_NODE_VALENCE, 1,
-	   [Flag indicating if the library should compute and store node valence values])
+            [Flag indicating if the library should compute and store node valence values])
   AC_MSG_RESULT(<<< Configuring library to store node valence >>>)
 fi
 # -------------------------------------------------------------
@@ -650,12 +613,12 @@ fi
 AC_ARG_ENABLE(complex,
               AS_HELP_STRING([--enable-complex],
                              [build to support complex-number solutions]),
- 	      [case "${enableval}" in
-	          yes)  enablecomplex=yes ;;
-		   no)  enablecomplex=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-complex) ;;
-	       esac],
-	       [enablecomplex=no])
+              [case "${enableval}" in
+                yes)  enablecomplex=yes ;;
+                no)  enablecomplex=no ;;
+                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-complex) ;;
+              esac],
+              [enablecomplex=no])
 
 if test "$enablecomplex" != no ; then
   AC_DEFINE(USE_COMPLEX_NUMBERS, 1,
@@ -719,11 +682,11 @@ fi
 AC_ARG_ENABLE(examples,
               AS_HELP_STRING([--disable-examples],
                              [Do not compile, install, or test with example suite]),
- 	      [case "${enableval}" in
-	          yes)  enableexamples=yes ;;
-		   no)  enableexamples=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-examples) ;;
-	       esac],
+              [case "${enableval}" in
+                yes)  enableexamples=yes ;;
+                no)  enableexamples=no ;;
+                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-examples) ;;
+              esac],
               [enableexamples=yes])
 
 if test "$enableexamples" = yes ; then

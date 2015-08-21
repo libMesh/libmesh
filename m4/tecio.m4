@@ -6,12 +6,12 @@ AC_DEFUN([CONFIGURE_TECIO],
   AC_ARG_ENABLE(tecio,
                 AS_HELP_STRING([--disable-tecio],
                                [build without Tecplot TecIO API support (from source)]),
-		[case "${enableval}" in
-		  yes)  enabletecio=yes ;;
-		   no)  enabletecio=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecio) ;;
-		 esac],
-		 [enabletecio=$enableoptional])
+                [case "${enableval}" in
+                  yes)  enabletecio=yes ;;
+                  no)  enabletecio=no ;;
+                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecio) ;;
+                esac],
+                [enabletecio=$enableoptional])
 
   AC_ARG_WITH(tecio-x11-include,
               AS_HELP_STRING([--with-tecio-x11-include=PATH],
@@ -67,20 +67,20 @@ AC_DEFUN([CONFIGURE_TECIO],
     # Set tecio platform-specific compiler flags.
     case "${host_os}" in
       *linux*)
-	TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
-	AC_CHECK_SIZEOF([void *])
-	if (test $ac_cv_sizeof_void_p = 8); then
-	  TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"
-	fi
-	;;
+        TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
+        AC_CHECK_SIZEOF([void *])
+        if (test $ac_cv_sizeof_void_p = 8); then
+          TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"
+        fi
+        ;;
 
       *darwin*)
-	TECIO_CPPFLAGS="-DDARWIN -DLONGIS64 $TECIO_CPPFLAGS"
+        TECIO_CPPFLAGS="-DDARWIN -DLONGIS64 $TECIO_CPPFLAGS"
         ;;
 
         *)
-	AC_MSG_RESULT([>>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<])
-	;;
+          AC_MSG_RESULT([>>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<])
+          ;;
     esac
 
 

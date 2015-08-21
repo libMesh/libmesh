@@ -48,21 +48,21 @@ AC_DEFUN([AX_TLS], [
   AC_CACHE_VAL(ac_cv_tls, [
     ax_tls_keywords="__thread __declspec(thread) none"
     for ax_tls_keyword in $ax_tls_keywords; do
-       case $ax_tls_keyword in
-          none) ac_cv_tls=none ; break ;;
-	  *)
-             AC_TRY_COMPILE(
-                [@%:@include <stdlib.h>
-                 static void
-                 foo(void) {
-                 static ] $ax_tls_keyword [ int bar;
-                 exit(1);
-                 }],
-                 [],
-                 [ac_cv_tls=$ax_tls_keyword ; break],
-                 ac_cv_tls=none
-             )
-	  esac
+      case $ax_tls_keyword in
+        none) ac_cv_tls=none ; break ;;
+        *)
+           AC_TRY_COMPILE(
+              [@%:@include <stdlib.h>
+               static void
+               foo(void) {
+               static ] $ax_tls_keyword [ int bar;
+               exit(1);
+               }],
+               [],
+               [ac_cv_tls=$ax_tls_keyword ; break],
+               ac_cv_tls=none
+           )
+      esac
     done
 ])
 

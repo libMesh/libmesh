@@ -2014,7 +2014,7 @@ Optional Packages:
                           Path to X11 header files. E.g. /usr/include but
                           _not_ /usr/include/X11
   --with-metis=<internal,PETSc>
-                          metis to use. interal: build from contrib. PETSc:
+                          metis to use. interal: build from contrib, PETSc:
                           rely on PETSc
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
@@ -4580,10 +4580,10 @@ fi
      # Check whether --enable-mpi was given.
 if test "${enable_mpi+set}" = set; then :
   enableval=$enable_mpi; case "${enableval}" in
-   		     yes)  enablempi=yes ;;
-   		      no)  enablempi=no ;;
-    		       *)  as_fn_error $? "bad value ${enableval} for --enable-mpi" "$LINENO" 5 ;;
-   		    esac
+                     yes)  enablempi=yes ;;
+                     no)  enablempi=no ;;
+                     *)  as_fn_error $? "bad value ${enableval} for --enable-mpi" "$LINENO" 5 ;;
+                   esac
 else
   enablempi=yes
 fi
@@ -5285,117 +5285,117 @@ $as_echo "<<< C++ compiler is gcc-4.9 >>>" >&6; }
         GXX_VERSION=gcc4.9
         ;;
       *4.8.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.8 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.8 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.8 >>>" >&6; }
-  	GXX_VERSION=gcc4.8
-  	;;
+        GXX_VERSION=gcc4.8
+        ;;
       *4.7.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.7 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.7 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.7 >>>" >&6; }
-  	GXX_VERSION=gcc4.7
-  	;;
+        GXX_VERSION=gcc4.7
+        ;;
       *4.6.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.6 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.6 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.6 >>>" >&6; }
-  	GXX_VERSION=gcc4.6
-  	;;
+        GXX_VERSION=gcc4.6
+        ;;
       *4.5.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.5 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.5 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.5 >>>" >&6; }
-  	GXX_VERSION=gcc4.5
-  	;;
+        GXX_VERSION=gcc4.5
+        ;;
       *4.4.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.4 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.4 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.4 >>>" >&6; }
-  	GXX_VERSION=gcc4.4
-  	;;
+        GXX_VERSION=gcc4.4
+        ;;
       *4.3.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.3 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.3 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.3 >>>" >&6; }
-  	GXX_VERSION=gcc4.3
-  	;;
+        GXX_VERSION=gcc4.3
+        ;;
       *4.2.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.2 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.2 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.2 >>>" >&6; }
-  	GXX_VERSION=gcc4.2
-  	;;
+        GXX_VERSION=gcc4.2
+        ;;
       *4.1.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.1 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.1 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.1 >>>" >&6; }
-  	GXX_VERSION=gcc4.1
-  	;;
+        GXX_VERSION=gcc4.1
+        ;;
       *4.0.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.0 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.0 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.0 >>>" >&6; }
-  	GXX_VERSION=gcc4.0
-  	;;
+        GXX_VERSION=gcc4.0
+        ;;
       *3.4.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.4 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.4 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-3.4 >>>" >&6; }
-  	GXX_VERSION=gcc3.4
-  	;;
+        GXX_VERSION=gcc3.4
+        ;;
       *3.3.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.3 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.3 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-3.3 >>>" >&6; }
-  	GXX_VERSION=gcc3.3
-  	;;
+        GXX_VERSION=gcc3.3
+        ;;
       *3.2.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.2 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.2 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-3.2 >>>" >&6; }
-  	GXX_VERSION=gcc3.2
-  	;;
+        GXX_VERSION=gcc3.2
+        ;;
       *3.1.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.1 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.1 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-3.1 >>>" >&6; }
-  	GXX_VERSION=gcc3.1
-  	;;
+        GXX_VERSION=gcc3.1
+        ;;
       *3.0.*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.0 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-3.0 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-3.0 >>>" >&6; }
-  	GXX_VERSION=gcc3.0
-  	;;
+        GXX_VERSION=gcc3.0
+        ;;
       *2.97*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-2.97 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-2.97 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-2.97 >>>" >&6; }
-  	GXX_VERSION=gcc2.97
-  	;;
+        GXX_VERSION=gcc2.97
+        ;;
       *2.96*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-2.96 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-2.96 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-2.96 >>>" >&6; }
-  	GXX_VERSION=gcc2.96
+        GXX_VERSION=gcc2.96
 
 $as_echo "#define BROKEN_IOSTREAM 1" >>confdefs.h
 
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for broken iostream >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for broken iostream >>>" >&5
 $as_echo "<<< Configuring library for broken iostream >>>" >&6; }
-  	;;
+        ;;
       *2.95*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-2.95 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-2.95 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-2.95 >>>" >&6; }
-  	GXX_VERSION=gcc2.95
+        GXX_VERSION=gcc2.95
 
 $as_echo "#define BROKEN_IOSTREAM 1" >>confdefs.h
 
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for broken iostream >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for broken iostream >>>" >&5
 $as_echo "<<< Configuring library for broken iostream >>>" >&6; }
-  	;;
+        ;;
       *"egcs-1.1"*)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is egcs-1.1 >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is egcs-1.1 >>>" >&5
 $as_echo "<<< C++ compiler is egcs-1.1 >>>" >&6; }
-  	GXX_VERSION=egcs1.1
-  	;;
+        GXX_VERSION=egcs1.1
+        ;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-  	# These compilers are too old to support a useful subset
-  	# of modern C++, so we don't support them
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is $GXX_VERSION_STRING >>>" >&5
+        # These compilers are too old to support a useful subset
+        # of modern C++, so we don't support them
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is $GXX_VERSION_STRING >>>" >&5
 $as_echo "<<< C++ compiler is $GXX_VERSION_STRING >>>" >&6; }
-  	as_fn_error $? "<<< C++ compiler is not supported >>>" "$LINENO" 5
-  	;;
+        as_fn_error $? "<<< C++ compiler is not supported >>>" "$LINENO" 5
+        ;;
       *)
-  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is unknown but accepted gcc version >>>" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is unknown but accepted gcc version >>>" >&5
 $as_echo "<<< C++ compiler is unknown but accepted gcc version >>>" >&6; }
-  	GXX_VERSION=gcc-other
-  	;;
+  GXX_VERSION=gcc-other
+  ;;
     esac
     # Check for Apple compilers
     case "$GXX_VERSION_STRING" in
@@ -5444,42 +5444,42 @@ $as_echo "<<< C++ compiler is MIPSpro C++ compiler >>>" >&6; }
             *10.1*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 10.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 10.1 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v10.1
+              GXX_VERSION=intel_itanium_icc_v10.1
               ;;
             *10.0*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 10.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 10.0 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v10.0
+              GXX_VERSION=intel_itanium_icc_v10.0
               ;;
             *9.1*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 9.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 9.1 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v9.1
+              GXX_VERSION=intel_itanium_icc_v9.1
               ;;
             *9.0*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 9.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 9.0 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v9.0
+              GXX_VERSION=intel_itanium_icc_v9.0
               ;;
             *8.1*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 8.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 8.1 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v8.1
+              GXX_VERSION=intel_itanium_icc_v8.1
               ;;
             *8.0*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 8.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 8.0 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v8.0
+              GXX_VERSION=intel_itanium_icc_v8.0
               ;;
             *7.1*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 7.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 7.1 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v7.1
+              GXX_VERSION=intel_itanium_icc_v7.1
               ;;
             *7.0*)
               { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&6; }
-  	      GXX_VERSION=intel_itanium_icc_v7.0
+              GXX_VERSION=intel_itanium_icc_v7.0
               ;;
           esac
         else
@@ -5507,108 +5507,108 @@ $as_echo "<<< C++ compiler is Intel(R) icc 13 >>>" >&6; }
               *12.1*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 12.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 12.1 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v12.x
+                GXX_VERSION=intel_icc_v12.x
                 ;;
               *12.*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 12 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 12 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v12.x
+                GXX_VERSION=intel_icc_v12.x
                 ;;
               *11.*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 11 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 11 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v11.x
+                GXX_VERSION=intel_icc_v11.x
                 ;;
               *10.1*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 10.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 10.1 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v10.1
+                GXX_VERSION=intel_icc_v10.1
                 ;;
               *10.0*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 10.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 10.0 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v10.0
+                GXX_VERSION=intel_icc_v10.0
                 ;;
               *9.1*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 9.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 9.1 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v9.1
+                GXX_VERSION=intel_icc_v9.1
                 ;;
               *9.0*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 9.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 9.0 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v9.0
+                GXX_VERSION=intel_icc_v9.0
                 ;;
               *8.1*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 8.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 8.1 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v8.1
+                GXX_VERSION=intel_icc_v8.1
                 ;;
               *8.0*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 8.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 8.0 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v8.0
+                GXX_VERSION=intel_icc_v8.0
                 ;;
               *7.1*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 7.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 7.1 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v7.1
+                GXX_VERSION=intel_icc_v7.1
                 ;;
               *7.0*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 7.0 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 7.0 >>>" >&6; }
-  	        GXX_VERSION=intel_icc_v7.0
+                GXX_VERSION=intel_icc_v7.0
                 ;;
             esac
           else
 
-            # Or Compaq's cxx compiler?
-            is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
-            if test "x$is_dec_cxx" != "x" ; then
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Compaq cxx >>>" >&5
+          # Or Compaq's cxx compiler?
+          is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
+          if test "x$is_dec_cxx" != "x" ; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Compaq cxx >>>" >&5
 $as_echo "<<< C++ compiler is Compaq cxx >>>" >&6; }
-              GXX_VERSION=compaq_cxx
+            GXX_VERSION=compaq_cxx
+          else
+
+            # Sun Studio?
+            is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
+            if test "x$is_sun_cc" != "x" ; then
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Sun Studio compiler >>>" >&5
+$as_echo "<<< C++ compiler is Sun Studio compiler >>>" >&6; }
+              GXX_VERSION=sun_studio
             else
 
-  	      # Sun Studio?
-              is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
-              if test "x$is_sun_cc" != "x" ; then
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Sun Studio compiler >>>" >&5
-$as_echo "<<< C++ compiler is Sun Studio compiler >>>" >&6; }
-                GXX_VERSION=sun_studio
+              # Sun Forte?
+              is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
+              if test "x$is_sun_forte_cc" != "x" ; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Sun Forte compiler >>>" >&5
+$as_echo "<<< C++ compiler is Sun Forte compiler >>>" >&6; }
+                GXX_VERSION=sun_forte
               else
 
-  	        # Sun Forte?
-                is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
-                if test "x$is_sun_forte_cc" != "x" ; then
-                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Sun Forte compiler >>>" >&5
-$as_echo "<<< C++ compiler is Sun Forte compiler >>>" >&6; }
-                  GXX_VERSION=sun_forte
+                # Cray C++?
+                is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
+                if test "x$is_cray_cc" != "x" ; then
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Cray C++ >>>" >&5
+$as_echo "<<< C++ compiler is Cray C++ >>>" >&6; }
+                  GXX_VERSION=cray_cc
                 else
 
-  	          # Cray C++?
-  	          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
-  	          if test "x$is_cray_cc" != "x" ; then
-  	            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Cray C++ >>>" >&5
-$as_echo "<<< C++ compiler is Cray C++ >>>" >&6; }
-  	            GXX_VERSION=cray_cc
-  	          else
-
-  	            # Portland Group C++?
-  	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-  	            if test "x$is_pgcc" != "x" ; then
-  	              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Portland Group C++ >>>" >&5
+                  # Portland Group C++?
+                  is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+                  if test "x$is_pgcc" != "x" ; then
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Portland Group C++ >>>" >&5
 $as_echo "<<< C++ compiler is Portland Group C++ >>>" >&6; }
-  	              GXX_VERSION=portland_group
-  	            else
+                    GXX_VERSION=portland_group
+                  else
 
-                      # HP-UX 11.11 aCC?
-                      is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
-  	              if test "x$is_hpux_acc" != "x" ; then
-  	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is HP-UX C++ >>>" >&5
+                    # HP-UX 11.11 aCC?
+                    is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
+                    if test "x$is_hpux_acc" != "x" ; then
+                      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is HP-UX C++ >>>" >&5
 $as_echo "<<< C++ compiler is HP-UX C++ >>>" >&6; }
-    	                GXX_VERSION=hpux_acc
-  	              else
+                      GXX_VERSION=hpux_acc
+                    else
 
                       # Clang/LLVM C++?
                       clang_version="`($CXX --version 2>&1)`"
@@ -5659,7 +5659,7 @@ $as_echo "proper compiler flags" >&6; }
                   fi
                 fi
               fi
-  	    fi
+            fi
           fi
         fi
       fi
@@ -6179,14 +6179,13 @@ fi
   # Check whether --enable-fortran was given.
 if test "${enable_fortran+set}" = set; then :
   enableval=$enable_fortran; case "${enableval}" in
-		  yes)  enablefortran=yes ;;
-		   no)  enablefortran=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-fortran" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablefortran=yes ;;
+                  no)  enablefortran=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-fortran" "$LINENO" 5 ;;
+                esac
 else
   enablefortran=yes
 fi
-
 
 
   if (test "x$enablefortran" = xyes); then
@@ -7097,10 +7096,10 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   # Check whether --enable-glibcxx-debugging was given.
 if test "${enable_glibcxx_debugging+set}" = set; then :
   enableval=$enable_glibcxx_debugging; case "${enableval}" in
-	   yes)  enableglibcxxdebugging=yes ;;
-	    no)  enableglibcxxdebugging=no ;;
- 	     *)  as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging" "$LINENO" 5 ;;
-	  esac
+                  yes)  enableglibcxxdebugging=yes ;;
+                  no)  enableglibcxxdebugging=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging" "$LINENO" 5 ;;
+                esac
 else
   enableglibcxxdebugging=yes
 fi
@@ -7170,16 +7169,16 @@ fi
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
       gcc3.* | gcc4.* | gcc5 | gcc6)
-	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
-	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
+        CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
+        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
+        CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 
-         if (test "x$enableglibcxxdebugging" = "xyes"); then
-	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-	 fi
-  	 ;;
+        if (test "x$enableglibcxxdebugging" = "xyes"); then
+          CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+        fi
+        ;;
       *)
-         ;;
+        ;;
     esac
 
 
@@ -7205,7 +7204,7 @@ fi
       ibm_xlc)
           CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
           CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGS_DBG="-qansialias -g"
@@ -7215,7 +7214,7 @@ fi
       MIPSpro)
           CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
           CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O2 -w"
           CFLAGS_DBG="-g"
@@ -7225,10 +7224,10 @@ fi
           # linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
 
-	  # Augment CXXFLAGS to include -LANG:std if not there.  This is
+          # Augment CXXFLAGS to include -LANG:std if not there.  This is
           # needed to compile the remaining configure tests
           if test "x`echo $CXXFLAGS | grep 'LANG:std'`" = "x" ; then
-	    CXXFLAGS="$CXXFLAGS -LANG:std"
+            CXXFLAGS="$CXXFLAGS -LANG:std"
           fi
           ;;
 
@@ -7244,14 +7243,14 @@ fi
         # Intel options for annotated assembly
         ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
-	# The -g flag is all OProfile needs to produce annotations
+        # The -g flag is all OProfile needs to produce annotations
         OPROFILE_FLAGS="-g"
 
         # Specific flags for specific versions
         case "$GXX_VERSION" in
 
           # Intel ICC >= v11.x
- 	  intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x)
+          intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x)
               # Disable some warning messages:
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
@@ -7274,6 +7273,7 @@ fi
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
+
           intel_icc_v10.1)
               # Disable some warning messages:
               # #175: 'subscript out of range'
@@ -7421,7 +7421,7 @@ fi
               ;;
 
           *)
-	      { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unknown Intel complier" >&5
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unknown Intel complier" >&5
 $as_echo "Unknown Intel complier" >&6; }
               ;;
         esac
@@ -7465,10 +7465,10 @@ $as_echo "Unknown Intel complier" >&6; }
 
           CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
           CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
           CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
-  	  CFLAGS_DEVEL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
 
           NODEPRECATEDFLAG=""
 
@@ -7486,7 +7486,7 @@ $as_echo "Unknown Intel complier" >&6; }
       sun_studio | sun_forte)
           CXXFLAGS_DBG="-library=stlport4 -g"
           CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
@@ -7497,20 +7497,20 @@ $as_echo "Unknown Intel complier" >&6; }
           ;;
 
       portland_group)
-	  CXXFLAGS_DBG="-g --no_using_std"
+          CXXFLAGS_DBG="-g --no_using_std"
           CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
           # PG C++ definitely doesn't understand -Wno-deprecated...
           NODEPRECATEDFLAG=""
 
-	  CFLAGS_DBG="-g"
+          CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
           CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # Disable exception handling if we don't use it
           if test "$enableexceptions" = no ; then
-	    CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+            CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
             CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
           fi
           ;;
@@ -7531,9 +7531,9 @@ $as_echo "Unknown Intel complier" >&6; }
           #  -Ae turns on ANSI C with some HP extensions
           CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
           CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
-	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
-	  CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
+          CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
           CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
           CFLAGS_DEVEL="$CFLAGS_DBG"
           LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
@@ -7542,14 +7542,14 @@ $as_echo "Unknown Intel complier" >&6; }
           ;;
 
       cray_cc)
-	  CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
- 	  CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
- 	  CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
           NODEPRECATEDFLAG=""
-	  CFLAGS_DBG="-G n"
-	  CFLAGS_OPT="-G n"
-	  CFLAGS_DEVEL="-G n"
-	  ;;
+          CFLAGS_DBG="-G n"
+          CFLAGS_OPT="-G n"
+          CFLAGS_DEVEL="-G n"
+          ;;
 
       clang)
           CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments"
@@ -7560,20 +7560,20 @@ $as_echo "Unknown Intel complier" >&6; }
           CFLAGS_OPT="-O2 -Qunused-arguments"
           CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit"
           CFLAGS_DBG="-g -Wimplicit -Qunused-arguments"
-	  ;;
+          ;;
 
       *)
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: No specific options for this C++ compiler known" >&5
 $as_echo "No specific options for this C++ compiler known" >&6; }
-	  CXXFLAGS_DBG="$CXXFLAGS"
-	  CXXFLAGS_OPT="$CXXFLAGS"
-	  CXXFLAGS_DEVEL="$CXXFLAGS"
+          CXXFLAGS_DBG="$CXXFLAGS"
+          CXXFLAGS_OPT="$CXXFLAGS"
+          CXXFLAGS_DEVEL="$CXXFLAGS"
           NODEPRECATEDFLAG=""
 
-	  CFLAGS_DBG="$CFLAGS"
-	  CFLAGS_OPT="$CFLAGS"
-	  CFLAGS_DEVEL="$CFLAGS"
-	  ;;
+          CFLAGS_DBG="$CFLAGS"
+          CFLAGS_OPT="$CFLAGS"
+          CFLAGS_DEVEL="$CFLAGS"
+          ;;
     esac
   fi
 
@@ -7647,7 +7647,7 @@ fi
       gcov coverage testing tool not found. Please install or update
       your PATH accordingly prior to enabling code coverage features.
 
-      	   " "$LINENO" 5
+         " "$LINENO" 5
    fi
 
    # ----------------------------------
@@ -7786,26 +7786,24 @@ libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 if test "${with_methods+set}" = set; then :
   withval=$with_methods; for method in ${withval} ; do
                 # make sure each method specified makes sense
-	        case "${method}" in
-		    optimized|opt)      ;;
-		    debug|dbg)          ;;
-		    devel)              ;;
-		    profiling|pro|prof) ;;
-		    oprofile|oprof)     ;;
-                    *)
-			as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
-			;;
+                case "${method}" in
+                  optimized|opt)      ;;
+                  debug|dbg)          ;;
+                  devel)              ;;
+                  profiling|pro|prof) ;;
+                  oprofile|oprof)     ;;
+                  *)                  as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5 ;;
                 esac
               done
-	      METHODS=${withval}
+              METHODS=${withval}
 else
 
-	       # default METHOD is opt if not specified.
-	        if (test "x${METHODS}" = x); then
-  		  METHODS="dbg devel opt"
-   		  { $as_echo "$as_me:${as_lineno-$LINENO}: result: No build methods specified, defaulting to \"$METHODS\"" >&5
+               # default METHOD is opt if not specified.
+               if (test "x${METHODS}" = x); then
+                 METHODS="dbg devel opt"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: No build methods specified, defaulting to \"$METHODS\"" >&5
 $as_echo "No build methods specified, defaulting to \"$METHODS\"" >&6; }
- 		fi
+               fi
 
 fi
 
@@ -7869,14 +7867,12 @@ $as_echo "<<< Configuring libMesh with methods \"$METHODS\" >>>" >&6; }
  # conditionally compile selected methods
  for method in ${METHODS}; do
      case "${method}" in
-         optimized|opt)      build_opt=yes   ;;
-         debug|dbg)          build_dbg=yes   ;;
-         devel)              build_devel=yes ;;
-         profiling|pro|prof) build_prof=yes  ;;
-         oprofile|oprof)     build_oprof=yes ;;
-         *)
-	     as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
-	     ;;
+       optimized|opt)      build_opt=yes   ;;
+       debug|dbg)          build_dbg=yes   ;;
+       devel)              build_devel=yes ;;
+       profiling|pro|prof) build_prof=yes  ;;
+       oprofile|oprof)     build_oprof=yes ;;
+       *)                  as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5 ;;
      esac
  done
 
@@ -28312,34 +28308,27 @@ fi
 
 case "$boundary_bytes" in
     1)
-
 $as_echo "#define BOUNDARY_ID_BYTES 1" >>confdefs.h
-
-	;;
+ ;;
     2)
-
 $as_echo "#define BOUNDARY_ID_BYTES 2" >>confdefs.h
-
-	;;
+ ;;
     4)
-
 $as_echo "#define BOUNDARY_ID_BYTES 4" >>confdefs.h
-
-	;;
+ ;;
     8)
-
 $as_echo "#define BOUNDARY_ID_BYTES 8" >>confdefs.h
-
-	;;
+ ;;
     *)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized boundary_id size: $boundary_bytes - configuring size...2" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized boundary_id size: $boundary_bytes - configuring size...2" >&5
 $as_echo ">>> unrecognized boundary_id size: $boundary_bytes - configuring size...2" >&6; }
 
 $as_echo "#define BOUNDARY_ID_BYTES 2" >>confdefs.h
 
-	boundary_bytes=2
-	;;
+      boundary_bytes=2
+      ;;
 esac
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of boundary_id... $boundary_bytes" >&5
 $as_echo "configuring size of boundary_id... $boundary_bytes" >&6; }
 # -------------------------------------------------------------
@@ -28360,34 +28349,27 @@ fi
 
 case "$dof_bytes" in
     1)
-
 $as_echo "#define DOF_ID_BYTES 1" >>confdefs.h
-
-	;;
+ ;;
     2)
-
 $as_echo "#define DOF_ID_BYTES 2" >>confdefs.h
-
-	;;
+ ;;
     4)
-
 $as_echo "#define DOF_ID_BYTES 4" >>confdefs.h
-
-	;;
+ ;;
     8)
-
 $as_echo "#define DOF_ID_BYTES 8" >>confdefs.h
-
-	;;
+ ;;
     *)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&5
 $as_echo ">>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&6; }
 
 $as_echo "#define DOF_ID_BYTES 4" >>confdefs.h
 
-	dof_bytes=4
-	;;
+      dof_bytes=4
+      ;;
 esac
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of dof_id... $dof_bytes" >&5
 $as_echo "configuring size of dof_id... $dof_bytes" >&6; }
 # -------------------------------------------------------------
@@ -28408,34 +28390,27 @@ fi
 
 case "$processor_bytes" in
     1)
-
 $as_echo "#define PROCESSOR_ID_BYTES 1" >>confdefs.h
-
-	;;
+ ;;
     2)
-
 $as_echo "#define PROCESSOR_ID_BYTES 2" >>confdefs.h
-
-	;;
+ ;;
     4)
-
 $as_echo "#define PROCESSOR_ID_BYTES 4" >>confdefs.h
-
-	;;
+ ;;
     8)
-
 $as_echo "#define PROCESSOR_ID_BYTES 8" >>confdefs.h
-
-	;;
+ ;;
     *)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&5
 $as_echo ">>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&6; }
 
 $as_echo "#define PROCESSOR_ID_BYTES 2" >>confdefs.h
 
-	processor_bytes=2
-	;;
+      processor_bytes=2
+      ;;
 esac
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of processor_id... $processor_bytes" >&5
 $as_echo "configuring size of processor_id... $processor_bytes" >&6; }
 # -------------------------------------------------------------
@@ -28456,34 +28431,27 @@ fi
 
 case "$subdomain_bytes" in
     1)
-
 $as_echo "#define SUBDOMAIN_ID_BYTES 1" >>confdefs.h
-
-	;;
+ ;;
     2)
-
 $as_echo "#define SUBDOMAIN_ID_BYTES 2" >>confdefs.h
-
-	;;
+ ;;
     4)
-
 $as_echo "#define SUBDOMAIN_ID_BYTES 4" >>confdefs.h
-
-	;;
+ ;;
     8)
-
 $as_echo "#define SUBDOMAIN_ID_BYTES 8" >>confdefs.h
-
-	;;
+ ;;
     *)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2" >&5
 $as_echo ">>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2" >&6; }
 
 $as_echo "#define SUBDOMAIN_ID_BYTES 2" >>confdefs.h
 
-	subdomain_bytes=2
-	;;
+      subdomain_bytes=2
+      ;;
 esac
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of subdomain_id... $subdomain_bytes" >&5
 $as_echo "configuring size of subdomain_id... $subdomain_bytes" >&6; }
 # -------------------------------------------------------------
@@ -28519,10 +28487,10 @@ fi
 # Check whether --enable-unique-id was given.
 if test "${enable_unique_id+set}" = set; then :
   enableval=$enable_unique_id; case "${enableval}" in
-	          yes)  enableuniqueid=yes ;;
-		   no)	enableuniqueid=no ;;
-		    *)  as_fn_error $? "bad value ${enableval} for --enable-unique-id" "$LINENO" 5 ;;
-	       esac
+                yes)  enableuniqueid=yes ;;
+                no) enableuniqueid=no ;;
+                *) as_fn_error $? "bad value ${enableval} for --enable-unique-id" "$LINENO" 5 ;;
+              esac
 else
   enableuniqueid=$enableeverything
 fi
@@ -28553,33 +28521,25 @@ fi
 
 case "$unique_bytes" in
     1)
-
 $as_echo "#define UNIQUE_ID_BYTES 1" >>confdefs.h
-
-	;;
+ ;;
     2)
-
 $as_echo "#define UNIQUE_ID_BYTES 2" >>confdefs.h
-
-	;;
+ ;;
     4)
-
 $as_echo "#define UNIQUE_ID_BYTES 4" >>confdefs.h
-
-	;;
+ ;;
     8)
-
 $as_echo "#define UNIQUE_ID_BYTES 8" >>confdefs.h
-
-	;;
+ ;;
     *)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized unique_id size: $unique_bytes - configuring size...8" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized unique_id size: $unique_bytes - configuring size...8" >&5
 $as_echo ">>> unrecognized unique_id size: $unique_bytes - configuring size...8" >&6; }
 
 $as_echo "#define UNIQUE_ID_BYTES 8" >>confdefs.h
 
-	unique_bytes=8
-	;;
+      unique_bytes=8
+      ;;
 esac
 
 if test "$enableuniqueid" = yes ; then
@@ -28982,10 +28942,10 @@ fi
 # Check whether --enable-complex was given.
 if test "${enable_complex+set}" = set; then :
   enableval=$enable_complex; case "${enableval}" in
-	          yes)  enablecomplex=yes ;;
-		   no)  enablecomplex=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-complex" "$LINENO" 5 ;;
-	       esac
+                yes)  enablecomplex=yes ;;
+                no)  enablecomplex=no ;;
+                *)  as_fn_error $? "bad value ${enableval} for --enable-complex" "$LINENO" 5 ;;
+              esac
 else
   enablecomplex=no
 fi
@@ -29073,10 +29033,10 @@ fi
 # Check whether --enable-examples was given.
 if test "${enable_examples+set}" = set; then :
   enableval=$enable_examples; case "${enableval}" in
-	          yes)  enableexamples=yes ;;
-		   no)  enableexamples=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-examples" "$LINENO" 5 ;;
-	       esac
+                yes)  enableexamples=yes ;;
+                no)  enableexamples=no ;;
+                *)  as_fn_error $? "bad value ${enableval} for --enable-examples" "$LINENO" 5 ;;
+              esac
 else
   enableexamples=yes
 fi
@@ -29147,10 +29107,10 @@ libmesh_installed_LIBS=""
 # Check whether --enable-optional was given.
 if test "${enable_optional+set}" = set; then :
   enableval=$enable_optional; case "${enableval}" in
-	      	  yes) enableoptional=yes ;;
-		   no) enableoptional=no ;;
- 		    *) as_fn_error $? "bad value ${enableval} for --enable-optional" "$LINENO" 5 ;;
-	       esac
+                yes) enableoptional=yes ;;
+                no) enableoptional=no ;;
+                *) as_fn_error $? "bad value ${enableval} for --enable-optional" "$LINENO" 5 ;;
+              esac
 else
   enableoptional=yes
 fi
@@ -29195,10 +29155,10 @@ fi
 # Check whether --enable-nested was given.
 if test "${enable_nested+set}" = set; then :
   enableval=$enable_nested; case "${enableval}" in
-	      	  yes) enablenested=yes ;;
-		   no) enablenested=no ;;
- 		    *) as_fn_error $? "bad value ${enableval} for --enable-nested" "$LINENO" 5 ;;
-	       esac
+                yes) enablenested=yes ;;
+                no) enablenested=no ;;
+                *) as_fn_error $? "bad value ${enableval} for --enable-nested" "$LINENO" 5 ;;
+              esac
 else
   enablenested=$enableoptional
 fi
@@ -29211,10 +29171,10 @@ fi
   # Check whether --enable-boost was given.
 if test "${enable_boost+set}" = set; then :
   enableval=$enable_boost; case "${enableval}" in
-  	      	  yes)  enableboost=yes ;;
-  		   no)  enableboost=no ;;
-   		    *)  as_fn_error $? "bad value ${enableval} for --enable-boost" "$LINENO" 5 ;;
-  	        esac
+                  yes)  enableboost=yes ;;
+                  no)  enableboost=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-boost" "$LINENO" 5 ;;
+                esac
 else
   enableboost=$enableoptional
 fi
@@ -29307,7 +29267,7 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
-		                                                ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp"/include{/boost*,}/boost/shared_ptr.hpp 2>/dev/null | sed 's#boost/shared_ptr.hpp##'`
+                                                                ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp"/include{/boost*,}/boost/shared_ptr.hpp 2>/dev/null | sed 's#boost/shared_ptr.hpp##'`
                 BOOST_CPPFLAGS="-I$ac_boost_include_dir_tmp"
                 break;
             fi
@@ -29588,7 +29548,7 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
-		                                                ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp"/include{/boost*,}/boost/shared_ptr.hpp 2>/dev/null | sed 's#boost/shared_ptr.hpp##'`
+                                                                ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp"/include{/boost*,}/boost/shared_ptr.hpp 2>/dev/null | sed 's#boost/shared_ptr.hpp##'`
                 BOOST_CPPFLAGS="-I$ac_boost_include_dir_tmp"
                 break;
             fi
@@ -29786,7 +29746,7 @@ fi
       if test "$internal_boost_found" = "no" ; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Libmesh boost installation *not* found >>>" >&5
 $as_echo "<<< Libmesh boost installation *not* found >>>" >&6; }
-	enableboost=no
+        enableboost=no
       else
         install_internal_boost=yes
         BOOST_INCLUDE="-I\$(top_srcdir)/contrib/boost/include"
@@ -30178,13 +30138,13 @@ if test "${with_mpi+set}" = set; then :
 else
 
               echo "note: MPI library path not given... trying prefix=$MPIHOME"
-	      MPI=$MPIHOME
+              MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then
-	MPI="/usr"
+  MPI="/usr"
 fi
 
 
@@ -30196,25 +30156,25 @@ MPI_INCLUDES_PATH="$MPI/include"
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# look for lam_version_show in liblam.(a/so)
-	# (this is needed in addition to libmpi.(a/so) for
-        # LAM MPI
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
+  # look for lam_version_show in liblam.(a/so)
+  # (this is needed in addition to libmpi.(a/so) for
+  # LAM MPI
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
 $as_echo_n "checking for lam_show_version in -llam... " >&6; }
 if ${ac_cv_lib_lam_lam_show_version+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -30252,16 +30212,16 @@ fi
 $as_echo "$ac_cv_lib_lam_lam_show_version" >&6; }
 if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 
-                       LIBS="-llam $LIBS"
-                       MPI_LIBS="-llam $MPI_LIBS"
+                 LIBS="-llam $LIBS"
+                 MPI_LIBS="-llam $MPI_LIBS"
 
 fi
 
 
-	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
-	  echo "note: MPI found to use Quadrics switch, looking for elan library"
-		 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
+  # Quadricss MPI requires the elan library to be included too
+  if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
+    echo "note: MPI found to use Quadrics switch, looking for elan library"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
 $as_echo_n "checking for elan_init in -lelan... " >&6; }
 if ${ac_cv_lib_elan_elan_init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -30299,16 +30259,16 @@ fi
 $as_echo "$ac_cv_lib_elan_elan_init" >&6; }
 if test "x$ac_cv_lib_elan_elan_init" = xyes; then :
 
-                                LIBS="-lelan $LIBS"
-                                MPI_LIBS="-lelan $MPI_LIBS"
+                   LIBS="-lelan $LIBS"
+                   MPI_LIBS="-lelan $MPI_LIBS"
 
 else
-  as_fn_error $? "Could not find elan library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find elan library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
 $as_echo_n "checking for MPI_Init in -lmpi... " >&6; }
 if ${ac_cv_lib_mpi_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -30346,10 +30306,10 @@ fi
 $as_echo "$ac_cv_lib_mpi_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
 
-		       MPI_LIBS="-lmpi $MPI_LIBS"
-	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpi"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
+                 MPI_LIBS="-lmpi $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpi"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
 $as_echo "Found valid MPI installlaion..." >&6; }
 
 else
@@ -30358,32 +30318,32 @@ $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
 fi
 
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
-	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+  # Myricomm MPICH requires the gm library to be included too
+  if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
+    echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then
             GMHOME="/usr"
@@ -30395,7 +30355,7 @@ if test "${with_gm+set}" = set; then :
 else
 
                         echo "note: GM library path not given... trying prefix=$MPIHOME"
-	                GM=$GMHOME
+                        GM=$GMHOME
 
 fi
 
@@ -30445,17 +30405,17 @@ if test "x$ac_cv_lib_gm_gm_open" = xyes; then :
                          MPI_LIBS="$MPI_LIBS -lgm"
 
 else
-  as_fn_error $? "Could not find gm library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find gm library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	# look for MPI_Init in libmpich.(a/so)
-        # try adding libmpl if we see it there; some MPICH2 versions
-        # require it.
-	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
-		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  # look for MPI_Init in libmpich.(a/so)
+  # try adding libmpl if we see it there; some MPICH2 versions
+  # require it.
+  if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+  LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -30493,21 +30453,19 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+                 MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpich"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
 $as_echo "Found valid MPICH installation with libmpl..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -30545,45 +30503,43 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+                   MPI_LIBS="-lmpich $MPI_LIBS"
+                   MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                   MPI_IMPL="mpich"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
 $as_echo "Found valid MPICH installation..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	fi
+  fi
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-	# Ensure the comiler finds the header file...
-	if test -e $MPI_INCLUDES_PATH/mpi.h; then
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+  # Ensure the comiler finds the header file...
+  if test -e $MPI_INCLUDES_PATH/mpi.h; then
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -30594,27 +30550,27 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
-		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+    CPPFLAGS=$tmpCPPFLAGS
+  elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+    MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -30625,23 +30581,24 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
+    CPPFLAGS=$tmpCPPFLAGS
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
 $as_echo "Could not find MPI header <mpi.h>..." >&6; }
-                enablempi=no
-	fi
+    enablempi=no
+  fi
+
 else
 
-	# no MPI install found, see if the compiler supports it
-      	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  # no MPI install found, see if the compiler supports it
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
 int
@@ -30654,8 +30611,8 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-	                 MPI_IMPL="built-in"
-                         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
+                   MPI_IMPL="built-in"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -30928,13 +30885,13 @@ if test "${with_mpi+set}" = set; then :
 else
 
               echo "note: MPI library path not given... trying prefix=$MPIHOME"
-	      MPI=$MPIHOME
+              MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then
-	MPI="/usr"
+  MPI="/usr"
 fi
 
 
@@ -30946,25 +30903,25 @@ MPI_INCLUDES_PATH="$MPI/include"
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# look for lam_version_show in liblam.(a/so)
-	# (this is needed in addition to libmpi.(a/so) for
-        # LAM MPI
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
+  # look for lam_version_show in liblam.(a/so)
+  # (this is needed in addition to libmpi.(a/so) for
+  # LAM MPI
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
 $as_echo_n "checking for lam_show_version in -llam... " >&6; }
 if ${ac_cv_lib_lam_lam_show_version+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31002,16 +30959,16 @@ fi
 $as_echo "$ac_cv_lib_lam_lam_show_version" >&6; }
 if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 
-                       LIBS="-llam $LIBS"
-                       MPI_LIBS="-llam $MPI_LIBS"
+                 LIBS="-llam $LIBS"
+                 MPI_LIBS="-llam $MPI_LIBS"
 
 fi
 
 
-	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
-	  echo "note: MPI found to use Quadrics switch, looking for elan library"
-		 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
+  # Quadricss MPI requires the elan library to be included too
+  if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
+    echo "note: MPI found to use Quadrics switch, looking for elan library"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
 $as_echo_n "checking for elan_init in -lelan... " >&6; }
 if ${ac_cv_lib_elan_elan_init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31049,16 +31006,16 @@ fi
 $as_echo "$ac_cv_lib_elan_elan_init" >&6; }
 if test "x$ac_cv_lib_elan_elan_init" = xyes; then :
 
-                                LIBS="-lelan $LIBS"
-                                MPI_LIBS="-lelan $MPI_LIBS"
+                   LIBS="-lelan $LIBS"
+                   MPI_LIBS="-lelan $MPI_LIBS"
 
 else
-  as_fn_error $? "Could not find elan library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find elan library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
 $as_echo_n "checking for MPI_Init in -lmpi... " >&6; }
 if ${ac_cv_lib_mpi_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31096,10 +31053,10 @@ fi
 $as_echo "$ac_cv_lib_mpi_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
 
-		       MPI_LIBS="-lmpi $MPI_LIBS"
-	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpi"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
+                 MPI_LIBS="-lmpi $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpi"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
 $as_echo "Found valid MPI installlaion..." >&6; }
 
 else
@@ -31108,32 +31065,32 @@ $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
 fi
 
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
-	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+  # Myricomm MPICH requires the gm library to be included too
+  if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
+    echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then
             GMHOME="/usr"
@@ -31145,7 +31102,7 @@ if test "${with_gm+set}" = set; then :
 else
 
                         echo "note: GM library path not given... trying prefix=$MPIHOME"
-	                GM=$GMHOME
+                        GM=$GMHOME
 
 fi
 
@@ -31195,17 +31152,17 @@ if test "x$ac_cv_lib_gm_gm_open" = xyes; then :
                          MPI_LIBS="$MPI_LIBS -lgm"
 
 else
-  as_fn_error $? "Could not find gm library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find gm library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	# look for MPI_Init in libmpich.(a/so)
-        # try adding libmpl if we see it there; some MPICH2 versions
-        # require it.
-	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
-		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  # look for MPI_Init in libmpich.(a/so)
+  # try adding libmpl if we see it there; some MPICH2 versions
+  # require it.
+  if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+  LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31243,21 +31200,19 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+                 MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpich"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
 $as_echo "Found valid MPICH installation with libmpl..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31295,45 +31250,43 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+                   MPI_LIBS="-lmpich $MPI_LIBS"
+                   MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                   MPI_IMPL="mpich"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
 $as_echo "Found valid MPICH installation..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	fi
+  fi
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-	# Ensure the comiler finds the header file...
-	if test -e $MPI_INCLUDES_PATH/mpi.h; then
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+  # Ensure the comiler finds the header file...
+  if test -e $MPI_INCLUDES_PATH/mpi.h; then
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -31344,27 +31297,27 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
-		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+    CPPFLAGS=$tmpCPPFLAGS
+  elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+    MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -31375,23 +31328,24 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
+    CPPFLAGS=$tmpCPPFLAGS
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
 $as_echo "Could not find MPI header <mpi.h>..." >&6; }
-                enablempi=no
-	fi
+    enablempi=no
+  fi
+
 else
 
-	# no MPI install found, see if the compiler supports it
-      	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  # no MPI install found, see if the compiler supports it
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
 int
@@ -31404,8 +31358,8 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-	                 MPI_IMPL="built-in"
-                         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
+                   MPI_IMPL="built-in"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -31448,13 +31402,13 @@ if test "${with_mpi+set}" = set; then :
 else
 
               echo "note: MPI library path not given... trying prefix=$MPIHOME"
-	      MPI=$MPIHOME
+              MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then
-	MPI="/usr"
+  MPI="/usr"
 fi
 
 
@@ -31466,25 +31420,25 @@ MPI_INCLUDES_PATH="$MPI/include"
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# look for lam_version_show in liblam.(a/so)
-	# (this is needed in addition to libmpi.(a/so) for
-        # LAM MPI
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
+  # look for lam_version_show in liblam.(a/so)
+  # (this is needed in addition to libmpi.(a/so) for
+  # LAM MPI
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
 $as_echo_n "checking for lam_show_version in -llam... " >&6; }
 if ${ac_cv_lib_lam_lam_show_version+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31522,16 +31476,16 @@ fi
 $as_echo "$ac_cv_lib_lam_lam_show_version" >&6; }
 if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 
-                       LIBS="-llam $LIBS"
-                       MPI_LIBS="-llam $MPI_LIBS"
+                 LIBS="-llam $LIBS"
+                 MPI_LIBS="-llam $MPI_LIBS"
 
 fi
 
 
-	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
-	  echo "note: MPI found to use Quadrics switch, looking for elan library"
-		 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
+  # Quadricss MPI requires the elan library to be included too
+  if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
+    echo "note: MPI found to use Quadrics switch, looking for elan library"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
 $as_echo_n "checking for elan_init in -lelan... " >&6; }
 if ${ac_cv_lib_elan_elan_init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31569,16 +31523,16 @@ fi
 $as_echo "$ac_cv_lib_elan_elan_init" >&6; }
 if test "x$ac_cv_lib_elan_elan_init" = xyes; then :
 
-                                LIBS="-lelan $LIBS"
-                                MPI_LIBS="-lelan $MPI_LIBS"
+                   LIBS="-lelan $LIBS"
+                   MPI_LIBS="-lelan $MPI_LIBS"
 
 else
-  as_fn_error $? "Could not find elan library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find elan library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
 $as_echo_n "checking for MPI_Init in -lmpi... " >&6; }
 if ${ac_cv_lib_mpi_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31616,10 +31570,10 @@ fi
 $as_echo "$ac_cv_lib_mpi_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
 
-		       MPI_LIBS="-lmpi $MPI_LIBS"
-	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpi"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
+                 MPI_LIBS="-lmpi $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpi"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
 $as_echo "Found valid MPI installlaion..." >&6; }
 
 else
@@ -31628,32 +31582,32 @@ $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
 fi
 
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
-	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+  # Myricomm MPICH requires the gm library to be included too
+  if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
+    echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then
             GMHOME="/usr"
@@ -31665,7 +31619,7 @@ if test "${with_gm+set}" = set; then :
 else
 
                         echo "note: GM library path not given... trying prefix=$MPIHOME"
-	                GM=$GMHOME
+                        GM=$GMHOME
 
 fi
 
@@ -31715,17 +31669,17 @@ if test "x$ac_cv_lib_gm_gm_open" = xyes; then :
                          MPI_LIBS="$MPI_LIBS -lgm"
 
 else
-  as_fn_error $? "Could not find gm library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find gm library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	# look for MPI_Init in libmpich.(a/so)
-        # try adding libmpl if we see it there; some MPICH2 versions
-        # require it.
-	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
-		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  # look for MPI_Init in libmpich.(a/so)
+  # try adding libmpl if we see it there; some MPICH2 versions
+  # require it.
+  if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+  LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31763,21 +31717,19 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+                 MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpich"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
 $as_echo "Found valid MPICH installation with libmpl..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -31815,45 +31767,43 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+                   MPI_LIBS="-lmpich $MPI_LIBS"
+                   MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                   MPI_IMPL="mpich"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
 $as_echo "Found valid MPICH installation..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	fi
+  fi
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-	# Ensure the comiler finds the header file...
-	if test -e $MPI_INCLUDES_PATH/mpi.h; then
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+  # Ensure the comiler finds the header file...
+  if test -e $MPI_INCLUDES_PATH/mpi.h; then
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -31864,27 +31814,27 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
-		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+    CPPFLAGS=$tmpCPPFLAGS
+  elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+    MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -31895,23 +31845,24 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
+    CPPFLAGS=$tmpCPPFLAGS
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
 $as_echo "Could not find MPI header <mpi.h>..." >&6; }
-                enablempi=no
-	fi
+    enablempi=no
+  fi
+
 else
 
-	# no MPI install found, see if the compiler supports it
-      	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  # no MPI install found, see if the compiler supports it
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
 int
@@ -31924,8 +31875,8 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-	                 MPI_IMPL="built-in"
-                         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
+                   MPI_IMPL="built-in"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -31966,13 +31917,13 @@ if test "${with_mpi+set}" = set; then :
 else
 
               echo "note: MPI library path not given... trying prefix=$MPIHOME"
-	      MPI=$MPIHOME
+              MPI=$MPIHOME
 
 fi
 
 
 if test -z "$MPI"; then
-	MPI="/usr"
+  MPI="/usr"
 fi
 
 
@@ -31984,25 +31935,25 @@ MPI_INCLUDES_PATH="$MPI/include"
 
 # look for LAM or other MPI implementation
 if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# look for lam_version_show in liblam.(a/so)
-	# (this is needed in addition to libmpi.(a/so) for
-        # LAM MPI
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
+  # look for lam_version_show in liblam.(a/so)
+  # (this is needed in addition to libmpi.(a/so) for
+  # LAM MPI
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
 $as_echo_n "checking for lam_show_version in -llam... " >&6; }
 if ${ac_cv_lib_lam_lam_show_version+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -32040,16 +31991,16 @@ fi
 $as_echo "$ac_cv_lib_lam_lam_show_version" >&6; }
 if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 
-                       LIBS="-llam $LIBS"
-                       MPI_LIBS="-llam $MPI_LIBS"
+                 LIBS="-llam $LIBS"
+                 MPI_LIBS="-llam $MPI_LIBS"
 
 fi
 
 
-	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
-	  echo "note: MPI found to use Quadrics switch, looking for elan library"
-		 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
+  # Quadricss MPI requires the elan library to be included too
+  if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
+    echo "note: MPI found to use Quadrics switch, looking for elan library"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
 $as_echo_n "checking for elan_init in -lelan... " >&6; }
 if ${ac_cv_lib_elan_elan_init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -32087,16 +32038,16 @@ fi
 $as_echo "$ac_cv_lib_elan_elan_init" >&6; }
 if test "x$ac_cv_lib_elan_elan_init" = xyes; then :
 
-                                LIBS="-lelan $LIBS"
-                                MPI_LIBS="-lelan $MPI_LIBS"
+                   LIBS="-lelan $LIBS"
+                   MPI_LIBS="-lelan $MPI_LIBS"
 
 else
-  as_fn_error $? "Could not find elan library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find elan library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
 $as_echo_n "checking for MPI_Init in -lmpi... " >&6; }
 if ${ac_cv_lib_mpi_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -32134,10 +32085,10 @@ fi
 $as_echo "$ac_cv_lib_mpi_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
 
-		       MPI_LIBS="-lmpi $MPI_LIBS"
-	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpi"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
+                 MPI_LIBS="-lmpi $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpi"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
 $as_echo "Found valid MPI installlaion..." >&6; }
 
 else
@@ -32146,32 +32097,32 @@ $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
 fi
 
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
+  echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
+  # Ensure the comiler finds the library...
+  tmpLIBS=$LIBS
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
+  LIBS="-L$MPI_LIBS_PATH $LIBS"
 
-	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
-	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
+  # Myricomm MPICH requires the gm library to be included too
+  if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
+    echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
 
           if (test "x$GMHOME" = x) ; then
             GMHOME="/usr"
@@ -32183,7 +32134,7 @@ if test "${with_gm+set}" = set; then :
 else
 
                         echo "note: GM library path not given... trying prefix=$MPIHOME"
-	                GM=$GMHOME
+                        GM=$GMHOME
 
 fi
 
@@ -32233,17 +32184,17 @@ if test "x$ac_cv_lib_gm_gm_open" = xyes; then :
                          MPI_LIBS="$MPI_LIBS -lgm"
 
 else
-  as_fn_error $? "Could not find gm library... exiting " "$LINENO" 5
+  as_fn_error $? "Could not find gm library... exiting" "$LINENO" 5
 fi
 
-	fi
+  fi
 
-	# look for MPI_Init in libmpich.(a/so)
-        # try adding libmpl if we see it there; some MPICH2 versions
-        # require it.
-	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
-		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  # look for MPI_Init in libmpich.(a/so)
+  # try adding libmpl if we see it there; some MPICH2 versions
+  # require it.
+  if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+  LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -32281,21 +32232,19 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+                 MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+                 MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                 MPI_IMPL="mpich"
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
 $as_echo "Found valid MPICH installation with libmpl..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -32333,45 +32282,43 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-			       MPI_LIBS="-lmpich $MPI_LIBS"
-			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-		               MPI_IMPL="mpich"
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+                   MPI_LIBS="-lmpich $MPI_LIBS"
+                   MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+                   MPI_IMPL="mpich"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
 $as_echo "Found valid MPICH installation..." >&6; }
 
 else
-
-       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-
 fi
 
-	fi
+  fi
 
-	ac_ext=cpp
+  ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LIBS=$tmpLIBS
+  LIBS=$tmpLIBS
 fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-	# Ensure the comiler finds the header file...
-	if test -e $MPI_INCLUDES_PATH/mpi.h; then
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+  # Ensure the comiler finds the header file...
+  if test -e $MPI_INCLUDES_PATH/mpi.h; then
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -32382,27 +32329,27 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
-		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
+    CPPFLAGS=$tmpCPPFLAGS
+  elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+    MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+    tmpCPPFLAGS=$CPPFLAGS
 
-		ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
 if test "x$ac_cv_header_mpi_h" = xyes; then :
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -32413,23 +32360,24 @@ $as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
 fi
 
 
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
+    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-		CPPFLAGS=$tmpCPPFLAGS
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
+    CPPFLAGS=$tmpCPPFLAGS
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
 $as_echo "Could not find MPI header <mpi.h>..." >&6; }
-                enablempi=no
-	fi
+    enablempi=no
+  fi
+
 else
 
-	# no MPI install found, see if the compiler supports it
-      	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  # no MPI install found, see if the compiler supports it
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
 int
@@ -32442,8 +32390,8 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-	                 MPI_IMPL="built-in"
-                         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
+                   MPI_IMPL="built-in"
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
 $as_echo "$CXX Compiler Supports MPI " >&6; }
 
 $as_echo "#define HAVE_MPI 1" >>confdefs.h
@@ -32497,10 +32445,10 @@ fi
   # Check whether --enable-slepc was given.
 if test "${enable_slepc+set}" = set; then :
   enableval=$enable_slepc; case "${enableval}" in
-                                 yes)  enableslepc=yes ;;
-                                 no)  enableslepc=no ;;
-                                 *)  as_fn_error $? "bad value ${enableval} for --enable-slepc" "$LINENO" 5 ;;
-                               esac
+                  yes)  enableslepc=yes ;;
+                  no)  enableslepc=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-slepc" "$LINENO" 5 ;;
+                esac
 else
   enableslepc=$enablepetsc
 fi
@@ -32571,11 +32519,27 @@ fi
       slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
 
-      if (test $slepcversion != $petscversion) ; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING:" >&5
-$as_echo "WARNING:" >&6; }
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Different version numbers for SLEPc and PETSc >>>" >&5
-$as_echo "<<< Different version numbers for SLEPc and PETSc >>>" >&6; }
+      # Older PETSc (3.3 and earlier) might not work if the version numbers don't match exactly.
+      oldpetsc=no
+
+      if (test $petscmajor -lt 3) ; then
+        oldpetsc=yes
+      fi
+
+      if (test $petscmajor == 3 -a $petscminor -lt 4) ; then
+        oldpetsc=yes
+      fi
+
+      # If PETSc is old, warn if the full version numbers (including the subminor version number) don't match exactly.
+      if (test "$oldpetsc" = "yes" -a $slepcversion != $petscversion) ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< WARNING: PETSc version $petscversion does not match SLEPc version $slepcversion >>>" >&5
+$as_echo "<<< WARNING: PETSc version $petscversion does not match SLEPc version $slepcversion >>>" >&6; }
+      fi
+
+      # For any PETSc version, warn if the major and minor version numbers don't match.
+      if (test $slepcmajor != $petscmajor -o $slepcminor != $petscminor) ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< WARNING: PETSc version $petscmajor.$petscminor does not match SLEPc version $slepcmajor.$slepcminor >>>" >&5
+$as_echo "<<< WARNING: PETSc version $petscmajor.$petscminor does not match SLEPc version $slepcmajor.$slepcminor >>>" >&6; }
       fi
 
       # OK, now we will create a temporary makefile to query SLEPc libs
@@ -32607,13 +32571,70 @@ $as_echo "<<< Querying SLEPc configuration from $includefile >>>" >&6; }
         printf '\t%s\n' "echo \$(SLEPC_LIB) \$(ARPACK_LIB)" >> Makefile_config_slepc
 
         SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
+
+        # If calling make worked, try to compile a trivial SLEPc
+        # program to check our configuration...
         if (test x$? = x0); then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can compile a trivial SLEPc program" >&5
+$as_echo_n "checking whether we can compile a trivial SLEPc program... " >&6; }
+          ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+          # Save the original CXXFLAGS contents
+          saveCXXFLAGS="$CXXFLAGS"
+
+          # Append both PETSc and SLEPc include paths to the CXXFLAGS variable.
+          CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS $SLEPC_INCLUDE"
+
+          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <slepc.h>
+          static char help[]="";
+
+          int main(int argc, char **argv)
+          {
+            SlepcInitialize(&argc, &argv, (char*)0, help);
+            SlepcFinalize();
+            return 0;
+          }
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
+$as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
+
 
 $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
-$as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
 
+
+
+else
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiling trivial SLEPc program failed. SLEPc disabled. >>>" >&5
+$as_echo "<<< Compiling trivial SLEPc program failed. SLEPc disabled. >>>" >&6; }
+            enableslepc=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+          # Return CXXFLAGS and LANG to their original state.
+          CXXFLAGS="$saveCXXFLAGS"
+          ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
         else
@@ -32652,10 +32673,10 @@ fi
   # Check whether --enable-trilinos was given.
 if test "${enable_trilinos+set}" = set; then :
   enableval=$enable_trilinos; case "${enableval}" in
-		  yes)  enabletrilinos=yes ;;
-		   no)  enabletrilinos=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-trilinos" "$LINENO" 5 ;;
-		 esac
+                                 yes)  enabletrilinos=yes ;;
+                                 no)  enabletrilinos=no ;;
+                                 *)  as_fn_error $? "bad value ${enableval} for --enable-trilinos" "$LINENO" 5 ;;
+                               esac
 else
   enabletrilinos=$enableoptional
 fi
@@ -32669,8 +32690,8 @@ fi
 
 
   if test "$enablecomplex" = no ; then
-      if test "$enabletrilinos" != no ; then
-          # -- try Trilinos 10 first
+    if test "$enabletrilinos" != no ; then
+      # -- try Trilinos 10 first
 
   if (test "x$TRILINOS_DIR" = "x"); then
     # Ubuntu trilinos package?
@@ -32730,7 +32751,6 @@ fi
 fi
 
 
-
 fi
 
 
@@ -32762,9 +32782,7 @@ else
 fi
 
 
-
 fi
-
 
 
 fi
@@ -32779,28 +32797,31 @@ $as_echo "#define HAVE_NOX 1" >>confdefs.h
 $as_echo "<<< Configuring library with NOX support >>>" >&6; }
        fi
 
-                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/ml_include.h" | $as_tr_sh`
-ac_fn_cxx_check_header_compile "$LINENO" "$withtrilinosdir/include/ml_include.h" "$as_ac_Header" "#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
+                                   as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/ml_include.h" | $as_tr_sh`
+ac_fn_cxx_check_header_compile "$LINENO" "$withtrilinosdir/include/ml_include.h" "$as_ac_Header" "
+                       #ifdef HAVE_PETSC
+                       #undef HAVE_PETSC
+                       #endif
 
 "
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
   as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/ml_include.h" | $as_tr_sh`
-ac_fn_cxx_check_header_compile "$LINENO" "$withtrilinosdir/ml_include.h" "$as_ac_Header" "#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
+ac_fn_cxx_check_header_compile "$LINENO" "$withtrilinosdir/ml_include.h" "$as_ac_Header" "
+                                        #ifdef HAVE_PETSC
+                                        #undef HAVE_PETSC
+                                        #endif
 
 "
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
   as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/ml/src/ml_config.h" | $as_tr_sh`
-ac_fn_cxx_check_header_compile "$LINENO" "$withtrilinosdir/packages/ml/src/ml_config.h" "$as_ac_Header" "#ifdef HAVE_PETSC
-#undef HAVE_PETSC
-#endif
+ac_fn_cxx_check_header_compile "$LINENO" "$withtrilinosdir/packages/ml/src/ml_config.h" "$as_ac_Header" "
+                                                         #ifdef HAVE_PETSC
+                                                         #undef HAVE_PETSC
+                                                         #endif
 
 "
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
@@ -32844,9 +32865,7 @@ else
 fi
 
 
-
 fi
-
 
 
 fi
@@ -32880,9 +32899,7 @@ else
 fi
 
 
-
 fi
-
 
 
 fi
@@ -32907,14 +32924,11 @@ $as_echo "<<< Configuring library with DTK support >>>" >&6; }
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
   if (test $enabletrilinos10 != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $TRILINOS_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)
-
-echo_include:
-	@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)
-EOF
+    printf '%s\n' "include $TRILINOS_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -32930,8 +32944,8 @@ EOF
 
 
 
-          # -- then Trilinos 9
-	  if test "$enabletrilinos10" = no ; then
+      # -- then Trilinos 9
+      if test "$enabletrilinos10" = no ; then
 
   if test "x$TRILINOS_DIR" = "x"; then
     TRILINOS_DIR=no
@@ -33117,14 +33131,11 @@ $as_echo "<<< Configuring library with DTK support >>>" >&6; }
   #
   # AztecOO
   if (test $enableaztecoo != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $AZTECOO_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(AZTECOO_LIBS)
-
-echo_include:
-	@echo \$(AZTECOO_INCLUDES)
-EOF
+    printf '%s\n' "include $AZTECOO_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(AZTECOO_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(AZTECOO_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -33140,14 +33151,11 @@ EOF
   #
   # Nox
   if (test $enablenox != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $NOX_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(NOX_LIBS)
-
-echo_include:
-	@echo \$(NOX_INCLUDES)
-EOF
+    printf '%s\n' "include $NOX_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(NOX_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(NOX_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -33163,14 +33171,11 @@ EOF
   #
   # ML
   if (test $enableml != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $ML_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(ML_LIBS)
-
-echo_include:
-	@echo \$(ML_INCLUDES)
-EOF
+    printf '%s\n' "include $ML_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(ML_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(ML_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -33188,14 +33193,11 @@ EOF
   #
   # Tpetra
   if (test $enabletpetra != no); then
-    cat <<EOF >Makefile_config_trilinos
-include $TPETRA_MAKEFILE_EXPORT
-echo_libs:
-	@echo \$(TPETRA_LIBS)
-
-echo_include:
-	@echo \$(TPETRA_INCLUDES)
-EOF
+    printf '%s\n' "include $TPETRA_MAKEFILE_EXPORT" > Makefile_config_trilinos
+    printf '%s\n' "echo_libs:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(TPETRA_LIBS)" >> Makefile_config_trilinos
+    printf '%s\n' "echo_include:" >> Makefile_config_trilinos
+    printf '\t%s\n' "@echo \$(TPETRA_INCLUDES)" >> Makefile_config_trilinos
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
@@ -33217,13 +33219,12 @@ EOF
 
 
 
-             if test "$enabletrilinos9" = no; then
-	       enabletrilinos=no
-	     fi
-	  fi
+        if test "$enabletrilinos9" = no; then
+          enabletrilinos=no
+        fi
       fi
+    fi
   fi
-
 
 if ( test "$enabletrilinos" = yes ); then
   libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $AZTECOO_INCLUDES $NOX_INCLUDES $ML_INCLUDES $TPETRA_INCLUDES $DTK_INCLUDES $libmesh_optional_INCLUDES"
@@ -33240,14 +33241,13 @@ fi
   # Check whether --enable-tbb was given.
 if test "${enable_tbb+set}" = set; then :
   enableval=$enable_tbb; case "${enableval}" in
-		  yes)  enabletbb=yes ;;
-		   no)  enabletbb=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-tbb" "$LINENO" 5 ;;
-		 esac
+                  yes)  enabletbb=yes ;;
+                  no)  enabletbb=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-tbb" "$LINENO" 5 ;;
+                esac
 else
   enabletbb=$enableoptional
 fi
-
 
 
   if (test $enabletbb = yes); then
@@ -33311,17 +33311,17 @@ else
 
     ax_tls_keywords="__thread __declspec(thread) none"
     for ax_tls_keyword in $ax_tls_keywords; do
-       case $ax_tls_keyword in
-          none) ac_cv_tls=none ; break ;;
-	  *)
-             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+      case $ax_tls_keyword in
+        none) ac_cv_tls=none ; break ;;
+        *)
+           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdlib.h>
-                 static void
-                 foo(void) {
-                 static  $ax_tls_keyword  int bar;
-                 exit(1);
-                 }
+               static void
+               foo(void) {
+               static  $ax_tls_keyword  int bar;
+               exit(1);
+               }
 int
 main ()
 {
@@ -33337,7 +33337,7 @@ else
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-	  esac
+      esac
     done
 
 fi
@@ -33370,10 +33370,10 @@ fi
 # Check whether --enable-pthreads was given.
 if test "${enable_pthreads+set}" = set; then :
   enableval=$enable_pthreads; case "${enableval}" in
-		  yes)  enablepthreads=yes ;;
-		   no)  enablepthreads=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
-		 esac
+                yes)  enablepthreads=yes ;;
+                no)  enablepthreads=no ;;
+                *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
+              esac
 else
   enablepthreads=$enableoptional
 fi
@@ -33952,15 +33952,13 @@ else
   # Check whether --enable-laspack was given.
 if test "${enable_laspack+set}" = set; then :
   enableval=$enable_laspack; case "${enableval}" in
-		  yes)  enablelaspack=yes ;;
-		   no)  enablelaspack=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-laspack" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablelaspack=yes ;;
+                  no)  enablelaspack=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-laspack" "$LINENO" 5 ;;
+                esac
 else
   enablelaspack=$enableoptional
 fi
-
-
 
 
       if (test $enablelaspack = yes); then
@@ -34012,15 +34010,13 @@ else
   # Check whether --enable-sfc was given.
 if test "${enable_sfc+set}" = set; then :
   enableval=$enable_sfc; case "${enableval}" in
-		  yes)  enablesfc=yes ;;
-		   no)  enablesfc=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-sfc" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablesfc=yes ;;
+                  no)  enablesfc=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-sfc" "$LINENO" 5 ;;
+                esac
 else
   enablesfc=$enableoptional
 fi
-
-
 
 
       if (test $enablesfc = yes); then
@@ -34066,15 +34062,13 @@ ac_config_files="$ac_config_files contrib/sfcurves/Makefile"
   # Check whether --enable-gzstreams was given.
 if test "${enable_gzstreams+set}" = set; then :
   enableval=$enable_gzstreams; case "${enableval}" in
-		  yes)  enablegz=yes ;;
-		   no)  enablegz=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-gz" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablegz=yes ;;
+                  no)  enablegz=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-gz" "$LINENO" 5 ;;
+                  esac
 else
   enablegz=$enableoptional
 fi
-
-
 
 
 if (test $enablegz = yes); then
@@ -34345,10 +34339,10 @@ fi
   # Check whether --enable-tecio was given.
 if test "${enable_tecio+set}" = set; then :
   enableval=$enable_tecio; case "${enableval}" in
-		  yes)  enabletecio=yes ;;
-		   no)  enabletecio=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-tecio" "$LINENO" 5 ;;
-		 esac
+                  yes)  enabletecio=yes ;;
+                  no)  enabletecio=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-tecio" "$LINENO" 5 ;;
+                esac
 else
   enabletecio=$enableoptional
 fi
@@ -34417,8 +34411,8 @@ fi
     # Set tecio platform-specific compiler flags.
     case "${host_os}" in
       *linux*)
-	TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
-	# The cast to long int works around a bug in the HP C Compiler
+        TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
+        # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
@@ -34451,19 +34445,19 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-	if (test $ac_cv_sizeof_void_p = 8); then
-	  TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"
-	fi
-	;;
+        if (test $ac_cv_sizeof_void_p = 8); then
+          TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"
+        fi
+        ;;
 
       *darwin*)
-	TECIO_CPPFLAGS="-DDARWIN -DLONGIS64 $TECIO_CPPFLAGS"
+        TECIO_CPPFLAGS="-DDARWIN -DLONGIS64 $TECIO_CPPFLAGS"
         ;;
 
         *)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<" >&5
 $as_echo ">>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<" >&6; }
-	;;
+          ;;
     esac
 
 
@@ -34510,10 +34504,10 @@ ac_config_files="$ac_config_files contrib/tecplot/tecio/Makefile"
   # Check whether --enable-tecplot was given.
 if test "${enable_tecplot+set}" = set; then :
   enableval=$enable_tecplot; case "${enableval}" in
-		  yes)  enabletecplot=yes ;;
-		   no)  enabletecplot=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-tecplot" "$LINENO" 5 ;;
-		 esac
+                  yes)  enabletecplot=yes ;;
+                  no)  enabletecplot=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-tecplot" "$LINENO" 5 ;;
+                esac
 else
   enabletecplot=no
 fi
@@ -34534,11 +34528,11 @@ $as_echo ">>> Not using vendor provided tecio libraries, deferring to source bui
       # now we just see if the file exists, without using AC_CHECK_FILE!
       TECPLOT_LIBRARY_PATH=""
       if (test -r $top_srcdir/contrib/tecplot/binary/lib/$host/tecio.a) ; then
-	  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
+        TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
       else
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring Tecplot failed, no tecio exists for $host <<<" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring Tecplot failed, no tecio exists for $host <<<" >&5
 $as_echo ">>> Configuring Tecplot failed, no tecio exists for $host <<<" >&6; }
-         enabletecplot=no
+        enabletecplot=no
       fi
 
       # Note: AC_CHECK_HEADER seems to fail if the path to the header
@@ -34549,10 +34543,8 @@ $as_echo ">>> Configuring Tecplot failed, no tecio exists for $host <<<" >&6; }
 
       ac_fn_cxx_check_header_mongrel "$LINENO" "TECIO.h" "ac_cv_header_TECIO_h" "$ac_includes_default"
 if test "x$ac_cv_header_TECIO_h" = xyes; then :
-
-	      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/binary/include
-	      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/binary/include"
-
+  TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/binary/include
+                       TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/binary/include"
 fi
 
 
@@ -34627,7 +34619,7 @@ else
 
                                     { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it! " >&5
 $as_echo "WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it! " >&6; }
-               		            enabletecplot=no
+                                    enabletecplot=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -34671,10 +34663,10 @@ ac_config_files="$ac_config_files contrib/tecplot/binary/Makefile"
   # Check whether --enable-metis was given.
 if test "${enable_metis+set}" = set; then :
   enableval=$enable_metis; case "${enableval}" in
-		  yes)  enablemetis=yes ;;
-		   no)  enablemetis=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-metis" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablemetis=yes ;;
+                  no)  enablemetis=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-metis" "$LINENO" 5 ;;
+                esac
 else
   enablemetis=$enableoptional
 fi
@@ -34684,10 +34676,13 @@ fi
 # Check whether --with-metis was given.
 if test "${with_metis+set}" = set; then :
   withval=$with_metis; case "${withval}" in
-                  internal)   build_metis=yes ;;
-		  PETSc)      build_metis=no ;;
-                      *) as_fn_error $? "bad value ${withval} for --with-metis" "$LINENO" 5 ;;
-                  esac
+               internal)
+                 build_metis=yes ;;
+               PETSc)
+                 build_metis=no ;;
+               *)
+                 as_fn_error $? "bad value ${withval} for --with-metis" "$LINENO" 5 ;;
+              esac
 else
   build_metis=yes
 fi
@@ -34713,17 +34708,17 @@ else
 
     ax_tls_keywords="__thread __declspec(thread) none"
     for ax_tls_keyword in $ax_tls_keywords; do
-       case $ax_tls_keyword in
-          none) ac_cv_tls=none ; break ;;
-	  *)
-             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+      case $ax_tls_keyword in
+        none) ac_cv_tls=none ; break ;;
+        *)
+           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdlib.h>
-                 static void
-                 foo(void) {
-                 static  $ax_tls_keyword  int bar;
-                 exit(1);
-                 }
+               static void
+               foo(void) {
+               static  $ax_tls_keyword  int bar;
+               exit(1);
+               }
 int
 main ()
 {
@@ -34739,7 +34734,7 @@ else
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-	  esac
+      esac
     done
 
 fi
@@ -34796,10 +34791,10 @@ ac_config_files="$ac_config_files contrib/metis/Makefile"
   # Check whether --enable-parmetis was given.
 if test "${enable_parmetis+set}" = set; then :
   enableval=$enable_parmetis; case "${enableval}" in
-		  yes)  enableparmetis=yes ;;
-		   no)  enableparmetis=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-parmetis" "$LINENO" 5 ;;
-		 esac
+                  yes)  enableparmetis=yes ;;
+                  no)  enableparmetis=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-parmetis" "$LINENO" 5 ;;
+                esac
 else
   enableparmetis=$enableoptional
 fi
@@ -34808,7 +34803,6 @@ fi
     if (test "x$enablempi" = xno); then
     enableparmetis=no
   fi
-
 
       if (test $enableparmetis = yes); then
             if (test $build_metis = yes); then
@@ -34959,15 +34953,13 @@ else
   # Check whether --enable-tetgen was given.
 if test "${enable_tetgen+set}" = set; then :
   enableval=$enable_tetgen; case "${enableval}" in
-		  yes)  enabletetgen=yes ;;
-		   no)  enabletetgen=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-tetgen" "$LINENO" 5 ;;
-		 esac
+                  yes)  enabletetgen=yes ;;
+                  no)  enabletetgen=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-tetgen" "$LINENO" 5 ;;
+                esac
 else
   enabletetgen=$enableoptional
 fi
-
-
 
 
       if (test $enabletetgen = yes); then
@@ -35018,15 +35010,13 @@ else
   # Check whether --enable-triangle was given.
 if test "${enable_triangle+set}" = set; then :
   enableval=$enable_triangle; case "${enableval}" in
-		  yes)  enabletriangle=yes ;;
-		   no)  enabletriangle=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-triangle" "$LINENO" 5 ;;
-		 esac
+                  yes)  enabletriangle=yes ;;
+                  no)  enabletriangle=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-triangle" "$LINENO" 5 ;;
+                esac
 else
   enabletriangle=$enableoptional
 fi
-
-
 
 
       if (test $enabletriangle = yes); then
@@ -35072,10 +35062,10 @@ ac_config_files="$ac_config_files contrib/triangle/Makefile"
   # Check whether --enable-qhull was given.
 if test "${enable_qhull+set}" = set; then :
   enableval=$enable_qhull; case "${enableval}" in
-		  yes)  enableqhull=yes;;
-		   no)  enableqhull=no;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-qhull" "$LINENO" 5 ;;
-		 esac
+                  yes)  enableqhull=yes;;
+                  no)  enableqhull=no;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-qhull" "$LINENO" 5 ;;
+                esac
 else
   enableqhull=$enableoptional
 fi
@@ -35294,15 +35284,13 @@ ac_config_files="$ac_config_files contrib/qhull/qhull/Makefile"
   # Check whether --enable-gmv was given.
 if test "${enable_gmv+set}" = set; then :
   enableval=$enable_gmv; case "${enableval}" in
-		  yes)  enablegmv=yes ;;
-		   no)  enablegmv=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-gmv" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablegmv=yes ;;
+                  no)  enablegmv=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-gmv" "$LINENO" 5 ;;
+                esac
 else
   enablegmv=$enableoptional
 fi
-
-
 
 
       if (test x$enablegmv = xyes); then
@@ -35716,10 +35704,10 @@ enableeigensparse=yes
   # Check whether --enable-eigen was given.
 if test "${enable_eigen+set}" = set; then :
   enableval=$enable_eigen; case "${enableval}" in
-		  yes)  enableeigen=yes ;;
-		   no)  enableeigen=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-eigen" "$LINENO" 5 ;;
-		 esac
+                  yes)  enableeigen=yes ;;
+                  no)  enableeigen=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-eigen" "$LINENO" 5 ;;
+                esac
 else
   enableeigen=$enableoptional
 fi
@@ -35745,26 +35733,26 @@ fi
 
     # Fall back on default paths to Eigen's include files
     if (test $witheigeninc != no); then
-	EIGEN_INC="$witheigeninc"
+      EIGEN_INC="$witheigeninc"
 
     elif (test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen); then
-	echo "Environment EIGEN_INC=$EIGEN_INC"
+      echo "Environment EIGEN_INC=$EIGEN_INC"
 
     elif (test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen); then
-	EIGEN_INC=$EIGEN3_INCLUDE
-	echo "Environment EIGEN3_INCLUDE=$EIGEN_INC"
+      EIGEN_INC=$EIGEN3_INCLUDE
+      echo "Environment EIGEN3_INCLUDE=$EIGEN_INC"
 
     elif (test "x$EIGEN_INCLUDE" != x -a -f $EIGEN_INCLUDE/Eigen/Eigen); then
-	EIGEN_INC=$EIGEN_INCLUDE
-	echo "Environment EIGEN_INCLUDE=$EIGEN_INC"
+      EIGEN_INC=$EIGEN_INCLUDE
+      echo "Environment EIGEN_INCLUDE=$EIGEN_INC"
 
     elif (test -f /usr/include/eigen3/Eigen/Eigen); then
-	EIGEN_INC="/usr/include/eigen3"
-	echo "System EIGEN_INC=$EIGEN_INC"
+      EIGEN_INC="/usr/include/eigen3"
+      echo "System EIGEN_INC=$EIGEN_INC"
 
     else
-	EIGEN_INC="/usr/include"
-	echo "Testing EIGEN_INC=$EIGEN_INC"
+      EIGEN_INC="/usr/include"
+      echo "Testing EIGEN_INC=$EIGEN_INC"
     fi
 
     # Initialize Makefile/config.h substitution variables
@@ -35798,12 +35786,12 @@ done
     # Check to make sure the external header files are sufficiently up
     # to date - this fixes our Eigen detection on Scientific Linux 6
     if (test x$externaleigenincFound = xyes); then
-        enableeigenincFound=yes
+      enableeigenincFound=yes
 
-        ac_eigen_save_CPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
+      ac_eigen_save_CPPFLAGS="$CPPFLAGS"
+      CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
-	for ac_header in Eigen/Dense
+      for ac_header in Eigen/Dense
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Dense" "ac_cv_header_Eigen_Dense" "$ac_includes_default"
 if test "x$ac_cv_header_Eigen_Dense" = xyes; then :
@@ -35818,8 +35806,8 @@ fi
 done
 
 
-        if (test x$enableeigensparse = xyes); then
-	    for ac_header in Eigen/Sparse
+      if (test x$enableeigensparse = xyes); then
+        for ac_header in Eigen/Sparse
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Sparse" "ac_cv_header_Eigen_Sparse" "$ac_includes_default"
 if test "x$ac_cv_header_Eigen_Sparse" = xyes; then :
@@ -35833,36 +35821,36 @@ fi
 
 done
 
-        fi
+      fi
 
-	CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
+      CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
     fi
 
 
     if (test x$enableeigenincFound = xyes); then
-        EIGEN_INCLUDE="-I$EIGEN_INC"
+      EIGEN_INCLUDE="-I$EIGEN_INC"
     elif (test -d $top_srcdir/contrib/eigen/eigen); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< external Eigen header files not found, using Eigen from ./contrib >>>" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< external Eigen header files not found, using Eigen from ./contrib >>>" >&5
 $as_echo "<<< external Eigen header files not found, using Eigen from ./contrib >>>" >&6; }
-	EIGEN_INC=$top_srcdir/contrib/eigen/eigen
-	EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
-	install_internal_eigen=yes
+      EIGEN_INC=$top_srcdir/contrib/eigen/eigen
+      EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
+      install_internal_eigen=yes
     else
-	enableeigen=no
+      enableeigen=no
     fi
 
 
     # OK, we have a usable eigen path, make sure the headers we want are good.
     if (test x$enableeigen = xyes); then
 
-        ac_eigen_save_CPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
+      ac_eigen_save_CPPFLAGS="$CPPFLAGS"
+      CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
-        # Do not use cached results for the header checks
-        { ac_cv_header_Eigen_Dense=; unset ac_cv_header_Eigen_Dense;}
-        { ac_cv_header_Eigen_Sparse=; unset ac_cv_header_Eigen_Sparse;}
+      # Do not use cached results for the header checks
+      { ac_cv_header_Eigen_Dense=; unset ac_cv_header_Eigen_Dense;}
+      { ac_cv_header_Eigen_Sparse=; unset ac_cv_header_Eigen_Sparse;}
 
-	for ac_header in Eigen/Dense
+      for ac_header in Eigen/Dense
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Dense" "ac_cv_header_Eigen_Dense" "$ac_includes_default"
 if test "x$ac_cv_header_Eigen_Dense" = xyes; then :
@@ -35877,8 +35865,8 @@ fi
 done
 
 
-        if (test x$enableeigensparse = xyes); then
-	    for ac_header in Eigen/Sparse
+      if (test x$enableeigensparse = xyes); then
+        for ac_header in Eigen/Sparse
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Sparse" "ac_cv_header_Eigen_Sparse" "$ac_includes_default"
 if test "x$ac_cv_header_Eigen_Sparse" = xyes; then :
@@ -35892,7 +35880,7 @@ fi
 
 done
 
-        fi
+      fi
 
         #-----------------------
         # Minimum version check
@@ -35967,27 +35955,22 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-	CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
+        CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
 
-	# if we survived, we really have Eigen
- 	if (test x$enableeigen = xyes); then
-            HAVE_EIGEN=1
+      # if we survived, we really have Eigen
+      if (test x$enableeigen = xyes); then
+        HAVE_EIGEN=1
 
 $as_echo "#define HAVE_EIGEN 1" >>confdefs.h
 
-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Eigen support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Eigen support >>>" >&5
 $as_echo "<<< Configuring library with Eigen support >>>" >&6; }
-        elif test "$is_package_required" = yes; then
-            as_fn_error $? "
-
-   Your EIGEN version ($EIGEN_INC) does not meet the minimum versioning
-   requirements ($min_eigen_version).  Please use --with-eigen-include to
-   specify the location of an updated installation.
-
-                " "$LINENO" 5
-	fi
+      elif test "$is_package_required" = yes; then
+        as_fn_error $? "Your EIGEN version ($EIGEN_INC) does not meet the minimum versioning
+                      requirements ($min_eigen_version).  Please use --with-eigen-include to
+                      specify the location of an updated installation." "$LINENO" 5
+      fi
     fi
-
     ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -36040,14 +36023,13 @@ fi
   # Check whether --enable-glpk was given.
 if test "${enable_glpk+set}" = set; then :
   enableval=$enable_glpk; case "${enableval}" in
-		  yes)  enableglpk=yes ;;
-		   no)  enableglpk=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-glpk" "$LINENO" 5 ;;
-		 esac
+                  yes)  enableglpk=yes ;;
+                  no)  enableglpk=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-glpk" "$LINENO" 5 ;;
+                esac
 else
   enableglpk=$enableoptional
 fi
-
 
 
   if (test $enableglpk = yes); then
@@ -36203,11 +36185,11 @@ ac_cv_lib_glpk=ac_cv_lib_glpk_main
        if (test x$enableglpk = xyes); then
          GLPK_INCLUDE="-I$GLPK_INC"
          GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
-	 if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
-	   if (test "$GLPK_LIB" != "/usr/lib" -a "$GLPK_LIB" != "/usr/lib64"); then
-	      GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
-	   fi
-	 fi
+         if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
+           if (test "$GLPK_LIB" != "/usr/lib" -a "$GLPK_LIB" != "/usr/lib64"); then
+             GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
+           fi
+         fi
 
 $as_echo "#define HAVE_GLPK 1" >>confdefs.h
 
@@ -36642,15 +36624,13 @@ ac_config_files="$ac_config_files contrib/capnproto/Makefile"
   # Check whether --enable-hdf5 was given.
 if test "${enable_hdf5+set}" = set; then :
   enableval=$enable_hdf5; case "${enableval}" in
-		  yes)  enablehdf5=yes ;;
-		   no)  enablehdf5=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-hdf5" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablehdf5=yes ;;
+                  no)  enablehdf5=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-hdf5" "$LINENO" 5 ;;
+                esac
 else
   enablehdf5=$enableoptional
 fi
-
-
 
 
   if (test $enablehdf5 = yes); then
@@ -36755,12 +36735,12 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test "x${found_header}" = "xyes" ; then
-        version_succeeded=no
+      version_succeeded=no
 
-    	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-       	#include <hdf5.h>
+        #include <hdf5.h>
 
 int
 main ()
@@ -36792,28 +36772,23 @@ $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-    	ac_ext=c
+      ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-    	if test "$version_succeeded" != "yes";then
-       	   if test "$is_package_required" = yes; then
-              as_fn_error $? "
-
-   Your HDF5 library version does not meet the minimum versioning
-   requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
-   of an updated installation or consider upgrading the system version.
-
-       	 	 " "$LINENO" 5
-           fi
+      if test "$version_succeeded" != "yes";then
+        if test "$is_package_required" = yes; then
+          as_fn_error $? "Your HDF5 library version does not meet the minimum versioning
+                        requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
+                        of an updated installation or consider upgrading the system version." "$LINENO" 5
         fi
+      fi
 
-    # Library availability
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for H5Fopen in -lhdf5" >&5
+      # Library availability
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for H5Fopen in -lhdf5" >&5
 $as_echo_n "checking for H5Fopen in -lhdf5... " >&6; }
 if ${ac_cv_lib_hdf5_H5Fopen+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -36855,22 +36830,21 @@ else
   found_library=no
 fi
 
-    ac_ext=cpp
+      ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    succeeded=no
-    if test "$found_header" = yes; then
+      succeeded=no
+      if test "$found_header" = yes; then
         if test "$version_succeeded" = yes; then
-	   if test "$found_library" = yes; then
-              succeeded=yes
-	   fi
+          if test "$found_library" = yes; then
+            succeeded=yes
+          fi
         fi
-    fi
-
+      fi
     fi
     CFLAGS="$ac_HDF5_save_CFLAGS"
     CPPFLAGS="$ac_HDF5_save_CPPFLAGS"
@@ -36878,21 +36852,21 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     LIBS="$ac_HDF5_save_LIBS"
 
     if test "$succeeded" = no; then
-       if test "$is_package_required" = yes; then
-          as_fn_error $? "HDF5 not found.  Try either --with-hdf5 or setting HDF5_DIR." "$LINENO" 5
-       else
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: optional HDF5 library not found, or does not meet version requirements" >&5
+      if test "$is_package_required" = yes; then
+        as_fn_error $? "HDF5 not found.  Try either --with-hdf5 or setting HDF5_DIR." "$LINENO" 5
+      else
+         { $as_echo "$as_me:${as_lineno-$LINENO}: optional HDF5 library not found, or does not meet version requirements" >&5
 $as_echo "$as_me: optional HDF5 library not found, or does not meet version requirements" >&6;}
-       fi
+      fi
 
-       HDF5_CFLAGS=""
-       HDF5_CPPFLAGS=""
-       HDF5_LIBS=""
-       HDF5_FLIBS=""
-       HDF5_CXXLIBS=""
-       HDF5_PREFIX=""
+      HDF5_CFLAGS=""
+      HDF5_CPPFLAGS=""
+      HDF5_LIBS=""
+      HDF5_FLIBS=""
+      HDF5_CXXLIBS=""
+      HDF5_PREFIX=""
     else
-        HAVE_HDF5=1
+      HAVE_HDF5=1
 
 $as_echo "#define HAVE_HDF5 1" >>confdefs.h
 
@@ -36903,9 +36877,7 @@ $as_echo "#define HAVE_HDF5 1" >>confdefs.h
 
 
     fi
-
     #AC_SUBST(HAVE_HDF5)
-
 fi
 
 #AM_CONDITIONAL(HDF5_ENABLED,test x$HAVE_HDF5 = x1)
@@ -36941,10 +36913,10 @@ fi
 if test "${enable_netcdf+set}" = set; then :
   enableval=$enable_netcdf; case "${enableval}" in
                   yes|new|v4) enablenetcdf=yes; netcdfversion=4  ;;
-		      old|v3) enablenetcdf=yes; netcdfversion=3  ;;
-		          no) enablenetcdf=no;  netcdfversion=no ;;
- 		           *) as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
-		 esac
+                  old|v3) enablenetcdf=yes; netcdfversion=3  ;;
+                  no) enablenetcdf=no;  netcdfversion=no ;;
+                  *) as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
+                esac
 else
   enablenetcdf=$enableoptional; netcdfversion=4
 fi
@@ -36957,48 +36929,47 @@ fi
 
   case "${netcdfversion}" in
       3)
-          # The NETCDF API is distributed with libmesh, so we don't have to guess
-          # where it might be installed...
-	  NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
+        # The NETCDF API is distributed with libmesh, so we don't have to guess
+        # where it might be installed...
+        NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
 
-  	  # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-          # note this is maddness - we will run configure in the subdirectory v4, but not use it,
-          # so this is nothing more than a hedge against that failing.  we need it to work for
-          # 'make dist' to work
-	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
-	  ;;
+        # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+        # note this is maddness - we will run configure in the subdirectory v4, but not use it,
+        # so this is nothing more than a hedge against that failing.  we need it to work for
+        # 'make dist' to work
+        libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+        ;;
 
       4)
-	  NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
+        NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
-	  # building netcdf-4 requires that we support nested subpackages
-	  if (test "x$enablenested" = "xno"); then
-	      as_fn_error $? "NetCDF v4 requres nested subpackages, try --enable-nested" "$LINENO" 5
-	  fi
+        # building netcdf-4 requires that we support nested subpackages
+        if (test "x$enablenested" = "xno"); then
+          as_fn_error $? "NetCDF v4 requres nested subpackages, try --enable-nested" "$LINENO" 5
+        fi
 
-	  if (test "x$enablehdf5" = "xno"); then
-  	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
-	  fi
+        if (test "x$enablehdf5" = "xno"); then
+          # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+          libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+        fi
 
-	  # netcdf will install its own pkgconfig script, use this to get proper static linking
-	  libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
+        # netcdf will install its own pkgconfig script, use this to get proper static linking
+        libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
-	  ;;
+        ;;
 
       *)
-	  NETCDF_INCLUDE=""
-	  enablenetcdf=no
-	  ;;
+        NETCDF_INCLUDE=""
+        enablenetcdf=no
+        ;;
   esac
 
   ac_config_files="$ac_config_files contrib/netcdf/v3/Makefile"
@@ -37050,16 +37021,15 @@ fi
   # Check whether --enable-exodus was given.
 if test "${enable_exodus+set}" = set; then :
   enableval=$enable_exodus; case "${enableval}" in
-		  yes|new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
-		      old|v509)  enableexodus=yes; exodusversion="v5.09" ;;
-		            no)  enableexodus=no;  exodusversion=no ;;
- 		             *)  as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
-		 esac
+                  yes|new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
+                  old|v509)  enableexodus=yes; exodusversion="v5.09" ;;
+                  no)  enableexodus=no;  exodusversion=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
+                esac
 else
   enableexodus=$enablenetcdf ; exodusversion="v5.22"
 fi
  # if unspecified, depend on netcdf
-
 
   # fix for --disable-optional
   if (test "x$enableexodus" = "xno"); then
@@ -37077,51 +37047,49 @@ $as_echo "defining -DNOT_NETCDF4 for our Exodus build" >&6; }
   case "${exodusversion}" in
 
       "v5.09")
-          # The EXODUS API is distributed with libmesh, so we don't have to guess
-          # where it might be installed...
-	  EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/include"
+        # The EXODUS API is distributed with libmesh, so we don't have to guess
+        # where it might be installed...
+        EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/include"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
-	  # Exodus Fortran API requires new version
-	  enableexodusfortran=no
-	  ;;
+        # Exodus Fortran API requires new version
+        enableexodusfortran=no
+        ;;
 
       "v5.22")
-	  EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
+        EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
-	  # Check whether --enable-exodus-fortran was given.
+        # Check whether --enable-exodus-fortran was given.
 if test "${enable_exodus_fortran+set}" = set; then :
   enableval=$enable_exodus_fortran; case "${enableval}" in
-			    yes)  enableexodusfortran=yes; ;;
-                             no)  enableexodusfortran=no;  ;;
-                              *)  as_fn_error $? "bad value ${enableval} for --enable-exodus-fortran" "$LINENO" 5 ;;
-                         esac
+                        yes)  enableexodusfortran=yes; ;;
+                        no)  enableexodusfortran=no;  ;;
+                        *)  as_fn_error $? "bad value ${enableval} for --enable-exodus-fortran" "$LINENO" 5 ;;
+                      esac
 else
   enableexodusfortran=$enablefortran
 fi
 
 
-	  if (test "x$enableexodusfortran" = "xyes"); then
-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus Fortran API >>>" >&5
+        if (test "x$enableexodusfortran" = "xyes"); then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus Fortran API >>>" >&5
 $as_echo "<<< Configuring library with Exodus Fortran API >>>" >&6; }
-	  fi
-	  ;;
+        fi
+        ;;
 
       *)
-	  EXODUS_INCLUDE=""
-	  enableexodus=no
-	  enableexodusfortran=no
-	  ;;
+        EXODUS_INCLUDE=""
+        enableexodus=no
+        enableexodusfortran=no
+        ;;
   esac
-
-
 
   ac_config_files="$ac_config_files contrib/exodusii/v5.09/Makefile"
 
@@ -37174,11 +37142,11 @@ fi
   # Check whether --enable-nemesis was given.
 if test "${enable_nemesis+set}" = set; then :
   enableval=$enable_nemesis; case "${enableval}" in
-		  yes|new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
-		      old|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
-		            no) enablenemesis=no  ; nemesisversion=no ;;
- 		             *) as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
-		 esac
+                  yes|new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
+                  old|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
+                  no) enablenemesis=no  ; nemesisversion=no ;;
+                  *) as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
+                esac
 else
   enablenemesis=$enableexodus ; # if unspecified, depend on exodus
                  if (test "x$exodusversion" = "xv5.22"); then
@@ -37189,7 +37157,6 @@ else
 fi
 
 
-
   # Trump --enable-nemesis with --disable-mpi
   if (test "x$enablempi" = xno); then
     nemesisversion=no
@@ -37198,29 +37165,29 @@ fi
   case "${nemesisversion}" in
 
       "v3.09")
-	  # The NEMESIS API is distributed with libmesh, so we don't have to guess
-	  # where it might be installed...
-	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion"
+        # The NEMESIS API is distributed with libmesh, so we don't have to guess
+        # where it might be installed...
+        NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion"
 
 $as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
 
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
 $as_echo "<<< Configuring library with Nemesis version $nemesisversion support >>>" >&6; }
-	  ;;
+        ;;
 
       "v5.22")
-	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
+        NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
 
 $as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
 
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
 $as_echo "<<< Configuring library with Nemesis version $nemesisversion support >>>" >&6; }
-	  ;;
+        ;;
 
       *)
-	  NEMESIS_INCLUDE=""
-	  enablenemesis=no
-	  ;;
+        NEMESIS_INCLUDE=""
+        enablenemesis=no
+        ;;
   esac
 
   ac_config_files="$ac_config_files contrib/nemesis/v3.09/Makefile"
@@ -37270,15 +37237,13 @@ fi
   # Check whether --enable-libHilbert was given.
 if test "${enable_libHilbert+set}" = set; then :
   enableval=$enable_libHilbert; case "${enableval}" in
-		  yes)  enablelibhilbert=yes ;;
-		   no)  enablelibhilbert=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-libHilbert" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablelibhilbert=yes ;;
+                  no)  enablelibhilbert=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-libHilbert" "$LINENO" 5 ;;
+                esac
 else
   enablelibhilbert=$enableoptional
 fi
-
-
 
 
       if (test $enablelibhilbert = yes); then
@@ -37743,10 +37708,10 @@ ac_config_files="$ac_config_files contrib/fparser/extrasrc/Makefile"
 # Check whether --enable-cppunit was given.
 if test "${enable_cppunit+set}" = set; then :
   enableval=$enable_cppunit; case "${enableval}" in
-		  yes)  enablecppunit=yes ;;
-		   no)  enablecppunit=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-cppunit" "$LINENO" 5 ;;
-		 esac
+                yes)  enablecppunit=yes ;;
+                no)  enablecppunit=no ;;
+                *)  as_fn_error $? "bad value ${enableval} for --enable-cppunit" "$LINENO" 5 ;;
+              esac
 else
   enablecppunit=$enableoptional
 fi
@@ -37913,15 +37878,13 @@ fi
   # Check whether --enable-nanoflann was given.
 if test "${enable_nanoflann+set}" = set; then :
   enableval=$enable_nanoflann; case "${enableval}" in
-		  yes)  enablenanoflann=yes ;;
-		   no)  enablenanoflann=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-nanoflann" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablenanoflann=yes ;;
+                  no)  enablenanoflann=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-nanoflann" "$LINENO" 5 ;;
+                esac
 else
   enablenanoflann=$enableoptional
 fi
-
-
 
 
   # The NANOFLANN API is distributed with libmesh, so we don't have to guess
