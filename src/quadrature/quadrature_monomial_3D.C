@@ -81,7 +81,7 @@ void QMonomial::init_3D(const ElemType type_in,
 
               // Convenient intermediate values.
               const Real sqrt19 = std::sqrt(19.L);
-              const Real tp     = std::sqrt(71440.L + 6802.L*sqrt19);
+              const Real tp     = std::sqrt(71440 + 6802*sqrt19);
 
               // Point data for permutations.
               const Real eta    =  0.00000000000000000000000000000000e+00L;
@@ -102,13 +102,13 @@ void QMonomial::init_3D(const ElemType type_in,
               // with the {lambda,xi} (resp {gamma,mu}) permutation.  The single-precision
               // results reported by Stroud are given for reference.
 
-              const Real A      = 32.0L / 19.0L;
+              const Real A      = Real(32)/19;
               // Stroud: 0.21052632  * 8.0 = 1.684210560;
 
-              const Real B      = 1.L / ( 260072.L/133225.L  - 1520*sqrt19/133225.L + (133.L - 37.L*sqrt19)*tp/133225.L );
+              const Real B      = Real(1) / (Real(260072)/133225  - 1520*sqrt19/133225 + (133 - 37*sqrt19)*tp/133225);
               // 5.4498735127757671684690782180890e-01L; // Stroud: 0.068123420 * 8.0 = 0.544987360;
 
-              const Real C      = 1.L / ( 260072.L/133225.L  - 1520*sqrt19/133225.L - (133.L - 37.L*sqrt19)*tp/133225.L );
+              const Real C      = Real(1) / (Real(260072)/133225  - 1520*sqrt19/133225 - (133 - 37*sqrt19)*tp/133225);
               // 5.0764422766979170420572375713840e-01L; // Stroud: 0.063455527 * 8.0 = 0.507644216;
 
               _points.resize(13);
@@ -177,10 +177,6 @@ void QMonomial::init_3D(const ElemType type_in,
             } // end case FOURTH,FIFTH
 
 
-// Tabulated-in-double-precision rules aren't accurate enough for
-// higher precision, so fall back on Gauss
-#if !defined(LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
-    !defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
           case SIXTH:
           case SEVENTH:
             {
@@ -227,17 +223,17 @@ void QMonomial::init_3D(const ElemType type_in,
                 r  = std::sqrt(6.L/7.L),
                 s  = std::sqrt((960.L - 3.L*std::sqrt(28798.L)) / 2726.L),
                 t  = std::sqrt((960.L + 3.L*std::sqrt(28798.L)) / 2726.L),
-                B1 = 8624.L / 29160.L,
-                B2 = 2744.L / 29160.L,
-                B3 = 8.L*(774.L*t*t - 230.L)/(9720.L*(t*t-s*s)),
-                B4 = 8.L*(230.L - 774.L*s*s)/(9720.L*(t*t-s*s));
+                B1 = Real(8624)/29160,
+                B2 = Real(2744)/29160,
+                B3 = 8*(774*t*t - 230)/(9720*(t*t-s*s)),
+                B4 = 8*(230 - 774*s*s)/(9720*(t*t-s*s));
 
               const Real data[4][4] =
                 {
-                  {r, 0.L, 0.L, B1},
-                  {r,   r, 0.L, B2},
-                  {s,   s,   s, B3},
-                  {t,   t,   t, B4}
+                  {r,  0,  0, B1},
+                  {r,  r,  0, B2},
+                  {s,  s,  s, B3},
+                  {t,  t,  t, B4}
                 };
 
               const unsigned int rule_id[4] = {
@@ -308,7 +304,6 @@ void QMonomial::init_3D(const ElemType type_in,
               kim_rule(data, rule_id, 5);
               return;
             } // end case EIGHTH
-#endif
 
 
             // By default: construct and use a Gauss quadrature rule

@@ -62,8 +62,8 @@ void QGaussLobatto::init_1D(const ElemType,
         _points[1]    = 0.0L;
         _points[2]    = -_points[0];
 
-        _weights[0]   = 1.0L / 3.0L;
-        _weights[1]   = 4.0L / 3.0L;
+        _weights[0]   = Real(1)/3;
+        _weights[1]   = Real(4)/3;
         _weights[2]   = _weights[0];
         return;
       }
@@ -81,8 +81,8 @@ void QGaussLobatto::init_1D(const ElemType,
         _points[ 2]    = -_points[1];
         _points[ 3]    = -_points[0];
 
-        _weights[ 0]   = 1.0L/6.0L;
-        _weights[ 1]   = 5.0L/6.0L;
+        _weights[ 0]   = Real(1)/6;
+        _weights[ 1]   = Real(5)/6;
         _weights[ 2]   = _weights[1];
         _weights[ 3]   = _weights[0];
 
@@ -103,9 +103,9 @@ void QGaussLobatto::init_1D(const ElemType,
         _points[ 3]    = -_points[1];
         _points[ 4]    = -_points[0];
 
-        _weights[ 0]   = 1.0L/10.0L;
-        _weights[ 1]   = 49.0L/90.0L;
-        _weights[ 2]   = 32.0L/45.0L;
+        _weights[ 0]   = 0.1;
+        _weights[ 1]   = Real(49)/90;
+        _weights[ 2]   = Real(32)/45;
         _weights[ 3]   = _weights[1];
         _weights[ 4]   = _weights[0];
 

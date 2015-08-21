@@ -73,7 +73,7 @@ void QGauss::init_3D(const ElemType type_in,
               _points[0](1) = .25;
               _points[0](2) = .25;
 
-              _weights[0] = .1666666666666666666666666666666666666666666667L;
+              _weights[0] = Real(1)/6;
 
               return;
             }
@@ -105,7 +105,7 @@ void QGauss::init_3D(const ElemType type_in,
 
 
 
-              _weights[0] = .0416666666666666666666666666666666666666666667;
+              _weights[0] = Real(1)/24;
               _weights[1] = _weights[0];
               _weights[2] = _weights[0];
               _weights[3] = _weights[0];
@@ -139,23 +139,23 @@ void QGauss::init_3D(const ElemType type_in,
                   _points[0](2) = .25;
 
                   _points[1](0) = .5;
-                  _points[1](1) = .16666666666666666666666666666666666666666667;
-                  _points[1](2) = .16666666666666666666666666666666666666666667;
+                  _points[1](1) = Real(1)/6;
+                  _points[1](2) = Real(1)/6;
 
-                  _points[2](0) = .16666666666666666666666666666666666666666667;
+                  _points[2](0) = Real(1)/6;
                   _points[2](1) = .5;
-                  _points[2](2) = .16666666666666666666666666666666666666666667;
+                  _points[2](2) = Real(1)/6;
 
-                  _points[3](0) = .16666666666666666666666666666666666666666667;
-                  _points[3](1) = .16666666666666666666666666666666666666666667;
+                  _points[3](0) = Real(1)/6;
+                  _points[3](1) = Real(1)/6;
                   _points[3](2) = .5;
 
-                  _points[4](0) = .16666666666666666666666666666666666666666667;
-                  _points[4](1) = .16666666666666666666666666666666666666666667;
-                  _points[4](2) = .16666666666666666666666666666666666666666667;
+                  _points[4](0) = Real(1)/6;
+                  _points[4](1) = Real(1)/6;
+                  _points[4](2) = Real(1)/6;
 
 
-                  _weights[0] = -.133333333333333333333333333333333333333333333;
+                  _weights[0] = Real(-2)/15;
                   _weights[1] = .075;
                   _weights[2] = _weights[1];
                   _weights[3] = _weights[1];
@@ -297,7 +297,7 @@ void QGauss::init_3D(const ElemType type_in,
 
               //       {
               // const Real a = 0.;
-              // const Real b = 0.333333333333333333333333333333333333333;
+              // const Real b = Real(1)/3;
 
               // _points[1](0) = a;
               // _points[1](1) = b;
@@ -316,8 +316,8 @@ void QGauss::init_3D(const ElemType type_in,
               // _points[4](2) = b;
               //       }
               //       {
-              // const Real a = 0.7272727272727272727272727272727272727272727272727272727;
-              // const Real b = 0.0909090909090909090909090909090909090909090909090909091;
+              // const Real a = Real(8)/11;
+              // const Real b = Real(1)/11;
 
               // _points[5](0) = a;
               // _points[5](1) = b;
