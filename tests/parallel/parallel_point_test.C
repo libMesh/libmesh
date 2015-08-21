@@ -15,6 +15,8 @@ class ParallelPointTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( ParallelPointTest );
 
+  CPPUNIT_TEST( testAllGatherPoint );
+  CPPUNIT_TEST( testAllGatherPairRealPoint );
   CPPUNIT_TEST( testBroadcastVectorValueInt );
   CPPUNIT_TEST( testBroadcastVectorValueReal );
   CPPUNIT_TEST( testBroadcastPoint );
@@ -31,6 +33,49 @@ public:
 
   void tearDown()
   {}
+
+
+
+  void testAllGatherPoint()
+  {
+    std::vector<Point> vals;
+    Real myrank = TestCommWorld->rank();
+    TestCommWorld->allgather(Point(myrank, myrank+0.25, myrank+0.5),vals);
+
+    const std::size_t comm_size = TestCommWorld->size();
+    const std::size_t vec_size  = vals.size();
+    CPPUNIT_ASSERT_EQUAL( comm_size, vec_size );
+    for (processor_id_type i=0; i<vals.size(); i++)
+      {
+        Real theirrank = i;
+        CPPUNIT_ASSERT_EQUAL( theirrank,      vals[i](0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.25, vals[i](1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,  vals[i](2) );
+      }
+  }
+
+
+
+  void testAllGatherPairRealPoint()
+  {
+    std::vector<std::pair<Real, Point> > vals;
+    Real myrank = TestCommWorld->rank();
+    TestCommWorld->allgather
+      (std::make_pair(myrank+0.75, Point(myrank, myrank+0.25, myrank+0.5)), vals);
+
+    const std::size_t comm_size = TestCommWorld->size();
+    const std::size_t vec_size  = vals.size();
+    CPPUNIT_ASSERT_EQUAL( comm_size, vec_size );
+
+    for (processor_id_type i=0; i<vals.size(); i++)
+      {
+        Real theirrank = i;
+        CPPUNIT_ASSERT_EQUAL( theirrank,      vals[i].second(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.25, vals[i].second(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,  vals[i].second(2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.75, vals[i].first );
+      }
+  }
 
 
 
