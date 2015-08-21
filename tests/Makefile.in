@@ -55,18 +55,21 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@	fparser/autodiff.C
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
-	$(am__EXEEXT_4) $(am__EXEEXT_5)
-noinst_PROGRAMS = $(am__EXEEXT_6)
+	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
+noinst_PROGRAMS = $(am__EXEEXT_7)
 @LIBMESH_OPT_MODE_TRUE@am__append_2 = unit_tests-opt
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
-# others segfault and/or hang.
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_4 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_5 = unit_tests-devel
-@LIBMESH_PROF_MODE_TRUE@am__append_6 = unit_tests-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_7 = unit_tests-oprof
+# others segfault and/or hang.  By default we will not run
+# GLIBCXX-debugging builds with cppunit unless specificallly
+# configured to.
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_4 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_5 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_6 = unit_tests-devel
+@LIBMESH_PROF_MODE_TRUE@am__append_7 = unit_tests-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_8 = unit_tests-oprof
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/run_unit_tests.sh.in $(top_srcdir)/build-aux/depcomp
@@ -119,11 +122,12 @@ CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES = run_unit_tests.sh
 CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
-@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
-@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_6 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_3 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_4 = unit_tests-devel$(EXEEXT)
+@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-prof$(EXEEXT)
+@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_6 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C geom/node_test.C \

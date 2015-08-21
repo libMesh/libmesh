@@ -943,6 +943,8 @@ CODE_COVERAGE_ENABLED_TRUE
 HAVE_GCOV_TOOLS
 GCOV_FLAGS
 have_gcov
+LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE
+LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE
 HAVE_CXX11
@@ -1073,6 +1075,7 @@ with_f77
 enable_cxx11
 enable_sanitize
 enable_glibcxx_debugging
+enable_glibcxx_debugging_cppunit
 enable_coverage
 with_methods
 enable_static
@@ -1855,6 +1858,8 @@ Optional Features:
   --disable-glibcxx-debugging
                           omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even
                           in dbg mode
+  --enable-glibcxx-debugging-cppunit
+                          Use GLIBCXX debugging flags for unit tests
   --enable-coverage       configure code coverage analysis tools
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -7118,6 +7123,31 @@ $as_echo "<<< Disabling GLIBCXX debugging on Darwin >>>" >&6; }
 else
   LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE='#'
   LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE=
+fi
+
+
+
+  # GLIBCXX-specific debugging flags conflict with cppunit on many of
+  # our users' systems.  However, being able to override this allows
+  # us to increase our unit test coverage.
+  # Check whether --enable-glibcxx-debugging-cppunit was given.
+if test "${enable_glibcxx_debugging_cppunit+set}" = set; then :
+  enableval=$enable_glibcxx_debugging_cppunit; case "${enableval}" in
+	   yes)  enableglibcxxdebuggingcppunit=yes ;;
+	    no)  enableglibcxxdebuggingcppunit=no ;;
+ 	     *)  as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging-cppunit" "$LINENO" 5 ;;
+	  esac
+else
+  enableglibcxxdebuggingcppunit=no
+fi
+
+
+   if test x$enableglibcxxdebuggingcppunit = xyes; then
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE=
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE='#'
+else
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE='#'
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE=
 fi
 
 
@@ -38278,6 +38308,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE}" && test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GLIBCXX_DEBUGGING\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE}" && test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CODE_COVERAGE_ENABLED_TRUE}" && test -z "${CODE_COVERAGE_ENABLED_FALSE}"; then
