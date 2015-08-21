@@ -1226,7 +1226,7 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase &mesh)
 
       const Elem* parent = elem->parent();
 
-      if (ip && parent)
+      if (ip && (ip != remote_elem) && parent)
         {
           libmesh_assert_equal_to (ip->top_parent(),
                                    elem->top_parent()->interior_parent());
