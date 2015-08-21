@@ -31,6 +31,7 @@ unit_tests_sources = \
 	numerics/type_vector_test.h \
 	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
+	parallel/parallel_point_test.C \
 	quadrature/quadrature_test.C \
         systems/equation_systems_test.C \
 	utils/vectormap_test.C
