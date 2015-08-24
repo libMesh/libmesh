@@ -36,18 +36,41 @@ namespace Parallel {
 
 #ifndef NDEBUG
 #define libmesh_assert_mpi_success(error_code) \
-  do { \
-    if (error_code != MPI_SUCCESS) \
-      { \
-        char error_string[MPI_MAX_ERROR_STRING+1]; \
-        int resultlen; \
-        MPI_Error_string(error_code, error_string, &resultlen); \
-        libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS, error_string); \
-      } \
+  do \
+    { \
+      if (error_code != MPI_SUCCESS) \
+        { \
+          char libmesh_mpi_error_string[MPI_MAX_ERROR_STRING+1]; \
+          int libmesh_mpi_error_string_len; \
+          MPI_Error_string(error_code, libmesh_mpi_error_string, \
+                           &libmesh_mpi_error_string_len); \
+          libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS, \
+                                      libmesh_mpi_error_string); \
+        } \
     } \
   while(0)
+
+// Only catch MPI return values when asserts are active.
+#define libmesh_call_mpi(mpi_call) \
+  do \
+    { \
+      unsigned int libmesh_mpi_error_code = \
+        mpi_call; \
+      libmesh_assert_mpi_success (libmesh_mpi_error_code); \
+    } \
+  while(0)
+
 #else
+
 #define libmesh_assert_mpi_success(error_code)  ((void) 0)
+
+#define libmesh_call_mpi(mpi_call) \
+  do \
+    { \
+      mpi_call; \
+    } \
+  while(0)
+
 #endif
 
 #define STANDARD_TYPE(cxxtype,mpitype)                                  \
@@ -149,21 +172,42 @@ public:
 
     MPI_Aint displs[2];
 #if MPI_VERSION > 1
-    MPI_Get_address (const_cast<T1*>(&example->first), &displs[0]);
-    MPI_Get_address (const_cast<T2*>(&example->second), &displs[1]);
+
+    libmesh_call_mpi
+      (MPI_Get_address (const_cast<T1*>(&example->first),
+                        &displs[0]));
+    libmesh_call_mpi
+      (MPI_Get_address (const_cast<T2*>(&example->second),
+                        &displs[1]));
+
 #else
-    MPI_Address (const_cast<T1*>(&example->first), &displs[0]);
-    MPI_Address (const_cast<T2*>(&example->second), &displs[1]);
+
+    libmesh_call_mpi
+      (MPI_Address (const_cast<T1*>(&example->first), &displs[0]));
+
+    libmesh_call_mpi
+      (MPI_Address (const_cast<T2*>(&example->second), &displs[1]));
+
 #endif
     displs[1] -= displs[0];
     displs[0] = 0;
 
 #if MPI_VERSION > 1
-    MPI_Type_create_struct (2, blocklengths, displs, types, &_datatype);
+
+    libmesh_call_mpi
+      (MPI_Type_create_struct (2, blocklengths, displs, types,
+                               &_datatype));
+
 #else
-    MPI_Type_struct (2, blocklengths, displs, types, &_datatype);
+
+    libmesh_call_mpi
+      (MPI_Type_struct (2, blocklengths, displs, types, &_datatype));
+
 #endif // #if MPI_VERSION > 1
-    MPI_Type_commit (&_datatype);
+
+    libmesh_call_mpi
+      (MPI_Type_commit (&_datatype));
+
 #endif // LIBMESH_HAVE_MPI
   }
 
@@ -260,27 +304,33 @@ inline void send_receive_vec_of_vec
   int packedsize=0, sendsize=0;
 
   // The outer buffer size
-  MPI_Pack_size (1,
-                 libMesh::Parallel::StandardType<unsigned int>(),
-                 comm.get(),
-                 &packedsize);
+  libmesh_call_mpi
+    (MPI_Pack_size (1,
+                    libMesh::Parallel::StandardType<unsigned int>(),
+                    comm.get(),
+                    &packedsize));
+
   sendsize += packedsize;
 
   for (std::size_t i=0; i<send.size(); i++)
     {
       // The size of the ith inner buffer
-      MPI_Pack_size (1,
-                     libMesh::Parallel::StandardType<unsigned int>(),
-                     comm.get(),
-                     &packedsize);
+      libmesh_call_mpi
+        (MPI_Pack_size (1,
+                        libMesh::Parallel::StandardType<unsigned int>(),
+                        comm.get(),
+                        &packedsize));
+
       sendsize += packedsize;
 
       // The data for each inner buffer
-      MPI_Pack_size (libMesh::cast_int<int>(send[i].size()),
-                     libMesh::Parallel::StandardType<T1>
-                     (send[i].empty() ? NULL : &send[i][0]),
-                     comm.get(),
-                     &packedsize);
+      libmesh_call_mpi
+        (MPI_Pack_size (libMesh::cast_int<int>(send[i].size()),
+                        libMesh::Parallel::StandardType<T1>
+                        (send[i].empty() ? NULL : &send[i][0]),
+                        comm.get(),
+                        &packedsize));
+
       sendsize += packedsize;
     }
 
@@ -292,24 +342,32 @@ inline void send_receive_vec_of_vec
 
   // ... the size of the outer buffer
   sendsize = libMesh::cast_int<int>(send.size());
-  MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-            &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-            comm.get());
+
+  libmesh_call_mpi
+    (MPI_Pack (&sendsize, 1,
+               libMesh::Parallel::StandardType<unsigned int>(),
+               &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()),
+               &pos, comm.get()));
 
   for (std::size_t i=0; i<send.size(); i++)
     {
       // ... the size of the ith inner buffer
       sendsize = libMesh::cast_int<int>(send[i].size());
-      MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-                &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-                comm.get());
+
+      libmesh_call_mpi
+        (MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
+                   &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
+                   comm.get()));
 
       // ... the contents of the ith inner buffer
       if (!send[i].empty())
-        MPI_Pack (&send[i][0], libMesh::cast_int<int>(send[i].size()),
-                  libMesh::Parallel::StandardType<T1>(&send[i][0]),
-                  &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-                  comm.get());
+        libmesh_call_mpi
+          (MPI_Pack (&send[i][0],
+                     libMesh::cast_int<int>(send[i].size()),
+                     libMesh::Parallel::StandardType<T1>(&send[i][0]),
+                     &sendbuf[0],
+                     libMesh::cast_int<int>(sendbuf.size()), &pos,
+                     comm.get()));
     }
 
   libmesh_assert_equal_to (static_cast<unsigned int>(pos), sendbuf.size());
@@ -323,28 +381,35 @@ inline void send_receive_vec_of_vec
   // Unpack the received buffer
   libmesh_assert (!recvbuf.empty());
   pos=0;
-  MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-              &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-              comm.get());
+  libmesh_call_mpi
+    (MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
+                 &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
+                 comm.get()));
 
   // ... size the outer buffer
   recv.resize (sendsize);
 
   for (std::size_t i=0; i<recv.size(); i++)
     {
-      MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-                  &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-                  comm.get());
+      libmesh_call_mpi
+        (MPI_Unpack (&recvbuf[0],
+                     libMesh::cast_int<int>(recvbuf.size()), &pos,
+                     &sendsize, 1,
+                     libMesh::Parallel::StandardType<unsigned int>(),
+                     comm.get()));
 
       // ... size the inner buffer
       recv[i].resize (sendsize);
 
       // ... unpack the inner buffer if it is not empty
       if (!recv[i].empty())
-        MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-                    &recv[i][0], libMesh::cast_int<int>(recv[i].size()),
-                    libMesh::Parallel::StandardType<T2>(&recv[i][0]),
-                    comm.get());
+        libmesh_call_mpi
+          (MPI_Unpack (&recvbuf[0],
+                       libMesh::cast_int<int>(recvbuf.size()), &pos,
+                       &recv[i][0],
+                       libMesh::cast_int<int>(recv[i].size()),
+                       libMesh::Parallel::StandardType<T2>(&recv[i][0]),
+                       comm.get()));
     }
 
   request.wait();
@@ -514,7 +579,9 @@ inline Communicator::~Communicator () {
 inline void Communicator::split(int color, int key, Communicator &target) const {
   target.clear();
   MPI_Comm newcomm;
-  MPI_Comm_split(this->get(), color, key, &newcomm);
+  libmesh_call_mpi
+    (MPI_Comm_split(this->get(), color, key, &newcomm));
+
   target.assign(newcomm);
   target.send_mode(this->send_mode());
 }
@@ -533,7 +600,9 @@ inline void Communicator::duplicate(const Communicator &comm) {
 inline void Communicator::duplicate(const communicator &comm) {
   if (_communicator != MPI_COMM_NULL)
     {
-      MPI_Comm_dup(comm, &_communicator);
+      libmesh_call_mpi
+        (MPI_Comm_dup(comm, &_communicator));
+
       _I_duped_it = true;
     }
   this->assign(_communicator);
@@ -547,7 +616,9 @@ inline void Communicator::clear() {
   if (_I_duped_it)
     {
       libmesh_assert (_communicator != MPI_COMM_NULL);
-      MPI_Comm_free(&_communicator);
+      libmesh_call_mpi
+        (MPI_Comm_free(&_communicator));
+
       _communicator = MPI_COMM_NULL;
     }
   _I_duped_it = false;
@@ -581,11 +652,15 @@ inline void Communicator::assign(const communicator &comm)
   if (_communicator != MPI_COMM_NULL)
     {
       int i;
-      MPI_Comm_size(_communicator, &i);
+      libmesh_call_mpi
+        (MPI_Comm_size(_communicator, &i));
+
       libmesh_assert_greater_equal (i, 0);
       _size = static_cast<unsigned int>(i);
 
-      MPI_Comm_rank(_communicator, &i);
+      libmesh_call_mpi
+        (MPI_Comm_rank(_communicator, &i));
+
       libmesh_assert_greater_equal (i, 0);
       _rank = static_cast<unsigned int>(i);
     }
@@ -655,7 +730,10 @@ inline int Status::tag () const
 inline unsigned int Status::size (const data_type &type) const
 {
   int msg_size;
-  MPI_Get_count (const_cast<MPI_Status*>(&_status), type, &msg_size);
+  libmesh_call_mpi
+    (MPI_Get_count (const_cast<MPI_Status*>(&_status), type,
+                    &msg_size));
+
   libmesh_assert_greater_equal (msg_size, 0);
   return msg_size;
 }
@@ -760,7 +838,8 @@ inline Status Request::wait ()
 
   Status stat;
 #ifdef LIBMESH_HAVE_MPI
-  MPI_Wait (&_request, stat.get());
+  libmesh_call_mpi
+    (MPI_Wait (&_request, stat.get()));
 #endif
   if (post_wait_work)
     for (std::vector<PostWaitWork*>::iterator i =
@@ -784,9 +863,9 @@ inline bool Request::test ()
 #ifdef LIBMESH_HAVE_MPI
   int val=0;
 
-  MPI_Test (&_request,
-            &val,
-            MPI_STATUS_IGNORE);
+  libmesh_call_mpi
+    (MPI_Test (&_request, &val, MPI_STATUS_IGNORE));
+
   if (val)
     {
       libmesh_assert          (_request == MPI_REQUEST_NULL);
@@ -804,9 +883,8 @@ inline bool Request::test (status &stat)
 {
   int val=0;
 
-  MPI_Test (&_request,
-            &val,
-            &stat);
+  libmesh_call_mpi
+    (MPI_Test (&_request, &val, &stat));
 
   return val;
 }
@@ -852,7 +930,8 @@ inline void Communicator::barrier () const
     {
       START_LOG("barrier()", "Parallel");
 
-      MPI_Barrier (this->get());
+      libmesh_call_mpi
+        (MPI_Barrier (this->get()));
 
       STOP_LOG("barrier()", "Parallel");
     }
@@ -1420,12 +1499,9 @@ inline void Communicator::min(T &r) const
       START_LOG("min(scalar)", "Parallel");
 
       T temp = r;
-      MPI_Allreduce (&temp,
-                     &r,
-                     1,
-                     StandardType<T>(&temp),
-                     MPI_MIN,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp), MPI_MIN,
+                        this->get()));
 
       STOP_LOG("min(scalar)", "Parallel");
     }
@@ -1440,12 +1516,12 @@ inline void Communicator::min(bool &r) const
 
       unsigned int tempsend = r;
       unsigned int temp;
-      MPI_Allreduce (&tempsend,
-                     &temp,
-                     1,
-                     StandardType<unsigned int>(),
-                     MPI_MIN,
-                     this->get());
+
+      libmesh_call_mpi
+        (MPI_Allreduce (&tempsend, &temp, 1, 
+                        StandardType<unsigned int>(), MPI_MIN,
+                        this->get()));
+
       r = temp;
 
       STOP_LOG("min(bool)", "Parallel");
@@ -1463,12 +1539,10 @@ inline void Communicator::min(std::vector<T> &r) const
       libmesh_assert(this->verify(r.size()));
 
       std::vector<T> temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size()),
-                     StandardType<T>(&temp[0]),
-                     MPI_MIN,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
+                        StandardType<T>(&temp[0]), MPI_MIN,
+                        this->get()));
 
       STOP_LOG("min(vector)", "Parallel");
     }
@@ -1486,12 +1560,11 @@ inline void Communicator::min(std::vector<bool> &r) const
       std::vector<unsigned int> ruint;
       pack_vector_bool(r, ruint);
       std::vector<unsigned int> temp(ruint.size());
-      MPI_Allreduce (&ruint[0],
-                     &temp[0],
-                     cast_int<int>(ruint.size()),
-                     StandardType<unsigned int>(),
-                     MPI_BAND,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&ruint[0], &temp[0],
+                        cast_int<int>(ruint.size()),
+                        StandardType<unsigned int>(), MPI_BAND,
+                        this->get()));
       unpack_vector_bool(temp, r);
 
       STOP_LOG("min(vector<bool>)", "Parallel");
@@ -1511,12 +1584,9 @@ inline void Communicator::minloc(T &r,
       in.val = r;
       in.rank = this->rank();
       DataPlusInt<T> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<T>(),
-                     MPI_MINLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in, &out, 1, dataplusint_type<T>(),
+                        MPI_MINLOC, this->get()));
       r = out.val;
       min_id = out.rank;
 
@@ -1538,12 +1608,9 @@ inline void Communicator::minloc(bool &r,
       in.val = r;
       in.rank = this->rank();
       DataPlusInt<int> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<int>(),
-                     MPI_MINLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in, &out, 1, dataplusint_type<int>(),
+                        MPI_MINLOC, this->get()));
       r = out.val;
       min_id = out.rank;
 
@@ -1571,12 +1638,10 @@ inline void Communicator::minloc(std::vector<T> &r,
           in[i].rank = this->rank();
         }
       std::vector<DataPlusInt<T> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     dataplusint_type<T>(),
-                     MPI_MINLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+                        dataplusint_type<T>(), MPI_MINLOC,
+                        this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = out[i].val;
@@ -1609,12 +1674,10 @@ inline void Communicator::minloc(std::vector<bool> &r,
           in[i].rank = this->rank();
         }
       std::vector<DataPlusInt<int> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     StandardType<int>(),
-                     MPI_MINLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+                        StandardType<int>(), MPI_MINLOC,
+                        this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = out[i].val;
@@ -1639,12 +1702,9 @@ inline void Communicator::max(T &r) const
       START_LOG("max(scalar)", "Parallel");
 
       T temp;
-      MPI_Allreduce (&r,
-                     &temp,
-                     1,
-                     StandardType<T>(&r),
-                     MPI_MAX,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&r, &temp, 1, StandardType<T>(&r), MPI_MAX,
+                        this->get()));
       r = temp;
 
       STOP_LOG("max(scalar)", "Parallel");
@@ -1660,12 +1720,10 @@ inline void Communicator::max(bool &r) const
 
       unsigned int tempsend = r;
       unsigned int temp;
-      MPI_Allreduce (&tempsend,
-                     &temp,
-                     1,
-                     StandardType<unsigned int>(),
-                     MPI_MAX,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&tempsend, &temp, 1,
+                        StandardType<unsigned int>(), MPI_MAX,
+                        this->get()));
       r = temp;
 
       STOP_LOG("max(bool)", "Parallel");
@@ -1683,12 +1741,10 @@ inline void Communicator::max(std::vector<T> &r) const
       libmesh_assert(this->verify(r.size()));
 
       std::vector<T> temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size()),
-                     StandardType<T>(&temp[0]),
-                     MPI_MAX,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
+                        StandardType<T>(&temp[0]), MPI_MAX,
+                        this->get()));
 
       STOP_LOG("max(vector)", "Parallel");
     }
@@ -1706,12 +1762,11 @@ inline void Communicator::max(std::vector<bool> &r) const
       std::vector<unsigned int> ruint;
       pack_vector_bool(r, ruint);
       std::vector<unsigned int> temp(ruint.size());
-      MPI_Allreduce (&ruint[0],
-                     &temp[0],
-                     cast_int<int>(ruint.size()),
-                     StandardType<unsigned int>(),
-                     MPI_BOR,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&ruint[0], &temp[0],
+                        cast_int<int>(ruint.size()),
+                        StandardType<unsigned int>(), MPI_BOR,
+                        this->get()));
       unpack_vector_bool(temp, r);
 
       STOP_LOG("max(vector<bool>)", "Parallel");
@@ -1731,12 +1786,9 @@ inline void Communicator::maxloc(T &r,
       in.val = r;
       in.rank = this->rank();
       DataPlusInt<T> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<T>(),
-                     MPI_MAXLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in, &out, 1, dataplusint_type<T>(),
+                        MPI_MAXLOC, this->get()));
       r = out.val;
       max_id = out.rank;
 
@@ -1758,12 +1810,9 @@ inline void Communicator::maxloc(bool &r,
       in.val = r;
       in.rank = this->rank();
       DataPlusInt<int> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<int>(),
-                     MPI_MAXLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in, &out, 1, dataplusint_type<int>(),
+                        MPI_MAXLOC, this->get()));
       r = out.val;
       max_id = out.rank;
 
@@ -1791,12 +1840,10 @@ inline void Communicator::maxloc(std::vector<T> &r,
           in[i].rank = this->rank();
         }
       std::vector<DataPlusInt<T> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     dataplusint_type<T>(),
-                     MPI_MAXLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+                        dataplusint_type<T>(), MPI_MAXLOC,
+                        this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = out[i].val;
@@ -1829,12 +1876,10 @@ inline void Communicator::maxloc(std::vector<bool> &r,
           in[i].rank = this->rank();
         }
       std::vector<DataPlusInt<int> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     StandardType<int>(),
-                     MPI_MAXLOC,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+                        StandardType<int>(), MPI_MAXLOC,
+                        this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = out[i].val;
@@ -1859,12 +1904,9 @@ inline void Communicator::sum(T &r) const
       START_LOG("sum()", "Parallel");
 
       T temp = r;
-      MPI_Allreduce (&temp,
-                     &r,
-                     1,
-                     StandardType<T>(&temp),
-                     MPI_SUM,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp), MPI_SUM,
+                        this->get()));
 
       STOP_LOG("sum()", "Parallel");
     }
@@ -1881,12 +1923,10 @@ inline void Communicator::sum(std::vector<T> &r) const
       libmesh_assert(this->verify(r.size()));
 
       std::vector<T> temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size()),
-                     StandardType<T>(&temp[0]),
-                     MPI_SUM,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
+                        StandardType<T>(&temp[0]), MPI_SUM,
+                        this->get()));
 
       STOP_LOG("sum()", "Parallel");
     }
@@ -1903,12 +1943,9 @@ inline void Communicator::sum(std::complex<T> &r) const
       START_LOG("sum()", "Parallel");
 
       std::complex<T> temp(r);
-      MPI_Allreduce (&temp,
-                     &r,
-                     2,
-                     StandardType<T>(),
-                     MPI_SUM,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp, &r, 2, StandardType<T>(), MPI_SUM,
+                        this->get()));
 
       STOP_LOG("sum()", "Parallel");
     }
@@ -1925,12 +1962,9 @@ inline void Communicator::sum(std::vector<std::complex<T> > &r) const
       libmesh_assert(this->verify(r.size()));
 
       std::vector<std::complex<T> > temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size() * 2),
-                     StandardType<T>(NULL),
-                     MPI_SUM,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size() * 2),
+                        StandardType<T>(NULL), MPI_SUM, this->get()));
 
       STOP_LOG("sum()", "Parallel");
     }
@@ -1988,10 +2022,8 @@ inline status Communicator::probe (const unsigned int src_processor_id,
 
   status stat;
 
-  MPI_Probe (src_processor_id,
-             tag.value(),
-             this->get(),
-             &stat);
+  libmesh_call_mpi
+    (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));
 
   STOP_LOG("probe()", "Parallel");
 
@@ -2009,19 +2041,14 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Ssend : MPI_Send) (dataptr,
-                            cast_int<int>(buf.size()),
-                            StandardType<T>(dataptr),
-                            dest_processor_id,
-                            tag.value(),
-                            this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Ssend : MPI_Send) (dataptr,
+                             cast_int<int>(buf.size()),
+                             StandardType<T>(dataptr),
+                             dest_processor_id,
+                             tag.value(),
+                             this->get()));
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2038,20 +2065,15 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Issend : MPI_Isend) (dataptr,
-                              cast_int<int>(buf.size()),
-                              StandardType<T>(dataptr),
-                              dest_processor_id,
-                              tag.value(),
-                              this->get(),
-                              req.get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Issend : MPI_Isend) (dataptr,
+                               cast_int<int>(buf.size()),
+                               StandardType<T>(dataptr),
+                               dest_processor_id,
+                               tag.value(),
+                               this->get(),
+                               req.get()));
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2067,19 +2089,14 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T* dataptr = &buf;
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Ssend : MPI_Send) (dataptr,
-                            1,
-                            StandardType<T>(dataptr),
-                            dest_processor_id,
-                            tag.value(),
-                            this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Ssend : MPI_Send) (dataptr,
+                             1,
+                             StandardType<T>(dataptr),
+                             dest_processor_id,
+                             tag.value(),
+                             this->get()));
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2096,20 +2113,15 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T* dataptr = &buf;
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Issend : MPI_Isend) (dataptr,
-                              1,
-                              StandardType<T>(dataptr),
-                              dest_processor_id,
-                              tag.value(),
-                              this->get(),
-                              req.get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Issend : MPI_Isend) (dataptr,
+                               1,
+                               StandardType<T>(dataptr),
+                               dest_processor_id,
+                               tag.value(),
+                               this->get(),
+                               req.get()));
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2211,19 +2223,14 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   START_LOG("send()", "Parallel");
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Ssend : MPI_Send) (buf.empty() ? NULL : &buf[0],
-                            cast_int<int>(buf.size()),
-                            type,
-                            dest_processor_id,
-                            tag.value(),
-                            this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Ssend : MPI_Send) (buf.empty() ? NULL : &buf[0],
+                             cast_int<int>(buf.size()),
+                             type,
+                             dest_processor_id,
+                             tag.value(),
+                             this->get()));
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2239,20 +2246,15 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   START_LOG("send()", "Parallel");
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Issend : MPI_Isend) (buf.empty() ? NULL : &buf[0],
-                              cast_int<int>(buf.size()),
-                              type,
-                              dest_processor_id,
-                              tag.value(),
-                              this->get(),
-                              req.get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Issend : MPI_Isend) (buf.empty() ? NULL : &buf[0],
+                               cast_int<int>(buf.size()),
+                               type,
+                               dest_processor_id,
+                               tag.value(),
+                               this->get(),
+                               req.get()));
 
   STOP_LOG("send()", "Parallel");
 }
@@ -2407,18 +2409,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   // datatype so we can later query the size
   Status stat(this->probe(src_processor_id, tag), StandardType<T>(&buf));
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Recv (&buf,
-              1,
-              StandardType<T>(&buf),
-              src_processor_id,
-              tag.value(),
-              this->get(),
-              stat.get());
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Recv (&buf, 1, StandardType<T>(&buf), src_processor_id,
+               tag.value(), this->get(), stat.get()));
 
   STOP_LOG("receive()", "Parallel");
 
@@ -2435,18 +2428,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 {
   START_LOG("receive()", "Parallel");
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Irecv (&buf,
-               1,
-               StandardType<T>(&buf),
-               src_processor_id,
-               tag.value(),
-               this->get(),
-               req.get());
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Irecv (&buf, 1, StandardType<T>(&buf), src_processor_id,
+                tag.value(), this->get(), req.get()));
 
   STOP_LOG("receive()", "Parallel");
 }
@@ -2571,18 +2555,10 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   // Use stat.source() and stat.tag() in the receive - if
   // src_processor_id is or tag is "any" then we want to be sure we
   // try to receive the same message we just probed.
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Recv (buf.empty() ? NULL : &buf[0],
-              cast_int<int>(buf.size()),
-              type,
-              stat.source(),
-              stat.tag(),
-              this->get(),
-              stat.get());
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Recv (buf.empty() ? NULL : &buf[0],
+               cast_int<int>(buf.size()), type, stat.source(),
+               stat.tag(), this->get(), stat.get()));
 
   libmesh_assert_equal_to (stat.size(), buf.size());
 
@@ -2602,18 +2578,10 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 {
   START_LOG("receive()", "Parallel");
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Irecv (buf.empty() ? NULL : &buf[0],
-               cast_int<int>(buf.size()),
-               type,
-               src_processor_id,
-               tag.value(),
-               this->get(),
-               req.get());
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Irecv (buf.empty() ? NULL : &buf[0],
+                cast_int<int>(buf.size()), type, src_processor_id,
+                tag.value(), this->get(), req.get()));
 
   STOP_LOG("receive()", "Parallel");
 }
@@ -2728,12 +2696,11 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
       return;
     }
 
-  MPI_Sendrecv(&sendvec, 1, StandardType<T1>(&sendvec),
-               dest_processor_id, send_tag.value(),
-               &recv, 1, StandardType<T2>(&recv),
-               source_processor_id, recv_tag.value(),
-               this->get(),
-               MPI_STATUS_IGNORE);
+  libmesh_call_mpi
+    (MPI_Sendrecv(&sendvec, 1, StandardType<T1>(&sendvec),
+                  dest_processor_id, send_tag.value(), &recv, 1,
+                  StandardType<T2>(&recv), source_processor_id,
+                  recv_tag.value(), this->get(), MPI_STATUS_IGNORE));
 
   STOP_LOG("send_receive()", "Parallel");
 }
@@ -2876,14 +2843,10 @@ inline void Communicator::gather(const unsigned int root_id,
 
       StandardType<T> send_type(&sendval);
 
-      MPI_Gather(&sendval,
-                 1,
-                 send_type,
-                 recv.empty() ? NULL : &recv[0],
-                 1,
-                 send_type,
-                 root_id,
-                 this->get());
+      libmesh_call_mpi
+        (MPI_Gather(&sendval, 1, send_type,
+                    recv.empty() ? NULL : &recv[0], 1, send_type,
+                    root_id, this->get()));
 
       STOP_LOG("gather()", "Parallel");
     }
@@ -2940,17 +2903,11 @@ inline void Communicator::gather(const unsigned int root_id,
     r.resize(globalsize);
 
   // and get the data from the remote processors
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, StandardType<T>(),
-                 r.empty() ? NULL : &r[0], &sendlengths[0],
-                 &displacements[0], StandardType<T>(),
-                 root_id,
-                 this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize,
+                  StandardType<T>(), r.empty() ? NULL : &r[0],
+                  &sendlengths[0], &displacements[0],
+                  StandardType<T>(), root_id, this->get()));
 
   STOP_LOG("gather()", "Parallel");
 }
@@ -2970,13 +2927,9 @@ inline void Communicator::allgather(T sendval,
     {
       StandardType<T> send_type(&sendval);
 
-      MPI_Allgather (&sendval,
-                     1,
-                     send_type,
-                     &recv[0],
-                     1,
-                     send_type,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allgather (&sendval, 1, send_type, &recv[0], 1,
+                        send_type, this->get()));
     }
   else if (comm_size > 0)
     recv[0] = sendval;
@@ -3007,13 +2960,10 @@ inline void Communicator::allgather
       r_src.swap(r);
       StandardType<T> send_type(&r_src[0]);
 
-      MPI_Allgather (&r_src[0],
-                     cast_int<int>(r_src.size()),
-                     send_type,
-                     &r[0],
-                     cast_int<int>(r_src.size()),
-                     send_type,
-                     this->get());
+      libmesh_call_mpi
+        (MPI_Allgather (&r_src[0], cast_int<int>(r_src.size()),
+                        send_type, &r[0], cast_int<int>(r_src.size()),
+                        send_type, this->get()));
       // libmesh_assert(this->verify(r));
       STOP_LOG("allgather()", "Parallel");
       return;
@@ -3050,15 +3000,10 @@ inline void Communicator::allgather
 
   // and get the data from the remote processors.
   // Pass NULL if our vector is empty.
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, send_type,
-                    &r[0], &sendlengths[0],
-                    &displacements[0], send_type, this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize,
+                     send_type, &r[0], &sendlengths[0],
+                     &displacements[0], send_type, this->get()));
 
   STOP_LOG("allgather()", "Parallel");
 }
@@ -3151,18 +3096,9 @@ inline void Communicator::alltoall(std::vector<T> &buf) const
 
   StandardType<T> send_type(&tmp[0]);
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Alltoall (&tmp[0],
-                  size_per_proc,
-                  send_type,
-                  &buf[0],
-                  size_per_proc,
-                  send_type,
-                  this->get());
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Alltoall (&tmp[0], size_per_proc, send_type, &buf[0],
+                   size_per_proc, send_type, this->get()));
 
   STOP_LOG("alltoall()", "Parallel");
 }
@@ -3184,13 +3120,9 @@ inline void Communicator::broadcast (T &data, const unsigned int root_id) const
   START_LOG("broadcast()", "Parallel");
 
   // Spread data to remote processors.
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Bcast (&data, 1, StandardType<T>(&data), root_id, this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Bcast (&data, 1, StandardType<T>(&data), root_id,
+                this->get()));
 
   STOP_LOG("broadcast()", "Parallel");
 }
@@ -3215,13 +3147,9 @@ inline void Communicator::broadcast (bool &data, const unsigned int root_id) con
   char char_data = data;
 
   // Spread data to remote processors.
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Bcast (&char_data, 1, StandardType<char>(&char_data), root_id, this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Bcast (&char_data, 1, StandardType<char>(&char_data),
+                root_id, this->get()));
 
   data = char_data;
 
@@ -3289,14 +3217,9 @@ inline void Communicator::broadcast (std::vector<T> &data,
   // Pass NULL if our vector is empty.
   T *data_ptr = data.empty() ? NULL : &data[0];
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Bcast (data_ptr, cast_int<int>(data.size()),
-               StandardType<T>(data_ptr), root_id, this->get());
-
-  libmesh_assert_mpi_success (ierr);
+  libmesh_call_mpi
+    (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
+                StandardType<T>(data_ptr), root_id, this->get()));
 
   STOP_LOG("broadcast()", "Parallel");
 }
