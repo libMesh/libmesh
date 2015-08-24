@@ -941,6 +941,7 @@ METHODS
 CODE_COVERAGE_ENABLED_FALSE
 CODE_COVERAGE_ENABLED_TRUE
 HAVE_GCOV_TOOLS
+GCOV_LDFLAGS
 GCOV_FLAGS
 have_gcov
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE
@@ -7677,7 +7678,7 @@ fi
       gcov coverage testing tool not found. Please install or update
       your PATH accordingly prior to enabling code coverage features.
 
-         " "$LINENO" 5
+      " "$LINENO" 5
    fi
 
    # ----------------------------------
@@ -7685,7 +7686,11 @@ fi
    # ----------------------------------
 
    HAVE_GCOV_TOOLS=1
-   GCOV_FLAGS="--coverage"
+   GCOV_FLAGS="-fprofile-arcs -ftest-coverage --coverage"
+   GCOV_LDFLAGS="--coverage -lgcov"
+
+   ac_coverage_save_LDFLAGS="$LDFLAGS"
+   LDFLAGS="${LDFLAGS} ${GCOV_LDFLAGS}"
 
    # Test for C...
 
@@ -7733,6 +7738,7 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
    CXXFLAGS="${GCOV_FLAGS} ${CXXFLAGS}"
+   LIBS="-lgcov ${LIBS}"
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -7786,6 +7792,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 fi
+
 
 
 
