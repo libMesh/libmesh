@@ -150,9 +150,6 @@ FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
 CONTAINER_TYPE(std::set);
 CONTAINER_TYPE(std::vector);
 
-// We'd love to do a singleton pattern on derived data types, rather
-// than commit, free, commit, free, ad infinitum... but it's a
-// little tricky when our T1 and T2 are undefined.
 template<typename T1, typename T2>
 class StandardType<std::pair<T1, T2> > : public DataType
 {
@@ -162,56 +159,69 @@ public:
     // We need an example for MPI_Address to use
     libmesh_assert(example);
 
-#ifdef LIBMESH_HAVE_MPI
-    // Get the sub-data-types, and make sure they live long enough
-    // to construct the derived type
-    StandardType<T1> d1(&example->first);
-    StandardType<T2> d2(&example->second);
-    MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
-    int blocklengths[] = {1,1};
+    // _static_type never gets freed, but it only gets committed once
+    // per T, so it's not a *huge* memory leak...
+    static data_type _static_type;
+    static bool _is_initialized = false;
 
-    MPI_Aint displs[2];
+    if (!_is_initialized)
+      {
+#ifdef LIBMESH_HAVE_MPI
+         // Get the sub-data-types, and make sure they live long enough
+         // to construct the derived type
+         StandardType<T1> d1(&example->first);
+         StandardType<T2> d2(&example->second);
+         MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
+         int blocklengths[] = {1,1};
+
+         MPI_Aint displs[2];
 #if MPI_VERSION > 1
 
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<T1*>(&example->first),
-                        &displs[0]));
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<T2*>(&example->second),
-                        &displs[1]));
+         libmesh_call_mpi
+           (MPI_Get_address (const_cast<T1*>(&example->first),
+                             &displs[0]));
+         libmesh_call_mpi
+           (MPI_Get_address (const_cast<T2*>(&example->second),
+                             &displs[1]));
 
 #else
 
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T1*>(&example->first), &displs[0]));
+         libmesh_call_mpi
+           (MPI_Address (const_cast<T1*>(&example->first), &displs[0]));
 
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T2*>(&example->second), &displs[1]));
+         libmesh_call_mpi
+           (MPI_Address (const_cast<T2*>(&example->second), &displs[1]));
 
 #endif
-    displs[1] -= displs[0];
-    displs[0] = 0;
+         displs[1] -= displs[0];
+         displs[0] = 0;
 
 #if MPI_VERSION > 1
 
-    libmesh_call_mpi
-      (MPI_Type_create_struct (2, blocklengths, displs, types,
-                               &_datatype));
+         libmesh_call_mpi
+           (MPI_Type_create_struct (2, blocklengths, displs, types,
+                                    &_static_type));
 
 #else
 
-    libmesh_call_mpi
-      (MPI_Type_struct (2, blocklengths, displs, types, &_datatype));
+         libmesh_call_mpi
+           (MPI_Type_struct (2, blocklengths, displs, types, &_static_type));
 
 #endif // #if MPI_VERSION > 1
 
-    libmesh_call_mpi
-      (MPI_Type_commit (&_datatype));
+         libmesh_call_mpi
+           (MPI_Type_commit (&_static_type));
 
 #endif // LIBMESH_HAVE_MPI
+
+        _is_initialized = true;
+      }
+
+    _datatype = _static_type;
   }
 
-  ~StandardType() { this->free(); }
+  // Make sure not to free our singleton
+  ~StandardType() {}
 };
 
 template<typename T>
