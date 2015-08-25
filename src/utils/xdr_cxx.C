@@ -400,6 +400,7 @@ bool Xdr::is_eof()
     case ENCODE:
     case DECODE:
       {
+#ifdef LIBMESH_HAVE_XDR
         libmesh_assert(fp);
 
         // Are we already at eof?
@@ -425,6 +426,16 @@ bool Xdr::is_eof()
         // We didn't see EOF; restore whatever we did see.
         ungetc(next, fp);
         break;
+#else
+
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
+
+        return false;
+
+#endif
+
       }
     case READ:
       {
