@@ -16,6 +16,7 @@ public:
   CPPUNIT_TEST_SUITE( ParallelPointTest );
 
   CPPUNIT_TEST( testAllGatherPoint );
+  CPPUNIT_TEST( testAllGatherPairPointPoint );
   CPPUNIT_TEST( testAllGatherPairRealPoint );
   CPPUNIT_TEST( testBroadcastVectorValueInt );
   CPPUNIT_TEST( testBroadcastVectorValueReal );
@@ -54,6 +55,30 @@ public:
       }
   }
 
+
+
+  void testAllGatherPairPointPoint()
+  {
+    std::vector<std::pair<Point, Point> > vals;
+    Real myrank = TestCommWorld->rank();
+    TestCommWorld->allgather
+      (std::make_pair(Point(myrank, myrank+0.125, myrank+0.25), Point(myrank+0.5, myrank+0.625, myrank+0.75)), vals);
+
+    const std::size_t comm_size = TestCommWorld->size();
+    const std::size_t vec_size  = vals.size();
+    CPPUNIT_ASSERT_EQUAL( comm_size, vec_size );
+
+    for (processor_id_type i=0; i<vals.size(); i++)
+      {
+        Real theirrank = i;
+        CPPUNIT_ASSERT_EQUAL( theirrank,       vals[i].first(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.125, vals[i].first(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.25,  vals[i].first(2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,   vals[i].second(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.625, vals[i].second(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+0.75,  vals[i].second(2) );
+      }
+  }
 
 
   void testAllGatherPairRealPoint()
