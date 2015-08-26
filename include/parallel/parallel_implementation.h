@@ -34,45 +34,6 @@ namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
-#ifndef NDEBUG
-#define libmesh_assert_mpi_success(error_code) \
-  do \
-    { \
-      if (error_code != MPI_SUCCESS) \
-        { \
-          char libmesh_mpi_error_string[MPI_MAX_ERROR_STRING+1]; \
-          int libmesh_mpi_error_string_len; \
-          MPI_Error_string(error_code, libmesh_mpi_error_string, \
-                           &libmesh_mpi_error_string_len); \
-          libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS, \
-                                      libmesh_mpi_error_string); \
-        } \
-    } \
-  while(0)
-
-// Only catch MPI return values when asserts are active.
-#define libmesh_call_mpi(mpi_call) \
-  do \
-    { \
-      unsigned int libmesh_mpi_error_code = \
-        mpi_call; \
-      libmesh_assert_mpi_success (libmesh_mpi_error_code); \
-    } \
-  while(0)
-
-#else
-
-#define libmesh_assert_mpi_success(error_code)  ((void) 0)
-
-#define libmesh_call_mpi(mpi_call) \
-  do \
-    { \
-      mpi_call; \
-    } \
-  while(0)
-
-#endif
-
 #define STANDARD_TYPE(cxxtype,mpitype)                                  \
   template<>                                                            \
   class StandardType<cxxtype> : public DataType                         \
