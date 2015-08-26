@@ -294,6 +294,8 @@ public:
 #ifdef LIBMESH_HAVE_MPI
   DataType (const DataType &other, unsigned int count)
   {
+    // FIXME - if we nest an inner type here will we run into bug
+    // https://github.com/libMesh/libmesh/issues/631 again?
     MPI_Type_contiguous(count, other._datatype, &_datatype);
     this->commit();
   }

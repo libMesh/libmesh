@@ -124,55 +124,79 @@ public:
     // per T, so it's not a *huge* memory leak...
     static data_type _static_type;
     static bool _is_initialized = false;
-
     if (!_is_initialized)
       {
 #ifdef LIBMESH_HAVE_MPI
-         // Get the sub-data-types, and make sure they live long enough
-         // to construct the derived type
-         StandardType<T1> d1(&example->first);
-         StandardType<T2> d2(&example->second);
-         MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
-         int blocklengths[] = {1,1};
 
-         MPI_Aint displs[2];
-#if MPI_VERSION > 1
+        // Get the sub-data-types, and make sure they live long enough
+        // to construct the derived type
+        StandardType<T1> d1(&example->first);
+        StandardType<T2> d2(&example->second);
 
-         libmesh_call_mpi
-           (MPI_Get_address (const_cast<T1*>(&example->first),
-                             &displs[0]));
-         libmesh_call_mpi
-           (MPI_Get_address (const_cast<T2*>(&example->second),
-                             &displs[1]));
+#if MPI_VERSION == 1
 
+        // Use MPI_LB and MPI_UB here to workaround potential bugs from
+        // nested MPI_LB and MPI_UB in the specifications of d1 and/or d2:
+        // https://github.com/libMesh/libmesh/issues/631
+        MPI_Datatype types[] = { MPI_LB, (data_type)d1, (data_type)d2, MPI_UB };
+        int blocklengths[] = {1,1,1,1};
+        MPI_Aint displs[4];
+
+        libmesh_call_mpi
+          (MPI_Address (const_cast<std::pair<T1,T2>*>(example),
+                        &displs[0]));
+        libmesh_call_mpi
+          (MPI_Address (const_cast<T1*>(&example->first),
+                        &displs[1]));
+        libmesh_call_mpi
+          (MPI_Address (const_cast<T2*>(&example->second),
+                        &displs[2]));
+        libmesh_call_mpi
+          (MPI_Address (const_cast<std::pair<T1,T2>*>(example+1),
+                        &displs[3]));
+
+        displs[1] -= displs[0];
+        displs[2] -= displs[0];
+        displs[3] -= displs[0];
+        displs[0] = 0;
+
+        libmesh_call_mpi
+          (MPI_Type_struct (4, blocklengths, displs, types,
+                            &_static_type));
 #else
+        MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
+        int blocklengths[] = {1,1};
+        MPI_Aint displs[2], start;
 
-         libmesh_call_mpi
-           (MPI_Address (const_cast<T1*>(&example->first), &displs[0]));
+        libmesh_call_mpi
+          (MPI_Get_address (const_cast<std::pair<T1,T2>*>(example),
+                            &start));
+        libmesh_call_mpi
+          (MPI_Get_address (const_cast<T1*>(&example->first),
+                            &displs[0]));
+        libmesh_call_mpi
+          (MPI_Get_address (const_cast<T2*>(&example->second),
+                            &displs[1]));
+        displs[0] -= start;
+        displs[1] -= start;
 
-         libmesh_call_mpi
-           (MPI_Address (const_cast<T2*>(&example->second), &displs[1]));
+        // create a prototype structure
+        MPI_Datatype tmptype;
+        libmesh_call_mpi
+          (MPI_Type_create_struct (2, blocklengths, displs, types,
+                                   &tmptype));
+        libmesh_call_mpi
+          (MPI_Type_commit (&tmptype));
 
-#endif
-         displs[1] -= displs[0];
-         displs[0] = 0;
-
-#if MPI_VERSION > 1
-
-         libmesh_call_mpi
-           (MPI_Type_create_struct (2, blocklengths, displs, types,
+        // resize the structure type to account for padding, if any
+        libmesh_call_mpi
+          (MPI_Type_create_resized (tmptype, 0,
+                                    sizeof(std::pair<T1,T2>),
                                     &_static_type));
+#endif
 
-#else
-
-         libmesh_call_mpi
-           (MPI_Type_struct (2, blocklengths, displs, types, &_static_type));
-
-#endif // #if MPI_VERSION > 1
-
-         libmesh_call_mpi
-           (MPI_Type_commit (&_static_type));
-
+        libmesh_call_mpi
+          (MPI_Type_commit (&_static_type));
 #endif // LIBMESH_HAVE_MPI
 
         _is_initialized = true;
