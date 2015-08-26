@@ -2320,9 +2320,20 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   std::size_t total_buffer_size =
     Parallel::packed_range_size(context, range_begin, range_end);
 
-  Request intermediate_req = request();
-  this->send(dest_processor_id, total_buffer_size, intermediate_req, tag);
+  // That local variable will be gone soon; we need a send buffer that
+  // will stick around.  I heard you like buffering so I put a buffer
+  // for your buffer size so you can buffer the size of your buffer.
+  std::size_t *total_buffer_size_buffer = new std::size_t;
+  *total_buffer_size_buffer = total_buffer_size;
 
+  // Delete the buffer size's buffer when we're done
+  Request intermediate_req = request();
+  intermediate_req.add_post_wait_work
+    (new Parallel::PostWaitDeleteBuffer<std::size_t>(total_buffer_size_buffer));
+  this->send(dest_processor_id, *total_buffer_size_buffer, intermediate_req, tag);
+
+  // And don't finish up the full request until we're done with its
+  // dependencies
   req.add_prior_request(intermediate_req);
 
 #ifdef DEBUG
