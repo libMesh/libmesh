@@ -1954,7 +1954,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                                              const MeshBase& cross_section,
                                              const unsigned int nz,
-                                             RealVectorValue extrusion_vector)
+                                             RealVectorValue extrusion_vector,
+                                             QueryElemSubdomainIDBase * elem_subdomain)
 {
   if (!cross_section.n_elem())
     return;
@@ -2136,8 +2137,12 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           new_elem->set_id(elem->id() + (k * orig_elem));
           new_elem->processor_id() = elem->processor_id();
 
-          // maintain the subdomain_id
-          new_elem->subdomain_id() = elem->subdomain_id();
+          if (!elem_subdomain)
+            // maintain the subdomain_id
+            new_elem->subdomain_id() = elem->subdomain_id();
+          else
+            // Allow the user to choose new subdomain_ids
+            new_elem->subdomain_id() = elem_subdomain->get_subdomain_for_layer(elem, k);
 
           new_elem = mesh.add_elem(new_elem);
 
