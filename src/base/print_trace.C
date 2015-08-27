@@ -140,7 +140,7 @@ bool gdb_backtrace(std::ostream &out_stream)
           command << gdb_command
                   << " -p "
                   << this_pid
-                  << " -batch -ex bt 2>/dev/null 1>"
+                  << " -batch -ex bt -ex detach 2>/dev/null 1>"
                   << temp_file;
           exit_status = std::system(command.str().c_str());
         }
