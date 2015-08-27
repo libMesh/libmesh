@@ -193,7 +193,7 @@ void ElemCutter::find_intersection_points(const Elem &elem,
           if ( (d_star > endpoint_tol) &&
                (d_star < (1.-endpoint_tol)) )
             {
-              const Point x_star = (edge->point(0)*(1.-d_star) +
+              const Point x_star = (edge->point(0)*(1-d_star) +
                                     edge->point(1)*d_star);
 
               std::cout << "adding cut point (d_star, x_star) = "

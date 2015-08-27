@@ -49,9 +49,9 @@ public:
     for (processor_id_type i=0; i<vals.size(); i++)
       {
         Real theirrank = i;
-        CPPUNIT_ASSERT_EQUAL( theirrank,      vals[i](0) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.25, vals[i](1) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,  vals[i](2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank,            vals[i](0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.25), vals[i](1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.5),  vals[i](2) );
       }
   }
 
@@ -71,12 +71,12 @@ public:
     for (processor_id_type i=0; i<vals.size(); i++)
       {
         Real theirrank = i;
-        CPPUNIT_ASSERT_EQUAL( theirrank,       vals[i].first(0) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.125, vals[i].first(1) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.25,  vals[i].first(2) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,   vals[i].second(0) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.625, vals[i].second(1) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.75,  vals[i].second(2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank,             vals[i].first(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.125), vals[i].first(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.25),  vals[i].first(2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.5),   vals[i].second(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.625), vals[i].second(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.75),  vals[i].second(2) );
       }
   }
 
@@ -86,7 +86,7 @@ public:
     std::vector<std::pair<Real, Point> > vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
-      (std::make_pair(myrank+0.75, Point(myrank, myrank+0.25, myrank+0.5)), vals);
+      (std::make_pair(Real(myrank+0.75), Point(myrank, myrank+0.25, myrank+0.5)), vals);
 
     const std::size_t comm_size = TestCommWorld->size();
     const std::size_t vec_size  = vals.size();
@@ -95,10 +95,10 @@ public:
     for (processor_id_type i=0; i<vals.size(); i++)
       {
         Real theirrank = i;
-        CPPUNIT_ASSERT_EQUAL( theirrank,      vals[i].second(0) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.25, vals[i].second(1) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.5,  vals[i].second(2) );
-        CPPUNIT_ASSERT_EQUAL( theirrank+0.75, vals[i].first );
+        CPPUNIT_ASSERT_EQUAL( theirrank,            vals[i].second(0) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.25), vals[i].second(1) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.5),  vals[i].second(2) );
+        CPPUNIT_ASSERT_EQUAL( theirrank+Real(0.75), vals[i].first );
       }
   }
 
