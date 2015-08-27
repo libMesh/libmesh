@@ -183,7 +183,11 @@ void print_trace(std::ostream &out_stream)
   // demangling, and they include line numbers!  If the GDB backtrace
   // fails, for example if your system does not have GDB, fall back to
   // calling backtrace().
-  bool gdb_worked = gdb_backtrace(out_stream);
+  bool gdb_worked = false;
+
+  // Let the user disable GDB backtraces with a command line option.
+  if (!libMesh::on_command_line("--no-gdb-backtrace"))
+    gdb_worked = gdb_backtrace(out_stream);
 
   // This part requires that your compiler at least supports
   // backtraces.  Demangling is also nice, but it will still run
