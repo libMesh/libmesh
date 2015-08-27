@@ -8,11 +8,14 @@ AC_MSG_RESULT(---------------------------------------------)
 
 
 # -------------------------------------------------------------
-# gdb backtrace command-- default "gdb"
+# gdb backtrace command -- default "gdb"
+#
+# Note: if you want to completely disable GDB backtraces, configure
+# libmesh with --without-gdb-command.
 # -------------------------------------------------------------
 AC_ARG_WITH([gdb-command],
     AS_HELP_STRING([--with-gdb-command=commandname],
-                          [command to invoke gdb]),
+                   [Specify command to invoke gdb.  Use --without-gdb-command to disable GDB backtraces.]),
     [gdb_command="$withval"],
     [gdb_command="gdb"])
 
