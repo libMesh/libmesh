@@ -19,6 +19,7 @@ unit_tests_sources = \
 	mesh/boundary_mesh.C \
 	mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C \
 	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \

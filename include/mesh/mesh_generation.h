@@ -151,6 +151,8 @@ void build_delaunay_square(UnstructuredMesh& mesh,
 class QueryElemSubdomainIDBase
 {
 public:
+  virtual ~QueryElemSubdomainIDBase() {}
+
   virtual subdomain_id_type get_subdomain_for_layer(const Elem * old_elem, unsigned int layer) = 0;
 };
 
