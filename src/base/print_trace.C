@@ -140,7 +140,7 @@ bool gdb_backtrace(std::ostream &out_stream)
           command << gdb_command
                   << " -p "
                   << this_pid
-                  << " -batch -ex bt 2>/dev/null 1>"
+                  << " -batch -ex bt -ex detach 2>/dev/null 1>"
                   << temp_file;
           exit_status = std::system(command.str().c_str());
         }
@@ -183,7 +183,13 @@ void print_trace(std::ostream &out_stream)
   // demangling, and they include line numbers!  If the GDB backtrace
   // fails, for example if your system does not have GDB, fall back to
   // calling backtrace().
-  bool gdb_worked = gdb_backtrace(out_stream);
+  bool gdb_worked = false;
+
+  // Let the user disable GDB backtraces by configuring with
+  // --without-gdb-command or with a command line option.
+  if (std::string(LIBMESH_GDB_COMMAND) != std::string("no") &&
+      !libMesh::on_command_line("--no-gdb-backtrace"))
+    gdb_worked = gdb_backtrace(out_stream);
 
   // This part requires that your compiler at least supports
   // backtraces.  Demangling is also nice, but it will still run
