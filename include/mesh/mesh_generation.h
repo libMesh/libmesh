@@ -37,6 +37,7 @@ namespace libMesh
 // forward declarations
 class MeshBase;
 class UnstructuredMesh;
+class Elem;
 
 
 
@@ -52,6 +53,10 @@ namespace MeshTools
  */
 namespace Generation
 {
+
+// forward declaration
+class QueryElemSubdomainIDBase;
+
 /**
  * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
  * Defaults to a unit cube (or line in 1D, square in 2D),
@@ -121,7 +126,8 @@ void build_sphere (UnstructuredMesh& mesh,
 void build_extrusion (UnstructuredMesh& mesh,
                       const MeshBase& cross_section,
                       const unsigned int nz,
-                      RealVectorValue extrusion_vector);
+                      RealVectorValue extrusion_vector,
+                      QueryElemSubdomainIDBase * elem_subdomain = NULL);
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 /**
@@ -137,6 +143,18 @@ void build_delaunay_square(UnstructuredMesh& mesh,
                            const ElemType type,
                            const std::vector<TriangleInterface::Hole*>* holes=NULL);
 #endif // #define LIBMESH_HAVE_TRIANGLE
+
+/**
+ * Class for receiving the callback during extrusion generation and providing user-defined
+ * subdomains based on the old (existing) element id and the current layer.
+ */
+class QueryElemSubdomainIDBase
+{
+public:
+  virtual ~QueryElemSubdomainIDBase() {}
+
+  virtual subdomain_id_type get_subdomain_for_layer(const Elem * old_elem, unsigned int layer) = 0;
+};
 
 } // end namespace Meshtools::Generation
 } // end namespace MeshTools
