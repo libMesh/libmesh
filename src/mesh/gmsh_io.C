@@ -20,6 +20,8 @@
 #include <set>
 #include <cstring> // std::memcpy
 #include <numeric>
+#include <vector>
+#include <algorithm>
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -158,6 +160,7 @@ void GmshIO::read_mesh(std::istream& in)
   // some variables
   int format=0, size=0;
   Real version = 1.0;
+  std::vector <int> lower_dimensional_blocks;
 
   // map to hold the node numbers for translation
   // note the the nodes can be non-consecutive
@@ -199,6 +202,35 @@ void GmshIO::read_mesh(std::istream& in)
               if (format)
                 libmesh_error_msg("Error: Unknown data format for mesh in Gmsh reader.");
             }
+
+          // look for a lower-dimensional block
+          else if (s.find("$PhysicalNames") == static_cast<std::string::size_type>(0))
+                          {
+                              std::string subdomain_id;
+                              size_t pos = 0;
+                              unsigned int num_physical_groups = 0;
+                              in >> num_physical_groups;
+
+                              for (unsigned int i=0; i<num_physical_groups; ++i)
+                              {
+                                std::getline(in, s);
+                                if(s.find("lower_dimensional_block") != std::string::npos)
+                                {
+                                    // we except the right MSH ASCII file format : "physical-dimension physical-number..."
+                                    pos = s.find(" ");
+                                    subdomain_id=s.substr(0, pos);
+                                    s.erase(0, pos+1);
+                                    pos = s.find(" ");
+                                    if (pos==0)libmesh_error_msg("Error: More than one space between the physical-dimension and the physical-number.");
+                                    subdomain_id=s.substr(0, pos);
+
+                                    std::istringstream buffer(subdomain_id);
+                                    int value;
+                                    buffer >> value;
+                                    lower_dimensional_blocks.push_back(value);
+                                }
+                               }
+                             }
 
           // read the node block
           else if (s.find("$NOD") == static_cast<std::string::size_type>(0) ||
@@ -429,7 +461,7 @@ void GmshIO::read_mesh(std::istream& in)
                       {
                         Elem* elem = *it;
 
-                        if (elem->dim() < max_elem_dimension_seen)
+                        if (elem->dim() < max_elem_dimension_seen && find(lower_dimensional_blocks.begin(), lower_dimensional_blocks.end(), elem->subdomain_id())==lower_dimensional_blocks.end())
                           {
                             // Debugging status
                             // libMesh::out << "Processing Elem " << elem->id() << " as a boundary element." << std::endl;
@@ -536,7 +568,7 @@ void GmshIO::read_mesh(std::istream& in)
                       {
                         Elem* elem = *it;
 
-                        if (elem->dim() < max_elem_dimension_seen)
+                        if (elem->dim() < max_elem_dimension_seen && find(lower_dimensional_blocks.begin(), lower_dimensional_blocks.end(), elem->subdomain_id())==lower_dimensional_blocks.end())
                           mesh.delete_elem(elem);
                       }
                   } // end 3rd loop over active elements
