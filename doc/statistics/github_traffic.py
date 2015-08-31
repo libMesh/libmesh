@@ -1060,7 +1060,8 @@ month_intervals = ['2014-Feb-17',
                    '2015-Apr-17',
                    '2015-May-17',
                    '2015-Jun-17',
-                   '2015-Jul-17']
+                   '2015-Jul-17',
+                   '2015-Aug-17']
 
 # Find the indexes of each date
 month_indexes = []
@@ -1083,12 +1084,10 @@ ax1 = fig.add_subplot(111)
 ax1.plot(x_axis, month_views, 'bo-')
 ax1.set_ylabel('Monthly page views (blue circles)')
 
-# For an odd number of months, include a middle tick mark, otherwise just
-# label the endpoints.
-n_months = len(x_axis)
-x_axis_ticks = [0, len(x_axis)-1]
-if n_months % 2 != 0:
-  x_axis_ticks.insert(1, n_months/2)
+# Place an x-axis tick mark every x_step months.  As we get more data,
+# we'll have to increase x_step.
+x_step = 4
+x_axis_ticks = range(0, len(x_axis), x_step)
 
 # Set tick labels and positions
 ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
