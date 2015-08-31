@@ -161,7 +161,16 @@ void GmshIO::read_mesh(std::istream& in)
 
   // Keep track of lower-dimensional blocks which are not BCs, but
   // actually blocks of lower-dimensional elements.
-  std::set<unsigned> lower_dimensional_blocks;
+  std::set<subdomain_id_type> lower_dimensional_blocks;
+
+  // Mapping from physical id -> (physical dim, physical name) pairs.
+  // These can refer to either "sidesets" or "subdomains"; we need to
+  // wait until the Mesh has been read to know which is which.  Note
+  // that we are using 'int' as the key here rather than
+  // subdomain_id_type or boundary_id_type, since at this point, it
+  // could be either.
+  typedef std::pair<unsigned, std::string> GmshPhysical;
+  std::map<int, GmshPhysical> gmsh_physicals;
 
   // map to hold the node numbers for translation
   // note the the nodes can be non-consecutive
@@ -204,7 +213,7 @@ void GmshIO::read_mesh(std::istream& in)
                 libmesh_error_msg("Error: Unknown data format for mesh in Gmsh reader.");
             }
 
-          // look for a lower-dimensional block
+          // Read and process the "PhysicalNames" section.
           else if (s.find("$PhysicalNames") == static_cast<std::string::size_type>(0))
             {
               // The lines in the PhysicalNames section should look like the following:
@@ -217,26 +226,43 @@ void GmshIO::read_mesh(std::istream& in)
               unsigned int num_physical_groups = 0;
               in >> num_physical_groups;
 
+              // Read rest of line including newline character.
+              std::getline(in, s);
+
               for (unsigned int i=0; i<num_physical_groups; ++i)
                 {
                   // Read an entire line of the PhysicalNames section.
                   std::getline(in, s);
 
-                  // We need to process lines which have the
-                  // libmesh-specific "lower_dimensional_block" tag in
-                  // order to flag those blocks as not being boundary
+                  // Use an istringstream to extract the physical
+                  // dimension, physical id, and physical name from
+                  // this line.
+                  std::istringstream s_stream(s);
+                  unsigned phys_dim;
+                  int phys_id;
+                  std::string phys_name;
+                  s_stream >> phys_dim >> phys_id >> phys_name;
+
+                  // Not sure if this is true for all Gmsh files, but
+                  // my test file has quotes around the phys_name
+                  // string.  So let's erase any quotes now...
+                  phys_name.erase(std::remove(phys_name.begin(), phys_name.end(), '"'), phys_name.end());
+
+                  // Record this ID for later assignment of subdomain/sideset names.
+                  gmsh_physicals[phys_id] = std::make_pair(phys_dim, phys_name);
+
+                  // If 's' also contains the libmesh-specific string
+                  // "lower_dimensional_block", add this block ID to
+                  // the list of blocks which are not boundary
                   // conditions.
                   if (s.find("lower_dimensional_block") != std::string::npos)
                     {
-                      // Use an istringstream to extract the first two numbers of this line.
-                      std::istringstream s_stream(s);
-                      unsigned
-                        phys_dim,
-                        phys_id;
-                      s_stream >> phys_dim >> phys_id;
+                      lower_dimensional_blocks.insert(cast_int<subdomain_id_type>(phys_id));
 
-                      // Store the ID in the set of lower-dimensional blocks.
-                      lower_dimensional_blocks.insert(phys_id);
+                      // The user has explicitly told us that this
+                      // block is a subdomain, so set that association
+                      // in the Mesh.
+                      mesh.subdomain_name(cast_int<subdomain_id_type>(phys_id)) = phys_name;
                     }
                 }
             }
@@ -455,6 +481,31 @@ void GmshIO::read_mesh(std::istream& in)
 
               // Set mesh_dimension based on the largest element dimension seen.
               mesh.set_mesh_dimension(max_elem_dimension_seen);
+
+              // Now that we know the maximum element dimension seen,
+              // we know whether the physical names are subdomain
+              // names or sideset names.
+              {
+                std::map<int, GmshPhysical>::iterator it = gmsh_physicals.begin();
+                for (; it != gmsh_physicals.end(); ++it)
+                  {
+                    // Extract data
+                    int phys_id = it->first;
+                    unsigned phys_dim = it->second.first;
+                    std::string phys_name = it->second.second;
+
+                    // If the physical's dimension matches the largest
+                    // dimension we've seen, it's a subdomain name.
+                    if (phys_dim == max_elem_dimension_seen)
+                      mesh.subdomain_name(cast_int<subdomain_id_type>(phys_id)) = phys_name;
+
+                    // Otherwise, if it's not a lower-dimensional
+                    // block, it's a sideset name.
+                    else if (phys_dim < max_elem_dimension_seen &&
+                             !lower_dimensional_blocks.count(cast_int<boundary_id_type>(phys_id)))
+                      mesh.boundary_info->sideset_name(cast_int<boundary_id_type>(phys_id)) = phys_name;
+                  }
+              }
 
               if (n_dims_seen > 1)
                 {
