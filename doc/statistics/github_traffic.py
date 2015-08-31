@@ -572,7 +572,12 @@ data = [
     '2015-Aug-23',   37,   13,
     '2015-Aug-24',  102,   25,
     '2015-Aug-25',   86,   25,
-    '2015-Aug-26',  155,   21,
+    '2015-Aug-26',  217,   27,
+    '2015-Aug-27',  156,   25,
+    '2015-Aug-28',  152,   16,
+    '2015-Aug-29',   15,    7,
+    '2015-Aug-30',   27,   12,
+    '2015-Aug-31',   25,   11,
     ]
 
 # Github now tracks the total number of clones and unique cloners
@@ -965,7 +970,12 @@ clone_data = [
     '2015-Aug-23',   13,    7,
     '2015-Aug-24',   26,   19,
     '2015-Aug-25',   39,   18,
-    '2015-Aug-26',    9,    6,
+    '2015-Aug-26',   28,   14,
+    '2015-Aug-27',   18,   13,
+    '2015-Aug-28',   29,   22,
+    '2015-Aug-29',    9,    7,
+    '2015-Aug-30',    5,    4,
+    '2015-Aug-31',   10,    6,
     ]
 
 # Extract the dates from the data array
@@ -1050,7 +1060,8 @@ month_intervals = ['2014-Feb-17',
                    '2015-Apr-17',
                    '2015-May-17',
                    '2015-Jun-17',
-                   '2015-Jul-17']
+                   '2015-Jul-17',
+                   '2015-Aug-17']
 
 # Find the indexes of each date
 month_indexes = []
@@ -1073,12 +1084,10 @@ ax1 = fig.add_subplot(111)
 ax1.plot(x_axis, month_views, 'bo-')
 ax1.set_ylabel('Monthly page views (blue circles)')
 
-# For an odd number of months, include a middle tick mark, otherwise just
-# label the endpoints.
-n_months = len(x_axis)
-x_axis_ticks = [0, len(x_axis)-1]
-if n_months % 2 != 0:
-  x_axis_ticks.insert(1, n_months/2)
+# Place an x-axis tick mark every x_step months.  As we get more data,
+# we'll have to increase x_step.
+x_step = 4
+x_axis_ticks = range(0, len(x_axis), x_step)
 
 # Set tick labels and positions
 ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
