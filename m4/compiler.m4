@@ -358,6 +358,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *16.*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
+                GXX_VERSION=intel_icc_v16.x
+                ;;
               *15.*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
                 GXX_VERSION=intel_icc_v15.x
@@ -802,7 +806,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
         case "$GXX_VERSION" in
 
           # Intel ICC >= v11.x
-          intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x)
+          intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x)
               # Disable some warning messages:
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
