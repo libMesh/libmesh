@@ -18,7 +18,7 @@ Number exact_value(const Point& /* p */,       // xyz location
 {
   std::cout<<"Warning ! No exact value function specified ! Returning 0." << std::endl;
 
-  return 0;
+  return Number(0.);
 }
 
 Gradient exact_grad(const Point& /* p */,       // xyz location
@@ -28,5 +28,5 @@ Gradient exact_grad(const Point& /* p */,       // xyz location
 {
   std::cout<<"Warning ! No exact value function specified ! Returning 0." << std::endl;
 
-  return 0;
+  return Gradient(0.);
 }
