@@ -667,7 +667,18 @@ public:
         // and/or for constraint application.
         if ((_include_liftfunc || _apply_constraints) &&
             elem_has_some_heterogenous_qoi_bc)
-          _sys.time_solver->element_residual(true, _femcontext);
+          {
+            bool jacobian_computed = _sys.time_solver->element_residual(true, _femcontext);
+
+            // If we're using numerical jacobians, above wont compute them
+            if (!jacobian_computed)
+              {
+                // Make sure we didn't compute a jacobian and lie about it
+                libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+                // Logging of numerical jacobians is done separately
+                _sys.numerical_elem_jacobian(_femcontext);
+              }
+          }
 
         // If we have some heterogenous dofs here, those are
         // themselves part of a regularized flux QoI which the library
