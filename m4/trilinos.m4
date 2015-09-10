@@ -109,7 +109,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enabletpetra=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/tpetra/src/Tpetra_config.h],
                                                          [enabletpetra=yes],
-                                                         [enabletpetra=no])])])
+                                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/tpetra/core/src/TpetraCore_config.h],
+                                                                          [enabletpetra=yes],
+                                                                          [AC_CHECK_HEADER([$withtrilinosdir/include/TpetraCore_config.h],
+                                                                                           [enabletpetra=yes],
+                                                                                           [enabletpetra=no])])])])])
 
        if test "$enabletpetra" != no ; then
           AC_DEFINE(HAVE_TPETRA, 1,
@@ -126,7 +130,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                         [enabledtk=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/DataTransferKit/src/DataTransferKit_config.hpp],
                                                          [enabledtk=yes],
-                                                         [enabledtk=no])])])
+                                                         [AC_CHECK_HEADER([$withtrilinosdir/DataTransferKit/packages/Utils/src/DataTransferKitUtils_config.hpp],
+                                                                          [enabledtk=yes],
+                                                                          [AC_CHECK_HEADER([$withtrilinosdir/include/DataTransferKitUtils_config.hpp],
+                                                                                           [enabledtk=yes],
+                                                                                           [enabledtk=no])])])])])
 
        if test "$enabledtk" != no ; then
           AC_DEFINE(HAVE_DTK, 1,
