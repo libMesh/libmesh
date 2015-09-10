@@ -32907,7 +32907,23 @@ ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/tpetra/src/T
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enabletpetra=yes
 else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/tpetra/core/src/TpetraCore_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/tpetra/core/src/TpetraCore_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabletpetra=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/TpetraCore_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/TpetraCore_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabletpetra=yes
+else
   enabletpetra=no
+fi
+
+
+fi
+
+
 fi
 
 
@@ -32941,7 +32957,23 @@ ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/DataTransferKit/src/D
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enabledtk=yes
 else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/DataTransferKit/packages/Utils/src/DataTransferKitUtils_config.hpp" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/DataTransferKit/packages/Utils/src/DataTransferKitUtils_config.hpp" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabledtk=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/DataTransferKitUtils_config.hpp" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/DataTransferKitUtils_config.hpp" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabledtk=yes
+else
   enabledtk=no
+fi
+
+
+fi
+
+
 fi
 
 
