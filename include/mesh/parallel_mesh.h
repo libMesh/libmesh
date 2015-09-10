@@ -390,6 +390,10 @@ public:
   const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
   const_element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
 
+  virtual element_iterator ghost_elements_begin ();
+  virtual element_iterator ghost_elements_end ();
+  virtual const_element_iterator ghost_elements_begin () const;
+  virtual const_element_iterator ghost_elements_end () const;
 
 
 

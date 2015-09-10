@@ -1244,4 +1244,35 @@ ParallelMesh::bnd_nodes_end () const
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
 }
 
+
+
+// ghost element iterator begin/end implementations
+ParallelMesh::element_iterator
+ParallelMesh::ghost_elements_begin ()
+{
+  Predicates::Ghost<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+ParallelMesh::const_element_iterator
+ParallelMesh::ghost_elements_begin () const
+{
+  Predicates::Ghost<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+ParallelMesh::element_iterator
+ParallelMesh::ghost_elements_end ()
+{
+  Predicates::Ghost<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+ParallelMesh::const_element_iterator
+ParallelMesh::ghost_elements_end () const
+{
+  Predicates::Ghost<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
 } // namespace libMesh
