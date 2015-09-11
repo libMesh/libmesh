@@ -242,189 +242,163 @@ public:
   /**
    * Elem iterator accessor functions.
    */
-  element_iterator elements_begin ();
-  element_iterator elements_end   ();
+  virtual element_iterator elements_begin ();
+  virtual element_iterator elements_end ();
+  virtual const_element_iterator elements_begin() const;
+  virtual const_element_iterator elements_end() const;
 
-  element_iterator active_elements_begin ();
-  element_iterator active_elements_end   ();
+  virtual element_iterator active_elements_begin ();
+  virtual element_iterator active_elements_end ();
+  virtual const_element_iterator active_elements_begin() const;
+  virtual const_element_iterator active_elements_end() const;
 
-  element_iterator ancestor_elements_begin ();
-  element_iterator ancestor_elements_end   ();
+  virtual element_iterator ancestor_elements_begin ();
+  virtual element_iterator ancestor_elements_end ();
+  virtual const_element_iterator ancestor_elements_begin() const;
+  virtual const_element_iterator ancestor_elements_end() const;
 
-  element_iterator subactive_elements_begin ();
-  element_iterator subactive_elements_end   ();
+  virtual element_iterator subactive_elements_begin ();
+  virtual element_iterator subactive_elements_end ();
+  virtual const_element_iterator subactive_elements_begin() const;
+  virtual const_element_iterator subactive_elements_end() const;
 
-  element_iterator not_active_elements_begin ();
-  element_iterator not_active_elements_end   ();
+  virtual element_iterator not_active_elements_begin ();
+  virtual element_iterator not_active_elements_end ();
+  virtual const_element_iterator not_active_elements_begin() const;
+  virtual const_element_iterator not_active_elements_end() const;
 
-  element_iterator not_ancestor_elements_begin ();
-  element_iterator not_ancestor_elements_end   ();
+  virtual element_iterator not_ancestor_elements_begin ();
+  virtual element_iterator not_ancestor_elements_end ();
+  virtual const_element_iterator not_ancestor_elements_begin() const;
+  virtual const_element_iterator not_ancestor_elements_end() const;
 
-  element_iterator not_subactive_elements_begin ();
-  element_iterator not_subactive_elements_end   ();
+  virtual element_iterator not_subactive_elements_begin ();
+  virtual element_iterator not_subactive_elements_end ();
+  virtual const_element_iterator not_subactive_elements_begin() const;
+  virtual const_element_iterator not_subactive_elements_end() const;
 
-  element_iterator local_elements_begin ();
-  element_iterator local_elements_end   ();
+  virtual element_iterator local_elements_begin ();
+  virtual element_iterator local_elements_end ();
+  virtual const_element_iterator local_elements_begin () const;
+  virtual const_element_iterator local_elements_end () const;
 
-  element_iterator semilocal_elements_begin ();
-  element_iterator semilocal_elements_end   ();
+  virtual element_iterator semilocal_elements_begin ();
+  virtual element_iterator semilocal_elements_end ();
+  virtual const_element_iterator semilocal_elements_begin () const;
+  virtual const_element_iterator semilocal_elements_end () const;
 
-  element_iterator facelocal_elements_begin ();
-  element_iterator facelocal_elements_end   ();
+  virtual element_iterator facelocal_elements_begin ();
+  virtual element_iterator facelocal_elements_end ();
+  virtual const_element_iterator facelocal_elements_begin () const;
+  virtual const_element_iterator facelocal_elements_end () const;
 
-  element_iterator not_local_elements_begin ();
-  element_iterator not_local_elements_end   ();
+  virtual element_iterator not_local_elements_begin ();
+  virtual element_iterator not_local_elements_end ();
+  virtual const_element_iterator not_local_elements_begin () const;
+  virtual const_element_iterator not_local_elements_end () const;
 
-  element_iterator active_local_elements_begin ();
-  element_iterator active_local_elements_end   ();
+  virtual element_iterator active_local_elements_begin ();
+  virtual element_iterator active_local_elements_end ();
+  virtual const_element_iterator active_local_elements_begin () const;
+  virtual const_element_iterator active_local_elements_end () const;
 
-  element_iterator active_not_local_elements_begin ();
-  element_iterator active_not_local_elements_end   ();
+  virtual element_iterator active_not_local_elements_begin ();
+  virtual element_iterator active_not_local_elements_end ();
+  virtual const_element_iterator active_not_local_elements_begin () const;
+  virtual const_element_iterator active_not_local_elements_end () const;
 
-  element_iterator level_elements_begin (unsigned int level);
-  element_iterator level_elements_end   (unsigned int level);
+  virtual element_iterator level_elements_begin (unsigned int level);
+  virtual element_iterator level_elements_end (unsigned int level);
+  virtual const_element_iterator level_elements_begin (unsigned int level) const;
+  virtual const_element_iterator level_elements_end (unsigned int level) const;
 
-  element_iterator not_level_elements_begin (unsigned int level);
-  element_iterator not_level_elements_end   (unsigned int level);
+  virtual element_iterator not_level_elements_begin (unsigned int level);
+  virtual element_iterator not_level_elements_end (unsigned int level);
+  virtual const_element_iterator not_level_elements_begin (unsigned int level) const;
+  virtual const_element_iterator not_level_elements_end (unsigned int level) const;
 
-  element_iterator local_level_elements_begin (unsigned int level);
-  element_iterator local_level_elements_end   (unsigned int level);
+  virtual element_iterator local_level_elements_begin (unsigned int level);
+  virtual element_iterator local_level_elements_end (unsigned int level);
+  virtual const_element_iterator local_level_elements_begin (unsigned int level) const;
+  virtual const_element_iterator local_level_elements_end (unsigned int level) const;
 
-  element_iterator local_not_level_elements_begin (unsigned int level);
-  element_iterator local_not_level_elements_end   (unsigned int level);
+  virtual element_iterator local_not_level_elements_begin (unsigned int level);
+  virtual element_iterator local_not_level_elements_end (unsigned int level);
+  virtual const_element_iterator local_not_level_elements_begin (unsigned int level) const;
+  virtual const_element_iterator local_not_level_elements_end (unsigned int level) const;
 
-  element_iterator pid_elements_begin (processor_id_type proc_id);
-  element_iterator pid_elements_end   (processor_id_type proc_id);
+  virtual element_iterator pid_elements_begin (processor_id_type proc_id);
+  virtual element_iterator pid_elements_end (processor_id_type proc_id);
+  virtual const_element_iterator pid_elements_begin (processor_id_type proc_id) const;
+  virtual const_element_iterator pid_elements_end (processor_id_type proc_id) const;
 
-  element_iterator type_elements_begin (ElemType type);
-  element_iterator type_elements_end   (ElemType type);
+  virtual element_iterator type_elements_begin (ElemType type);
+  virtual element_iterator type_elements_end (ElemType type);
+  virtual const_element_iterator type_elements_begin (ElemType type) const;
+  virtual const_element_iterator type_elements_end (ElemType type) const;
 
-  element_iterator active_type_elements_begin (ElemType type);
-  element_iterator active_type_elements_end   (ElemType type);
+  virtual element_iterator active_type_elements_begin (ElemType type);
+  virtual element_iterator active_type_elements_end (ElemType type);
+  virtual const_element_iterator active_type_elements_begin (ElemType type) const;
+  virtual const_element_iterator active_type_elements_end (ElemType type) const;
 
-  element_iterator active_pid_elements_begin (processor_id_type proc_id);
-  element_iterator active_pid_elements_end   (processor_id_type proc_id);
+  virtual element_iterator active_pid_elements_begin (processor_id_type proc_id);
+  virtual element_iterator active_pid_elements_end (processor_id_type proc_id);
+  virtual const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const;
+  virtual const_element_iterator active_pid_elements_end (processor_id_type proc_id) const;
 
-  element_iterator unpartitioned_elements_begin ();
-  element_iterator unpartitioned_elements_end ();
+  virtual element_iterator unpartitioned_elements_begin ();
+  virtual element_iterator unpartitioned_elements_end ();
+  virtual const_element_iterator unpartitioned_elements_begin () const;
+  virtual const_element_iterator unpartitioned_elements_end () const;
 
-  element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id);
-  element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id);
+  virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id);
+  virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id);
+  virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
+  virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const;
 
-  element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id);
-  element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id);
+  virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id);
+  virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id);
+  virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
+  virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const;
 
-
-  /**
-   * const Elem iterator accessor functions.
-   */
-  const_element_iterator elements_begin() const;
-  const_element_iterator elements_end()   const;
-
-  const_element_iterator active_elements_begin() const;
-  const_element_iterator active_elements_end()   const;
-
-  const_element_iterator ancestor_elements_begin() const;
-  const_element_iterator ancestor_elements_end()   const;
-
-  const_element_iterator subactive_elements_begin() const;
-  const_element_iterator subactive_elements_end()   const;
-
-  const_element_iterator not_active_elements_begin() const;
-  const_element_iterator not_active_elements_end()   const;
-
-  const_element_iterator not_ancestor_elements_begin() const;
-  const_element_iterator not_ancestor_elements_end()   const;
-
-  const_element_iterator not_subactive_elements_begin() const;
-  const_element_iterator not_subactive_elements_end()   const;
-
-  const_element_iterator local_elements_begin () const;
-  const_element_iterator local_elements_end   () const;
-
-  const_element_iterator semilocal_elements_begin () const;
-  const_element_iterator semilocal_elements_end   () const;
-
-  const_element_iterator facelocal_elements_begin () const;
-  const_element_iterator facelocal_elements_end   () const;
-
-  const_element_iterator not_local_elements_begin () const;
-  const_element_iterator not_local_elements_end   () const;
-
-  const_element_iterator active_local_elements_begin () const;
-  const_element_iterator active_local_elements_end   () const;
-
-  const_element_iterator active_not_local_elements_begin () const;
-  const_element_iterator active_not_local_elements_end   () const;
-
-  const_element_iterator level_elements_begin (unsigned int level) const;
-  const_element_iterator level_elements_end   (unsigned int level) const;
-
-  const_element_iterator not_level_elements_begin (unsigned int level) const;
-  const_element_iterator not_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator local_level_elements_begin (unsigned int level) const;
-  const_element_iterator local_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator local_not_level_elements_begin (unsigned int level) const;
-  const_element_iterator local_not_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator pid_elements_begin (processor_id_type proc_id) const;
-  const_element_iterator pid_elements_end   (processor_id_type proc_id) const;
-
-  const_element_iterator type_elements_begin (ElemType type) const;
-  const_element_iterator type_elements_end   (ElemType type) const;
-
-  const_element_iterator active_type_elements_begin (ElemType type) const;
-  const_element_iterator active_type_elements_end   (ElemType type) const;
-
-  const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const;
-  const_element_iterator active_pid_elements_end   (processor_id_type proc_id) const;
-
-  const_element_iterator unpartitioned_elements_begin () const;
-  const_element_iterator unpartitioned_elements_end () const;
-
-  const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
-  const_element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
-
-  const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
-  const_element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
-
-
-
-
+  virtual element_iterator ghost_elements_begin ();
+  virtual element_iterator ghost_elements_end ();
+  virtual const_element_iterator ghost_elements_begin () const;
+  virtual const_element_iterator ghost_elements_end () const;
 
   /**
-   * non-const Node iterator accessor functions.
+   * Node iterator accessor functions.
    */
-  node_iterator nodes_begin();
-  node_iterator nodes_end();
-  node_iterator active_nodes_begin();
-  node_iterator active_nodes_end();
-  node_iterator local_nodes_begin  ();
-  node_iterator local_nodes_end    ();
-  node_iterator pid_nodes_begin (processor_id_type proc_id);
-  node_iterator pid_nodes_end   (processor_id_type proc_id);
-  node_iterator bid_nodes_begin (boundary_id_type bndry_id);
-  node_iterator bid_nodes_end   (boundary_id_type bndry_id);
-  node_iterator bnd_nodes_begin ();
-  node_iterator bnd_nodes_end ();
+  virtual node_iterator nodes_begin ();
+  virtual node_iterator nodes_end ();
+  virtual const_node_iterator nodes_begin () const;
+  virtual const_node_iterator nodes_end () const;
 
-  /**
-   * const Node iterator accessor functions.
-   */
-  const_node_iterator nodes_begin() const;
-  const_node_iterator nodes_end()   const;
-  const_node_iterator active_nodes_begin() const;
-  const_node_iterator active_nodes_end()   const;
-  const_node_iterator local_nodes_begin  () const;
-  const_node_iterator local_nodes_end    () const;
-  const_node_iterator pid_nodes_begin (processor_id_type proc_id) const;
-  const_node_iterator pid_nodes_end   (processor_id_type proc_id) const;
-  const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const;
-  const_node_iterator bid_nodes_end   (boundary_id_type bndry_id) const;
-  const_node_iterator bnd_nodes_begin () const;
-  const_node_iterator bnd_nodes_end () const;
+  virtual node_iterator active_nodes_begin ();
+  virtual node_iterator active_nodes_end ();
+  virtual const_node_iterator active_nodes_begin () const;
+  virtual const_node_iterator active_nodes_end () const;
+
+  virtual node_iterator local_nodes_begin ();
+  virtual node_iterator local_nodes_end ();
+  virtual const_node_iterator local_nodes_begin () const;
+  virtual const_node_iterator local_nodes_end () const;
+
+  virtual node_iterator pid_nodes_begin (processor_id_type proc_id);
+  virtual node_iterator pid_nodes_end (processor_id_type proc_id);
+  virtual const_node_iterator pid_nodes_begin (processor_id_type proc_id) const;
+  virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const;
+
+  virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id);
+  virtual node_iterator bid_nodes_end (boundary_id_type bndry_id);
+  virtual const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const;
+  virtual const_node_iterator bid_nodes_end (boundary_id_type bndry_id) const;
+
+  virtual node_iterator bnd_nodes_begin ();
+  virtual node_iterator bnd_nodes_end ();
+  virtual const_node_iterator bnd_nodes_begin () const;
+  virtual const_node_iterator bnd_nodes_end () const;
 
 protected:
 

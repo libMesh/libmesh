@@ -805,6 +805,15 @@ public:
   virtual const_element_iterator unpartitioned_elements_end () const = 0;
 
   /**
+   * Iterate over "ghost" elements in the Mesh.  A ghost element is
+   * one which is *not* local, but *is* semilocal.
+   */
+  virtual element_iterator ghost_elements_begin () = 0;
+  virtual element_iterator ghost_elements_end () = 0;
+  virtual const_element_iterator ghost_elements_begin () const = 0;
+  virtual const_element_iterator ghost_elements_end () const = 0;
+
+  /**
    * Active, local, and negation forms of the element iterators described above.
    * An "active" element is an element without children (i.e. has not been refined).
    * A "local" element is one whose processor_id() matches the current processor.
