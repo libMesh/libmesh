@@ -153,6 +153,69 @@ protected:
     // but could potentially be made dynamic
   }
 
+  // Evaluate the ith FunctionParser and check the result
+#ifdef LIBMESH_HAVE_FPARSER
+  inline Output eval(FunctionParserBase<Output> & parser,
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx))
+  {
+#ifndef NDEBUG
+    Output result = parser.Eval(&_spacetime[0]);
+    int error_code = parser.EvalError();
+    if (error_code)
+      {
+        libMesh::err << "ERROR: FunctionParser is unable to evaluate component "
+                     << component_idx
+                     << " of expression '"
+                     << function_name
+                     << "' with arguments:\n";
+        for (unsigned int j=0; j<_spacetime.size(); ++j)
+          libMesh::err << '\t' << _spacetime[j] << '\n';
+        libMesh::err << '\n';
+
+        // Currently no API to report error messages, we'll do it manually
+        std::string error_message = "Reason: ";
+
+        switch (error_code)
+          {
+          case 1:
+            error_message += "Division by zero";
+            break;
+          case 2:
+            error_message += "Square Root error (negative value)";
+            break;
+          case 3:
+            error_message += "Log error (negative value)";
+            break;
+          case 4:
+            error_message += "Trigonometric error (asin or acos of illegal value)";
+            break;
+          case 5:
+            error_message += "Maximum recursion level reached";
+            break;
+          default:
+            error_message += "Unknown";
+            break;
+          }
+        libmesh_error_msg(error_message);
+      }
+
+    return result;
+#else
+    return parser.Eval(&_spacetime[0]);
+#endif
+  }
+#else // LIBMESH_HAVE_FPARSER
+  inline Output eval(char & libmesh_dbg_var(parser),
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx))
+  {
+    libmesh_error_msg("ERROR: This functionality requires fparser!");
+    return Output(0);
+  }
+#endif
+
+
 public:
 
   /**
@@ -379,12 +442,7 @@ public:
   {
     eval_args(c, p, time);
 
-#if LIBMESH_HAVE_FPARSER
-    return parsers[0].Eval(&_spacetime[0]);
-#else
-    libmesh_error_msg("ERROR: This functionality requires fparser!");
-    return Output(0);
-#endif
+    return eval(parsers[0], "f", 0);
   }
 
 
@@ -402,16 +460,10 @@ public:
 
     unsigned int size = output.size();
 
-#ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_equal_to (size, parsers.size());
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
     for (unsigned int i=0; i != size; ++i)
-      output(i) = parsers[i].Eval(&_spacetime[0]);
-#else
-    libmesh_error_msg("ERROR: This functionality requires fparser!");
-#endif
+      output(i) = eval(parsers[i], "f", i);
   }
 
 
@@ -425,16 +477,8 @@ public:
   {
     eval_args(c, p, time);
 
-#ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_less (i, parsers.size());
-
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-    return parsers[i].Eval(&_spacetime[0]);
-#else
-    libmesh_error_msg("ERROR: This functionality requires fparser!");
-    return Output(0);
-#endif
+    return eval(parsers[i], "f", i);
   }
 
 private:
@@ -446,6 +490,8 @@ private:
     _n_requested_hess_components;
 #ifdef LIBMESH_HAVE_FPARSER
   std::vector<FunctionParserBase<Output> > parsers;
+#else
+  std::vector<char> parsers;
 #endif
   std::vector<Output> _spacetime;
 
