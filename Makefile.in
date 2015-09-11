@@ -899,7 +899,7 @@ libmesh_dbg_la_OBJECTS = $(am_libmesh_dbg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am__v_lt_1 =
+am__v_lt_1 = 
 libmesh_dbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
