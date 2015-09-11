@@ -607,6 +607,7 @@ struct Ghost : abstract_multi_predicate<T>
   Ghost(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new active<T>);
     this->_predicates.push_back(new not_pid<T>(my_pid));
     this->_predicates.push_back(new semilocal_pid<T>(my_pid));
   }
