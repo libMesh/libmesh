@@ -497,13 +497,14 @@ EigenSparseVector<T>::~EigenSparseVector ()
 template <typename T>
 inline
 void EigenSparseVector<T>::init (const numeric_index_type n,
-                                 const numeric_index_type libmesh_dbg_var(n_local),
+                                 const numeric_index_type n_local,
                                  const bool fast,
                                  const ParallelType)
 {
   // Eigen vectors only for serial cases,
   // but can provide a "parallel" vector on one processor.
-  libmesh_assert_equal_to (n, n_local);
+  if (n != n_local)
+    libmesh_error_msg("Error: EigenSparseVectors can only be used in serial!");
 
   this->_type = SERIAL;
 
