@@ -64,6 +64,7 @@ private:
   // "named constructors" to build trees with parameters in a compact way
   static CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1);
   static CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2);
+  static CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2, const CodeTreeAD & param3);
 
   // variable index we are differentiating w.r.t.
   unsigned int var;
@@ -164,6 +165,16 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTr
   CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op));
   tree.AddParam(param1);
   tree.AddParam(param2);
+  tree.Rehash();
+  return tree;
+}
+template<typename Value_t>
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2, const CodeTreeAD & param3)
+{
+  CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op));
+  tree.AddParam(param1);
+  tree.AddParam(param2);
+  tree.AddParam(param3);
   tree.Rehash();
   return tree;
 }
@@ -353,14 +364,13 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
     case cFCall:
       if (func.GetFuncNo() == this->parser->mFPlog)
       {
-        // a<b ? (1/b - 1/(b*b)*(a-b) + 1/b^3 * (a-b)^2) : 1/a
-        diff.SetOpcode(cIf);
-        diff.AddParam(MakeTree(cLess, a, b));
-        diff.AddParam(MakeTree(cInv, b) - MakeTree(cInv, b*b) * (a-b)
-                      + MakeTree(cPow, b, CodeTreeAD(-3)) * MakeTree(cSqr, a-b));
-        diff.AddParam(MakeTree(cInv, a));
-        diff.Rehash();
-        break;
+        // a<b ? D(a) * [(1/b - 1/(b*b)*(a-b) + 1/b^3 * (a-b)^2) : 1/a]
+        return D(a) * MakeTree(cIf,
+          MakeTree(cLess, a, b),
+          MakeTree(cInv, b) - MakeTree(cInv, b*b) * (a-b)
+            + MakeTree(cPow, b, CodeTreeAD(-3)) * MakeTree(cSqr, a-b),
+            MakeTree(cInv, a)
+        );
       }
       // fall through to undefined
 

@@ -84,19 +84,19 @@ private:
 public:
   virtual void setUp()
   {
-    tests.push_back(ADTest("log(x) + log2(2*x) + log10(4*x)", 0.1, 3.0));
-    tests.push_back(ADTest("sin(x) + cos(2*x) + tan(4*x)", -5.0, 5.0, 1e-7, 1e-5, 100));
-    tests.push_back(ADTest("sinh(x) + cosh(x/2) + tanh(x/3)", -4.0, 4.0, 0.0001, 1e-5, 100));
-    tests.push_back(ADTest("plog(x,0.01)", 0.001, 0.05, 0.00001, 1e-5, 100));
+    tests.push_back(ADTest("log(x*x) + log2(2*x) + log10(4*x)", 0.1, 3.0));
+    tests.push_back(ADTest("sin(-x) + cos(2*x) + tan(4*x)", -5.0, 5.0, 1e-7, 1e-5, 100));
+    tests.push_back(ADTest("sinh(-x) + cosh(x/2) + tanh(x/3)", -4.0, 4.0, 0.0001, 1e-5, 100));
+    tests.push_back(ADTest("plog(-x,0.01)", 0.001, 0.05, 0.00001, 1e-5, 100));
     tests.push_back(ADTest("2 + 4*x + 8*x^2 + 16*x^3 + 32*x^4", -5.0, 5.0, 1e-5,1e-4));
     tests.push_back(ADTest("1/x^2", 0.01, 2.0, 1e-8));
-    tests.push_back(ADTest("sqrt(x)", 0.001, 2.0, 1e-6));
-    tests.push_back(ADTest("abs(x)", -1.99, 2.0));
-    tests.push_back(ADTest("asin(x)", -0.99, 0.99));
-    tests.push_back(ADTest("acos(x)", -0.99, 0.99));
-    tests.push_back(ADTest("atan(x)", -99, 99));
-    tests.push_back(ADTest("x*sin(x)*log(x)*tanh(x)", 0.001, 5, 1e-8));
-    tests.push_back(ADTest("exp(x) + 2*exp2(x)", -1.0, 2.0));
+    tests.push_back(ADTest("sqrt(x*2)", 0.001, 2.0, 1e-6));
+    tests.push_back(ADTest("abs(x*2)", -1.99, 2.0));
+    tests.push_back(ADTest("asin(-x)", -0.99, 0.99));
+    tests.push_back(ADTest("acos(-x)", -0.99, 0.99));
+    tests.push_back(ADTest("atan(-x)", -99, 99));
+    tests.push_back(ADTest("x*sin(-x)*log(x)*tanh(x)", 0.001, 5, 1e-8));
+    tests.push_back(ADTest("exp(-x) + 2*exp2(x)", -1.0, 2.0));
     tests.push_back(ADTest("hypot(2*x,1) - hypot(1,4*x)", -10, 10.0));
     tests.push_back(ADTest("if(x<0, (-x)^3, x^3)", -1.0, 1.0));
     tests.push_back(ADTest("max(x^2-0.5,0)", -1.5, 1.5));
