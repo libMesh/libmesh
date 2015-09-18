@@ -654,7 +654,7 @@ public:
         // of a QoI, then we need FE information to assemble the
         // element residual.
         if (_qoi.assemble_qoi_elements ||
-            (_include_liftfunc &&
+            ((_include_liftfunc || _apply_constraints) &&
              elem_has_some_heterogenous_qoi_bc))
           _femcontext.elem_fe_reinit();
 
