@@ -193,6 +193,9 @@
 /* Define to 1 if you have the <csignal> header file. */
 #undef HAVE_CSIGNAL
 
+/* Flag indicating whether the library will be compiled with CURL support */
+#undef HAVE_CURL
+
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
 

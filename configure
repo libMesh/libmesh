@@ -651,6 +651,10 @@ libmesh_pkgconfig_requires
 libmesh_contrib_INCLUDES
 libmesh_optional_LIBS
 libmesh_optional_INCLUDES
+LIBMESH_ENABLE_CURL_FALSE
+LIBMESH_ENABLE_CURL_TRUE
+CURL_LIBRARY
+CURL_INCLUDE
 LIBMESH_ENABLE_NANOFLANN_FALSE
 LIBMESH_ENABLE_NANOFLANN_TRUE
 NANOFLANN_INCLUDE
@@ -1192,6 +1196,9 @@ enable_cppunit
 with_cppunit_prefix
 with_cppunit_exec_prefix
 enable_nanoflann
+enable_curl
+with_curl_include
+with_curl_lib
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1968,6 +1975,7 @@ Optional Features:
                           Build fparser with bytecode debugging functions
   --disable-cppunit       Build without cppunit C++ unit testing support
   --disable-nanoflann     build without nanoflann KD-tree suppport
+  --disable-curl          build without curl support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2041,6 +2049,9 @@ Optional Packages:
                           to use
   --with-cppunit-prefix=PFX   Prefix where CppUnit is installed (optional)
   --with-cppunit-exec-prefix=PFX  Exec prefix where CppUnit is installed (optional)
+  --with-curl-include=PATH
+                          Specify the path for CURL header files
+  --with-curl-lib=PATH    Specify the path for CURL libs
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -37998,6 +38009,197 @@ ac_config_files="$ac_config_files contrib/nanoflann/Makefile"
 
 
 
+# -------------------------------------------------------------
+# libcurl -- enabled by default
+# Note: I tried to use the m4 files ax_lib_curl.m4 and
+# ax_path_generic.m4 from the autoconf-archive for this, but they
+# would not work (bootstrap failed!) on either Linux or OSX.
+# -------------------------------------------------------------
+
+  # Check whether --enable-curl was given.
+if test "${enable_curl+set}" = set; then :
+  enableval=$enable_curl; case "${enableval}" in
+                  yes)  enablecurl=yes ;;
+                  no)  enablecurl=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-curl" "$LINENO" 5 ;;
+                esac
+else
+  enablecurl=$enableoptional
+fi
+
+
+  if (test $enablecurl = yes); then
+
+    # User-specific include path
+
+# Check whether --with-curl-include was given.
+if test "${with_curl_include+set}" = set; then :
+  withval=$with_curl_include; withcurlinc=$withval
+else
+  withcurlinc=no
+fi
+
+
+    # User-specific library path
+
+# Check whether --with-curl-lib was given.
+if test "${with_curl_lib+set}" = set; then :
+  withval=$with_curl_lib; withcurllib=$withval
+else
+  withcurllib=no
+fi
+
+
+    # Start with reasonable defaults and let user-specified values
+    # override them.  We don't support allowing user environment vars
+    # to set these, as it just makes things too complicated and
+    # error-prone.
+    CURL_INC="/usr/include/curl"
+    CURL_LIB="/usr/lib"
+
+    # If the user specified --with-curl-include=foo, use that...
+    if (test $withcurlinc != no); then
+      CURL_INC="$withcurlinc"
+    fi
+
+    # If the user specified --with-curl-lib=foo, use that...
+    if (test $withcurllib != no); then
+      CURL_LIB="$withcurllib"
+    fi
+
+    # Initialize eventual Makefile/config.h substitution variables
+    CURL_INCLUDE=""
+    CURL_LIBRARY=""
+
+    # Actually test for the existence of headers and libs.
+    if (test $enablecurl = yes); then
+
+       # Check for existence of a header file in the specified location
+       curlincFound=no;
+       for ac_header in $CURL_INC/curl.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ curlincFound=yes
+fi
+
+done
+
+
+       if (test $curlincFound = no); then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: CURL header files not found!" >&5
+$as_echo "CURL header files not found!" >&6; }
+         enablecurl=no;
+       fi
+
+       # Curl versions are defined in curlver.h (not curl.h!) and look like this:
+       #define LIBCURL_VERSION_MAJOR 7
+       #define LIBCURL_VERSION_MINOR 37
+       #define LIBCURL_VERSION_PATCH 1
+       if (test $enablecurl = yes); then
+         curlmajor=`grep "define LIBCURL_VERSION_MAJOR" $CURL_INC/curlver.h | sed -e "s/#define LIBCURL_VERSION_MAJOR[ ]*//g"`
+         curlminor=`grep "define LIBCURL_VERSION_MINOR" $CURL_INC/curlver.h | sed -e "s/#define LIBCURL_VERSION_MINOR[ ]*//g"`
+         curlversion=$curlmajor.$curlminor
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with CURL version $curlversion support >>>" >&5
+$as_echo "<<< Configuring library with CURL version $curlversion support >>>" >&6; }
+       fi
+
+       if (test $enablecurl = yes); then
+         # Also Check for existence of required libraries.
+
+         # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
+         # Note: Basically tries to compile a function which calls main().
+
+         # Save original value of LIBS, then append $CURL_LIB
+         old_LIBS="$LIBS"
+         LIBS="$old_LIBS -L$CURL_LIB"
+
+         # Try to compile test prog to check for existence of CURL libraries
+         # AC_HAVE_LIBRARY uses the LIBS variable.
+         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lcurl" >&5
+$as_echo_n "checking for main in -lcurl... " >&6; }
+if ${ac_cv_lib_curl_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcurl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_curl_main=yes
+else
+  ac_cv_lib_curl_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_curl_main" >&5
+$as_echo "$ac_cv_lib_curl_main" >&6; }
+if test "x$ac_cv_lib_curl_main" = xyes; then :
+  enablecurl=yes
+else
+  enablecurl=no
+fi
+ac_cv_lib_curl=ac_cv_lib_curl_main
+
+
+         # Reset $LIBS
+         LIBS="$old_LIBS"
+       fi
+
+       # If both the header file and the required libs were found, continue.
+       if (test x$enablecurl = xyes); then
+         CURL_INCLUDE="-I$CURL_INC"
+         CURL_LIBRARY="-L$CURL_LIB -lcurl"
+         if (test "x$RPATHFLAG" != "x" -a -d $CURL_LIB); then # add the CURL_LIB to the linker run path, if it is a directory
+           if (test "$CURL_LIB" != "/usr/lib" -a "$CURL_LIB" != "/usr/lib64"); then
+             CURL_LIBRARY="${RPATHFLAG}${CURL_LIB} $CURL_LIBRARY"
+           fi
+         fi
+
+$as_echo "#define HAVE_CURL 1" >>confdefs.h
+
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with CURL support >>>" >&5
+$as_echo "<<< Configuring library with CURL support >>>" >&6; }
+       fi
+    fi
+  fi
+
+
+  # Substitute the substitution variables
+
+
+
+if (test x$enablecurl = xyes); then
+  libmesh_optional_INCLUDES="$CURL_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$CURL_LIBRARY $libmesh_optional_LIBS"
+fi
+ if test x$enablecurl = xyes; then
+  LIBMESH_ENABLE_CURL_TRUE=
+  LIBMESH_ENABLE_CURL_FALSE='#'
+else
+  LIBMESH_ENABLE_CURL_TRUE='#'
+  LIBMESH_ENABLE_CURL_FALSE=
+fi
+
+# -------------------------------------------------------------
+
+
 if test "$enableoptional" != no ; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ----------------------------------------------" >&5
 $as_echo "----------------------------------------------" >&6; }
@@ -38559,6 +38761,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NANOFLANN_TRUE}" && test -z "${LIBMESH_ENABLE_NANOFLANN_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NANOFLANN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_CURL_TRUE}" && test -z "${LIBMESH_ENABLE_CURL_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_CURL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${GIT_CHECKOUT_TRUE}" && test -z "${GIT_CHECKOUT_FALSE}"; then
@@ -41991,6 +42197,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'boost............................ : $enableboost
   echo '  'capnproto........................ : $enablecapnproto
   echo '  'cppunit.......................... : $enablecppunit
+  echo '  'curl............................. : $enablecurl
 #  if (test "x$enablecppunit" = "xyes"); then
 #  echo '     'CPPUNIT_CFLAGS................ : $CPPUNIT_CFLAGS
 #  echo '     'CPPUNIT_LIBS.................. : $CPPUNIT_LIBS
