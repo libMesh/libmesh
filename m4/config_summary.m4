@@ -112,6 +112,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'boost............................ : $enableboost
   echo '  'capnproto........................ : $enablecapnproto
   echo '  'cppunit.......................... : $enablecppunit
+  echo '  'curl............................. : $enablecurl
 #  if (test "x$enablecppunit" = "xyes"); then
 #  echo '     'CPPUNIT_CFLAGS................ : $CPPUNIT_CFLAGS
 #  echo '     'CPPUNIT_LIBS.................. : $CPPUNIT_LIBS
