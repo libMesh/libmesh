@@ -31,6 +31,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/solver_configuration.h"
 
 // C++ includes
 #include <cstddef>
@@ -131,8 +132,16 @@ public:
    */
   void attach_preconditioner(Preconditioner<T> * preconditioner);
 
+  /**
+   * Set the same_preconditioner flag, which indicates if we reuse the
+   * same preconditioner for subsequent solves.
+   */
   virtual void reuse_preconditioner(bool );
 
+  /**
+   * @return same_preconditioner, which indicates if we reuse the
+   * same preconditioner for subsequent solves.
+   */
   bool get_same_preconditioner();
 
   /**
@@ -242,6 +251,11 @@ public:
    */
   virtual LinearConvergenceReason get_converged_reason() const = 0;
 
+  /**
+   * Set the solver configuration object.
+   */
+  void set_solver_configuration(SolverConfiguration& solver_configuration);
+
 protected:
 
 
@@ -273,6 +287,12 @@ protected:
    */
   bool same_preconditioner;
 
+  /**
+   * Optionally store a SolverOptions object that can be used
+   * to set parameters like solver type, tolerances and iteration limits.
+   */
+  SolverConfiguration* _solver_configuration;
+
 };
 
 
@@ -287,7 +307,8 @@ LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator &comm_in) :
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
   _preconditioner      (NULL),
-  same_preconditioner  (false)
+  same_preconditioner  (false),
+  _solver_configuration(NULL)
 {
 }
 

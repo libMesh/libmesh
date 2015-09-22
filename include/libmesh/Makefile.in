@@ -556,7 +556,8 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h second_order_unsteady_solver.h \
 	slepc_eigen_solver.h slepc_macro.h solution_history.h solver.h \
-	steady_solver.h tao_optimization_solver.h time_solver.h \
+	solver_configuration.h steady_solver.h \
+	tao_optimization_solver.h time_solver.h \
 	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
 	twostep_time_solver.h unsteady_solver.h \
 	condensed_eigen_system.h continuation_system.h \
@@ -1847,6 +1848,9 @@ solution_history.h: $(top_srcdir)/include/solvers/solution_history.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solver.h: $(top_srcdir)/include/solvers/solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+solver_configuration.h: $(top_srcdir)/include/solvers/solver_configuration.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 steady_solver.h: $(top_srcdir)/include/solvers/steady_solver.h
