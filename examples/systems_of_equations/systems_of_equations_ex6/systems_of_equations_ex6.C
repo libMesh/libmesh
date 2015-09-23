@@ -38,6 +38,7 @@
 #include <math.h>
 
 // libMesh includes
+#include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
@@ -61,6 +62,9 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/getpot.h"
+#include "libmesh/solver_configuration.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/petsc_macro.h"
 
 #define x_scaling 1.3
 
@@ -76,6 +80,35 @@
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
+
+#ifdef LIBMESH_HAVE_PETSC
+// This class allows us to set the solver and preconditioner
+// to be appropriate for linear elasticity.
+class PetscSolverConfiguration : public SolverConfiguration
+{
+public:
+
+  PetscSolverConfiguration(PetscLinearSolver<Number>& petsc_linear_solver)
+  :
+  _petsc_linear_solver(petsc_linear_solver)
+  {
+  }
+
+  virtual void configure_solver()
+  {
+    PetscErrorCode ierr = 0;
+    ierr = KSPSetType (_petsc_linear_solver.ksp(), const_cast<KSPType>(KSPCG));
+    libmesh_assert(ierr == 0);
+
+    ierr = PCSetType (_petsc_linear_solver.pc(), const_cast<PCType>(PCBJACOBI));
+    libmesh_assert(ierr == 0);
+  }
+
+  // The linear solver object that we are configuring
+  PetscLinearSolver<Number>& _petsc_linear_solver;
+
+};
+#endif
 
 class LinearElasticity : public System::Assembly
 {
@@ -513,6 +546,15 @@ int main (int argc, char** argv)
   // Create a system named "Elasticity"
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Elasticity");
+
+#ifdef LIBMESH_HAVE_PETSC
+  // Attach a SolverConfiguration object to system.linear_solver
+  PetscLinearSolver<Number>* petsc_linear_solver =
+    libmesh_cast_ptr<PetscLinearSolver<Number>*>(system.get_linear_solver());
+  libmesh_assert(petsc_linear_solver);
+  PetscSolverConfiguration petsc_solver_config(*petsc_linear_solver);
+  petsc_linear_solver->set_solver_configuration(petsc_solver_config);
+#endif
 
   // Add three displacement variables, u and v, to the system
   unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
