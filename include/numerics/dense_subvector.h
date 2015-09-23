@@ -29,20 +29,18 @@
 namespace libMesh
 {
 
-
-
 /**
  * Defines a dense subvector for use in Finite Element-type computations.
  * Useful for storing element load vectors  before summation
  * into a global vector, particularly when you have systems of equations.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 template<typename T>
 class DenseSubVector : public DenseVectorBase<T>
 {
 public:
-
   /**
    * Constructor.  Creates a dense subvector of the vector
    * \p parent.  The subvector has dimensions \f$(m \times n)\f$,

@@ -34,7 +34,8 @@ namespace libMesh
  * and NumberTensorValue defines a real or complex-valued tensor depending
  * on how the library was configured.
  *
- * \author Roy H. Stogner 2004
+ * \author Roy H. Stogner
+ * \date 2004
  */
 template <typename T>
 class TensorValue : public TypeTensor<T>

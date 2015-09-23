@@ -34,13 +34,13 @@
 namespace libMesh
 {
 
-
 /**
  * This class provides a wrapper with which to evaluate a
  * (libMesh-style) function pointer in a FunctionBase-compatible
  * interface.
  *
- * @author Roy Stogner, 2012
+ * \author Roy Stogner
+ * \date 2012
  */
 template <typename Output=Number>
 class WrappedFunction : public FunctionBase<Output>

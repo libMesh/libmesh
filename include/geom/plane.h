@@ -28,11 +28,11 @@
 namespace libMesh
 {
 
-
 /**
  * This class defines a plane.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
 class Plane : public Surface
 {

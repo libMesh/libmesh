@@ -71,7 +71,8 @@ class SystemSubset;
  * one or more of the children of this class.
  * Note that templating \p EqnSystems relaxes the use of virtual members.
  *
- * @author Benjamin S. Kirk, 2003-2004.
+ * \author Benjamin S. Kirk
+ * \date 2003-2004
  */
 class System : public ReferenceCountedObject<System>,
                public ParallelObject

@@ -39,7 +39,8 @@ namespace libMesh
  * by the \p subdomain_id and possible the variable numbers.  The dofs
  * in the subset will be sorted.
  *
- * @author Tim Kroeger, 2010.
+ * \author Tim Kroeger
+ * \date 2010
  */
 class SystemSubsetBySubdomain : public SystemSubset,
                                 public ParallelObject

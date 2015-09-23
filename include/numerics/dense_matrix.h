@@ -34,14 +34,13 @@ namespace libMesh
 // Forward Declarations
 template <typename T> class DenseVector;
 
-
-
 /**
  * Defines a dense matrix for use in Finite Element-type computations.
  * Useful for storing element stiffness matrices before summation
  * into a global matrix.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
 template<typename T>
 class DenseMatrix : public DenseMatrixBase<T>

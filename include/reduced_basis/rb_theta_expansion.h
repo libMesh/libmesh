@@ -38,7 +38,8 @@ class RBParameters;
  * This class stores the set of RBTheta functor objects that define
  * the "parameter-dependent expansion" of a PDE.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class RBThetaExpansion : public ReferenceCountedObject<RBThetaExpansion>
 {

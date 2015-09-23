@@ -37,15 +37,14 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements writing meshes in the GMV format.
  * For a full description of the GMV format and to obtain the
  * GMV software see
  * <a href="http://laws.lanl.gov/XCM/gmv/GMVHome.html">the GMV home page</a>
  *
- * @author Benjamin S. Kirk, 2004
+ * \author Benjamin S. Kirk
+ * \date 2004
  */
 class GMVIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>

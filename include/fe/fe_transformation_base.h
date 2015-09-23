@@ -35,7 +35,8 @@ template< typename T > class HCurlFETransformation;
  * class assumes the \p FEGenericBase object has been initialized in the reference
  * domain (i.e. init_shape_functions has been called).
  *
- * @author Paul T. Bauman, 2012
+ * \author Paul T. Bauman
+ * \date 2012
  */
 template< typename OutputShape >
 class FETransformationBase

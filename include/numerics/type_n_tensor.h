@@ -31,7 +31,6 @@
 namespace libMesh
 {
 
-
 /**
  * This class will eventually define a rank-N tensor in \p LIBMESH_DIM
  * dimensional space of type T.
@@ -39,9 +38,9 @@ namespace libMesh
  * compile (but not give correct results) in the case of vector-valued
  * elements and second derivatives.
  *
- * \author Roy Stogner, 2012.
+ * \author Roy Stogner
+ * \date 2012
  */
-
 template <unsigned int N, typename T>
 class TypeNTensor
 {

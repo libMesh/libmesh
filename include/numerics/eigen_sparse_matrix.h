@@ -37,22 +37,18 @@
 namespace libMesh
 {
 
-
-
 // Forward declarations
 template <typename T> class DenseMatrix;
 template <typename T> class EigenSparseVector;
 template <typename T> class EigenSparseLinearSolver;
 
-
-
 /**
  * The EigenSparseMatrix class wraps a sparse matrix object from the Eigen
  * library.
  *
- * @author Benjamin S. Kirk, 2013
+ * \author Benjamin S. Kirk
+ * \date 2013
  */
-
 template <typename T>
 class EigenSparseMatrix : public SparseMatrix<T>
 {

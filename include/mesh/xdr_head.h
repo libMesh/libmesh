@@ -29,7 +29,9 @@ namespace libMesh
  * solution (\p XdrSHEAD) or mesh (\p XdrMHEAD) header interface
  * classes.
  *
- * @author Bill Barth, Robert McLay.
+ * \author Bill Barth
+ * \author Robert McLay
+ * \date 2000
  */
 class XdrHEAD
 {

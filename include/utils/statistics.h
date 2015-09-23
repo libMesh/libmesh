@@ -68,7 +68,8 @@ namespace libMesh
  * implemented in order to avoid possible problems with
  * buffer overruns.
  *
- * @author John W. Peterson, 2002
+ * \author John W. Peterson
+ * \date 2002
  */
 template <typename T>
 class StatisticsVector : public std::vector<T>

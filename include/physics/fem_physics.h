@@ -39,7 +39,8 @@ namespace libMesh
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2012
+ * \author Roy H. Stogner
+ * \date 2012
  */
 class FEMPhysics : public virtual DifferentiablePhysics
 {

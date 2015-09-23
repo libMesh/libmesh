@@ -50,9 +50,9 @@ template <typename T> class DenseMatrix;
  * Epetra data structures for parallel,
  * sparse matrices.
  *
- * @author Benjamin S. Kirk, 2008
+ * \author Benjamin S. Kirk
+ * \date 2008
  */
-
 template <typename T>
 class EpetraMatrix : public SparseMatrix<T>
 {

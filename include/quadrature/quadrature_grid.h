@@ -28,9 +28,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class creates quadrature points on a uniform grid, with
  * order+1 points on an edge.
@@ -45,7 +42,8 @@ namespace libMesh
  * functions which have discontinuities or discontinuous derivatives
  * on scales smaller than your element size.
  *
- * @author Roy Stogner, 2005.
+ * \author Roy Stogner
+ * \date 2005
  */
 class QGrid : public QBase
 {

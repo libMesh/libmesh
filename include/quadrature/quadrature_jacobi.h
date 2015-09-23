@@ -44,7 +44,8 @@ namespace libMesh
  * Still, this class is particularly helpful: check \p QGauss
  * for triangles and tetrahedra, with orders beyond \p THIRTIETH.
  *
- * @author John W. Peterson, 2003
+ * \author John W. Peterson
+ * \date 2003
  */
 class QJacobi : public QBase
 {

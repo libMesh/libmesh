@@ -43,7 +43,8 @@ class System;
  * for h refinement - any elements which do not contain a
  * user-provided singular point are instead flagged for p refinement.
  *
- * @author Roy H. Stogner, 2006.
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class HPSingularity
 {

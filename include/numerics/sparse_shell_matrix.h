@@ -31,13 +31,12 @@
 namespace libMesh
 {
 
-
 /**
  * This class allows to use any SparseMatrix object as a shell matrix.
  *
- * @author Tim Kroeger, 2008
+ * \author Tim Kroeger
+ * \date 2008
  */
-
 template <typename T>
 class SparseShellMatrix : public ShellMatrix<T>
 {

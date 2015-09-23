@@ -44,7 +44,8 @@ class System;
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2007
+ * \author Roy H. Stogner
+ * \date 2007
  */
 class TwostepTimeSolver : public AdaptiveTimeSolver
 {

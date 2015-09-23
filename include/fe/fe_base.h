@@ -93,7 +93,8 @@ class InfFE;
  * This class is well 'at the heart' of the library, so
  * things in here should better remain unchanged.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
 template <typename OutputType>
 class FEGenericBase : public FEAbstract

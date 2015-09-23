@@ -49,7 +49,8 @@ template <typename T> class NumericVector;
  * the computed errors are stored as floats rather than doubles
  * since the required precision is low.
  *
- * @author Benjamin S. Kirk, 2003.
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 class ErrorEstimator
 {

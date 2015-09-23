@@ -31,27 +31,21 @@
 #include "libmesh/eigen_core_support.h"
 #include "libmesh/numeric_vector.h"
 
-// C++ includes
-
-// Eigen includes
-
 namespace libMesh
 {
-
 
 // Forward declarations
 template <typename T> class EigenSparseMatrix;
 template <typename T> class EigenSparseLinearSolver;
 template <typename T> class SparseMatrix;
 
-
 /**
  * Eigen vector.  Provides a nice interface to the
  * Eigen C-based data structures for serial vectors.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
-
 template <typename T>
 class EigenSparseVector : public NumericVector<T>
 {

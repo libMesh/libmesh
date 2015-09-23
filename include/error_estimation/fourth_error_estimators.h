@@ -30,18 +30,13 @@
 namespace libMesh
 {
 
-
-
-
-
-
-
 /**
  * This class is an error indicator based on laplacian jumps between
  * elements.
  * See the JumpErrorEstimator class for most user APIs
  *
- * @author Roy H. Stogner, 2005
+ * \author Roy H. Stogner
+ * \date 2005
  */
 class LaplacianErrorEstimator : public JumpErrorEstimator
 {

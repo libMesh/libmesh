@@ -36,7 +36,8 @@ namespace libMesh
  *
  * This class defines a set of parameters index by strings.
  *
- * @author David J. Knezevic, 2012
+ * \author David J. Knezevic
+ * \date 2012
  */
 class RBParameters
 {

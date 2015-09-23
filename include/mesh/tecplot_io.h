@@ -34,12 +34,11 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements writing meshes in the Tecplot format.
  *
- * @author Benjamin S. Kirk, 2004
+ * \author Benjamin S. Kirk
+ * \date 2004
  */
 class TecplotIO : public MeshOutput<MeshBase>
 {

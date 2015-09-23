@@ -43,13 +43,12 @@ template <typename T> class NumericVector;
 class DofMap;
 class PointLocatorBase;
 
-
-
 /**
  * This class provides function-like objects for data
  * distributed over a mesh.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 class MeshFunction : public FunctionBase<Number>,
                      public ParallelObject

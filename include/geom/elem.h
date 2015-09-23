@@ -85,7 +85,8 @@ class PointLocatorBase;
  * In all that follows, nodes that live either on edges, faces or the
  * interior are named @e second-order nodes.
  *
- * \author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 class Elem : public ReferenceCountedObject<Elem>,
              public DofObject

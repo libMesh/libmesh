@@ -42,7 +42,8 @@ namespace libMesh
  * ParsedFEMFunction provides support for FParser-based parsed
  * functions in FEMSystem.
  *
- * @author Roy Stogner, 2014.
+ * \author Roy Stogner
+ * \date 2014
  */
 template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>

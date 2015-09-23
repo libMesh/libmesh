@@ -50,7 +50,8 @@ namespace libMesh
  * misimplementation will be the fault of Roy Stogner.  It's also
  * Roy's fault there's no literature reference here yet.
  *
- * @author Roy H. Stogner, 2009.
+ * \author Roy H. Stogner
+ * \date 2009
  */
 class AdjointResidualErrorEstimator : public ErrorEstimator
 {

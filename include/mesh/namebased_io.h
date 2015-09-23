@@ -38,7 +38,8 @@ class MeshBase;
  * Other I/O classes may have more advanced features that are not
  * accessible via this interface.
  *
- * @author Roy H. Stogner, 2015
+ * \author Roy H. Stogner
+ * \date 2015
  */
 class NameBasedIO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>

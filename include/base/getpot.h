@@ -128,7 +128,8 @@ namespace GETPOT_NAMESPACE {
  * GetPot - A class for parsing comand line arguments and
  * configuration files.
  *
- * @author (C) 2001-2002 Frank R. Schaefer
+ * \author Frank R. Schaefer
+ * \date (C) 2001-2002
  */
 class GetPot
 {

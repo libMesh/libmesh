@@ -62,7 +62,9 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
  * This class provides an interface to the NLopt optimization solvers.
  * http://ab-initio.mit.edu/wiki/index.php/NLopt
  *
- * @author David Knezevic and John Peterson, 2015
+ * \author David Knezevic
+ * \author John Peterson
+ * \date 2015
  */
 template <typename T>
 class NloptOptimizationSolver : public OptimizationSolver<T>

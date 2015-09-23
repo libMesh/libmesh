@@ -31,7 +31,9 @@ namespace libMesh
  * The \p XdrSHEAD class.  This class is responsible for
  * reading/writing \p xdr solution file headers.
  *
- * @author Bill Barth, Robert McLay.
+ * \author Bill Barth
+ * \author Robert McLay
+ * \date 2000
  */
 class XdrSHEAD : public XdrHEAD
 {

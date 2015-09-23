@@ -28,15 +28,13 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class implemenets Simpson quadrature.
  * This is the same thing as Newton-Cotes quadrature with three points.
  * Simpson's rule can integrate polynomials of degree three exactly.
  *
- * @author John W. Peterson, 2003
+ * \author John W. Peterson
+ * \date 2003
  */
 class QSimpson : public QBase
 {

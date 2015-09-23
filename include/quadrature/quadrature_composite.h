@@ -42,7 +42,8 @@ namespace libMesh
  * ElemCutter, which is only available if libmesh is configured with
  * --disable-strict-lgpl.
  *
- * @author Benjamin Kirk, 2013.
+ * \author Benjamin Kirk
+ * \date 2013
  */
 template <class QSubCell>
 class QComposite : public QSubCell

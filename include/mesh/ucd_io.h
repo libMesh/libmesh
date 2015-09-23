@@ -34,12 +34,11 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements reading & writing meshes in the AVS's UCD format.
  *
- * @author Benjamin S. Kirk, 2004
+ * \author Benjamin S. Kirk
+ * \date 2004
  */
 class UCDIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>

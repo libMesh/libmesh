@@ -34,7 +34,8 @@ namespace libMesh
  * This just requires an extra set of ElemAssembly functors
  * for the time-derivative term.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class TransientRBAssemblyExpansion : public RBAssemblyExpansion
 {

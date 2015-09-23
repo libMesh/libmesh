@@ -32,13 +32,11 @@
 namespace libMesh
 {
 
-
 // Forward Declarations
 class Node;
 class Elem;
 class MeshBase;
 class MeshDataUnvHeader;
-
 
 /**
  * The \p MeshData class handles actual data and the corresponding
@@ -50,7 +48,8 @@ class MeshDataUnvHeader;
  * To use \p MeshData, it has to be either activated or the compatibility
  * mode has to be enabled.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 class MeshData
 {

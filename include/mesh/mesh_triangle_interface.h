@@ -44,7 +44,8 @@ class UnstructuredMesh;
  * A C++ interface between LibMesh and the Triangle library written by
  * J.R. Shewchuk.
  *
- * @author John W. Peterson
+ * \author John W. Peterson
+ * \date 2011
  */
 class TriangleInterface
 {

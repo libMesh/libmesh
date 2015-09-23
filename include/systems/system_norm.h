@@ -39,7 +39,8 @@ namespace libMesh
  * Discrete vector norms and weighted l2 combinations of Sobolev norms and
  * seminorms are representable.
  *
- * @author Roy H. Stogner 2008
+ * \author Roy H. Stogner
+ * \date 2008
  */
 class SystemNorm
 {

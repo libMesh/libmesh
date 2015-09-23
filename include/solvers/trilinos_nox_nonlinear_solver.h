@@ -49,9 +49,9 @@ class Problem_Interface;
  * iterative solvers that is compatible with the \p libMesh
  * \p NonlinearSolver<>
  *
- * @author Chris Newman, 2008
+ * \author Chris Newman
+ * \date 2008
  */
-
 template <typename T>
 class NoxNonlinearSolver : public NonlinearSolver<T>
 {

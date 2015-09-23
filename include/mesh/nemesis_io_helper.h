@@ -55,7 +55,8 @@ extern "C" {
  * ExodusII_IO_Helper object, since Nemesis is based on
  * the same file format.
  *
- * @author John W. Peterson, 2008.
+ * \author John W. Peterson
+ * \date 2008
  */
 class Nemesis_IO_Helper : public ExodusII_IO_Helper
 {

@@ -58,9 +58,9 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
  * from various different solver packages in
  * different formats.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
 template <typename T>
 class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
                      public ParallelObject

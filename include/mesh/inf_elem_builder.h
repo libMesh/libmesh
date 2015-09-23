@@ -46,8 +46,9 @@ class Node;
  * top of an existing mesh.  It only makes sense to
  * use this if LIBMESH_ENABLE_INFINITE_ELEMENTS is true.
  *
- * @author original code by Daniel Dreyer, converted
- * to InfElemBuilder class by John W. Peterson, 2004.
+ * \author Daniel Dreyer
+ * \author John W. Peterson
+ * \date 2004
  */
 class InfElemBuilder
 {

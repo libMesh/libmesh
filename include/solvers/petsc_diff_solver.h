@@ -46,7 +46,8 @@ namespace libMesh
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2008
+ * \author Roy H. Stogner
+ * \date 2008
  */
 class PetscDiffSolver : public DiffSolver
 {

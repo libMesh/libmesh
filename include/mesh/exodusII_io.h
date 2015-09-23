@@ -44,7 +44,9 @@ class System;
  * default, LibMesh expects ExodusII files to have a ".exd"
  * or ".e" file extension.
  *
- * @author Benjamin Kirk, John Peterson, 2004.
+ * \author Benjamin Kirk
+ * \author John Peterson
+ * \date 2004
  */
 class ExodusII_IO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>,

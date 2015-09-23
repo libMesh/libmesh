@@ -33,13 +33,12 @@
 namespace libMesh
 {
 
-
-
 /**
  * This is the base class for enabling reference counting.  It
  * should not be used by the user, thus it has a private constructor.
  *
- * \author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 class ReferenceCounter
 {

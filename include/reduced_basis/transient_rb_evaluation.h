@@ -44,7 +44,8 @@ class TransientRBThetaExpansion;
  * We can handle time controls on the RHS as h(t)*f(x,\mu).
  * See Martin Grepl's thesis for more details.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class TransientRBEvaluation : public RBEvaluation, public RBTemporalDiscretization
 {

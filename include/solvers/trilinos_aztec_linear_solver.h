@@ -44,9 +44,9 @@ namespace libMesh
  * iterative solvers that is compatible with the \p libMesh
  * \p LinearSolver<>
  *
- * @author Benjamin Kirk, 2002-2008
+ * \author Benjamin Kirk
+ * \date 2002-2008
  */
-
 template <typename T>
 class AztecLinearSolver : public LinearSolver<T>
 {

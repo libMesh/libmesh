@@ -39,7 +39,8 @@ class Solver;
  * simulation.  A user can define a solver by deriving from this
  * class and implementing certain functions.
  *
- * @author Benjamin S. Kirk, 2003-2004.
+ * \author Benjamin S. Kirk
+ * \date 2003-2004
  */
 class Solver : public ReferenceCountedObject<Solver>
 {

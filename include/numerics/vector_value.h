@@ -34,7 +34,8 @@ namespace libMesh
  * and NumberVectorValue defines a real or complex-valued vector depending
  * on how the library was configured.
  *
- * \author Benjamin S. Kirk, 2003.
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 template <typename T>
 class VectorValue : public TypeVector<T>

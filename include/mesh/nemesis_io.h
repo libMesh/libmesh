@@ -35,7 +35,6 @@ namespace libMesh
 // Forward declarations
 class Nemesis_IO_Helper;
 
-
 /**
  * The \p Nemesis_IO class implements reading parallel meshes in the
  * \p Nemesis file format from Sandia National Labs.  Nemesis files
@@ -45,7 +44,8 @@ class Nemesis_IO_Helper;
  * of files the Mesh is split into and rank is the ID of the processor's
  * elements that were written to the file.
  *
- * @author John Peterson, 2008.
+ * \author John Peterson
+ * \date 2008
  */
 class Nemesis_IO : public MeshInput<MeshBase>,
                    public MeshOutput<MeshBase>,

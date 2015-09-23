@@ -53,9 +53,9 @@ template <typename T> class SparseMatrix;
  * Epetra vector. Provides a nice interface to the
  * Trilinos Epetra data structures for parallel vectors.
  *
- * @author Derek R. Gaston, 2008
+ * \author Derek R. Gaston
+ * \date 2008
  */
-
 template <typename T>
 class EpetraVector : public NumericVector<T>
 {

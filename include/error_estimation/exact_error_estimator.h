@@ -61,7 +61,8 @@ typedef NumberVectorValue   Gradient;
  * approximation error in other estimates, so this
  * estimator can be used to calculate effectivity.
  *
- * @author Roy Stogner, 2006.
+ * \author Roy Stogner
+ * \date 2006
  */
 class ExactErrorEstimator : public ErrorEstimator
 {

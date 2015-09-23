@@ -35,7 +35,8 @@ namespace libMesh
  * simulation.  A user can define a linear by deriving from this
  * class and implementing certain functions.
  *
- * @author Benjamin S. Kirk, 2003-2004.
+ * \author Benjamin S. Kirk
+ * \date 2003-2004
  */
 template <class T = Solver>
 class Linear : public T

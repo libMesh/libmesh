@@ -52,9 +52,9 @@ template <typename T> class ShellMatrix;
  * This class provides an interface to the suite of preconditioners available
  * from Petsc.
  *
- * @author Derek Gaston, 2009
+ * \author Derek Gaston
+ * \date 2009
  */
-
 template <typename T>
 class PetscPreconditioner : public Preconditioner<T>
 {

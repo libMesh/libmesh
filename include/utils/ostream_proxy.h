@@ -35,7 +35,8 @@ namespace libMesh
  *
  * It is up to the user to ensure that the target ostream remains valid.
  *
- * @author Roy Stogner, 2010.
+ * \author Roy Stogner
+ * \date 2010
  */
 template <typename charT=char, typename traits=std::char_traits<charT> >
 class BasicOStreamProxy

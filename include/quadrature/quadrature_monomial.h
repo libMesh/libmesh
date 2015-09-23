@@ -28,9 +28,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class defines alternate quadrature rules on
  * "tensor-product" elements (QUADs and HEXes) which can be
@@ -58,10 +55,9 @@ namespace libMesh
  * We also provide the original reference for each rule, as available,
  * in the source code file.
  *
- * @author John W. Peterson, 2008
+ * \author John W. Peterson
+ * \date 2008
  */
-
-
 class QMonomial : public QBase
 {
 public:

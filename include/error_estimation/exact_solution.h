@@ -56,11 +56,10 @@ typedef NumberVectorValue   Gradient;
  * for any component of any system.  These are the exact_value
  * and exact_deriv functions below.
  *
- * @author Benjamin S. Kirk w/ modifications for libmesh
- * by John W. Peterson
+ * \author Benjamin S. Kirk
+ * \author John W. Peterson (modifications for libmesh)
+ * \date 2004
  */
-
-
 class ExactSolution
 {
 

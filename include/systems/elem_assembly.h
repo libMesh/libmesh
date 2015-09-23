@@ -32,7 +32,8 @@ class FEMContext;
  * ElemAssembly provides a per-element (interior and boundary) assembly
  * functionality.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class ElemAssembly : public ReferenceCountedObject<ElemAssembly>
 {

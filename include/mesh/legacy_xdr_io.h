@@ -38,7 +38,9 @@ class MeshData;
 /**
  * The LegacyXdrIO class has been replaced by the XdrIO class.
  *
- * @author Benjamin Kirk, John Peterson, 2004.
+ * \author Benjamin Kirk
+ * \author John Peterson
+ * \date 2004
  */
 class LegacyXdrIO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>

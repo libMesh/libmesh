@@ -47,7 +47,8 @@ class Elem;
  * images for publications, since I didn't find/don't know of a free
  * visualization program which would do this.
  *
- * @author John W. Peterson, 2008
+ * \author John W. Peterson
+ * \date 2008
  */
 class PostscriptIO : public MeshOutput<MeshBase>
 {

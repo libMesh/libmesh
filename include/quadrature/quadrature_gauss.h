@@ -28,15 +28,14 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class implemenets specific orders of Gauss quadrature.
  * Gauss quadrature rules of Order \p p have the property of
  * integrating polynomials of degree \p p exactly.
  *
- * @author Benjamin Kirk and John W. Peterson, 2003.
+ * \author Benjamin Kirk
+ * \author John W. Peterson
+ * \date 2003
  */
 class QGauss : public QBase
 {

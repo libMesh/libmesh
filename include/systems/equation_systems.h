@@ -60,7 +60,8 @@ class MeshBase;
  * may be handled.  Also other features, like flags,
  * parameters, I/O etc are provided.
  *
- * @author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 class EquationSystems : public ReferenceCountedObject<EquationSystems>,
                         public ParallelObject

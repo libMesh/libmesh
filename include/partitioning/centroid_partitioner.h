@@ -43,7 +43,9 @@ class Elem;
  * define "less than" differently than if you cared about radial
  * distance.
  *
- * @author John W. Peterson and Benjamin S. Kirk, 2003
+ * \author John W. Peterson
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 class CentroidPartitioner : public Partitioner
 {

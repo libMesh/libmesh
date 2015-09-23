@@ -29,21 +29,18 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * Defines an abstract dense vector base class for use in
  * Finite Element-type computations. Specialized dense vectors,
  * for example DenseSubVectors, can be derived from this class.
  *
- * @author John W. Peterson, 2003
+ * \author John W. Peterson
+ * \date 2003
  */
 template<typename T>
 class DenseVectorBase
 {
 public:
-
   /**
    * Constructor.  Empty.
    */
@@ -103,14 +100,6 @@ public:
   void print_scientific(std::ostream& os) const;
 
 };
-
-
-
-// ------------------------------------------------------------
-// DenseVectorBase member functions
-
-
-
 
 } // namespace libMesh
 

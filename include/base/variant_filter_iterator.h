@@ -43,7 +43,8 @@
  * off the end or the beginning.  To reduce complexity, we only allow
  * traversal in one direction.
  *
- * @author John W. Peterson, 2004.
+ * \author John W. Peterson
+ * \date 2004
  */
 template<class Predicate, class Type, class ReferenceType = Type&, class PointerType = Type*>
 class variant_filter_iterator :

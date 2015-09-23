@@ -62,7 +62,8 @@ typedef RealTensorValue RealTensor;
  * This code is currently experimental and will not produce optimal
  * hp meshes without significant improvement.
  *
- * @author Roy H. Stogner, 2006.
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class HPCoarsenTest : public HPSelector
 {

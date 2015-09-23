@@ -42,7 +42,8 @@ class System;
  * for h refinement, and we may want to change some of those elements
  * to be flagged for p refinement.
  *
- * @author Roy H. Stogner, 2006.
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class HPSelector
 {

@@ -32,15 +32,13 @@ namespace libMesh
 // Forward Delcarations
 template <typename T> class DenseVectorBase;
 
-
-
-
 /**
  * Defines an abstract dense matrix base class for use in Finite Element-type
  * computations.  Specialized dense matrices, for example DenseSubMatrices,
  * can be derived from this class.
  *
- * @author John W. Peterson, 2003
+ * \author John W. Peterson
+ * \date 2003
  */
 template<typename T>
 class DenseMatrixBase

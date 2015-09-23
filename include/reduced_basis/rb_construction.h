@@ -47,7 +47,8 @@ class RBAssemblyExpansion;
  * of the certified reduced basis method for
  * steady-state elliptic parametrized PDEs.
  *
- * @author David J. Knezevic, 2009
+ * \author David J. Knezevic
+ * \date 2009
  */
 class RBConstruction : public RBConstructionBase<LinearImplicitSystem>
 {

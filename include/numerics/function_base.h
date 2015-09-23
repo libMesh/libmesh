@@ -31,11 +31,8 @@
 namespace libMesh
 {
 
-
-
 // Forward Declarations
 class Point;
-
 
 /**
  * This is the base class for functor-like classes.  These
@@ -56,7 +53,8 @@ class Point;
  * spatial dimensions, libMesh is expecting 2 components (i.e.
  * mesh_dimension() number of components).
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 template <typename Output=Number>
 class FunctionBase

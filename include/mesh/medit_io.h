@@ -33,8 +33,6 @@ namespace libMesh
 // Forward declarations:
 class MeshBase;
 
-
-
 /**
  * This class implements writing meshes in the mesh format
  * used by the MEdit visualization tool developed in the Gamma Project
@@ -43,7 +41,8 @@ class MeshBase;
  * MEdit software see the
  * <a href="http://www-rocq1.inria.fr/gamma/medit/medit.html">MEdit home page</a>.
  *
- * @author F. Prill, 2004
+ * \author Florian Prill
+ * \date 2004
  */
 class MEDITIO : public MeshOutput<MeshBase>
 {

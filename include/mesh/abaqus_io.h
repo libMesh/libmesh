@@ -29,11 +29,13 @@
 
 namespace libMesh
 {
+
 /**
  * The AbaqusIO class is a preliminary implementation for reading
  * Abaqus mesh files in ASCII format.
  *
- * @author John W. Peterson, 2011.
+ * \author John W. Peterson
+ * \date 2011
  */
 class AbaqusIO : public MeshInput<MeshBase>
 {

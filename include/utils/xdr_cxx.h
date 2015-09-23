@@ -61,7 +61,8 @@ namespace libMesh
  * created to handle equation system output as a replacement for
  * XdrIO since that is somewhat limited.
  *
- * @author Benjamin Kirk, 2003.
+ * \author Benjamin Kirk
+ * \date 2003
  */
 class Xdr
 {

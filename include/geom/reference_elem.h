@@ -36,7 +36,8 @@ class Elem;
  * This namespace implements singleton reference elements for each
  * fundamental element type supported by \p libMesh.
  *
- * \author Benjamin S. Kirk, 2013.
+ * \author Benjamin S. Kirk
+ * \date 2013
  */
 namespace ReferenceElem
 {

@@ -33,18 +33,16 @@
 namespace libMesh
 {
 
-
-
 // Forward Declarations
 class Point;
-
 
 /**
  * FEMFunctionBase is a base class from which users can derive in
  * order to define "function-like" objects that can be used within
  * FEMSystem.
  *
- * @author Roy Stogner, 2012.
+ * \author Roy Stogner
+ * \date 2012
  */
 template <typename Output=Number>
 class FEMFunctionBase

@@ -47,7 +47,8 @@ namespace libMesh
  * for standard reduced basis, EigenSystem for SCM)
  * at compile time.
  *
- * @author David J. Knezevic, 2009
+ * \author David J. Knezevic
+ * \date 2009
  */
 template<class Base>
 class RBConstructionBase : public Base, public RBParametrized

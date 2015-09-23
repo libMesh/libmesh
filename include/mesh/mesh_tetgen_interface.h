@@ -40,15 +40,16 @@ namespace libMesh
 class UnstructuredMesh;
 class TetGenWrapper;
 
-
 /**
  * Class \p TetGenMeshInterface provides an interface for
  * tetrahedrization of meshes using the TetGen library.  For
  * information about TetGen cf.
  * <a href="http://tetgen.berlios.de/">TetGen home page</a>.
  *
- * @author, Steffen Petersen, 2004
- * Refactoring, John W. Peterson, 2011
+ * \author Steffen Petersen
+ * \date 2004
+ * \author John W. Peterson
+ * \date 2011
  */
 class TetGenMeshInterface
 {

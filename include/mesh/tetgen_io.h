@@ -42,7 +42,8 @@ class MeshData;
  * Format description:
  * cf. <a href="http://tetgen.berlios.de/">TetGen home page</a>.
  *
- * @author Benjamin S. Kirk, 2004
+ * \author Benjamin S. Kirk
+ * \date 2004
  */
 class TetGenIO : public MeshInput<MeshBase>,
                  public MeshOutput<MeshBase>

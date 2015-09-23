@@ -36,7 +36,8 @@ namespace libMesh
  * are for use with Amtec's <a href="http://www.tecplot.com">Tecplot</a>
  * visualization package.
  *
- * @author Benjamin S. Kirk, 2004.
+ * \author Benjamin S. Kirk
+ * \date 2004
  */
 class PltLoader
 {

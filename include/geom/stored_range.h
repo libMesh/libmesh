@@ -29,7 +29,6 @@
 namespace libMesh
 {
 
-
 /**
  * The \p StoredRange class defined a contiguous, divisible set of objects
  * This class is used primarily as the argument to function objects.  The
@@ -45,7 +44,8 @@ namespace libMesh
  * such iterators has a cost proportional to the amount the iterator is advanced.
  * Hence in this implementation the user-provided range is packed into a vector.
  *
- * \author Benjamin S. Kirk, 2008.
+ * \author Benjamin S. Kirk
+ * \date 2008
  */
 template <typename iterator_type, typename object_type>
 class StoredRange

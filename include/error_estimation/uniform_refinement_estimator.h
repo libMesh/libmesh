@@ -39,7 +39,8 @@ namespace libMesh
  * and the solution on a uniformly refined (in h and/or p,
  * for an arbitrary number of levels) grid.
  *
- * @author Roy H. Stogner, 2006.
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class UniformRefinementEstimator : public ErrorEstimator
 {

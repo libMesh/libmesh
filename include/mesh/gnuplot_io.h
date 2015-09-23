@@ -37,7 +37,8 @@ class MeshBase;
  * This class implements writing meshes using GNUplot, designed for
  * use only with 1D meshes.
  *
- * @author David Knezevic, 2005
+ * \author David Knezevic
+ * \date 2005
  */
 class GnuPlotIO : public MeshOutput<MeshBase>
 {

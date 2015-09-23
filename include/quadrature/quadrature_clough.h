@@ -28,14 +28,12 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class creates a gaussian quadrature rule duplicated for each
  * subelement of a Clough-Tocher divided macroelement.
  *
- * @author Roy Stogner, 2005.
+ * \author Roy Stogner
+ * \date 2005
  */
 class QClough : public QBase
 {

@@ -50,7 +50,8 @@ class TetGenMeshInterface;
  * interfaces, the former of which is only defined if libmesh is configured
  * with --disable-strict-lgpl.
  *
- * \author Benjamin S. Kirk, 2013
+ * \author Benjamin S. Kirk
+ * \date 2013
  */
 class ElemCutter
 {

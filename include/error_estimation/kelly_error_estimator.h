@@ -57,7 +57,8 @@ class Point;
  * }
  * \endverbatim
  *
- * @author Benjamin S. Kirk, 2003.
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 class KellyErrorEstimator : public JumpErrorEstimator
 {

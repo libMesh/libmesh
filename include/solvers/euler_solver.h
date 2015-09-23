@@ -37,7 +37,8 @@ namespace libMesh
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2006
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class EulerSolver : public FirstOrderUnsteadySolver
 {

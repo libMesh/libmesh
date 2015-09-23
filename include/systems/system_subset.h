@@ -36,7 +36,8 @@ class System;
  * This is a base class for classes which represent subsets of the
  * dofs of a \p System.
  *
- * @author Tim Kroeger, 2010.
+ * \author Tim Kroeger
+ * \date 2010
  */
 class SystemSubset : public ReferenceCountedObject<SystemSubset>
 {
@@ -47,8 +48,6 @@ public:
    */
   explicit
   SystemSubset (const System& system);
-
-public:
 
   /**
    * Destructor.

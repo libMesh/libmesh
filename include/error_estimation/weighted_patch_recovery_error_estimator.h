@@ -43,8 +43,8 @@ class Elem;
 /**
  * This class implements the Patch Recovery error indicator.
  *
- *
- * @author Vikram Garg 2012.
+ * \author Vikram Garg
+ * \date 2012
  */
 class WeightedPatchRecoveryErrorEstimator : public PatchRecoveryErrorEstimator
 {

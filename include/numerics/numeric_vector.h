@@ -54,7 +54,8 @@ template <typename T> class ShellMatrix;
  * to vector storage schemes for different linear
  * algebra libraries.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 template <typename T>
 class NumericVector : public ReferenceCountedObject<NumericVector<T> >,

@@ -44,7 +44,8 @@ template <typename T> class NumericVector;
  * RBEvaluation encapsulates the functionality required
  * to _evaluate_ a given reduced basis model.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class RBEvaluation : public RBParametrized,
                      public ParallelObject

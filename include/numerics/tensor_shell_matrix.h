@@ -35,9 +35,9 @@ namespace libMesh
  * Shell matrix that is given by a tensor of two vectors, i.e. A =
  * v*w^T.
  *
- * @author Tim Kroeger, 2008
+ * \author Tim Kroeger
+ * \date 2008
  */
-
 template <typename T>
 class TensorShellMatrix : public ShellMatrix<T>
 {

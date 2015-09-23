@@ -45,7 +45,8 @@ namespace libMesh
  * RBSCMConstruction implements the the Successive Constraint Method (SCM)
  * for computing rigorous lower bounds for stability constants.
  *
- * @author David J. Knezevic 2009
+ * \author David J. Knezevic
+ * \date 2009
  */
 class RBSCMConstruction : public RBConstructionBase<CondensedEigenSystem>
 {

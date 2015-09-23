@@ -40,14 +40,15 @@ class MeshData;
 class Xdr;
 class Elem;
 
-
 /**
  * MeshIO class used for writing XDR (eXternal Data Representation)
  * and XDA mesh files.  XDR/XDA is libmesh's internal data format, and
  * allows the full refinement tree structure of the mesh to be written
  * to file.
  *
- * @author Benjamin Kirk, John Peterson, 2004.
+ * \author Benjamin Kirk
+ * \author John Peterson
+ * \date 2004
  */
 class XdrIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>,

@@ -55,7 +55,8 @@ class PointLocatorBase;
  * Using this class, one need not worry about the correct
  * finite element class.
  *
- * @author Daniel Dreyer, 2002-2007
+ * \author Daniel Dreyer
+ * \date 2002-2007
  */
 class FEInterface
 {

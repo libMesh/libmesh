@@ -55,9 +55,9 @@ extern "C"
 /**
  * This class provides an interface to the Tao optimization solvers.
  *
- * @author David Knezevic, 2015
+ * \author David Knezevic
+ * \date 2015
  */
-
 template <typename T>
 class TaoOptimizationSolver : public OptimizationSolver<T>
 {

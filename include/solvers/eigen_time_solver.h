@@ -60,10 +60,9 @@ template <typename T> class EigenSolver;
  * interface for EigenValue software.  The only current concrete implementation
  * is a SLEPc-based eigensolver class, which we make use of here as well.
  *
- * @author John W. Peterson 2007
+ * \author John W. Peterson
+ * \date 2007
  */
-
-
 class EigenTimeSolver : public TimeSolver
 {
 public:

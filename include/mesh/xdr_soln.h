@@ -36,7 +36,9 @@ class XdrSHEAD;
  * information about the solution
  * to \p xdr style binary files.
  *
- * @author Bill Barth, Robert McLay.
+ * \author Bill Barth
+ * \author Robert McLay
+ * \date 2000
  */
 class XdrSOLN: public XdrMGF
 {

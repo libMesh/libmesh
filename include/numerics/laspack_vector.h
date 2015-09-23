@@ -40,19 +40,17 @@
 namespace libMesh
 {
 
-
 // Forward declarations
 template <typename T> class LaspackLinearSolver;
 template <typename T> class SparseMatrix;
-
 
 /**
  * Laspack vector.  Provides a nice interface to the
  * Laspack C-based data structures for serial vectors.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
-
 template <typename T>
 class LaspackVector : public NumericVector<T>
 {

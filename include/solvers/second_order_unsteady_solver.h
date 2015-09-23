@@ -32,7 +32,8 @@ namespace libMesh
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Paul T. Bauman 2015
+ * \author Paul T. Bauman
+ * \date 2015
  */
 class SecondOrderUnsteadySolver : public UnsteadySolver
 {

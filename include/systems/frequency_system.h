@@ -35,9 +35,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * \p FrequencySystem provides a specific system class
  * for frequency-dependent (linear) systems.
@@ -60,7 +57,8 @@ namespace libMesh
  *   of \p EquationSystems<FrequencySystem> named \p current \p frequency.
  *   For this to work, only provide @e one frequency.
  *
- * \author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 class FrequencySystem : public LinearImplicitSystem
 {

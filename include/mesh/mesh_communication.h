@@ -36,14 +36,13 @@ class MeshBase;
 class ParallelMesh;
 class BoundaryInfo;
 
-
-
 /**
  * This is the \p MeshCommunication class.  It handles all the details
  * of communicating mesh information from one processor to another.  All
  * parallelization of the \p Mesh data structures is done via this class.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 class MeshCommunication
 {

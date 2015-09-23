@@ -31,15 +31,14 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements writing meshes in the Diva format.
  * This is a scientific visualization program created by Kelly Gaither.
  * More information on Diva can be found here:
  * http://www.erc.msstate.edu/simcenter/docs/diva/
  *
- * @author John W. Peterson, 2004
+ * \author John W. Peterson
+ * \date 2004
  */
 class DivaIO : public MeshOutput<MeshBase>
 {

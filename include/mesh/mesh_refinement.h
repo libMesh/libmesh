@@ -47,13 +47,12 @@ class Node;
 class ErrorVector;
 class PeriodicBoundaries;
 
-
-
 /**
  * This is the \p MeshRefinement class.  This class implements
  * adaptive mesh refinement algorithms for a \p MeshBase.
  *
- * @author Benjamin S. Kirk, 2002-2007.
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 class MeshRefinement : public ParallelObject
 {

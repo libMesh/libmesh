@@ -43,7 +43,8 @@ class Point;
  * for debugging purposes.  It derives from ErrorEstimator
  * just in case someone finds it useful in a DG framework.
  *
- * @author Roy H. Stogner, 2006.
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class DiscontinuityMeasure : public JumpErrorEstimator
 {

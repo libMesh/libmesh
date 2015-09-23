@@ -47,7 +47,8 @@ class Elem;
  * \p dim dimensional points describing the quadrature locations
  * (referenced to a master object) and associated weights.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
 class QBase : public ReferenceCountedObject<QBase>
 {

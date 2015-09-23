@@ -53,9 +53,9 @@ template <typename T> class ShellMatrix;
  * This class provides an interface to the suite of preconditioners available
  * from Trilinos.
  *
- * @author David Andrs, 2011
+ * \author David Andrs
+ * \date 2011
  */
-
 template <typename T>
 class TrilinosPreconditioner :
     public Preconditioner<T>,

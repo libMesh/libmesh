@@ -869,7 +869,8 @@ protected:
  * FELagrangeVec objects are used for working with vector-valued
  * finite elements
  *
- * @author Paul T. Bauman 2013.
+ * \author Paul T. Bauman
+ * \date 2013
  */
 template <unsigned int Dim>
 class FELagrangeVec : public FE<Dim,LAGRANGE_VEC>
@@ -891,7 +892,8 @@ public:
  * FENedelecOne objects are used for working with vector-valued
  * Nedelec finite elements of the first kind.
  *
- * @author Paul T. Bauman 2013.
+ * \author Paul T. Bauman
+ * \date 2013
  */
 template <unsigned int Dim>
 class FENedelecOne : public FE<Dim,NEDELEC_ONE>

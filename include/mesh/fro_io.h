@@ -32,13 +32,12 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements writing meshes in the .fro format
  * used by the MIT ACDL.  Valid only for triangular meshes.
  *
- * @author Benjamin S. Kirk, 2007
+ * \author Benjamin S. Kirk
+ * \date 2007
  */
 class FroIO : public MeshOutput<MeshBase>
 {
@@ -55,10 +54,6 @@ public:
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& );
-
-
-private:
-
 };
 
 

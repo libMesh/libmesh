@@ -35,8 +35,10 @@ namespace libMesh
  * The \p TetGenWrapper provides an interface for basic
  * access to TetGen data structures and methods.
  *
- * @author, Steffen Petersen, 2004
- * Refactoring, John W. Peterson, 2011
+ * \author Steffen Petersen
+ * \date 2004
+ * \author John W. Peterson
+ * \date 2011
  */
 class TetGenWrapper
 {

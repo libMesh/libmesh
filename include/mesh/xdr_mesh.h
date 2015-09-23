@@ -36,7 +36,9 @@ class XdrMHEAD;
  * information about the mesh
  * to \p xdr style binary files.
  *
- * @author Bill Barth, Robert McLay.
+ * \author Bill Barth
+ * \author Robert McLay
+ * \date 2000
  */
 class XdrMESH: public XdrMGF
 {

@@ -49,7 +49,8 @@ class NewtonSolver;
  * }
  * \endverbatim
  *
- * @author John W. Peterson 2007
+ * \author John W. Peterson
+ * \date 2007
  */
 class ContinuationSystem : public FEMSystem
 {

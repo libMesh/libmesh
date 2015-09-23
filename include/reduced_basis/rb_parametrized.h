@@ -38,7 +38,8 @@ namespace libMesh
  * This class defines basic functionality of
  * a parametrized object.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class RBParametrized : public ReferenceCountedObject<RBParametrized>
 {

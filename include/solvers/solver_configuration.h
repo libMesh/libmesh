@@ -32,9 +32,9 @@ namespace libMesh
  * configure_solver() in order to provide specific behavior for
  * particular types of solvers (e.g. LinearSolver, EigenSolver, etc).
  *
- * @author David Knezevic, 2015.
+ * \author David Knezevic
+ * \date 2015
  */
-
 class SolverConfiguration : public ReferenceCountedObject<SolverConfiguration>
 {
 public:

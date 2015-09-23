@@ -52,8 +52,9 @@ class MeshData;
  * This class will not have any functionality unless VTK is detected
  * during configure and hence LIBMESH_HAVE_VTK is defined.
  *
- * @author Wout Ruijter, 2007
- * (Checked in to LibMesh by J.W. Peterson)
+ * \author Wout Ruijter
+ * \author John W. Peterson
+ * \date 2007
  */
 class VTKIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>

@@ -30,14 +30,13 @@
 namespace libMesh
 {
 
-
-
 /**
  * Defines a dense submatrix for use in Finite Element-type computations.
  * Useful for storing element stiffness matrices before summation
  * into a global matrix, particularly when you have systems of equations.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
 template<typename T>
 class DenseSubMatrix : public DenseMatrixBase<T>

@@ -29,8 +29,6 @@
 namespace libMesh
 {
 
-
-
 /**
  * This class implements reference counting. Any class that
  * is properly derived from this class will get reference counted, provided
@@ -60,7 +58,8 @@ namespace libMesh
  * or \p DEBUG is not defined then this class does nothing.
  * All members are inlined and empty, so they should effectively disappear.
  *
- * \author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 template <typename T>
 class ReferenceCountedObject : public ReferenceCounter

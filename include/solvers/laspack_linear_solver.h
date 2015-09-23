@@ -40,14 +40,13 @@
 namespace libMesh
 {
 
-
-
 /**
  * This class provides an interface to Laspack
  * iterative solvers that is compatible with the \p libMesh
  * \p LinearSolver<>
  *
- * @author Benjamin Kirk, 2002-2007
+ * \author Benjamin Kirk
+ * \date 2002-2007
  */
 template <typename T>
 class LaspackLinearSolver : public LinearSolver<T>

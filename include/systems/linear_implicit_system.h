@@ -42,7 +42,8 @@ template <typename T> class ShellMatrix;
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p ExplicitSystem.
  *
- * @author Benjamin Kirk, 2005
+ * \author Benjamin Kirk
+ * \date 2005
  */
 class LinearImplicitSystem : public ImplicitSystem
 {

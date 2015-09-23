@@ -36,14 +36,13 @@
 namespace libMesh
 {
 
-
-
 /**
  * This class provides an interface to Eigen
  * iterative solvers that is compatible with the \p libMesh
  * \p LinearSolver<>
  *
- * @author Benjamin Kirk, 2013
+ * \author Benjamin Kirk
+ * \date 2013
  */
 template <typename T>
 class EigenSparseLinearSolver : public LinearSolver<T>

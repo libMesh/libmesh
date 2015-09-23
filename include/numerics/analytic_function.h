@@ -29,19 +29,17 @@
 namespace libMesh
 {
 
-
-
 // Forward Declarations
 template <typename T>
 class DenseVector;
-
 
 /**
  * This class provides function-like objects for which an
  * analytical expression can be provided.  The user may
  * either provide vector-return or number-return functions.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 template <typename Output=Number>
 class AnalyticFunction : public FunctionBase<Output>

@@ -34,7 +34,10 @@ namespace libMesh
  * This class is responsible
  * for reading/writing \p xdr mesh file headers.
  *
- * @author Bill Barth, Robert McLay.  Modified: John W. Peterson
+ * \author Bill Barth
+ * \author Robert McLay
+ * \author John W. Peterson
+ * \date 2000
  */
 class XdrMHEAD : public XdrHEAD
 {

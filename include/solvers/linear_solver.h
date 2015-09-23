@@ -52,9 +52,9 @@ class System;
  * class is overloaded to provide linear solvers from different packages
  * like PETSC or LASPACK.
  *
- * @author Benjamin Kirk, 2003
+ * \author Benjamin Kirk
+ * \date 2003
  */
-
 template <typename T>
 class LinearSolver : public ReferenceCountedObject<LinearSolver<T> >,
                      public ParallelObject

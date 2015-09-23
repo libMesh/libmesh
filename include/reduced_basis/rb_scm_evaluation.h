@@ -45,7 +45,8 @@ namespace libMesh
  * to _evaluate_ the Successive Constraint Method for
  * associated with a reduced basis model.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
 class RBSCMEvaluation : public RBParametrized,
                         public ParallelObject

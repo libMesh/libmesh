@@ -31,8 +31,6 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements reading meshes in the Matlab PDE toolkit
  * in a proprietary  format.
@@ -79,7 +77,8 @@ class MeshBase;
  * o The e matrix is entirely irrelevant in this code
  * o All of the matrices are row based
  *
- * @author John W. Peterson, 2004
+ * \author John W. Peterson
+ * \date 2004
  */
 class MatlabIO : public MeshInput<MeshBase>
 {

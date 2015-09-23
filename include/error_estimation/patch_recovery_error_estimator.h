@@ -41,8 +41,9 @@ class Elem;
 /**
  * This class implements the Patch Recovery error indicator.
  *
- *
- * @author Varis Carey, Benjamin S. Kirk, 2004.
+ * \author Varis Carey
+ * \author Benjamin S. Kirk
+ * \date 2004
  */
 class PatchRecoveryErrorEstimator : public ErrorEstimator
 {

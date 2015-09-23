@@ -35,7 +35,8 @@ class BoundaryInfo;
  * the element and node iterators.  These classes are not in general
  * used by the user, although they could be.
  *
- * @author John W. Peterson, 2004
+ * \author John W. Peterson
+ * \date 2004
  */
 namespace Predicates
 {

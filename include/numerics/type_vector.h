@@ -46,9 +46,9 @@ template <typename T> class TensorValue;
  * for a real-valued point in LIBMESH_DIM-space, or \p SpaceVector for a real
  * or complex-valued vector in LIBMESH_DIM-space.
  *
- * \author Benjamin S. Kirk, 2003.
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
 template <typename T>
 class TypeVector
 {

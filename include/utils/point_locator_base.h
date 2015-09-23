@@ -49,7 +49,8 @@ class Elem;
  * points in space: given a mesh they return the element
  * and local coordinates for a given point in global coordinates.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 class PointLocatorBase : public ReferenceCountedObject<PointLocatorBase>
 {

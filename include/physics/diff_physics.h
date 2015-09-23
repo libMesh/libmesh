@@ -72,7 +72,8 @@ template <typename T> class NumericVector;
  * DiffContext::get_elem_solution_accel_derivative(). The should be incorporated
  * into the Jacobian evaluations, if the Jacobian is being provided.
  *
- * @author Roy H. Stogner 2006
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class DifferentiablePhysics
 {

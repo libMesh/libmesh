@@ -44,7 +44,8 @@ class Elem;
  * Use \p PointLocatorBase::build() to create objects of this
  * type at run time.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
 class PointLocatorTree : public PointLocatorBase
 {

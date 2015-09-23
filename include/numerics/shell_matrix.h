@@ -40,9 +40,9 @@ template <typename T> class NumericVector;
  * but its action on a vector.  This class contains pure virtual
  * members that must be overloaded in derived classes.
  *
- * @author Tim Kroeger, 2008
+ * \author Tim Kroeger
+ * \date 2008
  */
-
 template <typename T>
 class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >,
                     public ParallelObject

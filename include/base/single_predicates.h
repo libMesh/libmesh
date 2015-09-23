@@ -39,7 +39,8 @@ namespace libMesh
  * as building blocks to create the "multi predicates" which can be found
  * in the multi_predicates.h header file.
  *
- * @author John W. Peterson, 2004
+ * \author John W. Peterson
+ * \date 2004
  */
 namespace Predicates
 {

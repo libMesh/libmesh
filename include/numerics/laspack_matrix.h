@@ -37,14 +37,10 @@
 namespace libMesh
 {
 
-
-
 // Forward declarations
 template <typename T> class DenseMatrix;
 template <typename T> class LaspackVector;
 template <typename T> class LaspackLinearSolver;
-
-
 
 /**
  * The LaspackMatrix class wraps a QMatrix object from the Laspack
@@ -52,9 +48,9 @@ template <typename T> class LaspackLinearSolver;
  * class is a full specialization of \p SparseMatrix<T> with \p T = \p
  * Real.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
 template <typename T>
 class LaspackMatrix : public SparseMatrix<T>
 {

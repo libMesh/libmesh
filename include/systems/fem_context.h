@@ -55,7 +55,8 @@ template <typename T> class NumericVector;
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2009
+ * \author Roy H. Stogner
+ * \date 2009
  */
 class FEMContext : public DiffContext
 {

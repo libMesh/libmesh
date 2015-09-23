@@ -42,7 +42,8 @@ class System;
  * refinement.  Future subclasses may handle anisotropic refinement
  * instead.
  *
- * @author Roy H. Stogner, 2006.
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class RefinementSelector
 {

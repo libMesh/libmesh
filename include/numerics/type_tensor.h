@@ -36,17 +36,15 @@ template <typename T> class TypeTensorColumn;
 template <typename T> class ConstTypeTensorColumn;
 template <unsigned int N, typename T> class TypeNTensor;
 
-
-
 /**
  * This class defines a tensor in \p LIBMESH_DIM dimensional space of type T.
  * T may either be Real or Complex.  The default constructor for
  * this class is protected, suggesting that you should not instantiate
  * one of these directly.
  *
- * \author Roy Stogner, 2004.
+ * \author Roy Stogner
+ * \date 2004
  */
-
 template <typename T>
 class TypeTensor
 {

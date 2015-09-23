@@ -159,7 +159,8 @@ class NodeConstraints : public std::map<const Node *,
  * belong to distinct processors.  This is so that the resulting data
  * structures will work well with parallel linear algebra packages.
  *
- * @author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 class DofMap : public ReferenceCountedObject<DofMap>,
                public ParallelObject

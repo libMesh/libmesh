@@ -36,7 +36,8 @@ class MeshBase;
  * This class defines a tree that may be used for fast point
  * location in space.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
 template <unsigned int N>
 class Tree : public TreeBase

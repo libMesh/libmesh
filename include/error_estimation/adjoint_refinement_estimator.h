@@ -41,7 +41,8 @@ namespace libMesh
  * solution as weighted against an adjoint solution on a uniformly
  * refined (in h and/or p, for an arbitrary number of levels) grid.
  *
- * @author Roy H. Stogner, 2009.
+ * \author Roy H. Stogner
+ * \date 2009
  */
 class AdjointRefinementEstimator : public ErrorEstimator
 {
