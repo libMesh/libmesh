@@ -249,6 +249,88 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase& mesh)
       Elem* elem = mesh.elem(eid);
       libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
 
+      // If the triangle happens to be in a corner (two boundary edges), 
+      // we perform a counter-clockwise loop by mirroring the previous triangle
+      // until we come back to the original triangle.
+      // This prevents degenerated triangles in the mesh corners
+      // and guarantees that the node in the middle of the loop is of valence=6.
+      for (unsigned int i = 0; i < elem->n_sides(); ++i)
+        {
+          libmesh_assert_not_equal_to(elem->neighbor(i), elem);
+
+          if (elem->neighbor(i) == NULL && elem->neighbor(next[i]) == NULL)
+          {
+            
+            Elem* nelem = elem;
+            unsigned int k = i ;
+            for (unsigned int l=0;l<4;l++)
+            {
+              // this is the vertex to be mirrored
+              Point point = nelem->point(k) + nelem->point(next[k]) - nelem->point(prev[k]);
+
+              // Check if the proposed vertex doesn't coincide with one of the existing vertices.
+              // This is necessary because for some triangulations, it can happen that two mirrored
+              // ghost vertices coincide, which would then lead to a zero size ghost element below.
+              Node* node = NULL;
+              for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
+                {
+                  if ((*ghost_nodes[j] - point).size() < tol * (elem->point(k) - point).size())
+                    {
+                      node = ghost_nodes[j];
+                      break;
+                    }
+                }
+
+              // add the new vertex only if no other is nearby
+              if (node == NULL)
+                {
+                  node = mesh.add_point(point);
+                  ghost_nodes.push_back(node);
+                }
+
+              Tri3Subdivision* newelem = new Tri3Subdivision();
+
+              // add the first new ghost element to the list just as in the non-corner case
+              if (l==0)
+                ghost_elems.push_back(newelem);
+
+              newelem->set_node(0) = nelem->get_node(next[k]);
+              newelem->set_node(1) = nelem->get_node(k);
+              newelem->set_node(2) = node;
+              newelem->set_neighbor(0,nelem);
+              newelem->set_ghost(true);
+              if (l>0)
+                newelem->set_neighbor(2,NULL);
+              nelem->set_neighbor(k,newelem);
+
+              mesh.add_elem(newelem);
+              mesh.get_boundary_info().add_node(nelem->get_node(k), 1);
+              mesh.get_boundary_info().add_node(nelem->get_node(next[k]), 1);
+              mesh.get_boundary_info().add_node(nelem->get_node(prev[k]), 1);
+              mesh.get_boundary_info().add_node(node, 1);
+
+              nelem = newelem;
+              k = 2 ;
+
+            }
+
+            Tri3Subdivision* newelem = new Tri3Subdivision();
+
+            newelem->set_node(0) = elem->get_node(next[i]);
+            newelem->set_node(1) = nelem->get_node(2);
+            newelem->set_node(2) = elem->get_node(prev[i]);
+            newelem->set_neighbor(0,nelem);
+            nelem->set_neighbor(2,newelem);
+            newelem->set_ghost(true);
+            newelem->set_neighbor(2,elem);
+            elem->set_neighbor(next[i],newelem);
+
+            mesh.add_elem(newelem);
+
+            break;
+          }
+        }
+
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
           libmesh_assert_not_equal_to(elem->neighbor(i), elem);
@@ -313,14 +395,16 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase& mesh)
               Tri3Subdivision *nb1 = static_cast<Tri3Subdivision *>(elem->neighbor(prev[i]));
               Tri3Subdivision *nb2 = nb1;
               unsigned int j = i;
+              unsigned int n_nb = 0 ;
               while (nb1 != NULL && nb1->id() != elem->id())
                 {
                   j = nb1->local_node_number(elem->node(i));
                   nb2 = nb1;
                   nb1 = static_cast<Tri3Subdivision *>(nb1->neighbor(prev[j]));
                   libmesh_assert(nb1 == NULL || nb1->id() != nb2->id());
+                  n_nb++;
                 }
-
+              
               libmesh_assert_not_equal_to(nb2->id(), elem->id());
 
               // Above, we merged coinciding ghost vertices. Therefore, we need
@@ -328,6 +412,53 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase& mesh)
               // these two (identical) ghost nodes.
               if (elem->get_node(next[i])->id() == nb2->get_node(prev[j])->id())
                 break;
+
+              // If the number of already present neighbors is less than 4, we add another extra element
+              // so that the node in the middle of the loop ends up being of valence=6.
+              // This case usually happens when the middle node corresponds to a corner of the original mesh,
+              // and the extra element below prevents degenerated triangles in the mesh corners.
+              if(n_nb<4)
+              {
+                // this is the vertex to be mirrored
+                Point point = nb2->point(j) + nb2->point(prev[j]) - nb2->point(next[j]);
+                // Check if the proposed vertex doesn't coincide with one of the existing vertices.
+                // This is necessary because for some triangulations, it can happen that two mirrored
+                // ghost vertices coincide, which would then lead to a zero size ghost element below.
+                Node* node = NULL;
+                for (unsigned int k = 0; k < ghost_nodes.size(); ++k)
+                  {
+                    if ((*ghost_nodes[k] - point).size() < tol * (nb2->point(j) - point).size())
+                      {
+                        node = ghost_nodes[k];
+                        break;
+                      }
+                  }
+
+                // add the new vertex only if no other is nearby
+                if (node == NULL)
+                  {
+                    node = mesh.add_point(point);
+                    ghost_nodes.push_back(node);
+                  }
+
+                Tri3Subdivision* newelem = new Tri3Subdivision();
+
+                newelem->set_node(0) = nb2->get_node(j);
+                newelem->set_node(1) = nb2->get_node(prev[j]);
+                newelem->set_node(2) = node;
+                newelem->set_neighbor(0,nb2);
+                newelem->set_neighbor(1,NULL);
+                newelem->set_ghost(true);
+                nb2->set_neighbor(prev[j],newelem);
+
+                mesh.add_elem(newelem);
+                mesh.get_boundary_info().add_node(nb2->get_node(j), 1);
+                mesh.get_boundary_info().add_node(nb2->get_node(prev[j]), 1);
+                mesh.get_boundary_info().add_node(node, 1);
+
+                nb2 = newelem ;
+                j = nb2->local_node_number(elem->node(i));
+              }
 
               Tri3Subdivision *newelem = new Tri3Subdivision();
               newelem->set_node(0) = elem->get_node(next[i]);
