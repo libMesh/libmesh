@@ -724,6 +724,13 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
                            PETSC_DEFAULT, max_its);
   LIBMESH_CHKERRABORT(ierr);
 
+  // If the SolverConfiguration object is provided, use it to override
+  // solver options.
+  if(this->_solver_configuration)
+    {
+      this->_solver_configuration->configure_solver();
+    }
+
   // Solve the linear system
   if(_restrict_solve_to_is!=NULL)
     {

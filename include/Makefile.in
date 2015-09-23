@@ -857,6 +857,7 @@ include_HEADERS = \
         solvers/slepc_macro.h \
         solvers/solution_history.h \
         solvers/solver.h \
+        solvers/solver_configuration.h \
         solvers/steady_solver.h \
         solvers/tao_optimization_solver.h \
         solvers/time_solver.h \

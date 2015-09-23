@@ -6,6 +6,6 @@ source $LIBMESH_DIR/examples/run_common.sh
 
 example_name=systems_of_equations_ex6
 
-options="-ksp_type cg -pc_type bjacobi"
+options=""
 
 run_example "$example_name" "$options"

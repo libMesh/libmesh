@@ -348,6 +348,7 @@ BUILT_SOURCES = \
         slepc_macro.h \
         solution_history.h \
         solver.h \
+        solver_configuration.h \
         steady_solver.h \
         tao_optimization_solver.h \
         time_solver.h \
@@ -1543,6 +1544,9 @@ solution_history.h: $(top_srcdir)/include/solvers/solution_history.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solver.h: $(top_srcdir)/include/solvers/solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+solver_configuration.h: $(top_srcdir)/include/solvers/solver_configuration.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 steady_solver.h: $(top_srcdir)/include/solvers/steady_solver.h
