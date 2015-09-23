@@ -23,6 +23,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "libmesh_exceptions.h"
+#include <petscsys.h>
 
 namespace libMesh
 {
@@ -35,8 +36,15 @@ class PetscSolverException : public SolverException
 public:
   PetscSolverException(int error_code_in) :
     SolverException(error_code_in)
-  {}
+  {
+    const char * text;
+    // This is one scenario where we don't catch the error code
+    // returned by a PETSc function :)
+    PetscErrorMessage(error_code, &text, NULL);
+    what_message = text;
+  }
 };
+
 
 
 // Macro which we call after every PETSc function that returns an error code.

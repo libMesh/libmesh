@@ -114,6 +114,11 @@ public:
   }
 
   /**
+   * Virtual destructor, gotta have one of those.
+   */
+  virtual ~SolverException() {};
+
+  /**
    * Override the what() function to provide a generic error message.
    */
   virtual const char * what() const throw()
