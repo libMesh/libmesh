@@ -122,21 +122,24 @@ namespace libMesh
     return const_node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
   }
 
+// Use an empty preprocessor token to silence older compilers that
+// still warn about empty macro arguments.
+#define EMPTY
 
 // Instantiate various element iterator accessor functions.
-INSTANTIATE_ELEM_ACCESSORS(elements,                        NotNull,              /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(active_elements,                 Active,               /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(not_active_elements,             NotActive,            /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(ancestor_elements,               Ancestor,             /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(not_ancestor_elements,           NotAncestor,          /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(subactive_elements,              SubActive,            /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(not_subactive_elements,          NotSubActive,         /*none*/,                       /*none*/)
-INSTANTIATE_ELEM_ACCESSORS(local_elements,                  Local,                /*none*/,                       this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(semilocal_elements,              SemiLocal,            /*none*/,                       this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(facelocal_elements,              FaceLocal,            /*none*/,                       this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(not_local_elements,              NotLocal,             /*none*/,                       this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(active_local_elements,           ActiveLocal,          /*none*/,                       this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(active_not_local_elements,       ActiveNotLocal,       /*none*/,                       this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(elements,                        NotNull,              EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(active_elements,                 Active,               EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(not_active_elements,             NotActive,            EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(ancestor_elements,               Ancestor,             EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(not_ancestor_elements,           NotAncestor,          EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(subactive_elements,              SubActive,            EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(not_subactive_elements,          NotSubActive,         EMPTY,                          EMPTY)
+INSTANTIATE_ELEM_ACCESSORS(local_elements,                  Local,                EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(semilocal_elements,              SemiLocal,            EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(facelocal_elements,              FaceLocal,            EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(not_local_elements,              NotLocal,             EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(active_local_elements,           ActiveLocal,          EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(active_not_local_elements,       ActiveNotLocal,       EMPTY,                          this->processor_id())
 INSTANTIATE_ELEM_ACCESSORS(level_elements,                  Level,                unsigned int level,             level)
 INSTANTIATE_ELEM_ACCESSORS(not_level_elements,              NotLevel,             unsigned int level,             level)
 INSTANTIATE_ELEM_ACCESSORS(pid_elements,                    PID,                  processor_id_type proc_id,      proc_id)
@@ -144,18 +147,18 @@ INSTANTIATE_ELEM_ACCESSORS(type_elements,                   Type,               
 INSTANTIATE_ELEM_ACCESSORS(active_type_elements,            ActiveType,           ElemType type,                  type)
 INSTANTIATE_ELEM_ACCESSORS(active_pid_elements,             ActivePID,            processor_id_type proc_id,      proc_id)
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_elements,       ActiveSubdomain,      subdomain_id_type subdomain_id, subdomain_id)
-INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                /*none*/,                       this->processor_id())
-INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  /*none*/,                       DofObject::invalid_processor_id)
+INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  EMPTY,                          DofObject::invalid_processor_id)
 INSTANTIATE_ELEM_ACCESSORS(local_level_elements,            LocalLevel,           unsigned int level,             this->processor_id(), level)
 INSTANTIATE_ELEM_ACCESSORS(local_not_level_elements,        LocalNotLevel,        unsigned int level,             this->processor_id(), level)
 INSTANTIATE_ELEM_ACCESSORS(active_local_subdomain_elements, ActiveLocalSubdomain, subdomain_id_type subdomain_id, this->processor_id(), subdomain_id)
 
 // Instantiate various node iterator accessor functions.
-INSTANTIATE_NODE_ACCESSORS(nodes,        NotNull, /*none*/,                  /*none*/)
-INSTANTIATE_NODE_ACCESSORS(active_nodes, Active,  /*none*/,                  /*none*/)
-INSTANTIATE_NODE_ACCESSORS(local_nodes,  Local,   /*none*/,                  this->processor_id())
-INSTANTIATE_NODE_ACCESSORS(pid_nodes,    PID,     processor_id_type proc_id, proc_id)
-INSTANTIATE_NODE_ACCESSORS(bnd_nodes,    BND,     /*none*/,                  this->get_boundary_info())
+INSTANTIATE_NODE_ACCESSORS(nodes,        NotNull, EMPTY,                               EMPTY)
+INSTANTIATE_NODE_ACCESSORS(active_nodes, Active,  EMPTY,                               EMPTY)
+INSTANTIATE_NODE_ACCESSORS(local_nodes,  Local,   EMPTY,                               this->processor_id())
+INSTANTIATE_NODE_ACCESSORS(pid_nodes,    PID,     processor_id_type proc_id,           proc_id)
+INSTANTIATE_NODE_ACCESSORS(bnd_nodes,    BND,     EMPTY,                               this->get_boundary_info())
 INSTANTIATE_NODE_ACCESSORS(bid_nodes,    BID,     boundary_id_type bndry_id, bndry_id, this->get_boundary_info())
 
 } // namespace libMesh
