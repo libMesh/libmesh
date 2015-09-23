@@ -44,10 +44,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2010
  */
-
-// ------------------------------------------------------------
-// RBEIMConstruction class definition
-
 class RBEIMConstruction : public RBConstruction
 {
 public:

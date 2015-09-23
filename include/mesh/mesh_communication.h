@@ -45,10 +45,6 @@ class BoundaryInfo;
  *
  * @author Benjamin S. Kirk, 2003
  */
-
-
-// ------------------------------------------------------------
-// MeshCommunication class definition
 class MeshCommunication
 {
 public:

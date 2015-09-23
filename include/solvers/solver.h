@@ -41,9 +41,6 @@ class Solver;
  *
  * @author Benjamin S. Kirk, 2003-2004.
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class Solver : public ReferenceCountedObject<Solver>
 {
 protected:

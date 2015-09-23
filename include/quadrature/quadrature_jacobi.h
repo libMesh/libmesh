@@ -28,11 +28,6 @@
 namespace libMesh
 {
 
-
-// ------------------------------------------------------------
-// QJacobi class definition
-
-
 /**
  * This class implements two (for now) Jacobi-Gauss quadrature
  * rules.  These rules have the same order of accuracy as the
@@ -48,6 +43,8 @@ namespace libMesh
  * since it only provides 1D rules, weighted, as described before.
  * Still, this class is particularly helpful: check \p QGauss
  * for triangles and tetrahedra, with orders beyond \p THIRTIETH.
+ *
+ * @author John W. Peterson, 2003
  */
 class QJacobi : public QBase
 {

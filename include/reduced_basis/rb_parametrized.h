@@ -40,8 +40,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2011
  */
-// ------------------------------------------------------------
-// RBParametrized class definition
 class RBParametrized : public ReferenceCountedObject<RBParametrized>
 {
 public:

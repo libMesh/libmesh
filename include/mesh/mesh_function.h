@@ -51,9 +51,6 @@ class PointLocatorBase;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// MeshFunction class definition
 class MeshFunction : public FunctionBase<Number>,
                      public ParallelObject
 {

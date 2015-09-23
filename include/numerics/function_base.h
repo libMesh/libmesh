@@ -58,9 +58,6 @@ class Point;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// FunctionBase class definition
 template <typename Output=Number>
 class FunctionBase
 {

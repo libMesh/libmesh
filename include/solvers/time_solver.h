@@ -54,9 +54,6 @@ class SystemNorm;
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class TimeSolver : public ReferenceCountedObject<TimeSolver>
 {
 public:

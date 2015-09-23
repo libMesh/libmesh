@@ -47,10 +47,6 @@ namespace libMesh
  *
  * @author David J. Knezevic 2009
  */
-
-// ------------------------------------------------------------
-// RBSCMConstruction class definition
-
 class RBSCMConstruction : public RBConstructionBase<CondensedEigenSystem>
 {
 public:

@@ -60,7 +60,7 @@ protected:
   // vectors at a given time or not
   bool overwrite_previously_stored;
 
-}; // end SolutionHistory class definition
+};
 
 } // end namespace libMesh
 

@@ -38,10 +38,9 @@ namespace libMesh
 /**
  * The \p PerfData class simply contains the performance
  * data that is recorded for individual events.
+ *
+ * @author Benjamin Kirk, 2003.
  */
-
-// ------------------------------------------------------------
-// PerfData class definition
 class PerfData
 {
 public:
@@ -116,13 +115,10 @@ protected:
  * This class is particulary useful for finding performance
  * bottlenecks.
  *
+ * @author Benjamin Kirk, 2003.
  */
-
-// ------------------------------------------------------------
-// PerfLog class definition
 class PerfLog
 {
-
 public:
 
   /**

@@ -36,11 +36,9 @@ template<typename T> class OptimizationSolver;
 /**
  * This System subclass enables us to assemble an objective function,
  * gradient, Hessian and bounds for optimization problems.
+ *
+ * @author David Knezevic, 2015
  */
-
-// ------------------------------------------------------------
-// OptimizationSystem class definition
-
 class OptimizationSystem : public ImplicitSystem
 {
 public:

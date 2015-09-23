@@ -41,9 +41,6 @@ class MeshBase;
  *
  * @author Benjamin S. Kirk, 2004
  */
-
-// ------------------------------------------------------------
-// UCDIO class definition
 class UCDIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>
 {

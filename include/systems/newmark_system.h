@@ -47,10 +47,6 @@ namespace libMesh
  * used for time integration are provided.
  * For details refer to the examples section.
  */
-
-// ------------------------------------------------------------
-// NewmarkSystem class definition
-
 class NewmarkSystem : public LinearImplicitSystem
 {
 public:

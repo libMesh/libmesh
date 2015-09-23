@@ -36,9 +36,6 @@ namespace libMesh
  * This is useful for writing the boundary of a domain for inspecting
  * boundary conditions and other things.
  */
-
-// ------------------------------------------------------------
-// BoundaryMesh class definition
 class BoundaryMesh : public Mesh
 {
 public:

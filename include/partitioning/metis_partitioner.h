@@ -32,9 +32,6 @@ namespace libMesh
  * The \p MetisPartitioner uses the Metis graph partitioner
  * to partition the elements.
  */
-
-// ------------------------------------------------------------
-// MetisPartitioner class definition
 class MetisPartitioner : public Partitioner
 {
 public:

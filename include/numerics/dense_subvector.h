@@ -38,9 +38,6 @@ namespace libMesh
  *
  * @author Benjamin S. Kirk, 2003
  */
-
-// ------------------------------------------------------------
-// DenseSubVector class definition
 template<typename T>
 class DenseSubVector : public DenseVectorBase<T>
 {

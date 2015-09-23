@@ -47,10 +47,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2011
  */
-
-// ------------------------------------------------------------
-// RBSCMEvaluation class definition
-
 class RBSCMEvaluation : public RBParametrized,
                         public ParallelObject
 {

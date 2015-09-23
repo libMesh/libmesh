@@ -52,14 +52,9 @@ class MeshDataUnvHeader;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// MeshData class definition
 class MeshData
 {
 public:
-
-
   //----------------------------------------------------------
   // convenient typedefs
   /**
@@ -633,9 +628,6 @@ protected:
 };
 
 
-
-//-----------------------------------------------------------
-// MeshDataUnvHeader class definition
 
 /**
  * Class \p MeshDataUnvHeader handles the data specified at

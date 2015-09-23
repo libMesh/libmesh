@@ -81,11 +81,6 @@ class MeshBase;
  *
  * @author John W. Peterson, 2004
  */
-
-
-
-// ------------------------------------------------------------
-// MatlabIO class definition
 class MatlabIO : public MeshInput<MeshBase>
 {
 public:

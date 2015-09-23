@@ -43,9 +43,6 @@ class DenseVector;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// AnalyticFunction class definition
 template <typename Output=Number>
 class AnalyticFunction : public FunctionBase<Output>
 {

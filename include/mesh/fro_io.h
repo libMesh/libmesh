@@ -40,9 +40,6 @@ class MeshBase;
  *
  * @author Benjamin S. Kirk, 2007
  */
-
-// ------------------------------------------------------------
-// FroIO class definition
 class FroIO : public MeshOutput<MeshBase>
 {
 public:

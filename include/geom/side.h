@@ -110,9 +110,6 @@ private:
  *
  * \author  Roy H. Stogner
  */
-
-// ------------------------------------------------------------
-//SideEdge class definition
 template <class EdgeType, class ParentType>
 class SideEdge : public EdgeType
 {

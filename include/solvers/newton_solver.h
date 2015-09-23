@@ -42,9 +42,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class NewtonSolver : public DiffSolver
 {
 public:

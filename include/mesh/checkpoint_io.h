@@ -41,12 +41,13 @@ class Elem;
 
 
 /**
+ * The CheckpointIO class can be used to write simplified restart
+ * files that can be used to restart simulations that have
+ * crashed. Only N-to-N (procs) restart is supported with CheckpointIO
+ * files.
  *
  * @author Benjamin Kirk, John Peterson, Derek Gaston
  */
-
-// ------------------------------------------------------------
-// CheckpointIO class definition
 class CheckpointIO : public MeshInput<MeshBase>,
                      public MeshOutput<MeshBase>,
                      public ParallelObject

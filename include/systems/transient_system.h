@@ -41,9 +41,6 @@ class ExplicitSystem;
  * that still additional vectors/matrices may be added,
  * as offered in the parent classes.
  */
-
-// ------------------------------------------------------------
-// TransientSystem class definition
 template <class Base>
 class TransientSystem : public Base
 {

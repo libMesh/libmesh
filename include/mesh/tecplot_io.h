@@ -41,9 +41,6 @@ class MeshBase;
  *
  * @author Benjamin S. Kirk, 2004
  */
-
-// ------------------------------------------------------------
-// TecplotIO class definition
 class TecplotIO : public MeshOutput<MeshBase>
 {
 public:

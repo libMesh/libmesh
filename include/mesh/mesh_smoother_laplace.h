@@ -45,10 +45,6 @@ namespace libMesh
  * \author John W. Peterson
  * \date 2002-2007
  */
-
-
-// ------------------------------------------------------------
-// LaplaceMeshSmoother class definition
 class LaplaceMeshSmoother : public MeshSmoother
 {
 public:

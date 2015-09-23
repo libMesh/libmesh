@@ -41,10 +41,9 @@ namespace libMesh
  * applying the base rule on each subelement.  This class uses the
  * ElemCutter, which is only available if libmesh is configured with
  * --disable-strict-lgpl.
+ *
+ * @author Benjamin Kirk, 2013.
  */
-
-// ------------------------------------------------------------
-// QComposite class definition
 template <class QSubCell>
 class QComposite : public QSubCell
 {

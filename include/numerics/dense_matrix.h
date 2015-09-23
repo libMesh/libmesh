@@ -43,9 +43,6 @@ template <typename T> class DenseVector;
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// Dense Matrix class definition
 template<typename T>
 class DenseMatrix : public DenseMatrixBase<T>
 {

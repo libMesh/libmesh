@@ -152,9 +152,6 @@ class NodeConstraints : public std::map<const Node *,
 
 
 
-// ------------------------------------------------------------
-// DofMap class definition
-
 /**
  * This class handles the numbering of degrees of freedom on a mesh.
  * For systems of equations the class supports a fixed number of variables.

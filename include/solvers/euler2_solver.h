@@ -44,9 +44,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class Euler2Solver : public FirstOrderUnsteadySolver
 {
 public:

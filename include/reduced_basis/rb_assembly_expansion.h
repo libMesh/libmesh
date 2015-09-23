@@ -37,9 +37,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2011
  */
-
-// ------------------------------------------------------------
-// RBAssemblyExpansion class definition
 class RBAssemblyExpansion : public ReferenceCountedObject<RBAssemblyExpansion>
 {
 public:

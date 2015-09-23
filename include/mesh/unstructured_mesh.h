@@ -45,9 +45,6 @@ class MeshData;
  * boundary, instantiate a BoundaryMesh with a reference to
  * this class, and then use that object's functionality.
  */
-
-// ------------------------------------------------------------
-// UnstructuredMesh class definition
 class UnstructuredMesh : public MeshBase
 {
 public:

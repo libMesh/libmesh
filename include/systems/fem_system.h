@@ -48,10 +48,6 @@ class FEMContext;
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// FEMSystem class definition
-
 class FEMSystem : public DifferentiableSystem,
                   public FEMPhysics
 {

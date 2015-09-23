@@ -41,9 +41,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2008
  */
-
-// ------------------------------------------------------------
-// SystemNorm class definition
 class SystemNorm
 {
 public:

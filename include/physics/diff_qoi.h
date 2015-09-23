@@ -43,10 +43,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// DifferentiableQoI class definition
-
 class DifferentiableQoI
 {
 public:

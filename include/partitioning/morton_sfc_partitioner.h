@@ -34,9 +34,6 @@ namespace libMesh
  * The \p MortonSFCPartitioner uses a Morton space
  * filling curve to partition the elements.
  */
-
-// ------------------------------------------------------------
-// MortonSFCLinearPartitioner class definition
 class MortonSFCPartitioner : public SFCPartitioner
 {
 public:
@@ -64,11 +61,9 @@ protected:
    */
   virtual void _do_partition (MeshBase& mesh,
                               const unsigned int n)
-  { SFCPartitioner::_do_partition (mesh, n); }
-
-
-private:
-
+  {
+    SFCPartitioner::_do_partition (mesh, n);
+  }
 };
 
 } // namespace libMesh

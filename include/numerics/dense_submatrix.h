@@ -39,9 +39,6 @@ namespace libMesh
  *
  * @author Benjamin S. Kirk, 2003
  */
-
-// ------------------------------------------------------------
-// DenseSubMatrix class definition
 template<typename T>
 class DenseSubMatrix : public DenseMatrixBase<T>
 {

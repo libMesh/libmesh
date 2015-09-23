@@ -39,9 +39,6 @@ namespace libMesh
  *
  * @author John W. Peterson, 2003
  */
-
-// ------------------------------------------------------------
-// DenseVectorBase class definition
 template<typename T>
 class DenseVectorBase
 {

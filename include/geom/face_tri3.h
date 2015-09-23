@@ -38,20 +38,18 @@ namespace libMesh
  * The \p Tri3 is an element in 2D composed of 3 nodes.
  * It is numbered like this:
  * \verbatim
- *   TRI3:  2
- *          o
- *         / \
- *        /   \
- *       /     \
- *      /       \
- *     /         \
- *    o-----------o
- *    0           1
+ *   TRI3:
+ *    2
+ *    o
+ *    |\
+ *    | \
+ *    |  \
+ *    |   \
+ *    |    \
+ *    o-----o
+ *    0      1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Tri3 class definition
 class Tri3 : public Tri
 {
 public:

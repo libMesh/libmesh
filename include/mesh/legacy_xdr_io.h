@@ -36,16 +36,13 @@ class MeshBase;
 class MeshData;
 
 /**
+ * The LegacyXdrIO class has been replaced by the XdrIO class.
  *
  * @author Benjamin Kirk, John Peterson, 2004.
  */
-
-// ------------------------------------------------------------
-// LegacyXdrIO class definition
 class LegacyXdrIO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>
 {
-
 public:
   /**
    * Enumeration flag for the type of software.

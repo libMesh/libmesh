@@ -42,10 +42,6 @@ template <typename T> class SparseMatrix;
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p ExplicitSystem.
  */
-
-// ------------------------------------------------------------
-// ImplicitSystem class definition
-
 class ImplicitSystem : public ExplicitSystem
 {
 public:

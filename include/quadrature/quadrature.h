@@ -49,10 +49,6 @@ class Elem;
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// QBase class definition
-
 class QBase : public ReferenceCountedObject<QBase>
 {
 protected:

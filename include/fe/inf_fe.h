@@ -70,9 +70,6 @@ class FEComputeData;
  * \author Daniel Dreyer
  * \date 2003
  */
-
-//-------------------------------------------------------------
-// InfFE class definition
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE : public FEBase
 {
@@ -92,8 +89,6 @@ protected:
    * \author Daniel Dreyer
    * \date 2003
    */
-  //-------------------------------------------------------------
-  // InfFE::Radial class definition
   class Radial
   {
   private:
@@ -183,8 +178,6 @@ protected:
    * \author Daniel Dreyer
    * \date 2003
    */
-  //-------------------------------------------------------------
-  // InfFE::Base class definition
   class Base
   {
   private:

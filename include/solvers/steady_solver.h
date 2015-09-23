@@ -43,9 +43,6 @@ class TimeSolver;
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class SteadySolver : public TimeSolver
 {
 public:

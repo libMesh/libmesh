@@ -25,27 +25,18 @@
 // C++ includes
 #include <iostream>
 
-// Local Includes
-// We don't use anything libMesh-specific here (yet)
-// #include "libmesh/libmesh_common.h"
-
-
 namespace libMesh
 {
 
-// Forward Declarations
-
-
-
-// ------------------------------------------------------------
-// OStreamProxy class definition
-//
-// This class is intended to be reseatable like a pointer-to-ostream
-// for flexibility, but to look like a reference when used to produce
-// less awkward user code.
-//
-// It is up to the user to ensure that the target ostream
-
+/**
+ * This class is intended to be reseatable like a pointer-to-ostream
+ * for flexibility, but to look like a reference when used to produce
+ * less awkward user code.
+ *
+ * It is up to the user to ensure that the target ostream remains valid.
+ *
+ * @author Roy Stogner, 2010.
+ */
 template <typename charT=char, typename traits=std::char_traits<charT> >
 class BasicOStreamProxy
 {

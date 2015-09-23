@@ -84,9 +84,6 @@ struct FEOutputType<NEDELEC_ONE>
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-
-//-------------------------------------------------------------
-// FE class definition
 template <unsigned int Dim, FEFamily T>
 class FE : public FEGenericBase<typename FEOutputType<T>::type>
 {
@@ -489,9 +486,6 @@ protected:
  * \author Roy Stogner
  * \date 2004
  */
-
-//-------------------------------------------------------------
-// FEHierarchic class definition
 template <unsigned int Dim>
 class FEClough : public FE<Dim,CLOUGH>
 {
@@ -514,9 +508,6 @@ public:
  * \author Roy Stogner
  * \date 2005
  */
-
-//-------------------------------------------------------------
-// FEHierarchic class definition
 template <unsigned int Dim>
 class FEHermite : public FE<Dim,HERMITE>
 {
@@ -540,17 +531,14 @@ public:
                                 const Real xi);
 };
 
+
+
 /**
  * Subdivision finite elements.
+ *
+ * Template specialization prototypes are needed for calling from
+ * inside FESubdivision::init_shape_functions
  */
-
-//-------------------------------------------------------------
-// FESubdivision class definition
-
-
-// template specialization prototypes, needed for being able to
-// call them from inside FESubdivision::init_shape_functions
-
 template <>
 Real FE<2,SUBDIVISION>::shape(const Elem* elem,
                               const Order order,
@@ -688,9 +676,6 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-
-//-------------------------------------------------------------
-// FEHierarchic class definition
 template <unsigned int Dim>
 class FEHierarchic : public FE<Dim,HIERARCHIC>
 {
@@ -713,9 +698,6 @@ public:
  * \author Truman E. Ellis
  * \date 2011
  */
-
-//-------------------------------------------------------------
-// FEL2Hierarchic class definition
 template <unsigned int Dim>
 class FEL2Hierarchic : public FE<Dim,L2_HIERARCHIC>
 {
@@ -738,9 +720,6 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-
-//-------------------------------------------------------------
-// FELagrange class definition
 template <unsigned int Dim>
 class FELagrange : public FE<Dim,LAGRANGE>
 {
@@ -758,8 +737,6 @@ public:
 /**
  * Discontinuous Lagrange finite elements.
  */
-//-------------------------------------------------------------
-// FEL2Lagrange class definition
 template <unsigned int Dim>
 class FEL2Lagrange : public FE<Dim,L2_LAGRANGE>
 {
@@ -781,9 +758,6 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-
-//-------------------------------------------------------------
-// FEMonomial class definition
 template <unsigned int Dim>
 class FEMonomial : public FE<Dim,MONOMIAL>
 {
@@ -798,8 +772,9 @@ public:
 };
 
 
-//-------------------------------------------------------------
-// FEScalar class definition
+/**
+ * The FEScalar class is used for workign with SCALAR variables.
+ */
 template <unsigned int Dim>
 class FEScalar : public FE<Dim,SCALAR>
 {
@@ -824,9 +799,6 @@ public:
  * \author Benjamin S. Kirk
  * \date 2002-2007
  */
-
-//-------------------------------------------------------------
-// FEXYZ class definition
 template <unsigned int Dim>
 class FEXYZ : public FE<Dim,XYZ>
 {
@@ -891,8 +863,14 @@ protected:
                             const std::vector<Real>& weights);
 };
 
-//-------------------------------------------------------------
-// FELagrangeVec class definition
+
+
+/**
+ * FELagrangeVec objects are used for working with vector-valued
+ * finite elements
+ *
+ * @author Paul T. Bauman 2013.
+ */
 template <unsigned int Dim>
 class FELagrangeVec : public FE<Dim,LAGRANGE_VEC>
 {
@@ -907,8 +885,14 @@ public:
 
 };
 
-//-------------------------------------------------------------
-// FENedelecOne class definition
+
+
+/**
+ * FENedelecOne objects are used for working with vector-valued
+ * Nedelec finite elements of the first kind.
+ *
+ * @author Paul T. Bauman 2013.
+ */
 template <unsigned int Dim>
 class FENedelecOne : public FE<Dim,NEDELEC_ONE>
 {

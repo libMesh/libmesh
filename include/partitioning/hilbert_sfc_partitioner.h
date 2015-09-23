@@ -34,9 +34,6 @@ namespace libMesh
  * The \p HilbertSFCPartitioner uses a Hilbert space
  * filling curve to partition the elements.
  */
-
-// ------------------------------------------------------------
-// HilbertSFCLinearPartitioner class definition
 class HilbertSFCPartitioner : public SFCPartitioner
 {
 public:
@@ -64,12 +61,9 @@ protected:
    */
   virtual void _do_partition (MeshBase& mesh,
                               const unsigned int n)
-  { SFCPartitioner::_do_partition (mesh, n); }
-
-
-
-private:
-
+  {
+    SFCPartitioner::_do_partition (mesh, n);
+  }
 };
 
 } // namespace libMesh

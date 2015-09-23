@@ -52,9 +52,6 @@ class TetGenMeshInterface;
  *
  * \author Benjamin S. Kirk, 2013
  */
-
-// ------------------------------------------------------------
-// ElemCutter class definition
 class ElemCutter
 {
 public:

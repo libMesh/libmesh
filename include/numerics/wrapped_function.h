@@ -42,9 +42,6 @@ namespace libMesh
  *
  * @author Roy Stogner, 2012
  */
-
-// ------------------------------------------------------------
-// WrappedFunction class definition
 template <typename Output=Number>
 class WrappedFunction : public FunctionBase<Output>
 {

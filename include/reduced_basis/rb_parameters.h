@@ -38,8 +38,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2012
  */
-// ------------------------------------------------------------
-// RBParameters class definition
 class RBParameters
 {
 public:

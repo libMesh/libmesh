@@ -38,9 +38,6 @@ class System;
  *
  * @author Tim Kroeger, 2010.
  */
-
-// ------------------------------------------------------------
-// SystemSubset class definition
 class SystemSubset : public ReferenceCountedObject<SystemSubset>
 {
 public:

@@ -44,11 +44,8 @@ class MeshBase;
  *
  * @author John W. Peterson, 2004, 2014
  * @author Martin Luthi (mluthi@tnoo.net), 2005: massive overhaul and extension,
- *                                         plus support for reading meshes and writing results
+ *   plus support for reading meshes and writing results
  */
-
-// ------------------------------------------------------------
-// GMVIO class definition
 class GmshIO : public MeshInput<MeshBase>,
                public MeshOutput<MeshBase>
 {

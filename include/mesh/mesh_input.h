@@ -44,9 +44,6 @@ namespace libMesh
  * \author Benjamin S. Kirk
  * \date 2004
  */
-
-// ------------------------------------------------------------
-// MeshInput class definition
 template <class MT>
 class MeshInput
 {

@@ -62,9 +62,6 @@ class MeshBase;
  *
  * @author Benjamin S. Kirk, 2002-2007
  */
-
-// ------------------------------------------------------------
-// EquationSystems class definition
 class EquationSystems : public ReferenceCountedObject<EquationSystems>,
                         public ParallelObject
 

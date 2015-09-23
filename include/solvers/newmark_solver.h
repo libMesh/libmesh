@@ -40,9 +40,6 @@ namespace libMesh
  *
  * @author Paul T. Bauman 2015
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class NewmarkSolver : public SecondOrderUnsteadySolver
 {
 public:

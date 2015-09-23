@@ -55,9 +55,6 @@ class MeshData;
  * @author Wout Ruijter, 2007
  * (Checked in to LibMesh by J.W. Peterson)
  */
-
-// ------------------------------------------------------------
-// VTKIO class definition
 class VTKIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>
 {

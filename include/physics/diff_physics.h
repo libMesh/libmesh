@@ -74,10 +74,6 @@ template <typename T> class NumericVector;
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// DifferentiablePhysics class definition
-
 class DifferentiablePhysics
 {
 public:

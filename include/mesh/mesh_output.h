@@ -48,9 +48,6 @@ class EquationSystems;
  * \author Benjamin S. Kirk
  * \date 2004
  */
-
-// ------------------------------------------------------------
-// MeshOutput class definition
 template <class MT>
 class MeshOutput
 {

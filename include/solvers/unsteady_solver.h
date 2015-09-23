@@ -44,9 +44,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2008
  */
-
-// ------------------------------------------------------------
-// UnsteadySolver class definition
 class UnsteadySolver : public TimeSolver
 {
 public:

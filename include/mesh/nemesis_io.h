@@ -47,9 +47,6 @@ class Nemesis_IO_Helper;
  *
  * @author John Peterson, 2008.
  */
-
-// ------------------------------------------------------------
-// Nemesis_IO class definition
 class Nemesis_IO : public MeshInput<MeshBase>,
                    public MeshOutput<MeshBase>,
                    public ParallelObject

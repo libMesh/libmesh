@@ -46,11 +46,6 @@ class TransientRBThetaExpansion;
  *
  * @author David J. Knezevic, 2011
  */
-
-
-// ------------------------------------------------------------
-// TransientRBEvaluation class definition
-
 class TransientRBEvaluation : public RBEvaluation, public RBTemporalDiscretization
 {
 public:

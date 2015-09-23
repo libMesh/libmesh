@@ -28,15 +28,12 @@
 namespace libMesh
 {
 
-
-// ------------------------------------------------------------
-// QTrap class definition
-
-
 /**
- * This class implemenets trapezoidal quadratue.  Sometimes
- * also known as Newton-Cotes quadrature with two points.  These rules
- * sample at the corners and will integrate linears exactly.
+ * This class implemenets trapezoidal quadratue.  Sometimes also known
+ * as Newton-Cotes quadrature with two points.  These rules sample at
+ * the corners and will integrate linears exactly.
+ *
+ * @author Benjamin Kirk, 2003.
  */
 class QTrap : public QBase
 {

@@ -46,10 +46,6 @@ template <typename T> class SparseMatrix;
  * \p A*x=lambda*x  and generalited eigenvalue problems
  * \p A*x=lambda*B*x.
  */
-
-// ------------------------------------------------------------
-// EigenSystem class definition
-
 class EigenSystem : public System
 {
 public:

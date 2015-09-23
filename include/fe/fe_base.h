@@ -95,9 +95,6 @@ class InfFE;
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// FEBase class definition
 template <typename OutputType>
 class FEGenericBase : public FEAbstract
 {

@@ -49,10 +49,6 @@ template <typename T> class NumericVector;
  *
  * @author Roy H. Stogner 2006
  */
-
-// ------------------------------------------------------------
-// DifferentiableSystem class definition
-
 class DifferentiableSystem : public ImplicitSystem,
                              public virtual DifferentiablePhysics,
                              public virtual DifferentiableQoI

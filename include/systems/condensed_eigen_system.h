@@ -41,10 +41,6 @@ namespace libMesh
  * This is useful, for example, in the case that one wants to solve
  * eigenvalue problems with Dirichlet boundary conditions.
  */
-
-// ------------------------------------------------------------
-// CondensedEigenSystem class definition
-
 class CondensedEigenSystem : public EigenSystem
 {
 public:

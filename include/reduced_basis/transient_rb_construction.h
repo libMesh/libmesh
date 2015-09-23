@@ -44,10 +44,6 @@ namespace libMesh
  *
  * @author David J. Knezevic 2009
  */
-
-// ------------------------------------------------------------
-// TransientRBConstruction class definition
-
 class TransientRBConstruction : public TransientSystem<RBConstruction>, public RBTemporalDiscretization
 {
 public:

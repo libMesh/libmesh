@@ -42,9 +42,6 @@ class ErrorVector;
  * object as input, which it will partition into a number of
  * subdomains.
  */
-
-// ------------------------------------------------------------
-// Partitioner class definition
 class Partitioner
 {
 public:

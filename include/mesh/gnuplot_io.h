@@ -34,14 +34,11 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class implements writing meshes using GNUplot, designed for use only
- * with 1D meshes.
+ * This class implements writing meshes using GNUplot, designed for
+ * use only with 1D meshes.
  *
  * @author David Knezevic, 2005
  */
-
-// ------------------------------------------------------------
-// GnuPlotIO class definition
 class GnuPlotIO : public MeshOutput<MeshBase>
 {
 public:

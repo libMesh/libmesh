@@ -45,10 +45,6 @@ class RBParametrizedFunction;
  *
  * @author David J. Knezevic, 2011
  */
-
-// ------------------------------------------------------------
-// RBEIMEvaluation class definition
-
 class RBEIMEvaluation : public RBEvaluation
 {
 public:

@@ -44,11 +44,9 @@ namespace libMesh
  * This quadrature type may be useful iff you are integrating
  * functions which have discontinuities or discontinuous derivatives
  * on scales smaller than your element size.
+ *
+ * @author Roy Stogner, 2005.
  */
-
-// ------------------------------------------------------------
-// QGrid class definition
-
 class QGrid : public QBase
 {
 public:

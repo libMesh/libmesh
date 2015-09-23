@@ -70,9 +70,6 @@ namespace libMesh
  *
  * @author John W. Peterson, 2002
  */
-
-// ------------------------------------------------------------
-// StatisticsVector class definition
 template <typename T>
 class StatisticsVector : public std::vector<T>
 {

@@ -91,9 +91,6 @@ class InfFE;
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// FEAbstract class definition
 class FEAbstract : public ReferenceCountedObject<FEAbstract>
 {
 protected:

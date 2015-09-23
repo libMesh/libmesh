@@ -40,9 +40,6 @@ class MeshBase;
  *
  * @author Roy H. Stogner, 2015
  */
-
-// ------------------------------------------------------------
-// NameBasedIO class definition
 class NameBasedIO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>
 {

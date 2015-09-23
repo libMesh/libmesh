@@ -57,10 +57,6 @@ class PointLocatorBase;
  *
  * @author Daniel Dreyer, 2002-2007
  */
-
-// ------------------------------------------------------------
-// FEInterface class definition
-
 class FEInterface
 {
 private:

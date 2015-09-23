@@ -48,9 +48,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2008
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class PetscDiffSolver : public DiffSolver
 {
 public:

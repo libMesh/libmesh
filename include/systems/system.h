@@ -73,9 +73,6 @@ class SystemSubset;
  *
  * @author Benjamin S. Kirk, 2003-2004.
  */
-
-// ------------------------------------------------------------
-// System class definition
 class System : public ReferenceCountedObject<System>,
                public ParallelObject
 {

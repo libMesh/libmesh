@@ -44,9 +44,6 @@ class MeshData;
  *
  * @author Benjamin S. Kirk, 2004
  */
-
-// ------------------------------------------------------------
-// TetGenIO class definition
 class TetGenIO : public MeshInput<MeshBase>,
                  public MeshOutput<MeshBase>
 {

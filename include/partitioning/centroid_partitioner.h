@@ -45,10 +45,6 @@ class Elem;
  *
  * @author John W. Peterson and Benjamin S. Kirk, 2003
  */
-
-
-
-// CentroidPartitioner class definition
 class CentroidPartitioner : public Partitioner
 {
 public:

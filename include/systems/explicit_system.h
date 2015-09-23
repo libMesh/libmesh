@@ -39,10 +39,6 @@ namespace libMesh
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p System.
  */
-
-// ------------------------------------------------------------
-// ExplicitSystem class definition
-
 class ExplicitSystem : public System
 {
 public:

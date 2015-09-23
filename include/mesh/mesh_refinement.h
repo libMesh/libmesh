@@ -55,10 +55,6 @@ class PeriodicBoundaries;
  *
  * @author Benjamin S. Kirk, 2002-2007.
  */
-
-
-// ------------------------------------------------------------
-// MeshRefinement class definition
 class MeshRefinement : public ParallelObject
 {
 public:

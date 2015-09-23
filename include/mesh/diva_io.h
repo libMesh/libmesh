@@ -41,9 +41,6 @@ class MeshBase;
  *
  * @author John W. Peterson, 2004
  */
-
-// ------------------------------------------------------------
-// DivaIO class definition
 class DivaIO : public MeshOutput<MeshBase>
 {
 public:

@@ -37,10 +37,6 @@ namespace libMesh
  *
  * @author Benjamin S. Kirk, 2003-2004.
  */
-
-// ------------------------------------------------------------
-// Linear class definition
-
 template <class T = Solver>
 class Linear : public T
 {

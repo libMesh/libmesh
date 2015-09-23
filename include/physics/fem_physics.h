@@ -41,10 +41,6 @@ namespace libMesh
  *
  * @author Roy H. Stogner 2012
  */
-
-// ------------------------------------------------------------
-// Finite Element Method Physics class definition
-
 class FEMPhysics : public virtual DifferentiablePhysics
 {
 public:

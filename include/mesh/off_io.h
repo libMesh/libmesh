@@ -37,9 +37,6 @@ class MeshBase;
  * triangulated surface in the
  * standard OFF OOGL format.
  */
-
-// ------------------------------------------------------------
-// OFFIO class definition
 class OFFIO : public MeshInput<MeshBase>
 {
 public:

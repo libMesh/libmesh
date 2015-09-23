@@ -49,11 +49,6 @@ class RBAssemblyExpansion;
  *
  * @author David J. Knezevic, 2009
  */
-
-
-// ------------------------------------------------------------
-// RBConstruction class definition
-
 class RBConstruction : public RBConstructionBase<LinearImplicitSystem>
 {
 public:

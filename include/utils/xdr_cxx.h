@@ -54,19 +54,15 @@ const unsigned int xdr_MAX_STRING_LENGTH=256;
 namespace libMesh
 {
 
-
-
-//--------------------------------------------------------------
-// Xdr class definition
-
 /**
  * This class implements a C++ interface to the XDR
  * (eXternal Data Representation) format.  XDR is useful for
  * creating platform-independent binary files.  This class was
  * created to handle equation system output as a replacement for
  * XdrIO since that is somewhat limited.
+ *
+ * @author Benjamin Kirk, 2003.
  */
-
 class Xdr
 {
 

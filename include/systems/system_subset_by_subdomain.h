@@ -41,9 +41,6 @@ namespace libMesh
  *
  * @author Tim Kroeger, 2010.
  */
-
-// ------------------------------------------------------------
-// SystemSubset class definition
 class SystemSubsetBySubdomain : public SystemSubset,
                                 public ParallelObject
 {

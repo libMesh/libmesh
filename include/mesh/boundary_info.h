@@ -53,9 +53,6 @@ class MeshData;
  *
  * TODO[JWP]: Generalize this to work with MeshBase again.
  */
-
-//------------------------------------------------------
-// BoundaryInfo class definition
 class BoundaryInfo : public ParallelObject
 {
 protected:

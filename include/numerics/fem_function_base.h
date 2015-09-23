@@ -39,8 +39,13 @@ namespace libMesh
 class Point;
 
 
-// ------------------------------------------------------------
-// FEMFunctionBase class definition
+/**
+ * FEMFunctionBase is a base class from which users can derive in
+ * order to define "function-like" objects that can be used within
+ * FEMSystem.
+ *
+ * @author Roy Stogner, 2012.
+ */
 template <typename Output=Number>
 class FEMFunctionBase
 {

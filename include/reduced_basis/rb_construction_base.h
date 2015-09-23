@@ -49,10 +49,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2009
  */
-
-
-// ------------------------------------------------------------
-// RBConstructionBase class definition
 template<class Base>
 class RBConstructionBase : public Base, public RBParametrized
 {

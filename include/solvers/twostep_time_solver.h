@@ -46,9 +46,6 @@ class System;
  *
  * @author Roy H. Stogner 2007
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class TwostepTimeSolver : public AdaptiveTimeSolver
 {
 public:

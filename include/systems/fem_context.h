@@ -57,10 +57,6 @@ template <typename T> class NumericVector;
  *
  * @author Roy H. Stogner 2009
  */
-
-// ------------------------------------------------------------
-// FEMContext class definition
-
 class FEMContext : public DiffContext
 {
 public:

@@ -47,9 +47,6 @@ class MeshBase;
  *
  * @author Benjamin S. Kirk, 2004
  */
-
-// ------------------------------------------------------------
-// GMVIO class definition
 class GMVIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>
 {

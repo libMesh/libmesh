@@ -50,10 +50,6 @@ class System;
  *
  * @author Roy H. Stogner 2009
  */
-
-// ------------------------------------------------------------
-// DifferentiableSystem class definition
-
 class DiffContext
 {
 public:

@@ -32,10 +32,6 @@ namespace libMesh
  * required to perform local element residual and Jacobian assembly
  * in the case of a discontinuous Galerkin (DG) discretization.
  */
-
-// ------------------------------------------------------------
-// DGFEMContext class definition
-
 class DGFEMContext : public FEMContext
 {
 public:

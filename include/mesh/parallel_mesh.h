@@ -43,9 +43,6 @@ class Node;
  * By "is intended" I mean that it doesn't work that way yet.  Don't
  * use this class unless you're developing or debugging it.
  */
-
-// ------------------------------------------------------------
-// UnstructuredMesh class definition
 class ParallelMesh : public UnstructuredMesh
 {
 public:

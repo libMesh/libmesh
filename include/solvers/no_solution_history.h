@@ -48,7 +48,7 @@ public:
     return UniquePtr<SolutionHistory >
       (new NoSolutionHistory());}
 
-}; // end NoSolutionHistory class definition
+};
 
 } // end namespace libMesh
 

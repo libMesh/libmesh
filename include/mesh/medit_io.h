@@ -45,9 +45,6 @@ class MeshBase;
  *
  * @author F. Prill, 2004
  */
-
-// ------------------------------------------------------------
-// medit_io class definition
 class MEDITIO : public MeshOutput<MeshBase>
 {
 public:

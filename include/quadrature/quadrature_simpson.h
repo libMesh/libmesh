@@ -38,10 +38,6 @@ namespace libMesh
  *
  * @author John W. Peterson, 2003
  */
-
-// ------------------------------------------------------------
-// QSimpson class definition
-
 class QSimpson : public QBase
 {
 public:

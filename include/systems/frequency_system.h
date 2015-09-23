@@ -62,10 +62,6 @@ namespace libMesh
  *
  * \author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// FrequencySystem class definition
-
 class FrequencySystem : public LinearImplicitSystem
 {
 public:

@@ -46,9 +46,6 @@ class System;
  *
  * @author Benjamin Kirk, John Peterson, 2004.
  */
-
-// ------------------------------------------------------------
-// ExodusII_IO class definition
 class ExodusII_IO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>,
                     public ParallelObject

@@ -36,9 +36,6 @@ namespace libMesh
  * to each processor.  Health Warning: THIS PARTITIONER COULD BE ARBITRARILY
  * BAD!!
  */
-
-// ------------------------------------------------------------
-// LinearPartitioner class definition
 class LinearPartitioner : public Partitioner
 {
 public:
@@ -63,9 +60,6 @@ protected:
    */
   virtual void _do_partition (MeshBase& mesh,
                               const unsigned int n);
-
-private:
-
 };
 
 

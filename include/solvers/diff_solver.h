@@ -62,9 +62,6 @@ inline LinearSolutionMonitor::~LinearSolutionMonitor() {}
  *
  * @author Roy H. Stogner 2006-2010
  */
-
-// ------------------------------------------------------------
-// Solver class definition
 class DiffSolver : public ReferenceCountedObject<DiffSolver>,
                    public ParallelObject
 {

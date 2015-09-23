@@ -42,9 +42,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// DirichletBoundary class definition
-
 /**
  * This class allows one to associate dirichlet boundary values with
  * a given set of mesh boundary ids and system variable ids.
@@ -60,7 +57,6 @@ namespace libMesh
  * adjoining face interiors unconstrained, but would still permit the
  * other edge and node DoFs around those faces to be constrained.
  */
-
 class DirichletBoundary
 {
 public:

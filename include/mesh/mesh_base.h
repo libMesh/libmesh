@@ -64,10 +64,6 @@ class MeshInput;
  *
  * \author  Benjamin S. Kirk
  */
-
-
-// ------------------------------------------------------------
-// MeshBase class definition
 class MeshBase : public ParallelObject
 {
 public:

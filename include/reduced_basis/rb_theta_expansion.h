@@ -40,9 +40,6 @@ class RBParameters;
  *
  * @author David J. Knezevic, 2011
  */
-
-// ------------------------------------------------------------
-// RBThetaExpansion class definition
 class RBThetaExpansion : public ReferenceCountedObject<RBThetaExpansion>
 {
 public:

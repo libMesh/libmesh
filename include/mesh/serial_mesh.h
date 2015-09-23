@@ -30,20 +30,12 @@
 namespace libMesh
 {
 
-
-
-
-
-
 /**
  * The \p SerialMesh class is derived from the \p MeshBase class,
  * and currently represents the default Mesh implementation.
  * Most methods for this class are found in MeshBase, and most
  * implementation details are found in UnstructuredMesh.
  */
-
-// ------------------------------------------------------------
-// Mesh class definition
 class SerialMesh : public UnstructuredMesh
 {
 public:

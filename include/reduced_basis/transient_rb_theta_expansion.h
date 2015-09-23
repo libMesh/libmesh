@@ -37,9 +37,6 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2011
  */
-
-// ------------------------------------------------------------
-// TransientRBThetaExpansion class definition
 class TransientRBThetaExpansion : public RBThetaExpansion
 {
 public:

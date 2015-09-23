@@ -57,9 +57,6 @@ void print_helper(std::ostream& os, const std::vector<P>* param);
  * \author Benjamin S. Kirk
  * \date 2004
  */
-
-// ------------------------------------------------------------
-// Parameters class definition
 class Parameters
 {
 public:
