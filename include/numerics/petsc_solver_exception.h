@@ -62,6 +62,9 @@ public:
 // PETSc's CHKERRABORT macro.
 #define LIBMESH_CHKERR(ierr) CHKERRABORT(this->comm().get(), ierr);
 
+// Let's also be backwards-compatible with the old macro name.
+#define LIBMESH_CHKERRABORT(ierr) LIBMESH_CHKERR(ierr)
+
 #endif
 
 } // namespace libMesh
