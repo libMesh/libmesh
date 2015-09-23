@@ -48,11 +48,21 @@ public:
 
 
 // Macro which we call after every PETSc function that returns an error code.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+
 #define LIBMESH_CHKERRABORT(ierr)               \
   do {                                          \
     if (ierr != 0) {                            \
       throw PetscSolverException(ierr);         \
     } } while(0)
+
+#else
+
+// If we don't have exceptions enabled, just fall back on calling
+// PETSc's CHKERRABORT macro.
+#define LIBMESH_CHKERRABORT(ierr) CHKERRABORT(this->comm().get(), ierr);
+
+#endif
 
 } // namespace libMesh
 
