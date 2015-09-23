@@ -439,7 +439,7 @@ void TaoOptimizationSolver<T>::clear ()
       PetscErrorCode ierr=0;
 
       ierr = TaoDestroy(&_tao);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 }
 
@@ -456,7 +456,7 @@ void TaoOptimizationSolver<T>::init ()
       PetscErrorCode ierr=0;
 
       ierr = TaoCreate(this->comm().get(),&_tao);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 }
 
@@ -490,7 +490,7 @@ void TaoOptimizationSolver<T>::solve ()
   // call TaoSetFromOptions twice (both before and after setting
   // custom options programatically)
   ierr = TaoSetFromOptions(_tao);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Set convergence tolerances
   // f(X) - f(X*) (estimated)            <= fatol
@@ -505,40 +505,40 @@ void TaoOptimizationSolver<T>::solve ()
                           /*gatol=*/PETSC_DEFAULT,
                           /*grtol=*/PETSC_DEFAULT,
                           /*gttol=*/PETSC_DEFAULT);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Set the max-allowed number of objective function evaluations
   // Command line equivalent: -tao_max_funcs
   ierr = TaoSetMaximumFunctionEvaluations(_tao, this->max_objective_function_evaluations);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Set the max-allowed number of optimization iterations.
   // Command line equivalent: -tao_max_it
   // Not implemented for now as it seems fairly similar to
   // ierr = TaoSetMaximumIterations(_tao, 4);
-  // LIBMESH_CHKERRABORT(ierr);
+  // LIBMESH_CHKERR(ierr);
 
   // Set solution vec and an initial guess
   ierr = TaoSetInitialVector(_tao, x->vec());
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // We have to have an objective function
   libmesh_assert( this->objective_object );
 
   // Set routines for objective, gradient, hessian evaluation
   ierr = TaoSetObjectiveRoutine(_tao, __libmesh_tao_objective, this);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   if ( this->gradient_object )
     {
       ierr = TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   if ( this->hessian_object )
     {
       ierr = TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   if ( this->lower_and_upper_bounds_object )
@@ -549,13 +549,13 @@ void TaoOptimizationSolver<T>::solve ()
       ierr = TaoSetVariableBounds(_tao,
                                   lb->vec(),
                                   ub->vec());
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   if ( this->equality_constraints_object )
     {
       ierr = TaoSetEqualityConstraintsRoutine(_tao, ceq->vec(), __libmesh_tao_equality_constraints, this);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   if ( this->equality_constraints_jacobian_object )
@@ -565,14 +565,14 @@ void TaoOptimizationSolver<T>::solve ()
                                            ceq_jac->mat(),
                                            __libmesh_tao_equality_constraints_jacobian,
                                            this);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   // Optionally set inequality constraints
   if ( this->inequality_constraints_object )
     {
       ierr = TaoSetInequalityConstraintsRoutine(_tao, cineq->vec(), __libmesh_tao_inequality_constraints, this);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   // Optionally set inequality constraints Jacobian
@@ -583,20 +583,20 @@ void TaoOptimizationSolver<T>::solve ()
                                              cineq_jac->mat(),
                                              __libmesh_tao_inequality_constraints_jacobian,
                                              this);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   // Check for Tao command line options
   ierr = TaoSetFromOptions(_tao);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Perform the optimization
   ierr = TaoSolve(_tao);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // Store the convergence/divergence reason
   ierr = TaoGetConvergedReason(_tao, &_reason);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   STOP_LOG("solve()", "TaoOptimizationSolver");
 }
@@ -619,7 +619,7 @@ void TaoOptimizationSolver<T>::get_dual_variables()
   ierr = TaoGetDualVariables(_tao,
                              &lambda_eq_petsc_vec,
                              &lambda_ineq_petsc_vec);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   STOP_LOG("get_dual_variables()", "TaoOptimizationSolver");
 }
@@ -642,7 +642,7 @@ int TaoOptimizationSolver<T>::get_converged_reason()
   if (this->initialized())
     {
       ierr = TaoGetConvergedReason(_tao, &_reason);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   return static_cast<int>(_reason);
