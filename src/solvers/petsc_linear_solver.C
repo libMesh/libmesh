@@ -733,7 +733,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   else
     {
       ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(77);
     }
 
   // Get the number of iterations required for convergence

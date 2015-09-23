@@ -139,7 +139,14 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Solve the system
-  system.solve();
+  try
+    {
+      system.solve();
+    }
+  catch (std::exception & e)
+    {
+      libmesh_error_msg("Caught exception during solve! e.what() = " << e.what());
+    }
 
   // Plot the solution
 #ifdef LIBMESH_HAVE_EXODUS_API
