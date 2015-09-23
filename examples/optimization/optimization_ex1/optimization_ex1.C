@@ -1,29 +1,34 @@
-/* The libMesh Finite Element Library. */
-/* Copyright (C) 2003  Benjamin S. Kirk */
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
-/* This library is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-/* This library is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
 
 // <h1>Optimization Example 1 - Optimization of a quadratic objective function</h1>
+// \author David Knezevic
+// \date 2015
 //
-// In this example we demonstrate how to use OptimizationSystem to solve the
-// optimization problem:
+// In this example we demonstrate how to use OptimizationSystem to
+// solve the optimization problem:
 //   min_U 0.5*U^T A U - U^T F
-// We enforce Dirichlet constraints on U so that the minimization is well-posed.
-// But note that we do not use OptimizationSystem's interface for imposing constraints
-// in this case, so we can use an unconstrained solver (e.g. TAO's "Newton's method
-// with line search" for unconstrained optimization is the default choice).
+// We enforce Dirichlet constraints on U so that the minimization is
+// well-posed.  But note that we do not use OptimizationSystem's
+// interface for imposing constraints in this case, so we can use an
+// unconstrained solver (e.g. TAO's "Newton's method with line search"
+// for unconstrained optimization is the default choice).
 
 // C++ include files that we need
 #include <iostream>

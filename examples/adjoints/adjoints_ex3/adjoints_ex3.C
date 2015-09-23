@@ -1,3 +1,64 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// <h1>Adjoints Example 3 - Stokes flow and Convection-Diffusion</h1>
+// \author Vikram Garg
+// \date 2012
+//
+// We solve a coupled Stokes + Convection Diffusion system in an H channel geometry
+// with 2 inlets and 2 outlets. The QoI is the species
+// flux from left outlet
+
+// Channel Geometry:
+//                              Wall
+//  ----------------------------------------------------------------
+// 0                                                                1
+//  ----------------------------     -------------------------------
+//                             |     |
+//                        Wall |     | Wall
+//                             |     |
+// -----------------------------     -------------------------------
+// 2                                                               2
+// -----------------------------------------------------------------
+//                              Wall
+
+// The equations governing this flow are:
+// Stokes: -VectorLaplacian(velocity) + grad(pressure) = vector(0)
+// Convection-Diffusion: - dot(velocity, grad(concentration) ) + Laplacian(concentration) = 0
+
+// The boundary conditions are:
+// u_1(0) = -(y-2)*(y-3), u_2(0) = 0 ; u_1(1) = (y-2)*(y-3), u_2(1) = 0 ;
+// u_1(walls) = 0, u_2(walls) = 0;
+// C(0) = 1 ; C(1) = 0;
+// grad(C) dot n (walls) = 0 ;
+// grad(C) dot n (2) = 0 ; grad(C) dot n (3) = 0
+
+// The QoI is:
+// Q((u,v), C) = integral_{left_outlet}  - u * C ds
+
+// The complete equal order adjoint QoI error estimate is: (Notation for derivatives: grad(C) = C,1 + C,2)
+// Q(u) - Q(u_h) \leq
+// |e(u_1)|_{H1} |e(u_1^*)|_{H1} +  |e(u_2)|_{H1} |e(u_2^*)|_{H1} +  (1/Pe) * |e(C)|_{H1} |e(C^*)|_{H1}  +
+//  ||e(u_1,1)||_{L2} ||e(p^*)||_{L2} + ||e(u_2,2)||_{L2} ||e(p^*)||_{L2} + ||e(u_1,1^*)||_{L2} ||e(p)||_{L2} + ||e(u_2,2^*)||_{L2} ||e(p)||_{L2}  +
+// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2}
+// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
+// = error_non_pressure + error_with_pressure + error_convection_diffusion_x + error_convection_diffusion_y
+
 // C++ includes
 #include <iostream>
 #include <sys/time.h>
@@ -48,44 +109,6 @@
 #include "output.h"
 #include "H-qoi.h"
 
-// We solve a coupled Stokes + Convection Diffusion system in an H channel geometry
-// with 2 inlets and 2 outlets. The QoI is the species
-// flux from left outlet
-
-// Channel Geometry:
-//                              Wall
-//  ----------------------------------------------------------------
-// 0                                                                1
-//  ----------------------------     -------------------------------
-//                             |     |
-//                        Wall |     | Wall
-//                             |     |
-// -----------------------------     -------------------------------
-// 2                                                               2
-// -----------------------------------------------------------------
-//                              Wall
-
-// The equations governing this flow are:
-// Stokes: -VectorLaplacian(velocity) + grad(pressure) = vector(0)
-// Convection-Diffusion: - dot(velocity, grad(concentration) ) + Laplacian(concentration) = 0
-
-// The boundary conditions are:
-// u_1(0) = -(y-2)*(y-3), u_2(0) = 0 ; u_1(1) = (y-2)*(y-3), u_2(1) = 0 ;
-// u_1(walls) = 0, u_2(walls) = 0;
-// C(0) = 1 ; C(1) = 0;
-// grad(C) dot n (walls) = 0 ;
-// grad(C) dot n (2) = 0 ; grad(C) dot n (3) = 0
-
-// The QoI is:
-// Q((u,v), C) = integral_{left_outlet}  - u * C ds
-
-// The complete equal order adjoint QoI error estimate is: (Notation for derivatives: grad(C) = C,1 + C,2)
-// Q(u) - Q(u_h) \leq
-// |e(u_1)|_{H1} |e(u_1^*)|_{H1} +  |e(u_2)|_{H1} |e(u_2^*)|_{H1} +  (1/Pe) * |e(C)|_{H1} |e(C^*)|_{H1}  +
-//  ||e(u_1,1)||_{L2} ||e(p^*)||_{L2} + ||e(u_2,2)||_{L2} ||e(p^*)||_{L2} + ||e(u_1,1^*)||_{L2} ||e(p)||_{L2} + ||e(u_2,2^*)||_{L2} ||e(p)||_{L2}  +
-// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2}
-// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
-// = error_non_pressure + error_with_pressure + error_convection_diffusion_x + error_convection_diffusion_y
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

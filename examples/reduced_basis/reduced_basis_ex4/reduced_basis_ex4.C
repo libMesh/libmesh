@@ -1,33 +1,42 @@
-/* rbOOmit: An implementation of the Certified Reduced Basis method. */
-/* Copyright (C) 2009, 2010 David J. Knezevic */
-/*     This file is part of rbOOmit. */
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
-/* rbOOmit is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-/* rbOOmit is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// rbOOmit: An implementation of the Certified Reduced Basis method.
+// Copyright (C) 2009, 2010 David J. Knezevic
+// This file is part of rbOOmit.
+
+
 
 // <h1>Reduced Basis Example 4 - Empirical Interpolation Method</h1>
-
-// In this example problem we develop a reduced basis approximation for a parametrized
-// PDE that has "non-affine" parameter dependence. This requires the use of the
-// Empirical Interpolation Method (EIM).
+// \author David Knezevic
+// \date 2011
 //
-// We first use EIM to construct an affine approximation to the non-affine term,
-// which is a parametrized function that is a Gaussian with "center" defined
-// by the two parameters (mu_1,mu_2) \in [-1,1]^2. We then employ this EIM
-// approximation in order to generate a reduced basis approximation for the
-// parametrized PDE: -0.05 * Laplacian(u) = f(mu_1,mu_2), with zero Dirichlet
-// boundary conditions.
+// In this example problem we develop a reduced basis approximation
+// for a parametrized PDE that has "non-affine" parameter
+// dependence. This requires the use of the Empirical Interpolation
+// Method (EIM).
+//
+// We first use EIM to construct an affine approximation to the
+// non-affine term, which is a parametrized function that is a
+// Gaussian with "center" defined by the two parameters (mu_1,mu_2)
+// \in [-1,1]^2. We then employ this EIM approximation in order to
+// generate a reduced basis approximation for the parametrized PDE:
+// -0.05 * Laplacian(u) = f(mu_1,mu_2), with zero Dirichlet boundary
+// conditions.
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"

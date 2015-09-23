@@ -1,24 +1,30 @@
-/* The libMesh Finite Element Library. */
-/* Copyright (C) 2002-2013 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner */
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
-/* This library is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-/* This library is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
 
 // Adjoints Example 5 - SolutionHistory, General Localized Vectors and Unsteady Adjoints.
-// This example showcases three new capabilities in libMesh. The primary motivation is adjoint sensitivity analysis for unsteady problems. The PDE we are interested in is the simple 2-d heat equation:
+// \author Vikram Garg
+// \date 2013
+//
+// This example showcases three new capabilities in libMesh. The
+// primary motivation is adjoint sensitivity analysis for unsteady
+// problems. The PDE we are interested in is the simple 2-d heat
+// equation:
 // partial(T)/partial(t) - K Laplacian(T) = 0
 // with initial condition:
 // T(x,y;0) = sin(pi*x) sin(pi*y) and boundary conditions:

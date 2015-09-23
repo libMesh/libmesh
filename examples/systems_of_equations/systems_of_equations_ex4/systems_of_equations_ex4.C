@@ -1,24 +1,25 @@
-/* The libMesh Finite Element Library. */
-/* Copyright (C) 2003  Benjamin S. Kirk */
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
-/* This library is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-/* This library is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
 
 // <h1> Systems Example 4 - Linear Elastic Cantilever </h1>
-//      By David Knezevic
+// \author David Knezevic
+// \date 2012
 //
 // In this example we model a homogeneous isotropic cantilever
 // using the equations of linear elasticity. We set the Poisson ratio to

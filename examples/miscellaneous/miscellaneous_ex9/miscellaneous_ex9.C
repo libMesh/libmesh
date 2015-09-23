@@ -1,45 +1,54 @@
-/* The libMesh Finite Element Library. */
-/* Copyright (C) 2003  Benjamin S. Kirk */
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
-/* This library is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-/* This library is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
 
-// <h1>Miscellaneous Example 9 - Implement an interface term to model a thermal "film resistance"</h1>
+// <h1>Miscellaneous Example 9 - Implement an interface term to model
+// a thermal "film resistance"</h1>
+// \author David Knezevic
+// \date 2013
 //
-// In this example we solve a Poisson problem, -\Laplacian u = f, with a non-standard interface
-// condition on the domain interior which models a thermal "film resistance". The interface condition
-// requires continuity of flux, and a jump in temperature proportional to the flux:
+// In this example we solve a Poisson problem, -\Laplacian u = f, with
+// a non-standard interface condition on the domain interior which
+// models a thermal "film resistance". The interface condition
+// requires continuity of flux, and a jump in temperature proportional
+// to the flux:
 //  \nabla u_1 \cdot n = \nabla u_2 \cdot n,
 //  u_1 - u_2 = R * \nabla u \cdot n
 //
-// To implement this PDE, we use two mesh subdomains, \Omega_1 and \Omega_2, with coincident boundaries,
-// but which are not connected in the FE sense. Let \Gamma denote the coincident boundary.
-// The term on \Gamma takes the form:
+// To implement this PDE, we use two mesh subdomains, \Omega_1 and
+// \Omega_2, with coincident boundaries, but which are not connected
+// in the FE sense. Let \Gamma denote the coincident boundary.  The
+// term on \Gamma takes the form:
 //
 //  1/R * \int_\Gamma (u_1 - u_2) (v_1 - v_2) ds,
 //
-// where u_1, u_2 (resp. v_1, v_2) are the trial (resp. test) functions on either side of \Gamma.
-// We implement this condition using C0 basis functions, but the "crack" in the mesh at \Gamma permits
-// a discontinuity in the solution. We also impose a heat flux on the bottom surface of the mesh, and a zero Dirichlet
-// condition on the top surface.
+// where u_1, u_2 (resp. v_1, v_2) are the trial (resp. test)
+// functions on either side of \Gamma.  We implement this condition
+// using C0 basis functions, but the "crack" in the mesh at \Gamma
+// permits a discontinuity in the solution. We also impose a heat flux
+// on the bottom surface of the mesh, and a zero Dirichlet condition
+// on the top surface.
 //
-// In order to implement the interface condition, we need to augment the matrix sparsity pattern,
-// which is handled by the class AugmentSparsityPatternOnInterface. (We do not need to augment the
-// send-list in this case since the PDE is linear and hence there is no need to broadcast non-local
-// solution values).
+// In order to implement the interface condition, we need to augment
+// the matrix sparsity pattern, which is handled by the class
+// AugmentSparsityPatternOnInterface. (We do not need to augment the
+// send-list in this case since the PDE is linear and hence there is
+// no need to broadcast non-local solution values).
 
 
 // C++ include files that we need

@@ -1,30 +1,39 @@
-/* rbOOmit: An implementation of the Certified Reduced Basis method. */
-/* Copyright (C) 2009, 2010 David J. Knezevic */
-/*     This file is part of rbOOmit. */
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
-/* rbOOmit is free software; you can redistribute it and/or */
-/* modify it under the terms of the GNU Lesser General Public */
-/* License as published by the Free Software Foundation; either */
-/* version 2.1 of the License, or (at your option) any later version. */
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-/* rbOOmit is distributed in the hope that it will be useful, */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-/* Lesser General Public License for more details. */
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-/* You should have received a copy of the GNU Lesser General Public */
-/* License along with this library; if not, write to the Free Software */
-/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// rbOOmit: An implementation of the Certified Reduced Basis method.
+// Copyright (C) 2009, 2010 David J. Knezevic
+// This file is part of rbOOmit.
+
+
 
 // <h1>Reduced Basis Example 2 - Successive Constraint Method</h1>
-
-// In this example we extend reduced_basis_ex1 to solve a steady convection-diffusion
-// problem on the unit square via the Reduced Basis Method. In this case, we modify the
-// PDE so that it no longer has a parameter-independent coercivity constant. Therefore,
-// in order to obtain an error bound, we need to employ the Successive Constraint
-// Method (SCM) implemented in RBSCMConstruction/RBSCMEvaluation to obtain a
-// parameter-dependent lower bound for the coercivity constant.
-
+// \author David Knezevic
+// \date 2011
+//
+// In this example we extend reduced_basis_ex1 to solve a steady
+// convection-diffusion problem on the unit square via the Reduced
+// Basis Method. In this case, we modify the PDE so that it no longer
+// has a parameter-independent coercivity constant. Therefore, in
+// order to obtain an error bound, we need to employ the Successive
+// Constraint Method (SCM) implemented in
+// RBSCMConstruction/RBSCMEvaluation to obtain a parameter-dependent
+// lower bound for the coercivity constant.
+//
 // The PDE being solved is div(k*grad(u)) + Beta*grad(u) = f
 // k is the diffusion coefficient :
 // - constant in the domain 0<=x<0.5 , its value is given by the first parameter mu[0]

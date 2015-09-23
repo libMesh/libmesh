@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -15,8 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
+
 // <h1>FEMSystem Example 3 - Unsteady Linear Elasticity with
 // FEMSystem</h1>
+// \author Paul Bauman
+// \date 2015
 //
 // This example shows how to solve the three-dimensional transient
 // linear elasticity equations using the DifferentiableSystem class framework.
