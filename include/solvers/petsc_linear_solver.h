@@ -25,6 +25,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_solver_exception.h"
 
 /**
  * Petsc include files.

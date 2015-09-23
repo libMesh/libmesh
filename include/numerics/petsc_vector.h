@@ -30,6 +30,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/petsc_solver_exception.h"
 #include LIBMESH_INCLUDE_UNORDERED_MAP
 
 /**

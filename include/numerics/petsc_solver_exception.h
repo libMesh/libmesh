@@ -38,6 +38,14 @@ public:
   {}
 };
 
+
+// Macro which we call after every PETSc function that returns an error code.
+#define LIBMESH_CHKERRABORT(ierr)               \
+  do {                                          \
+    if (ierr != 0) {                            \
+      throw PetscSolverException(ierr);         \
+    } } while(0)
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_PETSC
