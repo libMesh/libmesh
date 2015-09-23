@@ -136,7 +136,11 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 #  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 #endif
 
-#define LIBMESH_CHKERRABORT(ierr) if(ierr != 0) { throw SolverException(ierr); }
+#define LIBMESH_CHKERRABORT(ierr)               \
+  do {                                          \
+    if (ierr != 0) {                            \
+      throw SolverException(ierr);              \
+    } } while(0)
 
 #else // LIBMESH_HAVE_PETSC
 
