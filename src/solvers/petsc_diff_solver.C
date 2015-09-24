@@ -219,10 +219,10 @@ void PetscDiffSolver::init ()
   // and could have a value of either SNES_NONLINEAR_EQUATIONS or
   // SNES_UNCONSTRAINED_MINIMIZATION.
   ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 #else
   ierr = SNESCreate(this->comm().get(),&_snes);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 #endif
 
 #if PETSC_VERSION_LESS_THAN(2,3,3)
@@ -233,24 +233,24 @@ void PetscDiffSolver::init ()
   ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
                          this, PETSC_NULL);
 #endif
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   if (libMesh::on_command_line("--solver_system_names"))
     {
       ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 
   ierr = SNESSetFromOptions(_snes);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   KSP my_ksp;
   ierr = SNESGetKSP(_snes, &my_ksp);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   PC my_pc;
   ierr = KSPGetPC(my_ksp, &my_pc);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   petsc_auto_fieldsplit(my_pc, _system);
 
@@ -270,7 +270,7 @@ void PetscDiffSolver::clear()
   START_LOG("clear()", "PetscDiffSolver");
 
   int ierr = LibMeshSNESDestroy(&_snes);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   STOP_LOG("clear()", "PetscDiffSolver");
 }
@@ -283,11 +283,11 @@ void PetscDiffSolver::reinit()
 
   KSP my_ksp;
   int ierr = SNESGetKSP(_snes, &my_ksp);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   PC my_pc;
   ierr = KSPGetPC(my_ksp, &my_pc);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   petsc_auto_fieldsplit(my_pc, _system);
 }
@@ -368,28 +368,28 @@ unsigned int PetscDiffSolver::solve()
 
   ierr = SNESSetFunction (_snes, r.vec(),
                           __libmesh_petsc_diff_solver_residual, this);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   ierr = SNESSetJacobian (_snes, jac.mat(), jac.mat(),
                           __libmesh_petsc_diff_solver_jacobian, this);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
 # if PETSC_VERSION_LESS_THAN(2,2,0)
 
   ierr = SNESSolve (_snes, x.vec(), &_outer_iterations);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // 2.2.x style
 #elif PETSC_VERSION_LESS_THAN(2,3,0)
 
   ierr = SNESSolve (_snes, x.vec());
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   // 2.3.x & newer style
 #else
 
   ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
 #endif
 

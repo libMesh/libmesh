@@ -25,6 +25,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_solver_exception.h"
 
 /**
  * Petsc include files.
@@ -365,7 +366,7 @@ _restrict_solve_to_is_local_size(void)const
 
   PetscInt s;
   int ierr = ISGetLocalSize(_restrict_solve_to_is,&s);
-  LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERR(ierr);
 
   return s;
 }
@@ -393,7 +394,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
                               vec_in.first_local_index(),
                               vec_in.last_local_index(),
                               &_restrict_solve_to_is_complement);
-      LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERR(ierr);
     }
 #endif
 }
