@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,10 +33,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 
-// Eigen includes
-
-// C++ includes
-
 namespace libMesh
 {
 
@@ -49,14 +45,13 @@ template <typename T> class ShellMatrix;
  * This class provides an interface to the suite of preconditioners available
  * from Eigen.
  *
- * @author Benjamin Kirk, 2013.
+ * \author Benjamin Kirk
+ * \date 2013
  */
-
 template <typename T>
 class EigenPreconditioner : public Preconditioner<T>
 {
 public:
-
   /**
    *  Constructor. Initializes EigenPreconditioner data structures
    */
@@ -83,8 +78,6 @@ public:
    * Initialize data structures if not done so already.
    */
   virtual void init ();
-
-protected:
 };
 
 

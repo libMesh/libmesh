@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -41,11 +41,10 @@ template <typename T> class ShellMatrix;
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p ExplicitSystem.
+ *
+ * \author Benjamin Kirk
+ * \date 2005
  */
-
-// ------------------------------------------------------------
-// LinearImplicitSystem class definition
-
 class LinearImplicitSystem : public ImplicitSystem
 {
 public:

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -92,7 +92,8 @@ namespace libMesh
  * Reference LGPL Fortran90 code by John Burkardt can be found here:
  * http://people.scs.fsu.edu/~burkardt/f_src/gm_rules/gm_rules.html
  *
- * @author John W. Peterson, 2008
+ * \author John W. Peterson
+ * \date 2008
  */
 class QGrundmann_Moller : public QBase
 {

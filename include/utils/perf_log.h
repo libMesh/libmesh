@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,10 +38,10 @@ namespace libMesh
 /**
  * The \p PerfData class simply contains the performance
  * data that is recorded for individual events.
+ *
+ * \author Benjamin Kirk
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// PerfData class definition
 class PerfData
 {
 public:
@@ -116,13 +116,11 @@ protected:
  * This class is particulary useful for finding performance
  * bottlenecks.
  *
+ * \author Benjamin Kirk
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// PerfLog class definition
 class PerfLog
 {
-
 public:
 
   /**

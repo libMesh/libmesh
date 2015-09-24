@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,20 +28,14 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class implemenets Simpson quadrature.
  * This is the same thing as Newton-Cotes quadrature with three points.
  * Simpson's rule can integrate polynomials of degree three exactly.
  *
- * @author John W. Peterson, 2003
+ * \author John W. Peterson
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// QSimpson class definition
-
 class QSimpson : public QBase
 {
 public:

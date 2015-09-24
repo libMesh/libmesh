@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,6 @@ namespace libMesh
 // Forward declarations
 class Nemesis_IO_Helper;
 
-
 /**
  * The \p Nemesis_IO class implements reading parallel meshes in the
  * \p Nemesis file format from Sandia National Labs.  Nemesis files
@@ -45,11 +44,9 @@ class Nemesis_IO_Helper;
  * of files the Mesh is split into and rank is the ID of the processor's
  * elements that were written to the file.
  *
- * @author John Peterson, 2008.
+ * \author John Peterson
+ * \date 2008
  */
-
-// ------------------------------------------------------------
-// Nemesis_IO class definition
 class Nemesis_IO : public MeshInput<MeshBase>,
                    public MeshOutput<MeshBase>,
                    public ParallelObject

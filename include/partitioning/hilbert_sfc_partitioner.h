@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -34,9 +34,6 @@ namespace libMesh
  * The \p HilbertSFCPartitioner uses a Hilbert space
  * filling curve to partition the elements.
  */
-
-// ------------------------------------------------------------
-// HilbertSFCLinearPartitioner class definition
 class HilbertSFCPartitioner : public SFCPartitioner
 {
 public:
@@ -64,12 +61,9 @@ protected:
    */
   virtual void _do_partition (MeshBase& mesh,
                               const unsigned int n)
-  { SFCPartitioner::_do_partition (mesh, n); }
-
-
-
-private:
-
+  {
+    SFCPartitioner::_do_partition (mesh, n);
+  }
 };
 
 } // namespace libMesh

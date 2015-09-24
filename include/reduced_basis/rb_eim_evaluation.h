@@ -43,12 +43,9 @@ class RBParametrizedFunction;
  * to perform "online" evaluations for
  * EIM approximations.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
-
-// ------------------------------------------------------------
-// RBEIMEvaluation class definition
-
 class RBEIMEvaluation : public RBEvaluation
 {
 public:

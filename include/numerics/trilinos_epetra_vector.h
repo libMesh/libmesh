@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -53,9 +53,9 @@ template <typename T> class SparseMatrix;
  * Epetra vector. Provides a nice interface to the
  * Trilinos Epetra data structures for parallel vectors.
  *
- * @author Derek R. Gaston, 2008
+ * \author Derek R. Gaston
+ * \date 2008
  */
-
 template <typename T>
 class EpetraVector : public NumericVector<T>
 {

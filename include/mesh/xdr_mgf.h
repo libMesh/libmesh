@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -67,8 +67,6 @@ namespace libMesh
  * platforms.  For more information on the \p xdr format, see the
  * standard C include file \p rpc/rpc.h.
  *
- * @author Bill Barth, Robert McLay.
- *
  * There are essentially two inheritance trees and six classes:
  *       XdrMGF                         XdrHEAD
  *     ^        ^                    ^          ^
@@ -81,6 +79,10 @@ namespace libMesh
  *
  * XdrMGF, XdrMESH, and XdrSOLN handle the "meat" of the files: everything
  * other than the headers.
+ *
+ * \author Bill Barth
+ * \author Robert McLay
+ * \date 2000
  */
 class XdrMGF
 {

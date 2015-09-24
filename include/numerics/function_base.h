@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,11 +31,8 @@
 namespace libMesh
 {
 
-
-
 // Forward Declarations
 class Point;
-
 
 /**
  * This is the base class for functor-like classes.  These
@@ -56,11 +53,9 @@ class Point;
  * spatial dimensions, libMesh is expecting 2 components (i.e.
  * mesh_dimension() number of components).
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// FunctionBase class definition
 template <typename Output=Number>
 class FunctionBase
 {

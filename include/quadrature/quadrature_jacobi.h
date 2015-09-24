@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,11 +28,6 @@
 namespace libMesh
 {
 
-
-// ------------------------------------------------------------
-// QJacobi class definition
-
-
 /**
  * This class implements two (for now) Jacobi-Gauss quadrature
  * rules.  These rules have the same order of accuracy as the
@@ -48,6 +43,9 @@ namespace libMesh
  * since it only provides 1D rules, weighted, as described before.
  * Still, this class is particularly helpful: check \p QGauss
  * for triangles and tetrahedra, with orders beyond \p THIRTIETH.
+ *
+ * \author John W. Peterson
+ * \date 2003
  */
 class QJacobi : public QBase
 {

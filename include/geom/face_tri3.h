@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,20 +38,18 @@ namespace libMesh
  * The \p Tri3 is an element in 2D composed of 3 nodes.
  * It is numbered like this:
  * \verbatim
- *   TRI3:  2
- *          o
- *         / \
- *        /   \
- *       /     \
- *      /       \
- *     /         \
- *    o-----------o
- *    0           1
+ *   TRI3:
+ *    2
+ *    o
+ *    |\
+ *    | \
+ *    |  \
+ *    |   \
+ *    |    \
+ *    o-----o
+ *    0      1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Tri3 class definition
 class Tri3 : public Tri
 {
 public:

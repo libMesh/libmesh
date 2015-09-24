@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -60,15 +60,16 @@ extern "C" {
 }
 
 /**
- * This is the \p ExodusII_IO_Helper class.  This class hides the implementation
- * details of interfacing with the Exodus binary format.
+ * This is the \p ExodusII_IO_Helper class.  This class hides the
+ * implementation details of interfacing with the Exodus binary
+ * format.
  *
- * @author Johw W. Peterson, 2002.
+ * \author Johw W. Peterson
+ * \date 2002
  */
 class ExodusII_IO_Helper : public ParallelObject
 {
 public:
-
   /**
    * Constructor. Automatically initializes all the private members of
    * the class.  Also allows you to set the verbosity level to v=true

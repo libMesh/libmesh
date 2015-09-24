@@ -35,11 +35,9 @@ namespace libMesh
  * This class stores the set of RBTheta functor objects that define
  * the "parameter-dependent expansion" of a PDE.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
-
-// ------------------------------------------------------------
-// TransientRBThetaExpansion class definition
 class TransientRBThetaExpansion : public RBThetaExpansion
 {
 public:

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,8 @@
  * off the end or the beginning.  To reduce complexity, we only allow
  * traversal in one direction.
  *
- * @author John W. Peterson, 2004.
+ * \author John W. Peterson
+ * \date 2004
  */
 template<class Predicate, class Type, class ReferenceType = Type&, class PointerType = Type*>
 class variant_filter_iterator :

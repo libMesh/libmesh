@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,19 +36,14 @@ class MeshBase;
 class ParallelMesh;
 class BoundaryInfo;
 
-
-
 /**
  * This is the \p MeshCommunication class.  It handles all the details
  * of communicating mesh information from one processor to another.  All
  * parallelization of the \p Mesh data structures is done via this class.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
-
-// ------------------------------------------------------------
-// MeshCommunication class definition
 class MeshCommunication
 {
 public:

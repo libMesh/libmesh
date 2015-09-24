@@ -1,6 +1,6 @@
 
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,14 +35,15 @@ namespace libMesh
 // Forward Declarations
 class Elem;
 
-
-
 /**
  * This class implements useful utility functions for a patch of
  * elements
  *
- * @author Roy H. Stogner, 2007.
- * based on code by Varis Carey, Benjamin S. Kirk, 2004.
+ * \author Varis Carey
+ * \author Benjamin S. Kirk
+ * \date 2004
+ * \author Roy H. Stogner
+ * \date 2007
  */
 class Patch : public std::set<const Elem *>
 {

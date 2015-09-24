@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -48,8 +48,6 @@ EXTERN_C_FOR_PETSC_END
 namespace libMesh
 {
 
-
-
 // forward declarations
 template <typename T> class SparseMatrix;
 
@@ -57,9 +55,9 @@ template <typename T> class SparseMatrix;
  * Petsc vector. Provides a nice interface to the
  * Petsc C-based data structures for parallel vectors.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
-
 template <typename T>
 class PetscVector : public NumericVector<T>
 {

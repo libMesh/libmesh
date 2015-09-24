@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,17 +28,13 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * This class creates a gaussian quadrature rule duplicated for each
  * subelement of a Clough-Tocher divided macroelement.
+ *
+ * \author Roy Stogner
+ * \date 2005
  */
-
-// ------------------------------------------------------------
-// QClough class definition
-
 class QClough : public QBase
 {
 public:

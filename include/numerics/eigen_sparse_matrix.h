@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -37,22 +37,18 @@
 namespace libMesh
 {
 
-
-
 // Forward declarations
 template <typename T> class DenseMatrix;
 template <typename T> class EigenSparseVector;
 template <typename T> class EigenSparseLinearSolver;
 
-
-
 /**
  * The EigenSparseMatrix class wraps a sparse matrix object from the Eigen
  * library.
  *
- * @author Benjamin S. Kirk, 2013
+ * \author Benjamin S. Kirk
+ * \date 2013
  */
-
 template <typename T>
 class EigenSparseMatrix : public SparseMatrix<T>
 {

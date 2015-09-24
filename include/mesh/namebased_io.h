@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,11 +38,9 @@ class MeshBase;
  * Other I/O classes may have more advanced features that are not
  * accessible via this interface.
  *
- * @author Roy H. Stogner, 2015
+ * \author Roy H. Stogner
+ * \date 2015
  */
-
-// ------------------------------------------------------------
-// NameBasedIO class definition
 class NameBasedIO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>
 {

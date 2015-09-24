@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,13 +32,11 @@
 namespace libMesh
 {
 
-
 // Forward Declarations
 class Node;
 class Elem;
 class MeshBase;
 class MeshDataUnvHeader;
-
 
 /**
  * The \p MeshData class handles actual data and the corresponding
@@ -50,16 +48,12 @@ class MeshDataUnvHeader;
  * To use \p MeshData, it has to be either activated or the compatibility
  * mode has to be enabled.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// MeshData class definition
 class MeshData
 {
 public:
-
-
   //----------------------------------------------------------
   // convenient typedefs
   /**
@@ -633,9 +627,6 @@ protected:
 };
 
 
-
-//-----------------------------------------------------------
-// MeshDataUnvHeader class definition
 
 /**
  * Class \p MeshDataUnvHeader handles the data specified at

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -55,9 +55,9 @@ extern "C"
 /**
  * This class provides an interface to the Tao optimization solvers.
  *
- * @author David Knezevic, 2015
+ * \author David Knezevic
+ * \date 2015
  */
-
 template <typename T>
 class TaoOptimizationSolver : public OptimizationSolver<T>
 {

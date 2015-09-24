@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -46,8 +46,9 @@ class Node;
  * top of an existing mesh.  It only makes sense to
  * use this if LIBMESH_ENABLE_INFINITE_ELEMENTS is true.
  *
- * @author original code by Daniel Dreyer, converted
- * to InfElemBuilder class by John W. Peterson, 2004.
+ * \author Daniel Dreyer
+ * \author John W. Peterson
+ * \date 2004
  */
 class InfElemBuilder
 {

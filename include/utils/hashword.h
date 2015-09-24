@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,9 @@
 namespace
 {
 // Rotate x by k bits
-// @author Bob Jenkins, May 2006, Public Domain.
+// \author Bob Jenkins
+// \date May 2006
+// \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
 uint32_t rot(uint32_t x, uint32_t k)
@@ -46,7 +48,9 @@ uint32_t rot(uint32_t x, uint32_t k)
 
 
 // mix 3 32-bit values reversibly
-// @author Bob Jenkins, May 2006, Public Domain.
+// \author Bob Jenkins
+// \date May 2006
+// \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
 void mix(uint32_t& a, uint32_t& b, uint32_t& c)
@@ -61,7 +65,9 @@ void mix(uint32_t& a, uint32_t& b, uint32_t& c)
 
 
 // 'final' mixing of 3 32-bit numbers, result is stored in c.
-// @author Bob Jenkins, May 2006, Public Domain.
+// \author Bob Jenkins
+// \date May 2006
+// \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
 void final(uint32_t& a, uint32_t& b, uint32_t& c)
@@ -126,7 +132,9 @@ namespace Utility
 {
 // The hashword function takes an array of uint32_t's of length 'length'
 // and computes a single key from it.
-// @author Bob Jenkins, May 2006, Public Domain.
+// \author Bob Jenkins
+// \date May 2006
+// \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
 uint32_t hashword(const uint32_t *k, size_t length, uint32_t initval=0)
@@ -164,7 +172,9 @@ uint32_t hashword(const uint32_t *k, size_t length, uint32_t initval=0)
 
 
 // This is a hard-coded version of hashword for hashing exactly 2 numbers
-// @author Bob Jenkins, May 2006, Public Domain.
+// \author Bob Jenkins
+// \date May 2006
+// \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
 uint32_t hashword2(const uint32_t& first, const uint32_t& second, uint32_t initval=0)

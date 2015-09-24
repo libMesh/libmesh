@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -39,11 +39,9 @@ namespace libMesh
  * by the \p subdomain_id and possible the variable numbers.  The dofs
  * in the subset will be sorted.
  *
- * @author Tim Kroeger, 2010.
+ * \author Tim Kroeger
+ * \date 2010
  */
-
-// ------------------------------------------------------------
-// SystemSubset class definition
 class SystemSubsetBySubdomain : public SystemSubset,
                                 public ParallelObject
 {

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,8 @@ template <typename T> class Preconditioner;
  * This class provides a uniform interface for optimization solvers.  This base
  * class is overloaded to provide optimization solvers from different packages.
  *
- * @author David Knezevic, 2015
+ * \author David Knezevic
+ * \date 2015
  */
 template <typename T>
 class OptimizationSolver : public ReferenceCountedObject<OptimizationSolver<T> >,

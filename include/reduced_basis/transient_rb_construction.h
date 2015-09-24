@@ -42,12 +42,9 @@ namespace libMesh
  * We can handle time controls on the RHS as h(t)*f(x,\mu).
  * See Martin Grepl's thesis for more details.
  *
- * @author David J. Knezevic 2009
+ * \author David J. Knezevic
+ * \date 2009
  */
-
-// ------------------------------------------------------------
-// TransientRBConstruction class definition
-
 class TransientRBConstruction : public TransientSystem<RBConstruction>, public RBTemporalDiscretization
 {
 public:

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,23 +29,18 @@
 namespace libMesh
 {
 
-
-
 // Forward Declarations
 template <typename T>
 class DenseVector;
-
 
 /**
  * This class provides function-like objects for which an
  * analytical expression can be provided.  The user may
  * either provide vector-return or number-return functions.
  *
- * @author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// AnalyticFunction class definition
 template <typename Output=Number>
 class AnalyticFunction : public FunctionBase<Output>
 {

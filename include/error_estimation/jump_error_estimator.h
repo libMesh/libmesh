@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,15 +38,12 @@ namespace libMesh
 class Point;
 class Elem;
 
-
-
-
-
 /**
  * This abstract base class implements utility functions for error estimators
  * which are based on integrated jumps between elements.
  *
- * @author Roy H. Stogner, 2006
+ * \author Roy H. Stogner
+ * \date 2006
  */
 class JumpErrorEstimator : public ErrorEstimator
 {

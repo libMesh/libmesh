@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -70,9 +70,6 @@ class FEComputeData;
  * \author Daniel Dreyer
  * \date 2003
  */
-
-//-------------------------------------------------------------
-// InfFE class definition
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE : public FEBase
 {
@@ -92,8 +89,6 @@ protected:
    * \author Daniel Dreyer
    * \date 2003
    */
-  //-------------------------------------------------------------
-  // InfFE::Radial class definition
   class Radial
   {
   private:
@@ -183,8 +178,6 @@ protected:
    * \author Daniel Dreyer
    * \date 2003
    */
-  //-------------------------------------------------------------
-  // InfFE::Base class definition
   class Base
   {
   private:

@@ -36,9 +36,9 @@ class RBParameters;
  * object that arises from an "Empirical Interpolation Method" (EIM)
  * approximation.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
-
 class RBEIMTheta : public RBTheta
 {
 public:

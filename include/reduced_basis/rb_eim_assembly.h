@@ -41,9 +41,9 @@ class RBEIMConstruction;
  * object that arises from an "Empirical Interpolation Method" (EIM)
  * approximation.
  *
- * @author David J. Knezevic, 2012
+ * \author David J. Knezevic
+ * \date 2012
  */
-
 class RBEIMAssembly : public ElemAssembly
 {
 public:

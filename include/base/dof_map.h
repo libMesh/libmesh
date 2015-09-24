@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -152,9 +152,6 @@ class NodeConstraints : public std::map<const Node *,
 
 
 
-// ------------------------------------------------------------
-// DofMap class definition
-
 /**
  * This class handles the numbering of degrees of freedom on a mesh.
  * For systems of equations the class supports a fixed number of variables.
@@ -162,7 +159,8 @@ class NodeConstraints : public std::map<const Node *,
  * belong to distinct processors.  This is so that the resulting data
  * structures will work well with parallel linear algebra packages.
  *
- * @author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
 class DofMap : public ReferenceCountedObject<DofMap>,
                public ParallelObject

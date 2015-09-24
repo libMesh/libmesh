@@ -42,12 +42,9 @@ namespace libMesh
  * generate an affine approximation to non-affine
  * operators.
  *
- * @author David J. Knezevic, 2010
+ * \author David J. Knezevic
+ * \date 2010
  */
-
-// ------------------------------------------------------------
-// RBEIMConstruction class definition
-
 class RBEIMConstruction : public RBConstruction
 {
 public:

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,15 +32,13 @@
 namespace libMesh
 {
 
-
-
 /**
  * This class combines any number of shell matrices to a single shell
  * matrix, acting as the sum of the matrices.
  *
- * @author Tim Kroeger, 2008
+ * \author Tim Kroeger
+ * \date 2008
  */
-
 template <typename T>
 class SumShellMatrix : public ShellMatrix<T>
 {

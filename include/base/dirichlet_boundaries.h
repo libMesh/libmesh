@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -42,9 +42,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// DirichletBoundary class definition
-
 /**
  * This class allows one to associate dirichlet boundary values with
  * a given set of mesh boundary ids and system variable ids.
@@ -60,7 +57,6 @@ namespace libMesh
  * adjoining face interiors unconstrained, but would still permit the
  * other edge and node DoFs around those faces to be constrained.
  */
-
 class DirichletBoundary
 {
 public:

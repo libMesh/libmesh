@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,10 +31,6 @@
 namespace libMesh
 {
 
-// Forward declarations
-
-
-
 /**
  * In parallel meshes where a ghost element has neighbors which do
  * not exist on the local processor, the ghost element's neighbors
@@ -42,7 +38,8 @@ namespace libMesh
  * Library code can then distinguish between such elements and
  * boundary elements (with NULL neighbors).
  *
- * \author Roy H. Stogner, 2007
+ * \author Roy H. Stogner
+ * \date 2007
  */
 class RemoteElem : public Elem,
                    public Singleton

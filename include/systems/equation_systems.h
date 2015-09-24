@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -60,11 +60,9 @@ class MeshBase;
  * may be handled.  Also other features, like flags,
  * parameters, I/O etc are provided.
  *
- * @author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
-
-// ------------------------------------------------------------
-// EquationSystems class definition
 class EquationSystems : public ReferenceCountedObject<EquationSystems>,
                         public ParallelObject
 

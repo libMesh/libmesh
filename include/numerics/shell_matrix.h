@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -40,9 +40,9 @@ template <typename T> class NumericVector;
  * but its action on a vector.  This class contains pure virtual
  * members that must be overloaded in derived classes.
  *
- * @author Tim Kroeger, 2008
+ * \author Tim Kroeger
+ * \date 2008
  */
-
 template <typename T>
 class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >,
                     public ParallelObject

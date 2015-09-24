@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -39,14 +39,17 @@ class MeshData;
 class Xdr;
 class Elem;
 
-
 /**
+ * The CheckpointIO class can be used to write simplified restart
+ * files that can be used to restart simulations that have
+ * crashed. Only N-to-N (procs) restart is supported with CheckpointIO
+ * files.
  *
- * @author Benjamin Kirk, John Peterson, Derek Gaston
+ * \author Benjamin Kirk
+ * \author John Peterson
+ * \author Derek Gaston
+ * \date 2013
  */
-
-// ------------------------------------------------------------
-// CheckpointIO class definition
 class CheckpointIO : public MeshInput<MeshBase>,
                      public MeshOutput<MeshBase>,
                      public ParallelObject

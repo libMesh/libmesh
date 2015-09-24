@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -68,11 +68,9 @@ namespace libMesh
  * implemented in order to avoid possible problems with
  * buffer overruns.
  *
- * @author John W. Peterson, 2002
+ * \author John W. Peterson
+ * \date 2002
  */
-
-// ------------------------------------------------------------
-// StatisticsVector class definition
 template <typename T>
 class StatisticsVector : public std::vector<T>
 {

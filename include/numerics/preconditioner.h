@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -41,10 +41,6 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
-
-
-
-
 /**
  * This class provides a uniform interface for preconditioners.  This base
  * class is overloaded to provide linear solvers from different packages
@@ -54,9 +50,9 @@ template <typename T> class ShellMatrix;
  * performing the equivalent of the matrix vector product P^-1 x.  This
  * can also be thought of as (usually approximately) solving for Py=x.
  *
- * @author Derek Gaston, 2009
+ * \author Derek Gaston
+ * \date 2009
  */
-
 template <typename T>
 class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >,
                        public ParallelObject

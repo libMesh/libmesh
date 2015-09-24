@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,9 +35,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * \p FrequencySystem provides a specific system class
  * for frequency-dependent (linear) systems.
@@ -60,12 +57,9 @@ namespace libMesh
  *   of \p EquationSystems<FrequencySystem> named \p current \p frequency.
  *   For this to work, only provide @e one frequency.
  *
- * \author Daniel Dreyer, 2003
+ * \author Daniel Dreyer
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// FrequencySystem class definition
-
 class FrequencySystem : public LinearImplicitSystem
 {
 public:

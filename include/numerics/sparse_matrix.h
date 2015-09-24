@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -58,9 +58,9 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
  * from various different solver packages in
  * different formats.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
 template <typename T>
 class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
                      public ParallelObject

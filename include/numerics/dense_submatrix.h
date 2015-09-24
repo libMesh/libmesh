@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,18 +30,14 @@
 namespace libMesh
 {
 
-
-
 /**
  * Defines a dense submatrix for use in Finite Element-type computations.
  * Useful for storing element stiffness matrices before summation
  * into a global matrix, particularly when you have systems of equations.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// DenseSubMatrix class definition
 template<typename T>
 class DenseSubMatrix : public DenseMatrixBase<T>
 {

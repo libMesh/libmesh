@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,8 @@ namespace libMesh
  * for HCurl conforming elements. This class assumes the \p FEGenericBase object has been
  * initialized in the reference domain (i.e. \p init_shape_functions has been called).
  *
- * @author Paul T. Bauman, 2012
+ * \author Paul T. Bauman
+ * \date 2012
  */
 template< typename OutputShape >
 class HCurlFETransformation : public FETransformationBase<OutputShape>

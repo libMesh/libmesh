@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,8 +36,6 @@
 namespace libMesh
 {
 
-
-
 /**
  * Distributed vector. Provides an interface for simple
  * parallel, distributed vectors. Offers some collective
@@ -45,9 +43,9 @@ namespace libMesh
  * sill function without MPI, but only on one processor.
  * This lets us keep the parallel details behind the scenes.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
 template <typename T>
 class DistributedVector : public NumericVector<T>
 {

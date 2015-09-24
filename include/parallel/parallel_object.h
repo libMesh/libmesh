@@ -42,7 +42,8 @@ namespace libMesh
  * \p ParalelObject *requires* a \p Parallel::Communicator object
  * for construction.
  *
- * \author Benjamin S. Kirk, 2013.
+ * \author Benjamin S. Kirk
+ * \date 2013
  */
 class ParallelObject
 {

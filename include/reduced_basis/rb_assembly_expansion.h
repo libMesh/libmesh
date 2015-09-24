@@ -35,11 +35,9 @@ namespace libMesh
  * This class stores the set of ElemAssembly functor objects that define
  * the "parameter-independent expansion" of a PDE.
  *
- * @author David J. Knezevic, 2011
+ * \author David J. Knezevic
+ * \date 2011
  */
-
-// ------------------------------------------------------------
-// RBAssemblyExpansion class definition
 class RBAssemblyExpansion : public ReferenceCountedObject<RBAssemblyExpansion>
 {
 public:

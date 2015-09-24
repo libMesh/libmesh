@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -45,10 +45,6 @@ namespace libMesh
  * \author John W. Peterson
  * \date 2002-2007
  */
-
-
-// ------------------------------------------------------------
-// LaplaceMeshSmoother class definition
 class LaplaceMeshSmoother : public MeshSmoother
 {
 public:

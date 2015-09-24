@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -55,7 +55,8 @@ extern "C" {
  * ExodusII_IO_Helper object, since Nemesis is based on
  * the same file format.
  *
- * @author John W. Peterson, 2008.
+ * \author John W. Peterson
+ * \date 2008
  */
 class Nemesis_IO_Helper : public ExodusII_IO_Helper
 {

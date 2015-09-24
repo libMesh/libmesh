@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,20 +30,12 @@
 namespace libMesh
 {
 
-
-
-
-
-
 /**
  * The \p SerialMesh class is derived from the \p MeshBase class,
  * and currently represents the default Mesh implementation.
  * Most methods for this class are found in MeshBase, and most
  * implementation details are found in UnstructuredMesh.
  */
-
-// ------------------------------------------------------------
-// Mesh class definition
 class SerialMesh : public UnstructuredMesh
 {
 public:

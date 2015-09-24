@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -47,18 +47,13 @@ class Node;
 class ErrorVector;
 class PeriodicBoundaries;
 
-
-
 /**
  * This is the \p MeshRefinement class.  This class implements
  * adaptive mesh refinement algorithms for a \p MeshBase.
  *
- * @author Benjamin S. Kirk, 2002-2007.
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
-
-
-// ------------------------------------------------------------
-// MeshRefinement class definition
 class MeshRefinement : public ParallelObject
 {
 public:

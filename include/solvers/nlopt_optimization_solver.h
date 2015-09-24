@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,9 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
  * This class provides an interface to the NLopt optimization solvers.
  * http://ab-initio.mit.edu/wiki/index.php/NLopt
  *
- * @author David Knezevic and John Peterson, 2015
+ * \author David Knezevic
+ * \author John Peterson
+ * \date 2015
  */
 template <typename T>
 class NloptOptimizationSolver : public OptimizationSolver<T>

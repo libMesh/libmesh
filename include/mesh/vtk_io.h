@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,12 +52,10 @@ class MeshData;
  * This class will not have any functionality unless VTK is detected
  * during configure and hence LIBMESH_HAVE_VTK is defined.
  *
- * @author Wout Ruijter, 2007
- * (Checked in to LibMesh by J.W. Peterson)
+ * \author Wout Ruijter
+ * \author John W. Peterson
+ * \date 2007
  */
-
-// ------------------------------------------------------------
-// VTKIO class definition
 class VTKIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>
 {

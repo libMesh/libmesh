@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -40,19 +40,17 @@
 namespace libMesh
 {
 
-
 // Forward declarations
 template <typename T> class LaspackLinearSolver;
 template <typename T> class SparseMatrix;
-
 
 /**
  * Laspack vector.  Provides a nice interface to the
  * Laspack C-based data structures for serial vectors.
  *
- * @author Benjamin S. Kirk, 2002
+ * \author Benjamin S. Kirk
+ * \date 2002
  */
-
 template <typename T>
 class LaspackVector : public NumericVector<T>
 {

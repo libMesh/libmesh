@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,19 +31,15 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-
-
 /**
  * This class implements writing meshes in the Diva format.
  * This is a scientific visualization program created by Kelly Gaither.
  * More information on Diva can be found here:
  * http://www.erc.msstate.edu/simcenter/docs/diva/
  *
- * @author John W. Peterson, 2004
+ * \author John W. Peterson
+ * \date 2004
  */
-
-// ------------------------------------------------------------
-// DivaIO class definition
 class DivaIO : public MeshOutput<MeshBase>
 {
 public:

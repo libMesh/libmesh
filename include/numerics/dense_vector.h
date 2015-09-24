@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,21 +32,15 @@
 namespace libMesh
 {
 
-// Forward Declarations
-
-
-
 /**
  * Defines a dense vector for use in Finite Element-type computations.
  * This class is to basically compliment the \p DenseMatix class.  It
  * has additional capabilities over the \p std::vector that make it
  * useful for finite elements, particulary for systems of equations.
  *
- * @author Benjamin S. Kirk, 2003
+ * \author Benjamin S. Kirk
+ * \date 2003
  */
-
-// ------------------------------------------------------------
-// DenseVector class definition
 template<typename T>
 class DenseVector : public DenseVectorBase<T>
 {

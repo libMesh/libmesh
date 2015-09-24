@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,8 +28,6 @@
 
 namespace libMesh
 {
-
-
 
 /**
  * This class implements reference counting. Any class that
@@ -60,11 +58,9 @@ namespace libMesh
  * or \p DEBUG is not defined then this class does nothing.
  * All members are inlined and empty, so they should effectively disappear.
  *
- * \author Benjamin S. Kirk, 2002-2007
+ * \author Benjamin S. Kirk
+ * \date 2002-2007
  */
-
-// ------------------------------------------------------------
-// ReferenceCounter class definition
 template <typename T>
 class ReferenceCountedObject : public ReferenceCounter
 {

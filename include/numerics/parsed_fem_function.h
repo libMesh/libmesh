@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,8 +38,13 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// ParsedFEMFunction class definition
+/**
+ * ParsedFEMFunction provides support for FParser-based parsed
+ * functions in FEMSystem.
+ *
+ * \author Roy Stogner
+ * \date 2014
+ */
 template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>
 {
