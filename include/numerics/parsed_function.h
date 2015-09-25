@@ -47,7 +47,77 @@ class ParsedFunction : public FunctionBase<Output>
 public:
   explicit
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
-                  const std::vector<Output>* initial_vals=NULL) :
+                  const std::vector<Output>* initial_vals=NULL);
+
+  virtual Output operator() (const Point& p,
+                             const Real time = 0);
+
+  // Query if the automatic derivative generation was successful
+  virtual bool has_derivatives() { return _valid_derivatives; }
+
+  virtual Output dot(const Point& p,
+                     const Real time = 0);
+
+  virtual OutputGradient gradient(const Point& p,
+                                  const Real time = 0);
+
+  virtual void operator() (const Point& p,
+                           const Real time,
+                           DenseVector<Output>& output);
+
+  /**
+   * @returns the vector component \p i at coordinate
+   * \p p and time \p time.
+   */
+  virtual Output component (unsigned int i,
+                            const Point& p,
+                            Real time);
+
+  /**
+   * @returns the address of a parsed variable so you can supply a parameterized value
+   */
+  virtual Output & getVarAddress(const std::string & variable_name);
+
+  virtual UniquePtr<FunctionBase<Output> > clone() const;
+
+private:
+  // Set the _spacetime argument vector
+  void set_spacetime(const Point& p,
+                     const Real time = 0);
+
+  // Evaluate the ith FunctionParser and check the result
+  inline Output eval(FunctionParserADBase<Output> & parser,
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx));
+
+  std::string _expression;
+  std::vector<FunctionParserADBase<Output> > parsers;
+  std::vector<Output> _spacetime;
+
+  // derivative functions
+  std::vector<FunctionParserADBase<Output> > dx_parsers;
+#if LIBMESH_DIM > 1
+  std::vector<FunctionParserADBase<Output> > dy_parsers;
+#endif
+#if LIBMESH_DIM > 2
+  std::vector<FunctionParserADBase<Output> > dz_parsers;
+#endif
+  std::vector<FunctionParserADBase<Output> > dt_parsers;
+  bool _valid_derivatives;
+
+  // Additional variables/values that can be parsed and handled by the function parser
+  std::vector<std::string> _additional_vars;
+  std::vector<Output> _initial_vals;
+};
+
+
+/*----------------------- Inline functions ----------------------------------*/
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunction<Output,OutputGradient>::ParsedFunction
+  (const std::string& expression, const std::vector<std::string>* additional_vars,
+   const std::vector<Output>* initial_vals) :
     _expression (expression),
     _spacetime (LIBMESH_DIM+1 + (additional_vars ?
                                  additional_vars->size() : 0)),
@@ -165,25 +235,34 @@ public:
     this->_initialized = true;
   }
 
-  virtual Output operator() (const Point& p,
-                             const Real time = 0)
+template <typename Output, typename OutputGradient>
+inline
+Output
+ParsedFunction<Output,OutputGradient>::operator()
+  (const Point& p,
+   const Real time)
   {
     set_spacetime(p, time);
     return eval(parsers[0], "f", 0);
   }
 
-  // Query if the automatic derivative generation was successful
-  virtual bool has_derivatives() { return _valid_derivatives; }
-
-  virtual Output dot(const Point& p,
-                     const Real time = 0)
+template <typename Output, typename OutputGradient>
+inline
+Output
+ParsedFunction<Output,OutputGradient>::dot
+  (const Point& p,
+   const Real time)
   {
     set_spacetime(p, time);
     return eval(dt_parsers[0], "df/dt", 0);
   }
 
-  virtual OutputGradient gradient(const Point& p,
-                                  const Real time = 0)
+template <typename Output, typename OutputGradient>
+inline
+OutputGradient
+ParsedFunction<Output,OutputGradient>::gradient
+  (const Point& p,
+   const Real time)
   {
     OutputGradient grad;
     set_spacetime(p, time);
@@ -199,9 +278,13 @@ public:
     return grad;
   }
 
-  virtual void operator() (const Point& p,
-                           const Real time,
-                           DenseVector<Output>& output)
+template <typename Output, typename OutputGradient>
+inline
+void
+ParsedFunction<Output,OutputGradient>::operator()
+  (const Point& p,
+   const Real time,
+   DenseVector<Output>& output)
   {
     set_spacetime(p, time);
 
@@ -219,9 +302,13 @@ public:
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
-  virtual Output component (unsigned int i,
-                            const Point& p,
-                            Real time)
+template <typename Output, typename OutputGradient>
+inline
+Output
+ParsedFunction<Output,OutputGradient>::component
+  (unsigned int i,
+   const Point& p,
+   Real time)
   {
     set_spacetime(p, time);
     libmesh_assert_less (i, parsers.size());
@@ -235,7 +322,11 @@ public:
   /**
    * @returns the address of a parsed variable so you can supply a parameterized value
    */
-  virtual Output & getVarAddress(const std::string & variable_name)
+template <typename Output, typename OutputGradient>
+inline
+Output &
+ParsedFunction<Output,OutputGradient>::getVarAddress
+  (const std::string & variable_name)
   {
     const std::vector<std::string>::iterator it =
       std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
@@ -248,15 +339,22 @@ public:
   }
 
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const {
+template <typename Output, typename OutputGradient>
+inline
+UniquePtr<FunctionBase<Output> >
+ParsedFunction<Output,OutputGradient>::clone() const
+  {
     return UniquePtr<FunctionBase<Output> >
       (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
   }
 
-private:
   // Set the _spacetime argument vector
-  void set_spacetime(const Point& p,
-                     const Real time = 0)
+template <typename Output, typename OutputGradient>
+inline
+void
+ParsedFunction<Output,OutputGradient>::set_spacetime
+  (const Point& p,
+   const Real time)
   {
     _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
@@ -272,9 +370,13 @@ private:
   }
 
   // Evaluate the ith FunctionParser and check the result
-  inline Output eval(FunctionParserADBase<Output> & parser,
-                     const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx))
+template <typename Output, typename OutputGradient>
+inline
+Output
+ParsedFunction<Output,OutputGradient>::eval
+  (FunctionParserADBase<Output> & parser,
+   const std::string & libmesh_dbg_var(function_name),
+   unsigned int libmesh_dbg_var(component_idx))
   {
 #ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
@@ -323,31 +425,10 @@ private:
 #endif
   }
 
-  std::string _expression;
-  std::vector<FunctionParserADBase<Output> > parsers;
-  std::vector<Output> _spacetime;
-
-  // derivative functions
-  std::vector<FunctionParserADBase<Output> > dx_parsers;
-#if LIBMESH_DIM > 1
-  std::vector<FunctionParserADBase<Output> > dy_parsers;
-#endif
-#if LIBMESH_DIM > 2
-  std::vector<FunctionParserADBase<Output> > dz_parsers;
-#endif
-  std::vector<FunctionParserADBase<Output> > dt_parsers;
-  bool _valid_derivatives;
-
-  // Additional variables/values that can be parsed and handled by the function parser
-  std::vector<std::string> _additional_vars;
-  std::vector<Output> _initial_vals;
-};
-
-
 } // namespace libMesh
 
 
-#else // LIBMESH_HAVE_FPARSER
+#else // !LIBMESH_HAVE_FPARSER
 
 
 namespace libMesh {
@@ -380,6 +461,7 @@ public:
 private:
   Output _dummy;
 };
+
 
 
 } // namespace libMesh
