@@ -105,6 +105,9 @@ public:
                            Real time=0.);
 
 protected:
+  // Helper function for (minor) changes to expression
+  void parse (const std::string& expression);
+
   // Helper function for initial parsing
   std::size_t find_name (const std::string & varname,
                          const std::string & expr);
@@ -154,7 +157,8 @@ private:
   std::vector<bool> _need_var_hess;
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-  // Additional variables/values that can be parsed and handled by the function parser
+  // Variables/values that can be parsed and handled by the function parser
+  std::string variables;
   std::vector<std::string> _additional_vars;
   std::vector<Output> _initial_vals;
 };
@@ -170,7 +174,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
    const std::vector<std::string>* additional_vars,
    const std::vector<Output>* initial_vals)
     : _sys(sys),
-      _expression(expression),
+      _expression (), // overridden by parse()
       _n_vars(sys.n_vars()),
       _n_requested_vars(0),
       _n_requested_grad_components(0),
@@ -183,7 +187,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   {
-    std::string variables = "x";
+    variables = "x";
 #if LIBMESH_DIM > 1
     variables += ",y";
 #endif
@@ -195,7 +199,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
     for (unsigned int v=0; v != _n_vars; ++v)
       {
         const std::string & varname = sys.variable_name(v);
-        std::size_t varname_i = find_name(varname, _expression);
+        std::size_t varname_i = find_name(varname, expression);
 
         // If we didn't find our variable name then let's go to the
         // next.
@@ -216,7 +220,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
           {
             std::string gradname = std::string("grad_") +
               "xyz"[d] + '_' + varname;
-            std::size_t gradname_i = find_name(gradname, _expression);
+            std::size_t gradname_i = find_name(gradname, expression);
 
             // If we didn't find that gradient component of our
             // variable name then let's go to the next.
@@ -240,7 +244,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
             {
               std::string hessname = std::string("hess_") +
                 "xyz"[d1] + "xyz"[d2] + '_' + varname;
-              std::size_t hessname_i = find_name(hessname, _expression);
+              std::size_t hessname_i = find_name(hessname, expression);
 
               // If we didn't find that hessian component of our
               // variable name then let's go to the next.
@@ -313,57 +317,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
           }
       }
 
-    size_t nextstart = 0, end = 0;
-
-    while (end != std::string::npos)
-      {
-        // If we're past the end of the string, we can't make any more
-        // subparsers
-        if (nextstart >= expression.size())
-          break;
-
-        // If we're at the start of a brace delimited section, then we
-        // parse just that section:
-        if (expression[nextstart] == '{')
-          {
-            nextstart++;
-            end = expression.find('}', nextstart);
-          }
-        // otherwise we parse the whole thing
-        else
-          end = std::string::npos;
-
-        // We either want the whole end of the string (end == npos) or
-        // a substring in the middle.
-        std::string subexpression =
-          expression.substr(nextstart, (end == std::string::npos) ?
-                            std::string::npos : end - nextstart);
-
-        // fparser can crash on empty expressions
-        if (subexpression.empty())
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
-
-
-#ifdef LIBMESH_HAVE_FPARSER
-        // Parse (and optimize if possible) the subexpression.
-        // Add some basic constants, to Real precision.
-        FunctionParserBase<Output> fp;
-        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-        fp.AddConstant("pi", std::acos(Real(-1)));
-        fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
-        fp.Optimize();
-        parsers.push_back(fp);
-#else
-        libmesh_error_msg("ERROR: This functionality requires fparser!");
-#endif
-
-        // If at end, use nextstart=maxSize.  Else start at next
-        // character.
-        nextstart = (end == std::string::npos) ?
-          std::string::npos : end + 1;
-      }
+    this->parse(expression);
   }
 
 template <typename Output>
@@ -453,6 +407,67 @@ ParsedFEMFunction<Output>::component
 
     libmesh_assert_less (i, parsers.size());
     return eval(parsers[i], "f", i);
+  }
+
+template <typename Output>
+inline
+void
+ParsedFEMFunction<Output>::parse
+  (const std::string& expression)
+  {
+    _expression = expression;
+
+    size_t nextstart = 0, end = 0;
+
+    while (end != std::string::npos)
+      {
+        // If we're past the end of the string, we can't make any more
+        // subparsers
+        if (nextstart >= expression.size())
+          break;
+
+        // If we're at the start of a brace delimited section, then we
+        // parse just that section:
+        if (expression[nextstart] == '{')
+          {
+            nextstart++;
+            end = expression.find('}', nextstart);
+          }
+        // otherwise we parse the whole thing
+        else
+          end = std::string::npos;
+
+        // We either want the whole end of the string (end == npos) or
+        // a substring in the middle.
+        std::string subexpression =
+          expression.substr(nextstart, (end == std::string::npos) ?
+                            std::string::npos : end - nextstart);
+
+        // fparser can crash on empty expressions
+        if (subexpression.empty())
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+
+
+#ifdef LIBMESH_HAVE_FPARSER
+        // Parse (and optimize if possible) the subexpression.
+        // Add some basic constants, to Real precision.
+        FunctionParserBase<Output> fp;
+        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+        fp.AddConstant("pi", std::acos(Real(-1)));
+        fp.AddConstant("e", std::exp(Real(1)));
+        if (fp.Parse(subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+        fp.Optimize();
+        parsers.push_back(fp);
+#else
+        libmesh_error_msg("ERROR: This functionality requires fparser!");
+#endif
+
+        // If at end, use nextstart=maxSize.  Else start at next
+        // character.
+        nextstart = (end == std::string::npos) ?
+          std::string::npos : end + 1;
+      }
   }
 
 template <typename Output>

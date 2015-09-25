@@ -80,6 +80,10 @@ public:
 
   virtual UniquePtr<FunctionBase<Output> > clone() const;
 
+protected:
+  // Helper function for (minor) changes to expression
+  void parse (const std::string& expression);
+
 private:
   // Set the _spacetime argument vector
   void set_spacetime(const Point& p,
@@ -105,7 +109,8 @@ private:
   std::vector<FunctionParserADBase<Output> > dt_parsers;
   bool _valid_derivatives;
 
-  // Additional variables/values that can be parsed and handled by the function parser
+  // Variables/values that can be parsed and handled by the function parser
+  std::string variables;
   std::vector<std::string> _additional_vars;
   std::vector<Output> _initial_vals;
 };
@@ -118,7 +123,7 @@ inline
 ParsedFunction<Output,OutputGradient>::ParsedFunction
   (const std::string& expression, const std::vector<std::string>* additional_vars,
    const std::vector<Output>* initial_vals) :
-    _expression (expression),
+    _expression (), // overridden by parse()
     _spacetime (LIBMESH_DIM+1 + (additional_vars ?
                                  additional_vars->size() : 0)),
     _valid_derivatives (true),
@@ -130,7 +135,7 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction
     // variables passed
     //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
   {
-    std::string variables = "x";
+    variables = "x";
 #if LIBMESH_DIM > 1
     variables += ",y";
 #endif
@@ -153,84 +158,7 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction
           }
       }
 
-    size_t nextstart = 0, end = 0;
-
-    while (end != std::string::npos)
-      {
-        // If we're past the end of the string, we can't make any more
-        // subparsers
-        if (nextstart >= expression.size())
-          break;
-
-        // If we're at the start of a brace delimited section, then we
-        // parse just that section:
-        if (expression[nextstart] == '{')
-          {
-            nextstart++;
-            end = expression.find('}', nextstart);
-          }
-        // otherwise we parse the whole thing
-        else
-          end = std::string::npos;
-
-        // We either want the whole end of the string (end == npos) or
-        // a substring in the middle.
-        std::string subexpression =
-          expression.substr(nextstart, (end == std::string::npos) ?
-                            std::string::npos : end - nextstart);
-
-        // fparser can crash on empty expressions
-        if (subexpression.empty())
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
-
-        // Parse (and optimize if possible) the subexpression.
-        // Add some basic constants, to Real precision.
-        FunctionParserADBase<Output> fp;
-        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-        fp.AddConstant("pi", std::acos(Real(-1)));
-        fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
-
-        // use of derivatives is optional. suppress error output on the console
-        // use the has_derivatives() method to check if AutoDiff was successful.
-        fp.silenceAutoDiffErrors();
-
-        // generate derivatives through automatic differentiation
-        FunctionParserADBase<Output> dx_fp(fp);
-        if (dx_fp.AutoDiff("x") != -1) // -1 for success
-          _valid_derivatives = false;
-        dx_fp.Optimize();
-        dx_parsers.push_back(dx_fp);
-#if LIBMESH_DIM > 1
-        FunctionParserADBase<Output> dy_fp(fp);
-        if (dy_fp.AutoDiff("y") != -1) // -1 for success
-          _valid_derivatives = false;
-        dy_fp.Optimize();
-        dy_parsers.push_back(dy_fp);
-#endif
-#if LIBMESH_DIM > 2
-        FunctionParserADBase<Output> dz_fp(fp);
-        if (dz_fp.AutoDiff("z") != -1) // -1 for success
-          _valid_derivatives = false;
-        dz_fp.Optimize();
-        dz_parsers.push_back(dz_fp);
-#endif
-        FunctionParserADBase<Output> dt_fp(fp);
-        if (dt_fp.AutoDiff("t") != -1) // -1 for success
-          _valid_derivatives = false;
-        dt_fp.Optimize();
-        dt_parsers.push_back(dt_fp);
-
-        // now optimise original function (after derivatives are taken)
-        fp.Optimize();
-        parsers.push_back(fp);
-
-        // If at end, use nextstart=maxSize.  Else start at next
-        // character.
-        nextstart = (end == std::string::npos) ?
-          std::string::npos : end + 1;
-      }
+    this->parse(expression);
 
     this->_initialized = true;
   }
@@ -347,6 +275,95 @@ ParsedFunction<Output,OutputGradient>::clone() const
     return UniquePtr<FunctionBase<Output> >
       (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
   }
+
+template <typename Output, typename OutputGradient>
+inline
+void
+ParsedFunction<Output,OutputGradient>::parse
+  (const std::string& expression)
+  {
+    _expression = expression;
+
+    size_t nextstart = 0, end = 0;
+
+    while (end != std::string::npos)
+      {
+        // If we're past the end of the string, we can't make any more
+        // subparsers
+        if (nextstart >= expression.size())
+          break;
+
+        // If we're at the start of a brace delimited section, then we
+        // parse just that section:
+        if (expression[nextstart] == '{')
+          {
+            nextstart++;
+            end = expression.find('}', nextstart);
+          }
+        // otherwise we parse the whole thing
+        else
+          end = std::string::npos;
+
+        // We either want the whole end of the string (end == npos) or
+        // a substring in the middle.
+        std::string subexpression =
+          expression.substr(nextstart, (end == std::string::npos) ?
+                            std::string::npos : end - nextstart);
+
+        // fparser can crash on empty expressions
+        if (subexpression.empty())
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+
+        // Parse (and optimize if possible) the subexpression.
+        // Add some basic constants, to Real precision.
+        FunctionParserADBase<Output> fp;
+        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+        fp.AddConstant("pi", std::acos(Real(-1)));
+        fp.AddConstant("e", std::exp(Real(1)));
+        if (fp.Parse(subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+
+        // use of derivatives is optional. suppress error output on the console
+        // use the has_derivatives() method to check if AutoDiff was successful.
+        fp.silenceAutoDiffErrors();
+
+        // generate derivatives through automatic differentiation
+        FunctionParserADBase<Output> dx_fp(fp);
+        if (dx_fp.AutoDiff("x") != -1) // -1 for success
+          _valid_derivatives = false;
+        dx_fp.Optimize();
+        dx_parsers.push_back(dx_fp);
+#if LIBMESH_DIM > 1
+        FunctionParserADBase<Output> dy_fp(fp);
+        if (dy_fp.AutoDiff("y") != -1) // -1 for success
+          _valid_derivatives = false;
+        dy_fp.Optimize();
+        dy_parsers.push_back(dy_fp);
+#endif
+#if LIBMESH_DIM > 2
+        FunctionParserADBase<Output> dz_fp(fp);
+        if (dz_fp.AutoDiff("z") != -1) // -1 for success
+          _valid_derivatives = false;
+        dz_fp.Optimize();
+        dz_parsers.push_back(dz_fp);
+#endif
+        FunctionParserADBase<Output> dt_fp(fp);
+        if (dt_fp.AutoDiff("t") != -1) // -1 for success
+          _valid_derivatives = false;
+        dt_fp.Optimize();
+        dt_parsers.push_back(dt_fp);
+
+        // now optimise original function (after derivatives are taken)
+        fp.Optimize();
+        parsers.push_back(fp);
+
+        // If at end, use nextstart=maxSize.  Else start at next
+        // character.
+        nextstart = (end == std::string::npos) ?
+          std::string::npos : end + 1;
+      }
+  }
+
 
   // Set the _spacetime argument vector
 template <typename Output, typename OutputGradient>
