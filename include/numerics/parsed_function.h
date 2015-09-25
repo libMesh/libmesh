@@ -95,6 +95,7 @@ private:
                      unsigned int libmesh_dbg_var(component_idx));
 
   std::string _expression;
+  std::vector<std::string> _subexpressions;
   std::vector<FunctionParserADBase<Output> > parsers;
   std::vector<Output> _spacetime;
 
@@ -283,6 +284,7 @@ ParsedFunction<Output,OutputGradient>::parse
   (const std::string& expression)
   {
     _expression = expression;
+    _subexpressions.clear();
 
     size_t nextstart = 0, end = 0;
 
@@ -306,12 +308,12 @@ ParsedFunction<Output,OutputGradient>::parse
 
         // We either want the whole end of the string (end == npos) or
         // a substring in the middle.
-        std::string subexpression =
-          expression.substr(nextstart, (end == std::string::npos) ?
-                            std::string::npos : end - nextstart);
+        _subexpressions.push_back
+          (expression.substr(nextstart, (end == std::string::npos) ?
+                             std::string::npos : end - nextstart));
 
         // fparser can crash on empty expressions
-        if (subexpression.empty())
+        if (_subexpressions.back().empty())
           libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
 
         // Parse (and optimize if possible) the subexpression.
@@ -320,8 +322,10 @@ ParsedFunction<Output,OutputGradient>::parse
         fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+        if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
+          libmesh_error_msg
+            ("ERROR: FunctionParser is unable to parse expression: "
+             << _subexpressions.back() << '\n' << fp.ErrorMsg());
 
         // use of derivatives is optional. suppress error output on the console
         // use the has_derivatives() method to check if AutoDiff was successful.

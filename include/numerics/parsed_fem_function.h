@@ -131,6 +131,7 @@ protected:
 private:
   const System& _sys;
   std::string _expression;
+  std::vector<std::string> _subexpressions;
   unsigned int _n_vars,
     _n_requested_vars,
     _n_requested_grad_components,
@@ -416,6 +417,7 @@ ParsedFEMFunction<Output>::parse
   (const std::string& expression)
   {
     _expression = expression;
+    _subexpressions.clear();
 
     size_t nextstart = 0, end = 0;
 
@@ -439,12 +441,12 @@ ParsedFEMFunction<Output>::parse
 
         // We either want the whole end of the string (end == npos) or
         // a substring in the middle.
-        std::string subexpression =
-          expression.substr(nextstart, (end == std::string::npos) ?
-                            std::string::npos : end - nextstart);
+        _subexpressions.push_back
+          (expression.substr(nextstart, (end == std::string::npos) ?
+                             std::string::npos : end - nextstart));
 
         // fparser can crash on empty expressions
-        if (subexpression.empty())
+        if (_subexpressions.back().empty())
           libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
 
 
@@ -455,8 +457,10 @@ ParsedFEMFunction<Output>::parse
         fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+        if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
+          libmesh_error_msg
+            ("ERROR: FunctionParser is unable to parse expression: "
+             << _subexpressions.back() << '\n' << fp.ErrorMsg());
         fp.Optimize();
         parsers.push_back(fp);
 #else
