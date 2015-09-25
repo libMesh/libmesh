@@ -80,9 +80,23 @@ public:
 
   virtual UniquePtr<FunctionBase<Output> > clone() const;
 
+  /**
+   * @returns the value of an inline variable.  Will *only* be correct
+   * if the inline variable value is independent of input variables,
+   * if the inline variable is not redefined within any subexpression,
+   * and if the inline variable takes the same value within any
+   * subexpressions where it appears.
+   */
+  Output get_inline_value(const std::string& inline_var_name);
+
+
 protected:
   // Helper function for (minor) changes to expression
   void parse (const std::string& expression);
+
+  // Helper function for parsing out variable names
+  std::size_t find_name (const std::string & varname,
+                         const std::string & expr);
 
 private:
   // Set the _spacetime argument vector
@@ -279,6 +293,82 @@ ParsedFunction<Output,OutputGradient>::clone() const
 
 template <typename Output, typename OutputGradient>
 inline
+Output
+ParsedFunction<Output,OutputGradient>::get_inline_value
+  (const std::string& inline_var_name)
+  {
+    libmesh_assert_greater (_subexpressions.size(), 0);
+
+#ifndef NDEBUG
+    bool found_var_name = false;
+#endif
+    Output old_var_value;
+
+    for (unsigned int s=0; s != _subexpressions.size(); ++s)
+      {
+        const std::string & subexpression = _subexpressions[s];
+        const std::size_t varname_i =
+          find_name(inline_var_name, subexpression);
+        if (varname_i == std::string::npos)
+          continue;
+
+        const std::size_t assignment_i =
+          subexpression.find(":", varname_i+1);
+
+        libmesh_assert_not_equal_to(assignment_i, std::string::npos);
+
+        libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
+        for (unsigned int i = varname_i+1; i != assignment_i; ++i)
+          libmesh_assert_equal_to(subexpression[i], ' ');
+
+        std::size_t end_assignment_i =
+          subexpression.find(";", assignment_i+1);
+
+        libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
+
+        std::string new_subexpression =
+          subexpression.substr(0, end_assignment_i+1) +
+          inline_var_name;
+
+#ifdef LIBMESH_HAVE_FPARSER
+        // Parse and evaluate the new subexpression.
+        // Add the same constants as we used originally.
+        FunctionParserADBase<Output> fp;
+        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+        fp.AddConstant("pi", std::acos(Real(-1)));
+        fp.AddConstant("e", std::exp(Real(1)));
+        if (fp.Parse(new_subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg
+            ("ERROR: FunctionParser is unable to parse modified expression: "
+             << new_subexpression << '\n' << fp.ErrorMsg());
+
+        Output new_var_value = this->eval(fp, new_subexpression, 0);
+#ifdef NDEBUG
+        return new_var_value;
+#else
+        if (found_var_name)
+          {
+            libmesh_assert_equal_to(old_var_value, new_var_value);
+          }
+        else
+          {
+            old_var_value = new_var_value;
+            found_var_name = true;
+          }
+#endif
+
+#else
+        libmesh_error_msg("ERROR: This functionality requires fparser!");
+#endif
+      }
+
+    libmesh_assert(found_var_name);
+    return old_var_value;
+  }
+
+
+template <typename Output, typename OutputGradient>
+inline
 void
 ParsedFunction<Output,OutputGradient>::parse
   (const std::string& expression)
@@ -366,6 +456,31 @@ ParsedFunction<Output,OutputGradient>::parse
         nextstart = (end == std::string::npos) ?
           std::string::npos : end + 1;
       }
+  }
+
+
+template <typename Output, typename OutputGradient>
+inline
+std::size_t
+ParsedFunction<Output,OutputGradient>::find_name
+  (const std::string & varname,
+   const std::string & expr)
+  {
+    const std::size_t namesize = varname.size();
+    std::size_t varname_i = expr.find(varname);
+
+    while ((varname_i != std::string::npos) &&
+           (((varname_i > 0) &&
+             (std::isalnum(expr[varname_i-1]) ||
+              (expr[varname_i-1] == '_'))) ||
+            ((varname_i+namesize < expr.size()) &&
+             (std::isalnum(expr[varname_i+namesize]) ||
+              (expr[varname_i+namesize] == '_')))))
+      {
+        varname_i = expr.find(varname, varname_i+1);
+      }
+
+    return varname_i;
   }
 
 
