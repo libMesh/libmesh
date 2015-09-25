@@ -48,10 +48,419 @@ namespace libMesh
 template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>
 {
+public:
+
+  /**
+   * Constructor.
+   */
+  explicit
+  ParsedFEMFunction (const System& sys,
+                     const std::string& expression,
+                     const std::vector<std::string>* additional_vars=NULL,
+                     const std::vector<Output>* initial_vals=NULL);
+
+  /**
+   * Destructor.
+   */
+  virtual ~ParsedFEMFunction () {}
+
+  /**
+   * Prepares a context object for use.
+   */
+  virtual void init_context (const FEMContext &c);
+
+  /**
+   * Returns a new copy of the function.  The new copy should be as
+   * ``deep'' as necessary to allow independent destruction and
+   * simultaneous evaluations of the copies in different threads.
+   */
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const;
+
+  // ------------------------------------------------------
+  // misc
+  /**
+   * @returns the scalar value at coordinate
+   * \p p and time \p time, which defaults to zero.
+   * Purely virtual, so you have to overload it.
+   * Note that this cannot be a const method, check \p MeshFunction.
+   */
+  virtual Output operator() (const FEMContext& c, const Point& p,
+                             const Real time = 0.);
+
+  /**
+   * Return function for vectors.
+   * Returns in \p output the values of the data at the
+   * coordinate \p p and for time \p time.
+   */
+  void operator() (const FEMContext& c, const Point& p,
+                   const Real time,
+                   DenseVector<Output>& output);
+
+  /**
+   * @returns the vector component \p i at coordinate
+   * \p p and time \p time.
+   */
+  virtual Output component(const FEMContext& c, unsigned int i,
+                           const Point& p,
+                           Real time=0.);
+
 protected:
   // Helper function for initial parsing
   std::size_t find_name (const std::string & varname,
-                         const std::string & expr)
+                         const std::string & expr);
+
+  // Helper function for evaluating function arguments
+  void eval_args(const FEMContext& c,
+                 const Point& p,
+                 const Real time);
+
+  // Evaluate the ith FunctionParser and check the result
+#ifdef LIBMESH_HAVE_FPARSER
+  inline Output eval(FunctionParserBase<Output> & parser,
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx));
+#else // LIBMESH_HAVE_FPARSER
+  inline Output eval(char & libmesh_dbg_var(parser),
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx));
+#endif
+
+private:
+  const System& _sys;
+  std::string _expression;
+  unsigned int _n_vars,
+    _n_requested_vars,
+    _n_requested_grad_components,
+    _n_requested_hess_components;
+  bool _requested_normals;
+#ifdef LIBMESH_HAVE_FPARSER
+  std::vector<FunctionParserBase<Output> > parsers;
+#else
+  std::vector<char> parsers;
+#endif
+  std::vector<Output> _spacetime;
+
+  // Flags for which variables need to be computed
+
+  // _need_var[v] is true iff value(v) is needed
+  std::vector<bool> _need_var;
+
+  // _need_var_grad[v*LIBMESH_DIM+i] is true iff grad(v,i) is needed
+  std::vector<bool> _need_var_grad;
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // _need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+i*LIBMESH_DIM+j] is true
+  // iff grad(v,i,j) is needed
+  std::vector<bool> _need_var_hess;
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+  // Additional variables/values that can be parsed and handled by the function parser
+  std::vector<std::string> _additional_vars;
+  std::vector<Output> _initial_vals;
+};
+
+
+/*----------------------- Inline functions ----------------------------------*/
+
+template <typename Output>
+inline
+ParsedFEMFunction<Output>::ParsedFEMFunction
+  (const System& sys,
+   const std::string& expression,
+   const std::vector<std::string>* additional_vars,
+   const std::vector<Output>* initial_vals)
+    : _sys(sys),
+      _expression(expression),
+      _n_vars(sys.n_vars()),
+      _n_requested_vars(0),
+      _n_requested_grad_components(0),
+      _n_requested_hess_components(0),
+      _requested_normals(false),
+      _need_var(_n_vars, false),
+      _need_var_grad(_n_vars*LIBMESH_DIM, false)
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    , _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false)
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+  {
+    std::string variables = "x";
+#if LIBMESH_DIM > 1
+    variables += ",y";
+#endif
+#if LIBMESH_DIM > 2
+    variables += ",z";
+#endif
+    variables += ",t";
+
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        const std::string & varname = sys.variable_name(v);
+        std::size_t varname_i = find_name(varname, _expression);
+
+        // If we didn't find our variable name then let's go to the
+        // next.
+        if (varname_i == std::string::npos)
+          continue;
+
+        _need_var[v] = true;
+        variables += ',';
+        variables += varname;
+        _n_requested_vars++;
+      }
+
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        const std::string & varname = sys.variable_name(v);
+
+        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
+          {
+            std::string gradname = std::string("grad_") +
+              "xyz"[d] + '_' + varname;
+            std::size_t gradname_i = find_name(gradname, _expression);
+
+            // If we didn't find that gradient component of our
+            // variable name then let's go to the next.
+            if (gradname_i == std::string::npos)
+              continue;
+
+            _need_var_grad[v*LIBMESH_DIM+d] = true;
+            variables += ',';
+            variables += gradname;
+            _n_requested_grad_components++;
+          }
+      }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        const std::string & varname = sys.variable_name(v);
+
+        for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
+          for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
+            {
+              std::string hessname = std::string("hess_") +
+                "xyz"[d1] + "xyz"[d2] + '_' + varname;
+              std::size_t hessname_i = find_name(hessname, _expression);
+
+              // If we didn't find that hessian component of our
+              // variable name then let's go to the next.
+              if (hessname_i == std::string::npos)
+                continue;
+
+              _need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2]
+                = true;
+              variables += ',';
+              variables += hessname;
+              _n_requested_hess_components++;
+            }
+      }
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+      {
+        std::size_t nx_i = find_name("n_x", expression);
+        std::size_t ny_i = find_name("n_y", expression);
+        std::size_t nz_i = find_name("n_z", expression);
+
+        // If we found any requests for normal components then we'll
+        // compute normals
+        if (nx_i != std::string::npos ||
+            ny_i != std::string::npos ||
+            nz_i != std::string::npos)
+          {
+            _requested_normals = true;
+            variables += ',';
+            variables += "n_x";
+            if (LIBMESH_DIM > 1)
+              {  
+                variables += ',';
+                variables += "n_y";
+              }
+            if (LIBMESH_DIM > 2)
+              {  
+                variables += ',';
+                variables += "n_z";
+              }
+          }
+      }
+
+    _spacetime.resize
+      (LIBMESH_DIM + 1 + _n_requested_vars +
+       _n_requested_grad_components + _n_requested_hess_components +
+       (_requested_normals ? LIBMESH_DIM : 0) +
+       (additional_vars ? additional_vars->size() : 0));
+
+    // If additional vars were passed, append them to the string
+    // that we send to the function parser. Also add them to the
+    // end of our spacetime vector
+    if (additional_vars)
+      {
+        if (initial_vals)
+          std::copy(initial_vals->begin(), initial_vals->end(), std::back_inserter(_initial_vals));
+
+        std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
+
+        unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
+          _n_requested_grad_components + _n_requested_hess_components;
+
+        for (unsigned int i=0; i < additional_vars->size(); ++i)
+          {
+            variables += "," + (*additional_vars)[i];
+            // Initialize extra variables to the vector passed in or zero
+            // Note: The initial_vals vector can be shorter than the additional_vars vector
+            _spacetime[offset + i] =
+              (initial_vals && i < initial_vals->size()) ?
+              (*initial_vals)[i] : 0;
+          }
+      }
+
+    size_t nextstart = 0, end = 0;
+
+    while (end != std::string::npos)
+      {
+        // If we're past the end of the string, we can't make any more
+        // subparsers
+        if (nextstart >= expression.size())
+          break;
+
+        // If we're at the start of a brace delimited section, then we
+        // parse just that section:
+        if (expression[nextstart] == '{')
+          {
+            nextstart++;
+            end = expression.find('}', nextstart);
+          }
+        // otherwise we parse the whole thing
+        else
+          end = std::string::npos;
+
+        // We either want the whole end of the string (end == npos) or
+        // a substring in the middle.
+        std::string subexpression =
+          expression.substr(nextstart, (end == std::string::npos) ?
+                            std::string::npos : end - nextstart);
+
+        // fparser can crash on empty expressions
+        if (subexpression.empty())
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+
+
+#ifdef LIBMESH_HAVE_FPARSER
+        // Parse (and optimize if possible) the subexpression.
+        // Add some basic constants, to Real precision.
+        FunctionParserBase<Output> fp;
+        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+        fp.AddConstant("pi", std::acos(Real(-1)));
+        fp.AddConstant("e", std::exp(Real(1)));
+        if (fp.Parse(subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+        fp.Optimize();
+        parsers.push_back(fp);
+#else
+        libmesh_error_msg("ERROR: This functionality requires fparser!");
+#endif
+
+        // If at end, use nextstart=maxSize.  Else start at next
+        // character.
+        nextstart = (end == std::string::npos) ?
+          std::string::npos : end + 1;
+      }
+  }
+
+template <typename Output>
+inline
+void
+ParsedFEMFunction<Output>::init_context (const FEMContext &c)
+  {
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        FEBase* elem_fe;
+        c.get_element_fe(v, elem_fe);
+        if (_n_requested_vars)
+          elem_fe->get_phi();
+        if (_n_requested_grad_components)
+          elem_fe->get_dphi();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        if (_n_requested_hess_components)
+          elem_fe->get_d2phi();
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+      }
+
+    if (_requested_normals)
+      {
+        FEBase* side_fe;
+        c.get_side_fe(0, side_fe);
+
+        side_fe->get_normals();
+
+        // FIXME: this is a hack to support normals at quadrature
+        // points; we don't support normals elsewhere.
+        side_fe->get_xyz();
+      }
+  }
+
+template <typename Output>
+inline
+UniquePtr<FEMFunctionBase<Output> >
+ParsedFEMFunction<Output>::clone () const
+  {
+    return UniquePtr<FEMFunctionBase<Output> >
+      (new ParsedFEMFunction
+       (_sys, _expression, &_additional_vars, &_initial_vals));
+  }
+
+template <typename Output>
+inline
+Output
+ParsedFEMFunction<Output>::operator()
+  (const FEMContext& c, const Point& p,
+   const Real time)
+  {
+    eval_args(c, p, time);
+
+    return eval(parsers[0], "f", 0);
+  }
+
+
+
+template <typename Output>
+inline
+void
+ParsedFEMFunction<Output>::operator()
+  (const FEMContext& c, const Point& p,
+   const Real time,
+   DenseVector<Output>& output)
+  {
+    eval_args(c, p, time);
+
+    unsigned int size = output.size();
+
+    libmesh_assert_equal_to (size, parsers.size());
+
+    for (unsigned int i=0; i != size; ++i)
+      output(i) = eval(parsers[i], "f", i);
+  }
+
+
+template <typename Output>
+inline
+Output
+ParsedFEMFunction<Output>::component
+  (const FEMContext& c, unsigned int i,
+   const Point& p,
+   Real time)
+  {
+    eval_args(c, p, time);
+
+    libmesh_assert_less (i, parsers.size());
+    return eval(parsers[i], "f", i);
+  }
+
+template <typename Output>
+inline
+std::size_t
+ParsedFEMFunction<Output>::find_name
+  (const std::string & varname,
+   const std::string & expr)
   {
     const std::size_t namesize = varname.size();
     std::size_t varname_i = expr.find(varname);
@@ -70,8 +479,14 @@ protected:
     return varname_i;
   }
 
+
+
   // Helper function for evaluating function arguments
-  void eval_args(const FEMContext& c, const Point& p, const Real time)
+template <typename Output>
+inline
+void
+ParsedFEMFunction<Output>::eval_args
+  (const FEMContext& c, const Point& p, const Real time)
   {
     _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
@@ -192,11 +607,16 @@ protected:
     // but could potentially be made dynamic
   }
 
+
   // Evaluate the ith FunctionParser and check the result
 #ifdef LIBMESH_HAVE_FPARSER
-  inline Output eval(FunctionParserBase<Output> & parser,
-                     const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx))
+template <typename Output>
+inline
+Output
+ParsedFEMFunction<Output>::eval
+  (FunctionParserBase<Output> & parser,
+   const std::string & libmesh_dbg_var(function_name),
+   unsigned int libmesh_dbg_var(component_idx))
   {
 #ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
@@ -245,355 +665,19 @@ protected:
 #endif
   }
 #else // LIBMESH_HAVE_FPARSER
-  inline Output eval(char & libmesh_dbg_var(parser),
-                     const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx))
+template <typename Output>
+inline
+Output
+ParsedFEMFunction<Output>::eval
+  (char & libmesh_dbg_var(parser),
+   const std::string & libmesh_dbg_var(function_name),
+   unsigned int libmesh_dbg_var(component_idx))
   {
     libmesh_error_msg("ERROR: This functionality requires fparser!");
     return Output(0);
   }
 #endif
 
-
-public:
-
-  /**
-   * Constructor.
-   */
-  explicit
-  ParsedFEMFunction (const System& sys,
-                     const std::string& expression,
-                     const std::vector<std::string>* additional_vars=NULL,
-                     const std::vector<Output>* initial_vals=NULL)
-    : _sys(sys),
-      _expression(expression),
-      _n_vars(sys.n_vars()),
-      _n_requested_vars(0),
-      _n_requested_grad_components(0),
-      _n_requested_hess_components(0),
-      _requested_normals(false),
-      _need_var(_n_vars, false),
-      _need_var_grad(_n_vars*LIBMESH_DIM, false)
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    , _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false)
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  {
-    std::string variables = "x";
-#if LIBMESH_DIM > 1
-    variables += ",y";
-#endif
-#if LIBMESH_DIM > 2
-    variables += ",z";
-#endif
-    variables += ",t";
-
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        const std::string & varname = sys.variable_name(v);
-        std::size_t varname_i = find_name(varname, _expression);
-
-        // If we didn't find our variable name then let's go to the
-        // next.
-        if (varname_i == std::string::npos)
-          continue;
-
-        _need_var[v] = true;
-        variables += ',';
-        variables += varname;
-        _n_requested_vars++;
-      }
-
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        const std::string & varname = sys.variable_name(v);
-
-        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
-          {
-            std::string gradname = std::string("grad_") +
-              "xyz"[d] + '_' + varname;
-            std::size_t gradname_i = find_name(gradname, _expression);
-
-            // If we didn't find that gradient component of our
-            // variable name then let's go to the next.
-            if (gradname_i == std::string::npos)
-              continue;
-
-            _need_var_grad[v*LIBMESH_DIM+d] = true;
-            variables += ',';
-            variables += gradname;
-            _n_requested_grad_components++;
-          }
-      }
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        const std::string & varname = sys.variable_name(v);
-
-        for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
-          for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
-            {
-              std::string hessname = std::string("hess_") +
-                "xyz"[d1] + "xyz"[d2] + '_' + varname;
-              std::size_t hessname_i = find_name(hessname, _expression);
-
-              // If we didn't find that hessian component of our
-              // variable name then let's go to the next.
-              if (hessname_i == std::string::npos)
-                continue;
-
-              _need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2]
-                = true;
-              variables += ',';
-              variables += hessname;
-              _n_requested_hess_components++;
-            }
-      }
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-      {
-        std::size_t nx_i = find_name("n_x", _expression);
-        std::size_t ny_i = find_name("n_y", _expression);
-        std::size_t nz_i = find_name("n_z", _expression);
-
-        // If we found any requests for normal components then we'll
-        // compute normals
-        if (nx_i != std::string::npos ||
-            ny_i != std::string::npos ||
-            nz_i != std::string::npos)
-          {
-            _requested_normals = true;
-            variables += ',';
-            variables += "n_x";
-            if (LIBMESH_DIM > 1)
-              {  
-                variables += ',';
-                variables += "n_y";
-              }
-            if (LIBMESH_DIM > 2)
-              {  
-                variables += ',';
-                variables += "n_z";
-              }
-          }
-      }
-
-    _spacetime.resize
-      (LIBMESH_DIM + 1 + _n_requested_vars +
-       _n_requested_grad_components + _n_requested_hess_components +
-       (_requested_normals ? LIBMESH_DIM : 0) +
-       (additional_vars ? additional_vars->size() : 0));
-
-    // If additional vars were passed, append them to the string
-    // that we send to the function parser. Also add them to the
-    // end of our spacetime vector
-    if (additional_vars)
-      {
-        if (initial_vals)
-          std::copy(initial_vals->begin(), initial_vals->end(), std::back_inserter(_initial_vals));
-
-        std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
-
-        unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
-          _n_requested_grad_components + _n_requested_hess_components;
-
-        for (unsigned int i=0; i < additional_vars->size(); ++i)
-          {
-            variables += "," + (*additional_vars)[i];
-            // Initialize extra variables to the vector passed in or zero
-            // Note: The initial_vals vector can be shorter than the additional_vars vector
-            _spacetime[offset + i] =
-              (initial_vals && i < initial_vals->size()) ?
-              (*initial_vals)[i] : 0;
-          }
-      }
-
-    size_t nextstart = 0, end = 0;
-
-    while (end != std::string::npos)
-      {
-        // If we're past the end of the string, we can't make any more
-        // subparsers
-        if (nextstart >= expression.size())
-          break;
-
-        // If we're at the start of a brace delimited section, then we
-        // parse just that section:
-        if (expression[nextstart] == '{')
-          {
-            nextstart++;
-            end = expression.find('}', nextstart);
-          }
-        // otherwise we parse the whole thing
-        else
-          end = std::string::npos;
-
-        // We either want the whole end of the string (end == npos) or
-        // a substring in the middle.
-        std::string subexpression =
-          expression.substr(nextstart, (end == std::string::npos) ?
-                            std::string::npos : end - nextstart);
-
-        // fparser can crash on empty expressions
-        if (subexpression.empty())
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
-
-
-#ifdef LIBMESH_HAVE_FPARSER
-        // Parse (and optimize if possible) the subexpression.
-        // Add some basic constants, to Real precision.
-        FunctionParserBase<Output> fp;
-        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-        fp.AddConstant("pi", std::acos(Real(-1)));
-        fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
-        fp.Optimize();
-        parsers.push_back(fp);
-#else
-        libmesh_error_msg("ERROR: This functionality requires fparser!");
-#endif
-
-        // If at end, use nextstart=maxSize.  Else start at next
-        // character.
-        nextstart = (end == std::string::npos) ?
-          std::string::npos : end + 1;
-      }
-  }
-
-  /**
-   * Destructor.
-   */
-  virtual ~ParsedFEMFunction () {}
-
-  /**
-   * Prepares a context object for use.
-   */
-  virtual void init_context (const FEMContext &c) {
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        FEBase* elem_fe;
-        c.get_element_fe(v, elem_fe);
-        if (_n_requested_vars)
-          elem_fe->get_phi();
-        if (_n_requested_grad_components)
-          elem_fe->get_dphi();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (_n_requested_hess_components)
-          elem_fe->get_d2phi();
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-      }
-
-    if (_requested_normals)
-      {
-        FEBase* side_fe;
-        c.get_side_fe(0, side_fe);
-
-        side_fe->get_normals();
-
-        // FIXME: this is a hack to support normals at quadrature
-        // points; we don't support normals elsewhere.
-        side_fe->get_xyz();
-      }
-  }
-
-  /**
-   * Returns a new copy of the function.  The new copy should be as
-   * ``deep'' as necessary to allow independent destruction and
-   * simultaneous evaluations of the copies in different threads.
-   */
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const {
-    return UniquePtr<FEMFunctionBase<Output> >
-      (new ParsedFEMFunction
-       (_sys, _expression, &_additional_vars, &_initial_vals));
-  }
-
-  // ------------------------------------------------------
-  // misc
-  /**
-   * @returns the scalar value at coordinate
-   * \p p and time \p time, which defaults to zero.
-   * Purely virtual, so you have to overload it.
-   * Note that this cannot be a const method, check \p MeshFunction.
-   */
-  virtual Output operator() (const FEMContext& c, const Point& p,
-                             const Real time = 0.)
-  {
-    eval_args(c, p, time);
-
-    return eval(parsers[0], "f", 0);
-  }
-
-
-
-  /**
-   * Return function for vectors.
-   * Returns in \p output the values of the data at the
-   * coordinate \p p and for time \p time.
-   */
-  void operator() (const FEMContext& c, const Point& p,
-                   const Real time,
-                   DenseVector<Output>& output)
-  {
-    eval_args(c, p, time);
-
-    unsigned int size = output.size();
-
-    libmesh_assert_equal_to (size, parsers.size());
-
-    for (unsigned int i=0; i != size; ++i)
-      output(i) = eval(parsers[i], "f", i);
-  }
-
-
-  /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
-   */
-  virtual Output component(const FEMContext& c, unsigned int i,
-                           const Point& p,
-                           Real time=0.)
-  {
-    eval_args(c, p, time);
-
-    libmesh_assert_less (i, parsers.size());
-    return eval(parsers[i], "f", i);
-  }
-
-private:
-  const System& _sys;
-  std::string _expression;
-  unsigned int _n_vars,
-    _n_requested_vars,
-    _n_requested_grad_components,
-    _n_requested_hess_components;
-  bool _requested_normals;
-#ifdef LIBMESH_HAVE_FPARSER
-  std::vector<FunctionParserBase<Output> > parsers;
-#else
-  std::vector<char> parsers;
-#endif
-  std::vector<Output> _spacetime;
-
-  // Flags for which variables need to be computed
-
-  // _need_var[v] is true iff value(v) is needed
-  std::vector<bool> _need_var;
-
-  // _need_var_grad[v*LIBMESH_DIM+i] is true iff grad(v,i) is needed
-  std::vector<bool> _need_var_grad;
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  // _need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+i*LIBMESH_DIM+j] is true
-  // iff grad(v,i,j) is needed
-  std::vector<bool> _need_var_hess;
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  // Additional variables/values that can be parsed and handled by the function parser
-  std::vector<std::string> _additional_vars;
-  std::vector<Output> _initial_vals;
-};
 
 } // namespace libMesh
 
