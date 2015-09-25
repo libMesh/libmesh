@@ -153,6 +153,40 @@ protected:
         }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+    if (_requested_normals)
+      {
+        FEBase* side_fe;
+        c.get_side_fe(0, side_fe);
+
+        const std::vector<Point>& normals = side_fe->get_normals();
+
+        const std::vector<Point>& xyz = side_fe->get_xyz();
+
+        libmesh_assert_equal_to(normals.size(), xyz.size());
+
+        // We currently only support normals at quadrature points!
+#ifndef NDEBUG
+        bool at_quadrature_point = false;
+#endif
+        for (unsigned int qp = 0; qp != normals.size(); ++qp)
+          {
+            if (p == xyz[qp])
+              {
+                const Point& n = normals[qp];
+                for (unsigned int d=0; d != LIBMESH_DIM; ++d)
+                  {
+                    _spacetime[LIBMESH_DIM+1+request_index] = n(d);
+                    request_index++;
+                  }
+#ifndef NDEBUG
+                at_quadrature_point = true;
+#endif
+                break;
+              }
+          }
+
+        libmesh_assert(at_quadrature_point);
+      }
 
     // The remaining locations in _spacetime are currently set at construction
     // but could potentially be made dynamic
@@ -237,6 +271,7 @@ public:
       _n_requested_vars(0),
       _n_requested_grad_components(0),
       _n_requested_hess_components(0),
+      _requested_normals(false),
       _need_var(_n_vars, false),
       _need_var_grad(_n_vars*LIBMESH_DIM, false)
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -317,9 +352,37 @@ public:
       }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+      {
+        std::size_t nx_i = find_name("n_x", _expression);
+        std::size_t ny_i = find_name("n_y", _expression);
+        std::size_t nz_i = find_name("n_z", _expression);
+
+        // If we found any requests for normal components then we'll
+        // compute normals
+        if (nx_i != std::string::npos ||
+            ny_i != std::string::npos ||
+            nz_i != std::string::npos)
+          {
+            _requested_normals = true;
+            variables += ',';
+            variables += "n_x";
+            if (LIBMESH_DIM > 1)
+              {  
+                variables += ',';
+                variables += "n_y";
+              }
+            if (LIBMESH_DIM > 2)
+              {  
+                variables += ',';
+                variables += "n_z";
+              }
+          }
+      }
+
     _spacetime.resize
       (LIBMESH_DIM + 1 + _n_requested_vars +
        _n_requested_grad_components + _n_requested_hess_components +
+       (_requested_normals ? LIBMESH_DIM : 0) +
        (additional_vars ? additional_vars->size() : 0));
 
     // If additional vars were passed, append them to the string
@@ -421,6 +484,18 @@ public:
           elem_fe->get_d2phi();
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
       }
+
+    if (_requested_normals)
+      {
+        FEBase* side_fe;
+        c.get_side_fe(0, side_fe);
+
+        side_fe->get_normals();
+
+        // FIXME: this is a hack to support normals at quadrature
+        // points; we don't support normals elsewhere.
+        side_fe->get_xyz();
+      }
   }
 
   /**
@@ -493,6 +568,7 @@ private:
     _n_requested_vars,
     _n_requested_grad_components,
     _n_requested_hess_components;
+  bool _requested_normals;
 #ifdef LIBMESH_HAVE_FPARSER
   std::vector<FunctionParserBase<Output> > parsers;
 #else
