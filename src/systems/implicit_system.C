@@ -815,8 +815,13 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
               {
                 UniquePtr<NumericVector<Number> > lift_func =
                   this->get_adjoint_solution(i).zero_clone();
+
+		// The adjoint dof constraints rely on the primal dof
+		// constraints for dof coefficients
+                this->get_dof_map().unstash_dof_constraints();
                 this->get_dof_map().enforce_adjoint_constraints_exactly
                   (*lift_func.get(), i);
+                this->get_dof_map().stash_dof_constraints();
                 sensitivities[i][j] += partialR_partialp->dot(*lift_func);
               }
           }
