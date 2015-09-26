@@ -196,6 +196,11 @@ public:
    */
   void attach_deflation_space(NumericVector<T>& deflation_vector);
 
+  /**
+   * Returns the raw SLEPc eps context pointer.
+   */
+  EPS eps() { this->init(); return _eps; }
+
 private:
 
   /**
