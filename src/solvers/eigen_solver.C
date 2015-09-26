@@ -53,6 +53,12 @@ EigenSolver<T>::build(const Parallel::Communicator &comm,
 }
 
 
+template <typename T>
+void EigenSolver<T>::set_solver_configuration(SolverConfiguration& solver_configuration)
+{
+  _solver_configuration = &solver_configuration;
+}
+
 
 //------------------------------------------------------------------
 // Explicit instantiations

@@ -213,6 +213,13 @@ SlepcEigenSolver<T>::_solve_standard_helper
   ierr = EPSSetFromOptions (_eps);
   LIBMESH_CHKERR(ierr);
 
+  // If the SolverConfiguration object is provided, use it to override
+  // solver options.
+  if(this->_solver_configuration)
+    {
+      this->_solver_configuration->configure_solver();
+    }
+
   // Solve the eigenproblem.
   ierr = EPSSolve (_eps);
   LIBMESH_CHKERR(ierr);
@@ -500,6 +507,13 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   // other customization routines.
   ierr = EPSSetFromOptions (_eps);
   LIBMESH_CHKERR(ierr);
+
+  // If the SolverConfiguration object is provided, use it to override
+  // solver options.
+  if(this->_solver_configuration)
+    {
+      this->_solver_configuration->configure_solver();
+    }
 
   // Solve the eigenproblem.
   ierr = EPSSolve (_eps);
