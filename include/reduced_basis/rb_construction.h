@@ -416,6 +416,20 @@ public:
    */
   void set_convergence_assertion_flag(bool flag);
 
+  /**
+   * Set the extra linear solver.
+   */
+  void set_extra_linear_solver(
+    LinearSolver<Number>& extra_linear_solver,
+    SolverConfiguration& extra_solver_configuration);
+
+  /**
+   * Set the SolverConfiguration objects.
+   */
+  void set_solver_configurations(
+    SolverConfiguration& default_solver_configuration,
+    SolverConfiguration& inner_product_solver_configuration);
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -433,14 +447,6 @@ public:
    * to inner_product_matrix.
    */
   UniquePtr< LinearSolver<Number> > inner_product_solver;
-
-  /**
-   * Also, we store a pointer to an extra linear solver. This can be
-   * useful if we want to pass in the linear solver from somewhere
-   * else. For example, if a solver is already primed elsewhere
-   * then it can be more efficient to use that solver.
-   */
-  LinearSolver<Number>* extra_linear_solver;
 
   /**
    * The inner product matrix.
@@ -774,6 +780,21 @@ private:
    * Tolerance for training reduced basis using the Greedy scheme.
    */
   Real training_tolerance;
+
+  /**
+   * Also, we store a pointer to an extra linear solver. This can be
+   * useful if we want to pass in the linear solver from somewhere
+   * else. For example, if a solver is already primed elsewhere
+   * then it can be more efficient to use that solver.
+   */
+  LinearSolver<Number>* _extra_linear_solver;
+
+  /**
+   * The SolverConfiguration objects, e.g. defines the solver name, tolerances, etc.
+   */
+  SolverConfiguration* _default_solver_configuration;
+  SolverConfiguration* _inner_product_solver_configuration;
+  SolverConfiguration* _extra_solver_configuration;
 
 };
 

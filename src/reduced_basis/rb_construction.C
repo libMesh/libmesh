@@ -59,7 +59,6 @@ RBConstruction::RBConstruction (EquationSystems& es,
                                 const unsigned int number_in)
   : Parent(es, name_in, number_in),
     inner_product_solver(LinearSolver<Number>::build(es.comm())),
-    extra_linear_solver(NULL),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     use_relative_bound_in_greedy(false),
@@ -76,7 +75,11 @@ RBConstruction::RBConstruction (EquationSystems& es,
     assert_convergence(true),
     rb_eval(NULL),
     inner_product_assembly(NULL),
-    training_tolerance(-1.)
+    training_tolerance(-1.),
+    _extra_linear_solver(NULL),
+    _default_solver_configuration(NULL),
+    _inner_product_solver_configuration(NULL),
+    _extra_solver_configuration(NULL)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -461,7 +464,6 @@ void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
   // The primary solver is used for truth solves and other solves that
   // require different matrices, so set reuse_preconditioner(false).
   get_linear_solver()->reuse_preconditioner(false);
-
 }
 
 void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly,
@@ -1139,14 +1141,14 @@ Real RBConstruction::truth_solve(int plot_solution)
   truth_assembly();
 
   // truth_assembly assembles into matrix and rhs, so use those for the solve
-  if (extra_linear_solver)
+  if (_extra_linear_solver)
     {
-      // If extra_linear_solver has been initialized, then we use it for the
+      // If _extra_linear_solver has been initialized, then we use it for the
       // truth solves.
-      solve_for_matrix_and_rhs(*extra_linear_solver, *matrix, *rhs);
+      solve_for_matrix_and_rhs(*_extra_linear_solver, *matrix, *rhs);
 
       if (assert_convergence)
-        check_convergence(*extra_linear_solver);
+        check_convergence(*_extra_linear_solver);
     }
   else
     {
@@ -1624,7 +1626,7 @@ void RBConstruction::compute_output_dual_innerprods()
         }
 
       // We may not need to use linear_solver again (e.g. this would happen if we use
-      // extra_linear_solver for the truth_solves). As a result, let's clear linear_solver
+      // _extra_linear_solver for the truth_solves). As a result, let's clear linear_solver
       // to release any memory it may be taking up. If we do need it again, it will
       // be initialized when necessary.
       linear_solver->clear();
@@ -2156,6 +2158,29 @@ bool RBConstruction::get_convergence_assertion_flag() const
 void RBConstruction::set_convergence_assertion_flag(bool flag)
 {
   assert_convergence = flag;
+}
+
+void RBConstruction::set_extra_linear_solver(
+  LinearSolver<Number>& extra_linear_solver,
+  SolverConfiguration& extra_solver_configuration)
+{
+  _extra_linear_solver = &extra_linear_solver;
+  _extra_solver_configuration = &extra_solver_configuration;
+
+  _extra_linear_solver->set_solver_configuration(extra_solver_configuration);
+}
+
+void RBConstruction::set_solver_configurations(
+  SolverConfiguration& default_solver_configuration,
+  SolverConfiguration& inner_product_solver_configuration)
+{
+  _default_solver_configuration = &default_solver_configuration;
+  get_linear_solver()->set_solver_configuration(
+    default_solver_configuration);
+
+  _inner_product_solver_configuration = &inner_product_solver_configuration;
+  inner_product_solver->set_solver_configuration(
+    inner_product_solver_configuration);
 }
 
 } // namespace libMesh
