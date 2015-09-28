@@ -52,6 +52,9 @@ public:
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
                   const std::vector<Output>* initial_vals=NULL);
 
+  // Re-parse with new expression
+  void reparse (const std::string& expression);
+
   virtual Output operator() (const Point& p,
                              const Real time = 0);
 
@@ -103,8 +106,8 @@ public:
                         Output newval);
 
 protected:
-  // Helper function for (minor) changes to expression
-  void parse (const std::string& expression);
+  // Re-parse with minor changes to expression
+  void partial_reparse (const std::string& expression);
 
   // Helper function for parsing out variable names
   std::size_t find_name (const std::string & varname,
@@ -151,6 +154,8 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction
   (const std::string& expression, const std::vector<std::string>* additional_vars,
    const std::vector<Output>* initial_vals) :
     _expression (), // overridden by parse()
+    // Size the spacetime vector to account for space, time, and any additional
+    // variables passed
     _spacetime (LIBMESH_DIM+1 + (additional_vars ?
                                  additional_vars->size() : 0)),
     _valid_derivatives (true),
@@ -158,9 +163,17 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction
                       std::vector<std::string>()),
     _initial_vals (initial_vals ? *initial_vals :
                    std::vector<Output>())
-    // Size the spacetime vector to account for space, time, and any additional
-    // variables passed
-    //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
+  {
+    this->reparse(expression);
+    this->_initialized = true;
+  }
+
+
+template <typename Output, typename OutputGradient>
+inline
+void
+ParsedFunction<Output,OutputGradient>::reparse
+  (const std::string& expression)
   {
     variables = "x";
 #if LIBMESH_DIM > 1
@@ -174,20 +187,16 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction
     // If additional vars were passed, append them to the string
     // that we send to the function parser. Also add them to the
     // end of our spacetime vector
-    if (additional_vars)
+    for (unsigned int i=0; i < _additional_vars.size(); ++i)
       {
-        for (unsigned int i=0; i < additional_vars->size(); ++i)
-          {
-            variables += "," + (*additional_vars)[i];
-            // Initialize extra variables to the vector passed in or zero
-            // Note: The initial_vals vector can be shorter than the additional_vars vector
-            _spacetime[LIBMESH_DIM+1 + i] = (initial_vals && i < initial_vals->size()) ? (*initial_vals)[i] : 0;
-          }
+        variables += "," + _additional_vars[i];
+        // Initialize extra variables to the vector passed in or zero
+        // Note: The initial_vals vector can be shorter than the additional_vars vector
+        _spacetime[LIBMESH_DIM+1 + i] =
+          (i < _initial_vals.size()) ? _initial_vals[i] : 0;
       }
 
-    this->parse(expression);
-
-    this->_initialized = true;
+    this->partial_reparse(expression);
   }
 
 template <typename Output, typename OutputGradient>
@@ -436,14 +445,14 @@ ParsedFunction<Output,OutputGradient>::set_inline_value
         new_expression += '}';
       }
 
-    this->parse(new_expression);
+    this->partial_reparse(new_expression);
   }
 
 
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::parse
+ParsedFunction<Output,OutputGradient>::partial_reparse
   (const std::string& expression)
   {
     _expression = expression;
