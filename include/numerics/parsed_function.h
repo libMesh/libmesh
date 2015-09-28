@@ -87,7 +87,7 @@ public:
    * and if the inline variable takes the same value within any
    * subexpressions where it appears.
    */
-  Output get_inline_value(const std::string& inline_var_name);
+  Output get_inline_value(const std::string& inline_var_name) const;
 
 
 protected:
@@ -96,7 +96,7 @@ protected:
 
   // Helper function for parsing out variable names
   std::size_t find_name (const std::string & varname,
-                         const std::string & expr);
+                         const std::string & expr) const;
 
 private:
   // Set the _spacetime argument vector
@@ -106,7 +106,7 @@ private:
   // Evaluate the ith FunctionParser and check the result
   inline Output eval(FunctionParserADBase<Output> & parser,
                      const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx));
+                     unsigned int libmesh_dbg_var(component_idx)) const;
 
   std::string _expression;
   std::vector<std::string> _subexpressions;
@@ -295,7 +295,7 @@ template <typename Output, typename OutputGradient>
 inline
 Output
 ParsedFunction<Output,OutputGradient>::get_inline_value
-  (const std::string& inline_var_name)
+  (const std::string& inline_var_name) const
   {
     libmesh_assert_greater (_subexpressions.size(), 0);
 
@@ -464,7 +464,7 @@ inline
 std::size_t
 ParsedFunction<Output,OutputGradient>::find_name
   (const std::string & varname,
-   const std::string & expr)
+   const std::string & expr) const
   {
     const std::size_t namesize = varname.size();
     std::size_t varname_i = expr.find(varname);
@@ -512,7 +512,7 @@ Output
 ParsedFunction<Output,OutputGradient>::eval
   (FunctionParserADBase<Output> & parser,
    const std::string & libmesh_dbg_var(function_name),
-   unsigned int libmesh_dbg_var(component_idx))
+   unsigned int libmesh_dbg_var(component_idx)) const
   {
 #ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
