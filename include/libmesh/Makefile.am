@@ -223,7 +223,9 @@ BUILT_SOURCES = \
         laspack_vector.h \
         numeric_vector.h \
         parsed_fem_function.h \
+        parsed_fem_function_parameter.h \
         parsed_function.h \
+        parsed_function_parameter.h \
         petsc_macro.h \
         petsc_matrix.h \
         petsc_preconditioner.h \
@@ -1172,7 +1174,13 @@ numeric_vector.h: $(top_srcdir)/include/numerics/numeric_vector.h
 parsed_fem_function.h: $(top_srcdir)/include/numerics/parsed_fem_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+parsed_fem_function_parameter.h: $(top_srcdir)/include/numerics/parsed_fem_function_parameter.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 parsed_function.h: $(top_srcdir)/include/numerics/parsed_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parsed_function_parameter.h: $(top_srcdir)/include/numerics/parsed_function_parameter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_macro.h: $(top_srcdir)/include/numerics/petsc_macro.h
