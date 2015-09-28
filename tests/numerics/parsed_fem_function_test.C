@@ -109,6 +109,7 @@ public:
   CPPUNIT_TEST(testValues);
   CPPUNIT_TEST(testGradients);
   CPPUNIT_TEST(testHessians);
+  CPPUNIT_TEST(testInlineGetter);
   CPPUNIT_TEST(testNormals);
 
   CPPUNIT_TEST_SUITE_END();
@@ -183,6 +184,32 @@ private:
       }
   }
 
+  void testInlineGetter()
+  {
+    if (c->has_elem() &&
+        c->get_elem().processor_id() == TestCommWorld->rank())
+      {
+        ParsedFEMFunction<Number> ax2(*sys, "a:=4.5;a*x2");
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL
+          (libmesh_real(ax2(*c,Point(0.25,0.25,0.25))), 2.25, TOLERANCE*TOLERANCE);
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL
+          (libmesh_real(ax2.get_inline_value("a")), 4.5, TOLERANCE*TOLERANCE);
+
+        ParsedFEMFunction<Number> cxy8
+          (*sys, "a := 4 ; b := a/2+1; c:=b-a+3.5; c*x2*y4");
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL
+          (libmesh_real(cxy8(*c,Point(0.5,0.5,0.5))), 5.0, TOLERANCE*TOLERANCE);
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL
+          (libmesh_real(cxy8.get_inline_value("b")), 3.0, TOLERANCE*TOLERANCE);
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL
+          (libmesh_real(cxy8.get_inline_value("c")), 2.5, TOLERANCE*TOLERANCE);
+      }
+  }
 
   void testNormals()
   {
@@ -209,7 +236,6 @@ private:
           }
       }
   }
-
 
 };
 
