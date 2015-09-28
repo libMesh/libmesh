@@ -79,6 +79,8 @@ public:
                             const Point& p,
                             Real time);
 
+  const std::string & expression() { return _expression; }
+
   /**
    * @returns the address of a parsed variable so you can supply a parameterized value
    */

@@ -111,6 +111,8 @@ public:
                            const Point& p,
                            Real time=0.);
 
+  const std::string & expression() { return _expression; }
+
   /**
    * @returns the value of an inline variable.  Will *only* be correct
    * if the inline variable value is independent of input variables,
