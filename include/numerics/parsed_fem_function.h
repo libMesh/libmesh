@@ -111,7 +111,7 @@ public:
    * and if the inline variable takes the same value within any
    * subexpressions where it appears.
    */
-  Output get_inline_value(const std::string& inline_var_name);
+  Output get_inline_value(const std::string& inline_var_name) const;
 
 protected:
   // Helper function for (minor) changes to expression
@@ -119,7 +119,7 @@ protected:
 
   // Helper function for parsing out variable names
   std::size_t find_name (const std::string & varname,
-                         const std::string & expr);
+                         const std::string & expr) const;
 
   // Helper function for evaluating function arguments
   void eval_args(const FEMContext& c,
@@ -130,11 +130,11 @@ protected:
 #ifdef LIBMESH_HAVE_FPARSER
   inline Output eval(FunctionParserBase<Output> & parser,
                      const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx));
+                     unsigned int libmesh_dbg_var(component_idx)) const;
 #else // LIBMESH_HAVE_FPARSER
   inline Output eval(char & libmesh_dbg_var(parser),
                      const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx));
+                     unsigned int libmesh_dbg_var(component_idx)) const;
 #endif
 
 private:
@@ -423,7 +423,7 @@ template <typename Output>
 inline
 Output
 ParsedFEMFunction<Output>::get_inline_value
-  (const std::string& inline_var_name)
+  (const std::string& inline_var_name) const
   {
     libmesh_assert_greater (_subexpressions.size(), 0);
 
@@ -563,7 +563,7 @@ inline
 std::size_t
 ParsedFEMFunction<Output>::find_name
   (const std::string & varname,
-   const std::string & expr)
+   const std::string & expr) const
   {
     const std::size_t namesize = varname.size();
     std::size_t varname_i = expr.find(varname);
@@ -719,7 +719,7 @@ Output
 ParsedFEMFunction<Output>::eval
   (FunctionParserBase<Output> & parser,
    const std::string & libmesh_dbg_var(function_name),
-   unsigned int libmesh_dbg_var(component_idx))
+   unsigned int libmesh_dbg_var(component_idx)) const
   {
 #ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
