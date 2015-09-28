@@ -29,6 +29,7 @@ public:
   CPPUNIT_TEST_SUITE(ParsedFunctionTest);
 
   CPPUNIT_TEST(testValues);
+  CPPUNIT_TEST(testInlineGetter);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -48,6 +49,28 @@ private:
       (libmesh_real(xy8(Point(0.5,1.5,2.5))), 6.0, TOLERANCE*TOLERANCE);
   }
 
+  void testInlineGetter()
+  {
+    ParsedFunction<Number> ax2("a:=4.5;a*x*2");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (libmesh_real(ax2(Point(0.25,0.25,0.25))), 2.25, TOLERANCE*TOLERANCE);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (libmesh_real(ax2.get_inline_value("a")), 4.5, TOLERANCE*TOLERANCE);
+
+    ParsedFunction<Number> cxy8
+      ("a := 4 ; b := a/2+1; c:=b-a+3.5; c*x*2*y*4");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (libmesh_real(cxy8(Point(0.5,0.5,0.5))), 5.0, TOLERANCE*TOLERANCE);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (libmesh_real(cxy8.get_inline_value("b")), 3.0, TOLERANCE*TOLERANCE);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (libmesh_real(cxy8.get_inline_value("c")), 2.5, TOLERANCE*TOLERANCE);
+  }
 
 };
 
