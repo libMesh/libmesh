@@ -34,6 +34,10 @@
 
 // C++ includes
 #include <cctype>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {
@@ -112,6 +116,16 @@ public:
    * subexpressions where it appears.
    */
   Output get_inline_value(const std::string& inline_var_name) const;
+
+  /**
+   * @changes the value of an inline variable.  Forever after the
+   * variable value will take the given constant, independent of input
+   * variables, in every subexpression where it is already defined.
+   * Currently only works if the inline variable is not redefined
+   * within any one subexpression.
+   */
+  void set_inline_value(const std::string& inline_var_name,
+                        Output newval);
 
 protected:
   // Helper function for (minor) changes to expression
@@ -493,6 +507,62 @@ ParsedFEMFunction<Output>::get_inline_value
     libmesh_assert(found_var_name);
     return old_var_value;
   }
+
+template <typename Output>
+inline
+void
+ParsedFEMFunction<Output>::set_inline_value
+  (const std::string& inline_var_name,
+   Output newval)
+  {
+    libmesh_assert_greater (_subexpressions.size(), 0);
+
+#ifndef NDEBUG
+    bool found_var_name = false;
+#endif
+    for (unsigned int s=0; s != _subexpressions.size(); ++s)
+      {
+        const std::string & subexpression = _subexpressions[s];
+        const std::size_t varname_i =
+          find_name(inline_var_name, subexpression);
+        if (varname_i == std::string::npos)
+          continue;
+
+        const std::size_t assignment_i =
+          subexpression.find(":", varname_i+1);
+
+        libmesh_assert_not_equal_to(assignment_i, std::string::npos);
+
+        libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
+        for (unsigned int i = varname_i+1; i != assignment_i; ++i)
+          libmesh_assert_equal_to(subexpression[i], ' ');
+
+        std::size_t end_assignment_i =
+          subexpression.find(";", assignment_i+1);
+
+        libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
+
+        std::ostringstream new_subexpression;
+        new_subexpression << subexpression.substr(0, assignment_i+2)
+                          << std::setprecision(std::numeric_limits<Output>::digits10+2)
+                          << newval
+                          << subexpression.substr(end_assignment_i,
+                                                  std::string::npos);
+        _subexpressions[s] = new_subexpression.str();
+      }
+
+    std::string new_expression;
+
+    for (unsigned int s=0; s != _subexpressions.size(); ++s)
+      {
+        new_expression += '{';
+        new_expression += _subexpressions[s];
+        new_expression += '}';
+      }
+
+    this->parse(new_expression);
+  }
+
 
 template <typename Output>
 inline
