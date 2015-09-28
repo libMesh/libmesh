@@ -502,6 +502,7 @@ ParsedFEMFunction<Output>::parse
   {
     _expression = expression;
     _subexpressions.clear();
+    parsers.clear();
 
     size_t nextstart = 0, end = 0;
 
