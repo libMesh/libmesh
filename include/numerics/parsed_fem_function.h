@@ -68,6 +68,9 @@ public:
    */
   virtual ~ParsedFEMFunction () {}
 
+  // Re-parse with new expression
+  void reparse (const std::string& expression);
+
   /**
    * Prepares a context object for use.
    */
@@ -128,8 +131,8 @@ public:
                         Output newval);
 
 protected:
-  // Helper function for (minor) changes to expression
-  void parse (const std::string& expression);
+  // Helper function for reparsing minor changes to expression
+  void partial_reparse (const std::string& expression);
 
   // Helper function for parsing out variable names
   std::size_t find_name (const std::string & varname,
@@ -205,11 +208,24 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
       _n_requested_hess_components(0),
       _requested_normals(false),
       _need_var(_n_vars, false),
-      _need_var_grad(_n_vars*LIBMESH_DIM, false)
+      _need_var_grad(_n_vars*LIBMESH_DIM, false),
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    , _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false)
+      _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false),
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+      _additional_vars (additional_vars ? *additional_vars :
+                        std::vector<std::string>()),
+      _initial_vals (initial_vals ? *initial_vals :
+                     std::vector<Output>())
+  {
+    this->reparse(expression);
+  }
 
+
+template <typename Output>
+inline
+void
+ParsedFEMFunction<Output>::reparse
+  (const std::string& expression)
   {
     variables = "x";
 #if LIBMESH_DIM > 1
@@ -222,7 +238,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
 
     for (unsigned int v=0; v != _n_vars; ++v)
       {
-        const std::string & varname = sys.variable_name(v);
+        const std::string & varname = _sys.variable_name(v);
         std::size_t varname_i = find_name(varname, expression);
 
         // If we didn't find our variable name then let's go to the
@@ -238,7 +254,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
 
     for (unsigned int v=0; v != _n_vars; ++v)
       {
-        const std::string & varname = sys.variable_name(v);
+        const std::string & varname = _sys.variable_name(v);
 
         for (unsigned int d=0; d != LIBMESH_DIM; ++d)
           {
@@ -261,7 +277,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     for (unsigned int v=0; v != _n_vars; ++v)
       {
-        const std::string & varname = sys.variable_name(v);
+        const std::string & varname = _sys.variable_name(v);
 
         for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
           for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
@@ -315,33 +331,24 @@ ParsedFEMFunction<Output>::ParsedFEMFunction
       (LIBMESH_DIM + 1 + _n_requested_vars +
        _n_requested_grad_components + _n_requested_hess_components +
        (_requested_normals ? LIBMESH_DIM : 0) +
-       (additional_vars ? additional_vars->size() : 0));
+       _additional_vars.size());
 
     // If additional vars were passed, append them to the string
     // that we send to the function parser. Also add them to the
     // end of our spacetime vector
-    if (additional_vars)
+    unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
+      _n_requested_grad_components + _n_requested_hess_components;
+
+    for (unsigned int i=0; i < _additional_vars.size(); ++i)
       {
-        if (initial_vals)
-          std::copy(initial_vals->begin(), initial_vals->end(), std::back_inserter(_initial_vals));
-
-        std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
-
-        unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
-          _n_requested_grad_components + _n_requested_hess_components;
-
-        for (unsigned int i=0; i < additional_vars->size(); ++i)
-          {
-            variables += "," + (*additional_vars)[i];
-            // Initialize extra variables to the vector passed in or zero
-            // Note: The initial_vals vector can be shorter than the additional_vars vector
-            _spacetime[offset + i] =
-              (initial_vals && i < initial_vals->size()) ?
-              (*initial_vals)[i] : 0;
-          }
+        variables += "," + _additional_vars[i];
+        // Initialize extra variables to the vector passed in or zero
+        // Note: The initial_vals vector can be shorter than the additional_vars vector
+        _spacetime[offset + i] =
+          (i < _initial_vals.size()) ? _initial_vals[i] : 0;
       }
 
-    this->parse(expression);
+    this->partial_reparse(expression);
   }
 
 template <typename Output>
@@ -566,14 +573,14 @@ ParsedFEMFunction<Output>::set_inline_value
         new_expression += '}';
       }
 
-    this->parse(new_expression);
+    this->partial_reparse(new_expression);
   }
 
 
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::parse
+ParsedFEMFunction<Output>::partial_reparse
   (const std::string& expression)
   {
     _expression = expression;
