@@ -528,6 +528,10 @@ ParsedFEMFunction<Output>::set_inline_value
         if (varname_i == std::string::npos)
           continue;
 
+#ifndef NDEBUG
+        found_var_name = true;
+#endif
+
         const std::size_t assignment_i =
           subexpression.find(":", varname_i+1);
 
@@ -550,6 +554,8 @@ ParsedFEMFunction<Output>::set_inline_value
                                                   std::string::npos);
         _subexpressions[s] = new_subexpression.str();
       }
+
+    libmesh_assert(found_var_name);
 
     std::string new_expression;
 
