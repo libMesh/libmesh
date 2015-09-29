@@ -116,7 +116,7 @@ public:
   /**
    * Virtual destructor, gotta have one of those.
    */
-  virtual ~SolverException() {};
+  virtual ~SolverException() throw() {};
 
   /**
    * Override the what() function to provide a generic error message.
