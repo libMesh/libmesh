@@ -659,8 +659,6 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters_in
 
 void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters_in)
 {
-  Real deltap = TOLERANCE;
-
   ParameterVector& parameters =
     const_cast<ParameterVector&>(parameters_in);
 
@@ -675,21 +673,25 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parame
       // (R(p-dp) - R(p+dp)) / (2*dp)
 
       Number old_parameter = *parameters[p];
-      *parameters[p] -= deltap;
+
+      const Real delta_p =
+        TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
+
+      *parameters[p] -= delta_p;
 
       //      this->assembly(true, false, true);
       this->assembly(true, false, false);
       this->rhs->close();
       sensitivity_rhs = *this->rhs;
 
-      *parameters[p] = old_parameter + deltap;
+      *parameters[p] = old_parameter + delta_p;
 
       //      this->assembly(true, false, true);
       this->assembly(true, false, false);
       this->rhs->close();
 
       sensitivity_rhs -= *this->rhs;
-      sensitivity_rhs /= (2*deltap);
+      sensitivity_rhs /= (2*delta_p);
       sensitivity_rhs.close();
 
       *parameters[p] = old_parameter;
