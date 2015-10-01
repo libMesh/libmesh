@@ -703,9 +703,6 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
  const ParameterVector& parameters_in,
  SensitivityData&       sensitivities)
 {
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
-
   ParameterVector& parameters =
     const_cast<ParameterVector&>(parameters_in);
 
@@ -771,13 +768,17 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
   for (unsigned int j=0; j != Np; ++j)
     {
+      // We currently get partial derivatives via central differencing
+      const Real delta_p =
+        TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
+
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[j];
       // Number old_qoi = this->qoi;
 
-      *parameters[j] = old_parameter - delta_p*fmax(fabs(old_parameter),1.e-3);
+      *parameters[j] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       std::vector<Number> qoi_minus = this->qoi;
 
@@ -788,19 +789,19 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       UniquePtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
-      *parameters[j] = old_parameter + delta_p*fmax(fabs(old_parameter),1.e-3);
+      *parameters[j] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       std::vector<Number>& qoi_plus = this->qoi;
 
       std::vector<Number> partialq_partialp(Nq, 0);
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p*fmax(fabs(old_parameter),1.e-3));
+          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       this->assembly(true, false, true);
       this->rhs->close();
       *partialR_partialp += *this->rhs;
-      *partialR_partialp /= (2.*delta_p*fmax(fabs(old_parameter),1.e-3));
+      *partialR_partialp /= (2.*delta_p);
 
       // Don't leave the parameter changed
       *parameters[j] = old_parameter;
