@@ -769,14 +769,15 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   for (unsigned int j=0; j != Np; ++j)
     {
       // We currently get partial derivatives via central differencing
-      const Real delta_p =
-        TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[j];
       // Number old_qoi = this->qoi;
+
+      const Real delta_p =
+        TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
       *parameters[j] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
@@ -847,9 +848,6 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
  const ParameterVector& parameters_in,
  SensitivityData&       sensitivities)
 {
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
-
   ParameterVector& parameters =
     const_cast<ParameterVector&>(parameters_in);
 
@@ -896,9 +894,14 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
 
   for (unsigned int j=0; j != Np; ++j)
     {
+      // We currently get partial derivatives via central differencing
+
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[j];
+
+      const Real delta_p =
+        TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
       *parameters[j] = old_parameter - delta_p;
       this->assemble_qoi();
