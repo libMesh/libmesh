@@ -171,9 +171,26 @@ public:
   /**
    * If calculating numeric jacobians is required, the FEMSystem
    * will perturb each solution vector entry by numerical_jacobian_h
-   * when calculating finite differences.
+   * when calculating finite differences.  This defaults to the
+   * libMesh TOLERANCE but can be set manually.
+   *
+   * For ALE terms, the FEMSystem will perturb each mesh point in an
+   * element by numerical_jacobian_h * Elem::hmin()
    */
   Real numerical_jacobian_h;
+
+  /**
+   * If numerical_jacobian_h_for_var(var_num) is changed from its
+   * default value (numerical_jacobian_h), the FEMSystem will perturb
+   * solution vector entries for variable var_num by that amount when
+   * calculating finite differences with respect to that variable.
+   *
+   * This is useful in multiphysics problems which have not been
+   * normalized.
+   */
+  Real numerical_jacobian_h_for_var(unsigned int var_num) const;
+
+  void set_numerical_jacobian_h_for_var(unsigned int var_num, Real new_h);
 
   /**
    * If verify_analytic_jacobian is equal to zero (as it is by
@@ -229,8 +246,35 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
+
+private:
+  std::vector<Real> _numerical_jacobian_h_for_var;
 };
 
+// --------------------------------------------------------------
+// FEMSystem inline methods
+inline
+Real
+FEMSystem::numerical_jacobian_h_for_var(unsigned int var_num) const
+{
+  if ((var_num >= _numerical_jacobian_h_for_var.size()) ||
+      _numerical_jacobian_h_for_var[var_num] == Real(0))
+    return numerical_jacobian_h;
+
+  return _numerical_jacobian_h_for_var[var_num];
+}
+
+inline
+void FEMSystem::set_numerical_jacobian_h_for_var(unsigned int var_num,
+                                                 Real new_h)
+{
+  if (_numerical_jacobian_h_for_var.size() <= var_num)
+    _numerical_jacobian_h_for_var.resize(var_num+1,Real(0));
+
+  libmesh_assert_greater(new_h, 0);
+
+  _numerical_jacobian_h_for_var[var_num] = new_h;
+}
 
 } // namespace libMesh
 
