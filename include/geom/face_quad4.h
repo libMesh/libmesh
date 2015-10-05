@@ -61,7 +61,7 @@ public:
    */
   explicit
   Quad4 (Elem* p=NULL) :
-    Quad(Quad::n_nodes(), p, _nodelinks_data) {}
+    Quad(Quad4::n_nodes(), p, _nodelinks_data) {}
 
   /**
    * @returns \p QUAD4
