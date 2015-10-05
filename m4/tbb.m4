@@ -41,6 +41,12 @@ AC_DEFUN([CONFIGURE_TBB],
     if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
       TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
       TBB_INCLUDE=-I$TBB_INCLUDE_PATH
+
+      dnl Add rpath flags to the link line.
+      if (test "x$RPATHFLAG" != "x" -a -d $TBB_LIBS); then
+        TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
+      fi
+
       AC_SUBST(TBB_LIBRARY)
       AC_SUBST(TBB_INCLUDE)
       AC_DEFINE(USING_THREADS, 1,
