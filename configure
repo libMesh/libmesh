@@ -33396,6 +33396,11 @@ fi
       TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
       TBB_INCLUDE=-I$TBB_INCLUDE_PATH
 
+            if (test "x$RPATHFLAG" != "x" -a -d $TBB_LIBS); then
+        TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
+      fi
+
+
 
 
 $as_echo "#define USING_THREADS 1" >>confdefs.h
