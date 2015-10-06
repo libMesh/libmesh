@@ -278,13 +278,13 @@ public:
    *   ii) from inside, use '_set_variable()' below
    */
   template<typename T>
-  inline void set(const char* VarName, const T& Value, const bool Requested = true);
+  inline void set(const char* VarName, const T& Value, const bool Requested = true, const bool Overridden = true);
 
   template<typename T>
-  inline void set(const std::string& VarName, const T& Value, const bool Requested = true);
+  inline void set(const std::string& VarName, const T& Value, const bool Requested = true, const bool Overridden = true);
 
-  inline void set(const char* VarName, const char* Value, const bool Requested = true);
-  inline void set(const std::string& VarName, const char* Value, const bool Requested = true);
+  inline void set(const char* VarName, const char* Value, const bool Requested = true, const bool Overridden = true);
+  inline void set(const std::string& VarName, const char* Value, const bool Requested = true, const bool Overridden = true);
 
   inline unsigned vector_variable_size(const char* VarName) const;
   inline unsigned vector_variable_size(const std::string& VarName) const;
@@ -539,7 +539,8 @@ private:
    */
   inline void _set_variable(const std::string& VarName,
                             const std::string& Value,
-                            const bool Requested);
+                            const bool Requested,
+                            const bool Overridden);
 
   /**
    * produce three basic data vectors:
@@ -1113,7 +1114,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
           // => arg (from start to '=') = Name of variable
           //        (from '=' to end)   = value of variable
           _set_variable(arg.substr(0,equals_pos),
-                        arg.substr(equals_pos+1), false);
+                        arg.substr(equals_pos+1), false, true);
         }
     }
 }
@@ -2406,7 +2407,7 @@ GetPot::_record_variable_request(const std::string& Name) const
 //     arguments => append an argument in the argument vector that reflects the addition
 inline void
 GetPot::_set_variable(const std::string& VarName,
-                      const std::string& Value, const bool Requested /* = true */)
+                      const std::string& Value, const bool Requested /* = true */, const bool Overridden /* = true */)
 {
   const GetPot::variable* Var = Requested ?
     _request_variable(VarName.c_str()) :
@@ -2415,7 +2416,8 @@ GetPot::_set_variable(const std::string& VarName,
     variables.push_back(variable(VarName.c_str(), Value.c_str(), _field_separator.c_str()));
   else
     {
-      overridden_vars.insert(VarName.c_str());
+      if (Overridden)
+        overridden_vars.insert(VarName.c_str());
       (const_cast<GetPot::variable*>(Var))->take(Value.c_str(), _field_separator.c_str());
     }
 }
@@ -2424,36 +2426,36 @@ GetPot::_set_variable(const std::string& VarName,
 
 template <typename T>
 inline void
-GetPot::set(const char* VarName, const T& Value, const bool Requested /* = true */)
+GetPot::set(const char* VarName, const T& Value, const bool Requested /* = true */, const bool Overridden /* = true */)
 {
   std::ostringstream string_value;
   string_value << Value;
-  _set_variable(VarName, string_value.str().c_str(), Requested);
+  _set_variable(VarName, string_value.str().c_str(), Requested, Overridden);
 }
 
 
 
 template <typename T>
 inline void
-GetPot::set(const std::string& VarName, const T& Value, const bool Requested /* = true */)
+GetPot::set(const std::string& VarName, const T& Value, const bool Requested /* = true */, const bool Overridden /* = true */)
 {
-  set(VarName.c_str(), Value, Requested);
+  set(VarName.c_str(), Value, Requested, Overridden);
 }
 
 
 
 inline void
-GetPot::set(const char* VarName, const char* Value, const bool Requested /* = true */)
+GetPot::set(const char* VarName, const char* Value, const bool Requested /* = true */, const bool Overridden /* = true */)
 {
-  _set_variable(VarName, Value, Requested);
+  _set_variable(VarName, Value, Requested, Overridden);
 }
 
 
 
 inline void
-GetPot::set(const std::string& VarName, const char* Value, const bool Requested /* = true */)
+GetPot::set(const std::string& VarName, const char* Value, const bool Requested /* = true */, const bool Overridden /* = true */)
 {
-  set(VarName.c_str(), Value, Requested);
+  set(VarName.c_str(), Value, Requested, Overridden);
 }
 
 
