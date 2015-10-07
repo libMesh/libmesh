@@ -769,12 +769,16 @@ public:
 
                     _femcontext.get_dof_indices() = original_dofs;
 
-                    // If we're going to need K to impose a heterogenous
-                    // constraint, we may not have already computed it above.
                     if (has_heterogenous_constraint)
                       {
+                        // Q_u gets used for *adjoint* solves, so we
+                        // need K^T here.
+                        DenseMatrix<Number> elem_jacobian_transpose;
+                        _femcontext.get_elem_jacobian().get_transpose
+                          (elem_jacobian_transpose);
+
                         _sys.get_dof_map().heterogenously_constrain_element_vector
-                          (_femcontext.get_elem_jacobian(),
+                          (elem_jacobian_transpose,
                            _femcontext.get_qoi_derivatives()[i],
                            _femcontext.get_dof_indices(), false, i);
                       }
