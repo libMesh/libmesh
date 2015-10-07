@@ -431,6 +431,9 @@ private:
         std::vector<bool> is_boundary_node(elem->n_nodes(), false),
           is_boundary_edge(elem->n_edges(), false),
           is_boundary_side(elem->n_sides(), false);
+
+        // We also maintain a separate list of nodeset-based boundary nodes
+        std::vector<bool> is_boundary_nodeset(elem->n_nodes(), false);
         for (unsigned char s=0; s != elem->n_sides(); ++s)
           {
             // First see if this side has been requested
@@ -466,7 +469,10 @@ private:
 
             for (std::size_t i=0; i != bc_ids.size(); ++i)
               if (b.count(bc_ids[i]))
+              {
                 is_boundary_node[n] = true;
+                is_boundary_nodeset[n] = true;
+              }
           }
 
         // We can also impose Dirichlet boundary conditions on edges, so we should
@@ -508,7 +514,10 @@ private:
         // hold those fixed and project boundary edges, then hold
         // those fixed and project boundary faces,
 
-        // Interpolate node values first
+        // Interpolate node values first. Note that we have a special 
+        // case for nodes that have a boundary nodeset, since we do
+        // need to interpolate them directly, even if they're non-vertex
+        // nodes.
         unsigned int current_dof = 0;
         for (unsigned int n=0; n!= n_nodes; ++n)
           {
@@ -517,7 +526,8 @@ private:
             const unsigned int nc =
               FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
                                            n);
-            if (!elem->is_vertex(n) || !is_boundary_node[n])
+            if ( (!elem->is_vertex(n) || !is_boundary_node[n]) &&
+                  !is_boundary_nodeset[n] )
               {
                 current_dof += nc;
                 continue;
