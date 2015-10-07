@@ -324,60 +324,6 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
 
 
 
-  dnl Ifpack
-  AC_ARG_WITH(ifpack,
-              AS_HELP_STRING([--with-ifpack=PATH],[Specify the path to Ifpack installation]),
-              withifpackdir=$withval,
-              withifpackdir=$TRILINOS_DIR)
-
-  if test "$withifpackdir" != no ; then
-    if (test -r $withifpackdir/include/Makefile.export.Ifpack) ; then
-      IFPACK_MAKEFILE_EXPORT=$withifpackdir/include/Makefile.export.Ifpack
-    elif (test -r $withifpackdir/packages/ifpack/Makefile.export.Ifpack) ; then
-      IFPACK_MAKEFILE_EXPORT=$withifpackdir/packages/ifpack/Makefile.export.Ifpack
-    else
-      enableifpack=no
-    fi
-
-    if test "$enableifpack" != no ; then
-       enableifpack=yes
-       AC_DEFINE(TRILINOS_HAVE_IFPACK, 1,
-                 [Flag indicating whether the library shall be compiled to use the Ifpack solver collection])
-       AC_MSG_RESULT([<<< Configuring library with Ifpack support >>>])
-    fi
-  else
-    enableifpack=no
-  fi
-
-
-
-  dnl EpetraExt
-  AC_ARG_WITH(epetraext,
-              AS_HELP_STRING([--with-epetraext=PATH],[Specify the path to EpetraExt installation]),
-              withepetraextdir=$withval,
-              withepetraextdir=$TRILINOS_DIR)
-
-  if test "$withepetraextdir" != no ; then
-    if (test -r $withepetraextdir/include/Makefile.export.EpetraExt) ; then
-      EPETRAEXT_MAKEFILE_EXPORT=$withepetraextdir/include/Makefile.export.EpetraExt
-    elif (test -r $withepetraextdir/packages/epetraext/Makefile.export.EpetraExt) ; then
-      EPETRAEXT_MAKEFILE_EXPORT=$withepetraextdir/packages/epetraext/Makefile.export.EpetraExt
-    else
-      enableepetraext=no
-    fi
-
-    if test "$enableepetraext" != no ; then
-       enableepetraext=yes
-       AC_DEFINE(TRILINOS_HAVE_EPETRAEXT, 1,
-                 [Flag indicating whether the library shall be compiled to use the EpetraExt interfaces])
-       AC_MSG_RESULT([<<< Configuring library with EpetraExt support >>>])
-    fi
-  else
-    enableepetraext=no
-  fi
-
-
-
   dnl DTK
   AC_ARG_WITH(dtk,
               AS_HELP_STRING([--with-dtk=PATH],[Specify the path to Dtk installation]),
@@ -403,6 +349,19 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
     enabledtk=no
   fi
 
+
+
+  dnl Ifpack - rather than try and guess how this would have worked in
+  dnl Trilinos 9, we're just going to assume we don't have it.  If
+  dnl anyone ever wants to go back and write a configure test with
+  dnl an older Trilinos, that would be great!
+  enableifpack=no
+
+  dnl EpetraEXT - rather than try and guess how this would have worked in
+  dnl Trilinos 9, we're just going to assume we don't have it.  If
+  dnl anyone ever wants to go back and write a configure test with
+  dnl an older Trilinos, that would be great!
+  enableepetraext=no
 
 
   AC_SUBST(AZTECOO_MAKEFILE_EXPORT)
