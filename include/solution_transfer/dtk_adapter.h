@@ -37,7 +37,8 @@
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_ArrayRCP.hpp>
 
-namespace libMesh {
+namespace libMesh
+{
 
 class DTKAdapter
 {

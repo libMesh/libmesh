@@ -38,7 +38,8 @@
 
 #include <string>
 
-namespace libMesh {
+namespace libMesh
+{
 
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {

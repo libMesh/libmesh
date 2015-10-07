@@ -42,7 +42,8 @@
 #include <DTK_CommTools.hpp>
 #include <DTK_CommIndexer.hpp>
 
-namespace libMesh {
+namespace libMesh
+{
 
 DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm) :
   SolutionTransfer(comm)

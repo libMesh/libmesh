@@ -67,23 +67,34 @@ public:
   //! Compute an explicit Jacobian
   bool computeJacobian(const Epetra_Vector& x, Epetra_Operator& Jac);
 
-  //! Compute the Epetra_RowMatrix M, that will be used by the Aztec preconditioner instead of the Jacobian.  This is used when there is no explicit Jacobian present (i.e. Matrix-Free Newton-Krylov).  This MUST BE an Epetra_RowMatrix since the Aztec preconditioners need to know the sparsity pattern of the matrix.  Returns true if computation was successful.
+  //! Compute the Epetra_RowMatrix M, that will be used by the Aztec
+  //! preconditioner instead of the Jacobian.  This is used when there
+  //! is no explicit Jacobian present (i.e. Matrix-Free
+  //! Newton-Krylov).  This MUST BE an Epetra_RowMatrix since the
+  //! Aztec preconditioners need to know the sparsity pattern of the
+  //! matrix.  Returns true if computation was successful.
   bool computePrecMatrix(const Epetra_Vector& x, Epetra_RowMatrix& M);
 
-  //! Computes a user supplied preconditioner based on input vector x.  Returns true if computation was successful.
+  //! Computes a user supplied preconditioner based on input vector x.
+  //! Returns true if computation was successful.
   bool computePreconditioner(const Epetra_Vector& x, Epetra_Operator& Prec,
                              Teuchos::ParameterList* p);
 
   NoxNonlinearSolver<Number> * _solver;
 };
 
-//-----------------------------------------------------------------------------
+
+
 Problem_Interface::Problem_Interface(NoxNonlinearSolver<Number> * solver) :
   _solver(solver)
-{ }
+{}
+
+
 
 Problem_Interface::~Problem_Interface()
-{ }
+{}
+
+
 
 bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
                                  NOX::Epetra::Interface::Required::FillType /*fillType*/)
@@ -133,6 +144,8 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   return true;
 }
 
+
+
 bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
                                         Epetra_Operator & jac)
 {
@@ -179,11 +192,15 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
   return true;
 }
 
+
+
 bool Problem_Interface::computePrecMatrix(const Epetra_Vector & /*x*/, Epetra_RowMatrix & /*M*/)
 {
   //   libMesh::out << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
   throw 1;
 }
+
+
 
 bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
                                               Epetra_Operator & prec,
@@ -236,6 +253,7 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
 }
 
 
+
 //---------------------------------------------------------------------
 // NoxNonlinearSolver<> methods
 template <typename T>
@@ -243,12 +261,16 @@ void NoxNonlinearSolver<T>::clear ()
 {
 }
 
+
+
 template <typename T>
 void NoxNonlinearSolver<T>::init (const char * /*name*/)
 {
   if (!this->initialized())
     _interface = new Problem_Interface(this);
 }
+
+
 
 template <typename T>
 std::pair<unsigned int, Real>
@@ -384,6 +406,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobia
 
   return std::make_pair(total_iters, residual_norm);
 }
+
+
 
 template <typename T>
 int
