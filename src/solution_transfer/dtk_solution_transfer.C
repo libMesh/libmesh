@@ -19,7 +19,7 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #include "libmesh/dtk_solution_transfer.h"
 
@@ -110,4 +110,4 @@ DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_DTK

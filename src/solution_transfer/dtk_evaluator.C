@@ -1,6 +1,6 @@
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #include "libmesh/dtk_evaluator.h"
 

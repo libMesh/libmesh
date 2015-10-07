@@ -31,7 +31,7 @@ namespace libMesh
 
 //------------------------------------------------------------------
 // NonlinearSolver members
-#if defined(LIBMESH_HAVE_PETSC) || defined(LIBMESH_HAVE_NOX)
+#if defined(LIBMESH_HAVE_PETSC) || defined(LIBMESH_TRILINOS_HAVE_NOX)
 template <typename T>
 UniquePtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
@@ -45,7 +45,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
       return UniquePtr<NonlinearSolver<T> >(new PetscNonlinearSolver<T>(s));
 #endif // LIBMESH_HAVE_PETSC
 
-#ifdef LIBMESH_HAVE_NOX
+#ifdef LIBMESH_TRILINOS_HAVE_NOX
     case TRILINOS_SOLVERS:
       return UniquePtr<NonlinearSolver<T> >(new NoxNonlinearSolver<T>(s));
 #endif
@@ -58,7 +58,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
   return UniquePtr<NonlinearSolver<T> >();
 }
 
-#else // LIBMESH_HAVE_PETSC || LIBMESH_HAVE_NOX
+#else // LIBMESH_HAVE_PETSC || LIBMESH_TRILINOS_HAVE_NOX
 
 template <typename T>
 UniquePtr<NonlinearSolver<T> >

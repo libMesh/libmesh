@@ -29,7 +29,7 @@
 /**
  * Trilinos include files.
  */
-#ifdef LIBMESH_HAVE_AZTECOO
+#ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
 #include <Epetra_LinearProblem.h>
 #include <AztecOO.h>
 
@@ -187,5 +187,5 @@ AztecLinearSolver<T>::~AztecLinearSolver ()
 
 
 
-#endif // #ifdef LIBMESH_HAVE_AZTECOO
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
 #endif // LIBMESH_TRILINOS_AZTEC_LINEAR_SOLVER_H

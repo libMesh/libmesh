@@ -37,7 +37,7 @@
 #include "Ifpack_ICT.h"
 #endif
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
 #include "ml_MultiLevelPreconditioner.h"
 #endif
 
@@ -88,7 +88,7 @@ TrilinosPreconditioner<T>::compute()
   Ifpack_Preconditioner * ifpack = NULL;
 #endif
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
   ML_Epetra::MultiLevelPreconditioner * ml = NULL;
 #endif
 
@@ -103,7 +103,7 @@ TrilinosPreconditioner<T>::compute()
       break;
 #endif
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
       // ML preconditioners
     case AMG_PRECOND:
       ml = dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(_prec);
@@ -128,7 +128,7 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
   Ifpack_Preconditioner * pc = NULL;
 #endif
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
   ML_Epetra::MultiLevelPreconditioner * ml = NULL;
 #endif
 
@@ -171,7 +171,7 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
     case EISENSTAT_PRECOND:
       break;
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
     case AMG_PRECOND:
       ml = new ML_Epetra::MultiLevelPreconditioner(*_mat, _param_list, false);;
       _prec = ml;

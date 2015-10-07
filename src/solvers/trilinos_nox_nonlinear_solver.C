@@ -19,7 +19,7 @@
 
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_HAVE_NOX
+#ifdef LIBMESH_TRILINOS_HAVE_NOX
 
 
 // C++ includes
@@ -402,4 +402,4 @@ template class NoxNonlinearSolver<Number>;
 
 
 
-#endif // #ifdef LIBMESH_HAVE_NOX
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_NOX

@@ -58,7 +58,7 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
 #endif
 
 
-#if defined(LIBMESH_HAVE_TRILINOS) && (LIBMESH_HAVE_AZTECOO)
+#if defined(LIBMESH_HAVE_TRILINOS) && (LIBMESH_TRILINOS_HAVE_AZTECOO)
     case TRILINOS_SOLVERS:
       return UniquePtr<LinearSolver<T> >(new AztecLinearSolver<T>(comm));
 #endif
