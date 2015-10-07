@@ -749,15 +749,24 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
   // In the case of adjoints with heterogenous Dirichlet boundary
   // function phi, where
-  // q := R(u,phi) + S(u)
+  // q :=  S(u) - R(u,phi)
   // the final formula works out to:
   // dq/dp = (partial S / partial p) - z * (partial R / partial p)
   // Because we currently have no direct access to
   // (partial S / partial p), we use the identity
-  // (partial S / partial p) = (partial q / partial p) -
+  // (partial S / partial p) = (partial q / partial p) +
   //                           phi * (partial R / partial p)
   // to derive an equivalent equation:
-  // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
+  // dq/dp = (partial q / partial p) - (z-phi) * (partial R / partial p)
+
+  // Since z-phi degrees of freedom are zero for constrained indices,
+  // we can use the same constrained -(partial R / partial p) that we
+  // use for forward sensitivity solves, taking into account the
+  // differing sign convention.
+  //
+  // Since that vector is constrained, its constrained indices are
+  // zero, so its product with phi is zero, so we can neglect the
+  // evaluation of phi terms.
 
   for (unsigned int j=0; j != Np; ++j)
     {
@@ -791,20 +800,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          {
-            sensitivities[i][j] = partialq_partialp[i] +
-              neg_partialR_partialp.dot(this->get_adjoint_solution(i));
-
-            if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
-              {
-                UniquePtr<NumericVector<Number> > lift_func =
-                  this->get_adjoint_solution(i).zero_clone();
-
-                this->get_dof_map().enforce_adjoint_constraints_exactly
-                  (*lift_func.get(), i);
-                sensitivities[i][j] -= neg_partialR_partialp.dot(*lift_func);
-              }
-          }
+          sensitivities[i][j] = partialq_partialp[i] +
+            neg_partialR_partialp.dot(this->get_adjoint_solution(i));
     }
 
   // All parameters have been reset.
