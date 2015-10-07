@@ -731,6 +731,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       this->adjoint_solve(qoi_indices);
     }
 
+  this->assemble_residual_derivatives(parameters_in);
+
   // Get ready to fill in senstivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
 
@@ -757,17 +759,6 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // to derive an equivalent equation:
   // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
 
-
-  // If we have non-zero adjoint dofs on Dirichlet constrained
-  // boundary dofs, then we need the residual components
-  // corresponding to those dofs when using r*z to compute R(u,z), so
-  // we can't apply constraints.
-  //
-  // If we aren't in that situation we could apply constraints but
-  // it will be faster not to.
-
-  this->get_dof_map().stash_dof_constraints();
-
   for (unsigned int j=0; j != Np; ++j)
     {
       // We currently get partial derivatives via central differencing
@@ -776,7 +767,6 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
       Number old_parameter = *parameters[j];
-      // Number old_qoi = this->qoi;
 
       const Real delta_p =
         TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
@@ -785,12 +775,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       this->assemble_qoi(qoi_indices);
       std::vector<Number> qoi_minus = this->qoi;
 
-      this->assembly(true, false, true);
-      this->rhs->close();
-
-      // FIXME - this can and should be optimized to avoid the clone()
-      UniquePtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
-      *partialR_partialp *= -1;
+      NumericVector<Number> &neg_partialR_partialp = this->get_sensitivity_rhs(j);
 
       *parameters[j] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
@@ -801,45 +786,30 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
         if (qoi_indices.has_index(i))
           partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
-      this->assembly(true, false, true);
-      this->rhs->close();
-      *partialR_partialp += *this->rhs;
-      *partialR_partialp /= (2.*delta_p);
-
       // Don't leave the parameter changed
       *parameters[j] = old_parameter;
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            sensitivities[i][j] = partialq_partialp[i] -
-              partialR_partialp->dot(this->get_adjoint_solution(i));
+            sensitivities[i][j] = partialq_partialp[i] +
+              neg_partialR_partialp.dot(this->get_adjoint_solution(i));
 
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
               {
                 UniquePtr<NumericVector<Number> > lift_func =
                   this->get_adjoint_solution(i).zero_clone();
 
-		// The adjoint dof constraints rely on the primal dof
-		// constraints for dof coefficients
-                this->get_dof_map().unstash_dof_constraints();
                 this->get_dof_map().enforce_adjoint_constraints_exactly
                   (*lift_func.get(), i);
-                this->get_dof_map().stash_dof_constraints();
-                sensitivities[i][j] += partialR_partialp->dot(*lift_func);
+                sensitivities[i][j] -= neg_partialR_partialp.dot(*lift_func);
               }
           }
     }
 
   // All parameters have been reset.
-  // We didn't cache the original rhs or matrix for memory reasons,
-  // but we can restore them to a state consistent solution -
-  // principle of least surprise.
+  // Reset the original qoi.
 
-  this->get_dof_map().unstash_dof_constraints();
-  this->assembly(true, true);
-  this->rhs->close();
-  this->matrix->close();
   this->assemble_qoi(qoi_indices);
 }
 
