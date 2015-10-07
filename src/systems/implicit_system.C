@@ -906,11 +906,11 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
         TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
       *parameters[j] = old_parameter - delta_p;
-      this->assemble_qoi();
+      this->assemble_qoi(qoi_indices);
       std::vector<Number> qoi_minus = this->qoi;
 
       *parameters[j] = old_parameter + delta_p;
-      this->assemble_qoi();
+      this->assemble_qoi(qoi_indices);
       std::vector<Number>& qoi_plus = this->qoi;
 
       std::vector<Number> partialq_partialp(Nq, 0);
