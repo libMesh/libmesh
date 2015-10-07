@@ -855,8 +855,6 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
                                 /* include_liftfunc = */ true,
                                 /* apply_constraints = */ false);
 
-  // FIXME: what do we do with adjoint boundary conditions here?
-
   // We don't need these to be closed() in this function, but libMesh
   // standard practice is to have them closed() by the time the
   // function exits
