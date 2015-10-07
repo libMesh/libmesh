@@ -32829,7 +32829,7 @@ fi
 
        if test "$enableaztecoo" != no ; then
 
-$as_echo "#define HAVE_AZTECOO 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_AZTECOO 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with AztecOO support >>>" >&5
 $as_echo "<<< Configuring library with AztecOO support >>>" >&6; }
@@ -32863,7 +32863,7 @@ fi
 
        if test "$enablenox" != no ; then
 
-$as_echo "#define HAVE_NOX 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_NOX 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NOX support >>>" >&5
 $as_echo "<<< Configuring library with NOX support >>>" >&6; }
@@ -32912,7 +32912,7 @@ fi
 
        if test "$enableml" != no ; then
 
-$as_echo "#define HAVE_ML 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_ML 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with ML support >>>" >&5
 $as_echo "<<< Configuring library with ML support >>>" >&6; }
@@ -32962,7 +32962,7 @@ fi
 
        if test "$enabletpetra" != no ; then
 
-$as_echo "#define HAVE_TPETRA 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_TPETRA 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with TPetra support >>>" >&5
 $as_echo "<<< Configuring library with TPetra support >>>" >&6; }
@@ -33012,11 +33012,49 @@ fi
 
        if test "$enabledtk" != no ; then
 
-$as_echo "#define HAVE_DTK 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_DTK 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with DTK support >>>" >&5
 $as_echo "<<< Configuring library with DTK support >>>" >&6; }
        fi
+
+
+                                          as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Ifpack_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Ifpack_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enableifpack=yes
+else
+  enableifpack=no
+fi
+
+
+
+       if test "$enableifpack" != no ; then
+
+$as_echo "#define TRILINOS_HAVE_IFPACK 1" >>confdefs.h
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Trilinos Ifpack support >>>" >&5
+$as_echo "<<< Configuring library with Trilinos Ifpack support >>>" >&6; }
+       fi
+
+                                          as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/EpetraExt_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/EpetraExt_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enableepetraext=yes
+else
+  enableepetraext=no
+fi
+
+
+
+       if test "$enableepetraext" != no ; then
+
+$as_echo "#define TRILINOS_HAVE_EPETRAEXT 1" >>confdefs.h
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Trilinos EpetraExt support >>>" >&5
+$as_echo "<<< Configuring library with Trilinos EpetraExt support >>>" >&6; }
+       fi
+
     fi
   else
     enabletrilinos10=no
@@ -33076,7 +33114,7 @@ fi
     if test "$enableaztecoo" != no ; then
        enableaztecoo=yes
 
-$as_echo "#define HAVE_AZTECOO 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_AZTECOO 1" >>confdefs.h
 
        $as_echo "#define HAVE_TRILINOS 1" >>confdefs.h
 
@@ -33108,7 +33146,7 @@ fi
     if test "$enablenox" != no ; then
        enablenox=yes
 
-$as_echo "#define HAVE_NOX 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_NOX 1" >>confdefs.h
 
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nox support >>>" >&5
 $as_echo "<<< Configuring library with Nox support >>>" >&6; }
@@ -33140,7 +33178,7 @@ fi
     if test "$enableml" != no ; then
        enableml=yes
 
-$as_echo "#define HAVE_ML 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_ML 1" >>confdefs.h
 
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with ML support >>>" >&5
 $as_echo "<<< Configuring library with ML support >>>" >&6; }
@@ -33170,7 +33208,7 @@ fi
     if test "$enabletpetra" != no ; then
        enabletpetra=yes
 
-$as_echo "#define HAVE_TPETRA 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_TPETRA 1" >>confdefs.h
 
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Tpetra support >>>" >&5
 $as_echo "<<< Configuring library with Tpetra support >>>" >&6; }
@@ -33202,7 +33240,7 @@ fi
     if test "$enabledtk" != no ; then
        enabledtk=yes
 
-$as_echo "#define HAVE_DTK 1" >>confdefs.h
+$as_echo "#define TRILINOS_HAVE_DTK 1" >>confdefs.h
 
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with DTK support >>>" >&5
 $as_echo "<<< Configuring library with DTK support >>>" >&6; }
@@ -33211,6 +33249,11 @@ $as_echo "<<< Configuring library with DTK support >>>" >&6; }
     enabledtk=no
   fi
 
+
+
+          enableifpack=no
+
+          enableepetraext=no
 
 
 
@@ -42285,6 +42328,8 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'ML............................ : $enableml
   echo '     'Tpetra........................ : $enabletpetra
   echo '     'DTK........................... : $enabledtk
+  echo '     'Ifpack........................ : $enableifpack
+  echo '     'EpetraExt..................... : $enableepetraext
   fi
   echo '  'vtk.............................. : $enablevtk
   if (test "x$enablevtk" = "xyes"); then
