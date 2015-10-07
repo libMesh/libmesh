@@ -41,6 +41,13 @@
 namespace libMesh
 {
 
+/**
+ * Implements the evaluate() function to compute FE solution values at
+ * points requested by DTK.
+ *
+ * \author Derek Gaston
+ * \date 2013
+ */
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {
 public:
