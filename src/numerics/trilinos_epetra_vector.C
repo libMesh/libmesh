@@ -134,6 +134,8 @@ EpetraVector<T>::operator /= (NumericVector<T> & v)
   EpetraVector<T> & v_vec = cast_ref<EpetraVector<T>&>(v);
 
   _vec->ReciprocalMultiply(1.0, *v_vec._vec, *_vec, 0.0);
+
+  return *this;
 }
 
 
