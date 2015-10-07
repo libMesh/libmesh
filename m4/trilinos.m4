@@ -138,9 +138,41 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
 
        if test "$enabledtk" != no ; then
           AC_DEFINE(HAVE_DTK, 1,
-                    [Flag indicating whether the library shall be compiled to use the Trilinos DTK nonlinear solver])
+                    [Flag indicating whether the library shall be compiled to use the Trilinos DTK interfaces])
           AC_MSG_RESULT(<<< Configuring library with DTK support >>>)
        fi
+
+
+       dnl ------------------------------------------------------
+       dnl Ifpack - We are only going to look in one place for this,
+       dnl as I don't have access to lots of older versions of
+       dnl Trilinos to know where else it might be...
+       dnl ------------------------------------------------------
+       AC_CHECK_HEADER([$withtrilinosdir/include/Ifpack_config.h],
+                       [enableifpack=yes],
+                       [enableifpack=no])
+
+       if test "$enableifpack" != no ; then
+          AC_DEFINE(TRILINOS_HAVE_IFPACK, 1,
+                    [Flag indicating whether the library shall be compiled to use the Trilinos Ifpack interfaces])
+          AC_MSG_RESULT([<<< Configuring library with Trilinos Ifpack support >>>])
+       fi
+
+       dnl ------------------------------------------------------
+       dnl EpetraExt - We are only going to look in one place for this,
+       dnl as I don't have access to lots of older versions of
+       dnl Trilinos to know where else it might be...
+       dnl ------------------------------------------------------
+       AC_CHECK_HEADER([$withtrilinosdir/include/EpetraExt_config.h],
+                       [enableepetraext=yes],
+                       [enableepetraext=no])
+
+       if test "$enableepetraext" != no ; then
+          AC_DEFINE(TRILINOS_HAVE_EPETRAEXT, 1,
+                    [Flag indicating whether the library shall be compiled to use the Trilinos EpetraExt interfaces])
+          AC_MSG_RESULT([<<< Configuring library with Trilinos EpetraExt support >>>])
+       fi
+
     fi
   else
     enabletrilinos10=no
@@ -288,6 +320,60 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
     fi
   else
     enabletpetra=no
+  fi
+
+
+
+  dnl Ifpack
+  AC_ARG_WITH(ifpack,
+              AS_HELP_STRING([--with-ifpack=PATH],[Specify the path to Ifpack installation]),
+              withifpackdir=$withval,
+              withifpackdir=$TRILINOS_DIR)
+
+  if test "$withifpackdir" != no ; then
+    if (test -r $withifpackdir/include/Makefile.export.Ifpack) ; then
+      IFPACK_MAKEFILE_EXPORT=$withifpackdir/include/Makefile.export.Ifpack
+    elif (test -r $withifpackdir/packages/ifpack/Makefile.export.Ifpack) ; then
+      IFPACK_MAKEFILE_EXPORT=$withifpackdir/packages/ifpack/Makefile.export.Ifpack
+    else
+      enableifpack=no
+    fi
+
+    if test "$enableifpack" != no ; then
+       enableifpack=yes
+       AC_DEFINE(TRILINOS_HAVE_IFPACK, 1,
+                 [Flag indicating whether the library shall be compiled to use the Ifpack solver collection])
+       AC_MSG_RESULT([<<< Configuring library with Ifpack support >>>])
+    fi
+  else
+    enableifpack=no
+  fi
+
+
+
+  dnl EpetraExt
+  AC_ARG_WITH(epetraext,
+              AS_HELP_STRING([--with-epetraext=PATH],[Specify the path to EpetraExt installation]),
+              withepetraextdir=$withval,
+              withepetraextdir=$TRILINOS_DIR)
+
+  if test "$withepetraextdir" != no ; then
+    if (test -r $withepetraextdir/include/Makefile.export.EpetraExt) ; then
+      EPETRAEXT_MAKEFILE_EXPORT=$withepetraextdir/include/Makefile.export.EpetraExt
+    elif (test -r $withepetraextdir/packages/epetraext/Makefile.export.EpetraExt) ; then
+      EPETRAEXT_MAKEFILE_EXPORT=$withepetraextdir/packages/epetraext/Makefile.export.EpetraExt
+    else
+      enableepetraext=no
+    fi
+
+    if test "$enableepetraext" != no ; then
+       enableepetraext=yes
+       AC_DEFINE(TRILINOS_HAVE_EPETRAEXT, 1,
+                 [Flag indicating whether the library shall be compiled to use the EpetraExt interfaces])
+       AC_MSG_RESULT([<<< Configuring library with EpetraExt support >>>])
+    fi
+  else
+    enableepetraext=no
   fi
 
 

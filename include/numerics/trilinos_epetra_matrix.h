@@ -27,8 +27,12 @@
 // Trilinos includes
 #include <Epetra_FECrsMatrix.h>
 #include <Epetra_Map.h>
-#include <EpetraExt_MatrixMatrix.h>
 #include <Epetra_MpiComm.h>
+
+// The EpetraExt interface is only needed for EpetraMatrix::add()
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRAEXT
+#  include <EpetraExt_MatrixMatrix.h>
+#endif
 
 // Local includes
 #include "libmesh/sparse_matrix.h"
