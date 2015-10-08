@@ -32793,12 +32793,23 @@ fi
     fi
 
     if test "$enabletrilinos10" != no ; then
-       enabletrilinos10=yes
+                     enabletrilinos10=yes
+
+                            trilinosversionstring=`grep "define TRILINOS_VERSION_STRING" $withtrilinosdir/include/Trilinos_version.h | sed -e "s/#define TRILINOS_VERSION_STRING[ ]*//g" | tr -d '"'`
+
+              if test "x$trilinosversionstring" = "x" ; then
+         trilinosversionstring=`grep "define TRILINOS_MAJOR_VERSION" $withtrilinosdir/include/Trilinos_version.h | sed -e "s/#define TRILINOS_MAJOR_VERSION[ ]*//g"`
+       fi
+
+              if test "x$trilinosversionstring" = "x" ; then
+         trilinosversionstring=10+
+       fi
+
 
 $as_echo "#define HAVE_TRILINOS 1" >>confdefs.h
 
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Trilinos 10 support >>>" >&5
-$as_echo "<<< Configuring library with Trilinos 10 support >>>" >&6; }
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Trilinos $trilinosversionstring support >>>" >&5
+$as_echo "<<< Configuring library with Trilinos $trilinosversionstring support >>>" >&6; }
 
                             as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/AztecOO_config.h" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/AztecOO_config.h" "$as_ac_Header" "$ac_includes_default"
