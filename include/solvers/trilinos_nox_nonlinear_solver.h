@@ -20,7 +20,7 @@
 #ifndef LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
 #define LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
 
-#ifdef LIBMESH_HAVE_NOX
+#ifdef LIBMESH_TRILINOS_HAVE_NOX
 
 // Local includes
 #include "libmesh/nonlinear_solver.h"
@@ -146,5 +146,5 @@ NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
 } // namespace libMesh
 
 
-#endif // #ifdef LIBMESH_HAVE_NOX
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_NOX
 #endif // LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
