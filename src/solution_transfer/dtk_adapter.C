@@ -19,7 +19,7 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #include "libmesh/dtk_adapter.h"
 
@@ -285,4 +285,4 @@ DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_DTK

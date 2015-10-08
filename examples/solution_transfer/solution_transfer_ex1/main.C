@@ -33,7 +33,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 #include "libmesh/dtk_solution_transfer.h"
 #endif
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 {
   LibMeshInit init (argc, argv);
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 
   Mesh from_mesh(init.comm());
   MeshTools::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);

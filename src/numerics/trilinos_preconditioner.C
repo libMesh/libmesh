@@ -27,6 +27,7 @@
 #include "libmesh/trilinos_epetra_vector.h"
 #include "libmesh/libmesh_common.h"
 
+#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
 #include "Ifpack.h"
 #include "Ifpack_DiagPreconditioner.h"
 #include "Ifpack_AdditiveSchwarz.h"
@@ -34,8 +35,9 @@
 #include "Ifpack_ILUT.h"
 #include "Ifpack_IC.h"
 #include "Ifpack_ICT.h"
+#endif
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
 #include "ml_MultiLevelPreconditioner.h"
 #endif
 
@@ -54,7 +56,7 @@ void TrilinosPreconditioner<T>::apply(const NumericVector<T> & /* x */,
 template <typename T>
 void TrilinosPreconditioner<T>::init ()
 {
-  if(!this->_matrix)
+  if (!this->_matrix)
     libmesh_error_msg("ERROR: No matrix set for PetscPreconditioner, but init() called");
 
   // Clear the preconditioner in case it has been created in the past
@@ -82,21 +84,26 @@ template <typename T>
 void
 TrilinosPreconditioner<T>::compute()
 {
+#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
   Ifpack_Preconditioner * ifpack = NULL;
-#ifdef LIBMESH_HAVE_ML
+#endif
+
+#ifdef LIBMESH_TRILINOS_HAVE_ML
   ML_Epetra::MultiLevelPreconditioner * ml = NULL;
 #endif
 
   switch (this->_preconditioner_type)
     {
+#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
       // IFPACK preconditioners
     case ILU_PRECOND:
     case SOR_PRECOND:
       ifpack = dynamic_cast<Ifpack_Preconditioner *>(_prec);
       ifpack->Compute();
       break;
+#endif
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
       // ML preconditioners
     case AMG_PRECOND:
       ml = dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(_prec);
@@ -105,7 +112,9 @@ TrilinosPreconditioner<T>::compute()
 #endif
 
     default:
-      // no nothing here
+      // If we made it here, there were no TrilinosPreconditioners
+      // active, so that's probably an error.
+      libmesh_error_msg("ERROR: No valid TrilinosPreconditioners available!");
       break;
     }
 }
@@ -115,8 +124,11 @@ template <typename T>
 void
 TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & preconditioner_type)
 {
+#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
   Ifpack_Preconditioner * pc = NULL;
-#ifdef LIBMESH_HAVE_ML
+#endif
+
+#ifdef LIBMESH_TRILINOS_HAVE_ML
   ML_Epetra::MultiLevelPreconditioner * ml = NULL;
 #endif
 
@@ -132,12 +144,14 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
     case ICC_PRECOND:
       break;
 
+#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
     case ILU_PRECOND:
       pc = new Ifpack_ILU(_mat);
       pc->SetParameters(_param_list);
       pc->Initialize();
       _prec = pc;
       break;
+#endif
 
     case LU_PRECOND:
       break;
@@ -157,7 +171,7 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
     case EISENSTAT_PRECOND:
       break;
 
-#ifdef LIBMESH_HAVE_ML
+#ifdef LIBMESH_TRILINOS_HAVE_ML
     case AMG_PRECOND:
       ml = new ML_Epetra::MultiLevelPreconditioner(*_mat, _param_list, false);;
       _prec = ml;
@@ -165,9 +179,7 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
 #endif
 
     default:
-      libMesh::err << "ERROR:  Unsupported Trilinos Preconditioner: "
-                   << preconditioner_type       << std::endl
-                   << "Continuing with Trilinos defaults" << std::endl;
+      libmesh_error_msg("ERROR:  Unsupported Trilinos Preconditioner: " << preconditioner_type << "\nContinuing with Trilinos defaults");
     }
 
 }

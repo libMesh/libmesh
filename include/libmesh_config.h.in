@@ -175,10 +175,6 @@
 /* command to invoke gdb */
 #undef GDB_COMMAND
 
-/* Flag indicating whether the library shall be compiled to use the Trilinos
-   solver collection */
-#undef HAVE_AZTECOO
-
 /* define if the Boost library is available */
 #undef HAVE_BOOST
 
@@ -231,10 +227,6 @@
 
 /* define if the compiler supports dlopen/dlsym/dlclose */
 #undef HAVE_DLOPEN
-
-/* Flag indicating whether the library shall be compiled to use the
-   DataTransferKit */
-#undef HAVE_DTK
 
 /* Flag indicating whether the library will be compiled with Eigen support */
 #undef HAVE_EIGEN
@@ -337,10 +329,6 @@
 /* Flag indicating whether the library will be compiled with Metis support */
 #undef HAVE_METIS
 
-/* Flag indicating whether the library shall be compiled to use the ML package
-   */
-#undef HAVE_ML
-
 /* Flag indicating whether or not MPI is available */
 #undef HAVE_MPI
 
@@ -360,10 +348,6 @@
 
 /* Flag indicating whether the library will be compiled with NLOPT support */
 #undef HAVE_NLOPT
-
-/* Flag indicating whether the library shall be compiled to use the Nox solver
-   collection */
-#undef HAVE_NOX
 
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
@@ -467,10 +451,6 @@
 
 /* Flag indicating whether the library will be compiled with Tetgen support */
 #undef HAVE_TETGEN
-
-/* Flag indicating whether the library shall be compiled to use the Tpetra
-   solver collection */
-#undef HAVE_TPETRA
 
 /* define if the compiler supports std::tr1::hash */
 #undef HAVE_TR1_HASH
@@ -614,6 +594,34 @@
 
 /* If the compiler supports a TLS storage class define it to that here */
 #undef TLS
+
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   solver collection */
+#undef TRILINOS_HAVE_AZTECOO
+
+/* Flag indicating whether the library shall be compiled to use the
+   DataTransferKit */
+#undef TRILINOS_HAVE_DTK
+
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   EpetraExt interfaces */
+#undef TRILINOS_HAVE_EPETRAEXT
+
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   Ifpack interfaces */
+#undef TRILINOS_HAVE_IFPACK
+
+/* Flag indicating whether the library shall be compiled to use the ML package
+   */
+#undef TRILINOS_HAVE_ML
+
+/* Flag indicating whether the library shall be compiled to use the Nox solver
+   collection */
+#undef TRILINOS_HAVE_NOX
+
+/* Flag indicating whether the library shall be compiled to use the Tpetra
+   solver collection */
+#undef TRILINOS_HAVE_TPETRA
 
 /* size of unique_id */
 #undef UNIQUE_ID_BYTES

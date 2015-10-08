@@ -421,6 +421,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 template <typename T>
 void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRAEXT
   libmesh_assert (this->initialized());
 
   // sanity check. but this cannot avoid
@@ -431,6 +432,9 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   EpetraMatrix<T>* X = cast_ptr<EpetraMatrix<T>*> (&X_in);
 
   EpetraExt::MatrixMatrix::Add (*X->_mat, false, a_in, *_mat, 1.);
+#else
+  libmesh_error_msg("ERROR: EpetraExt is required for EpetraMatrix::add()!");
+#endif
 }
 
 

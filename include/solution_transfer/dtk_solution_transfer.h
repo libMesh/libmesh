@@ -22,7 +22,7 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #include "libmesh/solution_transfer.h"
 #include "libmesh/dtk_adapter.h"
@@ -36,10 +36,16 @@
 
 #include <string>
 
-namespace libMesh {
+namespace libMesh
+{
 
 /**
- * Implementation of a SolutionTransfer object that uses the DataTransferKit (https://github.com/CNERG/DataTransferKit) to transfer variables back and forth between systems.
+ * Implementation of a SolutionTransfer object that uses the
+ * DataTransferKit (https://github.com/CNERG/DataTransferKit) to
+ * transfer variables back and forth between systems.
+ *
+ * \author Derek Gaston
+ * \date 2013
  */
 class DTKSolutionTransfer : public SolutionTransfer
 {
@@ -51,12 +57,13 @@ public:
   /**
    * Transfer the values of a variable to another.
    *
-   * This is meant for transferring values from one EquationSystems to another
-   * even in the case of having different meshes.
+   * This is meant for transferring values from one EquationSystems to
+   * another even in the case of having different meshes.
    *
-   * Note that the first time this function is called for one combination of EquationSystems
-   * a lot of setup and caching is done.  Subsequent transfers between the same EquationSystems
-   * will be _much_ faster.
+   * Note that the first time this function is called for one
+   * combination of EquationSystems a lot of setup and caching is
+   * done.  Subsequent transfers between the same EquationSystems will
+   * be _much_ faster.
    */
   virtual void transfer(const Variable & from_var, const Variable & to_var);
 
@@ -75,6 +82,6 @@ protected:
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #endif // #define DTKSOLUTIONTRANSFER_H

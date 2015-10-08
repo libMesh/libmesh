@@ -180,6 +180,8 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'ML............................ : $enableml
   echo '     'Tpetra........................ : $enabletpetra
   echo '     'DTK........................... : $enabledtk
+  echo '     'Ifpack........................ : $enableifpack
+  echo '     'EpetraExt..................... : $enableepetraext
   fi
   echo '  'vtk.............................. : $enablevtk
   if (test "x$enablevtk" = "xyes"); then

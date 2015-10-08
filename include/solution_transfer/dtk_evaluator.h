@@ -23,7 +23,7 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
@@ -38,8 +38,16 @@
 
 #include <string>
 
-namespace libMesh {
+namespace libMesh
+{
 
+/**
+ * Implements the evaluate() function to compute FE solution values at
+ * points requested by DTK.
+ *
+ * \author Derek Gaston
+ * \date 2013
+ */
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {
 public:
@@ -64,6 +72,6 @@ protected:
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #endif // #define DTKEVALUATOR_H
