@@ -430,7 +430,12 @@ ParsedFunction<Output,OutputGradient>::set_inline_value
         std::ostringstream new_subexpression;
         new_subexpression << subexpression.substr(0, assignment_i+2)
                           << std::setprecision(std::numeric_limits<Output>::digits10+2)
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+                          << '(' << newval.real() << '+'
+                          << newval.imag() << 'i' << ')'
+#else
                           << newval
+#endif
                           << subexpression.substr(end_assignment_i,
                                                   std::string::npos);
         _subexpressions[s] = new_subexpression.str();
