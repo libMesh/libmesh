@@ -100,7 +100,7 @@ public:
    * Returns true if the Xdr file being read is at End-Of-File.
    * Note that this is *not* a const method - the only portable way to
    * test for an impending EOF is to peek at the next byte of the file
-   * first, which may set the eof flag on the istream. 
+   * first, which may set the eof flag on the istream.
    */
   bool is_eof();
 

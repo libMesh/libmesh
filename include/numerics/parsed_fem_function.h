@@ -317,12 +317,12 @@ ParsedFEMFunction<Output>::reparse
             variables += ',';
             variables += "n_x";
             if (LIBMESH_DIM > 1)
-              {  
+              {
                 variables += ',';
                 variables += "n_y";
               }
             if (LIBMESH_DIM > 2)
-              {  
+              {
                 variables += ',';
                 variables += "n_z";
               }

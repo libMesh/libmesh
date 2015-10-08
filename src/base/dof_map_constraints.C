@@ -514,7 +514,7 @@ private:
         // hold those fixed and project boundary edges, then hold
         // those fixed and project boundary faces,
 
-        // Interpolate node values first. Note that we have a special 
+        // Interpolate node values first. Note that we have a special
         // case for nodes that have a boundary nodeset, since we do
         // need to interpolate them directly, even if they're non-vertex
         // nodes.

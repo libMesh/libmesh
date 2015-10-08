@@ -1522,7 +1522,7 @@ inline void Communicator::min(bool &r) const
       unsigned int temp;
 
       libmesh_call_mpi
-        (MPI_Allreduce (&tempsend, &temp, 1, 
+        (MPI_Allreduce (&tempsend, &temp, 1,
                         StandardType<unsigned int>(), MPI_MIN,
                         this->get()));
 

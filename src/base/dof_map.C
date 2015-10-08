@@ -2165,7 +2165,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
   // Clear the DOF indices vector.
   di.clear();
-  
+
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
   if (elem->type() == TRI3SUBDIVISION)
