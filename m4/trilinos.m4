@@ -27,10 +27,28 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
     fi
 
     if test "$enabletrilinos10" != no ; then
+       dnl This actually implies Trilinos 10+, as this configure
+       dnl function also works with Trilinos 11.
        enabletrilinos10=yes
+
+       dnl Try to detect the full Trilinos version string by grepping through Trilinos_version.h.
+       dnl The version string is surrounded by quotes, so we use a slight variation on our usual
+       dnl grep command, and pass the result through 'tr' to remove those.
+       trilinosversionstring=`grep "define TRILINOS_VERSION_STRING" $withtrilinosdir/include/Trilinos_version.h | sed -e "s/#define TRILINOS_VERSION_STRING[ ]*//g" | tr -d '"'`
+
+       dnl If we couldn't extract anything for the full version string, try to just get the major version number.
+       if test "x$trilinosversionstring" = "x" ; then
+         trilinosversionstring=`grep "define TRILINOS_MAJOR_VERSION" $withtrilinosdir/include/Trilinos_version.h | sed -e "s/#define TRILINOS_MAJOR_VERSION[ ]*//g"`
+       fi
+
+       dnl If we couldn't extract the actual major version number, go with "10+"
+       if test "x$trilinosversionstring" = "x" ; then
+         trilinosversionstring=10+
+       fi
+
        AC_DEFINE(HAVE_TRILINOS, 1,
                  [Flag indicating whether the library shall be compiled to use the Trilinos solver collection])
-       AC_MSG_RESULT(<<< Configuring library with Trilinos 10 support >>>)
+       AC_MSG_RESULT([<<< Configuring library with Trilinos $trilinosversionstring support >>>])
 
        dnl ------------------------------------------------------
        dnl AztecOO
