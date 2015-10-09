@@ -33094,6 +33094,10 @@ $as_echo "<<< Configuring library with Trilinos EpetraExt support >>>" >&6; }
     rm -f Makefile_config_trilinos
   fi
 
+        if (test "x$RPATHFLAG" != "x" -a -d ${withtrilinosdir}/lib); then
+    TRILINOS_LIBS="${RPATHFLAG}${withtrilinosdir}/lib $TRILINOS_LIBS"
+  fi
+
 
 
 

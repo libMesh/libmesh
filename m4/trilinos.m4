@@ -219,6 +219,13 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
     rm -f Makefile_config_trilinos
   fi
 
+  dnl Add an rpath for $withtrilinosdir/lib to the link line.  You don't
+  dnl need this if Trilinos is built with static libs or if you can rely
+  dnl on {DYLD,LD}_LIBRARY_PATH, but we don't want to assume either.
+  if (test "x$RPATHFLAG" != "x" -a -d ${withtrilinosdir}/lib); then
+    TRILINOS_LIBS="${RPATHFLAG}${withtrilinosdir}/lib $TRILINOS_LIBS"
+  fi
+
   AC_SUBST(TRILINOS_LIBS)
   AC_SUBST(TRILINOS_INCLUDES)
 ])
