@@ -518,8 +518,8 @@ void EquationSystems::write(const std::string& name,
         // Write the number of equation systems
         io.data (n_sys, "# No. of Equation Systems");
 
-        for (std::map<std::string, System*>::const_iterator
-             pos = _systems.begin(); pos != _systems.end(); ++pos)
+        for (std::map<std::string, System*>::const_iterator pos = _systems.begin();
+             pos != _systems.end(); ++pos)
           {
             // Ignore this system if it has been marked as hidden
             if (pos->second->hide_output()) continue;
@@ -563,8 +563,8 @@ void EquationSystems::write(const std::string& name,
         // open a parallel buffer if warranted.
         Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-        for (std::map<std::string, System*>::const_iterator
-             pos = _systems.begin(); pos != _systems.end(); ++pos)
+        for (std::map<std::string, System*>::const_iterator pos = _systems.begin();
+             pos != _systems.end(); ++pos)
           {
             // Ignore this system if it has been marked as hidden
             if (pos->second->hide_output()) continue;

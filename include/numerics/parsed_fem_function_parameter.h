@@ -53,7 +53,7 @@ public:
    * remain at their previous values.
    */
   ParsedFEMFunctionParameter(ParsedFEMFunction<T> & func_ref,
-                          const std::string & param_name) :
+                             const std::string & param_name) :
     _func(func_ref), _name(param_name) {}
 
   /**

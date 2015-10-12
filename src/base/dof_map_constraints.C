@@ -469,10 +469,10 @@ private:
 
             for (std::size_t i=0; i != bc_ids.size(); ++i)
               if (b.count(bc_ids[i]))
-              {
-                is_boundary_node[n] = true;
-                is_boundary_nodeset[n] = true;
-              }
+                {
+                  is_boundary_node[n] = true;
+                  is_boundary_nodeset[n] = true;
+                }
           }
 
         // We can also impose Dirichlet boundary conditions on edges, so we should
@@ -527,7 +527,7 @@ private:
               FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
                                            n);
             if ( (!elem->is_vertex(n) || !is_boundary_node[n]) &&
-                  !is_boundary_nodeset[n] )
+                 !is_boundary_nodeset[n] )
               {
                 current_dof += nc;
                 continue;

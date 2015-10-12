@@ -422,48 +422,48 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase& mesh)
               // This case usually happens when the middle node corresponds to a corner of the original mesh,
               // and the extra element below prevents degenerated triangles in the mesh corners.
               if (n_nb < 4)
-              {
-                // this is the vertex to be mirrored
-                Point point = nb2->point(j) + nb2->point(prev[j]) - nb2->point(next[j]);
+                {
+                  // this is the vertex to be mirrored
+                  Point point = nb2->point(j) + nb2->point(prev[j]) - nb2->point(next[j]);
 
-                // Check if the proposed vertex doesn't coincide with one of the existing vertices.
-                // This is necessary because for some triangulations, it can happen that two mirrored
-                // ghost vertices coincide, which would then lead to a zero size ghost element below.
-                Node* node = NULL;
-                for (unsigned int k = 0; k < ghost_nodes.size(); ++k)
-                  {
-                    if ((*ghost_nodes[k] - point).size() < tol * (nb2->point(j) - point).size())
-                      {
-                        node = ghost_nodes[k];
-                        break;
-                      }
-                  }
+                  // Check if the proposed vertex doesn't coincide with one of the existing vertices.
+                  // This is necessary because for some triangulations, it can happen that two mirrored
+                  // ghost vertices coincide, which would then lead to a zero size ghost element below.
+                  Node* node = NULL;
+                  for (unsigned int k = 0; k < ghost_nodes.size(); ++k)
+                    {
+                      if ((*ghost_nodes[k] - point).size() < tol * (nb2->point(j) - point).size())
+                        {
+                          node = ghost_nodes[k];
+                          break;
+                        }
+                    }
 
-                // add the new vertex only if no other is nearby
-                if (node == NULL)
-                  {
-                    node = mesh.add_point(point);
-                    ghost_nodes.push_back(node);
-                  }
+                  // add the new vertex only if no other is nearby
+                  if (node == NULL)
+                    {
+                      node = mesh.add_point(point);
+                      ghost_nodes.push_back(node);
+                    }
 
-                Tri3Subdivision* newelem = new Tri3Subdivision();
+                  Tri3Subdivision* newelem = new Tri3Subdivision();
 
-                newelem->set_node(0) = nb2->get_node(j);
-                newelem->set_node(1) = nb2->get_node(prev[j]);
-                newelem->set_node(2) = node;
-                newelem->set_neighbor(0, nb2);
-                newelem->set_neighbor(1, NULL);
-                newelem->set_ghost(true);
-                nb2->set_neighbor(prev[j], newelem);
+                  newelem->set_node(0) = nb2->get_node(j);
+                  newelem->set_node(1) = nb2->get_node(prev[j]);
+                  newelem->set_node(2) = node;
+                  newelem->set_neighbor(0, nb2);
+                  newelem->set_neighbor(1, NULL);
+                  newelem->set_ghost(true);
+                  nb2->set_neighbor(prev[j], newelem);
 
-                mesh.add_elem(newelem);
-                mesh.get_boundary_info().add_node(nb2->get_node(j), 1);
-                mesh.get_boundary_info().add_node(nb2->get_node(prev[j]), 1);
-                mesh.get_boundary_info().add_node(node, 1);
+                  mesh.add_elem(newelem);
+                  mesh.get_boundary_info().add_node(nb2->get_node(j), 1);
+                  mesh.get_boundary_info().add_node(nb2->get_node(prev[j]), 1);
+                  mesh.get_boundary_info().add_node(node, 1);
 
-                nb2 = newelem;
-                j = nb2->local_node_number(elem->node(i));
-              }
+                  nb2 = newelem;
+                  j = nb2->local_node_number(elem->node(i));
+                }
 
               Tri3Subdivision *newelem = new Tri3Subdivision();
               newelem->set_node(0) = elem->get_node(next[i]);

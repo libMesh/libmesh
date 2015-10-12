@@ -858,9 +858,9 @@ inline bool Request::test ()
 #ifdef LIBMESH_HAVE_MPI
   int val=0;
 
-// MPI_STATUS_IGNORE is from MPI-2; using it with some version of
-// MPICH may cause a crash:
-// https://bugzilla.mcs.anl.gov/globus/show_bug.cgi?id=1798
+  // MPI_STATUS_IGNORE is from MPI-2; using it with some versions of
+  // MPICH may cause a crash:
+  // https://bugzilla.mcs.anl.gov/globus/show_bug.cgi?id=1798
 #if MPI_VERSION > 1
   libmesh_call_mpi
     (MPI_Test (&_request, &val, MPI_STATUS_IGNORE));
@@ -2711,9 +2711,9 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
       return;
     }
 
-// MPI_STATUS_IGNORE is from MPI-2; using it with some version of
-// MPICH may cause a crash:
-// https://bugzilla.mcs.anl.gov/globus/show_bug.cgi?id=1798
+  // MPI_STATUS_IGNORE is from MPI-2; using it with some versions of
+  // MPICH may cause a crash:
+  // https://bugzilla.mcs.anl.gov/globus/show_bug.cgi?id=1798
 #if MPI_VERSION > 1
   libmesh_call_mpi
     (MPI_Sendrecv(&sendvec, 1, StandardType<T1>(&sendvec),
