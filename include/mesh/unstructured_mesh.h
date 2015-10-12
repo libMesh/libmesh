@@ -113,7 +113,7 @@ public:
    * example, a mesh consisting of \p Tet10 will be converted
    * to a mesh with \p Tet4 etc.
    */
-  virtual void all_first_order ();
+  virtual void all_first_order () libmesh_override;
 
   /**
    * Converts a (conforming, non-refined) mesh with linear
@@ -126,7 +126,7 @@ public:
    * is built.  The same holds obviously for \p Quad4, \p Prism6
    * ...
    */
-  virtual void all_second_order (const bool full_ordered=true);
+  virtual void all_second_order (const bool full_ordered=true) libmesh_override;
 
   /**
    * Generates a new mesh containing all the elements which
@@ -158,7 +158,7 @@ public:
    * Other functions from MeshBase requiring re-definition.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
-                               const bool reset_current_list    = true);
+                               const bool reset_current_list    = true) libmesh_override;
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -166,7 +166,7 @@ public:
    * This removes all elements descended from currently active
    * elements in the mesh.
    */
-  virtual bool contract ();
+  virtual bool contract () libmesh_override;
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 };
