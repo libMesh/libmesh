@@ -16,7 +16,7 @@ from matplotlib.dates import date2num, num2date
 # https://github.com/libMesh/libmesh/graphs/traffic
 
 # Date, Views, Unique Visitors
-data = [
+view_data = [
     '2014-Feb-17', 274, 25,
     '2014-Feb-18', 145, 30,
     '2014-Feb-19', 129, 27,
@@ -1062,129 +1062,155 @@ clone_data = [
     '2015-Oct-12',    2,    2,
     ]
 
-# Extract the dates from the data array
-date_strings = data[0::3]
-
-# Convert date strings into numbers
-date_nums = []
-for d in date_strings:
-  date_nums.append(date2num(datetime.strptime(d, '%Y-%b-%d')))
-
-# Extract number of views from data array
-n_views = data[1::3]
-
-# Extract number of unique visitors from data array
-n_visitors = data[2::3]
-
-# Initialize an array with 1, 7, 14, ...
-N = len(date_strings)
-week_indexes = range(0, N, 7)
-
-# Get total views and average unique viewers for each week
-week_views = []
-week_visitors = []
-x_axis = []
-for i in range(0, len(week_indexes)-1):
-  start = week_indexes[i]
-  stop = week_indexes[i+1]
-  week_views.append(sum(n_views[start:stop]));
-  week_visitors.append(np.mean(n_visitors[start:stop]));
-  x_axis.append(date_nums[week_indexes[i]])
-
-# Get a reference to the figure
-fig = plt.figure()
-
-# 111 is equivalent to Matlab's subplot(1,1,1) command
-ax1 = fig.add_subplot(111)
-ax1.plot(x_axis, week_views, 'bo-')
-ax1.set_ylabel('Weekly page views (blue circles)')
-
-# Choose the number of labels to create, then use linspace to create them and convert them to ints
-n_labels = 4
-x_axis_ticks = np.linspace(0, len(x_axis)-1, n_labels).astype(int)
-
-# Set tick labels and positions
-ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
-ax1.set_xticklabels(['Week of \n' + str(num2date(x_axis[i]).date()) for i in x_axis_ticks])
-
-# Plot the average weekly unique visitors
-ax2 = ax1.twinx()
-ax2.plot(x_axis, week_visitors, 'gs--')
-ax2.set_ylabel('Avg. Daily Unique Visitors (green squares)')
-
-# Add title
-title_string = 'Total Pageviews: ' \
-               + str(sum(n_views)) \
-               + ', Avg. Daily Unique Visitors: ' \
-               + '%.1f' % np.mean(n_visitors)
-fig.suptitle(title_string)
-
-# Save as PDF
-plt.savefig('weekly_github_traffic.pdf')
 
 
+# Function which plots the two datasets on a single plot with two y axes.
+def plot_data(data_array, left_axis_label, right_axis_label,
+              weekly_plot_filename, monthly_plot_filename,
+              title_string1, title_string2):
+  # Extract the dates from the data array
+  date_strings = data_array[0::3]
 
-# Make monthly plot
-fig.clf()
+  # Convert date strings into numbers
+  date_nums = []
+  for d in date_strings:
+    date_nums.append(date2num(datetime.strptime(d, '%Y-%b-%d')))
 
-month_intervals = ['2014-Feb-17',
-                   '2014-Mar-17',
-                   '2014-Apr-17',
-                   '2014-May-17',
-                   '2014-Jun-17',
-                   '2014-Jul-17',
-                   '2014-Aug-17',
-                   '2014-Sep-17',
-                   '2014-Oct-17',
-                   '2014-Nov-17',
-                   '2014-Dec-17',
-                   '2015-Jan-17',
-                   '2015-Feb-17',
-                   '2015-Mar-17',
-                   '2015-Apr-17',
-                   '2015-May-17',
-                   '2015-Jun-17',
-                   '2015-Jul-17',
-                   '2015-Aug-17',
-                   '2015-Sep-17']
+  # Extract second column of data (n. views or n. clones).
+  data_column2 = data_array[1::3]
 
-# Find the indexes of each date
-month_indexes = []
-for date in month_intervals:
-  month_indexes.append(date_strings.index(date))
+  # Extract third column of data (unique visitors or unique cloners).
+  data_column3 = data_array[2::3]
 
-# Get total views and average unique viewers for each month
-month_views = [];
-month_visitors = [];
-x_axis = []
-for i in range(0, len(month_indexes)-1):
-  start = month_indexes[i]
-  stop = month_indexes[i+1]
-  month_views.append(sum(n_views[start:stop]));
-  month_visitors.append(np.mean(n_visitors[start:stop]));
-  x_axis.append(date_nums[month_indexes[i]])
+  # Initialize an array with 1, 7, 14, ...
+  N = len(date_strings)
+  week_indexes = range(0, N, 7)
 
-# 111 is equivalent to Matlab's subplot(1,1,1) command
-ax1 = fig.add_subplot(111)
-ax1.plot(x_axis, month_views, 'bo-')
-ax1.set_ylabel('Monthly page views (blue circles)')
+  # Get total views and average unique viewers for each week
+  weekly_column2 = []
+  weekly_column3 = []
+  x_axis = []
+  for i in range(0, len(week_indexes)-1):
+    start = week_indexes[i]
+    stop = week_indexes[i+1]
+    weekly_column2.append(sum(data_column2[start:stop]));
+    weekly_column3.append(np.mean(data_column3[start:stop]));
+    x_axis.append(date_nums[week_indexes[i]])
 
-# Place an x-axis tick mark every x_step months.  As we get more data,
-# we'll have to increase x_step.
-x_step = 4
-x_axis_ticks = range(0, len(x_axis), x_step)
+  # Get a reference to the figure
+  fig = plt.figure()
 
-# Set tick labels and positions
-ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
-ax1.set_xticklabels([num2date(x_axis[i]).strftime('%b\n%Y') for i in x_axis_ticks])
+  # 111 is equivalent to Matlab's subplot(1,1,1) command
+  ax1 = fig.add_subplot(111)
+  ax1.plot(x_axis, weekly_column2, 'bo-')
+  ax1.set_ylabel(left_axis_label + ' (blue circles)')
 
-# Plot the average weekly unique visitors
-ax2 = ax1.twinx()
-ax2.plot(x_axis, month_visitors, 'gs--')
-ax2.set_ylabel('Avg. Daily Unique Visitors (green squares)')
+  # Choose the number of labels to create, then use linspace to create
+  # them and convert them to ints.
+  n_labels = 4
+  x_axis_ticks = np.linspace(0, len(x_axis)-1, n_labels).astype(int)
 
-# Save as PDF
-plt.savefig('monthly_github_traffic.pdf')
+  # Set tick labels and positions
+  ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
+  ax1.set_xticklabels(['Week of \n' + str(num2date(x_axis[i]).date()) for i in x_axis_ticks])
+
+  # Plot the weekly column 3 data.
+  ax2 = ax1.twinx()
+  ax2.plot(x_axis, weekly_column3, 'gs--')
+  ax2.set_ylabel(right_axis_label + ' (green squares)')
+
+  # Add title
+  title_string = title_string1 \
+                 + ' ' \
+                 + str(sum(data_column2)) \
+                 + ', ' \
+                 + title_string2 \
+                 + ' ' \
+                 + '%.1f' % np.mean(data_column3)
+  fig.suptitle(title_string)
+
+  # Save as PDF
+  plt.savefig(weekly_plot_filename)
+
+
+
+  # Make monthly plot
+  fig.clf()
+
+  month_intervals = ['2014-Feb-17',
+                     '2014-Mar-17',
+                     '2014-Apr-17',
+                     '2014-May-17',
+                     '2014-Jun-17',
+                     '2014-Jul-17',
+                     '2014-Aug-17',
+                     '2014-Sep-17',
+                     '2014-Oct-17',
+                     '2014-Nov-17',
+                     '2014-Dec-17',
+                     '2015-Jan-17',
+                     '2015-Feb-17',
+                     '2015-Mar-17',
+                     '2015-Apr-17',
+                     '2015-May-17',
+                     '2015-Jun-17',
+                     '2015-Jul-17',
+                     '2015-Aug-17',
+                     '2015-Sep-17']
+
+  # Find the indexes of each date.
+  month_indexes = []
+  for date in month_intervals:
+    # Not all data sets have all of these dates, so we just use the
+    # ones we have.
+    if date in date_strings:
+      month_indexes.append(date_strings.index(date))
+
+  # Get total views and average unique viewers for each month
+  month_views = [];
+  month_visitors = [];
+  x_axis = []
+  for i in range(0, len(month_indexes)-1):
+    start = month_indexes[i]
+    stop = month_indexes[i+1]
+    month_views.append(sum(data_column2[start:stop]));
+    month_visitors.append(np.mean(data_column3[start:stop]));
+    x_axis.append(date_nums[month_indexes[i]])
+
+  # 111 is equivalent to Matlab's subplot(1,1,1) command
+  ax1 = fig.add_subplot(111)
+  ax1.plot(x_axis, month_views, 'bo-')
+  ax1.set_ylabel(left_axis_label + ' (blue circles)')
+
+  # Place an x-axis tick mark every x_step months.  As we get more data,
+  # we'll have to increase x_step.
+  x_step = 4
+  x_axis_ticks = range(0, len(x_axis), x_step)
+
+  # Set tick labels and positions
+  ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
+  ax1.set_xticklabels([num2date(x_axis[i]).strftime('%b\n%Y') for i in x_axis_ticks])
+
+  # Plot the average weekly unique visitors
+  ax2 = ax1.twinx()
+  ax2.plot(x_axis, month_visitors, 'gs--')
+  ax2.set_ylabel(right_axis_label + ' (green squares)')
+
+  # Save as PDF
+  plt.savefig(monthly_plot_filename)
+
+
+
+
+# Call the plot function with the page views, unique visitors data.
+plot_data(view_data, 'Weekly page views', 'Avg. Daily Unique Visitors',
+          'weekly_github_traffic.pdf', 'monthly_github_traffic.pdf',
+          'Total Pageviews:', 'Avg. Daily Unique Visitors:')
+
+# TODO: Call the plot function with the data on number of clones/unique clones.
+plot_data(clone_data, 'Clones per Week', 'Avg. Daily Unique Clones',
+          'weekly_github_clones.pdf', 'monthly_github_clones.pdf',
+          'Total Clones:', 'Avg. Daily Unique Cloners:')
 
 # Local Variables:
 # python-indent: 2
