@@ -71,8 +71,8 @@ public:
    * of each element.  This number is reserved for things like
    * material properties, etc.
    */
-  void partition (MeshBase& mesh,
-                  const unsigned int n);
+  virtual void partition (MeshBase& mesh,
+                          const unsigned int n);
 
   /**
    * Partition the \p MeshBase into \p mesh.n_processors() parts.
@@ -80,7 +80,7 @@ public:
    * of each element.  This number is reserved for things like
    * material properties, etc.
    */
-  void partition (MeshBase& mesh);
+  virtual void partition (MeshBase& mesh);
 
   /**
    * Repartitions the \p MeshBase into \p n parts.  This
