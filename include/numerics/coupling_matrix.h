@@ -369,8 +369,8 @@ public:
             _begin_it = _mat._ranges.end();
           }
         else
-        // We have *some* entry(s) in this row, we just need to find
-        // the earliest
+          // We have *some* entry(s) in this row, we just need to find
+          // the earliest
           {
             while (_begin_it != _mat._ranges.begin())
               {
@@ -443,10 +443,9 @@ protected:
 class ConstCouplingRowConstIterator
 {
 public:
-  ConstCouplingRowConstIterator
-    (const ConstCouplingRow& row_in,
-     std::size_t loc_in,
-     CouplingMatrix::rc_type::const_iterator it_in) :
+  ConstCouplingRowConstIterator (const ConstCouplingRow& row_in,
+                                 std::size_t loc_in,
+                                 CouplingMatrix::rc_type::const_iterator it_in) :
     _location(loc_in),
     _row(row_in),
     _it(it_in)
@@ -478,23 +477,23 @@ public:
       (_location, std::numeric_limits<std::size_t>::max());
 
     if (_location == _it->second)
-    {
-      ++_it;
+      {
+        ++_it;
 
-      // Are we past the end of the matrix?
-      if (_it == _row._mat._ranges.end())
-        _location = std::numeric_limits<std::size_t>::max();
-      else
-        {
-          _location = _it->first;
-          // Are we past the end of the row?
-          if (_location >= _row._mat.size()*(_row._row_i+1))
-            {
-              _location = std::numeric_limits<std::size_t>::max();
-              _it = _row._mat._ranges.end();
-            }
-        }
-    }
+        // Are we past the end of the matrix?
+        if (_it == _row._mat._ranges.end())
+          _location = std::numeric_limits<std::size_t>::max();
+        else
+          {
+            _location = _it->first;
+            // Are we past the end of the row?
+            if (_location >= _row._mat.size()*(_row._row_i+1))
+              {
+                _location = std::numeric_limits<std::size_t>::max();
+                _it = _row._mat._ranges.end();
+              }
+          }
+      }
     else
       ++_location;
 

@@ -745,11 +745,12 @@ private:
 
   Real _absolute_global_tolerance;
 
-  unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
-    _node_level_mismatch_limit;
+  unsigned char _face_level_mismatch_limit;
+  unsigned char _edge_level_mismatch_limit;
+  unsigned char _node_level_mismatch_limit;
 
-  signed char _overrefined_boundary_limit,
-              _underrefined_boundary_limit;
+  signed char _overrefined_boundary_limit;
+  signed char _underrefined_boundary_limit;
 
   /**
    * This option enforces the mismatch level prior to refinement by checking

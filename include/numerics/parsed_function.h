@@ -152,97 +152,87 @@ private:
 
 template <typename Output, typename OutputGradient>
 inline
-ParsedFunction<Output,OutputGradient>::ParsedFunction
-  (const std::string& expression, const std::vector<std::string>* additional_vars,
-   const std::vector<Output>* initial_vals) :
-    _expression (), // overridden by parse()
-    // Size the spacetime vector to account for space, time, and any additional
-    // variables passed
-    _spacetime (LIBMESH_DIM+1 + (additional_vars ?
-                                 additional_vars->size() : 0)),
-    _valid_derivatives (true),
-    _additional_vars (additional_vars ? *additional_vars :
-                      std::vector<std::string>()),
-    _initial_vals (initial_vals ? *initial_vals :
-                   std::vector<Output>())
-  {
-    this->reparse(expression);
-    this->_initialized = true;
-  }
+ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string& expression,
+                                                       const std::vector<std::string>* additional_vars,
+                                                       const std::vector<Output>* initial_vals) :
+  _expression (), // overridden by parse()
+  // Size the spacetime vector to account for space, time, and any additional
+  // variables passed
+  _spacetime (LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
+  _valid_derivatives (true),
+  _additional_vars (additional_vars ? *additional_vars : std::vector<std::string>()),
+  _initial_vals (initial_vals ? *initial_vals : std::vector<Output>())
+{
+  this->reparse(expression);
+  this->_initialized = true;
+}
 
 
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::reparse
-  (const std::string& expression)
-  {
-    variables = "x";
+ParsedFunction<Output,OutputGradient>::reparse (const std::string& expression)
+{
+  variables = "x";
 #if LIBMESH_DIM > 1
-    variables += ",y";
+  variables += ",y";
 #endif
 #if LIBMESH_DIM > 2
-    variables += ",z";
+  variables += ",z";
 #endif
-    variables += ",t";
+  variables += ",t";
 
-    // If additional vars were passed, append them to the string
-    // that we send to the function parser. Also add them to the
-    // end of our spacetime vector
-    for (unsigned int i=0; i < _additional_vars.size(); ++i)
-      {
-        variables += "," + _additional_vars[i];
-        // Initialize extra variables to the vector passed in or zero
-        // Note: The initial_vals vector can be shorter than the additional_vars vector
-        _spacetime[LIBMESH_DIM+1 + i] =
-          (i < _initial_vals.size()) ? _initial_vals[i] : 0;
-      }
+  // If additional vars were passed, append them to the string
+  // that we send to the function parser. Also add them to the
+  // end of our spacetime vector
+  for (unsigned int i=0; i < _additional_vars.size(); ++i)
+    {
+      variables += "," + _additional_vars[i];
+      // Initialize extra variables to the vector passed in or zero
+      // Note: The initial_vals vector can be shorter than the additional_vars vector
+      _spacetime[LIBMESH_DIM+1 + i] =
+        (i < _initial_vals.size()) ? _initial_vals[i] : 0;
+    }
 
-    this->partial_reparse(expression);
-  }
-
-template <typename Output, typename OutputGradient>
-inline
-Output
-ParsedFunction<Output,OutputGradient>::operator()
-  (const Point& p,
-   const Real time)
-  {
-    set_spacetime(p, time);
-    return eval(parsers[0], "f", 0);
-  }
+  this->partial_reparse(expression);
+}
 
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::dot
-  (const Point& p,
-   const Real time)
-  {
-    set_spacetime(p, time);
-    return eval(dt_parsers[0], "df/dt", 0);
-  }
+ParsedFunction<Output,OutputGradient>::operator() (const Point& p, const Real time)
+{
+  set_spacetime(p, time);
+  return eval(parsers[0], "f", 0);
+}
+
+template <typename Output, typename OutputGradient>
+inline
+Output
+ParsedFunction<Output,OutputGradient>::dot (const Point& p, const Real time)
+{
+  set_spacetime(p, time);
+  return eval(dt_parsers[0], "df/dt", 0);
+}
 
 template <typename Output, typename OutputGradient>
 inline
 OutputGradient
-ParsedFunction<Output,OutputGradient>::gradient
-  (const Point& p,
-   const Real time)
-  {
-    OutputGradient grad;
-    set_spacetime(p, time);
+ParsedFunction<Output,OutputGradient>::gradient (const Point& p, const Real time)
+{
+  OutputGradient grad;
+  set_spacetime(p, time);
 
-    grad(0) = eval(dx_parsers[0], "df/dx", 0);
+  grad(0) = eval(dx_parsers[0], "df/dx", 0);
 #if LIBMESH_DIM > 1
-    grad(1) = eval(dy_parsers[0], "df/dy", 0);
+  grad(1) = eval(dy_parsers[0], "df/dy", 0);
 #endif
 #if LIBMESH_DIM > 2
-    grad(2) = eval(dz_parsers[0], "df/dz", 0);
+  grad(2) = eval(dz_parsers[0], "df/dz", 0);
 #endif
 
-    return grad;
-  }
+  return grad;
+}
 
 template <typename Output, typename OutputGradient>
 inline
@@ -251,405 +241,397 @@ ParsedFunction<Output,OutputGradient>::operator()
   (const Point& p,
    const Real time,
    DenseVector<Output>& output)
-  {
-    set_spacetime(p, time);
+{
+  set_spacetime(p, time);
 
-    unsigned int size = output.size();
+  unsigned int size = output.size();
 
-    libmesh_assert_equal_to (size, parsers.size());
+  libmesh_assert_equal_to (size, parsers.size());
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-    for (unsigned int i=0; i != size; ++i)
-      output(i) = eval(parsers[i], "f", i);
-  }
+  // The remaining locations in _spacetime are currently fixed at construction
+  // but could potentially be made dynamic
+  for (unsigned int i=0; i != size; ++i)
+    output(i) = eval(parsers[i], "f", i);
+}
 
-  /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
-   */
+/**
+ * @returns the vector component \p i at coordinate
+ * \p p and time \p time.
+ */
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::component
-  (unsigned int i,
-   const Point& p,
-   Real time)
-  {
-    set_spacetime(p, time);
-    libmesh_assert_less (i, parsers.size());
+ParsedFunction<Output,OutputGradient>::component (unsigned int i,
+                                                  const Point& p,
+                                                  Real time)
+{
+  set_spacetime(p, time);
+  libmesh_assert_less (i, parsers.size());
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-    libmesh_assert_less(i, parsers.size());
-    return eval(parsers[i], "f", i);
-  }
+  // The remaining locations in _spacetime are currently fixed at construction
+  // but could potentially be made dynamic
+  libmesh_assert_less(i, parsers.size());
+  return eval(parsers[i], "f", i);
+}
 
-  /**
-   * @returns the address of a parsed variable so you can supply a parameterized value
-   */
+/**
+ * @returns the address of a parsed variable so you can supply a parameterized value
+ */
 template <typename Output, typename OutputGradient>
 inline
 Output &
-ParsedFunction<Output,OutputGradient>::getVarAddress
-  (const std::string & variable_name)
-  {
-    const std::vector<std::string>::iterator it =
-      std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
+ParsedFunction<Output,OutputGradient>::getVarAddress (const std::string & variable_name)
+{
+  const std::vector<std::string>::iterator it =
+    std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
 
-    if (it == _additional_vars.end())
-      libmesh_error_msg("ERROR: Requested variable not found in parsed function");
+  if (it == _additional_vars.end())
+    libmesh_error_msg("ERROR: Requested variable not found in parsed function");
 
-    // Iterator Arithmetic (How far from the end of the array is our target address?)
-    return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
-  }
+  // Iterator Arithmetic (How far from the end of the array is our target address?)
+  return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
+}
 
 
 template <typename Output, typename OutputGradient>
 inline
 UniquePtr<FunctionBase<Output> >
 ParsedFunction<Output,OutputGradient>::clone() const
-  {
-    return UniquePtr<FunctionBase<Output> >
-      (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
-  }
+{
+  return UniquePtr<FunctionBase<Output> >
+    (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
+}
 
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::get_inline_value
-  (const std::string& inline_var_name) const
-  {
-    libmesh_assert_greater (_subexpressions.size(), 0);
+ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string& inline_var_name) const
+{
+  libmesh_assert_greater (_subexpressions.size(), 0);
 
 #ifndef NDEBUG
-    bool found_var_name = false;
+  bool found_var_name = false;
 #endif
-    Output old_var_value;
+  Output old_var_value;
 
-    for (unsigned int s=0; s != _subexpressions.size(); ++s)
-      {
-        const std::string & subexpression = _subexpressions[s];
-        const std::size_t varname_i =
-          find_name(inline_var_name, subexpression);
-        if (varname_i == std::string::npos)
-          continue;
+  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+    {
+      const std::string & subexpression = _subexpressions[s];
+      const std::size_t varname_i =
+        find_name(inline_var_name, subexpression);
+      if (varname_i == std::string::npos)
+        continue;
 
-        const std::size_t assignment_i =
-          subexpression.find(":", varname_i+1);
+      const std::size_t assignment_i =
+        subexpression.find(":", varname_i+1);
 
-        libmesh_assert_not_equal_to(assignment_i, std::string::npos);
+      libmesh_assert_not_equal_to(assignment_i, std::string::npos);
 
-        libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
-        for (unsigned int i = varname_i+1; i != assignment_i; ++i)
-          libmesh_assert_equal_to(subexpression[i], ' ');
+      libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
+      for (unsigned int i = varname_i+1; i != assignment_i; ++i)
+        libmesh_assert_equal_to(subexpression[i], ' ');
 
-        std::size_t end_assignment_i =
-          subexpression.find(";", assignment_i+1);
+      std::size_t end_assignment_i =
+        subexpression.find(";", assignment_i+1);
 
-        libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
+      libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
 
-        std::string new_subexpression =
-          subexpression.substr(0, end_assignment_i+1) +
-          inline_var_name;
+      std::string new_subexpression =
+        subexpression.substr(0, end_assignment_i+1) +
+        inline_var_name;
 
 #ifdef LIBMESH_HAVE_FPARSER
-        // Parse and evaluate the new subexpression.
-        // Add the same constants as we used originally.
-        FunctionParserADBase<Output> fp;
-        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-        fp.AddConstant("pi", std::acos(Real(-1)));
-        fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(new_subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg
-            ("ERROR: FunctionParser is unable to parse modified expression: "
-             << new_subexpression << '\n' << fp.ErrorMsg());
+      // Parse and evaluate the new subexpression.
+      // Add the same constants as we used originally.
+      FunctionParserADBase<Output> fp;
+      fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+      fp.AddConstant("pi", std::acos(Real(-1)));
+      fp.AddConstant("e", std::exp(Real(1)));
+      if (fp.Parse(new_subexpression, variables) != -1) // -1 for success
+        libmesh_error_msg
+          ("ERROR: FunctionParser is unable to parse modified expression: "
+           << new_subexpression << '\n' << fp.ErrorMsg());
 
-        Output new_var_value = this->eval(fp, new_subexpression, 0);
+      Output new_var_value = this->eval(fp, new_subexpression, 0);
 #ifdef NDEBUG
-        return new_var_value;
+      return new_var_value;
 #else
-        if (found_var_name)
-          {
-            libmesh_assert_equal_to(old_var_value, new_var_value);
-          }
-        else
-          {
-            old_var_value = new_var_value;
-            found_var_name = true;
-          }
+      if (found_var_name)
+        {
+          libmesh_assert_equal_to(old_var_value, new_var_value);
+        }
+      else
+        {
+          old_var_value = new_var_value;
+          found_var_name = true;
+        }
 #endif
 
 #else
-        libmesh_error_msg("ERROR: This functionality requires fparser!");
+      libmesh_error_msg("ERROR: This functionality requires fparser!");
 #endif
-      }
+    }
 
-    libmesh_assert(found_var_name);
-    return old_var_value;
-  }
+  libmesh_assert(found_var_name);
+  return old_var_value;
+}
 
 
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::set_inline_value
-  (const std::string& inline_var_name,
-   Output newval)
-  {
-    libmesh_assert_greater (_subexpressions.size(), 0);
+ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string& inline_var_name,
+                                                         Output newval)
+{
+  libmesh_assert_greater (_subexpressions.size(), 0);
 
 #ifndef NDEBUG
-    bool found_var_name = false;
+  bool found_var_name = false;
 #endif
-    for (unsigned int s=0; s != _subexpressions.size(); ++s)
-      {
-        const std::string & subexpression = _subexpressions[s];
-        const std::size_t varname_i =
-          find_name(inline_var_name, subexpression);
-        if (varname_i == std::string::npos)
-          continue;
+  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+    {
+      const std::string & subexpression = _subexpressions[s];
+      const std::size_t varname_i =
+        find_name(inline_var_name, subexpression);
+      if (varname_i == std::string::npos)
+        continue;
 
 #ifndef NDEBUG
-        found_var_name = true;
+      found_var_name = true;
 #endif
-        const std::size_t assignment_i =
-          subexpression.find(":", varname_i+1);
+      const std::size_t assignment_i =
+        subexpression.find(":", varname_i+1);
 
-        libmesh_assert_not_equal_to(assignment_i, std::string::npos);
+      libmesh_assert_not_equal_to(assignment_i, std::string::npos);
 
-        libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
-        for (unsigned int i = varname_i+1; i != assignment_i; ++i)
-          libmesh_assert_equal_to(subexpression[i], ' ');
+      libmesh_assert_equal_to(subexpression[assignment_i+1], '=');
+      for (unsigned int i = varname_i+1; i != assignment_i; ++i)
+        libmesh_assert_equal_to(subexpression[i], ' ');
 
-        std::size_t end_assignment_i =
-          subexpression.find(";", assignment_i+1);
+      std::size_t end_assignment_i =
+        subexpression.find(";", assignment_i+1);
 
-        libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
+      libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
 
-        std::ostringstream new_subexpression;
-        new_subexpression << subexpression.substr(0, assignment_i+2)
-                          << std::setprecision(std::numeric_limits<Output>::digits10+2)
+      std::ostringstream new_subexpression;
+      new_subexpression << subexpression.substr(0, assignment_i+2)
+                        << std::setprecision(std::numeric_limits<Output>::digits10+2)
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                          << '(' << newval.real() << '+'
-                          << newval.imag() << 'i' << ')'
+                        << '(' << newval.real() << '+'
+                        << newval.imag() << 'i' << ')'
 #else
-                          << newval
+                        << newval
 #endif
-                          << subexpression.substr(end_assignment_i,
-                                                  std::string::npos);
-        _subexpressions[s] = new_subexpression.str();
-      }
+                        << subexpression.substr(end_assignment_i,
+                                                std::string::npos);
+      _subexpressions[s] = new_subexpression.str();
+    }
 
-    libmesh_assert(found_var_name);
+  libmesh_assert(found_var_name);
 
-    std::string new_expression;
+  std::string new_expression;
 
-    for (unsigned int s=0; s != _subexpressions.size(); ++s)
-      {
-        new_expression += '{';
-        new_expression += _subexpressions[s];
-        new_expression += '}';
-      }
+  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+    {
+      new_expression += '{';
+      new_expression += _subexpressions[s];
+      new_expression += '}';
+    }
 
-    this->partial_reparse(new_expression);
-  }
+  this->partial_reparse(new_expression);
+}
 
 
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::partial_reparse
-  (const std::string& expression)
-  {
-    _expression = expression;
-    _subexpressions.clear();
-    parsers.clear();
+ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string& expression)
+{
+  _expression = expression;
+  _subexpressions.clear();
+  parsers.clear();
 
-    size_t nextstart = 0, end = 0;
+  size_t nextstart = 0, end = 0;
 
-    while (end != std::string::npos)
-      {
-        // If we're past the end of the string, we can't make any more
-        // subparsers
-        if (nextstart >= expression.size())
-          break;
+  while (end != std::string::npos)
+    {
+      // If we're past the end of the string, we can't make any more
+      // subparsers
+      if (nextstart >= expression.size())
+        break;
 
-        // If we're at the start of a brace delimited section, then we
-        // parse just that section:
-        if (expression[nextstart] == '{')
-          {
-            nextstart++;
-            end = expression.find('}', nextstart);
-          }
-        // otherwise we parse the whole thing
-        else
-          end = std::string::npos;
+      // If we're at the start of a brace delimited section, then we
+      // parse just that section:
+      if (expression[nextstart] == '{')
+        {
+          nextstart++;
+          end = expression.find('}', nextstart);
+        }
+      // otherwise we parse the whole thing
+      else
+        end = std::string::npos;
 
-        // We either want the whole end of the string (end == npos) or
-        // a substring in the middle.
-        _subexpressions.push_back
-          (expression.substr(nextstart, (end == std::string::npos) ?
-                             std::string::npos : end - nextstart));
+      // We either want the whole end of the string (end == npos) or
+      // a substring in the middle.
+      _subexpressions.push_back
+        (expression.substr(nextstart, (end == std::string::npos) ?
+                           std::string::npos : end - nextstart));
 
-        // fparser can crash on empty expressions
-        if (_subexpressions.back().empty())
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+      // fparser can crash on empty expressions
+      if (_subexpressions.back().empty())
+        libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
 
-        // Parse (and optimize if possible) the subexpression.
-        // Add some basic constants, to Real precision.
-        FunctionParserADBase<Output> fp;
-        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-        fp.AddConstant("pi", std::acos(Real(-1)));
-        fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
-          libmesh_error_msg
-            ("ERROR: FunctionParser is unable to parse expression: "
-             << _subexpressions.back() << '\n' << fp.ErrorMsg());
+      // Parse (and optimize if possible) the subexpression.
+      // Add some basic constants, to Real precision.
+      FunctionParserADBase<Output> fp;
+      fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+      fp.AddConstant("pi", std::acos(Real(-1)));
+      fp.AddConstant("e", std::exp(Real(1)));
+      if (fp.Parse(_subexpressions.back(), variables) != -1) // -1 for success
+        libmesh_error_msg
+          ("ERROR: FunctionParser is unable to parse expression: "
+           << _subexpressions.back() << '\n' << fp.ErrorMsg());
 
-        // use of derivatives is optional. suppress error output on the console
-        // use the has_derivatives() method to check if AutoDiff was successful.
-        fp.silenceAutoDiffErrors();
+      // use of derivatives is optional. suppress error output on the console
+      // use the has_derivatives() method to check if AutoDiff was successful.
+      fp.silenceAutoDiffErrors();
 
-        // generate derivatives through automatic differentiation
-        FunctionParserADBase<Output> dx_fp(fp);
-        if (dx_fp.AutoDiff("x") != -1) // -1 for success
-          _valid_derivatives = false;
-        dx_fp.Optimize();
-        dx_parsers.push_back(dx_fp);
+      // generate derivatives through automatic differentiation
+      FunctionParserADBase<Output> dx_fp(fp);
+      if (dx_fp.AutoDiff("x") != -1) // -1 for success
+        _valid_derivatives = false;
+      dx_fp.Optimize();
+      dx_parsers.push_back(dx_fp);
 #if LIBMESH_DIM > 1
-        FunctionParserADBase<Output> dy_fp(fp);
-        if (dy_fp.AutoDiff("y") != -1) // -1 for success
-          _valid_derivatives = false;
-        dy_fp.Optimize();
-        dy_parsers.push_back(dy_fp);
+      FunctionParserADBase<Output> dy_fp(fp);
+      if (dy_fp.AutoDiff("y") != -1) // -1 for success
+        _valid_derivatives = false;
+      dy_fp.Optimize();
+      dy_parsers.push_back(dy_fp);
 #endif
 #if LIBMESH_DIM > 2
-        FunctionParserADBase<Output> dz_fp(fp);
-        if (dz_fp.AutoDiff("z") != -1) // -1 for success
-          _valid_derivatives = false;
-        dz_fp.Optimize();
-        dz_parsers.push_back(dz_fp);
+      FunctionParserADBase<Output> dz_fp(fp);
+      if (dz_fp.AutoDiff("z") != -1) // -1 for success
+        _valid_derivatives = false;
+      dz_fp.Optimize();
+      dz_parsers.push_back(dz_fp);
 #endif
-        FunctionParserADBase<Output> dt_fp(fp);
-        if (dt_fp.AutoDiff("t") != -1) // -1 for success
-          _valid_derivatives = false;
-        dt_fp.Optimize();
-        dt_parsers.push_back(dt_fp);
+      FunctionParserADBase<Output> dt_fp(fp);
+      if (dt_fp.AutoDiff("t") != -1) // -1 for success
+        _valid_derivatives = false;
+      dt_fp.Optimize();
+      dt_parsers.push_back(dt_fp);
 
-        // now optimise original function (after derivatives are taken)
-        fp.Optimize();
-        parsers.push_back(fp);
+      // now optimise original function (after derivatives are taken)
+      fp.Optimize();
+      parsers.push_back(fp);
 
-        // If at end, use nextstart=maxSize.  Else start at next
-        // character.
-        nextstart = (end == std::string::npos) ?
-          std::string::npos : end + 1;
-      }
-  }
+      // If at end, use nextstart=maxSize.  Else start at next
+      // character.
+      nextstart = (end == std::string::npos) ?
+        std::string::npos : end + 1;
+    }
+}
 
 
 template <typename Output, typename OutputGradient>
 inline
 std::size_t
-ParsedFunction<Output,OutputGradient>::find_name
-  (const std::string & varname,
-   const std::string & expr) const
-  {
-    const std::size_t namesize = varname.size();
-    std::size_t varname_i = expr.find(varname);
+ParsedFunction<Output,OutputGradient>::find_name (const std::string & varname,
+                                                  const std::string & expr) const
+{
+  const std::size_t namesize = varname.size();
+  std::size_t varname_i = expr.find(varname);
 
-    while ((varname_i != std::string::npos) &&
-           (((varname_i > 0) &&
-             (std::isalnum(expr[varname_i-1]) ||
-              (expr[varname_i-1] == '_'))) ||
-            ((varname_i+namesize < expr.size()) &&
-             (std::isalnum(expr[varname_i+namesize]) ||
-              (expr[varname_i+namesize] == '_')))))
-      {
-        varname_i = expr.find(varname, varname_i+1);
-      }
+  while ((varname_i != std::string::npos) &&
+         (((varname_i > 0) &&
+           (std::isalnum(expr[varname_i-1]) ||
+            (expr[varname_i-1] == '_'))) ||
+          ((varname_i+namesize < expr.size()) &&
+           (std::isalnum(expr[varname_i+namesize]) ||
+            (expr[varname_i+namesize] == '_')))))
+    {
+      varname_i = expr.find(varname, varname_i+1);
+    }
 
-    return varname_i;
-  }
+  return varname_i;
+}
 
 
-  // Set the _spacetime argument vector
+// Set the _spacetime argument vector
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::set_spacetime
-  (const Point& p,
-   const Real time)
-  {
-    _spacetime[0] = p(0);
+ParsedFunction<Output,OutputGradient>::set_spacetime (const Point& p,
+                                                      const Real time)
+{
+  _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
+  _spacetime[1] = p(1);
 #endif
 #if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
+  _spacetime[2] = p(2);
 #endif
-    _spacetime[LIBMESH_DIM] = time;
+  _spacetime[LIBMESH_DIM] = time;
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-  }
+  // The remaining locations in _spacetime are currently fixed at construction
+  // but could potentially be made dynamic
+}
 
-  // Evaluate the ith FunctionParser and check the result
+// Evaluate the ith FunctionParser and check the result
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::eval
-  (FunctionParserADBase<Output> & parser,
-   const std::string & libmesh_dbg_var(function_name),
-   unsigned int libmesh_dbg_var(component_idx)) const
-  {
+ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & parser,
+                                             const std::string & libmesh_dbg_var(function_name),
+                                             unsigned int libmesh_dbg_var(component_idx)) const
+{
 #ifndef NDEBUG
-    Output result = parser.Eval(&_spacetime[0]);
-    int error_code = parser.EvalError();
-    if (error_code)
-      {
-        libMesh::err << "ERROR: FunctionParser is unable to evaluate component "
-                     << component_idx
-                     << " of expression '"
-                     << function_name
-                     << "' with arguments:\n";
-        for (unsigned int j=0; j<_spacetime.size(); ++j)
-          libMesh::err << '\t' << _spacetime[j] << '\n';
-        libMesh::err << '\n';
+  Output result = parser.Eval(&_spacetime[0]);
+  int error_code = parser.EvalError();
+  if (error_code)
+    {
+      libMesh::err << "ERROR: FunctionParser is unable to evaluate component "
+                   << component_idx
+                   << " of expression '"
+                   << function_name
+                   << "' with arguments:\n";
+      for (unsigned int j=0; j<_spacetime.size(); ++j)
+        libMesh::err << '\t' << _spacetime[j] << '\n';
+      libMesh::err << '\n';
 
-        // Currently no API to report error messages, we'll do it manually
-        std::string error_message = "Reason: ";
+      // Currently no API to report error messages, we'll do it manually
+      std::string error_message = "Reason: ";
 
-        switch (error_code)
-          {
-          case 1:
-            error_message += "Division by zero";
-            break;
-          case 2:
-            error_message += "Square Root error (negative value)";
-            break;
-          case 3:
-            error_message += "Log error (negative value)";
-            break;
-          case 4:
-            error_message += "Trigonometric error (asin or acos of illegal value)";
-            break;
-          case 5:
-            error_message += "Maximum recursion level reached";
-            break;
-          default:
-            error_message += "Unknown";
-            break;
-          }
-        libmesh_error_msg(error_message);
-      }
+      switch (error_code)
+        {
+        case 1:
+          error_message += "Division by zero";
+          break;
+        case 2:
+          error_message += "Square Root error (negative value)";
+          break;
+        case 3:
+          error_message += "Log error (negative value)";
+          break;
+        case 4:
+          error_message += "Trigonometric error (asin or acos of illegal value)";
+          break;
+        case 5:
+          error_message += "Maximum recursion level reached";
+          break;
+        default:
+          error_message += "Unknown";
+          break;
+        }
+      libmesh_error_msg(error_message);
+    }
 
-    return result;
+  return result;
 #else
-    return parser.Eval(&_spacetime[0]);
+  return parser.Eval(&_spacetime[0]);
 #endif
-  }
+}
 
 } // namespace libMesh
 
@@ -680,9 +662,9 @@ public:
   virtual void init() {}
   virtual void clear() {}
   virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
-  virtual UniquePtr<FunctionBase<Output> > clone() const {
-    return UniquePtr<FunctionBase<Output> >
-      (new ParsedFunction<Output>(""));
+  virtual UniquePtr<FunctionBase<Output> > clone() const
+  {
+    return UniquePtr<FunctionBase<Output> > (new ParsedFunction<Output>(""));
   }
 private:
   Output _dummy;

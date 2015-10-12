@@ -350,7 +350,7 @@ public:
    * Otherwise, this must be reimplemented.
    */
   virtual bool damping_residual (bool request_jacobian,
-                              DiffContext &) {
+                                 DiffContext &) {
     return request_jacobian;
   }
 
