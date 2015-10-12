@@ -612,7 +612,14 @@ data = [
     '2015-Oct-02',   91,   29,
     '2015-Oct-03',   41,   15,
     '2015-Oct-04',   26,   11,
-    '2015-Oct-05',   33,   14,
+    '2015-Oct-05',   33,   14, # We probably missed some data on Monday, Oct. 5.  Github switched to providing only 1 week of traffic data.
+    '2015-Oct-06',   74,   27,
+    '2015-Oct-07',  143,   29,
+    '2015-Oct-08',   47,   21,
+    '2015-Oct-09',   71,   28,
+    '2015-Oct-10',   20,    7,
+    '2015-Oct-11',   63,   18,
+    '2015-Oct-12',   38,   16,
     ]
 
 # Github now tracks the total number of clones and unique cloners
@@ -1045,7 +1052,14 @@ clone_data = [
     '2015-Oct-02',    7,    7,
     '2015-Oct-03',   11,    7,
     '2015-Oct-04',    4,    4,
-    '2015-Oct-05',    3,    2,
+    '2015-Oct-05',    3,    2, # We probably missed some data on Monday, Oct. 5.  Github switched to providing only 1 week of traffic data.
+    '2015-Oct-06',   51,   19,
+    '2015-Oct-07',   43,   23,
+    '2015-Oct-08',   56,   16,
+    '2015-Oct-09',   52,   23,
+    '2015-Oct-10',   33,    9,
+    '2015-Oct-11',    6,    5,
+    '2015-Oct-12',    2,    2,
     ]
 
 # Extract the dates from the data array
