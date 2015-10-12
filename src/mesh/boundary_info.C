@@ -251,9 +251,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 
 
 
-void BoundaryInfo::add_elements
-  (const std::set<boundary_id_type> &requested_boundary_ids,
-   UnstructuredMesh& boundary_mesh)
+void BoundaryInfo::add_elements(const std::set<boundary_id_type> &requested_boundary_ids,
+                                UnstructuredMesh& boundary_mesh)
 {
   START_LOG("add_elements()", "BoundaryInfo");
 
@@ -1887,12 +1886,11 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
 
 
 
-void BoundaryInfo::_find_id_maps
-  (const std::set<boundary_id_type> &requested_boundary_ids,
-   dof_id_type first_free_node_id,
-   std::map<dof_id_type, dof_id_type> * node_id_map,
-   dof_id_type first_free_elem_id,
-   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
+void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> &requested_boundary_ids,
+                                 dof_id_type first_free_node_id,
+                                 std::map<dof_id_type, dof_id_type> * node_id_map,
+                                 dof_id_type first_free_elem_id,
+                                 std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
 {
   // We'll do the same modulus trick that ParallelMesh uses to avoid
   // id conflicts between different processors

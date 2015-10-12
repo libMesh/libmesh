@@ -1497,11 +1497,11 @@ bool Elem::ancestor() const
 {
 #ifdef LIBMESH_ENABLE_AMR
 
-// Use a fast, ParallelMesh-safe definition
+  // Use a fast, ParallelMesh-safe definition
   const bool is_ancestor =
     !this->active() && !this->subactive();
 
-// But check for inconsistencies if we have time
+  // But check for inconsistencies if we have time
 #ifdef DEBUG
   if (!is_ancestor && this->has_children())
     {

@@ -97,8 +97,9 @@ KellyErrorEstimator::internal_side_integration ()
     {
       // Calculate solution gradients on fine and coarse elements
       // at this quadrature point
-      Gradient grad_fine   =   fine_context->side_gradient(var, qp),
-               grad_coarse = coarse_context->side_gradient(var, qp);
+      Gradient
+        grad_fine   = fine_context->side_gradient(var, qp),
+        grad_coarse = coarse_context->side_gradient(var, qp);
 
       // Find the jump in the normal derivative
       // at this quadrature point

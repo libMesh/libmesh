@@ -1213,7 +1213,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       if (!context.get_dof_indices(v).empty())
         {
           for (unsigned int i = 0;
-                i != context.get_dof_indices().size(); ++i)
+               i != context.get_dof_indices().size(); ++i)
             if (context.get_dof_indices()[i] ==
                 context.get_dof_indices(v)[0])
               j_offset = i;

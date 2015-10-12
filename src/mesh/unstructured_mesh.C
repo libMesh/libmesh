@@ -524,7 +524,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   for (unsigned int cn=0; cn != child->n_nodes();
                        ++cn)
                     if (child->point(cn).absolute_fuzzy_equals
-                          (current_elem->point(n), node_tolerance))
+                        (current_elem->point(n), node_tolerance))
                       {
                         child_contains_this_node = true;
                         break;

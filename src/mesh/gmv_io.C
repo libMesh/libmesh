@@ -663,7 +663,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
                   out_stream << '\n';
                 }
 
-                break;
+              break;
             }
 
           case 2:
@@ -751,7 +751,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
                   out_stream << '\n';
                 }
 
-                break;
+              break;
             }
 
           case 3:
@@ -910,7 +910,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
                   out_stream << '\n';
                 }
 
-                break;
+              break;
             }
 
           default:
@@ -1265,52 +1265,54 @@ void GMVIO::write_binary (const std::string& fname,
 
           case 1:
             {
-            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-              {
-                std::strcpy(buf, "line    ");
-                out_stream.write(buf, std::strlen(buf));
+              for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+                {
+                  std::strcpy(buf, "line    ");
+                  out_stream.write(buf, std::strlen(buf));
 
-                tempint = 2;
-                std::memcpy(buf, &tempint, sizeof(unsigned int));
-                out_stream.write(buf, sizeof(unsigned int));
+                  tempint = 2;
+                  std::memcpy(buf, &tempint, sizeof(unsigned int));
+                  out_stream.write(buf, sizeof(unsigned int));
 
-                std::vector<dof_id_type> conn;
-                (*it)->connectivity(se,TECPLOT,conn);
+                  std::vector<dof_id_type> conn;
+                  (*it)->connectivity(se,TECPLOT,conn);
 
-                out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-              }
+                  out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+                }
 
-            break;
+              break;
             }
 
           case 2:
             {
-            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-              {
-                std::strcpy(buf, "quad    ");
-                out_stream.write(buf, std::strlen(buf));
-                tempint = 4;
-                std::memcpy(buf, &tempint, sizeof(unsigned int));
-                out_stream.write(buf, sizeof(unsigned int));
-                std::vector<dof_id_type> conn;
-                (*it)->connectivity(se,TECPLOT,conn);
-                out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-              }
-            break;
+              for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+                {
+                  std::strcpy(buf, "quad    ");
+                  out_stream.write(buf, std::strlen(buf));
+                  tempint = 4;
+                  std::memcpy(buf, &tempint, sizeof(unsigned int));
+                  out_stream.write(buf, sizeof(unsigned int));
+                  std::vector<dof_id_type> conn;
+                  (*it)->connectivity(se,TECPLOT,conn);
+                  out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+                }
+
+              break;
             }
           case 3:
             {
-            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-              {
-                std::strcpy(buf, "phex8   ");
-                out_stream.write(buf, std::strlen(buf));
-                tempint = 8;
-                std::memcpy(buf, &tempint, sizeof(unsigned int));
-                out_stream.write(buf, sizeof(unsigned int));
-                std::vector<dof_id_type> conn;
-                (*it)->connectivity(se,TECPLOT,conn);
-                out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
-              }
+              for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+                {
+                  std::strcpy(buf, "phex8   ");
+                  out_stream.write(buf, std::strlen(buf));
+                  tempint = 8;
+                  std::memcpy(buf, &tempint, sizeof(unsigned int));
+                  out_stream.write(buf, sizeof(unsigned int));
+                  std::vector<dof_id_type> conn;
+                  (*it)->connectivity(se,TECPLOT,conn);
+                  out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+                }
+
               break;
             }
           default:

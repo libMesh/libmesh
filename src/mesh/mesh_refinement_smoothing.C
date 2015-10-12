@@ -373,14 +373,12 @@ bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch
             const Elem* neighbor = *n_it;
 
             const unsigned char neighbor_level =
-              cast_int<unsigned char>
-                (neighbor->level() +
-                 ((neighbor->refinement_flag() == Elem::REFINE) ? 1 : 0));
-            const unsigned char neighbor_p_level =
-              cast_int<unsigned char>
-                (neighbor->p_level() +
-                 ((neighbor->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+              cast_int<unsigned char>(neighbor->level() +
+                                      ((neighbor->refinement_flag() == Elem::REFINE) ? 1 : 0));
 
+            const unsigned char neighbor_p_level =
+              cast_int<unsigned char>(neighbor->p_level() +
+                                      ((neighbor->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
             if (((neighbor_level + 1 - max_mismatch) >
                  elem->level()) &&

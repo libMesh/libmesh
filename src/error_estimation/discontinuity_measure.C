@@ -91,8 +91,9 @@ DiscontinuityMeasure::internal_side_integration ()
     {
       // Calculate solution values on fine and coarse elements
       // at this quadrature point
-      Number u_fine   = fine_context->side_value(var, qp),
-             u_coarse = coarse_context->side_value(var, qp);
+      Number
+        u_fine   = fine_context->side_value(var, qp),
+        u_coarse = coarse_context->side_value(var, qp);
 
       // Find the jump in the value
       // at this quadrature point

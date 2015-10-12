@@ -333,8 +333,8 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
   const bool has_children = (rflag > invalid_rflag);
 
   const Elem::RefinementState refinement_flag = has_children ?
-      cast_int<Elem::RefinementState>(rflag - invalid_rflag - 1) :
-      cast_int<Elem::RefinementState>(rflag);
+    cast_int<Elem::RefinementState>(rflag - invalid_rflag - 1) :
+    cast_int<Elem::RefinementState>(rflag);
 
   // int 3: p refinement flag
   const int pflag = cast_int<int>(*in++);
