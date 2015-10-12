@@ -6,6 +6,7 @@
 *-opt
 *-devel
 *~
+*.pyc
 contrib/bin/xda2mgf
 contrib/bin/libmesh-config
 doc/Doxyfile
