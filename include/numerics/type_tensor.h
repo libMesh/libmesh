@@ -109,6 +109,11 @@ protected:
 public:
 
   /**
+   * Helper typdef for C++98 generic programming
+   */
+  typedef T value_type;
+
+  /**
    * Copy-constructor.
    */
   template<typename T2>
