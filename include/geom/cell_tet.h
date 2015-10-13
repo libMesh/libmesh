@@ -40,7 +40,14 @@ public:
    * Default tetrahedral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Tet (const unsigned int nn, Elem* p, Node** nodelinkdata);
+  Tet (const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata),
+    _diagonal_selection(INVALID_DIAG)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
@@ -189,22 +196,7 @@ protected:
    * of the three.
    */
   void choose_diagonal() const;
-
 };
-
-
-
-// ------------------------------------------------------------
-// Tet class member functions
-inline
-Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata)
-  , _diagonal_selection(INVALID_DIAG)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
 
 } // namespace libMesh
 

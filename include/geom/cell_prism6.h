@@ -57,7 +57,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Prism6  (Elem* p=NULL);
+  Prism6 (Elem* p=NULL) :
+    Prism(Prism6::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p PRISM6
@@ -178,17 +180,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// Prism6 class member functions
-inline
-Prism6::Prism6(Elem* p) :
-  Prism(Prism6::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

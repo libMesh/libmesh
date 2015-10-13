@@ -193,7 +193,6 @@ private:
    * of mid-side (or second-order) nodes
    */
   static const unsigned short int _second_order_adjacent_vertices[2][2];
-
 };
 
 

@@ -50,7 +50,9 @@ public:
    * Default infinite prism element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {}
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
@@ -132,17 +134,6 @@ protected:
    */
   static const Real _master_points[12][3];
 };
-
-
-
-// ------------------------------------------------------------
-// InfPrism class member functions
-inline
-InfPrism::InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata)
-{
-}
-
 
 } // namespace libMesh
 

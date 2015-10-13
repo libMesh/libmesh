@@ -61,7 +61,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfPrism6 (Elem* p=NULL);
+  InfPrism6 (Elem* p=NULL) :
+    InfPrism(InfPrism6::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 6.  The \p InfPrism6 has 6 nodes.
@@ -181,17 +183,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// InfPrism6 class member functions
-inline
-InfPrism6::InfPrism6(Elem* p) :
-  InfPrism(InfPrism6::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

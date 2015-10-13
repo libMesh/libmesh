@@ -74,7 +74,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid13 (Elem* p=NULL);
+  Pyramid13 (Elem* p=NULL) :
+    Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 13.
@@ -197,16 +199,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// Pyramid13 class member functions
-inline
-Pyramid13::Pyramid13(Elem* p) :
-  Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
-{
-}
 
 } // namespace libMesh
 

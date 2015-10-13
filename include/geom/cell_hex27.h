@@ -73,7 +73,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Hex27  (Elem* p=NULL);
+  Hex27 (Elem* p=NULL) :
+    Hex(Hex27::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p HEX27
@@ -243,17 +245,6 @@ private:
   static const unsigned short int _remaining_second_order_adjacent_vertices[6][4];
 
 };
-
-
-
-// ------------------------------------------------------------
-// Hex27 class member functions
-inline
-Hex27::Hex27(Elem* p) :
-  Hex(Hex27::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

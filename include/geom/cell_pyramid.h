@@ -41,7 +41,13 @@ public:
    * takes number of nodes and parent.
    * Derived classes implement 'true' elements.
    */
-  Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    Cell(nn, Pyramid::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
@@ -137,19 +143,6 @@ protected:
 #endif
 
 };
-
-
-
-// ------------------------------------------------------------
-// Pyramid class member functions
-inline
-Pyramid::Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Pyramid::n_sides(), p, _elemlinks_data, nodelinkdata)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
 
 } // namespace libMesh
 

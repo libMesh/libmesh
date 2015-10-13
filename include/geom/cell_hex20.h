@@ -73,7 +73,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Hex20  (Elem* p=NULL);
+  Hex20 (Elem* p=NULL) :
+    Hex(Hex20::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p HEX20
@@ -216,17 +218,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// Hex20 class member functions
-inline
-Hex20::Hex20(Elem* p) :
-  Hex(Hex20::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

@@ -59,7 +59,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Hex8 (Elem* p=NULL);
+  Hex8 (Elem* p=NULL) :
+    Hex(Hex8::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p HEX8
@@ -180,17 +182,6 @@ protected:
 
 #endif // LIBMESH_ENABLE_AMR
 };
-
-
-
-// ------------------------------------------------------------
-// Hex8 class member functions
-inline
-Hex8::Hex8(Elem* p) :
-  Hex(Hex8::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

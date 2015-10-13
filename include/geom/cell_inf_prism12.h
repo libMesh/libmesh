@@ -68,7 +68,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfPrism12 (Elem* p=NULL);
+  InfPrism12 (Elem* p=NULL) :
+    InfPrism(InfPrism12::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 12.  The \p InfPrism12 has 12 nodes.
@@ -225,17 +227,6 @@ private:
    */
   static const unsigned short int _second_order_vertex_child_index[12];
 };
-
-
-
-// ------------------------------------------------------------
-// InfPrism12 class member functions
-inline
-InfPrism12::InfPrism12(Elem* p) :
-  InfPrism(InfPrism12::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

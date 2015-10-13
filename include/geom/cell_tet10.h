@@ -65,7 +65,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet10 (Elem* p=NULL);
+  Tet10 (Elem* p=NULL) :
+    Tet(Tet10::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p TET10
@@ -230,16 +232,6 @@ private:
    */
   static const unsigned short int _second_order_vertex_child_index[10];
 };
-
-
-
-// ------------------------------------------------------------
-// Tet10 class member functions
-inline
-Tet10::Tet10(Elem* p) :
-  Tet(Tet10::n_nodes(), p, _nodelinks_data)
-{
-}
 
 } // namespace libMesh
 
