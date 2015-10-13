@@ -28,8 +28,6 @@
 namespace libMesh
 {
 
-
-
 /**
  * The \p BoundaryMesh is a \p Mesh in its own right, but it
  * contains a description of the boundary of some other mesh.
@@ -39,7 +37,6 @@ namespace libMesh
 class BoundaryMesh : public Mesh
 {
 public:
-
   /**
    * Constructor. Initializes dimenstion and processor id.
    */
@@ -57,16 +54,11 @@ public:
   BoundaryMesh (unsigned char dim=1);
 #endif
 
-
   /**
    * Destructor.
    */
   ~BoundaryMesh();
-
-private:
 };
-
-
 
 } // namespace libMesh
 
