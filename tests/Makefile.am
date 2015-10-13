@@ -31,6 +31,7 @@ unit_tests_sources = \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h \
+	numerics/vector_value_test.C \
 	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
 	parallel/parallel_point_test.C \
