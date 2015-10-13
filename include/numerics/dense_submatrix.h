@@ -74,7 +74,7 @@ public:
   /**
    * Set every element in the submatrix to 0.
    */
-  virtual void zero();
+  virtual void zero() libmesh_override;
 
   /**
    * @returns the \p (i,j) element of the submatrix.
@@ -92,23 +92,25 @@ public:
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T el(const unsigned int i,
-               const unsigned int j) const { return (*this)(i,j); }
+               const unsigned int j) const libmesh_override
+  { return (*this)(i,j); }
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T & el(const unsigned int i,
-                 const unsigned int j)     { return (*this)(i,j); }
+                 const unsigned int j) libmesh_override
+  { return (*this)(i,j); }
 
   /**
    * Performs the operation: (*this) <- M2 * (*this)
    */
-  virtual void left_multiply (const DenseMatrixBase<T>& M2);
+  virtual void left_multiply (const DenseMatrixBase<T>& M2) libmesh_override;
 
   /**
    * Performs the operation: (*this) <- (*this) * M3
    */
-  virtual void right_multiply (const DenseMatrixBase<T>& M3);
+  virtual void right_multiply (const DenseMatrixBase<T>& M3) libmesh_override;
 
   /**
    * Changes the location of the submatrix in the parent matrix.

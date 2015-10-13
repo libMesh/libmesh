@@ -85,7 +85,8 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual Output operator() (const FEMContext&, const Point& p,
+  virtual Output operator() (const FEMContext&,
+                             const Point& p,
                              const Real time = 0.) = 0;
 
 
@@ -94,7 +95,8 @@ public:
    * Returns in \p output the values of the data at the
    * coordinate \p p.
    */
-  void operator() (const FEMContext&, const Point& p,
+  void operator() (const FEMContext&,
+                   const Point& p,
                    DenseVector<Output>& output);
 
   /**
@@ -104,7 +106,8 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual void operator() (const FEMContext&, const Point& p,
+  virtual void operator() (const FEMContext&,
+                           const Point& p,
                            const Real time,
                            DenseVector<Output>& output) = 0;
 
@@ -118,15 +121,16 @@ public:
    * implementation is based on a vector evaluation, which is usually
    * unnecessarily inefficient.
    */
-  virtual Output component(const FEMContext&, unsigned int i,
+  virtual Output component(const FEMContext&,
+                           unsigned int i,
                            const Point& p,
                            Real time=0.);
-
 };
 
 template <typename Output>
 inline
-Output FEMFunctionBase<Output>::component (const FEMContext& context, unsigned int i,
+Output FEMFunctionBase<Output>::component (const FEMContext& context,
+                                           unsigned int i,
                                            const Point& p,
                                            Real time)
 {
@@ -137,7 +141,8 @@ Output FEMFunctionBase<Output>::component (const FEMContext& context, unsigned i
 
 template <typename Output>
 inline
-void FEMFunctionBase<Output>::operator() (const FEMContext& context, const Point& p,
+void FEMFunctionBase<Output>::operator() (const FEMContext& context,
+                                          const Point& p,
                                           DenseVector<Output>& output)
 {
   // Call the time-dependent function with t=0.

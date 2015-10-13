@@ -84,33 +84,32 @@ public:
   /**
    * The actual initialization process.
    */
-  void init ();
+  virtual void init () libmesh_override;
 
   /**
    * Clears the function.
    */
-  void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Returns a new deep copy of the function.
    */
-  virtual UniquePtr<FunctionBase<Output> > clone () const;
+  virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
   /**
    * @returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
-  Output operator() (const Point& p,
-                     const Real time=0.);
+  virtual Output operator() (const Point& p,
+                             const Real time=0.) libmesh_override;
 
   /**
    * Like before, but returns the values in a
    * writable reference.
    */
-  void operator() (const Point& p,
-                   const Real time,
-                   DenseVector<Output>& output);
-
+  virtual void operator() (const Point& p,
+                           const Real time,
+                           DenseVector<Output>& output) libmesh_override;
 };
 
 
