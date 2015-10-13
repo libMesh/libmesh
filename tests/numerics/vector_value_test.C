@@ -32,5 +32,15 @@ public:
   CPPUNIT_TEST_SUITE_END();
 };
 
+class ComplexVectorValueTest : public TypeVectorTestBase<VectorValue<Complex> > {
+public:
+  CPPUNIT_TEST_SUITE( NumberVectorValueTest );
+
+  VECTORVALUETEST
+
+  CPPUNIT_TEST_SUITE_END();
+};
+
 CPPUNIT_TEST_SUITE_REGISTRATION( RealVectorValueTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( NumberVectorValueTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( ComplexVectorValueTest );
