@@ -184,9 +184,9 @@ public:
   virtual void estimate_error (const System& system,
                                ErrorVector& error_per_cell,
                                const NumericVector<Number>* solution_vector = NULL,
-                               bool estimate_parent_error = false);
+                               bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const
+  virtual ErrorEstimatorType type() const libmesh_override
   { return EXACT;}
 
 private:

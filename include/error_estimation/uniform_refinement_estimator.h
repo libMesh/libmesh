@@ -80,7 +80,7 @@ public:
   virtual void estimate_error (const System& system,
                                ErrorVector& error_per_cell,
                                const NumericVector<Number>* solution_vector = NULL,
-                               bool estimate_parent_error = false);
+                               bool estimate_parent_error = false) libmesh_override;
 
   /**
    * Currently this function ignores the error_norm member variable,
@@ -93,7 +93,7 @@ public:
                                 ErrorVector& error_per_cell,
                                 const std::map<const System*, SystemNorm>& error_norms,
                                 const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
-                                bool estimate_parent_error = false);
+                                bool estimate_parent_error = false) libmesh_override;
 
   /**
    * Currently this function ignores the component_scale member variable,
@@ -106,9 +106,9 @@ public:
   virtual void estimate_errors (const EquationSystems& equation_systems,
                                 ErrorMap& errors_per_cell,
                                 const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
-                                bool estimate_parent_error = false);
+                                bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const
+  virtual ErrorEstimatorType type() const libmesh_override
   { return UNIFORM_REFINEMENT;}
 
   /**
