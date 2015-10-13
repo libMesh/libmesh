@@ -90,6 +90,19 @@ protected:
               boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
               const Scalar3>::type z=0);
 
+
+  /**
+   * Constructor-from-scalar.  Sets higher dimensional entries to 0.
+   * Necessary because for some reason the constructor-from-scalars
+   * alone is insufficient to let the compiler figure out
+   * TypeVector<Complex> v = 0;
+   */
+  template <typename Scalar>
+  TypeVector (const Scalar x,
+              typename
+              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+              const Scalar>::type* sfinae = NULL);
+
 public:
 
   /**
@@ -427,6 +440,27 @@ TypeVector<T>::TypeVector (typename
   _coords[2] = z;
 #else
   libmesh_assert_equal_to (z, 0);
+#endif
+}
+
+
+
+template <typename T>
+template <typename Scalar>
+inline
+TypeVector<T>::TypeVector (const Scalar x,
+                           typename
+                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                           const Scalar>::type* /*sfinae*/)
+{
+  _coords[0] = x;
+
+#if LIBMESH_DIM > 1
+  _coords[1] = 0;
+#endif
+
+#if LIBMESH_DIM > 2
+  _coords[2] = 0;
 #endif
 }
 

@@ -71,6 +71,20 @@ public:
                boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
                const Scalar3>::type z = 0);
 
+
+  /**
+   * Constructor-from-scalar.  Sets higher dimensional entries to 0.
+   * Necessary because for some reason the constructor-from-scalars
+   * alone is insufficient to let the compiler figure out
+   * VectorValue<Complex> v = 0;
+   */
+  template <typename Scalar>
+  VectorValue (const Scalar x,
+               typename
+               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+               const Scalar>::type* sfinae = NULL);
+
+
   /**
    * Copy-constructor.
    */
@@ -161,6 +175,16 @@ VectorValue<T>::VectorValue (typename
 }
 
 
+template <typename T>
+template <typename Scalar>
+inline
+VectorValue<T>::VectorValue (const Scalar x,
+                             typename
+                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                             const Scalar>::type* /*sfinae*/) :
+  TypeVector<T> (x)
+{
+}
 
 template <typename T>
 template <typename T2>
