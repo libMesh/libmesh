@@ -108,12 +108,12 @@ public:
    * functional.  The primal and dual subestimator error_norm values
    * are used, and should be chosen appropriately for your model.
    */
-  void estimate_error (const System& system,
-                       ErrorVector& error_per_cell,
-                       const NumericVector<Number>* solution_vector = NULL,
-                       bool estimate_parent_error = false);
+  virtual void estimate_error (const System& system,
+                               ErrorVector& error_per_cell,
+                               const NumericVector<Number>* solution_vector = NULL,
+                               bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const
+  virtual ErrorEstimatorType type() const libmesh_override
   { return ADJOINT_RESIDUAL;}
 
 protected:

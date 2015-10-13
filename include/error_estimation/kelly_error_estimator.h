@@ -87,7 +87,7 @@ public:
                                                           const Point& p,
                                                           const std::string& var_name));
 
-  virtual ErrorEstimatorType type() const
+  virtual ErrorEstimatorType type() const libmesh_override
   { return KELLY;}
 
 protected:

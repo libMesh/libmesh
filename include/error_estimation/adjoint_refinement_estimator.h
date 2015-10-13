@@ -127,17 +127,6 @@ protected:
   /* A vector to hold the computed global QoI error estimate */
   std::vector<Number> computed_global_QoI_errors;
 
-  /* /\** */
-  /*  * The code for estimate_error and both estimate_errors versions is very */
-  /*  * similar, so we use the same function for all three */
-  /*  *\/ */
-  /* virtual void _estimate_error (const EquationSystems *equation_systems, */
-  /*                               const System* system, */
-  /* ErrorVector* error_per_cell, */
-  /*         std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell, */
-  /*         const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL, */
-  /* bool estimate_parent_error = false); */
-
   /**
    * A QoISet to handle cases with multiple QoIs available
    */
