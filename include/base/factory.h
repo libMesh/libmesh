@@ -100,8 +100,7 @@ private:
   /**
    * @returns a new object of type Derived.
    */
-  UniquePtr<Base> create ();
-
+  virtual UniquePtr<Base> create () libmesh_override;
 };
 
 
