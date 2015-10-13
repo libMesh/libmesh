@@ -54,7 +54,7 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string& name);
+  virtual void read (const std::string& name) libmesh_override;
 
   /**
    * Default false.  Abaqus files have only nodesets in them by

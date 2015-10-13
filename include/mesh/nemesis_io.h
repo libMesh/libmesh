@@ -71,12 +71,12 @@ public:
    * You provide the basename, then LibMesh appends the ".size.rank"
    * depending on this->n_processors() and this->processor_id().
    */
-  virtual void read (const std::string& base_filename);
+  virtual void read (const std::string& base_filename) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& base_filename);
+  virtual void write (const std::string& base_filename) libmesh_override;
 
   /**
    * Write one timestep's worth of the solution.
