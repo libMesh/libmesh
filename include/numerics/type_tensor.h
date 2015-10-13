@@ -109,7 +109,7 @@ protected:
 public:
 
   /**
-   * Helper typdef for C++98 generic programming
+   * Helper typedef for C++98 generic programming
    */
   typedef T value_type;
 
