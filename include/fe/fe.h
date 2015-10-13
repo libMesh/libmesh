@@ -496,7 +496,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEClough(const FEType& fet);
+  FEClough(const FEType& fet) :
+    FE<Dim,CLOUGH> (fet)
+  {}
 };
 
 
@@ -518,7 +520,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEHermite(const FEType& fet);
+  FEHermite(const FEType& fet) :
+    FE<Dim,HERMITE> (fet)
+  {}
 
   /**
    * 1D hermite functions on unit interval
@@ -686,7 +690,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEHierarchic(const FEType& fet);
+  FEHierarchic(const FEType& fet) :
+    FE<Dim,HIERARCHIC> (fet)
+  {}
 };
 
 
@@ -708,7 +714,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEL2Hierarchic(const FEType& fet);
+  FEL2Hierarchic(const FEType& fet) :
+    FE<Dim,L2_HIERARCHIC> (fet)
+  {}
 };
 
 
@@ -730,7 +738,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FELagrange(const FEType& fet);
+  FELagrange(const FEType& fet) :
+    FE<Dim,LAGRANGE> (fet)
+  {}
 };
 
 
@@ -747,7 +757,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEL2Lagrange(const FEType& fet);
+  FEL2Lagrange(const FEType& fet) :
+    FE<Dim,L2_LAGRANGE> (fet)
+  {}
 };
 
 
@@ -768,7 +780,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEMonomial(const FEType& fet);
+  FEMonomial(const FEType& fet) :
+    FE<Dim,MONOMIAL> (fet)
+  {}
 };
 
 
@@ -787,7 +801,9 @@ public:
    * the system.
    */
   explicit
-  FEScalar(const FEType& fet);
+  FEScalar(const FEType& fet) :
+    FE<Dim,SCALAR> (fet)
+  {}
 };
 
 
@@ -809,7 +825,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FEXYZ(const FEType& fet);
+  FEXYZ(const FEType& fet) :
+    FE<Dim,XYZ> (fet)
+  {}
 
   /**
    * Explicitly call base class method.  This prevents some
@@ -882,8 +900,9 @@ public:
    * to be used in dimension \p Dim.
    */
   explicit
-  FELagrangeVec(const FEType& fet);
-
+  FELagrangeVec(const FEType& fet) :
+    FE<Dim,LAGRANGE_VEC> (fet)
+  {}
 };
 
 
@@ -899,14 +918,14 @@ template <unsigned int Dim>
 class FENedelecOne : public FE<Dim,NEDELEC_ONE>
 {
 public:
-
   /**
    * Constructor. Creates a vector Lagrange finite element
    * to be used in dimension \p Dim.
    */
   explicit
-  FENedelecOne(const FEType& fet);
-
+  FENedelecOne(const FEType& fet) :
+    FE<Dim,NEDELEC_ONE> (fet)
+  {}
 };
 
 
@@ -1021,7 +1040,6 @@ typedef FE<3,MONOMIAL> FEMonomial3D;
 
 
 
-
 // ------------------------------------------------------------
 // FE class inline members
 template <unsigned int Dim, FEFamily T>
@@ -1035,120 +1053,6 @@ FE<Dim,T>::FE (const FEType& fet) :
   // Family specified in the template instantiation
   // matches the one in the FEType object
   libmesh_assert_equal_to (T, this->get_family());
-}
-
-
-
-// ------------------------------------------------------------
-// FEClough class inline members
-template <unsigned int Dim>
-inline
-FEClough<Dim>::FEClough (const FEType& fet) :
-  FE<Dim,CLOUGH> (fet)
-{
-}
-
-
-
-// ------------------------------------------------------------
-// FEHermite class inline members
-template <unsigned int Dim>
-inline
-FEHermite<Dim>::FEHermite (const FEType& fet) :
-  FE<Dim,HERMITE> (fet)
-{
-}
-
-
-
-// ------------------------------------------------------------
-// FEHierarchic class inline members
-template <unsigned int Dim>
-inline
-FEHierarchic<Dim>::FEHierarchic (const FEType& fet) :
-  FE<Dim,HIERARCHIC> (fet)
-{
-}
-
-
-
-// ------------------------------------------------------------
-// FEL2Hierarchic class inline members
-template <unsigned int Dim>
-inline
-FEL2Hierarchic<Dim>::FEL2Hierarchic (const FEType& fet) :
-  FE<Dim,L2_HIERARCHIC> (fet)
-{
-}
-
-
-
-// ------------------------------------------------------------
-// FELagrange class inline members
-template <unsigned int Dim>
-inline
-FELagrange<Dim>::FELagrange (const FEType& fet) :
-  FE<Dim,LAGRANGE> (fet)
-{
-}
-
-// ------------------------------------------------------------
-// FELagrangeVec class inline members
-template <unsigned int Dim>
-inline
-FELagrangeVec<Dim>::FELagrangeVec (const FEType& fet) :
-  FE<Dim,LAGRANGE_VEC> (fet)
-{
-}
-
-// ------------------------------------------------------------
-// FEL2Lagrange class inline members
-template <unsigned int Dim>
-inline
-FEL2Lagrange<Dim>::FEL2Lagrange (const FEType& fet) :
-  FE<Dim,L2_LAGRANGE> (fet)
-{
-}
-
-
-
-// ------------------------------------------------------------
-// FEMonomial class inline members
-template <unsigned int Dim>
-inline
-FEMonomial<Dim>::FEMonomial (const FEType& fet) :
-  FE<Dim,MONOMIAL> (fet)
-{
-}
-
-
-
-
-// ------------------------------------------------------------
-// FEXYZ class inline members
-template <unsigned int Dim>
-inline
-FEXYZ<Dim>::FEXYZ (const FEType& fet) :
-  FE<Dim,XYZ> (fet)
-{
-}
-
-// ------------------------------------------------------------
-// FEScalar class inline members
-template <unsigned int Dim>
-inline
-FEScalar<Dim>::FEScalar (const FEType& fet) :
-  FE<Dim,SCALAR> (fet)
-{
-}
-
-// ------------------------------------------------------------
-// FENedelecOne class inline members
-template <unsigned int Dim>
-inline
-FENedelecOne<Dim>::FENedelecOne (const FEType& fet) :
-  FE<Dim,NEDELEC_ONE> (fet)
-{
 }
 
 } // namespace libMesh
