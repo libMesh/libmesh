@@ -131,6 +131,19 @@ public:
     CPPUNIT_ASSERT_EQUAL( T(1), (avector)(2) );
   }
 
+  void testScalarInit()  // Not valid for all derived classes!
+  {
+    DerivedClass avector = 0;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+
+    DerivedClass bvector = 2.0;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , libmesh_real(bvector(0)) , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(bvector(1)) , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , libmesh_real(bvector(2)) , TOLERANCE*TOLERANCE );
+  }
+
   void testScalarMult()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(0)) , TOLERANCE*TOLERANCE );
