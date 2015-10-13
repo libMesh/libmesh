@@ -56,7 +56,7 @@ public:
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -64,65 +64,60 @@ public:
                  _master_points[i][2]);
   }
 
-  //   /**
-  //    * @returns 4 for the base \p s=0 and 2 for side faces.
-  //    */
-  //   unsigned int n_children_per_side(const unsigned int s) const;
-
   /**
    * @returns 4.  Infinite elements have one side less
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.
    */
-  unsigned int n_sides() const { return 4; }
+  virtual unsigned int n_sides() const libmesh_override { return 4; }
 
   /**
    * @returns 6.  All infinite prisms (in our
    * setting) have 6 vertices.
    */
-  unsigned int n_vertices() const { return 6; }
+  virtual unsigned int n_vertices() const libmesh_override { return 6; }
 
   /**
    * @returns 6.  All infinite prismahedrals have 6 edges,
    * 3 lying in the base, and 3 perpendicular to the base.
    */
-  unsigned int n_edges() const { return 6; }
+  virtual unsigned int n_edges() const libmesh_override { return 6; }
 
   /**
    * @returns 4.  All prisms have 4 faces.
    */
-  unsigned int n_faces() const { return 4; }
+  virtual unsigned int n_faces() const libmesh_override { return 4; }
 
   /**
    * @returns 4
    */
-  unsigned int n_children() const { return 4; }
+  virtual unsigned int n_children() const libmesh_override { return 4; }
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+                                const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * @returns a primitive (3-noded) tri or (4-noded) infquad for
    * face i.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
 
 protected:
@@ -147,26 +142,6 @@ InfPrism::InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
   InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata)
 {
 }
-
-
-// inline
-// unsigned int InfPrism::n_children_per_side(const unsigned int s) const
-// {
-//   libmesh_assert_less (s, this->n_sides());
-
-//   switch (s)
-//   {
-//     case 0:
-//       // every infinite prism has 4 children in the base side
-//       return 4;
-
-//     default:
-//       // on infinite faces (sides), only 2 children exist
-//       //
-//       // note that the face at infinity is already caught by the libmesh_assertion
-//       return 2;
-//   }
-// }
 
 
 } // namespace libMesh

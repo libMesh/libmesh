@@ -82,70 +82,70 @@ public:
   /**
    * @returns 16.  The \p InfHex16 has 16 nodes.
    */
-  unsigned int n_nodes() const { return 16; }
+  virtual unsigned int n_nodes() const libmesh_override { return 16; }
 
   /**
    * @returns \p INFHEX16
    */
-  ElemType     type ()   const { return INFHEX16; }
+  virtual ElemType type () const libmesh_override { return INFHEX16; }
 
   /**
-   * @returns 4
+   * @returns the number of sub elements for this element type.
    */
-  unsigned int n_sub_elem() const { return 1; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+                               const unsigned int e) const libmesh_override;
 
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; }
+  virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
    * Returns a \p QUAD8 built coincident with face 0, an \p INFQUAD6
    * built coincident with faces 1 to 4. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy) const libmesh_override;
 
   /**
    * Returns a \p EDGE3 built coincident with edges 0 to 3, or \p INFEDGE2
    * built coincident with edges 4 to 11. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
@@ -153,7 +153,7 @@ public:
   /**
    * @returns 2 for all \p n
    */
-  unsigned int n_second_order_adjacent_vertices (const unsigned int) const
+  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override
   { return 2; }
 
   /**
@@ -161,8 +161,8 @@ public:
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 8 \le n < 16 \f$.
    */
-  unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                   const unsigned int v) const;
+  virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
+                                                           const unsigned int v) const libmesh_override;
 
   /**
    * @returns the child number \p c and element-local index \p v of the
@@ -174,7 +174,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-  second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -204,9 +204,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
+  virtual float embedding_matrix (const unsigned int i,
+                                  const unsigned int j,
+                                  const unsigned int k) const libmesh_override
   { return _embedding_matrix[i][j][k]; }
 
   /**

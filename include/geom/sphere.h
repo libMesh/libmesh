@@ -119,13 +119,13 @@ public:
    * @returns true if the point p is above the surface,
    * false otherwise.
    */
-  bool above_surface (const Point& p) const;
+  virtual bool above_surface (const Point& p) const libmesh_override;
 
   /**
    * @returns true if the point p is below the surface,
    * false otherwise.
    */
-  bool below_surface (const Point& p) const;
+  virtual bool below_surface (const Point& p) const libmesh_override;
 
   /**
    * @returns true if the point p is on the surface,
@@ -133,18 +133,18 @@ public:
    * the surface really means "very close" to account
    * for roundoff error.
    */
-  bool on_surface (const Point& p) const;
+  virtual bool on_surface (const Point& p) const libmesh_override;
 
   /**
    * @returns the closest point on the surface to point p.
    */
-  Point closest_point (const Point& p) const;
+  virtual Point closest_point (const Point& p) const libmesh_override;
 
   /**
    * @returns a unit vector normal to the surface at
    * point p.
    */
-  Point unit_normal (const Point& p) const;
+  virtual Point unit_normal (const Point& p) const libmesh_override;
 
   /**
    * Returns the radius of the sphere.
@@ -170,17 +170,16 @@ public:
    * @returns the spherical coordinates for the
    * cartesian coordinates \p cart.
    */
-  Point surface_coords (const Point& cart) const;
+  virtual Point surface_coords (const Point& cart) const libmesh_override;
 
   /**
    * @returns the cartesian coordinates for the
    * spherical coordinates \p sph.
    */
-  Point world_coords (const Point& sph) const;
+  virtual Point world_coords (const Point& sph) const libmesh_override;
 
 
 private:
-
 
   /**
    * The center of the sphere.

@@ -64,66 +64,66 @@ public:
   /**
    * @returns \p TRI3
    */
-  ElemType type () const { return TRI3; }
+  virtual ElemType type () const libmesh_override { return TRI3; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (== is_node_on_side in 2D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const
+                               const unsigned int e) const libmesh_override
   { return this->is_node_on_side(n,e); }
 
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
-  virtual bool has_affine_map () const { return true; }
+  virtual bool has_affine_map () const libmesh_override { return true; }
 
   /**
    * @returns true iff the Lagrange shape functions on this element
    * are linear
    */
-  virtual bool is_linear () const { return true; }
+  virtual bool is_linear () const libmesh_override { return true; }
 
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; }
+  virtual Order default_order() const libmesh_override { return FIRST; }
 
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy) const libmesh_override;
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -135,7 +135,7 @@ public:
   /**
    * An optimized method for computing the area of a 3-node triangle.
    */
-  virtual Real volume () const;
+  virtual Real volume () const libmesh_override;
 
   /**
    * Returns the minimum and maximum angles for the triangle
@@ -158,9 +158,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
+  virtual float embedding_matrix (const unsigned int i,
+                                  const unsigned int j,
+                                  const unsigned int k) const libmesh_override
   { return _embedding_matrix[i][j][k]; }
 
   /**

@@ -79,7 +79,7 @@ public:
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -90,98 +90,93 @@ public:
   /**
    * @returns 2, the dimensionality of the object.
    */
-  unsigned int dim() const { return 2; }
-
-  //   /**
-  //    * @returns 2 for the base, 1 otherwise
-  //    */
-  //   unsigned int n_children_per_side(const unsigned int s) const;
+  virtual unsigned int dim() const libmesh_override { return 2; }
 
   /**
    * @returns 3.  Infinite faces have one side less
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.
    */
-  unsigned int n_sides() const { return 3; }
+  virtual unsigned int n_sides() const libmesh_override { return 3; }
 
   /**
    * @returns 4.  All infinite quads (in our setting) have 4 vertices.
    */
-  unsigned int n_vertices() const { return 4; }
+  virtual unsigned int n_vertices() const libmesh_override { return 4; }
 
   /**
    * @returns 3.  All infinite quads have 1 edge in the
    * base, and 2 perpendicular to the base.
    */
-  unsigned int n_edges() const { return 3; }
+  virtual unsigned int n_edges() const libmesh_override { return 3; }
 
   /**
    * @returns 0.  All 2D elements have no faces, just
    * edges.
    */
-  unsigned int n_faces() const { return 0; }
+  virtual unsigned int n_faces() const libmesh_override { return 0; }
 
   /**
    * @returns 2
    */
-  unsigned int n_children() const { return 2; }
+  virtual unsigned int n_children() const libmesh_override { return 2; }
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+                                const unsigned int s) const libmesh_override;
 
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * @returns a primitive (2-noded) edge or infedge for
    * edge \p i.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
   /**
    * build_edge and build_side are identical in 2D
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override
   { return build_side(i); }
 
   /*
    * is_edge_on_side is trivial in 2D
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const
+                               const unsigned int s) const libmesh_override
   { return (e == s); }
 
   /**
    * Based on the quality metric \p q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  Real quality (const ElemQuality q) const;
+  virtual Real quality (const ElemQuality q) const libmesh_override;
 
   /**
    * Returns the suggested quality bounds for
    * the hex based on quality measure q.  These are
    * the values suggested by the CUBIT User's Manual.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const libmesh_override;
 
   /**
    * @returns \p true.  All classes derived from \p InfQuad
    * are infinite elements.
    */
-  bool infinite () const { return true; }
+  virtual bool infinite () const libmesh_override { return true; }
 
   /**
    * @returns the origin of this infinite element.
    */
-  Point origin () const;
+  virtual Point origin () const libmesh_override;
 
 
 protected:
@@ -196,27 +191,6 @@ protected:
    */
   static const Real _master_points[6][3];
 };
-
-
-
-// ------------------------------------------------------------
-// InfQuad class member functions
-// inline
-// unsigned int InfQuad::n_children_per_side(const unsigned int s) const
-// {
-//   libmesh_assert_less (s, this->n_sides());
-
-//   switch (s)
-//   {
-//     case 0:
-//       // every infinite face has 2 children in the base edge
-//       return 2;
-
-//     default:
-//       // on infinite edges only 1 child
-//       return 1;
-//   }
-// }
 
 
 

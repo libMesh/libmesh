@@ -46,7 +46,7 @@ public:
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -58,58 +58,58 @@ public:
    * @returns 6.  All prism-derivatives are guaranteed to have at
    * least 6 nodes.
    */
-  unsigned int n_nodes() const { return 6; }
+  virtual unsigned int n_nodes() const libmesh_override { return 6; }
 
   /**
    * @returns 5
    */
-  unsigned int n_sides() const { return 5; }
+  virtual unsigned int n_sides() const libmesh_override { return 5; }
 
   /**
    * @returns 6.  All prisms have 6 vertices.
    */
-  unsigned int n_vertices() const { return 6; }
+  virtual unsigned int n_vertices() const libmesh_override { return 6; }
 
   /**
    * @returns 9.  All prisms have 9 edges.
    */
-  unsigned int n_edges() const { return 9; }
+  virtual unsigned int n_edges() const libmesh_override { return 9; }
 
   /**
    * @returns 5.  All prisms have 5 faces.
    */
-  unsigned int n_faces() const { return 5; }
+  virtual unsigned int n_faces() const libmesh_override { return 5; }
 
   /**
    * @returns 8
    */
-  unsigned int n_children() const { return 8; }
+  virtual unsigned int n_children() const libmesh_override { return 8; }
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+                                const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * @returns a primitive triangle or quad for
    * face i.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
 
 

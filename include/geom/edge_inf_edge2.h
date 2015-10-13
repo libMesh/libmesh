@@ -65,7 +65,7 @@ public:
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(0,i,0);
@@ -74,62 +74,62 @@ public:
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+                               const unsigned int e) const libmesh_override;
 
   /**
    * @returns \p INFEDGE2
    */
-  ElemType type()  const { return INFEDGE2; }
+  virtual ElemType type() const libmesh_override { return INFEDGE2; }
 
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; }
+  virtual Order default_order() const libmesh_override { return FIRST; }
 
   virtual void connectivity(const unsigned int se,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p true.  This is an infinite element.
    */
-  bool infinite () const { return true; }
+  virtual bool infinite () const libmesh_override { return true; }
 
   /**
    * @returns the origin of this infinite element.
    */
-  Point origin () const;
+  virtual Point origin () const libmesh_override;
 
 #endif
 
@@ -148,9 +148,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int,
-                          const unsigned int,
-                          const unsigned int) const
+  virtual float embedding_matrix (const unsigned int,
+                                  const unsigned int,
+                                  const unsigned int) const libmesh_override
   { libmesh_not_implemented(); return 0.; }
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
