@@ -176,7 +176,10 @@ public:
   /**
    * @returns the origin of this infinite element.
    */
-  virtual Point origin () const libmesh_override;
+  virtual Point origin () const libmesh_override
+  {
+    return ( this->point(0)*2 - this->point(this->n_vertices()/2) );
+  }
 
 
 protected:
@@ -191,15 +194,6 @@ protected:
    */
   static const Real _master_points[6][3];
 };
-
-
-
-inline
-Point InfQuad::origin () const
-{
-  return ( this->point(0)*2 - this->point(this->n_vertices()/2) );
-}
-
 
 } // namespace libMesh
 

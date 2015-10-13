@@ -58,7 +58,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet4 (Elem* p=NULL);
+  Tet4 (Elem* p=NULL) :
+    Tet(Tet4::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p TET4
@@ -202,16 +204,6 @@ protected:
 #endif
 
 };
-
-
-
-// ------------------------------------------------------------
-// Tet4 class member functions
-inline
-Tet4::Tet4(Elem* p) :
-  Tet(Tet4::n_nodes(), p, _nodelinks_data)
-{
-}
 
 } // namespace libMesh
 

@@ -63,7 +63,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfHex8 (Elem* p=NULL);
+  InfHex8 (Elem* p=NULL) :
+    InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 8.  The \p InfHex8 has 8 nodes.
@@ -186,17 +188,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// InfHex8 class member functions
-inline
-InfHex8::InfHex8(Elem* p) :
-  InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

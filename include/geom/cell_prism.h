@@ -40,7 +40,13 @@ public:
    * Default prismatic element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Prism(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  Prism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
@@ -112,15 +118,12 @@ public:
   virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
 
-
 protected:
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[6+(LIBMESH_DIM>3)];
-
-
 
   /**
    * Matrix that tells which vertices define the location
@@ -145,19 +148,6 @@ protected:
    */
   static const Real _master_points[18][3];
 };
-
-
-
-// ------------------------------------------------------------
-// Prism class member functions
-inline
-Prism::Prism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
 
 } // namespace libMesh
 

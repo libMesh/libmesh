@@ -67,21 +67,13 @@ public:
   /**
    * @returns the origin of this infinite element.
    */
-  virtual Point origin () const libmesh_override;
+  virtual Point origin () const libmesh_override
+  {
+    return (this->point(0)*2 - this->point(this->n_vertices()/2));
+  }
 };
 
-
-// ------------------------------------------------------------
-// InfCell inline functions
-inline
-Point InfCell::origin () const
-{
-  return ( this->point(0)*2 - this->point( this->n_vertices()/2 ) );
-}
-
-
 } // namespace libMesh
-
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

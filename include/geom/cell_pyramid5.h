@@ -58,7 +58,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid5 (Elem* p=NULL);
+  Pyramid5 (Elem* p=NULL) :
+    Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p PRYAMID
@@ -169,16 +171,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// Pyramid5 class member functions
-inline
-Pyramid5::Pyramid5(Elem* p) :
-  Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data)
-{
-}
 
 } // namespace libMesh
 

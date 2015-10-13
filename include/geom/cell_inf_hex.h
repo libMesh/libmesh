@@ -30,9 +30,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * The \p InfHex is an element in 3D with 5 sides.
  * The \f$ 6^{th} \f$ side is theoretically located at infinity,
@@ -50,7 +47,13 @@ public:
    * Default infinite brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    InfCell(nn, InfHex::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
@@ -167,19 +170,6 @@ protected:
    */
   static const Real _master_points[18][3];
 };
-
-
-
-// ------------------------------------------------------------
-// InfHex class member functions
-inline
-InfHex::InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  InfCell(nn, InfHex::n_sides(), p, _elemlinks_data, nodelinkdata)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
 
 
 } // namespace libMesh

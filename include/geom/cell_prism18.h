@@ -75,7 +75,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Prism18  (Elem* p=NULL);
+  Prism18 (Elem* p=NULL) :
+    Prism(Prism18::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p PRISM18
@@ -238,17 +240,6 @@ protected:
    */
   static const unsigned short int _remaining_second_order_adjacent_vertices[3][4];
 };
-
-
-
-// ------------------------------------------------------------
-// Prism18 class member functions
-inline
-Prism18::Prism18(Elem* p) :
-  Prism(Prism18::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

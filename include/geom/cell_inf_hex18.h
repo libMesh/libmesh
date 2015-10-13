@@ -77,7 +77,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfHex18 (Elem* p=NULL);
+  InfHex18 (Elem* p=NULL) :
+    InfHex(InfHex18::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 18.  The \p InfHex18 has 18 nodes.
@@ -229,17 +231,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// InfHex18 class member functions
-inline
-InfHex18::InfHex18(Elem* p) :
-  InfHex(InfHex18::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

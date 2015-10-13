@@ -75,7 +75,9 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Prism15  (Elem* p=NULL);
+  Prism15 (Elem* p=NULL) :
+    Prism(Prism15::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p PRISM15
@@ -216,19 +218,7 @@ protected:
 
 #endif
 
-
 };
-
-
-
-// ------------------------------------------------------------
-// Prism15 class member functions
-inline
-Prism15::Prism15(Elem* p) :
-  Prism(Prism15::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 
