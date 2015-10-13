@@ -459,7 +459,7 @@ protected:
    * an infinite element.
    */
   virtual void init_base_shape_functions(const std::vector<Point>& qp,
-                                         const Elem* e);
+                                         const Elem* e) libmesh_override;
 
 #endif
 
@@ -583,7 +583,7 @@ public:
    */
   virtual void reinit (const Elem* elem,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL);
+                       const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * This prevents some compilers being confused by partially
@@ -593,7 +593,7 @@ public:
                        const unsigned int,
                        const Real = TOLERANCE,
                        const std::vector<Point>* const = NULL,
-                       const std::vector<Real>* const = NULL)
+                       const std::vector<Real>* const = NULL) libmesh_override
   { libmesh_not_implemented(); }
 
   /**
@@ -601,7 +601,7 @@ public:
    * locations (on a reference element) where the shape functions are
    * to be calculated.
    */
-  virtual void attach_quadrature_rule (QBase* q);
+  virtual void attach_quadrature_rule (QBase* q) libmesh_override;
 
   /**
    * Update the various member data fields \p phi,
@@ -611,7 +611,7 @@ public:
    * the quadrature points.
    */
   virtual void init_shape_functions(const std::vector<Point>& qp,
-                                    const Elem* elem);
+                                    const Elem* elem) libmesh_override;
 
   /**
    * @returns the value of the \f$ i^{th} \f$ of the 12 quartic
@@ -817,7 +817,7 @@ public:
    */
   virtual void reinit (const Elem* elem,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL)
+                       const std::vector<Real>* const weights = NULL) libmesh_override
   { FE<Dim,XYZ>::reinit (elem, pts, weights); }
 
   /**
@@ -828,7 +828,7 @@ public:
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL);
+                       const std::vector<Real>* const weights = NULL) libmesh_override;
 
 
 protected:
@@ -841,7 +841,7 @@ protected:
    * the quadrature points.
    */
   virtual void init_shape_functions(const std::vector<Point>& qp,
-                                    const Elem* e);
+                                    const Elem* e) libmesh_override;
 
   /**
    * After having updated the jacobian and the transformation
@@ -853,7 +853,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem* elem, const std::vector<Point>& qp);
+  virtual void compute_shape_functions(const Elem* elem, const std::vector<Point>& qp) libmesh_override;
 
   /**
    * Compute the map & shape functions for this face.
