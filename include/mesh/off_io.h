@@ -51,7 +51,7 @@ public:
    * Reads in an OFF OOGL data file based on the string
    * you pass it.
    */
-  virtual void read (const std::string& name);
+  virtual void read (const std::string& name) libmesh_override;
 
 private:
   /**
@@ -59,7 +59,7 @@ private:
    * is called by the public interface function and implements
    * reading the file.
    */
-  virtual void read_stream (std::istream& in);
+  void read_stream (std::istream& in);
 };
 
 

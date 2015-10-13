@@ -73,13 +73,13 @@ public:
    * The user is responsible for calling Mesh::prepare_for_use()
    * after reading the mesh and before using it.
    */
-  virtual void read (const std::string& name);
+  virtual void read (const std::string& name) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file
    * in the Gmsh *.msh format.
    */
-  virtual void write (const std::string& name);
+  virtual void write (const std::string& name) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -87,7 +87,7 @@ public:
    */
   virtual void write_nodal_data (const std::string&,
                                  const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+                                 const std::vector<std::string>&) libmesh_override;
 
   /**
    * Flag indicating whether or not to write a binary file.  While binary
@@ -113,13 +113,13 @@ private:
    * is called by the public interface function and implements
    * reading the file.
    */
-  virtual void read_mesh (std::istream& in);
+  void read_mesh (std::istream& in);
 
   /**
    * This method implements writing a mesh to a
    * specified file.  This will write an ASCII *.msh file.
    */
-  virtual void write_mesh (std::ostream& out);
+  void write_mesh (std::ostream& out);
 
   /**
    * This method implements writing a mesh with nodal data to a specified file

@@ -68,12 +68,12 @@ public:
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& );
+  virtual void write (const std::string&) libmesh_override;
 
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string& mesh_file);
+  virtual void read (const std::string& mesh_file) libmesh_override;
 
   //   /**
   //    * This method implements reading a mesh from a specified file.
@@ -96,7 +96,7 @@ public:
    */
   virtual void write_nodal_data (const std::string&,
                                  const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+                                 const std::vector<std::string>&) libmesh_override;
 
   /**
    * Flag indicating whether or not to write a binary file.  While binary
