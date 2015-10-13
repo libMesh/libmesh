@@ -88,25 +88,23 @@ public:
    */
   ~MeshFunction ();
 
-
-
   /**
-   * The actual initialization process.
-   * specifies the method to use when building a \p PointLocator
+   * Override the FunctionBase::init() member function by calling our
+   * own and specifying the Trees::NODES method.  specifies the method
+   * to use when building a \p PointLocator
    */
-  void init () { this->init(Trees::NODES); }
-
+  virtual void init () libmesh_override { this->init(Trees::NODES); }
 
   /**
    * The actual initialization process.  Takes an optional argument which
    * specifies the method to use when building a \p PointLocator
    */
-  virtual void init (const Trees::BuildType point_locator_build_type);
+  void init (const Trees::BuildType point_locator_build_type);
 
   /**
    * Clears the function.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Returns a new copy of the function.  The new copy uses the
@@ -115,7 +113,7 @@ public:
    * Note that this implies the copy should not be used after the
    * original is destroyed.
    */
-  virtual UniquePtr<FunctionBase<Number> > clone () const;
+  virtual UniquePtr<FunctionBase<Number> > clone () const libmesh_override;
 
   /**
    * @returns the value of variable 0 at point
