@@ -934,9 +934,9 @@ bool TypeVector<T>::operator == (const TypeVector<T>& rhs) const
 
 
 
-template <>
+template <typename T>
 inline
-bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
+bool TypeVector<T>::operator != (const TypeVector<T>& rhs) const
 {
   return (!(*this == rhs));
 }
