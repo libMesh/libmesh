@@ -27,10 +27,6 @@ namespace libMesh
 {
 
 
-// Forward declarations
-
-
-
 /**
  * The \p Cell is an abstract element type that lives in
  * three dimensions.  A cell could be a tetrahedron, a hexahedron,
@@ -55,22 +51,15 @@ public:
    */
   unsigned int dim () const { return 3; }
 
-  //   /**
-  //    * @returns 4
-  //    */
-  //   unsigned int n_children_per_side(const unsigned int) const { return 4; }
-
-
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p false.  All classes derived from \p Cell
    * are finite elements.
    */
-  bool infinite () const { return false; }
+  virtual bool infinite () const libmesh_override { return false; }
 
 #endif
-
 };
 
 

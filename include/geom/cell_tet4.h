@@ -58,92 +58,92 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet4  (Elem* p=NULL);
+  Tet4 (Elem* p=NULL);
 
   /**
    * @returns \p TET4
    */
-  ElemType type () const { return TET4; }
+  virtual ElemType type () const libmesh_override { return TET4; }
 
   /**
    * @returns 4
    */
-  unsigned int n_nodes() const { return 4; }
+  virtual unsigned int n_nodes() const libmesh_override { return 4; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+                               const unsigned int e) const libmesh_override;
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+                                const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
-  virtual bool has_affine_map () const { return true; }
+  virtual bool has_affine_map () const libmesh_override { return true; }
 
   /**
    * @returns true iff the Lagrange shape functions on this element
    * are linear
    */
-  virtual bool is_linear () const { return true; }
+  virtual bool is_linear () const libmesh_override { return true; }
 
   /**
    * @returns FIRST
    */
-  Order default_order() const { return FIRST; }
+  virtual Order default_order() const libmesh_override { return FIRST; }
 
   /**
    * Builds a \p TRI3 built coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy) const libmesh_override;
 
   /**
    * Builds a \p EDGE2 built coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -161,7 +161,7 @@ public:
    * An optimized method for computing the area of a
    * 4-node tetrahedron.
    */
-  virtual Real volume () const;
+  virtual Real volume () const libmesh_override;
 
   /**
    * Returns the min and max *dihedral* angles for the tetrahedron.
@@ -187,9 +187,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const;
+  virtual float embedding_matrix (const unsigned int i,
+                                  const unsigned int j,
+                                  const unsigned int k) const libmesh_override;
 
   /**
    * Matrix that computes new nodal locations/solution values
@@ -198,27 +198,6 @@ protected:
   static const float _embedding_matrix[8][4][4];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
-
-  // public:
-  //
-  //  /**
-  //   * Allows the user to reselect the diagonal after refinement.  This
-  //   * function may only be called directly after the element is refined
-  //   * for the first time (and before the \p EquationSystems::reinit()
-  //   * is called).  It will destroy and re-create the children if
-  //   * necessary.
-  //   */
-  //  void reselect_diagonal (const Diagonal diag);
-  //
-  //  /**
-  //   * Reselects the diagonal after refinement to be the optimal one.
-  //   * This makes sense if the user has moved some grid points, so that
-  //   * the former optimal choice is no longer optimal.  Also, the user
-  //   * may exclude one diagonal from this selection by giving it as
-  //   * argument.  In this case, the more optimal one of the remaining
-  //   * two diagonals is chosen.
-  //   */
-  //  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
 
 #endif
 
