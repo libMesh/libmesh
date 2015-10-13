@@ -10,11 +10,15 @@
 
 using namespace libMesh;
 
+#define VECTORVALUETEST                         \
+  TYPEVECTORTEST                                \
+  CPPUNIT_TEST( testScalarInit );               \
+
 class RealVectorValueTest : public TypeVectorTestBase<VectorValue<Real> > {
 public:
   CPPUNIT_TEST_SUITE( RealVectorValueTest );
 
-  TYPEVECTORTEST
+  VECTORVALUETEST
 
   CPPUNIT_TEST_SUITE_END();
 };
@@ -23,7 +27,7 @@ class NumberVectorValueTest : public TypeVectorTestBase<VectorValue<Number> > {
 public:
   CPPUNIT_TEST_SUITE( NumberVectorValueTest );
 
-  TYPEVECTORTEST
+  VECTORVALUETEST
 
   CPPUNIT_TEST_SUITE_END();
 };
