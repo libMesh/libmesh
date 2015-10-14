@@ -45,12 +45,22 @@ public:
    * Constructor.  Declares the order of the quadrature rule.
    */
   QGauss (const unsigned int _dim,
-          const Order _order=INVALID_ORDER);
+          const Order _order=INVALID_ORDER) :
+    QBase(_dim, _order)
+  {
+    // explicitly call the init function in 1D since the
+    // other tensor-product rules require this one.
+    // note that EDGE will not be used internally, however
+    // if we called the function with INVALID_ELEM it would try to
+    // be smart and return, thinking it had already done the work.
+    if (_dim == 1)
+      init(EDGE2);
+  }
 
   /**
    * Destructor.
    */
-  ~QGauss();
+  ~QGauss() {}
 
   /**
    * @returns \p QGAUSS
@@ -66,7 +76,6 @@ private:
                         unsigned int p_level=0) libmesh_override;
   virtual void init_3D (const ElemType _type=INVALID_ELEM,
                         unsigned int p_level=0) libmesh_override;
-
 
   /**
    * The Dunavant rule is for triangles.  It takes permutation points and
@@ -93,34 +102,6 @@ private:
                   const unsigned int n_pts);
 };
 
-
-
-// ------------------------------------------------------------
-// QGauss class members
-inline
-QGauss::QGauss(const unsigned int d,
-               const Order o) : QBase(d,o)
-{
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    init(EDGE2);
-}
-
-
-
-
-inline
-QGauss::~QGauss()
-{
-}
-
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_QUADRATURE_GAUSS_H

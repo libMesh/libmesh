@@ -45,7 +45,17 @@ public:
    */
   explicit
   QTrap (const unsigned int _dim,
-         const Order o=FIRST);
+         const Order o=FIRST) :
+    QBase(_dim,o)
+  {
+    // explicitly call the init function in 1D since the
+    // other tensor-product rules require this one.
+    // note that EDGE will not be used internally, however
+    // if we called the function with INVALID_ELEM it would try to
+    // be smart and return, thinking it had already done the work.
+    if (_dim == 1)
+      init(EDGE2);
+  }
 
   /**
    * Destructor. Empty.
@@ -67,24 +77,6 @@ private:
                         unsigned int p_level=0) libmesh_override;
 };
 
-// ------------------------------------------------------------
-// QTrap class members
-inline
-QTrap::QTrap(const unsigned int d,
-             const Order) : QBase(d,FIRST)
-{
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    init(EDGE2);
-}
-
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_QUADRATURE_TRAP_H
