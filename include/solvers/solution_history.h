@@ -32,25 +32,37 @@ class SolutionHistory
 {
 public:
 
-  // Constructor
+  /**
+   * Constructor
+   */
   SolutionHistory() :
     overwrite_previously_stored(false) {}
 
-  // Destructor
+  /**
+   * Destructor
+   */
   virtual ~SolutionHistory () {}
 
-  // Function to store a solution, pure virtual
+  /**
+   * Function to store a solution, pure virtual
+   */
   virtual void store() = 0;
 
-  // Function to retrieve a solution, pure virtual
+  /**
+   * Function to retrieve a solution, pure virtual
+   */
   virtual void retrieve() = 0;
 
-  // Cloning function for an UniquePtr, pure virtual, used in the
-  // setter function in time_solver.C
+  /**
+   * Cloning function for an UniquePtr, pure virtual, used in the
+   * setter function in time_solver.C
+   */
   virtual UniquePtr<SolutionHistory > clone() const = 0;
 
-  // Turn on overwrite_previously_stored to overwrite any
-  // already-saved data encountered during subsequent store() calls
+  /**
+   * Turn on overwrite_previously_stored to overwrite any
+   * already-saved data encountered during subsequent store() calls
+   */
   void set_overwrite_previously_stored (bool val)
   { overwrite_previously_stored = val; }
 
@@ -59,7 +71,6 @@ protected:
   // Flag to specify whether we want to overwrite previously stored
   // vectors at a given time or not
   bool overwrite_previously_stored;
-
 };
 
 } // end namespace libMesh

@@ -67,7 +67,7 @@ public:
    */
   ~TwostepTimeSolver ();
 
-  void solve();
+  virtual void solve() libmesh_override;
 };
 
 

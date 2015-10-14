@@ -65,23 +65,23 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Initialize data structures if not done so already.
    */
-  void init (const char *name=NULL);
+  virtual void init (const char *name=NULL) libmesh_override;
 
   /**
    * Call the Aztec solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix_in,
          NumericVector<T> &solution_in,
          NumericVector<T> &rhs_in,
          const double tol,
-         const unsigned int m_its)
+         const unsigned int m_its) libmesh_override
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -92,23 +92,23 @@ public:
    * that the linear solver will not compute a preconditioner in this
    * case, and will instead premultiply by the matrix you provide.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix,
          SparseMatrix<T>  &preconditioner,
          NumericVector<T> &solution,
          NumericVector<T> &rhs,
          const double tol,
-         const unsigned int m_its);
+         const unsigned int m_its) libmesh_override;
 
   /**
    * This function solves a system whose matrix is a shell matrix.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   solve (const ShellMatrix<T>& shell_matrix,
          NumericVector<T>& solution_in,
          NumericVector<T>& rhs_in,
          const double tol,
-         const unsigned int m_its);
+         const unsigned int m_its) libmesh_override;
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -121,7 +121,7 @@ public:
          NumericVector<T>& solution_in,
          NumericVector<T>& rhs_in,
          const double tol,
-         const unsigned int m_its);
+         const unsigned int m_its) libmesh_override;
 
   /**
    * Fills the input vector with the sequence of residual norms
@@ -140,7 +140,7 @@ public:
   /**
    * Returns the solver's convergence flag
    */
-  virtual LinearConvergenceReason get_converged_reason() const;
+  virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 
 private:
 

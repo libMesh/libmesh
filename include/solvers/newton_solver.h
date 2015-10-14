@@ -64,19 +64,19 @@ public:
    * The initialization function.  This method is used to
    * initialize internal data structures before a simulation begins.
    */
-  virtual void init ();
+  virtual void init () libmesh_override;
 
   /**
    * The reinitialization function.  This method is used after
    * changes in the mesh.
    */
-  virtual void reinit ();
+  virtual void reinit () libmesh_override;
 
   /**
    * This method performs a solve, using an inexact Newton-Krylov
    * method with line search.
    */
-  virtual unsigned int solve ();
+  virtual unsigned int solve () libmesh_override;
 
   /**
    * If this is set to true, the solver is forced to test the residual

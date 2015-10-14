@@ -70,13 +70,13 @@ public:
    * The reinitialization function.  This method is used after
    * changes in the mesh.
    */
-  virtual void reinit ();
+  virtual void reinit () libmesh_override;
 
   /**
    * The initialization function.  solve() calls this to create
    * a new SNES context.
    */
-  void init ();
+  virtual void init () libmesh_override;
 
   /**
    * The clear function.  solve() calls this to destroy
@@ -89,7 +89,7 @@ public:
    * this method will depend on the PETSc SNES settings.
    * See the PETSc documentation for more details.
    */
-  virtual unsigned int solve ();
+  virtual unsigned int solve () libmesh_override;
 
 protected:
 

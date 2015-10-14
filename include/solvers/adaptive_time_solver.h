@@ -66,47 +66,47 @@ public:
    */
   virtual ~AdaptiveTimeSolver ();
 
-  virtual void init();
+  virtual void init() libmesh_override;
 
-  virtual void reinit();
+  virtual void reinit() libmesh_override;
 
   virtual void solve() = 0;
 
-  virtual void advance_timestep();
+  virtual void advance_timestep() libmesh_override;
 
   /**
    * This method is passed on to the core_time_solver
    */
-  virtual Real error_order () const;
+  virtual Real error_order () const libmesh_override;
 
   /**
    * This method is passed on to the core_time_solver
    */
   virtual bool element_residual (bool get_jacobian,
-                                 DiffContext&);
+                                 DiffContext&) libmesh_override;
 
   /**
    * This method is passed on to the core_time_solver
    */
   virtual bool side_residual (bool get_jacobian,
-                              DiffContext&);
+                              DiffContext&) libmesh_override;
 
   /**
    * This method is passed on to the core_time_solver
    */
   virtual bool nonlocal_residual (bool get_jacobian,
-                                  DiffContext&);
+                                  DiffContext&) libmesh_override;
 
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
-  virtual UniquePtr<DiffSolver> &diff_solver();
+  virtual UniquePtr<DiffSolver> &diff_solver() libmesh_override;
 
   /**
    * An implicit linear solver to use for adjoint and sensitivity
    * problems.
    */
-  virtual UniquePtr<LinearSolver<Number> > &linear_solver();
+  virtual UniquePtr<LinearSolver<Number> > &linear_solver() libmesh_override;
 
   /**
    * This object is used to take timesteps

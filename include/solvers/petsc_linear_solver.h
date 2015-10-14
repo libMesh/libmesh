@@ -113,14 +113,14 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Initialize data structures if not done so already.
    * Assigns a name, which is turned into an underscore-separated
    * prefix for the underlying KSP object.
    */
-  void init (const char *name = NULL);
+  virtual void init (const char *name = NULL) libmesh_override;
 
   /**
    * Initialize data structures if not done so already plus much more
@@ -135,7 +135,7 @@ public:
    * Since field names are applied to DoF numberings, this method must
    * be called again after any System reinit.
    */
-  virtual void init_names (const System&);
+  virtual void init_names (const System&) libmesh_override;
 
   /**
    * After calling this method, all successive solves will be
@@ -145,18 +145,18 @@ public:
    * \p NULL pointer.
    */
   virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
-                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) libmesh_override;
 
   /**
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix_in,
          NumericVector<T> &solution_in,
          NumericVector<T> &rhs_in,
          const double tol,
-         const unsigned int m_its)
+         const unsigned int m_its) libmesh_override
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -166,13 +166,12 @@ public:
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   adjoint_solve (SparseMatrix<T>  &matrix_in,
                  NumericVector<T> &solution_in,
                  NumericVector<T> &rhs_in,
                  const double tol,
-                 const unsigned int m_its);
-
+                 const unsigned int m_its) libmesh_override;
 
   /**
    * This method allows you to call a linear solver while specifying
@@ -189,23 +188,23 @@ public:
    * to this method for LasPack -- You could probably implement it by hand
    * if you wanted.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix,
          SparseMatrix<T>  &preconditioner,
          NumericVector<T> &solution,
          NumericVector<T> &rhs,
          const double tol,
-         const unsigned int m_its);
+         const unsigned int m_its) libmesh_override;
 
   /**
    * This function solves a system whose matrix is a shell matrix.
    */
-  std::pair<unsigned int, Real>
+  virtual std::pair<unsigned int, Real>
   solve (const ShellMatrix<T>& shell_matrix,
          NumericVector<T>& solution_in,
          NumericVector<T>& rhs_in,
          const double tol,
-         const unsigned int m_its);
+         const unsigned int m_its) libmesh_override;
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -218,7 +217,7 @@ public:
          NumericVector<T>& solution_in,
          NumericVector<T>& rhs_in,
          const double tol,
-         const unsigned int m_its);
+         const unsigned int m_its) libmesh_override;
 
   /**
    * Returns the raw PETSc preconditioner context pointer.  This allows
@@ -251,7 +250,7 @@ public:
   /**
    * Returns the solver's convergence flag
    */
-  virtual LinearConvergenceReason get_converged_reason() const;
+  virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 
 private:
 
@@ -327,7 +326,6 @@ private:
    * what happens with the dofs outside the subset.
    */
   SubsetSolveMode _subset_solve_mode;
-
 };
 
 
