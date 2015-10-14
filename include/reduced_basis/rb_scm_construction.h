@@ -79,7 +79,7 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Set the RBSCMEvaluation object.
@@ -122,7 +122,7 @@ public:
    * a negative value of the argument indicates we are
    * not performing a bounding box solve.
    */
-  virtual void set_eigensolver_properties(int ) { }
+  virtual void set_eigensolver_properties(int) {}
 
   /**
    * Set the name of the associated RB system --- we need
@@ -166,7 +166,7 @@ protected:
    * usually this is the mass or inner-product
    * matrix, but needs to be implemented in subclass.
    */
-  virtual void load_matrix_B() ;
+  virtual void load_matrix_B();
 
   /**
    * Compute the SCM bounding box.
@@ -234,7 +234,6 @@ private:
    * perform the Evaluation stage of the SCM.
    */
   RBSCMEvaluation* rb_scm_eval;
-
 };
 
 } // namespace libMesh

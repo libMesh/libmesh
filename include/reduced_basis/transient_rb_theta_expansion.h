@@ -79,7 +79,6 @@ private:
    * Vector storing the pointers to the RBTheta functors.
    */
   std::vector<RBTheta*> _M_theta_vector;
-
 };
 
 }

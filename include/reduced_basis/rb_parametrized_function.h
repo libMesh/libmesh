@@ -50,7 +50,6 @@ public:
    * \p mu at the point \p p.
    */
   virtual Number evaluate(const RBParameters& , const Point& , const Elem&) { return 0.; }
-
 };
 
 }
