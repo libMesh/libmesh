@@ -53,12 +53,14 @@ public:
    * Constructor.  Declares the order of the quadrature rule.
    */
   QGrid (const unsigned int _dim,
-         const Order _order=INVALID_ORDER);
+         const Order _order=INVALID_ORDER) :
+    QBase(_dim, _order)
+  {}
 
   /**
    * Destructor.
    */
-  ~QGrid();
+  ~QGrid() {}
 
   /**
    * @returns \p QGRID
@@ -75,25 +77,6 @@ private:
   virtual void init_3D (const ElemType _type=INVALID_ELEM,
                         unsigned int p_level=0) libmesh_override;
 };
-
-
-
-// ------------------------------------------------------------
-// QGauss class members
-inline
-QGrid::QGrid(const unsigned int d,
-             const Order o) : QBase(d,o)
-{
-}
-
-
-
-
-inline
-QGrid::~QGrid()
-{
-}
-
 
 } // namespace libMesh
 

@@ -182,12 +182,6 @@ private:
                 const unsigned int n_pts);
 };
 
-
-
 } // namespace libMesh
-
-
-
-
 
 #endif // LIBMESH_QUADRATURE_MONOMIAL_H
