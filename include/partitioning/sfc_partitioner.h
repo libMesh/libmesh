@@ -29,8 +29,6 @@
 namespace libMesh
 {
 
-
-
 /**
  * The \p SFCPartitioner uses a Hilbert or Morton-ordered space
  * filling curve to partition the elements.
@@ -51,7 +49,7 @@ public:
    * Creates a new partitioner of this type and returns it in
    * an \p UniquePtr.
    */
-  virtual UniquePtr<Partitioner> clone () const
+  virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
     return UniquePtr<Partitioner>(new SFCPartitioner());
   }
@@ -69,11 +67,10 @@ protected:
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
-                              const unsigned int n);
+                              const unsigned int n) libmesh_override;
 
 
 private:
-
 
   /**
    * The type of space-filling curve to use.  Hilbert by default.
