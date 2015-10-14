@@ -125,12 +125,12 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * @returns a string indicating the type of the system.
    */
-  virtual std::string system_type () const;
+  virtual std::string system_type () const libmesh_override;
 
   /**
    * Perform a "truth" solve, i.e. solve the finite element system at
@@ -354,8 +354,7 @@ public:
    * Set the state of this RBConstruction object based on the arguments
    * to this function.
    */
-  void set_rb_construction_parameters(
-                                      unsigned int n_training_samples_in,
+  void set_rb_construction_parameters(unsigned int n_training_samples_in,
                                       bool deterministic_training_in,
                                       bool use_relative_bound_in_greedy_in,
                                       unsigned int training_parameters_random_seed_in,
