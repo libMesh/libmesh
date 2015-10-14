@@ -51,13 +51,13 @@ namespace libMesh
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {
 public:
-  typedef DataTransferKit::MeshContainer<int>      MeshContainerType;
-  typedef DataTransferKit::FieldContainer<Number>     FieldContainerType;
+  typedef DataTransferKit::MeshContainer<int> MeshContainerType;
+  typedef DataTransferKit::FieldContainer<Number> FieldContainerType;
 
   DTKEvaluator(System & in_sys, std::string var_name);
 
-  FieldContainerType evaluate( const Teuchos::ArrayRCP<int>& elements,
-                               const Teuchos::ArrayRCP<double>& coords );
+  virtual FieldContainerType evaluate(const Teuchos::ArrayRCP<int>& elements,
+                                      const Teuchos::ArrayRCP<double>& coords) libmesh_override;
 
 protected:
   System & sys;

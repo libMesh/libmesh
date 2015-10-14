@@ -65,7 +65,7 @@ public:
    * done.  Subsequent transfers between the same EquationSystems will
    * be _much_ faster.
    */
-  virtual void transfer(const Variable & from_var, const Variable & to_var);
+  virtual void transfer(const Variable & from_var, const Variable & to_var) libmesh_override;
 
 protected:
   typedef DataTransferKit::SharedDomainMap<DTKAdapter::MeshContainerType,DTKAdapter::MeshContainerType> shared_domain_map_type;

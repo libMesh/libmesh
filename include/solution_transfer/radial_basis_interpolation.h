@@ -82,12 +82,12 @@ public:
    * Clears all internal data structures and restores to a
    * pristine state.
    */
-  virtual void clear();
+  virtual void clear() libmesh_override;
 
   /**
    * Prepares data structures for use.
    */
-  virtual void prepare_for_use ();
+  virtual void prepare_for_use () libmesh_override;
 
   /**
    * Interpolate source data at target points.
@@ -95,8 +95,7 @@ public:
    */
   virtual void interpolate_field_data (const std::vector<std::string> &field_names,
                                        const std::vector<Point>  &tgt_pts,
-                                       std::vector<Number> &tgt_vals) const;
-
+                                       std::vector<Number> &tgt_vals) const libmesh_override;
 };
 
 } // namespace libMesh
