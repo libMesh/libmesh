@@ -55,17 +55,17 @@ public:
   /**
    * @returns \p QGAUSS
    */
-  QuadratureType type() const { return QGAUSS; }
+  virtual QuadratureType type() const libmesh_override { return QGAUSS; }
 
 
 private:
 
-  void init_1D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
-  void init_2D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
-  void init_3D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_1D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
+  virtual void init_2D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
+  virtual void init_3D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 
 
   /**
@@ -91,7 +91,6 @@ private:
    */
   void keast_rule(const Real rule_data[][4],
                   const unsigned int n_pts);
-
 };
 
 

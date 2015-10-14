@@ -53,7 +53,7 @@ public:
   /**
    * @returns \p QCLOUGH
    */
-  QuadratureType type() const { return QCLOUGH; }
+  virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
 
 
 private:
@@ -64,7 +64,6 @@ private:
                 unsigned int p_level=0);
   void init_3D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);
-
 };
 
 

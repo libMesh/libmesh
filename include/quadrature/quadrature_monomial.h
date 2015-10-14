@@ -76,7 +76,7 @@ public:
   /**
    * @returns \p QMONOMIAL
    */
-  QuadratureType type() const { return QMONOMIAL; }
+  virtual QuadratureType type() const libmesh_override { return QMONOMIAL; }
 
 
 private:
@@ -84,20 +84,20 @@ private:
   /**
    * Just uses a Gauss rule in 1D.
    */
-  void init_1D (const ElemType,
-                unsigned int =0);
+  virtual void init_1D (const ElemType,
+                        unsigned int =0) libmesh_override;
 
   /**
    * More efficient rules for QUADs
    */
-  void init_2D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_2D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 
   /**
    * More efficient rules for HEXes
    */
-  void init_3D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_3D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 
 
 

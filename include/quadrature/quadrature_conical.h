@@ -58,12 +58,12 @@ public:
   /**
    * @returns the QuadratureType for this class
    */
-  QuadratureType type() const { return QCONICAL; }
+  virtual QuadratureType type() const libmesh_override { return QCONICAL; }
 
 private:
 
-  void init_1D (const ElemType,
-                unsigned int =0)
+  virtual void init_1D (const ElemType,
+                        unsigned int =0) libmesh_override
   {
     // See about making this non-pure virtual in the base class
     libmesh_not_implemented();
@@ -72,13 +72,13 @@ private:
   /**
    * The conical product rules are defined in 2D only for Tris.
    */
-  void init_2D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_2D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
   /**
    * The conical product rules are defined in 3D only for Tets.
    */
-  void init_3D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_3D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 
   /**
    * Implementation of conical product rule for a Tri in 2D of

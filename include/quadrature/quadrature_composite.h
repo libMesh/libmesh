@@ -72,7 +72,7 @@ public:
   /**
    * @returns \p QCOMPOSITE
    */
-  QuadratureType type() const { return QCOMPOSITE; }
+  virtual QuadratureType type() const libmesh_override { return QCOMPOSITE; }
 
   /**
    * Initializes the data structures for a specific, potentially cut
