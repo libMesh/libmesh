@@ -113,13 +113,13 @@ public:
   /**
    * @returns \p QGRUNDMANN_MOLLER
    */
-  QuadratureType type() const { return QGRUNDMANN_MOLLER; }
+  virtual QuadratureType type() const libmesh_override { return QGRUNDMANN_MOLLER; }
 
 
 private:
 
-  void init_1D (const ElemType,
-                unsigned int =0)
+  virtual void init_1D (const ElemType,
+                        unsigned int =0) libmesh_override
   {
     // See about making this non-pure virtual in the base class
     libmesh_not_implemented();
@@ -128,14 +128,14 @@ private:
   /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.
    */
-  void init_3D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_3D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 
   /**
    * Initialize a 2D GM rule.  Only makes sense for Tris.
    */
-  void init_2D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  virtual void init_2D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 
   /**
    * This routine is called from init_2D() and init_3D().  It actually

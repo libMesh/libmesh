@@ -68,16 +68,15 @@ public:
    * @returns the \p QuadratureType, either
    * \p QJACOBI_1_0 or \p QJACOBI_2_0.
    */
-  QuadratureType type() const;
+  virtual QuadratureType type() const libmesh_override;
 
 
 private:
   const unsigned int _alpha;
   const unsigned int _beta;
 
-  void init_1D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
-
+  virtual void init_1D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 };
 
 
