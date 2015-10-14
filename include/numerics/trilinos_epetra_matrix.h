@@ -100,7 +100,7 @@ public:
   /**
    * The \p EpetraMatrix needs the full sparsity pattern.
    */
-  bool need_full_sparsity_pattern () const
+  virtual bool need_full_sparsity_pattern () const libmesh_override
   { return true; }
 
   /**
@@ -108,7 +108,7 @@ public:
    * tell the underlying matrix storage scheme how
    * to map the \f$ (i,j) \f$ elements.
    */
-  void update_sparsity_pattern (const SparsityPattern::Graph &);
+  virtual void update_sparsity_pattern (const SparsityPattern::Graph &) libmesh_override;
 
   /**
    * Initialize a Petsc matrix that is of global
@@ -120,18 +120,18 @@ public:
    * Optionally supports a block size, which indicates dense coupled blocks
    * for systems with multiple variables all of the same type.
    */
-  void init (const numeric_index_type m,
-             const numeric_index_type n,
-             const numeric_index_type m_l,
-             const numeric_index_type n_l,
-             const numeric_index_type nnz=30,
-             const numeric_index_type noz=10,
-             const numeric_index_type blocksize=1);
+  virtual void init (const numeric_index_type m,
+                     const numeric_index_type n,
+                     const numeric_index_type m_l,
+                     const numeric_index_type n_l,
+                     const numeric_index_type nnz=30,
+                     const numeric_index_type noz=10,
+                     const numeric_index_type blocksize=1) libmesh_override;
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
    */
-  void init ();
+  virtual void init () libmesh_override;
 
   /**
    * Release all memory and return
@@ -139,44 +139,44 @@ public:
    * having called the default
    * constructor.
    */
-  void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Set all entries to 0. This method retains
    * sparsity structure.
    */
-  void zero ();
+  virtual void zero () libmesh_override;
 
   /**
    * Call the Petsc assemble routines.
    * sends necessary messages to other
    * processors
    */
-  void close () const;
+  virtual void close () const libmesh_override;
 
   /**
    * @returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
-  numeric_index_type m () const;
+  virtual numeric_index_type m () const libmesh_override;
 
   /**
    * @returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
-  numeric_index_type n () const;
+  virtual numeric_index_type n () const libmesh_override;
 
   /**
    * return row_start, the index of the first
    * matrix row stored on this processor
    */
-  numeric_index_type row_start () const;
+  virtual numeric_index_type row_start () const libmesh_override;
 
   /**
    * return row_stop, the index of the last
    * matrix row (+1) stored on this processor
    */
-  numeric_index_type row_stop () const;
+  virtual numeric_index_type row_stop () const libmesh_override;
 
   /**
    * Set the element \p (i,j) to \p value.
@@ -184,9 +184,9 @@ public:
    * not exist. Still, it is allowed to store
    * zero values in non-existent fields.
    */
-  void set (const numeric_index_type i,
-            const numeric_index_type j,
-            const T value);
+  virtual void set (const numeric_index_type i,
+                    const numeric_index_type j,
+                    const T value) libmesh_override;
 
   /**
    * Add \p value to the element
@@ -196,9 +196,9 @@ public:
    * store zero values in
    * non-existent fields.
    */
-  void add (const numeric_index_type i,
-            const numeric_index_type j,
-            const T value);
+  virtual void add (const numeric_index_type i,
+                    const numeric_index_type j,
+                    const T value) libmesh_override;
 
   /**
    * Add the full matrix to the
@@ -206,17 +206,16 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-
-  void add_matrix (const DenseMatrix<T> &dm,
-                   const std::vector<numeric_index_type> &rows,
-                   const std::vector<numeric_index_type> &cols);
+  virtual void add_matrix (const DenseMatrix<T> &dm,
+                           const std::vector<numeric_index_type> &rows,
+                           const std::vector<numeric_index_type> &cols) libmesh_override;
 
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  void add_matrix (const DenseMatrix<T> &dm,
-                   const std::vector<numeric_index_type> &dof_indices);
+  virtual void add_matrix (const DenseMatrix<T> &dm,
+                           const std::vector<numeric_index_type> &dof_indices) libmesh_override;
 
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
@@ -227,7 +226,7 @@ public:
    * whenever you add a non-zero value to \p X.  Note: \p X will
    * be closed, if not already done, before performing any work.
    */
-  void add (const T a, SparseMatrix<T> &X);
+  virtual void add (const T a, SparseMatrix<T> &X) libmesh_override;
 
   /**
    * Return the value of the entry
@@ -236,8 +235,8 @@ public:
    * should always be careful where
    * you call this function.
    */
-  T operator () (const numeric_index_type i,
-                 const numeric_index_type j) const;
+  virtual T operator () (const numeric_index_type i,
+                         const numeric_index_type j) const libmesh_override;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -250,7 +249,7 @@ public:
    * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
-  Real l1_norm () const;
+  virtual Real l1_norm () const libmesh_override;
 
   /**
    * Return the linfty-norm of the
@@ -264,29 +263,29 @@ public:
    * \f$|Mv|_infty \leq |M|_infty |v|_infty\f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
-  Real linfty_norm () const;
+  virtual Real linfty_norm () const libmesh_override;
 
   /**
    * see if Petsc matrix has been closed
    * and fully assembled yet
    */
-  bool closed() const;
+  virtual bool closed() const libmesh_override;
 
   /**
    * Print the contents of the matrix, by default to libMesh::out.
    */
-  void print_personal(std::ostream& os=libMesh::out) const;
+  virtual void print_personal(std::ostream& os=libMesh::out) const libmesh_override;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  void get_diagonal (NumericVector<T>& dest) const;
+  virtual void get_diagonal (NumericVector<T>& dest) const libmesh_override;
 
   /**
    * Copies the transpose of the matrix into \p dest, which may be
    * *this.
    */
-  virtual void get_transpose (SparseMatrix<T>& dest) const;
+  virtual void get_transpose (SparseMatrix<T>& dest) const libmesh_override;
 
   /**
    * Swaps the raw PETSc matrix context pointers.

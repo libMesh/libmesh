@@ -58,31 +58,31 @@ public:
    * @returns \p m, the row-dimension of the matrix where the marix is
    * \f$ M \times N \f$.
    */
-  virtual numeric_index_type m () const;
+  virtual numeric_index_type m () const libmesh_override;
 
   /**
    * @returns \p n, the column-dimension of the matrix where the marix
    * is \f$ M \times N \f$.
    */
-  virtual numeric_index_type n () const;
+  virtual numeric_index_type n () const libmesh_override;
 
   /**
    * Multiplies the matrix with \p arg and stores the result in \p
    * dest.
    */
   virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const;
+                            const NumericVector<T>& arg) const libmesh_override;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
   virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const;
+                                const NumericVector<T>& arg) const libmesh_override;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const;
+  virtual void get_diagonal (NumericVector<T>& dest) const libmesh_override;
 
 protected:
   /**
@@ -94,7 +94,6 @@ protected:
    * The row vector.
    */
   const NumericVector<T>& _w;
-
 };
 
 
