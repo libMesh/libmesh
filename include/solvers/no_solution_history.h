@@ -31,23 +31,33 @@ class NoSolutionHistory : public SolutionHistory
 {
 public:
 
-  // Constructor
+  /**
+   * Constructor
+   */
   NoSolutionHistory() : SolutionHistory() {}
 
-  // Destructor
+  /**
+   * Destructor
+   */
   virtual ~NoSolutionHistory() {}
 
-  // Virtual function store which we will be overriding
-  virtual void store();
+  /**
+   * Virtual function store which we will be overriding
+   */
+  virtual void store() libmesh_override;
 
-  // Virtual function retrieve which we will be overriding
-  virtual void retrieve();
+  /**
+   * Virtual function retrieve which we will be overriding
+   */
+  virtual void retrieve() libmesh_override;
 
-  // Definition of the clone function needed for the setter function
-  virtual UniquePtr<SolutionHistory > clone() const {
-    return UniquePtr<SolutionHistory >
-      (new NoSolutionHistory());}
-
+  /**
+   * Definition of the clone function needed for the setter function
+   */
+  virtual UniquePtr<SolutionHistory > clone() const libmesh_override
+  {
+    return UniquePtr<SolutionHistory >(new NoSolutionHistory());
+  }
 };
 
 } // end namespace libMesh

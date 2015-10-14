@@ -90,13 +90,13 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char* name = NULL);
+  virtual void init (const char* name = NULL) libmesh_override;
 
   /**
    * Returns the raw PETSc snes context pointer.
@@ -107,17 +107,18 @@ public:
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,    // System Jacobian Matrix
-                                               NumericVector<T>&,   // Solution vector
-                                               NumericVector<T>&,   // Residual vector
-                                               const double,        // Stopping tolerance
-                                               const unsigned int); // N. Iterations
+  virtual std::pair<unsigned int, Real>
+  solve (SparseMatrix<T>&,                     // System Jacobian Matrix
+         NumericVector<T>&,                    // Solution vector
+         NumericVector<T>&,                    // Residual vector
+         const double,                         // Stopping tolerance
+         const unsigned int) libmesh_override; // N. Iterations
 
   /**
    * Prints a useful message about why the latest nonlinear solve
    * con(di)verged.
    */
-  virtual void print_converged_reason();
+  virtual void print_converged_reason() libmesh_override;
 
   /**
    * Returns the currently-available (or most recently obtained, if the SNES object has
@@ -129,14 +130,15 @@ public:
   /**
    * Get the total number of linear iterations done in the last solve
    */
-  virtual int get_total_linear_iterations();
+  virtual int get_total_linear_iterations() libmesh_override;
 
   /**
    * If called *during* the solve(), for example by the user-specified
    * residual or Jacobian function, returns the current nonlinear iteration
    * number.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const { return _current_nonlinear_iteration_number; }
+  virtual unsigned get_current_nonlinear_iteration_number() const libmesh_override
+  { return _current_nonlinear_iteration_number; }
 
   /**
    * Set if the residual should be zeroed out in the callback

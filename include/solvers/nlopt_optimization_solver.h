@@ -90,12 +90,12 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init ();
+  virtual void init () libmesh_override;
 
   /**
    * Returns the raw NLopt object.
@@ -105,20 +105,20 @@ public:
   /**
    * Call the NLopt solver.
    */
-  virtual void solve ();
+  virtual void solve () libmesh_override;
 
   /**
    * Prints a useful message about why the latest optimization solve
    * con(di)verged.
    */
-  virtual void print_converged_reason();
+  virtual void print_converged_reason() libmesh_override;
 
   /**
    * Returns the currently-available (or most recently obtained, if the NLopt object has
    * been destroyed) convergence reason.  Refer to NLopt docs for the meaning of different
    * the value.
    */
-  virtual int get_converged_reason();
+  virtual int get_converged_reason() libmesh_override;
 
   /**
    * Returns a writeable reference to the current iteration count

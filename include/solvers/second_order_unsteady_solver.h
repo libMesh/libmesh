@@ -57,26 +57,26 @@ public:
    * The initialization function.  This method is used to
    * initialize internal data structures before a simulation begins.
    */
-  virtual void init ();
+  virtual void init () libmesh_override;
 
   /**
    * The data initialization function.  This method is used to
    * initialize internal data structures after the underlying System
    * has been initialized
    */
-  virtual void init_data ();
+  virtual void init_data () libmesh_override;
 
   /**
    * The reinitialization function.  This method is used to
    * resize internal data vectors after a mesh change.
    */
-  virtual void reinit ();
+  virtual void reinit () libmesh_override;
 
   /**
    * This method retrieves all the stored solutions at the current
    * system.time
    */
-  virtual void retrieve_timestep ();
+  virtual void retrieve_timestep () libmesh_override;
 
   /**
    * Specify non-zero initial velocity. Should be called before solve().
@@ -109,7 +109,6 @@ protected:
    * Serial vector of previous time step accleration \f$ \ddot{u}_n \f$
    */
   UniquePtr<NumericVector<Number> > _old_local_solution_accel;
-
 };
 
 } // end namespace libMesh
