@@ -970,8 +970,8 @@ Gradient FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp) 
 
 
 template<typename OutputType>
-void FEMContext::FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp,
-                                                     OutputType& du) const
+void FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp,
+                                         OutputType& du) const
 {
   this->some_gradient
     <OutputType,
@@ -1047,8 +1047,8 @@ Gradient FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp) cons
 
 
 template<typename OutputType>
-void FEMContext::FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
-                                                 OutputType& du) const
+void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
+                                     OutputType& du) const
 {
   this->some_gradient<OutputType,
                       &FEMContext::get_side_fe
