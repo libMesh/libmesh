@@ -574,39 +574,33 @@ public:
   void interior_div(unsigned int var, unsigned int qp,
                     OutputType& div_u) const;
 
-  /**
-   * Reinitialize all my FEM context data on a given
-   * element for the given system
-   */
-  //  virtual void reinit(const FEMSystem&, Elem*);
-
   // should be protected:
   /**
    * Reinitialize Elem and FE objects if necessary for integration at a new
    * point in time: specifically, handle moving elements in moving mesh
    * schemes.
    */
-  virtual void elem_reinit(Real theta);
+  virtual void elem_reinit(Real theta) libmesh_override;
 
   /**
    * Reinitialize Elem and side FE objects if necessary for integration at a
    * new point in time: specifically, handle moving elements in moving mesh
    * schemes.
    */
-  virtual void elem_side_reinit(Real theta);
+  virtual void elem_side_reinit(Real theta) libmesh_override;
 
   /**
    * Reinitialize Elem and edge FE objects if necessary for
    * integration at a new point in time: specifically, handle moving
    * elements in moving mesh schemes.
    */
-  virtual void elem_edge_reinit(Real theta);
+  virtual void elem_edge_reinit(Real theta) libmesh_override;
 
   /**
    * Gives derived classes the opportunity to reinitialize data needed
    * for nonlocal calculations at a new point within a timestep
    */
-  virtual void nonlocal_reinit(Real theta);
+  virtual void nonlocal_reinit(Real theta) libmesh_override;
 
   /**
    * Reinitializes local data vectors/matrices on the current geometric element

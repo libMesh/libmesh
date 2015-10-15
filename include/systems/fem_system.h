@@ -81,15 +81,16 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Prepares \p matrix or \p rhs for matrix assembly.
    * Users may reimplement this to add pre- or post-assembly
    * code before or after calling FEMSystem::assembly()
    */
-  virtual void assembly (bool get_residual, bool get_jacobian,
-                         bool apply_heterogeneous_constraints = false);
+  virtual void assembly (bool get_residual,
+                         bool get_jacobian,
+                         bool apply_heterogeneous_constraints = false) libmesh_override;
 
   /**
    * Invokes the solver associated with the system.  For steady state
@@ -99,7 +100,7 @@ public:
    * For moving mesh systems, this also translates the mesh to the
    * solution position.
    */
-  virtual void solve ();
+  virtual void solve () libmesh_override;
 
   /**
    * Tells the FEMSystem to set the degree of freedom coefficients
@@ -121,7 +122,7 @@ public:
    * who subclass FEMContext will need to also reimplement this method to build
    * it.
    */
-  virtual UniquePtr<DiffContext> build_context();
+  virtual UniquePtr<DiffContext> build_context() libmesh_override;
 
   /*
    * Prepares the result of a build_context() call for use.
@@ -135,7 +136,7 @@ public:
    * Runs a postprocessing loop over all elements, and if
    * \p postprocess_sides is true over all sides.
    */
-  virtual void postprocess ();
+  virtual void postprocess () libmesh_override;
 
   /**
    * Runs a qoi assembly loop over all elements, and if
@@ -145,8 +146,7 @@ public:
    * quantities of interest that are not expressible as a sum of
    * element qois.
    */
-  virtual void assemble_qoi
-  (const QoISet& indices = QoISet());
+  virtual void assemble_qoi (const QoISet& indices = QoISet()) libmesh_override;
 
   /**
    * Runs a qoi derivative assembly loop over all elements, and if
@@ -155,10 +155,9 @@ public:
    * Users may have to override this function for quantities of
    * interest that are not expressible as a sum of element qois.
    */
-  virtual void assemble_qoi_derivative
-  (const QoISet &qoi_indices = QoISet(),
-   bool include_liftfunc = true,
-   bool apply_constraints = true);
+  virtual void assemble_qoi_derivative (const QoISet &qoi_indices = QoISet(),
+                                        bool include_liftfunc = true,
+                                        bool apply_constraints = true) libmesh_override;
 
   /**
    * If fe_reinit_during_postprocess is true (it is true by default), FE
@@ -245,7 +244,7 @@ protected:
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void init_data ();
+  virtual void init_data () libmesh_override;
 
 private:
   std::vector<Real> _numerical_jacobian_h_for_var;

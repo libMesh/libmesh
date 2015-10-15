@@ -72,7 +72,6 @@ public:
     // By default, just clear the values map
     values.clear();
   }
-
 };
 
 }

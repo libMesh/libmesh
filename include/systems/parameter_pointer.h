@@ -47,26 +47,33 @@ public:
   /**
    * Setter: change the value of the parameter we access.
    */
-  virtual void set (const T & new_value) { libmesh_assert(_ptr); *_ptr = new_value; }
+  virtual void set (const T & new_value) libmesh_override
+  { libmesh_assert(_ptr); *_ptr = new_value; }
 
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const { libmesh_assert(_ptr); return *_ptr; }
+  virtual const T& get () const libmesh_override
+  { libmesh_assert(_ptr); return *_ptr; }
 
   /**
    * Reseater: change the location of the parameter we access.
    * This is included for backward compatibility, but is deprecated.
    */
   virtual ParameterAccessor<T> &
-  operator= (T * new_ptr) { libmesh_deprecated(); _ptr = new_ptr; return *this; }
+  operator= (T * new_ptr) libmesh_override
+  {
+    libmesh_deprecated();
+    _ptr = new_ptr;
+    return *this;
+  }
 
   /**
    * Returns a new copy of the accessor.
    */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const {
-    return UniquePtr<ParameterAccessor<T> >
-      (new ParameterPointer<T>(_ptr));
+  virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
+  {
+    return UniquePtr<ParameterAccessor<T> >(new ParameterPointer<T>(_ptr));
   }
 
 private:

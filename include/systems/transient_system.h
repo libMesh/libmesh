@@ -73,20 +73,20 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit ();
+  virtual void reinit () libmesh_override;
 
   /**
    * @returns \p "Transient" prepended to T::system_type().
    * Helps in identifying the system type in an equation
    * system file.
    */
-  virtual std::string system_type () const;
+  virtual std::string system_type () const libmesh_override;
 
 
   //-----------------------------------------------------------------
@@ -123,19 +123,18 @@ public:
 
 protected:
 
-
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void init_data ();
+  virtual void init_data () libmesh_override;
 
   /**
    * Re-update the local values when the mesh has changed.
    * This method takes the data updated by \p update() and
    * makes it up-to-date on the current mesh.
    */
-  virtual void re_update ();
+  virtual void re_update () libmesh_override;
 };
 
 

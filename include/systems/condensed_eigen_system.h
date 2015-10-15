@@ -85,7 +85,7 @@ public:
    * the dofs in local_non_condensed_dofs_vector
    * stripped out of the system matrices on each processor.
    */
-  virtual void solve();
+  virtual void solve() libmesh_override;
 
   /**
    * Overload get_eigenpair to retrieve the eigenpair for
@@ -93,7 +93,7 @@ public:
    * entries of the solution vector (the condensed
    * entries are set to zero by default).
    */
-  virtual std::pair<Real, Real> get_eigenpair(unsigned int i);
+  virtual std::pair<Real, Real> get_eigenpair(unsigned int i) libmesh_override;
 
   /**
    * The (condensed) system matrix for standard eigenvalue problems.
@@ -119,7 +119,6 @@ private:
    * have been initialized.
    */
   bool condensed_dofs_initialized;
-
 };
 
 
