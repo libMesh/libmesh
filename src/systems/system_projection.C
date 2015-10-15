@@ -482,33 +482,45 @@ void System::project_vector (const NumericVector<Number>& old_v,
   NumericVector<Number> &new_vector = *new_vector_ptr;
   const NumericVector<Number> &old_vector = *old_vector_ptr;
 
-  Threads::parallel_for (active_local_elem_range,
-                         ProjectVector(*this,
-                                       old_vector,
-                                       new_vector)
-                         );
+  const unsigned int n_variables = this->n_vars();
 
-  // Copy the SCALAR dofs from old_vector to new_vector
-  // Note: We assume that all SCALAR dofs are on the
-  // processor with highest ID
-  if(this->processor_id() == (this->n_processors()-1))
+  if (n_variables)
     {
-      const DofMap& dof_map = this->get_dof_map();
-      for (unsigned int var=0; var<this->n_vars(); var++)
-        if(this->variable(var).type().family == SCALAR)
-          {
-            // We can just map SCALAR dofs directly across
-            std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
-            dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
-            dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
-            const unsigned int new_n_dofs =
-              cast_int<unsigned int>(new_SCALAR_indices.size());
+      std::vector<unsigned int> vars(n_variables);
+      for (unsigned int i=0; i != n_variables; ++i)
+        vars[i] = i;
 
-            for (unsigned int i=0; i<new_n_dofs; i++)
+      // Use a typedef to make the calling sequence for parallel_for() a bit more readable
+      typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
+
+      OldSolutionValue f(*this, old_vector);
+      VectorSetAction<Number> setter(new_vector);
+
+      Threads::parallel_for (active_local_elem_range,
+                             FEMProjector(*this, f, NULL, setter, vars));
+
+      // Copy the SCALAR dofs from old_vector to new_vector
+      // Note: We assume that all SCALAR dofs are on the
+      // processor with highest ID
+      if(this->processor_id() == (this->n_processors()-1))
+        {
+          const DofMap& dof_map = this->get_dof_map();
+          for (unsigned int var=0; var<this->n_vars(); var++)
+            if(this->variable(var).type().family == SCALAR)
               {
-                new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
+                // We can just map SCALAR dofs directly across
+                std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
+                dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
+                dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
+                const unsigned int new_n_dofs =
+                  cast_int<unsigned int>(new_SCALAR_indices.size());
+
+                for (unsigned int i=0; i<new_n_dofs; i++)
+                  {
+                    new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
+                  }
               }
-          }
+        }
     }
 
   new_vector.close();
