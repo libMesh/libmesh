@@ -795,6 +795,41 @@ public:
   void elem_position_get();
 
   /**
+   * Enum describing what data to use when initializing algebraic
+   * structures on each element.
+   */
+  enum AlgebraicType { NONE = 0,  // Do not reinitialize dof_indices
+                       DOFS_ONLY, // Reinitialize dof_indices, not
+                                  // algebraic structures
+                       CURRENT,   // Use dof_indices, current solution
+                       OLD };     // Use old_dof_indices, custom solution
+
+  /**
+   * Setting which determines whether to initialize algebraic
+   * structures (elem_*) on each element and set their values from
+   * current_local_solution.  Algebraic initialization may be disabled
+   * for efficiency in cases where FEMContext is only used as a
+   * convenient container of FE objects.
+   */
+  void set_algebraic_type(const AlgebraicType atype)
+    { _atype = atype; }
+
+  /*
+   * Get the current AlgebraicType setting
+   */
+  AlgebraicType algebraic_type() { return _atype; }
+
+  /**
+   * Set a NumericVector to be used in place of current_local_solution
+   * for calculating elem_solution.  Set to NULL to restore the
+   * current_local_solution behavior.  Advanced DifferentiableSystem
+   * specific capabilities will only be enabled in the
+   * current_local_solution case.
+   */
+  void set_custom_solution(const NumericVector<Number> * custom_sol)
+    { _custom_solution = custom_sol; }
+
+  /**
    * System from which to acquire moving mesh information
    */
   System *_mesh_sys;
@@ -815,6 +850,16 @@ public:
   unsigned char edge;
 
 protected:
+
+  /**
+   * Keep track of what type of algebra reinitialization is to be done
+   */
+  AlgebraicType _atype;
+
+  /**
+   * Data with which to do algebra reinitialization
+   */
+  const NumericVector<Number> * _custom_solution;
 
   /**
    * Helper function to reduce some code duplication in the *_point_* methods.
