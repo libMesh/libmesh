@@ -63,17 +63,18 @@ public:
   /**
    * Prints the nodes.
    */
-  void print_nodes(std::ostream& my_out=libMesh::out) const;
+  virtual void print_nodes(std::ostream& my_out=libMesh::out) const libmesh_override;
 
   /**
    * Prints the nodes.
    */
-  void print_elements(std::ostream& my_out=libMesh::out) const;
+  virtual void print_elements(std::ostream& my_out=libMesh::out) const libmesh_override;
 
   /**
    * @returns the number of active bins.
    */
-  unsigned int n_active_bins() const { return root.n_active_bins(); }
+  virtual unsigned int n_active_bins() const libmesh_override
+  { return root.n_active_bins(); }
 
   /**
    * @returns a pointer to the element containing point p,

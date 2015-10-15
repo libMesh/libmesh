@@ -222,10 +222,6 @@ public:
    * with one passed parameter instead of two.
    */
   virtual std::vector<dof_id_type> cut_above(Real cut) const;
-
-
-private:
-
 };
 
 } // namespace libMesh
