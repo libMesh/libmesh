@@ -37,19 +37,20 @@ public:
   ConstFunction (const Output &c) : _c(c) { this->_initialized = true; }
 
   virtual Output operator() (const Point&,
-                             const Real = 0)
+                             const Real = 0) libmesh_override
   { return _c; }
 
   virtual void operator() (const Point&,
                            const Real,
-                           DenseVector<Output>& output)
+                           DenseVector<Output>& output) libmesh_override
   {
     unsigned int size = output.size();
     for (unsigned int i=0; i != size; ++i)
       output(i) = _c;
   }
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const {
+  virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override
+  {
     return UniquePtr<FunctionBase<Output> >
       (new ConstFunction<Output>(_c));
   }

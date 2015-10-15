@@ -1234,7 +1234,7 @@ struct PostWaitCopyBuffer : public PostWaitWork {
   PostWaitCopyBuffer(const Container& buffer, const OutputIter out)
     : _buf(buffer), _out(out) {}
 
-  virtual void run() { std::copy(_buf.begin(), _buf.end(), _out); }
+  virtual void run() libmesh_override { std::copy(_buf.begin(), _buf.end(), _out); }
 
 private:
   const Container& _buf;
@@ -1247,7 +1247,7 @@ struct PostWaitUnpackBuffer : public PostWaitWork {
   PostWaitUnpackBuffer(const Container& buffer, Context *context, OutputIter out) :
     _buf(buffer), _context(context), _out(out) {}
 
-  virtual void run() { Parallel::unpack_range(_buf, _context, _out); }
+  virtual void run() libmesh_override { Parallel::unpack_range(_buf, _context, _out); }
 
 private:
   const Container& _buf;
@@ -1261,7 +1261,7 @@ template <typename Container>
 struct PostWaitDeleteBuffer : public PostWaitWork {
   PostWaitDeleteBuffer(Container* buffer) : _buf(buffer) {}
 
-  virtual void run() { delete _buf; }
+  virtual void run() libmesh_override { delete _buf; }
 
 private:
   Container* _buf;

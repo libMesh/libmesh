@@ -116,11 +116,6 @@ public:
     VectorValue&>::type
   operator = (const Scalar& libmesh_dbg_var(p))
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
-
-
-private:
-
-
 };
 
 

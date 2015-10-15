@@ -75,62 +75,64 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Prism18  (Elem* p=NULL);
+  Prism18 (Elem* p=NULL) :
+    Prism(Prism18::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns \p PRISM18
    */
-  ElemType     type () const   { return PRISM18; }
+  virtual ElemType type () const libmesh_override { return PRISM18; }
 
   /**
    * @returns 18
    */
-  unsigned int n_nodes() const { return 18; }
+  virtual unsigned int n_nodes() const libmesh_override { return 18; }
 
   /**
    * @returns 8
    */
-  unsigned int n_sub_elem() const { return 8; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 8; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+                               const unsigned int e) const libmesh_override;
 
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
-  virtual bool has_affine_map () const;
+  virtual bool has_affine_map () const libmesh_override;
 
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; }
+  virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
    * @returns an id associated with the \p s side of this element.
@@ -141,37 +143,37 @@ public:
    * use the center node of each quad face to provide a perfect (unique)
    * key.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * Builds a \p QUAD9 or \p TRI6 built coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy) const libmesh_override;
 
   /**
    * Builds a \p EDGE3 or \p INFEDGE2 built coincident with edge i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
   /**
    * @returns 2 for all edge nodes and 4 for face nodes
    */
-  unsigned int n_second_order_adjacent_vertices (const unsigned int) const;
+  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override;
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 6 \le n < 18 \f$.
    */
-  unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                   const unsigned int v) const;
+  virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
+                                                           const unsigned int v) const libmesh_override;
 
   /**
    * @returns the child number \p c and element-local index \p v of the
@@ -183,7 +185,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-  second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -213,9 +215,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
+  virtual float embedding_matrix (const unsigned int i,
+                                  const unsigned int j,
+                                  const unsigned int k) const libmesh_override
   { return _embedding_matrix[i][j][k]; }
 
   /**
@@ -237,19 +239,7 @@ protected:
    * matrix contained in \p cell_prism.C
    */
   static const unsigned short int _remaining_second_order_adjacent_vertices[3][4];
-
 };
-
-
-
-// ------------------------------------------------------------
-// Prism18 class member functions
-inline
-Prism18::Prism18(Elem* p) :
-  Prism(Prism18::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

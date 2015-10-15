@@ -75,12 +75,12 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string& );
+  virtual void read (const std::string&) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& );
+  virtual void write (const std::string&) libmesh_override;
 
   /**
    * Set the flag indicationg if we should be verbose.

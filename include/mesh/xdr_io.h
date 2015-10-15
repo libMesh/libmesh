@@ -69,7 +69,7 @@ public:
    * files.
    */
   explicit
-  XdrIO (MeshBase&,       const bool=false);
+  XdrIO (MeshBase&, const bool=false);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -89,12 +89,12 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string&);
+  virtual void read (const std::string&) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&);
+  virtual void write (const std::string&) libmesh_override;
 
   /**
    * Get/Set the flag indicating if we should read/write binary.

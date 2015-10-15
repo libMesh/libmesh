@@ -75,33 +75,35 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char* name = NULL);
+  virtual void init (const char* name = NULL) libmesh_override;
 
   /**
    * Call the Nox solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> &,    // System Jacobian Matrix
-                                               NumericVector<T> &,   // Solution vector
-                                               NumericVector<T> &,   // Residual vector
-                                               const double,         // Stopping tolerance
-                                               const unsigned int);  // N. Iterations
+  virtual std::pair<unsigned int, Real>
+  solve (SparseMatrix<T> &,                     // System Jacobian Matrix
+         NumericVector<T> &,                    // Solution vector
+         NumericVector<T> &,                    // Residual vector
+         const double,                          // Stopping tolerance
+         const unsigned int) libmesh_override;  // N. Iterations
   /**
    * Get the total number of linear iterations done in the last solve
    */
-  virtual int get_total_linear_iterations();
+  virtual int get_total_linear_iterations() libmesh_override;
 
   /**
    * If called *during* the solve(), for example by the user-specified
    * residual or Jacobian function, returns the current nonlinear iteration
    * number.  Not currently implemented.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const { libmesh_not_implemented(); return 0; }
+  virtual unsigned get_current_nonlinear_iteration_number() const libmesh_override
+  { libmesh_not_implemented(); return 0; }
 
 private:
 

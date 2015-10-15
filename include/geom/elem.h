@@ -432,11 +432,6 @@ public:
   void write_connectivity (std::ostream& out,
                            const IOPackage iop) const;
 
-  //   /**
-  //    * @returns the VTK element type of the sc-th sub-element.
-  //    */
-  //   virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
-
   /**
    * @returns the type of element that has been derived from this
    * base class.
@@ -579,12 +574,6 @@ public:
    */
   virtual unsigned int opposite_node(const unsigned int n,
                                      const unsigned int s) const;
-
-  //   /**
-  //    * @returns the number of children this element has that
-  //    * share side \p s
-  //    */
-  //   virtual unsigned int n_children_per_side (const unsigned int) const = 0;
 
   /**
    * @returns the number of sub-elements this element may be broken

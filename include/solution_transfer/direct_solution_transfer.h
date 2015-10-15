@@ -42,7 +42,7 @@ public:
   /**
    * Transfer the values of a variable to another.
    */
-  virtual void transfer(const Variable & from_var, const Variable & to_var);
+  virtual void transfer(const Variable & from_var, const Variable & to_var) libmesh_override;
 };
 
 } // namespace libMesh

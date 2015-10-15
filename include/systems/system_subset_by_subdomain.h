@@ -58,18 +58,18 @@ public:
     /**
      * Constructor.
      */
-    SubdomainSelection (void);
+    SubdomainSelection ();
 
     /**
      * Destructor.
      */
-    virtual ~SubdomainSelection (void);
+    virtual ~SubdomainSelection ();
 
     /**
      * Method that decides whether a given subdomain id is included in
      * the subset or nor.
      */
-    virtual bool operator()(const subdomain_id_type& subdomain_id)const=0;
+    virtual bool operator() (const subdomain_id_type& subdomain_id) const = 0;
 
   private:
     /**
@@ -78,7 +78,7 @@ public:
      * We won't even bother implementing this; we'll just make sure
      * that the compiler doesn't implement a default.
      */
-    SubdomainSelection(const SubdomainSelection&);
+    SubdomainSelection (const SubdomainSelection&);
 
     /**
      * This isn't a copyable object, so let's make sure nobody tries.
@@ -86,9 +86,10 @@ public:
      * We won't even bother implementing this; we'll just make sure
      * that the compiler doesn't implement a default.
      */
-    SubdomainSelection& operator=(const SubdomainSelection&);
-
+    SubdomainSelection& operator = (const SubdomainSelection&);
   }; // subclass \p SubdomainSelection
+
+
 
   /**
    * Selection of subdomain ids by a list.
@@ -107,7 +108,7 @@ public:
      * Method that decides whether a given subdomain id is included in
      * the subset or nor.
      */
-    virtual bool operator()(const subdomain_id_type& subdomain_id)const;
+    virtual bool operator() (const subdomain_id_type& subdomain_id) const libmesh_override;
 
   protected:
     /**
@@ -150,7 +151,7 @@ public:
    * consists of.  The result will contain local dofs on each
    * processor only and will not contain duplictates.
    */
-  virtual const std::vector<unsigned int>& dof_ids(void)const;
+  virtual const std::vector<unsigned int>& dof_ids () const libmesh_override;
 
   /**
    * Initializes the class.  Will be called by the constructors.  Can

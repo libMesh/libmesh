@@ -75,42 +75,40 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear ();
+  virtual void clear () libmesh_override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit ();
+  virtual void reinit () libmesh_override;
 
   /**
    * Prepares \p qoi for quantity of interest assembly, then calls
    * user qoi function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi
-  (const QoISet& qoi_indices = QoISet());
+  virtual void assemble_qoi (const QoISet& qoi_indices = QoISet()) libmesh_override;
 
   /**
    * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
    * then calls user qoi derivative function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi_derivative
-  (const QoISet &qoi_indices = QoISet(),
-   bool include_liftfunc = true,
-   bool apply_constraints = true);
+  virtual void assemble_qoi_derivative (const QoISet &qoi_indices = QoISet(),
+                                        bool include_liftfunc = true,
+                                        bool apply_constraints = true) libmesh_override;
 
   /**
    * Assembles & solves the linear system Ax=b.
    */
-  virtual void solve ();
+  virtual void solve () libmesh_override;
 
   /**
    * @returns \p "Explicit".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const { return "Explicit"; }
+  virtual std::string system_type () const libmesh_override { return "Explicit"; }
 
   /**
    * The system matrix.  Implicit systems are characterized by
@@ -122,16 +120,14 @@ public:
 
 protected:
 
-
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void init_data ();
+  virtual void init_data () libmesh_override;
 
 
 private:
-
 
   /**
    * Add the system right-hand-side vector to the \p _vectors data structure.
@@ -140,12 +136,6 @@ private:
   void add_system_rhs ();
 };
 
-
-
-// ------------------------------------------------------------
-// ExplicitSystem inline methods
-
 } // namespace libMesh
-
 
 #endif // LIBMESH_EXPLICIT_SYSTEM_H

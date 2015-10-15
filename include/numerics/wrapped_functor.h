@@ -52,7 +52,7 @@ public:
     : _func(func.clone())
   { }
 
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const libmesh_override
   {
     return UniquePtr<FEMFunctionBase<Output> >
       (new WrappedFunctor<Output> (*_func));
@@ -64,7 +64,7 @@ public:
    */
   virtual Output operator() (const FEMContext&,
                              const Point& p,
-                             const Real time = 0.)
+                             const Real time = 0.) libmesh_override
   { return _func->operator()(p, time); }
 
   /**
@@ -75,7 +75,7 @@ public:
   virtual void operator() (const FEMContext&,
                            const Point& p,
                            const Real time,
-                           DenseVector<Output>& output)
+                           DenseVector<Output>& output) libmesh_override
   { _func->operator() (p, time, output); }
 
   /**
@@ -85,7 +85,7 @@ public:
   virtual Output component (const FEMContext&,
                             unsigned int i,
                             const Point& p,
-                            Real time=0.)
+                            Real time=0.) libmesh_override
   { return _func->component(i, p, time); }
 
 protected:

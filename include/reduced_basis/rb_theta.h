@@ -64,7 +64,6 @@ public:
    * to provide problem dependent behavior.
    */
   virtual Number evaluate(const RBParameters& ) { return 1.; }
-
 };
 
 }

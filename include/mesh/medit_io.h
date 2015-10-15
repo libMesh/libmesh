@@ -65,7 +65,7 @@ public:
   /**
    * This method implements writing a mesh to a specified ".mesh" file.
    */
-  virtual void write (const std::string& );
+  virtual void write (const std::string&) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -73,7 +73,7 @@ public:
    */
   virtual void write_nodal_data (const std::string&,
                                  const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+                                 const std::vector<std::string>&) libmesh_override;
 
   /**
    * Flag indicating whether or not to write a binary file
@@ -87,9 +87,9 @@ private:
    * specified file where the nodal data and variable names are optionally
    * provided.  This will write an ASCII file.
    */
-  virtual void write_ascii (const std::string&,
-                            const std::vector<Number>* = NULL,
-                            const std::vector<std::string>* = NULL);
+  void write_ascii (const std::string&,
+                    const std::vector<Number>* = NULL,
+                    const std::vector<std::string>* = NULL);
 
   /**
    * Flag to write binary data.

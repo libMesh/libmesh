@@ -74,92 +74,94 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid13  (Elem* p=NULL);
+  Pyramid13 (Elem* p=NULL) :
+    Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 13.
    */
-  virtual unsigned int n_nodes() const { return 13; }
+  virtual unsigned int n_nodes() const libmesh_override { return 13; }
 
   /**
    * @returns \p PRYAMID13
    */
-  ElemType type () const { return PYRAMID13; }
+  virtual ElemType type () const libmesh_override { return PYRAMID13; }
 
   /**
    * FIXME: we don't yet have a refinement pattern for pyramids...
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+                               const unsigned int e) const libmesh_override;
 
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
-  virtual bool has_affine_map () const;
+  virtual bool has_affine_map () const libmesh_override;
 
   /**
    * @returns SECOND
    */
-  Order default_order() const { return SECOND; }
+  virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
    * Builds a \p QUAD8 or \p TRI6 coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy) const libmesh_override;
 
   /**
    * Builds a \p EDGE3 coincident with edge i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
   /**
    * @returns 2 for all edge nodes
    */
-  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const;
+  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const libmesh_override;
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                           const unsigned int v) const;
+                                                           const unsigned int v) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -187,9 +189,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int,
-                          const unsigned int,
-                          const unsigned int) const
+  virtual float embedding_matrix (const unsigned int,
+                                  const unsigned int,
+                                  const unsigned int) const libmesh_override
   { libmesh_not_implemented(); return 0.; }
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
@@ -197,16 +199,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// Pyramid13 class member functions
-inline
-Pyramid13::Pyramid13(Elem* p) :
-  Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
-{
-}
 
 } // namespace libMesh
 

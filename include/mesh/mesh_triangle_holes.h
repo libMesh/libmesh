@@ -84,11 +84,11 @@ public:
    */
   PolygonHole(const Point& center, Real radius, unsigned int n_points);
 
-  virtual unsigned int n_points() const;
+  virtual unsigned int n_points() const libmesh_override;
 
-  virtual Point point(const unsigned int n) const;
+  virtual Point point(const unsigned int n) const libmesh_override;
 
-  virtual Point inside() const;
+  virtual Point inside() const libmesh_override;
 
 private:
   /**
@@ -129,11 +129,11 @@ public:
   ArbitraryHole(const Point& center,
                 const std::vector<Point>& points);
 
-  virtual unsigned int n_points() const;
+  virtual unsigned int n_points() const libmesh_override;
 
-  virtual Point point(const unsigned int n) const;
+  virtual Point point(const unsigned int n) const libmesh_override;
 
-  virtual Point inside() const;
+  virtual Point inside() const libmesh_override;
 
 private:
   /**

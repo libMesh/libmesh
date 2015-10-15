@@ -31,13 +31,10 @@
 namespace libMesh
 {
 
-
-
 // Forward Declarations
 class MeshBase;
 class Point;
 class Elem;
-
 
 /**
  * This is a point locator.  It locates points in space
@@ -88,21 +85,21 @@ public:
    * Clears the locator.  Overloaded from base class.  This method
    * frees dynamic memory using "delete".
    */
-  virtual void clear();
+  virtual void clear() libmesh_override;
 
   /**
    * Initializes the locator, so that the \p operator() methods can
    * be used.  Overloaded from base class.  This method allocates dynamic
    * memory using "new".
    */
-  virtual void init();
+  virtual void init() libmesh_override;
 
   /**
    * Locates the element in which the point with global coordinates
    * \p p is located, optionally restricted to a set of allowed subdomains.
    * Overloaded from base class.
    */
-  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
+  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const libmesh_override;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
@@ -110,26 +107,26 @@ public:
    * return a NULL pointer instead of crashing.  Per default, this
    * mode is off.
    */
-  virtual void enable_out_of_mesh_mode ();
+  virtual void enable_out_of_mesh_mode () libmesh_override;
 
   /**
    * Disables out-of-mesh mode (default).  If asked to find a point
    * that is contained in no mesh at all, the point locator will now
    * crash.
    */
-  virtual void disable_out_of_mesh_mode ();
+  virtual void disable_out_of_mesh_mode () libmesh_override;
 
   /**
    * Set a tolerance to use when determining
    * if a point is contained within the mesh.
    */
-  virtual void set_close_to_point_tol(Real close_to_point_tol);
+  virtual void set_close_to_point_tol(Real close_to_point_tol) libmesh_override;
 
   /**
    * Specify that we do not want to use a user-specified tolerance to
    * determine if a point is contained within the mesh.
    */
-  virtual void unset_close_to_point_tol();
+  virtual void unset_close_to_point_tol() libmesh_override;
 
 protected:
   /**
@@ -140,7 +137,6 @@ protected:
    */
   std::vector<std::pair<Point, const Elem *> >* _list;
 };
-
 
 } // namespace libMesh
 

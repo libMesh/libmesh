@@ -43,17 +43,19 @@ public:
    * Constructor.  Declares the order of the quadrature rule.
    */
   QClough (const unsigned int _dim,
-           const Order _order=INVALID_ORDER);
+           const Order _order=INVALID_ORDER) :
+    QBase(_dim, _order)
+  {}
 
   /**
    * Destructor.
    */
-  ~QClough();
+  ~QClough() {}
 
   /**
    * @returns \p QCLOUGH
    */
-  QuadratureType type() const { return QCLOUGH; }
+  virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
 
 
 private:
@@ -64,27 +66,7 @@ private:
                 unsigned int p_level=0);
   void init_3D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);
-
 };
-
-
-
-// ------------------------------------------------------------
-// QClough class members
-inline
-QClough::QClough(const unsigned int d,
-                 const Order o) : QBase(d,o)
-{
-}
-
-
-
-
-inline
-QClough::~QClough()
-{
-}
-
 
 } // namespace libMesh
 

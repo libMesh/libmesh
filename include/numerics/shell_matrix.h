@@ -88,7 +88,6 @@ public:
    * Copies the diagonal part of the matrix into \p dest.
    */
   virtual void get_diagonal (NumericVector<T>& dest) const = 0;
-
 };
 
 

@@ -330,14 +330,14 @@ public:
   /**
    * @returns the continuity of the element.
    */
-  virtual FEContinuity get_continuity() const
+  virtual FEContinuity get_continuity() const libmesh_override
   { return C_ZERO; }  // FIXME - is this true??
 
   /**
    * @returns true if the element's higher order shape functions are
    * hierarchic
    */
-  virtual bool is_hierarchic() const
+  virtual bool is_hierarchic() const libmesh_override
   { return false; }  // FIXME - Inf FEs don't handle p elevation yet
 
   /**
@@ -397,7 +397,7 @@ public:
    */
   virtual void reinit (const Elem* elem,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL);
+                       const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -408,7 +408,7 @@ public:
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL);
+                       const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -419,7 +419,7 @@ public:
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
                             const std::vector<Point>* const pts = NULL,
-                            const std::vector<Real>* const weights = NULL);
+                            const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * Computes the reference space quadrature points on the side of
@@ -429,7 +429,7 @@ public:
                          const Elem* /* side */,
                          const unsigned int /* s */,
                          const std::vector<Point>& /* reference_side_points */,
-                         std::vector<Point>&       /* reference_points */)
+                         std::vector<Point>& /* reference_points */) libmesh_override
   {
     libmesh_not_implemented();
   }
@@ -445,13 +445,13 @@ public:
    * and another for base integration, using the convenient
    * \p QBase::build() method.
    */
-  virtual void attach_quadrature_rule (QBase* q);
+  virtual void attach_quadrature_rule (QBase* q) libmesh_override;
 
   /**
    * @returns the number of shape functions associated with
    * this infinite element.
    */
-  virtual unsigned int n_shape_functions () const
+  virtual unsigned int n_shape_functions () const libmesh_override
   { return _n_total_approx_sf; }
 
   /**
@@ -459,7 +459,7 @@ public:
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
-  virtual unsigned int n_quadrature_points () const
+  virtual unsigned int n_quadrature_points () const libmesh_override
   { libmesh_assert(radial_qrule); return _n_total_qp; }
 
 
@@ -511,7 +511,7 @@ protected:
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
   virtual void init_base_shape_functions(const std::vector<Point>&,
-                                         const Elem*)
+                                         const Elem*) libmesh_override
   { libmesh_not_implemented(); }
 
   /**
@@ -557,7 +557,7 @@ protected:
    * it protected.
    * Overloaded method from the \p FEBase version.
    */
-  virtual void compute_shape_functions(const Elem*, const std::vector<Point>&);
+  virtual void compute_shape_functions(const Elem*, const std::vector<Point>&) libmesh_override;
 
 
 
@@ -790,7 +790,7 @@ private:
   /**
    * @returns \p false, currently not required.
    */
-  virtual bool shapes_need_reinit() const;
+  virtual bool shapes_need_reinit() const libmesh_override;
 
   /**
    * When \p compute_node_indices_fast() is used, this static

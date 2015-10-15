@@ -78,14 +78,14 @@ public:
   }
 
   virtual Output operator() (const Point& p,
-                             const Real time = 0)
+                             const Real time = 0) libmesh_override
   {
     return this->component(0,p,time);
   }
 
   virtual void operator() (const Point& p,
                            const Real time,
-                           DenseVector<Output>& output)
+                           DenseVector<Output>& output) libmesh_override
   {
     libmesh_assert_greater_equal (output.size(),
                                   reverse_index_map.size());
@@ -110,7 +110,7 @@ public:
    */
   virtual Output component (unsigned int i,
                             const Point& p,
-                            Real time)
+                            Real time) libmesh_override
   {
     if (i >= reverse_index_map.size() ||
         reverse_index_map[i].first == libMesh::invalid_uint)
@@ -124,18 +124,21 @@ public:
       component(reverse_index_map[i].second,p,time);
   }
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const {
+  virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override
+  {
     CompositeFunction* returnval = new CompositeFunction();
     for (unsigned int i=0; i != subfunctions.size(); ++i)
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
     return UniquePtr<FunctionBase<Output> > (returnval);
   }
 
-  unsigned int n_subfunctions () const {
+  unsigned int n_subfunctions () const
+  {
     return subfunctions.size();
   }
 
-  unsigned int n_components () const {
+  unsigned int n_components () const
+  {
     return reverse_index_map.size();
   }
 

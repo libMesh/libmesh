@@ -16,8 +16,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// See the file:
 
-// quadrature_jacobi_1D.C
+#include "libmesh/quadrature_jacobi.h"
 
-// for implementation.
+namespace libMesh
+{
+
+// See the file: quadrature_jacobi_1D.C for implementation of specific
+// element types.
+
+QuadratureType QJacobi::type() const
+{
+  if ((_alpha == 1) && (_beta == 0))
+    return QJACOBI_1_0;
+
+  else if ((_alpha == 2) && (_beta == 0))
+    return QJACOBI_2_0;
+
+  else
+    libmesh_error_msg("Invalid Jacobi quadrature rule: alpha = " << _alpha << ", beta = " << _beta);
+}
+
+}

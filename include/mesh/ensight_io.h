@@ -73,7 +73,7 @@ public:
   /**
    * write solution
    */
-  virtual void write (const std::string &name);
+  virtual void write (const std::string &name) libmesh_override;
 
   /**
    * write solution

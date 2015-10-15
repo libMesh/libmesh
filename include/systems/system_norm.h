@@ -30,8 +30,6 @@
 namespace libMesh
 {
 
-// Forward Declarations
-
 /**
  * This class defines a norm/seminorm to be applied to a NumericVector which
  * contains coefficients in a finite element space.

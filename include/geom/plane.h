@@ -98,13 +98,13 @@ public:
    * @returns true if the point p is above the surface,
    * false otherwise.
    */
-  bool above_surface (const Point& p) const;
+  virtual bool above_surface (const Point& p) const libmesh_override;
 
   /**
    * @returns true if the point p is below the surface,
    * false otherwise.
    */
-  bool below_surface (const Point& p) const;
+  virtual bool below_surface (const Point& p) const libmesh_override;
 
   /**
    * @returns true if the point p is on the surface,
@@ -112,18 +112,18 @@ public:
    * the surface really means "very close" to account
    * for roundoff error.
    */
-  bool on_surface (const Point& p) const;
+  virtual bool on_surface (const Point& p) const libmesh_override;
 
   /**
    * @returns the closest point on the surface to point p.
    */
-  Point closest_point (const Point& p) const;
+  virtual Point closest_point (const Point& p) const libmesh_override;
 
   /**
    * @returns a unit vector normal to the surface at
    * point p.
    */
-  Point unit_normal (const Point& p) const;
+  virtual Point unit_normal (const Point& p) const libmesh_override;
 
   /**
    * @returns a point on the plane useful

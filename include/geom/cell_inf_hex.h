@@ -30,9 +30,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * The \p InfHex is an element in 3D with 5 sides.
  * The \f$ 6^{th} \f$ side is theoretically located at infinity,
@@ -50,13 +47,19 @@ public:
    * Default infinite brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    InfCell(nn, InfHex::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -64,81 +67,73 @@ public:
                  _master_points[i][2]);
   }
 
-
-  //   /**
-  //    * @returns 4 for the base \p s=0 and 2 for side faces.
-  //    */
-  //   unsigned int n_children_per_side(const unsigned int s) const;
-
   /**
    * @returns 5.  Infinite elements have one side less
    * than their conventional counterparts, since one
    * side is supposed to be located at infinity.
    */
-  unsigned int n_sides() const { return 5; }
+  virtual unsigned int n_sides() const libmesh_override { return 5; }
 
   /**
    * @returns 8.  All infinite hexahedrals (in our
    * setting) have 8 vertices.
    */
-  unsigned int n_vertices() const { return 8; }
+  virtual unsigned int n_vertices() const libmesh_override { return 8; }
 
   /**
    * @returns 8.  All infinite hexahedrals have 8 edges,
    * 4 lying in the base, and 4 perpendicular to the base.
    */
-  unsigned int n_edges() const { return 8; }
+  virtual unsigned int n_edges() const libmesh_override { return 8; }
 
   /**
    * @returns 5.  All hexahedrals have 5 faces.
    */
-  unsigned int n_faces() const { return 5; }
+  virtual unsigned int n_faces() const libmesh_override { return 5; }
 
   /**
    * @returns 4
    */
-  unsigned int n_children() const { return 4; }
+  virtual unsigned int n_children() const libmesh_override { return 4; }
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+                                const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * @returns a primitive (4-noded) quad or infquad for
    * face i.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  Real quality (const ElemQuality q) const;
+  virtual Real quality (const ElemQuality q) const libmesh_override;
 
   /**
    * Returns the suggested quality bounds for
    * the hex based on quality measure q.  These are
    * the values suggested by the CUBIT User's Manual.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
-
-
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const libmesh_override;
 
 protected:
 
@@ -175,39 +170,6 @@ protected:
    */
   static const Real _master_points[18][3];
 };
-
-
-
-// ------------------------------------------------------------
-// InfHex class member functions
-inline
-InfHex::InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  InfCell(nn, InfHex::n_sides(), p, _elemlinks_data, nodelinkdata)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
-
-
-// inline
-// unsigned int InfHex::n_children_per_side(const unsigned int s) const
-// {
-//   libmesh_assert_less (s, this->n_sides());
-
-//   switch (s)
-//   {
-//     case 0:
-//       // every infinite element has 4 children in the base side
-//       return 4;
-
-//     default:
-//       // on infinite faces (sides), only 2 children exist
-//       //
-//       // note that the face at infinity is already caught by the libmesh_assertion
-//       return 2;
-//   }
-// }
 
 
 } // namespace libMesh

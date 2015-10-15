@@ -54,7 +54,7 @@ public:
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& );
+  virtual void write (const std::string&) libmesh_override;
 
 private:
 
@@ -63,7 +63,7 @@ private:
    * file is called by the public interface file after it
    * constructs an ofstream.
    */
-  virtual void write_stream(std::ostream& out);
+  void write_stream(std::ostream& out);
 };
 
 

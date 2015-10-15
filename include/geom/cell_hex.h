@@ -40,13 +40,20 @@ public:
    * Default brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Hex(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
+
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -57,46 +64,46 @@ public:
   /**
    * @returns 6
    */
-  unsigned int n_sides() const { return 6; }
+  virtual unsigned int n_sides() const libmesh_override { return 6; }
 
   /**
    * @returns 8.  All hexahedrals have 8 vertices.
    */
-  unsigned int n_vertices() const { return 8; }
+  virtual unsigned int n_vertices() const libmesh_override { return 8; }
 
   /**
    * @returns 12.  All hexahedrals have 12 edges.
    */
-  unsigned int n_edges() const { return 12; }
+  virtual unsigned int n_edges() const libmesh_override { return 12; }
 
   /**
    * @returns 6.  All hexahedrals have 6 faces.
    */
-  unsigned int n_faces() const { return 6; }
+  virtual unsigned int n_faces() const libmesh_override { return 6; }
 
   /**
    * @returns 8
    */
-  unsigned int n_children() const { return 8; }
+  virtual unsigned int n_children() const libmesh_override { return 8; }
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+                                const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /**
    * @returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
    */
-  virtual unsigned int opposite_side(const unsigned int s) const;
+  virtual unsigned int opposite_side(const unsigned int s) const libmesh_override;
 
   /**
    * @returns the local node number for the node opposite to node n
@@ -104,34 +111,33 @@ public:
    * throws an error otherwise.
    */
   virtual unsigned int opposite_node(const unsigned int n,
-                                     const unsigned int s) const;
+                                     const unsigned int s) const libmesh_override;
 
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * @returns a primitive (4-noded) quad for
    * face i.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  Real quality (const ElemQuality q) const;
+  virtual Real quality (const ElemQuality q) const libmesh_override;
 
   /**
    * Returns the suggested quality bounds for
    * the hex based on quality measure q.  These are
    * the values suggested by the CUBIT User's Manual.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
-
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const libmesh_override;
 
 
 protected:
@@ -171,19 +177,6 @@ protected:
    */
   static const int _child_node_lookup[8][27];
 };
-
-
-
-// ------------------------------------------------------------
-// Hex class member functions
-inline
-Hex::Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
 
 } // namespace libMesh
 

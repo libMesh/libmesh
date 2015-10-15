@@ -63,75 +63,77 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfHex8  (Elem* p=NULL);
+  InfHex8 (Elem* p=NULL) :
+    InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
+  {}
 
   /**
    * @returns 8.  The \p InfHex8 has 8 nodes.
    */
-  unsigned int n_nodes() const { return 8; }
+  virtual unsigned int n_nodes() const libmesh_override { return 8; }
 
   /**
    * @returns \p INFHEX8
    */
-  ElemType     type() const { return INFHEX8; }
+  virtual ElemType type() const libmesh_override { return INFHEX8; }
 
   /**
    * @returns 1
    */
-  unsigned int n_sub_elem() const { return 1; }
+  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
    * @returns true iff the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const;
+  virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+                               const unsigned int e) const libmesh_override;
 
   /**
    * @returns FIRST
    */
-  Order        default_order() const { return FIRST; }
+  virtual Order default_order() const libmesh_override { return FIRST; }
 
   /**
    * Returns a \p QUAD4 built coincident with face 0, an \p INFQUAD4
    * built coincident with faces 1 to 4. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy) const libmesh_override;
 
   /**
    * Returns an \p EDGE2 built coincident with edges 0 to 3, an \p INFEDGE2
    * built coincident with edges 4 to 7. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+                            std::vector<dof_id_type>& conn) const libmesh_override;
 
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
@@ -141,7 +143,7 @@ public:
    * \p p.  Customized for infinite elements, since knowledge
    * about the envelope can be helpful.
    */
-  bool contains_point (const Point& p, Real tol=TOLERANCE) const;
+  virtual bool contains_point (const Point& p, Real tol=TOLERANCE) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -170,9 +172,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
+  virtual float embedding_matrix (const unsigned int i,
+                                  const unsigned int j,
+                                  const unsigned int k) const libmesh_override
   { return _embedding_matrix[i][j][k]; }
 
   /**
@@ -186,17 +188,6 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
 
 };
-
-
-
-// ------------------------------------------------------------
-// InfHex8 class member functions
-inline
-InfHex8::InfHex8(Elem* p) :
-  InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
-{
-}
-
 
 } // namespace libMesh
 

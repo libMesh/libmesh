@@ -40,13 +40,20 @@ public:
    * Default tetrahedral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Tet  (const unsigned int nn, Elem* p, Node** nodelinkdata);
+  Tet (const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata),
+    _diagonal_selection(INVALID_DIAG)
+  {
+    // Make sure the interior parent isn't undefined
+    if (LIBMESH_DIM > 3)
+      this->set_interior_parent(NULL);
+  }
 
   /**
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  Point master_point (const unsigned int i) const
+  virtual Point master_point (const unsigned int i) const libmesh_override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -57,59 +64,59 @@ public:
   /**
    * @returns 4
    */
-  unsigned int n_sides() const { return 4; }
+  virtual unsigned int n_sides() const libmesh_override { return 4; }
 
   /**
    * @returns 4.  All tetrahedrals have 4 vertices.
    */
-  unsigned int n_vertices() const { return 4; }
+  virtual unsigned int n_vertices() const libmesh_override { return 4; }
 
   /**
    * @returns 6.  All tetrahedrals have 6 edges.
    */
-  unsigned int n_edges() const { return 6; }
+  virtual unsigned int n_edges() const libmesh_override { return 6; }
 
   /**
    * @returns 4.  All tetrahedrals have 4 faces.
    */
-  unsigned int n_faces() const { return 4; }
+  virtual unsigned int n_faces() const libmesh_override { return 4; }
 
   /**
    * @returns 8
    */
-  unsigned int n_children() const { return 8; }
+  virtual unsigned int n_children() const libmesh_override { return 8; }
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+                               const unsigned int s) const libmesh_override;
 
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  dof_id_type key (const unsigned int s) const;
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
    * @returns a primitive (3-noded) triangle for
    * face i.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
 
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  Real quality (const ElemQuality q) const;
+  virtual Real quality (const ElemQuality q) const libmesh_override;
 
   /**
    * Returns the suggested quality bounds for
    * the hex based on quality measure q.  These are
    * the values suggested by the CUBIT User's Manual.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const libmesh_override;
 
   /**
    * This enumeration keeps track of which diagonal is selected during
@@ -147,7 +154,8 @@ public:
    * But we want to cache topology data based on that matrix.  So we return a
    * "version number" based on the diagonal selection.
    */
-  virtual unsigned int embedding_matrix_version () const {
+  virtual unsigned int embedding_matrix_version () const libmesh_override
+  {
     this->choose_diagonal();
     return this->diagonal_selection();
   }
@@ -188,22 +196,7 @@ protected:
    * of the three.
    */
   void choose_diagonal() const;
-
 };
-
-
-
-// ------------------------------------------------------------
-// Tet class member functions
-inline
-Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata)
-  , _diagonal_selection(INVALID_DIAG)
-{
-  // Make sure the interior parent isn't undefined
-  if (LIBMESH_DIM > 3)
-    this->set_interior_parent(NULL);
-}
 
 } // namespace libMesh
 

@@ -77,13 +77,13 @@ public:
   /**
    * Clear this object.
    */
-  virtual void clear();
+  virtual void clear() libmesh_override;
 
   /**
    * Read parameters in from file and set up this system
    * accordingly.
    */
-  virtual void process_parameters_file (const std::string& parameters_filename);
+  virtual void process_parameters_file (const std::string& parameters_filename) libmesh_override;
 
   /**
    * Specify which type of "best fit" we use to guide the EIM
@@ -94,19 +94,19 @@ public:
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
-  virtual void print_info();
+  virtual void print_info() libmesh_override;
 
   /**
    * Initialize this system so that we can perform
    * the Construction stage of the RB method.
    */
   virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
-                                          bool skip_vector_assembly=false);
+                                          bool skip_vector_assembly=false) libmesh_override;
 
   /**
    * Override train_reduced_basis to first initialize _parametrized_functions_in_training_set.
    */
-  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
+  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true) libmesh_override;
 
   /**
    * Load the truth representation of the parametrized function
@@ -116,7 +116,7 @@ public:
    * If \p plot_solution > 0 the solution will be plotted
    * to an output file.
    */
-  virtual Real truth_solve(int plot_solution);
+  virtual Real truth_solve(int plot_solution) libmesh_override;
 
   /**
    * We compute the best fit of parametrized_function
@@ -132,7 +132,7 @@ public:
    * relevant to the projection calculations in
    * load_calN_parametrized_function.
    */
-  virtual void init_context(FEMContext &c);
+  virtual void init_context(FEMContext &c) libmesh_override;
 
   /**
    * Evaluate the mesh function at the specified point and for the specified variable.
@@ -187,38 +187,38 @@ protected:
   /**
    * Override to initialize the coupling matrix to decouple variables in this system.
    */
-  virtual void init_data();
+  virtual void init_data() libmesh_override;
 
   /**
    * Add a new basis function to the RB space. Overload
    * to enrich with the EIM basis functions.
    */
-  virtual void enrich_RB_space();
+  virtual void enrich_RB_space() libmesh_override;
 
   /**
    * Update the system after enriching the RB space; this calls
    * a series of functions to update the system properly.
    */
-  virtual void update_system();
+  virtual void update_system() libmesh_override;
 
   /**
    * Compute the reduced basis matrices for the current basis.
    * Overload to update the inner product matrix that
    * is used to compute the best fit to parametrized_function.
    */
-  virtual void update_RB_system_matrices();
+  virtual void update_RB_system_matrices() libmesh_override;
 
   /**
    * Overload to return the best fit error. This function is used in
    * the Greedy algorithm to select the next parameter.
    */
-  virtual Real get_RB_error_bound();
+  virtual Real get_RB_error_bound() libmesh_override;
 
   /**
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
-  virtual bool greedy_termination_test(Real training_greedy_error, int count);
+  virtual bool greedy_termination_test(Real training_greedy_error, int count) libmesh_override;
 
   /**
    * Loop over the training set and compute the parametrized function for each

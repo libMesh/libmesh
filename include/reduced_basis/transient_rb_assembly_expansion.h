@@ -83,7 +83,6 @@ private:
    * assembly.
    */
   std::vector<ElemAssembly*> _M_assembly_vector;
-
 };
 
 }

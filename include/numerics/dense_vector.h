@@ -72,19 +72,21 @@ public:
   /**
    * @returns the size of the vector.
    */
-  virtual unsigned int size() const {
+  virtual unsigned int size() const libmesh_override
+  {
     return cast_int<unsigned int>(_val.size());
   }
 
   /**
    * @returns true iff size() is 0
    */
-  virtual bool empty() const { return _val.empty(); }
+  virtual bool empty() const libmesh_override
+  { return _val.empty(); }
 
   /**
    * Set every element in the vector to 0.
    */
-  virtual void zero();
+  virtual void zero() libmesh_override;
 
   /**
    * @returns the \p (i) element of the vector as a const reference.
@@ -99,12 +101,14 @@ public:
   /**
    * @returns the \p (i) element of the vector.
    */
-  virtual T el(const unsigned int i) const { return (*this)(i); }
+  virtual T el(const unsigned int i) const libmesh_override
+  { return (*this)(i); }
 
   /**
    * @returns the \p (i) element of the vector as a writeable reference.
    */
-  virtual T & el(const unsigned int i)     { return (*this)(i); }
+  virtual T & el(const unsigned int i) libmesh_override
+  { return (*this)(i); }
 
   /**
    * Assignment operator.

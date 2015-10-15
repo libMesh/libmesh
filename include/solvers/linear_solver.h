@@ -214,7 +214,6 @@ public:
                                                const unsigned int) = 0; // N. Iterations
 
 
-
   /**
    * This function solves a system whose matrix is a shell matrix, but
    * a sparse matrix is used as preconditioning matrix, this allowing
@@ -292,7 +291,6 @@ protected:
    * to set parameters like solver type, tolerances and iteration limits.
    */
   SolverConfiguration* _solver_configuration;
-
 };
 
 

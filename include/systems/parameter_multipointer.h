@@ -57,12 +57,16 @@ public:
    * A simple reseater won't work with a multipointer
    */
   virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
+  operator= (T * /* new_ptr */) libmesh_override
+  {
+    libmesh_error();
+    return *this;
+  }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  virtual void set (const T & new_value)
+  virtual void set (const T & new_value) libmesh_override
   {
     libmesh_assert(!_ptrs.empty());
 #ifndef NDEBUG
@@ -81,7 +85,7 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const
+  virtual const T& get () const libmesh_override
   {
     libmesh_assert(!_ptrs.empty());
     T& val = *_ptrs[0];
@@ -97,7 +101,8 @@ public:
   /**
    * Returns a new copy of the accessor.
    */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const {
+  virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
+  {
     ParameterMultiPointer *pmp = new ParameterMultiPointer<T>();
     pmp->_ptrs = _ptrs;
 

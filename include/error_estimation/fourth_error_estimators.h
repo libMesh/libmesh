@@ -55,7 +55,7 @@ public:
    */
   ~LaplacianErrorEstimator() {}
 
-  virtual ErrorEstimatorType type() const
+  virtual ErrorEstimatorType type() const libmesh_override
   { return LAPLACIAN;}
 
 protected:
@@ -64,13 +64,13 @@ protected:
    * An initialization function, for requesting specific data from the FE
    * objects
    */
-  virtual void init_context(FEMContext &c);
+  virtual void init_context(FEMContext &c) libmesh_override;
 
   /**
    * The function which calculates a laplacian jump based error
    * term on an internal side
    */
-  virtual void internal_side_integration();
+  virtual void internal_side_integration() libmesh_override;
 };
 
 

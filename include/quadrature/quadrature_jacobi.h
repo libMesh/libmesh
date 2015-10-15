@@ -57,7 +57,14 @@ public:
   QJacobi (const unsigned int _dim,
            const Order _order=INVALID_ORDER,
            const unsigned int a=1,
-           const unsigned int b=0);
+           const unsigned int b=0) :
+    QBase(_dim, _order),
+    _alpha(a),
+    _beta(b)
+  {
+    if (_dim == 1)
+      init(EDGE2);
+  }
 
   /**
    * Destructor. Empty.
@@ -68,50 +75,16 @@ public:
    * @returns the \p QuadratureType, either
    * \p QJACOBI_1_0 or \p QJACOBI_2_0.
    */
-  QuadratureType type() const;
-
+  virtual QuadratureType type() const libmesh_override;
 
 private:
   const unsigned int _alpha;
   const unsigned int _beta;
 
-  void init_1D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
-
+  virtual void init_1D (const ElemType _type=INVALID_ELEM,
+                        unsigned int p_level=0) libmesh_override;
 };
 
-
-
-
-// ------------------------------------------------------------
-// QJacobi class members
-inline
-QJacobi::QJacobi(const unsigned int d,
-                 const Order o,
-                 const unsigned int a,
-                 const unsigned int b) : QBase(d,o), _alpha(a), _beta(b)
-{
-  if (_dim == 1)
-    init(EDGE2);
-}
-
-
-
-inline
-QuadratureType QJacobi::type() const
-{
-  if ((_alpha == 1) && (_beta == 0))
-    return QJACOBI_1_0;
-
-  else if ((_alpha == 2) && (_beta == 0))
-    return QJACOBI_2_0;
-
-  else
-    libmesh_error_msg("Invalid Jacobi quadrature rule: alpha = " << _alpha << ", beta = " << _beta);
-}
-
-
 } // namespace libMesh
-
 
 #endif // LIBMESH_QUADRATURE_JACOBI_H

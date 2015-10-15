@@ -74,14 +74,14 @@ public:
   /**
    * Prepares a context object for use.
    */
-  virtual void init_context (const FEMContext &c);
+  virtual void init_context (const FEMContext &c) libmesh_override;
 
   /**
    * Returns a new copy of the function.  The new copy should be as
    * ``deep'' as necessary to allow independent destruction and
    * simultaneous evaluations of the copies in different threads.
    */
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const;
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const libmesh_override;
 
   // ------------------------------------------------------
   // misc
@@ -91,25 +91,28 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual Output operator() (const FEMContext& c, const Point& p,
-                             const Real time = 0.);
+  virtual Output operator() (const FEMContext& c,
+                             const Point& p,
+                             const Real time = 0.) libmesh_override;
 
   /**
    * Return function for vectors.
    * Returns in \p output the values of the data at the
    * coordinate \p p and for time \p time.
    */
-  void operator() (const FEMContext& c, const Point& p,
+  void operator() (const FEMContext& c,
+                   const Point& p,
                    const Real time,
-                   DenseVector<Output>& output);
+                   DenseVector<Output>& output) libmesh_override;
 
   /**
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
-  virtual Output component(const FEMContext& c, unsigned int i,
+  virtual Output component(const FEMContext& c,
+                           unsigned int i,
                            const Point& p,
-                           Real time=0.);
+                           Real time=0.) libmesh_override;
 
   const std::string & expression() { return _expression; }
 

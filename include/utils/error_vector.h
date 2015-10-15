@@ -75,13 +75,13 @@ public:
   /**
    * Returns the minimum nonzero value in the data set.
    */
-  virtual ErrorVectorReal minimum() const;
+  virtual ErrorVectorReal minimum() const libmesh_override;
 
   /**
    * Returns the mean value of the data set. Ignores
    * zero values.
    */
-  virtual Real mean() const;
+  virtual Real mean() const libmesh_override;
 
   /**
    * Returns the median (e.g. the middle)
@@ -91,14 +91,14 @@ public:
    * can't be called on const objects.
    * Source: GNU Scientific Library
    */
-  virtual Real median();
+  virtual Real median() libmesh_override;
 
   /**
    * A const version of the median funtion.
    * Requires twice the memory of original
    * data set but does not change the original.
    */
-  virtual Real median() const;
+  virtual Real median() const libmesh_override;
 
   /**
    * Computes the variance of the data set
@@ -110,7 +110,7 @@ public:
    * is normalized by N in this case.
    * Source: GNU Scientific Library
    */
-  virtual Real variance() const
+  virtual Real variance() const libmesh_override
   { return this->variance(this->mean()); }
 
   /**
@@ -124,21 +124,21 @@ public:
    * standard deviation squared.
    * Source: GNU Scientific Library
    */
-  virtual Real variance(const Real mean) const;
+  virtual Real variance(const Real mean) const libmesh_override;
 
   /**
    * Returns a vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * below the cutoff value cut ignoring inactive elements.
    */
-  virtual std::vector<dof_id_type> cut_below(Real cut) const;
+  virtual std::vector<dof_id_type> cut_below(Real cut) const libmesh_override;
 
   /**
    * Returns a vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * above the cutoff value cut ignoring inactive elements.
    */
-  virtual std::vector<dof_id_type> cut_above(Real cut) const;
+  virtual std::vector<dof_id_type> cut_above(Real cut) const libmesh_override;
 
   /**
    * Plots a data file, of a type determined by looking at
@@ -160,7 +160,6 @@ protected:
    */
   MeshBase *_mesh;
 };
-
 
 } // namespace libMesh
 

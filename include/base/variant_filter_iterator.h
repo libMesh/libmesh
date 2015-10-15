@@ -72,9 +72,18 @@ public:
   struct IterBase
   {
     virtual ~IterBase() {}
-    virtual  IterBase* clone() const = 0 ;
-    virtual ReferenceType operator*() const = 0;    // <-- CUSTOM INTERFACE METHOD
-    virtual IterBase& operator++() = 0;          // <-- CUSTOM INTERFACE METHOD
+    virtual  IterBase* clone() const = 0;
+
+    /**
+     * Custom interface method.
+     */
+    virtual ReferenceType operator*() const = 0;
+
+    /**
+     * Custom interface method.
+     */
+    virtual IterBase& operator++() = 0;
+
     virtual bool equal(const IterBase *other) const = 0;
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
@@ -95,7 +104,7 @@ public:
   struct PredBase
   {
     virtual ~PredBase() {}
-    virtual PredBase* clone() const = 0 ;
+    virtual PredBase* clone() const = 0;
     virtual bool operator()(const IterBase* in) const = 0;
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
@@ -144,7 +153,7 @@ public:
      * @returns a copy of this object as a pointer to
      * the base (non-templated) class.
      */
-    virtual IterBase* clone() const
+    virtual IterBase* clone() const libmesh_override
     {
 #ifdef __SUNPRO_CC
       variant_filter_iterator::Iter<IterType> *copy =
@@ -161,7 +170,7 @@ public:
      * Returns a copy of this object as a pointer to a
      * different type of object.
      */
-    virtual typename IterBase::const_IterBase* const_clone() const
+    virtual typename IterBase::const_IterBase* const_clone() const libmesh_override
     {
       /**
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
@@ -178,7 +187,7 @@ public:
     /**
      * Custom interface method.
      */
-    virtual ReferenceType operator*() const   // <-- CUSTOM INTERFACE METHOD
+    virtual ReferenceType operator*() const libmesh_override
     {
       return *iter_data;
     }
@@ -186,7 +195,7 @@ public:
     /**
      * Custom interface method.
      */
-    virtual Iter& operator++()         // <-- CUSTOM INTERFACE METHOD
+    virtual Iter& operator++() libmesh_override
     {
       ++iter_data;
       return *this;
@@ -198,7 +207,7 @@ public:
      * fails it means you compared two different derived
      * classes.
      */
-    virtual bool equal(const IterBase *other) const
+    virtual bool equal(const IterBase *other) const libmesh_override
     {
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
@@ -242,7 +251,7 @@ public:
     /**
      * Returns a copy of this object as a pointer to the base class.
      */
-    virtual PredBase* clone() const
+    virtual PredBase* clone() const libmesh_override
     {
 #ifdef __SUNPRO_CC
       variant_filter_iterator::Pred<IterType,PredType> *copy =
@@ -260,7 +269,7 @@ public:
      * The redefinition of the const_clone function for the Pred class.
      * Notice the strange typename syntax required.  Will it compile everywhere?
      */
-    virtual typename PredBase::const_PredBase* const_clone() const
+    virtual typename PredBase::const_PredBase* const_clone() const libmesh_override
     {
       /**
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
@@ -281,7 +290,7 @@ public:
     /**
      * Re-implementation of op()
      */
-    virtual bool operator() (const IterBase* in) const
+    virtual bool operator() (const IterBase* in) const libmesh_override
     {
       libmesh_assert(in);
 
