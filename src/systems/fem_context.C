@@ -41,6 +41,8 @@ FEMContext::FEMContext (const System &sys)
     _mesh_y_var(0),
     _mesh_z_var(0),
     side(0), edge(0),
+    _atype(CURRENT),
+    _custom_solution(NULL),
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
@@ -1538,146 +1540,189 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
 {
   this->set_elem(e);
 
-  // Initialize the per-element data for elem.
-  if(this->has_elem())
-    sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
-  else
-    // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-    sys.get_dof_map().dof_indices (NULL, this->get_dof_indices());
+  if (algebraic_type() == CURRENT ||
+      algebraic_type() == DOFS_ONLY)
+    {
+      // Initialize the per-element data for elem.
+      if(this->has_elem())
+        sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
+      else
+        // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+        sys.get_dof_map().dof_indices (NULL, this->get_dof_indices());
+    }
+  else if (algebraic_type() == OLD)
+    {
+      // Initialize the per-element data for elem.
+      if(this->has_elem())
+        sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices());
+      else
+        // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+        sys.get_dof_map().old_dof_indices (NULL, this->get_dof_indices());
+    }
 
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices().size());
   const std::size_t n_qoi = sys.qoi.size();
 
-  // This also resizes elem_solution
-  sys.current_local_solution->get(this->get_dof_indices(), this->get_elem_solution().get_values());
-
-  if (sys.use_fixed_solution)
-    this->get_elem_fixed_solution().resize(n_dofs);
-
-  // Only make space for these if we're using DiffSystem
-  // This is assuming *only* DiffSystem is using elem_solution_rate/accel
-  const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
-  if(diff_system)
+  if (this->algebraic_type() != NONE &&
+      this->algebraic_type() != DOFS_ONLY)
     {
-      // Now, we only need these if the solver is unsteady
-      if( !diff_system->get_time_solver().is_steady() )
+      // This also resizes elem_solution
+      if (_custom_solution == NULL)
+        sys.current_local_solution->get(this->get_dof_indices(), this->get_elem_solution().get_values());
+      else
+        _custom_solution->get(this->get_dof_indices(), this->get_elem_solution().get_values());
+
+      if (sys.use_fixed_solution)
+        this->get_elem_fixed_solution().resize(n_dofs);
+
+      // Only make space for these if we're using DiffSystem
+      // This is assuming *only* DiffSystem is using elem_solution_rate/accel
+      const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
+      if(diff_system)
         {
-          this->get_elem_solution_rate().resize(n_dofs);
+          // Now, we only need these if the solver is unsteady
+          if( !diff_system->get_time_solver().is_steady() )
+            {
+              this->get_elem_solution_rate().resize(n_dofs);
 
-          // We only need accel space if the TimeSolver is second order
-          const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
+              // We only need accel space if the TimeSolver is second order
+              const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
 
-          if( time_solver.time_order() >= 2 )
-            this->get_elem_solution_accel().resize(n_dofs);
+              if( time_solver.time_order() >= 2 )
+                this->get_elem_solution_accel().resize(n_dofs);
+            }
         }
+
+      // These resize calls also zero out the residual and jacobian
+      this->get_elem_residual().resize(n_dofs);
+      this->get_elem_jacobian().resize(n_dofs, n_dofs);
+
+      this->get_qoi_derivatives().resize(n_qoi);
+      this->_elem_qoi_subderivatives.resize(n_qoi);
+      for (std::size_t q=0; q != n_qoi; ++q)
+        (this->get_qoi_derivatives())[q].resize(n_dofs);
     }
-
-  // These resize calls also zero out the residual and jacobian
-  this->get_elem_residual().resize(n_dofs);
-  this->get_elem_jacobian().resize(n_dofs, n_dofs);
-
-  this->get_qoi_derivatives().resize(n_qoi);
-  this->_elem_qoi_subderivatives.resize(n_qoi);
-  for (std::size_t q=0; q != n_qoi; ++q)
-    (this->get_qoi_derivatives())[q].resize(n_dofs);
 
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
     for (unsigned int i=0; i != sys.n_vars(); ++i)
       {
-        if(this->has_elem())
-          sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
-        else
-          // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-          sys.get_dof_map().dof_indices (NULL, this->get_dof_indices(i), i);
-
-
-        const unsigned int n_dofs_var = cast_int<unsigned int>
-          (this->get_dof_indices(i).size());
-
-        this->get_elem_solution(i).reposition
-          (sub_dofs, n_dofs_var);
-
-        // Only make space for these if we're using DiffSystem
-        // This is assuming *only* DiffSystem is using elem_solution_rate/accel
-        const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
-        if(diff_system)
+        if (algebraic_type() == CURRENT ||
+            algebraic_type() == DOFS_ONLY)
           {
-            // Now, we only need these if the solver is unsteady
-            if( !diff_system->get_time_solver().is_steady() )
+            if(this->has_elem())
+              sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
+            else
+              // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+              sys.get_dof_map().dof_indices (NULL, this->get_dof_indices(i), i);
+          }
+        else if (algebraic_type() == OLD)
+          {
+            if(this->has_elem())
+              sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
+            else
+              // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+              sys.get_dof_map().old_dof_indices (NULL, this->get_dof_indices(i), i);
+          }
+
+        if (this->algebraic_type() != NONE &&
+            this->algebraic_type() != DOFS_ONLY)
+          {
+            const unsigned int n_dofs_var = cast_int<unsigned int>
+              (this->get_dof_indices(i).size());
+
+            this->get_elem_solution(i).reposition
+              (sub_dofs, n_dofs_var);
+
+            // Only make space for these if we're using DiffSystem
+            // This is assuming *only* DiffSystem is using elem_solution_rate/accel
+            const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
+            if(diff_system)
               {
-                this->get_elem_solution_rate(i).reposition
-                  (sub_dofs, n_dofs_var);
+                // Now, we only need these if the solver is unsteady
+                if( !diff_system->get_time_solver().is_steady() )
+                  {
+                    this->get_elem_solution_rate(i).reposition
+                      (sub_dofs, n_dofs_var);
 
-                // We only need accel space if the TimeSolver is second order
-                const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
+                    // We only need accel space if the TimeSolver is second order
+                    const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
 
-                if( time_solver.time_order() >= 2 )
-                  this->get_elem_solution_accel(i).reposition
-                    (sub_dofs, n_dofs_var);
+                    if( time_solver.time_order() >= 2 )
+                      this->get_elem_solution_accel(i).reposition
+                        (sub_dofs, n_dofs_var);
+                  }
               }
+
+            if (sys.use_fixed_solution)
+              this->get_elem_fixed_solution(i).reposition
+                (sub_dofs, n_dofs_var);
+
+            this->get_elem_residual(i).reposition
+              (sub_dofs, n_dofs_var);
+
+            for (std::size_t q=0; q != n_qoi; ++q)
+              this->get_qoi_derivatives(q,i).reposition
+                (sub_dofs, n_dofs_var);
+
+            for (unsigned int j=0; j != i; ++j)
+              {
+                const unsigned int n_dofs_var_j =
+                  cast_int<unsigned int>
+                  (this->get_dof_indices(j).size());
+
+                this->get_elem_jacobian(i,j).reposition
+                  (sub_dofs, this->get_elem_residual(j).i_off(),
+                   n_dofs_var, n_dofs_var_j);
+                this->get_elem_jacobian(j,i).reposition
+                  (this->get_elem_residual(j).i_off(), sub_dofs,
+                   n_dofs_var_j, n_dofs_var);
+              }
+            this->get_elem_jacobian(i,i).reposition
+              (sub_dofs, sub_dofs,
+               n_dofs_var,
+               n_dofs_var);
+            sub_dofs += n_dofs_var;
           }
-
-        if (sys.use_fixed_solution)
-          this->get_elem_fixed_solution(i).reposition
-            (sub_dofs, n_dofs_var);
-
-        this->get_elem_residual(i).reposition
-          (sub_dofs, n_dofs_var);
-
-        for (std::size_t q=0; q != n_qoi; ++q)
-          this->get_qoi_derivatives(q,i).reposition
-            (sub_dofs, n_dofs_var);
-
-        for (unsigned int j=0; j != i; ++j)
-          {
-            const unsigned int n_dofs_var_j =
-              cast_int<unsigned int>
-              (this->get_dof_indices(j).size());
-
-            this->get_elem_jacobian(i,j).reposition
-              (sub_dofs, this->get_elem_residual(j).i_off(),
-               n_dofs_var, n_dofs_var_j);
-            this->get_elem_jacobian(j,i).reposition
-              (this->get_elem_residual(j).i_off(), sub_dofs,
-               n_dofs_var_j, n_dofs_var);
-          }
-        this->get_elem_jacobian(i,i).reposition
-          (sub_dofs, sub_dofs,
-           n_dofs_var,
-           n_dofs_var);
-        sub_dofs += n_dofs_var;
       }
-    libmesh_assert_equal_to (sub_dofs, n_dofs);
+
+    if (this->algebraic_type() != NONE &&
+        this->algebraic_type() != DOFS_ONLY)
+      libmesh_assert_equal_to (sub_dofs, n_dofs);
   }
 
   // Now do the localization for the user requested vectors
-  DiffContext::localized_vectors_iterator localized_vec_it = this->_localized_vectors.begin();
-  const DiffContext::localized_vectors_iterator localized_vec_end = this->_localized_vectors.end();
-
-  for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
+  if (this->algebraic_type() != NONE)
     {
-      const NumericVector<Number>& current_localized_vector = *localized_vec_it->first;
-      DenseVector<Number>& target_vector = localized_vec_it->second.first;
+      DiffContext::localized_vectors_iterator localized_vec_it = this->_localized_vectors.begin();
+      const DiffContext::localized_vectors_iterator localized_vec_end = this->_localized_vectors.end();
 
-      current_localized_vector.get(this->get_dof_indices(), target_vector.get_values());
-
-      // Initialize the per-variable data for elem.
-      unsigned int sub_dofs = 0;
-      for (unsigned int i=0; i != sys.n_vars(); ++i)
+      for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
         {
-          const unsigned int n_dofs_var = cast_int<unsigned int>
-            (this->get_dof_indices(i).size());
-          sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
+          const NumericVector<Number>& current_localized_vector = *localized_vec_it->first;
+          DenseVector<Number>& target_vector = localized_vec_it->second.first;
 
-          localized_vec_it->second.second[i]->reposition
-            (sub_dofs, n_dofs_var);
+          current_localized_vector.get(this->get_dof_indices(), target_vector.get_values());
 
-          sub_dofs += n_dofs_var;
+          // Initialize the per-variable data for elem.
+          unsigned int sub_dofs = 0;
+          for (unsigned int i=0; i != sys.n_vars(); ++i)
+            {
+              const unsigned int n_dofs_var = cast_int<unsigned int>
+                (this->get_dof_indices(i).size());
+
+              // This is redundant with earlier initialization, isn't it? - RHS
+              // sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
+
+              localized_vec_it->second.second[i]->reposition
+                (sub_dofs, n_dofs_var);
+
+              sub_dofs += n_dofs_var;
+            }
+          libmesh_assert_equal_to (sub_dofs, n_dofs);
         }
-      libmesh_assert_equal_to (sub_dofs, n_dofs);
     }
 }
 
