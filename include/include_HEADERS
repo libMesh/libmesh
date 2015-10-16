@@ -336,7 +336,6 @@ include_HEADERS =  \
         solvers/euler2_solver.h \
         solvers/euler_solver.h \
         solvers/first_order_unsteady_solver.h \
-        solvers/linear.h \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
         solvers/newmark_solver.h \
@@ -354,7 +353,6 @@ include_HEADERS =  \
         solvers/slepc_eigen_solver.h \
         solvers/slepc_macro.h \
         solvers/solution_history.h \
-        solvers/solver.h \
         solvers/solver_configuration.h \
         solvers/steady_solver.h \
         solvers/tao_optimization_solver.h \

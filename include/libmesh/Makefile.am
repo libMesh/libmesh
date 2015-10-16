@@ -332,7 +332,6 @@ BUILT_SOURCES = \
         euler_solver.h \
         first_order_unsteady_solver.h \
         laspack_linear_solver.h \
-        linear.h \
         linear_solver.h \
         memory_solution_history.h \
         newmark_solver.h \
@@ -350,7 +349,6 @@ BUILT_SOURCES = \
         slepc_eigen_solver.h \
         slepc_macro.h \
         solution_history.h \
-        solver.h \
         solver_configuration.h \
         steady_solver.h \
         tao_optimization_solver.h \
@@ -1501,9 +1499,6 @@ first_order_unsteady_solver.h: $(top_srcdir)/include/solvers/first_order_unstead
 laspack_linear_solver.h: $(top_srcdir)/include/solvers/laspack_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-linear.h: $(top_srcdir)/include/solvers/linear.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 linear_solver.h: $(top_srcdir)/include/solvers/linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1553,9 +1548,6 @@ slepc_macro.h: $(top_srcdir)/include/solvers/slepc_macro.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solution_history.h: $(top_srcdir)/include/solvers/solution_history.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-solver.h: $(top_srcdir)/include/solvers/solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solver_configuration.h: $(top_srcdir)/include/solvers/solver_configuration.h
