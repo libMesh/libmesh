@@ -551,14 +551,14 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	solution_transfer.h adaptive_time_solver.h diff_solver.h \
 	eigen_solver.h eigen_sparse_linear_solver.h \
 	eigen_time_solver.h euler2_solver.h euler_solver.h \
-	first_order_unsteady_solver.h laspack_linear_solver.h linear.h \
+	first_order_unsteady_solver.h laspack_linear_solver.h \
 	linear_solver.h memory_solution_history.h newmark_solver.h \
 	newton_solver.h nlopt_optimization_solver.h \
 	no_solution_history.h nonlinear_solver.h optimization_solver.h \
 	petsc_auto_fieldsplit.h petsc_diff_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h second_order_unsteady_solver.h \
-	slepc_eigen_solver.h slepc_macro.h solution_history.h solver.h \
+	slepc_eigen_solver.h slepc_macro.h solution_history.h \
 	solver_configuration.h steady_solver.h \
 	tao_optimization_solver.h time_solver.h \
 	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
@@ -1805,9 +1805,6 @@ first_order_unsteady_solver.h: $(top_srcdir)/include/solvers/first_order_unstead
 laspack_linear_solver.h: $(top_srcdir)/include/solvers/laspack_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-linear.h: $(top_srcdir)/include/solvers/linear.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 linear_solver.h: $(top_srcdir)/include/solvers/linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1857,9 +1854,6 @@ slepc_macro.h: $(top_srcdir)/include/solvers/slepc_macro.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solution_history.h: $(top_srcdir)/include/solvers/solution_history.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-solver.h: $(top_srcdir)/include/solvers/solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solver_configuration.h: $(top_srcdir)/include/solvers/solver_configuration.h
