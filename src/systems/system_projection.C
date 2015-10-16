@@ -123,7 +123,7 @@ public:
 
 template <typename Output,
           void (FEMContext::*point_output)
-            (unsigned int, const Point &, Output&) const>
+            (unsigned int, const Point &, Output&, const Real) const>
 class OldSolutionValue : public FEMFunctionBase<Output>
 {
 public:
@@ -163,7 +163,7 @@ public:
       return 0;
 
     Output n;
-    (old_context.*point_output)(0, p, n);
+    (old_context.*point_output)(0, p, n, out_of_elem_tol);
     return n;
   }
 
@@ -180,7 +180,7 @@ public:
     const unsigned int size = output.size();
 
     for (unsigned int v=0; v != size; ++v)
-      (old_context.*point_output)(v, p, output(v));
+      (old_context.*point_output)(v, p, output(v), out_of_elem_tol);
   }
 
   virtual Output component(const FEMContext& c, unsigned int i,
@@ -191,7 +191,7 @@ public:
       return 0;
 
     Output n;
-    (old_context.*point_output)(i, p, n);
+    (old_context.*point_output)(i, p, n, out_of_elem_tol);
     return n;
   }
 
@@ -201,44 +201,54 @@ protected:
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
-        if (!elem.old_dof_object)
-          return false;
-
-        last_elem = &elem;
-
         if (elem.refinement_flag() == Elem::JUST_REFINED)
-          old_context.pre_fe_reinit(sys, elem.parent());
+          {
+            old_context.pre_fe_reinit(sys, elem.parent());
+          }
         else if (elem.refinement_flag() == Elem::JUST_COARSENED)
           {
+            // Find the child with this point.  Use a large tolerance
+            // to allow for out-of-element finite differencing of
+            // mixed gradient terms.  Pray we have no quadrature
+            // locations like 0.49999999 on C0 elements.
             for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child(c)->contains_point(p))
+              if (elem.child(c)->close_to_point(p, out_of_elem_tol))
                 {
                   old_context.pre_fe_reinit(sys, elem.child(c));
                   break;
                 }
 
-            libmesh_assert(old_context.get_elem().contains_point(p));
+            libmesh_assert
+              (old_context.get_elem().close_to_point(p, out_of_elem_tol));
           }
         else
-          old_context.pre_fe_reinit(sys, &elem);
+          {
+            if (!elem.old_dof_object)
+              return false;
+
+            old_context.pre_fe_reinit(sys, &elem);
+          }
+
+        last_elem = &elem;
       }
     else
       {
         libmesh_assert(old_context.has_elem());
 
-        if (!old_context.get_elem().contains_point(p))
+        if (!old_context.get_elem().close_to_point(p, out_of_elem_tol))
           {
             libmesh_assert_equal_to
               (elem.refinement_flag(), Elem::JUST_COARSENED);
 
             for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child(c)->contains_point(p))
+              if (elem.child(c)->close_to_point(p, out_of_elem_tol))
                 {
                   old_context.pre_fe_reinit(sys, elem.child(c));
                   break;
                 }
 
-            libmesh_assert(old_context.get_elem().contains_point(p));
+            libmesh_assert
+              (old_context.get_elem().close_to_point(p, out_of_elem_tol));
           }
       }
 
@@ -250,8 +260,22 @@ private:
   const System &sys;
   FEMContext old_context;
   const NumericVector<Number> & old_solution;
+
+  static const Real out_of_elem_tol;
 };
 
+
+template <>
+const Real
+OldSolutionValue
+  <Number, &FEMContext::point_value>::out_of_elem_tol =
+  3*TOLERANCE;
+
+template <>
+const Real
+OldSolutionValue
+  <Gradient, &FEMContext::point_gradient>::out_of_elem_tol =
+  3*TOLERANCE;
 
 
 /**
@@ -1041,10 +1065,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   if (dim > 1)
                     {
                       // We'll finite difference mixed derivatives
+                      Real delta_x = TOLERANCE * elem->hmin();
+
                       Point nxminus = elem->point(n),
                         nxplus = elem->point(n);
-                      nxminus(0) -= TOLERANCE;
-                      nxplus(0) += TOLERANCE;
+                      nxminus(0) -= delta_x;
+                      nxplus(0) += delta_x;
                       VectorValue<FValue> gxminus =
                         g->component(context,
                                      var_component,
@@ -1061,7 +1087,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       current_dof++;
                       // xy derivative
                       Ue(current_dof) = (gxplus(1) - gxminus(1))
-                        / 2. / TOLERANCE;
+                        / 2. / delta_x;
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
 
@@ -1073,14 +1099,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           current_dof++;
                           // xz derivative
                           Ue(current_dof) = (gxplus(2) - gxminus(2))
-                            / 2. / TOLERANCE;
+                            / 2. / delta_x;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // We need new points for yz
                           Point nyminus = elem->point(n),
                             nyplus = elem->point(n);
-                          nyminus(1) -= TOLERANCE;
-                          nyplus(1) += TOLERANCE;
+                          nyminus(1) -= delta_x;
+                          nyplus(1) += delta_x;
                           VectorValue<FValue> gyminus =
                             g->component(context,
                                          var_component,
@@ -1093,7 +1119,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                                          system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
-                            / 2. / TOLERANCE;
+                            / 2. / delta_x;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // Getting a 2nd order xyz is more tedious
@@ -1101,14 +1127,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                             nxmyp = elem->point(n),
                             nxpym = elem->point(n),
                             nxpyp = elem->point(n);
-                          nxmym(0) -= TOLERANCE;
-                          nxmym(1) -= TOLERANCE;
-                          nxmyp(0) -= TOLERANCE;
-                          nxmyp(1) += TOLERANCE;
-                          nxpym(0) += TOLERANCE;
-                          nxpym(1) -= TOLERANCE;
-                          nxpyp(0) += TOLERANCE;
-                          nxpyp(1) += TOLERANCE;
+                          nxmym(0) -= delta_x;
+                          nxmym(1) -= delta_x;
+                          nxmyp(0) -= delta_x;
+                          nxmyp(1) += delta_x;
+                          nxpym(0) += delta_x;
+                          nxpym(1) -= delta_x;
+                          nxpyp(0) += delta_x;
+                          nxpyp(1) += delta_x;
                           VectorValue<FValue> gxmym =
                             g->component(context,
                                          var_component,
@@ -1130,12 +1156,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                                          nxpyp,
                                          system.time);
                           FValue gxzplus = (gxpyp(2) - gxmyp(2))
-                            / 2. / TOLERANCE;
+                            / 2. / delta_x;
                           FValue gxzminus = (gxpym(2) - gxmym(2))
-                            / 2. / TOLERANCE;
+                            / 2. / delta_x;
                           // xyz derivative
                           Ue(current_dof) = (gxzplus - gxzminus)
-                            / 2. / TOLERANCE;
+                            / 2. / delta_x;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                         }
