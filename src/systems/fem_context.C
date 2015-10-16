@@ -769,8 +769,10 @@ Number FEMContext::point_value(unsigned int var, const Point &p) const
 }
 
 template<typename OutputType>
-void FEMContext::point_value(unsigned int var, const Point &p,
-                             OutputType& u) const
+void FEMContext::point_value(unsigned int var,
+                             const Point &p,
+                             OutputType& u,
+                             const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
@@ -788,7 +790,8 @@ void FEMContext::point_value(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<OutputShape> >&  phi = fe_new->get_phi();
@@ -815,8 +818,10 @@ Gradient FEMContext::point_gradient(unsigned int var, const Point &p) const
 
 
 template<typename OutputType>
-void FEMContext::point_gradient(unsigned int var, const Point &p,
-                                OutputType& grad_u) const
+void FEMContext::point_gradient(unsigned int var,
+                                const Point &p,
+                                OutputType& grad_u,
+                                const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
@@ -836,7 +841,8 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&  dphi = fe_new->get_dphi();
@@ -864,8 +870,10 @@ Tensor FEMContext::point_hessian(unsigned int var, const Point &p) const
 
 
 template<typename OutputType>
-void FEMContext::point_hessian(unsigned int var, const Point &p,
-                               OutputType& hess_u) const
+void FEMContext::point_hessian(unsigned int var,
+                               const Point &p,
+                               OutputType& hess_u,
+                               const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
@@ -887,7 +895,8 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&  d2phi = fe_new->get_d2phi();
@@ -904,8 +913,10 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 
 
 template<typename OutputType>
-void FEMContext::point_curl(unsigned int var, const Point &p,
-                            OutputType& curl_u) const
+void FEMContext::point_curl(unsigned int var,
+                            const Point &p,
+                            OutputType& curl_u,
+                            const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
@@ -923,7 +934,8 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >&  curl_phi = fe_new->get_curl_phi();
@@ -1098,8 +1110,10 @@ Number FEMContext::fixed_point_value(unsigned int var, const Point &p) const
 }
 
 template<typename OutputType>
-void FEMContext::fixed_point_value(unsigned int var, const Point &p,
-                                   OutputType& u) const
+void FEMContext::fixed_point_value(unsigned int var,
+                                   const Point &p,
+                                   OutputType& u,
+                                   const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
@@ -1117,7 +1131,8 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<OutputShape> >&  phi = fe_new->get_phi();
@@ -1144,8 +1159,10 @@ Gradient FEMContext::fixed_point_gradient(unsigned int var, const Point &p) cons
 
 
 template<typename OutputType>
-void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
-                                      OutputType& grad_u) const
+void FEMContext::fixed_point_gradient(unsigned int var,
+                                      const Point &p,
+                                      OutputType& grad_u,
+                                      const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
@@ -1165,7 +1182,8 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&  dphi = fe_new->get_dphi();
@@ -1193,8 +1211,10 @@ Tensor FEMContext::fixed_point_hessian(unsigned int var, const Point &p) const
 
 
 template<typename OutputType>
-void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
-                                     OutputType& hess_u) const
+void FEMContext::fixed_point_hessian(unsigned int var,
+                                     const Point &p,
+                                     OutputType& hess_u,
+                                     const Real tolerance) const
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
@@ -1216,7 +1236,8 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+    this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&  d2phi = fe_new->get_d2phi();
@@ -1748,8 +1769,10 @@ void FEMContext::_update_time_from_system(Real theta)
 
 
 template<typename OutputShape>
-UniquePtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
-                                                                 const Point &p ) const
+UniquePtr<FEGenericBase<OutputShape> >
+FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
+                          const Point &p,
+                          const Real tolerance) const
 {
   FEType fe_type = fe->get_fe_type();
 
@@ -1766,7 +1789,8 @@ UniquePtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGeneric
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
   Point master_point = this->has_elem() ?
-    FEInterface::inverse_map(elem_dim, fe_type, &this->get_elem(), p) :
+    FEInterface::inverse_map
+      (elem_dim, fe_type, &this->get_elem(), p, tolerance) :
     Point(0);
 
   std::vector<Point> coor(1, master_point);
@@ -1840,19 +1864,19 @@ template void FEMContext::side_hessians<Tensor>(unsigned int, const NumericVecto
 //                                            std::vector<??>&) const;
 #endif
 
-template void FEMContext::point_value<Number>(unsigned int, const Point&, Number&) const;
-template void FEMContext::point_value<Gradient>(unsigned int, const Point&, Gradient&) const;
+template void FEMContext::point_value<Number>(unsigned int, const Point&, Number&, const Real) const;
+template void FEMContext::point_value<Gradient>(unsigned int, const Point&, Gradient&, const Real) const;
 
-template void FEMContext::point_gradient<Gradient>(unsigned int, const Point&, Gradient&) const;
-template void FEMContext::point_gradient<Tensor>(unsigned int, const Point&, Tensor&) const;
+template void FEMContext::point_gradient<Gradient>(unsigned int, const Point&, Gradient&, const Real) const;
+template void FEMContext::point_gradient<Tensor>(unsigned int, const Point&, Tensor&, const Real) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::point_hessian<Tensor>(unsigned int, const Point&, Tensor&) const;
+template void FEMContext::point_hessian<Tensor>(unsigned int, const Point&, Tensor&, const Real) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::point_hessian<??>(unsigned int, const Point&, ??&) const;
 #endif
 
-template void FEMContext::point_curl<Gradient>(unsigned int, const Point&, Gradient&) const;
+template void FEMContext::point_curl<Gradient>(unsigned int, const Point&, Gradient&, const Real) const;
 
 template void FEMContext::fixed_interior_value<Number>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::fixed_interior_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
@@ -1878,14 +1902,14 @@ template void FEMContext::fixed_side_hessian<Tensor>(unsigned int, unsigned int,
 //template void FEMContext::fixed_side_hessian<??>(unsigned int, unsigned int, ??&) const;
 #endif
 
-template void FEMContext::fixed_point_value<Number>(unsigned int, const Point&, Number&) const;
-template void FEMContext::fixed_point_value<Gradient>(unsigned int, const Point&, Gradient&) const;
+template void FEMContext::fixed_point_value<Number>(unsigned int, const Point&, Number&, const Real) const;
+template void FEMContext::fixed_point_value<Gradient>(unsigned int, const Point&, Gradient&, const Real) const;
 
-template void FEMContext::fixed_point_gradient<Gradient>(unsigned int, const Point&, Gradient&) const;
-template void FEMContext::fixed_point_gradient<Tensor>(unsigned int, const Point&, Tensor&) const;
+template void FEMContext::fixed_point_gradient<Gradient>(unsigned int, const Point&, Gradient&, const Real) const;
+template void FEMContext::fixed_point_gradient<Tensor>(unsigned int, const Point&, Tensor&, const Real) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point&, Tensor&) const;
+template void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point&, Tensor&, const Real) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::fixed_point_hessian<??>(unsigned int, const Point&, ??&) const;
 #endif
@@ -1902,8 +1926,10 @@ template void FEMContext::interior_accel<Gradient>(unsigned int, unsigned int, G
 template void FEMContext::side_accel<Number>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::side_accel<Gradient>(unsigned int, unsigned int, Gradient&) const;
 
-template UniquePtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
-template UniquePtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;
+template UniquePtr<FEGenericBase<Real> > FEMContext::build_new_fe
+  ( const FEGenericBase<Real>*, const Point &, const Real ) const;
+template UniquePtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe
+  ( const FEGenericBase<RealGradient>*, const Point &, const Real ) const;
 
 
 } // namespace libMesh

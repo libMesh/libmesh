@@ -335,10 +335,15 @@ public:
   /**
    * Returns the value of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void point_value(unsigned int var, const Point &p,
-                   OutputType& u) const;
+  void point_value(unsigned int var,
+                   const Point &p,
+                   OutputType& u,
+                   const Real tolerance = TOLERANCE) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
@@ -375,10 +380,15 @@ public:
   /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void point_gradient(unsigned int var, const Point &p,
-                      OutputType& grad_u) const;
+  void point_gradient(unsigned int var,
+                      const Point &p,
+                      OutputType& grad_u,
+                      const Real tolerance = TOLERANCE) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -418,10 +428,15 @@ public:
   /**
    * Returns the hessian of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void point_hessian(unsigned int var, const Point &p,
-                     OutputType& hess_u) const;
+  void point_hessian(unsigned int var,
+                     const Point &p,
+                     OutputType& hess_u,
+                     const Real tolerance = TOLERANCE) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -494,10 +509,15 @@ public:
   /**
    * Returns the value of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void fixed_point_value(unsigned int var, const Point &p,
-                         OutputType& u) const;
+  void fixed_point_value(unsigned int var,
+                         const Point &p,
+                         OutputType& u,
+                         const Real tolerance = TOLERANCE) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
@@ -518,10 +538,15 @@ public:
   /**
    * Returns the gradient of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void fixed_point_gradient(unsigned int var, const Point &p,
-                            OutputType& grad_u) const;
+  void fixed_point_gradient(unsigned int var,
+                            const Point &p,
+                            OutputType& grad_u,
+                            const Real tolerance = TOLERANCE) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -543,10 +568,15 @@ public:
   /**
    * Returns the hessian of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void fixed_point_hessian(unsigned int var, const Point &p,
-                           OutputType& hess_u) const;
+  void fixed_point_hessian(unsigned int var,
+                           const Point &p,
+                           OutputType& hess_u,
+                           const Real tolerance = TOLERANCE) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -561,10 +591,15 @@ public:
   /**
    * Returns the curl of the solution variable \p var at the physical
    * point \p p on the current element.
+   *
+   * Allows evaluation of points within a relative tolerance outside
+   * the element.
    */
   template<typename OutputType>
-  void point_curl(unsigned int var, const Point &p,
-                  OutputType& curl_u) const;
+  void point_curl(unsigned int var,
+                  const Point &p,
+                  OutputType& curl_u,
+                  const Real tolerance = TOLERANCE) const;
 
   /**
    * Returns the divergence of the solution variable \p var at the physical
@@ -865,7 +900,9 @@ protected:
    * Helper function to reduce some code duplication in the *_point_* methods.
    */
   template<typename OutputShape>
-  UniquePtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
+  UniquePtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe,
+                                                       const Point &p,
+                                                       const Real tolerance = TOLERANCE) const;
 
   /**
    * Helper function to promote accessor usage
