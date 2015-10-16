@@ -121,7 +121,10 @@ public:
 };
 
 
-class OldSolutionValue : public FEMFunctionBase<Number>
+template <typename Output,
+          void (FEMContext::*point_output)
+            (unsigned int, const Point &, Output&) const>
+class OldSolutionValue : public FEMFunctionBase<Output>
 {
 public:
   OldSolutionValue(const libMesh::System &sys_in,
@@ -135,9 +138,9 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
-  virtual UniquePtr<FEMFunctionBase<Number> > clone () const
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
   {
-    return UniquePtr<FEMFunctionBase<Number> >
+    return UniquePtr<FEMFunctionBase<Output> >
       (new OldSolutionValue(*this));
   }
 
@@ -153,20 +156,20 @@ public:
     context.set_algebraic_type(FEMContext::DOFS_ONLY);
   }
 
-  virtual Number operator() (const FEMContext& c, const Point& p,
+  virtual Output operator() (const FEMContext& c, const Point& p,
                              const Real /* time */ = 0.)
   {
     if (!this->check_old_context(c, p))
       return 0;
 
-    Number n;
-    old_context.point_value(0, p, n);
+    Output n;
+    (old_context.*point_output)(0, p, n);
     return n;
   }
 
   virtual void operator() (const FEMContext& c, const Point& p,
                            const Real /* time */,
-                           DenseVector<Number>& output)
+                           DenseVector<Output>& output)
   {
     if (!this->check_old_context(c, p))
       {
@@ -177,20 +180,18 @@ public:
     const unsigned int size = output.size();
 
     for (unsigned int v=0; v != size; ++v)
-      old_context.point_value(v, p, output(v));
+      (old_context.*point_output)(v, p, output(v));
   }
 
-  virtual Number component(const FEMContext& c, unsigned int i,
+  virtual Output component(const FEMContext& c, unsigned int i,
                            const Point& p,
                            Real /* time */ =0.)
   {
     if (!this->check_old_context(c, p))
       return 0;
 
-    Number n;
-    // FIXME - this breaks in the presence of SCALAR and vector-valued
-    // types?
-    old_context.point_value(i, p, n);
+    Output n;
+    (old_context.*point_output)(i, p, n);
     return n;
   }
 
@@ -468,11 +469,12 @@ void System::project_vector (const NumericVector<Number>& old_v,
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
       typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
 
-      OldSolutionValue f(*this, old_vector);
+      OldSolutionValue<Number,   &FEMContext::point_value>    f(*this, old_vector);
+      OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
       VectorSetAction<Number> setter(new_vector);
 
       Threads::parallel_for (active_local_elem_range,
-                             FEMProjector(*this, f, NULL, setter, vars));
+                             FEMProjector(*this, f, &g, setter, vars));
 
       // Copy the SCALAR dofs from old_vector to new_vector
       // Note: We assume that all SCALAR dofs are on the
