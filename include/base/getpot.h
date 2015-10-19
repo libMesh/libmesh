@@ -2298,7 +2298,7 @@ GetPot::get_value_no_default(const std::string& VarName, const T& Default) const
 inline const char*
 GetPot::get_value_no_default(const char* VarName, const char* Default) const
 {
-  return _internal_managed_copy(get_value_no_default(VarName, Default));
+  return _internal_managed_copy(get_value_no_default(VarName, std::string(Default)));
 }
 
 
