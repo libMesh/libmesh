@@ -1198,21 +1198,63 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // In 3D, project any edge values next
           if (dim > 2 && cont != DISCONTINUOUS)
             {
-              const std::vector<Point>& xyz_values = edge_fe->get_xyz();
-              const std::vector<Real>& JxW = edge_fe->get_JxW();
+              // If we're JUST_COARSENED we'll need a custom
+              // evaluation, not just the standard edge FE
+              const std::vector<Point>& xyz_values =
+                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                edge_fe->get_xyz() : fe->get_xyz();
+              const std::vector<Real>& JxW =
+                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                edge_fe->get_JxW() : fe->get_JxW();
 
-              const std::vector<std::vector<Real> >& phi = edge_fe->get_phi();
+              const std::vector<std::vector<Real> >& phi =
+                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                edge_fe->get_phi() : fe->get_phi();
               const std::vector<std::vector<RealGradient> >* dphi = NULL;
               if (cont == C_ONE)
-                dphi = &(edge_fe->get_dphi());
+                dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                  &(edge_fe->get_dphi()) : &(fe->get_dphi());
 
               for (unsigned char e=0; e != elem->n_edges(); ++e)
                 {
                   context.edge = e;
-                  context.edge_fe_reinit();
 
-                  const QBase& qedgerule = context.get_edge_qrule();
-                  const unsigned int n_qp = qedgerule.n_points();
+                  if (elem->refinement_flag() != Elem::JUST_COARSENED)
+                    context.edge_fe_reinit();
+                  else
+                    {
+                      std::vector<Point> fine_points;
+
+                      UniquePtr<FEBase> fine_fe
+                        (FEBase::build (dim, fe_type));
+
+                      UniquePtr<QBase> qrule
+                        (fe_type.default_quadrature_rule(1));
+                      fine_fe->attach_quadrature_rule(qrule.get());
+
+                      const std::vector<Point> & child_xyz =
+                        fine_fe->get_xyz();
+
+                      for (unsigned int c = 0;
+                           c != elem->n_children(); ++c)
+                        {
+                          if (!elem->is_child_on_edge(c, e))
+                            continue;
+
+                          fine_fe->edge_reinit(elem->child(c), e);
+                          fine_points.insert(fine_points.end(),
+                                             child_xyz.begin(),
+                                             child_xyz.end());
+                        }
+
+                      std::vector<Point> fine_qp;
+                      FEInterface::inverse_map (dim, fe_type, elem,
+                                                fine_points, fine_qp);
+
+                      context.elem_fe_reinit(&fine_qp);
+                    }
+
+                  const unsigned int n_qp = xyz_values.size();
 
                   FEInterface::dofs_on_edge(elem, dim, fe_type, e,
                                             side_dofs);
@@ -1306,13 +1348,22 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
             {
-              const std::vector<Point>& xyz_values = side_fe->get_xyz();
-              const std::vector<Real>& JxW = side_fe->get_JxW();
+              // If we're JUST_COARSENED we'll need a custom
+              // evaluation, not just the standard side FE
+              const std::vector<Point>& xyz_values =
+                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                side_fe->get_xyz() : fe->get_xyz();
+              const std::vector<Real>& JxW =
+                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                side_fe->get_JxW() : fe->get_JxW();
 
-              const std::vector<std::vector<Real> >& phi = side_fe->get_phi();
+              const std::vector<std::vector<Real> >& phi =
+                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                side_fe->get_phi() : fe->get_phi();
               const std::vector<std::vector<RealGradient> >* dphi = NULL;
               if (cont == C_ONE)
-                dphi = &(side_fe->get_dphi());
+                dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
+                  &(side_fe->get_dphi()) : &(fe->get_dphi());
 
               for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {
@@ -1336,10 +1387,43 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   DenseVector<FValue> Uside(free_dofs);
 
                   context.side = s;
-                  context.side_fe_reinit();
 
-                  const QBase& qsiderule = context.get_side_qrule();
-                  const unsigned int n_qp = qsiderule.n_points();
+                  if (elem->refinement_flag() != Elem::JUST_COARSENED)
+                    context.side_fe_reinit();
+                  else
+                    {
+                      std::vector<Point> fine_points;
+
+                      UniquePtr<FEBase> fine_fe
+                        (FEBase::build (dim, fe_type));
+
+                      UniquePtr<QBase> qrule
+                        (fe_type.default_quadrature_rule(dim-1));
+                      fine_fe->attach_quadrature_rule(qrule.get());
+
+                      const std::vector<Point> & child_xyz =
+                        fine_fe->get_xyz();
+
+                      for (unsigned int c = 0;
+                           c != elem->n_children(); ++c)
+                        {
+                          if (!elem->is_child_on_side(c, s))
+                            continue;
+
+                          fine_fe->reinit(elem->child(c), s);
+                          fine_points.insert(fine_points.end(),
+                                             child_xyz.begin(),
+                                             child_xyz.end());
+                        }
+
+                      std::vector<Point> fine_qp;
+                      FEInterface::inverse_map (dim, fe_type, elem,
+                                                fine_points, fine_qp);
+
+                      context.elem_fe_reinit(&fine_qp);
+                    }
+
+                  const unsigned int n_qp = xyz_values.size();
 
                   // Loop over the quadrature points
                   for (unsigned int qp=0; qp<n_qp; qp++)
@@ -1423,17 +1507,47 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // There may be nothing to project
           if (free_dofs)
             {
-              context.elem_fe_reinit();
-
-              const QBase& qrule = context.get_element_qrule();
-              const unsigned int n_qp = qrule.n_points();
               const std::vector<Point>& xyz_values = fe->get_xyz();
               const std::vector<Real>& JxW = fe->get_JxW();
 
               const std::vector<std::vector<Real> >& phi = fe->get_phi();
               const std::vector<std::vector<RealGradient> >* dphi = NULL;
               if (cont == C_ONE)
-                dphi = &(side_fe->get_dphi());
+                dphi = &(fe->get_dphi());
+
+              if (elem->refinement_flag() != Elem::JUST_COARSENED)
+                context.elem_fe_reinit();
+              else
+                {
+                  std::vector<Point> fine_points;
+
+                  UniquePtr<FEBase> fine_fe
+                    (FEBase::build (dim, fe_type));
+
+                  UniquePtr<QBase> qrule
+                    (fe_type.default_quadrature_rule(dim));
+                  fine_fe->attach_quadrature_rule(qrule.get());
+
+                  const std::vector<Point> & child_xyz =
+                    fine_fe->get_xyz();
+
+                  for (unsigned int c = 0;
+                       c != elem->n_children(); ++c)
+                    {
+                      fine_fe->reinit(elem->child(c));
+                      fine_points.insert(fine_points.end(),
+                                         child_xyz.begin(),
+                                         child_xyz.end());
+                    }
+
+                  std::vector<Point> fine_qp;
+                  FEInterface::inverse_map (dim, fe_type, elem,
+                                            fine_points, fine_qp);
+
+                  context.elem_fe_reinit(&fine_qp);
+                }
+
+              const unsigned int n_qp = xyz_values.size();
 
               Ke.resize (free_dofs, free_dofs); Ke.zero();
               Fe.resize (free_dofs); Fe.zero();
