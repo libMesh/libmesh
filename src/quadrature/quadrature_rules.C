@@ -30,6 +30,8 @@ namespace libMesh
 
 std::string QuadratureRules::name (const QuadratureType q)
 {
+  libmesh_deprecated();
+
   std::string its_name;
 
   switch (q)
