@@ -130,7 +130,7 @@ public:
    * Most FEMSystem-based problems will need to reimplement this in order to
    * call FE::get_*() as their particular physics requires.
    */
-  virtual void init_context(DiffContext &);
+  virtual void init_context(DiffContext &) libmesh_override;
 
   /**
    * Runs a postprocessing loop over all elements, and if

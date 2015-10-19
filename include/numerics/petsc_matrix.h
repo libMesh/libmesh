@@ -381,7 +381,7 @@ protected:
   virtual void _get_submatrix(SparseMatrix<T>& submatrix,
                               const std::vector<numeric_index_type>& rows,
                               const std::vector<numeric_index_type>& cols,
-                              const bool reuse_submatrix) const;
+                              const bool reuse_submatrix) const libmesh_override;
 
 private:
 
