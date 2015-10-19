@@ -70,7 +70,7 @@ public:
 
   virtual void reinit() libmesh_override;
 
-  virtual void solve() = 0;
+  virtual void solve() libmesh_override = 0;
 
   virtual void advance_timestep() libmesh_override;
 

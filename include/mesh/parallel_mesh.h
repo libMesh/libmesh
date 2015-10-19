@@ -128,7 +128,7 @@ public:
    * nodes containers.
    * Calls libmesh_assert() on each possible failure.
    */
-  virtual void libmesh_assert_valid_parallel_ids() const;
+  virtual void libmesh_assert_valid_parallel_ids() const libmesh_override;
 
   /**
    * Verify refinement_flag and p_refinement_flag consistency of our

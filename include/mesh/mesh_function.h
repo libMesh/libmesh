@@ -120,7 +120,7 @@ public:
    * \p p and for \p time, which defaults to zero.
    */
   Number operator() (const Point& p,
-                     const Real time=0.);
+                     const Real time=0.) libmesh_override;
 
   /**
    * @returns the first derivatives of variable 0 at point
@@ -146,7 +146,7 @@ public:
    */
   void operator() (const Point& p,
                    const Real time,
-                   DenseVector<Number>& output);
+                   DenseVector<Number>& output) libmesh_override;
 
   /**
    * Computes values at coordinate \p p and for time \p time,
