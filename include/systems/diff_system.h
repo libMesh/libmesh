@@ -123,7 +123,7 @@ public:
    */
   virtual void assembly (bool get_residual,
                          bool get_jacobian,
-                         bool apply_heterogeneous_constraints = false) = 0;
+                         bool apply_heterogeneous_constraints = false) libmesh_override = 0;
 
   /**
    * Invokes the solver associated with the system.  For steady state
@@ -142,7 +142,7 @@ public:
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual UniquePtr<DifferentiablePhysics> clone_physics()
+  virtual UniquePtr<DifferentiablePhysics> clone_physics() libmesh_override
   {
     libmesh_not_implemented();
     // dummy
@@ -152,7 +152,7 @@ public:
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual UniquePtr<DifferentiableQoI> clone()
+  virtual UniquePtr<DifferentiableQoI> clone() libmesh_override
   {
     libmesh_not_implemented();
     // dummy

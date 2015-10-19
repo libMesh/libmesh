@@ -85,9 +85,9 @@ public:
    * The skip_renumber_nodes_and_elements argument is now deprecated -
    * to disallow renumbering, set \p MeshBase::allow_renumbering(false)
    */
-  void read (const std::string& name,
-             MeshData* mesh_data=NULL,
-             bool skip_renumber_nodes_and_elements=false);
+  virtual void read (const std::string& name,
+                     MeshData* mesh_data=NULL,
+                     bool skip_renumber_nodes_and_elements=false) libmesh_override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
@@ -96,8 +96,8 @@ public:
    * also pass a separate pointer to the MeshData object you have been
    * using with this mesh, since these write methods expect it.
    */
-  void write (const std::string& name,
-              MeshData* mesh_data=NULL);
+  virtual void write (const std::string& name,
+                      MeshData* mesh_data=NULL) libmesh_override;
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the

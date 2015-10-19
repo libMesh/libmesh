@@ -81,7 +81,7 @@ public:
   */
   std::vector<FEMFunctionBase<Number>*> weight_functions;
 
-  virtual ErrorEstimatorType type() const
+  virtual ErrorEstimatorType type() const libmesh_override
   { return WEIGHTED_PATCH_RECOVERY;}
 
 private:
