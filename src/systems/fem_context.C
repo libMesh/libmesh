@@ -1362,7 +1362,8 @@ void FEMContext::nonlocal_reinit(Real theta)
 }
 
 
-void FEMContext::elem_fe_reinit ()
+void FEMContext::elem_fe_reinit
+  (const std::vector<Point>* const pts)
 {
   // Initialize all the interior FE objects on elem.
   // Logging of FE::reinit is done in the FE functions
@@ -1377,7 +1378,7 @@ void FEMContext::elem_fe_reinit ()
        i != local_fe_end; ++i)
     {
       if(this->has_elem())
-        i->second->reinit(&(this->get_elem()));
+        i->second->reinit(&(this->get_elem()), pts);
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
         i->second->reinit(NULL);

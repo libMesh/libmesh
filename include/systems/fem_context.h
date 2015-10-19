@@ -645,7 +645,7 @@ public:
   /**
    * Reinitializes interior FE objects on the current geometric element
    */
-  void elem_fe_reinit();
+  void elem_fe_reinit(const std::vector<Point>* const pts = NULL);
 
   /**
    * Reinitializes side FE objects on the current geometric element
