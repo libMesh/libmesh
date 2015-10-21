@@ -121,7 +121,7 @@ FEMContext::FEMContext (const System &sys)
               _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
               _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim]);
 
-              if (this->_dim == 3)
+              if (dim == 3)
                 {
                   _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
                   _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule);
