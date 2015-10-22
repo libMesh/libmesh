@@ -2,14 +2,14 @@
 AC_DEFUN([CONFIGURE_CURL],
 [
   AC_ARG_ENABLE(curl,
-                AS_HELP_STRING([--disable-curl],
-                               [build without curl support]),
+                AS_HELP_STRING([--enable-curl],
+                               [link against libcurl, for using the cURL API]),
                 [case "${enableval}" in
                   yes)  enablecurl=yes ;;
                   no)  enablecurl=no ;;
                   *)  AC_MSG_ERROR(bad value ${enableval} for --enable-curl) ;;
                 esac],
-                [enablecurl=$enableoptional])
+                [enablecurl=no])
 
   if (test $enablecurl = yes); then
 
