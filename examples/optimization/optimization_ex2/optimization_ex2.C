@@ -233,9 +233,9 @@ Number AssembleOptimization::objective (
   UniquePtr< NumericVector<Number> > AxU = soln.zero_clone();
 
   A_matrix->vector_mult(*AxU, soln);
-  Real UTxAxU = AxU->dot(soln);
+  Number UTxAxU = AxU->dot(soln);
 
-  Real UTxF = F_vector->dot(soln);
+  Number UTxF = F_vector->dot(soln);
 
   return 0.5 * UTxAxU - UTxF;
 }
@@ -451,8 +451,18 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #ifndef LIBMESH_HAVE_PETSC_TAO
+
   libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support");
+
+#elif LIBMESH_USE_COMPLEX_NUMBERS
+
+  // According to
+  // http://www.mcs.anl.gov/research/projects/tao/documentation/installation.html
+  // TAO & PETSc-complex are currently mutually exclusive
+  libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support & real-numbers only");
+
 #endif
+
 
   GetPot infile("optimization_ex2.in");
   const std::string approx_order = infile("approx_order", "FIRST");
