@@ -214,7 +214,7 @@ protected:
    * The frequenices have to be set @e prior to calling
    * \p init().
    */
-  virtual void init_data libmesh_override ();
+  virtual void init_data () libmesh_override;
 
   /**
    * Sets the current frequency to the \p n-th entry in the vector
