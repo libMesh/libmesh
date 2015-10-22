@@ -859,7 +859,7 @@ inline
 Output
 ParsedFEMFunction<Output>::eval (char & libmesh_dbg_var(parser),
                                  const std::string & libmesh_dbg_var(function_name),
-                                 unsigned int libmesh_dbg_var(component_idx))
+                                 unsigned int libmesh_dbg_var(component_idx)) const
 {
   libmesh_error_msg("ERROR: This functionality requires fparser!");
   return Output(0);
