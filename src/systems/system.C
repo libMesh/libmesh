@@ -227,6 +227,10 @@ void System::clear ()
 
 void System::init ()
 {
+  // Calling init() twice on the same system currently works evil
+  // magic, whether done directly or via EquationSystems::read()
+  libmesh_assert(!this->is_initialized());
+
   // First initialize any required data:
   // either only the basic System data
   if (_basic_system_only)
