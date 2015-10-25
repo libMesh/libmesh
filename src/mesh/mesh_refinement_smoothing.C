@@ -323,13 +323,18 @@ bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
                 neighbor->set_refinement_flag(Elem::REFINE);
                 flags_changed = true;
               }
-            if (((elem_p_level + 1 - max_mismatch) >
-                 neighbor->p_level()) &&
-                (neighbor->p_refinement_flag() != Elem::REFINE))
-              {
-                neighbor->set_p_refinement_flag(Elem::REFINE);
-                flags_changed = true;
-              }
+
+            if (max_mismatch>0)
+            {
+				if (((elem_p_level + 1 - max_mismatch) >
+					 neighbor->p_level()) &&
+					(neighbor->p_refinement_flag() != Elem::REFINE))
+				  {
+					neighbor->set_p_refinement_flag(Elem::REFINE);
+					flags_changed = true;
+				  }
+            }
+
           } // loop over interior neighbors
       }
   }
@@ -387,13 +392,17 @@ bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch
                 elem->set_refinement_flag(Elem::REFINE);
                 flags_changed = true;
               }
-            if (((neighbor_p_level + 1 - max_mismatch) >
-                 elem->p_level()) &&
-                (elem->p_refinement_flag() != Elem::REFINE))
-              {
-                elem->set_p_refinement_flag(Elem::REFINE);
-                flags_changed = true;
-              }
+
+            if (max_mismatch>0)
+            {
+				if (((neighbor_p_level + 1 - max_mismatch) >
+					 elem->p_level()) &&
+					(elem->p_refinement_flag() != Elem::REFINE))
+				  {
+					elem->set_p_refinement_flag(Elem::REFINE);
+					flags_changed = true;
+				  }
+            }
           } // loop over interior neighbors
       }
   }
