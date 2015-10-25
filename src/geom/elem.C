@@ -950,12 +950,14 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
         }
       else
         {
-          for (unsigned int p=1; p < this->n_nodes(); ++p)
+          for (unsigned int p=0; p < this->n_nodes(); ++p)
+          {
             if (!elem->contains_point(this->point(p)))
               {
                 neighbor_set.erase(current);
                 break;
               }
+          }
         }
     }
 }
