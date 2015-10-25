@@ -357,5 +357,250 @@ public:
 
 };
 
+class MixedDimensionNonUniformRefinement : public CppUnit::TestCase {
+  /**
+   * Given a mesh with four 2D elements and an overlapping 1D element this test ensures that when
+   * a single 2D element that is flagged for refinement, which is a neighbor of the 1D element, that
+   * the 1D element will is also be flagged for refinement due to an underrefined_boundary_limit of
+   * 0 (default) and the neighboring 2D element will also refined due to an overrefined_boundary_limit
+   * of 0 (default).
+   */
+public:
+  CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement );
+
+  CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testDofOrdering );
+
+  CPPUNIT_TEST_SUITE_END();
+
+  // Yes, this is necessary. Somewhere in those macros is a protected/private
+protected:
+
+  SerialMesh* _mesh;
+
+  void build_mesh()
+  {
+    _mesh = new SerialMesh(*TestCommWorld);
+    /*
+        We start with this
+
+
+      (0,2)           (1,2)
+        4---------------5
+        |               |
+        |               |
+        |       1       |
+        |               |
+        |               |
+      (0,1)           (1,1)
+        3---------------2
+        |               |
+        |               |
+        |       0       |
+        |               |
+        |               |
+        0---------------1
+      (0,0)           (1,0)
+        |               |
+        |       2       |
+        |               |
+        |               |
+        6---------------7
+      (0,-1)          (1,-1)
+        |               |
+        |       3       |
+        |               |
+        |               |
+        9---------------8
+      (0,-2)          (1,-2)
+
+       But the single element refinement should result
+       with this for the default max_mismatch = 0 case
+
+        4---------------5
+        |               |
+        |               |
+        |       1       |
+        |               |
+        |               |
+        3------14-------2
+        |       |       |
+        |   7   |   8   |
+       12------11-------13
+        |       |       |
+        |   5   |   6   |
+        0------10-------1
+        |       |       |
+        |   11  |   12  |
+       17------16-------18
+        |       |       |
+        |   9   |   10  |
+        6------15-------7
+        |               |
+        |               |
+        |       3       |
+        |               |
+        |               |
+        9---------------8
+
+     */
+
+    _mesh->set_mesh_dimension(2);
+
+    _mesh->add_point( Point(0.0,0.0), 0 );
+    _mesh->add_point( Point(1.0,0.0), 1 );
+    _mesh->add_point( Point(1.0,1.0), 2 );
+    _mesh->add_point( Point(0.0,1.0), 3 );
+    _mesh->add_point( Point(0.0,2.0), 4 );
+    _mesh->add_point( Point(1.0,2.0), 5 );
+    _mesh->add_point( Point(0.0,-1.0), 6 );
+    _mesh->add_point( Point(1.0,-1.0), 7 );
+    _mesh->add_point( Point(1.0,-2.0), 8 );
+    _mesh->add_point( Point(0.0,-2.0), 9 );
+
+
+    {
+      Elem* quad0 = _mesh->add_elem( new Quad4 );
+      quad0->set_node(0) = _mesh->node_ptr(0);
+      quad0->set_node(1) = _mesh->node_ptr(1);
+      quad0->set_node(2) = _mesh->node_ptr(2);
+      quad0->set_node(3) = _mesh->node_ptr(3);
+
+      Elem* quad1 = _mesh->add_elem( new Quad4 );
+      quad1->set_node(0) = _mesh->node_ptr(3);
+      quad1->set_node(1) = _mesh->node_ptr(2);
+      quad1->set_node(2) = _mesh->node_ptr(5);
+      quad1->set_node(3) = _mesh->node_ptr(4);
+
+      Elem* quad2 = _mesh->add_elem( new Quad4 );
+      quad2->set_node(0) = _mesh->node_ptr(6);
+      quad2->set_node(1) = _mesh->node_ptr(7);
+      quad2->set_node(2) = _mesh->node_ptr(1);
+      quad2->set_node(3) = _mesh->node_ptr(0);
+
+      Elem* quad3 = _mesh->add_elem( new Quad4 );
+      quad3->set_node(0) = _mesh->node_ptr(9);
+      quad3->set_node(1) = _mesh->node_ptr(8);
+      quad3->set_node(2) = _mesh->node_ptr(7);
+      quad3->set_node(3) = _mesh->node_ptr(6);
+
+      Elem* edge = _mesh->add_elem( new Edge2 );
+      edge->set_node(0) = _mesh->node_ptr(0);
+      edge->set_node(1) = _mesh->node_ptr(1);
+
+      // 2D elements will have subdomain id 0, this one will have 1
+      edge->subdomain_id() = 1;
+    }
+
+    // Let's set an interior_parent() this time for testing
+	_mesh->elem(4)->set_interior_parent(_mesh->elem(0));
+
+    // libMesh will renumber, but we numbered according to its scheme
+    // anyway. We do this because when we call uniformly_refine subsequenly,
+    // it's going use skip_renumber=false.
+    _mesh->prepare_for_use(false /*skip_renumber*/);
+
+#ifdef LIBMESH_ENABLE_AMR
+	    //Flag the bottom element for refinement
+	    _mesh->elem(0)->set_refinement_flag(Elem::REFINE);
+	    MeshRefinement(*_mesh).refine_and_coarsen_elements();
+#endif
+
+  }
+
+public:
+  void setUp()
+  {
+    this->build_mesh();
+  }
+
+  void tearDown()
+  {
+    delete _mesh;
+  }
+
+  void testMesh()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    // We should have 13 total and 10 active elements.
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
+
+    // We should have 15 nodes
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)19, _mesh->n_nodes() );
+
+    // EDGE2,id=13 should have same nodes of bottom of QUAD4, id=5
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(5)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(5)->node(1) );
+
+    // EDGE2,id=14 should have same nodes of bottom of QUAD4, id=6
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(6)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(6)->node(1) );
+
+    // EDGE2,id=13 should have same nodes of top of QUAD4, id=11
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(11)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(11)->node(2) );
+
+    // EDGE2,id=14 should have same nodes of top of QUAD4, id=12
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(12)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(12)->node(2) );
+
+    // Shared node between the EDGE2 elements should have the same global id
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(14)->node(0) );
+
+    // EDGE2 child elements should have the correct parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->parent(), _mesh->elem(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->parent(), _mesh->elem(4) );
+
+    // EDGE2 child elements should have the correct interior_parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->interior_parent(), _mesh->elem(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->interior_parent(), _mesh->elem(6) );
+#endif
+  }
+
+  void testDofOrdering()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    EquationSystems es(*_mesh);
+    es.add_system<LinearImplicitSystem>("TestDofSystem");
+    es.get_system("TestDofSystem").add_variable("u",FIRST);
+    es.init();
+
+    DofMap& dof_map = es.get_system("TestDofSystem").get_dof_map();
+
+    std::vector<dof_id_type> top_quad5_dof_indices, top_quad6_dof_indices;
+    std::vector<dof_id_type> bottom_quad11_dof_indices, bottom_quad12_dof_indices;
+    std::vector<dof_id_type> edge13_dof_indices, edge14_dof_indices;
+
+    dof_map.dof_indices( _mesh->elem(5),  top_quad5_dof_indices );
+    dof_map.dof_indices( _mesh->elem(6),  top_quad6_dof_indices );
+    dof_map.dof_indices( _mesh->elem(11), bottom_quad11_dof_indices );
+    dof_map.dof_indices( _mesh->elem(12), bottom_quad12_dof_indices );
+    dof_map.dof_indices( _mesh->elem(13), edge13_dof_indices );
+    dof_map.dof_indices( _mesh->elem(14), edge14_dof_indices );
+
+    // EDGE2,id=13 should have same dofs as of bottom of QUAD4, id=5
+    CPPUNIT_ASSERT_EQUAL( edge13_dof_indices[0], top_quad5_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( edge13_dof_indices[1], top_quad5_dof_indices[1] );
+
+    // EDGE2,id=14 should have same dofs of bottom of QUAD4, id=6
+    CPPUNIT_ASSERT_EQUAL( edge14_dof_indices[0], top_quad6_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( edge14_dof_indices[1], top_quad6_dof_indices[1] );
+
+    // EDGE2,id=13 should have same dofs of top of QUAD4, id=11
+    CPPUNIT_ASSERT_EQUAL( edge13_dof_indices[0], bottom_quad11_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( edge13_dof_indices[1], bottom_quad11_dof_indices[2] );
+
+    // EDGE2,id=14 should have same dofs of top of QUAD4, id=12
+    CPPUNIT_ASSERT_EQUAL( edge14_dof_indices[0], bottom_quad12_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( edge14_dof_indices[1], bottom_quad12_dof_indices[2] );
+
+    //EDGE2 elements should have same shared dof number
+    CPPUNIT_ASSERT_EQUAL( edge13_dof_indices[1], edge14_dof_indices[0] );
+#endif
+  }
+};
+
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionRefinedMeshTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionNonUniformRefinement );
