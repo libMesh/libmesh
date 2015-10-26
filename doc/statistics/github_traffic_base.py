@@ -6,6 +6,7 @@ import math
 # Import stuff for working with dates
 from datetime import datetime
 from matplotlib.dates import date2num, num2date
+import calendar
 
 # Github has a "traffic" page now, but it doesn't seem like you can
 # put in an arbitrary date range?  When I looked at it, it showed the
@@ -127,35 +128,27 @@ class PlotData(object):
     # Make monthly plot
     fig.clf()
 
-    month_intervals = ['2014-Feb-17',
-                       '2014-Mar-17',
-                       '2014-Apr-17',
-                       '2014-May-17',
-                       '2014-Jun-17',
-                       '2014-Jul-17',
-                       '2014-Aug-17',
-                       '2014-Sep-17',
-                       '2014-Oct-17',
-                       '2014-Nov-17',
-                       '2014-Dec-17',
-                       '2015-Jan-17',
-                       '2015-Feb-17',
-                       '2015-Mar-17',
-                       '2015-Apr-17',
-                       '2015-May-17',
-                       '2015-Jun-17',
-                       '2015-Jul-17',
-                       '2015-Aug-17',
-                       '2015-Sep-17',
-                       '2015-Oct-17']
+    # Generate date numbers at montly intervals starting from '2014-Feb-17'
+    now = datetime.now()
+    month_intervals = [735281] # date2num for '2014-Feb-17'
+    for yr in xrange(2014, now.year+1):
+      for mo in xrange(1, 13):
+        # Skip Jan 2014
+        if (yr==2014 and mo==1):
+          continue
+
+        # http://stackoverflow.com/questions/27814983/how-to-get-month-interval-using-datetime-in-python
+        # Add the number of days in the current month to the previous date num to
+        # get the next one.
+        month_intervals.append(month_intervals[-1] + calendar.monthrange(yr, mo)[1])
 
     # Find the indexes of each date.
     month_indexes = []
     for date in month_intervals:
       # Not all data sets have all of these dates, so we just use the
       # ones we have.
-      if date in date_strings:
-        month_indexes.append(date_strings.index(date))
+      if date in date_nums:
+        month_indexes.append(date_nums.index(date))
 
     # Get total views and average unique viewers for each month
     monthly_column2 = [];
