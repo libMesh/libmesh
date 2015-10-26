@@ -146,7 +146,8 @@ class PlotData(object):
                        '2015-Jun-17',
                        '2015-Jul-17',
                        '2015-Aug-17',
-                       '2015-Sep-17']
+                       '2015-Sep-17',
+                       '2015-Oct-17']
 
     # Find the indexes of each date.
     month_indexes = []
