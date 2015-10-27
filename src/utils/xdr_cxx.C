@@ -728,6 +728,12 @@ void Xdr::data (T& a, const char* comment_in)
         libmesh_assert(out.get());
         libmesh_assert (out->good());
 
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        *out << std::scientific
+             << std::setprecision(16);
+
         this->do_write(a);
         *out << "\t " << comment_in << '\n';
 
@@ -837,6 +843,12 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
       {
         libmesh_assert(out.get());
         libmesh_assert (out->good());
+
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        *out << std::scientific
+             << std::setprecision(16);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
