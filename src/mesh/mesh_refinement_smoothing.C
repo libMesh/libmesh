@@ -339,6 +339,9 @@ bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
       }
   }
 
+  // If flags changed on any processor then they changed globally
+  this->comm().max(flags_changed);
+
   return flags_changed;
 }
 
@@ -406,6 +409,9 @@ bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch
           } // loop over interior neighbors
       }
   }
+
+  // If flags changed on any processor then they changed globally
+  this->comm().max(flags_changed);
 
   return flags_changed;
 }
