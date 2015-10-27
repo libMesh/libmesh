@@ -9,6 +9,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/edge_edge2.h>
 #include <libmesh/face_quad4.h>
+#include <libmesh/face_tri3.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh_refinement.h>
@@ -601,6 +602,246 @@ public:
   }
 };
 
+class MixedDimensionNonUniformRefinementTriangle : public CppUnit::TestCase {
+  /**
+   * Given a mesh with four TRI3 elements and an overlapping EDG2 element this test ensures that when
+   * a single TRI3 element that is flagged for refinement, which is a neighbor of the EDGE2 element, that
+   * the EDGE2 element will is also be flagged for refinement due to an underrefined_boundary_limit of
+   * 0 (default) and the neighboring TRI3 element will also refined due to an overrefined_boundary_limit
+   * of 0 (default).
+   */
+public:
+  CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinementTriangle );
+
+  CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testDofOrdering );
+
+  CPPUNIT_TEST_SUITE_END();
+
+protected:
+
+  SerialMesh* _mesh;
+
+  void build_mesh()
+  {
+    _mesh = new SerialMesh(*TestCommWorld);
+
+    /*
+       We start with this
+
+	   (0,1)             (1,1)
+		 3---------2
+		 |        -|
+		 |      -  |
+		 |    -    |
+		 |  -      |
+		 |-        |
+	   (0,0) 0---------1 (1,0)
+		 |        -|
+		 |      -  |
+		 |    -    |
+		 |  -      |
+		 |-        |
+		 4---------5
+	   (0,-1)           (1,-1)
+
+
+            But the single element refinement should result
+            with this for the default max_mismatch = 0 case
+
+	   (0,1)             (1,1)
+		 3---------2
+		 |        -|
+		 |      -  |
+		 |    7----8
+		 |  - |  - |
+		 |-   |-   |
+	   (0,0) 0----6----1 (1,0)
+		 |  - |   -|
+		 |-   | -  |
+		10----9    |
+		 |  -      |
+		 |-        |
+		 4---------5
+	   (0,-1)           (1,-1)
+     */
+
+    _mesh->set_mesh_dimension(2);
+
+    _mesh->add_point( Point(0.0,-1.0), 4 );
+    _mesh->add_point( Point(1.0,-1.0), 5 );
+    _mesh->add_point( Point(1.0, 0.0), 1 );
+    _mesh->add_point( Point(1.0, 1.0), 2 );
+    _mesh->add_point( Point(0.0, 1.0), 3 );
+    _mesh->add_point( Point(0.0, 0.0), 0 );
+
+    {
+      Elem* elem0 = _mesh->add_elem( new Tri3 );
+      elem0->set_node(0) = _mesh->node_ptr(0);
+      elem0->set_node(1) = _mesh->node_ptr(1);
+      elem0->set_node(2) = _mesh->node_ptr(2);
+
+      Elem* elem1 = _mesh->add_elem( new Tri3 );
+      elem1->set_node(0) = _mesh->node_ptr(2);
+      elem1->set_node(1) = _mesh->node_ptr(3);
+      elem1->set_node(2) = _mesh->node_ptr(0);
+
+      Elem* elem2 = _mesh->add_elem( new Tri3 );
+      elem2->set_node(0) = _mesh->node_ptr(1);
+      elem2->set_node(1) = _mesh->node_ptr(0);
+      elem2->set_node(2) = _mesh->node_ptr(4);
+
+      Elem* elem3 = _mesh->add_elem( new Tri3 );
+      elem3->set_node(0) = _mesh->node_ptr(4);
+      elem3->set_node(1) = _mesh->node_ptr(5);
+      elem3->set_node(2) = _mesh->node_ptr(1);
+
+      Elem* edge = _mesh->add_elem( new Edge2 );
+      edge->set_node(0) = _mesh->node_ptr(0);
+      edge->set_node(1) = _mesh->node_ptr(1);
+
+      // 2D elements will have subdomain id 0, this one will have 1
+      edge->subdomain_id() = 1;
+
+    }
+
+    // libMesh will renumber, but we numbered according to its scheme
+    // anyway. We do this because when we call uniformly_refine subsequently,
+    // it's going use skip_renumber=false.
+    _mesh->prepare_for_use(false /*skip_renumber*/);
+
+    // Let's set an interior_parent() this time for testing
+    _mesh->elem(4)->set_interior_parent(_mesh->elem(0));
+
+
+#ifdef LIBMESH_ENABLE_AMR
+    //Flag the bottom element for refinement
+    _mesh->elem(4)->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(*_mesh).refine_and_coarsen_elements();
+#endif
+  }
+
+public:
+  void setUp()
+  {
+    this->build_mesh();
+  }
+
+  void tearDown()
+  {
+    delete _mesh;
+   }
+
+  void testMesh()
+  {
+    // We should have 15 total and 12 active elements.
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
+
+    // We should have 15 nodes
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)11, _mesh->n_nodes() );
+
+    // EDGE2,id=13 should have same nodes of the base of TRI3, id=5
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(5)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(5)->node(1) );
+
+    // EDGE2,id=13 should have same nodes of the base of TRI3, id=10
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(10)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(10)->node(0) );
+
+    // EDGE2,id=13 should have same node as the tip of TRI3, id=8 and id=12
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(8)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(12)->node(0) );
+
+    // EDGE2,id=14 should have same nodes of the base of TRI3, id=6
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(6)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(6)->node(1) );
+
+    // EDGE2,id=14 should have same nodes of the base of TRI3, id=9
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(9)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(9)->node(0) );
+
+    // EDGE2,id=14 should have same node as the tip of TRI3, id=8 and id=12
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(8)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(12)->node(0) );
+
+    // Shared node between the EDGE2 elements should have the same global id
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(14)->node(0) );
+
+    // EDGE2 child elements should have the correct parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->parent(), _mesh->elem(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->parent(), _mesh->elem(4) );
+
+    // EDGE2 child elements should have the correct interior_parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->interior_parent(), _mesh->elem(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->interior_parent(), _mesh->elem(6) );
+
+  }
+
+  void testDofOrdering()
+  {
+    EquationSystems es(*_mesh);
+    es.add_system<LinearImplicitSystem>("TestDofSystem");
+    es.get_system("TestDofSystem").add_variable("u",FIRST);
+    es.init();
+
+    DofMap& dof_map = es.get_system("TestDofSystem").get_dof_map();
+
+    //Elements above the EDGE2 elements
+    std::vector<dof_id_type> elem5_dof_indices, elem6_dof_indices, elem8_dof_indices;
+
+    //Elements below the EDGE2 elements
+    std::vector<dof_id_type> elem9_dof_indices, elem10_dof_indices, elem12_dof_indices;
+
+    //EDGE2 Elements
+    std::vector<dof_id_type> elem13_dof_indices, elem14_dof_indices;
+
+    dof_map.dof_indices( _mesh->elem(5), elem5_dof_indices );
+    dof_map.dof_indices( _mesh->elem(6), elem6_dof_indices );
+    dof_map.dof_indices( _mesh->elem(8), elem8_dof_indices );
+    dof_map.dof_indices( _mesh->elem(9), elem9_dof_indices );
+    dof_map.dof_indices( _mesh->elem(10), elem10_dof_indices );
+    dof_map.dof_indices( _mesh->elem(12), elem12_dof_indices );
+    dof_map.dof_indices( _mesh->elem(13), elem13_dof_indices );
+    dof_map.dof_indices( _mesh->elem(14), elem14_dof_indices );
+
+    /* The dofs for the EDGE2 (id = 13 and id =14) element should be the same
+       as the bottom edge of the top TRI3 (id=5 and id=6) and the tip of
+       TRI3 id = 8 dofs */
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[0], elem5_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[1], elem5_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[1], elem6_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[1], elem8_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[0], elem6_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[1], elem6_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[0], elem5_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[0], elem8_dof_indices[0] );
+
+    /* The dofs for the EDGE2 (id = 13 and id =14) element should be the same
+       as the top edge of the bottom TRI3 (id=9 and id=10) and the tip of
+       TRI3 id = 12 dofs */
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[0], elem10_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[1], elem10_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[1], elem9_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem13_dof_indices[1], elem12_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[0], elem9_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[1], elem9_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[0], elem10_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem14_dof_indices[0], elem12_dof_indices[0] );
+
+    /* The nodes for the bottom edge of the top TRI3 elements should have
+       the same global ids as the top edge of the bottom TRI3 elements. */
+    CPPUNIT_ASSERT_EQUAL( elem5_dof_indices[0], elem10_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem5_dof_indices[1], elem10_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem6_dof_indices[0], elem9_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem6_dof_indices[1], elem9_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem8_dof_indices[0], elem12_dof_indices[0] );
+  }
+
+};
+
+
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionRefinedMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionNonUniformRefinement );
+CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionNonUniformRefinementTriangle );
