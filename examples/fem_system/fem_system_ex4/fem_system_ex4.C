@@ -62,6 +62,9 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--enable-amr");
 #else
 
+  // This doesn't converge with Eigen BICGSTAB for some reason...
+  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+
   // Parse the input file
   GetPot infile("fem_system_ex4.in");
 
