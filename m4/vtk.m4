@@ -1,3 +1,28 @@
+dnl Declare compilation test function preamble to
+dnl be used later with AC_LANG_PROGRAM
+m4_define([_AX_CXX_COMPILE_VTK_preamble],
+          [[
+             @%:@include "vtkSmartPointer.h"
+             @%:@include "vtkCellArray.h"
+             @%:@include "vtkUnstructuredGrid.h"
+             @%:@include "vtkPoints.h"
+             @%:@include "vtkDoubleArray.h"
+             @%:@include "vtkXMLPUnstructuredGridWriter.h"
+             @%:@include "vtkImageThreshold.h"
+          ]])
+
+dnl Declare compilation test function body to
+dnl be used later with AC_LANG_PROGRAM
+m4_define([_AX_CXX_COMPILE_VTK_body],
+          [[
+             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+             vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+          ]])
+
 dnl ----------------------------------------------------------------
 dnl VTK Mesh I/O API (by Wout Ruijter) requires VTK headers and lib
 dnl ----------------------------------------------------------------
@@ -133,59 +158,68 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl VTK 6.1.x
          elif (test $vtkmajor -eq 6 -a $vtkminor -eq 1); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+           VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                     -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+
+           # Some Linux distributions (Arch) install VTK without the
+           # "libfoo-6.x.so" naming scheme, so we try to handle that
+           # situation as well.
+           VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
+                                   -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
+                                   -lvtkIOImage -lvtkImagingMath"
 
          dnl VTK 6.2.x and above
          else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
+           VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                     -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
+
+           # Some Linux distributions (Arch) install VTK without the
+           # "libfoo-6.x.so" naming scheme, so we try to handle that
+           # situation as well.
+           VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
+                                   -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
+                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML"
          fi
 
-         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
-           VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
-         fi
-
-         LIBS="$old_LIBS $VTK_LIBRARY"
-         CPPFLAGS="$CPPFLAGS -I$VTK_INC"
-
-         dnl Try to compile test prog to check for existence of VTK libraries
+         dnl Try to compile test prog to check for existence of VTK libraries.
          dnl AC_LINK_IFELSE uses the LIBS variable.  Note that we cannot use
          dnl AC_HAVE_LIBRARY here because its first argument must be a literal
          dnl string.
          if (test $vtkmajor -gt 5); then
-           AC_LINK_IFELSE(
-           [
-             AC_LANG_PROGRAM([
-             @%:@include "vtkSmartPointer.h"
-             @%:@include "vtkCellArray.h"
-             @%:@include "vtkUnstructuredGrid.h"
-             @%:@include "vtkPoints.h"
-             @%:@include "vtkDoubleArray.h"
-             @%:@include "vtkXMLPUnstructuredGridWriter.h"
-             @%:@include "vtkImageThreshold.h"
-                              ],
-                             [
-             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
-             vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
-             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
-                             ])
-           ],
-           [enablevtk=yes],
-           [
-             enablevtk=no
-             dnl Print an informative message if linking failed, otherwise the user will just see:
-             dnl "Configuring library without VTK support"
+           CPPFLAGS="$CPPFLAGS -I$VTK_INC"
+
+           dnl 1. First try linking the NO_VERSION library names
+           LIBS="$old_LIBS $VTK_LIBRARY_NO_VERSION"
+           AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
+                          [enablevtk=yes
+                           VTK_LIBRARY=$VTK_LIBRARY_NO_VERSION],
+                          [enablevtk=no])
+
+           dnl 2. If that didn't work, try linking the library names with version numbers.
+           if (test x$enablevtk = xno); then
+             LIBS="$old_LIBS $VTK_LIBRARY_WITH_VERSION"
+             AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
+                            [enablevtk=yes
+                             VTK_LIBRARY=$VTK_LIBRARY_WITH_VERSION],
+                            [enablevtk=no])
+           fi
+
+           dnl 3. If that also failed, print a message that we failed.
+           if (test x$enablevtk = xno); then
              AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
-           ])
+           fi
+
+           dnl Reset $LIBS, $CPPFLAGS
+           LIBS="$old_LIBS"
+           CPPFLAGS="$old_CPPFLAGS"
 
          dnl Check for VTK 5.x libraries
          else
+           LIBS="$old_LIBS $VTK_LIBRARY"
+           CPPFLAGS="$CPPFLAGS -I$VTK_INC"
+
            AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
 
            if (test $enablevtk = yes); then
@@ -196,16 +230,21 @@ AC_DEFUN([CONFIGURE_VTK],
            if (test $enablevtk = yes); then
              AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
            fi
-         fi
 
-         dnl Reset $LIBS, $CPPFLAGS
-         LIBS="$old_LIBS"
-         CPPFLAGS="$old_CPPFLAGS"
+           dnl Reset $LIBS, $CPPFLAGS
+           LIBS="$old_LIBS"
+           CPPFLAGS="$old_CPPFLAGS"
+         fi
        fi
 
        dnl If both the header file and the required libs were found, continue.
        if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
+
+         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
+           VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+         fi
+
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
        else

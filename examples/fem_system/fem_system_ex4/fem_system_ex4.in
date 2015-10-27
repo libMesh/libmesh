@@ -6,13 +6,13 @@ global_tolerance = 0.0
 
 # The desired number of active mesh elements
 # Make this nonzero to solve to a specified mesh size
-n_elements = 400
+n_elements = 1200
 
 # The coarse grid size from which to start adaptivity
 coarsegridsize = 20
 
 # The maximum number of adaptive steps per timestep
-max_adaptivesteps = 0
+max_adaptivesteps = 2
 
 # Turn this off to see the NewtonSolver chatter
 solver_quiet = false

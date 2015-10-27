@@ -109,6 +109,9 @@ public:
    * for algorithms which couple boundary and interior mesh
    * information.  Any pre-existing \p boundary_mesh data is cleared.
    * Only boundary elements with the specified ids are extracted.
+   * Boundary IDs for the nodes on \p requested_boundary_ids
+   * will also be copied over to \p boundary_mesh. We do not
+   * currently copy edge boundary IDs over to \p boundary_mesh.
    *
    * If you are using a MeshData class with this Mesh, you can
    * pass a pointer to both the boundary_mesh's MeshData object,

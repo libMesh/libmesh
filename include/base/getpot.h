@@ -390,6 +390,13 @@ public:
   inline STRING_VECTOR unidentified_nominuses() const;
 
   /**
+   * Accessors for requested variables
+   */
+  std::set<std::string> get_requested_arguments() const;
+  std::set<std::string> get_requested_variables() const;
+  std::set<std::string> get_requested_sections() const;
+
+  /**
    * output
    */
 
@@ -2298,7 +2305,7 @@ GetPot::get_value_no_default(const std::string& VarName, const T& Default) const
 inline const char*
 GetPot::get_value_no_default(const char* VarName, const char* Default) const
 {
-  return _internal_managed_copy(get_value_no_default(VarName, Default));
+  return _internal_managed_copy(get_value_no_default(VarName, std::string(Default)));
 }
 
 
@@ -3728,6 +3735,36 @@ GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
         ufos.push_back(*it);
     }
   return ufos;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// (*) Accessors for requested types
+//.............................................................................
+
+inline
+std::set<std::string>
+GetPot::get_requested_arguments() const
+{
+  return _requested_arguments;
+}
+
+
+
+inline
+std::set<std::string>
+GetPot::get_requested_variables() const
+{
+  return _requested_variables;
+}
+
+
+
+inline
+std::set<std::string>
+GetPot::get_requested_sections() const
+{
+  return _requested_sections;
 }
 
 

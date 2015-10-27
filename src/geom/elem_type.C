@@ -30,6 +30,8 @@ namespace libMesh
 
 std::string ElementTypes::basic_name (const ElemType t)
 {
+  libmesh_deprecated();
+
   std::string its_name;
   switch (t)
     {
@@ -131,6 +133,8 @@ std::string ElementTypes::basic_name (const ElemType t)
 
 std::string ElementTypes::name(const ElemType t)
 {
+  libmesh_deprecated();
+
   std::string its_name;
   switch (t)
     {

@@ -253,8 +253,18 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #ifndef LIBMESH_HAVE_PETSC_TAO
+
   libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support");
+
+#elif LIBMESH_USE_COMPLEX_NUMBERS
+
+  // According to
+  // http://www.mcs.anl.gov/research/projects/tao/documentation/installation.html
+  // TAO & PETSc-complex are currently mutually exclusive
+  libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support & real-numbers only");
+
 #endif
+
 
   if (libMesh::on_command_line ("--use-eigen"))
     {

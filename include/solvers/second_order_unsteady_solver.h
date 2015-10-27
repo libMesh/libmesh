@@ -50,7 +50,7 @@ public:
    */
   virtual ~SecondOrderUnsteadySolver ();
 
-  virtual unsigned int time_order() const
+  virtual unsigned int time_order() const libmesh_override
   { return 2; }
 
   /**

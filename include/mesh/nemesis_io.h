@@ -86,7 +86,9 @@ public:
   /**
    * Output a nodal solution.
    */
-  void write_nodal_data (const std::string& fname, const std::vector<Number>& soln, const std::vector<std::string>& names);
+  virtual void write_nodal_data (const std::string& fname,
+                                 const std::vector<Number>& soln,
+                                 const std::vector<std::string>& names) libmesh_override;
 
   /**
    * Set the flag indicationg if we should be verbose.

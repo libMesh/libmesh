@@ -96,20 +96,20 @@ protected:
    * An initialization function, for requesting specific data from the FE
    * objects
    */
-  virtual void init_context(FEMContext &c);
+  virtual void init_context(FEMContext &c) libmesh_override;
 
   /**
    * The function which calculates a normal derivative jump based error
    * term on an internal side
    */
-  virtual void internal_side_integration();
+  virtual void internal_side_integration() libmesh_override;
 
   /**
    * The function which calculates a normal derivative jump based error
    * term on a boundary side.
    * Returns true if the flux bc function is in fact defined on the current side.
    */
-  virtual bool boundary_side_integration();
+  virtual bool boundary_side_integration() libmesh_override;
 
   /**
    * Pointer to function that returns BC information.

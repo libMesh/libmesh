@@ -140,9 +140,9 @@ public:
   /**
    * Write out a nodal solution.
    */
-  void write_nodal_data (const std::string&,
-                         const std::vector<Number>&,
-                         const std::vector<std::string>&);
+  virtual void write_nodal_data (const std::string&,
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&) libmesh_override;
 
   /**
    * Write out a discontinuous nodal solution.

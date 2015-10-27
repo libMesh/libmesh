@@ -2263,7 +2263,7 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem*>
 #define LIBMESH_ENABLE_TOPOLOGY_CACHES                                  \
   virtual                                                               \
   std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > & \
-  _get_bracketing_node_cache() const                                    \
+  _get_bracketing_node_cache() const libmesh_override                   \
   {                                                                     \
     static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > c; \
     return c;                                                           \
@@ -2271,7 +2271,7 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem*>
                                                                         \
   virtual                                                               \
   std::vector<std::vector<std::vector<signed char> > > &                \
-  _get_parent_indices_cache() const                                     \
+  _get_parent_indices_cache() const libmesh_override                    \
   {                                                                     \
     static std::vector<std::vector<std::vector<signed char> > > c;      \
     return c;                                                           \

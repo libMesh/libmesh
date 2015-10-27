@@ -1975,7 +1975,7 @@ Optional Features:
                           Build fparser with bytecode debugging functions
   --disable-cppunit       Build without cppunit C++ unit testing support
   --disable-nanoflann     build without nanoflann KD-tree suppport
-  --disable-curl          build without curl support
+  --enable-curl           link against libcurl, for using the cURL API
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -35643,27 +35643,36 @@ _ACEOF
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
 
                   elif (test $vtkmajor -eq 6 -a $vtkminor -eq 1); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+           VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                     -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+
+           # Some Linux distributions (Arch) install VTK without the
+           # "libfoo-6.x.so" naming scheme, so we try to handle that
+           # situation as well.
+           VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
+                                   -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
+                                   -lvtkIOImage -lvtkImagingMath"
 
                   else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
-         fi
+           VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                     -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
 
-         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
-           VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+           # Some Linux distributions (Arch) install VTK without the
+           # "libfoo-6.x.so" naming scheme, so we try to handle that
+           # situation as well.
+           VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
+                                   -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
+                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML"
          fi
-
-         LIBS="$old_LIBS $VTK_LIBRARY"
-         CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
                                              if (test $vtkmajor -gt 5); then
+           CPPFLAGS="$CPPFLAGS -I$VTK_INC"
+
+                      LIBS="$old_LIBS $VTK_LIBRARY_NO_VERSION"
            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
 
              #include "vtkSmartPointer.h"
              #include "vtkCellArray.h"
@@ -35687,21 +35696,66 @@ main ()
   ;
   return 0;
 }
-
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   enablevtk=yes
+                           VTK_LIBRARY=$VTK_LIBRARY_NO_VERSION
 else
-
-             enablevtk=no
-                                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Linking a test program against the VTK libraries failed >>>" >&5
-$as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; }
-
+  enablevtk=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
+                      if (test x$enablevtk = xno); then
+             LIBS="$old_LIBS $VTK_LIBRARY_WITH_VERSION"
+             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+             #include "vtkSmartPointer.h"
+             #include "vtkCellArray.h"
+             #include "vtkUnstructuredGrid.h"
+             #include "vtkPoints.h"
+             #include "vtkDoubleArray.h"
+             #include "vtkXMLPUnstructuredGridWriter.h"
+             #include "vtkImageThreshold.h"
+
+int
+main ()
+{
+
+             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+             vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  enablevtk=yes
+                             VTK_LIBRARY=$VTK_LIBRARY_WITH_VERSION
+else
+  enablevtk=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+           fi
+
+                      if (test x$enablevtk = xno); then
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Linking a test program against the VTK libraries failed >>>" >&5
+$as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; }
+           fi
+
+                      LIBS="$old_LIBS"
+           CPPFLAGS="$old_CPPFLAGS"
+
                   else
+           LIBS="$old_LIBS $VTK_LIBRARY"
+           CPPFLAGS="$CPPFLAGS -I$VTK_INC"
+
            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
 $as_echo_n "checking for main in -lvtkIO... " >&6; }
 if ${ac_cv_lib_vtkIO_main+:} false; then :
@@ -35819,14 +35873,19 @@ fi
 ac_cv_lib_vtkFiltering=ac_cv_lib_vtkFiltering_main
 
            fi
-         fi
 
-                  LIBS="$old_LIBS"
-         CPPFLAGS="$old_CPPFLAGS"
+                      LIBS="$old_LIBS"
+           CPPFLAGS="$old_CPPFLAGS"
+         fi
        fi
 
               if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
+
+         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
+           VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+         fi
+
 
 $as_echo "#define HAVE_VTK 1" >>confdefs.h
 
@@ -38102,7 +38161,7 @@ if test "${enable_curl+set}" = set; then :
                   *)  as_fn_error $? "bad value ${enableval} for --enable-curl" "$LINENO" 5 ;;
                 esac
 else
-  enablecurl=$enableoptional
+  enablecurl=no
 fi
 
 
