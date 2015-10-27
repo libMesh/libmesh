@@ -10,6 +10,7 @@
 #include <libmesh/edge_edge2.h>
 #include <libmesh/face_quad4.h>
 #include <libmesh/face_tri3.h>
+#include <libmesh/cell_hex8.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh_refinement.h>
@@ -840,8 +841,305 @@ public:
 
 };
 
+class MixedDimensionNonUniformRefinement3D : public CppUnit::TestCase {
+  /**
+   * Given a mesh with 36 HEX8 elements and an overlapping QUAD4 element located in the center of the HEX8
+   * elements, this test ensures that when a single HEX8 element is flagged for refinement, which
+   * is a neighbor of the QUAD4 element, that the QUAD4 element will is also be flagged for refinement
+   * due to an underrefined_boundary_limit of 0 (default) and the neighboring HEX8 element (with respect
+   * to the QUAD4 element) will also refined due to an overrefined_boundary_limit of 0 (default).
+   */
+public:
+  CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement3D );
+
+  CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testDofOrdering );
+
+  CPPUNIT_TEST_SUITE_END();
+
+  // Yes, this is necessary. Somewhere in those macros is a protected/private
+protected:
+
+  SerialMesh* _mesh;
+
+  void build_mesh()
+  {
+    _mesh = new SerialMesh(*TestCommWorld);
+
+    _mesh->set_mesh_dimension(3);
+
+    //Add the nodes
+    for(unsigned int z = 0; z < 5; z++)
+    {
+        for(unsigned int y = 0; y < 4; y++)
+        {
+             for(unsigned int x = 0; x < 4; x++)
+             {
+                 _mesh->add_point( Point(Real(x),Real(y),Real(z)), 16*z+4*y+x);
+             }
+        }
+    }
+
+    {
+      //Add the HEX8 elements
+      for(unsigned int z = 0; z < 4; z++)
+      {
+          for(unsigned int y = 0; y < 3; y++)
+          {
+              for(unsigned int x = 0; x < 3; x++)
+              {
+                  Elem* hex = _mesh->add_elem( new Hex8 );
+                  hex->set_node(0) = _mesh->node_ptr(x+4*y    +16*z        );
+                  hex->set_node(1) = _mesh->node_ptr(x+4*y    +16*z     + 1);
+                  hex->set_node(2) = _mesh->node_ptr(x+4*y    +16*(z+1) + 1);
+                  hex->set_node(3) = _mesh->node_ptr(x+4*y    +16*(z+1)    );
+                  hex->set_node(4) = _mesh->node_ptr(x+4*(y+1)+16*z        );
+                  hex->set_node(5) = _mesh->node_ptr(x+4*(y+1)+16*z     + 1);
+                  hex->set_node(6) = _mesh->node_ptr(x+4*(y+1)+16*(z+1) + 1);
+                  hex->set_node(7) = _mesh->node_ptr(x+4*(y+1)+16*(z+1)    );
+              }
+          }
+      }
+      Elem* quad = _mesh->add_elem( new Quad4 );
+      unsigned int x=1,y=1,z=2;
+      quad->set_node(0) = _mesh->node_ptr(x+4*y    +16*z    );
+      quad->set_node(1) = _mesh->node_ptr(x+4*y    +16*z + 1);
+      quad->set_node(2) = _mesh->node_ptr(x+4*(y+1)+16*z + 1);
+      quad->set_node(3) = _mesh->node_ptr(x+4*(y+1)+16*z    );
+
+      // 2D elements will have subdomain id 0, this one will have 1
+      quad->subdomain_id() = 1;
+    }
+
+    // Let's set an interior_parent() this time for testing
+    _mesh->elem(36)->set_interior_parent(_mesh->elem(13));
+
+    // libMesh will renumber, but we numbered according to its scheme
+    // anyway. We do this because when we call uniformly_refine subsequently,
+    // it's going use skip_renumber=false.
+    _mesh->prepare_for_use(false /*skip_renumber*/);
+
+#ifdef LIBMESH_ENABLE_AMR
+    //Flag the bottom element for refinement
+    _mesh->elem(13)->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(*_mesh).refine_and_coarsen_elements();
+#endif
+  }
+
+public:
+  void setUp()
+  {
+    this->build_mesh();
+  }
+
+  void tearDown()
+  {
+    delete _mesh;
+  }
+
+  void testMesh()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    // We should have 57 total and 54 active elements.
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)57, _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)54, _mesh->n_active_elem() );
+
+    // We should have 113 nodes
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)113, _mesh->n_nodes() );
+
+    // QUAD4,id=53 should have same nodes as a face in HEX8, id=39
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(0), _mesh->elem(39)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(1), _mesh->elem(39)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(39)->node(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(3), _mesh->elem(39)->node(7) );
+
+    // QUAD4,id=53 should have same nodes as a face in HEX8, id=45
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(0), _mesh->elem(45)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(1), _mesh->elem(45)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(45)->node(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(3), _mesh->elem(45)->node(4) );
+
+    // QUAD4,id=54 should have same nodes as a face in HEX8, id=40
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(0), _mesh->elem(40)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(1), _mesh->elem(40)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(2), _mesh->elem(40)->node(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(3), _mesh->elem(40)->node(7) );
+
+    // QUAD4,id=54 should have same nodes as a face in HEX8, id=46
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(0), _mesh->elem(46)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(1), _mesh->elem(46)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(2), _mesh->elem(46)->node(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(3), _mesh->elem(46)->node(4) );
+
+    // QUAD4,id=55 should have same nodes as a face in HEX8, id=43
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(0), _mesh->elem(43)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(1), _mesh->elem(43)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(2), _mesh->elem(43)->node(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(3), _mesh->elem(43)->node(7) );
+
+    // QUAD4,id=55 should have same nodes as a face in HEX8, id=49
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(0), _mesh->elem(49)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(1), _mesh->elem(49)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(2), _mesh->elem(49)->node(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(3), _mesh->elem(49)->node(4) );
+
+    // QUAD4,id=56 should have same nodes as a face in HEX8, id=44
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(0), _mesh->elem(44)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(1), _mesh->elem(44)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(2), _mesh->elem(44)->node(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(3), _mesh->elem(44)->node(7) );
+
+    // QUAD4,id=56 should have same nodes as a face in HEX8, id=50
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(0), _mesh->elem(50)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(1), _mesh->elem(50)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(2), _mesh->elem(50)->node(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(3), _mesh->elem(50)->node(4) );
+
+    // Shared node between the QUAD4 elements should have the same global id
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(1), _mesh->elem(54)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(54)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(3), _mesh->elem(55)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(55)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(3), _mesh->elem(56)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(2), _mesh->elem(56)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(1), _mesh->elem(56)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(2), _mesh->elem(56)->node(3) );
+
+    // QUAD4 child elements should have the correct parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->parent(), _mesh->elem(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->parent(), _mesh->elem(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->parent(), _mesh->elem(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->parent(), _mesh->elem(36) );
+
+    // QUAD4 child elements should have the correct interior_parent
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->interior_parent(), _mesh->elem(39) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->interior_parent(), _mesh->elem(40) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->interior_parent(), _mesh->elem(43) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->interior_parent(), _mesh->elem(44) );
+
+#endif
+  }
+
+  void testDofOrdering()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    EquationSystems es(*_mesh);
+    es.add_system<LinearImplicitSystem>("TestDofSystem");
+    es.get_system("TestDofSystem").add_variable("u",FIRST);
+    es.init();
+
+    DofMap& dof_map = es.get_system("TestDofSystem").get_dof_map();
+
+    //Elements to the left of the QUAD4 elements
+    std::vector<dof_id_type> elem43_dof_indices, elem44_dof_indices, elem49_dof_indices, elem50_dof_indices;
+    //Elements to the right of the QUAD4 elements
+    std::vector<dof_id_type> elem39_dof_indices, elem40_dof_indices, elem45_dof_indices, elem46_dof_indices;
+    //QUAD4 elements
+    std::vector<dof_id_type> elem53_dof_indices, elem54_dof_indices, elem55_dof_indices, elem56_dof_indices;
+
+    dof_map.dof_indices( _mesh->elem(43), elem43_dof_indices );
+    dof_map.dof_indices( _mesh->elem(44), elem44_dof_indices );
+    dof_map.dof_indices( _mesh->elem(49), elem49_dof_indices );
+    dof_map.dof_indices( _mesh->elem(50), elem50_dof_indices );
+    dof_map.dof_indices( _mesh->elem(39), elem39_dof_indices );
+    dof_map.dof_indices( _mesh->elem(40), elem40_dof_indices );
+    dof_map.dof_indices( _mesh->elem(45), elem45_dof_indices );
+    dof_map.dof_indices( _mesh->elem(46), elem46_dof_indices );
+    dof_map.dof_indices( _mesh->elem(54), elem54_dof_indices );
+    dof_map.dof_indices( _mesh->elem(55), elem55_dof_indices );
+    dof_map.dof_indices( _mesh->elem(53), elem53_dof_indices );
+    dof_map.dof_indices( _mesh->elem(56), elem56_dof_indices );
+
+    /* The dofs for the QUAD4 (ids = 53, 54, 55, and 56) element should be the same
+       as the face of the HEX8 elements HEX8 (id=39, 40, 43, and 44) left of the
+       QUAD4 elements. */
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[0], elem39_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[1], elem39_dof_indices[2] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[2], elem39_dof_indices[6] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[3], elem39_dof_indices[7] );
+
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[0], elem40_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[1], elem40_dof_indices[2] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[2], elem40_dof_indices[6] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[3], elem40_dof_indices[7] );
+
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[0], elem43_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[1], elem43_dof_indices[2] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[2], elem43_dof_indices[6] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[3], elem43_dof_indices[7] );
+
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[0], elem44_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[1], elem44_dof_indices[2] );
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[2], elem44_dof_indices[6] );
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[3], elem44_dof_indices[7] );
+
+    /* The dofs for the QUAD4 (ids = 53, 54, 55, and 56) element should be the same
+       as the face of the HEX8 elements HEX8 (id=45, 46, 49, and 50) left of the
+       QUAD4 elements. */
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[0], elem45_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[1], elem45_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[2], elem45_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[3], elem45_dof_indices[4] );
+
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[0], elem46_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[1], elem46_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[2], elem46_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[3], elem46_dof_indices[4] );
+
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[0], elem49_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[1], elem49_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[2], elem49_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[3], elem49_dof_indices[4] );
+
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[0], elem50_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[1], elem50_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[2], elem50_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem56_dof_indices[3], elem50_dof_indices[4] );
+
+    /* The dofs for the HEX8 elements (id=39, 40, 43, and 44) should be the same
+       on the left side of the QUAD4 elements as the HEX8 elements (id=45, 46, 49, and 50)
+       on the right as QUAD4 elements. */
+    CPPUNIT_ASSERT_EQUAL( elem39_dof_indices[3], elem45_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem39_dof_indices[2], elem45_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem39_dof_indices[6], elem45_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem39_dof_indices[7], elem45_dof_indices[4] );
+
+    CPPUNIT_ASSERT_EQUAL( elem40_dof_indices[3], elem46_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem40_dof_indices[2], elem46_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem40_dof_indices[6], elem46_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem40_dof_indices[7], elem46_dof_indices[4] );
+
+    CPPUNIT_ASSERT_EQUAL( elem43_dof_indices[3], elem49_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem43_dof_indices[2], elem49_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem43_dof_indices[6], elem49_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem43_dof_indices[7], elem49_dof_indices[4] );
+
+    CPPUNIT_ASSERT_EQUAL( elem44_dof_indices[3], elem50_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem44_dof_indices[2], elem50_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem44_dof_indices[6], elem50_dof_indices[5] );
+    CPPUNIT_ASSERT_EQUAL( elem44_dof_indices[7], elem50_dof_indices[4] );
+
+    /* The dofs for the QUAD4 elements (ids = 53, 54, 55, and 56) should be the
+       same for shared nodes. */
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[1], elem54_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[2], elem54_dof_indices[3] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[3], elem55_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[2], elem55_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem53_dof_indices[2], elem56_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[3], elem55_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[3], elem56_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem54_dof_indices[2], elem56_dof_indices[1] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[1], elem56_dof_indices[0] );
+    CPPUNIT_ASSERT_EQUAL( elem55_dof_indices[2], elem56_dof_indices[3] );
+
+
+#endif
+  }
+};
+
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionRefinedMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionNonUniformRefinement );
 CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionNonUniformRefinementTriangle );
+CPPUNIT_TEST_SUITE_REGISTRATION( MixedDimensionNonUniformRefinement3D );
