@@ -276,7 +276,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
 
 
-bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
+bool MeshRefinement::limit_overrefined_boundary(const signed char max_mismatch)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -316,30 +316,35 @@ bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
             // would be nice
             Elem* neighbor = const_cast<Elem*>(*n_it);
 
-            if (((elem_level - max_mismatch) >
-                 neighbor->level()) &&
-                (neighbor->refinement_flag() != Elem::REFINE))
+            if (max_mismatch >= 0)
               {
-                neighbor->set_refinement_flag(Elem::REFINE);
-                flags_changed = true;
-              }
-            if (((elem_p_level + 1 - max_mismatch) >
-                 neighbor->p_level()) &&
-                (neighbor->p_refinement_flag() != Elem::REFINE))
-              {
-                neighbor->set_p_refinement_flag(Elem::REFINE);
-                flags_changed = true;
+                if ((elem_level > neighbor->level() + max_mismatch) &&
+                    (neighbor->refinement_flag() != Elem::REFINE))
+                  {
+                    neighbor->set_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
+
+                if ((elem_p_level > neighbor->p_level() + max_mismatch) &&
+                    (neighbor->p_refinement_flag() != Elem::REFINE))
+                  {
+                    neighbor->set_p_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
               }
           } // loop over interior neighbors
       }
   }
+
+  // If flags changed on any processor then they changed globally
+  this->comm().max(flags_changed);
 
   return flags_changed;
 }
 
 
 
-bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch)
+bool MeshRefinement::limit_underrefined_boundary(const signed char max_mismatch)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -380,23 +385,30 @@ bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch
               cast_int<unsigned char>(neighbor->p_level() +
                                       ((neighbor->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
-            if (((neighbor_level + 1 - max_mismatch) >
-                 elem->level()) &&
-                (elem->refinement_flag() != Elem::REFINE))
+            if (max_mismatch >= 0)
               {
-                elem->set_refinement_flag(Elem::REFINE);
-                flags_changed = true;
-              }
-            if (((neighbor_p_level + 1 - max_mismatch) >
-                 elem->p_level()) &&
-                (elem->p_refinement_flag() != Elem::REFINE))
-              {
-                elem->set_p_refinement_flag(Elem::REFINE);
-                flags_changed = true;
+                if ((neighbor_level >
+                     elem->level() + max_mismatch) &&
+                    (elem->refinement_flag() != Elem::REFINE))
+                  {
+                    elem->set_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
+
+                if ((neighbor_p_level >
+                     elem->p_level() + max_mismatch) &&
+                    (elem->p_refinement_flag() != Elem::REFINE))
+                  {
+                    elem->set_p_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
               }
           } // loop over interior neighbors
       }
   }
+
+  // If flags changed on any processor then they changed globally
+  this->comm().max(flags_changed);
 
   return flags_changed;
 }

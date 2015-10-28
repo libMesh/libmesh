@@ -601,14 +601,14 @@ private:
    * to prevent corresponding boundary element refinement mismatch
    * from exceeding the given limit.
    */
-  bool limit_overrefined_boundary (const unsigned int max_mismatch);
+  bool limit_overrefined_boundary (const signed char max_mismatch);
 
   /*
    * This algorithm flags boundary elements for refinement as needed
    * to prevent corresponding interior element refinement mismatch
    * from exceeding the given limit.
    */
-  bool limit_underrefined_boundary (const unsigned int max_mismatch);
+  bool limit_underrefined_boundary (const signed char max_mismatch);
 
   /**
    * This algorithm selects an element for refinement
