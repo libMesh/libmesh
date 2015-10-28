@@ -130,10 +130,11 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C numerics/composite_function_test.C \
+	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/boundary_mesh.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -150,6 +151,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
+	base/unit_tests_dbg-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-boundary_mesh.$(OBJEXT) \
@@ -186,10 +188,11 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C numerics/composite_function_test.C \
+	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/boundary_mesh.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -205,6 +208,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
+	base/unit_tests_devel-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
 	mesh/unit_tests_devel-boundary_mesh.$(OBJEXT) \
@@ -239,10 +243,11 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C numerics/composite_function_test.C \
+	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/boundary_mesh.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -258,6 +263,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
+	base/unit_tests_oprof-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-boundary_mesh.$(OBJEXT) \
@@ -292,10 +298,11 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C numerics/composite_function_test.C \
+	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/boundary_mesh.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -311,6 +318,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
+	base/unit_tests_opt-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
 	mesh/unit_tests_opt-boundary_mesh.$(OBJEXT) \
@@ -343,10 +351,11 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C numerics/composite_function_test.C \
+	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/boundary_mesh.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -362,6 +371,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
+	base/unit_tests_prof-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
 	mesh/unit_tests_prof-boundary_mesh.$(OBJEXT) \
@@ -792,8 +802,8 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
-	base/getpot_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/boundary_mesh.C \
+	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
+	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
@@ -897,6 +907,8 @@ base/$(DEPDIR)/$(am__dirstamp):
 	@: > base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_dbg-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_dbg-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/$(am__dirstamp):
 	@$(MKDIR_P) geom
 	@: > geom/$(am__dirstamp)
@@ -999,6 +1011,8 @@ unit_tests-dbg$(EXEEXT): $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_DEPENDENCIES
 	$(AM_V_CXXLD)$(unit_tests_dbg_LINK) $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_LDADD) $(LIBS)
 base/unit_tests_devel-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_devel-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -1052,6 +1066,8 @@ unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPEND
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
 base/unit_tests_oprof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_oprof-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
@@ -1107,6 +1123,8 @@ unit_tests-oprof$(EXEEXT): $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_DEPEND
 	$(AM_V_CXXLD)$(unit_tests_oprof_LINK) $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_LDADD) $(LIBS)
 base/unit_tests_opt-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_opt-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -1160,6 +1178,8 @@ unit_tests-opt$(EXEEXT): $(unit_tests_opt_OBJECTS) $(unit_tests_opt_DEPENDENCIES
 	@rm -f unit_tests-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_opt_LINK) $(unit_tests_opt_OBJECTS) $(unit_tests_opt_LDADD) $(LIBS)
 base/unit_tests_prof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_prof-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
@@ -1234,10 +1254,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_oprof-driver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_opt-driver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_prof-driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-getpot_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_devel-autodiff.Po@am__quote@
@@ -1411,6 +1436,20 @@ base/unit_tests_dbg-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_dbg-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
+base/unit_tests_dbg-auto_ptr_test.o: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Tpo -c -o base/unit_tests_dbg-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_dbg-auto_ptr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+
+base/unit_tests_dbg-auto_ptr_test.obj: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-auto_ptr_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Tpo -c -o base/unit_tests_dbg-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_dbg-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
 
 geom/unit_tests_dbg-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo -c -o geom/unit_tests_dbg-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -1776,6 +1815,20 @@ base/unit_tests_devel-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
+base/unit_tests_devel-auto_ptr_test.o: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Tpo -c -o base/unit_tests_devel-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_devel-auto_ptr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+
+base/unit_tests_devel-auto_ptr_test.obj: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-auto_ptr_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Tpo -c -o base/unit_tests_devel-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_devel-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+
 geom/unit_tests_devel-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
@@ -2139,6 +2192,20 @@ base/unit_tests_oprof-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_oprof-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
+base/unit_tests_oprof-auto_ptr_test.o: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Tpo -c -o base/unit_tests_oprof-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_oprof-auto_ptr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+
+base/unit_tests_oprof-auto_ptr_test.obj: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-auto_ptr_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Tpo -c -o base/unit_tests_oprof-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_oprof-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
 
 geom/unit_tests_oprof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -2504,6 +2571,20 @@ base/unit_tests_opt-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
+base/unit_tests_opt-auto_ptr_test.o: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Tpo -c -o base/unit_tests_opt-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_opt-auto_ptr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+
+base/unit_tests_opt-auto_ptr_test.obj: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-auto_ptr_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Tpo -c -o base/unit_tests_opt-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_opt-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+
 geom/unit_tests_opt-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
@@ -2867,6 +2948,20 @@ base/unit_tests_prof-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_prof-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
+base/unit_tests_prof-auto_ptr_test.o: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Tpo -c -o base/unit_tests_prof-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_prof-auto_ptr_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
+
+base/unit_tests_prof-auto_ptr_test.obj: base/auto_ptr_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-auto_ptr_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Tpo -c -o base/unit_tests_prof-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_prof-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
 
 geom/unit_tests_prof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
