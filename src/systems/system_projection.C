@@ -194,17 +194,23 @@ public:
                        const Point& p,
                        Real /* time */ =0.)
   {
+    START_LOG ("component(c,i,p,t)", "OldSolutionValue");
     if (!this->check_old_context(c, p))
-      return 0;
+      {
+        STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
+        return 0;
+      }
 
     Output n;
     (old_context.*point_output)(i, p, n, out_of_elem_tol);
+    STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
     return n;
   }
 
 protected:
   bool check_old_context (const FEMContext& c, const Point& p)
   {
+    START_LOG ("check_old_context", "OldSolutionValue");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -231,7 +237,10 @@ protected:
         else
           {
             if (!elem.old_dof_object)
-              return false;
+              {
+                STOP_LOG ("check_old_context", "OldSolutionValue");
+                return false;
+              }
 
             old_context.pre_fe_reinit(sys, &elem);
           }
@@ -259,6 +268,7 @@ protected:
           }
       }
 
+    STOP_LOG ("check_old_context", "OldSolutionValue");
     return true;
   }
 
@@ -400,7 +410,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
                              NumericVector<Number>& new_v,
                              int is_adjoint) const
 {
-  START_LOG ("project_vector()", "System");
+  START_LOG ("project_vector(old,new)", "System");
 
   /**
    * This method projects a solution from an old mesh to a current, refined
@@ -583,7 +593,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-  STOP_LOG("project_vector()", "System");
+  STOP_LOG("project_vector(old,new)", "System");
 }
 
 
@@ -664,7 +674,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
                              FunctionBase<Gradient> *g,
                              int is_adjoint) const
 {
-  START_LOG ("project_vector()", "System");
+  START_LOG ("project_vector(FunctionBase)", "System");
 
   libmesh_assert(f);
 
@@ -679,7 +689,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   else
     this->project_vector(new_vector, &f_fem, NULL, is_adjoint);
 
-  STOP_LOG ("project_vector()", "System");
+  STOP_LOG ("project_vector(FunctionBase)", "System");
 }
 
 
@@ -1032,6 +1042,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
+          START_LOG ("project_nodes","GenericProjector");
+
           // In general, we need a series of
           // projections to ensure a unique and continuous
           // solution.  We start by interpolating nodes, then
@@ -1223,6 +1235,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 libmesh_error_msg("Unknown continuity " << cont);
             }
 
+          STOP_LOG ("project_nodes","GenericProjector");
+
+          START_LOG ("project_edges","GenericProjector");
+
           // In 3D, project any edge values next
           if (dim > 2 && cont != DISCONTINUOUS)
             {
@@ -1372,6 +1388,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     }
                 }
             } // end if (dim > 2 && cont != DISCONTINUOUS)
+
+          STOP_LOG ("project_edges","GenericProjector");
+
+          START_LOG ("project_sides","GenericProjector");
 
           // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
@@ -1523,6 +1543,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 }
             }// end if (dim > 1 && cont != DISCONTINUOUS)
 
+          STOP_LOG ("project_sides","GenericProjector");
+
+          START_LOG ("project_interior","GenericProjector");
+
           // Project the interior values, finally
 
           // Some interior dofs are on nodes/edges/sides and
@@ -1646,12 +1670,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
             } // if there are free interior dofs
 
+          STOP_LOG ("project_interior","GenericProjector");
+
           // Make sure every DoF got reached!
           for (unsigned int i=0; i != n_dofs; ++i)
             libmesh_assert(dof_is_fixed[i]);
 
           action.insert(context, var, Ue);
-
         } // end variables loop
     } // end elements loop
 
