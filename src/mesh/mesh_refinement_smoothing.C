@@ -316,25 +316,22 @@ bool MeshRefinement::limit_overrefined_boundary(const signed char max_mismatch)
             // would be nice
             Elem* neighbor = const_cast<Elem*>(*n_it);
 
-            if (((elem_level - max_mismatch) >
-                 neighbor->level()) &&
-                (neighbor->refinement_flag() != Elem::REFINE))
+            if (max_mismatch >= 0)
               {
-                neighbor->set_refinement_flag(Elem::REFINE);
-                flags_changed = true;
+                if ((elem_level > neighbor->level() + max_mismatch) &&
+                    (neighbor->refinement_flag() != Elem::REFINE))
+                  {
+                    neighbor->set_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
+
+                if ((elem_p_level > neighbor->p_level() + max_mismatch) &&
+                    (neighbor->p_refinement_flag() != Elem::REFINE))
+                  {
+                    neighbor->set_p_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
               }
-
-            if (max_mismatch>0)
-            {
-				if (((elem_p_level + 1 - max_mismatch) >
-					 neighbor->p_level()) &&
-					(neighbor->p_refinement_flag() != Elem::REFINE))
-				  {
-					neighbor->set_p_refinement_flag(Elem::REFINE);
-					flags_changed = true;
-				  }
-            }
-
           } // loop over interior neighbors
       }
   }
@@ -388,24 +385,24 @@ bool MeshRefinement::limit_underrefined_boundary(const signed char max_mismatch)
               cast_int<unsigned char>(neighbor->p_level() +
                                       ((neighbor->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
-            if (((neighbor_level + 1 - max_mismatch) >
-                 elem->level()) &&
-                (elem->refinement_flag() != Elem::REFINE))
+            if (max_mismatch >= 0)
               {
-                elem->set_refinement_flag(Elem::REFINE);
-                flags_changed = true;
-              }
+                if ((neighbor_level >
+                     elem->level() + max_mismatch) &&
+                    (elem->refinement_flag() != Elem::REFINE))
+                  {
+                    elem->set_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
 
-            if (max_mismatch>0)
-            {
-				if (((neighbor_p_level + 1 - max_mismatch) >
-					 elem->p_level()) &&
-					(elem->p_refinement_flag() != Elem::REFINE))
-				  {
-					elem->set_p_refinement_flag(Elem::REFINE);
-					flags_changed = true;
-				  }
-            }
+                if ((neighbor_p_level >
+                     elem->p_level() + max_mismatch) &&
+                    (elem->p_refinement_flag() != Elem::REFINE))
+                  {
+                    elem->set_p_refinement_flag(Elem::REFINE);
+                    flags_changed = true;
+                  }
+              }
           } // loop over interior neighbors
       }
   }
