@@ -373,6 +373,13 @@ public:
   }
 
   /**
+   * Forward compatibility with newer smart pointer types.  This
+   * allows code like if (!foo) to work with AutoPtr.
+   */
+  explicit operator bool() const
+  { return (this->get() != NULL); }
+
+  /**
    * op() for AutoPtrRef<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
