@@ -938,7 +938,7 @@ void Elem::find_interior_neighbors(std::set<const Elem *> &neighbor_set) const
       if (elem->level() > this->level())
         {
           unsigned int vertices_contained = 0;
-          for (unsigned int p=1; p < elem->n_nodes(); ++p)
+          for (unsigned int p=0; p < elem->n_nodes(); ++p)
             if (this->contains_point(elem->point(p)))
               vertices_contained++;
 
