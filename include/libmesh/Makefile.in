@@ -579,12 +579,13 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
 	perfmon.h plt_loader.h point_locator_base.h \
 	point_locator_list.h point_locator_tree.h pool_allocator.h \
-	restore_warnings.h statistics.h string_to_enum.h timestamp.h \
-	topology_map.h tree.h tree_base.h tree_node.h utility.h \
-	vectormap.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1) $(am__append_3) $(am__append_5) \
-	$(am__append_7) $(am__append_9) $(am__append_11) \
-	$(am__append_13) $(am__append_15) libmesh_config.h
+	restore_warnings.h safe_bool.h statistics.h string_to_enum.h \
+	timestamp.h topology_map.h tree.h tree_base.h tree_node.h \
+	utility.h vectormap.h xdr_cxx.h \
+	parallel_communicator_specializations $(am__append_1) \
+	$(am__append_3) $(am__append_5) $(am__append_7) \
+	$(am__append_9) $(am__append_11) $(am__append_13) \
+	$(am__append_15) libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) $(am__append_14) $(am__append_16) \
@@ -2022,6 +2023,9 @@ pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+safe_bool.h: $(top_srcdir)/include/utils/safe_bool.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 statistics.h: $(top_srcdir)/include/utils/statistics.h
