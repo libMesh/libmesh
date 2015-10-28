@@ -121,10 +121,35 @@ public:
 };
 
 
+template <typename Output>
+class FEMFunctionWrapper
+{
+public:
+  FEMFunctionWrapper(FEMFunctionBase<Output> &f) : _f(f) {}
+
+  void init_context (FEMContext &c) { _f.init_context(c); }
+
+  Output eval_at_node (const FEMContext& c,
+                       unsigned int i,
+                       const Node& n,
+                       const Real time)
+  { return _f.component(c, i, n, time); }
+
+  Output eval_at_point (const FEMContext& c,
+                        unsigned int i,
+                        const Point& n,
+                        const Real time)
+  { return _f.component(c, i, n, time); }
+
+private:
+  FEMFunctionBase<Output> &_f;
+};
+
+
 template <typename Output,
           void (FEMContext::*point_output)
             (unsigned int, const Point &, Output&, const Real) const>
-class OldSolutionValue : public FEMFunctionBase<Output>
+class OldSolutionValue
 {
 public:
   OldSolutionValue(const libMesh::System &sys_in,
@@ -138,54 +163,36 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
-  {
-    return UniquePtr<FEMFunctionBase<Output> >
-      (new OldSolutionValue(*this));
-  }
-
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
-  //
-  // Obviously this method should have taken a non-const reference,
-  // but I don't see any easy way to fix that while maintaining
-  // backwards compatibility.
-  virtual void init_context (const FEMContext &c)
+  void init_context (FEMContext &c)
   {
-    FEMContext &context = const_cast<FEMContext &>(c);
-    context.set_algebraic_type(FEMContext::DOFS_ONLY);
+    c.set_algebraic_type(FEMContext::DOFS_ONLY);
   }
 
-  virtual Output operator() (const FEMContext& c, const Point& p,
-                             const Real /* time */ = 0.)
+  Output eval_at_node (const FEMContext& c,
+                       unsigned int i,
+                       const Node& n,
+                       Real /* time */ =0.)
   {
-    if (!this->check_old_context(c, p))
-      return 0;
-
-    Output n;
-    (old_context.*point_output)(0, p, n, out_of_elem_tol);
-    return n;
-  }
-
-  virtual void operator() (const FEMContext& c, const Point& p,
-                           const Real /* time */,
-                           DenseVector<Output>& output)
-  {
-    if (!this->check_old_context(c, p))
+    START_LOG ("component(c,i,n,t)", "OldSolutionValue");
+    if (!this->check_old_context(c, n))
       {
-        output.zero();
-        return;
+        STOP_LOG ("component(c,i,n,t)", "OldSolutionValue");
+        return 0;
       }
 
-    const unsigned int size = output.size();
-
-    for (unsigned int v=0; v != size; ++v)
-      (old_context.*point_output)(v, p, output(v), out_of_elem_tol);
+    Output o;
+    (old_context.*point_output)(i, n, o, out_of_elem_tol);
+    STOP_LOG ("component(c,i,n,t)", "OldSolutionValue");
+    return o;
   }
 
-  virtual Output component(const FEMContext& c, unsigned int i,
-                           const Point& p,
-                           Real /* time */ =0.)
+
+  Output eval_at_point(const FEMContext& c,
+                       unsigned int i,
+                       const Point& p,
+                       Real /* time */ =0.)
   {
     if (!this->check_old_context(c, p))
       return 0;
@@ -491,7 +498,11 @@ void System::project_vector (const NumericVector<Number>& old_v,
         vars[i] = i;
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-      typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
+      typedef
+        GenericProjector
+          <OldSolutionValue<Number,   &FEMContext::point_value>,
+           OldSolutionValue<Gradient, &FEMContext::point_gradient>,
+           Number, VectorSetAction<Number> > FEMProjector;
 
       OldSolutionValue<Number,   &FEMContext::point_value>    f(*this, old_vector);
       OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
@@ -698,8 +709,25 @@ void System::project_vector (NumericVector<Number>& new_vector,
     vars[i] = i;
 
   // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-  typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
-  Threads::parallel_for(active_local_range, FEMProjector(*this, *f, g, setter, vars));
+  typedef
+    GenericProjector
+      <FEMFunctionWrapper<Number>, FEMFunctionWrapper<Gradient>,
+       Number, VectorSetAction<Number> > FEMProjector;
+
+  FEMFunctionWrapper<Number> fw(*f);
+
+  if (g)
+    {
+      FEMFunctionWrapper<Gradient> gw(*g);
+
+      Threads::parallel_for
+        (active_local_range,
+         FEMProjector(*this, fw, &gw, setter, vars));
+    }
+  else
+    Threads::parallel_for
+      (active_local_range,
+       FEMProjector(*this, fw, NULL, setter, vars));
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
@@ -1036,10 +1064,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (cont == C_ZERO)
                 {
                   libmesh_assert_equal_to (nc, 1);
-                  Ue(current_dof) = f.component(context,
-                                                var_component,
-                                                elem->point(n),
-                                                system.time);
+                  Ue(current_dof) = f.eval_at_node(context,
+                                                   var_component,
+                                                   *elem->get_node(n),
+                                                   system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
@@ -1047,17 +1075,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (fe_type.family == HERMITE)
                 {
                   Ue(current_dof) =
-                    f.component(context,
-                                var_component,
-                                elem->point(n),
-                                system.time);
+                    f.eval_at_node(context,
+                                   var_component,
+                                   *elem->get_node(n),
+                                   system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
-                    g->component(context,
-                                 var_component,
-                                 elem->point(n),
-                                 system.time);
+                    g->eval_at_node(context,
+                                    var_component,
+                                    *elem->get_node(n),
+                                    system.time);
                   // x derivative
                   Ue(current_dof) = grad(0);
                   dof_is_fixed[current_dof] = true;
@@ -1072,15 +1100,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       nxminus(0) -= delta_x;
                       nxplus(0) += delta_x;
                       VectorValue<FValue> gxminus =
-                        g->component(context,
-                                     var_component,
-                                     nxminus,
-                                     system.time);
+                        g->eval_at_point(context,
+                                         var_component,
+                                         nxminus,
+                                         system.time);
                       VectorValue<FValue> gxplus =
-                        g->component(context,
-                                     var_component,
-                                     nxplus,
-                                     system.time);
+                        g->eval_at_point(context,
+                                         var_component,
+                                         nxplus,
+                                         system.time);
                       // y derivative
                       Ue(current_dof) = grad(1);
                       dof_is_fixed[current_dof] = true;
@@ -1108,15 +1136,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           nyminus(1) -= delta_x;
                           nyplus(1) += delta_x;
                           VectorValue<FValue> gyminus =
-                            g->component(context,
-                                         var_component,
-                                         nyminus,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nyminus,
+                                             system.time);
                           VectorValue<FValue> gyplus =
-                            g->component(context,
-                                         var_component,
-                                         nyplus,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nyplus,
+                                             system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
                             / 2. / delta_x;
@@ -1136,25 +1164,25 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           nxpyp(0) += delta_x;
                           nxpyp(1) += delta_x;
                           VectorValue<FValue> gxmym =
-                            g->component(context,
-                                         var_component,
-                                         nxmym,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxmym,
+                                             system.time);
                           VectorValue<FValue> gxmyp =
-                            g->component(context,
-                                         var_component,
-                                         nxmyp,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxmyp,
+                                             system.time);
                           VectorValue<FValue> gxpym =
-                            g->component(context,
-                                         var_component,
-                                         nxpym,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxpym,
+                                             system.time);
                           VectorValue<FValue> gxpyp =
-                            g->component(context,
-                                         var_component,
-                                         nxpyp,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxpyp,
+                                             system.time);
                           FValue gxzplus = (gxpyp(2) - gxmyp(2))
                             / 2. / delta_x;
                           FValue gxzminus = (gxpym(2) - gxmym(2))
@@ -1173,17 +1201,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (cont == C_ONE)
                 {
                   libmesh_assert_equal_to (nc, 1 + dim);
-                  Ue(current_dof) = f.component(context,
-                                                var_component,
-                                                elem->point(n),
-                                                system.time);
+                  Ue(current_dof) = f.eval_at_node(context,
+                                                   var_component,
+                                                   *elem->get_node(n),
+                                                   system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
-                    g->component(context,
-                                 var_component,
-                                 elem->point(n),
-                                 system.time);
+                    g->eval_at_node(context,
+                                    var_component,
+                                    *elem->get_node(n),
+                                    system.time);
                   for (unsigned int i=0; i!= dim; ++i)
                     {
                       Ue(current_dof) = grad(i);
@@ -1279,17 +1307,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int qp=0; qp<n_qp; qp++)
                     {
                       // solution at the quadrature point
-                      FValue fineval = f.component(context,
-                                                   var_component,
-                                                   xyz_values[qp],
-                                                   system.time);
+                      FValue fineval = f.eval_at_point(context,
+                                                       var_component,
+                                                       xyz_values[qp],
+                                                       system.time);
                       // solution grad at the quadrature point
                       VectorValue<FValue> finegrad;
                       if (cont == C_ONE)
-                        finegrad = g->component(context,
-                                                var_component,
-                                                xyz_values[qp],
-                                                system.time);
+                        finegrad = g->eval_at_point(context,
+                                                    var_component,
+                                                    xyz_values[qp],
+                                                    system.time);
 
                       // Form edge projection matrix
                       for (unsigned int sidei=0, freei=0;
@@ -1429,17 +1457,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int qp=0; qp<n_qp; qp++)
                     {
                       // solution at the quadrature point
-                      FValue fineval = f.component(context,
-                                                   var_component,
-                                                   xyz_values[qp],
-                                                   system.time);
+                      FValue fineval = f.eval_at_point(context,
+                                                       var_component,
+                                                       xyz_values[qp],
+                                                       system.time);
                       // solution grad at the quadrature point
                       VectorValue<FValue> finegrad;
                       if (cont == C_ONE)
-                        finegrad = g->component(context,
-                                                var_component,
-                                                xyz_values[qp],
-                                                system.time);
+                        finegrad = g->eval_at_point(context,
+                                                    var_component,
+                                                    xyz_values[qp],
+                                                    system.time);
 
                       // Form side projection matrix
                       for (unsigned int sidei=0, freei=0;
@@ -1558,17 +1586,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               for (unsigned int qp=0; qp<n_qp; qp++)
                 {
                   // solution at the quadrature point
-                  FValue fineval = f.component(context,
-                                               var_component,
-                                               xyz_values[qp],
-                                               system.time);
+                  FValue fineval = f.eval_at_point(context,
+                                                   var_component,
+                                                   xyz_values[qp],
+                                                   system.time);
                   // solution grad at the quadrature point
                   VectorValue<FValue> finegrad;
                   if (cont == C_ONE)
-                    finegrad = g->component(context,
-                                            var_component,
-                                            xyz_values[qp],
-                                            system.time);
+                    finegrad = g->eval_at_point(context,
+                                                var_component,
+                                                xyz_values[qp],
+                                                system.time);
 
                   // Form interior projection matrix
                   for (unsigned int i=0, freei=0; i != n_dofs; ++i)
