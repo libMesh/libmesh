@@ -376,7 +376,11 @@ public:
    * Forward compatibility with newer smart pointer types.  This
    * allows code like if (!foo) to work with AutoPtr.
    */
-  explicit operator bool() const
+#ifdef LIBMESH_HAVE_CXX11
+  // Conversion operators can only be marked explicit in C++11.
+  explicit
+#endif
+  operator bool() const
   { return (this->get() != NULL); }
 
   /**
