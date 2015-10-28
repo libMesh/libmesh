@@ -173,21 +173,7 @@ public:
   Output eval_at_node (const FEMContext& c,
                        unsigned int i,
                        const Node& n,
-                       Real /* time */ =0.)
-  {
-    START_LOG ("component(c,i,n,t)", "OldSolutionValue");
-    if (!this->check_old_context(c, n))
-      {
-        STOP_LOG ("component(c,i,n,t)", "OldSolutionValue");
-        return 0;
-      }
-
-    Output o;
-    (old_context.*point_output)(i, n, o, out_of_elem_tol);
-    STOP_LOG ("component(c,i,n,t)", "OldSolutionValue");
-    return o;
-  }
-
+                       Real /* time */ =0.);
 
   Output eval_at_point(const FEMContext& c,
                        unsigned int i,
@@ -280,6 +266,83 @@ private:
 
   static const Real out_of_elem_tol;
 };
+
+
+template<>
+inline
+Number
+OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node
+  (const FEMContext& c,
+   unsigned int i,
+   const Node& n,
+   Real)
+  {
+    START_LOG ("Number eval_at_node()", "OldSolutionValue");
+
+    // Optimize for the common case, where this node was part of the
+    // old solution.
+    //
+    // Be sure to handle cases where the variable wasn't defined on
+    // this node (due to changing subdomain support) or where the
+    // variable has no components on this node (due to Elem order
+    // exceeding FE order)
+    if (n.old_dof_object &&
+        n.old_dof_object->n_vars(sys.number()) &&
+        n.old_dof_object->n_comp(sys.number(), i))
+      {
+        const dof_id_type old_id =
+          n.old_dof_object->dof_number(sys.number(), i, 0);
+        STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
+        return old_solution(old_id);
+      }
+
+    STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
+
+    return this->eval_at_point(c, i, n, 0);
+  }
+
+
+
+template<>
+inline
+Gradient
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node
+  (const FEMContext& c,
+   unsigned int i,
+   const Node& n,
+   Real)
+  {
+    START_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+
+    // Optimize for the common case, where this node was part of the
+    // old solution.
+    //
+    // Be sure to handle cases where the variable wasn't defined on
+    // this node (due to changing subdomain support) or where the
+    // variable has no components on this node (due to Elem order
+    // exceeding FE order)
+    if (n.old_dof_object &&
+        n.old_dof_object->n_vars(sys.number()) &&
+        n.old_dof_object->n_comp(sys.number(), i))
+      {
+        Gradient g;
+        for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+          {
+            const dof_id_type old_id =
+              n.old_dof_object->dof_number(sys.number(), i, d+1);
+            g(d) = old_solution(old_id);
+          }
+        STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+        return g;
+      }
+
+    STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+
+    return this->eval_at_point(c, i, n, 0);
+  }
+
+
+
 
 
 template <>
