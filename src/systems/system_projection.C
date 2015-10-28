@@ -978,6 +978,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   // The new element degree of freedom coefficients
   DenseVector<FValue> Ue;
 
+  const unsigned int sysnum = system.number();
+
   // Context objects to contain all our required FE objects
   FEMContext context( system );
 
@@ -1302,8 +1304,57 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           START_LOG ("project_edges","GenericProjector");
 
-          // In 3D, project any edge values next
-          if (dim > 2 && cont != DISCONTINUOUS)
+          // In 3D, handle any edge values next.  Optimize (at a
+          // slight cost of accuracy) the LAGRANGE case by using
+          // interpolation instead of L2 projection.
+          if (dim > 2 && fe_type.family == LAGRANGE)
+            {
+              for (unsigned char e=0; e != elem->n_edges(); ++e)
+                {
+                  for (unsigned char n=0; n != elem->n_nodes(); ++n)
+                    {
+                      // Vertices are on edges but we're done there
+                      if (elem->is_vertex(n))
+                        continue;
+
+                      // Other nodes on edges need interpolation
+                      if (!elem->is_node_on_edge(n,e))
+                        continue;
+
+                      const Node * node = elem->get_node(n);
+
+                      // Look for dofs on this edge node
+                      const unsigned int edge_comp =
+                        node->n_comp(sysnum, var_component);
+
+                      // We're LAGRANGE so we don't double-up dofs
+                      libmesh_assert_less (edge_comp, 2);
+
+                      // But we might be subparametric
+                      if (!edge_comp)
+                        continue;
+
+                      // If we have a dof, find its index
+                      const dof_id_type new_edge_dof =
+                        node->dof_number(sysnum, var_component, 0);
+
+                      // And set its value
+                      for (unsigned int i=0; i != n_dofs; ++i)
+                        if (dof_indices[i] == new_edge_dof)
+                          {
+                            dof_is_fixed[i] = true;
+                            FValue &ui = Ue(i);
+                            ui = f.eval_at_node(context,
+                                                var_component,
+                                                *node,
+                                                system.time);
+                            break;
+                          }
+                    }
+                }
+            }
+          // In 3D with non-LAGRANGE, project any edge values next
+          else if (dim > 2 && cont != DISCONTINUOUS)
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
