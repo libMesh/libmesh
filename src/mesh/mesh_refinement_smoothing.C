@@ -276,7 +276,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
 
 
-bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
+bool MeshRefinement::limit_overrefined_boundary(const signed char max_mismatch)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -347,7 +347,7 @@ bool MeshRefinement::limit_overrefined_boundary(const unsigned int max_mismatch)
 
 
 
-bool MeshRefinement::limit_underrefined_boundary(const unsigned int max_mismatch)
+bool MeshRefinement::limit_underrefined_boundary(const signed char max_mismatch)
 {
   // This function must be run on all processors at once
   parallel_object_only();
