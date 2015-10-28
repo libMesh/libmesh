@@ -20,6 +20,7 @@
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh_common.h" // for libmesh_deprecated()
+#include "libmesh/safe_bool.h"
 
 // LibMesh's AutoPtr is now libmesh_deprecated(), just like the
 // std::auto_ptr it is based on.
@@ -159,7 +160,7 @@ struct AutoPtrRef
  * purpose.  It is provided "as is" without express or implied warranty.
  */
 template<typename Tp>
-class AutoPtr
+class AutoPtr : public safe_bool<AutoPtr<Tp> >
 {
 private:
 
@@ -373,15 +374,15 @@ public:
   }
 
   /**
-   * Forward compatibility with newer smart pointer types.  This
-   * allows code like if (!foo) to work with AutoPtr.
+   * A "safe" replacement for operator bool () that behaves more like
+   * an explicit conversion operator even in C++98.  Defining an
+   * operator bool() provides forward compatibility with newer smart
+   * pointer types, allowing code like if (!foo) to work with AutoPtr.
    */
-#ifdef LIBMESH_HAVE_CXX11
-  // Conversion operators can only be marked explicit in C++11.
-  explicit
-#endif
-  operator bool() const
-  { return (this->get() != NULL); }
+  bool boolean_test() const
+  {
+    return (this->get() != NULL);
+  }
 
   /**
    * op() for AutoPtrRef<Tp1>.  Calls the release member.
