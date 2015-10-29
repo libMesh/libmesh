@@ -146,7 +146,6 @@ libmesh_SOURCES =  \
         src/geom/elem_cutter.C \
         src/geom/elem_quality.C \
         src/geom/elem_refinement.C \
-        src/geom/elem_type.C \
         src/geom/face.C \
         src/geom/face_inf_quad.C \
         src/geom/face_inf_quad4.C \
@@ -308,7 +307,6 @@ libmesh_SOURCES =  \
         src/quadrature/quadrature_monomial_1D.C \
         src/quadrature/quadrature_monomial_2D.C \
         src/quadrature/quadrature_monomial_3D.C \
-        src/quadrature/quadrature_rules.C \
         src/quadrature/quadrature_simpson.C \
         src/quadrature/quadrature_simpson_1D.C \
         src/quadrature/quadrature_simpson_2D.C \

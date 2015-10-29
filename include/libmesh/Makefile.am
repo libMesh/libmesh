@@ -118,7 +118,6 @@ BUILT_SOURCES = \
         elem_hash.h \
         elem_quality.h \
         elem_range.h \
-        elem_type.h \
         face.h \
         face_inf_quad.h \
         face_inf_quad4.h \
@@ -289,7 +288,6 @@ BUILT_SOURCES = \
         quadrature_grid.h \
         quadrature_jacobi.h \
         quadrature_monomial.h \
-        quadrature_rules.h \
         quadrature_simpson.h \
         quadrature_trap.h \
         rb_assembly_expansion.h \
@@ -859,9 +857,6 @@ elem_quality.h: $(top_srcdir)/include/geom/elem_quality.h
 elem_range.h: $(top_srcdir)/include/geom/elem_range.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-elem_type.h: $(top_srcdir)/include/geom/elem_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 face.h: $(top_srcdir)/include/geom/face.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1370,9 +1365,6 @@ quadrature_jacobi.h: $(top_srcdir)/include/quadrature/quadrature_jacobi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_monomial.h: $(top_srcdir)/include/quadrature/quadrature_monomial.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-quadrature_rules.h: $(top_srcdir)/include/quadrature/quadrature_rules.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_simpson.h: $(top_srcdir)/include/quadrature/quadrature_simpson.h
