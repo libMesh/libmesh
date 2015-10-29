@@ -375,9 +375,8 @@ public:
 
   /**
    * A "safe" replacement for operator bool () that behaves more like
-   * an explicit conversion operator even in C++98.  Defining an
-   * operator bool() provides forward compatibility with newer smart
-   * pointer types, allowing code like if (!foo) to work with AutoPtr.
+   * an explicit conversion operator even in C++98. This allows code
+   * like if (!foo) to work with AutoPtr.
    */
   bool boolean_test() const
   {
