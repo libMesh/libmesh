@@ -272,12 +272,11 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/edge_edge2.C src/geom/edge_edge3.C \
 	src/geom/edge_edge4.C src/geom/edge_inf_edge2.C \
 	src/geom/elem.C src/geom/elem_cutter.C src/geom/elem_quality.C \
-	src/geom/elem_refinement.C src/geom/elem_type.C \
-	src/geom/face.C src/geom/face_inf_quad.C \
-	src/geom/face_inf_quad4.C src/geom/face_inf_quad6.C \
-	src/geom/face_quad.C src/geom/face_quad4.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/elem_refinement.C src/geom/face.C \
+	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
+	src/geom/face_inf_quad6.C src/geom/face_quad.C \
+	src/geom/face_quad4.C src/geom/face_quad8.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_subdivision.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
@@ -381,7 +380,6 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_monomial_1D.C \
 	src/quadrature/quadrature_monomial_2D.C \
 	src/quadrature/quadrature_monomial_3D.C \
-	src/quadrature/quadrature_rules.C \
 	src/quadrature/quadrature_simpson.C \
 	src/quadrature/quadrature_simpson_1D.C \
 	src/quadrature/quadrature_simpson_2D.C \
@@ -618,7 +616,6 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/geom/libmesh_dbg_la-elem_cutter.lo \
 	src/geom/libmesh_dbg_la-elem_quality.lo \
 	src/geom/libmesh_dbg_la-elem_refinement.lo \
-	src/geom/libmesh_dbg_la-elem_type.lo \
 	src/geom/libmesh_dbg_la-face.lo \
 	src/geom/libmesh_dbg_la-face_inf_quad.lo \
 	src/geom/libmesh_dbg_la-face_inf_quad4.lo \
@@ -779,7 +776,6 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_monomial_1D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_monomial_2D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_monomial_3D.lo \
-	src/quadrature/libmesh_dbg_la-quadrature_rules.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_simpson.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_simpson_1D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_simpson_2D.lo \
@@ -991,12 +987,11 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/edge_edge2.C src/geom/edge_edge3.C \
 	src/geom/edge_edge4.C src/geom/edge_inf_edge2.C \
 	src/geom/elem.C src/geom/elem_cutter.C src/geom/elem_quality.C \
-	src/geom/elem_refinement.C src/geom/elem_type.C \
-	src/geom/face.C src/geom/face_inf_quad.C \
-	src/geom/face_inf_quad4.C src/geom/face_inf_quad6.C \
-	src/geom/face_quad.C src/geom/face_quad4.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/elem_refinement.C src/geom/face.C \
+	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
+	src/geom/face_inf_quad6.C src/geom/face_quad.C \
+	src/geom/face_quad4.C src/geom/face_quad8.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_subdivision.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
@@ -1100,7 +1095,6 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_monomial_1D.C \
 	src/quadrature/quadrature_monomial_2D.C \
 	src/quadrature/quadrature_monomial_3D.C \
-	src/quadrature/quadrature_rules.C \
 	src/quadrature/quadrature_simpson.C \
 	src/quadrature/quadrature_simpson_1D.C \
 	src/quadrature/quadrature_simpson_2D.C \
@@ -1336,7 +1330,6 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/geom/libmesh_devel_la-elem_cutter.lo \
 	src/geom/libmesh_devel_la-elem_quality.lo \
 	src/geom/libmesh_devel_la-elem_refinement.lo \
-	src/geom/libmesh_devel_la-elem_type.lo \
 	src/geom/libmesh_devel_la-face.lo \
 	src/geom/libmesh_devel_la-face_inf_quad.lo \
 	src/geom/libmesh_devel_la-face_inf_quad4.lo \
@@ -1497,7 +1490,6 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/quadrature/libmesh_devel_la-quadrature_monomial_1D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_monomial_2D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_monomial_3D.lo \
-	src/quadrature/libmesh_devel_la-quadrature_rules.lo \
 	src/quadrature/libmesh_devel_la-quadrature_simpson.lo \
 	src/quadrature/libmesh_devel_la-quadrature_simpson_1D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_simpson_2D.lo \
@@ -1706,12 +1698,11 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/edge_edge2.C src/geom/edge_edge3.C \
 	src/geom/edge_edge4.C src/geom/edge_inf_edge2.C \
 	src/geom/elem.C src/geom/elem_cutter.C src/geom/elem_quality.C \
-	src/geom/elem_refinement.C src/geom/elem_type.C \
-	src/geom/face.C src/geom/face_inf_quad.C \
-	src/geom/face_inf_quad4.C src/geom/face_inf_quad6.C \
-	src/geom/face_quad.C src/geom/face_quad4.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/elem_refinement.C src/geom/face.C \
+	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
+	src/geom/face_inf_quad6.C src/geom/face_quad.C \
+	src/geom/face_quad4.C src/geom/face_quad8.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_subdivision.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
@@ -1815,7 +1806,6 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_monomial_1D.C \
 	src/quadrature/quadrature_monomial_2D.C \
 	src/quadrature/quadrature_monomial_3D.C \
-	src/quadrature/quadrature_rules.C \
 	src/quadrature/quadrature_simpson.C \
 	src/quadrature/quadrature_simpson_1D.C \
 	src/quadrature/quadrature_simpson_2D.C \
@@ -2051,7 +2041,6 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/geom/libmesh_oprof_la-elem_cutter.lo \
 	src/geom/libmesh_oprof_la-elem_quality.lo \
 	src/geom/libmesh_oprof_la-elem_refinement.lo \
-	src/geom/libmesh_oprof_la-elem_type.lo \
 	src/geom/libmesh_oprof_la-face.lo \
 	src/geom/libmesh_oprof_la-face_inf_quad.lo \
 	src/geom/libmesh_oprof_la-face_inf_quad4.lo \
@@ -2212,7 +2201,6 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_monomial_1D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_monomial_2D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_monomial_3D.lo \
-	src/quadrature/libmesh_oprof_la-quadrature_rules.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_simpson.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_simpson_1D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_simpson_2D.lo \
@@ -2421,12 +2409,11 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/edge_edge2.C src/geom/edge_edge3.C \
 	src/geom/edge_edge4.C src/geom/edge_inf_edge2.C \
 	src/geom/elem.C src/geom/elem_cutter.C src/geom/elem_quality.C \
-	src/geom/elem_refinement.C src/geom/elem_type.C \
-	src/geom/face.C src/geom/face_inf_quad.C \
-	src/geom/face_inf_quad4.C src/geom/face_inf_quad6.C \
-	src/geom/face_quad.C src/geom/face_quad4.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/elem_refinement.C src/geom/face.C \
+	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
+	src/geom/face_inf_quad6.C src/geom/face_quad.C \
+	src/geom/face_quad4.C src/geom/face_quad8.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_subdivision.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
@@ -2530,7 +2517,6 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_monomial_1D.C \
 	src/quadrature/quadrature_monomial_2D.C \
 	src/quadrature/quadrature_monomial_3D.C \
-	src/quadrature/quadrature_rules.C \
 	src/quadrature/quadrature_simpson.C \
 	src/quadrature/quadrature_simpson_1D.C \
 	src/quadrature/quadrature_simpson_2D.C \
@@ -2766,7 +2752,6 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/geom/libmesh_opt_la-elem_cutter.lo \
 	src/geom/libmesh_opt_la-elem_quality.lo \
 	src/geom/libmesh_opt_la-elem_refinement.lo \
-	src/geom/libmesh_opt_la-elem_type.lo \
 	src/geom/libmesh_opt_la-face.lo \
 	src/geom/libmesh_opt_la-face_inf_quad.lo \
 	src/geom/libmesh_opt_la-face_inf_quad4.lo \
@@ -2927,7 +2912,6 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/quadrature/libmesh_opt_la-quadrature_monomial_1D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_monomial_2D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_monomial_3D.lo \
-	src/quadrature/libmesh_opt_la-quadrature_rules.lo \
 	src/quadrature/libmesh_opt_la-quadrature_simpson.lo \
 	src/quadrature/libmesh_opt_la-quadrature_simpson_1D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_simpson_2D.lo \
@@ -3135,12 +3119,11 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/edge_edge2.C src/geom/edge_edge3.C \
 	src/geom/edge_edge4.C src/geom/edge_inf_edge2.C \
 	src/geom/elem.C src/geom/elem_cutter.C src/geom/elem_quality.C \
-	src/geom/elem_refinement.C src/geom/elem_type.C \
-	src/geom/face.C src/geom/face_inf_quad.C \
-	src/geom/face_inf_quad4.C src/geom/face_inf_quad6.C \
-	src/geom/face_quad.C src/geom/face_quad4.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/elem_refinement.C src/geom/face.C \
+	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
+	src/geom/face_inf_quad6.C src/geom/face_quad.C \
+	src/geom/face_quad4.C src/geom/face_quad8.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_subdivision.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
@@ -3244,7 +3227,6 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_monomial_1D.C \
 	src/quadrature/quadrature_monomial_2D.C \
 	src/quadrature/quadrature_monomial_3D.C \
-	src/quadrature/quadrature_rules.C \
 	src/quadrature/quadrature_simpson.C \
 	src/quadrature/quadrature_simpson_1D.C \
 	src/quadrature/quadrature_simpson_2D.C \
@@ -3480,7 +3462,6 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/geom/libmesh_prof_la-elem_cutter.lo \
 	src/geom/libmesh_prof_la-elem_quality.lo \
 	src/geom/libmesh_prof_la-elem_refinement.lo \
-	src/geom/libmesh_prof_la-elem_type.lo \
 	src/geom/libmesh_prof_la-face.lo \
 	src/geom/libmesh_prof_la-face_inf_quad.lo \
 	src/geom/libmesh_prof_la-face_inf_quad4.lo \
@@ -3641,7 +3622,6 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/quadrature/libmesh_prof_la-quadrature_monomial_1D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_monomial_2D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_monomial_3D.lo \
-	src/quadrature/libmesh_prof_la-quadrature_rules.lo \
 	src/quadrature/libmesh_prof_la-quadrature_simpson.lo \
 	src/quadrature/libmesh_prof_la-quadrature_simpson_1D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_simpson_2D.lo \
@@ -4811,7 +4791,6 @@ libmesh_SOURCES = \
         src/geom/elem_cutter.C \
         src/geom/elem_quality.C \
         src/geom/elem_refinement.C \
-        src/geom/elem_type.C \
         src/geom/face.C \
         src/geom/face_inf_quad.C \
         src/geom/face_inf_quad4.C \
@@ -4973,7 +4952,6 @@ libmesh_SOURCES = \
         src/quadrature/quadrature_monomial_1D.C \
         src/quadrature/quadrature_monomial_2D.C \
         src/quadrature/quadrature_monomial_3D.C \
-        src/quadrature/quadrature_rules.C \
         src/quadrature/quadrature_simpson.C \
         src/quadrature/quadrature_simpson_1D.C \
         src/quadrature/quadrature_simpson_2D.C \
@@ -5775,8 +5753,6 @@ src/geom/libmesh_dbg_la-elem_quality.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-elem_refinement.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/libmesh_dbg_la-elem_type.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-face.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-face_inf_quad.lo: src/geom/$(am__dirstamp) \
@@ -6208,9 +6184,6 @@ src/quadrature/libmesh_dbg_la-quadrature_monomial_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_dbg_la-quadrature_monomial_3D.lo:  \
-	src/quadrature/$(am__dirstamp) \
-	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/libmesh_dbg_la-quadrature_rules.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_dbg_la-quadrature_simpson.lo:  \
@@ -6870,8 +6843,6 @@ src/geom/libmesh_devel_la-elem_quality.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-elem_refinement.lo:  \
 	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/libmesh_devel_la-elem_type.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-face.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-face_inf_quad.lo: src/geom/$(am__dirstamp) \
@@ -7268,9 +7239,6 @@ src/quadrature/libmesh_devel_la-quadrature_monomial_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_devel_la-quadrature_monomial_3D.lo:  \
-	src/quadrature/$(am__dirstamp) \
-	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/libmesh_devel_la-quadrature_rules.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_devel_la-quadrature_simpson.lo:  \
@@ -7902,8 +7870,6 @@ src/geom/libmesh_oprof_la-elem_quality.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-elem_refinement.lo:  \
 	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/libmesh_oprof_la-elem_type.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-face.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-face_inf_quad.lo: src/geom/$(am__dirstamp) \
@@ -8300,9 +8266,6 @@ src/quadrature/libmesh_oprof_la-quadrature_monomial_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_oprof_la-quadrature_monomial_3D.lo:  \
-	src/quadrature/$(am__dirstamp) \
-	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/libmesh_oprof_la-quadrature_rules.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_oprof_la-quadrature_simpson.lo:  \
@@ -8934,8 +8897,6 @@ src/geom/libmesh_opt_la-elem_quality.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-elem_refinement.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/libmesh_opt_la-elem_type.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-face.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-face_inf_quad.lo: src/geom/$(am__dirstamp) \
@@ -9331,9 +9292,6 @@ src/quadrature/libmesh_opt_la-quadrature_monomial_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_opt_la-quadrature_monomial_3D.lo:  \
-	src/quadrature/$(am__dirstamp) \
-	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/libmesh_opt_la-quadrature_rules.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_opt_la-quadrature_simpson.lo:  \
@@ -9963,8 +9921,6 @@ src/geom/libmesh_prof_la-elem_quality.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-elem_refinement.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/libmesh_prof_la-elem_type.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-face.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-face_inf_quad.lo: src/geom/$(am__dirstamp) \
@@ -10360,9 +10316,6 @@ src/quadrature/libmesh_prof_la-quadrature_monomial_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_prof_la-quadrature_monomial_3D.lo:  \
-	src/quadrature/$(am__dirstamp) \
-	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/libmesh_prof_la-quadrature_rules.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_prof_la-quadrature_simpson.lo:  \
@@ -11740,7 +11693,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-elem_cutter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-elem_quality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-elem_refinement.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-elem_type.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_inf_quad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_inf_quad4.Plo@am__quote@
@@ -11794,7 +11746,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-elem_cutter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-elem_quality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-elem_refinement.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-elem_type.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_inf_quad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_inf_quad4.Plo@am__quote@
@@ -11848,7 +11799,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-elem_cutter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-elem_quality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-elem_refinement.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-elem_type.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_inf_quad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_inf_quad4.Plo@am__quote@
@@ -11902,7 +11852,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-elem_cutter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-elem_quality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-elem_refinement.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-elem_type.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_inf_quad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_inf_quad4.Plo@am__quote@
@@ -11956,7 +11905,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-elem_cutter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-elem_quality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-elem_refinement.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-elem_type.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_inf_quad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_inf_quad4.Plo@am__quote@
@@ -12553,7 +12501,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_monomial_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_monomial_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_monomial_3D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_rules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_simpson.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_simpson_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_simpson_2D.Plo@am__quote@
@@ -12593,7 +12540,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_monomial_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_monomial_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_monomial_3D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_rules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_simpson.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_simpson_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_simpson_2D.Plo@am__quote@
@@ -12633,7 +12579,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_monomial_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_monomial_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_monomial_3D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_rules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_simpson.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_simpson_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_simpson_2D.Plo@am__quote@
@@ -12673,7 +12618,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_monomial_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_monomial_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_monomial_3D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_rules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_simpson.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_simpson_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_simpson_2D.Plo@am__quote@
@@ -12713,7 +12657,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_monomial_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_monomial_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_monomial_3D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_rules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_simpson.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_simpson_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_simpson_2D.Plo@am__quote@
@@ -14292,13 +14235,6 @@ src/geom/libmesh_dbg_la-elem_refinement.lo: src/geom/elem_refinement.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-elem_refinement.lo `test -f 'src/geom/elem_refinement.C' || echo '$(srcdir)/'`src/geom/elem_refinement.C
 
-src/geom/libmesh_dbg_la-elem_type.lo: src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-elem_type.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-elem_type.Tpo -c -o src/geom/libmesh_dbg_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_dbg_la-elem_type.Tpo src/geom/$(DEPDIR)/libmesh_dbg_la-elem_type.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/elem_type.C' object='src/geom/libmesh_dbg_la-elem_type.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-
 src/geom/libmesh_dbg_la-face.lo: src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-face.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-face.Tpo -c -o src/geom/libmesh_dbg_la-face.lo `test -f 'src/geom/face.C' || echo '$(srcdir)/'`src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_dbg_la-face.Tpo src/geom/$(DEPDIR)/libmesh_dbg_la-face.Plo
@@ -15418,13 +15354,6 @@ src/quadrature/libmesh_dbg_la-quadrature_monomial_3D.lo: src/quadrature/quadratu
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_monomial_3D.C' object='src/quadrature/libmesh_dbg_la-quadrature_monomial_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_monomial_3D.lo `test -f 'src/quadrature/quadrature_monomial_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_monomial_3D.C
-
-src/quadrature/libmesh_dbg_la-quadrature_rules.lo: src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_rules.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_rules.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_rules.Tpo src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_rules.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_rules.C' object='src/quadrature/libmesh_dbg_la-quadrature_rules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
 
 src/quadrature/libmesh_dbg_la-quadrature_simpson.lo: src/quadrature/quadrature_simpson.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_simpson.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_simpson.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_simpson.lo `test -f 'src/quadrature/quadrature_simpson.C' || echo '$(srcdir)/'`src/quadrature/quadrature_simpson.C
@@ -17239,13 +17168,6 @@ src/geom/libmesh_devel_la-elem_refinement.lo: src/geom/elem_refinement.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-elem_refinement.lo `test -f 'src/geom/elem_refinement.C' || echo '$(srcdir)/'`src/geom/elem_refinement.C
 
-src/geom/libmesh_devel_la-elem_type.lo: src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-elem_type.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-elem_type.Tpo -c -o src/geom/libmesh_devel_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-elem_type.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-elem_type.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/elem_type.C' object='src/geom/libmesh_devel_la-elem_type.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-
 src/geom/libmesh_devel_la-face.lo: src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-face.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-face.Tpo -c -o src/geom/libmesh_devel_la-face.lo `test -f 'src/geom/face.C' || echo '$(srcdir)/'`src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-face.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-face.Plo
@@ -18365,13 +18287,6 @@ src/quadrature/libmesh_devel_la-quadrature_monomial_3D.lo: src/quadrature/quadra
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_monomial_3D.C' object='src/quadrature/libmesh_devel_la-quadrature_monomial_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_monomial_3D.lo `test -f 'src/quadrature/quadrature_monomial_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_monomial_3D.C
-
-src/quadrature/libmesh_devel_la-quadrature_rules.lo: src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_rules.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_rules.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_rules.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_rules.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_rules.C' object='src/quadrature/libmesh_devel_la-quadrature_rules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
 
 src/quadrature/libmesh_devel_la-quadrature_simpson.lo: src/quadrature/quadrature_simpson.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_simpson.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_simpson.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_simpson.lo `test -f 'src/quadrature/quadrature_simpson.C' || echo '$(srcdir)/'`src/quadrature/quadrature_simpson.C
@@ -20186,13 +20101,6 @@ src/geom/libmesh_oprof_la-elem_refinement.lo: src/geom/elem_refinement.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-elem_refinement.lo `test -f 'src/geom/elem_refinement.C' || echo '$(srcdir)/'`src/geom/elem_refinement.C
 
-src/geom/libmesh_oprof_la-elem_type.lo: src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-elem_type.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-elem_type.Tpo -c -o src/geom/libmesh_oprof_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_oprof_la-elem_type.Tpo src/geom/$(DEPDIR)/libmesh_oprof_la-elem_type.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/elem_type.C' object='src/geom/libmesh_oprof_la-elem_type.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-
 src/geom/libmesh_oprof_la-face.lo: src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-face.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-face.Tpo -c -o src/geom/libmesh_oprof_la-face.lo `test -f 'src/geom/face.C' || echo '$(srcdir)/'`src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_oprof_la-face.Tpo src/geom/$(DEPDIR)/libmesh_oprof_la-face.Plo
@@ -21312,13 +21220,6 @@ src/quadrature/libmesh_oprof_la-quadrature_monomial_3D.lo: src/quadrature/quadra
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_monomial_3D.C' object='src/quadrature/libmesh_oprof_la-quadrature_monomial_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_monomial_3D.lo `test -f 'src/quadrature/quadrature_monomial_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_monomial_3D.C
-
-src/quadrature/libmesh_oprof_la-quadrature_rules.lo: src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_rules.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_rules.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_rules.Tpo src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_rules.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_rules.C' object='src/quadrature/libmesh_oprof_la-quadrature_rules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
 
 src/quadrature/libmesh_oprof_la-quadrature_simpson.lo: src/quadrature/quadrature_simpson.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_simpson.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_simpson.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_simpson.lo `test -f 'src/quadrature/quadrature_simpson.C' || echo '$(srcdir)/'`src/quadrature/quadrature_simpson.C
@@ -23133,13 +23034,6 @@ src/geom/libmesh_opt_la-elem_refinement.lo: src/geom/elem_refinement.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-elem_refinement.lo `test -f 'src/geom/elem_refinement.C' || echo '$(srcdir)/'`src/geom/elem_refinement.C
 
-src/geom/libmesh_opt_la-elem_type.lo: src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-elem_type.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-elem_type.Tpo -c -o src/geom/libmesh_opt_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-elem_type.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-elem_type.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/elem_type.C' object='src/geom/libmesh_opt_la-elem_type.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-
 src/geom/libmesh_opt_la-face.lo: src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-face.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-face.Tpo -c -o src/geom/libmesh_opt_la-face.lo `test -f 'src/geom/face.C' || echo '$(srcdir)/'`src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-face.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-face.Plo
@@ -24259,13 +24153,6 @@ src/quadrature/libmesh_opt_la-quadrature_monomial_3D.lo: src/quadrature/quadratu
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_monomial_3D.C' object='src/quadrature/libmesh_opt_la-quadrature_monomial_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_monomial_3D.lo `test -f 'src/quadrature/quadrature_monomial_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_monomial_3D.C
-
-src/quadrature/libmesh_opt_la-quadrature_rules.lo: src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_rules.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_rules.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_rules.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_rules.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_rules.C' object='src/quadrature/libmesh_opt_la-quadrature_rules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
 
 src/quadrature/libmesh_opt_la-quadrature_simpson.lo: src/quadrature/quadrature_simpson.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_simpson.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_simpson.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_simpson.lo `test -f 'src/quadrature/quadrature_simpson.C' || echo '$(srcdir)/'`src/quadrature/quadrature_simpson.C
@@ -26080,13 +25967,6 @@ src/geom/libmesh_prof_la-elem_refinement.lo: src/geom/elem_refinement.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-elem_refinement.lo `test -f 'src/geom/elem_refinement.C' || echo '$(srcdir)/'`src/geom/elem_refinement.C
 
-src/geom/libmesh_prof_la-elem_type.lo: src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-elem_type.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-elem_type.Tpo -c -o src/geom/libmesh_prof_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_prof_la-elem_type.Tpo src/geom/$(DEPDIR)/libmesh_prof_la-elem_type.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/elem_type.C' object='src/geom/libmesh_prof_la-elem_type.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-elem_type.lo `test -f 'src/geom/elem_type.C' || echo '$(srcdir)/'`src/geom/elem_type.C
-
 src/geom/libmesh_prof_la-face.lo: src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-face.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-face.Tpo -c -o src/geom/libmesh_prof_la-face.lo `test -f 'src/geom/face.C' || echo '$(srcdir)/'`src/geom/face.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_prof_la-face.Tpo src/geom/$(DEPDIR)/libmesh_prof_la-face.Plo
@@ -27206,13 +27086,6 @@ src/quadrature/libmesh_prof_la-quadrature_monomial_3D.lo: src/quadrature/quadrat
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_monomial_3D.C' object='src/quadrature/libmesh_prof_la-quadrature_monomial_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_monomial_3D.lo `test -f 'src/quadrature/quadrature_monomial_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_monomial_3D.C
-
-src/quadrature/libmesh_prof_la-quadrature_rules.lo: src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_rules.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_rules.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_rules.Tpo src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_rules.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_rules.C' object='src/quadrature/libmesh_prof_la-quadrature_rules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_rules.lo `test -f 'src/quadrature/quadrature_rules.C' || echo '$(srcdir)/'`src/quadrature/quadrature_rules.C
 
 src/quadrature/libmesh_prof_la-quadrature_simpson.lo: src/quadrature/quadrature_simpson.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_simpson.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_simpson.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_simpson.lo `test -f 'src/quadrature/quadrature_simpson.C' || echo '$(srcdir)/'`src/quadrature/quadrature_simpson.C
