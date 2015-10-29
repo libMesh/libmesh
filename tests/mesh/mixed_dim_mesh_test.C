@@ -495,7 +495,7 @@ protected:
     }
 
     // Let's set an interior_parent() this time for testing
-	_mesh->elem(4)->set_interior_parent(_mesh->elem(0));
+    _mesh->elem(4)->set_interior_parent(_mesh->elem(0));
 
     // libMesh will renumber, but we numbered according to its scheme
     // anyway. We do this because when we call uniformly_refine subsequenly,
@@ -503,9 +503,9 @@ protected:
     _mesh->prepare_for_use(false /*skip_renumber*/);
 
 #ifdef LIBMESH_ENABLE_AMR
-	    //Flag the bottom element for refinement
-	    _mesh->elem(0)->set_refinement_flag(Elem::REFINE);
-	    MeshRefinement(*_mesh).refine_and_coarsen_elements();
+    //Flag the bottom element for refinement
+    _mesh->elem(0)->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(*_mesh).refine_and_coarsen_elements();
 #endif
 
   }
@@ -627,44 +627,44 @@ protected:
   {
     _mesh = new SerialMesh(*TestCommWorld);
 
-    /*
-       We start with this
-
-	   (0,1)             (1,1)
-		 3---------2
-		 |        -|
-		 |      -  |
-		 |    -    |
-		 |  -      |
-		 |-        |
-	   (0,0) 0---------1 (1,0)
-		 |        -|
-		 |      -  |
-		 |    -    |
-		 |  -      |
-		 |-        |
-		 4---------5
-	   (0,-1)           (1,-1)
-
-
-            But the single element refinement should result
-            with this for the default max_mismatch = 0 case
-
-	   (0,1)             (1,1)
-		 3---------2
-		 |        -|
-		 |      -  |
-		 |    7----8
-		 |  - |  - |
-		 |-   |-   |
-	   (0,0) 0----6----1 (1,0)
-		 |  - |   -|
-		 |-   | -  |
-		10----9    |
-		 |  -      |
-		 |-        |
-		 4---------5
-	   (0,-1)           (1,-1)
+    /**
+     * We start with this
+     *
+     *  (0,1)             (1,1)
+     *        3---------2
+     *        |        -|
+     *        |      -  |
+     *        |    -    |
+     *        |  -      |
+     *        |-        |
+     *  (0,0) 0---------1 (1,0)
+     *        |        -|
+     *        |      -  |
+     *        |    -    |
+     *        |  -      |
+     *        |-        |
+     *        4---------5
+     *  (0,-1)            (1,-1)
+     *
+     *
+     * But the single element refinement should result
+     * with this for the default max_mismatch = 0 case
+     *
+     * (0,1)             (1,1)
+     *       3---------2
+     *       |        -|
+     *       |      -  |
+     *       |    7----8
+     *       |  - |  - |
+     *       |-   |-   |
+     * (0,0) 0----6----1 (1,0)
+     *       |  - |   -|
+     *       |-   | -  |
+     *      10----9    |
+     *       |  -      |
+     *       |-        |
+     *       4---------5
+     * (0,-1)           (1,-1)
      */
 
     _mesh->set_mesh_dimension(2);
