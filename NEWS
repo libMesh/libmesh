@@ -1,3 +1,73 @@
+0.9.4 -> 0.9.5
+  * Add interface to SLEPc's solver for generalized indefinite Hermitian eigenvalue problems (GHIEP).
+  * Refactor NumericVector::insert(), add PetscVector<T>::insert() specializations.
+  * Refactor NumericVector::add_vector().
+  * Add DiffContext::elem_solution_rate.
+  * Add systems_of_equations_ex7, solves large deformation elasticity.
+  * Add hand-coded TypeTensor<T>::inverse().
+  * Add static Elem::invalid_subdomain_id value.
+  * Bugfix in PatchRecoveryErrorEstimator.
+  * Miscellaneous improvements to FParser/FPOptimizer/JIT/AD code.
+  * Add/enhance unit tests for many classes.
+  * Add Elem::build(NODEELEM).
+  * Add CompositeFunction and CompositeFEMFunction.
+  * Add NameBasedIO, refactor UnstructuredMesh::read().
+  * Add 2D Grundmann-Moller quadrature rules for triangles.
+  * Improve OpenMP configure test.
+  * Return "invalid" ids from MeshBase::get_id_by_name(), BoundaryInfo::get_id_by_name() rather than erroring.
+  * Generalize the concept of "dimension" in Mesh with elem_dimensions std::set.
+  * Add the ParameterAccessor, ParameterMultiPointer class hierarchies.
+  * Fix bug in adjoints_ex3.
+  * Allow custom gdb command, enabling/disabling of gdb backtraces.
+  * Add mixed dimension mesh support to PointLocator.
+  * Add post-init() EquationSystems::add_system().
+  * Fix PointLocator bug in 2D case where elements aren't in x-y plane.
+  * Update AutoPtr to UniquePtr, add build support for Howard Hinnant's C++03 unique_ptr implementation.
+  * Miscellaneous bugfixes to support configuring with --with-dof-id-bytes=8.
+  * Add TopologyMap class, use to look up new nodes during refinement.
+  * Merge METIS/ParMETIS upstream patches from PETSc repo.
+  * Make METIS IDXTYPEWIDTH and REALTYPEWIDTH match dof_id_type and Real, respectively.
+  * Add MeshBase::{bnd,bid}_nodes_{begin,end}.
+  * Add systems_of_equations_ex8, solves linear elasticity with contact.
+  * Add GenericProjector, use to refactor FEM projection code.
+  * Add support for linking against VTK 6.2+.
+  * Add ErrorEstimatorType enum.
+  * Correctly compute second derivatives on non-affine elements.
+  * Tetgen is no longer enabled unless libmesh is configured with --disable-strict-lgpl.
+  * Miscellaneous bugfixes in RBEIMConstruction.
+  * Adding Optimization{Solver,System} classes, examples with nlopt and TAO instantiations.
+  * Add configure test for dlopen() and friends.
+  * Add embedding matrix for Prism15.
+  * Add EigenSparseLinearSolver::get_converged_reason().
+  * Add support for 1D elements in MeshTools::find_nodal_neighbors().
+  * Replace uses of "echo -n" in shell scripts with printf.
+  * Add support for PETSc 3.6.x release series.
+  * Use common FEMParameters in adjoints examples.
+  * Add support (and bugfixes) for mixed dimension refinement.
+  * Add NewmarkSolver support for FEMSystem-based codes.
+  * Add support for sparse CouplingMatrix.  Improves performance in many-sparsely-coupled-variables problems.
+  * Add {First,Second}OrderUnsteadySolver for FEMSystem-based codes.
+  * Support reading boundary conditions and lower-dimensional elements in Gmsh files.
+  * Refactoring/bugfixes in misc_ex3, use object-oriented NonlinearImplicitSystem interface.
+  * Upgrade Eigen distributed with libmesh to version 3.2.5.
+  * Add Cap'n Proto serialization support in reduced basis code and examples.
+  * Multiple bugfixes for the --enable-complex configuration.
+  * Miscellaneous bugfixes for single precision and long double precision builds.
+  * Detect version 3.6.0+ in SLEPc configure test.
+  * Add support for debug-enabled PETSc builds -- Vec{Get,Restore}ArrayRead(), fix redundant close() calls, etc.
+  * Parallel mesh repartitioning bugfixes/enhancements.
+  * Miscellaneous improvements to trilinos.m4, set more #defines for the parts of Trilinos which are available.
+  * Bugfixes for non-blocking send/receive requiring persistent buffers.
+  * Add support for user-defined subdomain id assignment in MeshExtrusion.
+  * Add MeshBase::ghost_elements_{begin,end} iterators.
+  * Add SolverConfiguration class to generalize the setting of complicated solver parameters.
+  * Add PetscSolverException, change LIBMESH_CHKERRABORT -> LIBMESH_CHKERR to throw exceptions rather than aborting.
+  * Miscellaneous improvements/bugfixes to Parsed*Function classes.
+  * Miscellaneous bugfixes in Trilinos support code, better include guards.
+  * Use C++11 "override" feature via libmesh_override where appropriate.
+  * Remove outdated QuadratureRules and ElementTypes functionality.
+  * Support "if (!foo)" for AutoPtr using safe_bool<T> utility function.
+
 0.9.3 -> 0.9.4
   * Pyramid13 elements
   * Subdivision surfaces
