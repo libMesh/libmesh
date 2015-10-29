@@ -405,6 +405,7 @@ BUILT_SOURCES = \
         point_locator_tree.h \
         pool_allocator.h \
         restore_warnings.h \
+        safe_bool.h \
         statistics.h \
         string_to_enum.h \
         timestamp.h \
@@ -1716,6 +1717,9 @@ pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+safe_bool.h: $(top_srcdir)/include/utils/safe_bool.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 statistics.h: $(top_srcdir)/include/utils/statistics.h
