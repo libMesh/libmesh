@@ -41,20 +41,58 @@ foreach( @cleaned_up_libs_first ) {
 #
 # Move from right to left and remove duplicate -L library paths
 #
-my @cleaned_up_libs;
+my @cleaned_up_libs_third;
 foreach( @cleaned_up_libs_second ) {
         $_ = remove_rel_paths($_);
         if( !($_=~/-L/) ) {
-                push @cleaned_up_libs, $_;
+                push @cleaned_up_libs_third, $_;
         }
-        elsif( !entry_exists($_,\@cleaned_up_libs) ) {
-                push @cleaned_up_libs, $_;
+        elsif( !entry_exists($_,\@cleaned_up_libs_third) ) {
+                push @cleaned_up_libs_third, $_;
         }
 }
+
+#
+# Move system library paths to the end of the link line.  This way,
+# there should be less risk of libmesh linking against something in
+# /usr/lib by accident.
+#
+my @cleaned_up_libs_fourth;
+my @system_lib_paths;
+foreach( @cleaned_up_libs_third ) {
+    $_ = remove_rel_paths($_);
+    # Discard libary paths starting with /usr.  This includes e.g.
+    # /usr/lib and /usr/local/lib, which are assumed to be system
+    # library paths.
+    if( ($_=~/-L\/usr/) )
+    {
+        push @system_lib_paths, $_;
+    }
+    # Discard -Wl,* flags starting with /usr
+    elsif( ($_=~/-Wl,.*\/usr/) )
+    {
+        push @system_lib_paths, $_;
+    }
+    # Otherwise, keep the path.
+    else
+    {
+        push @cleaned_up_libs_fourth, $_;
+    }
+}
+
+#
+# Push system lib paths onto the end of the list
+#
+foreach( @system_lib_paths )
+{
+    push @cleaned_up_libs_fourth, $_;
+}
+
 #
 # Print the new list of libraries and paths
 #
-print join( " ", @cleaned_up_libs );
+print join( " ", @cleaned_up_libs_fourth );
+
 
 #
 # Subroutines
