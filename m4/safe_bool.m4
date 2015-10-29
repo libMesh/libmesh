@@ -23,8 +23,8 @@ AC_DEFUN([CONFIGURE_SAFE_BOOL],
   public:
     bool boolean_test() const
     {
-      // This dummy class just returns false for operator bool()
-      return false;
+      // This dummy class just returns true for operator bool()
+      return true;
     }
   };
   ]], [[
@@ -52,8 +52,8 @@ AC_DEFUN([CONFIGURE_SAFE_BOOL],
   public:
     bool boolean_test() const
     {
-      // This dummy class just returns false for operator bool()
-      return false;
+      // This dummy class just returns true for operator bool()
+      return true;
     }
   };
   ]], [[
@@ -75,10 +75,16 @@ AC_DEFUN([CONFIGURE_SAFE_BOOL],
 
   AC_LANG_POP([C++])
 
-  # Set the header file define and print a message on compilation success
-  if (test x$safe_bool_comparison_works = xyes -a x$safe_bool_equality_fails = xyes); then
+  # safe_bool<T> must provide at least basic functionality.
+  if (test x$safe_bool_comparison_works = xyes); then
     AC_MSG_RESULT([<<< Compiling libmesh with safe_bool<T> support >>>])
   else
     AC_MSG_ERROR([libMesh requires a working safe_bool<T> implementation])
+  fi
+
+  # It would be *nice* if safe_bool prevented incorrect code from
+  # compiling, but we don't require that.
+  if (test x$safe_bool_equality_fails = xno); then
+    AC_MSG_WARN([safe_bool<T> does not prevent incorrect equality comparisons])
   fi
 ])

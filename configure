@@ -30016,8 +30016,8 @@ $as_echo_n "checking if safe_bool<T> allows boolean comparisons... " >&6; }
   public:
     bool boolean_test() const
     {
-      // This dummy class just returns false for operator bool()
-      return false;
+      // This dummy class just returns true for operator bool()
+      return true;
     }
   };
 
@@ -30064,8 +30064,8 @@ $as_echo_n "checking if safe_bool<T> prevents implicit conversions... " >&6; }
   public:
     bool boolean_test() const
     {
-      // This dummy class just returns false for operator bool()
-      return false;
+      // This dummy class just returns true for operator bool()
+      return true;
     }
   };
 
@@ -30108,12 +30108,19 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-  # Set the header file define and print a message on compilation success
-  if (test x$safe_bool_comparison_works = xyes -a x$safe_bool_equality_fails = xyes); then
+  # safe_bool<T> must provide at least basic functionality.
+  if (test x$safe_bool_comparison_works = xyes); then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiling libmesh with safe_bool<T> support >>>" >&5
 $as_echo "<<< Compiling libmesh with safe_bool<T> support >>>" >&6; }
   else
     as_fn_error $? "libMesh requires a working safe_bool<T> implementation" "$LINENO" 5
+  fi
+
+  # It would be *nice* if safe_bool prevented incorrect code from
+  # compiling, but we don't require that.
+  if (test x$safe_bool_equality_fails = xno); then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: safe_bool<T> does not prevent incorrect equality comparisons" >&5
+$as_echo "$as_me: WARNING: safe_bool<T> does not prevent incorrect equality comparisons" >&2;}
   fi
 
 # --------------------------------------------------------------
