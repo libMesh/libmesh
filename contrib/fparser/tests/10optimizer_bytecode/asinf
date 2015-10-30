@@ -1,0 +1,5 @@
+T=f
+V=x
+R=0,1,1
+F=asin(0.7)+x
+C=asinf(0.7)+x

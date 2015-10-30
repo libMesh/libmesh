@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex10.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;iostream&gt;
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
+        #include &lt;set&gt;
+        #include &lt;sstream&gt;
+        #include &lt;fstream&gt;
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/serial_mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/exact_solution.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/dirichlet_boundaries.h"
+        #include "libmesh/zero_function.h"
+        #include "libmesh/libmesh_logging.h"
+        #include "libmesh/getpot.h"
+        #include "libmesh/error_vector.h"
+        #include "libmesh/kelly_error_estimator.h"
+        #include "libmesh/mesh_refinement.h"
+        
+        using namespace libMesh;
+        
+        bool compare_elements(const SerialMesh& mesh1, const SerialMesh& mesh2);
+        void assemble_poisson(EquationSystems& es,
+                              const std::string& system_name);
+        void assemble_and_solve(MeshBase&, EquationSystems&);
+        
+        int main (int argc, char** argv)
+        {
+          START_LOG("Initialize and create cubes", "main");
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Create a GetPot object to parse the command line
+</div>
+
+<div class ="fragment">
+<pre>
+          GetPot command_line (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Check for proper calling arguments.
+</div>
+
+<div class ="fragment">
+<pre>
+          if (argc &lt; 3)
+            libmesh_error_msg("Usage:\n" &lt;&lt; "\t " &lt;&lt; argv[0] &lt;&lt; " -n 15");
+        
+</pre>
+</div>
+<div class = "comment">
+Brief message to the user regarding the program name
+and command line arguments.
+</div>
+
+<div class ="fragment">
+<pre>
+          else
+            {
+              std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+        
+              for (int i=1; i&lt;argc; i++)
+                std::cout &lt;&lt; " " &lt;&lt; argv[i];
+        
+              std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+            }
+        
+</pre>
+</div>
+<div class = "comment">
+This is 3D-only problem
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int dim = 3;
+        
+</pre>
+</div>
+<div class = "comment">
+Skip higher-dimensional examples on a lower-dimensional libMesh build
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(dim &lt;= LIBMESH_DIM, "3D support");
+        
+</pre>
+</div>
+<div class = "comment">
+Read number of elements used in each cube from command line
+</div>
+
+<div class ="fragment">
+<pre>
+          int ps = 10;
+          if ( command_line.search(1, "-n") )
+            ps = command_line.next(ps);
+        
+</pre>
+</div>
+<div class = "comment">
+Generate eight meshes that will be stitched
+</div>
+
+<div class ="fragment">
+<pre>
+          SerialMesh mesh (init.comm());
+          SerialMesh mesh1(init.comm());
+          SerialMesh mesh2(init.comm());
+          SerialMesh mesh3(init.comm());
+          SerialMesh mesh4(init.comm());
+          SerialMesh mesh5(init.comm());
+          SerialMesh mesh6(init.comm());
+          SerialMesh mesh7(init.comm());
+          MeshTools::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
+          MeshTools::Generation::build_cube (mesh1, ps, ps, ps,    0,  1,    0,  1,  0, 1, HEX8);
+          MeshTools::Generation::build_cube (mesh2, ps, ps, ps, -1,    0, -1,    0,  0, 1, HEX8);
+          MeshTools::Generation::build_cube (mesh3, ps, ps, ps,    0,  1, -1,    0,  0, 1, HEX8);
+          MeshTools::Generation::build_cube (mesh4, ps, ps, ps, -1,    0,    0,  1, -1, 0, HEX8);
+          MeshTools::Generation::build_cube (mesh5, ps, ps, ps,    0,  1,    0,  1, -1, 0, HEX8);
+          MeshTools::Generation::build_cube (mesh6, ps, ps, ps, -1,    0, -1,    0, -1, 0, HEX8);
+          MeshTools::Generation::build_cube (mesh7, ps, ps, ps,    0,  1, -1,    0, -1, 0, HEX8);
+        
+</pre>
+</div>
+<div class = "comment">
+Generate a single unstitched reference mesh
+</div>
+
+<div class ="fragment">
+<pre>
+          SerialMesh nostitch_mesh(init.comm());
+          MeshTools::Generation::build_cube (nostitch_mesh, ps*2, ps*2, ps*2, -1, 1, -1, 1, -1, 1, HEX8);
+          STOP_LOG("Initialize and create cubes", "main");
+        
+          START_LOG("Stitching", "main");
+</pre>
+</div>
+<div class = "comment">
+We stitch the meshes in a hierarchical way.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, true, false, false);
+          mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
+          mesh.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
+          mesh4.stitch_meshes(mesh5, 2, 4, TOLERANCE, true, true, false, false);
+          mesh6.stitch_meshes(mesh7, 2, 4, TOLERANCE, true, true, false, false);
+          mesh4.stitch_meshes(mesh6, 1, 3, TOLERANCE, true, true, false, false);
+          mesh.stitch_meshes(mesh4, 0, 5, TOLERANCE, true, true, false, false);
+          STOP_LOG("Stitching", "main");
+        
+          START_LOG("Initialize and solve systems", "main");
+          EquationSystems equation_systems_stitch (mesh);
+          assemble_and_solve(mesh, equation_systems_stitch);
+        
+          EquationSystems equation_systems_nostitch (nostitch_mesh);
+          assemble_and_solve(nostitch_mesh, equation_systems_nostitch);
+          STOP_LOG("Initialize and solve systems", "main");
+        
+          START_LOG("Result comparison", "main");
+          ExactSolution comparison(equation_systems_stitch);
+          comparison.attach_reference_solution(&equation_systems_nostitch);
+          comparison.compute_error("Poisson", "u");
+          Real error = comparison.l2_error("Poisson", "u");
+          libmesh_assert_less(error, TOLERANCE*sqrt(TOLERANCE));
+          libMesh::out &lt;&lt; "L2 error between stitched and non-stitched cases: " &lt;&lt; error &lt;&lt; std::endl;
+          STOP_LOG("Result comparison", "main");
+        
+          START_LOG("Output", "main");
+        #ifdef LIBMESH_HAVE_EXODUS_API
+          ExodusII_IO(mesh).write_equation_systems(
+                                                   "solution_stitch.exo",
+                                                   equation_systems_stitch);
+          ExodusII_IO(nostitch_mesh).write_equation_systems(
+                                                   "solution_nostitch.exo",
+                                                   equation_systems_nostitch);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+          STOP_LOG("Output", "main");
+        
+          return 0;
+        }
+        
+        void assemble_and_solve(MeshBase& mesh, EquationSystems& equation_systems)
+        {
+          mesh.print_info();
+        
+          LinearImplicitSystem& system =
+            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
+        
+          unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
+        
+          system.attach_assemble_function (assemble_poisson);
+        
+          std::set&lt;boundary_id_type&gt; boundary_ids;
+</pre>
+</div>
+<div class = "comment">
+the cube has boundaries IDs 0, 1, 2, 3, 4 and 5
+</div>
+
+<div class ="fragment">
+<pre>
+          for(int j = 0; j&lt;6; ++j)
+            {
+              boundary_ids.insert(j);
+            }
+        
+</pre>
+</div>
+<div class = "comment">
+Create a vector storing the variable numbers which the BC applies to
+</div>
+
+<div class ="fragment">
+<pre>
+          std::vector&lt;unsigned int&gt; variables(1);
+          variables[0] = u_var;
+        
+          ZeroFunction&lt;&gt; zf;
+          DirichletBoundary dirichlet_bc(boundary_ids,
+                                         variables,
+                                         &zf);
+          system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+        
+          equation_systems.init();
+          equation_systems.print_info();
+        
+        #ifdef LIBMESH_ENABLE_AMR
+          MeshRefinement mesh_refinement(mesh);
+        
+          mesh_refinement.refine_fraction()  = 0.7;
+          mesh_refinement.coarsen_fraction() = 0.3;
+          mesh_refinement.max_h_level()      = 5;
+        
+          const unsigned int max_r_steps = 2;
+        
+          for(unsigned int r_step=0; r_step&lt;=max_r_steps; r_step++)
+            {
+              system.solve();
+              if(r_step != max_r_steps)
+                {
+                  ErrorVector error;
+                  KellyErrorEstimator error_estimator;
+        
+                  error_estimator.estimate_error(system, error);
+        
+                  libMesh::out &lt;&lt; "Error estimate\nl2 norm = " &lt;&lt; error.l2_norm() &lt;&lt;
+                    "\nmaximum = " &lt;&lt; error.maximum() &lt;&lt; std::endl;
+        
+                  mesh_refinement.flag_elements_by_error_fraction (error);
+        
+                  mesh_refinement.refine_and_coarsen_elements();
+        
+                  equation_systems.reinit();
+                }
+            }
+        #else
+          system.solve();
+        #endif
+        }
+        
+        void assemble_poisson(EquationSystems& es,
+                              const std::string& system_name)
+        {
+          libmesh_assert_equal_to (system_name, "Poisson");
+        
+          const MeshBase& mesh = es.get_mesh();
+          const unsigned int dim = mesh.mesh_dimension();
+          LinearImplicitSystem& system = es.get_system&lt;LinearImplicitSystem&gt;("Poisson");
+        
+          const DofMap& dof_map = system.get_dof_map();
+        
+          FEType fe_type = dof_map.variable_type(0);
+          AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+          QGauss qrule (dim, FIFTH);
+          fe-&gt;attach_quadrature_rule (&qrule);
+          AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
+          QGauss qface(dim-1, FIFTH);
+          fe_face-&gt;attach_quadrature_rule (&qface);
+        
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
+        
+          DenseMatrix&lt;Number&gt; Ke;
+          DenseVector&lt;Number&gt; Fe;
+        
+          std::vector&lt;dof_id_type&gt; dof_indices;
+        
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+        
+          for ( ; el != end_el; ++el)
+            {
+              const Elem* elem = *el;
+        
+              dof_map.dof_indices (elem, dof_indices);
+        
+              fe-&gt;reinit (elem);
+        
+              Ke.resize (dof_indices.size(),
+                         dof_indices.size());
+        
+              Fe.resize (dof_indices.size());
+        
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+                {
+                  for (unsigned int i=0; i&lt;phi.size(); i++)
+                    {
+                      Fe(i) += JxW[qp]*phi[i][qp];
+                      for (unsigned int j=0; j&lt;phi.size(); j++)
+                        {
+                          Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                        }
+                    }
+                }
+        
+              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+        
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
+            }
+        }
+        
+        
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex10.C without comments: </h1> 
+<pre> 
+  #include &lt;iostream&gt;
+  #include &lt;algorithm&gt;
+  #include &lt;math.h&gt;
+  #include &lt;set&gt;
+  #include &lt;sstream&gt;
+  #include &lt;fstream&gt;
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/serial_mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exact_solution.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dirichlet_boundaries.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/zero_function.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_logging.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/error_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/kelly_error_estimator.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_refinement.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> compare_elements(<B><FONT COLOR="#228B22">const</FONT></B> SerialMesh&amp; mesh1, <B><FONT COLOR="#228B22">const</FONT></B> SerialMesh&amp; mesh2);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_and_solve(MeshBase&amp;, EquationSystems&amp;);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;Initialize and create cubes&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+    LibMeshInit init (argc, argv);
+  
+    GetPot command_line (argc, argv);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
+      libmesh_error_msg(<B><FONT COLOR="#BC8F8F">&quot;Usage:\n&quot;</FONT></B> &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\t &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -n 15&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+  
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+      }
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 3;
+  
+    libmesh_example_requires(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">int</FONT></B> ps = 10;
+    <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-n&quot;</FONT></B>) )
+      ps = command_line.next(ps);
+  
+    SerialMesh mesh (init.comm());
+    SerialMesh mesh1(init.comm());
+    SerialMesh mesh2(init.comm());
+    SerialMesh mesh3(init.comm());
+    SerialMesh mesh4(init.comm());
+    SerialMesh mesh5(init.comm());
+    SerialMesh mesh6(init.comm());
+    SerialMesh mesh7(init.comm());
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh1, ps, ps, ps,    0,  1,    0,  1,  0, 1, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh2, ps, ps, ps, -1,    0, -1,    0,  0, 1, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh3, ps, ps, ps,    0,  1, -1,    0,  0, 1, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh4, ps, ps, ps, -1,    0,    0,  1, -1, 0, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh5, ps, ps, ps,    0,  1,    0,  1, -1, 0, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh6, ps, ps, ps, -1,    0, -1,    0, -1, 0, HEX8);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh7, ps, ps, ps,    0,  1, -1,    0, -1, 0, HEX8);
+  
+    SerialMesh nostitch_mesh(init.comm());
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (nostitch_mesh, ps*2, ps*2, ps*2, -1, 1, -1, 1, -1, 1, HEX8);
+    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;Initialize and create cubes&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  
+    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;Stitching&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+    mesh.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, true, false, false);
+    mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
+    mesh.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
+    mesh4.stitch_meshes(mesh5, 2, 4, TOLERANCE, true, true, false, false);
+    mesh6.stitch_meshes(mesh7, 2, 4, TOLERANCE, true, true, false, false);
+    mesh4.stitch_meshes(mesh6, 1, 3, TOLERANCE, true, true, false, false);
+    mesh.stitch_meshes(mesh4, 0, 5, TOLERANCE, true, true, false, false);
+    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;Stitching&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  
+    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;Initialize and solve systems&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+    EquationSystems equation_systems_stitch (mesh);
+    assemble_and_solve(mesh, equation_systems_stitch);
+  
+    EquationSystems equation_systems_nostitch (nostitch_mesh);
+    assemble_and_solve(nostitch_mesh, equation_systems_nostitch);
+    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;Initialize and solve systems&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  
+    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;Result comparison&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+    ExactSolution comparison(equation_systems_stitch);
+    comparison.attach_reference_solution(&amp;equation_systems_nostitch);
+    comparison.compute_error(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    Real error = comparison.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    libmesh_assert_less(error, TOLERANCE*sqrt(TOLERANCE));
+    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2 error between stitched and non-stitched cases: &quot;</FONT></B> &lt;&lt; error &lt;&lt; std::endl;
+    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;Result comparison&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  
+    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;Output&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO(mesh).write_equation_systems(
+                                             <B><FONT COLOR="#BC8F8F">&quot;solution_stitch.exo&quot;</FONT></B>,
+                                             equation_systems_stitch);
+    ExodusII_IO(nostitch_mesh).write_equation_systems(
+                                             <B><FONT COLOR="#BC8F8F">&quot;solution_nostitch.exo&quot;</FONT></B>,
+                                             equation_systems_nostitch);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;Output&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_and_solve(MeshBase&amp; mesh, EquationSystems&amp; equation_systems)
+  {
+    mesh.print_info();
+  
+    LinearImplicitSystem&amp; system =
+      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST, LAGRANGE);
+  
+    system.attach_assemble_function (assemble_poisson);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; boundary_ids;
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j&lt;6; ++j)
+      {
+        boundary_ids.insert(j);
+      }
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; variables(1);
+    variables[0] = u_var;
+  
+    ZeroFunction&lt;&gt; zf;
+    DirichletBoundary dirichlet_bc(boundary_ids,
+                                   variables,
+                                   &amp;zf);
+    system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+  
+    equation_systems.init();
+    equation_systems.print_info();
+  
+  #ifdef LIBMESH_ENABLE_AMR
+    MeshRefinement mesh_refinement(mesh);
+  
+    mesh_refinement.refine_fraction()  = 0.7;
+    mesh_refinement.coarsen_fraction() = 0.3;
+    mesh_refinement.max_h_level()      = 5;
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps = 2;
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;=max_r_steps; r_step++)
+      {
+        system.solve();
+        <B><FONT COLOR="#A020F0">if</FONT></B>(r_step != max_r_steps)
+          {
+            ErrorVector error;
+            KellyErrorEstimator error_estimator;
+  
+            error_estimator.estimate_error(system, error);
+  
+            <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Error estimate\nl2 norm = &quot;</FONT></B> &lt;&lt; error.l2_norm() &lt;&lt;
+              <B><FONT COLOR="#BC8F8F">&quot;\nmaximum = &quot;</FONT></B> &lt;&lt; error.maximum() &lt;&lt; std::endl;
+  
+            mesh_refinement.flag_elements_by_error_fraction (error);
+  
+            mesh_refinement.refine_and_coarsen_elements();
+  
+            equation_systems.reinit();
+          }
+      }
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
+    system.solve();
+  #endif
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+  {
+    libmesh_assert_equal_to (system_name, <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+  
+    FEType fe_type = dof_map.variable_type(0);
+    AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+    QGauss qrule (dim, FIFTH);
+    fe-&gt;attach_quadrature_rule (&amp;qrule);
+    AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
+    QGauss qface(dim-1, FIFTH);
+    fe_face-&gt;attach_quadrature_rule (&amp;qface);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+  
+    DenseMatrix&lt;Number&gt; Ke;
+    DenseVector&lt;Number&gt; Fe;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+        dof_map.dof_indices (elem, dof_indices);
+  
+        fe-&gt;reinit (elem);
+  
+        Ke.resize (dof_indices.size(),
+                   dof_indices.size());
+  
+        Fe.resize (dof_indices.size());
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+              {
+                Fe(i) += JxW[qp]*phi[i][qp];
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+                  {
+                    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  }
+              }
+          }
+  
+        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+  
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+        system.rhs-&gt;add_vector    (Fe, dof_indices);
+      }
+  }
+  
+  
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex10:
+*   example-opt -n 2 
+***************************************************************
+ 
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/miscellaneous/miscellaneous_ex10/.libs/example-opt -n 2
+
+In SerialMesh::stitch_meshes:
+This mesh has 9 nodes on boundary 2.
+Other mesh has 9 nodes on boundary 4.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 9 matching nodes.
+
+In SerialMesh::stitch_meshes:
+This mesh has 9 nodes on boundary 2.
+Other mesh has 9 nodes on boundary 4.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 9 matching nodes.
+
+In SerialMesh::stitch_meshes:
+This mesh has 15 nodes on boundary 1.
+Other mesh has 15 nodes on boundary 3.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 15 matching nodes.
+
+In SerialMesh::stitch_meshes:
+This mesh has 9 nodes on boundary 2.
+Other mesh has 9 nodes on boundary 4.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 9 matching nodes.
+
+In SerialMesh::stitch_meshes:
+This mesh has 9 nodes on boundary 2.
+Other mesh has 9 nodes on boundary 4.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 9 matching nodes.
+
+In SerialMesh::stitch_meshes:
+This mesh has 15 nodes on boundary 1.
+Other mesh has 15 nodes on boundary 3.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 15 matching nodes.
+
+In SerialMesh::stitch_meshes:
+This mesh has 25 nodes on boundary 0.
+Other mesh has 25 nodes on boundary 5.
+Minimum edge length on both surfaces is 0.5.
+In SerialMesh::stitch_meshes:
+Found 25 matching nodes.
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=125
+    n_local_nodes()=125
+  n_elem()=64
+    n_local_elem()=64
+    n_active_elem()=64
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=125
+    n_local_dofs()=125
+    n_constrained_dofs()=98
+    n_local_constrained_dofs()=98
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 17.576
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 98
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+Error estimate
+l2 norm = 1.15141
+maximum = 0.23987
+Error estimate
+l2 norm = 0.721321
+maximum = 0.0504688
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=125
+    n_local_nodes()=125
+  n_elem()=64
+    n_local_elem()=64
+    n_active_elem()=64
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=125
+    n_local_dofs()=125
+    n_constrained_dofs()=98
+    n_local_constrained_dofs()=98
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 17.576
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 98
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+Error estimate
+l2 norm = 1.15141
+maximum = 0.23987
+Error estimate
+l2 norm = 0.721321
+maximum = 0.0504688
+L2 error between stitched and non-stitched cases: 5.08152e-14
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:09 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=3.61008, Active time=3.53527                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     6          0.0029      0.000479    0.0029      0.000479    0.08     0.08     |
+|   build_constraint_matrix()        8000       0.0149      0.000002    0.0149      0.000002    0.42     0.42     |
+|   build_sparsity()                 6          0.0396      0.006603    0.0460      0.007674    1.12     1.30     |
+|   cnstrn_elem_mat_vec()            8000       0.0310      0.000004    0.0310      0.000004    0.88     0.88     |
+|   create_dof_constraints()         6          0.0885      0.014751    0.1030      0.017174    2.50     2.91     |
+|   distribute_dofs()                6          0.0030      0.000503    0.0129      0.002144    0.09     0.36     |
+|   dof_indices()                    134088     0.1546      0.000001    0.1546      0.000001    4.37     4.37     |
+|   enforce_constraints_exactly()    4          0.0006      0.000154    0.0006      0.000154    0.02     0.02     |
+|   old_dof_indices()                15744      0.0098      0.000001    0.0098      0.000001    0.28     0.28     |
+|   prepare_send_list()              6          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         6          0.0098      0.001640    0.0098      0.001640    0.28     0.28     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          2          0.0090      0.004505    0.0143      0.007164    0.25     0.41     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               2          0.0114      0.005680    0.0114      0.005680    0.32     0.32     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        72728      0.1596      0.000002    0.1596      0.000002    4.51     4.51     |
+|   init_shape_functions()           61255      0.4312      0.000007    0.4312      0.000007    12.20    12.20    |
+|   inverse_map()                    194180     0.5835      0.000003    0.5835      0.000003    16.50    16.50    |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             72728      0.1281      0.000002    0.1281      0.000002    3.62     3.62     |
+|   compute_face_map()               2784       0.0032      0.000001    0.0032      0.000001    0.09     0.09     |
+|   init_face_shape_functions()      4          0.0000      0.000009    0.0000      0.000009    0.00     0.00     |
+|   init_reference_to_physical_map() 61255      0.4500      0.000007    0.4500      0.000007    12.73    12.73    |
+|                                                                                                                 |
+| JumpErrorEstimator                                                                                              |
+|   estimate_error()                 4          0.0367      0.009175    0.1659      0.041470    1.04     4.69     |
+|                                                                                                                 |
+| LocationMap                                                                                                     |
+|   find()                           54656      0.0198      0.000000    0.0198      0.000000    0.56     0.56     |
+|   init()                           8          0.0020      0.000254    0.0020      0.000254    0.06     0.06     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   contract()                       4          0.0002      0.000058    0.0009      0.000237    0.01     0.03     |
+|   find_neighbors()                 13         0.0216      0.001658    0.0216      0.001658    0.61     0.61     |
+|   renumber_nodes_and_elem()        44         0.0023      0.000051    0.0023      0.000051    0.06     0.06     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         2          0.0001      0.000030    0.0257      0.012875    0.00     0.73     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _coarsen_elements()              8          0.0002      0.000027    0.0002      0.000027    0.01     0.01     |
+|   _refine_elements()               8          0.0402      0.005026    0.1037      0.012962    1.14     2.93     |
+|   add_point()                      54656      0.0344      0.000001    0.0588      0.000001    0.97     1.66     |
+|   make_coarsening_compatible()     8          0.0018      0.000226    0.0018      0.000226    0.05     0.05     |
+|   make_flags_parallel_consistent() 12         0.0016      0.000131    0.0016      0.000131    0.04     0.04     |
+|   make_refinement_compatible()     8          0.0001      0.000018    0.0001      0.000018    0.00     0.00     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     9          0.0003      0.000035    0.0003      0.000035    0.01     0.01     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      6          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               20         0.0005      0.000023    0.0005      0.000023    0.01     0.01     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          6          0.0323      0.005389    0.0323      0.005389    0.91     0.91     |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  1          0.0095      0.009507    0.0095      0.009507    0.27     0.27     |
+|   operator()                       83520      0.2518      0.000003    0.5323      0.000006    7.12     15.06    |
+|                                                                                                                 |
+| ProjectVector                                                                                                   |
+|   operator()                       4          0.0230      0.005755    0.0631      0.015779    0.65     1.79     |
+|                                                                                                                 |
+| SerialMesh                                                                                                      |
+|   stitch_meshes()                  7          0.0015      0.000207    0.0015      0.000217    0.04     0.04     |
+|                                                                                                                 |
+| StatisticsVector                                                                                                |
+|   maximum()                        4          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       6          0.1067      0.017787    0.2784      0.046392    3.02     7.87     |
+|   project_vector()                 4          0.0049      0.001219    0.0737      0.018431    0.14     2.09     |
+|                                                                                                                 |
+| main                                                                                                            |
+|   Initialize and create cubes      1          0.0826      0.082617    0.0835      0.083475    2.34     2.36     |
+|   Initialize and solve systems     1          0.0117      0.011737    0.8603      0.860268    0.33     24.33    |
+|   Output                           1          0.0007      0.000722    0.0265      0.026473    0.02     0.75     |
+|   Result comparison                1          0.7180      0.717988    2.6342      2.634202    20.31    74.51    |
+|   Stitching                        1          0.0000      0.000012    0.0015      0.001531    0.00     0.04     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            823833     3.5353                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex10:
+*   example-opt -n 2 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

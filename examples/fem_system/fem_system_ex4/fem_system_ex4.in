@@ -1,0 +1,26 @@
+# The global FEM error tolerance at each timestep
+# Make this nonzero to solve to a specified tolerance
+# This will probably break with KellyErrorIndicator
+# const Real global_tolerance = 1.e-3;
+global_tolerance = 0.0
+
+# The desired number of active mesh elements
+# Make this nonzero to solve to a specified mesh size
+n_elements = 1200
+
+# The coarse grid size from which to start adaptivity
+coarsegridsize = 20
+
+# The maximum number of adaptive steps per timestep
+max_adaptivesteps = 2
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false
+
+# Solve the 2D or 3D problem
+dimension = 2
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-7
+
+relative_residual_tolerance = 1.e-7

@@ -1,0 +1,174 @@
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  outline: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+pre,tt {
+    font-family: courier, "courier new", monospace;
+}
+
+body {
+    color: #434343;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size:   0.8em;
+    line-height: 1.2em;
+    background: #444 url('images/bg.png');
+}
+
+h1 {
+  font-family: 'Capriola', Tahoma, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 1.7em;
+  line-height: 1.2em;
+  color: #383838;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-family: 'Capriola', Tahoma, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 1.4em;
+  line-height: 1.2em;
+  color: #383838;
+  margin-bottom: 6px;
+}
+
+h3 {
+  font-family: 'Capriola', Tahoma, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 1.2em;
+  line-height: 1.2em;
+  color: #383838;
+  margin-bottom: 4px;
+}
+
+a {
+    color: #5b77a4;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #7d94bb;
+}
+
+/* The fragment defines a background color for code chunks */
+div.fragment {
+  background           : #ddd;
+  color                : navy;
+  font-family          : courier, "courier new", monospace;
+  font-size            : 1em;
+  margin-left          : 0em;
+  margin-right         : 0em;
+  padding-left         : 0em;
+  padding-right        : 0em;
+  margin-top           : 0em;
+  margin-bottom        : 0em;
+  padding-top          : 0.1em;
+  padding-bottom       : 0.1em;
+  border-style         : solid;
+  border-width         : 0;
+  border-color         : #000000;
+}
+
+
+#w {
+  display: block;
+  margin: 0 auto;
+  margin-top: 5px;
+}
+
+#content {
+  display: block;
+  background: #fff;
+  padding: 10px 10px;
+}
+
+#logo { display: block; border: 0px solid #232323; border-bottom-width: 0; }
+#logobg {
+  display: block;
+  width: 100%;
+  height: 208px;
+  background: url('images/libmesh_mesh_small.png') top left no-repeat;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* top navigation */
+#navigation {
+  display: block;
+  height: 35px;
+  background-color: #131313;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#202020), to(#131313));
+  background-image: -webkit-linear-gradient(top, #202020, #131313);
+  background-image: -moz-linear-gradient(top, #202020, #131313);
+  background-image: -ms-linear-gradient(top, #202020, #131313);
+  background-image: -o-linear-gradient(top, #202020, #131313);
+  background-image: linear-gradient(top, #202020, #131313);
+}
+
+#navigation ul { list-style: none; padding: 0px 7px; }
+
+#navigation ul li { display: inline; float: left; }
+#navigation ul li a {
+  display: block;
+  padding: 0 8px;
+  color: #fff;
+  font-size: 1.1em;
+  text-decoration: none;
+  line-height: 35px;
+  font-weight: bold;
+  margin-right: 6px;
+  text-shadow: 1px 1px 1px #000;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+#navigation ul li a:hover { color: #a8d6e7; }
+
+/* hidden fixed navigation */
+#fixedbar {
+  display: none;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  background: rgba(0,0,0,0.75);
+  overflow: hidden;
+}
+
+#fixednav {
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0px 25px;
+}
+
+#fixednav li {list-style: none; }
+
+#fixednav li a {
+  display: block;
+  float: left;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #96aed8;
+  line-height: 40px;
+  text-decoration: none;
+  padding: 0px 4px;
+  margin-right: 6px;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+
+#fixednav li a:hover {
+  color: #fff;
+  background: rgba(0,0,0,0.3);
+}

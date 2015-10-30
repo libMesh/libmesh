@@ -1,0 +1,5 @@
+T=d
+V=x
+R=-10, 10, 0.25
+F=ceil(x)
+C=ceil(x)

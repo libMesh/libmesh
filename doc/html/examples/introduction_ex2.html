@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file introduction_ex2.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;iostream&gt;
+</pre>
+</div>
+<div class = "comment">
+Basic include file needed for the mesh functionality.
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+</pre>
+</div>
+<div class = "comment">
+Include file that defines various mesh generation utilities
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/mesh_generation.h"
+</pre>
+</div>
+<div class = "comment">
+Include file that defines (possibly multiple) systems of equations.
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/equation_systems.h"
+</pre>
+</div>
+<div class = "comment">
+Include files that define a simple steady system
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/transient_system.h"
+        #include "libmesh/explicit_system.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        
+        
+        int main (int argc, char** argv)
+        {
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this 2D example if libMesh was compiled as 1D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(2 &lt;= LIBMESH_DIM, "2D support");
+        
+</pre>
+</div>
+<div class = "comment">
+A brief message to the user to inform her of the
+exact name of the program being run, and its command line.
+</div>
+
+<div class ="fragment">
+<pre>
+          std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+          for (int i=1; i&lt;argc; i++)
+            std::cout &lt;&lt; " " &lt;&lt; argv[i];
+          std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+        
+</pre>
+</div>
+<div class = "comment">
+Create a mesh, with dimension to be overridden later, distributed
+across the default MPI communicator.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh(init.comm());
+        
+</pre>
+</div>
+<div class = "comment">
+Use the MeshTools::Generation mesh generator to create a uniform
+2D grid on the unit square.  By default a mesh of QUAD4
+elements will be created.  We instruct the mesh generator
+to build a mesh of 5x5 elements.
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshTools::Generation::build_square (mesh, 5, 5);
+        
+</pre>
+</div>
+<div class = "comment">
+Create an equation systems object. This object can
+contain multiple systems of different
+flavors for solving loosely coupled physics.  Each system can
+contain multiple variables of different approximation orders.
+Here we will simply create a single system with one variable.
+Later on, other flavors of systems will be introduced.  For the
+moment, we use the general system.
+The EquationSystems object needs a reference to the mesh
+object, so the order of construction here is important.
+</div>
+
+<div class ="fragment">
+<pre>
+          EquationSystems equation_systems (mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+Add a flag "test" that is visible for all systems.  This
+helps in inter-system communication.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.parameters.set&lt;bool&gt; ("test") = true;
+        
+</pre>
+</div>
+<div class = "comment">
+Set a simulation-specific parameter visible for all systems.
+This helps in inter-system-communication.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.parameters.set&lt;Real&gt; ("dummy") = 42.;
+        
+</pre>
+</div>
+<div class = "comment">
+Set another simulation-specific parameter
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.parameters.set&lt;Real&gt; ("nobody") = 0.;
+        
+</pre>
+</div>
+<div class = "comment">
+Now we declare the system and its variables.
+We begin by adding a "TransientLinearImplicitSystem" to the
+EquationSystems object, and we give it the name
+"Simple System".
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; ("Simple System");
+        
+</pre>
+</div>
+<div class = "comment">
+Adds the variable "u" to "Simple System".  "u"
+will be approximated using first-order approximation.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.get_system("Simple System").add_variable("u", FIRST);
+        
+</pre>
+</div>
+<div class = "comment">
+Next we'll by add an "ExplicitSystem" to the
+EquationSystems object, and we give it the name
+"Complex System".
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.add_system&lt;ExplicitSystem&gt; ("Complex System");
+        
+</pre>
+</div>
+<div class = "comment">
+Give "Complex System" three variables -- each with a different approximation
+order.  Variables "c" and "T" will use first-order Lagrange approximation,
+while variable "dv" will use a second-order discontinuous
+approximation space.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.get_system("Complex System").add_variable("c", FIRST);
+          equation_systems.get_system("Complex System").add_variable("T", FIRST);
+          equation_systems.get_system("Complex System").add_variable("dv", SECOND, MONOMIAL);
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the data structures for the equation system.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.init();
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the mesh to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
+</pre>
+</div>
+<div class = "comment">
+Prints information about the system to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Write the equation system if the user specified an
+output file name.  Note that there are two possible
+formats to write to.  Specifying WRITE will
+create a formatted ASCII file.  Optionally, you can specify
+ENCODE and get an XDR-encoded binary file.
+
+<br><br>We will write the data, clear the object, and read the file
+we just wrote.  This is simply to demonstrate capability.
+Note that you might use this in an application to periodically
+dump the state of your simulation.  You can then restart from
+this data later.
+</div>
+
+<div class ="fragment">
+<pre>
+          if (argc &gt; 1)
+            if (argv[1][0] != '-')
+              {
+                std::cout &lt;&lt; "&lt;&lt;&lt; Writing system to file " &lt;&lt; argv[1]
+                          &lt;&lt; std::endl;
+        
+</pre>
+</div>
+<div class = "comment">
+Write the system.
+</div>
+
+<div class ="fragment">
+<pre>
+                equation_systems.write (argv[1], WRITE);
+        
+</pre>
+</div>
+<div class = "comment">
+Clear the equation systems data structure.
+</div>
+
+<div class ="fragment">
+<pre>
+                equation_systems.clear ();
+        
+                std::cout &lt;&lt; "&gt;&gt;&gt; Reading system from file " &lt;&lt; argv[1]
+                          &lt;&lt; std::endl &lt;&lt; std::endl;
+        
+</pre>
+</div>
+<div class = "comment">
+Read the file we just wrote.  This better
+work!
+</div>
+
+<div class ="fragment">
+<pre>
+                equation_systems.read (argv[1], READ);
+        
+</pre>
+</div>
+<div class = "comment">
+Print the information again.
+</div>
+
+<div class ="fragment">
+<pre>
+                equation_systems.print_info();
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+All done.  libMesh objects are destroyed here.  Because the
+LibMeshInit object was created first, its destruction occurs
+last, and it's destructor finalizes any external libraries and
+checks for leaked memory.
+</div>
+
+<div class ="fragment">
+<pre>
+          return 0;
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file introduction_ex2.C without comments: </h1> 
+<pre> 
+  #include &lt;iostream&gt;
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/transient_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/explicit_system.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+    libmesh_example_requires(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+  
+    Mesh mesh(init.comm());
+  
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 5, 5);
+  
+    EquationSystems equation_systems (mesh);
+  
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt; (<B><FONT COLOR="#BC8F8F">&quot;test&quot;</FONT></B>) = true;
+  
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;dummy&quot;</FONT></B>) = 42.;
+  
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;nobody&quot;</FONT></B>) = 0.;
+  
+    equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Simple System&quot;</FONT></B>);
+  
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Simple System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
+  
+    equation_systems.add_system&lt;ExplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>);
+  
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;c&quot;</FONT></B>, FIRST);
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;T&quot;</FONT></B>, FIRST);
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;dv&quot;</FONT></B>, SECOND, MONOMIAL);
+  
+    equation_systems.init();
+  
+    mesh.print_info();
+    equation_systems.print_info();
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &gt; 1)
+      <B><FONT COLOR="#A020F0">if</FONT></B> (argv[1][0] != <B><FONT COLOR="#BC8F8F">'-'</FONT></B>)
+        {
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;&lt;&lt;&lt; Writing system to file &quot;</FONT></B> &lt;&lt; argv[1]
+                    &lt;&lt; std::endl;
+  
+          equation_systems.write (argv[1], WRITE);
+  
+          equation_systems.clear ();
+  
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;&gt;&gt;&gt; Reading system from file &quot;</FONT></B> &lt;&lt; argv[1]
+                    &lt;&lt; std::endl &lt;&lt; std::endl;
+  
+          equation_systems.read (argv[1], READ);
+  
+          equation_systems.print_info();
+        }
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example introduction_ex2:
+*   example-opt  
+***************************************************************
+ 
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex2/.libs/example-opt
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=36
+    n_local_nodes()=36
+  n_elem()=25
+    n_local_elem()=25
+    n_active_elem()=25
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #1, "Complex System"
+    Type "Explicit"
+    Variables={ "c" "T" } "dv" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=222
+    n_local_dofs()=222
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #0, "Simple System"
+    Type "TransientLinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:55 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.086086, Active time=0.000876                                              |
+ -------------------------------------------------------------------------------------------------------------
+| Event                          nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list() 2          0.0000      0.000018    0.0000      0.000018    4.22     4.22     |
+|   build_sparsity()             1          0.0001      0.000147    0.0002      0.000173    16.78    19.75    |
+|   create_dof_constraints()     2          0.0000      0.000023    0.0000      0.000023    5.25     5.25     |
+|   distribute_dofs()            2          0.0001      0.000050    0.0003      0.000126    11.42    28.77    |
+|   dof_indices()                25         0.0000      0.000001    0.0000      0.000001    2.51     2.51     |
+|   prepare_send_list()          2          0.0000      0.000000    0.0000      0.000000    0.11     0.11     |
+|   reinit()                     2          0.0002      0.000075    0.0002      0.000075    17.24    17.24    |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()             1          0.0002      0.000167    0.0002      0.000167    19.06    19.06    |
+|   renumber_nodes_and_elem()    2          0.0000      0.000012    0.0000      0.000012    2.74     2.74     |
+|                                                                                                             |
+| MeshTools::Generation                                                                                       |
+|   build_cube()                 1          0.0002      0.000161    0.0002      0.000161    18.38    18.38    |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                  2          0.0000      0.000000    0.0000      0.000000    0.11     0.11     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()           1          0.0000      0.000019    0.0000      0.000019    2.17     2.17     |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                        43         0.0009                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example introduction_ex2:
+*   example-opt  
+***************************************************************
+ 
+***************************************************************
+* Running Example introduction_ex2:
+*   example-opt eqn_sys.dat 
+***************************************************************
+ 
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex2/.libs/example-opt eqn_sys.dat
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=36
+    n_local_nodes()=36
+  n_elem()=25
+    n_local_elem()=25
+    n_active_elem()=25
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #1, "Complex System"
+    Type "Explicit"
+    Variables={ "c" "T" } "dv" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=222
+    n_local_dofs()=222
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #0, "Simple System"
+    Type "TransientLinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+<<< Writing system to file eqn_sys.dat
+>>> Reading system from file eqn_sys.dat
+
+ EquationSystems
+  n_systems()=2
+   System #0, "Complex System"
+    Type "Explicit"
+    Variables={ "c" "T" } "dv" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=222
+    n_local_dofs()=222
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #1, "Simple System"
+    Type "TransientLinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:56 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.08942, Active time=0.007028                                               |
+ -------------------------------------------------------------------------------------------------------------
+| Event                          nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list() 4          0.0001      0.000015    0.0001      0.000015    0.83     0.83     |
+|   build_sparsity()             2          0.0002      0.000109    0.0003      0.000128    3.10     3.64     |
+|   create_dof_constraints()     4          0.0001      0.000017    0.0001      0.000017    0.94     0.94     |
+|   distribute_dofs()            4          0.0002      0.000040    0.0004      0.000102    2.31     5.81     |
+|   dof_indices()                50         0.0000      0.000001    0.0000      0.000001    0.51     0.51     |
+|   prepare_send_list()          4          0.0000      0.000000    0.0000      0.000000    0.03     0.03     |
+|   reinit()                     4          0.0002      0.000061    0.0002      0.000061    3.49     3.49     |
+|                                                                                                             |
+| EquationSystems                                                                                             |
+|   read()                       1          0.0013      0.001345    0.0024      0.002403    19.14    34.19    |
+|   update()                     1          0.0001      0.000113    0.0001      0.000113    1.61     1.61     |
+|   write()                      1          0.0012      0.001198    0.0029      0.002852    17.05    40.58    |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()             1          0.0001      0.000142    0.0001      0.000142    2.02     2.02     |
+|   renumber_nodes_and_elem()    2          0.0000      0.000013    0.0000      0.000013    0.36     0.36     |
+|                                                                                                             |
+| MeshCommunication                                                                                           |
+|   assign_global_indices()      2          0.0015      0.000735    0.0015      0.000737    20.90    20.99    |
+|                                                                                                             |
+| MeshTools::Generation                                                                                       |
+|   build_cube()                 1          0.0002      0.000169    0.0002      0.000169    2.40     2.40     |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                  12         0.0000      0.000000    0.0000      0.000000    0.03     0.03     |
+|   probe()                      24         0.0001      0.000004    0.0001      0.000004    1.37     1.37     |
+|   receive()                    16         0.0001      0.000008    0.0001      0.000008    1.84     1.94     |
+|   send()                       16         0.0015      0.000094    0.0015      0.000094    21.30    21.30    |
+|   send_receive()               8          0.0000      0.000000    0.0000      0.000000    0.04     0.04     |
+|                                                                                                             |
+| Parallel::Request                                                                                           |
+|   wait()                       16         0.0000      0.000002    0.0000      0.000002    0.48     0.48     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()           1          0.0000      0.000019    0.0000      0.000019    0.27     0.27     |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                        174        0.0070                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example introduction_ex2:
+*   example-opt eqn_sys.dat 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

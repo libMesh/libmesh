@@ -1,0 +1,3839 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file assembly.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef __assembly_h__
+        #define __assembly_h__
+        
+</pre>
+</div>
+<div class = "comment">
+rbOOmit includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/rb_parameters.h"
+        #include "libmesh/rb_theta.h"
+        #include "libmesh/rb_theta_expansion.h"
+        #include "libmesh/rb_assembly_expansion.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in bits from the libMesh namespace.
+Just the bits we're using, since this is a header.
+</div>
+
+<div class ="fragment">
+<pre>
+        using libMesh::ElemAssembly;
+        using libMesh::FEMContext;
+        using libMesh::Number;
+        using libMesh::Real;
+        using libMesh::RBAssemblyExpansion;
+        using libMesh::RBParameters;
+        using libMesh::RBTheta;
+        using libMesh::RBThetaExpansion;
+        using libMesh::numeric_index_type;
+        using libMesh::System;
+        using libMesh::Node;
+        
+</pre>
+</div>
+<div class = "comment">
+boundary IDs
+</div>
+
+<div class ="fragment">
+<pre>
+        #define BOUNDARY_ID_MIN_Z 0
+        #define BOUNDARY_ID_MIN_Y 1
+        #define BOUNDARY_ID_MAX_X 2
+        #define BOUNDARY_ID_MAX_Y 3
+        #define BOUNDARY_ID_MIN_X 4
+        #define BOUNDARY_ID_MAX_Z 5
+        #define NODE_BOUNDARY_ID 10
+        
+        class ElasticityRBConstruction;
+        
+</pre>
+</div>
+<div class = "comment">
+Kronecker delta function
+</div>
+
+<div class ="fragment">
+<pre>
+        inline Real kronecker_delta(unsigned int i,
+                                    unsigned int j);
+        
+</pre>
+</div>
+<div class = "comment">
+Rank-4 tensor for elasticity
+</div>
+
+<div class ="fragment">
+<pre>
+        Real elasticity_tensor(unsigned int i,
+                               unsigned int j,
+                               unsigned int k,
+                               unsigned int l);
+        
+        struct ElasticityAssembly : ElemAssembly
+        {
+        
+          ElasticityAssembly(ElasticityRBConstruction& rb_sys_in)
+            :
+            rb_sys(rb_sys_in)
+          {}
+        
+          /**
+           * The ElasticityRBConstruction object that will use this assembly.
+           */
+          ElasticityRBConstruction& rb_sys;
+        };
+        
+        struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& ) { return 1.; } };
+        struct AssemblyA0 : ElasticityAssembly
+        {
+        
+          AssemblyA0(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+The interior assembly operator
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void interior_assembly(FEMContext &c);
+        
+        };
+        
+        struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("x_scaling"); } };
+        struct AssemblyA1 : ElasticityAssembly
+        {
+        
+          AssemblyA1(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+The interior assembly operator
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void interior_assembly(FEMContext &c);
+        
+        };
+        
+        struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return 1./mu.get_value("x_scaling"); } };
+        struct AssemblyA2 : ElasticityAssembly
+        {
+        
+          AssemblyA2(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+The interior assembly operator
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void interior_assembly(FEMContext &c);
+        
+        };
+        
+        struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("load_Fx"); } };
+        struct AssemblyF0 : ElasticityAssembly
+        {
+          AssemblyF0(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+Apply a traction
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void boundary_assembly(FEMContext &c);
+        
+        };
+        
+        struct ThetaF1 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("load_Fy"); } };
+        struct AssemblyF1 : ElasticityAssembly
+        {
+          AssemblyF1(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+Apply a traction
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void boundary_assembly(FEMContext &c);
+        };
+        
+        struct ThetaF2 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("load_Fz"); } };
+        struct AssemblyF2 : ElasticityAssembly
+        {
+          AssemblyF2(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+Apply a traction
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void boundary_assembly(FEMContext &c);
+        };
+        
+        struct ThetaPointLoadX : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fx"); } };
+        struct AssemblyPointLoadX : ElemAssembly
+        {
+          AssemblyPointLoadX()
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+Apply a point load
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void
+            get_nodal_rhs_values(
+              std::map&lt;numeric_index_type, Number&gt;& values,
+              const System& sys,
+              const Node& node);
+        
+        };
+        
+        struct ThetaPointLoadY : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fy"); } };
+        struct AssemblyPointLoadY : ElemAssembly
+        {
+          AssemblyPointLoadY()
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+Apply a point load
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void
+            get_nodal_rhs_values(
+              std::map&lt;numeric_index_type, Number&gt;& values,
+              const System& sys,
+              const Node& node);
+        
+        };
+        
+        struct ThetaPointLoadZ : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fz"); } };
+        struct AssemblyPointLoadZ : ElemAssembly
+        {
+          AssemblyPointLoadZ()
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+Apply a point load
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void
+            get_nodal_rhs_values(
+              std::map&lt;numeric_index_type, Number&gt;& values,
+              const System& sys,
+              const Node& node);
+        
+        };
+        
+        struct InnerProductAssembly : ElasticityAssembly
+        {
+        
+          InnerProductAssembly(ElasticityRBConstruction& rb_sys_in)
+            :
+            ElasticityAssembly(rb_sys_in)
+          {}
+        
+</pre>
+</div>
+<div class = "comment">
+The interior assembly operator
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void interior_assembly(FEMContext &c);
+        
+        };
+        
+</pre>
+</div>
+<div class = "comment">
+Define an RBThetaExpansion class for this PDE
+</div>
+
+<div class ="fragment">
+<pre>
+        struct ElasticityThetaExpansion : RBThetaExpansion
+        {
+        
+          /**
+           * Constructor.
+           */
+          ElasticityThetaExpansion()
+          {
+</pre>
+</div>
+<div class = "comment">
+set up the RBThetaExpansion object
+</div>
+
+<div class ="fragment">
+<pre>
+            attach_A_theta(&theta_a_0);
+            attach_A_theta(&theta_a_1);
+            attach_A_theta(&theta_a_2);
+            attach_F_theta(&theta_f_0);
+            attach_F_theta(&theta_f_1);
+            attach_F_theta(&theta_f_2);
+            attach_F_theta(&theta_point_load_x);
+            attach_F_theta(&theta_point_load_y);
+            attach_F_theta(&theta_point_load_z);
+          }
+        
+</pre>
+</div>
+<div class = "comment">
+The RBTheta member variables
+</div>
+
+<div class ="fragment">
+<pre>
+          ThetaA0 theta_a_0;
+          ThetaA1 theta_a_1;
+          ThetaA2 theta_a_2;
+          ThetaF0 theta_f_0;
+          ThetaF1 theta_f_1;
+          ThetaF2 theta_f_2;
+          ThetaPointLoadX theta_point_load_x;
+          ThetaPointLoadY theta_point_load_y;
+          ThetaPointLoadZ theta_point_load_z;
+        };
+        
+</pre>
+</div>
+<div class = "comment">
+Define an RBAssemblyExpansion class for this PDE
+</div>
+
+<div class ="fragment">
+<pre>
+        struct ElasticityAssemblyExpansion : RBAssemblyExpansion
+        {
+        
+          /**
+           * Constructor.
+           */
+          ElasticityAssemblyExpansion(ElasticityRBConstruction& rb_sys_in)
+            :
+            A0_assembly(rb_sys_in),
+            A1_assembly(rb_sys_in),
+            A2_assembly(rb_sys_in),
+            F0_assembly(rb_sys_in),
+            F1_assembly(rb_sys_in),
+            F2_assembly(rb_sys_in)
+          {
+</pre>
+</div>
+<div class = "comment">
+And set up the RBAssemblyExpansion object
+</div>
+
+<div class ="fragment">
+<pre>
+            attach_A_assembly(&A0_assembly);
+            attach_A_assembly(&A1_assembly);
+            attach_A_assembly(&A2_assembly);
+            attach_F_assembly(&F0_assembly);
+            attach_F_assembly(&F1_assembly);
+            attach_F_assembly(&F2_assembly);
+            attach_F_assembly(&point_load_assembly_x);
+            attach_F_assembly(&point_load_assembly_y);
+            attach_F_assembly(&point_load_assembly_z);
+          }
+        
+</pre>
+</div>
+<div class = "comment">
+The ElemAssembly objects
+</div>
+
+<div class ="fragment">
+<pre>
+          AssemblyA0 A0_assembly;
+          AssemblyA1 A1_assembly;
+          AssemblyA2 A2_assembly;
+          AssemblyF0 F0_assembly;
+          AssemblyF1 F1_assembly;
+          AssemblyF2 F2_assembly;
+          AssemblyPointLoadX point_load_assembly_x;
+          AssemblyPointLoadY point_load_assembly_y;
+          AssemblyPointLoadZ point_load_assembly_z;
+        };
+        
+        #endif
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file rb_classes.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef __rb_classes_h__
+        #define __rb_classes_h__
+        
+</pre>
+</div>
+<div class = "comment">
+local includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "assembly.h"
+        
+</pre>
+</div>
+<div class = "comment">
+rbOOmit includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/rb_construction.h"
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/fe_base.h"
+        #include "libmesh/dof_map.h"
+        
+        using namespace libMesh;
+        
+        
+        class ElasticityRBEvaluation : public RBEvaluation
+        {
+        public:
+        
+          /**
+           * Constructor. Just set the theta expansion.
+           */
+          ElasticityRBEvaluation(const Parallel::Communicator& comm)
+            : RBEvaluation(comm)
+          {
+            set_rb_theta_expansion(elasticity_theta_expansion);
+          }
+        
+          /**
+           * Return a "dummy" lower bound for the coercivity constant.
+           * To do this rigorously we should use the SCM classes.
+           */
+          virtual Real get_stability_lower_bound() { return 1.; }
+        
+          /**
+           * The object that stores the "theta" expansion of the parameter dependent PDE,
+           * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+           */
+          ElasticityThetaExpansion elasticity_theta_expansion;
+        };
+        
+        
+        class ElasticityRBConstruction : public RBConstruction
+        {
+        public:
+        
+          ElasticityRBConstruction (EquationSystems& es,
+                                    const std::string& name_in,
+                                    const unsigned int number_in)
+            : Parent(es, name_in, number_in),
+              elasticity_assembly_expansion(*this),
+              ip_assembly(*this)
+          {}
+        
+          /**
+           * Destructor.
+           */
+          virtual ~ElasticityRBConstruction () {}
+        
+          /**
+           * The type of system.
+           */
+          typedef ElasticityRBConstruction sys_type;
+        
+          /**
+           * The type of the parent.
+           */
+          typedef RBConstruction Parent;
+        
+          /**
+           * Initialize data structures.
+           */
+          virtual void init_data()
+          {
+            u_var = this-&gt;add_variable("u", FIRST);
+            v_var = this-&gt;add_variable("v", FIRST);
+            w_var = this-&gt;add_variable("w", FIRST);
+        
+</pre>
+</div>
+<div class = "comment">
+Generate a DirichletBoundary object
+</div>
+
+<div class ="fragment">
+<pre>
+            dirichlet_bc = build_zero_dirichlet_boundary_object();
+        
+</pre>
+</div>
+<div class = "comment">
+Set the Dirichet boundary condition
+</div>
+
+<div class ="fragment">
+<pre>
+            dirichlet_bc-&gt;b.insert(BOUNDARY_ID_MIN_X); // Dirichlet boundary at x=0
+            dirichlet_bc-&gt;variables.push_back(u_var);
+            dirichlet_bc-&gt;variables.push_back(v_var);
+            dirichlet_bc-&gt;variables.push_back(w_var);
+        
+</pre>
+</div>
+<div class = "comment">
+Attach dirichlet_bc (must do this _before_ Parent::init_data)
+</div>
+
+<div class ="fragment">
+<pre>
+            get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
+        
+            Parent::init_data();
+        
+</pre>
+</div>
+<div class = "comment">
+Set the rb_assembly_expansion for this Construction object
+</div>
+
+<div class ="fragment">
+<pre>
+            set_rb_assembly_expansion(elasticity_assembly_expansion);
+        
+</pre>
+</div>
+<div class = "comment">
+We need to define an inner product matrix for this problem
+</div>
+
+<div class ="fragment">
+<pre>
+            set_inner_product_assembly(ip_assembly);
+          }
+        
+          /**
+           * Pre-request all relevant element data.
+           */
+          virtual void init_context(FEMContext &c)
+          {
+</pre>
+</div>
+<div class = "comment">
+For efficiency, we should prerequest all
+the data we will need to build the
+linear system before doing an element loop.
+</div>
+
+<div class ="fragment">
+<pre>
+            FEBase* elem_fe = NULL;
+            c.get_element_fe(u_var, elem_fe);
+        
+            elem_fe-&gt;get_JxW();
+            elem_fe-&gt;get_phi();
+            elem_fe-&gt;get_dphi();
+          }
+        
+          /**
+           * Variable numbers.
+           */
+          unsigned int u_var;
+          unsigned int v_var;
+          unsigned int w_var;
+        
+          /**
+           * The object that stores the "assembly" expansion of the parameter dependent PDE.
+           */
+          ElasticityAssemblyExpansion elasticity_assembly_expansion;
+        
+          /**
+           * Object to assemble the inner product matrix
+           */
+          InnerProductAssembly ip_assembly;
+        
+          /**
+           * The object that defines which degrees of freedom are on a Dirichlet boundary.
+           */
+          AutoPtr&lt;DirichletBoundary&gt; dirichlet_bc;
+        
+        };
+        
+        #endif
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file assembly.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "assembly.h"
+        #include "rb_classes.h"
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_submatrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/dense_subvector.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/fe_interface.h"
+        #include "libmesh/fe_base.h"
+        #include "libmesh/elem_assembly.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/boundary_info.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in bits from the libMesh namespace.
+Just the bits we're using, since this is a header.
+</div>
+
+<div class ="fragment">
+<pre>
+        using libMesh::ElemAssembly;
+        using libMesh::FEInterface;
+        using libMesh::FEMContext;
+        using libMesh::Number;
+        using libMesh::Point;
+        using libMesh::RBTheta;
+        using libMesh::Real;
+        using libMesh::RealGradient;
+        
+</pre>
+</div>
+<div class = "comment">
+Kronecker delta function
+</div>
+
+<div class ="fragment">
+<pre>
+        inline Real kronecker_delta(unsigned int i,
+                                    unsigned int j)
+        {
+          return i == j ? 1. : 0.;
+        }
+        
+        Real elasticity_tensor(unsigned int i,
+                               unsigned int j,
+                               unsigned int k,
+                               unsigned int l)
+        {
+</pre>
+</div>
+<div class = "comment">
+Define the Poisson ratio and Young's modulus
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real nu = 0.3;
+          const Real E  = 1.;
+        
+</pre>
+</div>
+<div class = "comment">
+Define the Lame constants (lambda_1 and lambda_2) based on nu and E
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real lambda_1 = E * nu / ( (1. + nu) * (1. - 2.*nu) );
+          const Real lambda_2 = 0.5 * E / (1. + nu);
+        
+          return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l)
+            + lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+        }
+        
+        void AssemblyA0::interior_assembly(FEMContext &c)
+        {
+          const unsigned int n_components = rb_sys.n_vars();
+        
+</pre>
+</div>
+<div class = "comment">
+make sure we have three components
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_assert_equal_to (n_components, 3);
+        
+          const unsigned int u_var = rb_sys.u_var;
+          const unsigned int v_var = rb_sys.v_var;
+          const unsigned int w_var = rb_sys.w_var;
+        
+          FEBase* elem_fe = NULL;
+          c.get_element_fe(u_var, elem_fe);
+        
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+          std::vector&lt;unsigned int&gt; n_var_dofs(n_components);
+          n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+          n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+          n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+        
+          for (unsigned int C_i = 0; C_i &lt; n_components; C_i++)
+            {
+              unsigned int C_j = 0;
+              for (unsigned int C_k = 0; C_k &lt; n_components; C_k++)
+                {
+                  for (unsigned int C_l = 1; C_l &lt; n_components; C_l++)
+                    {
+        
+                      Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                      for (unsigned int qp=0; qp&lt;n_qpoints; qp++)
+                        {
+                          for (unsigned int i=0; i&lt;n_var_dofs[C_i]; i++)
+                            {
+                              for (unsigned int j=0; j&lt;n_var_dofs[C_k]; j++)
+                                {
+                                  (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                                    JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                                }
+                            }
+                        }
+        
+                    }
+                }
+            }
+        
+          for (unsigned int C_i = 0; C_i &lt; n_components; C_i++)
+            {
+              for (unsigned int C_j = 1; C_j &lt; n_components; C_j++)
+                {
+                  for (unsigned int C_k = 0; C_k &lt; n_components; C_k++)
+                    {
+                      unsigned int C_l = 0;
+        
+                      Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                      for (unsigned int qp=0; qp&lt;n_qpoints; qp++)
+                        {
+                          for (unsigned int i=0; i&lt;n_var_dofs[C_i]; i++)
+                            {
+                              for (unsigned int j=0; j&lt;n_var_dofs[C_k]; j++)
+                                {
+                                  (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                                    JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                                }
+                            }
+                        }
+        
+                    }
+                }
+            }
+        
+        }
+        
+        void AssemblyA1::interior_assembly(FEMContext &c)
+        {
+          const unsigned int n_components = rb_sys.n_vars();
+        
+</pre>
+</div>
+<div class = "comment">
+make sure we have three components
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_assert_equal_to (n_components, 3);
+        
+          const unsigned int u_var = rb_sys.u_var;
+          const unsigned int v_var = rb_sys.v_var;
+          const unsigned int w_var = rb_sys.w_var;
+        
+          FEBase* elem_fe = NULL;
+          c.get_element_fe(u_var, elem_fe);
+        
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+          std::vector&lt;unsigned int&gt; n_var_dofs(n_components);
+          n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+          n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+          n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+        
+          for (unsigned int C_i = 0; C_i &lt; n_components; C_i++)
+            {
+              for (unsigned int C_j = 1; C_j &lt; n_components; C_j++)
+                {
+                  for (unsigned int C_k = 0; C_k &lt; n_components; C_k++)
+                    {
+                      for (unsigned int C_l = 1; C_l &lt; n_components; C_l++)
+                        {
+        
+                          Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                          for (unsigned int qp=0; qp&lt;n_qpoints; qp++)
+                            {
+                              for (unsigned int i=0; i&lt;n_var_dofs[C_i]; i++)
+                                {
+                                  for (unsigned int j=0; j&lt;n_var_dofs[C_k]; j++)
+                                    {
+                                      (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                                        JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                                    }
+                                }
+                            }
+        
+                        }
+                    }
+                }
+            }
+        }
+        
+        void AssemblyA2::interior_assembly(FEMContext &c)
+        {
+          const unsigned int n_components = rb_sys.n_vars();
+        
+</pre>
+</div>
+<div class = "comment">
+make sure we have three components
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_assert_equal_to (n_components, 3);
+        
+          const unsigned int u_var = rb_sys.u_var;
+          const unsigned int v_var = rb_sys.v_var;
+          const unsigned int w_var = rb_sys.w_var;
+        
+          FEBase* elem_fe = NULL;
+          c.get_element_fe(u_var, elem_fe);
+        
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+          std::vector&lt;unsigned int&gt; n_var_dofs(n_components);
+          n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+          n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+          n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+        
+          for (unsigned int C_i = 0; C_i &lt; n_components; C_i++)
+            {
+              unsigned int C_j = 0;
+        
+              for (unsigned int C_k = 0; C_k &lt; n_components; C_k++)
+                {
+                  unsigned int C_l = 0;
+        
+                  Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                  for (unsigned int qp=0; qp&lt;n_qpoints; qp++)
+                    {
+                      for (unsigned int i=0; i&lt;n_var_dofs[C_i]; i++)
+                        {
+                          for (unsigned int j=0; j&lt;n_var_dofs[C_k]; j++)
+                            {
+                              (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                                JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                            }
+                        }
+                    }
+        
+                }
+            }
+        }
+        
+        void AssemblyF0::boundary_assembly(FEMContext &c)
+        {
+          if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+               (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+            {
+              const unsigned int u_var = 0;
+        
+              FEBase* side_fe = NULL;
+              c.get_side_fe(u_var, side_fe);
+        
+              const std::vector&lt;Real&gt; &JxW_side = side_fe-&gt;get_JxW();
+        
+              const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi_side = side_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+              const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+              unsigned int n_qpoints = c.get_side_qrule().n_points();
+              DenseSubVector&lt;Number&gt;& Fu = c.get_elem_residual(u_var);
+        
+              for (unsigned int qp=0; qp &lt; n_qpoints; qp++)
+                for (unsigned int i=0; i &lt; n_u_dofs; i++)
+                  {
+                    Fu(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
+                  }
+            }
+        }
+        
+        void AssemblyF1::boundary_assembly(FEMContext &c)
+        {
+          if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+               (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+            {
+              const unsigned int u_var = 0;
+              const unsigned int v_var = 1;
+        
+              FEBase* side_fe = NULL;
+              c.get_side_fe(u_var, side_fe);
+        
+              const std::vector&lt;Real&gt; &JxW_side = side_fe-&gt;get_JxW();
+        
+              const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi_side = side_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+              const unsigned int n_v_dofs = c.get_dof_indices(u_var).size();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+              unsigned int n_qpoints = c.get_side_qrule().n_points();
+              DenseSubVector&lt;Number&gt;& Fv = c.get_elem_residual(v_var);
+        
+              for (unsigned int qp=0; qp &lt; n_qpoints; qp++)
+                for (unsigned int i=0; i &lt; n_v_dofs; i++)
+                  {
+                    Fv(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
+                  }
+            }
+        }
+        
+        void AssemblyF2::boundary_assembly(FEMContext &c)
+        {
+          if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+               (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+            {
+              const unsigned int u_var = 0;
+              const unsigned int w_var = 2;
+        
+              FEBase* side_fe = NULL;
+              c.get_side_fe(u_var, side_fe);
+        
+              const std::vector&lt;Real&gt; &JxW_side = side_fe-&gt;get_JxW();
+        
+              const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi_side = side_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+              const unsigned int n_w_dofs = c.get_dof_indices(w_var).size();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+              unsigned int n_qpoints = c.get_side_qrule().n_points();
+              DenseSubVector&lt;Number&gt;& Fw = c.get_elem_residual(w_var);
+        
+              for (unsigned int qp=0; qp &lt; n_qpoints; qp++)
+                for (unsigned int i=0; i &lt; n_w_dofs; i++)
+                  {
+                    Fw(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
+                  }
+            }
+        }
+        
+        void AssemblyPointLoadX::get_nodal_rhs_values(
+              std::map&lt;numeric_index_type, Number&gt;& values,
+              const System& sys,
+              const Node& node)
+        {
+</pre>
+</div>
+<div class = "comment">
+First clear the values map
+</div>
+
+<div class ="fragment">
+<pre>
+          values.clear();
+        
+          if(sys.get_mesh().get_boundary_info().has_boundary_id
+               (&node, NODE_BOUNDARY_ID))
+          {
+            numeric_index_type dof_index =
+              node.dof_number(sys.number(), sys.variable_number("u"), 0);
+            values[dof_index] = 1.;
+          }
+        }
+        
+        void AssemblyPointLoadY::get_nodal_rhs_values(
+              std::map&lt;numeric_index_type, Number&gt;& values,
+              const System& sys,
+              const Node& node)
+        {
+</pre>
+</div>
+<div class = "comment">
+First clear the values map
+</div>
+
+<div class ="fragment">
+<pre>
+          values.clear();
+        
+          if(sys.get_mesh().get_boundary_info().has_boundary_id
+               (&node, NODE_BOUNDARY_ID))
+          {
+            numeric_index_type dof_index =
+              node.dof_number(sys.number(), sys.variable_number("v"), 0);
+            values[dof_index] = 1.;
+          }
+        }
+        
+        void AssemblyPointLoadZ::get_nodal_rhs_values(
+              std::map&lt;numeric_index_type, Number&gt;& values,
+              const System& sys,
+              const Node& node)
+        {
+</pre>
+</div>
+<div class = "comment">
+First clear the values map
+</div>
+
+<div class ="fragment">
+<pre>
+          values.clear();
+        
+          if(sys.get_mesh().get_boundary_info().has_boundary_id
+               (&node, NODE_BOUNDARY_ID))
+          {
+            numeric_index_type dof_index =
+              node.dof_number(sys.number(), sys.variable_number("w"), 0);
+            values[dof_index] = 1.;
+          }
+        }
+        
+        void InnerProductAssembly::interior_assembly(FEMContext &c)
+        {
+          const unsigned int u_var = rb_sys.u_var;
+          const unsigned int v_var = rb_sys.v_var;
+          const unsigned int w_var = rb_sys.w_var;
+        
+          FEBase* elem_fe = NULL;
+          c.get_element_fe(u_var, elem_fe);
+        
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+          const unsigned int n_v_dofs = c.get_dof_indices(v_var).size();
+          const unsigned int n_w_dofs = c.get_dof_indices(w_var).size();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+          DenseSubMatrix&lt;Number&gt;& Kuu = c.get_elem_jacobian(u_var,u_var);
+          DenseSubMatrix&lt;Number&gt;& Kvv = c.get_elem_jacobian(v_var,v_var);
+          DenseSubMatrix&lt;Number&gt;& Kww = c.get_elem_jacobian(w_var,w_var);
+        
+          for (unsigned int qp=0; qp&lt;n_qpoints; qp++)
+            {
+              for (unsigned int i=0; i&lt;n_u_dofs; i++)
+                for (unsigned int j=0; j&lt;n_u_dofs; j++)
+                  {
+                    Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  }
+        
+              for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                  {
+                    Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  }
+        
+              for (unsigned int i=0; i&lt;n_w_dofs; i++)
+                for (unsigned int j=0; j&lt;n_w_dofs; j++)
+                  {
+                    Kww(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  }
+            }
+        }
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file reduced_basis_ex5.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;iostream&gt;
+        #include &lt;algorithm&gt;
+        #include &lt;cstdlib&gt; // *must* precede &lt;cmath&gt; for proper std:abs() on PGI, Sun Studio CC
+        #include &lt;cmath&gt;
+        #include &lt;set&gt;
+        
+</pre>
+</div>
+<div class = "comment">
+Basic include file needed for the mesh functionality.
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/getpot.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/libmesh_logging.h"
+        
+</pre>
+</div>
+<div class = "comment">
+local includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "rb_classes.h"
+        #include "assembly.h"
+        
+</pre>
+</div>
+<div class = "comment">
+boundary IDs
+</div>
+
+<div class ="fragment">
+<pre>
+        #define BOUNDARY_ID_MIN_Z 0
+        #define BOUNDARY_ID_MIN_Y 1
+        #define BOUNDARY_ID_MAX_X 2
+        #define BOUNDARY_ID_MAX_Y 3
+        #define BOUNDARY_ID_MIN_X 4
+        #define BOUNDARY_ID_MAX_Z 5
+        #define NODE_BOUNDARY_ID 10
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
+Define a function to scale the mesh according to the parameter.
+</div>
+
+<div class ="fragment">
+<pre>
+        void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename);
+        
+</pre>
+</div>
+<div class = "comment">
+Post-process the solution to compute stresses
+</div>
+
+<div class ="fragment">
+<pre>
+        void compute_stresses(EquationSystems& es);
+        
+</pre>
+</div>
+<div class = "comment">
+The main program.
+</div>
+
+<div class ="fragment">
+<pre>
+        int main(int argc, char** argv) {
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+        
+        #if !defined(LIBMESH_HAVE_XDR)
+</pre>
+</div>
+<div class = "comment">
+We need XDR support to write out reduced bases
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(false, "--enable-xdr");
+        #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
+</pre>
+</div>
+<div class = "comment">
+XDR binary support requires double precision
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(false, "--disable-singleprecision");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+This example only works if libMesh was compiled for 3D
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int dim = 3;
+          libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
+        
+          std::string parameters_filename = "reduced_basis_ex5.in";
+          GetPot infile(parameters_filename);
+        
+          unsigned int n_elem_x  = infile("n_elem_x",0);
+          unsigned int n_elem_y  = infile("n_elem_y",0);
+          unsigned int n_elem_z  = infile("n_elem_z",0);
+          Real x_size            = infile("x_size", 0.);
+          Real y_size            = infile("y_size", 0.);
+          Real z_size            = infile("z_size", 0.);
+        
+          bool store_basis_functions = infile("store_basis_functions", true);
+        
+</pre>
+</div>
+<div class = "comment">
+Read the "online_mode" flag from the command line
+</div>
+
+<div class ="fragment">
+<pre>
+          GetPot command_line(argc, argv);
+          int online_mode = 0;
+          if ( command_line.search(1, "-online_mode") ) {
+            online_mode = command_line.next(online_mode);
+          }
+        
+        
+          Mesh mesh (init.comm(), dim);
+          MeshTools::Generation::build_cube (mesh,
+                                             n_elem_x,
+                                             n_elem_y,
+                                             n_elem_z,
+                                             0., x_size,
+                                             0., y_size,
+                                             0., z_size,
+                                             HEX8);
+        
+</pre>
+</div>
+<div class = "comment">
+Let's add a some node boundary condition so that we can impose a point load
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+          for ( ; el != end_el; ++el)
+            {
+              const Elem* elem = *el;
+        
+              unsigned int side_max_x = 0, side_max_y = 0, side_max_z = 0;
+              bool found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
+              for(unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+                {
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+                    {
+                      side_max_x = side;
+                      found_side_max_x = true;
+                    }
+        
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+                    {
+                      side_max_y = side;
+                      found_side_max_y = true;
+                    }
+        
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+                    {
+                      side_max_z = side;
+                      found_side_max_z = true;
+                    }
+                }
+        
+</pre>
+</div>
+<div class = "comment">
+If elem has sides on boundaries
+BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
+then let's set a node boundary condition
+</div>
+
+<div class ="fragment">
+<pre>
+              if(found_side_max_x && found_side_max_y && found_side_max_z)
+                {
+                  for(unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
+                    {
+                      if (elem-&gt;is_node_on_side(n, side_max_x) &&
+                          elem-&gt;is_node_on_side(n, side_max_y) &&
+                          elem-&gt;is_node_on_side(n, side_max_z) )
+                        {
+                          mesh.get_boundary_info().add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
+                        }
+                    }
+                }
+            }
+        
+          mesh.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Create an equation systems object.
+</div>
+
+<div class ="fragment">
+<pre>
+          EquationSystems equation_systems(mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+We override RBConstruction with ElasticityRBConstruction in order to
+specialize a few functions for this particular problem.
+</div>
+
+<div class ="fragment">
+<pre>
+          ElasticityRBConstruction& rb_con =
+            equation_systems.add_system&lt;ElasticityRBConstruction&gt;("RBElasticity");
+        
+</pre>
+</div>
+<div class = "comment">
+Also, initialize an ExplicitSystem to store stresses
+</div>
+
+<div class ="fragment">
+<pre>
+          ExplicitSystem& stress_system =
+            equation_systems.add_system&lt;ExplicitSystem&gt; ("StressSystem");
+          stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_10", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_20", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_21", CONSTANT, MONOMIAL);
+          stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+          stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the data structures for the equation system.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.init ();
+          equation_systems.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Build a new RBEvaluation object which will be used to perform
+Reduced Basis calculations. This is required in both the
+"Offline" and "Online" stages.
+</div>
+
+<div class ="fragment">
+<pre>
+          ElasticityRBEvaluation rb_eval(mesh.comm());
+        
+</pre>
+</div>
+<div class = "comment">
+We need to give the RBConstruction object a pointer to
+our RBEvaluation object
+</div>
+
+<div class ="fragment">
+<pre>
+          rb_con.set_rb_evaluation(rb_eval);
+        
+          if(!online_mode) // Perform the Offline stage of the RB method
+            {
+</pre>
+</div>
+<div class = "comment">
+Read in the data that defines this problem from the specified text file
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_con.process_parameters_file(parameters_filename);
+        
+</pre>
+</div>
+<div class = "comment">
+Print out info that describes the current setup of rb_con
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_con.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Prepare rb_con for the Construction stage of the RB method.
+This sets up the necessary data structures and performs
+initial assembly of the "truth" affine expansion of the PDE.
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_con.initialize_rb_construction();
+        
+</pre>
+</div>
+<div class = "comment">
+Compute the reduced basis space by computing "snapshots", i.e.
+"truth" solves, at well-chosen parameter values and employing
+these snapshots as basis functions.
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_con.train_reduced_basis();
+        
+</pre>
+</div>
+<div class = "comment">
+Write out the data that will subsequently be required for the Evaluation stage
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_con.get_rb_evaluation().write_offline_data_to_files();
+        
+</pre>
+</div>
+<div class = "comment">
+If requested, write out the RB basis functions for visualization purposes
+</div>
+
+<div class ="fragment">
+<pre>
+              if(store_basis_functions)
+                {
+</pre>
+</div>
+<div class = "comment">
+Write out the basis functions
+</div>
+
+<div class ="fragment">
+<pre>
+                  rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+                }
+            }
+          else // Perform the Online stage of the RB method
+            {
+</pre>
+</div>
+<div class = "comment">
+Read in the reduced basis data
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_eval.read_offline_data_from_files();
+        
+</pre>
+</div>
+<div class = "comment">
+Iinitialize online parameters
+</div>
+
+<div class ="fragment">
+<pre>
+              Real online_x_scaling = infile("online_x_scaling", 0.);
+              Real online_load_Fx   = infile("online_load_Fx",   0.);
+              Real online_load_Fy   = infile("online_load_Fy",   0.);
+              Real online_load_Fz   = infile("online_load_Fz",   0.);
+              Real online_point_load_Fx   = infile("online_point_load_Fx",   0.);
+              Real online_point_load_Fy   = infile("online_point_load_Fy",   0.);
+              Real online_point_load_Fz   = infile("online_point_load_Fz",   0.);
+              RBParameters online_mu;
+              online_mu.set_value("x_scaling", online_x_scaling);
+              online_mu.set_value("load_Fx",   online_load_Fx);
+              online_mu.set_value("load_Fy",   online_load_Fy);
+              online_mu.set_value("load_Fz",   online_load_Fz);
+              online_mu.set_value("point_load_Fx",   online_point_load_Fx);
+              online_mu.set_value("point_load_Fy",   online_point_load_Fy);
+              online_mu.set_value("point_load_Fz",   online_point_load_Fz);
+              rb_eval.set_parameters(online_mu);
+              rb_eval.print_parameters();
+        
+</pre>
+</div>
+<div class = "comment">
+Now do the Online solve using the precomputed reduced basis
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+        
+              if(store_basis_functions)
+                {
+</pre>
+</div>
+<div class = "comment">
+Read in the basis functions
+</div>
+
+<div class ="fragment">
+<pre>
+                  rb_eval.read_in_basis_functions(rb_con);
+        
+</pre>
+</div>
+<div class = "comment">
+Plot the solution
+</div>
+
+<div class ="fragment">
+<pre>
+                  rb_con.load_rb_solution();
+        
+                  const RBParameters& rb_eval_params = rb_eval.get_parameters();
+                  scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
+                }
+            }
+        
+          return 0;
+        }
+        
+        void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
+        {
+</pre>
+</div>
+<div class = "comment">
+Loop over the mesh nodes and move them!
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshBase& mesh = es.get_mesh();
+        
+          MeshBase::node_iterator       node_it  = mesh.nodes_begin();
+          const MeshBase::node_iterator node_end = mesh.nodes_end();
+        
+          for( ; node_it != node_end; node_it++)
+            {
+              Node* node = *node_it;
+        
+              (*node)(0) *= mu.get_value("x_scaling");
+            }
+        
+</pre>
+</div>
+<div class = "comment">
+Post-process the solution to compute the stresses
+</div>
+
+<div class ="fragment">
+<pre>
+          compute_stresses(es);
+        
+        #ifdef LIBMESH_HAVE_EXODUS_API
+          ExodusII_IO (mesh).write_equation_systems (filename, es);
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over the mesh nodes and move them!
+</div>
+
+<div class ="fragment">
+<pre>
+          node_it = mesh.nodes_begin();
+        
+          for( ; node_it != node_end; node_it++)
+            {
+              Node* node = *node_it;
+        
+              (*node)(0) /= mu.get_value("x_scaling");
+            }
+        }
+        
+        void compute_stresses(EquationSystems& es)
+        {
+          START_LOG("compute_stresses()", "main");
+        
+          const MeshBase& mesh = es.get_mesh();
+        
+          const unsigned int dim = mesh.mesh_dimension();
+        
+          ElasticityRBConstruction& system = es.get_system&lt;ElasticityRBConstruction&gt;("RBElasticity");
+        
+          unsigned int displacement_vars[3];
+          displacement_vars[0] = system.variable_number ("u");
+          displacement_vars[1] = system.variable_number ("v");
+          displacement_vars[2] = system.variable_number ("w");
+          const unsigned int u_var = system.variable_number ("u");
+        
+          const DofMap& dof_map = system.get_dof_map();
+          FEType fe_type = dof_map.variable_type(u_var);
+          AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+          QGauss qrule (dim, fe_type.default_quadrature_order());
+          fe-&gt;attach_quadrature_rule (&qrule);
+        
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+Also, get a reference to the ExplicitSystem
+</div>
+
+<div class ="fragment">
+<pre>
+          ExplicitSystem& stress_system = es.get_system&lt;ExplicitSystem&gt;("StressSystem");
+          const DofMap& stress_dof_map = stress_system.get_dof_map();
+          unsigned int sigma_vars[3][3];
+          sigma_vars[0][0] = stress_system.variable_number ("sigma_00");
+          sigma_vars[0][1] = stress_system.variable_number ("sigma_01");
+          sigma_vars[0][2] = stress_system.variable_number ("sigma_02");
+          sigma_vars[1][0] = stress_system.variable_number ("sigma_10");
+          sigma_vars[1][1] = stress_system.variable_number ("sigma_11");
+          sigma_vars[1][2] = stress_system.variable_number ("sigma_12");
+          sigma_vars[2][0] = stress_system.variable_number ("sigma_20");
+          sigma_vars[2][1] = stress_system.variable_number ("sigma_21");
+          sigma_vars[2][2] = stress_system.variable_number ("sigma_22");
+          unsigned int vonMises_var = stress_system.variable_number ("vonMises");
+        
+</pre>
+</div>
+<div class = "comment">
+Storage for the stress dof indices on each element
+</div>
+
+<div class ="fragment">
+<pre>
+          std::vector&lt; std::vector&lt;dof_id_type&gt; &gt; dof_indices_var(system.n_vars());
+          std::vector&lt;dof_id_type&gt; stress_dof_indices_var;
+        
+</pre>
+</div>
+<div class = "comment">
+To store the stress tensor on each element
+</div>
+
+<div class ="fragment">
+<pre>
+          DenseMatrix&lt;Number&gt; elem_sigma;
+        
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+        
+          for ( ; el != end_el; ++el)
+            {
+              const Elem* elem = *el;
+        
+              for(unsigned int var=0; var&lt;3; var++)
+                {
+                  dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
+                }
+        
+              fe-&gt;reinit (elem);
+        
+              elem_sigma.resize(3,3);
+        
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+                {
+                  for(unsigned int C_i=0; C_i&lt;3; C_i++)
+                    for(unsigned int C_j=0; C_j&lt;3; C_j++)
+                      for(unsigned int C_k=0; C_k&lt;3; C_k++)
+                        {
+                          const unsigned int n_var_dofs = dof_indices_var[C_k].size();
+        
+</pre>
+</div>
+<div class = "comment">
+Get the gradient at this quadrature point
+</div>
+
+<div class ="fragment">
+<pre>
+                          Gradient displacement_gradient;
+                          for(unsigned int l=0; l&lt;n_var_dofs; l++)
+                            {
+                              displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
+                            }
+        
+                          for(unsigned int C_l=0; C_l&lt;3; C_l++)
+                            {
+                              elem_sigma(C_i,C_j) += JxW[qp]*( elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
+                            }
+        
+                        }
+                }
+        
+</pre>
+</div>
+<div class = "comment">
+Get the average stresses by dividing by the element volume
+</div>
+
+<div class ="fragment">
+<pre>
+              elem_sigma.scale(1./elem-&gt;volume());
+        
+</pre>
+</div>
+<div class = "comment">
+load elem_sigma data into stress_system
+</div>
+
+<div class ="fragment">
+<pre>
+              for(unsigned int i=0; i&lt;3; i++)
+                for(unsigned int j=0; j&lt;3; j++)
+                  {
+                    stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
+        
+</pre>
+</div>
+<div class = "comment">
+We are using CONSTANT MONOMIAL basis functions, hence we only need to get
+one dof index per variable
+</div>
+
+<div class ="fragment">
+<pre>
+                    dof_id_type dof_index = stress_dof_indices_var[0];
+        
+                    if( (stress_system.solution-&gt;first_local_index() &lt;= dof_index) &&
+                        (dof_index &lt; stress_system.solution-&gt;last_local_index()) )
+                      {
+                        stress_system.solution-&gt;set(dof_index, elem_sigma(i,j));
+                      }
+        
+                  }
+        
+</pre>
+</div>
+<div class = "comment">
+Also, the von Mises stress
+</div>
+
+<div class ="fragment">
+<pre>
+              Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                                       pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
+                                                       pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                                       6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                                       ) );
+              stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
+              dof_id_type dof_index = stress_dof_indices_var[0];
+              if( (stress_system.solution-&gt;first_local_index() &lt;= dof_index) &&
+                  (dof_index &lt; stress_system.solution-&gt;last_local_index()) )
+                {
+                  stress_system.solution-&gt;set(dof_index, vonMises_value);
+                }
+        
+            }
+        
+</pre>
+</div>
+<div class = "comment">
+Should call close and update when we set vector entries directly
+</div>
+
+<div class ="fragment">
+<pre>
+          stress_system.solution-&gt;close();
+          stress_system.update();
+        
+          STOP_LOG("compute_stresses()", "main");
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file assembly.h without comments: </h1> 
+<pre> 
+  #ifndef __assembly_h__
+  #define __assembly_h__
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_parameters.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_theta.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_theta_expansion.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_assembly_expansion.h&quot;</FONT></B>
+  
+  using libMesh::ElemAssembly;
+  using libMesh::FEMContext;
+  using libMesh::Number;
+  using libMesh::Real;
+  using libMesh::RBAssemblyExpansion;
+  using libMesh::RBParameters;
+  using libMesh::RBTheta;
+  using libMesh::RBThetaExpansion;
+  using libMesh::numeric_index_type;
+  using libMesh::System;
+  using libMesh::Node;
+  
+  #define BOUNDARY_ID_MIN_Z 0
+  #define BOUNDARY_ID_MIN_Y 1
+  #define BOUNDARY_ID_MAX_X 2
+  #define BOUNDARY_ID_MAX_Y 3
+  #define BOUNDARY_ID_MIN_X 4
+  #define BOUNDARY_ID_MAX_Z 5
+  #define NODE_BOUNDARY_ID 10
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> ElasticityRBConstruction;
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B> Real kronecker_delta(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j);
+  
+  Real elasticity_tensor(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i,
+                         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j,
+                         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> k,
+                         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l);
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ElasticityAssembly : ElemAssembly
+  {
+  
+    ElasticityAssembly(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      rb_sys(rb_sys_in)
+    {}
+  
+    <I><FONT COLOR="#B22222">/**
+     * The ElasticityRBConstruction object that will use this assembly.
+     */</FONT></I>
+    ElasticityRBConstruction&amp; rb_sys;
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaA0 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; ) { <B><FONT COLOR="#A020F0">return</FONT></B> 1.; } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyA0 : ElasticityAssembly
+  {
+  
+    AssemblyA0(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaA1 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu) { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;x_scaling&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyA1 : ElasticityAssembly
+  {
+  
+    AssemblyA1(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaA2 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu) { <B><FONT COLOR="#A020F0">return</FONT></B> 1./mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;x_scaling&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyA2 : ElasticityAssembly
+  {
+  
+    AssemblyA2(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaF0 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu) { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;load_Fx&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyF0 : ElasticityAssembly
+  {
+    AssemblyF0(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> boundary_assembly(FEMContext &amp;c);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaF1 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu)   { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;load_Fy&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyF1 : ElasticityAssembly
+  {
+    AssemblyF1(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> boundary_assembly(FEMContext &amp;c);
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaF2 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu)   { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;load_Fz&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyF2 : ElasticityAssembly
+  {
+    AssemblyF2(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> boundary_assembly(FEMContext &amp;c);
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaPointLoadX : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu) { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;point_load_Fx&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyPointLoadX : ElemAssembly
+  {
+    AssemblyPointLoadX()
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B>
+      get_nodal_rhs_values(
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;numeric_index_type, Number&gt;&amp; values,
+        <B><FONT COLOR="#228B22">const</FONT></B> System&amp; sys,
+        <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaPointLoadY : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu) { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;point_load_Fy&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyPointLoadY : ElemAssembly
+  {
+    AssemblyPointLoadY()
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B>
+      get_nodal_rhs_values(
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;numeric_index_type, Number&gt;&amp; values,
+        <B><FONT COLOR="#228B22">const</FONT></B> System&amp; sys,
+        <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaPointLoadZ : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu) { <B><FONT COLOR="#A020F0">return</FONT></B> mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;point_load_Fz&quot;</FONT></B>); } };
+  <B><FONT COLOR="#228B22">struct</FONT></B> AssemblyPointLoadZ : ElemAssembly
+  {
+    AssemblyPointLoadZ()
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B>
+      get_nodal_rhs_values(
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;numeric_index_type, Number&gt;&amp; values,
+        <B><FONT COLOR="#228B22">const</FONT></B> System&amp; sys,
+        <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> InnerProductAssembly : ElasticityAssembly
+  {
+  
+    InnerProductAssembly(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      ElasticityAssembly(rb_sys_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c);
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ElasticityThetaExpansion : RBThetaExpansion
+  {
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.
+     */</FONT></I>
+    ElasticityThetaExpansion()
+    {
+      attach_A_theta(&amp;theta_a_0);
+      attach_A_theta(&amp;theta_a_1);
+      attach_A_theta(&amp;theta_a_2);
+      attach_F_theta(&amp;theta_f_0);
+      attach_F_theta(&amp;theta_f_1);
+      attach_F_theta(&amp;theta_f_2);
+      attach_F_theta(&amp;theta_point_load_x);
+      attach_F_theta(&amp;theta_point_load_y);
+      attach_F_theta(&amp;theta_point_load_z);
+    }
+  
+    ThetaA0 theta_a_0;
+    ThetaA1 theta_a_1;
+    ThetaA2 theta_a_2;
+    ThetaF0 theta_f_0;
+    ThetaF1 theta_f_1;
+    ThetaF2 theta_f_2;
+    ThetaPointLoadX theta_point_load_x;
+    ThetaPointLoadY theta_point_load_y;
+    ThetaPointLoadZ theta_point_load_z;
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ElasticityAssemblyExpansion : RBAssemblyExpansion
+  {
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.
+     */</FONT></I>
+    ElasticityAssemblyExpansion(ElasticityRBConstruction&amp; rb_sys_in)
+      :
+      A0_assembly(rb_sys_in),
+      A1_assembly(rb_sys_in),
+      A2_assembly(rb_sys_in),
+      F0_assembly(rb_sys_in),
+      F1_assembly(rb_sys_in),
+      F2_assembly(rb_sys_in)
+    {
+      attach_A_assembly(&amp;A0_assembly);
+      attach_A_assembly(&amp;A1_assembly);
+      attach_A_assembly(&amp;A2_assembly);
+      attach_F_assembly(&amp;F0_assembly);
+      attach_F_assembly(&amp;F1_assembly);
+      attach_F_assembly(&amp;F2_assembly);
+      attach_F_assembly(&amp;point_load_assembly_x);
+      attach_F_assembly(&amp;point_load_assembly_y);
+      attach_F_assembly(&amp;point_load_assembly_z);
+    }
+  
+    AssemblyA0 A0_assembly;
+    AssemblyA1 A1_assembly;
+    AssemblyA2 A2_assembly;
+    AssemblyF0 F0_assembly;
+    AssemblyF1 F1_assembly;
+    AssemblyF2 F2_assembly;
+    AssemblyPointLoadX point_load_assembly_x;
+    AssemblyPointLoadY point_load_assembly_y;
+    AssemblyPointLoadZ point_load_assembly_z;
+  };
+  
+  #endif
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file rb_classes.h without comments: </h1> 
+<pre> 
+  #ifndef __rb_classes_h__
+  #define __rb_classes_h__
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;assembly.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_construction.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> ElasticityRBEvaluation : <B><FONT COLOR="#228B22">public</FONT></B> RBEvaluation
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor. Just set the theta expansion.
+     */</FONT></I>
+    ElasticityRBEvaluation(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm)
+      : RBEvaluation(comm)
+    {
+      set_rb_theta_expansion(elasticity_theta_expansion);
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Return a &quot;dummy&quot; lower bound for the coercivity constant.
+     * To do this rigorously we should use the SCM classes.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Real get_stability_lower_bound() { <B><FONT COLOR="#A020F0">return</FONT></B> 1.; }
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that stores the &quot;theta&quot; expansion of the parameter dependent PDE,
+     * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+     */</FONT></I>
+    ElasticityThetaExpansion elasticity_theta_expansion;
+  };
+  
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> ElasticityRBConstruction : <B><FONT COLOR="#228B22">public</FONT></B> RBConstruction
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    ElasticityRBConstruction (EquationSystems&amp; es,
+                              <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                              <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+      : Parent(es, name_in, number_in),
+        elasticity_assembly_expansion(*<B><FONT COLOR="#A020F0">this</FONT></B>),
+        ip_assembly(*<B><FONT COLOR="#A020F0">this</FONT></B>)
+    {}
+  
+    <I><FONT COLOR="#B22222">/**
+     * Destructor.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> ~ElasticityRBConstruction () {}
+  
+    <I><FONT COLOR="#B22222">/**
+     * The type of system.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">typedef</FONT></B> ElasticityRBConstruction sys_type;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The type of the parent.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">typedef</FONT></B> RBConstruction Parent;
+  
+    <I><FONT COLOR="#B22222">/**
+     * Initialize data structures.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_data()
+    {
+      u_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
+      v_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable(<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, FIRST);
+      w_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable(<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>, FIRST);
+  
+      dirichlet_bc = build_zero_dirichlet_boundary_object();
+  
+      dirichlet_bc-&gt;b.insert(BOUNDARY_ID_MIN_X); <I><FONT COLOR="#B22222">// Dirichlet boundary at x=0
+</FONT></I>      dirichlet_bc-&gt;variables.push_back(u_var);
+      dirichlet_bc-&gt;variables.push_back(v_var);
+      dirichlet_bc-&gt;variables.push_back(w_var);
+  
+      get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
+  
+      <B><FONT COLOR="#5F9EA0">Parent</FONT></B>::init_data();
+  
+      set_rb_assembly_expansion(elasticity_assembly_expansion);
+  
+      set_inner_product_assembly(ip_assembly);
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Pre-request all relevant element data.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_context(FEMContext &amp;c)
+    {
+      FEBase* elem_fe = NULL;
+      c.get_element_fe(u_var, elem_fe);
+  
+      elem_fe-&gt;get_JxW();
+      elem_fe-&gt;get_phi();
+      elem_fe-&gt;get_dphi();
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Variable numbers.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var;
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var;
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that stores the &quot;assembly&quot; expansion of the parameter dependent PDE.
+     */</FONT></I>
+    ElasticityAssemblyExpansion elasticity_assembly_expansion;
+  
+    <I><FONT COLOR="#B22222">/**
+     * Object to assemble the inner product matrix
+     */</FONT></I>
+    InnerProductAssembly ip_assembly;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that defines which degrees of freedom are on a Dirichlet boundary.
+     */</FONT></I>
+    AutoPtr&lt;DirichletBoundary&gt; dirichlet_bc;
+  
+  };
+  
+  #endif
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file assembly.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;assembly.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;rb_classes.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_subvector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_interface.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem_assembly.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/boundary_info.h&quot;</FONT></B>
+  
+  using libMesh::ElemAssembly;
+  using libMesh::FEInterface;
+  using libMesh::FEMContext;
+  using libMesh::Number;
+  using libMesh::Point;
+  using libMesh::RBTheta;
+  using libMesh::Real;
+  using libMesh::RealGradient;
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B> Real kronecker_delta(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j)
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> i == j ? 1. : 0.;
+  }
+  
+  Real elasticity_tensor(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i,
+                         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j,
+                         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> k,
+                         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> Real nu = 0.3;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real E  = 1.;
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real lambda_1 = E * nu / ( (1. + nu) * (1. - 2.*nu) );
+    <B><FONT COLOR="#228B22">const</FONT></B> Real lambda_2 = 0.5 * E / (1. + nu);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l)
+      + lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyA0::interior_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_components = rb_sys.n_vars();
+  
+    libmesh_assert_equal_to (n_components, 3);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = rb_sys.u_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = rb_sys.v_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = rb_sys.w_var;
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; n_var_dofs(n_components);
+    n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+    n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+    n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i = 0; C_i &lt; n_components; C_i++)
+      {
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_j = 0;
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_k = 0; C_k &lt; n_components; C_k++)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_l = 1; C_l &lt; n_components; C_l++)
+              {
+  
+                Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;n_qpoints; qp++)
+                  {
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_var_dofs[C_i]; i++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_var_dofs[C_k]; j++)
+                          {
+                            (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                              JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                          }
+                      }
+                  }
+  
+              }
+          }
+      }
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i = 0; C_i &lt; n_components; C_i++)
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_j = 1; C_j &lt; n_components; C_j++)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_k = 0; C_k &lt; n_components; C_k++)
+              {
+                <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_l = 0;
+  
+                Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;n_qpoints; qp++)
+                  {
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_var_dofs[C_i]; i++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_var_dofs[C_k]; j++)
+                          {
+                            (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                              JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                          }
+                      }
+                  }
+  
+              }
+          }
+      }
+  
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyA1::interior_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_components = rb_sys.n_vars();
+  
+    libmesh_assert_equal_to (n_components, 3);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = rb_sys.u_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = rb_sys.v_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = rb_sys.w_var;
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; n_var_dofs(n_components);
+    n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+    n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+    n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i = 0; C_i &lt; n_components; C_i++)
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_j = 1; C_j &lt; n_components; C_j++)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_k = 0; C_k &lt; n_components; C_k++)
+              {
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_l = 1; C_l &lt; n_components; C_l++)
+                  {
+  
+                    Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;n_qpoints; qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_var_dofs[C_i]; i++)
+                          {
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_var_dofs[C_k]; j++)
+                              {
+                                (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                                  JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                              }
+                          }
+                      }
+  
+                  }
+              }
+          }
+      }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyA2::interior_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_components = rb_sys.n_vars();
+  
+    libmesh_assert_equal_to (n_components, 3);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = rb_sys.u_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = rb_sys.v_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = rb_sys.w_var;
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; n_var_dofs(n_components);
+    n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+    n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+    n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i = 0; C_i &lt; n_components; C_i++)
+      {
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_j = 0;
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_k = 0; C_k &lt; n_components; C_k++)
+          {
+            <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_l = 0;
+  
+            Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;n_qpoints; qp++)
+              {
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_var_dofs[C_i]; i++)
+                  {
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_var_dofs[C_k]; j++)
+                      {
+                        (c.get_elem_jacobian(C_i,C_k))(i,j) +=
+                          JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                      }
+                  }
+              }
+  
+          }
+      }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyF0::boundary_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
+  
+        FEBase* side_fe = NULL;
+        c.get_side_fe(u_var, side_fe);
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW_side = side_fe-&gt;get_JxW();
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi_side = side_fe-&gt;get_phi();
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+  
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+        DenseSubVector&lt;Number&gt;&amp; Fu = c.get_elem_residual(u_var);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp &lt; n_qpoints; qp++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i &lt; n_u_dofs; i++)
+            {
+              Fu(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
+            }
+      }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyF1::boundary_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = 1;
+  
+        FEBase* side_fe = NULL;
+        c.get_side_fe(u_var, side_fe);
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW_side = side_fe-&gt;get_JxW();
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi_side = side_fe-&gt;get_phi();
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_v_dofs = c.get_dof_indices(u_var).size();
+  
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+        DenseSubVector&lt;Number&gt;&amp; Fv = c.get_elem_residual(v_var);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp &lt; n_qpoints; qp++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i &lt; n_v_dofs; i++)
+            {
+              Fv(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
+            }
+      }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyF2::boundary_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = 2;
+  
+        FEBase* side_fe = NULL;
+        c.get_side_fe(u_var, side_fe);
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW_side = side_fe-&gt;get_JxW();
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi_side = side_fe-&gt;get_phi();
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_w_dofs = c.get_dof_indices(w_var).size();
+  
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+        DenseSubVector&lt;Number&gt;&amp; Fw = c.get_elem_residual(w_var);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp &lt; n_qpoints; qp++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i &lt; n_w_dofs; i++)
+            {
+              Fw(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
+            }
+      }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyPointLoadX::get_nodal_rhs_values(
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;numeric_index_type, Number&gt;&amp; values,
+        <B><FONT COLOR="#228B22">const</FONT></B> System&amp; sys,
+        <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node)
+  {
+    values.clear();
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;node, NODE_BOUNDARY_ID))
+    {
+      numeric_index_type dof_index =
+        node.dof_number(sys.number(), sys.variable_number(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>), 0);
+      values[dof_index] = 1.;
+    }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyPointLoadY::get_nodal_rhs_values(
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;numeric_index_type, Number&gt;&amp; values,
+        <B><FONT COLOR="#228B22">const</FONT></B> System&amp; sys,
+        <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node)
+  {
+    values.clear();
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;node, NODE_BOUNDARY_ID))
+    {
+      numeric_index_type dof_index =
+        node.dof_number(sys.number(), sys.variable_number(<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>), 0);
+      values[dof_index] = 1.;
+    }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AssemblyPointLoadZ::get_nodal_rhs_values(
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;numeric_index_type, Number&gt;&amp; values,
+        <B><FONT COLOR="#228B22">const</FONT></B> System&amp; sys,
+        <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node)
+  {
+    values.clear();
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;node, NODE_BOUNDARY_ID))
+    {
+      numeric_index_type dof_index =
+        node.dof_number(sys.number(), sys.variable_number(<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>), 0);
+      values[dof_index] = 1.;
+    }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> InnerProductAssembly::interior_assembly(FEMContext &amp;c)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = rb_sys.u_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = rb_sys.v_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = rb_sys.w_var;
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_v_dofs = c.get_dof_indices(v_var).size();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_w_dofs = c.get_dof_indices(w_var).size();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    DenseSubMatrix&lt;Number&gt;&amp; Kuu = c.get_elem_jacobian(u_var,u_var);
+    DenseSubMatrix&lt;Number&gt;&amp; Kvv = c.get_elem_jacobian(v_var,v_var);
+    DenseSubMatrix&lt;Number&gt;&amp; Kww = c.get_elem_jacobian(w_var,w_var);
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;n_qpoints; qp++)
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+            {
+              Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+            }
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+            {
+              Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+            }
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_w_dofs; i++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_w_dofs; j++)
+            {
+              Kww(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+            }
+      }
+  }
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file reduced_basis_ex5.C without comments: </h1> 
+<pre> 
+  #include &lt;iostream&gt;
+  #include &lt;algorithm&gt;
+  #include &lt;cstdlib&gt; <I><FONT COLOR="#B22222">// *must* precede &lt;cmath&gt; for proper std:abs() on PGI, Sun Studio CC
+</FONT></I>  #include &lt;cmath&gt;
+  #include &lt;set&gt;
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_logging.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;rb_classes.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;assembly.h&quot;</FONT></B>
+  
+  #define BOUNDARY_ID_MIN_Z 0
+  #define BOUNDARY_ID_MIN_Y 1
+  #define BOUNDARY_ID_MAX_X 2
+  #define BOUNDARY_ID_MAX_Y 3
+  #define BOUNDARY_ID_MIN_X 4
+  #define BOUNDARY_ID_MAX_Z 5
+  #define NODE_BOUNDARY_ID 10
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> scale_mesh_and_plot(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; filename);
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> compute_stresses(EquationSystems&amp; es);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv) {
+    LibMeshInit init (argc, argv);
+  
+  #<B><FONT COLOR="#A020F0">if</FONT></B> !defined(LIBMESH_HAVE_XDR)
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-xdr&quot;</FONT></B>);
+  #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--disable-singleprecision&quot;</FONT></B>);
+  #endif
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 3;
+    libmesh_example_requires(dim == LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string parameters_filename = <B><FONT COLOR="#BC8F8F">&quot;reduced_basis_ex5.in&quot;</FONT></B>;
+    GetPot infile(parameters_filename);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_elem_x  = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elem_x&quot;</FONT></B>,0);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_elem_y  = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elem_y&quot;</FONT></B>,0);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_elem_z  = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elem_z&quot;</FONT></B>,0);
+    Real x_size            = infile(<B><FONT COLOR="#BC8F8F">&quot;x_size&quot;</FONT></B>, 0.);
+    Real y_size            = infile(<B><FONT COLOR="#BC8F8F">&quot;y_size&quot;</FONT></B>, 0.);
+    Real z_size            = infile(<B><FONT COLOR="#BC8F8F">&quot;z_size&quot;</FONT></B>, 0.);
+  
+    <B><FONT COLOR="#228B22">bool</FONT></B> store_basis_functions = infile(<B><FONT COLOR="#BC8F8F">&quot;store_basis_functions&quot;</FONT></B>, true);
+  
+    GetPot command_line(argc, argv);
+    <B><FONT COLOR="#228B22">int</FONT></B> online_mode = 0;
+    <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-online_mode&quot;</FONT></B>) ) {
+      online_mode = command_line.next(online_mode);
+    }
+  
+  
+    Mesh mesh (init.comm(), dim);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+                                       n_elem_x,
+                                       n_elem_y,
+                                       n_elem_z,
+                                       0., x_size,
+                                       0., y_size,
+                                       0., z_size,
+                                       HEX8);
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side_max_x = 0, side_max_y = 0, side_max_z = 0;
+        <B><FONT COLOR="#228B22">bool</FONT></B> found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
+        <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+          {
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+              {
+                side_max_x = side;
+                found_side_max_x = true;
+              }
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+              {
+                side_max_y = side;
+                found_side_max_y = true;
+              }
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+              {
+                side_max_z = side;
+                found_side_max_z = true;
+              }
+          }
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(found_side_max_x &amp;&amp; found_side_max_y &amp;&amp; found_side_max_z)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;is_node_on_side(n, side_max_x) &amp;&amp;
+                    elem-&gt;is_node_on_side(n, side_max_y) &amp;&amp;
+                    elem-&gt;is_node_on_side(n, side_max_z) )
+                  {
+                    mesh.get_boundary_info().add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
+                  }
+              }
+          }
+      }
+  
+    mesh.print_info();
+  
+    EquationSystems equation_systems(mesh);
+  
+    ElasticityRBConstruction&amp; rb_con =
+      equation_systems.add_system&lt;ElasticityRBConstruction&gt;(<B><FONT COLOR="#BC8F8F">&quot;RBElasticity&quot;</FONT></B>);
+  
+    ExplicitSystem&amp; stress_system =
+      equation_systems.add_system&lt;ExplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;StressSystem&quot;</FONT></B>);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_00&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_01&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_02&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_10&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_11&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_12&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_20&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_21&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;sigma_22&quot;</FONT></B>, CONSTANT, MONOMIAL);
+    stress_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;vonMises&quot;</FONT></B>, CONSTANT, MONOMIAL);
+  
+    equation_systems.init ();
+    equation_systems.print_info();
+  
+    ElasticityRBEvaluation rb_eval(mesh.comm());
+  
+    rb_con.set_rb_evaluation(rb_eval);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(!online_mode) <I><FONT COLOR="#B22222">// Perform the Offline stage of the RB method
+</FONT></I>      {
+        rb_con.process_parameters_file(parameters_filename);
+  
+        rb_con.print_info();
+  
+        rb_con.initialize_rb_construction();
+  
+        rb_con.train_reduced_basis();
+  
+        rb_con.get_rb_evaluation().write_offline_data_to_files();
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(store_basis_functions)
+          {
+            rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+          }
+      }
+    <B><FONT COLOR="#A020F0">else</FONT></B> <I><FONT COLOR="#B22222">// Perform the Online stage of the RB method
+</FONT></I>      {
+        rb_eval.read_offline_data_from_files();
+  
+        Real online_x_scaling = infile(<B><FONT COLOR="#BC8F8F">&quot;online_x_scaling&quot;</FONT></B>, 0.);
+        Real online_load_Fx   = infile(<B><FONT COLOR="#BC8F8F">&quot;online_load_Fx&quot;</FONT></B>,   0.);
+        Real online_load_Fy   = infile(<B><FONT COLOR="#BC8F8F">&quot;online_load_Fy&quot;</FONT></B>,   0.);
+        Real online_load_Fz   = infile(<B><FONT COLOR="#BC8F8F">&quot;online_load_Fz&quot;</FONT></B>,   0.);
+        Real online_point_load_Fx   = infile(<B><FONT COLOR="#BC8F8F">&quot;online_point_load_Fx&quot;</FONT></B>,   0.);
+        Real online_point_load_Fy   = infile(<B><FONT COLOR="#BC8F8F">&quot;online_point_load_Fy&quot;</FONT></B>,   0.);
+        Real online_point_load_Fz   = infile(<B><FONT COLOR="#BC8F8F">&quot;online_point_load_Fz&quot;</FONT></B>,   0.);
+        RBParameters online_mu;
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;x_scaling&quot;</FONT></B>, online_x_scaling);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;load_Fx&quot;</FONT></B>,   online_load_Fx);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;load_Fy&quot;</FONT></B>,   online_load_Fy);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;load_Fz&quot;</FONT></B>,   online_load_Fz);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;point_load_Fx&quot;</FONT></B>,   online_point_load_Fx);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;point_load_Fy&quot;</FONT></B>,   online_point_load_Fy);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;point_load_Fz&quot;</FONT></B>,   online_point_load_Fz);
+        rb_eval.set_parameters(online_mu);
+        rb_eval.print_parameters();
+  
+        rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(store_basis_functions)
+          {
+            rb_eval.read_in_basis_functions(rb_con);
+  
+            rb_con.load_rb_solution();
+  
+            <B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; rb_eval_params = rb_eval.get_parameters();
+            scale_mesh_and_plot(equation_systems, rb_eval_params, <B><FONT COLOR="#BC8F8F">&quot;RB_sol.e&quot;</FONT></B>);
+          }
+      }
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> scale_mesh_and_plot(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; filename)
+  {
+    MeshBase&amp; mesh = es.get_mesh();
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::node_iterator       node_it  = mesh.nodes_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::node_iterator node_end = mesh.nodes_end();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B>( ; node_it != node_end; node_it++)
+      {
+        Node* node = *node_it;
+  
+        (*node)(0) *= mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;x_scaling&quot;</FONT></B>);
+      }
+  
+    compute_stresses(es);
+  
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO (mesh).write_equation_systems (filename, es);
+  #endif
+  
+    node_it = mesh.nodes_begin();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B>( ; node_it != node_end; node_it++)
+      {
+        Node* node = *node_it;
+  
+        (*node)(0) /= mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;x_scaling&quot;</FONT></B>);
+      }
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> compute_stresses(EquationSystems&amp; es)
+  {
+    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;compute_stresses()&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+  
+    ElasticityRBConstruction&amp; system = es.get_system&lt;ElasticityRBConstruction&gt;(<B><FONT COLOR="#BC8F8F">&quot;RBElasticity&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> displacement_vars[3];
+    displacement_vars[0] = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    displacement_vars[1] = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
+    displacement_vars[2] = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    FEType fe_type = dof_map.variable_type(u_var);
+    AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+    QGauss qrule (dim, fe_type.default_quadrature_order());
+    fe-&gt;attach_quadrature_rule (&amp;qrule);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+  
+    ExplicitSystem&amp; stress_system = es.get_system&lt;ExplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;StressSystem&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; stress_dof_map = stress_system.get_dof_map();
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> sigma_vars[3][3];
+    sigma_vars[0][0] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_00&quot;</FONT></B>);
+    sigma_vars[0][1] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_01&quot;</FONT></B>);
+    sigma_vars[0][2] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_02&quot;</FONT></B>);
+    sigma_vars[1][0] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_10&quot;</FONT></B>);
+    sigma_vars[1][1] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_11&quot;</FONT></B>);
+    sigma_vars[1][2] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_12&quot;</FONT></B>);
+    sigma_vars[2][0] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_20&quot;</FONT></B>);
+    sigma_vars[2][1] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_21&quot;</FONT></B>);
+    sigma_vars[2][2] = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;sigma_22&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> vonMises_var = stress_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;vonMises&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt; std::vector&lt;dof_id_type&gt; &gt; dof_indices_var(system.n_vars());
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; stress_dof_indices_var;
+  
+    DenseMatrix&lt;Number&gt; elem_sigma;
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> var=0; var&lt;3; var++)
+          {
+            dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
+          }
+  
+        fe-&gt;reinit (elem);
+  
+        elem_sigma.resize(3,3);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i=0; C_i&lt;3; C_i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_j=0; C_j&lt;3; C_j++)
+                <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_k=0; C_k&lt;3; C_k++)
+                  {
+                    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_var_dofs = dof_indices_var[C_k].size();
+  
+                    Gradient displacement_gradient;
+                    <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l=0; l&lt;n_var_dofs; l++)
+                      {
+                        displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
+                      }
+  
+                    <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_l=0; C_l&lt;3; C_l++)
+                      {
+                        elem_sigma(C_i,C_j) += JxW[qp]*( elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
+                      }
+  
+                  }
+          }
+  
+        elem_sigma.scale(1./elem-&gt;volume());
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;3; i++)
+          <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;3; j++)
+            {
+              stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
+  
+              dof_id_type dof_index = stress_dof_indices_var[0];
+  
+              <B><FONT COLOR="#A020F0">if</FONT></B>( (stress_system.solution-&gt;first_local_index() &lt;= dof_index) &amp;&amp;
+                  (dof_index &lt; stress_system.solution-&gt;last_local_index()) )
+                {
+                  stress_system.solution-&gt;set(dof_index, elem_sigma(i,j));
+                }
+  
+            }
+  
+        Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                                 pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
+                                                 pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                                 6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                                 ) );
+        stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
+        dof_id_type dof_index = stress_dof_indices_var[0];
+        <B><FONT COLOR="#A020F0">if</FONT></B>( (stress_system.solution-&gt;first_local_index() &lt;= dof_index) &amp;&amp;
+            (dof_index &lt; stress_system.solution-&gt;last_local_index()) )
+          {
+            stress_system.solution-&gt;set(dof_index, vonMises_value);
+          }
+  
+      }
+  
+    stress_system.solution-&gt;close();
+    stress_system.update();
+  
+    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;compute_stresses()&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;main&quot;</FONT></B>);
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example reduced_basis_ex5:
+*   example-opt -online_mode 0 
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=1845
+    n_local_nodes()=1845
+  n_elem()=1280
+    n_local_elem()=1280
+    n_active_elem()=1280
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 12:52:43 ***
+ EquationSystems
+  n_systems()=2
+   System #0, "RBElasticity"
+    Type "RBConstruction"
+    Variables={ "u" "v" "w" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=5535
+    n_local_dofs()=5535
+    n_constrained_dofs()=135
+    n_local_constrained_dofs()=135
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 63.9431
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 81
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 135
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+   System #1, "StressSystem"
+    Type "Explicit"
+    Variables={ "sigma_00" "sigma_01" "sigma_02" "sigma_10" "sigma_11" "sigma_12" "sigma_20" "sigma_21" "sigma_22" "vonMises" } 
+    Finite Element Types="MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="CONSTANT", "THIRD" 
+    n_dofs()=12800
+    n_local_dofs()=12800
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Initializing training parameters with random training set...
+Parameter load_Fx: log scaling = 0
+Parameter load_Fy: log scaling = 0
+Parameter load_Fz: log scaling = 0
+Parameter point_load_Fx: log scaling = 0
+Parameter point_load_Fy: log scaling = 0
+Parameter point_load_Fz: log scaling = 0
+Parameter x_scaling: log scaling = 0
+
+
+RBConstruction parameters:
+system name: RBElasticity
+constrained_problem: 0
+Nmax: 15
+Basis training error tolerance: 0.001
+Aq operators attached: 3
+Fq functions attached: 6
+n_outputs: 0
+Number of parameters: 7
+Parameter load_Fx: Min = -5, Max = 5
+Parameter load_Fy: Min = -5, Max = 5
+Parameter load_Fz: Min = -5, Max = 5
+Parameter point_load_Fx: Min = -5, Max = 5
+Parameter point_load_Fy: Min = -5, Max = 5
+Parameter point_load_Fz: Min = -5, Max = 5
+Parameter x_scaling: Min = 0.5, Max = 2
+n_training_samples: 1000
+reuse preconditioner? 1
+use a relative error bound in greedy? 1
+write out data during basis training? 0
+quiet mode? 1
+
+Assembling inner product matrix
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Oct 22 2014 at 12:52:50 ***
+Assembling affine operator 1 of 3
+Assembling affine operator 2 of 3
+Assembling affine operator 3 of 3
+Assembling affine vector 1 of 6
+Assembling affine vector 2 of 6
+Assembling affine vector 3 of 6
+Assembling affine vector 4 of 6
+Assembling affine vector 5 of 6
+Assembling affine vector 6 of 6
+
+---- Performing Greedy basis enrichment ----
+
+---- Basis dimension: 0 ----
+Performing RB solves on training set
+Maximum (relative) error bound is inf
+
+Performing truth solve at parameter:
+load_Fx: 1.266592e+00
+load_Fy: -4.109548e+00
+load_Fz: 1.396300e+00
+point_load_Fx: 4.598900e+00
+point_load_Fy: 2.162196e-01
+point_load_Fz: 2.269937e+00
+x_scaling: 1.617462e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 1 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 89.8776
+
+Performing truth solve at parameter:
+load_Fx: -8.963213e-01
+load_Fy: -3.949336e+00
+load_Fz: 1.739975e+00
+point_load_Fx: -4.371082e+00
+point_load_Fy: -2.776685e+00
+point_load_Fz: -3.045370e-01
+x_scaling: 8.356259e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 2 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 1.60602
+
+Performing truth solve at parameter:
+load_Fx: 3.591485e+00
+load_Fy: -4.645976e+00
+load_Fz: 1.928910e+00
+point_load_Fx: -3.693947e+00
+point_load_Fy: 2.797378e+00
+point_load_Fz: 1.206801e+00
+x_scaling: 5.761611e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 3 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.504403
+
+Performing truth solve at parameter:
+load_Fx: -3.994200e+00
+load_Fy: -3.496641e+00
+load_Fz: -3.648171e+00
+point_load_Fx: 4.420391e+00
+point_load_Fy: -2.142044e+00
+point_load_Fz: -9.989135e-02
+x_scaling: 1.986990e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 4 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.608424
+
+Performing truth solve at parameter:
+load_Fx: 9.611246e-01
+load_Fy: -2.542670e+00
+load_Fz: 2.907215e+00
+point_load_Fx: 3.805601e+00
+point_load_Fy: -3.375147e-01
+point_load_Fz: 9.777125e-01
+x_scaling: 9.267348e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 5 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.186677
+
+Performing truth solve at parameter:
+load_Fx: 3.934577e+00
+load_Fy: -2.929760e+00
+load_Fz: -4.361115e+00
+point_load_Fx: -4.951432e+00
+point_load_Fy: -1.886840e+00
+point_load_Fz: -7.871341e-01
+x_scaling: 5.194926e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 6 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0605016
+
+Performing truth solve at parameter:
+load_Fx: 1.728887e+00
+load_Fy: 2.340480e+00
+load_Fz: 2.443317e+00
+point_load_Fx: -4.598292e+00
+point_load_Fy: -9.314863e-01
+point_load_Fz: -2.720646e-01
+x_scaling: 1.131046e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0298945
+
+Performing truth solve at parameter:
+load_Fx: 2.425385e+00
+load_Fy: -4.231576e+00
+load_Fz: 1.380558e+00
+point_load_Fx: -3.181895e+00
+point_load_Fy: -4.321427e+00
+point_load_Fz: 4.372916e-03
+x_scaling: 5.174223e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0223828
+
+Performing truth solve at parameter:
+load_Fx: -2.911908e+00
+load_Fy: -1.887688e+00
+load_Fz: 2.951137e+00
+point_load_Fx: 4.003635e+00
+point_load_Fy: 4.706385e+00
+point_load_Fz: 2.067211e-01
+x_scaling: 1.377973e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0143025
+
+Performing truth solve at parameter:
+load_Fx: 2.330746e+00
+load_Fy: -1.504521e+00
+load_Fz: -3.319167e+00
+point_load_Fx: -3.208491e+00
+point_load_Fy: -8.910305e-01
+point_load_Fz: 9.080035e-02
+x_scaling: 1.987271e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 10 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00720385
+
+Performing truth solve at parameter:
+load_Fx: -2.442497e+00
+load_Fy: -1.193690e+00
+load_Fz: -1.964109e+00
+point_load_Fx: -1.781127e+00
+point_load_Fy: -6.814788e-01
+point_load_Fz: -1.997788e-01
+x_scaling: 5.480835e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 11 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00715415
+
+Performing truth solve at parameter:
+load_Fx: -3.420292e+00
+load_Fy: 2.892063e+00
+load_Fz: -6.872057e-01
+point_load_Fx: -1.228033e+00
+point_load_Fy: -5.240613e-01
+point_load_Fz: -5.320652e-02
+x_scaling: 1.042545e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 12 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00609572
+
+Performing truth solve at parameter:
+load_Fx: 2.919773e+00
+load_Fy: 4.236188e-01
+load_Fz: -4.050978e+00
+point_load_Fx: 1.530443e+00
+point_load_Fy: -7.513105e-01
+point_load_Fz: 6.196746e-01
+x_scaling: 5.443249e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 13 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00513392
+
+Performing truth solve at parameter:
+load_Fx: 2.714535e+00
+load_Fy: -2.621453e+00
+load_Fz: 1.503627e+00
+point_load_Fx: 4.496333e+00
+point_load_Fy: 1.581526e+00
+point_load_Fz: 3.208500e-01
+x_scaling: 8.284414e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 14 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00208842
+
+Performing truth solve at parameter:
+load_Fx: -3.455083e+00
+load_Fy: -3.689720e+00
+load_Fz: -1.960464e+00
+point_load_Fx: 3.315724e+00
+point_load_Fy: 2.006939e+00
+point_load_Fz: 1.462568e-01
+x_scaling: 5.033565e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 15 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0020602
+
+Maximum number of basis functions reached: Nmax = 15
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:41:29 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=54.8656, Active time=54.7501                                                       |
+ --------------------------------------------------------------------------------------------------------------------
+| Event                                 nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                  w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|--------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                    |
+|                                                                                                                    |
+| DofMap                                                                                                             |
+|   add_neighbors_to_send_list()        2          0.0014      0.000713    0.0014      0.000713    0.00     0.00     |
+|   build_constraint_matrix()           12800      0.0133      0.000001    0.0133      0.000001    0.02     0.02     |
+|   build_sparsity()                    1          0.0202      0.020220    0.0219      0.021883    0.04     0.04     |
+|   cnstrn_elem_mat_vec()               12800      0.0185      0.000001    0.0185      0.000001    0.03     0.03     |
+|   create_dof_constraints()            2          0.0075      0.003767    0.0103      0.005156    0.01     0.02     |
+|   distribute_dofs()                   2          0.0008      0.000402    0.0039      0.001959    0.00     0.01     |
+|   dof_indices()                       56320      0.0475      0.000001    0.0475      0.000001    0.09     0.09     |
+|   prepare_send_list()                 2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                            2          0.0031      0.001557    0.0031      0.001557    0.01     0.01     |
+|                                                                                                                    |
+| FE                                                                                                                 |
+|   compute_shape_functions()           23040      0.0933      0.000004    0.0933      0.000004    0.17     0.17     |
+|   init_shape_functions()              10250      0.1119      0.000011    0.1119      0.000011    0.20     0.20     |
+|                                                                                                                    |
+| FEMap                                                                                                              |
+|   compute_affine_map()                23040      0.0261      0.000001    0.0261      0.000001    0.05     0.05     |
+|   compute_face_map()                  10240      0.0121      0.000001    0.0121      0.000001    0.02     0.02     |
+|   init_face_shape_functions()         10         0.0001      0.000007    0.0001      0.000007    0.00     0.00     |
+|   init_reference_to_physical_map()    10250      0.0964      0.000009    0.0964      0.000009    0.18     0.18     |
+|                                                                                                                    |
+| Mesh                                                                                                               |
+|   find_neighbors()                    1          0.0025      0.002525    0.0025      0.002525    0.00     0.00     |
+|   renumber_nodes_and_elem()           2          0.0002      0.000113    0.0002      0.000113    0.00     0.00     |
+|                                                                                                                    |
+| MeshCommunication                                                                                                  |
+|   assign_global_indices()             1          0.0304      0.030357    0.0304      0.030369    0.06     0.06     |
+|                                                                                                                    |
+| MeshTools::Generation                                                                                              |
+|   build_cube()                        1          0.0009      0.000923    0.0009      0.000923    0.00     0.00     |
+|                                                                                                                    |
+| Parallel                                                                                                           |
+|   allgather()                         6          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   probe()                             8          0.0001      0.000011    0.0001      0.000011    0.00     0.00     |
+|   receive()                           4          0.0005      0.000113    0.0005      0.000114    0.00     0.00     |
+|   send()                              4          0.0012      0.000301    0.0012      0.000301    0.00     0.00     |
+|   send_receive()                      4          0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|                                                                                                                    |
+| Parallel::Request                                                                                                  |
+|   wait()                              4          0.0000      0.000008    0.0000      0.000008    0.00     0.00     |
+|                                                                                                                    |
+| Partitioner                                                                                                        |
+|   single_partition()                  1          0.0001      0.000075    0.0001      0.000075    0.00     0.00     |
+|                                                                                                                    |
+| PetscLinearSolver                                                                                                  |
+|   solve()                             66         49.4055     0.748568    49.4055     0.748568    90.24    90.24    |
+|                                                                                                                    |
+| RBConstruction                                                                                                     |
+|   add_scaled_matrix_and_vector()      10         0.4248      0.042485    0.8533      0.085328    0.78     1.56     |
+|   clear()                             1          0.0011      0.001099    0.0011      0.001099    0.00     0.00     |
+|   compute_Fq_representor_innerprods() 1          0.0135      0.013485    0.4164      0.416434    0.02     0.76     |
+|   compute_max_error_bound()           16         0.1058      0.006612    2.0206      0.126288    0.19     3.69     |
+|   enrich_RB_space()                   15         0.0757      0.005044    0.0757      0.005044    0.14     0.14     |
+|   train_reduced_basis()               1          0.0045      0.004537    53.8266     53.826644   0.01     98.31    |
+|   truth_assembly()                    15         0.6797      0.045316    0.6797      0.045316    1.24     1.24     |
+|   truth_solve()                       15         0.0139      0.000923    46.7108     3.114054    0.03     85.32    |
+|   update_RB_system_matrices()         15         0.4650      0.030999    0.4650      0.030999    0.85     0.85     |
+|   update_residual_terms()             15         1.1482      0.076546    4.1336      0.275571    2.10     7.55     |
+|                                                                                                                    |
+| RBEvaluation                                                                                                       |
+|   clear()                             1          0.0002      0.000152    0.0002      0.000152    0.00     0.00     |
+|   compute_residual_dual_norm()        16000      1.7744      0.000111    1.7744      0.000111    3.24     3.24     |
+|   rb_solve()                          16000      0.1376      0.000009    1.9134      0.000120    0.25     3.49     |
+|   resize_data_structures()            1          0.0001      0.000053    0.0001      0.000053    0.00     0.00     |
+|   write_offline_data_to_files()       1          0.0012      0.001165    0.0012      0.001165    0.00     0.00     |
+|   write_out_basis_functions()         1          0.0001      0.000100    0.0430      0.042990    0.00     0.08     |
+|   write_out_vectors()                 1          0.0107      0.010745    0.0429      0.042890    0.02     0.08     |
+ --------------------------------------------------------------------------------------------------------------------
+| Totals:                               190972     54.7501                                         100.00            |
+ --------------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example reduced_basis_ex5:
+*   example-opt -online_mode 0 
+***************************************************************
+***************************************************************
+* Running Example reduced_basis_ex5:
+*   example-opt -online_mode 1 
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=1845
+    n_local_nodes()=1845
+  n_elem()=1280
+    n_local_elem()=1280
+    n_active_elem()=1280
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 12:52:43 ***
+ EquationSystems
+  n_systems()=2
+   System #0, "RBElasticity"
+    Type "RBConstruction"
+    Variables={ "u" "v" "w" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=5535
+    n_local_dofs()=5535
+    n_constrained_dofs()=135
+    n_local_constrained_dofs()=135
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 63.9431
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 81
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 135
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+   System #1, "StressSystem"
+    Type "Explicit"
+    Variables={ "sigma_00" "sigma_01" "sigma_02" "sigma_10" "sigma_11" "sigma_12" "sigma_20" "sigma_21" "sigma_22" "vonMises" } 
+    Finite Element Types="MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="CONSTANT", "THIRD" 
+    n_dofs()=12800
+    n_local_dofs()=12800
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+load_Fx: 0.000000e+00
+load_Fy: 0.000000e+00
+load_Fz: -1.000000e+00
+point_load_Fx: 0.000000e+00
+point_load_Fy: 0.000000e+00
+point_load_Fz: 1.000000e+00
+x_scaling: 1.300000e+00
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:41:29 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.302326, Active time=0.19                                                           |
+ ----------------------------------------------------------------------------------------------------------------------
+| Event                                   nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                    w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|----------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                      |
+|                                                                                                                      |
+| DofMap                                                                                                               |
+|   add_neighbors_to_send_list()          2          0.0014      0.000717    0.0014      0.000717    0.75     0.75     |
+|   build_sparsity()                      1          0.0202      0.020218    0.0219      0.021890    10.64    11.52    |
+|   create_dof_constraints()              2          0.0077      0.003829    0.0105      0.005235    4.03     5.51     |
+|   distribute_dofs()                     2          0.0008      0.000394    0.0038      0.001919    0.42     2.02     |
+|   dof_indices()                         38400      0.0227      0.000001    0.0227      0.000001    11.92    11.92    |
+|   prepare_send_list()                   2          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                              2          0.0030      0.001522    0.0030      0.001522    1.60     1.60     |
+|                                                                                                                      |
+| EquationSystems                                                                                                      |
+|   build_solution_vector()               1          0.0179      0.017861    0.0287      0.028657    9.40     15.08    |
+|                                                                                                                      |
+| ExodusII_IO                                                                                                          |
+|   write_nodal_data()                    1          0.0047      0.004688    0.0047      0.004688    2.47     2.47     |
+|                                                                                                                      |
+| FE                                                                                                                   |
+|   compute_shape_functions()             1280       0.0013      0.000001    0.0013      0.000001    0.69     0.69     |
+|   init_shape_functions()                1          0.0000      0.000030    0.0000      0.000030    0.02     0.02     |
+|                                                                                                                      |
+| FEMap                                                                                                                |
+|   compute_affine_map()                  1280       0.0014      0.000001    0.0014      0.000001    0.74     0.74     |
+|   init_reference_to_physical_map()      1          0.0000      0.000047    0.0000      0.000047    0.02     0.02     |
+|                                                                                                                      |
+| Mesh                                                                                                                 |
+|   find_neighbors()                      1          0.0026      0.002598    0.0026      0.002598    1.37     1.37     |
+|   renumber_nodes_and_elem()             2          0.0002      0.000113    0.0002      0.000113    0.12     0.12     |
+|                                                                                                                      |
+| MeshCommunication                                                                                                    |
+|   assign_global_indices()               1          0.0305      0.030484    0.0305      0.030496    16.04    16.05    |
+|                                                                                                                      |
+| MeshOutput                                                                                                           |
+|   write_equation_systems()              1          0.0001      0.000087    0.0334      0.033433    0.05     17.60    |
+|                                                                                                                      |
+| MeshTools::Generation                                                                                                |
+|   build_cube()                          1          0.0009      0.000928    0.0009      0.000928    0.49     0.49     |
+|                                                                                                                      |
+| Parallel                                                                                                             |
+|   allgather()                           6          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   probe()                               4          0.0001      0.000013    0.0001      0.000013    0.03     0.03     |
+|   receive()                             4          0.0001      0.000034    0.0001      0.000034    0.07     0.07     |
+|   send()                                4          0.0018      0.000447    0.0018      0.000447    0.94     0.94     |
+|   send_receive()                        4          0.0000      0.000003    0.0000      0.000003    0.01     0.01     |
+|                                                                                                                      |
+| Parallel::Request                                                                                                    |
+|   wait()                                4          0.0000      0.000005    0.0000      0.000005    0.01     0.01     |
+|                                                                                                                      |
+| Partitioner                                                                                                          |
+|   single_partition()                    1          0.0001      0.000076    0.0001      0.000076    0.04     0.04     |
+|                                                                                                                      |
+| RBConstruction                                                                                                       |
+|   clear()                               1          0.0003      0.000261    0.0003      0.000261    0.14     0.14     |
+|   load_rb_solution()                    1          0.0002      0.000233    0.0002      0.000233    0.12     0.12     |
+|                                                                                                                      |
+| RBEvaluation                                                                                                         |
+|   clear()                               1          0.0000      0.000022    0.0000      0.000022    0.01     0.01     |
+|   compute_residual_dual_norm()          1          0.0003      0.000287    0.0003      0.000287    0.15     0.15     |
+|   rb_solve()                            1          0.0140      0.014007    0.0143      0.014294    7.37     7.52     |
+|   read_in_basis_functions()             1          0.0001      0.000068    0.0454      0.045401    0.04     23.90    |
+|   read_in_vectors_from_multiple_files() 1          0.0128      0.012839    0.0453      0.045333    6.76     23.86    |
+|   read_offline_data_from_files()        1          0.0010      0.000989    0.0010      0.001049    0.52     0.55     |
+|   resize_data_structures()              1          0.0001      0.000060    0.0001      0.000060    0.03     0.03     |
+|                                                                                                                      |
+| main                                                                                                                 |
+|   compute_stresses()                    1          0.0437      0.043700    0.0576      0.057576    23.00    30.30    |
+ ----------------------------------------------------------------------------------------------------------------------
+| Totals:                                 41018      0.1900                                          100.00            |
+ ----------------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example reduced_basis_ex5:
+*   example-opt -online_mode 1 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

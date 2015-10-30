@@ -1,0 +1,2450 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file assembly.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef __assembly_h__
+        #define __assembly_h__
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/fe_interface.h"
+        #include "libmesh/elem.h"
+        
+</pre>
+</div>
+<div class = "comment">
+rbOOmit includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/rb_assembly_expansion.h"
+        #include "libmesh/rb_eim_theta.h"
+        #include "libmesh/rb_parametrized_function.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in bits from the libMesh namespace.
+Just the bits we're using, since this is a header.
+</div>
+
+<div class ="fragment">
+<pre>
+        using libMesh::ElemAssembly;
+        using libMesh::FEMContext;
+        using libMesh::Number;
+        using libMesh::Point;
+        using libMesh::RBAssemblyExpansion;
+        using libMesh::RBEIMAssembly;
+        using libMesh::RBEIMConstruction;
+        using libMesh::RBParametrizedFunction;
+        using libMesh::RBParameters;
+        using libMesh::RBTheta;
+        using libMesh::RBThetaExpansion;
+        using libMesh::Real;
+        using libMesh::RealGradient;
+        using libMesh::Elem;
+        using libMesh::FEBase;
+        
+        struct ShiftedGaussian : public RBParametrizedFunction
+        {
+          virtual Number evaluate(const RBParameters& mu,
+                                  const Point& p,
+                                  const Elem& )
+          {
+            Real center_x = mu.get_value("center_x");
+            Real center_y = mu.get_value("center_y");
+            return exp( -2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)) );
+          }
+        };
+        
+</pre>
+</div>
+<div class = "comment">
+Expansion of the PDE operator
+</div>
+
+<div class ="fragment">
+<pre>
+        struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& )   { return 0.05;  } };
+        
+        struct A0 : ElemAssembly
+        {
+</pre>
+</div>
+<div class = "comment">
+Assemble the Laplacian operator
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void interior_assembly(FEMContext &c)
+          {
+            const unsigned int u_var = 0;
+        
+            FEBase* elem_fe = NULL;
+            c.get_element_fe(u_var, elem_fe);
+        
+            const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+            const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+            const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+            unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+            for (unsigned int qp=0; qp != n_qpoints; qp++)
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                for (unsigned int j=0; j != n_u_dofs; j++)
+                  c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+          }
+        };
+        
+        
+        struct EIM_IP_assembly : ElemAssembly
+        {
+        
+</pre>
+</div>
+<div class = "comment">
+Use the L2 norm to find the best fit
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void interior_assembly(FEMContext &c)
+          {
+            const unsigned int u_var = 0;
+        
+            FEBase* elem_fe = NULL;
+            c.get_element_fe(u_var, elem_fe);
+        
+            const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+            const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = elem_fe-&gt;get_phi();
+        
+            const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+        
+            unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+            for (unsigned int qp=0; qp != n_qpoints; qp++)
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                for (unsigned int j=0; j != n_u_dofs; j++)
+                  c.get_elem_jacobian()(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+          }
+        };
+        
+        struct EIM_F : RBEIMAssembly
+        {
+        
+          EIM_F(RBEIMConstruction& rb_eim_con_in,
+                unsigned int basis_function_index_in)
+            : RBEIMAssembly(rb_eim_con_in,
+                            basis_function_index_in)
+          {}
+        
+          virtual void interior_assembly(FEMContext &c)
+          {
+</pre>
+</div>
+<div class = "comment">
+PDE variable number
+</div>
+
+<div class ="fragment">
+<pre>
+            const unsigned int u_var = 0;
+        
+            FEBase* elem_fe = NULL;
+            c.get_element_fe(u_var, elem_fe);
+        
+</pre>
+</div>
+<div class = "comment">
+EIM variable number
+</div>
+
+<div class ="fragment">
+<pre>
+            const unsigned int eim_var = 0;
+        
+            const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+            const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = elem_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+            const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the affine operator
+</div>
+
+<div class ="fragment">
+<pre>
+            unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+            std::vector&lt;Number&gt; eim_values;
+            evaluate_basis_function(eim_var,
+                                    c.get_elem(),
+                                    c.get_element_qrule(),
+                                    eim_values);
+        
+            for (unsigned int qp=0; qp != n_qpoints; qp++)
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                c.get_elem_residual()(i) += JxW[qp] * ( eim_values[qp]*phi[i][qp] );
+          }
+        
+        };
+        
+</pre>
+</div>
+<div class = "comment">
+Define an RBThetaExpansion class for this PDE
+</div>
+
+<div class ="fragment">
+<pre>
+        struct EimTestRBThetaExpansion : RBThetaExpansion
+        {
+        
+          /**
+           * Constructor.
+           */
+          EimTestRBThetaExpansion()
+          {
+            attach_A_theta(&theta_a_0);
+          }
+        
+</pre>
+</div>
+<div class = "comment">
+The RBTheta member variables
+</div>
+
+<div class ="fragment">
+<pre>
+          ThetaA0 theta_a_0;
+        };
+        
+</pre>
+</div>
+<div class = "comment">
+Define an RBAssemblyExpansion class for this PDE
+</div>
+
+<div class ="fragment">
+<pre>
+        struct EimTestRBAssemblyExpansion : RBAssemblyExpansion
+        {
+        
+          /**
+           * Constructor.
+           */
+          EimTestRBAssemblyExpansion()
+          {
+            attach_A_assembly(&A0_assembly);
+          }
+        
+</pre>
+</div>
+<div class = "comment">
+A0 assembly object
+</div>
+
+<div class ="fragment">
+<pre>
+          A0 A0_assembly;
+        
+        };
+        
+        #endif
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file eim_classes.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef __eim_classes_h__
+        #define __eim_classes_h__
+        
+</pre>
+</div>
+<div class = "comment">
+local includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/rb_eim_construction.h"
+        #include "assembly.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in bits from the libMesh namespace.
+Just the bits we're using, since this is a header.
+</div>
+
+<div class ="fragment">
+<pre>
+        using libMesh::AutoPtr;
+        using libMesh::EquationSystems;
+        using libMesh::RBEIMEvaluation;
+        
+</pre>
+</div>
+<div class = "comment">
+A simple subclass of RBEIMEvaluation. Overload
+evaluate_parametrized_function to define the
+function that we "empirically" interpolate.
+</div>
+
+<div class ="fragment">
+<pre>
+        class SimpleEIMEvaluation : public RBEIMEvaluation
+        {
+        public:
+        
+          SimpleEIMEvaluation(const libMesh::Parallel::Communicator& comm)
+            : RBEIMEvaluation(comm)
+          {
+            attach_parametrized_function(&sg);
+          }
+        
+          /**
+           * Parametrized function that we approximate with EIM
+           */
+          ShiftedGaussian sg;
+        
+        };
+        
+</pre>
+</div>
+<div class = "comment">
+A simple subclass of RBEIMConstruction.
+</div>
+
+<div class ="fragment">
+<pre>
+        class SimpleEIMConstruction : public RBEIMConstruction
+        {
+        public:
+        
+          /**
+           * Constructor.
+           */
+          SimpleEIMConstruction (EquationSystems& es,
+                                 const std::string& name_in,
+                                 const unsigned int number_in)
+            : Parent(es, name_in, number_in)
+          {
+          }
+        
+          /**
+           * The type of the parent.
+           */
+          typedef RBEIMConstruction Parent;
+        
+          /**
+           * Provide an implementation of build_eim_assembly
+           */
+          virtual AutoPtr&lt;ElemAssembly&gt; build_eim_assembly(unsigned int index)
+          {
+            return AutoPtr&lt;ElemAssembly&gt;(new EIM_F(*this, index));
+          }
+        
+          /**
+           * Initialize data structures.
+           */
+          virtual void init_data()
+          {
+            u_var = this-&gt;add_variable ("f_EIM", libMesh::FIRST);
+        
+            Parent::init_data();
+        
+            set_inner_product_assembly(ip);
+          }
+        
+          /**
+           * Variable number for u.
+           */
+          unsigned int u_var;
+        
+          /**
+           * Inner product assembly object
+           */
+          EIM_IP_assembly ip;
+        
+        };
+        
+        #endif
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file rb_classes.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef __rb_classes_h__
+        #define __rb_classes_h__
+        
+        #include "libmesh/rb_construction.h"
+        #include "assembly.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in bits from the libMesh namespace.
+Just the bits we're using, since this is a header.
+</div>
+
+<div class ="fragment">
+<pre>
+        using libMesh::DirichletBoundary;
+        using libMesh::RBConstruction;
+        using libMesh::RBEvaluation;
+        
+</pre>
+</div>
+<div class = "comment">
+A simple subclass of RBEvaluation.
+</div>
+
+<div class ="fragment">
+<pre>
+        class SimpleRBEvaluation : public RBEvaluation
+        {
+        public:
+        
+          /**
+           * Constructor. Just set the theta expansion.
+           */
+          SimpleRBEvaluation(const libMesh::Parallel::Communicator& comm)
+            : RBEvaluation(comm)
+          {
+            set_rb_theta_expansion(eim_test_rb_theta_expansion);
+          }
+        
+          /**
+           * The object that stores the "theta" expansion of the parameter dependent PDE,
+           * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+           */
+          EimTestRBThetaExpansion eim_test_rb_theta_expansion;
+        
+        };
+        
+        class SimpleRBConstruction : public RBConstruction
+        {
+        public:
+        
+          SimpleRBConstruction (EquationSystems& es,
+                                const std::string& name_in,
+                                const unsigned int number_in)
+            : Parent(es, name_in, number_in),
+              dirichlet_bc(AutoPtr&lt;DirichletBoundary&gt;(NULL))
+          {}
+        
+          /**
+           * Destructor.
+           */
+          virtual ~SimpleRBConstruction () {}
+        
+          /**
+           * The type of system.
+           */
+          typedef SimpleRBConstruction sys_type;
+        
+          /**
+           * The type of the parent.
+           */
+          typedef RBConstruction Parent;
+        
+          /**
+           * Initialize data structures.
+           */
+          virtual void init_data()
+          {
+            u_var = this-&gt;add_variable ("u", libMesh::FIRST);
+        
+</pre>
+</div>
+<div class = "comment">
+Generate a DirichletBoundary object
+</div>
+
+<div class ="fragment">
+<pre>
+            dirichlet_bc = build_zero_dirichlet_boundary_object();
+        
+</pre>
+</div>
+<div class = "comment">
+Set the Dirichet boundary IDs
+and the Dirichlet boundary variable numbers
+</div>
+
+<div class ="fragment">
+<pre>
+            dirichlet_bc-&gt;b.insert(0);
+            dirichlet_bc-&gt;b.insert(1);
+            dirichlet_bc-&gt;b.insert(2);
+            dirichlet_bc-&gt;b.insert(3);
+            dirichlet_bc-&gt;variables.push_back(u_var);
+        
+</pre>
+</div>
+<div class = "comment">
+Attach dirichlet_bc (must do this _before_ Parent::init_data)
+</div>
+
+<div class ="fragment">
+<pre>
+            get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
+        
+            Parent::init_data();
+        
+</pre>
+</div>
+<div class = "comment">
+Set the rb_assembly_expansion for this Construction object.
+</div>
+
+<div class ="fragment">
+<pre>
+            set_rb_assembly_expansion(eim_test_rb_assembly_expansion);
+        
+</pre>
+</div>
+<div class = "comment">
+We need to define an inner product matrix for this problem
+</div>
+
+<div class ="fragment">
+<pre>
+            set_inner_product_assembly(eim_test_rb_assembly_expansion.A0_assembly);
+          }
+        
+          /**
+           * Pre-request all relevant element data.
+           */
+          virtual void init_context(FEMContext &c)
+          {
+</pre>
+</div>
+<div class = "comment">
+For efficiency, we should prerequest all
+the data we will need to build the
+linear system before doing an element loop.
+</div>
+
+<div class ="fragment">
+<pre>
+            FEBase* elem_fe = NULL;
+            c.get_element_fe(u_var, elem_fe);
+        
+            elem_fe-&gt;get_JxW();
+            elem_fe-&gt;get_phi();
+            elem_fe-&gt;get_dphi();
+          }
+        
+          /**
+           * Variable number for u.
+           */
+          unsigned int u_var;
+        
+          /**
+           * The object that stores the "theta" expansion of the parameter dependent PDE,
+           * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+           */
+          EimTestRBThetaExpansion eim_test_rb_theta_expansion;
+        
+          /**
+           * The object that stores the "assembly" expansion of the parameter dependent PDE,
+           * i.e. the objects that define how to assemble the set of parameter-independent
+           * operators in the affine expansion of the PDE.
+           */
+          EimTestRBAssemblyExpansion eim_test_rb_assembly_expansion;
+        
+          /**
+           * The object that defines which degrees of freedom are on a Dirichlet boundary.
+           */
+          AutoPtr&lt;DirichletBoundary&gt; dirichlet_bc;
+        
+        };
+        
+        #endif
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file reduced_basis_ex4.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/getpot.h"
+        
+        #include "eim_classes.h"
+        #include "rb_classes.h"
+        
+        using namespace libMesh;
+        
+        
+        int main (int argc, char** argv)
+        {
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+        
+        #if !defined(LIBMESH_HAVE_XDR)
+</pre>
+</div>
+<div class = "comment">
+We need XDR support to write out reduced bases
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(false, "--enable-xdr");
+        #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
+</pre>
+</div>
+<div class = "comment">
+XDR binary support requires double precision
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(false, "--disable-singleprecision");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this 2D example if libMesh was compiled as 1D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(2 &lt;= LIBMESH_DIM, "2D support");
+        
+</pre>
+</div>
+<div class = "comment">
+Define the names of the input files we will read the problem properties from
+</div>
+
+<div class ="fragment">
+<pre>
+          std::string eim_parameters = "eim.in";
+          std::string rb_parameters  = "rb.in";
+          std::string main_parameters = "reduced_basis_ex4.in";
+          GetPot infile(main_parameters);
+        
+          unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
+          const unsigned int dim = 2;                      // The number of spatial dimensions
+          bool store_basis_functions = infile("store_basis_functions", false); // Do we write out basis functions?
+        
+</pre>
+</div>
+<div class = "comment">
+Read the "online_mode" flag from the command line
+</div>
+
+<div class ="fragment">
+<pre>
+          GetPot command_line (argc, argv);
+          int online_mode = 0;
+          if ( command_line.search(1, "-online_mode") )
+            online_mode = command_line.next(online_mode);
+        
+</pre>
+</div>
+<div class = "comment">
+Create a mesh (just a simple square) on the default MPI
+communicator.  We currently have to create a SerialMesh here due
+to a reduced_basis regression with ParallelMesh
+</div>
+
+<div class ="fragment">
+<pre>
+          SerialMesh mesh (init.comm(), dim);
+          MeshTools::Generation::build_square (mesh,
+                                               n_elem, n_elem,
+                                               -1., 1.,
+                                               -1., 1.,
+                                               QUAD4);
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the EquationSystems object for this mesh and attach
+the EIM and RB Construction objects
+</div>
+
+<div class ="fragment">
+<pre>
+          EquationSystems equation_systems (mesh);
+        
+          SimpleEIMConstruction & eim_construction =
+            equation_systems.add_system&lt;SimpleEIMConstruction&gt; ("EIM");
+          SimpleRBConstruction & rb_construction =
+            equation_systems.add_system&lt;SimpleRBConstruction&gt; ("RB");
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the data structures for the equation system.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.init ();
+        
+</pre>
+</div>
+<div class = "comment">
+Print out some information about the "truth" discretization
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
+          equation_systems.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the standard RBEvaluation object
+</div>
+
+<div class ="fragment">
+<pre>
+          SimpleRBEvaluation rb_eval(mesh.comm());
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the EIM RBEvaluation object
+</div>
+
+<div class ="fragment">
+<pre>
+          SimpleEIMEvaluation eim_rb_eval(mesh.comm());
+        
+</pre>
+</div>
+<div class = "comment">
+Set the rb_eval objects for the RBConstructions
+</div>
+
+<div class ="fragment">
+<pre>
+          eim_construction.set_rb_evaluation(eim_rb_eval);
+          rb_construction.set_rb_evaluation(rb_eval);
+        
+          if(!online_mode)
+            {
+</pre>
+</div>
+<div class = "comment">
+Read data from input file and print state
+</div>
+
+<div class ="fragment">
+<pre>
+              eim_construction.process_parameters_file(eim_parameters);
+              eim_construction.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Perform the EIM Greedy and write out the data
+</div>
+
+<div class ="fragment">
+<pre>
+              eim_construction.initialize_rb_construction();
+              eim_construction.train_reduced_basis();
+              eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
+        
+</pre>
+</div>
+<div class = "comment">
+Read data from input file and print state
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_construction.process_parameters_file(rb_parameters);
+        
+</pre>
+</div>
+<div class = "comment">
+attach the EIM theta objects to the RBConstruction and RBEvaluation objects
+</div>
+
+<div class ="fragment">
+<pre>
+              eim_rb_eval.initialize_eim_theta_objects();
+              rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+        
+</pre>
+</div>
+<div class = "comment">
+attach the EIM assembly objects to the RBConstruction object
+</div>
+
+<div class ="fragment">
+<pre>
+              eim_construction.initialize_eim_assembly_objects();
+              rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
+        
+</pre>
+</div>
+<div class = "comment">
+Print out the state of rb_construction now that the EIM objects have been attached
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_construction.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Need to initialize _after_ EIM greedy so that
+the system knows how many affine terms there are
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_construction.initialize_rb_construction();
+              rb_construction.train_reduced_basis();
+              rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
+        
+</pre>
+</div>
+<div class = "comment">
+Write out the basis functions, if requested
+</div>
+
+<div class ="fragment">
+<pre>
+              if(store_basis_functions)
+                {
+</pre>
+</div>
+<div class = "comment">
+Write out the basis functions
+</div>
+
+<div class ="fragment">
+<pre>
+                  eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
+                  rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+                }
+            }
+          else
+            {
+              eim_rb_eval.read_offline_data_from_files("eim_data");
+        
+</pre>
+</div>
+<div class = "comment">
+attach the EIM theta objects to rb_eval objects
+</div>
+
+<div class ="fragment">
+<pre>
+              eim_rb_eval.initialize_eim_theta_objects();
+              rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+        
+</pre>
+</div>
+<div class = "comment">
+Read in the offline data for rb_eval
+</div>
+
+<div class ="fragment">
+<pre>
+              rb_eval.read_offline_data_from_files("rb_data");
+        
+</pre>
+</div>
+<div class = "comment">
+Get the parameters at which we will do a reduced basis solve
+</div>
+
+<div class ="fragment">
+<pre>
+              Real online_center_x = infile("online_center_x", 0.);
+              Real online_center_y = infile("online_center_y", 0.);
+              RBParameters online_mu;
+              online_mu.set_value("center_x", online_center_x);
+              online_mu.set_value("center_y", online_center_y);
+              rb_eval.set_parameters(online_mu);
+              rb_eval.print_parameters();
+              rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+        
+</pre>
+</div>
+<div class = "comment">
+plot the solution, if requested
+</div>
+
+<div class ="fragment">
+<pre>
+              if(store_basis_functions)
+                {
+</pre>
+</div>
+<div class = "comment">
+read in the data from files
+</div>
+
+<div class ="fragment">
+<pre>
+                  eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
+                  rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+        
+                  eim_construction.load_rb_solution();
+                  rb_construction.load_rb_solution();
+        #ifdef LIBMESH_HAVE_EXODUS_API
+                  ExodusII_IO(mesh).write_equation_systems("RB_sol.e",equation_systems);
+        #endif
+                }
+            }
+        
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file assembly.h without comments: </h1> 
+<pre> 
+  #ifndef __assembly_h__
+  #define __assembly_h__
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_interface.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_assembly_expansion.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_eim_theta.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_parametrized_function.h&quot;</FONT></B>
+  
+  using libMesh::ElemAssembly;
+  using libMesh::FEMContext;
+  using libMesh::Number;
+  using libMesh::Point;
+  using libMesh::RBAssemblyExpansion;
+  using libMesh::RBEIMAssembly;
+  using libMesh::RBEIMConstruction;
+  using libMesh::RBParametrizedFunction;
+  using libMesh::RBParameters;
+  using libMesh::RBTheta;
+  using libMesh::RBThetaExpansion;
+  using libMesh::Real;
+  using libMesh::RealGradient;
+  using libMesh::Elem;
+  using libMesh::FEBase;
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ShiftedGaussian : <B><FONT COLOR="#228B22">public</FONT></B> RBParametrizedFunction
+  {
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; mu,
+                            <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                            <B><FONT COLOR="#228B22">const</FONT></B> Elem&amp; )
+    {
+      Real center_x = mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;center_x&quot;</FONT></B>);
+      Real center_y = mu.get_value(<B><FONT COLOR="#BC8F8F">&quot;center_y&quot;</FONT></B>);
+      <B><FONT COLOR="#A020F0">return</FONT></B> exp( -2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)) );
+    }
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> ThetaA0 : RBTheta { <B><FONT COLOR="#228B22">virtual</FONT></B> Number evaluate(<B><FONT COLOR="#228B22">const</FONT></B> RBParameters&amp; )   { <B><FONT COLOR="#A020F0">return</FONT></B> 0.05;  } };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> A0 : ElemAssembly
+  {
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c)
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
+  
+      FEBase* elem_fe = NULL;
+      c.get_element_fe(u_var, elem_fe);
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = elem_fe-&gt;get_dphi();
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+  
+      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
+            c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+    }
+  };
+  
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> EIM_IP_assembly : ElemAssembly
+  {
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c)
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
+  
+      FEBase* elem_fe = NULL;
+      c.get_element_fe(u_var, elem_fe);
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = elem_fe-&gt;get_phi();
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+  
+      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
+            c.get_elem_jacobian()(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+    }
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> EIM_F : RBEIMAssembly
+  {
+  
+    EIM_F(RBEIMConstruction&amp; rb_eim_con_in,
+          <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> basis_function_index_in)
+      : RBEIMAssembly(rb_eim_con_in,
+                      basis_function_index_in)
+    {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c)
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
+  
+      FEBase* elem_fe = NULL;
+      c.get_element_fe(u_var, elem_fe);
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> eim_var = 0;
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = elem_fe-&gt;get_phi();
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+  
+      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt; eim_values;
+      evaluate_basis_function(eim_var,
+                              c.get_elem(),
+                              c.get_element_qrule(),
+                              eim_values);
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+          c.get_elem_residual()(i) += JxW[qp] * ( eim_values[qp]*phi[i][qp] );
+    }
+  
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> EimTestRBThetaExpansion : RBThetaExpansion
+  {
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.
+     */</FONT></I>
+    EimTestRBThetaExpansion()
+    {
+      attach_A_theta(&amp;theta_a_0);
+    }
+  
+    ThetaA0 theta_a_0;
+  };
+  
+  <B><FONT COLOR="#228B22">struct</FONT></B> EimTestRBAssemblyExpansion : RBAssemblyExpansion
+  {
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.
+     */</FONT></I>
+    EimTestRBAssemblyExpansion()
+    {
+      attach_A_assembly(&amp;A0_assembly);
+    }
+  
+    A0 A0_assembly;
+  
+  };
+  
+  #endif
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file eim_classes.h without comments: </h1> 
+<pre> 
+  #ifndef __eim_classes_h__
+  #define __eim_classes_h__
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_eim_construction.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;assembly.h&quot;</FONT></B>
+  
+  using libMesh::AutoPtr;
+  using libMesh::EquationSystems;
+  using libMesh::RBEIMEvaluation;
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> SimpleEIMEvaluation : <B><FONT COLOR="#228B22">public</FONT></B> RBEIMEvaluation
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    SimpleEIMEvaluation(<B><FONT COLOR="#228B22">const</FONT></B> libMesh::Parallel::Communicator&amp; comm)
+      : RBEIMEvaluation(comm)
+    {
+      attach_parametrized_function(&amp;sg);
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Parametrized function that we approximate with EIM
+     */</FONT></I>
+    ShiftedGaussian sg;
+  
+  };
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> SimpleEIMConstruction : <B><FONT COLOR="#228B22">public</FONT></B> RBEIMConstruction
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.
+     */</FONT></I>
+    SimpleEIMConstruction (EquationSystems&amp; es,
+                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                           <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+      : Parent(es, name_in, number_in)
+    {
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * The type of the parent.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">typedef</FONT></B> RBEIMConstruction Parent;
+  
+    <I><FONT COLOR="#B22222">/**
+     * Provide an implementation of build_eim_assembly
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;ElemAssembly&gt; build_eim_assembly(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> index)
+    {
+      <B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;ElemAssembly&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> EIM_F(*<B><FONT COLOR="#A020F0">this</FONT></B>, index));
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Initialize data structures.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_data()
+    {
+      u_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;f_EIM&quot;</FONT></B>, libMesh::FIRST);
+  
+      <B><FONT COLOR="#5F9EA0">Parent</FONT></B>::init_data();
+  
+      set_inner_product_assembly(ip);
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Variable number for u.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var;
+  
+    <I><FONT COLOR="#B22222">/**
+     * Inner product assembly object
+     */</FONT></I>
+    EIM_IP_assembly ip;
+  
+  };
+  
+  #endif
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file rb_classes.h without comments: </h1> 
+<pre> 
+  #ifndef __rb_classes_h__
+  #define __rb_classes_h__
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/rb_construction.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;assembly.h&quot;</FONT></B>
+  
+  using libMesh::DirichletBoundary;
+  using libMesh::RBConstruction;
+  using libMesh::RBEvaluation;
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> SimpleRBEvaluation : <B><FONT COLOR="#228B22">public</FONT></B> RBEvaluation
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor. Just set the theta expansion.
+     */</FONT></I>
+    SimpleRBEvaluation(<B><FONT COLOR="#228B22">const</FONT></B> libMesh::Parallel::Communicator&amp; comm)
+      : RBEvaluation(comm)
+    {
+      set_rb_theta_expansion(eim_test_rb_theta_expansion);
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that stores the &quot;theta&quot; expansion of the parameter dependent PDE,
+     * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+     */</FONT></I>
+    EimTestRBThetaExpansion eim_test_rb_theta_expansion;
+  
+  };
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> SimpleRBConstruction : <B><FONT COLOR="#228B22">public</FONT></B> RBConstruction
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    SimpleRBConstruction (EquationSystems&amp; es,
+                          <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                          <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+      : Parent(es, name_in, number_in),
+        dirichlet_bc(AutoPtr&lt;DirichletBoundary&gt;(NULL))
+    {}
+  
+    <I><FONT COLOR="#B22222">/**
+     * Destructor.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> ~SimpleRBConstruction () {}
+  
+    <I><FONT COLOR="#B22222">/**
+     * The type of system.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">typedef</FONT></B> SimpleRBConstruction sys_type;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The type of the parent.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">typedef</FONT></B> RBConstruction Parent;
+  
+    <I><FONT COLOR="#B22222">/**
+     * Initialize data structures.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_data()
+    {
+      u_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, libMesh::FIRST);
+  
+      dirichlet_bc = build_zero_dirichlet_boundary_object();
+  
+      dirichlet_bc-&gt;b.insert(0);
+      dirichlet_bc-&gt;b.insert(1);
+      dirichlet_bc-&gt;b.insert(2);
+      dirichlet_bc-&gt;b.insert(3);
+      dirichlet_bc-&gt;variables.push_back(u_var);
+  
+      get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
+  
+      <B><FONT COLOR="#5F9EA0">Parent</FONT></B>::init_data();
+  
+      set_rb_assembly_expansion(eim_test_rb_assembly_expansion);
+  
+      set_inner_product_assembly(eim_test_rb_assembly_expansion.A0_assembly);
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Pre-request all relevant element data.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_context(FEMContext &amp;c)
+    {
+      FEBase* elem_fe = NULL;
+      c.get_element_fe(u_var, elem_fe);
+  
+      elem_fe-&gt;get_JxW();
+      elem_fe-&gt;get_phi();
+      elem_fe-&gt;get_dphi();
+    }
+  
+    <I><FONT COLOR="#B22222">/**
+     * Variable number for u.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that stores the &quot;theta&quot; expansion of the parameter dependent PDE,
+     * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+     */</FONT></I>
+    EimTestRBThetaExpansion eim_test_rb_theta_expansion;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that stores the &quot;assembly&quot; expansion of the parameter dependent PDE,
+     * i.e. the objects that define how to assemble the set of parameter-independent
+     * operators in the affine expansion of the PDE.
+     */</FONT></I>
+    EimTestRBAssemblyExpansion eim_test_rb_assembly_expansion;
+  
+    <I><FONT COLOR="#B22222">/**
+     * The object that defines which degrees of freedom are on a Dirichlet boundary.
+     */</FONT></I>
+    AutoPtr&lt;DirichletBoundary&gt; dirichlet_bc;
+  
+  };
+  
+  #endif
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file reduced_basis_ex4.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;eim_classes.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;rb_classes.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+  #<B><FONT COLOR="#A020F0">if</FONT></B> !defined(LIBMESH_HAVE_XDR)
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-xdr&quot;</FONT></B>);
+  #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--disable-singleprecision&quot;</FONT></B>);
+  #endif
+  
+    libmesh_example_requires(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string eim_parameters = <B><FONT COLOR="#BC8F8F">&quot;eim.in&quot;</FONT></B>;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string rb_parameters  = <B><FONT COLOR="#BC8F8F">&quot;rb.in&quot;</FONT></B>;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string main_parameters = <B><FONT COLOR="#BC8F8F">&quot;reduced_basis_ex4.in&quot;</FONT></B>;
+    GetPot infile(main_parameters);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_elem = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elem&quot;</FONT></B>, 1);       <I><FONT COLOR="#B22222">// Determines the number of elements in the &quot;truth&quot; mesh
+</FONT></I>    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;                      <I><FONT COLOR="#B22222">// The number of spatial dimensions
+</FONT></I>    <B><FONT COLOR="#228B22">bool</FONT></B> store_basis_functions = infile(<B><FONT COLOR="#BC8F8F">&quot;store_basis_functions&quot;</FONT></B>, false); <I><FONT COLOR="#B22222">// Do we write out basis functions?
+</FONT></I>  
+    GetPot command_line (argc, argv);
+    <B><FONT COLOR="#228B22">int</FONT></B> online_mode = 0;
+    <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-online_mode&quot;</FONT></B>) )
+      online_mode = command_line.next(online_mode);
+  
+    SerialMesh mesh (init.comm(), dim);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+                                         n_elem, n_elem,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         QUAD4);
+  
+    EquationSystems equation_systems (mesh);
+  
+    SimpleEIMConstruction &amp; eim_construction =
+      equation_systems.add_system&lt;SimpleEIMConstruction&gt; (<B><FONT COLOR="#BC8F8F">&quot;EIM&quot;</FONT></B>);
+    SimpleRBConstruction &amp; rb_construction =
+      equation_systems.add_system&lt;SimpleRBConstruction&gt; (<B><FONT COLOR="#BC8F8F">&quot;RB&quot;</FONT></B>);
+  
+    equation_systems.init ();
+  
+    mesh.print_info();
+    equation_systems.print_info();
+  
+    SimpleRBEvaluation rb_eval(mesh.comm());
+  
+    SimpleEIMEvaluation eim_rb_eval(mesh.comm());
+  
+    eim_construction.set_rb_evaluation(eim_rb_eval);
+    rb_construction.set_rb_evaluation(rb_eval);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(!online_mode)
+      {
+        eim_construction.process_parameters_file(eim_parameters);
+        eim_construction.print_info();
+  
+        eim_construction.initialize_rb_construction();
+        eim_construction.train_reduced_basis();
+        eim_construction.get_rb_evaluation().write_offline_data_to_files(<B><FONT COLOR="#BC8F8F">&quot;eim_data&quot;</FONT></B>);
+  
+        rb_construction.process_parameters_file(rb_parameters);
+  
+        eim_rb_eval.initialize_eim_theta_objects();
+        rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+  
+        eim_construction.initialize_eim_assembly_objects();
+        rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
+  
+        rb_construction.print_info();
+  
+        rb_construction.initialize_rb_construction();
+        rb_construction.train_reduced_basis();
+        rb_construction.get_rb_evaluation().write_offline_data_to_files(<B><FONT COLOR="#BC8F8F">&quot;rb_data&quot;</FONT></B>);
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(store_basis_functions)
+          {
+            eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,<B><FONT COLOR="#BC8F8F">&quot;eim_data&quot;</FONT></B>);
+            rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,<B><FONT COLOR="#BC8F8F">&quot;rb_data&quot;</FONT></B>);
+          }
+      }
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      {
+        eim_rb_eval.read_offline_data_from_files(<B><FONT COLOR="#BC8F8F">&quot;eim_data&quot;</FONT></B>);
+  
+        eim_rb_eval.initialize_eim_theta_objects();
+        rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+  
+        rb_eval.read_offline_data_from_files(<B><FONT COLOR="#BC8F8F">&quot;rb_data&quot;</FONT></B>);
+  
+        Real online_center_x = infile(<B><FONT COLOR="#BC8F8F">&quot;online_center_x&quot;</FONT></B>, 0.);
+        Real online_center_y = infile(<B><FONT COLOR="#BC8F8F">&quot;online_center_y&quot;</FONT></B>, 0.);
+        RBParameters online_mu;
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;center_x&quot;</FONT></B>, online_center_x);
+        online_mu.set_value(<B><FONT COLOR="#BC8F8F">&quot;center_y&quot;</FONT></B>, online_center_y);
+        rb_eval.set_parameters(online_mu);
+        rb_eval.print_parameters();
+        rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(store_basis_functions)
+          {
+            eim_rb_eval.read_in_basis_functions(eim_construction,<B><FONT COLOR="#BC8F8F">&quot;eim_data&quot;</FONT></B>);
+            rb_eval.read_in_basis_functions(rb_construction,<B><FONT COLOR="#BC8F8F">&quot;rb_data&quot;</FONT></B>);
+  
+            eim_construction.load_rb_solution();
+            rb_construction.load_rb_solution();
+  #ifdef LIBMESH_HAVE_EXODUS_API
+            ExodusII_IO(mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;RB_sol.e&quot;</FONT></B>,equation_systems);
+  #endif
+          }
+      }
+  
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example reduced_basis_ex4:
+*   example-opt -online_mode 0 
+***************************************************************
+ 
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 12:52:43 ***
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=676
+    n_local_nodes()=676
+  n_elem()=625
+    n_local_elem()=625
+    n_active_elem()=625
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #0, "EIM"
+    Type "RBConstruction"
+    Variables="f_EIM" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=676
+    n_local_dofs()=676
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.54438
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #1, "RB"
+    Type "RBConstruction"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=676
+    n_local_dofs()=676
+    n_constrained_dofs()=100
+    n_local_constrained_dofs()=100
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.54438
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 100
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+Initializing training parameters with deterministic training set...
+Parameter center_x: log scaling = 0
+Parameter center_y: log scaling = 0
+
+
+RBConstruction parameters:
+system name: EIM
+constrained_problem: 0
+Nmax: 20
+Basis training error tolerance: 0.001
+Aq operators attached: 0
+Fq functions attached: 0
+n_outputs: 0
+Number of parameters: 2
+Parameter center_x: Min = -1, Max = 1
+Parameter center_y: Min = -1, Max = 1
+n_training_samples: 25
+reuse preconditioner? 1
+use a relative error bound in greedy? 0
+write out data during basis training? 0
+quiet mode? 1
+
+
+RBEIMConstruction parameters:
+best fit type: projection
+
+Assembling inner product matrix
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Oct 22 2014 at 12:52:50 ***
+Initializing parametrized functions in training set...
+Completed solve for training sample 1 of 25
+Completed solve for training sample 2 of 25
+Completed solve for training sample 3 of 25
+Completed solve for training sample 4 of 25
+Completed solve for training sample 5 of 25
+Completed solve for training sample 6 of 25
+Completed solve for training sample 7 of 25
+Completed solve for training sample 8 of 25
+Completed solve for training sample 9 of 25
+Completed solve for training sample 10 of 25
+Completed solve for training sample 11 of 25
+Completed solve for training sample 12 of 25
+Completed solve for training sample 13 of 25
+Completed solve for training sample 14 of 25
+Completed solve for training sample 15 of 25
+Completed solve for training sample 16 of 25
+Completed solve for training sample 17 of 25
+Completed solve for training sample 18 of 25
+Completed solve for training sample 19 of 25
+Completed solve for training sample 20 of 25
+Completed solve for training sample 21 of 25
+Completed solve for training sample 22 of 25
+Completed solve for training sample 23 of 25
+Completed solve for training sample 24 of 25
+Completed solve for training sample 25 of 25
+Parametrized functions in training set initialized
+
+
+---- Performing Greedy basis enrichment ----
+
+---- Basis dimension: 0 ----
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 1 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.04028
+
+Performing truth solve at parameter:
+center_x: 5.000000e-01
+center_y: 5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 2 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.00428
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 3 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.02817
+
+Performing truth solve at parameter:
+center_x: -5.000000e-01
+center_y: -5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 4 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.00298
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 5 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.00292
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 6 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.86594
+
+Performing truth solve at parameter:
+center_x: -5.000000e-01
+center_y: 5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.816903
+
+Performing truth solve at parameter:
+center_x: 5.000000e-01
+center_y: -5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.681622
+
+Performing truth solve at parameter:
+center_x: 0.000000e+00
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.658046
+
+Performing truth solve at parameter:
+center_x: 0.000000e+00
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 10 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.606155
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 0.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 11 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.606138
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: 0.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 12 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.193607
+
+Performing truth solve at parameter:
+center_x: 0.000000e+00
+center_y: 0.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 13 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.184868
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: -5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 14 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.214039
+
+Performing truth solve at parameter:
+center_x: 5.000000e-01
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 15 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.175349
+
+Performing truth solve at parameter:
+center_x: 5.000000e-01
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 16 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.163258
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: 5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 17 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.161335
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: -5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 18 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.159752
+
+Performing truth solve at parameter:
+center_x: -5.000000e-01
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 19 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.123948
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 5.000000e-01
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 20 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.162888
+
+Maximum number of basis functions reached: Nmax = 20.
+Perform one more Greedy iteration for error bounds.
+Performing truth solve at parameter:
+center_x: -5.000000e-01
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+
+---- Basis dimension: 20 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.162888
+
+Extra Greedy iteration finished.
+Initializing training parameters with deterministic training set...
+Parameter center_x: log scaling = 0
+Parameter center_y: log scaling = 0
+
+
+RBConstruction parameters:
+system name: RB
+constrained_problem: 0
+Nmax: 15
+Basis training error tolerance: 0.001
+Aq operators attached: 1
+Fq functions attached: 20
+n_outputs: 0
+Number of parameters: 2
+Parameter center_x: Min = -1, Max = 1
+Parameter center_y: Min = -1, Max = 1
+n_training_samples: 100
+reuse preconditioner? 1
+use a relative error bound in greedy? 0
+write out data during basis training? 0
+quiet mode? 1
+
+Assembling inner product matrix
+Assembling affine operator 1 of 1
+Assembling affine vector 1 of 20
+Assembling affine vector 2 of 20
+Assembling affine vector 3 of 20
+Assembling affine vector 4 of 20
+Assembling affine vector 5 of 20
+Assembling affine vector 6 of 20
+Assembling affine vector 7 of 20
+Assembling affine vector 8 of 20
+Assembling affine vector 9 of 20
+Assembling affine vector 10 of 20
+Assembling affine vector 11 of 20
+Assembling affine vector 12 of 20
+Assembling affine vector 13 of 20
+Assembling affine vector 14 of 20
+Assembling affine vector 15 of 20
+Assembling affine vector 16 of 20
+Assembling affine vector 17 of 20
+Assembling affine vector 18 of 20
+Assembling affine vector 19 of 20
+Assembling affine vector 20 of 20
+
+---- Performing Greedy basis enrichment ----
+
+---- Basis dimension: 0 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.388376
+
+Performing truth solve at parameter:
+center_x: -1.111111e-01
+center_y: 1.111111e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 1 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.176776
+
+Performing truth solve at parameter:
+center_x: 5.555556e-01
+center_y: -5.555556e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 2 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.15644
+
+Performing truth solve at parameter:
+center_x: -5.555556e-01
+center_y: -5.555556e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 3 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.130994
+
+Performing truth solve at parameter:
+center_x: 5.555556e-01
+center_y: 5.555556e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 4 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0984295
+
+Performing truth solve at parameter:
+center_x: -5.555556e-01
+center_y: 5.555556e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 5 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0475053
+
+Performing truth solve at parameter:
+center_x: -1.111111e-01
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 6 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0432771
+
+Performing truth solve at parameter:
+center_x: 1.111111e-01
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0310976
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: -1.111111e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0264776
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: 1.111111e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0242248
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 10 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0228554
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 11 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0206759
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 12 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0188747
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 13 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.00819468
+
+Performing truth solve at parameter:
+center_x: 1.000000e+00
+center_y: -3.333333e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 14 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.00761207
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 3.333333e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 15 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.00555548
+
+Maximum number of basis functions reached: Nmax = 15
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:33 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=1.26716, Active time=1.15502                                                       |
+ --------------------------------------------------------------------------------------------------------------------
+| Event                                 nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                  w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|--------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                    |
+|                                                                                                                    |
+| DofMap                                                                                                             |
+|   add_neighbors_to_send_list()        2          0.0003      0.000159    0.0003      0.000159    0.03     0.03     |
+|   build_constraint_matrix()           13750      0.0059      0.000000    0.0059      0.000000    0.51     0.51     |
+|   build_sparsity()                    2          0.0023      0.001172    0.0033      0.001626    0.20     0.28     |
+|   cnstrn_elem_mat_vec()               13750      0.0098      0.000001    0.0098      0.000001    0.85     0.85     |
+|   create_dof_constraints()            2          0.0019      0.000929    0.0025      0.001246    0.16     0.22     |
+|   distribute_dofs()                   2          0.0004      0.000212    0.0019      0.000971    0.04     0.17     |
+|   dof_indices()                       101065     0.0636      0.000001    0.0636      0.000001    5.50     5.50     |
+|   prepare_send_list()                 2          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                            2          0.0015      0.000757    0.0015      0.000757    0.13     0.13     |
+|                                                                                                                    |
+| FE                                                                                                                 |
+|   compute_shape_functions()           57925      0.0574      0.000001    0.0574      0.000001    4.97     4.97     |
+|   init_shape_functions()              2389       0.0051      0.000002    0.0051      0.000002    0.44     0.44     |
+|   inverse_map()                       5480       0.0062      0.000001    0.0062      0.000001    0.53     0.53     |
+|                                                                                                                    |
+| FEMap                                                                                                              |
+|   compute_affine_map()                57925      0.0321      0.000001    0.0321      0.000001    2.78     2.78     |
+|   compute_face_map()                  2300       0.0048      0.000002    0.0104      0.000005    0.41     0.90     |
+|   init_face_shape_functions()         23         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   init_reference_to_physical_map()    2389       0.0039      0.000002    0.0039      0.000002    0.34     0.34     |
+|                                                                                                                    |
+| Mesh                                                                                                               |
+|   find_neighbors()                    1          0.0010      0.000960    0.0010      0.000960    0.08     0.08     |
+|   renumber_nodes_and_elem()           2          0.0001      0.000029    0.0001      0.000029    0.01     0.01     |
+|                                                                                                                    |
+| MeshCommunication                                                                                                  |
+|   assign_global_indices()             2          0.0266      0.013300    0.0266      0.013307    2.30     2.30     |
+|                                                                                                                    |
+| MeshTools::Generation                                                                                              |
+|   build_cube()                        1          0.0004      0.000351    0.0004      0.000351    0.03     0.03     |
+|                                                                                                                    |
+| Parallel                                                                                                           |
+|   allgather()                         10         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   probe()                             16         0.0001      0.000006    0.0001      0.000006    0.01     0.01     |
+|   receive()                           8          0.0002      0.000021    0.0002      0.000021    0.01     0.01     |
+|   send()                              8          0.0016      0.000198    0.0016      0.000198    0.14     0.14     |
+|   send_receive()                      8          0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|                                                                                                                    |
+| Parallel::Request                                                                                                  |
+|   wait()                              8          0.0000      0.000004    0.0000      0.000004    0.00     0.00     |
+|                                                                                                                    |
+| Partitioner                                                                                                        |
+|   single_partition()                  1          0.0000      0.000037    0.0000      0.000037    0.00     0.00     |
+|                                                                                                                    |
+| PetscLinearSolver                                                                                                  |
+|   solve()                             75         0.0750      0.001000    0.0750      0.001000    6.49     6.49     |
+|                                                                                                                    |
+| PointLocatorTree                                                                                                   |
+|   init(no master)                     1          0.0006      0.000570    0.0006      0.000570    0.05     0.05     |
+|   operator()                          440        0.0035      0.000008    0.0041      0.000009    0.30     0.36     |
+|                                                                                                                    |
+| RBConstruction                                                                                                     |
+|   add_scaled_matrix_and_vector()      23         0.0768      0.003339    0.2259      0.009820    6.65     19.55    |
+|   clear()                             3          0.0007      0.000231    0.0007      0.000231    0.06     0.06     |
+|   compute_Fq_representor_innerprods() 2          0.0018      0.000876    0.0252      0.012579    0.15     2.18     |
+|   compute_max_error_bound()           37         0.0068      0.000185    0.6054      0.016363    0.59     52.42    |
+|   enrich_RB_space()                   15         0.0028      0.000187    0.0028      0.000187    0.24     0.24     |
+|   train_reduced_basis()               2          0.0025      0.001252    0.7827      0.391359    0.22     67.77    |
+|   truth_assembly()                    15         0.0065      0.000433    0.0069      0.000461    0.56     0.60     |
+|   truth_solve()                       15         0.0006      0.000038    0.0244      0.001629    0.05     2.12     |
+|   update_RB_system_matrices()         36         0.0100      0.000278    0.0100      0.000278    0.87     0.87     |
+|   update_residual_terms()             15         0.0155      0.001032    0.0329      0.002191    1.34     2.85     |
+|                                                                                                                    |
+| RBEIMAssembly                                                                                                      |
+|   evaluate_basis_function             12500      0.0255      0.000002    0.0584      0.000005    2.21     5.06     |
+|                                                                                                                    |
+| RBEIMConstruction                                                                                                  |
+|   compute_best_fit_error()            525        0.0308      0.000059    0.0372      0.000071    2.66     3.22     |
+|   enrich_RB_space()                   21         0.0338      0.001610    0.0759      0.003613    2.93     6.57     |
+|   truth_solve()                       571        0.0667      0.000117    0.1311      0.000230    5.78     11.35    |
+|   update_RB_system_matrices()         21         0.0017      0.000080    0.0084      0.000398    0.14     0.72     |
+|                                                                                                                    |
+| RBEIMEvaluation                                                                                                    |
+|   rb_solve()                          1633       0.0335      0.000021    0.0335      0.000021    2.90     2.90     |
+|   write_offline_data_to_files()       1          0.0006      0.000563    0.0014      0.001423    0.05     0.12     |
+|                                                                                                                    |
+| RBEvaluation                                                                                                       |
+|   clear()                             3          0.0001      0.000033    0.0001      0.000033    0.01     0.01     |
+|   compute_residual_dual_norm()        1600       0.4964      0.000310    0.4964      0.000310    42.97    42.97    |
+|   rb_solve()                          1600       0.0318      0.000020    0.5612      0.000351    2.75     48.59    |
+|   resize_data_structures()            2          0.0000      0.000020    0.0000      0.000020    0.00     0.00     |
+|   write_offline_data_to_files()       2          0.0014      0.000678    0.0014      0.000678    0.12     0.12     |
+|   write_out_basis_functions()         2          0.0002      0.000079    0.0328      0.016424    0.01     2.84     |
+|   write_out_vectors()                 2          0.0042      0.002095    0.0327      0.016344    0.36     2.83     |
+|                                                                                                                    |
+| XdrIO                                                                                                              |
+|   write()                             1          0.0004      0.000381    0.0004      0.000381    0.03     0.03     |
+ --------------------------------------------------------------------------------------------------------------------
+| Totals:                               276236     1.1550                                          100.00            |
+ --------------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example reduced_basis_ex4:
+*   example-opt -online_mode 0 
+***************************************************************
+***************************************************************
+* Running Example reduced_basis_ex4:
+*   example-opt -online_mode 1 
+***************************************************************
+ 
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 12:52:43 ***
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=676
+    n_local_nodes()=676
+  n_elem()=625
+    n_local_elem()=625
+    n_active_elem()=625
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #0, "EIM"
+    Type "RBConstruction"
+    Variables="f_EIM" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=676
+    n_local_dofs()=676
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.54438
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #1, "RB"
+    Type "RBConstruction"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=676
+    n_local_dofs()=676
+    n_constrained_dofs()=100
+    n_local_constrained_dofs()=100
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.54438
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 100
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+center_x: -6.000000e-01
+center_y: 7.000000e-01
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:33 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.144588, Active time=0.060552                                                       |
+ ----------------------------------------------------------------------------------------------------------------------
+| Event                                   nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                    w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|----------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                      |
+|                                                                                                                      |
+| DofMap                                                                                                               |
+|   add_neighbors_to_send_list()          2          0.0002      0.000123    0.0002      0.000123    0.41     0.41     |
+|   build_sparsity()                      2          0.0019      0.000937    0.0026      0.001323    3.09     4.37     |
+|   create_dof_constraints()              2          0.0011      0.000564    0.0015      0.000753    1.86     2.49     |
+|   distribute_dofs()                     2          0.0004      0.000176    0.0015      0.000763    0.58     2.52     |
+|   dof_indices()                         3125       0.0017      0.000001    0.0017      0.000001    2.78     2.78     |
+|   prepare_send_list()                   2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                              2          0.0012      0.000587    0.0012      0.000587    1.94     1.94     |
+|                                                                                                                      |
+| EquationSystems                                                                                                      |
+|   build_solution_vector()               1          0.0012      0.001184    0.0020      0.001983    1.96     3.27     |
+|                                                                                                                      |
+| ExodusII_IO                                                                                                          |
+|   write_nodal_data()                    1          0.0024      0.002441    0.0024      0.002441    4.03     4.03     |
+|                                                                                                                      |
+| Mesh                                                                                                                 |
+|   find_neighbors()                      2          0.0010      0.000489    0.0010      0.000489    1.62     1.62     |
+|   renumber_nodes_and_elem()             2          0.0001      0.000028    0.0001      0.000028    0.09     0.09     |
+|                                                                                                                      |
+| MeshCommunication                                                                                                    |
+|   assign_global_indices()               2          0.0268      0.013381    0.0268      0.013391    44.20    44.23    |
+|                                                                                                                      |
+| MeshOutput                                                                                                           |
+|   write_equation_systems()              1          0.0001      0.000080    0.0045      0.004504    0.13     7.44     |
+|                                                                                                                      |
+| MeshTools::Generation                                                                                                |
+|   build_cube()                          1          0.0004      0.000357    0.0004      0.000357    0.59     0.59     |
+|                                                                                                                      |
+| Parallel                                                                                                             |
+|   allgather()                           10         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   probe()                               8          0.0001      0.000007    0.0001      0.000007    0.09     0.09     |
+|   receive()                             8          0.0001      0.000017    0.0001      0.000017    0.23     0.23     |
+|   send()                                8          0.0015      0.000193    0.0015      0.000193    2.55     2.55     |
+|   send_receive()                        8          0.0000      0.000002    0.0000      0.000002    0.02     0.02     |
+|                                                                                                                      |
+| Parallel::Request                                                                                                    |
+|   wait()                                8          0.0000      0.000003    0.0000      0.000003    0.04     0.04     |
+|                                                                                                                      |
+| Partitioner                                                                                                          |
+|   set_node_processor_ids()              1          0.0000      0.000018    0.0000      0.000018    0.03     0.03     |
+|   single_partition()                    2          0.0000      0.000021    0.0000      0.000021    0.07     0.07     |
+|                                                                                                                      |
+| RBConstruction                                                                                                       |
+|   clear()                               3          0.0004      0.000122    0.0004      0.000122    0.60     0.60     |
+|   load_rb_solution()                    2          0.0002      0.000095    0.0002      0.000095    0.31     0.31     |
+|                                                                                                                      |
+| RBEIMEvaluation                                                                                                      |
+|   rb_solve()                            1          0.0125      0.012455    0.0125      0.012455    20.57    20.57    |
+|   read_offline_data_from_files()        1          0.0003      0.000319    0.0013      0.001309    0.53     2.16     |
+|                                                                                                                      |
+| RBEvaluation                                                                                                         |
+|   clear()                               3          0.0000      0.000013    0.0000      0.000013    0.06     0.06     |
+|   compute_residual_dual_norm()          1          0.0004      0.000371    0.0004      0.000371    0.61     0.61     |
+|   rb_solve()                            1          0.0002      0.000192    0.0130      0.013018    0.32     21.50    |
+|   read_in_basis_functions()             2          0.0000      0.000015    0.0336      0.016792    0.05     55.46    |
+|   read_in_vectors_from_multiple_files() 2          0.0050      0.002502    0.0336      0.016777    8.26     55.41    |
+|   read_offline_data_from_files()        2          0.0010      0.000483    0.0010      0.000509    1.60     1.68     |
+|   resize_data_structures()              2          0.0001      0.000026    0.0001      0.000026    0.09     0.09     |
+|                                                                                                                      |
+| XdrIO                                                                                                                |
+|   read()                                1          0.0004      0.000409    0.0004      0.000409    0.68     0.68     |
+ ----------------------------------------------------------------------------------------------------------------------
+| Totals:                                 3221       0.0606                                          100.00            |
+ ----------------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example reduced_basis_ex4:
+*   example-opt -online_mode 1 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

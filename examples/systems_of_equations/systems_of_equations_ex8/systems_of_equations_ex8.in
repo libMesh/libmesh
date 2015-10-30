@@ -1,0 +1,18 @@
+approx_order = FIRST
+fe_family = LAGRANGE
+
+young_modulus = 1.
+poisson_ratio = 0.3
+
+# Note: The contact penalty should be larger (about 100), we turn it down to make the
+# problem easier to solve in the regression test setting.
+contact_penalty = 1.e-1
+contact_proximity_tol = 0.1
+
+nonlinear_abs_tol = 1.e-12
+nonlinear_rel_tol = 1.e-3
+nonlinear_max_its = 5
+
+n_solves = 1
+initial_forcing_magnitude = 0.001
+force_increment = 0.0005

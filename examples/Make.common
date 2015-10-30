@@ -1,0 +1,129 @@
+######################################################################
+#
+# Common environment for all examples
+#
+# This file is included by *every* example.  If we are careful, common
+# rules like 'make doc' or 'make run' can be defined here, once and
+# for all.
+#
+AUTOMAKE_OPTIONS = subdir-objects
+
+AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include $(libmesh_contrib_INCLUDES)
+AM_CFLAGS    = $(libmesh_CFLAGS)
+AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
+AM_LDFLAGS   = $(libmesh_LDFLAGS)
+LIBS         = $(libmesh_optional_LIBS)
+
+examples_source_path  = $(top_srcdir)/examples
+examples_install_path = $(prefix)/examples
+
+######################################################################
+#
+# Building the flavors
+#
+check_PROGRAMS =
+
+datadir	  = $(install_dir)
+data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
+
+if LIBMESH_DBG_MODE
+  check_PROGRAMS      += example-dbg
+  example_dbg_SOURCES  = $(sources)
+  example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+  example_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+  example_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
+endif
+
+if LIBMESH_DEVEL_MODE
+  check_PROGRAMS        += example-devel
+  example_devel_SOURCES  = $(sources)
+  example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+  example_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+  example_devel_LDADD    = $(top_builddir)/libmesh_devel.la
+endif
+
+if LIBMESH_OPT_MODE
+  check_PROGRAMS      += example-opt
+  example_opt_SOURCES  = $(sources)
+  example_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+  example_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+  example_opt_LDADD    = $(top_builddir)/libmesh_opt.la
+endif
+
+if LIBMESH_PROF_MODE
+  check_PROGRAMS        += example-prof
+  example_prof_SOURCES  = $(sources)
+  example_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  example_prof_CXXFLAGS = $(CXXFLAGS_PROF)
+  example_prof_LDADD    = $(top_builddir)/libmesh_prof.la
+endif
+
+if LIBMESH_OPROF_MODE
+  check_PROGRAMS        += example-oprof
+  example_oprof_SOURCES  = $(sources)
+  example_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  example_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
+  example_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
+endif
+
+
+######################################################################
+#
+# Choose a flavor to run when making documentation
+#
+if LIBMESH_OPT_MODE
+  DOC_PROGRAM = example-opt
+  DOC_METHOD=opt
+else
+if LIBMESH_OPROF_MODE
+  DOC_PROGRAM = example-oprof
+  DOC_METHOD=oprof
+else
+if LIBMESH_PROF_MODE
+  DOC_PROGRAM = example-prof
+  DOC_METHOD=prof
+else
+if LIBMESH_DEVEL_MODE
+  DOC_PROGRAM = example-devel
+  DOC_METHOD=devel
+else
+if LIBMESH_DBG_MODE
+  DOC_PROGRAM = example-dbg
+  DOC_METHOD=dbg
+endif
+endif
+endif
+endif
+endif
+
+######################################################################
+#
+# Running the tests
+#
+TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)"
+
+TESTS = $(check_SCRIPTS)
+
+
+# Convenience method: 'make run'
+run: $(check_PROGRAMS)
+	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
+
+
+######################################################################
+#
+# how to make documentation
+#
+CLEANFILES += $(example_name).html stdout.log
+doc: $(example_name).html
+html: $(example_name).html
+$(example_name).html: $(DOC_PROGRAM) \
+                        $(top_srcdir)/contrib/bin/ex2html.sh \
+                       Makefile
+	$(MAKE) METHODS=$(DOC_METHOD) -s run > stdout.log
+	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
+	  ex2html.sh $(example_name) $(abs_srcdir)
+
+# Local Variables:
+# mode: makefile
+# End:

@@ -1,0 +1,73 @@
+What is this?
+-------------
+We like to keep track of any publications that actually *use* libmesh
+to obtain results.  It can be any type of publication: conference
+talk, poster, refereed article, technical report, user manual,
+dissertation, etc.  It's best if it is easily accessible from the web.
+We don't track publications here that only mention libmesh in a laundry
+list of FEM libraries, although it is nice to have the citations ;-)
+
+
+
+No, I mean what are all the files in this directory?
+----------------------------------------------------
+A set of bibtex files (named by year, four.bib is from 2004 for
+example) and a few others (preprints.bib, theses.bib) which, using the
+accompanying Makefile and scripts, can be used to generate a PDF
+document or the publications.php page that currently resides at
+http://libmesh.sf.net/publications.php.  These scripts started life as
+something I [JWP] personally maintained, but have now been
+transitioned into the source repository, just in case I get hit by a
+bus.
+
+
+
+OK, so what can I do?
+--------------------
+* Add a new reference:
+  Choose one of the templates in templates.bib, copy it to the appropriate
+  year (or theses.bib or preprints.bib if appropriate) and fill in the
+  relevant details.
+
+* Generate a PDF:
+  Type 'make all_pdfs'.  Assuming you have a reasonably modern version
+  of LaTeX installed, it will produce a file called all_pdfs.pdf with
+  all the references organized by year.  This is useful for ensuring
+  that your citation renders correctly (accents, etc.) in PDF.
+
+* Update the publications.php site:
+  You must have bibtex2html installed, grab it here:
+
+    https://www.lri.fr/~filliatr/bibtex2html
+
+  I built from source, but the binaries might also work for you.  Once
+  that's installed and in your PATH, run the ./create_website.sh
+  script.  Several files will be generated, the main one is called
+  publications.php.  You may be able to view it locally by renaming it
+  to publications.html and pointing your browser at
+  file:///path/to/publications.html.  Once you are satisfied with the
+  results, you can upload them to the libmesh site (assuming your sf
+  account name is jimbob and you are a developer on the libmesh
+  project) by doing:
+
+  sftp jimbob,libmesh@web.sf.net
+  cd htdocs
+  put publications.php
+
+
+
+Any other tips I should know?
+-----------------------------
+* I use preprints.bib primarily as a "TODO" list for citations that are
+  available online, but are still lacking some piece of information, such
+  as journal issue, page numbers, etc.
+
+* If you have any problems running the script, or if you have a reference
+  you want added, please let me know (jwpeterson at gmail).
+
+
+
+
+
+LocalWords:  libmesh bibtex preprints Makefile PDF php JWP LaTeX pdf
+LocalWords:  html jimbob sftp cd htdocs TODO pdfs jwpeterson gmail

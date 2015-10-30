@@ -1,0 +1,2003 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file curl_curl_exact_solution.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh_common.h"
+        #include "libmesh/vector_value.h"
+        
+        using namespace libMesh;
+        
+        #ifndef __curl_curl_exact_solution_h__
+        #define __curl_curl_exact_solution_h__
+        
+        class CurlCurlExactSolution
+        {
+        public:
+          CurlCurlExactSolution(){}
+        
+          ~CurlCurlExactSolution(){}
+        
+          RealGradient operator()( Real x, Real y )
+          {
+            const Real ux =  cos(pi*x)*sin(pi*y);
+            const Real uy = -sin(pi*x)*cos(pi*y);
+        
+            return RealGradient( ux, uy );
+          }
+        
+          RealTensor grad( Real x, Real y )
+          {
+            const Real dux_dx = -pi*sin(pi*x)*sin(pi*y);
+            const Real dux_dy = pi*cos(pi*x)*cos(pi*y);
+            const Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
+            const Real duy_dy = pi*sin(pi*x)*sin(pi*y);
+        
+            return RealTensor( dux_dx, dux_dy, Real(0), duy_dx, duy_dy );
+          }
+        
+          RealGradient curl( Real x, Real y )
+          {
+            const Real dux_dy =  pi*cos(pi*x)*cos(pi*y);
+            const Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
+        
+            return RealGradient( Real(0), Real(0), duy_dx - dux_dy );
+          }
+        
+          RealGradient forcing(  Real x, Real y )
+          {
+            const Real fx =  (2*pi*pi + 1)*cos(pi*x)*sin(pi*y);
+            const Real fy = -(2*pi*pi + 1)*sin(pi*x)*cos(pi*y);
+        
+            return RealGradient( fx, fy );
+          }
+        
+        };
+        
+        #endif // __curl_curl_exact_solution_h__
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file curl_curl_system.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/fem_system.h"
+        #include "libmesh/vector_value.h"
+        #include "libmesh/tensor_value.h"
+        #include "libmesh/dirichlet_boundaries.h"
+        
+        #include "curl_curl_exact_solution.h"
+        
+        using namespace libMesh;
+        
+        #ifndef __curl_curl_system_h__
+        #define __curl_curl_system_h__
+        
+</pre>
+</div>
+<div class = "comment">
+FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
+but we must specify element residuals
+</div>
+
+<div class ="fragment">
+<pre>
+        class CurlCurlSystem : public FEMSystem
+        {
+        
+        public:
+        
+</pre>
+</div>
+<div class = "comment">
+Constructor
+</div>
+
+<div class ="fragment">
+<pre>
+          CurlCurlSystem( EquationSystems& es,
+                          const std::string& name,
+                          const unsigned int number );
+        
+</pre>
+</div>
+<div class = "comment">
+System initialization
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void init_data ();
+        
+</pre>
+</div>
+<div class = "comment">
+Context initialization
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void init_context(DiffContext &context);
+        
+</pre>
+</div>
+<div class = "comment">
+Element residual and jacobian calculations
+Time dependent parts
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual bool element_time_derivative (bool request_jacobian,
+                                                DiffContext& context);
+        
+          virtual bool side_time_derivative(bool request_jacobian,
+                                            DiffContext& context);
+        
+        protected:
+</pre>
+</div>
+<div class = "comment">
+Indices for each variable;
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int u_var;
+        
+          void init_dirichlet_bcs();
+        
+</pre>
+</div>
+<div class = "comment">
+Returns the value of a forcing function at point p.
+</div>
+
+<div class ="fragment">
+<pre>
+          RealGradient forcing(const Point& p);
+        
+</pre>
+</div>
+<div class = "comment">
+Returns the value of the exact solution for this model problem.
+</div>
+
+<div class ="fragment">
+<pre>
+          RealGradient exact_solution( const Point& p );
+        
+          CurlCurlExactSolution soln;
+        
+        };
+        
+        #endif //__curl_curl_system_h__
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file solution_function.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/function_base.h"
+        #include "curl_curl_exact_solution.h"
+        
+        using namespace libMesh;
+        
+        #ifndef __solution_function_h__
+        #define __solution_function_h__
+        
+        class SolutionFunction : public FunctionBase&lt;Number&gt;
+        {
+        public:
+        
+          SolutionFunction( const unsigned int u_var )
+            : _u_var(u_var) {}
+          ~SolutionFunction( ){}
+        
+          virtual Number operator() (const Point&, const Real = 0)
+          { libmesh_not_implemented(); }
+        
+          virtual void operator() (const Point& p,
+                                   const Real,
+                                   DenseVector&lt;Number&gt;& output)
+          {
+            output.zero();
+            const Real x=p(0), y=p(1);
+</pre>
+</div>
+<div class = "comment">
+libMesh assumes each component of the vector-valued variable is stored
+contiguously.
+</div>
+
+<div class ="fragment">
+<pre>
+            output(_u_var)   = soln( x, y )(0);
+            output(_u_var+1) = soln( x, y )(1);
+          }
+        
+          virtual Number component( unsigned int component_in, const Point& p,
+                                    const Real )
+          {
+            const Real x=p(0), y=p(1);
+            return soln( x, y )(component_in);
+          }
+        
+          virtual AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() const
+          { return AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; (new SolutionFunction(_u_var)); }
+        
+        private:
+        
+          const unsigned int _u_var;
+          CurlCurlExactSolution soln;
+        };
+        
+        class SolutionGradient : public FunctionBase&lt;Gradient&gt;
+        {
+        public:
+        
+          SolutionGradient( const unsigned int u_var )
+            : _u_var(u_var) {}
+          ~SolutionGradient( ){}
+        
+          virtual Gradient operator() (const Point&, const Real = 0)
+          { libmesh_not_implemented(); }
+        
+          virtual void operator() (const Point& p,
+                                   const Real,DenseVector&lt;Gradient&gt;& output)
+          {
+            output.zero();
+            const Real x=p(0), y=p(1);
+            output(_u_var)   = soln.grad( x, y ).row(0);
+            output(_u_var+1) = soln.grad( x, y ).row(1);
+          }
+        
+          virtual Gradient component( unsigned int component_in, const Point& p,
+                                      const Real )
+          {
+            const Real x=p(0), y=p(1);
+            return soln.grad( x, y ).row(component_in);
+          }
+        
+          virtual AutoPtr&lt;FunctionBase&lt;Gradient&gt; &gt; clone() const
+          { return AutoPtr&lt;FunctionBase&lt;Gradient&gt; &gt; (new SolutionGradient(_u_var)); }
+        
+        private:
+        
+          const unsigned int _u_var;
+          CurlCurlExactSolution soln;
+        };
+        
+        #endif // __solution_function_h__
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file curl_curl_system.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/getpot.h"
+        
+        #include "curl_curl_system.h"
+        
+        #include "libmesh/dof_map.h"
+        #include "libmesh/fe_base.h"
+        #include "libmesh/fe_interface.h"
+        #include "libmesh/fem_context.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/quadrature.h"
+        #include "libmesh/string_to_enum.h"
+        #include "libmesh/zero_function.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        CurlCurlSystem::CurlCurlSystem( EquationSystems& es,
+                                        const std::string& name_in,
+                                        const unsigned int number_in)
+          : FEMSystem(es, name_in, number_in)
+        {
+          return;
+        }
+        
+        void CurlCurlSystem::init_data ()
+        {
+</pre>
+</div>
+<div class = "comment">
+Check the input file for Reynolds number, application type,
+approximation type
+</div>
+
+<div class ="fragment">
+<pre>
+          GetPot infile("vector_fe_ex3.in");
+        
+</pre>
+</div>
+<div class = "comment">
+Add the solution variable
+</div>
+
+<div class ="fragment">
+<pre>
+          u_var = this-&gt;add_variable ("u", FIRST, NEDELEC_ONE);
+        
+          this-&gt;time_evolving(u_var);
+        
+</pre>
+</div>
+<div class = "comment">
+Useful debugging options
+Set verify_analytic_jacobians to 1e-6 to use
+</div>
+
+<div class ="fragment">
+<pre>
+          this-&gt;verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
+          this-&gt;print_jacobians = infile("print_jacobians", false);
+          this-&gt;print_element_jacobians = infile("print_element_jacobians", false);
+        
+          this-&gt;extra_quadrature_order = infile("extra_quadrature_order", 0 );
+        
+          this-&gt;init_dirichlet_bcs();
+        
+</pre>
+</div>
+<div class = "comment">
+Do the parent's initialization after variables and boundary constraints are defined
+</div>
+
+<div class ="fragment">
+<pre>
+          FEMSystem::init_data();
+        }
+        
+        void CurlCurlSystem::init_dirichlet_bcs()
+        {
+          const boundary_id_type all_ids[4] = {0,1,2,3};
+          std::set&lt;boundary_id_type&gt; boundary_ids( all_ids, all_ids+4 );
+        
+          std::vector&lt;unsigned int&gt; vars;
+          vars.push_back( u_var );
+        
+          ZeroFunction&lt;Real&gt; func;
+        
+</pre>
+</div>
+<div class = "comment">
+this->get_dof_map().add_dirichlet_boundary( libMesh::DirichletBoundary( boundary_ids, vars, &func ) );
+</div>
+
+<div class ="fragment">
+<pre>
+          return;
+        }
+        
+        void CurlCurlSystem::init_context(DiffContext &context)
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+Get finite element object
+</div>
+
+<div class ="fragment">
+<pre>
+          FEGenericBase&lt;RealGradient&gt;* fe;
+          c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
+        
+</pre>
+</div>
+<div class = "comment">
+We should prerequest all the data
+we will need to build the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          fe-&gt;get_JxW();
+          fe-&gt;get_phi();
+          fe-&gt;get_curl_phi();
+          fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+Get finite element object
+</div>
+
+<div class ="fragment">
+<pre>
+          FEGenericBase&lt;RealGradient&gt;* side_fe;
+          c.get_side_fe&lt;RealGradient&gt;( u_var, side_fe );
+        
+          side_fe-&gt;get_JxW();
+          side_fe-&gt;get_phi();
+        
+          return;
+        }
+        
+        
+        bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
+                                                      DiffContext &context)
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+Get finite element object
+</div>
+
+<div class ="fragment">
+<pre>
+          FEGenericBase&lt;RealGradient&gt;* fe = NULL;
+          c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+
+
+<br><br>Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape functions at interior quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& phi = fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& curl_phi = fe-&gt;get_curl_phi();
+        
+          const std::vector&lt;Point&gt;& qpoint = fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+        
+          DenseSubMatrix&lt;Number&gt; &Kuu = c.get_elem_jacobian(u_var,u_var);
+        
+          DenseSubVector&lt;Number&gt; &Fu = c.get_elem_residual(u_var);
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the element Jacobian and residual.
+Constructing the residual requires the solution and its
+gradient from the previous timestep.  This must be
+calculated at each quadrature point by summing the
+solution degree-of-freedom values by the appropriate
+weight functions.
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over quadrature points
+</div>
+
+<div class ="fragment">
+<pre>
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+              Gradient u;
+              Gradient curl_u;
+        
+              c.interior_value( u_var, qp, u );
+        
+              c.interior_curl( u_var, qp, curl_u );
+        
+</pre>
+</div>
+<div class = "comment">
+Value of the forcing function at this quadrature point
+</div>
+
+<div class ="fragment">
+<pre>
+              RealGradient f = this-&gt;forcing(qpoint[qp]);
+        
+</pre>
+</div>
+<div class = "comment">
+First, an i-loop over the degrees of freedom.
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                {
+                  Fu(i) += ( curl_u*curl_phi[i][qp] + u*phi[i][qp] - f*phi[i][qp] )*JxW[qp];
+        
+                  if (request_jacobian)
+                    {
+</pre>
+</div>
+<div class = "comment">
+Matrix contributions for the uu and vv couplings.
+</div>
+
+<div class ="fragment">
+<pre>
+                      for (unsigned int j=0; j != n_u_dofs; j++)
+                        {
+                          Kuu(i,j) += ( curl_phi[j][qp]*curl_phi[i][qp] +
+                                        phi[j][qp]*phi[i][qp] )*JxW[qp];
+        
+                        }
+                    }
+        
+                }
+            } // end of the quadrature point qp-loop
+        
+          return request_jacobian;
+        }
+        
+        
+        bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
+                                                   DiffContext &context)
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+Get finite element object
+</div>
+
+<div class ="fragment">
+<pre>
+          FEGenericBase&lt;RealGradient&gt;* side_fe = NULL;
+          c.get_side_fe&lt;RealGradient&gt;( u_var, side_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+
+
+<br><br>Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape functions at interior quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& phi = side_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+        
+          const std::vector&lt;Point&gt;& normals = side_fe-&gt;get_normals();
+        
+          const std::vector&lt;Point&gt;& qpoint = side_fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+The penalty value.  \frac{1}{\epsilon}
+in the discussion above.
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real penalty = 1.e10;
+        
+          DenseSubMatrix&lt;Number&gt; &Kuu = c.get_elem_jacobian(u_var,u_var);
+          DenseSubVector&lt;Number&gt; &Fu = c.get_elem_residual(u_var);
+        
+          const unsigned int n_qpoints = c.get_side_qrule().n_points();
+        
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+              Gradient u;
+              c.side_value( u_var, qp, u );
+        
+              RealGradient N( normals[qp](0), normals[qp](1) );
+        
+              Gradient u_exact = this-&gt;exact_solution( qpoint[qp] ) ;
+        
+              Gradient Ncu = (u - u_exact).cross(N);
+        
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                {
+                  Fu(i) += penalty*Ncu*(phi[i][qp].cross(N))*JxW[qp];
+        
+                  if (request_jacobian)
+                    {
+                      for (unsigned int j=0; j != n_u_dofs; j++)
+                        Kuu(i,j) += penalty*(phi[j][qp].cross(N))*(phi[i][qp].cross(N))*JxW[qp];
+                    }
+                }
+        
+            }
+        
+          return request_jacobian;
+        }
+        
+        RealGradient CurlCurlSystem::forcing( const Point& p )
+        {
+          Real x = p(0); Real y = p(1);
+        
+          return soln.forcing(x,y);
+        }
+        
+        RealGradient CurlCurlSystem::exact_solution( const Point& p )
+        {
+          Real x = p(0); Real y = p(1);
+        
+          return soln(x,y);
+        }
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file vector_fe_ex3.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/getpot.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/exact_solution.h"
+        #include "libmesh/string_to_enum.h"
+        
+</pre>
+</div>
+<div class = "comment">
+The systems and solvers we may use
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "curl_curl_system.h"
+        #include "libmesh/diff_solver.h"
+        #include "libmesh/steady_solver.h"
+        
+        #include "solution_function.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
+The main program.
+</div>
+
+<div class ="fragment">
+<pre>
+        int main (int argc, char** argv)
+        {
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Parse the input file
+</div>
+
+<div class ="fragment">
+<pre>
+          GetPot infile("vector_fe_ex3.in");
+        
+</pre>
+</div>
+<div class = "comment">
+Read in parameters from the input file
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int grid_size = infile( "grid_size", 2 );
+        
+</pre>
+</div>
+<div class = "comment">
+Skip higher-dimensional examples on a lower-dimensional libMesh build
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(3 &lt;= LIBMESH_DIM, "2D/3D support");
+        
+</pre>
+</div>
+<div class = "comment">
+Create a mesh, with dimension to be overridden later, on the
+default MPI communicator.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh(init.comm());
+        
+</pre>
+</div>
+<div class = "comment">
+Use the MeshTools::Generation mesh generator to create a uniform
+grid on the square [-1,1]^D. We must use TRI6 elements for the
+Nedelec triangle elements.
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+          std::string elem_str = command_line_value( std::string("element_type"),
+                                                     std::string("TRI6") );
+        
+          if (elem_str != "TRI6" && elem_str != "QUAD8" && elem_str != "QUAD9")
+            libmesh_error_msg("You selected: "                                  \
+                              &lt;&lt; elem_str                                       \
+                              &lt;&lt; " but this example must be run with TRI6, QUAD8, or QUAD9.");
+        
+          MeshTools::Generation::build_square (mesh,
+                                               grid_size,
+                                               grid_size,
+                                               -1., 1.,
+                                               -1., 1.,
+                                               Utility::string_to_enum&lt;ElemType&gt;(elem_str));
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the mesh to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Create an equation systems object.
+</div>
+
+<div class ="fragment">
+<pre>
+          EquationSystems equation_systems (mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+Declare the system "Navier-Stokes" and its variables.
+</div>
+
+<div class ="fragment">
+<pre>
+          CurlCurlSystem & system =
+            equation_systems.add_system&lt;CurlCurlSystem&gt; ("CurlCurl");
+        
+</pre>
+</div>
+<div class = "comment">
+This example only implements the steady-state problem
+</div>
+
+<div class ="fragment">
+<pre>
+          system.time_solver =
+            AutoPtr&lt;TimeSolver&gt;(new SteadySolver(system));
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the system
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.init();
+        
+</pre>
+</div>
+<div class = "comment">
+And the nonlinear solver options
+</div>
+
+<div class ="fragment">
+<pre>
+          DiffSolver &solver = *(system.time_solver-&gt;diff_solver().get());
+          solver.quiet = infile("solver_quiet", true);
+          solver.verbose = !solver.quiet;
+          solver.max_nonlinear_iterations =
+            infile("max_nonlinear_iterations", 15);
+          solver.relative_step_tolerance =
+            infile("relative_step_tolerance", 1.e-3);
+          solver.relative_residual_tolerance =
+            infile("relative_residual_tolerance", 1.0e-13);
+          solver.absolute_residual_tolerance =
+            infile("absolute_residual_tolerance", 0.0);
+        
+</pre>
+</div>
+<div class = "comment">
+And the linear solver options
+</div>
+
+<div class ="fragment">
+<pre>
+          solver.max_linear_iterations =
+            infile("max_linear_iterations", 50000);
+          solver.initial_linear_tolerance =
+            infile("initial_linear_tolerance", 1.e-10);
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the system to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.print_info();
+        
+          system.solve();
+        
+          ExactSolution exact_sol( equation_systems );
+        
+          std::vector&lt;FunctionBase&lt;Number&gt;* &gt; sols;
+          std::vector&lt;FunctionBase&lt;Gradient&gt;* &gt; grads;
+        
+          sols.push_back( new SolutionFunction(system.variable_number("u")) );
+          grads.push_back( new SolutionGradient(system.variable_number("u")) );
+        
+          exact_sol.attach_exact_values(sols);
+          exact_sol.attach_exact_derivs(grads);
+        
+</pre>
+</div>
+<div class = "comment">
+Use higher quadrature order for more accurate error results
+</div>
+
+<div class ="fragment">
+<pre>
+          int extra_error_quadrature = infile("extra_error_quadrature",2);
+          exact_sol.extra_quadrature_order(extra_error_quadrature);
+        
+</pre>
+</div>
+<div class = "comment">
+Compute the error.
+</div>
+
+<div class ="fragment">
+<pre>
+          exact_sol.compute_error("CurlCurl", "u");
+        
+</pre>
+</div>
+<div class = "comment">
+Print out the error values
+</div>
+
+<div class ="fragment">
+<pre>
+          std::cout &lt;&lt; "L2-Error is: "
+                    &lt;&lt; exact_sol.l2_error("CurlCurl", "u")
+                    &lt;&lt; std::endl;
+          std::cout &lt;&lt; "HCurl semi-norm error is: "
+                    &lt;&lt; exact_sol.error_norm("CurlCurl", "u", HCURL_SEMINORM )
+                    &lt;&lt; std::endl;
+          std::cout &lt;&lt; "HCurl-Error is: "
+                    &lt;&lt; exact_sol.hcurl_error("CurlCurl", "u")
+                    &lt;&lt; std::endl;
+        
+        #ifdef LIBMESH_HAVE_EXODUS_API
+        
+</pre>
+</div>
+<div class = "comment">
+We write the file in the ExodusII format.
+</div>
+
+<div class ="fragment">
+<pre>
+          ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
+        
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+        
+</pre>
+</div>
+<div class = "comment">
+All done.
+</div>
+
+<div class ="fragment">
+<pre>
+          return 0;
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file curl_curl_exact_solution.h without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_common.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/vector_value.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  #ifndef __curl_curl_exact_solution_h__
+  #define __curl_curl_exact_solution_h__
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> CurlCurlExactSolution
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+    CurlCurlExactSolution(){}
+  
+    ~CurlCurlExactSolution(){}
+  
+    RealGradient <B><FONT COLOR="#A020F0">operator</FONT></B>()( Real x, Real y )
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real ux =  cos(pi*x)*sin(pi*y);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real uy = -sin(pi*x)*cos(pi*y);
+  
+      <B><FONT COLOR="#A020F0">return</FONT></B> RealGradient( ux, uy );
+    }
+  
+    RealTensor grad( Real x, Real y )
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real dux_dx = -pi*sin(pi*x)*sin(pi*y);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real dux_dy = pi*cos(pi*x)*cos(pi*y);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real duy_dy = pi*sin(pi*x)*sin(pi*y);
+  
+      <B><FONT COLOR="#A020F0">return</FONT></B> RealTensor( dux_dx, dux_dy, Real(0), duy_dx, duy_dy );
+    }
+  
+    RealGradient curl( Real x, Real y )
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real dux_dy =  pi*cos(pi*x)*cos(pi*y);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
+  
+      <B><FONT COLOR="#A020F0">return</FONT></B> RealGradient( Real(0), Real(0), duy_dx - dux_dy );
+    }
+  
+    RealGradient forcing(  Real x, Real y )
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real fx =  (2*pi*pi + 1)*cos(pi*x)*sin(pi*y);
+      <B><FONT COLOR="#228B22">const</FONT></B> Real fy = -(2*pi*pi + 1)*sin(pi*x)*cos(pi*y);
+  
+      <B><FONT COLOR="#A020F0">return</FONT></B> RealGradient( fx, fy );
+    }
+  
+  };
+  
+  #endif <I><FONT COLOR="#B22222">// __curl_curl_exact_solution_h__
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file curl_curl_system.h without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/vector_value.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/tensor_value.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dirichlet_boundaries.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;curl_curl_exact_solution.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  #ifndef __curl_curl_system_h__
+  #define __curl_curl_system_h__
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> CurlCurlSystem : <B><FONT COLOR="#228B22">public</FONT></B> FEMSystem
+  {
+  
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    CurlCurlSystem( EquationSystems&amp; es,
+                    <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
+                    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number );
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_data ();
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_context(DiffContext &amp;context);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                          DiffContext&amp; context);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> side_time_derivative(<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                      DiffContext&amp; context);
+  
+  <B><FONT COLOR="#228B22">protected</FONT></B>:
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var;
+  
+    <B><FONT COLOR="#228B22">void</FONT></B> init_dirichlet_bcs();
+  
+    RealGradient forcing(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p);
+  
+    RealGradient exact_solution( <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p );
+  
+    CurlCurlExactSolution soln;
+  
+  };
+  
+  #endif <I><FONT COLOR="#B22222">//__curl_curl_system_h__
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file solution_function.h without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/function_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;curl_curl_exact_solution.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  #ifndef __solution_function_h__
+  #define __solution_function_h__
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> SolutionFunction : <B><FONT COLOR="#228B22">public</FONT></B> FunctionBase&lt;Number&gt;
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    SolutionFunction( <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var )
+      : _u_var(u_var) {}
+    ~SolutionFunction( ){}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Number <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp;, <B><FONT COLOR="#228B22">const</FONT></B> Real = 0)
+    { libmesh_not_implemented(); }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                             <B><FONT COLOR="#228B22">const</FONT></B> Real,
+                             DenseVector&lt;Number&gt;&amp; output)
+    {
+      output.zero();
+      <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1);
+      output(_u_var)   = soln( x, y )(0);
+      output(_u_var+1) = soln( x, y )(1);
+    }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Number component( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component_in, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                              <B><FONT COLOR="#228B22">const</FONT></B> Real )
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1);
+      <B><FONT COLOR="#A020F0">return</FONT></B> soln( x, y )(component_in);
+    }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() <B><FONT COLOR="#228B22">const</FONT></B>
+    { <B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; (<B><FONT COLOR="#A020F0">new</FONT></B> SolutionFunction(_u_var)); }
+  
+  <B><FONT COLOR="#228B22">private</FONT></B>:
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> _u_var;
+    CurlCurlExactSolution soln;
+  };
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> SolutionGradient : <B><FONT COLOR="#228B22">public</FONT></B> FunctionBase&lt;Gradient&gt;
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    SolutionGradient( <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var )
+      : _u_var(u_var) {}
+    ~SolutionGradient( ){}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Gradient <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp;, <B><FONT COLOR="#228B22">const</FONT></B> Real = 0)
+    { libmesh_not_implemented(); }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                             <B><FONT COLOR="#228B22">const</FONT></B> Real,DenseVector&lt;Gradient&gt;&amp; output)
+    {
+      output.zero();
+      <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1);
+      output(_u_var)   = soln.grad( x, y ).row(0);
+      output(_u_var+1) = soln.grad( x, y ).row(1);
+    }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Gradient component( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component_in, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                                <B><FONT COLOR="#228B22">const</FONT></B> Real )
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1);
+      <B><FONT COLOR="#A020F0">return</FONT></B> soln.grad( x, y ).row(component_in);
+    }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Gradient&gt; &gt; clone() <B><FONT COLOR="#228B22">const</FONT></B>
+    { <B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;FunctionBase&lt;Gradient&gt; &gt; (<B><FONT COLOR="#A020F0">new</FONT></B> SolutionGradient(_u_var)); }
+  
+  <B><FONT COLOR="#228B22">private</FONT></B>:
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> _u_var;
+    CurlCurlExactSolution soln;
+  };
+  
+  #endif <I><FONT COLOR="#B22222">// __solution_function_h__
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file curl_curl_system.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;curl_curl_system.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_interface.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_context.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/zero_function.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#5F9EA0">CurlCurlSystem</FONT></B>::CurlCurlSystem( EquationSystems&amp; es,
+                                  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                                  <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+    : FEMSystem(es, name_in, number_in)
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> CurlCurlSystem::init_data ()
+  {
+    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;vector_fe_ex3.in&quot;</FONT></B>);
+  
+    u_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST, NEDELEC_ONE);
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(u_var);
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;verify_analytic_jacobians = infile(<B><FONT COLOR="#BC8F8F">&quot;verify_analytic_jacobians&quot;</FONT></B>, 0.);
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;print_jacobians = infile(<B><FONT COLOR="#BC8F8F">&quot;print_jacobians&quot;</FONT></B>, false);
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;print_element_jacobians = infile(<B><FONT COLOR="#BC8F8F">&quot;print_element_jacobians&quot;</FONT></B>, false);
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;extra_quadrature_order = infile(<B><FONT COLOR="#BC8F8F">&quot;extra_quadrature_order&quot;</FONT></B>, 0 );
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;init_dirichlet_bcs();
+  
+    <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::init_data();
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> CurlCurlSystem::init_dirichlet_bcs()
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> boundary_id_type all_ids[4] = {0,1,2,3};
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; boundary_ids( all_ids, all_ids+4 );
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; vars;
+    vars.push_back( u_var );
+  
+    ZeroFunction&lt;Real&gt; func;
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> CurlCurlSystem::init_context(DiffContext &amp;context)
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEGenericBase&lt;RealGradient&gt;* fe;
+    c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
+  
+    fe-&gt;get_JxW();
+    fe-&gt;get_phi();
+    fe-&gt;get_curl_phi();
+    fe-&gt;get_xyz();
+  
+    FEGenericBase&lt;RealGradient&gt;* side_fe;
+    c.get_side_fe&lt;RealGradient&gt;( u_var, side_fe );
+  
+    side_fe-&gt;get_JxW();
+    side_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> CurlCurlSystem::element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                                DiffContext &amp;context)
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEGenericBase&lt;RealGradient&gt;* fe = NULL;
+    c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
+  
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; phi = fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; curl_phi = fe-&gt;get_curl_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qpoint = fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+  
+    DenseSubMatrix&lt;Number&gt; &amp;Kuu = c.get_elem_jacobian(u_var,u_var);
+  
+    DenseSubVector&lt;Number&gt; &amp;Fu = c.get_elem_residual(u_var);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        Gradient u;
+        Gradient curl_u;
+  
+        c.interior_value( u_var, qp, u );
+  
+        c.interior_curl( u_var, qp, curl_u );
+  
+        RealGradient f = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;forcing(qpoint[qp]);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+          {
+            Fu(i) += ( curl_u*curl_phi[i][qp] + u*phi[i][qp] - f*phi[i][qp] )*JxW[qp];
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian)
+              {
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
+                  {
+                    Kuu(i,j) += ( curl_phi[j][qp]*curl_phi[i][qp] +
+                                  phi[j][qp]*phi[i][qp] )*JxW[qp];
+  
+                  }
+              }
+  
+          }
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+  }
+  
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> CurlCurlSystem::side_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                             DiffContext &amp;context)
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEGenericBase&lt;RealGradient&gt;* side_fe = NULL;
+    c.get_side_fe&lt;RealGradient&gt;( u_var, side_fe );
+  
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; phi = side_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(u_var).size();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; normals = side_fe-&gt;get_normals();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qpoint = side_fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+  
+    DenseSubMatrix&lt;Number&gt; &amp;Kuu = c.get_elem_jacobian(u_var,u_var);
+    DenseSubVector&lt;Number&gt; &amp;Fu = c.get_elem_residual(u_var);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        Gradient u;
+        c.side_value( u_var, qp, u );
+  
+        RealGradient N( normals[qp](0), normals[qp](1) );
+  
+        Gradient u_exact = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;exact_solution( qpoint[qp] ) ;
+  
+        Gradient Ncu = (u - u_exact).cross(N);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+          {
+            Fu(i) += penalty*Ncu*(phi[i][qp].cross(N))*JxW[qp];
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian)
+              {
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
+                  Kuu(i,j) += penalty*(phi[j][qp].cross(N))*(phi[i][qp].cross(N))*JxW[qp];
+              }
+          }
+  
+      }
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+  }
+  
+  RealGradient CurlCurlSystem::forcing( <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p )
+  {
+    Real x = p(0); Real y = p(1);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> soln.forcing(x,y);
+  }
+  
+  RealGradient CurlCurlSystem::exact_solution( <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p )
+  {
+    Real x = p(0); Real y = p(1);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> soln(x,y);
+  }
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file vector_fe_ex3.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exact_solution.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;curl_curl_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/diff_solver.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/steady_solver.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;solution_function.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;vector_fe_ex3.in&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> grid_size = infile( <B><FONT COLOR="#BC8F8F">&quot;grid_size&quot;</FONT></B>, 2 );
+  
+    libmesh_example_requires(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
+  
+    Mesh mesh(init.comm());
+  
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string elem_str = command_line_value( std::string(<B><FONT COLOR="#BC8F8F">&quot;element_type&quot;</FONT></B>),
+                                               <B><FONT COLOR="#5F9EA0">std</FONT></B>::string(<B><FONT COLOR="#BC8F8F">&quot;TRI6&quot;</FONT></B>) );
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (elem_str != <B><FONT COLOR="#BC8F8F">&quot;TRI6&quot;</FONT></B> &amp;&amp; elem_str != <B><FONT COLOR="#BC8F8F">&quot;QUAD8&quot;</FONT></B> &amp;&amp; elem_str != <B><FONT COLOR="#BC8F8F">&quot;QUAD9&quot;</FONT></B>)
+      libmesh_error_msg(<B><FONT COLOR="#BC8F8F">&quot;You selected: &quot;</FONT></B>                                  \
+                        &lt;&lt; elem_str                                       \
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; but this example must be run with TRI6, QUAD8, or QUAD9.&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+                                         grid_size,
+                                         grid_size,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;ElemType&gt;(elem_str));
+  
+  
+    mesh.print_info();
+  
+    EquationSystems equation_systems (mesh);
+  
+    CurlCurlSystem &amp; system =
+      equation_systems.add_system&lt;CurlCurlSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;CurlCurl&quot;</FONT></B>);
+  
+    system.time_solver =
+      AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> SteadySolver(system));
+  
+    equation_systems.init();
+  
+    DiffSolver &amp;solver = *(system.time_solver-&gt;diff_solver().get());
+    solver.quiet = infile(<B><FONT COLOR="#BC8F8F">&quot;solver_quiet&quot;</FONT></B>, true);
+    solver.verbose = !solver.quiet;
+    solver.max_nonlinear_iterations =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;max_nonlinear_iterations&quot;</FONT></B>, 15);
+    solver.relative_step_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;relative_step_tolerance&quot;</FONT></B>, 1.e-3);
+    solver.relative_residual_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;relative_residual_tolerance&quot;</FONT></B>, 1.0e-13);
+    solver.absolute_residual_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;absolute_residual_tolerance&quot;</FONT></B>, 0.0);
+  
+    solver.max_linear_iterations =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 50000);
+    solver.initial_linear_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;initial_linear_tolerance&quot;</FONT></B>, 1.e-10);
+  
+    equation_systems.print_info();
+  
+    system.solve();
+  
+    ExactSolution exact_sol( equation_systems );
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FunctionBase&lt;Number&gt;* &gt; sols;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FunctionBase&lt;Gradient&gt;* &gt; grads;
+  
+    sols.push_back( <B><FONT COLOR="#A020F0">new</FONT></B> SolutionFunction(system.variable_number(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)) );
+    grads.push_back( <B><FONT COLOR="#A020F0">new</FONT></B> SolutionGradient(system.variable_number(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)) );
+  
+    exact_sol.attach_exact_values(sols);
+    exact_sol.attach_exact_derivs(grads);
+  
+    <B><FONT COLOR="#228B22">int</FONT></B> extra_error_quadrature = infile(<B><FONT COLOR="#BC8F8F">&quot;extra_error_quadrature&quot;</FONT></B>,2);
+    exact_sol.extra_quadrature_order(extra_error_quadrature);
+  
+    exact_sol.compute_error(<B><FONT COLOR="#BC8F8F">&quot;CurlCurl&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2-Error is: &quot;</FONT></B>
+              &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;CurlCurl&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
+              &lt;&lt; std::endl;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;HCurl semi-norm error is: &quot;</FONT></B>
+              &lt;&lt; exact_sol.error_norm(<B><FONT COLOR="#BC8F8F">&quot;CurlCurl&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, HCURL_SEMINORM )
+              &lt;&lt; std::endl;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;HCurl-Error is: &quot;</FONT></B>
+              &lt;&lt; exact_sol.hcurl_error(<B><FONT COLOR="#BC8F8F">&quot;CurlCurl&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
+              &lt;&lt; std::endl;
+  
+  #ifdef LIBMESH_HAVE_EXODUS_API
+  
+    ExodusII_IO(mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;out.e&quot;</FONT></B>, equation_systems);
+  
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example vector_fe_ex3:
+*   example-opt element_type=TRI6 -pc_type jacobi 
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1681
+    n_local_nodes()=1681
+  n_elem()=800
+    n_local_elem()=800
+    n_active_elem()=800
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u" 
+    Finite Element Types="NEDELEC_ONE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=1240
+    n_local_dofs()=1240
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 4.87097
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 5
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 23.6078
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1051, residual 5.82317e-14
+Trying full Newton step
+  Current Residual: 2.34782e-11
+  Nonlinear solver converged, step 0, residual reduction 9.9451e-13 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.128366
+HCurl semi-norm error is: 0.655952
+HCurl-Error is: 0.668394
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:41:48 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.21853, Active time=0.113884                                                   |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0002      0.000188    0.0002      0.000188    0.17     0.17     |
+|   build_sparsity()                 1          0.0010      0.001042    0.0015      0.001520    0.91     1.33     |
+|   create_dof_constraints()         1          0.0001      0.000091    0.0001      0.000091    0.08     0.08     |
+|   distribute_dofs()                1          0.0003      0.000334    0.0014      0.001394    0.29     1.22     |
+|   dof_indices()                    5604       0.0038      0.000001    0.0038      0.000001    3.35     3.35     |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0011      0.001059    0.0011      0.001059    0.93     0.93     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0061      0.006076    0.0139      0.013895    5.34     12.20    |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0030      0.002951    0.0030      0.002951    2.59     2.59     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        3360       0.0035      0.000001    0.0035      0.000001    3.05     3.05     |
+|   init_shape_functions()           3360       0.0048      0.000001    0.0048      0.000001    4.17     4.17     |
+|   inverse_map()                    320        0.0004      0.000001    0.0004      0.000001    0.33     0.33     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       1          0.0051      0.005143    0.0114      0.011440    4.52     10.05    |
+|   assembly(get_residual)           1          0.0043      0.004326    0.0105      0.010476    3.80     9.20     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             3360       0.0030      0.000001    0.0030      0.000001    2.68     2.68     |
+|   compute_face_map()               160        0.0003      0.000002    0.0007      0.000005    0.30     0.66     |
+|   init_face_shape_functions()      160        0.0001      0.000001    0.0001      0.000001    0.08     0.08     |
+|   init_reference_to_physical_map() 3360       0.0100      0.000003    0.0100      0.000003    8.80     8.80     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0008      0.000778    0.0008      0.000778    0.68     0.68     |
+|   renumber_nodes_and_elem()        2          0.0001      0.000068    0.0001      0.000068    0.12     0.12     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0000      0.000045    0.0169      0.016892    0.04     14.83    |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0005      0.000536    0.0005      0.000536    0.47     0.47     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          1          0.0090      0.008962    0.0871      0.087110    7.87     76.49    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0001      0.000063    0.0001      0.000063    0.06     0.06     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.0562      0.056231    0.0562      0.056231    49.38    49.38    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            19703      0.1139                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   example-opt element_type=TRI6 -pc_type jacobi 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   example-opt element_type=QUAD8 -pc_type jacobi 
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1281
+    n_local_nodes()=1281
+  n_elem()=400
+    n_local_elem()=400
+    n_active_elem()=400
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u" 
+    Finite Element Types="NEDELEC_ONE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=840
+    n_local_dofs()=840
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 6.71429
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 7
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 28.9779
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 13, residual 1.30136e-13
+Trying full Newton step
+  Current Residual: 4.20884e-06
+  Nonlinear solver converged, step 0, residual reduction 1.45243e-07 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.12862
+HCurl semi-norm error is: 0.802879
+HCurl-Error is: 0.813116
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:41:49 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.129012, Active time=0.032852                                                  |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0001      0.000133    0.0001      0.000133    0.40     0.40     |
+|   build_sparsity()                 1          0.0007      0.000672    0.0009      0.000933    2.05     2.84     |
+|   create_dof_constraints()         1          0.0001      0.000065    0.0001      0.000065    0.20     0.20     |
+|   distribute_dofs()                1          0.0002      0.000229    0.0010      0.000961    0.70     2.93     |
+|   dof_indices()                    2804       0.0019      0.000001    0.0019      0.000001    5.89     5.89     |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0007      0.000732    0.0007      0.000732    2.23     2.23     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0033      0.003340    0.0083      0.008286    10.17    25.22    |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0027      0.002723    0.0027      0.002723    8.29     8.29     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        563        0.0007      0.000001    0.0007      0.000001    2.24     2.24     |
+|   init_shape_functions()           563        0.0006      0.000001    0.0006      0.000001    1.88     1.88     |
+|   inverse_map()                    320        0.0005      0.000001    0.0005      0.000001    1.38     1.38     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       1          0.0025      0.002474    0.0043      0.004328    7.53     13.17    |
+|   assembly(get_residual)           1          0.0018      0.001801    0.0036      0.003551    5.48     10.81    |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             1760       0.0017      0.000001    0.0017      0.000001    5.19     5.19     |
+|   compute_face_map()               160        0.0004      0.000002    0.0008      0.000005    1.08     2.54     |
+|   init_face_shape_functions()      160        0.0001      0.000001    0.0001      0.000001    0.31     0.31     |
+|   init_reference_to_physical_map() 563        0.0031      0.000005    0.0031      0.000005    9.42     9.42     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0006      0.000599    0.0006      0.000599    1.82     1.82     |
+|   renumber_nodes_and_elem()        2          0.0001      0.000055    0.0001      0.000055    0.34     0.34     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0000      0.000043    0.0111      0.011052    0.13     33.64    |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0005      0.000479    0.0005      0.000479    1.46     1.46     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          1          0.0092      0.009176    0.0183      0.018286    27.93    55.66    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0000      0.000048    0.0000      0.000048    0.15     0.15     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.0012      0.001229    0.0012      0.001229    3.74     3.74     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            6912       0.0329                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   example-opt element_type=QUAD8 -pc_type jacobi 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   example-opt element_type=QUAD9 -pc_type jacobi 
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1681
+    n_local_nodes()=1681
+  n_elem()=400
+    n_local_elem()=400
+    n_active_elem()=400
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u" 
+    Finite Element Types="NEDELEC_ONE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=840
+    n_local_dofs()=840
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 6.71429
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 7
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 28.9779
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 13, residual 1.17383e-13
+Trying full Newton step
+  Current Residual: 3.40241e-06
+  Nonlinear solver converged, step 0, residual reduction 1.17414e-07 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.12862
+HCurl semi-norm error is: 0.802879
+HCurl-Error is: 0.813116
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:41:49 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.130836, Active time=0.03697                                                   |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0001      0.000136    0.0001      0.000136    0.37     0.37     |
+|   build_sparsity()                 1          0.0007      0.000704    0.0010      0.000981    1.90     2.65     |
+|   create_dof_constraints()         1          0.0001      0.000067    0.0001      0.000067    0.18     0.18     |
+|   distribute_dofs()                1          0.0003      0.000318    0.0012      0.001207    0.86     3.26     |
+|   dof_indices()                    2804       0.0021      0.000001    0.0021      0.000001    5.65     5.65     |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0009      0.000888    0.0009      0.000888    2.40     2.40     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0037      0.003707    0.0112      0.011224    10.03    30.36    |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0026      0.002621    0.0026      0.002621    7.09     7.09     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        563        0.0008      0.000001    0.0008      0.000001    2.11     2.11     |
+|   init_shape_functions()           563        0.0006      0.000001    0.0006      0.000001    1.59     1.59     |
+|   inverse_map()                    320        0.0007      0.000002    0.0007      0.000002    1.81     1.81     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       1          0.0025      0.002502    0.0047      0.004704    6.77     12.72    |
+|   assembly(get_residual)           1          0.0018      0.001837    0.0039      0.003897    4.97     10.54    |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             1760       0.0018      0.000001    0.0018      0.000001    4.94     4.94     |
+|   compute_face_map()               160        0.0004      0.000003    0.0011      0.000007    1.20     3.08     |
+|   init_face_shape_functions()      160        0.0001      0.000001    0.0001      0.000001    0.26     0.26     |
+|   init_reference_to_physical_map() 563        0.0058      0.000010    0.0058      0.000010    15.60    15.60    |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0006      0.000640    0.0006      0.000640    1.73     1.73     |
+|   renumber_nodes_and_elem()        2          0.0001      0.000052    0.0001      0.000052    0.28     0.28     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0000      0.000042    0.0139      0.013888    0.11     37.57    |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0005      0.000480    0.0005      0.000480    1.30     1.30     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          1          0.0094      0.009352    0.0192      0.019190    25.30    51.91    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0001      0.000073    0.0001      0.000073    0.20     0.20     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.0012      0.001237    0.0012      0.001237    3.35     3.35     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            6912       0.0370                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   example-opt element_type=QUAD9 -pc_type jacobi 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

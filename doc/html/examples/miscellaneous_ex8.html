@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file meshless_interpolation_function.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+        #define LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+        
+</pre>
+</div>
+<div class = "comment">
+Local Includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/function_base.h"
+        #include "libmesh/meshfree_interpolation.h"
+        #include "libmesh/threads.h"
+        
+        
+</pre>
+</div>
+<div class = "comment">
+C++ includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;cstddef&gt;
+        
+        namespace libMesh
+        {
+        
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Forward Declarations
+</div>
+
+<div class ="fragment">
+<pre>
+        template &lt;typename T&gt;
+        class DenseVector;
+        
+        
+</pre>
+</div>
+<div class = "comment">
+------------------------------------------------------------
+MeshlessInterpolationFunction class definition
+</div>
+
+<div class ="fragment">
+<pre>
+        class MeshlessInterpolationFunction : public FunctionBase&lt;Number&gt;
+        {
+        private:
+          const MeshfreeInterpolation &_mfi;
+          mutable std::vector&lt;Point&gt; _pts;
+          mutable std::vector&lt;Number&gt; _vals;
+          Threads::spin_mutex &_mutex;
+        
+        public:
+        
+          /**
+           * Constructor.  Requires a \p \pMeshlessInterpolation object.
+           */
+          MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
+                                         Threads::spin_mutex &mutex) :
+            _mfi (mfi),
+            _mutex(mutex)
+          {}
+        
+        
+          /**
+           * The actual initialization process.
+           */
+          void init ();
+        
+          /**
+           * Clears the function.
+           */
+          void clear ();
+        
+          /**
+           * Returns a new deep copy of the function.
+           */
+          virtual AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone () const;
+        
+          /**
+           * @returns the value at point \p p and time
+           * \p time, which defaults to zero.
+           */
+          Number operator() (const Point& p,
+                             const Real time=0.);
+        
+          /**
+           * Like before, but returns the values in a
+           * writable reference.
+           */
+          void operator() (const Point& p,
+                           const Real time,
+                           DenseVector&lt;Number&gt;& output);
+        
+        };
+        
+        
+        
+</pre>
+</div>
+<div class = "comment">
+------------------------------------------------------------
+MeshlessInterpolationFunction inline methods
+</div>
+
+<div class ="fragment">
+<pre>
+        inline
+        Number MeshlessInterpolationFunction::operator() (const Point& p,
+                                                          const Real /* time */)
+        {
+          _pts.clear();
+          _pts.push_back(p);
+          _vals.resize(1);
+        
+          Threads::spin_mutex::scoped_lock lock(_mutex);
+        
+          _mfi.interpolate_field_data (_mfi.field_variables(),
+                                       _pts, _vals);
+        
+          return _vals.front();
+        }
+        
+        
+        
+        inline
+        void MeshlessInterpolationFunction::operator() (const Point& p,
+                                                        const Real time,
+                                                        DenseVector&lt;Number&gt;& output)
+        {
+          output.resize(1);
+          output(0) = (*this)(p,time);
+          return;
+        }
+        
+        
+        
+        inline
+        void MeshlessInterpolationFunction::init ()
+        {
+        }
+        
+        
+        
+        inline
+        void MeshlessInterpolationFunction::clear ()
+        {
+        }
+        
+        
+        
+        inline
+        AutoPtr&lt;FunctionBase&lt;Number&gt; &gt;
+        MeshlessInterpolationFunction::clone () const
+        {
+          return AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; (new MeshlessInterpolationFunction (_mfi, _mutex) );
+        }
+        
+        
+        } // namespace libMesh
+        
+        
+        #endif // LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex8.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/meshfree_interpolation.h"
+        #include "libmesh/radial_basis_interpolation.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/tecplot_io.h"
+        #include "libmesh/threads.h"
+        #include "meshless_interpolation_function.h"
+        
+</pre>
+</div>
+<div class = "comment">
+C++ includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;cstdlib&gt;
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        
+        void create_random_point_cloud (const unsigned int Npts,
+                                        std::vector&lt;Point&gt; &pts,
+                                        const Real max_range = 10)
+        {
+          std::cout &lt;&lt; "Generating "&lt;&lt; Npts &lt;&lt; " point cloud...";
+          pts.resize(Npts);
+        
+          for (size_t i=0;i&lt;Npts;i++)
+            {
+              pts[i](0) = max_range * (std::rand() % 1000) / Real(1000);
+              pts[i](1) = max_range * (std::rand() % 1000) / Real(1000);
+              pts[i](2) = max_range * (std::rand() % 1000) / Real(1000);
+            }
+          std::cout &lt;&lt; "done\n";
+        }
+        
+        
+        
+        Real exact_solution_u (const Point &p)
+        {
+          const Real
+            x = p(0),
+            y = p(1),
+            z = p(2);
+        
+          return (x*x*x   +
+                  y*y*y*y +
+                  z*z*z*z*z);
+        }
+        
+        
+        
+        Real exact_solution_v (const Point &p)
+        {
+          const Real
+            x = p(0),
+            y = p(1),
+            z = p(2);
+        
+          return (x*x   +
+                  y*y +
+                  z*z*z);
+        }
+        
+        Number exact_value (const Point& p,
+                            const Parameters&,
+                            const std::string&,
+                            const std::string&)
+        {
+          return exact_solution_v(p);
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+We now define the function which provides the
+initialization routines for the "Convection-Diffusion"
+system.  This handles things like setting initial
+conditions and boundary conditions.
+</div>
+
+<div class ="fragment">
+<pre>
+        void init_sys(EquationSystems& es,
+                      const std::string& system_name)
+        {
+</pre>
+</div>
+<div class = "comment">
+Get a reference to the Convection-Diffusion system object.
+</div>
+
+<div class ="fragment">
+<pre>
+          System & system =
+            es.get_system&lt;System&gt;(system_name);
+        
+          system.project_solution(exact_value, NULL, es.parameters);
+        }
+        
+        
+        
+        
+        int main(int argc, char** argv)
+        {
+</pre>
+</div>
+<div class = "comment">
+Skip this example if we do not meet certain requirements
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(3 &lt;= LIBMESH_DIM, "3D support");
+        #ifndef LIBMESH_HAVE_EIGEN
+          libmesh_example_requires(false, "--enable-eigen");
+        #endif
+        #ifndef LIBMESH_HAVE_ZLIB_H
+          libmesh_example_requires(false, "--enable-zlib");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+          {
+</pre>
+</div>
+<div class = "comment">
+Demonstration case 1
+</div>
+
+<div class ="fragment">
+<pre>
+            {
+              std::vector&lt;Point&gt;       tgt_pts;
+              std::vector&lt;Number&gt;      tgt_data_idi, tgt_data_rbi;
+              std::vector&lt;std::string&gt; field_vars;
+        
+              field_vars.push_back("u");
+              field_vars.push_back("v");
+        
+              InverseDistanceInterpolation&lt;3&gt; idi (init.comm(),
+                                                   /* n_interp_pts = */ 8,
+                                                   /* power =        */ 2);
+        
+              RadialBasisInterpolation&lt;3&gt; rbi (init.comm());
+        
+              idi.set_field_variables (field_vars);
+              rbi.set_field_variables (field_vars);
+        
+              create_random_point_cloud (100,
+                                         idi.get_source_points());
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Explicitly set the data values we will interpolate from
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                const std::vector&lt;Point&gt; &src_pts  (idi.get_source_points());
+                std::vector&lt;Number&gt;      &src_vals (idi.get_source_vals());
+        
+                src_vals.clear(); src_vals.reserve(2*src_pts.size());
+        
+                for (std::vector&lt;Point&gt;::const_iterator pt_it=src_pts.begin();
+                     pt_it != src_pts.end(); ++pt_it)
+                  {
+                    src_vals.push_back (exact_solution_u (*pt_it));
+                    src_vals.push_back (exact_solution_v (*pt_it));
+                  }
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+give rbi the same info as idi
+</div>
+
+<div class ="fragment">
+<pre>
+              rbi.get_source_points() = idi.get_source_points();
+              rbi.get_source_vals()   = idi.get_source_vals();
+        
+              idi.prepare_for_use();
+              rbi.prepare_for_use();
+        
+              std::cout &lt;&lt; idi;
+        
+</pre>
+</div>
+<div class = "comment">
+Interpolate to some other random points, and evaluate the result
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                create_random_point_cloud (10,
+                                           tgt_pts);
+        
+</pre>
+</div>
+<div class = "comment">
+tgt_pts = rbi.get_source_points();
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+                idi.interpolate_field_data (field_vars,
+                                            tgt_pts,
+                                            tgt_data_idi);
+        
+                rbi.interpolate_field_data (field_vars,
+                                            tgt_pts,
+                                            tgt_data_rbi);
+        
+                std::vector&lt;Number&gt;::const_iterator
+                  v_idi=tgt_data_idi.begin(),
+                  v_rbi=tgt_data_rbi.begin();
+        
+                for (std::vector&lt;Point&gt;::const_iterator  p_it=tgt_pts.begin();
+                     p_it!=tgt_pts.end(); ++p_it)
+                  {
+                    std::cout &lt;&lt; "\nAt target point " &lt;&lt; *p_it
+                              &lt;&lt; "\n u_interp_idi="   &lt;&lt; *v_idi
+                              &lt;&lt; ", u_interp_rbi="    &lt;&lt; *v_rbi
+                              &lt;&lt; ", u_exact="         &lt;&lt; exact_solution_u(*p_it);
+                    ++v_idi;
+                    ++v_rbi;
+                    std::cout &lt;&lt; "\n v_interp_idi=" &lt;&lt; *v_idi
+                              &lt;&lt; ", v_interp_rbi="  &lt;&lt; *v_rbi
+                              &lt;&lt; ", v_exact="       &lt;&lt; exact_solution_v(*p_it)
+                              &lt;&lt; std::endl;
+                    ++v_idi;
+                    ++v_rbi;
+                  }
+              }
+            }
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Demonstration case 2
+</div>
+
+<div class ="fragment">
+<pre>
+            {
+              Mesh mesh_a(init.comm()), mesh_b(init.comm());
+        
+              mesh_a.read("struct.ucd.gz"); mesh_b.read("unstruct.ucd.gz");
+        
+</pre>
+</div>
+<div class = "comment">
+Create equation systems objects.
+</div>
+
+<div class ="fragment">
+<pre>
+              EquationSystems
+                es_a(mesh_a), es_b(mesh_b);
+        
+              System
+                &sys_a = es_a.add_system&lt;System&gt;("src_system"),
+                &sys_b = es_b.add_system&lt;System&gt;("dest_system");
+        
+              sys_a.add_variable ("Cp", FIRST);
+              sys_b.add_variable ("Cp", FIRST);
+        
+              sys_a.attach_init_function (init_sys);
+              es_a.init();
+        
+</pre>
+</div>
+<div class = "comment">
+Write out the initial conditions.
+</div>
+
+<div class ="fragment">
+<pre>
+              TecplotIO(mesh_a).write_equation_systems ("src.dat",
+                                                        es_a);
+        
+              InverseDistanceInterpolation&lt;3&gt; idi (init.comm(),
+                                                   /* n_interp_pts = */ 4,
+                                                   /* power =        */ 2);
+              RadialBasisInterpolation&lt;3&gt; rbi (init.comm());
+        
+              std::vector&lt;Point&gt;  &src_pts  (idi.get_source_points());
+              std::vector&lt;Number&gt; &src_vals (idi.get_source_vals());
+              std::vector&lt;std::string&gt; field_vars;
+              field_vars.push_back("Cp");
+              idi.set_field_variables(field_vars);
+        
+</pre>
+</div>
+<div class = "comment">
+We now will loop over every node in the source mesh
+and add it to a source point list, along with the solution
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                MeshBase::const_node_iterator nd  = mesh_a.local_nodes_begin();
+                MeshBase::const_node_iterator end = mesh_a.local_nodes_end();
+        
+                for (; nd!=end; ++nd)
+                  {
+                    const Node *node(*nd);
+                    src_pts.push_back(*node);
+                    src_vals.push_back(sys_a.current_solution(node-&gt;dof_number(0,0,0)));
+                  }
+        
+                rbi.set_field_variables(field_vars);
+                rbi.get_source_points() = idi.get_source_points();
+                rbi.get_source_vals()   = idi.get_source_vals();
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+We have only set local values - prepare for use by gathering remote gata
+</div>
+
+<div class ="fragment">
+<pre>
+              idi.prepare_for_use();
+              rbi.prepare_for_use();
+        
+</pre>
+</div>
+<div class = "comment">
+Create a MeshlessInterpolationFunction that uses our InverseDistanceInterpolation
+object.  Since each MeshlessInterpolationFunction shares the same InverseDistanceInterpolation
+object in a threaded environment we must also provide a locking mechanism.
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                Threads::spin_mutex mutex;
+                MeshlessInterpolationFunction mif(idi, mutex);
+        
+</pre>
+</div>
+<div class = "comment">
+project the solution onto system b
+</div>
+
+<div class ="fragment">
+<pre>
+                es_b.init();
+                sys_b.project_solution (&mif);
+        
+</pre>
+</div>
+<div class = "comment">
+Write the result
+</div>
+
+<div class ="fragment">
+<pre>
+                TecplotIO(mesh_b).write_equation_systems ("dest_idi.dat",
+                                                          es_b);
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+Create a MeshlessInterpolationFunction that uses our RadialBasisInterpolation
+object.  Since each MeshlessInterpolationFunction shares the same RadialBasisInterpolation
+object in a threaded environment we must also provide a locking mechanism.
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                Threads::spin_mutex mutex;
+                MeshlessInterpolationFunction mif(rbi, mutex);
+        
+</pre>
+</div>
+<div class = "comment">
+project the solution onto system b
+</div>
+
+<div class ="fragment">
+<pre>
+                sys_b.project_solution (&mif);
+        
+</pre>
+</div>
+<div class = "comment">
+Write the result
+</div>
+
+<div class ="fragment">
+<pre>
+                TecplotIO(mesh_b).write_equation_systems ("dest_rbi.dat",
+                                                          es_b);
+              }
+            }
+        
+        
+        
+          }
+          return 0;
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file meshless_interpolation_function.h without comments: </h1> 
+<pre> 
+  #ifndef LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+  #define LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/function_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/meshfree_interpolation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/threads.h&quot;</FONT></B>
+  
+  
+  #include &lt;cstddef&gt;
+  
+  namespace libMesh
+  {
+  
+  
+  
+  <B><FONT COLOR="#228B22">template</FONT></B> &lt;typename T&gt;
+  <B><FONT COLOR="#228B22">class</FONT></B> DenseVector;
+  
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> MeshlessInterpolationFunction : <B><FONT COLOR="#228B22">public</FONT></B> FunctionBase&lt;Number&gt;
+  {
+  <B><FONT COLOR="#228B22">private</FONT></B>:
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshfreeInterpolation &amp;_mfi;
+    mutable std::vector&lt;Point&gt; _pts;
+    mutable std::vector&lt;Number&gt; _vals;
+    <B><FONT COLOR="#5F9EA0">Threads</FONT></B>::spin_mutex &amp;_mutex;
+  
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.  Requires a \p \pMeshlessInterpolation object.
+     */</FONT></I>
+    MeshlessInterpolationFunction (<B><FONT COLOR="#228B22">const</FONT></B> MeshfreeInterpolation &amp;mfi,
+                                   <B><FONT COLOR="#5F9EA0">Threads</FONT></B>::spin_mutex &amp;mutex) :
+      _mfi (mfi),
+      _mutex(mutex)
+    {}
+  
+  
+    <I><FONT COLOR="#B22222">/**
+     * The actual initialization process.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">void</FONT></B> init ();
+  
+    <I><FONT COLOR="#B22222">/**
+     * Clears the function.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">void</FONT></B> clear ();
+  
+    <I><FONT COLOR="#B22222">/**
+     * Returns a new deep copy of the function.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone () <B><FONT COLOR="#228B22">const</FONT></B>;
+  
+    <I><FONT COLOR="#B22222">/**
+     * @returns the value at point \p p and time
+     * \p time, which defaults to zero.
+     */</FONT></I>
+    Number <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                       <B><FONT COLOR="#228B22">const</FONT></B> Real time=0.);
+  
+    <I><FONT COLOR="#B22222">/**
+     * Like before, but returns the values in a
+     * writable reference.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                     <B><FONT COLOR="#228B22">const</FONT></B> Real time,
+                     DenseVector&lt;Number&gt;&amp; output);
+  
+  };
+  
+  
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B>
+  Number MeshlessInterpolationFunction::<B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                                                    <B><FONT COLOR="#228B22">const</FONT></B> Real <I><FONT COLOR="#B22222">/* time */</FONT></I>)
+  {
+    _pts.clear();
+    _pts.push_back(p);
+    _vals.resize(1);
+  
+    <B><FONT COLOR="#5F9EA0">Threads</FONT></B>::spin_mutex::scoped_lock lock(_mutex);
+  
+    _mfi.interpolate_field_data (_mfi.field_variables(),
+                                 _pts, _vals);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> _vals.front();
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B>
+  <B><FONT COLOR="#228B22">void</FONT></B> MeshlessInterpolationFunction::<B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                                                  <B><FONT COLOR="#228B22">const</FONT></B> Real time,
+                                                  DenseVector&lt;Number&gt;&amp; output)
+  {
+    output.resize(1);
+    output(0) = (*<B><FONT COLOR="#A020F0">this</FONT></B>)(p,time);
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B>
+  <B><FONT COLOR="#228B22">void</FONT></B> MeshlessInterpolationFunction::init ()
+  {
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B>
+  <B><FONT COLOR="#228B22">void</FONT></B> MeshlessInterpolationFunction::clear ()
+  {
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">inline</FONT></B>
+  AutoPtr&lt;FunctionBase&lt;Number&gt; &gt;
+  <B><FONT COLOR="#5F9EA0">MeshlessInterpolationFunction</FONT></B>::clone () <B><FONT COLOR="#228B22">const</FONT></B>
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; (<B><FONT COLOR="#A020F0">new</FONT></B> MeshlessInterpolationFunction (_mfi, _mutex) );
+  }
+  
+  
+  } <I><FONT COLOR="#B22222">// namespace libMesh
+</FONT></I>  
+  
+  #endif <I><FONT COLOR="#B22222">// LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex8.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/meshfree_interpolation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/radial_basis_interpolation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/tecplot_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/threads.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;meshless_interpolation_function.h&quot;</FONT></B>
+  
+  #include &lt;cstdlib&gt;
+  
+  
+  using namespace libMesh;
+  
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> create_random_point_cloud (<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> Npts,
+                                  <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Point&gt; &amp;pts,
+                                  <B><FONT COLOR="#228B22">const</FONT></B> Real max_range = 10)
+  {
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Generating &quot;</FONT></B>&lt;&lt; Npts &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; point cloud...&quot;</FONT></B>;
+    pts.resize(Npts);
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (size_t i=0;i&lt;Npts;i++)
+      {
+        pts[i](0) = max_range * (std::rand() % 1000) / Real(1000);
+        pts[i](1) = max_range * (std::rand() % 1000) / Real(1000);
+        pts[i](2) = max_range * (std::rand() % 1000) / Real(1000);
+      }
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;done\n&quot;</FONT></B>;
+  }
+  
+  
+  
+  Real exact_solution_u (<B><FONT COLOR="#228B22">const</FONT></B> Point &amp;p)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> Real
+      x = p(0),
+      y = p(1),
+      z = p(2);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> (x*x*x   +
+            y*y*y*y +
+            z*z*z*z*z);
+  }
+  
+  
+  
+  Real exact_solution_v (<B><FONT COLOR="#228B22">const</FONT></B> Point &amp;p)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> Real
+      x = p(0),
+      y = p(1),
+      z = p(2);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> (x*x   +
+            y*y +
+            z*z*z);
+  }
+  
+  Number exact_value (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                      <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,
+                      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,
+                      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;)
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> exact_solution_v(p);
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> init_sys(EquationSystems&amp; es,
+                <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+  {
+    System &amp; system =
+      es.get_system&lt;System&gt;(system_name);
+  
+    system.project_solution(exact_value, NULL, es.parameters);
+  }
+  
+  
+  
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    libmesh_example_requires(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+  #ifndef LIBMESH_HAVE_EIGEN
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-eigen&quot;</FONT></B>);
+  #endif
+  #ifndef LIBMESH_HAVE_ZLIB_H
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-zlib&quot;</FONT></B>);
+  #endif
+  
+    LibMeshInit init (argc, argv);
+    {
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Point&gt;       tgt_pts;
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt;      tgt_data_idi, tgt_data_rbi;
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; field_vars;
+  
+        field_vars.push_back(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+        field_vars.push_back(<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
+  
+        InverseDistanceInterpolation&lt;3&gt; idi (init.comm(),
+                                             <I><FONT COLOR="#B22222">/* n_interp_pts = */</FONT></I> 8,
+                                             <I><FONT COLOR="#B22222">/* power =        */</FONT></I> 2);
+  
+        RadialBasisInterpolation&lt;3&gt; rbi (init.comm());
+  
+        idi.set_field_variables (field_vars);
+        rbi.set_field_variables (field_vars);
+  
+        create_random_point_cloud (100,
+                                   idi.get_source_points());
+  
+  
+        {
+          <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt; &amp;src_pts  (idi.get_source_points());
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt;      &amp;src_vals (idi.get_source_vals());
+  
+          src_vals.clear(); src_vals.reserve(2*src_pts.size());
+  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;Point&gt;::const_iterator pt_it=src_pts.begin();
+               pt_it != src_pts.end(); ++pt_it)
+            {
+              src_vals.push_back (exact_solution_u (*pt_it));
+              src_vals.push_back (exact_solution_v (*pt_it));
+            }
+        }
+  
+        rbi.get_source_points() = idi.get_source_points();
+        rbi.get_source_vals()   = idi.get_source_vals();
+  
+        idi.prepare_for_use();
+        rbi.prepare_for_use();
+  
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; idi;
+  
+        {
+          create_random_point_cloud (10,
+                                     tgt_pts);
+  
+  
+          idi.interpolate_field_data (field_vars,
+                                      tgt_pts,
+                                      tgt_data_idi);
+  
+          rbi.interpolate_field_data (field_vars,
+                                      tgt_pts,
+                                      tgt_data_rbi);
+  
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt;::const_iterator
+            v_idi=tgt_data_idi.begin(),
+            v_rbi=tgt_data_rbi.begin();
+  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;Point&gt;::const_iterator  p_it=tgt_pts.begin();
+               p_it!=tgt_pts.end(); ++p_it)
+            {
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\nAt target point &quot;</FONT></B> &lt;&lt; *p_it
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n u_interp_idi=&quot;</FONT></B>   &lt;&lt; *v_idi
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, u_interp_rbi=&quot;</FONT></B>    &lt;&lt; *v_rbi
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, u_exact=&quot;</FONT></B>         &lt;&lt; exact_solution_u(*p_it);
+              ++v_idi;
+              ++v_rbi;
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n v_interp_idi=&quot;</FONT></B> &lt;&lt; *v_idi
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, v_interp_rbi=&quot;</FONT></B>  &lt;&lt; *v_rbi
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, v_exact=&quot;</FONT></B>       &lt;&lt; exact_solution_v(*p_it)
+                        &lt;&lt; std::endl;
+              ++v_idi;
+              ++v_rbi;
+            }
+        }
+      }
+  
+  
+      {
+        Mesh mesh_a(init.comm()), mesh_b(init.comm());
+  
+        mesh_a.read(<B><FONT COLOR="#BC8F8F">&quot;struct.ucd.gz&quot;</FONT></B>); mesh_b.read(<B><FONT COLOR="#BC8F8F">&quot;unstruct.ucd.gz&quot;</FONT></B>);
+  
+        EquationSystems
+          es_a(mesh_a), es_b(mesh_b);
+  
+        System
+          &amp;sys_a = es_a.add_system&lt;System&gt;(<B><FONT COLOR="#BC8F8F">&quot;src_system&quot;</FONT></B>),
+          &amp;sys_b = es_b.add_system&lt;System&gt;(<B><FONT COLOR="#BC8F8F">&quot;dest_system&quot;</FONT></B>);
+  
+        sys_a.add_variable (<B><FONT COLOR="#BC8F8F">&quot;Cp&quot;</FONT></B>, FIRST);
+        sys_b.add_variable (<B><FONT COLOR="#BC8F8F">&quot;Cp&quot;</FONT></B>, FIRST);
+  
+        sys_a.attach_init_function (init_sys);
+        es_a.init();
+  
+        TecplotIO(mesh_a).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;src.dat&quot;</FONT></B>,
+                                                  es_a);
+  
+        InverseDistanceInterpolation&lt;3&gt; idi (init.comm(),
+                                             <I><FONT COLOR="#B22222">/* n_interp_pts = */</FONT></I> 4,
+                                             <I><FONT COLOR="#B22222">/* power =        */</FONT></I> 2);
+        RadialBasisInterpolation&lt;3&gt; rbi (init.comm());
+  
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Point&gt;  &amp;src_pts  (idi.get_source_points());
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt; &amp;src_vals (idi.get_source_vals());
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; field_vars;
+        field_vars.push_back(<B><FONT COLOR="#BC8F8F">&quot;Cp&quot;</FONT></B>);
+        idi.set_field_variables(field_vars);
+  
+        {
+          <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_node_iterator nd  = mesh_a.local_nodes_begin();
+          <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_node_iterator end = mesh_a.local_nodes_end();
+  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (; nd!=end; ++nd)
+            {
+              <B><FONT COLOR="#228B22">const</FONT></B> Node *node(*nd);
+              src_pts.push_back(*node);
+              src_vals.push_back(sys_a.current_solution(node-&gt;dof_number(0,0,0)));
+            }
+  
+          rbi.set_field_variables(field_vars);
+          rbi.get_source_points() = idi.get_source_points();
+          rbi.get_source_vals()   = idi.get_source_vals();
+        }
+  
+        idi.prepare_for_use();
+        rbi.prepare_for_use();
+  
+        {
+          <B><FONT COLOR="#5F9EA0">Threads</FONT></B>::spin_mutex mutex;
+          MeshlessInterpolationFunction mif(idi, mutex);
+  
+          es_b.init();
+          sys_b.project_solution (&amp;mif);
+  
+          TecplotIO(mesh_b).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;dest_idi.dat&quot;</FONT></B>,
+                                                    es_b);
+        }
+  
+        {
+          <B><FONT COLOR="#5F9EA0">Threads</FONT></B>::spin_mutex mutex;
+          MeshlessInterpolationFunction mif(rbi, mutex);
+  
+          sys_b.project_solution (&amp;mif);
+  
+          TecplotIO(mesh_b).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;dest_rbi.dat&quot;</FONT></B>,
+                                                    es_b);
+        }
+      }
+  
+  
+  
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex8:
+*   example-opt  
+***************************************************************
+ 
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/radial_basis_interpolation.h, line 79, compiled Oct 22 2014 at 13:18:37 ***
+Generating 100 point cloud...done
+bounding box is 
+(x,y,z)=(    0.34,     0.19,     0.11)
+(x,y,z)=(    9.65,     9.96,     9.96)
+*** Warning, This code is untested, experimental, or likely to see future API changes: ./include/libmesh/radial_basis_functions.h, line 83, compiled Oct 22 2014 at 12:52:45 ***
+bounding box is 
+(x,y,z)=(    0.34,     0.19,     0.11)
+(x,y,z)=(    9.65,     9.96,     9.96)
+r_bbox = 16.7078
+rbf(r_bbox/2) = 0.1875
+MeshfreeInterpolation
+ n_source_points()=100
+ n_field_variables()=2
+  variables = u v 
+Generating 10 point cloud...done
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/solution_transfer/meshfree_interpolation.C, line 198, compiled Oct 22 2014 at 12:52:45 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/solution_transfer/radial_basis_interpolation.C, line 157, compiled Oct 22 2014 at 12:52:45 ***
+
+At target point (x,y,z)=(    5.42,     9.36,     1.07)
+ u_interp_idi=4803.83, u_interp_rbi=6870.47, u_exact=7836.06
+ v_interp_idi=106.595, v_interp_rbi=113.042, v_exact=118.211
+
+At target point (x,y,z)=(    4.45,     7.56,     1.79)
+ u_interp_idi=3509.34, u_interp_rbi=3430.57, u_exact=3373.03
+ v_interp_idi=85.4045, v_interp_rbi=81.9013, v_exact=82.6914
+
+At target point (x,y,z)=(    4.18,     8.87,     4.12)
+ u_interp_idi=6451.46, u_interp_rbi=6646.29, u_exact=7450.19
+ v_interp_idi=184.391, v_interp_rbi=162.671, v_exact=166.084
+
+At target point (x,y,z)=(    3.48,     1.72,     6.59)
+ u_interp_idi=23069.6, u_interp_rbi=10932.2, u_exact=12479.6
+ v_interp_idi=396.343, v_interp_rbi=293.003, v_exact=301.26
+
+At target point (x,y,z)=(    0.09,     3.36,      2.1)
+ u_interp_idi=908.709, u_interp_rbi=780.758, u_exact=168.297
+ v_interp_idi=54.327, v_interp_rbi=21.4919, v_exact=20.5587
+
+At target point (x,y,z)=(    3.42,     5.87,     2.06)
+ u_interp_idi=1535.98, u_interp_rbi=1083.06, u_exact=1264.38
+ v_interp_idi=66.3452, v_interp_rbi=53.1053, v_exact=54.8951
+
+At target point (x,y,z)=(    3.01,     7.13,     3.72)
+ u_interp_idi=4526.71, u_interp_rbi=3341.46, u_exact=3324.05
+ v_interp_idi=148.21, v_interp_rbi=111.182, v_exact=111.376
+
+At target point (x,y,z)=(    3.21,     2.55,     8.19)
+ u_interp_idi=44062.4, u_interp_rbi=37097.7, u_exact=36923.8
+ v_interp_idi=611.747, v_interp_rbi=565.728, v_exact=566.16
+
+At target point (x,y,z)=(    5.99,     7.21,     9.04)
+ u_interp_idi=50450.1, u_interp_rbi=62514.7, u_exact=63290.2
+ v_interp_idi=727.746, v_interp_rbi=822.928, v_exact=826.627
+
+At target point (x,y,z)=(    9.39,     8.11,      9.4)
+ u_interp_idi=64143.1, u_interp_rbi=79657.4, u_exact=78544.3
+ v_interp_idi=860.46, v_interp_rbi=987.44, v_exact=984.528
+bounding box is 
+(x,y,z)=(      -1,        0,        0)
+(x,y,z)=(       0,        1,        1)
+bounding box is 
+(x,y,z)=(      -1,        0,        0)
+(x,y,z)=(       0,        1,        1)
+r_bbox = 1.73205
+rbf(r_bbox/2) = 0.1875
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:05 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=5.79832, Active time=5.68163                                                |
+ -------------------------------------------------------------------------------------------------------------
+| Event                          nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list() 2          0.0017      0.000874    0.0017      0.000874    0.03     0.03     |
+|   create_dof_constraints()     2          0.0012      0.000576    0.0012      0.000576    0.02     0.02     |
+|   distribute_dofs()            2          0.0019      0.000960    0.0086      0.004307    0.03     0.15     |
+|   dof_indices()                28896      0.0158      0.000001    0.0158      0.000001    0.28     0.28     |
+|   prepare_send_list()          2          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                     2          0.0067      0.003347    0.0067      0.003347    0.12     0.12     |
+|                                                                                                             |
+| EquationSystems                                                                                             |
+|   build_solution_vector()      3          0.0128      0.004265    0.0212      0.007054    0.23     0.37     |
+|                                                                                                             |
+| InverseDistanceInterpolation<>                                                                              |
+|   construct_kd_tree()          4          0.0015      0.000364    0.0015      0.000364    0.03     0.03     |
+|   interpolate_field_data()     16873      0.0201      0.000001    0.0201      0.000001    0.35     0.35     |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()             2          0.0097      0.004863    0.0097      0.004863    0.17     0.17     |
+|   read()                       2          0.0266      0.013296    0.0266      0.013296    0.47     0.47     |
+|   renumber_nodes_and_elem()    4          0.0006      0.000153    0.0006      0.000153    0.01     0.01     |
+|                                                                                                             |
+| MeshOutput                                                                                                  |
+|   write_equation_systems()     3          0.0001      0.000039    0.0565      0.018825    0.00     0.99     |
+|                                                                                                             |
+| MeshfreeInterpolation                                                                                       |
+|   gather_remote_data()         4          0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                  2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()           2          0.0003      0.000146    0.0003      0.000146    0.01     0.01     |
+|                                                                                                             |
+| RadialBasisInterpolation<>                                                                                  |
+|   interpolate_field_data()     16873      1.0859      0.000064    1.0859      0.000064    19.11    19.11    |
+|   prepare_for_use()            2          4.4264      2.213216    4.4264      2.213216    77.91    77.91    |
+|                                                                                                             |
+| System                                                                                                      |
+|   project_vector()             3          0.0352      0.011717    1.1545      0.384826    0.62     20.32    |
+|                                                                                                             |
+| TecplotIO                                                                                                   |
+|   write_nodal_data()           3          0.0352      0.011731    0.0352      0.011731    0.62     0.62     |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                        62686      5.6816                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex8:
+*   example-opt  
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

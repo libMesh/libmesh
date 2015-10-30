@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=-1,1,0.5
+F=!!x * (y<0)
+C=fp_notNot(x) * Value_t(fp_less(y,0))

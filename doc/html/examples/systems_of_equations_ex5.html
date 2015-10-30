@@ -1,0 +1,1160 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file systems_of_equations_ex5.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;iostream&gt;
+        #include &lt;algorithm&gt;
+        #include &lt;math.h&gt;
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_submatrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/dense_subvector.h"
+        #include "libmesh/perf_log.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/boundary_info.h"
+        #include "libmesh/zero_function.h"
+        #include "libmesh/dirichlet_boundaries.h"
+        #include "libmesh/string_to_enum.h"
+        #include "libmesh/getpot.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
+Matrix and right-hand side assemble
+</div>
+
+<div class ="fragment">
+<pre>
+        void assemble_elasticity(EquationSystems& es,
+                                 const std::string& system_name);
+        
+</pre>
+</div>
+<div class = "comment">
+Define the elasticity tensor, which is a fourth-order tensor
+i.e. it has four indices i,j,k,l
+</div>
+
+<div class ="fragment">
+<pre>
+        Real eval_elasticity_tensor(unsigned int i,
+                                    unsigned int j,
+                                    unsigned int k,
+                                    unsigned int l);
+        
+</pre>
+</div>
+<div class = "comment">
+Begin the main program.
+</div>
+
+<div class ="fragment">
+<pre>
+        int main (int argc, char** argv)
+        {
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh and any dependent libaries
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+This example NaNs with the Eigen sparse linear solvers
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the cantilever mesh
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int dim = 2;
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this 2D example if libMesh was compiled as 1D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(dim &lt;= LIBMESH_DIM, "2D support");
+        
+</pre>
+</div>
+<div class = "comment">
+Create a 2D mesh distributed across the default MPI communicator.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh(init.comm(), dim);
+          MeshTools::Generation::build_square (mesh,
+                                               50, 10,
+                                               0., 1.,
+                                               0., 0.2,
+                                               QUAD9);
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the mesh to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Create an equation systems object.
+</div>
+
+<div class ="fragment">
+<pre>
+          EquationSystems equation_systems (mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+Declare the system and its variables.
+Create a system named "Elasticity"
+</div>
+
+<div class ="fragment">
+<pre>
+          LinearImplicitSystem& system =
+            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Elasticity");
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Add two displacement variables, u and v, to the system
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int u_var      = system.add_variable("u", SECOND, LAGRANGE);
+          unsigned int v_var      = system.add_variable("v", SECOND, LAGRANGE);
+        
+</pre>
+</div>
+<div class = "comment">
+Add a SCALAR variable for the Lagrange multiplier to enforce our constraint
+</div>
+
+<div class ="fragment">
+<pre>
+          system.add_variable("lambda", FIRST, SCALAR);
+        
+        
+          system.attach_assemble_function (assemble_elasticity);
+        
+</pre>
+</div>
+<div class = "comment">
+Construct a Dirichlet boundary condition object
+We impose a "clamped" boundary condition on the
+"left" boundary, i.e. bc_id = 3
+</div>
+
+<div class ="fragment">
+<pre>
+          std::set&lt;boundary_id_type&gt; boundary_ids;
+          boundary_ids.insert(3);
+        
+</pre>
+</div>
+<div class = "comment">
+Create a vector storing the variable numbers which the BC applies to
+</div>
+
+<div class ="fragment">
+<pre>
+          std::vector&lt;unsigned int&gt; variables(2);
+          variables[0] = u_var; variables[1] = v_var;
+        
+</pre>
+</div>
+<div class = "comment">
+Create a ZeroFunction to initialize dirichlet_bc
+</div>
+
+<div class ="fragment">
+<pre>
+          ZeroFunction&lt;&gt; zf;
+        
+          DirichletBoundary dirichlet_bc(boundary_ids,
+                                         variables,
+                                         &zf);
+        
+</pre>
+</div>
+<div class = "comment">
+We must add the Dirichlet boundary condition _before_
+we call equation_systems.init()
+</div>
+
+<div class ="fragment">
+<pre>
+          system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the data structures for the equation system.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.init();
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the system to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Solve the system
+</div>
+
+<div class ="fragment">
+<pre>
+          system.solve();
+        
+</pre>
+</div>
+<div class = "comment">
+Plot the solution
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifdef LIBMESH_HAVE_EXODUS_API
+          ExodusII_IO (mesh).write_equation_systems("displacement.e",equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+        
+</pre>
+</div>
+<div class = "comment">
+All done.
+</div>
+
+<div class ="fragment">
+<pre>
+          return 0;
+        }
+        
+        
+        void assemble_elasticity(EquationSystems& es,
+                                 const std::string& system_name)
+        {
+          libmesh_assert_equal_to (system_name, "Elasticity");
+        
+          const MeshBase& mesh = es.get_mesh();
+        
+          const unsigned int dim = mesh.mesh_dimension();
+        
+          LinearImplicitSystem& system = es.get_system&lt;LinearImplicitSystem&gt;("Elasticity");
+        
+          const unsigned int u_var = system.variable_number ("u");
+          const unsigned int v_var = system.variable_number ("v");
+          const unsigned int lambda_var = system.variable_number ("lambda");
+        
+          const DofMap& dof_map = system.get_dof_map();
+          FEType fe_type = dof_map.variable_type(0);
+          AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+          QGauss qrule (dim, fe_type.default_quadrature_order());
+          fe-&gt;attach_quadrature_rule (&qrule);
+        
+          AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
+          QGauss qface(dim-1, fe_type.default_quadrature_order());
+          fe_face-&gt;attach_quadrature_rule (&qface);
+        
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
+        
+          DenseMatrix&lt;Number&gt; Ke;
+          DenseVector&lt;Number&gt; Fe;
+        
+          DenseSubMatrix&lt;Number&gt;
+            Kuu(Ke), Kuv(Ke),
+            Kvu(Ke), Kvv(Ke);
+          DenseSubMatrix&lt;Number&gt; Klambda_v(Ke), Kv_lambda(Ke);
+        
+          DenseSubVector&lt;Number&gt;
+            Fu(Fe),
+            Fv(Fe);
+        
+          std::vector&lt;dof_id_type&gt; dof_indices;
+          std::vector&lt;dof_id_type&gt; dof_indices_u;
+          std::vector&lt;dof_id_type&gt; dof_indices_v;
+          std::vector&lt;dof_id_type&gt; dof_indices_lambda;
+        
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+        
+          for ( ; el != end_el; ++el)
+            {
+              const Elem* elem = *el;
+        
+              dof_map.dof_indices (elem, dof_indices);
+              dof_map.dof_indices (elem, dof_indices_u, u_var);
+              dof_map.dof_indices (elem, dof_indices_v, v_var);
+              dof_map.dof_indices (elem, dof_indices_lambda, lambda_var);
+        
+              const unsigned int n_dofs   = dof_indices.size();
+              const unsigned int n_u_dofs = dof_indices_u.size();
+              const unsigned int n_v_dofs = dof_indices_v.size();
+              const unsigned int n_lambda_dofs = dof_indices_lambda.size();
+        
+              fe-&gt;reinit (elem);
+        
+              Ke.resize (n_dofs, n_dofs);
+              Fe.resize (n_dofs);
+        
+              Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
+              Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
+        
+              Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
+              Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
+        
+</pre>
+</div>
+<div class = "comment">
+Also, add a row and a column to enforce the constraint
+</div>
+
+<div class ="fragment">
+<pre>
+              Kv_lambda.reposition (v_var*n_u_dofs, v_var*n_u_dofs+n_v_dofs, n_v_dofs, 1);
+              Klambda_v.reposition (v_var*n_v_dofs+n_v_dofs, v_var*n_v_dofs, 1, n_v_dofs);
+        
+              Fu.reposition (u_var*n_u_dofs, n_u_dofs);
+              Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+        
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+                {
+                  for (unsigned int i=0; i&lt;n_u_dofs; i++)
+                    for (unsigned int j=0; j&lt;n_u_dofs; j++)
+                      {
+</pre>
+</div>
+<div class = "comment">
+Tensor indices
+</div>
+
+<div class ="fragment">
+<pre>
+                        unsigned int C_i, C_j, C_k, C_l;
+                        C_i=0, C_k=0;
+        
+        
+                        C_j=0, C_l=0;
+                        Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=0;
+                        Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=0, C_l=1;
+                        Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=1;
+                        Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                      }
+        
+                  for (unsigned int i=0; i&lt;n_u_dofs; i++)
+                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                      {
+</pre>
+</div>
+<div class = "comment">
+Tensor indices
+</div>
+
+<div class ="fragment">
+<pre>
+                        unsigned int C_i, C_j, C_k, C_l;
+                        C_i=0, C_k=1;
+        
+        
+                        C_j=0, C_l=0;
+                        Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=0;
+                        Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=0, C_l=1;
+                        Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=1;
+                        Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                      }
+        
+                  for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                    for (unsigned int j=0; j&lt;n_u_dofs; j++)
+                      {
+</pre>
+</div>
+<div class = "comment">
+Tensor indices
+</div>
+
+<div class ="fragment">
+<pre>
+                        unsigned int C_i, C_j, C_k, C_l;
+                        C_i=1, C_k=0;
+        
+        
+                        C_j=0, C_l=0;
+                        Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=0;
+                        Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=0, C_l=1;
+                        Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=1;
+                        Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                      }
+        
+                  for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                      {
+</pre>
+</div>
+<div class = "comment">
+Tensor indices
+</div>
+
+<div class ="fragment">
+<pre>
+                        unsigned int C_i, C_j, C_k, C_l;
+                        C_i=1, C_k=1;
+        
+        
+                        C_j=0, C_l=0;
+                        Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=0;
+                        Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=0, C_l=1;
+                        Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+        
+                        C_j=1, C_l=1;
+                        Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                      }
+                }
+        
+              {
+                for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {
+                      const std::vector&lt;boundary_id_type&gt; bc_ids =
+                        mesh.get_boundary_info().boundary_ids (elem,side);
+        
+                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
+                      const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
+        
+                      fe_face-&gt;reinit(elem, side);
+        
+                      for (std::vector&lt;boundary_id_type&gt;::const_iterator b =
+                             bc_ids.begin(); b != bc_ids.end(); ++b)
+                        {
+                          const boundary_id_type bc_id = *b;
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
+</pre>
+</div>
+<div class = "comment">
+Add the loading
+</div>
+
+<div class ="fragment">
+<pre>
+                              if( bc_id == 2 )
+                                {
+                                  for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                                    {
+                                      Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                                    }
+                                }
+        
+</pre>
+</div>
+<div class = "comment">
+Add the constraint contributions
+</div>
+
+<div class ="fragment">
+<pre>
+                              if( bc_id == 1 )
+                                {
+                                  for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                                    for (unsigned int j=0; j&lt;n_lambda_dofs; j++)
+                                      {
+                                        Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                                      }
+        
+                                  for (unsigned int i=0; i&lt;n_lambda_dofs; i++)
+                                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                                      {
+                                        Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                                      }
+                                }
+                            }
+                        }
+                    }
+              }
+        
+              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+        
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
+            }
+        }
+        
+        Real eval_elasticity_tensor(unsigned int i,
+                                    unsigned int j,
+                                    unsigned int k,
+                                    unsigned int l)
+        {
+</pre>
+</div>
+<div class = "comment">
+Define the Poisson ratio
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real nu = 0.3;
+        
+</pre>
+</div>
+<div class = "comment">
+Define the Lame constants (lambda_1 and lambda_2) based on Poisson ratio
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real lambda_1 = nu / ( (1. + nu) * (1. - 2.*nu) );
+          const Real lambda_2 = 0.5 / (1 + nu);
+        
+</pre>
+</div>
+<div class = "comment">
+Define the Kronecker delta functions that we need here
+</div>
+
+<div class ="fragment">
+<pre>
+          Real delta_ij = (i == j) ? 1. : 0.;
+          Real delta_il = (i == l) ? 1. : 0.;
+          Real delta_ik = (i == k) ? 1. : 0.;
+          Real delta_jl = (j == l) ? 1. : 0.;
+          Real delta_jk = (j == k) ? 1. : 0.;
+          Real delta_kl = (k == l) ? 1. : 0.;
+        
+          return lambda_1 * delta_ij * delta_kl + lambda_2 * (delta_ik * delta_jl + delta_il * delta_jk);
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file systems_of_equations_ex5.C without comments: </h1> 
+<pre> 
+  #include &lt;iostream&gt;
+  #include &lt;algorithm&gt;
+  #include &lt;math.h&gt;
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_subvector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/perf_log.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/boundary_info.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/zero_function.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dirichlet_boundaries.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_elasticity(EquationSystems&amp; es,
+                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+  
+  Real eval_elasticity_tensor(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> k,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+    libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, <B><FONT COLOR="#BC8F8F">&quot;--enable-petsc or --enable-laspack&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;
+  
+    libmesh_example_requires(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+  
+    Mesh mesh(init.comm(), dim);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+                                         50, 10,
+                                         0., 1.,
+                                         0., 0.2,
+                                         QUAD9);
+  
+  
+    mesh.print_info();
+  
+  
+    EquationSystems equation_systems (mesh);
+  
+    LinearImplicitSystem&amp; system =
+      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Elasticity&quot;</FONT></B>);
+  
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var      = system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND, LAGRANGE);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var      = system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, SECOND, LAGRANGE);
+  
+    system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;lambda&quot;</FONT></B>, FIRST, SCALAR);
+  
+  
+    system.attach_assemble_function (assemble_elasticity);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; boundary_ids;
+    boundary_ids.insert(3);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; variables(2);
+    variables[0] = u_var; variables[1] = v_var;
+  
+    ZeroFunction&lt;&gt; zf;
+  
+    DirichletBoundary dirichlet_bc(boundary_ids,
+                                   variables,
+                                   &amp;zf);
+  
+    system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+  
+    equation_systems.init();
+  
+    equation_systems.print_info();
+  
+    system.solve();
+  
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO (mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;displacement.e&quot;</FONT></B>,equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+  
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_elasticity(EquationSystems&amp; es,
+                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+  {
+    libmesh_assert_equal_to (system_name, <B><FONT COLOR="#BC8F8F">&quot;Elasticity&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+  
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Elasticity&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> lambda_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;lambda&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+    FEType fe_type = dof_map.variable_type(0);
+    AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+    QGauss qrule (dim, fe_type.default_quadrature_order());
+    fe-&gt;attach_quadrature_rule (&amp;qrule);
+  
+    AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
+    QGauss qface(dim-1, fe_type.default_quadrature_order());
+    fe_face-&gt;attach_quadrature_rule (&amp;qface);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+  
+    DenseMatrix&lt;Number&gt; Ke;
+    DenseVector&lt;Number&gt; Fe;
+  
+    DenseSubMatrix&lt;Number&gt;
+      Kuu(Ke), Kuv(Ke),
+      Kvu(Ke), Kvv(Ke);
+    DenseSubMatrix&lt;Number&gt; Klambda_v(Ke), Kv_lambda(Ke);
+  
+    DenseSubVector&lt;Number&gt;
+      Fu(Fe),
+      Fv(Fe);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_u;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_v;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_lambda;
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+        dof_map.dof_indices (elem, dof_indices);
+        dof_map.dof_indices (elem, dof_indices_u, u_var);
+        dof_map.dof_indices (elem, dof_indices_v, v_var);
+        dof_map.dof_indices (elem, dof_indices_lambda, lambda_var);
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dofs   = dof_indices.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = dof_indices_u.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_v_dofs = dof_indices_v.size();
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_lambda_dofs = dof_indices_lambda.size();
+  
+        fe-&gt;reinit (elem);
+  
+        Ke.resize (n_dofs, n_dofs);
+        Fe.resize (n_dofs);
+  
+        Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
+        Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
+  
+        Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
+        Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
+  
+        Kv_lambda.reposition (v_var*n_u_dofs, v_var*n_u_dofs+n_v_dofs, n_v_dofs, 1);
+        Klambda_v.reposition (v_var*n_v_dofs+n_v_dofs, v_var*n_v_dofs, 1, n_v_dofs);
+  
+        Fu.reposition (u_var*n_u_dofs, n_u_dofs);
+        Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+                {
+                  <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i, C_j, C_k, C_l;
+                  C_i=0, C_k=0;
+  
+  
+                  C_j=0, C_l=0;
+                  Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=0;
+                  Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=0, C_l=1;
+                  Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=1;
+                  Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                }
+  
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+                {
+                  <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i, C_j, C_k, C_l;
+                  C_i=0, C_k=1;
+  
+  
+                  C_j=0, C_l=0;
+                  Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=0;
+                  Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=0, C_l=1;
+                  Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=1;
+                  Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                }
+  
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+                {
+                  <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i, C_j, C_k, C_l;
+                  C_i=1, C_k=0;
+  
+  
+                  C_j=0, C_l=0;
+                  Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=0;
+                  Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=0, C_l=1;
+                  Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=1;
+                  Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                }
+  
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+                {
+                  <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> C_i, C_j, C_k, C_l;
+                  C_i=1, C_k=1;
+  
+  
+                  C_j=0, C_l=0;
+                  Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=0;
+                  Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=0, C_l=1;
+                  Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+  
+                  C_j=1, C_l=1;
+                  Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                }
+          }
+  
+        {
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;boundary_id_type&gt; bc_ids =
+                  mesh.get_boundary_info().boundary_ids (elem,side);
+  
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+  
+                fe_face-&gt;reinit(elem, side);
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;boundary_id_type&gt;::const_iterator b =
+                       bc_ids.begin(); b != bc_ids.end(); ++b)
+                  {
+                    <B><FONT COLOR="#228B22">const</FONT></B> boundary_id_type bc_id = *b;
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">if</FONT></B>( bc_id == 2 )
+                          {
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+                              {
+                                Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                              }
+                          }
+  
+                        <B><FONT COLOR="#A020F0">if</FONT></B>( bc_id == 1 )
+                          {
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+                              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_lambda_dofs; j++)
+                                {
+                                  Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                                }
+  
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_lambda_dofs; i++)
+                              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+                                {
+                                  Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                                }
+                          }
+                      }
+                  }
+              }
+        }
+  
+        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+  
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+        system.rhs-&gt;add_vector    (Fe, dof_indices);
+      }
+  }
+  
+  Real eval_elasticity_tensor(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> k,
+                              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> l)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> Real nu = 0.3;
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real lambda_1 = nu / ( (1. + nu) * (1. - 2.*nu) );
+    <B><FONT COLOR="#228B22">const</FONT></B> Real lambda_2 = 0.5 / (1 + nu);
+  
+    Real delta_ij = (i == j) ? 1. : 0.;
+    Real delta_il = (i == l) ? 1. : 0.;
+    Real delta_ik = (i == k) ? 1. : 0.;
+    Real delta_jl = (j == l) ? 1. : 0.;
+    Real delta_jk = (j == k) ? 1. : 0.;
+    Real delta_kl = (k == l) ? 1. : 0.;
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> lambda_1 * delta_ij * delta_kl + lambda_2 * (delta_ik * delta_jl + delta_il * delta_jk);
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example systems_of_equations_ex5:
+*   example-opt -ksp_type cg 
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=2121
+    n_local_nodes()=2121
+  n_elem()=500
+    n_local_elem()=500
+    n_active_elem()=500
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Elasticity"
+    Type "LinearImplicit"
+    Variables={ "u" "v" } "lambda" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "SCALAR", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" 
+    n_dofs()=4243
+    n_local_dofs()=4243
+    n_constrained_dofs()=42
+    n_local_constrained_dofs()=42
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 32.6206
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 4243
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 42
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:27 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.260814, Active time=0.17352                                                   |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   SCALAR_dof_indices()             2500       0.0009      0.000000    0.0009      0.000000    0.54     0.54     |
+|   add_neighbors_to_send_list()     1          0.0005      0.000491    0.0007      0.000701    0.28     0.40     |
+|   build_constraint_matrix()        500        0.0003      0.000001    0.0003      0.000001    0.19     0.19     |
+|   build_sparsity()                 1          0.0047      0.004693    0.0058      0.005757    2.70     3.32     |
+|   cnstrn_elem_mat_vec()            500        0.0094      0.000019    0.0094      0.000019    5.39     5.39     |
+|   create_dof_constraints()         1          0.0020      0.001953    0.0032      0.003237    1.13     1.87     |
+|   distribute_dofs()                1          0.0004      0.000366    0.0015      0.001459    0.21     0.84     |
+|   dof_indices()                    5000       0.0047      0.000001    0.0056      0.000001    2.69     3.24     |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0011      0.001091    0.0011      0.001091    0.63     0.63     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0021      0.002109    0.0036      0.003566    1.22     2.06     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0032      0.003207    0.0032      0.003207    1.85     1.85     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        640        0.0007      0.000001    0.0007      0.000001    0.39     0.39     |
+|   init_shape_functions()           141        0.0001      0.000001    0.0001      0.000001    0.06     0.06     |
+|   inverse_map()                    420        0.0009      0.000002    0.0009      0.000002    0.49     0.49     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             640        0.0007      0.000001    0.0007      0.000001    0.38     0.38     |
+|   compute_face_map()               140        0.0005      0.000004    0.0014      0.000010    0.31     0.82     |
+|   init_face_shape_functions()      21         0.0000      0.000002    0.0000      0.000002    0.02     0.02     |
+|   init_reference_to_physical_map() 141        0.0007      0.000005    0.0007      0.000005    0.38     0.38     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0007      0.000728    0.0007      0.000728    0.42     0.42     |
+|   renumber_nodes_and_elem()        2          0.0001      0.000058    0.0001      0.000058    0.07     0.07     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0001      0.000068    0.0068      0.006842    0.04     3.94     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0006      0.000577    0.0006      0.000577    0.33     0.33     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0001      0.000066    0.0001      0.000066    0.04     0.04     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.1190      0.119018    0.1190      0.119018    68.59    68.59    |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       1          0.0202      0.020226    0.0359      0.035949    11.66    20.72    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            10660      0.1735                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example systems_of_equations_ex5:
+*   example-opt -ksp_type cg 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

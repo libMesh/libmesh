@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file main.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/explicit_system.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/libmesh_config.h"
+        
+        #ifdef LIBMESH_HAVE_DTK
+        #include "libmesh/dtk_solution_transfer.h"
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        
+        Number initial_value(const Point& p,
+                             const Parameters& /* parameters */,
+                             const std::string&,
+                             const std::string&)
+        {
+          return p(0)*p(0) + 1; // x^2 + 1
+        }
+        
+        void initialize(EquationSystems& es,
+                        const std::string& system_name)
+        {
+          ExplicitSystem & system = es.get_system&lt;ExplicitSystem&gt;(system_name);
+          es.parameters.set&lt;Real&gt; ("time") = system.time = 0;
+          system.project_solution(initial_value, NULL, es.parameters);
+        }
+        
+        int main(int argc, char* argv[])
+        {
+          LibMeshInit init (argc, argv);
+        
+        #ifdef LIBMESH_HAVE_DTK
+        
+          Mesh from_mesh(init.comm());
+          MeshTools::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
+          from_mesh.print_info();
+          EquationSystems from_es(from_mesh);
+          System & from_sys = from_es.add_system&lt;ExplicitSystem&gt;("From");
+          unsigned int from_var = from_sys.add_variable("from");
+          from_sys.attach_init_function(initialize);
+          from_es.init();
+        
+          ExodusII_IO(from_mesh).write_equation_systems("from.e", from_es);
+        
+          Mesh to_mesh(init.comm());
+          MeshTools::Generation::build_cube(to_mesh, 5, 5, 5, 0, 1, 0, 1, 0, 1, TET4);
+          to_mesh.print_info();
+          EquationSystems to_es(to_mesh);
+          System & to_sys = to_es.add_system&lt;ExplicitSystem&gt;("To");
+          unsigned int to_var = to_sys.add_variable("to");
+          to_es.init();
+        
+          DTKSolutionTransfer dtk_transfer(init.comm());
+        
+          dtk_transfer.transfer(from_sys.variable(from_var), to_sys.variable(to_var));
+        
+          to_es.update();
+          ExodusII_IO(to_mesh).write_equation_systems("to.e", to_es);
+        
+        #endif
+        
+          return 0;
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file main.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/explicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_config.h&quot;</FONT></B>
+  
+  #ifdef LIBMESH_HAVE_DTK
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dtk_solution_transfer.h&quot;</FONT></B>
+  #endif
+  
+  using namespace libMesh;
+  
+  
+  Number initial_value(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                       <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp; <I><FONT COLOR="#B22222">/* parameters */</FONT></I>,
+                       <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,
+                       <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;)
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> p(0)*p(0) + 1; <I><FONT COLOR="#B22222">// x^2 + 1
+</FONT></I>  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> initialize(EquationSystems&amp; es,
+                  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+  {
+    ExplicitSystem &amp; system = es.get_system&lt;ExplicitSystem&gt;(system_name);
+    es.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>) = system.time = 0;
+    system.project_solution(initial_value, NULL, es.parameters);
+  }
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>* argv[])
+  {
+    LibMeshInit init (argc, argv);
+  
+  #ifdef LIBMESH_HAVE_DTK
+  
+    Mesh from_mesh(init.comm());
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
+    from_mesh.print_info();
+    EquationSystems from_es(from_mesh);
+    System &amp; from_sys = from_es.add_system&lt;ExplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;From&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> from_var = from_sys.add_variable(<B><FONT COLOR="#BC8F8F">&quot;from&quot;</FONT></B>);
+    from_sys.attach_init_function(initialize);
+    from_es.init();
+  
+    ExodusII_IO(from_mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;from.e&quot;</FONT></B>, from_es);
+  
+    Mesh to_mesh(init.comm());
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube(to_mesh, 5, 5, 5, 0, 1, 0, 1, 0, 1, TET4);
+    to_mesh.print_info();
+    EquationSystems to_es(to_mesh);
+    System &amp; to_sys = to_es.add_system&lt;ExplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;To&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> to_var = to_sys.add_variable(<B><FONT COLOR="#BC8F8F">&quot;to&quot;</FONT></B>);
+    to_es.init();
+  
+    DTKSolutionTransfer dtk_transfer(init.comm());
+  
+    dtk_transfer.transfer(from_sys.variable(from_var), to_sys.variable(to_var));
+  
+    to_es.update();
+    ExodusII_IO(to_mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;to.e&quot;</FONT></B>, to_es);
+  
+  #endif
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example solution_transfer_ex1:
+*   example-opt  
+***************************************************************
+ 
+ 
+***************************************************************
+* Done Running Example solution_transfer_ex1:
+*   example-opt  
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

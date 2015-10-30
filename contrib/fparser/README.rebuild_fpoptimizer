@@ -1,0 +1,19 @@
+Use the upstream Makefile to rebuild the fpoptimizer.cc file (only
+necessary after changes to source files in the fpoptimizer
+directory)
+
+> rm -f .dep fpoptimizer.cc
+> make -f Makefile.orig fpoptimizer.cc
+
+Note that the upstream Makefile is patched to add the include path
+necessary to find libmesh_config.h
+
+Limitations:
+
+.) You must have an installed version of LibMesh with a valid
+   libmesh_config.h file $LIBMESH_DIR (or if $LIBMESH_DIR is not set, in
+   ../../installed) for compilation to succeed.
+
+.) Rebuilding fpoptimizer.cc is known to work with most
+   flavors of GCC on GNU/Linux systems.  It is known to *not* work on
+   systems with non-GNU sed, like Mac OSX.

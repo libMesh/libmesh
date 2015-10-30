@@ -1,0 +1,22 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{url}
+\usepackage{amsmath} % References can use \text
+\renewcommand{\rmdefault}{ptm} % What does it do? Somehow resets the default font...
+\usepackage{helvet}
+
+% Call "References" section something else
+\renewcommand{\refname}{2015}
+
+\begin{document}
+
+% Don't use page numbers
+\pagestyle{empty}
+
+% Cite everything
+\nocite*
+
+\bibliographystyle{ieeetr}
+\bibliography{fifteen}
+
+\end{document}

@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=-3,3,0.11
+F=tan(atan2(x,y))
+C=fp_tan(fp_atan2(x,y))

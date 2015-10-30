@@ -1,0 +1,5 @@
+T=d ld li f mf gi
+V=x,y
+R=0,1,1
+F= !(x > y)
+C= x <= y

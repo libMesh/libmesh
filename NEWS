@@ -1,0 +1,298 @@
+0.9.3 -> 0.9.4
+  * Pyramid13 elements
+  * Subdivision surfaces
+  * Support for PETSc fieldsplits
+  * Point loads in reduced basis problems
+  * Improved AdjointRefinementErrorEstimator indicator quality
+  * Discontinous plotting can be done with subsets of EquationSystems
+  * complex-valued and single-precision ExodusII/Nemesis output
+  * allow appending to Tecplot ASCII files
+  * improved Abaqus, Gmsh, UNV I/O support
+  * VTK 6 support
+  * QHull now distributed in contrib/
+  * Several Fparser enhancements by @dschwen
+    * Automatic differentiation
+    * Allow NaN in fparser parsed functions
+    * Fparser JIT support
+    * Many fpoptimizer bugfixes
+    * plog (polynomial log approximation) function added
+  * Support NaN to locally disable DirichletBoundary functions
+  * Methods for nonlocal computations with SCALARs in FEMSystem
+  * PointLocator option for local element searches
+  * PointLocator/MeshFunction option for searches close to elements
+  * Better solver convergence reporting
+  * Better 16-bit and 64-bit hash functions
+  * Better QGrid behavior, documentation
+  * DenseMatrix eigenvalue computations
+  * DenseMatrix operations with mixed scalar types
+  * Mesh stitching can now be done using node and edge boundary IDs
+  * Variational mesh smoother refactoring
+  * MeshModification::transform() with arbitrary warping functions
+  * Use MPI_THREAD_FUNNELED when available
+  * libmesh_cast_ptr/ref/int deprecated, replaced by cast_ptr/ref/int
+  * libMeshEnums namespace removed; enumerations in libMesh namespace
+  * Configure tests for more C++11 features
+  * Default complation with -std=c++11, easier for users to disable
+  * Better configure autodetection of slepc, eigen compatibility
+  * configure options for software licensing
+    * non-LGPL-compatible options disabled by default
+    * libHilbert now under LGPL
+  * clearer "configure --help" output
+  * more verbose error messages using libmesh_error_msg()
+  * reformatted source code, no tabs should be in code from now on
+  * Assorted bug fixes, optimizations, new regression tests
+    * all_first_order() and build_extrusion() bugs fixed
+    * fixed libHilbert interface regression
+      * some xda/xdr files created with 0.9.3 MAY BE CORRUPTED when
+        read with older/newer libMesh versions, and vice-versa!
+    * fixed bug with stitching "slivers"
+    * fixed std::memset bug which pops up for newer GCCs on OSX
+    * fixed misc. distcheck bugs
+  * Many fixes to silence paranoid compiler warnings (see doc/notes/compiler_warnings.txt)
+  * Use -f when symbolic linking files during build/install stage
+  * 1D Gauss-Lobatto quadrature rules, additional quadrature unit testing
+  * Cut-cell quadrature (ElemCutter, QComposite classes) for XFEM
+  * Per-subdomain scalar variable support
+  * Added 'meshavg' application for averaging solutions
+  * GDB backtraces and backtraces from the segfault handler
+  * Support -fsanitize=address flags on newer Clang and GCC compilers
+  * http://libmesh.github.io created, http://libmesh.sf.net is gone/permanently blocked
+  * "make doc" target completely overhauled
+  * Protect Mesh::BoundaryInfo behind an accessor.
+  * NumericVector::add_vector(), ::get(), ::insert() refactoring.
+
+0.9.2 -> 0.9.3
+  * FEMContext public members now private, must use API pushed in 0.9.2.
+    Breaks backward compatibility of FEMContext.
+  * Intel 14.0 Compatibility.
+  * Streamlined checkpoint/restart capability for ephemeral usage.
+  * new --disable-warnings option.
+  * Added heterogeneous Dirichlet adjoint constraints.
+  * Added edge Dirichlet constraints.
+  * Improved support for non-32-bit IDs.
+  * PETSc 3.5 support.
+  * OSX 10.9 XDR compatibility.
+  * Memory optimizations for Metis/Parmetis partitioning auxiliary
+    data structures.
+  * HEX20, PRISM15, PYRAMID5, PYRAMID14 shape functions.
+  * Nedelec elements.
+  * Upgraded bundled Boost to v1.55.
+  * Expanded ExodusII API.
+  * Additional enum/string conversion utility functions.
+  * Assorted bugfixes:
+    * for SzaBab and Bernstein h-adaptivity.
+    * for p-adaptivity.
+  * global_n_processors()/global_processor_id() functions to access
+    MPI rank information from the original communicator used to
+    initialize the library
+  * Fixed longstanding bug that could arise for mixed finite element
+    types with ParallelMesh on specific partitionings
+
+0.9.1 -> 0.9.2
+  * PETSc 3.4 support
+  * PETSc BAIJ matrix support for blocked matrices
+    * opt-in for this with './configure --enable-blocked-storage ...'
+    * may cause issues with preallocation in Reduced Basis code -
+      see http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
+  * Refreshed packaged METIS and ParMETIS to latest versions
+  * Experimental support for DGFEMContext
+  * New accessor API for FEMContext objects. Public members deprecated.
+  * Assorted bugfixes:
+    * for nonstandard index sizes
+
+0.9.0 -> 0.9.1
+  * Multi-communicator-capable objects
+    * Communicator-using ParallelObject subclasses can be initialized
+      with arbitrary MPI communicators, independent of the
+      communicator used to init libMesh or the communicators used by
+      other non-interacting objects
+    * No internal library code still uses CommWorld communicators
+    * CommWorld and global Parallel:: methods can be disabled via
+      configure --disable-default-comm-world, breaking backwards
+      compatibility, to facilitate compile-time checking of
+      libMesh-based codes for compatibility with multi-communicator
+      usage.
+      * These methods will be disabled by default in future versions,
+	but configure --enable-default-comm-world will work for the
+        next few releases
+  * Additional specializations for Parallel:: communication methods
+  * New SolutionTransfer infrastructure, implementations, examples
+  * Singleton framework added
+  * Complex-valued libMesh builds can new read real-valued restarts
+  * Interface to and contrib copy of Eigen linear algebra package
+  * Interface to and contrib copy of newer Nemesis/ExodusII/NetCDF
+  * build Tecplot binary I/O library from source,
+    * old behavior can be restored via --disable-tecio --enable-tecplot
+  * Assorted bugfixes:
+    * UnsteadySolver is now more robust inside AMR loops
+    * Preconditioner setup is more robust with AMR
+    * Fixes in Trilinos and SLEPc package interfaces
+    * Fix for multithreaded QoI derivative assembly
+    * Fixes for compiler and 3rd party library compatibility
+  * Clarifications, updates to API documentation
+
+
+0.8.0 -> 0.9.0
+  * automake build system
+    libMesh-specific implementation features:
+    source and header files must be listed explicitly.
+    When adding a header file,
+      1.) svn add the file
+      2.) cd include ; ./rebuild_include_HEADERS.sh
+      3.) cd include/libmesh ; ./rebuild_makefile.sh
+    When adding a soure file,
+      1.) svn add the file
+      2.) cd src ; ./rebuild_libmesh_la_SOURCES.sh
+    General notes:
+      o make install && make installcheck
+        installs the built library & performs sanity checking
+      o make distcheck
+        packages up a tarball and tests it for self-sufficiency.
+	always do this when modifying the build system.
+      o for more information, view the README and INSTALL files.
+  * VariableGroups DofObject storage optimization for the common
+    case of multiple Variables of the same type within a System.
+    Note this changes the default variable ordering within a
+    System - the old format is available via System::identify_variable_groups()
+  * TecplotIO binary format updated to support v11.2 features where
+    available.  This includes encoding the solution time into output files,
+    writing each libMesh subdomain to a separate Tecplot zone, and support
+    for 1D Tecplot binary files.
+  * ./configure'able support for identifier types. Defaults:
+         id size (boundaries)............. : 2 bytes
+         id size (dofs)................... : 4 bytes
+         id size (processors)............. : 2 bytes
+         id size (subdomains)............. : 2 bytes
+  * Reduced memory footprint for Node objects.
+  * Fix for using specified preconditioners with adaptivity and PETSc-3.3.
+  * New Examples:
+     o fem_system_ex2: Nonlinear elasticity, courtesy Robert Weidlich.
+     o adjoints_ex5: Unsteady Adjoints.
+     o miscellaneous_ex8: meshfree, inverse distance interpolation.
+
+
+0.7.3 -> 0.8.0
+  * Vector-valued finite elements & related examples
+  * Entirely refactored Parallel namespace implementation
+  * Properly communicate DofIndices when communicating DofObjects
+  * std::thread-like asynchronous function execution
+  * Refactored serialized EquationSystems I/O for increased performance
+  * Heterogeneous constraints & bug fixes
+  * Proper DirichletConstraints Dirichlet boundary conditions
+  * Improved PeriodicBoundary support
+  * Refactored, parallelized SparsityPattern generation
+  * Weighted Patch Recovery Error Estimator suppport
+  * Relocated header files, e.g.
+      #include "dof_map.h" becomes
+      #include "libmesh/dof_map.h"
+    this will be strictly enforced in the next release.
+  * ParallelMesh fixes
+  * PGI, Sun Studio compiler portability fixes
+  * MeshTools::Generation::build_sphere() icosahedron support
+  * Improved Abaqus reader support
+  * Improved UCDIO writer support
+  * Output only a subset of variables from EquationSystems
+  * Run-time floating point exception trapping via --enable-fpe
+  * Refreshed packaged METIS and ParMETIS to latest versions
+  * PETSc-3.3, SLEPc 3.3 support
+  * Trilinos-11 support
+  * Mac OSX 10.8 "Mountain Lion" fixes
+  * New Examples:
+     o systems_of_equations 4, 5, 6: 2D and 3D linear elasticity
+     o reduced_basis_ex5: 3D linear elasticity with the Reduced Basis method
+     o reduced_basis_ex6: Empirical interpolation method for a geometrically parametrized domain in 3D
+     o reduced_basis_ex7: Complex-valued Reduced Basis problem modeling an acoustic horn
+
+
+0.7.2 -> 0.7.3
+  * Templated FunctionBase and subclass functors
+  * Functor-based versions of more system APIs
+  * Integrated function parser based functor
+  * More flexible PetscMatrix responds to -mat_type
+  * Elem::close_to_point() method for contact problems
+  * Heterogenous constraint equation support
+  * Dirichlet constraint equation support
+  * More methods are ParallelMesh-compatible
+  * Mesh extrusion generation
+  * UniformRefinement error estimates for more adjoint options
+  * Element truth table written in ExodusII output
+  * GetPot detection of overridden variables
+  * Reorganized examples by category
+  * C++11 compatibility fixes
+  * Many assorted bug fixes
+
+0.7.1 -> 0.7.2
+  * Discontinuous hierarchic FE basis
+  * PatchRecoveryErrorEstimator patch reuse option
+  * New partitioning-aware Patch construction option
+  * More efficient adjoint solves with PETSc
+  * New projection example utility
+  * Bare System objects are now useful for efficient utilities
+  * Many Exodus/Nemesis output improvements
+  * BoundaryInfo::sync() is now AMR- and ParallelMesh-compatible
+  * More code is now ParallelMesh-compatible
+  * More flexible Parallel:: APIs
+  * Elem:: utilities for semi-structured grids
+  * NodeConstraints calculations for moving mesh users
+  * Stack trace output on any uncaught exception
+  * Corrected non-standard C++ in FE class specializations
+  * Multithreaded FEMSystem assembly functions
+  * Assorted efficiency improvements
+  * Various Trilinos, Tetgen, Triangle interface improvements
+  * Compatibility with newer third-party packages, compilers
+  * Read support for ABAQUS meshes
+  * Many assorted bug fixes
+
+0.7.0 -> 0.7.1
+  * Periodic boundary support enhancements
+  * New example with subdomain-restricted variables
+  * New examples with adjoint-based adaptivity, sensitivities
+  * More flexible multiphysics AdjointResidualErrorEstimator norms
+  * PatchRecoveryErrorEstimator of directional derivative seminorms
+  * Improved VTK output
+  * Separate RBEvaluation class for online Reduced Basis solves
+  * Object-based assembly API options
+  * Partitioning can now use element weights
+  * Better support for boundaries with multiple BC IDs
+  * More matrix printing options
+  * XZ compression support
+  * Subset solves with PETSc
+  * Better SLEPc compatibility
+  * Properly read restart files with a subset of our variables
+  * New utility for comparing restart files
+  * Easier enabling of float, long double configurations
+  * Most features now work with RTTI disabled
+  * Many assorted bug fixes
+
+0.6.4 -> 0.7.0
+  * Certified Reduced Basis model creation/evaluation
+  * Adjoint-based sensitivity calculations and error indicators
+  * Support for newer PETSc, SLEPc
+  * More autodetection of optional dependencies
+  * New examples:
+  ** Discontinuous Galerkin
+  ** SCALAR Lagrange multipliers
+  ** Certified Reduced Basis method
+  * Parallel:: utilities for std::set data
+  * Parallel:: support for non-default MPI communicators
+  * Parallel:: support for non-magic-number message tags
+  * GMVIO support for subdomain material ids
+  * ExodusII support for writing discontinuous data
+  * Switched some example output formats to Exodus, now that GMV is going away
+  * More ASCII IO support for variable precision
+  * FEMContext utilities are now useable outside FEMSystem
+  * Optional BLAS-based dense linear algebra operations
+  * Improved fork of GetPot input parsing
+  * Support for interior boundary ids
+  * Elem::find_edge_neighbors utility
+  * Additional patch recovery error estimation norm options
+  * Additional SystemNorm functionality
+  * Support for zero-dimensional "meshes"
+  * Support mesh construction without pre-specified dimensionality
+  * Optional independent redirection of libMesh output/error text streams
+  * Moved libMesh classes into libMesh namespace
+  * More forward declarations, refactoring to reduce header dependencies
+  * Fix for an infrequent-but-major I/O-corrupting bug in our libHilbert interface
+  * Fix for errors when doing adaptive refinement across a periodic boundary
+  * Fix for projections on systems with per-subdomain variables
+  * Many fixes for minor bugs, overzealous assertions

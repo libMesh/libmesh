@@ -1,0 +1,25 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[hyphens]{url}
+\usepackage{amsmath} % References can use \text
+\renewcommand{\rmdefault}{ptm} % What does it do? Somehow resets the default font...
+\usepackage{helvet}
+
+\title{Papers by people using LibMesh}
+\author{Various}
+\begin{document}
+\maketitle
+
+% Cite everything
+\nocite*
+
+%% In the ieeetr format, if you specify a month and an issue number,
+%% it prints only the month!
+%% The unsrt format, on the other hand, prints both, like this:
+%% International Journal of Blah, 13(4):999-1016,November 2009.
+%% Another option is the newer IEEEtran, which also seems to print
+%% both, and uses a different font for URLs.
+\bibliographystyle{ieeetr}
+\bibliography{libmesh,theses,preprints,fifteen,fourteen,thirteen,twelve,eleven,ten,nine,eight,seven,six,five,four}
+
+\end{document}

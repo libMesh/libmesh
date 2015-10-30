@@ -1,0 +1,1560 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file augment_sparsity_on_interface.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef AUGMENT_SPARSITY_ON_INTERFACE_H
+        #define AUGMENT_SPARSITY_ON_INTERFACE_H
+        
+        #include "libmesh/dof_map.h"
+        #include "libmesh/equation_systems.h"
+        
+        using libMesh::DofMap;
+        using libMesh::EquationSystems;
+        using libMesh::dof_id_type;
+        using libMesh::boundary_id_type;
+        
+</pre>
+</div>
+<div class = "comment">
+Convenient typedef for a map for (element id,side id) --> element neighbor id
+</div>
+
+<div class ="fragment">
+<pre>
+        typedef std::map&lt; std::pair&lt;dof_id_type, unsigned char&gt;, dof_id_type&gt; ElementIdMap;
+        
+        class AugmentSparsityOnInterface : public DofMap::AugmentSparsityPattern
+        {
+        private:
+        
+          /**
+           * The EquationSystems object that we're using here.
+           */
+          EquationSystems& _es;
+        
+          /**
+           * A map from (lower element ID, side ID) to matching upper element ID. Here "lower"
+           * and "upper" refer to the lower and upper (wrt +z direction) sides of the crack in
+           * our mesh.
+           */
+          ElementIdMap _lower_to_upper;
+        
+          /**
+           * Boundary IDs for the lower and upper faces of the "crack" in the mesh.
+           */
+          boundary_id_type _crack_boundary_lower, _crack_boundary_upper;
+        
+        public:
+        
+          /**
+           * Constructor.
+           */
+          AugmentSparsityOnInterface(EquationSystems& es,
+                                     boundary_id_type crack_boundary_lower,
+                                     boundary_id_type crack_boundary_upper);
+        
+          /**
+           * @return a const reference to the lower-to-upper element ID map.
+           */
+          const ElementIdMap& get_lower_to_upper() const;
+        
+          /**
+           * User-defined function to augment the sparsity pattern.
+           */
+          virtual void augment_sparsity_pattern (libMesh::SparsityPattern::Graph & ,
+                                                 std::vector&lt;dof_id_type&gt; & n_nz,
+                                                 std::vector&lt;dof_id_type&gt; & n_oz);
+        
+        };
+        
+        #endif
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file augment_sparsity_on_interface.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "augment_sparsity_on_interface.h"
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/linear_implicit_system.h"
+        
+        using namespace libMesh;
+        
+        AugmentSparsityOnInterface::AugmentSparsityOnInterface(EquationSystems& es,
+                                                               boundary_id_type crack_boundary_lower,
+                                                               boundary_id_type crack_boundary_upper)
+          :
+          _es(es),
+          _crack_boundary_lower(crack_boundary_lower),
+          _crack_boundary_upper(crack_boundary_upper)
+        {}
+        
+        const ElementIdMap& AugmentSparsityOnInterface::get_lower_to_upper() const
+        {
+          return _lower_to_upper;
+        }
+        
+        void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Graph & ,
+                                                                   std::vector&lt;dof_id_type&gt; & n_nz,
+                                                                   std::vector&lt;dof_id_type&gt; & n_oz)
+        {
+</pre>
+</div>
+<div class = "comment">
+get a constant reference to the mesh object
+</div>
+
+<div class ="fragment">
+<pre>
+          const MeshBase& mesh = _es.get_mesh();
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over all elements (not just local elements) to make sure we find
+"neighbor" elements on opposite sides of the crack.
+
+
+<br><br>TODO: This won't work with ParallelMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshBase::const_element_iterator       el     = mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+        
+</pre>
+</div>
+<div class = "comment">
+Map from (elem,side) to centroid
+</div>
+
+<div class ="fragment">
+<pre>
+          std::map&lt; std::pair&lt;dof_id_type,unsigned char&gt;, Point&gt; lower_centroids;
+          std::map&lt; std::pair&lt;dof_id_type,unsigned char&gt;, Point&gt; upper_centroids;
+        
+          for ( ; el != end_el; ++el)
+            {
+              const Elem* elem = *el;
+        
+              {
+                for (unsigned char side=0; side&lt;elem-&gt;n_sides(); side++)
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {
+                      if( mesh.get_boundary_info().has_boundary_id
+                            (elem,side, _crack_boundary_lower) )
+                        {
+                          AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
+        
+                          lower_centroids[std::make_pair(elem-&gt;id(), side)] = side_elem-&gt;centroid();
+                        }
+                    }
+              }
+        
+              {
+                for (unsigned char side=0; side&lt;elem-&gt;n_sides(); side++)
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {
+                      if( mesh.get_boundary_info().has_boundary_id
+                            (elem,side, _crack_boundary_upper) )
+                        {
+                          AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
+        
+                          upper_centroids[std::make_pair(elem-&gt;id(), side)] = side_elem-&gt;centroid();
+                        }
+                    }
+              }
+            }
+          std::size_t n_lower_centroids = lower_centroids.size();
+          std::size_t n_upper_centroids = upper_centroids.size();
+          libmesh_assert(n_lower_centroids == n_upper_centroids);
+        
+</pre>
+</div>
+<div class = "comment">
+Clear _lower_to_upper. This map will be used for matrix assembly later on.
+</div>
+
+<div class ="fragment">
+<pre>
+          _lower_to_upper.clear();
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the two-way element ID map
+</div>
+
+<div class ="fragment">
+<pre>
+          std::map&lt;dof_id_type, dof_id_type&gt; two_way_element_ID_map;
+        
+</pre>
+</div>
+<div class = "comment">
+We do an N^2 search to find elements with matching centroids. This could be optimized,
+e.g. by first sorting the centroids based on their (x,y,z) location.
+</div>
+
+<div class ="fragment">
+<pre>
+          {
+            std::map&lt; std::pair&lt;dof_id_type,unsigned char&gt;, Point&gt;::iterator it     = lower_centroids.begin();
+            std::map&lt; std::pair&lt;dof_id_type,unsigned char&gt;, Point&gt;::iterator it_end = lower_centroids.end();
+            for( ; it != it_end; ++it)
+              {
+                Point lower_centroid = it-&gt;second;
+        
+</pre>
+</div>
+<div class = "comment">
+find centroid in upper_centroids
+</div>
+
+<div class ="fragment">
+<pre>
+                std::map&lt; std::pair&lt;dof_id_type,unsigned char&gt;, Point&gt;::iterator inner_it     = upper_centroids.begin();
+                std::map&lt; std::pair&lt;dof_id_type,unsigned char&gt;, Point&gt;::iterator inner_it_end = upper_centroids.end();
+        
+                Real min_distance = std::numeric_limits&lt;Real&gt;::max();
+                for( ; inner_it != inner_it_end; ++inner_it)
+                  {
+                    Point upper_centroid = inner_it-&gt;second;
+        
+                    Real distance = (upper_centroid - lower_centroid).size();
+                    if( distance &lt; min_distance )
+                      {
+                        min_distance = distance;
+                        _lower_to_upper[it-&gt;first] = inner_it-&gt;first.first;
+                      }
+                  }
+        
+</pre>
+</div>
+<div class = "comment">
+We should've found matching elements on either side of the crack by now
+</div>
+
+<div class ="fragment">
+<pre>
+                libmesh_assert_less(min_distance, TOLERANCE);
+        
+</pre>
+</div>
+<div class = "comment">
+fill up a "two way element ID map" which we iterate over below
+</div>
+
+<div class ="fragment">
+<pre>
+                dof_id_type this_id     = it-&gt;first.first;
+                dof_id_type neighbor_id = _lower_to_upper[it-&gt;first];
+                two_way_element_ID_map[this_id]     = neighbor_id;
+                two_way_element_ID_map[neighbor_id] = this_id;
+              }
+          }
+        
+          {
+            const LinearImplicitSystem &system =
+              _es.get_system&lt;LinearImplicitSystem&gt; ("Poisson");
+            const DofMap &dof_map = system.get_dof_map();
+            const unsigned int sys_num = system.number();
+            const unsigned int var_num = system.variable_number("u");
+        
+</pre>
+</div>
+<div class = "comment">
+Create a set that will have the DoF numbers we need to augment the sparsity pattern
+</div>
+
+<div class ="fragment">
+<pre>
+            std::set&lt;dof_id_type&gt; local_coupled_dofs, remote_coupled_dofs;
+        
+            std::map&lt;dof_id_type, dof_id_type&gt;::iterator it     = two_way_element_ID_map.begin();
+            std::map&lt;dof_id_type, dof_id_type&gt;::iterator it_end = two_way_element_ID_map.end();
+        
+            for( ; it != it_end; ++it)
+              {
+                local_coupled_dofs.clear();
+                remote_coupled_dofs.clear();
+        
+</pre>
+</div>
+<div class = "comment">
+get a pointer to the one of the elements on the crack
+</div>
+
+<div class ="fragment">
+<pre>
+                const Elem* this_elem = mesh.elem(it-&gt;first);
+        
+</pre>
+</div>
+<div class = "comment">
+get a pointer to the neighbor element on the other side
+of the "crack" in the mesh
+</div>
+
+<div class ="fragment">
+<pre>
+                const Elem* neighbor_elem = mesh.elem(it-&gt;second);
+        
+</pre>
+</div>
+<div class = "comment">
+Now loop over the nodes and get the DoFs on neighbor_elem.
+These will be used to augment the sparsity patttern.
+</div>
+
+<div class ="fragment">
+<pre>
+                for (unsigned int n=0; n&lt;neighbor_elem-&gt;n_nodes(); n++)
+                  {
+                    const dof_id_type global_dof_number = neighbor_elem-&gt;get_node(n)-&gt;dof_number(sys_num,var_num,0);
+        
+</pre>
+</div>
+<div class = "comment">
+and finally insert it into one of the sets
+</div>
+
+<div class ="fragment">
+<pre>
+                    if ((global_dof_number &lt;  dof_map.first_dof()) ||
+                        (global_dof_number &gt;= dof_map.end_dof()))
+                      {
+                        remote_coupled_dofs.insert(global_dof_number);
+                      }
+                    else
+                      {
+                        local_coupled_dofs.insert(global_dof_number);
+                      }
+        
+                  } // end loop over nodes on neighbor element
+        
+</pre>
+</div>
+<div class = "comment">
+conservatively increase the preallocation for the implicit matrix contribution
+to account for these dofs
+</div>
+
+<div class ="fragment">
+<pre>
+                for (unsigned int nl=0; nl&lt;this_elem-&gt;n_nodes(); nl++)
+                  {
+                    const dof_id_type
+                      global_dof_number = this_elem-&gt;get_node(nl)-&gt;dof_number(sys_num,var_num,0),
+                      n_local_dofs      = dof_map.n_local_dofs(),
+                      n_remote_dofs     = dof_map.n_dofs() - n_local_dofs;
+        
+</pre>
+</div>
+<div class = "comment">
+only monkey with the sparsity pattern for local dofs!
+</div>
+
+<div class ="fragment">
+<pre>
+                    if ((global_dof_number &gt;= dof_map.first_dof()) &&
+                        (global_dof_number  &lt; dof_map.end_dof()))
+                      {
+                        const dof_id_type
+                          dof_offset = global_dof_number - dof_map.first_dof();
+        
+                        libmesh_assert_less (dof_offset, n_nz.size());
+                        libmesh_assert_less (dof_offset, n_oz.size());
+        
+                        n_nz[dof_offset] += local_coupled_dofs.size();
+                        n_oz[dof_offset] += remote_coupled_dofs.size();
+        
+</pre>
+</div>
+<div class = "comment">
+for crazy coarse problems on many processors we need to impose sane limits
+since we shouldn't allow n_nz > n_local_dofs, for example
+</div>
+
+<div class ="fragment">
+<pre>
+                        n_nz[dof_offset] = std::min(n_nz[dof_offset], n_local_dofs);
+                        n_oz[dof_offset] = std::min(n_oz[dof_offset], n_remote_dofs);
+                      }
+                  } // end loop over nodes on target element
+              }
+          }
+        
+        }
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex9.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;iostream&gt;
+        #include &lt;limits&gt;
+        
+</pre>
+</div>
+<div class = "comment">
+libMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/serial_mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/mesh_refinement.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/getpot.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/fe_interface.h"
+        #include "libmesh/boundary_info.h"
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/zero_function.h"
+        #include "libmesh/dirichlet_boundaries.h"
+        
+</pre>
+</div>
+<div class = "comment">
+local includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "augment_sparsity_on_interface.h"
+        
+</pre>
+</div>
+<div class = "comment">
+define the boundary IDs in the mesh
+</div>
+
+<div class ="fragment">
+<pre>
+        #define MIN_Z_BOUNDARY 1
+        #define MAX_Z_BOUNDARY 2
+        #define CRACK_BOUNDARY_LOWER 3
+        #define CRACK_BOUNDARY_UPPER 4
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        /**
+         * Assemble the system matrix and rhs vector.
+         */
+        void assemble_poisson(EquationSystems& es,
+                              const ElementIdMap& lower_to_upper);
+        
+</pre>
+</div>
+<div class = "comment">
+The main program.
+</div>
+
+<div class ="fragment">
+<pre>
+        int main (int argc, char** argv)
+        {
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+This example uses an ExodusII input file
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef LIBMESH_HAVE_EXODUS_API
+          libmesh_example_requires(false, "--enable-exodus");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+The sparsity augmentation code requires PETSc
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this 3D example if libMesh was compiled as 1D or 2D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires(3 &lt;= LIBMESH_DIM, "3D support");
+        
+          GetPot command_line (argc, argv);
+        
+          Real R = 2.;
+          if ( command_line.search(1, "-R") )
+            R = command_line.next(R);
+        
+</pre>
+</div>
+<div class = "comment">
+Maintaining the right ghost elements on a ParallelMesh is
+trickier.
+</div>
+
+<div class ="fragment">
+<pre>
+          SerialMesh mesh(init.comm());
+          mesh.read("miscellaneous_ex9.exo");
+        
+          EquationSystems equation_systems (mesh);
+        
+          LinearImplicitSystem& system =
+            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
+          system.add_variable("u", FIRST, LAGRANGE);
+        
+</pre>
+</div>
+<div class = "comment">
+We want to call assemble_poisson "manually" so that we can pass in
+lower_to_upper, hence set assemble_before_solve = false
+</div>
+
+<div class ="fragment">
+<pre>
+          system.assemble_before_solve = false;
+        
+</pre>
+</div>
+<div class = "comment">
+Impose zero Dirichlet boundary condition on MAX_Z_BOUNDARY
+</div>
+
+<div class ="fragment">
+<pre>
+          std::set&lt;boundary_id_type&gt; boundary_ids;
+          boundary_ids.insert(MAX_Z_BOUNDARY);
+          std::vector&lt;unsigned int&gt; variables;
+          variables.push_back(0);
+          ZeroFunction&lt;&gt; zf;
+          DirichletBoundary dirichlet_bc(boundary_ids,
+                                         variables,
+                                         &zf);
+          system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+        
+</pre>
+</div>
+<div class = "comment">
+Attach an object to the DofMap that will augment the sparsity pattern
+due to the degrees-of-freedom on the "crack"
+</div>
+
+<div class ="fragment">
+<pre>
+          AugmentSparsityOnInterface augment_sparsity(equation_systems,
+                                                      CRACK_BOUNDARY_LOWER,
+                                                      CRACK_BOUNDARY_UPPER);
+          system.get_dof_map().attach_extra_sparsity_object(augment_sparsity);
+        
+          equation_systems.init();
+          equation_systems.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Set the jump term coefficient, it will be used in assemble_poisson
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.parameters.set&lt;Real&gt;("R") = R;
+        
+</pre>
+</div>
+<div class = "comment">
+Assemble and then solve
+</div>
+
+<div class ="fragment">
+<pre>
+          assemble_poisson(equation_systems,
+                           augment_sparsity.get_lower_to_upper());
+          system.solve();
+        
+        #ifdef LIBMESH_HAVE_EXODUS_API
+</pre>
+</div>
+<div class = "comment">
+Plot the solution
+</div>
+
+<div class ="fragment">
+<pre>
+          ExodusII_IO (mesh).write_equation_systems ("solution.exo",
+                                                     equation_systems);
+        #endif
+        
+          return 0;
+        }
+        
+        void assemble_poisson(EquationSystems& es,
+                              const ElementIdMap& lower_to_upper)
+        {
+          const MeshBase& mesh = es.get_mesh();
+          const unsigned int dim = mesh.mesh_dimension();
+        
+          Real R = es.parameters.get&lt;Real&gt;("R");
+        
+          LinearImplicitSystem& system = es.get_system&lt;LinearImplicitSystem&gt;("Poisson");
+        
+          const DofMap& dof_map = system.get_dof_map();
+        
+          FEType fe_type = dof_map.variable_type(0);
+        
+          AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+          AutoPtr&lt;FEBase&gt; fe_elem_face (FEBase::build(dim, fe_type));
+          AutoPtr&lt;FEBase&gt; fe_neighbor_face (FEBase::build(dim, fe_type));
+        
+          QGauss qrule (dim, fe_type.default_quadrature_order());
+          QGauss qface(dim-1, fe_type.default_quadrature_order());
+        
+          fe-&gt;attach_quadrature_rule (&qrule);
+          fe_elem_face-&gt;attach_quadrature_rule (&qface);
+          fe_neighbor_face-&gt;attach_quadrature_rule (&qface);
+        
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
+        
+          const std::vector&lt;Real&gt;& JxW_face = fe_elem_face-&gt;get_JxW();
+        
+          const std::vector&lt;Point&gt;& qface_points = fe_elem_face-&gt;get_xyz();
+        
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face          = fe_elem_face-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_neighbor_face = fe_neighbor_face-&gt;get_phi();
+        
+          DenseMatrix&lt;Number&gt; Ke;
+          DenseVector&lt;Number&gt; Fe;
+        
+          DenseMatrix&lt;Number&gt; Kne;
+          DenseMatrix&lt;Number&gt; Ken;
+          DenseMatrix&lt;Number&gt; Kee;
+          DenseMatrix&lt;Number&gt; Knn;
+        
+          std::vector&lt;dof_id_type&gt; dof_indices;
+        
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+        
+          for ( ; el != end_el; ++el)
+            {
+              const Elem* elem = *el;
+        
+              dof_map.dof_indices (elem, dof_indices);
+              const unsigned int n_dofs = dof_indices.size();
+        
+              fe-&gt;reinit (elem);
+        
+              Ke.resize (n_dofs, n_dofs);
+              Fe.resize (n_dofs);
+        
+</pre>
+</div>
+<div class = "comment">
+Assemble element interior terms for the matrix
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+                for (unsigned int i=0; i&lt;n_dofs; i++)
+                  for (unsigned int j=0; j&lt;n_dofs; j++)
+                    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        
+</pre>
+</div>
+<div class = "comment">
+Boundary flux provides forcing in this example
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {
+                      if( mesh.get_boundary_info().has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
+                        {
+                          fe_elem_face-&gt;reinit(elem, side);
+        
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
+                              for (unsigned int i=0; i&lt;phi.size(); i++)
+                                {
+                                  Fe(i) += JxW_face[qp] * phi_face[i][qp];
+                                }
+                            }
+                        }
+        
+                    }
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+Add boundary terms on the crack
+</div>
+
+<div class ="fragment">
+<pre>
+              {
+                for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {
+</pre>
+</div>
+<div class = "comment">
+Found the lower side of the crack. Assemble terms due to lower and upper in here.
+</div>
+
+<div class ="fragment">
+<pre>
+                      if( mesh.get_boundary_info().has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
+                        {
+                          fe_elem_face-&gt;reinit(elem, side);
+        
+                          ElementIdMap::const_iterator ltu_it =
+                            lower_to_upper.find(std::make_pair(elem-&gt;id(),side));
+                          dof_id_type upper_elem_id = ltu_it-&gt;second;
+                          const Elem* neighbor = mesh.elem(upper_elem_id);
+        
+                          std::vector&lt;Point&gt; qface_neighbor_points;
+                          FEInterface::inverse_map (elem-&gt;dim(), fe-&gt;get_fe_type(),
+                                                    neighbor, qface_points, qface_neighbor_points);
+                          fe_neighbor_face-&gt;reinit(neighbor, &qface_neighbor_points);
+        
+                          std::vector&lt;dof_id_type&gt; neighbor_dof_indices;
+                          dof_map.dof_indices (neighbor, neighbor_dof_indices);
+                          const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
+        
+                          Kne.resize (n_neighbor_dofs, n_dofs);
+                          Ken.resize (n_dofs, n_neighbor_dofs);
+                          Kee.resize (n_dofs, n_dofs);
+                          Knn.resize (n_neighbor_dofs, n_neighbor_dofs);
+        
+</pre>
+</div>
+<div class = "comment">
+Lower-to-lower coupling term
+</div>
+
+<div class ="fragment">
+<pre>
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
+                              for (unsigned int i=0; i&lt;n_dofs; i++)
+                                for (unsigned int j=0; j&lt;n_dofs; j++)
+                                  {
+                                    Kee(i,j) -= JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_face[j][qp]);
+                                  }
+                            }
+        
+</pre>
+</div>
+<div class = "comment">
+Lower-to-upper coupling term
+</div>
+
+<div class ="fragment">
+<pre>
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
+                              for (unsigned int i=0; i&lt;n_dofs; i++)
+                                for (unsigned int j=0; j&lt;n_neighbor_dofs; j++)
+                                  {
+                                    Ken(i,j) += JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_neighbor_face[j][qp]);
+                                  }
+                            }
+        
+</pre>
+</div>
+<div class = "comment">
+Upper-to-upper coupling term
+</div>
+
+<div class ="fragment">
+<pre>
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
+                              for (unsigned int i=0; i&lt;n_neighbor_dofs; i++)
+                                for (unsigned int j=0; j&lt;n_neighbor_dofs; j++)
+                                  {
+                                    Knn(i,j) -= JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_neighbor_face[j][qp]);
+                                  }
+                            }
+        
+</pre>
+</div>
+<div class = "comment">
+Upper-to-lower coupling term
+</div>
+
+<div class ="fragment">
+<pre>
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
+                              for (unsigned int i=0; i&lt;n_neighbor_dofs; i++)
+                                for (unsigned int j=0; j&lt;n_dofs; j++)
+                                  {
+                                    Kne(i,j) += JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_face[j][qp]);
+                                  }
+                            }
+        
+                          system.matrix-&gt;add_matrix(Kne,neighbor_dof_indices,dof_indices);
+                          system.matrix-&gt;add_matrix(Ken,dof_indices,neighbor_dof_indices);
+                          system.matrix-&gt;add_matrix(Kee,dof_indices);
+                          system.matrix-&gt;add_matrix(Knn,neighbor_dof_indices);
+                        }
+                    }
+              }
+        
+              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+        
+              system.matrix-&gt;add_matrix (Ke, dof_indices);
+              system.rhs-&gt;add_vector    (Fe, dof_indices);
+            }
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file augment_sparsity_on_interface.h without comments: </h1> 
+<pre> 
+  #ifndef AUGMENT_SPARSITY_ON_INTERFACE_H
+  #define AUGMENT_SPARSITY_ON_INTERFACE_H
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  
+  using libMesh::DofMap;
+  using libMesh::EquationSystems;
+  using libMesh::dof_id_type;
+  using libMesh::boundary_id_type;
+  
+  <B><FONT COLOR="#228B22">typedef</FONT></B> std::map&lt; std::pair&lt;dof_id_type, <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, dof_id_type&gt; ElementIdMap;
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> AugmentSparsityOnInterface : <B><FONT COLOR="#228B22">public</FONT></B> DofMap::AugmentSparsityPattern
+  {
+  <B><FONT COLOR="#228B22">private</FONT></B>:
+  
+    <I><FONT COLOR="#B22222">/**
+     * The EquationSystems object that we're using here.
+     */</FONT></I>
+    EquationSystems&amp; _es;
+  
+    <I><FONT COLOR="#B22222">/**
+     * A map from (lower element ID, side ID) to matching upper element ID. Here &quot;lower&quot;
+     * and &quot;upper&quot; refer to the lower and upper (wrt +z direction) sides of the crack in
+     * our mesh.
+     */</FONT></I>
+    ElementIdMap _lower_to_upper;
+  
+    <I><FONT COLOR="#B22222">/**
+     * Boundary IDs for the lower and upper faces of the &quot;crack&quot; in the mesh.
+     */</FONT></I>
+    boundary_id_type _crack_boundary_lower, _crack_boundary_upper;
+  
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+  
+    <I><FONT COLOR="#B22222">/**
+     * Constructor.
+     */</FONT></I>
+    AugmentSparsityOnInterface(EquationSystems&amp; es,
+                               boundary_id_type crack_boundary_lower,
+                               boundary_id_type crack_boundary_upper);
+  
+    <I><FONT COLOR="#B22222">/**
+     * @return a const reference to the lower-to-upper element ID map.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">const</FONT></B> ElementIdMap&amp; get_lower_to_upper() <B><FONT COLOR="#228B22">const</FONT></B>;
+  
+    <I><FONT COLOR="#B22222">/**
+     * User-defined function to augment the sparsity pattern.
+     */</FONT></I>
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> augment_sparsity_pattern (libMesh::SparsityPattern::Graph &amp; ,
+                                           <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; &amp; n_nz,
+                                           <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; &amp; n_oz);
+  
+  };
+  
+  #endif
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file augment_sparsity_on_interface.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;augment_sparsity_on_interface.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#5F9EA0">AugmentSparsityOnInterface</FONT></B>::AugmentSparsityOnInterface(EquationSystems&amp; es,
+                                                         boundary_id_type crack_boundary_lower,
+                                                         boundary_id_type crack_boundary_upper)
+    :
+    _es(es),
+    _crack_boundary_lower(crack_boundary_lower),
+    _crack_boundary_upper(crack_boundary_upper)
+  {}
+  
+  <B><FONT COLOR="#228B22">const</FONT></B> ElementIdMap&amp; AugmentSparsityOnInterface::get_lower_to_upper() <B><FONT COLOR="#228B22">const</FONT></B>
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> _lower_to_upper;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Graph &amp; ,
+                                                             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; &amp; n_nz,
+                                                             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; &amp; n_oz)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = _es.get_mesh();
+  
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt; std::pair&lt;dof_id_type,<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, Point&gt; lower_centroids;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt; std::pair&lt;dof_id_type,<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, Point&gt; upper_centroids;
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+        {
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id
+                      (elem,side, _crack_boundary_lower) )
+                  {
+                    AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
+  
+                    lower_centroids[std::make_pair(elem-&gt;id(), side)] = side_elem-&gt;centroid();
+                  }
+              }
+        }
+  
+        {
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id
+                      (elem,side, _crack_boundary_upper) )
+                  {
+                    AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
+  
+                    upper_centroids[std::make_pair(elem-&gt;id(), side)] = side_elem-&gt;centroid();
+                  }
+              }
+        }
+      }
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::size_t n_lower_centroids = lower_centroids.size();
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::size_t n_upper_centroids = upper_centroids.size();
+    libmesh_assert(n_lower_centroids == n_upper_centroids);
+  
+    _lower_to_upper.clear();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;dof_id_type, dof_id_type&gt; two_way_element_ID_map;
+  
+    {
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt; std::pair&lt;dof_id_type,<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, Point&gt;::iterator it     = lower_centroids.begin();
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt; std::pair&lt;dof_id_type,<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, Point&gt;::iterator it_end = lower_centroids.end();
+      <B><FONT COLOR="#A020F0">for</FONT></B>( ; it != it_end; ++it)
+        {
+          Point lower_centroid = it-&gt;second;
+  
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt; std::pair&lt;dof_id_type,<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, Point&gt;::iterator inner_it     = upper_centroids.begin();
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt; std::pair&lt;dof_id_type,<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B>&gt;, Point&gt;::iterator inner_it_end = upper_centroids.end();
+  
+          Real min_distance = std::numeric_limits&lt;Real&gt;::max();
+          <B><FONT COLOR="#A020F0">for</FONT></B>( ; inner_it != inner_it_end; ++inner_it)
+            {
+              Point upper_centroid = inner_it-&gt;second;
+  
+              Real distance = (upper_centroid - lower_centroid).size();
+              <B><FONT COLOR="#A020F0">if</FONT></B>( distance &lt; min_distance )
+                {
+                  min_distance = distance;
+                  _lower_to_upper[it-&gt;first] = inner_it-&gt;first.first;
+                }
+            }
+  
+          libmesh_assert_less(min_distance, TOLERANCE);
+  
+          dof_id_type this_id     = it-&gt;first.first;
+          dof_id_type neighbor_id = _lower_to_upper[it-&gt;first];
+          two_way_element_ID_map[this_id]     = neighbor_id;
+          two_way_element_ID_map[neighbor_id] = this_id;
+        }
+    }
+  
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> LinearImplicitSystem &amp;system =
+        _es.get_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+      <B><FONT COLOR="#228B22">const</FONT></B> DofMap &amp;dof_map = system.get_dof_map();
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> sys_num = system.number();
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> var_num = system.variable_number(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+  
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;dof_id_type&gt; local_coupled_dofs, remote_coupled_dofs;
+  
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;dof_id_type, dof_id_type&gt;::iterator it     = two_way_element_ID_map.begin();
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;dof_id_type, dof_id_type&gt;::iterator it_end = two_way_element_ID_map.end();
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B>( ; it != it_end; ++it)
+        {
+          local_coupled_dofs.clear();
+          remote_coupled_dofs.clear();
+  
+          <B><FONT COLOR="#228B22">const</FONT></B> Elem* this_elem = mesh.elem(it-&gt;first);
+  
+          <B><FONT COLOR="#228B22">const</FONT></B> Elem* neighbor_elem = mesh.elem(it-&gt;second);
+  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;neighbor_elem-&gt;n_nodes(); n++)
+            {
+              <B><FONT COLOR="#228B22">const</FONT></B> dof_id_type global_dof_number = neighbor_elem-&gt;get_node(n)-&gt;dof_number(sys_num,var_num,0);
+  
+              <B><FONT COLOR="#A020F0">if</FONT></B> ((global_dof_number &lt;  dof_map.first_dof()) ||
+                  (global_dof_number &gt;= dof_map.end_dof()))
+                {
+                  remote_coupled_dofs.insert(global_dof_number);
+                }
+              <B><FONT COLOR="#A020F0">else</FONT></B>
+                {
+                  local_coupled_dofs.insert(global_dof_number);
+                }
+  
+            } <I><FONT COLOR="#B22222">// end loop over nodes on neighbor element
+</FONT></I>  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nl=0; nl&lt;this_elem-&gt;n_nodes(); nl++)
+            {
+              <B><FONT COLOR="#228B22">const</FONT></B> dof_id_type
+                global_dof_number = this_elem-&gt;get_node(nl)-&gt;dof_number(sys_num,var_num,0),
+                n_local_dofs      = dof_map.n_local_dofs(),
+                n_remote_dofs     = dof_map.n_dofs() - n_local_dofs;
+  
+              <B><FONT COLOR="#A020F0">if</FONT></B> ((global_dof_number &gt;= dof_map.first_dof()) &amp;&amp;
+                  (global_dof_number  &lt; dof_map.end_dof()))
+                {
+                  <B><FONT COLOR="#228B22">const</FONT></B> dof_id_type
+                    dof_offset = global_dof_number - dof_map.first_dof();
+  
+                  libmesh_assert_less (dof_offset, n_nz.size());
+                  libmesh_assert_less (dof_offset, n_oz.size());
+  
+                  n_nz[dof_offset] += local_coupled_dofs.size();
+                  n_oz[dof_offset] += remote_coupled_dofs.size();
+  
+                  n_nz[dof_offset] = std::min(n_nz[dof_offset], n_local_dofs);
+                  n_oz[dof_offset] = std::min(n_oz[dof_offset], n_remote_dofs);
+                }
+            } <I><FONT COLOR="#B22222">// end loop over nodes on target element
+</FONT></I>        }
+    }
+  
+  }
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex9.C without comments: </h1> 
+<pre> 
+  #include &lt;iostream&gt;
+  #include &lt;limits&gt;
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/serial_mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_interface.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/boundary_info.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/zero_function.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dirichlet_boundaries.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;augment_sparsity_on_interface.h&quot;</FONT></B>
+  
+  #define MIN_Z_BOUNDARY 1
+  #define MAX_Z_BOUNDARY 2
+  #define CRACK_BOUNDARY_LOWER 3
+  #define CRACK_BOUNDARY_UPPER 4
+  
+  using namespace libMesh;
+  
+  <I><FONT COLOR="#B22222">/**
+   * Assemble the system matrix and rhs vector.
+   */</FONT></I>
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> ElementIdMap&amp; lower_to_upper);
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+  #ifndef LIBMESH_HAVE_EXODUS_API
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-exodus&quot;</FONT></B>);
+  #endif
+  
+    libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, <B><FONT COLOR="#BC8F8F">&quot;--enable-petsc&quot;</FONT></B>);
+  
+    libmesh_example_requires(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+  
+    GetPot command_line (argc, argv);
+  
+    Real R = 2.;
+    <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-R&quot;</FONT></B>) )
+      R = command_line.next(R);
+  
+    SerialMesh mesh(init.comm());
+    mesh.read(<B><FONT COLOR="#BC8F8F">&quot;miscellaneous_ex9.exo&quot;</FONT></B>);
+  
+    EquationSystems equation_systems (mesh);
+  
+    LinearImplicitSystem&amp; system =
+      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+    system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST, LAGRANGE);
+  
+    system.assemble_before_solve = false;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; boundary_ids;
+    boundary_ids.insert(MAX_Z_BOUNDARY);
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; variables;
+    variables.push_back(0);
+    ZeroFunction&lt;&gt; zf;
+    DirichletBoundary dirichlet_bc(boundary_ids,
+                                   variables,
+                                   &amp;zf);
+    system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+  
+    AugmentSparsityOnInterface augment_sparsity(equation_systems,
+                                                CRACK_BOUNDARY_LOWER,
+                                                CRACK_BOUNDARY_UPPER);
+    system.get_dof_map().attach_extra_sparsity_object(augment_sparsity);
+  
+    equation_systems.init();
+    equation_systems.print_info();
+  
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;R&quot;</FONT></B>) = R;
+  
+    assemble_poisson(equation_systems,
+                     augment_sparsity.get_lower_to_upper());
+    system.solve();
+  
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;solution.exo&quot;</FONT></B>,
+                                               equation_systems);
+  #endif
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
+                        <B><FONT COLOR="#228B22">const</FONT></B> ElementIdMap&amp; lower_to_upper)
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+  
+    Real R = es.parameters.get&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;R&quot;</FONT></B>);
+  
+    LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
+  
+    FEType fe_type = dof_map.variable_type(0);
+  
+    AutoPtr&lt;FEBase&gt; fe (FEBase::build(dim, fe_type));
+    AutoPtr&lt;FEBase&gt; fe_elem_face (FEBase::build(dim, fe_type));
+    AutoPtr&lt;FEBase&gt; fe_neighbor_face (FEBase::build(dim, fe_type));
+  
+    QGauss qrule (dim, fe_type.default_quadrature_order());
+    QGauss qface(dim-1, fe_type.default_quadrature_order());
+  
+    fe-&gt;attach_quadrature_rule (&amp;qrule);
+    fe_elem_face-&gt;attach_quadrature_rule (&amp;qface);
+    fe_neighbor_face-&gt;attach_quadrature_rule (&amp;qface);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_elem_face-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qface_points = fe_elem_face-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face          = fe_elem_face-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_neighbor_face = fe_neighbor_face-&gt;get_phi();
+  
+    DenseMatrix&lt;Number&gt; Ke;
+    DenseVector&lt;Number&gt; Fe;
+  
+    DenseMatrix&lt;Number&gt; Kne;
+    DenseMatrix&lt;Number&gt; Ken;
+    DenseMatrix&lt;Number&gt; Kee;
+    DenseMatrix&lt;Number&gt; Knn;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+        dof_map.dof_indices (elem, dof_indices);
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dofs = dof_indices.size();
+  
+        fe-&gt;reinit (elem);
+  
+        Ke.resize (n_dofs, n_dofs);
+        Fe.resize (n_dofs);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_dofs; i++)
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_dofs; j++)
+              Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+  
+        {
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
+                  {
+                    fe_elem_face-&gt;reinit(elem, side);
+  
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+                          {
+                            Fe(i) += JxW_face[qp] * phi_face[i][qp];
+                          }
+                      }
+                  }
+  
+              }
+        }
+  
+        {
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
+                  {
+                    fe_elem_face-&gt;reinit(elem, side);
+  
+                    <B><FONT COLOR="#5F9EA0">ElementIdMap</FONT></B>::const_iterator ltu_it =
+                      lower_to_upper.find(std::make_pair(elem-&gt;id(),side));
+                    dof_id_type upper_elem_id = ltu_it-&gt;second;
+                    <B><FONT COLOR="#228B22">const</FONT></B> Elem* neighbor = mesh.elem(upper_elem_id);
+  
+                    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Point&gt; qface_neighbor_points;
+                    <B><FONT COLOR="#5F9EA0">FEInterface</FONT></B>::inverse_map (elem-&gt;dim(), fe-&gt;get_fe_type(),
+                                              neighbor, qface_points, qface_neighbor_points);
+                    fe_neighbor_face-&gt;reinit(neighbor, &amp;qface_neighbor_points);
+  
+                    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; neighbor_dof_indices;
+                    dof_map.dof_indices (neighbor, neighbor_dof_indices);
+                    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_neighbor_dofs = neighbor_dof_indices.size();
+  
+                    Kne.resize (n_neighbor_dofs, n_dofs);
+                    Ken.resize (n_dofs, n_neighbor_dofs);
+                    Kee.resize (n_dofs, n_dofs);
+                    Knn.resize (n_neighbor_dofs, n_neighbor_dofs);
+  
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_dofs; i++)
+                          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_dofs; j++)
+                            {
+                              Kee(i,j) -= JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_face[j][qp]);
+                            }
+                      }
+  
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_dofs; i++)
+                          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_neighbor_dofs; j++)
+                            {
+                              Ken(i,j) += JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_neighbor_face[j][qp]);
+                            }
+                      }
+  
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_neighbor_dofs; i++)
+                          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_neighbor_dofs; j++)
+                            {
+                              Knn(i,j) -= JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_neighbor_face[j][qp]);
+                            }
+                      }
+  
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_neighbor_dofs; i++)
+                          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_dofs; j++)
+                            {
+                              Kne(i,j) += JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_face[j][qp]);
+                            }
+                      }
+  
+                    system.matrix-&gt;add_matrix(Kne,neighbor_dof_indices,dof_indices);
+                    system.matrix-&gt;add_matrix(Ken,dof_indices,neighbor_dof_indices);
+                    system.matrix-&gt;add_matrix(Kee,dof_indices);
+                    system.matrix-&gt;add_matrix(Knn,neighbor_dof_indices);
+                  }
+              }
+        }
+  
+        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+  
+        system.matrix-&gt;add_matrix (Ke, dof_indices);
+        system.rhs-&gt;add_vector    (Fe, dof_indices);
+      }
+  }
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex9:
+*   example-opt  
+***************************************************************
+ 
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=1868
+    n_local_dofs()=1868
+    n_constrained_dofs()=44
+    n_local_constrained_dofs()=44
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 14.0032
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 42
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 44
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:05 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.262435, Active time=0.132964                                                  |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0019      0.001871    0.0019      0.001871    1.41     1.41     |
+|   build_constraint_matrix()        8371       0.0029      0.000000    0.0029      0.000000    2.17     2.17     |
+|   build_sparsity()                 1          0.0142      0.014192    0.0194      0.019361    10.67    14.56    |
+|   cnstrn_elem_mat_vec()            8371       0.0127      0.000002    0.0127      0.000002    9.55     9.55     |
+|   create_dof_constraints()         1          0.0114      0.011376    0.0162      0.016240    8.56     12.21    |
+|   distribute_dofs()                1          0.0014      0.001430    0.0069      0.006905    1.08     5.19     |
+|   dof_indices()                    33550      0.0181      0.000001    0.0181      0.000001    13.62    13.62    |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0055      0.005475    0.0055      0.005475    4.12     4.12     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0071      0.007111    0.0122      0.012195    5.35     9.17     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0058      0.005783    0.0058      0.005783    4.35     4.35     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        8569       0.0101      0.000001    0.0101      0.000001    7.62     7.62     |
+|   init_shape_functions()           199        0.0001      0.000001    0.0001      0.000001    0.08     0.08     |
+|   inverse_map()                    264        0.0002      0.000001    0.0002      0.000001    0.18     0.18     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             8569       0.0060      0.000001    0.0060      0.000001    4.50     4.50     |
+|   compute_face_map()               132        0.0002      0.000001    0.0002      0.000001    0.13     0.13     |
+|   init_face_shape_functions()      1          0.0000      0.000015    0.0000      0.000015    0.01     0.01     |
+|   init_reference_to_physical_map() 199        0.0003      0.000001    0.0003      0.000001    0.20     0.20     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0120      0.011954    0.0120      0.011954    8.99     8.99     |
+|   read()                           1          0.0037      0.003689    0.0037      0.003689    2.77     2.77     |
+|   renumber_nodes_and_elem()        2          0.0006      0.000311    0.0006      0.000311    0.47     0.47     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0001      0.000054    0.0180      0.018033    0.04     13.56    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0002      0.000208    0.0002      0.000208    0.16     0.16     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.0186      0.018607    0.0186      0.018607    13.99    13.99    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            68241      0.1330                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex9:
+*   example-opt  
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

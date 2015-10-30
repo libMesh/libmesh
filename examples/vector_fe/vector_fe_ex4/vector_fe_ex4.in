@@ -1,0 +1,23 @@
+# The coarse rid size from which to start adaptivity
+grid_size = 4 
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false 
+
+# Solve the 2D or 3D problem
+dimension = 3 
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-6
+
+print_element_jacobians = 'false'
+
+print_jacobians = 'false'
+
+extra_quadrature_order = 2 
+
+max_linear_iterations = 5000
+
+initial_linear_tolerance = 1.0e-14
+
+relative_residual_tolerance = 1.0e-6

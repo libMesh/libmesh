@@ -1,0 +1,12 @@
+# ========= Main function parameters =========
+
+n_elem = 25
+store_basis_functions = true
+
+parameter_names = 'center_x center_y'
+
+online_center_x = -0.6
+online_center_y = 0.7
+
+center_x = '-1 1'
+center_y = '-1 1'

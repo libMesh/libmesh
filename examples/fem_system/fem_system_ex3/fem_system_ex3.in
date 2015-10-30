@@ -1,0 +1,20 @@
+# Solve a transient instead of a steady problem?
+transient = true 
+
+# The interval between our timesteps
+deltat = 0.25
+
+# And the number of timesteps to take.
+# Note: Use 25 timesteps to simulate approximately three periods of oscillation.
+n_timesteps = 5
+
+# Write out every nth timestep to file.
+write_interval = 1
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-3
+
+relative_residual_tolerance = 1.e-3

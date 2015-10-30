@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x,y
+R=-2,2,0.5
+F=exp(x*2 + y*3)
+C=fp_exp(x*2 + y*3)

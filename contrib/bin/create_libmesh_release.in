@@ -1,0 +1,80 @@
+#!/bin/sh
+
+
+#
+# TODO - could we grab the version number from include/libmesh_config.h?
+#
+
+#
+# Define the usage() function
+#
+usage ()
+{
+  echo "usage: $0 release-id-string"
+  echo " e.g.: $0 libmesh-0.4.3"
+  exit
+}
+
+
+#
+# Need at least one command-line argument
+#
+if [ "$#" != "1" ] ; then
+    usage $0
+fi
+
+# Need to run this from a configured directory
+if [ ! -f Makefile -o ! -f config.log ] ; then
+    echo "error: no Makefile/config.log, please run from a configured directory tree!"
+    exit
+fi
+
+#
+# Get the user-specified release string
+#
+release=$1
+tagname=$release #`echo $release | sed -e "s/[.]/_/g"`
+#echo "tagname = $tagname"
+
+#
+# create tarballs via 'make dist'
+#
+echo ""
+echo "Creating distribution files..."
+make dist >/dev/null || exit
+ls -l libmesh*.tar.*
+
+#
+# tag the current libmesh/master git repository for this release
+#
+echo ""
+echo "Tagging master git repository as \"$tagname\""
+git tag -a $tagname -m "tagging libMesh $tagname"
+#git push origin $tagname
+
+#
+# Possibly upload the file to sourceforge
+#
+echo ""
+echo "Done."
+echo "Would you like to open an SFTP connection to frs.sourceforge.net"
+echo "so you can put the file in the /incoming directory?"
+echo -n "Y or N? "
+read ans
+if [ "$ans" = "Y" -o "$ans" = "y" -o "$ans" = "Yes" -o "$ans" = "yes" ]; then
+    echo "**************************************"
+    echo " once you are in, type:"
+    echo " cd /home/frs/project/libmesh/libmesh "
+    echo " and go about your business, e.g."
+    echo " $ mkdir foo"
+    echo " $ cd foo"
+    echo " $ put libmesh*.tar.*"
+    echo "**************************************"
+    exec sftp frs.sourceforge.net
+fi
+
+
+
+# Local Variables:
+# mode: shell-script
+# End:

@@ -1,0 +1,1830 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex11.C with comments: </h1> 
+<div class = "comment">
+<h1>Miscellaneous Example 11 - Using Loop Subdivision Shell Elements</h1>
+
+<br><br>This example demonstrates how subdivision surface shell elements
+are used, and how boundary conditions can be applied to them.  To
+keep it simple, we solve the static deflection of a clamped, square,
+linearly elastic Kirchhoff-Love plate subject to a uniform
+load distribution.  Refer to Cirak et al., Int. J. Numer. Meth.
+Engng. 2000; 47: 2039-2072, for a detailed description of what's
+implemented.  In fact, this example follows that paper very closely.
+
+
+<br><br>
+
+<br><br>C++ include files that we need
+</div>
+
+<div class ="fragment">
+<pre>
+        #include &lt;iostream&gt;
+        
+</pre>
+</div>
+<div class = "comment">
+LibMesh includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/libmesh.h"
+        #include "libmesh/serial_mesh.h"
+        #include "libmesh/mesh_refinement.h"
+        #include "libmesh/mesh_modification.h"
+        #include "libmesh/mesh_tools.h"
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature.h"
+        #include "libmesh/node.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/vector_value.h"
+        #include "libmesh/tensor_value.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_submatrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/dense_subvector.h"
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/vtk_io.h"
+        #include "libmesh/exodusII_io.h"
+        
+</pre>
+</div>
+<div class = "comment">
+These are the include files typically needed for subdivision elements.
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/face_tri3_subdivision.h"
+        #include "libmesh/mesh_subdivision_support.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+</pre>
+</div>
+<div class = "comment">
+Function prototype.  This is the function that will assemble
+the stiffness matrix and the right-hand-side vector ready
+for solution.
+</div>
+
+<div class ="fragment">
+<pre>
+        void assemble_shell (EquationSystems& es, const std::string& system_name);
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Begin the main program.
+</div>
+
+<div class ="fragment">
+<pre>
+        int main (int argc, char** argv)
+        {
+</pre>
+</div>
+<div class = "comment">
+Initialize libMesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this 3D example if libMesh was compiled as 1D/2D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this example without --enable-node-valence
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef LIBMESH_ENABLE_NODE_VALENCE
+          libmesh_example_requires (false, "--enable-node-valence");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this example without --enable-amr; requires MeshRefinement
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef LIBMESH_ENABLE_AMR
+          libmesh_example_requires(false, "--enable-amr");
+        #else
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this example without --enable-second; requires d2phi
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+          libmesh_example_requires(false, "--enable-second");
+        #else
+        
+</pre>
+</div>
+<div class = "comment">
+Create a 2D mesh distributed across the default MPI communicator.
+Subdivision surfaces do not appear to work with ParallelMesh yet.
+</div>
+
+<div class ="fragment">
+<pre>
+          SerialMesh mesh (init.comm(), 2);
+        
+</pre>
+</div>
+<div class = "comment">
+Read the coarse square mesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.read ("square_mesh.off");
+        
+</pre>
+</div>
+<div class = "comment">
+Resize the square plate to edge length L.
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real L = 100.;
+          MeshTools::Modification::scale(mesh, L, L, L);
+        
+</pre>
+</div>
+<div class = "comment">
+Quadrisect the mesh triangles a few times to obtain a
+finer mesh.  Subdivision surface elements require the
+refinement data to be removed afterwards.
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshRefinement mesh_refinement (mesh);
+          mesh_refinement.uniformly_refine (3);
+          MeshTools::Modification::flatten (mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+Write the mesh before the ghost elements are added.
+</div>
+
+<div class ="fragment">
+<pre>
+        #if defined(LIBMESH_HAVE_VTK)
+          VTKIO(mesh).write ("without_ghosts.pvtu");
+        #endif
+        #if defined(LIBMESH_HAVE_EXODUS_API)
+          ExodusII_IO(mesh).write ("without_ghosts.e");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the triangulated mesh to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Turn the triangulated mesh into a subdivision mesh
+and add an additional row of "ghost" elements around
+it in order to complete the extended local support of
+the triangles at the boundaries.  If the second
+argument is set to true, the outermost existing
+elements are converted into ghost elements, and the
+actual physical mesh is thus getting smaller.
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshTools::Subdivision::prepare_subdivision_mesh (mesh, false);
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the subdivision mesh to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Write the mesh with the ghost elements added.
+Compare this to the original mesh to see the difference.
+</div>
+
+<div class ="fragment">
+<pre>
+        #if defined(LIBMESH_HAVE_VTK)
+          VTKIO(mesh).write ("with_ghosts.pvtu");
+        #endif
+        #if defined(LIBMESH_HAVE_EXODUS_API)
+          ExodusII_IO(mesh).write ("with_ghosts.e");
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Create an equation systems object.
+</div>
+
+<div class ="fragment">
+<pre>
+          EquationSystems equation_systems (mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+Declare the system and its variables.
+Create a linear implicit system named "Shell".
+</div>
+
+<div class ="fragment">
+<pre>
+          LinearImplicitSystem & system = equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Shell");
+        
+</pre>
+</div>
+<div class = "comment">
+Add the three translational deformation variables
+"u", "v", "w" to "Shell".  Since subdivision shell
+elements meet the C1-continuity requirement, no
+rotational or other auxiliary variables are needed.
+Loop Subdivision Elements are always interpolated
+by quartic box splines, hence the order must always
+be \p FOURTH.
+</div>
+
+<div class ="fragment">
+<pre>
+          system.add_variable ("u", FOURTH, SUBDIVISION);
+          system.add_variable ("v", FOURTH, SUBDIVISION);
+          system.add_variable ("w", FOURTH, SUBDIVISION);
+        
+</pre>
+</div>
+<div class = "comment">
+Give the system a pointer to the matrix and rhs assembly
+function.
+</div>
+
+<div class ="fragment">
+<pre>
+          system.attach_assemble_function (assemble_shell);
+        
+</pre>
+</div>
+<div class = "comment">
+Use the parameters of the equation systems object to
+tell the shell system about the material properties, the
+shell thickness, and the external load.
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real h  = 1.;
+          const Real E  = 1.e7;
+          const Real nu = 0.;
+          const Real q  = 1.;
+          equation_systems.parameters.set&lt;Real&gt; ("thickness")       = h;
+          equation_systems.parameters.set&lt;Real&gt; ("young's modulus") = E;
+          equation_systems.parameters.set&lt;Real&gt; ("poisson ratio")   = nu;
+          equation_systems.parameters.set&lt;Real&gt; ("uniform load")    = q;
+        
+</pre>
+</div>
+<div class = "comment">
+Initialize the data structures for the equation system.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.init();
+        
+</pre>
+</div>
+<div class = "comment">
+Print information about the system to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.print_info();
+        
+</pre>
+</div>
+<div class = "comment">
+Solve the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          system.solve();
+        
+</pre>
+</div>
+<div class = "comment">
+After solving the system, write the solution to a VTK
+or ExodusII output file ready for import in, e.g.,
+Paraview.
+</div>
+
+<div class ="fragment">
+<pre>
+        #if defined(LIBMESH_HAVE_VTK)
+          VTKIO(mesh).write_equation_systems ("out.pvtu", equation_systems);
+        #endif
+        #if defined(LIBMESH_HAVE_EXODUS_API)
+          ExodusII_IO(mesh).write_equation_systems ("out.e", equation_systems);
+        #endif
+        
+</pre>
+</div>
+<div class = "comment">
+Find the center node to measure the maximum deformation of the plate.
+</div>
+
+<div class ="fragment">
+<pre>
+          Node* center_node = 0;
+          Real nearest_dist_sq = mesh.point(0).size_sq();
+          for (unsigned int nid=1; nid&lt;mesh.n_nodes(); ++nid)
+          {
+            const Real dist_sq = mesh.point(nid).size_sq();
+            if (dist_sq &lt; nearest_dist_sq)
+            {
+              nearest_dist_sq = dist_sq;
+              center_node = mesh.node_ptr(nid);
+            }
+          }
+        
+</pre>
+</div>
+<div class = "comment">
+Finally, we evaluate the z-displacement "w" at the center node.
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int w_var = system.variable_number ("w");
+          dof_id_type w_dof = center_node-&gt;dof_number (system.number(), w_var, 0);
+          Number w = 0;
+          if (w_dof &gt;= system.get_dof_map().first_dof() &&
+              w_dof &lt;  system.get_dof_map().end_dof())
+            w = system.current_solution(w_dof);
+          system.comm().sum(w);
+        
+        
+</pre>
+</div>
+<div class = "comment">
+The analytic solution for the maximum displacement of
+a clamped square plate in pure bending, from Taylor,
+Govindjee, Commun. Numer. Meth. Eng. 20, 757-765, 2004.
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real D = E * h*h*h / (12*(1-nu*nu));
+          const Real w_analytic = 0.001265319 * L*L*L*L * q / D;
+        
+</pre>
+</div>
+<div class = "comment">
+Print the finite element solution and the analytic
+prediction of the maximum displacement of the clamped
+square plate to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          std::cout &lt;&lt; "z-displacement of the center point: " &lt;&lt; w &lt;&lt; std::endl;
+          std::cout &lt;&lt; "Analytic solution for pure bending: " &lt;&lt; w_analytic &lt;&lt; std::endl;
+        
+        #endif // #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        
+        #endif // #ifdef LIBMESH_ENABLE_AMR
+        
+</pre>
+</div>
+<div class = "comment">
+All done.
+</div>
+
+<div class ="fragment">
+<pre>
+          return 0;
+        }
+        
+        #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        
+</pre>
+</div>
+<div class = "comment">
+We now define the matrix and rhs vector assembly function
+for the shell system.  This function implements the
+linear Kirchhoff-Love theory for thin shells.  At the
+end we also take into account the boundary conditions
+here, using the penalty method.
+</div>
+
+<div class ="fragment">
+<pre>
+        void assemble_shell (EquationSystems& es, const std::string& system_name)
+        {
+</pre>
+</div>
+<div class = "comment">
+It is a good idea to make sure we are assembling
+the proper system.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_assert_equal_to (system_name, "Shell");
+        
+</pre>
+</div>
+<div class = "comment">
+Get a constant reference to the mesh object.
+</div>
+
+<div class ="fragment">
+<pre>
+          const MeshBase& mesh = es.get_mesh();
+        
+</pre>
+</div>
+<div class = "comment">
+Get a reference to the shell system object.
+</div>
+
+<div class ="fragment">
+<pre>
+          LinearImplicitSystem & system = es.get_system&lt;LinearImplicitSystem&gt; ("Shell");
+        
+</pre>
+</div>
+<div class = "comment">
+Get the shell parameters that we need during assembly.
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real h  = es.parameters.get&lt;Real&gt; ("thickness");
+          const Real E  = es.parameters.get&lt;Real&gt; ("young's modulus");
+          const Real nu = es.parameters.get&lt;Real&gt; ("poisson ratio");
+          const Real q  = es.parameters.get&lt;Real&gt; ("uniform load");
+        
+</pre>
+</div>
+<div class = "comment">
+Compute the membrane stiffness \p K and the bending
+rigidity \p D from these parameters.
+</div>
+
+<div class ="fragment">
+<pre>
+          const Real K = E * h     /     (1-nu*nu);
+          const Real D = E * h*h*h / (12*(1-nu*nu));
+        
+</pre>
+</div>
+<div class = "comment">
+Numeric ids corresponding to each variable in the system.
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int u_var = system.variable_number ("u");
+          const unsigned int v_var = system.variable_number ("v");
+          const unsigned int w_var = system.variable_number ("w");
+        
+</pre>
+</div>
+<div class = "comment">
+Get the Finite Element type for "u".  Note this will be
+the same as the type for "v" and "w".
+</div>
+
+<div class ="fragment">
+<pre>
+          FEType fe_type = system.variable_type (u_var);
+        
+</pre>
+</div>
+<div class = "comment">
+Build a Finite Element object of the specified type.
+</div>
+
+<div class ="fragment">
+<pre>
+          AutoPtr&lt;FEBase&gt; fe (FEBase::build(2, fe_type));
+        
+</pre>
+</div>
+<div class = "comment">
+A Gauss quadrature rule for numerical integration.
+For subdivision shell elements, a single Gauss point per
+element is sufficient, hence we use extraorder = 0.
+</div>
+
+<div class ="fragment">
+<pre>
+          const int extraorder = 0;
+          AutoPtr&lt;QBase&gt; qrule (fe_type.default_quadrature_rule (2, extraorder));
+        
+</pre>
+</div>
+<div class = "comment">
+Tell the finite element object to use our quadrature rule.
+</div>
+
+<div class ="fragment">
+<pre>
+          fe-&gt;attach_quadrature_rule (qrule.get());
+        
+</pre>
+</div>
+<div class = "comment">
+The element Jacobian * quadrature weight at each integration point.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt;& JxW = fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The surface tangents in both directions at the quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;RealGradient&gt;& dxyzdxi  = fe-&gt;get_dxyzdxi();
+          const std::vector&lt;RealGradient&gt;& dxyzdeta = fe-&gt;get_dxyzdeta();
+        
+</pre>
+</div>
+<div class = "comment">
+The second partial derivatives at the quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;RealGradient&gt;& d2xyzdxi2    = fe-&gt;get_d2xyzdxi2();
+          const std::vector&lt;RealGradient&gt;& d2xyzdeta2   = fe-&gt;get_d2xyzdeta2();
+          const std::vector&lt;RealGradient&gt;& d2xyzdxideta = fe-&gt;get_d2xyzdxideta();
+        
+</pre>
+</div>
+<div class = "comment">
+The element shape function and its derivatives evaluated at the
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;&          phi = fe-&gt;get_phi();
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = fe-&gt;get_dphi();
+          const std::vector&lt;std::vector&lt;RealTensor&gt; &gt;&  d2phi = fe-&gt;get_d2phi();
+        
+</pre>
+</div>
+<div class = "comment">
+A reference to the \p DofMap object for this system.  The \p DofMap
+object handles the index translation from node and element numbers
+to degree of freedom numbers.
+</div>
+
+<div class ="fragment">
+<pre>
+          const DofMap & dof_map = system.get_dof_map();
+        
+</pre>
+</div>
+<div class = "comment">
+Define data structures to contain the element stiffness matrix
+and right-hand-side vector contribution.  Following
+basic finite element terminology we will denote these
+"Ke" and "Fe".
+</div>
+
+<div class ="fragment">
+<pre>
+          DenseMatrix&lt;Number&gt; Ke;
+          DenseVector&lt;Number&gt; Fe;
+        
+          DenseSubMatrix&lt;Number&gt;
+            Kuu(Ke), Kuv(Ke), Kuw(Ke),
+            Kvu(Ke), Kvv(Ke), Kvw(Ke),
+            Kwu(Ke), Kwv(Ke), Kww(Ke);
+        
+          DenseSubVector&lt;Number&gt;
+            Fu(Fe),
+            Fv(Fe),
+            Fw(Fe);
+        
+</pre>
+</div>
+<div class = "comment">
+This vector will hold the degree of freedom indices for
+the element.  These define where in the global system
+the element degrees of freedom get mapped.
+</div>
+
+<div class ="fragment">
+<pre>
+          std::vector&lt;dof_id_type&gt; dof_indices;
+          std::vector&lt;dof_id_type&gt; dof_indices_u;
+          std::vector&lt;dof_id_type&gt; dof_indices_v;
+          std::vector&lt;dof_id_type&gt; dof_indices_w;
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will loop over all the elements in the mesh.  We will
+compute the element matrix and right-hand-side contribution.
+</div>
+
+<div class ="fragment">
+<pre>
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+        
+          for (; el != end_el; ++el)
+          {
+</pre>
+</div>
+<div class = "comment">
+Store a pointer to the element we are currently
+working on.  This allows for nicer syntax later.
+</div>
+
+<div class ="fragment">
+<pre>
+            const Elem* elem = *el;
+        
+</pre>
+</div>
+<div class = "comment">
+The ghost elements at the boundaries need to be excluded
+here, as they don't belong to the physical shell,
+but serve for a proper boundary treatment only.
+</div>
+
+<div class ="fragment">
+<pre>
+            libmesh_assert_equal_to (elem-&gt;type(), TRI3SUBDIVISION);
+            const Tri3Subdivision* sd_elem = static_cast&lt;const Tri3Subdivision*&gt; (elem);
+            if (sd_elem-&gt;is_ghost())
+              continue;
+        
+</pre>
+</div>
+<div class = "comment">
+Get the degree of freedom indices for the
+current element.  These define where in the global
+matrix and right-hand-side this element will
+contribute to.
+</div>
+
+<div class ="fragment">
+<pre>
+            dof_map.dof_indices (elem, dof_indices);
+            dof_map.dof_indices (elem, dof_indices_u, u_var);
+            dof_map.dof_indices (elem, dof_indices_v, v_var);
+            dof_map.dof_indices (elem, dof_indices_w, w_var);
+        
+            const std::size_t n_dofs   = dof_indices.size();
+            const std::size_t n_u_dofs = dof_indices_u.size();
+            const std::size_t n_v_dofs = dof_indices_v.size();
+            const std::size_t n_w_dofs = dof_indices_w.size();
+        
+</pre>
+</div>
+<div class = "comment">
+Compute the element-specific data for the current
+element.  This involves computing the location of the
+quadrature points and the shape functions
+(phi, dphi, d2phi) for the current element.
+</div>
+
+<div class ="fragment">
+<pre>
+            fe-&gt;reinit (elem);
+        
+</pre>
+</div>
+<div class = "comment">
+Zero the element matrix and right-hand side before
+summing them.  We use the resize member here because
+the number of degrees of freedom might have changed from
+the last element.
+</div>
+
+<div class ="fragment">
+<pre>
+            Ke.resize (n_dofs, n_dofs);
+            Fe.resize (n_dofs);
+        
+</pre>
+</div>
+<div class = "comment">
+Reposition the submatrices...  The idea is this:
+
+<br><br>-           -          -  -
+| Kuu Kuv Kuw |        | Fu |
+Ke = | Kvu Kvv Kvw |;  Fe = | Fv |
+| Kwu Kwv Kww |        | Fw |
+-           -          -  -
+
+<br><br>The \p DenseSubMatrix.repostition () member takes the
+(row_offset, column_offset, row_size, column_size).
+
+<br><br>Similarly, the \p DenseSubVector.reposition () member
+takes the (row_offset, row_size)
+</div>
+
+<div class ="fragment">
+<pre>
+            Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
+            Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
+            Kuw.reposition (u_var*n_u_dofs, w_var*n_u_dofs, n_u_dofs, n_w_dofs);
+        
+            Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
+            Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
+            Kvw.reposition (v_var*n_v_dofs, w_var*n_v_dofs, n_v_dofs, n_w_dofs);
+        
+            Kwu.reposition (w_var*n_w_dofs, u_var*n_w_dofs, n_w_dofs, n_u_dofs);
+            Kwv.reposition (w_var*n_w_dofs, v_var*n_w_dofs, n_w_dofs, n_v_dofs);
+            Kww.reposition (w_var*n_w_dofs, w_var*n_w_dofs, n_w_dofs, n_w_dofs);
+        
+            Fu.reposition (u_var*n_u_dofs, n_u_dofs);
+            Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+            Fw.reposition (w_var*n_u_dofs, n_w_dofs);
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the element matrix and right-hand-side.
+</div>
+
+<div class ="fragment">
+<pre>
+            for (unsigned int qp=0; qp&lt;qrule-&gt;n_points(); ++qp)
+            {
+</pre>
+</div>
+<div class = "comment">
+First, we compute the external force resulting
+from a load q distributed uniformly across the plate.
+Since the load is supposed to be transverse to the plate,
+it affects the z-direction, i.e. the "w" variable.
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i&lt;n_u_dofs; ++i)
+                Fw(i) += JxW[qp] * phi[i][qp] * q;
+        
+</pre>
+</div>
+<div class = "comment">
+Next, we assemble the stiffness matrix.  This is only valid
+for the linear theory, i.e., for small deformations, where
+reference and deformed surface metrics are indistinguishable.
+
+
+<br><br>Get the three surface basis vectors.
+</div>
+
+<div class ="fragment">
+<pre>
+              const RealVectorValue & a1 = dxyzdxi[qp];
+              const RealVectorValue & a2 = dxyzdeta[qp];
+                    RealVectorValue   a3 = a1.cross(a2);
+              const Real jac = a3.size(); // the surface Jacobian
+              libmesh_assert_greater (jac, 0);
+              a3 /= jac; // the shell director a3 is normalized to unit length
+        
+</pre>
+</div>
+<div class = "comment">
+Get the derivatives of the surface tangents.
+</div>
+
+<div class ="fragment">
+<pre>
+              const RealVectorValue & a11 = d2xyzdxi2[qp];
+              const RealVectorValue & a22 = d2xyzdeta2[qp];
+              const RealVectorValue & a12 = d2xyzdxideta[qp];
+        
+</pre>
+</div>
+<div class = "comment">
+Compute the three covariant components of the first
+fundamental form of the surface.
+</div>
+
+<div class ="fragment">
+<pre>
+              const RealVectorValue a(a1*a1, a2*a2, a1*a2);
+        
+</pre>
+</div>
+<div class = "comment">
+The elastic H matrix in Voigt's notation, computed from the
+covariant components of the first fundamental form rather
+than the contravariant components, exploiting that the
+contravariant first fundamental form is the inverse of the
+covatiant first fundamental form (hence the determinant etc.).
+</div>
+
+<div class ="fragment">
+<pre>
+              RealTensorValue H;
+              H(0,0)          =  a(1) * a(1);
+              H(0,1) = H(1,0) =   nu  * a(1) * a(0) + (1-nu) * a(2) * a(2);
+              H(0,2) = H(2,0) = -a(1) * a(2);
+              H(1,1)          =  a(0) * a(0);
+              H(1,2) = H(2,1) = -a(0) * a(2);
+              H(2,2)          = 0.5 * ((1-nu) * a(1) * a(0) + (1+nu) * a(2) * a(2));
+              const Real det = a(0) * a(1) - a(2) * a(2);
+              libmesh_assert_not_equal_to (det * det, 0);
+              H /= det * det;
+        
+</pre>
+</div>
+<div class = "comment">
+Precompute come cross products for the bending part below.
+</div>
+
+<div class ="fragment">
+<pre>
+              const RealVectorValue a11xa2 = a11.cross(a2);
+              const RealVectorValue a22xa2 = a22.cross(a2);
+              const RealVectorValue a12xa2 = a12.cross(a2);
+              const RealVectorValue a1xa11 =  a1.cross(a11);
+              const RealVectorValue a1xa22 =  a1.cross(a22);
+              const RealVectorValue a1xa12 =  a1.cross(a12);
+              const RealVectorValue a2xa3  =  a2.cross(a3);
+              const RealVectorValue a3xa1  =  a3.cross(a1);
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over all pairs of nodes I,J.
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i&lt;n_u_dofs; ++i)
+              {
+                for (unsigned int j=0; j&lt;n_u_dofs; ++j)
+                {
+</pre>
+</div>
+<div class = "comment">
+The membrane strain matrices in Voigt's notation.
+</div>
+
+<div class ="fragment">
+<pre>
+                  RealTensorValue MI, MJ;
+                  for (unsigned int k=0; k&lt;3; ++k)
+                  {
+                    MI(0,k) = dphi[i][qp](0) * a1(k);
+                    MI(1,k) = dphi[i][qp](1) * a2(k);
+                    MI(2,k) = dphi[i][qp](1) * a1(k)
+                            + dphi[i][qp](0) * a2(k);
+        
+                    MJ(0,k) = dphi[j][qp](0) * a1(k);
+                    MJ(1,k) = dphi[j][qp](1) * a2(k);
+                    MJ(2,k) = dphi[j][qp](1) * a1(k)
+                            + dphi[j][qp](0) * a2(k);
+                  }
+        
+</pre>
+</div>
+<div class = "comment">
+The bending strain matrices in Voigt's notation.
+</div>
+
+<div class ="fragment">
+<pre>
+                  RealTensorValue BI, BJ;
+                  for (unsigned int k=0; k&lt;3; ++k)
+                  {
+                    const Real term_ik = dphi[i][qp](0) * a2xa3(k)
+                                       + dphi[i][qp](1) * a3xa1(k);
+                    BI(0,k) = -d2phi[i][qp](0,0) * a3(k)
+                              +(dphi[i][qp](0) * a11xa2(k)
+                              + dphi[i][qp](1) * a1xa11(k)
+                              + (a3*a11) * term_ik) / jac;
+                    BI(1,k) = -d2phi[i][qp](1,1) * a3(k)
+                              +(dphi[i][qp](0) * a22xa2(k)
+                              + dphi[i][qp](1) * a1xa22(k)
+                              + (a3*a22) * term_ik) / jac;
+                    BI(2,k) = 2 * (-d2phi[i][qp](0,1) * a3(k)
+                                   +(dphi[i][qp](0) * a12xa2(k)
+                                   + dphi[i][qp](1) * a1xa12(k)
+                                   + (a3*a12) * term_ik) / jac);
+        
+                    const Real term_jk = dphi[j][qp](0) * a2xa3(k)
+                                       + dphi[j][qp](1) * a3xa1(k);
+                    BJ(0,k) = -d2phi[j][qp](0,0) * a3(k)
+                              +(dphi[j][qp](0) * a11xa2(k)
+                              + dphi[j][qp](1) * a1xa11(k)
+                              + (a3*a11) * term_jk) / jac;
+                    BJ(1,k) = -d2phi[j][qp](1,1) * a3(k)
+                              +(dphi[j][qp](0) * a22xa2(k)
+                              + dphi[j][qp](1) * a1xa22(k)
+                              + (a3*a22) * term_jk) / jac;
+                    BJ(2,k) = 2 * (-d2phi[j][qp](0,1) * a3(k)
+                                   +(dphi[j][qp](0) * a12xa2(k)
+                                   + dphi[j][qp](1) * a1xa12(k)
+                                   + (a3*a12) * term_jk) / jac);
+                  }
+        
+</pre>
+</div>
+<div class = "comment">
+The total stiffness matrix coupling the nodes
+I and J is a sum of membrane and bending
+contributions according to the following formula.
+</div>
+
+<div class ="fragment">
+<pre>
+                  const RealTensorValue KIJ = JxW[qp] * K * MI.transpose() * H * MJ
+                                            + JxW[qp] * D * BI.transpose() * H * BJ;
+        
+</pre>
+</div>
+<div class = "comment">
+Insert the components of the coupling stiffness
+matrix \p KIJ into the corresponding directional
+submatrices.
+</div>
+
+<div class ="fragment">
+<pre>
+                  Kuu(i,j) += KIJ(0,0);
+                  Kuv(i,j) += KIJ(0,1);
+                  Kuw(i,j) += KIJ(0,2);
+        
+                  Kvu(i,j) += KIJ(1,0);
+                  Kvv(i,j) += KIJ(1,1);
+                  Kvw(i,j) += KIJ(1,2);
+        
+                  Kwu(i,j) += KIJ(2,0);
+                  Kwv(i,j) += KIJ(2,1);
+                  Kww(i,j) += KIJ(2,2);
+                }
+              }
+        
+            } // end of the quadrature point qp-loop
+        
+</pre>
+</div>
+<div class = "comment">
+The element matrix and right-hand-side are now built
+for this element.  Add them to the global matrix and
+right-hand-side vector.  The \p NumericMatrix::add_matrix()
+and \p NumericVector::add_vector() members do this for us.
+</div>
+
+<div class ="fragment">
+<pre>
+            system.matrix-&gt;add_matrix (Ke, dof_indices);
+            system.rhs-&gt;add_vector    (Fe, dof_indices);
+          } // end of non-ghost element loop
+        
+</pre>
+</div>
+<div class = "comment">
+Next, we apply the boundary conditions.  In this case,
+all boundaries are clamped by the penalty method, using
+the special "ghost" nodes along the boundaries.  Note
+that there are better ways to implement boundary conditions
+for subdivision shells.  We use the simplest way here,
+which is known to be overly restrictive and will lead to
+a slightly too small deformation of the plate.
+</div>
+
+<div class ="fragment">
+<pre>
+          el = mesh.active_local_elements_begin();
+        
+          for (; el != end_el; ++el)
+          {
+</pre>
+</div>
+<div class = "comment">
+Store a pointer to the element we are currently
+working on.  This allows for nicer syntax later.
+</div>
+
+<div class ="fragment">
+<pre>
+            const Elem* elem = *el;
+        
+</pre>
+</div>
+<div class = "comment">
+For the boundary conditions, we only need to loop over
+the ghost elements.
+</div>
+
+<div class ="fragment">
+<pre>
+            libmesh_assert_equal_to (elem-&gt;type(), TRI3SUBDIVISION);
+            const Tri3Subdivision* gh_elem = static_cast&lt;const Tri3Subdivision*&gt; (elem);
+            if (!gh_elem-&gt;is_ghost())
+              continue;
+        
+</pre>
+</div>
+<div class = "comment">
+Find the side which is part of the physical plate boundary,
+that is, the boundary of the original mesh without ghosts.
+</div>
+
+<div class ="fragment">
+<pre>
+            for (unsigned int s=0; s&lt;elem-&gt;n_sides(); ++s)
+            {
+              const Tri3Subdivision* nb_elem = static_cast&lt;const Tri3Subdivision*&gt; (elem-&gt;neighbor(s));
+              if (nb_elem == NULL || nb_elem-&gt;is_ghost())
+                continue;
+        
+              /*
+               * Determine the four nodes involved in the boundary
+               * condition treatment of this side.  The \p MeshTools::Subdiv
+               * namespace provides lookup tables \p next and \p prev
+               * for an efficient determination of the next and previous
+               * nodes of an element, respectively.
+               *
+               *      n4
+               *     /  \
+               *    / gh \
+               *  n2 ---- n3
+               *    \ nb /
+               *     \  /
+               *      n1
+               */
+              Node* nodes [4]; // n1, n2, n3, n4
+              nodes[1] = gh_elem-&gt;get_node(s); // n2
+              nodes[2] = gh_elem-&gt;get_node(MeshTools::Subdivision::next[s]); // n3
+              nodes[3] = gh_elem-&gt;get_node(MeshTools::Subdivision::prev[s]); // n4
+        
+</pre>
+</div>
+<div class = "comment">
+The node in the interior of the domain, \p n1, is the
+hardest to find.  Walk along the edges of element \p nb until
+we have identified it.
+</div>
+
+<div class ="fragment">
+<pre>
+              unsigned int n_int = 0;
+              nodes[0] = nb_elem-&gt;get_node(0);
+              while (nodes[0]-&gt;id() == nodes[1]-&gt;id() || nodes[0]-&gt;id() == nodes[2]-&gt;id())
+                nodes[0] = nb_elem-&gt;get_node(++n_int);
+        
+</pre>
+</div>
+<div class = "comment">
+The penalty value.  \f$ \frac{1}{\epsilon} \f$
+</div>
+
+<div class ="fragment">
+<pre>
+              const Real penalty = 1.e10;
+        
+</pre>
+</div>
+<div class = "comment">
+With this simple method, clamped boundary conditions are
+obtained by penalizing the displacements of all four nodes.
+This ensures that the displacement field vanishes on the
+boundary side \p s.
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int n=0; n&lt;4; ++n)
+              {
+                const dof_id_type u_dof = nodes[n]-&gt;dof_number (system.number(), u_var, 0);
+                const dof_id_type v_dof = nodes[n]-&gt;dof_number (system.number(), v_var, 0);
+                const dof_id_type w_dof = nodes[n]-&gt;dof_number (system.number(), w_var, 0);
+                system.matrix-&gt;add (u_dof, u_dof, penalty);
+                system.matrix-&gt;add (v_dof, v_dof, penalty);
+                system.matrix-&gt;add (w_dof, w_dof, penalty);
+              }
+            }
+          } // end of ghost element loop
+        }
+        
+        #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file miscellaneous_ex11.C without comments: </h1> 
+<pre> 
+  
+  
+  #include &lt;iostream&gt;
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/serial_mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_modification.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_tools.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/node.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/vector_value.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/tensor_value.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_subvector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/vtk_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/face_tri3_subdivision.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_subdivision_support.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_shell (EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+  #endif
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+    libmesh_example_requires (3 == LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+  
+  #ifndef LIBMESH_ENABLE_NODE_VALENCE
+    libmesh_example_requires (false, <B><FONT COLOR="#BC8F8F">&quot;--enable-node-valence&quot;</FONT></B>);
+  #endif
+  
+  #ifndef LIBMESH_ENABLE_AMR
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-amr&quot;</FONT></B>);
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
+  
+  #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    libmesh_example_requires(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-second&quot;</FONT></B>);
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
+  
+    SerialMesh mesh (init.comm(), 2);
+  
+    mesh.read (<B><FONT COLOR="#BC8F8F">&quot;square_mesh.off&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real L = 100.;
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Modification::scale(mesh, L, L, L);
+  
+    MeshRefinement mesh_refinement (mesh);
+    mesh_refinement.uniformly_refine (3);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Modification::flatten (mesh);
+  
+  #<B><FONT COLOR="#A020F0">if</FONT></B> defined(LIBMESH_HAVE_VTK)
+    VTKIO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;without_ghosts.pvtu&quot;</FONT></B>);
+  #endif
+  #<B><FONT COLOR="#A020F0">if</FONT></B> defined(LIBMESH_HAVE_EXODUS_API)
+    ExodusII_IO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;without_ghosts.e&quot;</FONT></B>);
+  #endif
+  
+    mesh.print_info();
+  
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Subdivision::prepare_subdivision_mesh (mesh, false);
+  
+    mesh.print_info();
+  
+  #<B><FONT COLOR="#A020F0">if</FONT></B> defined(LIBMESH_HAVE_VTK)
+    VTKIO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;with_ghosts.pvtu&quot;</FONT></B>);
+  #endif
+  #<B><FONT COLOR="#A020F0">if</FONT></B> defined(LIBMESH_HAVE_EXODUS_API)
+    ExodusII_IO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;with_ghosts.e&quot;</FONT></B>);
+  #endif
+  
+    EquationSystems equation_systems (mesh);
+  
+    LinearImplicitSystem &amp; system = equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Shell&quot;</FONT></B>);
+  
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FOURTH, SUBDIVISION);
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, FOURTH, SUBDIVISION);
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>, FOURTH, SUBDIVISION);
+  
+    system.attach_assemble_function (assemble_shell);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real h  = 1.;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real E  = 1.e7;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real nu = 0.;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real q  = 1.;
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;thickness&quot;</FONT></B>)       = h;
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;young's modulus&quot;</FONT></B>) = E;
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;poisson ratio&quot;</FONT></B>)   = nu;
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;uniform load&quot;</FONT></B>)    = q;
+  
+    equation_systems.init();
+  
+    equation_systems.print_info();
+  
+    system.solve();
+  
+  #<B><FONT COLOR="#A020F0">if</FONT></B> defined(LIBMESH_HAVE_VTK)
+    VTKIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.pvtu&quot;</FONT></B>, equation_systems);
+  #endif
+  #<B><FONT COLOR="#A020F0">if</FONT></B> defined(LIBMESH_HAVE_EXODUS_API)
+    ExodusII_IO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.e&quot;</FONT></B>, equation_systems);
+  #endif
+  
+    Node* center_node = 0;
+    Real nearest_dist_sq = mesh.point(0).size_sq();
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nid=1; nid&lt;mesh.n_nodes(); ++nid)
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Real dist_sq = mesh.point(nid).size_sq();
+      <B><FONT COLOR="#A020F0">if</FONT></B> (dist_sq &lt; nearest_dist_sq)
+      {
+        nearest_dist_sq = dist_sq;
+        center_node = mesh.node_ptr(nid);
+      }
+    }
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>);
+    dof_id_type w_dof = center_node-&gt;dof_number (system.number(), w_var, 0);
+    Number w = 0;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (w_dof &gt;= system.get_dof_map().first_dof() &amp;&amp;
+        w_dof &lt;  system.get_dof_map().end_dof())
+      w = system.current_solution(w_dof);
+    system.comm().sum(w);
+  
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real D = E * h*h*h / (12*(1-nu*nu));
+    <B><FONT COLOR="#228B22">const</FONT></B> Real w_analytic = 0.001265319 * L*L*L*L * q / D;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;z-displacement of the center point: &quot;</FONT></B> &lt;&lt; w &lt;&lt; std::endl;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Analytic solution for pure bending: &quot;</FONT></B> &lt;&lt; w_analytic &lt;&lt; std::endl;
+  
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+</FONT></I>  
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_ENABLE_AMR
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+  
+  #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> assemble_shell (EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+  {
+    libmesh_assert_equal_to (system_name, <B><FONT COLOR="#BC8F8F">&quot;Shell&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
+  
+    LinearImplicitSystem &amp; system = es.get_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Shell&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real h  = es.parameters.get&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;thickness&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real E  = es.parameters.get&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;young's modulus&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real nu = es.parameters.get&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;poisson ratio&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real q  = es.parameters.get&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;uniform load&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real K = E * h     /     (1-nu*nu);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real D = E * h*h*h / (12*(1-nu*nu));
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>);
+  
+    FEType fe_type = system.variable_type (u_var);
+  
+    AutoPtr&lt;FEBase&gt; fe (FEBase::build(2, fe_type));
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> extraorder = 0;
+    AutoPtr&lt;QBase&gt; qrule (fe_type.default_quadrature_rule (2, extraorder));
+  
+    fe-&gt;attach_quadrature_rule (qrule.get());
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;RealGradient&gt;&amp; dxyzdxi  = fe-&gt;get_dxyzdxi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;RealGradient&gt;&amp; dxyzdeta = fe-&gt;get_dxyzdeta();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;RealGradient&gt;&amp; d2xyzdxi2    = fe-&gt;get_d2xyzdxi2();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;RealGradient&gt;&amp; d2xyzdeta2   = fe-&gt;get_d2xyzdeta2();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;RealGradient&gt;&amp; d2xyzdxideta = fe-&gt;get_d2xyzdxideta();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;          phi = fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = fe-&gt;get_dphi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealTensor&gt; &gt;&amp;  d2phi = fe-&gt;get_d2phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> DofMap &amp; dof_map = system.get_dof_map();
+  
+    DenseMatrix&lt;Number&gt; Ke;
+    DenseVector&lt;Number&gt; Fe;
+  
+    DenseSubMatrix&lt;Number&gt;
+      Kuu(Ke), Kuv(Ke), Kuw(Ke),
+      Kvu(Ke), Kvv(Ke), Kvw(Ke),
+      Kwu(Ke), Kwv(Ke), Kww(Ke);
+  
+    DenseSubVector&lt;Number&gt;
+      Fu(Fe),
+      Fv(Fe),
+      Fw(Fe);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_u;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_v;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_w;
+  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (; el != end_el; ++el)
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+      libmesh_assert_equal_to (elem-&gt;type(), TRI3SUBDIVISION);
+      <B><FONT COLOR="#228B22">const</FONT></B> Tri3Subdivision* sd_elem = static_cast&lt;<B><FONT COLOR="#228B22">const</FONT></B> Tri3Subdivision*&gt; (elem);
+      <B><FONT COLOR="#A020F0">if</FONT></B> (sd_elem-&gt;is_ghost())
+        <B><FONT COLOR="#A020F0">continue</FONT></B>;
+  
+      dof_map.dof_indices (elem, dof_indices);
+      dof_map.dof_indices (elem, dof_indices_u, u_var);
+      dof_map.dof_indices (elem, dof_indices_v, v_var);
+      dof_map.dof_indices (elem, dof_indices_w, w_var);
+  
+      <B><FONT COLOR="#228B22">const</FONT></B> std::size_t n_dofs   = dof_indices.size();
+      <B><FONT COLOR="#228B22">const</FONT></B> std::size_t n_u_dofs = dof_indices_u.size();
+      <B><FONT COLOR="#228B22">const</FONT></B> std::size_t n_v_dofs = dof_indices_v.size();
+      <B><FONT COLOR="#228B22">const</FONT></B> std::size_t n_w_dofs = dof_indices_w.size();
+  
+      fe-&gt;reinit (elem);
+  
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
+  
+      Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
+      Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
+      Kuw.reposition (u_var*n_u_dofs, w_var*n_u_dofs, n_u_dofs, n_w_dofs);
+  
+      Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
+      Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
+      Kvw.reposition (v_var*n_v_dofs, w_var*n_v_dofs, n_v_dofs, n_w_dofs);
+  
+      Kwu.reposition (w_var*n_w_dofs, u_var*n_w_dofs, n_w_dofs, n_u_dofs);
+      Kwv.reposition (w_var*n_w_dofs, v_var*n_w_dofs, n_w_dofs, n_v_dofs);
+      Kww.reposition (w_var*n_w_dofs, w_var*n_w_dofs, n_w_dofs, n_w_dofs);
+  
+      Fu.reposition (u_var*n_u_dofs, n_u_dofs);
+      Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+      Fw.reposition (w_var*n_u_dofs, n_w_dofs);
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); ++qp)
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; ++i)
+          Fw(i) += JxW[qp] * phi[i][qp] * q;
+  
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue &amp; a1 = dxyzdxi[qp];
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue &amp; a2 = dxyzdeta[qp];
+              RealVectorValue   a3 = a1.cross(a2);
+        <B><FONT COLOR="#228B22">const</FONT></B> Real jac = a3.size(); <I><FONT COLOR="#B22222">// the surface Jacobian
+</FONT></I>        libmesh_assert_greater (jac, 0);
+        a3 /= jac; <I><FONT COLOR="#B22222">// the shell director a3 is normalized to unit length
+</FONT></I>  
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue &amp; a11 = d2xyzdxi2[qp];
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue &amp; a22 = d2xyzdeta2[qp];
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue &amp; a12 = d2xyzdxideta[qp];
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a(a1*a1, a2*a2, a1*a2);
+  
+        RealTensorValue H;
+        H(0,0)          =  a(1) * a(1);
+        H(0,1) = H(1,0) =   nu  * a(1) * a(0) + (1-nu) * a(2) * a(2);
+        H(0,2) = H(2,0) = -a(1) * a(2);
+        H(1,1)          =  a(0) * a(0);
+        H(1,2) = H(2,1) = -a(0) * a(2);
+        H(2,2)          = 0.5 * ((1-nu) * a(1) * a(0) + (1+nu) * a(2) * a(2));
+        <B><FONT COLOR="#228B22">const</FONT></B> Real det = a(0) * a(1) - a(2) * a(2);
+        libmesh_assert_not_equal_to (det * det, 0);
+        H /= det * det;
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a11xa2 = a11.cross(a2);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a22xa2 = a22.cross(a2);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a12xa2 = a12.cross(a2);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a1xa11 =  a1.cross(a11);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a1xa22 =  a1.cross(a22);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a1xa12 =  a1.cross(a12);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a2xa3  =  a2.cross(a3);
+        <B><FONT COLOR="#228B22">const</FONT></B> RealVectorValue a3xa1  =  a3.cross(a1);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; ++i)
+        {
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; ++j)
+          {
+            RealTensorValue MI, MJ;
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> k=0; k&lt;3; ++k)
+            {
+              MI(0,k) = dphi[i][qp](0) * a1(k);
+              MI(1,k) = dphi[i][qp](1) * a2(k);
+              MI(2,k) = dphi[i][qp](1) * a1(k)
+                      + dphi[i][qp](0) * a2(k);
+  
+              MJ(0,k) = dphi[j][qp](0) * a1(k);
+              MJ(1,k) = dphi[j][qp](1) * a2(k);
+              MJ(2,k) = dphi[j][qp](1) * a1(k)
+                      + dphi[j][qp](0) * a2(k);
+            }
+  
+            RealTensorValue BI, BJ;
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> k=0; k&lt;3; ++k)
+            {
+              <B><FONT COLOR="#228B22">const</FONT></B> Real term_ik = dphi[i][qp](0) * a2xa3(k)
+                                 + dphi[i][qp](1) * a3xa1(k);
+              BI(0,k) = -d2phi[i][qp](0,0) * a3(k)
+                        +(dphi[i][qp](0) * a11xa2(k)
+                        + dphi[i][qp](1) * a1xa11(k)
+                        + (a3*a11) * term_ik) / jac;
+              BI(1,k) = -d2phi[i][qp](1,1) * a3(k)
+                        +(dphi[i][qp](0) * a22xa2(k)
+                        + dphi[i][qp](1) * a1xa22(k)
+                        + (a3*a22) * term_ik) / jac;
+              BI(2,k) = 2 * (-d2phi[i][qp](0,1) * a3(k)
+                             +(dphi[i][qp](0) * a12xa2(k)
+                             + dphi[i][qp](1) * a1xa12(k)
+                             + (a3*a12) * term_ik) / jac);
+  
+              <B><FONT COLOR="#228B22">const</FONT></B> Real term_jk = dphi[j][qp](0) * a2xa3(k)
+                                 + dphi[j][qp](1) * a3xa1(k);
+              BJ(0,k) = -d2phi[j][qp](0,0) * a3(k)
+                        +(dphi[j][qp](0) * a11xa2(k)
+                        + dphi[j][qp](1) * a1xa11(k)
+                        + (a3*a11) * term_jk) / jac;
+              BJ(1,k) = -d2phi[j][qp](1,1) * a3(k)
+                        +(dphi[j][qp](0) * a22xa2(k)
+                        + dphi[j][qp](1) * a1xa22(k)
+                        + (a3*a22) * term_jk) / jac;
+              BJ(2,k) = 2 * (-d2phi[j][qp](0,1) * a3(k)
+                             +(dphi[j][qp](0) * a12xa2(k)
+                             + dphi[j][qp](1) * a1xa12(k)
+                             + (a3*a12) * term_jk) / jac);
+            }
+  
+            <B><FONT COLOR="#228B22">const</FONT></B> RealTensorValue KIJ = JxW[qp] * K * MI.transpose() * H * MJ
+                                      + JxW[qp] * D * BI.transpose() * H * BJ;
+  
+            Kuu(i,j) += KIJ(0,0);
+            Kuv(i,j) += KIJ(0,1);
+            Kuw(i,j) += KIJ(0,2);
+  
+            Kvu(i,j) += KIJ(1,0);
+            Kvv(i,j) += KIJ(1,1);
+            Kvw(i,j) += KIJ(1,2);
+  
+            Kwu(i,j) += KIJ(2,0);
+            Kwv(i,j) += KIJ(2,1);
+            Kww(i,j) += KIJ(2,2);
+          }
+        }
+  
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>  
+      system.matrix-&gt;add_matrix (Ke, dof_indices);
+      system.rhs-&gt;add_vector    (Fe, dof_indices);
+    } <I><FONT COLOR="#B22222">// end of non-ghost element loop
+</FONT></I>  
+    el = mesh.active_local_elements_begin();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (; el != end_el; ++el)
+    {
+      <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
+  
+      libmesh_assert_equal_to (elem-&gt;type(), TRI3SUBDIVISION);
+      <B><FONT COLOR="#228B22">const</FONT></B> Tri3Subdivision* gh_elem = static_cast&lt;<B><FONT COLOR="#228B22">const</FONT></B> Tri3Subdivision*&gt; (elem);
+      <B><FONT COLOR="#A020F0">if</FONT></B> (!gh_elem-&gt;is_ghost())
+        <B><FONT COLOR="#A020F0">continue</FONT></B>;
+  
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); ++s)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Tri3Subdivision* nb_elem = static_cast&lt;<B><FONT COLOR="#228B22">const</FONT></B> Tri3Subdivision*&gt; (elem-&gt;neighbor(s));
+        <B><FONT COLOR="#A020F0">if</FONT></B> (nb_elem == NULL || nb_elem-&gt;is_ghost())
+          <B><FONT COLOR="#A020F0">continue</FONT></B>;
+  
+        <I><FONT COLOR="#B22222">/*
+         * Determine the four nodes involved in the boundary
+         * condition treatment of this side.  The \p MeshTools::Subdiv
+         * namespace provides lookup tables \p next and \p prev
+         * for an efficient determination of the next and previous
+         * nodes of an element, respectively.
+         *
+         *      n4
+         *     /  \
+         *    / gh \
+         *  n2 ---- n3
+         *    \ nb /
+         *     \  /
+         *      n1
+         */</FONT></I>
+        Node* nodes [4]; <I><FONT COLOR="#B22222">// n1, n2, n3, n4
+</FONT></I>        nodes[1] = gh_elem-&gt;get_node(s); <I><FONT COLOR="#B22222">// n2
+</FONT></I>        nodes[2] = gh_elem-&gt;get_node(MeshTools::Subdivision::next[s]); <I><FONT COLOR="#B22222">// n3
+</FONT></I>        nodes[3] = gh_elem-&gt;get_node(MeshTools::Subdivision::prev[s]); <I><FONT COLOR="#B22222">// n4
+</FONT></I>  
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_int = 0;
+        nodes[0] = nb_elem-&gt;get_node(0);
+        <B><FONT COLOR="#A020F0">while</FONT></B> (nodes[0]-&gt;id() == nodes[1]-&gt;id() || nodes[0]-&gt;id() == nodes[2]-&gt;id())
+          nodes[0] = nb_elem-&gt;get_node(++n_int);
+  
+        <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;4; ++n)
+        {
+          <B><FONT COLOR="#228B22">const</FONT></B> dof_id_type u_dof = nodes[n]-&gt;dof_number (system.number(), u_var, 0);
+          <B><FONT COLOR="#228B22">const</FONT></B> dof_id_type v_dof = nodes[n]-&gt;dof_number (system.number(), v_var, 0);
+          <B><FONT COLOR="#228B22">const</FONT></B> dof_id_type w_dof = nodes[n]-&gt;dof_number (system.number(), w_var, 0);
+          system.matrix-&gt;add (u_dof, u_dof, penalty);
+          system.matrix-&gt;add (v_dof, v_dof, penalty);
+          system.matrix-&gt;add (w_dof, w_dof, penalty);
+        }
+      }
+    } <I><FONT COLOR="#B22222">// end of ghost element loop
+</FONT></I>  }
+  
+  #endif <I><FONT COLOR="#B22222">// LIBMESH_ENABLE_SECOND_DERIVATIVES
+</pre> 
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex11:
+*   example-opt  
+***************************************************************
+ 
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=145
+    n_local_nodes()=145
+  n_elem()=256
+    n_local_elem()=256
+    n_active_elem()=256
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=177
+    n_local_nodes()=177
+  n_elem()=320
+    n_local_elem()=320
+    n_active_elem()=320
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Shell"
+    Type "LinearImplicit"
+    Variables={ "u" "v" "w" } 
+    Finite Element Types="SUBDIVISION", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FOURTH", "THIRD" 
+    n_dofs()=531
+    n_local_dofs()=531
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 92.0847
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 111
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+z-displacement of the center point: 0.14267
+Analytic solution for pure bending: 0.151838
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:10 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.146271, Active time=0.057647                                              |
+ -------------------------------------------------------------------------------------------------------------
+| Event                          nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list() 1          0.0001      0.000090    0.0001      0.000090    0.16     0.16     |
+|   build_sparsity()             1          0.0088      0.008800    0.0092      0.009193    15.27    15.95    |
+|   create_dof_constraints()     1          0.0001      0.000055    0.0001      0.000055    0.10     0.10     |
+|   distribute_dofs()            1          0.0001      0.000096    0.0003      0.000346    0.17     0.60     |
+|   dof_indices()                2048       0.0020      0.000001    0.0020      0.000001    3.45     3.45     |
+|   prepare_send_list()          1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                     1          0.0003      0.000250    0.0003      0.000250    0.43     0.43     |
+|                                                                                                             |
+| EquationSystems                                                                                             |
+|   build_solution_vector()      1          0.0008      0.000844    0.0015      0.001504    1.46     2.61     |
+|                                                                                                             |
+| ExodusII_IO                                                                                                 |
+|   write_nodal_data()           1          0.0011      0.001110    0.0011      0.001110    1.93     1.93     |
+|                                                                                                             |
+| FEMap                                                                                                       |
+|   compute_map()                256        0.0003      0.000001    0.0003      0.000001    0.47     0.47     |
+|                                                                                                             |
+| FESubdivision                                                                                               |
+|   init_shape_functions()       256        0.0104      0.000040    0.0104      0.000040    17.96    17.96    |
+|   reinit()                     256        0.0003      0.000001    0.0110      0.000043    0.59     19.08    |
+|                                                                                                             |
+| LocationMap                                                                                                 |
+|   find()                       756        0.0003      0.000000    0.0003      0.000000    0.46     0.46     |
+|   init()                       3          0.0000      0.000010    0.0000      0.000010    0.05     0.05     |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()             7          0.0017      0.000245    0.0017      0.000245    2.98     2.98     |
+|   read()                       1          0.0006      0.000630    0.0006      0.000630    1.09     1.09     |
+|   renumber_nodes_and_elem()    14         0.0002      0.000011    0.0002      0.000011    0.27     0.27     |
+|                                                                                                             |
+| MeshOutput                                                                                                  |
+|   write_equation_systems()     1          0.0001      0.000059    0.0027      0.002673    0.10     4.64     |
+|                                                                                                             |
+| MeshRefinement                                                                                              |
+|   _refine_elements()           3          0.0006      0.000195    0.0014      0.000483    1.01     2.51     |
+|   add_point()                  756        0.0005      0.000001    0.0008      0.000001    0.81     1.40     |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                  1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()           7          0.0001      0.000010    0.0001      0.000010    0.12     0.12     |
+|                                                                                                             |
+| PetscLinearSolver                                                                                           |
+|   solve()                      1          0.0057      0.005691    0.0057      0.005691    9.87     9.87     |
+|                                                                                                             |
+| System                                                                                                      |
+|   assemble()                   1          0.0238      0.023773    0.0359      0.035926    41.24    62.32    |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                        4375       0.0576                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex11:
+*   example-opt  
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

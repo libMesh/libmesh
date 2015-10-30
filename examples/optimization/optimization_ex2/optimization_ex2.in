@@ -1,0 +1,18 @@
+n_elem = 10
+approx_order = SECOND
+fe_family = LAGRANGE
+
+# This example does not converge with Tao when using iterative solvers
+# due to preconditioning issues, but it works if you use a direct
+# solver, such as SuperLU, MUMPS, or UMFPack.  An example command line
+# which uses SuperLU is given below:
+# ./example-opt -tao_monitor -tao_view -tao_type ipm -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package superlu_dist
+
+# If you have installed NLopt (http://ab-initio.mit.edu/wiki/index.php/NLopt) and
+# libmesh has been properly configured to use it, you can uncomment the
+# line below to use NLopt solvers instead of PETSc/Tao.
+#
+# Only a few NLopt algorithms support both equality and inequality constraints
+# as required by this example, so you must run with --nlopt-algorithm followed by
+# one of: LD_SLSQP, GN_ISRES, or LN_COBYLA.
+# optimization_solver_type = NLOPT_SOLVERS
