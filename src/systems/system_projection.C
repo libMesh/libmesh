@@ -56,23 +56,42 @@ class GenericProjector
 private:
   const System &system;
 
-  FFunctor & f;
-  GFunctor * g;  // Needed for C1 type elements only
-  ProjectionAction & action;
+  // For TBB compatibility and thread safety we'll copy these in
+  // operator()
+  const FFunctor & master_f;
+  const GFunctor * master_g;  // Needed for C1 type elements only
+  bool g_was_copied;
+  const ProjectionAction & master_action;
   const std::vector<unsigned int>& variables;
 
 public:
   GenericProjector (const System &system_in,
-                    FFunctor & f_in,
-                    GFunctor * g_in,
-                    ProjectionAction & act_in,
+                    const FFunctor & f_in,
+                    const GFunctor * g_in,
+                    const ProjectionAction & act_in,
                     const std::vector<unsigned int>& variables_in) :
     system(system_in),
-    f(f_in),
-    g(g_in),
-    action(act_in),
+    master_f(f_in),
+    master_g(g_in),
+    g_was_copied(false),
+    master_action(act_in),
     variables(variables_in)
   {}
+
+  GenericProjector (const GenericProjector& in) :
+    system(in.system),
+    master_f(in.master_f),
+    master_g(in.master_g ? new GFunctor(*in.master_g) : NULL),
+    g_was_copied(in.master_g),
+    master_action(in.master_action),
+    variables(in.variables)
+  {}
+
+  ~GenericProjector()
+  {
+    if (g_was_copied)
+      delete master_g;
+  }
 
   void operator() (const ConstElemRange &range) const;
 };
@@ -125,24 +144,27 @@ template <typename Output>
 class FEMFunctionWrapper
 {
 public:
-  FEMFunctionWrapper(FEMFunctionBase<Output> &f) : _f(f) {}
+  FEMFunctionWrapper(const FEMFunctionBase<Output> &f) : _f(f.clone()) {}
 
-  void init_context (FEMContext &c) { _f.init_context(c); }
+  FEMFunctionWrapper(const FEMFunctionWrapper<Output> &fw) :
+    _f(fw._f->clone()) {}
+
+  void init_context (FEMContext &c) { _f->init_context(c); }
 
   Output eval_at_node (const FEMContext& c,
                        unsigned int i,
                        const Node& n,
                        const Real time)
-  { return _f.component(c, i, n, time); }
+  { return _f->component(c, i, n, time); }
 
   Output eval_at_point (const FEMContext& c,
                         unsigned int i,
                         const Point& n,
                         const Real time)
-  { return _f.component(c, i, n, time); }
+  { return _f->component(c, i, n, time); }
 
 private:
-  FEMFunctionBase<Output> &_f;
+  AutoPtr<FEMFunctionBase<Output> > _f;
 };
 
 
@@ -158,6 +180,16 @@ public:
   sys(sys_in),
   old_context(sys_in),
   old_solution(old_sol)
+  {
+    old_context.set_algebraic_type(FEMContext::OLD);
+    old_context.set_custom_solution(&old_solution);
+  }
+
+  OldSolutionValue(const OldSolutionValue &in) :
+  last_elem(NULL),
+  sys(in.sys),
+  old_context(sys),
+  old_solution(in.old_solution)
   {
     old_context.set_algebraic_type(FEMContext::OLD);
     old_context.set_custom_solution(&old_solution);
@@ -966,6 +998,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 {
   START_LOG ("operator()","GenericProjector");
 
+  ProjectionAction action(master_action);
+  FFunctor f(master_f);
+  AutoPtr<GFunctor> g;
+  if (master_g)
+    g.reset(new GFunctor(*master_g));
+
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -1035,7 +1073,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   // Now initialize any user requested shape functions, xyz vals, etc
   f.init_context(context);
-  if(g)
+  if(g.get())
     g->init_context(context);
 
   // this->init_context(context);
