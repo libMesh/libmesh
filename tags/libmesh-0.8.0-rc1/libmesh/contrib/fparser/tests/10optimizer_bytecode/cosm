@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=0,1,1
+F=cos(1.1)+x
+C=MpfrFloat::cos(1.1)+x

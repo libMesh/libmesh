@@ -1,0 +1,35 @@
+T=d ld f mf cd cf cld
+V=x
+R=-9.42477796076937971538793014983850865259,9.42477796076937971538793014983850865259,0.785398163397448309615660845819875721049292349
+F=cos(x+pi) + cos(x+pi*2/3) + cos(x+pi*5/2) + cos(x+pi*6/2) + cos(x+pi*7/2) + \
+  sin(x+pi) + sin(x+pi*2/3) + sin(x+pi*5/2) + sin(x+pi*6/2) + sin(x+pi*7/2) + \
+  cos(x-pi) + cos(x-pi*2/3) + cos(x-pi*5/2) + cos(x-pi*6/2) + cos(x-pi*7/2) + \
+  sin(x-pi) + sin(x-pi*2/3) + sin(x-pi*5/2) + sin(x-pi*6/2) + sin(x-pi*7/2)
+C=fp_cos(x+fp_const_pi<Value_t>()) + \
+  fp_cos(x+fp_const_pi<Value_t>()*2/3) + \
+  fp_cos(x+fp_const_pi<Value_t>()*5/2) + \
+  fp_cos(x+fp_const_pi<Value_t>()*6/2) + \
+  fp_cos(x+fp_const_pi<Value_t>()*7/2) + \
+  fp_sin(x+fp_const_pi<Value_t>()) + \
+  fp_sin(x+fp_const_pi<Value_t>()*2/3) + \
+  fp_sin(x+fp_const_pi<Value_t>()*5/2) + \
+  fp_sin(x+fp_const_pi<Value_t>()*6/2) + \
+  fp_sin(x+fp_const_pi<Value_t>()*7/2) + \
+  fp_cos(x-fp_const_pi<Value_t>()) + \
+  fp_cos(x-fp_const_pi<Value_t>()*2/3) + \
+  fp_cos(x-fp_const_pi<Value_t>()*5/2) + \
+  fp_cos(x-fp_const_pi<Value_t>()*6/2) + \
+  fp_cos(x-fp_const_pi<Value_t>()*7/2) + \
+  fp_sin(x-fp_const_pi<Value_t>()) + \
+  fp_sin(x-fp_const_pi<Value_t>()*2/3) + \
+  fp_sin(x-fp_const_pi<Value_t>()*5/2) + \
+  fp_sin(x-fp_const_pi<Value_t>()*6/2) + \
+  fp_sin(x-fp_const_pi<Value_t>()*7/2)
+
+# Expected optimization:
+#   cos(x + pi*2/3)
+# + cos(x - pi*2/3)
+# + sin(x - pi*2/3)
+# + sin(x + pi*2/3)
+# - 4*sin(x)
+# - 4*cos(x)

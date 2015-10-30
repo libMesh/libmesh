@@ -1,0 +1,67 @@
+######################################################################
+#
+# Common environment for all contribued packages
+# 
+# If we are careful, common rules can be defined here, 
+# once and for all.
+# 
+AUTOMAKE_OPTIONS = subdir-objects 
+
+AM_CPPFLAGS  = $(pkg_cppflags) # any defined package-specific include paths
+AM_CFLAGS    = 
+AM_CXXFLAGS  = 
+
+######################################################################
+#
+# Building the flavors
+#
+noinst_LTLIBRARIES = 
+
+if LIBMESH_OPT_MODE
+  noinst_LTLIBRARIES        += libopt.la
+  libopt_la_SOURCES  = $(pkg_sources)
+  libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+  libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  libopt_la_CFLAGS   = $(CFLAGS_OPT)
+  libopt_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+if LIBMESH_DBG_MODE
+  noinst_LTLIBRARIES        += libdbg.la
+  libdbg_la_SOURCES  = $(pkg_sources)
+  libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+  libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
+  libdbg_la_CFLAGS   = $(CFLAGS_DBG)
+  libdbg_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+if LIBMESH_DEVEL_MODE
+  noinst_LTLIBRARIES          += libdevel.la
+  libdevel_la_SOURCES  = $(pkg_sources)
+  libdevel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+  libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+  libdevel_la_CFLAGS   = $(CFLAGS_DEVEL)
+  libdevel_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+if LIBMESH_PROF_MODE
+  noinst_LTLIBRARIES          += libprof.la
+  libprof_la_SOURCES  = $(pkg_sources)
+  libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+  libprof_la_CFLAGS   = $(CFLAGS_PROF)
+  libprof_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+if LIBMESH_OPROF_MODE
+  noinst_LTLIBRARIES          += liboprof.la
+  liboprof_la_SOURCES  = $(pkg_sources)
+  liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+  liboprof_la_CFLAGS   = $(CFLAGS_OPROF)
+  liboprof_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+# Local Variables:
+# mode: makefile
+# End:

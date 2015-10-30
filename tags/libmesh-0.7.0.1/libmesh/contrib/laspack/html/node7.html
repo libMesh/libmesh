@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> Installation</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Installation">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html231 HREF="node8.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html229 HREF="laspack.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html223 HREF="node6.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html233 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html232 HREF="node8.html"> Optimizing and Example </A>
+<B>Up:</B> <A NAME=tex2html230 HREF="laspack.html">LASPack Reference Manual</A>
+<B> Previous:</B> <A NAME=tex2html224 HREF="node6.html"> Changes in Version </A>
+<BR> <HR> <P>
+<H1><A NAME=SECTION00040000000000000000> Installation</A></H1>
+<P>
+<H6><A NAME=SectionInstall>&#160;</A></H6>
+<P>
+In order to simplify the description of the installation procedure,
+we assume that you are working on a UNIX system
+and have already copied
+the <tt> LASPack</tt>
+  distribution file <A NAME=tex2html9 HREF="http://www.tu-dresden.de/mwism/skalicky/laspack-1.12.3.tar.Z"><tt> laspack-1.12.3.tar.Z</tt></A>.
+<P>
+The complete installation consists of the following five steps:
+<P>
+<OL><LI>
+  Move the file <tt> laspack-1.12.3.tar.Z</tt> to the directory
+  that will become the top-level directory for the source files.
+<LI>
+  Uncompress and untar the file:
+  <blockquote> <tt> uncompress laspack-1.12.3.tar.Z</tt> <BR> 
+    <tt> tar xvf laspack-1.12.3.tar</tt>
+  </blockquote>
+  This should create the entire distribution tree.
+<LI>
+  Make sure that you have appropriately set the following variables
+  of your UNIX environment
+  (for compilation of the source files an ANSI C compiler is needed):
+  
+
+<PRE>    HOME           home directory 
+    CC             name of the C compiler 
+    CFLAGS         compiler options 
+    LDFLAGS        linker options
+</PRE>
+<P>
+<LI>
+  There are two possibilities for installing the package:
+<P>
+  <DL ><DT>User's installation:
+<DD>
+    This should be carried out if you want to install <tt> LASPack</tt>
+  in 
+    your home directory so that it is available only to you.
+<P>
+    At this stage, you could use the environment variable <tt> ARCH_EXT</tt> 
+    in order to install the library and the test programs
+    in different subdirectories depending on computer architecture.
+    If you share your home directory across a heterogeneous computer network,
+    it may be advantageous for the management of several versions of binaries.
+    In this case, set the variable <tt> ARCH_EXT</tt> to an appropriate value
+    (e.g. <tt> /sunos</tt> on Sun workstations, <tt> /hp-ux</tt>
+    on HP workstations, etc.).
+<P>
+    Make sure that the directory <tt> $HOME/bin$ARCH_EXT</tt>
+    (or <tt> $HOME/bin</tt> if you don't use <tt> ARCH_EXT</tt>)
+    is contained in the environment variable <tt> PATH</tt> and
+    run the installation script:
+    <blockquote> <tt> ./install</tt>
+    </blockquote>
+    This will generate the library <tt> liblaspack.a</tt>
+    (and the library <tt> libxc.a</tt> which is not a part of <tt> LASPack</tt>
+  but
+    required by some test programs)
+    and install it in the directory <tt> $HOME/lib$ARCH_EXT</tt>.
+    Furthermore, it will build the test programs and install them
+    in the directory <tt> $HOME/bin$ARCH_EXT</tt>.
+  <DT>Local installation:
+<DD>
+    This will install the <tt> LASPack</tt>
+  library and corresponding header files
+    in the directory <tt> /usr/local/lib</tt> and the test programs
+    in the directory <tt> /usr/local/bin</tt> 
+    which are usually used for such a kind of software.
+    To do this you need permission to write in these directories.
+    Futhermore you should set the environment vatiable <tt> PATH</tt>
+    to <tt> /usr/local/bin</tt>.
+<P>
+    The installation script should be started with an additional parameter:
+    <blockquote> <tt> ./install local</tt>
+    </blockquote> 
+ </DL>
+<LI>
+  Finally, running the installation script,
+  the <tt> LASPack</tt>
+  library created is automatically checked.
+  By means of the program <A HREF="node12.html#SubsectionMLSTEST"><tt> mlstest</tt></A>,
+  all combinations of multilevel solvers, plain iterative procedures,
+  and preconditioners available in <tt> LASPack</tt>
+  are tested
+  on a two-dimensional Poisson problem.
+  If all goes well, you get the message:
+  <blockquote> <tt> LASPack tested successfully.</tt>
+  </blockquote>
+  Therewith the <tt> LASPack</tt>
+  installation is completed.
+<P>
+  In order to run test programs in a C shell,
+  do not forget to renew the hash tables by the command:
+  <blockquote> <tt> rehash</tt>
+  </blockquote></OL>
+<P>
+<tt> LASPack</tt>
+  as well as the installation script were successfully 
+tested on several machines: Sun Sparc5, HP 9000/735, IBM RS/6000 550,
+DEC 3000/800 M, SGI IRIS Indigo and PC 486 (running Linux).
+Nevertheless, if the installation fails, please 
+<A NAME=tex2html10 HREF="bugs.html">contact the author</A>.
+<P>
+<BR> <HR><A NAME=tex2html231 HREF="node8.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html229 HREF="laspack.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html223 HREF="node6.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html233 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html232 HREF="node8.html"> Optimizing and Example </A>
+<B>Up:</B> <A NAME=tex2html230 HREF="laspack.html">LASPack Reference Manual</A>
+<B> Previous:</B> <A NAME=tex2html224 HREF="node6.html"> Changes in Version </A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

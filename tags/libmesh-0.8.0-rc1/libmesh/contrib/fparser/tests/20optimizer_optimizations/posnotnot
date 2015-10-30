@@ -1,0 +1,7 @@
+T=d ld f mf cd cf cld
+V=x
+R=-1,1,0.5
+F=!!(sin(x) + 1.2)
+C=fp_notNot(fp_sin(x) + 1.2)
+
+# Expected optimization: produce cAbsNotNot

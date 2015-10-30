@@ -1,0 +1,24 @@
+T=d ld f mf cd cf cld
+V=x
+R=-5,5,2
+
+# Combine tests:
+#   cmplt_pow_imm_negpos
+#   cmple_pow_imm_negpos
+#   cmpgt_pow_imm_negpos
+#   cmpge_pow_imm_negpos
+#   cmpne_pow_imm_negpos
+#   cmpeq_pow_imm_negpos
+
+F=0x0001 * (pow(x,-2) < 0.0625) + \
+  0x0002 * (pow(x,-2) <= 0.0625) + \
+  0x0004 * (pow(x,-2) > 0.0625) + \
+  0x0008 * (pow(x,-2) >= 0.0625) + \
+  0x0010 * (pow(x,-2) != 0.0625) + \
+  0x0020 * (pow(x,-2) = 0.0625)
+C=0x0001 * fp_less(fp_pow(x,-2), 0.0625) + \
+  0x0002 * fp_lessOrEq(fp_pow(x,-2), 0.0625) + \
+  0x0004 * fp_greater(fp_pow(x,-2), 0.0625) + \
+  0x0008 * fp_greaterOrEq(fp_pow(x,-2), 0.0625) + \
+  0x0010 * fp_nequal(fp_pow(x,-2), 0.0625) + \
+  0x0020 * fp_equal(fp_pow(x,-2), 0.0625)

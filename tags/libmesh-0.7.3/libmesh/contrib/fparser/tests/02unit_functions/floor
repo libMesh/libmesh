@@ -1,0 +1,5 @@
+T=d
+V=x
+R=-10, 10, 0.25
+F=floor(x)
+C=floor(x)

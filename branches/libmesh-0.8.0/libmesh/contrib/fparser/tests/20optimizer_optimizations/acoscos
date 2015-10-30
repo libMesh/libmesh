@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x
+R=-1,1,0.1
+F=cos(acos(x))
+C=fp_cos(fp_acos(x))

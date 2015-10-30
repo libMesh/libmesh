@@ -1,0 +1,611 @@
+/* $Id: ex13.C,v 1.1 2004-02-09 18:32:46 jwpeterson Exp $ */
+
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
+
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
+
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
+
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+ // <h1>Example 13 - Unsteady Navier-Stokes Equations - Unsteady Nonlinear Systems of Equations</h1>
+ //
+ // This example shows how a simple, unsteady, nonlinear system of equations
+ // can be solved in parallel.  The system of equations are the familiar
+ // Navier-Stokes equations for low-speed incompressible fluid flow.  This
+ // example introduces the concept of the inner nonlinear loop for each
+ // timestep, and requires a good deal of linear algebra number-crunching
+ // at each step.  If you have the General Mesh Viewer (GMV) installed,
+ // the script movie.sh in this directory will also take appropriate screen
+ // shots of each of the solution files in the time sequence.  These rgb files
+ // can then be animated with the "animate" utility of ImageMagick if it is
+ // installed on your system.  On a PIII 1GHz machine in debug mode, this
+ // example takes a little over a minute to run.  If you would like to see
+ // a more detailed time history, or compute more timesteps, that is certainly
+ // possible by changing the n_timesteps and dt variables below.
+
+// C++ include files that we need
+#include <iostream>
+#include <algorithm>
+#include <math.h>
+
+// Basic include file needed for the mesh functionality.
+#include "libmesh.h"
+#include "mesh.h"
+#include "equation_systems.h"
+#include "fe.h"
+#include "quadrature_gauss.h"
+#include "dof_map.h"
+#include "sparse_matrix.h"
+#include "numeric_vector.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+#include "implicit_system.h"
+#include "error_vector.h"
+#include "error_estimator.h"
+#include "transient_system.h"
+#include "perf_log.h"
+
+// Some (older) compilers do not offer full stream 
+// functionality, OStringStream works around this.
+#include "o_string_stream.h"
+
+// For systems of equations the \p DenseSubMatrix
+// and \p DenseSubVector provide convenient ways for
+// assembling the element matrix and vector on a
+// component-by-component basis.
+#include "dense_submatrix.h"
+#include "dense_subvector.h"
+
+// Function prototype.  This function will assemble the system
+// matrix and right-hand-side.
+void assemble_stokes (EquationSystems& es,
+		      const std::string& system_name);
+
+// The main program.
+int main (int argc, char** argv)
+{
+  // Initialize libMesh.
+  libMesh::init (argc, argv);
+  {    
+    // Set the dimensionality of the mesh = 2
+    const unsigned int dim = 2;     
+    
+    // Create a two-dimensional mesh.
+    Mesh mesh (dim);
+    
+    // Use the internal mesh generator to create a uniform
+    // grid on the square [-1,1]^D.  We instruct the mesh generator
+    // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+    // elements in 3D.  Building these higher-order elements allows
+    // us to use higher-order approximation, as in example 3.
+    mesh.build_square (20, 20,
+		       0., 1.,
+		       0., 1.,
+		       QUAD9);
+    
+    // Print information about the mesh to the screen.
+    mesh.print_info();
+    
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+    
+    // Declare the system and its variables.
+    {
+      // Creates a transient system named "Navier-Stokes"
+      TransientImplicitSystem & system = 
+	equation_systems.add_system<TransientImplicitSystem> ("Navier-Stokes");
+      
+      // Add the variables "u" & "v" to "Navier-Stokes".  They
+      // will be approximated using second-order approximation.
+      system.add_variable ("u", SECOND);
+      system.add_variable ("v", SECOND);
+
+      // Add the variable "p" to "Navier-Stokes". This will
+      // be approximated with a first-order basis,
+      // providing an LBB-stable pressure-velocity pair.
+      system.add_variable ("p", FIRST);
+
+      // Give the system a pointer to the matrix assembly
+      // function.
+      system.attach_assemble_function (assemble_stokes);
+      
+      // Initialize the data structures for the equation system.
+      equation_systems.init ();
+
+      equation_systems.set_parameter("linear solver maximum iterations") = 250;
+      equation_systems.set_parameter("linear solver tolerance") = 1.e-3;
+      
+      // Prints information about the system to the screen.
+      equation_systems.print_info();
+    }
+
+    // Create a performance-logging object for this example
+    PerfLog perf_log("Example 13");
+    
+    // Now we begin the timestep loop to compute the time-accurate
+    // solution of the equations.
+    const Real dt = 0.005;
+    Real time     = 0.0;
+    const unsigned int n_timesteps = 15;
+
+    // The number of steps and the stopping criterion are also required
+    // for the nonlinear iterations.
+    const unsigned int n_nonlinear_steps = 15;
+    const Real nonlinear_tolerance       = 1.e-2;
+    
+    // Tell the system of equations what the timestep is by using
+    // the set_parameter function.  The matrix assembly routine can
+    // then reference this parameter.
+    equation_systems.set_parameter ("dt")   = dt;
+
+    // Get a reference to the Stokes system to use later.
+    TransientImplicitSystem&  stokes_system =
+	  equation_systems.get_system<TransientImplicitSystem>("Navier-Stokes");
+    
+    for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
+      {
+	// Incremenet the time counter, set the time and the
+	// time step size as parameters in the EquationSystem.
+	time += dt;
+
+	// Let the system of equations know the current time.
+	// This might be necessary for a time-dependent forcing
+	// function for example.
+	equation_systems.set_parameter ("time") = time;
+
+	// A pretty update message
+	std::cout << " Solving time step " << t_step << ", time = " << time << std::endl;
+
+	// Now we need to update the solution vector from the
+	// previous time step.  This is done directly through
+	// the reference to the Stokes system.
+	*stokes_system.old_local_solution = *stokes_system.current_local_solution;
+
+	// Now we begin the nonlinear loop
+	for (unsigned int l=0; l<n_nonlinear_steps; ++l)
+	  {
+	    // The first thing to do is to get a copy of the solution at
+	    // the current nonlinear iteration.  This value will be used to
+	    // determine if we can exit the nonlinear loop.
+	    AutoPtr<NumericVector<Number> >
+	      last_nonlinear_soln (stokes_system.current_local_solution->clone());
+	    
+	    // Assemble & solve the linear system.
+	    perf_log.start_event("linear solve");
+	    equation_systems("Navier-Stokes").solve();
+	    perf_log.stop_event("linear solve");
+	    
+	    // Compute the difference between this solution and the last
+	    // nonlinear iterate.
+	    last_nonlinear_soln->add (-1., *stokes_system.current_local_solution);
+
+	    // Close the vector before computing its norm
+	    last_nonlinear_soln->close();
+
+	    // Compute the l2 norm of the difference
+	    const Real norm_delta = last_nonlinear_soln->l2_norm();
+
+	    // Print out convergence information
+	    std::cout << "Nonlinear convergence: ||u - u_old|| = "
+		      << norm_delta
+		      << std::endl;
+
+	    // Terminate the solution iteration if the difference between
+	    // this iteration and the last is sufficiently small.
+	    if (norm_delta < nonlinear_tolerance)
+	      {
+		std::cout << " Nonlinear solver converged at step "
+			  << l
+			  << std::endl;
+		break;
+	      }
+	    
+	  } // end nonlinear loop
+	
+	// Write out every nth timestep to file.
+	const unsigned int write_interval = 1;
+	
+	if ((t_step+1)%write_interval == 0)
+	  {
+	    OStringStream file_name;
+
+	    // We write the file name in the gmv auto-read format.
+	    file_name << "out.gmv.";
+	    OSSRealzeroright(file_name,3,0, t_step + 1);
+	    
+	    mesh.write_gmv (file_name.str(),
+			    equation_systems);
+	  }
+      } // end timestep loop.
+  }
+  
+  // All done.  
+  return libMesh::close ();
+}
+
+
+
+
+
+
+// The matrix assembly function to be called at each time step to
+// prepare for the linear solve.
+void assemble_stokes (EquationSystems& es,
+		      const std::string& system_name)
+{
+  // It is a good idea to make sure we are assembling
+  // the proper system.
+  assert (system_name == "Navier-Stokes");
+  
+  // Get a constant reference to the mesh object.
+  const Mesh& mesh = es.get_mesh();
+  
+  // The dimension that we are running
+  const unsigned int dim = mesh.mesh_dimension();
+  
+  // Get a reference to the Stokes system object.
+  TransientImplicitSystem & stokes_system =
+    es.get_system<TransientImplicitSystem> ("Navier-Stokes");
+
+  // Numeric ids corresponding to each variable in the system
+  const unsigned int u_var = stokes_system.variable_number ("u");
+  const unsigned int v_var = stokes_system.variable_number ("v");
+  const unsigned int p_var = stokes_system.variable_number ("p");
+  
+  // Get the Finite Element type for "u".  Note this will be
+  // the same as the type for "v".
+  FEType fe_vel_type = stokes_system.variable_type(u_var);
+  
+  // Get the Finite Element type for "p".
+  FEType fe_pres_type = stokes_system.variable_type(p_var);
+
+  // Build a Finite Element object of the specified type for
+  // the velocity variables.
+  AutoPtr<FEBase> fe_vel  (FEBase::build(dim, fe_vel_type));
+    
+  // Build a Finite Element object of the specified type for
+  // the pressure variables.
+  AutoPtr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
+  
+  // A Gauss quadrature rule for numerical integration.
+  // Let the \p FEType object decide what order rule is appropriate.
+  QGauss qrule (dim, fe_vel_type.default_quadrature_order());
+
+  // Tell the finite element objects to use our quadrature rule.
+  fe_vel->attach_quadrature_rule (&qrule);
+  fe_pres->attach_quadrature_rule (&qrule);
+  
+  // Here we define some references to cell-specific data that
+  // will be used to assemble the linear system.
+  //
+  // The element Jacobian * quadrature weight at each integration point.   
+  const std::vector<Real>& JxW = fe_vel->get_JxW();
+
+  // The element shape functions evaluated at the quadrature points.
+  const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
+
+  // The element shape function gradients for the velocity
+  // variables evaluated at the quadrature points.
+  const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
+
+  // The element shape functions for the pressure variable
+  // evaluated at the quadrature points.
+  const std::vector<std::vector<Real> >& psi = fe_pres->get_phi();
+
+  // The value of the linear shape function gradients at the quadrature points
+  // const std::vector<std::vector<RealGradient> >& dpsi = fe_pres->get_dphi();
+  
+  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // object handles the index translation from node and element numbers
+  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // in future examples.
+  const DofMap & dof_map = stokes_system.get_dof_map();
+
+  // Define data structures to contain the element matrix
+  // and right-hand-side vector contribution.  Following
+  // basic finite element terminology we will denote these
+  // "Ke" and "Fe".
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
+
+  DenseSubMatrix<Number>
+    Kuu(Ke), Kuv(Ke), Kup(Ke),
+    Kvu(Ke), Kvv(Ke), Kvp(Ke),
+    Kpu(Ke), Kpv(Ke), Kpp(Ke);
+
+  DenseSubVector<Number>
+    Fu(Fe),
+    Fv(Fe),
+    Fp(Fe);
+
+  // This vector will hold the degree of freedom indices for
+  // the element.  These define where in the global system
+  // the element degrees of freedom get mapped.
+  std::vector<unsigned int> dof_indices;
+  std::vector<unsigned int> dof_indices_u;
+  std::vector<unsigned int> dof_indices_v;
+  std::vector<unsigned int> dof_indices_p;
+
+  // Find out what the timestep size parameter is from the system, and
+  // the value of theta for the theta method.  We use implicit Euler (theta=1)
+  // for this simulation even though it is only first-order accurate in time.
+  // The reason for this decision is that the second-order Crank-Nicolson
+  // method is notoriously oscillatory for problems with discontinuous
+  // initial data such as the lid-driven cavity.  Therefore,
+  // we sacrifice accuracy in time for stability, but since the solution
+  // reaches steady state relatively quickly we can afford to take small
+  // timesteps.  If you monitor the initial nonlinear residual for this
+  // simulation, you should see that it is monotonically decreasing in time.
+  const Real dt    = es.parameter("dt");
+  const Real time  = es.parameter("time");
+  const Real theta = 1.;
+    
+  // Now we will loop over all the elements in the mesh that
+  // live on the local processor. We will compute the element
+  // matrix and right-hand-side contribution.  Since the mesh
+  // will be refined we want to only consider the ACTIVE elements,
+  // hence we use a variant of the \p active_elem_iterator.
+  const_active_local_elem_iterator           el (mesh.elements_begin());
+  const const_active_local_elem_iterator end_el (mesh.elements_end());
+  
+  for ( ; el != end_el; ++el)
+    {    
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem* elem = *el;
+      
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
+      dof_map.dof_indices (elem, dof_indices);
+      dof_map.dof_indices (elem, dof_indices_u, u_var);
+      dof_map.dof_indices (elem, dof_indices_v, v_var);
+      dof_map.dof_indices (elem, dof_indices_p, p_var);
+
+      const unsigned int n_dofs   = dof_indices.size();
+      const unsigned int n_u_dofs = dof_indices_u.size(); 
+      const unsigned int n_v_dofs = dof_indices_v.size(); 
+      const unsigned int n_p_dofs = dof_indices_p.size();
+      
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points (q_point) and the shape functions
+      // (phi, dphi) for the current element.
+      fe_vel->reinit  (elem);
+      fe_pres->reinit (elem);
+
+      // Zero the element matrix and right-hand side before
+      // summing them.  We use the resize member here because
+      // the number of degrees of freedom might have changed from
+      // the last element.  Note that this will be the case if the
+      // element type is different (i.e. the last element was a
+      // triangle, now we are on a quadrilateral).
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
+
+      // Reposition the submatrices...  The idea is this:
+      //
+      //         -           -          -  -
+      //        | Kuu Kuv Kup |        | Fu |
+      //   Ke = | Kvu Kvv Kvp |;  Fe = | Fv |
+      //        | Kpu Kpv Kpp |        | Fv |
+      //         -           -          -  -
+      //
+      // The \p DenseSubMatrix.repostition () member takes the
+      // (row_offset, column_offset, row_size, column_size).
+      // 
+      // Similarly, the \p DenseSubVector.reposition () member
+      // takes the (row_offset, row_size)
+      Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
+      Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
+      Kup.reposition (u_var*n_u_dofs, p_var*n_u_dofs, n_u_dofs, n_p_dofs);
+      
+      Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
+      Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
+      Kvp.reposition (v_var*n_v_dofs, p_var*n_v_dofs, n_v_dofs, n_p_dofs);
+      
+      Kpu.reposition (p_var*n_u_dofs, u_var*n_u_dofs, n_p_dofs, n_u_dofs);
+      Kpv.reposition (p_var*n_u_dofs, v_var*n_u_dofs, n_p_dofs, n_v_dofs);
+      Kpp.reposition (p_var*n_u_dofs, p_var*n_u_dofs, n_p_dofs, n_p_dofs);
+
+      Fu.reposition (u_var*n_u_dofs, n_u_dofs);
+      Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+      Fp.reposition (p_var*n_u_dofs, n_p_dofs);
+
+      // Now we will build the element matrix and right-hand-side.
+      // Constructing the RHS requires the solution and its
+      // gradient from the previous timestep.  This must be
+      // calculated at each quadrature point by summing the
+      // solution degree-of-freedom values by the appropriate
+      // weight functions.
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+	{
+	  // Values to hold the solution & its gradient at the previous timestep.
+	  Number   u = 0., u_old = 0.;
+	  Number   v = 0., v_old = 0.;
+	  Number   p_old = 0.;
+	  Gradient grad_u, grad_u_old;
+	  Gradient grad_v, grad_v_old;
+	  
+	  // Compute the velocity & its gradient from the previous timestep
+	  // and the old Newton iterate.
+	  for (unsigned int l=0; l<n_u_dofs; l++)
+	    {
+	      // From the old timestep:
+	      u_old += phi[l][qp]*stokes_system.old_solution (dof_indices_u[l]);
+	      v_old += phi[l][qp]*stokes_system.old_solution (dof_indices_v[l]);
+	      grad_u_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_u[l]));
+	      grad_v_old.add_scaled (dphi[l][qp],stokes_system.old_solution (dof_indices_v[l]));
+
+	      // From the previous Newton iterate:
+	      u += phi[l][qp]*stokes_system.current_solution (dof_indices_u[l]); 
+	      v += phi[l][qp]*stokes_system.current_solution (dof_indices_v[l]);
+	      grad_u.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_u[l]));
+	      grad_v.add_scaled (dphi[l][qp],stokes_system.current_solution (dof_indices_v[l]));
+	    }
+
+	  // Compute the old pressure value at this quadrature point.
+	  for (unsigned int l=0; l<n_p_dofs; l++)
+	    {
+	      p_old += psi[l][qp]*stokes_system.old_solution (dof_indices_p[l]);
+	    }
+
+	  // Definitions for convenience.  It is sometimes simpler to do a
+	  // dot product if you have the full vector at your disposal.
+	  const Point U_old (u_old, v_old);
+	  const Point U     (u,     v);
+	  const Real  u_x = grad_u(0);
+	  const Real  u_y = grad_u(1);
+	  const Real  v_x = grad_v(0);
+	  const Real  v_y = grad_v(1);
+	  
+	  // First, an i-loop over the velocity degrees of freedom.
+	  // We know that n_u_dofs == n_v_dofs so we can compute contributions
+	  // for both at the same time.
+	  for (unsigned int i=0; i<n_u_dofs; i++)
+	    {
+	      Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term 
+				(1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + // convection term
+				(1.-theta)*dt*p_old*dphi[i][qp](0)  -         // pressure term on rhs
+				(1.-theta)*dt*(grad_u_old*dphi[i][qp]) +      // diffusion term on rhs
+				theta*dt*(U*grad_u)*phi[i][qp]);              // Newton term
+
+		
+	      Fv(i) += JxW[qp]*(v_old*phi[i][qp] -                             // mass-matrix term
+				(1.-theta)*dt*(U_old*grad_v_old)*phi[i][qp] +  // convection term
+				(1.-theta)*dt*p_old*dphi[i][qp](1) -           // pressure term on rhs
+				(1.-theta)*dt*(grad_v_old*dphi[i][qp]) +       // diffusion term on rhs
+				theta*dt*(U*grad_v)*phi[i][qp]);               // Newton term
+	    
+
+	      // Note that the Fp block is identically zero unless we are using
+	      // some kind of artificial compressibility scheme...
+
+	      // Matrix contributions for the uu and vv couplings.
+	      for (unsigned int j=0; j<n_u_dofs; j++)
+		{
+		  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
+				       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
+				       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
+				       theta*dt*u_x*phi[i][qp]*phi[j][qp]);   // Newton term
+
+		  Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];     // Newton term
+		  
+		  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
+				       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
+				       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
+				       theta*dt*v_y*phi[i][qp]*phi[j][qp]);   // Newton term
+
+		  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];     // Newton term
+		}
+
+	      // Matrix contributions for the up and vp couplings.
+	      for (unsigned int j=0; j<n_p_dofs; j++)
+		{
+		  Kup(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](0));
+		  Kvp(i,j) += JxW[qp]*(-theta*dt*psi[j][qp]*dphi[i][qp](1));
+		}
+	    }
+
+	  // Now an i-loop over the pressure degrees of freedom.  This code computes
+	  // the matrix entries due to the continuity equation.  Note: To maintain a
+	  // symmetric matrix, we may (or may not) multiply the continuity equation by
+	  // negative one.  Here we do not.
+	  for (unsigned int i=0; i<n_p_dofs; i++)
+	    {
+	      for (unsigned int j=0; j<n_u_dofs; j++)
+		{
+		  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+		  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+		}
+	    }
+	} // end of the quadrature point qp-loop
+
+      
+      // At this point the interior element integration has
+      // been completed.  However, we have not yet addressed
+      // boundary conditions.  For this example we will only
+      // consider simple Dirichlet boundary conditions imposed
+      // via the penalty method. The penalty method used here
+      // is equivalent (for Lagrange basis functions) to lumping
+      // the matrix resulting from the L2 projection penalty
+      // approach introduced in example 3.
+      {
+	// The following loops over the sides of the element.
+	// If the element has no neighbor on a side then that
+	// side MUST live on a boundary of the domain.
+	for (unsigned int s=0; s<elem->n_sides(); s++)
+	  if (elem->neighbor(s) == NULL)
+	    {
+	      AutoPtr<Elem> side (elem->build_side(s));
+	      	      
+	      // Loop over the nodes on the side.
+	      for (unsigned int ns=0; ns<side->n_nodes(); ns++)
+		{
+		  // The location on the boundary of the current
+		  // node.
+		   
+		  //const Real xf = side->point(ns)(0);
+		  const Real yf = side->point(ns)(1);
+		  
+		  // The penalty value.  \f$ \frac{1}{\epsilon \f$
+		  const Real penalty = 1.e10;
+		  
+		  // The boundary values.
+		   
+		  // Set u = 1 on the top boundary, 0 everywhere else
+		  const Real u_value = (yf > .99) ? 1. : 0.;
+		  
+		  // Set v = 0 everywhere
+		  const Real v_value = 0.;
+		  
+		  // Find the node on the element matching this node on
+		  // the side.  That defined where in the element matrix
+		  // the boundary condition will be applied.
+		  for (unsigned int n=0; n<elem->n_nodes(); n++)
+		    if (elem->node(n) == side->node(ns))
+		      {
+			// Matrix contribution.
+			Kuu(n,n) += penalty;
+			Kvv(n,n) += penalty;
+		  		  
+			// Right-hand-side contribution.
+			Fu(n) += penalty*u_value;
+			Fv(n) += penalty*v_value;
+		      }
+		} // end face node loop	  
+	    } // end if (elem->neighbor(side) == NULL)
+      } // end boundary condition section	  
+      
+      // We have now built the element matrix and RHS vector in terms
+      // of the element degrees of freedom.  However, it is possible
+      // that some of the element DOFs are constrained to enforce
+      // solution continuity, i.e. they are not really "free".  We need
+      // to constrain those DOFs in terms of non-constrained DOFs to
+      // ensure a continuous solution.  The
+      // \p DofMap::constrain_element_matrix_and_vector() method does
+      // just that.
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+      
+      // The element matrix and right-hand-side are now built
+      // for this element.  Add them to the global matrix and
+      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
+      // and \p PetscVector::add_vector() members do this for us.
+      stokes_system.matrix->add_matrix (Ke, dof_indices);
+      stokes_system.rhs->add_vector    (Fe, dof_indices);
+    } // end of element loop
+  
+  // That's it.
+  return;
+}

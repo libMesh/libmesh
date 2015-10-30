@@ -1,0 +1,15 @@
+*~
+*.go
+*.o
+*.pgo
+*.syo
+ex12
+*.gmv
+ii_files
+so_locations
+*.log
+gmon.out
+*.unv
+*.gz
+*.gmv.*
+ex13

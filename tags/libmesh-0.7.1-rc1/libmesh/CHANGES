@@ -1,0 +1,33 @@
+
+0.6.4 -> 0.7.0
+  * Certified Reduced Basis model creation/evaluation
+  * Adjoint-based sensitivity calculations and error indicators
+  * Support for newer PETSc, SLEPc
+  * More autodetection of optional dependencies
+  * New examples:
+  ** Discontinuous Galerkin
+  ** SCALAR Lagrange multipliers
+  ** Certified Reduced Basis method
+  * Parallel:: utilities for std::set data
+  * Parallel:: support for non-default MPI communicators
+  * Parallel:: support for non-magic-number message tags
+  * GMVIO support for subdomain material ids
+  * ExodusII support for writing discontinuous data
+  * Switched some example output formats to Exodus, now that GMV is going away
+  * More ASCII IO support for variable precision
+  * FEMContext utilities are now useable outside FEMSystem
+  * Optional BLAS-based dense linear algebra operations
+  * Improved fork of GetPot input parsing
+  * Support for interior boundary ids
+  * Elem::find_edge_neighbors utility
+  * Additional patch recovery error estimation norm options
+  * Additional SystemNorm functionality
+  * Support for zero-dimensional "meshes"
+  * Support mesh construction without pre-specified dimensionality
+  * Optional independent redirection of libMesh output/error text streams
+  * Moved libMesh classes into libMesh namespace
+  * More forward declarations, refactoring to reduce header dependencies
+  * Fix for an infrequent-but-major I/O-corrupting bug in our libHilbert interface
+  * Fix for errors when doing adaptive refinement across a periodic boundary
+  * Fix for projections on systems with per-subdomain variables
+  * Many fixes for minor bugs, overzealous assertions

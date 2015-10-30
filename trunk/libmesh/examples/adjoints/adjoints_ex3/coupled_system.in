@@ -1,0 +1,17 @@
+
+# Note - the time scaling in this problem's nondimensionalization is
+# such that we cannot solve transient Re=0
+Reynolds = 1.0
+
+verify_analytic_jacobians = 0.
+print_jacobians = false
+print_element_jacobians = false
+
+# The polynomial order and finite element type to use for the pressure
+# variable.
+pressure_p = 1
+fe_family = 'LAGRANGE'
+
+species_transport = true
+
+Pe = 1.

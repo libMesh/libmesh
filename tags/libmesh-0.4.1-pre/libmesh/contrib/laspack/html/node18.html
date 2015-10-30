@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> ERRHANDL(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" ERRHANDL(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html366 HREF="node19.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html364 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html358 HREF="node17.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html368 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html367 HREF="node19.html"> FACTOR(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html365 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html359 HREF="node17.html"> EIGENVAL(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00083000000000000000>&#160</A><A NAME=ERRHANDL> ERRHANDL(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00083100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> LASError</tt>, <tt> LASBreak</tt>, <tt> LASResult</tt>, <tt> WriteLASErrDescr</tt> 
+-- error handling routines
+<P>
+<H3><A NAME=SECTION00083200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/errhandl.h&gt;
+
+typedef enum { 
+    LASOK, 
+    LASMemAllocErr, 
+    LASLValErr, 
+    LASDimErr, 
+    LASRangeErr, 
+    LASSymStorErr, 
+    LASMatrCombErr, 
+    LASMulInvErr, 
+    LASElNotSortedErr, 
+    LASZeroInDiagErr, 
+    LASZeroPivotErr, 
+    LASILUStructErr, 
+    LASBreakdownErr, 
+    LASUserBreak 
+} LASErrType;
+
+void LASError(LASErrIdType ErrId, char *ProcName, char *Object1Name, 
+              char *Object2Name, char *Object3Name);
+void LASBreak(void);
+LASErrIdType LASResult(void);
+void WriteLASErrDescr(FILE *File);
+</PRE>
+<H3><A NAME=SECTION00083300000000000000> DESCRIPTION</A></H3>
+<P>
+<tt> LASPack</tt>
+  incorporates a system for error handling.
+In most of the routines of the library,
+the consistency of passed parameters as well as 
+the appearance of some exceptional situations are checked.
+<P>
+<H6><A NAME=LASError>&#160;</A></H6>
+The procedure <tt> LASError</tt> is intended for internal usage in <tt> LASPack</tt>
+ .
+In case of errors,
+it transmits information about their cause to the error handling system
+which prevents further execution of <tt> LASPack</tt>
+  routines.
+As parameter <tt> ErrId</tt>,
+one of the following symbolic values
+depending on the reason of the exceptional situation is used:
+
+
+<PRE>    LASMemAllocErr     Not enough memory is available.
+    LASLValErr         L-value parameter is expected.
+    LASDimErr          Objects have incompatible dimensions.
+    LASRangeErr        Indices are out of range.
+    LASSymStorErr      Some elements are stored in lower triangular part
+                       of a symmetric matrix.
+    LASMatrCombErr     Matrices can not be combined.
+    LASMulInvErr       Inverse multiplication can not be carried out.
+    LASElNotSortedErr  Matrix elements are not sorted.
+    LASZeroInDiagErr   Zero elements in matrix diagonal are not allowed.
+    LASZeroPivotErr    Factorization produces zero pivot elements.
+    LASILUStructErr    Matrix has structure which is not allowed
+                       for ILU factorization.
+    LASBreakdownErr    Iterative solver fails.
+</PRE>
+<P>
+
+In addition, 
+the name of the routine where the error has occurred, <tt> ProcName</tt>,
+and names of concerning objects,
+<tt> Object1Name</tt>, <tt> Object2Name</tt> and <tt> Object3Name</tt>
+(e.g. names of vector or matrices),
+should be passed, too.
+The unused parameters should be set to <tt> NULL</tt>.
+<P>
+<H6><A NAME=LASBreak>&#160;</A></H6>
+From an application, the processing of <tt> LASPack</tt>
+  routines
+may by terminated by the procedure <tt> LASBreak</tt>
+which set the error status to <tt> LASUserBreak</tt>.
+<P>
+<H6><A NAME=LASResult>&#160;</A></H6>
+The current error status can be got by the procedure <tt> LASResult</tt>.
+If all <tt> LASPack</tt>
+  routines have been runs faultless,
+the usual value <tt> LASOK</tt> by which the library is initialized is returned.
+In other cases,
+the procedure <tt> LASResult</tt> returns one of the symbolic values
+listed above.
+<P>
+<H6><A NAME=WriteLASErrDescr>&#160;</A></H6>
+Verbal description the the error occasion can be put out
+in the file <tt> File</tt> by the procedure <tt> WriteLASErrDescr</tt>.
+<P>
+<H3><A NAME=SECTION00083400000000000000> FILES</A></H3>
+<P>
+  <tt> errhandl.h ... </tt> header file <BR> 
+
+  <tt> errhandl.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00083500000000000000> EXAMPLES</A></H3>
+<P>
+The code fragment
+
+<PRE>Vector a, b;
+
+V_Constr(&amp;a, &quot;a&quot;, 6, Normal, True);
+V_Constr(&amp;b, &quot;b&quot;, 7, Normal, True);
+
+V_SetAllCmp(&amp;a, 0.0);      
+
+Asgn_VV(&amp;b, &amp;a);
+
+if (LASResult() != LASOK) {
+    printf(&quot;LASPack error: &quot;);
+    WriteLASErrDescr(stdin);
+}
+
+V_Destr(&amp;a);
+V_Destr(&amp;b);
+</PRE>
+
+produces the following error message:
+
+<PRE>LASPack error: in Asgn_VV for a, b:
+Objects have incompatible dimensions.
+</PRE>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

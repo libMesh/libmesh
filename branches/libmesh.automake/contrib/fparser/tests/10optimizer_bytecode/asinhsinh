@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-3,3,0.1
+F=sinh(asinh(x))
+C=fp_sinh(fp_asinh(x))

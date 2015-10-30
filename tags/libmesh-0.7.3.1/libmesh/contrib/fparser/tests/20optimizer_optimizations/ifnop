@@ -1,0 +1,5 @@
+T=d ld f mf li gi cd cf cld
+V=x,y
+R=0,1,1
+F=if(x,y,y)
+C=x*0+y

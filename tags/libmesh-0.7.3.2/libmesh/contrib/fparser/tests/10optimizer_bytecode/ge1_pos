@@ -1,0 +1,11 @@
+T=d f ld
+V=x
+R=-1,1,0.25
+F=(acos(x) >= 1) + \
+  2*(1 <= acos(x)) + \
+  4*(acos(x) <= 1) + \
+  8*(1 >= acos(x))
+C=fp_greaterOrEq(fp_acos(x), 1) + \
+  2*fp_lessOrEq(1, fp_acos(x)) + \
+  4*fp_lessOrEq(fp_acos(x), 1) + \
+  8*fp_greaterOrEq(1, fp_acos(x))

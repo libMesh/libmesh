@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y,z
+R=-1,1,0.5
+F=if(!(sin(x)+1.2), y,z)
+C=fp_truth(fp_sin(x)+1.2)!=0 ? z:y

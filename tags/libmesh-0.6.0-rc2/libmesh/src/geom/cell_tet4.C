@@ -1,0 +1,360 @@
+// $Id: cell_tet4.C,v 1.25 2006-11-02 13:50:36 jwpeterson Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// C++ includes
+
+// Local includes
+#include "side.h"
+#include "cell_tet4.h"
+#include "edge_edge2.h"
+#include "face_tri3.h"
+
+
+
+// ------------------------------------------------------------
+// Tet4 class static member initializations
+const unsigned int Tet4::side_nodes_map[4][3] =
+{
+  {0, 2, 1}, // Side 0
+  {0, 1, 3}, // Side 1
+  {1, 2, 3}, // Side 2
+  {2, 0, 3}  // Side 3
+};
+
+const unsigned int Tet4::edge_nodes_map[6][2] =
+{
+  {0, 1}, // Side 0
+  {1, 2}, // Side 1
+  {0, 2}, // Side 2
+  {0, 3}, // Side 3
+  {1, 3}, // Side 4
+  {2, 3}  // Side 5
+};
+
+
+// ------------------------------------------------------------
+// Tet4 class member functions
+
+bool Tet4::is_vertex(const unsigned int) const
+{
+  return true;
+}
+
+bool Tet4::is_edge(const unsigned int) const
+{
+  return false;
+}
+
+bool Tet4::is_face(const unsigned int) const
+{
+  return false;
+}
+
+bool Tet4::is_node_on_edge(const unsigned int n,
+			   const unsigned int e) const
+{
+  assert(e < n_edges());
+  for (unsigned int i = 0; i != 2; ++i)
+    if (edge_nodes_map[e][i] == n)
+      return true;
+  return false;
+}
+
+bool Tet4::is_node_on_side(const unsigned int n,
+			   const unsigned int s) const
+{
+  assert(s < n_sides());
+  for (unsigned int i = 0; i != 3; ++i)
+    if (side_nodes_map[s][i] == n)
+      return true;
+  return false;
+}
+
+AutoPtr<Elem> Tet4::build_side (const unsigned int i) const
+{
+  assert (i < this->n_sides());
+
+  AutoPtr<Elem> ap(new Side<Tri3,Tet4>(this,i));
+  return ap;
+  
+//   AutoPtr<Elem> face(new Tri3);
+
+//   switch (i)
+//     {
+//     case 0:
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(1);
+
+// 	return face;
+//       }
+//     case 1:
+//       {
+// 	face->set_node(0) = this->get_node(0);
+// 	face->set_node(1) = this->get_node(1);
+// 	face->set_node(2) = this->get_node(3);
+
+// 	return face;
+//       }
+//     case 2:
+//       {
+// 	face->set_node(0) = this->get_node(1);
+// 	face->set_node(1) = this->get_node(2);
+// 	face->set_node(2) = this->get_node(3);
+
+// 	return face;
+//       }
+//     case 3:
+//       {
+// 	face->set_node(0) = this->get_node(2);
+// 	face->set_node(1) = this->get_node(0);
+// 	face->set_node(2) = this->get_node(3);
+	
+// 	return face;
+//       }
+//     default:
+//       {
+// 	error();
+//       }
+//     }
+
+//   // We'll never get here.
+//   error();  
+//   return face;
+}
+
+
+AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
+{
+  assert (i < this->n_edges());
+
+  return AutoPtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
+}
+
+
+void Tet4::connectivity(const unsigned int sc,
+			const IOPackage iop,
+			std::vector<unsigned int>& conn) const
+{
+  assert (_nodes != NULL);
+  assert (sc < this->n_sub_elem());
+  assert (iop != INVALID_IO_PACKAGE);
+
+
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+	conn.resize(8);
+	conn[0] = this->node(0)+1;
+	conn[1] = this->node(1)+1;
+	conn[2] = this->node(2)+1;
+	conn[3] = this->node(2)+1;
+	conn[4] = this->node(3)+1;
+	conn[5] = this->node(3)+1;
+	conn[6] = this->node(3)+1;
+	conn[7] = this->node(3)+1;
+	return;
+      }
+
+    case VTK:
+      {
+	conn.resize(4);
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	conn[2] = this->node(2);
+	conn[3] = this->node(3);
+	return;
+      }
+
+    default:
+      error();
+    }
+
+  error();
+}
+
+
+
+#ifdef ENABLE_AMR
+
+const float Tet4::_embedding_matrix[8][4][4] =
+  {
+    // embedding matrix for child 0
+    {
+      // 0    1    2    3  
+      {1.0, 0.0, 0.0, 0.0}, // 0
+      {0.5, 0.5, 0.0, 0.0}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
+  
+    // embedding matrix for child 1
+    {
+      // 0    1    2    3  
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 1.0, 0.0, 0.0}, // 1
+      {0.0, 0.5, 0.5, 0.0}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
+  
+    // embedding matrix for child 2
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 1.0, 0.0}, // 2
+      {0.0, 0.0, 0.5, 0.5}  // 3
+    },
+  
+    // embedding matrix for child 3
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.0, 0.5}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.0, 0.0, 1.0}  // 3
+    },
+  
+    // embedding matrix for child 4
+    {
+      // 0    1    2    3  
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    },
+  
+    // embedding matrix for child 5
+    {
+      // 0    1    2    3  
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.5, 0.0, 0.5, 0.0}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
+  
+    // embedding matrix for child 6
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5, 0.0}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.5, 0.0, 0.5}  // 3
+    },
+  
+    // embedding matrix for child 7
+    {
+      // 0    1    2    3  
+      {0.5, 0.0, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.0, 0.5}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.5, 0.0, 0.0, 0.5}  // 3
+    }
+  };
+
+#endif // #ifdef ENABLE_AMR
+
+
+
+
+
+Real Tet4::volume () const
+{
+  // The volume of a tetrahedron is 1/6 the box product formed
+  // by its base and apex vectors
+  Point a ( *this->get_node(3) - *this->get_node(0) );
+
+  // b is the vector pointing from 0 to 1
+  Point b ( *this->get_node(1) - *this->get_node(0) );
+
+  // c is the vector pointing from 0 to 2
+  Point c ( *this->get_node(2) - *this->get_node(0) );
+
+  return (1.0 / 6.0) * (a * (b.cross(c)));
+}
+
+
+
+
+std::pair<Real, Real> Tet4::min_and_max_angle() const
+{
+  Point n[4];
+  
+  // Compute the outward normal vectors on each face
+  n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
+  n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
+  n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
+  n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
+
+  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
+
+  // Compute dihedral angles
+  for (unsigned int k=0,i=0; i<4; ++i)
+    for (unsigned int j=i+1; j<4; ++j,k+=1)
+      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].size() / n[j].size()); // return value is between 0 and PI
+
+  // Return max/min dihedral angles
+  return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
+ 			*std::max_element(dihedral_angles, dihedral_angles+6));
+
+}
+
+
+
+float Tet4::embedding_matrix (const unsigned int i,
+			      const unsigned int j,
+			      const unsigned int k) const
+{
+  // Check for uninitialized diagonal selection
+  if (this->_diagonal_selection==INVALID_DIAG)
+    {
+      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+
+      this->_diagonal_selection=DIAG_02_13;
+      
+      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+	{
+	  if (diag_01_23 < diag_03_12)
+	    this->_diagonal_selection=DIAG_01_23;
+
+	  else
+	    this->_diagonal_selection=DIAG_03_12;
+	}
+    }
+
+  // Permuted j and k indices
+  unsigned int
+    jp=j,
+    kp=k;
+
+  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
+    {
+      // Permute j, k
+      if (jp!=3) jp=(jp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+      if (kp!=3) kp=(kp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+    }
+
+  // Call embedding matrx with permuted indices
+  return this->_embedding_matrix[i][jp][kp]; 
+}

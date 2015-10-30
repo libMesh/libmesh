@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-10,10,1
+F=x*(x^3)
+C=fp_pow(x,4)

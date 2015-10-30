@@ -1,0 +1,16 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libmesh
+Description: The libMesh Finite Element Library
+Requires:
+Version: @VERSION@
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_oprof \
+      @libmesh_optional_LIBS@
+Libs.private: 
+Cflags: @CPPFLAGS_OPROF@ @CXXFLAGS_OPROF@ \
+        -I${includedir} -I${includedir}/contrib \
+	@libmesh_optional_INCLUDES@
+

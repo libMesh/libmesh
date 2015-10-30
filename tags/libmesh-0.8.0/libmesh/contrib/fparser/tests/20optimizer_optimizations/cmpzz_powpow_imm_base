@@ -1,0 +1,24 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=-6,6,1
+
+# Combine tests:
+#   cmplt_powpow_imm_base
+#   cmple_powpow_imm_base
+#   cmpgt_powpow_imm_base
+#   cmpge_powpow_imm_base
+#   cmpne_powpow_imm_base
+#   cmpeq_powpow_imm_base
+
+F=0x0001 * (pow(2,x) < pow(-4,y)) + \
+  0x0002 * (pow(2,x) <= pow(-4,y)) + \
+  0x0004 * (pow(2,x) > pow(-4,y)) + \
+  0x0008 * (pow(2,x) >= pow(-4,y)) + \
+  0x0010 * (pow(2,x) != pow(-4,y)) + \
+  0x0020 * (pow(2,x) = pow(-4,y))
+C=0x0001 * fp_less(fp_pow(2,x), fp_pow(-4,y)) + \
+  0x0002 * fp_lessOrEq(fp_pow(2,x), fp_pow(-4,y)) + \
+  0x0004 * fp_greater(fp_pow(2,x), fp_pow(-4,y)) + \
+  0x0008 * fp_greaterOrEq(fp_pow(2,x), fp_pow(-4,y)) + \
+  0x0010 * fp_nequal(fp_pow(2,x), fp_pow(-4,y)) + \
+  0x0020 * fp_equal(fp_pow(2,x), fp_pow(-4,y))

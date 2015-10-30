@@ -1,0 +1,5 @@
+T=d f ld
+V=x
+R=0.001, 0.9, 0.01
+F=abs(x) ^ 1506
+C=fp_pow(fp_abs(x), 1506)

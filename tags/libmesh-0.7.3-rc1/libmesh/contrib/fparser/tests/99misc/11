@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y,z
+R=1,19,.8
+F=-(-(-(-(-x))-x))+y*1+log(1.1^z)
+C=(-x-x)+y+fp_log(fp_pow(1.1, z))

@@ -1,0 +1,372 @@
+// $Id: fe_bernstein_shape_1D.C,v 1.1 2005-05-10 17:48:41 spetersen Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// Local includes
+#include "libmesh_config.h"
+#ifdef ENABLE_HIGHER_ORDER_SHAPES
+
+#include "fe.h"
+#include "elem.h"
+#include "utility.h"
+
+
+
+template <>
+Real FE<1,BERNSTEIN>::shape(const ElemType,
+			    const Order order,
+			    const unsigned int i,
+			    const Point& p)
+{
+  const Real xi = p(0);	   
+  using Utility::pow;
+  
+  switch (order)
+    {
+    case FIRST:
+      
+      switch(i)
+	{
+	case 0:
+	  return (1.-xi)/2.;
+	case 1:
+	  return (1.+xi)/2.;
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();	    
+	}
+      
+    case SECOND:
+      
+      switch(i)
+	{
+	case 0:
+	  return (1./4.)*pow<2>(1.-xi);
+	case 1:
+	  return (1./4.)*pow<2>(1.+xi);
+	case 2:
+	  return (1./2.)*(1.-xi)*(1.+xi);
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();	    
+	}   
+      
+    case THIRD:
+      
+      switch(i)
+	{
+	case 0:
+	  return (1./8.)*pow<3>(1.-xi);
+	case 1:
+	  return (1./8.)*pow<3>(1.+xi);
+	case 2:
+	  return (3./8.)*(1.+xi)*pow<2>(1.-xi);
+	case 3:
+	  return (3./8.)*pow<2>(1.+xi)*(1.-xi);      		
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();	    
+	}   
+      
+    case FOURTH:
+      
+      switch(i)
+	{
+	case 0:
+	  return (1./16.)*pow<4>(1.-xi);
+	case 1:
+	  return (1./16.)*pow<4>(1.+xi);
+	case 2:
+	  return (1./ 4.)*(1.+xi)*pow<3>(1.-xi);
+	case 3:
+	  return (3./ 8.)*pow<2>(1.+xi)*pow<2>(1.-xi);
+	case 4:
+	  return (1./ 4.)*pow<3>(1.+xi)*(1.-xi);
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();	    
+	}   
+      
+      
+    case FIFTH:
+      
+      switch(i)
+	{
+	case 0:
+	  return (1./32.)*pow<5>(1.-xi);
+	case 1:
+	  return (1./32.)*pow<5>(1.+xi);
+	case 2:
+	  return (5./32.)*(1.+xi)*pow<4>(1.-xi);    
+	case 3:
+	  return (5./16.)*pow<2>(1.+xi)*pow<3>(1.-xi);
+	case 4:
+	  return (5./16.)*pow<3>(1.+xi)*pow<2>(1.-xi);
+	case 5:
+	  return (5./32.)*pow<4>(1.+xi)*(1.-xi);
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();	    
+	}   
+      
+      
+    case SIXTH:
+      
+      switch (i)
+	{
+	case 0:
+	  return ( 1./64.)*pow<6>(1.-xi);
+	case 1:
+	  return ( 1./64.)*pow<6>(1.+xi);
+	case 2:
+	  return ( 3./32.)*(1.+xi)*pow<5>(1.-xi);
+	case 3:
+	  return (15./64.)*pow<2>(1.+xi)*pow<4>(1.-xi);
+	case 4:
+	  return ( 5./16.)*pow<3>(1.+xi)*pow<3>(1.-xi);
+	case 5:                              
+	  return (15./64.)*pow<4>(1.+xi)*pow<2>(1.-xi);
+	case 6:
+	  return ( 3./32.)*pow<5>(1.+xi)*(1.-xi);    
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();	    
+	}         
+      
+    default:
+      {
+	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+	error();
+      }
+    }
+  
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,BERNSTEIN>::shape(const Elem* elem,
+			    const Order order,
+			    const unsigned int i,
+			    const Point& p)
+{
+  assert (elem != NULL);
+  
+  return FE<1,BERNSTEIN>::shape(elem->type(), order, i, p);
+}
+
+
+
+template <>
+Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
+				  const Order order,
+				  const unsigned int i,
+				  const unsigned int j,
+				  const Point& p)
+{
+  // only d()/dxi in 1D!
+  
+  assert (j == 0);
+  
+  const Real xi = p(0);
+  
+  using Utility::pow;	   
+  
+  switch (order)
+    {      
+    case FIRST:
+	
+      switch(i)
+	{
+	case 0:
+	  return -.5;
+	case 1:
+	  return .5;        
+	default:
+	  std::cerr << "Invalid shape function index " << i << std::endl;
+	  error();
+	}
+      
+    case SECOND:
+      
+      switch(i)
+	{
+	case 0:
+	  return (xi-1.)*.5;
+	case 1:
+	  return (xi+1.)*.5;
+	case 2:
+	  return -xi;      	
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();
+	}
+      
+    case THIRD:
+
+      switch(i)
+	{
+	case 0:
+	  return -0.375*pow<2>(1.-xi);
+	case 1:
+	  return  0.375*pow<2>(1.+xi);
+	case 2:
+	  return -0.375 -.75*xi +1.125*pow<2>(xi);
+	case 3:
+	  return  0.375 -.75*xi -1.125*pow<2>(xi);
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();
+	}
+      
+    case FOURTH:
+      
+      switch(i)
+	{
+	case 0:
+	  return -0.25*pow<3>(1.-xi);
+	case 1:
+	  return  0.25*pow<3>(1.+xi);
+	case 2:
+	  return -0.5 +1.5*pow<2>(xi)-pow<3>(xi); 
+	case 3:
+	  return  1.5*(pow<3>(xi)-xi);
+	case 4:
+	  return  0.5 -1.5*pow<2>(xi)-pow<3>(xi);  
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();
+	}
+      
+    case FIFTH:
+      
+      switch(i)
+	{
+	case 0:
+	  return -(5./32.)*pow<4>(xi-1.);
+	case 1:
+	  return  (5./32.)*pow<4>(xi+1.);
+	case 2:
+	  return  (5./32.)*pow<4>(1.-xi)         -(5./8.)*(1.+xi)*pow<3>(1.-xi);
+	case 3:
+	  return  (5./ 8.)*(1.+xi)*pow<3>(1.-xi) -(15./16.)*pow<2>(1.+xi)*pow<2>(1.-xi);
+	case 4: 
+	  return -(5./ 8.)*pow<3>(1.+xi)*(1.-xi) +(15./16.)*pow<2>(1.+xi)*pow<2>(1.-xi); 
+	case 5:
+	  return  (5./ 8.)*pow<3>(1.+xi)*(1.-xi) -(5./32.)*pow<4>(1.+xi);          
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();
+	}
+      
+    case SIXTH:		
+      
+      switch(i)
+	{
+	case 0:
+	  return -( 3./32.)*pow<5>(1.-xi);
+	case 1:
+	  return  ( 3./32.)*pow<5>(1.+xi);
+	case 2:
+	  return  ( 3./32.)*pow<5>(1.-xi)-(15./32.)*(1.+xi)*pow<4>(1.-xi);
+	case 3:
+	  return  (15./32.)*(1.+xi)*pow<4>(1.-xi)-(15./16.)*pow<2>(1.+xi)*pow<3>(1.-xi); 
+	case 4:
+	  return -(15./ 8.)*xi +(15./4.)*pow<3>(xi)-(15./8.)*pow<5>(xi);
+	case 5:
+	  return -(15./32.)*(1.-xi)*pow<4>(1.+xi)+(15./16.)*pow<2>(1.-xi)*pow<3>(1.+xi);                        
+	case 6:
+	  return  (15./32.)*pow<4>(1.+xi)*(1.-xi)-(3./32.)*pow<5>(1.+xi);
+	default:
+	  std::cerr << "Invalid shape function index!" << std::endl;
+	  error();
+	}
+      
+      
+    default:
+      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      error();
+      
+    }
+  
+  error();
+  return 0.;
+}
+
+
+
+template <>
+Real FE<1,BERNSTEIN>::shape_deriv(const Elem* elem,
+				  const Order order,
+				  const unsigned int i,
+				  const unsigned int j,
+				  const Point& p)
+{
+  assert (elem != NULL);
+  
+  return FE<1,BERNSTEIN>::shape_deriv(elem->type(),
+				      order, i, j, p);
+}
+
+
+
+template <>
+Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
+					 const Order,
+					 const unsigned int,
+					 const unsigned int,
+					 const Point&)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+  std::cerr << "Second derivatives for Bernstein elements "
+            << "are not yet implemented!"
+            << std::endl;
+
+  warning_given = true;
+  return 0.;
+}
+
+
+
+
+template <>
+Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem*,
+					 const Order,
+					 const unsigned int,
+					 const unsigned int,
+					 const Point&)
+{
+  static bool warning_given = false;
+
+  if (!warning_given)
+  std::cerr << "Second derivatives for Bernstein elements "
+            << "are not yet implemented!"
+            << std::endl;
+
+  warning_given = true;
+  return 0.;
+}
+
+
+#endif //ENABLE_HIGHER_ORDER_SHAPES

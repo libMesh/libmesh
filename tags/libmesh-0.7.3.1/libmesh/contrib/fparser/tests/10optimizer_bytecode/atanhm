@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=0,1,1
+F=atanh(0.7)+x
+C=MpfrFloat::atanh(0.7)+x

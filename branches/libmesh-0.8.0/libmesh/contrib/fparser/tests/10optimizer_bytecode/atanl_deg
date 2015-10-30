@@ -1,0 +1,6 @@
+DEG=true
+T=ld
+V=x
+R=0,1,1
+F=atan(1.1)+x
+C=r2d(atanl(1.1))+x

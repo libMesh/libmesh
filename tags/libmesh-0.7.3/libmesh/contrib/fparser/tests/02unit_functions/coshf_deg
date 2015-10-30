@@ -1,0 +1,6 @@
+DEG=true
+T=f
+V=x
+R=-40, 40, 0.1
+F=cosh(x)
+C=coshf(d2r(x))

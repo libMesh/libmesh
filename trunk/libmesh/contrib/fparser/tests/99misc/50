@@ -1,0 +1,23 @@
+T=d f ld mf li gi
+V=x,y
+R=-10, 10, 1
+F=(x<y | y<x) + \
+   2*(x<y & y<x) + \
+   4*(x<=y & y<=x) + \
+   8*(x<y & x!=y) + \
+   16*(x<y | x!=y) + \
+   32*(x<=y & x>=y) + \
+   64*(x<=y | x>=y) + \
+   128*(x!=y & x=y) + \
+   256*(x!=y & x!=y) + \
+   512*(x<=y & x=y)
+C=fp_or(fp_less(x,y), fp_less(y,x)) + \
+   2*fp_and(fp_less(x,y), fp_less(y,x)) + \
+   4*fp_and(fp_lessOrEq(x,y), fp_lessOrEq(y,x)) + \
+   8*fp_and(fp_less(x,y), fp_nequal(x,y)) + \
+   16*fp_or(fp_less(x,y), fp_nequal(x,y)) + \
+   32*fp_and(fp_lessOrEq(x,y), fp_greaterOrEq(x,y)) + \
+   64*fp_or(fp_lessOrEq(x,y), fp_greaterOrEq(x,y)) + \
+   128*fp_and(fp_nequal(x,y), fp_equal(x,y)) + \
+   256*fp_and(fp_nequal(x,y), fp_nequal(x,y)) + \
+   512*fp_and(fp_lessOrEq(x,y), fp_equal(x,y))

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> Program  matropt</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Program  matropt">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html279 HREF="node12.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html277 HREF="node8.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html271 HREF="node10.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html281 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html280 HREF="node12.html"> Program  mlstest</A>
+<B>Up:</B> <A NAME=tex2html278 HREF="node8.html"> Optimizing and Example </A>
+<B> Previous:</B> <A NAME=tex2html272 HREF="node10.html"> Program  vectopt</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00053000000000000000> Program  matropt</A></H2>
+<P>
+
+<P>
+<H6><A NAME=SubsectionMATROPT>&#160;</A></H6>
+<P>
+This program <tt> matropt</tt> could be used to check the efficiency
+of several implementations of the matrix by vector product:
+
+<PRE>  &lt;Vector 2&gt; = &lt;Matrix&gt; &lt;Vector 1&gt;.
+</PRE>
+
+The results may be shown as follows:
+
+<PRE>Results:    (for dimension 100000, cycles 100)
+--------
+
+ implementation    CPU time
+-----------------------------------------
+    LASPack       1.967e-01 s = 100.0 %
+       1          2.836e-01 s = 144.2 %
+       2          2.326e-01 s = 118.3 %
+       3          1.928e-01 s =  98.0 %
+       4          2.005e-01 s = 101.9 %
+-----------------------------------------
+</PRE>
+<P>
+For details of the implementations look at the file
+<tt> laspack/examples/matropt/testproc.c</tt>.
+The current <tt> LASPack</tt>
+  version corresponds to the implementation 3.
+This is, in comparison with <tt> LASPack</tt>
+ , simplified and
+can therefore be a little faster.
+<P>
+
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

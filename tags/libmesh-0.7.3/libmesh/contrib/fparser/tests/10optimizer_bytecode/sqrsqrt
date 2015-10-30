@@ -1,0 +1,6 @@
+# cSqr cSqrt
+T=d
+V=x
+R=-10,10,0.1
+F=sqrt(x^2)
+C=fp_sqrt(x*x)

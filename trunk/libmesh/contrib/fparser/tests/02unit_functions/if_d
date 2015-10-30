@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y,z
+R=-1.25,1.25,0.25
+F=if(x,y,z)
+C=fp_abs(x) >= 0.5 ? y : z

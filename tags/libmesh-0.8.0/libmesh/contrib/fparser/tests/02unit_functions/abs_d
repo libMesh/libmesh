@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-400, 400, 0.5
+F=abs(x)
+C=x<0 ? -x : x

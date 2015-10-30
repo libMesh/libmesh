@@ -1,0 +1,232 @@
+
+// We only need to bother with most of these specializations if we're
+// actually in parallel.
+#ifdef LIBMESH_HAVE_MPI
+    bool verify(const std::string & r) const;
+
+    template <typename T>
+    void min(std::vector<T> &r) const;
+
+    void min(bool &r) const;
+
+    void min(std::vector<bool> &r) const;
+
+    void minloc(bool &r,
+                unsigned int &min_id) const;
+
+    void minloc(std::vector<bool> &r,
+                std::vector<unsigned int> &min_id) const;
+
+    template <typename T>
+    void max(std::vector<T> &r) const;
+
+    void max(bool &r) const;
+
+    void max(std::vector<bool> &r) const;
+
+    void maxloc(bool &r,
+                unsigned int &max_id) const;
+
+    void maxloc(std::vector<bool> &r,
+                std::vector<unsigned int> &max_id) const;
+
+    template <typename T>
+    void sum(std::vector<T> &r) const;
+
+    template <typename T>
+    void sum(std::complex<T> &r) const;
+
+    template <typename T>
+    void sum(std::vector<std::complex<T> > &r) const;
+
+    template <typename T>
+    void set_union(std::set<T> &data,
+                   const unsigned int root_id) const;
+
+    template <typename T>
+    void set_union(std::set<T> &data) const;
+ 
+    template <typename T1, typename T2>
+    void set_union(std::map<T1,T2> &data,
+                   const unsigned int root_id) const;
+
+    template <typename T1, typename T2>
+    void set_union(std::map<T1,T2> &data) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::basic_string<T> &buf,
+               const MessageTag &tag) const;
+ 
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::basic_string<T> &buf,
+               Request &req,
+               const MessageTag &tag) const;
+ 
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::set<T> &buf,
+               const MessageTag &tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::set<T> &buf,
+               Request &req,
+               const MessageTag &tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::set<T> &buf,
+               const DataType &type,
+               const MessageTag &tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::set<T> &buf,
+               const DataType &type,
+               Request &req,
+               const MessageTag &tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::vector<T> &buf,
+               const MessageTag &tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::vector<T> &buf,
+               Request &req,
+               const MessageTag &tag) const;
+
+    template <typename T>
+    void send (const unsigned int dest_processor_id,
+               std::vector<T> &buf,
+               const DataType &type,
+               const MessageTag &tag) const;
+
+    template <typename T>
+    void send (const unsigned int dest_processor_id,
+               std::vector<T> &buf,
+               const DataType &type,
+               Request &req,
+               const MessageTag &tag) const;
+
+    template<typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::basic_string<T> &buf,
+                    const MessageTag &tag) const;
+
+    template<typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::basic_string<T> &buf,
+                  Request &req,
+                  const MessageTag &tag) const;
+
+    template<typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::set<T> &buf,
+                    const MessageTag &tag) const;
+
+    template<typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::set<T> &buf,
+                  Request &req,
+                  const MessageTag &tag) const;
+
+    template <typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::set<T> &buf,
+                    const DataType &type,
+                    const MessageTag &tag) const;
+
+    template <typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::set<T> &buf,
+                  const DataType &type,
+                  Request &req,
+                  const MessageTag &tag) const;
+ 
+    template<typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::vector<T> &buf,
+                    const MessageTag &tag) const;
+
+    template<typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::vector<T> &buf,
+                  Request &req,
+                  const MessageTag &tag) const;
+
+    template <typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::vector<T> &buf,
+                    const DataType &type,
+                    const MessageTag &tag) const;
+
+    template <typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::vector<T> &buf,
+                  const DataType &type,
+                  Request &req,
+                  const MessageTag &tag) const;
+
+    template <typename T>
+    void broadcast(std::basic_string<T> &data,
+                   const unsigned int root_id=0) const;
+
+    template <typename T>
+    void broadcast(std::vector<T> &data,
+                   const unsigned int root_id=0) const;
+
+    template <typename T>
+    void broadcast(std::set<T> &data,
+                   const unsigned int root_id=0) const;
+
+    // In new overloaded function template entries we have to
+    // re-specify the default arguments
+    template <typename T1, typename T2>
+    void send_receive(const unsigned int dest_processor_id,
+                      std::vector<T1> &send,
+                      const DataType &type1,
+                      const unsigned int source_processor_id,
+                      std::vector<T2> &recv,
+                      const DataType &type2,
+                      const MessageTag &send_tag = no_tag,
+                      const MessageTag &recv_tag = any_tag) const;
+
+    template <typename T1, typename T2>
+    void send_receive(const unsigned int dest_processor_id,
+                      std::vector<T1> &send,
+                      const unsigned int source_processor_id,
+                      std::vector<T2> &recv,
+                      const MessageTag &send_tag = no_tag,
+                      const MessageTag &recv_tag = any_tag) const;
+
+    // We specialize on the T1==T2 case so that we can handle
+    // send_receive-to-self with a plain copy rather than going through
+    // MPI.
+    template <typename T>
+    void send_receive(const unsigned int dest_processor_id,
+                      std::vector<T> &send,
+                      const unsigned int source_processor_id,
+                      std::vector<T> &recv,
+                      const MessageTag &send_tag = no_tag,
+                      const MessageTag &recv_tag = any_tag) const;
+
+    template <typename T1, typename T2>
+    void send_receive(const unsigned int dest_processor_id,
+                      std::vector<std::vector<T1> > &send,
+                      const unsigned int source_processor_id,
+                      std::vector<std::vector<T2> > &recv,
+                      const MessageTag &send_tag = no_tag,
+                      const MessageTag &recv_tag = any_tag) const;
+
+    template <typename T>
+    void send_receive(const unsigned int dest_processor_id,
+                      std::vector<std::vector<T> > &send,
+                      const unsigned int source_processor_id,
+                      std::vector<std::vector<T> > &recv,
+                      const MessageTag &send_tag = no_tag,
+                      const MessageTag &recv_tag = any_tag) const;
+#endif // LIBMESH_HAVE_MPI

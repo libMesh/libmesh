@@ -1,0 +1,6 @@
+T=d f ld li cd cf cld
+V=x
+R=0,1,1
+F=(x=if(1,0,0)) + (if(1,0,0)=x)
+C=fp_equal(x,0) + fp_equal(0,x)
+

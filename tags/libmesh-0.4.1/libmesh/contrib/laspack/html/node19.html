@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> FACTOR(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" FACTOR(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html377 HREF="node20.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html375 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html369 HREF="node18.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html379 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html378 HREF="node20.html"> ITERSOLV(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html376 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html370 HREF="node18.html"> ERRHANDL(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00084000000000000000>&#160</A><A NAME=FACTOR> FACTOR(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00084100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> ILUFactor</tt>
+-- incomplete factorization of quadratic matrices
+<P>
+<H3><A NAME=SECTION00084200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/factor.h&gt;
+ 
+QMatrix *ILUFactor(QMatrix *Q);
+</PRE>
+<H3><A NAME=SECTION00084300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=ILUFactor>&#160;</A></H6>
+At the first call of the procedure <tt> ILUFactor</tt>
+for a given matrix <tt> Q</tt>,
+
+the incomplete factorization of the matrix is carried out.
+For non-symmetric matrices, the ILU factorization with
+
+<PRE>    Q = (D + L) D^{-1} (D + U) + R
+</PRE>
+<P>
+is performed, where <tt> D</tt>,
+ <tt> U</tt>,
+ and
+<tt> L</tt>
+ are certain diagonal, upper,
+and lower triangular matrices, respectively.
+The remainder matrix <tt> R</tt>
+ contains fill elements,
+which have been ignored during the factorization process.
+For symmetric matrices, the incomplete Cholesky factorization
+with <tt> L = U^T</tt>
+ is applied.
+In order to be able to perform the incomplete factorization
+for singular matrices too,
+regularization by means of increasing of diagonal entries is applied.
+<P>
+In the current implementation, matrices <tt> L</tt>
+ and
+<tt> U</tt>
+ are laid down
+with the same position of non-zero elements as in matrix <tt> Q.</tt>
+<P>
+Matrices are stored <tt> D</tt>,
+ <tt> U</tt>,
+ and
+<tt> L</tt>
+ in connection with <tt> Q</tt>
+
+as matrix <tt> D + L + U</tt>
+ of the type <tt> QMatrix</tt>.
+This one is also the one returned by the procedure <tt> ILUFactor</tt>.
+How to extract the particular matrices from it,
+is shown in the example below.
+<P>
+<H3><A NAME=SECTION00084400000000000000> REFERENCES</A></H3>
+<P>
+The incomplete factorization is comprehensively described and analyzed
+e.g. in:
+
+<blockquote> W. Hackbusch:
+  Iterative Solution of Large Sparse Systems of Equations,
+  Springer-Verlag, Berlin, 1994.
+</blockquote><H3><A NAME=SECTION00084500000000000000> FILES</A></H3>
+<P>
+  <tt> factor.h ... </tt> header file <BR> 
+
+  <tt> factor.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00084600000000000000> EXAMPLES</A></H3>
+<P>
+The following example shows the usage of the procedure <tt> ILUFactor</tt>
+in the implementation of an ILU preconditioner.
+This has to solve the system of equations
+
+<PRE>    W y = c
+</PRE>
+<P>
+which arises during the solution of preconditioned systems
+
+<PRE>    W^{-1} A x = W^{-1} b
+</PRE>
+<P>
+at which
+
+<PRE>    W = (D + L) D^{-1} (D + U).
+</PRE>
+<P>
+The corresponding <tt> LASPack</tt>
+  routine could be built as follows:
+
+<PRE>Vector *ILUPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
+{
+    Q_Lock(A);
+    V_Lock(y);
+    V_Lock(c);
+
+    Asgn_VV(y, MulInv_QV(Add_QQ(Diag_Q(ILUFactor(A)), Upper_Q(ILUFactor(A))), 
+        Mul_QV(Diag_Q(ILUFactor(A)),
+        MulInv_QV(Add_QQ(Diag_Q(ILUFactor(A)), Lower_Q(ILUFactor(A))), c))));
+
+    Q_Unlock(A);
+    V_Unlock(y);
+    V_Unlock(c);
+
+    return(y);
+}
+</PRE>
+<P>
+<H3><A NAME=SECTION00084700000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node25.html#QMATRIX">qmatrix(3LAS)</A>, <A HREF="node23.html#OPERATS">operats(3LAS)</A>,
+<A HREF="node18.html#ERRHANDL">errhandl(3LAS)</A>
+<P>
+<H3><A NAME=SECTION00084800000000000000> BUGS</A></H3>
+<P>
+In the current implementation,
+it is assumed that the matrix <tt> Q</tt>
+ has
+a symmetric structure with regard to non-zero elements.
+Because during discretization of differential equations even such matrices
+arise,
+this restriction is not grave for many applications.
+For matrices which did not have satisfy the above condition,
+the error <tt> LASILUStructErr</tt> is raised.
+<P>
+<BR> <HR><A NAME=tex2html377 HREF="node20.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html375 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html369 HREF="node18.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html379 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html378 HREF="node20.html"> ITERSOLV(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html376 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html370 HREF="node18.html"> ERRHANDL(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

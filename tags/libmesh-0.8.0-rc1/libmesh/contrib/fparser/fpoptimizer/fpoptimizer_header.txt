@@ -1,0 +1,23 @@
+/***************************************************************************\
+|* Function Parser for C++ v4.4.3                                          *|
+|*-------------------------------------------------------------------------*|
+|* Function optimizer                                                      *|
+|*-------------------------------------------------------------------------*|
+|* Copyright: Joel Yliluoma                                                *|
+|*                                                                         *|
+|* This library is distributed under the terms of the                      *|
+|* GNU Lesser General Public License version 3.                            *|
+|* (See lgpl.txt and gpl.txt for the license text.)                        *|
+\***************************************************************************/
+
+/* NOTE:
+ This file contains generated code (from the optimizer sources) and is
+ not intended to be modified by hand. If you want to modify the optimizer,
+ download the development version of the library.
+*/
+
+#include "fpconfig.hh"
+#ifdef FP_SUPPORT_OPTIMIZER
+#include "fparser.hh"
+#include "extrasrc/fptypes.hh"
+#include "extrasrc/fpaux.hh"

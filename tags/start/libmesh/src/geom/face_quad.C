@@ -1,0 +1,169 @@
+// $Id: face_quad.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// C++ includes
+#include <iterator>
+#include <algorithm>
+
+// Local includes
+#include "face_quad.h"
+#include "mesh_base.h"
+#include "mesh_refinement.h"
+#include "fe.h"
+
+
+
+// ------------------------------------------------------------
+// Quad class member functions
+Elem Quad::side (const unsigned int i) const
+{
+  assert (i < n_sides());
+
+  Elem edge(2);
+
+  switch (i)
+    {
+    case 0:
+      {
+	edge.node(0) = node(0);
+	edge.node(1) = node(1);
+	
+	return edge;
+      }
+    case 1:
+      {
+	edge.node(0) = node(1);
+	edge.node(1) = node(2);
+	
+	return edge;
+      }
+    case 2:
+      {
+	edge.node(0) = node(2);
+	edge.node(1) = node(3);
+	
+	return edge;
+      }
+    case 3:
+      {
+	edge.node(0) = node(3);
+	edge.node(1) = node(0);
+	
+	return edge;
+      }
+    default:
+      {
+	error();
+      }
+    };
+
+
+  // We will never get here...  Look at the code above.
+  error();
+  
+  return edge;
+};
+
+
+
+
+
+real Quad::quality (const MeshBase& mesh, const ElemQuality q) const
+{
+  return 0.0; // Not implemented
+}
+
+
+
+
+
+
+std::pair<real, real> Quad::qual_bounds (const ElemQuality q) const
+{
+  std::pair<real, real> bounds;
+  
+  switch (q)
+    {
+
+    case ASPECT_RATIO:
+      bounds.first  = 1.;
+      bounds.second = 4.;
+      break;
+      
+    case SKEW:
+      bounds.first  = 0.;
+      bounds.second = 0.5;
+      break;
+
+    case TAPER:
+      bounds.first  = 0.;
+      bounds.second = 0.7;
+      break;
+
+    case WARP:
+      bounds.first  = 0.9;
+      bounds.second = 1.;
+      break;
+     
+    case STRETCH:
+      bounds.first  = 0.25;
+      bounds.second = 1.;
+      break;
+
+    case MIN_ANGLE:
+      bounds.first  = 45.;
+      bounds.second = 90.;
+      break;
+      
+    case MAX_ANGLE:
+      bounds.first  = 90.;
+      bounds.second = 135.;
+      break;
+      
+    case CONDITION:
+      bounds.first  = 1.;
+      bounds.second = 4.;
+      break;
+
+    case JACOBIAN:
+      bounds.first  = 0.5;
+      bounds.second = 1.;
+      break;
+      
+    case SHEAR:
+    case SHAPE:
+    case SIZE:
+      bounds.first  = 0.3;
+      bounds.second = 1.;
+      break;
+      
+    case DISTORTION:
+      bounds.first  = 0.6;
+      bounds.second = 1.;
+      break;
+      
+    default:
+      std::cout << "Warning: Invalid quality measure chosen." << std::endl;
+      bounds.first  = -1;
+      bounds.second = -1;
+    }
+
+  return bounds;
+}
+

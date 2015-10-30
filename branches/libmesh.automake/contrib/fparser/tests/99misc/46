@@ -1,0 +1,10 @@
+T=d f ld mf
+V=x,y
+R=-.9, .9, .15
+F=abs(floor(acos(x)+4)) + 1.1*abs(floor(acos(y)+1.5)) + \
+  (acos(x) < (acos(y)-10)) + 1.2*max(-4, acos(x)) + 1.3*min(9, acos(x)-9)
+C=fp_abs(fp_floor(fp_acos(x)+4)) + \
+  1.1*fp_abs(fp_floor(fp_acos(y)+1.5)) + \
+  fp_less(fp_acos(x), (fp_acos(y)-10)) + \
+  1.2*fp_max(-4, fp_acos(x)) + \
+  1.3*fp_min(9, fp_acos(x)-9)

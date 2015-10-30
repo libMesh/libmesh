@@ -1,0 +1,6 @@
+DEG=true
+T=f
+V=x
+R=-400, 400, 5
+F=cos(x)
+C=cosf(d2r(x))

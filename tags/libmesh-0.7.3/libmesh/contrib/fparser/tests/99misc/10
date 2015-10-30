@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y,z
+R=1,4,.3
+F=1+sin(cos(max(1+2+3+4+5, x+y+z)))+2
+C=1+fp_sin(fp_cos( fp_max(1+2+3+4+5, x+y+z)))+2

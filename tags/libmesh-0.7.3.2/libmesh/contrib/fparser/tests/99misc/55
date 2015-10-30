@@ -1,0 +1,9 @@
+T=d f ld mf
+V=x,y
+R=1,100, .5
+F=(x^1.2 < 0) + (y^2.5 < 0) + 2*(x*x<0) + 3*(y^3<0) + 4*(x^4<0)
+C=fp_less(fp_pow(x,1.2), 0) + \
+  fp_less(fp_pow(y,2.5), 0) + \
+  2*fp_less(x*x, 0) + \
+  3*fp_less(fp_pow(y,3), 0) + \
+  4*fp_less(fp_pow(x,4), 0)

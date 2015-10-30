@@ -1,0 +1,5 @@
+T=d li cd
+V=a,b
+R=-1,1,2
+F=abs(a)/(abs(b)*5)
+C=fp_abs(a)/(fp_abs(b)*5)

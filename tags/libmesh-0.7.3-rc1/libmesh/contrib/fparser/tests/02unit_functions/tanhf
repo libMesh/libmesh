@@ -1,0 +1,5 @@
+T=f
+V=x
+R=-40000, 40000, 5
+F=tanh(x)
+C=tanhf(x)

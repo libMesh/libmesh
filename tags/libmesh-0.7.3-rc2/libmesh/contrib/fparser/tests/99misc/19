@@ -1,0 +1,17 @@
+T=d f ld mf li gi
+V=x,y
+R=-100,100,1
+F=(x<y)+10*(x<=y)+100*(x>y)+1000*(x>=y)+10000*(x=y)+100000*(x!=y)+ \
+  (x&y)*2+(x|y)*20+(!x)*200+(!!x)*2000+4*!((x<y)&(x<3))+40*!!(!(x>y)|(x>3))
+C=    fp_less(x,y)+\
+  10*fp_lessOrEq(x,y)+\
+  100*fp_greater(x,y)+\
+  1000*fp_greaterOrEq(x,y)+\
+  10000*fp_equal(x,y)+\
+  100000*fp_nequal(x,y) \
+ +fp_and(x,y)*2 \
+ +fp_or(x,y)*20 \
+ +fp_not(x)*200 \
+ +fp_truth(x)*2000 \
+ +4*fp_not(fp_and(fp_less(x,y), fp_less(x,3))) \
+ +40*fp_or(fp_not(fp_greater(x,y)), fp_greater(x,3))

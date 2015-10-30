@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x
+R=-5,5,2
+F=(pow(x,-2) > 0.0625)
+C=fp_greater(fp_pow(x,-2), 0.0625)

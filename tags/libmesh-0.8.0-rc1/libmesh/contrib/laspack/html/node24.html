@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> PRECOND(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" PRECOND(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html432 HREF="node25.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html430 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html424 HREF="node23.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html434 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html433 HREF="node25.html"> QMATRIX(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html431 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html425 HREF="node23.html"> OPERATS(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00089000000000000000>&#160;</A><A NAME=PRECOND> PRECOND(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00089100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> JacobiPrecond</tt>, <tt> SSORPrecond</tt>, <tt> ILUPrecond</tt>
+-- pre-defined preconditioners
+<P>
+<H3><A NAME=SECTION00089200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/precond.h&gt;
+
+typedef Vector *(*PrecondProcType)(QMatrix *, Vector *, Vector *, double)
+
+Vector *JacobiPrecond(QMatrix *A, Vector *y, Vector *c, double Omega); 
+Vector *SSORPrecond(QMatrix *A, Vector *y, Vector *c, double Omega); 
+Vector *ILUPrecond(QMatrix *A, Vector *y, Vector *c, double Omega);
+</PRE>
+<H3><A NAME=SECTION00089300000000000000> DESCRIPTION</A></H3>
+<P>
+In <tt> LASPack</tt>
+ , three preconditioners are currently available.
+They will be applied to the system
+
+<PRE>    W y = c
+</PRE>
+<P>
+which arises during the solution of the preconditioned systems of equations
+
+<PRE>    W^{-1} A x = W^{-1} b.
+</PRE>
+<P>
+In all three cases, the matrix <tt> W</tt>
+ is derived
+from the matrix <tt> A</tt>
+.
+The parameter <tt> Omega</tt> 
+
+is used as relaxation parameter.
+<P>
+<H6><A NAME=JacobiPrecond>&#160;</A></H6>
+The procedure <tt> JacobiPrecond</tt> performs the preconditioning
+by means of the weighted diagonal of the original matrix
+
+<PRE>    W = 1 / Omega . diag(A)
+</PRE>
+<P>
+so that
+
+<PRE>    y = Omega diag(A)^{-1} c.
+</PRE>
+<P>
+<H6><A NAME=SSORPrecond>&#160;</A></H6>
+For preconditioning by the Symmetric Successive Over-relaxation Method,
+the matrix <tt> A</tt>
+ is decomposed
+in the diagonal <tt> D</tt>,
+ the lower triangular 
+part <tt> L</tt>,
+ and the upper triangular part <tt> U</tt>
+:
+
+<PRE>    A = D + L + U.
+</PRE>
+<P>
+The procedure <tt> SSORPrecond</tt> then uses
+
+<PRE>    W = 1 / (2 - Omega) . (D / Omega + L) (D / Omega)^{-1} (D / Omega + U).
+</PRE>
+<P>
+Hence follows
+
+<PRE>    y = (2 - Omega) / Omega . (D / Omega + U)^{-1} D (D / Omega + L)^{-1} c.
+</PRE>
+<P>
+<H6><A NAME=ILUPrecond>&#160;</A></H6>
+The usage of <tt> ILUPrecond</tt> assumes an incomplete factorization
+of the matrix <tt> A</tt>
+ in the form
+
+<PRE>    A = W + R = (D + L) D^{-1} (D + U) + R
+</PRE>
+<P>
+Here <tt> D</tt>,
+ <tt> U</tt>,
+ and
+<tt> L</tt>
+ are certain diagonal, upper, and 
+lower triangular matrices, respectively,
+the remainder matrix <tt> R</tt>
+ contains fill elements,
+which have been ignored during the factorization process.
+<P>
+The matrix <tt> W</tt>
+ can be inverted exactly
+so that
+
+<PRE>    y = (D + U)^{-1} D (D + L)^{-1} c.
+</PRE>
+<P>
+All the three preconditioners are applicable to both,
+symmetric and non-symmetric matrices.
+For symmetric matrices,
+the symmetry condition <tt> L = U^T</tt>
+ is 
+taken into account.
+<P>
+<H3><A NAME=SECTION00089400000000000000> REFERENCES</A></H3>
+<P>
+For description and theoretical foundation of the above preconditioners
+see e.g.:
+
+<blockquote> W. Hackbusch:
+  Iterative Solution of Large Sparse Systems of Equations,
+  Springer-Verlag, Berlin, 1994.
+</blockquote><H3><A NAME=SECTION00089500000000000000> FILES</A></H3>
+<P>
+  <tt> precond.h ... </tt> header file <BR> 
+
+  <tt> precond.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00089600000000000000> EXAMPLES</A></H3>
+<P>
+Preconditioners as well as iterative solvers are defined in <tt> LASPack</tt>
+  by
+means of matrix-vector operations,
+especially the procedures <tt> Mul_QV</tt> and <tt> MulInv_QV</tt>
+from module <tt> OPERATS</tt>.
+This keeps them independent of the matrix storage format.
+The Jacobi preconditioner is implemented e.g. by the following one-line 
+statement:
+
+<PRE>Vector *JacobiPrecond(QMatrix *A, Vector *y, Vector *c, double Omega)
+{
+    Q_Lock(A);
+    V_Lock(y);
+    V_Lock(c);
+
+    Asgn_VV(y, Mul_SV(Omega, MulInv_QV(Diag_Q(A), c)));
+
+    Q_Unlock(A);
+    V_Unlock(y);
+    V_Unlock(c);
+
+    return(y);
+}
+</PRE>
+<P>
+<H3><A NAME=SECTION00089700000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node25.html#QMATRIX">qmatrix(3LAS)</A>, <A HREF="node27.html#VECTOR">vector(3LAS)</A>,
+<A HREF="node19.html#FACTOR">factor(3LAS)</A>, <A HREF="node20.html#ITERSOLV">itersolv(3LAS)</A>,
+<A HREF="#MGSOLV">mgsolv(3LAS)</A>, <A HREF="node23.html#OPERATS">operats(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html432 HREF="node25.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html430 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html424 HREF="node23.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html434 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html433 HREF="node25.html"> QMATRIX(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html431 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html425 HREF="node23.html"> OPERATS(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

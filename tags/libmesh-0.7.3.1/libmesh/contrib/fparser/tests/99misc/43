@@ -1,0 +1,8 @@
+T=d ld mf
+V=x
+R=-100,100,.03
+
+# This function is too complex for "float" accuracy
+
+F=log(x*x)+abs(exp(abs(x)+1))
+C=fp_log(x*x)+fp_abs(fp_exp(fp_abs(x)+1))

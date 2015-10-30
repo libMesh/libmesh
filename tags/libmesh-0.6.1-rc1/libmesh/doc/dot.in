@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+# $Id: dot.in,v 1.1 2005-09-30 16:53:56 benkirk Exp $
+# This is a wrapper for dot to create pretty class diagrams
+# corresponding to the libMesh web page style
+
+DOT=@DOT@
+
+if test -x $DOT ; then
+    #
+    # Redefine defaults if the user has not
+    # specified any in these environment variables
+    if [ "x$DOTBGCOLOR" = "x" ]; then
+	DOTBGCOLOR=transparent
+    fi
+
+    if [ "x$DOTFILLCOLOR" = "x" ]; then
+	DOTFILLCOLOR=#BBBBBB
+    fi
+
+    if [ "x$DOTFONTCOLOR" = "x" ]; then
+	DOTFONTCOLOR=black
+    fi
+
+    if [ "x$DOTCOLOR" = "x" ]; then
+	DOTCOLOR=black
+    fi
+
+
+
+    DOTARGS=""
+
+    #
+    # Set the background color
+    DOTARGS="$DOTARGS -Gbgcolor=$DOTBGCOLOR"
+
+    #
+    # Set the fill color
+    DOTARGS="$DOTARGS -Nfillcolor=$DOTFILLCOLOR -Nstyle=filled"
+
+    #
+    # Set the font color
+    DOTARGS="$DOTARGS -Nfontcolor=$DOTFONTCOLOR"
+ 
+    #
+    # Set the default color
+    DOTARGS="$DOTARGS -Ncolor=$DOTCOLOR"
+
+    $DOT $DOTARGS $*
+fi
+
+
+# Local Variables:
+# mode: shell-script
+# End:

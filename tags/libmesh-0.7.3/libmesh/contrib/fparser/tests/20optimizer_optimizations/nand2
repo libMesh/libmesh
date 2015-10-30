@@ -1,0 +1,7 @@
+T=d ld f mf li gi cd cf cld
+V=x,y
+R=0,1,1
+F=!x | !y
+C=fp_or(fp_not(x),fp_not(y))
+
+# Expected result: !(x & y)   hence NAND

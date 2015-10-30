@@ -1,0 +1,5 @@
+T=d f ld mf li gi
+V=x
+R=0,1,1
+F=(abs(-3))+x
+C=(3)+x

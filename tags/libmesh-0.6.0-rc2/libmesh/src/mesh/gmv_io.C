@@ -1,0 +1,1732 @@
+// $Id: gmv_io.C,v 1.32 2007-01-15 03:16:20 roystgnr Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// Changes: 
+// o no more subelements, all elements are written down to GMV directly
+// o Some nodes have to be left out, eg node 8 in QUAD9 
+// o
+
+
+// C++ includes
+#include <iomanip>
+#include <fstream>
+#include <cstring> // for std::strcpy, std::memcpy
+#include <cstdio>  // for std::sprintf
+#include <vector>
+
+// Local includes
+#include "libmesh_config.h"
+#include "gmv_io.h"
+#include "mesh_base.h"
+#include "elem.h"
+#include "equation_systems.h"
+
+// anonymous namespace to hold local data
+namespace
+{
+  /**
+   * Defines mapping from libMesh element types to GMV element types.
+   */
+  struct elementDefinition {
+    std::string label;
+    std::vector<unsigned int> nodes;
+  };
+
+
+  // maps from a libMesh element type to the proper
+  // GMV elementDefinition.  Placing the data structure
+  // here in this anonymous namespace gives us the
+  // benefits of a global variable without the nasty
+  // side-effects
+  std::map<ElemType, elementDefinition> eletypes;
+
+
+
+  // ------------------------------------------------------------
+  // helper function to initialize the eletypes map
+  void init_eletypes ()
+  {
+    if (eletypes.empty())
+      {
+	// This should happen only once.  The first time this method
+	// is called the eletypes data struture will be empty, and
+	// we will fill it.  Any subsequent calls will find an initialized
+	// eletypes map and will do nothing.
+
+	//==============================
+	// setup the element definitions
+	elementDefinition eledef;
+
+	// use "swap trick" from Scott Meyer's "Effective STL" to initialize
+	// eledef.nodes vector
+	
+	// EDGE2
+	{
+	  eledef.label = "line 2";
+	  const unsigned int nodes[] = {0,1};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	
+	  eletypes[EDGE2] = eledef;
+	}
+  
+	// LINE3
+	{
+	  eledef.label = "line 3";
+	  const unsigned int nodes[] = {0,1,2};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  
+	  eletypes[EDGE3] = eledef;
+	}
+      
+	// TRI3
+	{
+	  eledef.label = "tri3 3";
+	  const unsigned int nodes[] = {0,1,2};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  
+	  eletypes[TRI3] = eledef;
+	}
+      
+	// TRI6
+	{
+	  eledef.label = "6tri 6";
+	  const unsigned int nodes[] = {0,1,2,3,4,5};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+
+	  eletypes[TRI6] = eledef;
+	}
+      
+	// QUAD4
+	{
+	  eledef.label = "quad 4";
+	  const unsigned int nodes[] = {0,1,2,3};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+
+	  eletypes[QUAD4] = eledef;
+	}
+      
+	// QUAD8, QUAD9
+	{
+	  eledef.label = "8quad 8";
+	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+
+	  eletypes[QUAD8] = eledef;
+	  eletypes[QUAD9] = eledef;
+	}
+      
+	// HEX8
+	{
+	  eledef.label = "phex8 8";
+	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+
+	  eletypes[HEX8] = eledef;
+	}
+      
+	// HEX20, HEX27
+	{
+	  eledef.label = "phex20 20";
+	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+
+	  eletypes[HEX20] = eledef;
+	  eletypes[HEX27] = eledef;
+	}
+      
+	// TET4
+	{
+	  eledef.label = "tet 4";
+	  const unsigned int nodes[] = {0,1,2,3};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+
+	  eletypes[TET4] = eledef;
+	}
+      
+	// TET10
+	{
+	  eledef.label = "ptet10 10";
+	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,9};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  
+	  eletypes[TET10] = eledef;
+	}
+      
+	// PRISM6
+	{
+	  eledef.label = "pprism6 6";
+	  const unsigned int nodes[] = {0,1,2,3,4,5};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  
+	  eletypes[PRISM6] = eledef;
+	}
+      
+	// PRISM15, PRISM18
+	{
+	  eledef.label = "pprism15 15";
+	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11};
+	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
+	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  
+	  eletypes[PRISM15] = eledef;
+	  eletypes[PRISM18] = eledef;
+	}
+	//==============================      
+      }
+  }
+  
+} // end anonymous namespace
+
+
+// ------------------------------------------------------------
+// GMVIO  members
+void GMVIO::write (const std::string& fname)
+{
+  if (libMesh::processor_id() == 0)
+    if (this->binary())
+      this->write_binary (fname);
+    else
+      this->write_ascii_old_impl  (fname);
+}
+
+
+
+void GMVIO::write_nodal_data (const std::string& fname,
+                              const std::vector<Number>& soln,
+                              const std::vector<std::string>& names)
+{
+  if (libMesh::processor_id() == 0)
+    if (this->binary())
+      this->write_binary (fname, &soln, &names);
+    else
+      this->write_ascii_old_impl  (fname, &soln, &names);
+}
+
+
+
+void GMVIO::write_ascii_new_impl (const std::string& fname,
+				  const std::vector<Number>* v,
+				  const std::vector<std::string>* solution_names)
+{
+#ifdef ENABLE_INFINITE_ELEMENTS
+
+  std::cerr << "WARNING:  GMVIO::write_ascii_new_impl() not infinite-element aware!"
+	    << std::endl;
+  here();
+
+  this->write_ascii_old_impl (fname, v, solution_names);
+
+#else
+  
+  // Open the output file stream
+  std::ofstream out (fname.c_str());
+  
+  assert (out.good());
+
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  unsigned int mesh_max_p_level = 0;
+
+  // Begin interfacing with the GMV data file
+  {
+    out << "gmvinput ascii\n\n";
+
+    // write the nodes
+    out << "nodes " << mesh.n_nodes() << "\n";
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << mesh.point(v)(0) << " ";
+    out << "\n";
+    
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << mesh.point(v)(1) << " ";
+    out << "\n";
+    
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << mesh.point(v)(2) << " ";
+    out << "\n\n";
+  }
+
+  {
+    // write the connectivity
+    out << "cells " << mesh.n_active_elem() << "\n";
+    
+    // initialize the eletypes map
+    init_eletypes();
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+    
+    for ( ; it != end; ++it)
+      {
+        const Elem* elem = *it;
+
+        mesh_max_p_level = std::max(mesh_max_p_level,
+                                    elem->p_level());
+
+	// Make sure we have a valid entry for
+	// the current element type.
+	assert (eletypes.count(elem->type()));
+
+        const elementDefinition& ele = eletypes[elem->type()];
+
+	// The element mapper better not require any more nodes
+	// than are present in the current element!
+	assert (ele.nodes.size() <= elem->n_nodes());
+	
+        out << ele.label << "\n";
+        for (unsigned int i=0; i < ele.nodes.size(); i++)
+          out << elem->node(ele.nodes[i])+1 << " ";
+        out << "\n";
+      }
+    out << "\n";
+  }
+  
+  // optionally write the partition information
+  if (this->partitioning())
+    {
+      out << "material "
+          << mesh.n_partitions()
+          << " 0\n";
+
+      for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
+        out << "proc_" << proc << "\n";
+      
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      // FIXME - don't we need to use an elementDefinition here? - RHS
+      for ( ; it != end; ++it)
+        out << (*it)->processor_id()+1 << "\n";
+      out << "\n";
+    }
+
+  // If there are *any* variables at all in the system (including
+  // p level, or arbitrary cell-based data)
+  // to write, the gmv file needs to contain the word "variable"
+  // on a line by itself.
+  bool write_variable = false;
+
+  // 1.) p-levels
+  if (this->p_levels() && mesh_max_p_level)
+    write_variable = true;
+
+  // 2.) solution data
+  if ((solution_names != NULL) && (v != NULL))
+    write_variable = true;
+
+  // 3.) cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    write_variable = true;
+  
+  if (write_variable)
+    out << "variable\n";
+  
+//   if ((this->p_levels() && mesh_max_p_level) || 
+//     ((solution_names != NULL) && (v != NULL)))
+//     out << "variable\n";
+
+  // optionally write the polynomial degree information
+  if (this->p_levels() && mesh_max_p_level)
+    {
+      out << "p_level 0\n";
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+        {
+          const Elem* elem = *it;
+
+          const elementDefinition& ele = eletypes[elem->type()];
+
+	  // The element mapper better not require any more nodes
+	  // than are present in the current element!
+	  assert (ele.nodes.size() <= elem->n_nodes());
+
+          for (unsigned int i=0; i < ele.nodes.size(); i++)
+            out << elem->p_level() << " ";
+        }
+      out << "\n\n";
+    }
+
+
+  // optionally write cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    {
+      std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
+      const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
+
+      for (; it != end; ++it)
+	{
+	  // write out the variable name, followed by a zero.
+	  out << (*it).first << " 0\n";
+
+	  const std::vector<Real>* the_array = (*it).second;
+	  
+	  // Loop over active elements, write out cell data.  If second-order cells
+	  // are split into sub-elements, the sub-elements inherit their parent's
+	  // cell-centered data.
+	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+	  
+	  for ( ; elem_it != elem_end; ++elem_it)
+	    {
+	      const Elem* e = *elem_it;
+	      
+	      // If there's a seg-fault, it will probably be here!
+	      const Real the_value = the_array->operator[](e->id());
+	      
+	      if (this->subdivide_second_order())
+		for (unsigned int se=0; se < e->n_sub_elem(); se++)
+		  out << the_value << " ";
+	      else
+		out << the_value << " ";
+	    }
+	  
+	  out << "\n\n";
+	}
+    }
+
+  
+  // optionally write the data
+  if ((solution_names != NULL) && (v != NULL))
+    {      
+      const unsigned int n_vars = solution_names->size();
+
+      if (!(v->size() == mesh.n_nodes()*n_vars))
+        std::cerr << "ERROR: v->size()=" << v->size()
+                  << ", mesh.n_nodes()=" << mesh.n_nodes()
+                  << ", n_vars=" << n_vars
+                  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+                  << "\n";
+      
+      assert (v->size() == mesh.n_nodes()*n_vars);
+
+      for (unsigned int c=0; c<n_vars; c++)
+        {
+
+#ifdef USE_COMPLEX_NUMBERS
+
+          // in case of complex data, write _three_ data sets
+          // for each component
+
+          // this is the real part
+          out << "r_" << (*solution_names)[c] << " 1\n";
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            out << std::setprecision(10) << (*v)[n*n_vars + c].real() << " ";
+
+          out << "\n\n";
+
+          // this is the imaginary part
+          out << "i_" << (*solution_names)[c] << " 1\n";
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            out << std::setprecision(10) << (*v)[n*n_vars + c].imag() << " ";
+
+          out << "\n\n";
+
+          // this is the magnitude
+          out << "a_" << (*solution_names)[c] << " 1\n";
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            out << std::setprecision(10)
+                << std::abs((*v)[n*n_vars + c]) << " ";
+
+          out << "\n\n";
+
+#else
+
+          out << (*solution_names)[c] << " 1\n";
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            out << std::setprecision(10) << (*v)[n*n_vars + c] << " ";
+	  
+          out << "\n\n";
+
+#endif
+        }
+      
+    }
+
+  // If we wrote any variables, we have to close the variable section now
+  if (write_variable)
+    out << "endvars\n";
+
+  
+  // end of the file
+  out << "\nendgmv\n";
+
+#endif
+}
+
+
+
+
+
+
+void GMVIO::write_ascii_old_impl (const std::string& fname,
+				  const std::vector<Number>* v,
+				  const std::vector<std::string>* solution_names)
+{
+  // Open the output file stream
+  std::ofstream out (fname.c_str());
+  
+  assert (out.good());
+
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  unsigned int mesh_max_p_level = 0;
+  
+  // Begin interfacing with the GMV data file
+
+  // FIXME - if subdivide_second_order() is off,
+  // we probably should only be writing the
+  // vertex nodes - RHS
+  {
+    // write the nodes
+    
+    out << "gmvinput ascii\n\n";
+    out << "nodes " << mesh.n_nodes() << '\n';
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << mesh.point(v)(0) << " ";
+         
+    out << '\n';
+    
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << mesh.point(v)(1) << " ";
+    
+    out << '\n';
+    
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      out << mesh.point(v)(2) << " ";
+     
+    out << '\n' << '\n';
+  }
+
+
+  
+  {
+    // write the connectivity
+    
+    out << "cells ";
+    if (this->subdivide_second_order())
+      out << mesh.n_active_sub_elem();
+    else
+      out << mesh.n_active_elem();
+    out << '\n';
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+    switch (mesh.mesh_dimension())
+      {
+      case 1:
+	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+
+	  for ( ; it != end; ++it)
+            {
+              mesh_max_p_level = std::max(mesh_max_p_level,
+                                          (*it)->p_level());
+
+              if (this->subdivide_second_order())
+	        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	          {
+		    out << "line 2\n";
+		    (*it)->connectivity(se, TECPLOT, conn);
+		    for (unsigned int i=0; i<conn.size(); i++)
+		      out << conn[i] << " ";
+		
+		    out << '\n';
+	          }
+              else
+                {
+		  out << "line 2\n";
+                  if ((*it)->default_order() == FIRST)
+		    (*it)->connectivity(0, TECPLOT, conn);
+                  else
+                    {
+                      AutoPtr<Elem> lo_elem = Elem::build(
+                        Elem::first_order_equivalent_type((*it)->type()));
+                      for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                        lo_elem->set_node(i) = (*it)->get_node(i);
+		      lo_elem->connectivity(0, TECPLOT, conn);
+                    }
+		  for (unsigned int i=0; i<conn.size(); i++)
+		    out << conn[i] << " ";
+		
+		  out << '\n';
+                }
+            }
+	  break;
+	}
+	
+      case 2:
+	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
+	  for ( ; it != end; ++it)
+            {
+              mesh_max_p_level = std::max(mesh_max_p_level,
+                                          (*it)->p_level());
+
+              if (this->subdivide_second_order())
+	        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	          {
+		    // Quad elements
+		    if (((*it)->type() == QUAD4) ||
+		        ((*it)->type() == QUAD8) ||
+		        ((*it)->type() == QUAD9)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		        || ((*it)->type() == INFQUAD4)
+		        || ((*it)->type() == INFQUAD6)
+#endif
+		        )
+                      {
+		        out << "quad 4\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<conn.size(); i++)
+		          out << conn[i] << " ";
+		      }
+
+		    // Triangle elements
+		    else if (((*it)->type() == TRI3) ||
+			     ((*it)->type() == TRI6))
+		      {
+		        out << "tri 3\n";
+		        (*it)->connectivity(se, TECPLOT, conn);
+		        for (unsigned int i=0; i<3; i++)
+		          out << conn[i] << " ";
+		      }
+		    else
+		      error();
+                  }
+              else // !this->subdivide_second_order()
+                {
+		  // Quad elements
+		  if (((*it)->type() == QUAD4)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		      || ((*it)->type() == INFQUAD4)
+#endif
+		      )
+                    {
+		      (*it)->connectivity(0, TECPLOT, conn);
+		      out << "quad 4\n";
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+		  else if (((*it)->type() == QUAD8) ||
+		           ((*it)->type() == QUAD9)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		           || ((*it)->type() == INFQUAD6)
+#endif
+		          )
+		    {
+                      AutoPtr<Elem> lo_elem = Elem::build(
+                        Elem::first_order_equivalent_type((*it)->type()));
+                      for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                        lo_elem->set_node(i) = (*it)->get_node(i);
+		      lo_elem->connectivity(0, TECPLOT, conn);
+		      out << "quad 4\n";
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+		  else if ((*it)->type() == TRI3)
+		    {
+		      (*it)->connectivity(0, TECPLOT, conn);
+		      out << "tri 3\n";
+		      for (unsigned int i=0; i<3; i++)
+		        out << conn[i] << " ";
+		    }
+		  else if ((*it)->type() == TRI6)
+		    {
+                      AutoPtr<Elem> lo_elem = Elem::build(
+                        Elem::first_order_equivalent_type((*it)->type()));
+                      for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
+                        lo_elem->set_node(i) = (*it)->get_node(i);
+		      lo_elem->connectivity(0, TECPLOT, conn);
+		      out << "tri 3\n";
+		      for (unsigned int i=0; i<3; i++)
+		        out << conn[i] << " ";
+		    }
+		
+		  out << '\n';
+	        }
+            }
+	  
+	  break;
+	}
+	
+	
+      case 3:
+	{
+	  // The same temporary storage will be used for each element
+	  std::vector<unsigned int> conn;
+	  
+	  for ( ; it != end; ++it)
+            {
+              mesh_max_p_level = std::max(mesh_max_p_level,
+                                          (*it)->p_level());
+
+	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	        {
+
+#ifndef  ENABLE_INFINITE_ELEMENTS
+		  if (((*it)->type() == HEX8)   ||    
+		      ((*it)->type() == HEX27))
+		    {
+		      out << "phex8 8\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+		
+		  else if ((*it)->type() == HEX20)
+		    {
+		      out << "phex20 20\n";
+		      out << (*it)->node(0)+1  << " "
+			  << (*it)->node(1)+1  << " "
+			  << (*it)->node(2)+1  << " "
+			  << (*it)->node(3)+1  << " "
+			  << (*it)->node(4)+1  << " "
+			  << (*it)->node(5)+1  << " "
+			  << (*it)->node(6)+1  << " "
+			  << (*it)->node(7)+1  << " "
+			  << (*it)->node(8)+1  << " "
+			  << (*it)->node(9)+1  << " "
+			  << (*it)->node(10)+1 << " "
+			  << (*it)->node(11)+1 << " "
+			  << (*it)->node(16)+1 << " "
+			  << (*it)->node(17)+1 << " "
+			  << (*it)->node(18)+1 << " "
+			  << (*it)->node(19)+1 << " "
+			  << (*it)->node(12)+1 << " "
+			  << (*it)->node(13)+1 << " "
+			  << (*it)->node(14)+1 << " "
+			  << (*it)->node(15)+1 << " ";
+		    }
+#else
+		  /*
+		   * In case of infinite elements, HEX20
+		   * should be handled just like the
+		   * INFHEX16, since these connect to each other
+		   */
+		  if (((*it)->type() == HEX8)     ||
+		      ((*it)->type() == HEX27)    ||
+		      ((*it)->type() == INFHEX8)  ||
+		      ((*it)->type() == INFHEX16) ||
+		      ((*it)->type() == INFHEX18) ||
+		      ((*it)->type() == HEX20))
+		    {
+		      out << "phex8 8\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+#endif
+		
+		  else if (((*it)->type() == TET4)  ||
+			   ((*it)->type() == TET10))
+		    {
+		      out << "tet 4\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      out << conn[0] << " "
+			  << conn[2] << " "
+			  << conn[1] << " "
+			  << conn[4] << " ";
+		      }
+#ifndef  ENABLE_INFINITE_ELEMENTS
+		  else if (((*it)->type() == PRISM6)  ||
+			   ((*it)->type() == PRISM15) ||
+			   ((*it)->type() == PRISM18))
+#else
+		  else if (((*it)->type() == PRISM6)     ||
+			   ((*it)->type() == PRISM15)    ||
+			   ((*it)->type() == PRISM18)    ||
+			   ((*it)->type() == INFPRISM6)  ||
+			   ((*it)->type() == INFPRISM12))
+#endif
+		    {
+		      /**
+		       * Note that the prisms are treated as
+		       * degenerated phex8's.
+		       */
+		      out << "phex8 8\n";
+		      (*it)->connectivity(se, TECPLOT, conn);
+		      for (unsigned int i=0; i<conn.size(); i++)
+		        out << conn[i] << " ";
+		    }
+		
+		  else
+		    {
+		      std::cout << "Encountered an unrecognized element "
+			        << "type.  Possibly a dim-1 dimensional "
+			        << "element?  Aborting..."
+			        << std::endl;
+		      error();
+		    }
+		
+		  out << '\n';
+	        }
+            }
+	  
+	  break;
+	}
+	
+      default:
+	error();
+      }
+    
+    out << '\n';
+  }
+  
+
+  
+  // optionally write the partition information
+  if (this->partitioning())
+    {
+      out << "material "
+	  << mesh.n_partitions()
+	  << " 0"<< '\n';
+
+      for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
+	out << "proc_" << proc << '\n';
+      
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+        if (this->subdivide_second_order())
+	  for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	    out << (*it)->processor_id()+1 << '\n';
+        else
+	  out << (*it)->processor_id()+1 << '\n';
+      
+      out << '\n';
+    }
+
+
+  // If there are *any* variables at all in the system (including
+  // p level, or arbitrary cell-based data)
+  // to write, the gmv file needs to contain the word "variable"
+  // on a line by itself.
+  bool write_variable = false;
+
+  // 1.) p-levels
+  if (this->p_levels() && mesh_max_p_level)
+    write_variable = true;
+
+  // 2.) solution data
+  if ((solution_names != NULL) && (v != NULL))
+    write_variable = true;
+
+  // 3.) cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    write_variable = true;
+  
+  if (write_variable)
+    out << "variable\n";
+
+
+  // optionally write the p-level information
+  if (this->p_levels() && mesh_max_p_level)
+    {
+      out << "p_level 0\n";
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+        if (this->subdivide_second_order())
+	  for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+            out << (*it)->p_level() << " ";
+        else
+          out << (*it)->p_level() << " ";
+      out << "\n\n";
+    }
+
+
+
+  
+  // optionally write cell-centered data
+  if ( !(this->_cell_centered_data.empty()) )
+    {
+      std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
+      const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
+
+      for (; it != end; ++it)
+	{
+	  // write out the variable name, followed by a zero.
+	  out << (*it).first << " 0\n";
+
+	  const std::vector<Real>* the_array = (*it).second;
+	  
+	  // Loop over active elements, write out cell data.  If second-order cells
+	  // are split into sub-elements, the sub-elements inherit their parent's
+	  // cell-centered data.
+	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+	  
+	  for ( ; elem_it != elem_end; ++elem_it)
+	    {
+	      const Elem* e = *elem_it;
+	      
+	      // If there's a seg-fault, it will probably be here!
+	      const Real the_value = the_array->operator[](e->id());
+	      
+	      if (this->subdivide_second_order())
+		for (unsigned int se=0; se < e->n_sub_elem(); se++)
+		  out << the_value << " ";
+	      else
+		out << the_value << " ";
+	    }
+	  
+	  out << "\n\n";
+	}
+    }
+
+
+
+  
+  // optionally write the data
+  if ((solution_names != NULL) &&
+      (v != NULL))
+    {      
+      const unsigned int n_vars = solution_names->size();
+
+      if (!(v->size() == mesh.n_nodes()*n_vars))
+	std::cerr << "ERROR: v->size()=" << v->size()
+		  << ", mesh.n_nodes()=" << mesh.n_nodes()
+		  << ", n_vars=" << n_vars
+		  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+		  << std::endl;
+      
+      assert (v->size() == mesh.n_nodes()*n_vars);
+
+      for (unsigned int c=0; c<n_vars; c++)
+	{
+
+#ifdef USE_COMPLEX_NUMBERS
+
+	  // in case of complex data, write _tree_ data sets
+	  // for each component
+
+	  // this is the real part
+	  out << "r_" << (*solution_names)[c] << " 1\n";
+	  
+	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	    out << std::setprecision(10) << (*v)[n*n_vars + c].real() << " ";
+	  
+	  out << '\n' << '\n';
+
+
+	  // this is the imaginary part
+	  out << "i_" << (*solution_names)[c] << " 1\n";
+	  
+	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	    out << std::setprecision(10) << (*v)[n*n_vars + c].imag() << " ";
+	  
+	  out << '\n' << '\n';
+
+	  // this is the magnitude
+	  out << "a_" << (*solution_names)[c] << " 1\n";
+	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	    out << std::setprecision(10)
+		<< std::abs((*v)[n*n_vars + c]) << " ";
+
+	  out << '\n' << '\n';
+
+#else
+
+	  out << (*solution_names)[c] << " 1\n";
+	  
+	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+	    out << std::setprecision(10) << (*v)[n*n_vars + c] << " ";
+	  
+	  out << '\n' << '\n';
+
+#endif
+	}
+      
+    }
+  
+  // If we wrote any variables, we have to close the variable section now
+  if (write_variable)
+    out << "endvars\n";
+
+  
+  // end of the file
+  out << "\nendgmv\n";
+}
+
+
+
+
+
+
+
+void GMVIO::write_binary (const std::string& fname,
+                          const std::vector<Number>* vec,
+                          const std::vector<std::string>* solution_names)
+{
+  std::ofstream out (fname.c_str());
+  
+  assert (out.good());
+
+  // get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  unsigned int mesh_max_p_level = 0;
+  
+  char buf[80];
+
+  // Begin interfacing with the GMV data file
+  {
+    // write the nodes
+    std::strcpy(buf, "gmvinput");
+    out.write(buf, std::strlen(buf));
+	      
+    std::strcpy(buf, "ieeei4r4");
+    out.write(buf, std::strlen(buf));
+  }
+
+
+  
+  // write the nodes
+  {
+    std::strcpy(buf, "nodes   ");
+    out.write(buf, std::strlen(buf));
+
+    unsigned int tempint = mesh.n_nodes();
+    
+    std::memcpy(buf, &tempint, sizeof(unsigned int));
+
+    out.write(buf, sizeof(unsigned int));
+
+    // write the x coordinate
+    float *temp = new float[mesh.n_nodes()];
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      temp[v] = static_cast<float>(mesh.point(v)(0));
+    out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+    // write the y coordinate
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      temp[v] = static_cast<float>(mesh.point(v)(1));
+    out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+    // write the z coordinate
+    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      temp[v] = static_cast<float>(mesh.point(v)(2));
+    out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+    delete [] temp;
+  }
+
+
+  // write the connectivity
+  {
+    std::strcpy(buf, "cells   ");
+    out.write(buf, std::strlen(buf));
+
+    unsigned int tempint = mesh.n_active_elem();
+    
+    std::memcpy(buf, &tempint, sizeof(unsigned int));
+    
+    out.write(buf, sizeof(unsigned int));
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+    switch (mesh.mesh_dimension())
+      {
+
+      case 1:
+        for ( ; it != end; ++it)
+          {
+            mesh_max_p_level = std::max(mesh_max_p_level,
+                                        (*it)->p_level());
+
+            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+              {
+                std::strcpy(buf, "line    ");
+                out.write(buf, std::strlen(buf));
+	      
+                tempint = 2;
+                std::memcpy(buf, &tempint, sizeof(unsigned int));
+                out.write(buf, sizeof(unsigned int));
+
+                std::vector<unsigned int> conn;
+                (*it)->connectivity(se,TECPLOT,conn);
+	      
+                out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+              }
+          }
+        break;
+	
+      case 2:
+        for ( ; it != end; ++it)
+          {
+            mesh_max_p_level = std::max(mesh_max_p_level,
+                                        (*it)->p_level());
+
+            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+              {
+                std::strcpy(buf, "quad    ");
+                out.write(buf, std::strlen(buf));
+                tempint = 4;
+                std::memcpy(buf, &tempint, sizeof(unsigned int));
+                out.write(buf, sizeof(unsigned int));
+                std::vector<unsigned int> conn;
+                (*it)->connectivity(se,TECPLOT,conn);
+                out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+              }
+          }
+        break;
+      case 3:
+        for ( ; it != end; ++it)
+          {
+            mesh_max_p_level = std::max(mesh_max_p_level,
+                                        (*it)->p_level());
+
+            for(unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
+              {
+                std::strcpy(buf, "phex8   ");
+                out.write(buf, std::strlen(buf));
+                tempint = 8;
+                std::memcpy(buf, &tempint, sizeof(unsigned int));
+                out.write(buf, sizeof(unsigned int));
+                std::vector<unsigned int> conn;
+                (*it)->connectivity(se,TECPLOT,conn);
+                out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+              }
+          }
+        break;
+      default:
+        error();
+	
+      }
+  }
+  
+  
+  
+  // optionally write the partition information
+  if (this->partitioning())
+    {
+      std::strcpy(buf, "material");
+      out.write(buf, std::strlen(buf));
+      
+      unsigned int tmpint = mesh.n_processors();
+      std::memcpy(buf, &tmpint, sizeof(unsigned int));
+      out.write(buf, sizeof(unsigned int));
+
+      tmpint = 0; // IDs are cell based
+      std::memcpy(buf, &tmpint, sizeof(unsigned int));
+      out.write(buf, sizeof(unsigned int));
+
+
+      for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
+        {
+          std::sprintf(buf, "proc_%d", proc);
+          out.write(buf, 8);
+        }
+
+      std::vector<unsigned int> proc_id (mesh.n_active_elem());
+      
+      unsigned int n=0;
+      
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          proc_id[n++] = (*it)->processor_id()+1;
+      
+      
+      out.write(reinterpret_cast<char *>(&proc_id[0]),
+                sizeof(unsigned int)*proc_id.size());
+    }
+
+  // If there are *any* variables at all in the system (including
+  // p level, or arbitrary cell-based data)
+  // to write, the gmv file needs to contain the word "variable"
+  // on a line by itself.
+  bool write_variable = false;
+
+  // 1.) p-levels
+  if (this->p_levels() && mesh_max_p_level)
+    write_variable = true;
+
+  // 2.) solution data
+  if ((solution_names != NULL) && (vec != NULL))
+    write_variable = true;
+
+  //   // 3.) cell-centered data - unsupported
+  //   if ( !(this->_cell_centered_data.empty()) )
+  //     write_variable = true;
+
+  if (write_variable)
+    {
+      std::strcpy(buf, "variable");
+      out.write(buf, std::strlen(buf));
+    }
+
+  // optionally write the partition information
+  if (this->p_levels() && mesh_max_p_level)
+    {
+      unsigned int n_floats = mesh.n_active_elem();
+      for (unsigned int i=0; i != mesh.mesh_dimension(); ++i)
+        n_floats *= 2;
+
+      float *temp = new float[n_floats];
+
+      std::strcpy(buf, "p_level");
+      out.write(buf, std::strlen(buf));
+
+      unsigned int tempint = 0; // p levels are cell data
+
+      std::memcpy(buf, &tempint, sizeof(unsigned int));
+      out.write(buf, sizeof(unsigned int));
+
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+      unsigned int n=0;
+
+      for (; it != end; ++it)
+        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          temp[n++] = static_cast<float>( (*it)->p_level() );
+
+      out.write(reinterpret_cast<char *>(temp),
+                sizeof(float)*n_floats);
+
+      delete [] temp;
+    }
+
+  
+   // optionally write cell-centered data
+   if ( !(this->_cell_centered_data.empty()) )
+     {
+       std::cerr << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
+       
+//        std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
+//        const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
+
+//        for (; it != end; ++it)
+//  	{
+//  	  // Write out the variable name ...
+//  	  std::strcpy(buf, (*it).first.c_str());
+//  	  out.write(buf, std::strlen(buf));
+	  
+//  	  // ... followed by a zero.
+//  	  unsigned int tempint = 0; // 0 signifies cell data
+//  	  std::memcpy(buf, &tempint, sizeof(unsigned int));
+//  	  out.write(buf, sizeof(unsigned int));
+
+//  	  // Get a pointer to the array of cell-centered data values
+//  	  const std::vector<Real>* the_array = (*it).second;
+
+// 	  // Since the_array might contain zeros (for inactive elements) we need to
+// 	  // make a copy of it containing just values for active elements.
+// 	  const unsigned int n_floats = mesh.n_active_elem() * (1<<mesh.mesh_dimension());
+// 	  float *temp = new float[n_floats];
+
+// 	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+// 	  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end(); 
+// 	  unsigned int n=0;
+
+// 	  for (; elem_it != elem_end; ++elem_it)
+// 	    {
+// 	      // If there's a seg-fault, it will probably be here!
+// 	      const float the_value = static_cast<float>(the_array->operator[]((*elem_it)->id()));
+	      
+// 	      for (unsigned int se=0; se<(*elem_it)->n_sub_elem(); se++)
+// 		temp[n++] = the_value;
+// 	    }
+
+	  
+//  	  // Write "the_array" directly to the file
+//  	  out.write(reinterpret_cast<char *>(temp),
+//  		    sizeof(float)*n_floats);
+
+// 	  delete [] temp;
+//  	}
+     }
+
+  
+  
+  
+  // optionally write the data
+  if ((solution_names != NULL) &&
+      (vec != NULL))
+    {
+      float *temp = new float[mesh.n_nodes()];
+
+      const unsigned int n_vars = solution_names->size();
+      
+      for (unsigned int c=0; c<n_vars; c++)
+        {
+
+#ifdef USE_COMPLEX_NUMBERS
+          // for complex data, write three datasets
+
+
+          // Real part
+          std::strcpy(buf, "r_");
+          out.write(buf, 2);
+          std::strcpy(buf, (*solution_names)[c].c_str());
+          out.write(buf, 6);
+	  
+          unsigned int tempint = 1; // always do nodal data
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
+          out.write(buf, sizeof(unsigned int));
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            temp[n] = static_cast<float>( (*vec)[n*n_vars + c].real() );
+	  
+          out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+
+          // imaginary part
+          std::strcpy(buf, "i_");
+          out.write(buf, 2);
+          std::strcpy(buf, (*solution_names)[c].c_str());
+          out.write(buf, 6);
+	  
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
+          out.write(buf, sizeof(unsigned int));
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            temp[n] = static_cast<float>( (*vec)[n*n_vars + c].imag() );
+	  
+          out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+          // magnitude
+          std::strcpy(buf, "a_");
+          out.write(buf, 2);
+          std::strcpy(buf, (*solution_names)[c].c_str());
+          out.write(buf, 6);
+	  
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
+          out.write(buf, sizeof(unsigned int));
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            temp[n] = static_cast<float>(std::abs((*vec)[n*n_vars + c]));
+	  
+          out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+#else
+
+
+          std::strcpy(buf, (*solution_names)[c].c_str());
+          out.write(buf, 8);
+	  
+          unsigned int tempint = 1; // always do nodal data
+          std::memcpy(buf, &tempint, sizeof(unsigned int));
+          out.write(buf, sizeof(unsigned int));
+	  
+          for (unsigned int n=0; n<mesh.n_nodes(); n++)
+            temp[n] = static_cast<float>((*vec)[n*n_vars + c]);
+	  
+          out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+
+
+#endif
+
+	  
+        }
+    
+      delete [] temp;
+      
+    }
+
+  // If we wrote any variables, we have to close the variable section now
+  if (write_variable)
+    {
+      std::strcpy(buf, "endvars ");
+      out.write(buf, std::strlen(buf));
+    }
+
+  // end the file
+  std::strcpy(buf, "endgmv  ");
+  out.write(buf, std::strlen(buf));
+}
+
+
+
+
+
+
+
+
+
+void GMVIO::write_discontinuous_gmv (const std::string& name,
+				     const EquationSystems& es,
+				     const bool write_partitioning) const
+{
+  std::vector<std::string> solution_names;
+  std::vector<Number>      v;
+
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  
+  es.build_variable_names  (solution_names);
+  es.build_discontinuous_solution_vector (v);
+  
+  if (mesh.processor_id() != 0) return;
+  
+  std::ofstream out(name.c_str());
+  
+  assert (out.good());
+
+  // Begin interfacing with the GMV data file
+  {
+
+    // write the nodes    
+    out << "gmvinput ascii" << std::endl << std::endl;
+    
+    // Compute the total weight
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      unsigned int tw=0;
+      
+      for ( ; it != end; ++it)
+	tw += (*it)->n_nodes();
+      
+      out << "nodes " << tw << std::endl;
+    }
+    
+
+
+    // Write all the x values
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+      
+      for ( ; it != end; ++it)   
+	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+	  out << (*it)->point(n)(0) << " ";
+
+      out << std::endl;
+    }
+    
+    
+    // Write all the y values
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)   
+	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+	  out << (*it)->point(n)(1) << " ";
+
+      out << std::endl;
+    }
+    
+    
+    // Write all the z values
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+      
+      for ( ; it != end; ++it)   
+	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+	  out << (*it)->point(n)(2) << " ";
+
+      out << std::endl << std::endl;
+    }
+  }
+
+
+  
+  {
+    // write the connectivity
+    
+    out << "cells " << mesh.n_active_elem() << std::endl;
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+    unsigned int nn=1;
+    
+    switch (mesh.mesh_dimension())
+      {
+      case 1:
+	{
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == EDGE2) ||
+		    ((*it)->type() == EDGE3) ||
+		    ((*it)->type() == EDGE4)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		    || ((*it)->type() == INFEDGE2)
+#endif
+		    )
+		  {
+		    out << "line 2" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+		    
+		  }
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
+	  break;
+	}
+	
+      case 2:
+	{
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == QUAD4) ||
+		    ((*it)->type() == QUAD8) ||
+		    ((*it)->type() == QUAD9)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		    || ((*it)->type() == INFQUAD4)
+		    || ((*it)->type() == INFQUAD6)
+#endif
+		    )
+		  {
+		    out << "quad 4" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+		    
+		  }
+                else if (((*it)->type() == TRI3) ||
+                         ((*it)->type() == TRI6))
+                  {
+                    out << "tri 3" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+		    
+                  }
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
+	  break;
+	}
+	
+	
+      case 3:
+	{
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		if (((*it)->type() == HEX8) ||
+		    ((*it)->type() == HEX20) ||
+		    ((*it)->type() == HEX27)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		    || ((*it)->type() == INFHEX8)
+		    || ((*it)->type() == INFHEX16)
+		    || ((*it)->type() == INFHEX18)
+#endif
+		    )
+		  {
+		    out << "phex8 8" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+		  }
+                else if (((*it)->type() == PRISM6) ||
+                         ((*it)->type() == PRISM15) ||
+                         ((*it)->type() == PRISM18)
+#ifdef ENABLE_INFINITE_ELEMENTS
+		         || ((*it)->type() == INFPRISM6)
+		         || ((*it)->type() == INFPRISM12)
+#endif
+			 )
+                  {
+                    out << "pprism6 6" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+                  }
+                else if (((*it)->type() == TET4) ||
+                         ((*it)->type() == TET10))
+                  {
+                    out << "tet 4" << std::endl;
+		    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+		      out << nn++ << " ";
+                  }
+		else
+		  {
+		    error();
+		  }
+		
+		out << std::endl;
+	      }
+	  
+	  break;
+	}
+	
+      default:
+	error();
+      }
+    
+    out << std::endl;
+  }
+  
+
+  
+  // optionally write the partition information
+  if (write_partitioning)
+    {
+      out << "material "
+	  << mesh.n_processors()
+	  << " 0"<< std::endl;
+
+      for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
+	out << "proc_" << proc << std::endl;
+      
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+      for ( ; it != end; ++it)
+	out << (*it)->processor_id()+1 << std::endl;
+      
+      out << std::endl;
+    }
+
+
+  // Writing cell-centered data is not yet supported in discontinuous GMV files.
+  if ( !(this->_cell_centered_data.empty()) )
+    {
+      std::cerr << "Cell-centered data not (yet) supported for discontinuous GMV files!" << std::endl;
+    }
+
+  
+  
+  // write the data
+  {
+    const unsigned int n_vars = solution_names.size();
+      
+    //    assert (v.size() == tw*n_vars);
+
+    out << "variable" << std::endl;
+
+
+    for (unsigned int c=0; c<n_vars; c++)
+      {
+
+#ifdef USE_COMPLEX_NUMBERS
+
+        // in case of complex data, write _tree_ data sets
+        // for each component
+
+        // this is the real part
+        out << "r_" << solution_names[c] << " 1" << std::endl;
+        {
+          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+          for ( ; it != end; ++it)
+            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+              out << std::setprecision(10) << v[(n++)*n_vars + c].real() << " ";	    
+        }	  	  
+        out << std::endl << std::endl;
+
+
+        // this is the imaginary part
+        out << "i_" << solution_names[c] << " 1" << std::endl;	  
+        {
+          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	    
+          for ( ; it != end; ++it)
+            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+              out << std::setprecision(10) << v[(n++)*n_vars + c].imag() << " ";	    
+        }	  
+        out << std::endl << std::endl;
+
+        // this is the magnitude
+        out << "a_" << solution_names[c] << " 1" << std::endl;
+        {
+          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	    
+          for ( ; it != end; ++it)
+            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+              out << std::setprecision(10)
+                  << std::abs(v[(n++)*n_vars + c]) << " ";	    
+        }
+        out << std::endl << std::endl;
+
+#else
+
+        out << solution_names[c] << " 1" << std::endl;
+        {
+          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	    
+          unsigned int nn=0;
+	  
+          for ( ; it != end; ++it)
+            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+              out << std::setprecision(10) << v[(nn++)*n_vars + c] << " ";	    
+        }	  
+        out << std::endl << std::endl;
+
+#endif
+
+      }
+      
+    out << "endvars" << std::endl;
+  }
+
+  
+  // end of the file
+  out << std::endl << "endgmv" << std::endl;
+}
+
+
+
+
+
+void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_name,
+				    const std::vector<Real>* cell_centered_data_vals)
+{
+  assert (cell_centered_data_vals != NULL);
+  assert (cell_centered_data_vals->size() == this->mesh().n_active_elem());
+  this->_cell_centered_data[cell_centered_data_name] = cell_centered_data_vals;
+}

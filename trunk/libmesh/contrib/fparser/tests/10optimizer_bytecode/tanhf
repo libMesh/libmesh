@@ -1,0 +1,5 @@
+T=f
+V=x
+R=0,1,1
+F=tanh(1.1)+x
+C=tanhf(1.1)+x

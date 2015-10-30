@@ -1,0 +1,102 @@
+This is TeX, Version 3.14159 (C version 6.1) (format=latex 95.7.10)  17 JAN 1996 14:58
+**images.tex
+(images.tex
+LaTeX2e <1995/06/01> patch level 1
+Hyphenation patterns for english, german, loaded.
+
+(/usr/TeX/texmf/tex/latex/base/latex209.def
+File: latex209.def 1995/06/30 v0.46 Standard LaTeX file
+Entering LaTeX 2.09 compatibility mode.
+\footheight=\dimen102
+\@maxsep=\dimen103
+\@dblmaxsep=\dimen104
+(/usr/TeX/texmf/tex/latex/base/tracefnt.sty
+Package: tracefnt 1995/06/15 v3.0b Standard LaTeX package (font tracing)
+\tracingfonts=\count82
+LaTeX Info: Redefining \selectfont on input line 133.
+)
+\symbold=\mathgroup4
+\symsans=\mathgroup5
+\symtypewriter=\mathgroup6
+\symitalic=\mathgroup7
+\symsmallcaps=\mathgroup8
+\symslanted=\mathgroup9
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 275.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 276.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 277.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 283.
+LaTeX Info: Redefining \em on input line 293.
+(/usr/TeX/texmf/tex/latex/base/latexsym.sty
+Package: latexsym 1995/03/18 v2.2a Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup10
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 81.
+)
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 358.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 360.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 362.
+(/usr/TeX/texmf/tex/latex/config/latex209.cfg (/usr/TeX/texmf/tex/latex/tools/r
+awfonts.sty
+Compatibility mode: package `' requested, but `rawfonts' provided.
+Package: rawfonts 1994/05/08 Low-level LaTeX 2.09 font compatibility
+(/usr/TeX/texmf/tex/latex/tools/somedefs.sty
+Package: somedefs 1994/06/01 Toolkit for optional definitions
+)
+LaTeX Font Info:    Try loading font information for U+lasy on input line 30.
+(/usr/TeX/texmf/tex/latex/base/Ulasy.fd
+File: Ulasy.fd 1995/03/18 v2.2aLaTeX symbol font definitions
+)))) (/usr/TeX/texmf/tex/latex/base/article.cls
+Document Class: article 1995/06/26 v1.3g Standard LaTeX document class
+(/usr/TeX/texmf/tex/latex/base/size10.clo
+File: size10.clo 1995/06/26 v1.3g Standard LaTeX file (size option)
+)
+\c@part=\count83
+\c@section=\count84
+\c@subsection=\count85
+\c@subsubsection=\count86
+\c@paragraph=\count87
+\c@subparagraph=\count88
+\c@figure=\count89
+\c@table=\count90
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+Compatibility mode: definition of \rm ignored.
+Compatibility mode: definition of \sf ignored.
+Compatibility mode: definition of \tt ignored.
+Compatibility mode: definition of \bf ignored.
+Compatibility mode: definition of \it ignored.
+Compatibility mode: definition of \sl ignored.
+Compatibility mode: definition of \sc ignored.
+LaTeX Info: Redefining \cal on input line 491.
+LaTeX Info: Redefining \mit on input line 492.
+\bibindent=\dimen105
+) (/home/hd11/numeric/skalicky/sources/laspack/doc/html.sty)
+\lthtmlwrite=\write3
+\sizebox=\box26
+(images.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+[1
+
+
+] (images.aux) ) 
+Here is how much of TeX's memory you used:
+ 704 strings out of 10928
+ 7291 string characters out of 72166
+ 49141 words of memory out of 262141
+ 3565 multiletter control sequences out of 9500
+ 19156 words of font info for 73 fonts, out of 150000 for 255
+ 14 hyphenation exceptions out of 607
+ 21i,9n,20p,314b,308s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on images.dvi (1 page, 1432 bytes).

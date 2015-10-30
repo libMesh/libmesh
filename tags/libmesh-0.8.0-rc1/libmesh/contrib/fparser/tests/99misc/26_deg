@@ -1,0 +1,6 @@
+T=d f ld mf
+DEG=1
+V=x
+R=-100,100,.1
+F=sin(x) + cos(x*1.5) + asin(x/110) + acos(x/120)
+C=fp_sin(d2r(x)) + fp_cos(d2r(x*1.5)) + r2d(fp_asin(x/110.0)) + r2d(fp_acos(x/120.0))

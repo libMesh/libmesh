@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> Introduction</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Introduction">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html175 HREF="node3.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html173 HREF="laspack.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html167 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html177 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html176 HREF="node3.html"> What's New</A>
+<B>Up:</B> <A NAME=tex2html174 HREF="laspack.html">LASPack Reference Manual</A>
+<B> Previous:</B> <A NAME=tex2html168 HREF="node1.html">Contents</A>
+<BR> <HR> <P>
+<H1><A NAME=SECTION00020000000000000000> Introduction</A></H1>
+<P>
+<H6><A NAME=SectionIntro>&#160;</A></H6>
+<P>
+<tt> LASPack</tt>
+  is a package for solving large sparse systems of linear equations
+like those which arise from the discretization of partial differential 
+equations.
+<P>
+<P>
+<P>
+Main features:
+<UL><LI> 
+  The primary aim of <tt> LASPack</tt>
+  is the implementation of efficient iterative
+  methods for the solution of systems of linear equations.
+  All routines and data structures are optimized for effective usage
+  of resources especially with regard to large sparse matrices.
+  The package can be accessed from an application through
+  a straightforward interface defined in the form of procedure calls.
+<LI>
+  Besides the obligatory Jacobi, successive over-relaxation, Chebyshev, and
+  conjugate gradient solvers,
+  <tt> LASPack</tt>
+  contains selected state-of-the-art algorithms
+  which are commonly used for large sparse systems:
+  <UL><LI>
+    CG-like methods for non-symmetric systems: CGN, GMRES, BiCG, QMR, CGS, and
+    BiCGStab,
+  <LI>
+    multilevel methods such as the multigrid and conjugate gradient methods
+    preconditioned by multigrid and BPX preconditioners.
+  </UL>
+  All the above solvers are applicable not only to the positive definite or
+  non-symmetric matrices,
+  but are also adopted for singular systems
+  (e.g. arising from discretization of Neumann boundary value problems).
+<LI>
+  The implementation is based on an object-oriented approach  
+  (although it is programmed in C).
+  Vectors and matrices are defined as new data types in connection with
+  the corresponding supporting routines.
+  The basic operations are implemented in such a way
+  that they allow the programming of linear algebra algorithms
+  in a natural way.
+<LI>
+  <tt> LASPack</tt>
+  is extensible in a simple manner. 
+  An access to the internal representation of vectors and matrices
+  is not necessary and is avoided,
+  as required of the object-oriented programming.
+  This allows an improvement of algorithms or a modification
+  of data structures with no adjustment of application programs
+  using the package.
+<LI>
+  <tt> LASPack</tt>
+  is written in ANSI C and is thus largely portable.
+</UL><BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

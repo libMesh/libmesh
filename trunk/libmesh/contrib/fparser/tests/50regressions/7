@@ -1,0 +1,9 @@
+# Bug: x>7 & x<2 (which should produce 0) was wrongly optimized
+#      with the same rule that works for e.g. x>7 & x<13
+# Introduced in commit ________
+# Fixed in commit e42268a289f256104c01c15873f2d63eac3a95b2
+T=d li
+V=x
+R=-9,9,1
+F=x>7 & x<2
+C=x-x

@@ -1,0 +1,5 @@
+T=li gi
+V=x,y
+R=-2,2,1
+F=if(x, y/x, y/2)
+C=y / (fp_truth(x)!=0 ? x : 2)

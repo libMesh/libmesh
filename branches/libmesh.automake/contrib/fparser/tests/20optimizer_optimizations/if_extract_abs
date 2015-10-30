@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=-2,2,1
+F=if(x, abs(x+2), abs(y+5))
+C=fp_abs(fp_truth(x)!=0 ? (x+2) : (y+5))

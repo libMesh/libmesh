@@ -1,0 +1,5 @@
+T=d li gi cd
+V=x
+R=-5,5,1
+F=sub(abs(x) >= if(1,4,0), abs(x) >= (if(1,1,0)-1))
+C=userDefFuncSub({fp_greaterOrEq(fp_abs(x),4), fp_greaterOrEq(fp_abs(x),0)})

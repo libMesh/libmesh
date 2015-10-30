@@ -1,0 +1,8 @@
+# Bug: atan2(-x,-y) wrongly optimized to atan2(x,y)
+# Introduced in commit ff12195f506cb3138067ee0e467ead97cdaca322
+# Fixed in commit 907b889a93e4b93b0dc501fb904f471744c779e4
+T=d f
+V=x,y
+R=-9,9,1
+F=atan2(-x,-y) + 10*atan2(-x,y) + 20*atan2(x,-y) + 30*atan2(x,y)
+C=fp_atan2(-x,-y) + 10*fp_atan2(-x,y) + 20*fp_atan2(x,-y) + 30*fp_atan2(x,y)

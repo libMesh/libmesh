@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=.1, .9, .025
+F=abs(x)+acos(x)+asin(x)+atan(x)+atan2(x,y)+ceil(x)+cos(x)+cosh(x)+cot(x)+csc(x) + pow(x,y)
+C=fp_abs(x)+fp_acos(x)+fp_asin(x)+fp_atan(x)+fp_atan2(x,y)+fp_ceil(x)+fp_cos(x)+fp_cosh(x)+1.0/fp_tan(x)+1.0/fp_sin(x) +fp_pow(x,y)

@@ -1,0 +1,9 @@
+T=d ld f mf cd cf cld
+V=x
+R=-1,1,1
+F=cos(sqrt(cbrt(x^6))) + sqrt(cbrt(x^6))
+C=fp_cos(fp_abs(x)) + fp_abs(x)
+
+# sqrt(cbrt(x^6)) produces abs(x) through fpoptimizer.
+# We cannot use abs(x) directly, because
+# then bytecode optimizer would take it.

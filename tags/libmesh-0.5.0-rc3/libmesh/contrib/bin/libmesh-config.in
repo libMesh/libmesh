@@ -1,0 +1,56 @@
+#!/bin/sh
+
+#
+# Define the usage() function
+#
+
+usage ()
+{
+  echo "usage: $0 --cxxflags --include --ldflags"
+  exit
+}
+
+
+#
+# Need at least one command-line argument
+#
+if [ "$#" = "0" ] ; then
+    usage $0
+fi
+
+echo_list=""
+
+#
+# Process the command-line arguments, build up
+# echo_list
+#
+while [ "x$1" != "x" ]; do
+    case "$1" in
+	"--cxxflags")
+	    echo_list="echo_cxxflags $echo_list"
+	    ;;
+	
+	"--include")
+	    echo_list="echo_include $echo_list"
+	    ;;
+	
+	"--ldflags")
+	    echo_list="echo_ldflags $echo_list"
+	    ;;
+	
+	*)
+	    echo "Unknown argument: $1"
+	    usage $0
+    esac
+    shift
+done
+
+
+#
+# Use make to process the echo_list
+#
+make --no-print-directory -C @PWD@ $echo_list
+
+# Local Variables:
+# mode: shell-script
+# End:

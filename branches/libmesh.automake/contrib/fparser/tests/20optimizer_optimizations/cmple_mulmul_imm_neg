@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=-6,6,1
+F=((x*-4) <= (y+6))
+C=fp_lessOrEq(x*-4, y+6)

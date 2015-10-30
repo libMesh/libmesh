@@ -1,0 +1,5 @@
+T=li gi
+V=x
+R=-2, 2, 1
+F=!x
+C=Value_t(x==0)

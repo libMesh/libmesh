@@ -1,0 +1,12 @@
+T=d ld f mf cd cf cld
+V=x
+R=-3,3,0.25
+F=if(x>0,  floor(x),ceil(x))+\
+  if(x>=0, floor(x),ceil(x))+\
+  if(x<0,  ceil(x),floor(x))+\
+  if(x<=0, ceil(x),floor(x))+\
+  10*if(x>0,  ceil(x),floor(x))+\
+  10*if(x>=0, ceil(x),floor(x))+\
+  10*if(x<0,  floor(x),ceil(x))+\
+  10*if(x<=0, floor(x),ceil(x))
+C=fp_trunc(x)*4 + 40*(x>0?fp_ceil(x):fp_floor(x))

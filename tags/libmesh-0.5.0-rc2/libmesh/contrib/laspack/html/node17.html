@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> EIGENVAL(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" EIGENVAL(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html355 HREF="node18.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html353 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html347 HREF="node16.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html357 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html356 HREF="node18.html"> ERRHANDL(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html354 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html348 HREF="node16.html"> INTRO(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00082000000000000000>&#160</A><A NAME=EIGENVAL> EIGENVAL(3LAS)</A></H2>
+<P>
+<H6><A NAME=EIGENVAL>&#160;</A></H6>
+<P>
+
+<H3><A NAME=SECTION00082100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> SetEigenvalAccuracy</tt>, <tt> GetMaxEigenval</tt>, <tt> GetMinEigenval</tt>
+-- estimation of extremal eigenvalues
+<P>
+
+<H3><A NAME=SECTION00082200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<P>
+
+<PRE>#include &lt;laspack/eigenval.h&gt;
+
+void SetEigenvalAccuracy(double Eps);
+double GetMinEigenval(QMatrix *Q, PrecondProcType PrecondProc,
+                      double OmegaPrecond);
+double GetMaxEigenval(QMatrix *Q, PrecondProcType PrecondProc,
+                      double OmegaPrecond);
+</PRE>
+<H3><A NAME=SECTION00082300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=GetMinEigenval>&#160;</A><A NAME=GetMaxEigenval>&#160;</A></H6>
+The procedures <tt> GetMinEigenval</tt> and <tt> GetMaxEigenval</tt>
+estimate extremal eigenvalues of the matrix <tt> Q</tt>.
+In <tt> LASPack</tt>
+  both eigenvalues are required internally
+for the Chebyshev method.
+Otherwise they could be applied in an application,
+e.g. for the estimation of the condition number of a matrix
+(see example below).
+<P>
+The algorithm used is based on the Lanczos method for symmetric matrices. 
+Eigenvalues of non-symmetric matrices are estimated by means of
+<tt> Q^T Q</tt>.
+<P>
+For singular matrices, if the null space has been specified,
+the zero eigenvalue is not considered.
+<P>
+If any procedure for preconditioning is given
+by the parameter <tt> PrecondProc</tt> (i.e. if <tt> PrecondProc != NULL</tt>),
+eigenvalues are computed for the preconditioned matrix.
+The procedure used should have the prototype
+
+<PRE>  Vector *(*PrecondProcType)(QMatrix *, Vector *, Vector *, double)
+</PRE>
+
+The parameter <tt> OmegaPrecond</tt> will be passed as a relaxation parameter 
+to the preconditioner.
+<P>
+<H6><A NAME=SetEigenvalAccuracy>&#160;</A></H6>
+The accuracy for the stopping criterion can be set by <tt> SetEigenvalAccuracy</tt>.
+The default is 1e-4.
+<P>
+Each of the procedures <tt> GetMinEigenval</tt> and <tt> GetMaxEigenval</tt> 
+causes the estimation of both, minimum and maximum eigenvalues.
+They are stored together with the parameters <tt> PrecondProc</tt>
+and <tt> OmegaPrecond</tt> in connection with the matrix <tt> Q</tt>,
+and are returned at the next call of the above routines
+if the same parameters are used.
+Therefore, the extremal eigenvalues need not be stored additionally,
+but could be queried on demand without extra computational costs.
+<P>
+<H3><A NAME=SECTION00082400000000000000> REFERENCES</A></H3>
+<P>
+The implementation of the Lanczos method follows algorithms described in:
+
+<blockquote> G. Golub, C. van Loan:
+   Matrix Computations, second edition,
+   The Johns Hopkins University Press, Baltimore, 1989.
+</blockquote><H3><A NAME=SECTION00082500000000000000> FILES</A></H3>
+<P>
+  <tt> eigenval.h ... </tt> header file <BR> 
+
+  <tt> eigenval.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00082600000000000000> EXAMPLES</A></H3>
+<P>
+In the following code fragment,
+condition numbers of a matrix and their preconditioned variants are estimated.
+
+<PRE>QMatrix A;
+double LambdaMax, LambdaMin;
+size_t Dim;
+
+
+Dim = ... ;
+Q_Constr(&amp;A, &quot;A&quot;, Dim, True, Rowws, Normal, True);
+
+/* generation of the matrix A */
+
+...
+    
+printf(&quot;Condition numbers of the matrix %s:\n\n&quot;, Q_GetName(&amp;A));
+
+LambdaMax = GetMaxEigenval(&amp;A, NULL, 1.0);
+LambdaMin = GetMinEigenval(&amp;A, NULL, 1.0);
+printf(&quot;without preconditioning:      k = %12.5e\n&quot;, LambdaMax / LambdaMin); 
+
+LambdaMax = GetMaxEigenval(&amp;A, JacobiPrecond, 1.0);
+LambdaMin = GetMinEigenval(&amp;A, JacobiPrecond, 1.0);
+printf(&quot;with Jacobi preconditioning:  k = %12.5e\n&quot;, LambdaMax / LambdaMin); 
+
+LambdaMax = GetMaxEigenval(&amp;A, SSORPrecond, 1.0);
+LambdaMin = GetMinEigenval(&amp;A, SSORPrecond, 1.0);
+printf(&quot;with SSOR preconditioning:    k = %12.5e\n&quot;, LambdaMax / LambdaMin); 
+
+LambdaMax = GetMaxEigenval(&amp;A, ILUPrecond, 1.0);
+LambdaMin = GetMinEigenval(&amp;A, ILUPrecond, 1.0);
+printf(&quot;with ILU preconditioning:     k = %12.5e\n&quot;, LambdaMax / LambdaMin); 
+    
+Q_Destr(&amp;A);
+</PRE>
+<P>
+<H3><A NAME=SECTION00082700000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node25.html#QMATRIX">qmatrix(3LAS)</A>, <A HREF="node24.html#PRECOND">precond(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html355 HREF="node18.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html353 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html347 HREF="node16.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html357 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html356 HREF="node18.html"> ERRHANDL(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html354 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html348 HREF="node16.html"> INTRO(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

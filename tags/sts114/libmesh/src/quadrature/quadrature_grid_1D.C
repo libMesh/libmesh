@@ -1,0 +1,44 @@
+// $Id: quadrature_grid_1D.C,v 1.1 2005-01-13 21:54:03 roystgnr Exp $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2005  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// C++ includes
+
+// Local includes
+#include "quadrature_grid.h"
+ 
+
+
+void QGrid::init_1D(const ElemType)
+{
+  //----------------------------------------------------------------------
+  // 1D quadrature rules
+
+  _points.resize(_order + 1);
+  _weights.resize(_order + 1);
+  for (int i = 0; i != _order + 1; ++i)
+    {
+      _points[i](0) = 2.0 * (double)i / (double)_order - 1.0;
+      _weights[i] = 2.0 / (double)(_order + 1);
+    }
+  return;
+}
+ 
+

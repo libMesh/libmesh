@@ -1,0 +1,7 @@
+# Bug fixed in release version 4.0.4
+
+T=d f ld mf li gi
+V=x,y
+R=-2, 2, 1
+F=sqr(x) | sub(x,y) | value()
+C=fp_or(fp_or(userDefFuncSqr({x}), userDefFuncSub({x,y})), userDefFuncValue({}))

@@ -1,0 +1,13 @@
+T=d ld li f mf gi cd cf cld
+V=x,y,z
+R=0,4,1
+F=max(z,min(x,max(max(z,y),x))) + \
+  10*min(z,max(x,min(y,x))) + \
+  100*min(max(x,y),min(y,z)) + \
+  1000*max(min(x,y),max(y,z))
+C=fp_max(z,fp_min(x,fp_max(fp_max(z,y),x))) + \
+  10*fp_min(z,fp_max(x,fp_min(y,x))) + \
+  100*fp_min(fp_max(x,y),fp_min(y,z)) + \
+  1000*fp_max(fp_min(x,y),fp_max(y,z))
+
+# Expected optimization: max(x,z) + min(x,z)*10 + min(y,z)*100 + max(y,z)*1000

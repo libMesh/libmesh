@@ -1,0 +1,7 @@
+T=d ld f mf cd cf cld
+V=x,y,z
+R=-1,1,0.5
+F=!x * !y * !z
+C=fp_not(x) * fp_not(y) * fp_not(z)
+
+# Expected result: !(x | y | z)  hence NOR

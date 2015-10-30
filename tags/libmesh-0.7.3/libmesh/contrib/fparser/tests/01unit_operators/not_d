@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x
+R=-1.25,1.25,0.25
+F=!x
+C=Value_t( fp_abs(x) < 0.5 )

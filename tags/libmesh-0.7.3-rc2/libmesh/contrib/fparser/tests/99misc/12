@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=1,2000,.5
+F=1/log(10^((3-2)/log(x)))
+C=1.0/fp_log(fp_pow(10.0, 1.0/fp_log(x)))

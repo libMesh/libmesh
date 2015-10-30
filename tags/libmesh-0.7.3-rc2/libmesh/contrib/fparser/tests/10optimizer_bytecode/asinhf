@@ -1,0 +1,5 @@
+T=f
+V=x
+R=0,1,1
+F=asinh(1.1)+x
+C=logf(1.1 + sqrtf(1.1*1.1+1))+x

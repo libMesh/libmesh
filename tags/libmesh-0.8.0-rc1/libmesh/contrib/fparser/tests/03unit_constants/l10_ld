@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=0,1,1
+F=x*0+ logten
+C=logl(x*0+10)

@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-10,10,.01
+F=cos(x)*sin(1-x)*(1-cos(x/2)*sin(x*5))
+C=fp_cos(x)*fp_sin(1-x)*(1-fp_cos(x/2)*fp_sin(x*5))

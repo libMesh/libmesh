@@ -1,0 +1,5 @@
+T=d f ld li gi
+V=x
+R=-5,5,1
+F=!!(x+4)
+C=fp_notNot(x+4)

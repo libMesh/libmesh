@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=0,1,1
+F=floor(1.1)+x
+C=MpfrFloat::floor(1.1)+x

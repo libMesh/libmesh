@@ -1,0 +1,32 @@
+# Solve a singular or non-singular problem
+singularity = true        
+
+# In what dimension
+dimension = 3 
+
+# With what elements ("tensor", "simplex")
+element_type = tensor
+
+# minimum approximation order
+p_order = 1 
+
+# Mesh refinement type: h, p, or hp
+refinement_type = h 
+
+# Number of uniform refinement steps
+uniform_h_r_steps = 2
+
+# Maximum number of adaptive refinement steps
+max_adaptive_r_steps = 3
+
+# Percentage of elements to refine at each step
+refine_fraction = 0.8
+
+# Percentage of elements to coarsen at each step
+coarsen_fraction = 0.1
+
+# Maximux h refinement level for an element
+max_h_level = 9
+
+# Penalty term, it ensures interior penalty formulation stability
+ip_penalty = 4

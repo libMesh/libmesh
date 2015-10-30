@@ -1,0 +1,7 @@
+# cDup [x+x==Value_t(1)] cAdd      x cMul
+
+T=d f ld mf
+V=x
+R=-3,3,1
+F=(x+x)*0.5
+C=x

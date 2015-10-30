@@ -1,0 +1,15 @@
+T=d f ld
+V=x
+R=-3,3,0.5
+F=1*(sinh(x)=sinh(2)) + \
+  2*(sinh(x)<sinh(2)) + \
+  4*(sinh(x)<=sinh(2)) + \
+  8*(sinh(x)>sinh(2)) + \
+  16*(sinh(x)>=sinh(2)) + \
+  32*(sinh(x)!=sinh(2))
+C=1*fp_equal(fp_sinh(x),fp_sinh(2)) + \
+  2*fp_less(fp_sinh(x),fp_sinh(2)) + \
+  4*fp_lessOrEq(fp_sinh(x),fp_sinh(2)) + \
+  8*fp_greater(fp_sinh(x),fp_sinh(2)) + \
+  16*fp_greaterOrEq(fp_sinh(x),fp_sinh(2)) + \
+  32*fp_nequal(fp_sinh(x),fp_sinh(2))

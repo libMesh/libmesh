@@ -1,0 +1,9 @@
+# sin/cos/tan/csc/sec/cot CSE bugs
+# Introduced in commit 62b869dd21c1c7fe7ec4fcd846c9e9c12a27a34a
+# Fixed in commit b887b5a13b0ca689c208fb01072ac353a048797c
+
+T=d f ld mf
+V=x
+R=-0.7, 0.7, 0.28
+F=sub(sin(x)+csc(x),cos(x))
+C=userDefFuncSub({fp_sin(x)+1/fp_sin(x),fp_cos(x)})

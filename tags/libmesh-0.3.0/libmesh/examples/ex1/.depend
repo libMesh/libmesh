@@ -1,0 +1,26 @@
+ex1.$(obj-suffix):\
+    ex1.C\
+    ../../include/auto_ptr.h\
+    ../../include/boundary_info.h\
+    ../../include/boundary_mesh.h\
+    ../../include/dof_object.h\
+    ../../include/elem.h\
+    ../../include/elem_iterators.h\
+    ../../include/enum_elem_quality.h\
+    ../../include/enum_elem_type.h\
+    ../../include/enum_order.h\
+    ../../include/libmesh.h\
+    ../../include/mesh.h\
+    ../../include/mesh_base.h\
+    ../../include/mesh_common.h\
+    ../../include/mesh_config.h\
+    ../../include/mesh_refinement.h\
+    ../../include/node.h\
+    ../../include/node_iterators.h\
+    ../../include/perf_log.h\
+    ../../include/point.h\
+    ../../include/predicated_iterator.h\
+    ../../include/reference_counted_object.h\
+    ../../include/reference_counter.h\
+    ../../include/sphere.h\
+    ../../include/surface.h

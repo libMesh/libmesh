@@ -1,0 +1,5 @@
+T=d cd
+V=x
+R=1e-6, 4000, 0.1
+F=log(x)
+C=log(x)

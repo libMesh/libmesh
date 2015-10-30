@@ -1,0 +1,15 @@
+T=d f ld
+V=x
+R=-1,1,0.25
+F=1*(acos(x)=acos(0.75)) + \
+  2*(acos(x)<acos(0.75)) + \
+  4*(acos(x)<=acos(0.75)) + \
+  8*(acos(x)>acos(0.75)) + \
+  16*(acos(x)>=acos(0.75)) + \
+  32*(acos(x)!=acos(0.75))
+C=1*fp_equal(fp_acos(x),fp_acos(0.75)) + \
+  2*fp_less(fp_acos(x),fp_acos(0.75)) + \
+  4*fp_lessOrEq(fp_acos(x),fp_acos(0.75)) + \
+  8*fp_greater(fp_acos(x),fp_acos(0.75)) + \
+  16*fp_greaterOrEq(fp_acos(x),fp_acos(0.75)) + \
+  32*fp_nequal(fp_acos(x),fp_acos(0.75))

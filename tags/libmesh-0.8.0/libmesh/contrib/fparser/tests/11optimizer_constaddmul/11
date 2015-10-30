@@ -1,0 +1,6 @@
+T=d li cd
+V=a,b
+R=-15,15,2
+F=abs(b)/(50/a)
+C=fp_abs(b)/(50/a)
+# Note: Using 50 instead of 5 to prevent division-by-zero in integer test

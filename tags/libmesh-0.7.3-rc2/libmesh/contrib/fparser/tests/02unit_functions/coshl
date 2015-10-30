@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=-140, 140, 0.1
+F=cosh(x)
+C=coshl(x)

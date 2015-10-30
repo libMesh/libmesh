@@ -1,0 +1,331 @@
+// $Id: cell_hex.C,v 1.1.1.1 2003-01-10 16:17:48 libmesh Exp $
+
+// The Next Great Finite Element Library.
+// Copyright (C) 2002  Benjamin S. Kirk, John W. Peterson
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// C++ includes
+#include <algorithm>
+
+// Local includes
+#include "mesh.h"
+
+// Temporary includes
+#include "cell_hex.h"
+#include "face_quad4.h"
+
+
+
+
+// ------------------------------------------------------------
+// Hex class member functions
+Elem Hex::side (const unsigned int i) const
+{
+  assert (i < n_sides());
+  assert (_nodes.size() == n_nodes());
+
+
+  
+  Elem face(4);
+
+  // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
+  switch (i)
+    {
+    case 0:  // the face at z = -1
+      {
+	face.node(0) = node(0);
+	face.node(1) = node(3);
+	face.node(2) = node(2);
+	face.node(3) = node(1);
+
+	return face;
+      }
+    case 1:  // the face at y = -1
+      {
+	face.node(0) = node(0);
+	face.node(1) = node(1);
+	face.node(2) = node(5);
+	face.node(3) = node(4);
+	
+	return face;
+      }
+    case 2:  // the face at x = 1
+      {
+	face.node(0) = node(1);
+	face.node(1) = node(2);
+	face.node(2) = node(6);
+	face.node(3) = node(5);
+
+	return face;
+      }
+    case 3: // the face at y = 1
+      {
+	face.node(0) = node(2);
+	face.node(1) = node(3);
+	face.node(2) = node(7);
+	face.node(3) = node(6);
+	
+	return face;
+      }
+    case 4: // the face at x = -1
+      {
+	face.node(0) = node(3);
+	face.node(1) = node(0);
+	face.node(2) = node(4);
+	face.node(3) = node(7);
+
+	return face;
+      }
+    case 5: // the face at z = 1
+      {
+	face.node(0) = node(4);
+	face.node(1) = node(5);
+	face.node(2) = node(6);
+	face.node(3) = node(7);
+	
+	return face;
+      }
+    default:
+      {
+	error();
+	return face;
+      }
+    };
+
+  // We'll never get here.
+  error();
+
+  return face;
+};
+
+
+
+real Hex::quality (const MeshBase& mesh, 
+		   const ElemQuality q) const
+{
+  switch (q)
+    {
+      
+      /**
+       * Compue the min/max diagonal ratio.
+       * Source: CUBIT User's Manual.
+       */
+    case DIAGONAL:
+      {
+	// Diagonal between node 0 and node 6
+	const real d06 = this->length(mesh,0,6);
+
+	// Diagonal between node 3 and node 5
+	const real d35 = this->length(mesh,3,5);
+
+	// Diagonal between node 1 and node 7
+	const real d17 = this->length(mesh,1,7);
+
+	// Diagonal between node 2 and node 4 
+	const real d24 = this->length(mesh,2,4);
+
+	// Find the biggest and smallest diagonals
+	const real min = std::min(d06, std::min(d35, std::min(d17, d24)));
+	const real max = std::max(d06, std::max(d35, std::max(d17, d24)));
+
+	assert (max != 0.0);
+	
+	return min / max;
+
+	break;
+      }
+
+      /**
+       * Minimum ratio of lengths derived from opposite edges.
+       * Source: CUBIT User's Manual.
+       */
+    case TAPER:
+      {
+
+	/**
+	 * Compute the side lengths.
+	 */
+	const real d01 = this->length(mesh,0,1);
+	const real d12 = this->length(mesh,1,2);
+	const real d23 = this->length(mesh,2,3);
+	const real d03 = this->length(mesh,0,3);
+	const real d45 = this->length(mesh,4,5);
+	const real d56 = this->length(mesh,5,6);
+	const real d67 = this->length(mesh,6,7);
+	const real d47 = this->length(mesh,4,7);
+	const real d04 = this->length(mesh,0,4);
+	const real d15 = this->length(mesh,1,5);
+	const real d37 = this->length(mesh,3,7);
+	const real d26 = this->length(mesh,2,6);
+
+	std::vector<real> edge_ratios(12);
+	// Front
+	edge_ratios[0] = std::min(d01, d45) / std::max(d01, d45);
+	edge_ratios[1] = std::min(d04, d15) / std::max(d04, d15);
+
+	// Right
+	edge_ratios[2] = std::min(d15, d26) / std::max(d15, d26);
+	edge_ratios[3] = std::min(d12, d56) / std::max(d12, d56);
+
+	// Back
+	edge_ratios[4] = std::min(d67, d23) / std::max(d67, d23);
+	edge_ratios[5] = std::min(d26, d37) / std::max(d26, d37);
+
+	// Left
+	edge_ratios[6] = std::min(d04, d37) / std::max(d04, d37);
+	edge_ratios[7] = std::min(d03, d47) / std::max(d03, d47);
+
+	// Bottom
+	edge_ratios[8] = std::min(d01, d23) / std::max(d01, d23);
+	edge_ratios[9] = std::min(d03, d12) / std::max(d03, d12);
+
+	// Top
+	edge_ratios[10] = std::min(d45, d67) / std::max(d45, d67);
+	edge_ratios[11] = std::min(d56, d47) / std::max(d56, d47);
+	
+	return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
+
+	break;
+      }
+
+
+      /**
+       * Minimum edge length divided by max diagonal length.
+       * Source: CUBIT User's Manual.
+       */
+    case STRETCH:
+      {
+	const real sqrt3 = 1.73205080756888;
+
+	/**
+	 * Compute the maximum diagonal.
+	 */
+	const real d06 = this->length(mesh,0,6);
+	const real d17 = this->length(mesh,1,7);
+	const real d35 = this->length(mesh,3,5);
+	const real d24 = this->length(mesh,2,4);
+	const real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
+
+	assert ( max_diag != 0.0 );
+
+	/**
+	 * Compute the minimum edge length.
+	 */
+	std::vector<real> edges(12);
+	edges[0]  = this->length(mesh,0,1);
+	edges[1]  = this->length(mesh,1,2);
+	edges[2]  = this->length(mesh,2,3);
+	edges[3]  = this->length(mesh,0,3);
+	edges[4]  = this->length(mesh,4,5);
+	edges[5]  = this->length(mesh,5,6);
+	edges[6]  = this->length(mesh,6,7);
+	edges[7]  = this->length(mesh,4,7);
+	edges[8]  = this->length(mesh,0,4);
+	edges[9]  = this->length(mesh,1,5);
+	edges[10] = this->length(mesh,2,6);
+	edges[11] = this->length(mesh,3,7);
+
+	const real min_edge = *(std::min_element(edges.begin(), edges.end()));
+	return sqrt3 * min_edge / max_diag ;
+	break;
+      }
+
+      
+      /**
+       * I don't know what to do for this metric. 
+       * Maybe the base class knows...
+       */
+    default:
+      {
+	return Elem::quality(mesh, q);
+      }
+    }
+
+    
+    // Will never get here...
+    error();
+    return 0.;
+};
+
+
+
+std::pair<real, real> Hex::qual_bounds (const ElemQuality q) const
+{
+  std::pair<real, real> bounds;
+  
+  switch (q)
+    {
+
+    case ASPECT_RATIO:
+      bounds.first  = 1.;
+      bounds.second = 4.;
+      break;
+      
+    case SKEW:
+      bounds.first  = 0.;
+      bounds.second = 0.5;
+      break;
+
+    case SHEAR:
+    case SHAPE:
+      bounds.first  = 0.3;
+      bounds.second = 1.;
+      break;
+
+    case CONDITION:
+      bounds.first  = 1.;
+      bounds.second = 8.;
+      break;
+
+    case JACOBIAN:
+      bounds.first  = 0.5;
+      bounds.second = 1.;
+      break;  
+      
+    case DISTORTION:
+      bounds.first  = 0.6;
+      bounds.second = 1.;
+      break;  
+
+    case TAPER:
+      bounds.first  = 0.;
+      bounds.second = 0.4;
+      break;
+      
+    case STRETCH:
+      bounds.first  = 0.25;
+      bounds.second = 1.;
+      break;
+      
+    case DIAGONAL:
+      bounds.first  = 0.65;
+      bounds.second = 1.;
+      break;
+
+    case SIZE:
+      bounds.first  = 0.5;
+      bounds.second = 1.;
+      break;
+      
+    default:
+      std::cout << "Warning: Invalid quality measure chosen." << std::endl;
+      bounds.first  = -1;
+      bounds.second = -1;
+    }
+
+  return bounds;
+};

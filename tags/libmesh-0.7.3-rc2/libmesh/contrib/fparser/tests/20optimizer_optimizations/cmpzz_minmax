@@ -1,0 +1,24 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=0,1,1
+
+# Combine tests:
+#   cmplt_minmax
+#   cmple_minmax
+#   cmpgt_minmax
+#   cmpge_minmax
+#   cmpne_minmax
+#   cmpeq_minmax
+
+F=0x0001 * if(x < y,x,y) + \
+  0x0002 * if(x <= y,x,y) + \
+  0x0004 * if(x > y,x,y) + \
+  0x0008 * if(x >= y,x,y) + \
+  0x0010 * if(x != y,x,y) + \
+  0x0020 * if(x = y,x,y)
+C=0x0001 * ((fp_less(x,y)!=0)?x:y) + \
+  0x0002 * ((fp_lessOrEq(x,y)!=0)?x:y) + \
+  0x0004 * ((fp_greater(x,y)!=0)?x:y) + \
+  0x0008 * ((fp_greaterOrEq(x,y)!=0)?x:y) + \
+  0x0010 * ((fp_nequal(x,y)!=0)?x:y) + \
+  0x0020 * ((fp_equal(x,y)!=0)?x:y)

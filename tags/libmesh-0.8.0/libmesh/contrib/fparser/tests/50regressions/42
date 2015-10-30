@@ -1,0 +1,7 @@
+# See "What's new in v3.2" for this regression. hypot() is unrelated.
+
+T=d f ld mf
+V=x,y
+R=-3,3,.25
+F=sqrt(x*x) + 1.5*((y*y)^.25) + hypot(x,y)
+C=fp_sqrt(x*x) + 1.5*(fp_pow(y*y, 0.25)) + fp_hypot(x,y)

@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y,z
+R=-1,1,1
+F=if(x, y|z, z)
+C=fp_truth(x)!=0 ? fp_or(y,z) : z

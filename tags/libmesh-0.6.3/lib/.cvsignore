@@ -1,0 +1,8 @@
+*_opt
+*_dbg
+*_pro
+*_oprof
+*_devel
+ii_files
+so_locations
+.nfs*

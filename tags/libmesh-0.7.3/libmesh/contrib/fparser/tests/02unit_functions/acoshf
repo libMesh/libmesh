@@ -1,0 +1,5 @@
+T=f
+V=x
+R=1, 400, 0.1
+F=acosh(x)
+C=logf(x + sqrtf(x*x - 1))

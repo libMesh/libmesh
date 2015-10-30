@@ -1,0 +1,5 @@
+T=ld
+V=x,y
+R=0.01, 4, 0.05
+F=pow(x,y)
+C=powl(x,y)

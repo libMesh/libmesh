@@ -1,0 +1,5 @@
+T=d f li
+V=x
+R=-1,1,1
+F=sub(abs(x)<0, x<0)
+C=fp_less(fp_abs(x),x-x) - fp_less(x,x-x)

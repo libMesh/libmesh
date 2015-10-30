@@ -1,0 +1,5 @@
+T=d f ld mf li gi cd cf cld
+V=x,y
+R=-4, 4, 1
+F=max(x,y)
+C=x>y ? x : y

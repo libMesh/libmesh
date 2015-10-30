@@ -1,0 +1,8 @@
+# Bug: pIf + multiplication by zero begets a broken opcode
+# Introduced in commit 547195b5f155cf7a706e3a5cca796e9cb7d33c38
+# Fixed in commit 7146fbe79611e0a6bb77ff983448fa23909336c6
+T=d li
+V=a,b
+R=-1,1,1
+F=if(a,b*0,a*0)*0
+C=a*b*0

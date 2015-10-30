@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x
+R=0,1,1
+F=if(x,1,0) + 10*if(x,0,1)    + 100*if(x>0,1,0) + 1000*if(x>0,0,1)
+C=fp_notNot(x) + 10*fp_not(x) + 100*fp_greater(x,0) + 1000*fp_lessOrEq(x,0)

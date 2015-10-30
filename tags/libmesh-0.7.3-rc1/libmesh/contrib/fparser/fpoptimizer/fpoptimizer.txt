@@ -1,0 +1,357 @@
+FILES:
+  fpoptimizer.hh  - C++ structures
+  fpoptimizer.dat - Optimization operations
+
+PLAN:
+1.  Convert fpoptimizer.dat into code that initializes Grammar
+    - either automatically or manually
+    - avoid runtime parsing of .dat file
+    - prefer static const structs over constructor code
+    *DONE: See fpoptimizer_grammar_gen.y .
+           Produces fpoptimizer_grammar.cc .
+
+2.  Augment the CodeTree mechanism the following ways:
+    - Add mechanism that generates a hash value for the contents
+      of the tree, for easy comparison of identical subtrees
+      *DONE
+    - Any time a CodeTree changes in any way that may affect the
+      hash, update the hash value for this node and recursively
+      to all parents
+      (Note: Ensure that a CodeTree may only have one parent.)
+
+2.  Create code that matches a given CodeTree node to Grammar,
+    and finds the rules that match (only one should match at most,
+    but it can match a number of different ways, but that does not
+    matter; only utilize the first way)
+    - If a matching rule is found, replace either the matched params
+      or the entire node as instructed in the rule. Ensure that the
+      node gets its hash updated, along with its parents recursively.
+    - The matching can be optimized by grouping the rules by the Opcode
+    Note: The matching can get really complex and/or heavy in the
+    cases where the same operand (or worse, the same set of operands)
+    is expected to be found in two different subtrees. It may require
+    some O(n!) algorithms. However, those rules can be safely skipped
+    if the runtime sees that it would be too costly to check them.
+
+3. Algorithm for matching trees:
+     First,
+       match all nodes in the entire tree. (Do this only once.)
+     Any time a hash of a node is updated,
+       match that node.
+       (When the hashes are changed recursively for a node and all
+        its parents, match all those affected nodes after the hashes
+        have been regenerated.)
+     Repeat until no substitutions are done.
+
+     Overall, first apply this algorithm using the [ENTRY] rules only.
+     Then, apply the rules with [INTERMEDIATE] rules only.
+     Finally, apply the rules with [FINAL] rules only.
+
+3.5. Algorithm for matching nodes:
+       TODO
+
+4a. Algorithm for handling bytecode:
+     First, convert the bytecode into a CodeTree.
+     Then run the matching algorithm.
+     Last, convert the produced CodeTree back into bytecode.
+
+     When generating the bytecode, additional optimizations can be performed:
+     - Converting raise-to-integer-powers into sequences of cInv/cDup/cFetch/cMul
+       using the powi algorithm already existing in fpoptimizer.cc
+       (be wary of generating too long sequences, though)
+       *DONE
+     - Converting multiply-by-integers into sequences of cNeg/cDup/cFetch/cAdd
+       using the powi algorithm already existing in fpoptimizer.cc
+       (be wary of generating too long sequences, though)
+       *DONE
+     - Reordering cMul operands such that inverted operands
+       don't come first, to avoid creating cInv unless necessary.
+       When inverted operands come in non-head positions, use cDiv instead of cMul.
+       *DONE
+     - Reordering cAdd operands such that negated operands
+       don't come first, to avoid creating cNeg unless necessary.
+       When negated operands come in non-head positions, use cSub instead of cAdd.
+       *DONE
+     - When an identical subtree is synthesized into bytecode more than
+       once in a row, use cDup for the subsequential occurrences.
+       To that point, reorder any commutative operands so as to
+       increase the chances of cDup being utilized.
+       *TODO
+
+4b. Optional algorithm if an SSA evaluator is supported
+   (possibly only if a JIT backend exists):
+     1. First, convert the bytecode into a CodeTree.
+     2. Then run the matching algorithm.
+     3. Then convert the produced CodeTree into SSA format.
+       SSA is a medium-level intermediate language (chapter 4.3 in [1], [2]),
+       in which each instruction takes one of the following forms:
+           target = command source1 source2 <...>
+             - commands such as add, mul, pow, cos, max, less
+           jump <label>
+           branch <label> if source == 0
+           target = phi source1 source2
+             - phi is used after two branches merge, to select
+               either result from the branches into one variable;
+               it is not a fparser function.
+       and in which every variable is written to only once,
+       i.e. "x = x+5" never occurs, but is instead written
+         as "x2 = x1+5"
+       <label> can be a pointer to another codeblock.
+     4. Then run generic optimizations on the SSA code, such
+       as common subexpression elimination (CSE, described
+       in chapter 13.1 in [1]).
+       Try also global value numbering (GVN, see [3]).
+       Note: After CSE, it's difficult to convert
+        the code back into bytecode.
+       Note: Due to the hashing, it is possible that some
+        of the CSE can be done automatically in the SSA
+        generation phase by peeling the CodeTree depth-first,
+        storing identical trees only once.
+     5a. (Apply this option if we do not have JIT.)
+        Eliminate the "single assignment" property of SSA
+        by mapping out the lifetimes of the variables and
+        reusing the same variables where possible. This
+        decreases the memory usage of the evaluator and
+        improves the cache efficiency.
+     5b. (Apply this option if we do have JIT.)
+        Perform register allocation for the SSA code,
+        as per chapter 16 in [1]. Doing this before
+        actual JIT will make the JIT more straightforward.
+        Doing code scheduling could be useful as well,
+        though it gets somewhat complex. (Chapter 17 in [1].)
+   If there's a library we can use from step 3 forward, it'd be great.
+   Note: There are many typical optimizations that we don't need to do.
+   For instance, we don't need to do "dead code elimination", because
+   dead code is never produced in the first place.
+
+[1] = Advanced Compiler Design & Implementation by Steven S. Muchnick, ISBN 1-55860-320-4
+[2] = http://en.wikipedia.org/wiki/Static_single_assignment_form
+[3] = http://en.wikipedia.org/wiki/Global_value_numbering
+
+
+
+
+----------------------------------------
+------------------------------------------------------
+CODETREE - A REPRESENTATION OF MATHEMATICAL EXPRESSION
+------------------------------------------------------
+FPoptimizer changes the bytecode expression into tree format.
+
+An FPoptimizer expression is called a CodeTree.
+
+A CodeTree node has:
+	- 0 to N children
+	- Type (Opcode)
+	- Type-dependent other fields
+	Different type of nodes:
+		cVar:
+			Has a type-dependent field "Var", which
+			identifies the var number
+		cImmed:
+			Has a type-dependent field "Value", which
+			describes the constant value of this node
+		cFCall and cPCall:
+			Has a type-dependent field "FuncNo", which
+			describes the function number called
+		Anything else:
+			Has a number of children which describe
+			the parameters to the operation.
+			For example, if the type (Opcode) is cSin,
+			it has a single child, which is a CodeTree
+			that describes the parameter of the sin() call.
+			If the type (Opcode) is cAdd, it has an arbitrary
+			number of children, which are all added together.
+	Examples of some expressions in tree format:
+		Expression: sin(x)*cos(y)
+		Tree:	Opcode=cMul
+			Child[0]:
+				Opcode=cSin
+				Child[0]:
+		       			Opcode=cVar
+		       			Var=0
+			Child[1]:
+				Opcode=cCos
+				Child[0]:
+		       			Opcode=cVar
+		       			Var=1
+		Expression: 1.0 + 2.0 - 3.0 - (4.0 + -5.5)
+		Actual expression (converted by bytecode reader):
+		            1.0 + 2.0 + (-1 * 3.0) + (-1 * (4.0 + -5.5))
+		Tree:	Opcode=cAdd
+			Child[0]:
+				Opcode=cImmed
+				Value=1.0
+			Child[1]:
+				Opcode=cImmed
+				Value=2.0
+			Child[2]:
+				Opcode=cMul
+				Child[0]:
+					Opcode=cImmed
+					Value=-1.0
+				Child[1]:
+					Opcode=cImmed
+					Value=3.0
+			Child[3]:
+				Opcode=cMul
+				Child[0]:
+					Opcode=cImmed
+					Value=-1.0
+				Child[1]:
+					Opcode=cAdd
+					Child[0]:
+						Opcode=cImmed
+						Value=4.0
+					Child[1]:
+						Opcode=cImmed
+						Value=-5.5
+
+------------------------------------------------------
+GRAMMAR RULE - A TREE SUBSTITUTION RULE DESCRIPTION
+------------------------------------------------------
+The Grammar describes changes (optimizations) that
+can be performed to the CodeTree.
+
+The Grammar is composed of Rules, each of which describes
+a matching-tree, and a replacement.
+
+A matching-tree node (ParamSpec) has:
+	-------
+	- Opcode
+	- Method of parameter matching
+	- 0 to N params (ParamSpec)
+	Different types of methods:
+		PositionalParams:
+			Indicates that the tree given must match
+			the params given, in exactly that order;
+			there may not be other children in the tree.
+		SelectedParams:
+			Indicates that the tree given must match
+			the params given, in any order;
+			there may not be other children in the tree.
+		AnyParams:
+			Indicates that the tree given must match
+			the params given; in any order;
+			the tree may additionally have other children,
+			too. If the parameter list contains a RestHolder,
+			those other children are captured there.
+
+List of parameters (an index to MatchedParams)
+	- Single parent
+	- Type (opcode)
+	- 0 to N children
+	- Type-dependent other fields
+	Different types of nodes:
+		NumConstant:
+			Indicates that a CodeTree
+			with type=cImmed and
+			a particular Value is matched.
+			The value is found in pack.clist[node.index].
+		ImmedHolder:
+			Indicates that a CodeTree
+			with type=cImmed and
+			some Value is matched.
+			The ImmedHolder fields are enumerated
+			such that in a single CodeTree matching
+			operation, all ImmedHolders having the
+			same index value must match CodeTrees
+			evaluating to the same numeric value.
+			For example, if an ImmedHolder with index=0
+			happens to match a CodeTree with Value=1.443,
+			all other ImmedHolders with index=0 must
+			also match a CodeTree with Value=1.443.
+		NamedHolder
+			Indicates that any CodeTree is matched regardless of type.
+			The NamedHolder fields are enumerated
+			such that in a single CodeTree matching
+			operation, all NamedHolders having the
+			same index value must match CodeTrees
+			that are identical to the first one.
+			For example, if an NamedHolder with index=0
+			happens to match a CodeTree representing
+			the expression sin(x),
+			all other NamedHolders with index=0 must
+			also match a CodeTree representing
+			the expression sin(x).
+		SubFunction
+			Indicates a subtree that must be matched.
+		RestHolder
+			Within the target CodeTree, matches anything not
+			matched by the other rules in the parent ParamSpec.
+		Anything else:
+			Indicates a mathematical expression whose
+			value is treated by the NumConstant rules above.
+
+Example rules:
+	Grammar file syntax: cMin x x
+	Internal structure: Function.opcode = cMin
+	                    Function.index refers to MatchedParams where
+	                      MatchedParams.type  = AnyParams
+	                      MatchedParams.count = 2
+	                      MatchedParams.index refers to ParamSpec where
+	                        ParamSpec[0].opcode = NamedHolder
+	                        ParamSpec[0].index  = 0   -- "x" is namedholder 0
+	                        ParamSpec[1].opcode = NamedHolder
+	                        ParamSpec[1].index  = 0   -- another x
+	Explanation:
+		This rule matches a CodeTree
+	        where the opcode = cMin and that
+	        tree has two identical subtrees.
+
+	Grammar file syntax: cMul x <1> (cPow [(cMul x <2>) -1])
+	Internal structure: Function.opcode = cMul
+	                    Function.index refers to MatchedParams where
+	                      MatchedParams.type = AnyParams
+	                      MatchedParams.count = 3
+	                      MatchedParams.index refers to ParamSpec where
+	                        ParamSpec[0].opcode = NamedHolder
+	                        ParamSpec[0].index  = 0   -- "x" is namedholder 0
+	                        ParamSpec[1].opcode = RestHolder
+	                        ParamSpec[1].index  = 1   -- RestHolder #1 captures anything else within that cMul group
+	                        ParamSpec[2].opcode = SubFunction
+	                        ParamSpec[2].index refers to Function where
+	                          Function.opcode = cPow
+	                          Function.index refers to MatchedParams where
+	                            MatchedParams.type = PositionalParams
+	                            MatchedParams.count = 2
+	                            MatchedParams.index refers to ParamSpec where
+	                              ParamSpec[0].opcode = SubFunction
+	                              ParamSpec[0].index refers to Function where
+	                                Function.opcode = cMul
+	                                Function.index refers to MatchedParams where
+	                                  MatchedParams.type  = AnyParams
+	                                  MatchedParams.count = 2
+	                                  MatchedParams.index refers to ParamSpec where
+	                                    ParamSpec[0].opcode = NamedHolder
+	                                    ParamSpec[0].index  = 0 -- must match a subtree identical to that of "x" earlier
+	                                    ParamSpec[1].opcode = RestHolder
+	                                    ParamSpec[1].index  = 2 -- RestHolder #2 captures anything else within that cMul group
+	                              ParamSpec[1].opcode = NumConstant
+	                              ParamSpec[1].value  = -1
+	Explanation:
+		This rule matches a CodeTree of type cMul,
+		 where there exists at least two children,
+		 where one of them is an arbitrary expression,
+		  call that "x",
+		 and one of them is a CodeTree of type cPow,
+		  where there are exactly two children,
+		  where the first child is a CodeTree of type cMul,
+		   where there exists at least one child,
+		   where that one child is an arbitrary expression,
+		    which must match the "x" captured earlier,
+		   and anything else from that inner cMul codetree
+		   is captured into restholder <2>;
+		  and the second child of the cPow codetree
+		   is a CodeTree of type cImmed, where its Value equals -1;
+		 and anything else from that outer cMul codetree
+		 is captured into restholder <1>.
+		This rule matches expressions such as:
+			sin(z)*5*( (sin(z)*7) ^ (-1))
+			sin(z) is captured into NamedHolder x
+			5      is captured into RestHolder <1>
+			7      is captured into RestHolder <2>
+		Or
+			6*((6*w)^(-1))
+			value 6 is captured into NamedHolder x
+			nothing is captured into RestHolder <1>
+			w       is captured into RestHolder <2>.
