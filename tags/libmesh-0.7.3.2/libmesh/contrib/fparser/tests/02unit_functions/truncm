@@ -1,5 +1,0 @@
-T=mf
-V=x
-R=-400, 400, 0.1
-F=trunc(x)
-C=MpfrFloat::trunc(x)

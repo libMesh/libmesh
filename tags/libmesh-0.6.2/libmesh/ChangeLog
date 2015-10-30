@@ -1,9 +1,0 @@
-2003-02-26  Benjamin S. Kirk  <benkirk@hactar.ae.utexas.edu>
-
-	* src/apps/.cvsignore (Module): Ignore foo.cc
-
-	* src/apps (Module): Added the ChangeLog.  This is useful when
-	running cvs inside emacs since it can automatically create the
-	change log from the cvs messages.
-	
-

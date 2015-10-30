@@ -1,5 +1,0 @@
-T=ld
-V=x
-R=1, 400, 0.1
-F=acosh(x)
-C=logl(x + sqrtl(x*x - 1))

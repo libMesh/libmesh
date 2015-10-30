@@ -1,9 +1,0 @@
-exodus
-netcdf
-ii_files
-so_locations
-*.log
-libmesh-config
-create_libmesh_release
-xda2mgf
-.nfs*

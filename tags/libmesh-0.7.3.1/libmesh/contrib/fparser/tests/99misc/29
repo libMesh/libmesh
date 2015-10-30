@@ -1,5 +1,0 @@
-T=d f ld mf li gi
-V=x,y
-R=-5,5,1
-F=x-y*1
-C=x-y*1

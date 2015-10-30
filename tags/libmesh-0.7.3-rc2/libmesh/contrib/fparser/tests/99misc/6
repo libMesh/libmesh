@@ -1,6 +1,0 @@
-D=!defined(FP_DISABLE_EVAL)
-T=d f ld mf
-V=x,y
-R=.1,10,2
-F=if(x>0&y>0,x*y+eval(x-1,y-1),0)+1
-C=(x>1e-14 && y>1e-14 ? x*y + EVAL({x-1,y-1}) : 0)+1
