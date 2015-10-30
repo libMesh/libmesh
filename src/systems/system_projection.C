@@ -1881,6 +1881,31 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
 
           dof_map.old_dof_indices (parent, di);
 
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+            {
+              const Node* node = elem->get_node(n);
+              const DofObject* old_dofs = node->old_dof_object;
+
+              if (old_dofs)
+                {
+                  const unsigned int sysnum = system.number();
+                  const unsigned int nv = old_dofs->n_vars(sysnum);
+                  for (unsigned int v=0; v != nv; ++v)
+                    {
+                      const unsigned int nc =
+                        old_dofs->n_comp(sysnum, v);
+                      for (unsigned int c=0; c != nc; ++c)
+                        di.push_back
+                          (old_dofs->dof_number(sysnum, v, c));
+                    }
+                }
+            }
+
+          std::sort(di.begin(), di.end());
+          std::vector<dof_id_type>::iterator new_end =
+            std::unique(di.begin(), di.end());
+          std::vector<dof_id_type>(di.begin(), new_end).swap(di);
+
           // Fix up the parent's p level in case we changed it
           (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
         }
