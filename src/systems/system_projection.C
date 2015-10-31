@@ -56,23 +56,42 @@ class GenericProjector
 private:
   const System &system;
 
-  FFunctor & f;
-  GFunctor * g;  // Needed for C1 type elements only
-  ProjectionAction & action;
+  // For TBB compatibility and thread safety we'll copy these in
+  // operator()
+  const FFunctor & master_f;
+  const GFunctor * master_g;  // Needed for C1 type elements only
+  bool g_was_copied;
+  const ProjectionAction & master_action;
   const std::vector<unsigned int>& variables;
 
 public:
   GenericProjector (const System &system_in,
-                    FFunctor & f_in,
-                    GFunctor * g_in,
-                    ProjectionAction & act_in,
+                    const FFunctor & f_in,
+                    const GFunctor * g_in,
+                    const ProjectionAction & act_in,
                     const std::vector<unsigned int>& variables_in) :
     system(system_in),
-    f(f_in),
-    g(g_in),
-    action(act_in),
+    master_f(f_in),
+    master_g(g_in),
+    g_was_copied(false),
+    master_action(act_in),
     variables(variables_in)
   {}
+
+  GenericProjector (const GenericProjector& in) :
+    system(in.system),
+    master_f(in.master_f),
+    master_g(in.master_g ? new GFunctor(*in.master_g) : NULL),
+    g_was_copied(in.master_g),
+    master_action(in.master_action),
+    variables(in.variables)
+  {}
+
+  ~GenericProjector()
+  {
+    if (g_was_copied)
+      delete master_g;
+  }
 
   void operator() (const ConstElemRange &range) const;
 };
@@ -121,10 +140,38 @@ public:
 };
 
 
+template <typename Output>
+class FEMFunctionWrapper
+{
+public:
+  FEMFunctionWrapper(const FEMFunctionBase<Output> &f) : _f(f.clone()) {}
+
+  FEMFunctionWrapper(const FEMFunctionWrapper<Output> &fw) :
+    _f(fw._f->clone()) {}
+
+  void init_context (FEMContext &c) { _f->init_context(c); }
+
+  Output eval_at_node (const FEMContext& c,
+                       unsigned int i,
+                       const Node& n,
+                       const Real time)
+  { return _f->component(c, i, n, time); }
+
+  Output eval_at_point (const FEMContext& c,
+                        unsigned int i,
+                        const Point& n,
+                        const Real time)
+  { return _f->component(c, i, n, time); }
+
+private:
+  AutoPtr<FEMFunctionBase<Output> > _f;
+};
+
+
 template <typename Output,
           void (FEMContext::*point_output)
             (unsigned int, const Point &, Output&, const Real) const>
-class OldSolutionValue : public FEMFunctionBase<Output>
+class OldSolutionValue
 {
 public:
   OldSolutionValue(const libMesh::System &sys_in,
@@ -138,66 +185,50 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
+  OldSolutionValue(const OldSolutionValue &in) :
+  last_elem(NULL),
+  sys(in.sys),
+  old_context(sys),
+  old_solution(in.old_solution)
   {
-    return UniquePtr<FEMFunctionBase<Output> >
-      (new OldSolutionValue(*this));
+    old_context.set_algebraic_type(FEMContext::OLD);
+    old_context.set_custom_solution(&old_solution);
   }
 
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
-  //
-  // Obviously this method should have taken a non-const reference,
-  // but I don't see any easy way to fix that while maintaining
-  // backwards compatibility.
-  virtual void init_context (const FEMContext &c)
+  void init_context (FEMContext &c)
   {
-    FEMContext &context = const_cast<FEMContext &>(c);
-    context.set_algebraic_type(FEMContext::DOFS_ONLY);
+    c.set_algebraic_type(FEMContext::DOFS_ONLY);
   }
 
-  virtual Output operator() (const FEMContext& c, const Point& p,
-                             const Real /* time */ = 0.)
-  {
-    if (!this->check_old_context(c, p))
-      return 0;
+  Output eval_at_node (const FEMContext& c,
+                       unsigned int i,
+                       const Node& n,
+                       Real /* time */ =0.);
 
-    Output n;
-    (old_context.*point_output)(0, p, n, out_of_elem_tol);
-    return n;
-  }
-
-  virtual void operator() (const FEMContext& c, const Point& p,
-                           const Real /* time */,
-                           DenseVector<Output>& output)
+  Output eval_at_point(const FEMContext& c,
+                       unsigned int i,
+                       const Point& p,
+                       Real /* time */ =0.)
   {
+    START_LOG ("component(c,i,p,t)", "OldSolutionValue");
     if (!this->check_old_context(c, p))
       {
-        output.zero();
-        return;
+        STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
+        return 0;
       }
-
-    const unsigned int size = output.size();
-
-    for (unsigned int v=0; v != size; ++v)
-      (old_context.*point_output)(v, p, output(v), out_of_elem_tol);
-  }
-
-  virtual Output component(const FEMContext& c, unsigned int i,
-                           const Point& p,
-                           Real /* time */ =0.)
-  {
-    if (!this->check_old_context(c, p))
-      return 0;
 
     Output n;
     (old_context.*point_output)(i, p, n, out_of_elem_tol);
+    STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
     return n;
   }
 
 protected:
   bool check_old_context (const FEMContext& c, const Point& p)
   {
+    START_LOG ("check_old_context", "OldSolutionValue");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -224,7 +255,10 @@ protected:
         else
           {
             if (!elem.old_dof_object)
-              return false;
+              {
+                STOP_LOG ("check_old_context", "OldSolutionValue");
+                return false;
+              }
 
             old_context.pre_fe_reinit(sys, &elem);
           }
@@ -252,6 +286,7 @@ protected:
           }
       }
 
+    STOP_LOG ("check_old_context", "OldSolutionValue");
     return true;
   }
 
@@ -263,6 +298,83 @@ private:
 
   static const Real out_of_elem_tol;
 };
+
+
+template<>
+inline
+Number
+OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node
+  (const FEMContext& c,
+   unsigned int i,
+   const Node& n,
+   Real)
+  {
+    START_LOG ("Number eval_at_node()", "OldSolutionValue");
+
+    // Optimize for the common case, where this node was part of the
+    // old solution.
+    //
+    // Be sure to handle cases where the variable wasn't defined on
+    // this node (due to changing subdomain support) or where the
+    // variable has no components on this node (due to Elem order
+    // exceeding FE order)
+    if (n.old_dof_object &&
+        n.old_dof_object->n_vars(sys.number()) &&
+        n.old_dof_object->n_comp(sys.number(), i))
+      {
+        const dof_id_type old_id =
+          n.old_dof_object->dof_number(sys.number(), i, 0);
+        STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
+        return old_solution(old_id);
+      }
+
+    STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
+
+    return this->eval_at_point(c, i, n, 0);
+  }
+
+
+
+template<>
+inline
+Gradient
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node
+  (const FEMContext& c,
+   unsigned int i,
+   const Node& n,
+   Real)
+  {
+    START_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+
+    // Optimize for the common case, where this node was part of the
+    // old solution.
+    //
+    // Be sure to handle cases where the variable wasn't defined on
+    // this node (due to changing subdomain support) or where the
+    // variable has no components on this node (due to Elem order
+    // exceeding FE order)
+    if (n.old_dof_object &&
+        n.old_dof_object->n_vars(sys.number()) &&
+        n.old_dof_object->n_comp(sys.number(), i))
+      {
+        Gradient g;
+        for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+          {
+            const dof_id_type old_id =
+              n.old_dof_object->dof_number(sys.number(), i, d+1);
+            g(d) = old_solution(old_id);
+          }
+        STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+        return g;
+      }
+
+    STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+
+    return this->eval_at_point(c, i, n, 0);
+  }
+
+
+
 
 
 template <>
@@ -393,7 +505,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
                              NumericVector<Number>& new_v,
                              int is_adjoint) const
 {
-  START_LOG ("project_vector()", "System");
+  START_LOG ("project_vector(old,new)", "System");
 
   /**
    * This method projects a solution from an old mesh to a current, refined
@@ -491,7 +603,11 @@ void System::project_vector (const NumericVector<Number>& old_v,
         vars[i] = i;
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-      typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
+      typedef
+        GenericProjector
+          <OldSolutionValue<Number,   &FEMContext::point_value>,
+           OldSolutionValue<Gradient, &FEMContext::point_gradient>,
+           Number, VectorSetAction<Number> > FEMProjector;
 
       OldSolutionValue<Number,   &FEMContext::point_value>    f(*this, old_vector);
       OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
@@ -572,7 +688,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-  STOP_LOG("project_vector()", "System");
+  STOP_LOG("project_vector(old,new)", "System");
 }
 
 
@@ -653,7 +769,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
                              FunctionBase<Gradient> *g,
                              int is_adjoint) const
 {
-  START_LOG ("project_vector()", "System");
+  START_LOG ("project_vector(FunctionBase)", "System");
 
   libmesh_assert(f);
 
@@ -668,7 +784,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   else
     this->project_vector(new_vector, &f_fem, NULL, is_adjoint);
 
-  STOP_LOG ("project_vector()", "System");
+  STOP_LOG ("project_vector(FunctionBase)", "System");
 }
 
 
@@ -698,8 +814,25 @@ void System::project_vector (NumericVector<Number>& new_vector,
     vars[i] = i;
 
   // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-  typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
-  Threads::parallel_for(active_local_range, FEMProjector(*this, *f, g, setter, vars));
+  typedef
+    GenericProjector
+      <FEMFunctionWrapper<Number>, FEMFunctionWrapper<Gradient>,
+       Number, VectorSetAction<Number> > FEMProjector;
+
+  FEMFunctionWrapper<Number> fw(*f);
+
+  if (g)
+    {
+      FEMFunctionWrapper<Gradient> gw(*g);
+
+      Threads::parallel_for
+        (active_local_range,
+         FEMProjector(*this, fw, &gw, setter, vars));
+    }
+  else
+    Threads::parallel_for
+      (active_local_range,
+       FEMProjector(*this, fw, NULL, setter, vars));
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
@@ -865,6 +998,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 {
   START_LOG ("operator()","GenericProjector");
 
+  ProjectionAction action(master_action);
+  FFunctor f(master_f);
+  AutoPtr<GFunctor> g;
+  if (master_g)
+    g.reset(new GFunctor(*master_g));
+
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -876,6 +1015,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   DenseVector<FValue> Fe;
   // The new element degree of freedom coefficients
   DenseVector<FValue> Ue;
+
+  const unsigned int sysnum = system.number();
 
   // Context objects to contain all our required FE objects
   FEMContext context( system );
@@ -932,7 +1073,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   // Now initialize any user requested shape functions, xyz vals, etc
   f.init_context(context);
-  if(g)
+  if(g.get())
     g->init_context(context);
 
   // this->init_context(context);
@@ -1004,6 +1145,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
+          START_LOG ("project_nodes","GenericProjector");
+
           // In general, we need a series of
           // projections to ensure a unique and continuous
           // solution.  We start by interpolating nodes, then
@@ -1036,10 +1179,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (cont == C_ZERO)
                 {
                   libmesh_assert_equal_to (nc, 1);
-                  Ue(current_dof) = f.component(context,
-                                                var_component,
-                                                elem->point(n),
-                                                system.time);
+                  Ue(current_dof) = f.eval_at_node(context,
+                                                   var_component,
+                                                   *elem->get_node(n),
+                                                   system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
@@ -1047,17 +1190,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (fe_type.family == HERMITE)
                 {
                   Ue(current_dof) =
-                    f.component(context,
-                                var_component,
-                                elem->point(n),
-                                system.time);
+                    f.eval_at_node(context,
+                                   var_component,
+                                   *elem->get_node(n),
+                                   system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
-                    g->component(context,
-                                 var_component,
-                                 elem->point(n),
-                                 system.time);
+                    g->eval_at_node(context,
+                                    var_component,
+                                    *elem->get_node(n),
+                                    system.time);
                   // x derivative
                   Ue(current_dof) = grad(0);
                   dof_is_fixed[current_dof] = true;
@@ -1072,15 +1215,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       nxminus(0) -= delta_x;
                       nxplus(0) += delta_x;
                       VectorValue<FValue> gxminus =
-                        g->component(context,
-                                     var_component,
-                                     nxminus,
-                                     system.time);
+                        g->eval_at_point(context,
+                                         var_component,
+                                         nxminus,
+                                         system.time);
                       VectorValue<FValue> gxplus =
-                        g->component(context,
-                                     var_component,
-                                     nxplus,
-                                     system.time);
+                        g->eval_at_point(context,
+                                         var_component,
+                                         nxplus,
+                                         system.time);
                       // y derivative
                       Ue(current_dof) = grad(1);
                       dof_is_fixed[current_dof] = true;
@@ -1108,15 +1251,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           nyminus(1) -= delta_x;
                           nyplus(1) += delta_x;
                           VectorValue<FValue> gyminus =
-                            g->component(context,
-                                         var_component,
-                                         nyminus,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nyminus,
+                                             system.time);
                           VectorValue<FValue> gyplus =
-                            g->component(context,
-                                         var_component,
-                                         nyplus,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nyplus,
+                                             system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
                             / 2. / delta_x;
@@ -1136,25 +1279,25 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           nxpyp(0) += delta_x;
                           nxpyp(1) += delta_x;
                           VectorValue<FValue> gxmym =
-                            g->component(context,
-                                         var_component,
-                                         nxmym,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxmym,
+                                             system.time);
                           VectorValue<FValue> gxmyp =
-                            g->component(context,
-                                         var_component,
-                                         nxmyp,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxmyp,
+                                             system.time);
                           VectorValue<FValue> gxpym =
-                            g->component(context,
-                                         var_component,
-                                         nxpym,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxpym,
+                                             system.time);
                           VectorValue<FValue> gxpyp =
-                            g->component(context,
-                                         var_component,
-                                         nxpyp,
-                                         system.time);
+                            g->eval_at_point(context,
+                                             var_component,
+                                             nxpyp,
+                                             system.time);
                           FValue gxzplus = (gxpyp(2) - gxmyp(2))
                             / 2. / delta_x;
                           FValue gxzminus = (gxpym(2) - gxmym(2))
@@ -1173,17 +1316,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (cont == C_ONE)
                 {
                   libmesh_assert_equal_to (nc, 1 + dim);
-                  Ue(current_dof) = f.component(context,
-                                                var_component,
-                                                elem->point(n),
-                                                system.time);
+                  Ue(current_dof) = f.eval_at_node(context,
+                                                   var_component,
+                                                   *elem->get_node(n),
+                                                   system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
-                    g->component(context,
-                                 var_component,
-                                 elem->point(n),
-                                 system.time);
+                    g->eval_at_node(context,
+                                    var_component,
+                                    *elem->get_node(n),
+                                    system.time);
                   for (unsigned int i=0; i!= dim; ++i)
                     {
                       Ue(current_dof) = grad(i);
@@ -1195,8 +1338,61 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 libmesh_error_msg("Unknown continuity " << cont);
             }
 
-          // In 3D, project any edge values next
-          if (dim > 2 && cont != DISCONTINUOUS)
+          STOP_LOG ("project_nodes","GenericProjector");
+
+          START_LOG ("project_edges","GenericProjector");
+
+          // In 3D, handle any edge values next.  Optimize (at a
+          // slight cost of accuracy) the LAGRANGE case by using
+          // interpolation instead of L2 projection.
+          if (dim > 2 && fe_type.family == LAGRANGE)
+            {
+              for (unsigned char e=0; e != elem->n_edges(); ++e)
+                {
+                  for (unsigned char n=0; n != elem->n_nodes(); ++n)
+                    {
+                      // Vertices are on edges but we're done there
+                      if (elem->is_vertex(n))
+                        continue;
+
+                      // Other nodes on edges need interpolation
+                      if (!elem->is_node_on_edge(n,e))
+                        continue;
+
+                      const Node * node = elem->get_node(n);
+
+                      // Look for dofs on this edge node
+                      const unsigned int edge_comp =
+                        node->n_comp(sysnum, var_component);
+
+                      // We're LAGRANGE so we don't double-up dofs
+                      libmesh_assert_less (edge_comp, 2);
+
+                      // But we might be subparametric
+                      if (!edge_comp)
+                        continue;
+
+                      // If we have a dof, find its index
+                      const dof_id_type new_edge_dof =
+                        node->dof_number(sysnum, var_component, 0);
+
+                      // And set its value
+                      for (unsigned int i=0; i != n_dofs; ++i)
+                        if (dof_indices[i] == new_edge_dof)
+                          {
+                            dof_is_fixed[i] = true;
+                            FValue &ui = Ue(i);
+                            ui = f.eval_at_node(context,
+                                                var_component,
+                                                *node,
+                                                system.time);
+                            break;
+                          }
+                    }
+                }
+            }
+          // In 3D with non-LAGRANGE, project any edge values next
+          else if (dim > 2 && cont != DISCONTINUOUS)
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
@@ -1279,17 +1475,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int qp=0; qp<n_qp; qp++)
                     {
                       // solution at the quadrature point
-                      FValue fineval = f.component(context,
-                                                   var_component,
-                                                   xyz_values[qp],
-                                                   system.time);
+                      FValue fineval = f.eval_at_point(context,
+                                                       var_component,
+                                                       xyz_values[qp],
+                                                       system.time);
                       // solution grad at the quadrature point
                       VectorValue<FValue> finegrad;
                       if (cont == C_ONE)
-                        finegrad = g->component(context,
-                                                var_component,
-                                                xyz_values[qp],
-                                                system.time);
+                        finegrad = g->eval_at_point(context,
+                                                    var_component,
+                                                    xyz_values[qp],
+                                                    system.time);
 
                       // Form edge projection matrix
                       for (unsigned int sidei=0, freei=0;
@@ -1344,6 +1540,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     }
                 }
             } // end if (dim > 2 && cont != DISCONTINUOUS)
+
+          STOP_LOG ("project_edges","GenericProjector");
+
+          START_LOG ("project_sides","GenericProjector");
 
           // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
@@ -1429,17 +1629,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int qp=0; qp<n_qp; qp++)
                     {
                       // solution at the quadrature point
-                      FValue fineval = f.component(context,
-                                                   var_component,
-                                                   xyz_values[qp],
-                                                   system.time);
+                      FValue fineval = f.eval_at_point(context,
+                                                       var_component,
+                                                       xyz_values[qp],
+                                                       system.time);
                       // solution grad at the quadrature point
                       VectorValue<FValue> finegrad;
                       if (cont == C_ONE)
-                        finegrad = g->component(context,
-                                                var_component,
-                                                xyz_values[qp],
-                                                system.time);
+                        finegrad = g->eval_at_point(context,
+                                                    var_component,
+                                                    xyz_values[qp],
+                                                    system.time);
 
                       // Form side projection matrix
                       for (unsigned int sidei=0, freei=0;
@@ -1494,6 +1694,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     }
                 }
             }// end if (dim > 1 && cont != DISCONTINUOUS)
+
+          STOP_LOG ("project_sides","GenericProjector");
+
+          START_LOG ("project_interior","GenericProjector");
 
           // Project the interior values, finally
 
@@ -1558,17 +1762,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               for (unsigned int qp=0; qp<n_qp; qp++)
                 {
                   // solution at the quadrature point
-                  FValue fineval = f.component(context,
-                                               var_component,
-                                               xyz_values[qp],
-                                               system.time);
+                  FValue fineval = f.eval_at_point(context,
+                                                   var_component,
+                                                   xyz_values[qp],
+                                                   system.time);
                   // solution grad at the quadrature point
                   VectorValue<FValue> finegrad;
                   if (cont == C_ONE)
-                    finegrad = g->component(context,
-                                            var_component,
-                                            xyz_values[qp],
-                                            system.time);
+                    finegrad = g->eval_at_point(context,
+                                                var_component,
+                                                xyz_values[qp],
+                                                system.time);
 
                   // Form interior projection matrix
                   for (unsigned int i=0, freei=0; i != n_dofs; ++i)
@@ -1618,12 +1822,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
             } // if there are free interior dofs
 
+          STOP_LOG ("project_interior","GenericProjector");
+
           // Make sure every DoF got reached!
           for (unsigned int i=0; i != n_dofs; ++i)
             libmesh_assert(dof_is_fixed[i]);
 
           action.insert(context, var, Ue);
-
         } // end variables loop
     } // end elements loop
 
@@ -1713,6 +1918,31 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
             }
 
           dof_map.old_dof_indices (parent, di);
+
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+            {
+              const Node* node = elem->get_node(n);
+              const DofObject* old_dofs = node->old_dof_object;
+
+              if (old_dofs)
+                {
+                  const unsigned int sysnum = system.number();
+                  const unsigned int nv = old_dofs->n_vars(sysnum);
+                  for (unsigned int v=0; v != nv; ++v)
+                    {
+                      const unsigned int nc =
+                        old_dofs->n_comp(sysnum, v);
+                      for (unsigned int c=0; c != nc; ++c)
+                        di.push_back
+                          (old_dofs->dof_number(sysnum, v, c));
+                    }
+                }
+            }
+
+          std::sort(di.begin(), di.end());
+          std::vector<dof_id_type>::iterator new_end =
+            std::unique(di.begin(), di.end());
+          std::vector<dof_id_type>(di.begin(), new_end).swap(di);
 
           // Fix up the parent's p level in case we changed it
           (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
