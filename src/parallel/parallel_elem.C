@@ -33,6 +33,7 @@ namespace
 {
 using namespace libMesh;
 
+#ifdef LIBMESH_HAVE_MPI
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 static const unsigned int header_size = 12;
 #else
@@ -40,6 +41,7 @@ static const unsigned int header_size = 11;
 #endif
 
 static const largest_id_type elem_magic_header = 987654321;
+#endif
 }
 
 
