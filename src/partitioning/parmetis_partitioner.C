@@ -57,8 +57,9 @@ namespace libMesh
 
 // Minimum elements on each processor required for us to choose
 // Parmetis over Metis.
+#ifdef LIBMESH_HAVE_PARMETIS
 const unsigned int MIN_ELEM_PER_PROC = 4;
-
+#endif
 
 // ------------------------------------------------------------
 // ParmetisPartitioner implementation
