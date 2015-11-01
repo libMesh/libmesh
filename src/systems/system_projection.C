@@ -164,7 +164,7 @@ public:
   { return _f->component(c, i, n, time); }
 
 private:
-  AutoPtr<FEMFunctionBase<Output> > _f;
+  UniquePtr<FEMFunctionBase<Output> > _f;
 };
 
 
@@ -1000,7 +1000,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   ProjectionAction action(master_action);
   FFunctor f(master_f);
-  AutoPtr<GFunctor> g;
+  UniquePtr<GFunctor> g;
   if (master_g)
     g.reset(new GFunctor(*master_g));
 
