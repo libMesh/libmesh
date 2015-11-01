@@ -68,9 +68,14 @@ inline unsigned int to_uint ( const T &t )
 
 // test equality for a.first -> a.second mapping.  since we can only map to one
 // value only test the first entry
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned int> &a,
                                          const std::pair<unsigned int, unsigned int> &b)
-{ return a.first == b.first; }
+{
+  return a.first == b.first;
+}
+#endif
+
 }
 
 
@@ -89,8 +94,8 @@ Nemesis_IO::Nemesis_IO (MeshBase& mesh,
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper(*this, false, single_precision)),
-#endif
   _timestep(1),
+#endif
   _verbose (false),
   _append(false)
 {

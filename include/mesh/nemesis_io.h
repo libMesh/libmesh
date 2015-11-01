@@ -116,8 +116,8 @@ public:
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   Nemesis_IO_Helper *nemhelper;
-#endif
   int _timestep;
+#endif
 
   bool _verbose;
 
