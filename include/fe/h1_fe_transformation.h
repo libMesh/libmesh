@@ -20,10 +20,12 @@
 
 #include "libmesh/fe_transformation_base.h"
 #include "libmesh/compare_types.h"
-#include "libmesh/elem.h"
 
 namespace libMesh
 {
+
+// Forward declarations
+class Elem;
 
 /**
  * This class handles the computation of the shape functions in the

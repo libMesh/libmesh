@@ -3,6 +3,7 @@
 
 // local includes
 #include "libmesh/rb_eim_construction.h"
+#include "libmesh/rb_eim_evaluation.h"
 #include "assembly.h"
 
 // Bring in bits from the libMesh namespace.

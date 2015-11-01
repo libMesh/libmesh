@@ -22,10 +22,12 @@
 
 #include "libmesh/fe_map.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
 
 namespace libMesh
 {
+
+// Forward declarations
+class Elem;
 
 class FEXYZMap : public FEMap
 {

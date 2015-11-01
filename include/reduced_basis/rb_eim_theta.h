@@ -22,7 +22,6 @@
 
 // rbOOmit includes
 #include "libmesh/rb_theta.h"
-#include "libmesh/rb_eim_evaluation.h"
 
 // C++ includes
 
@@ -30,6 +29,7 @@ namespace libMesh
 {
 
 class RBParameters;
+class RBEIMEvaluation;
 
 /**
  * This class provides functionality required to define an RBTheta

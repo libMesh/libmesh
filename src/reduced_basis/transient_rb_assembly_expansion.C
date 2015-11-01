@@ -19,6 +19,7 @@
 
 // rbOOmit includes
 #include "libmesh/transient_rb_assembly_expansion.h"
+#include "libmesh/elem_assembly.h"
 
 namespace libMesh
 {

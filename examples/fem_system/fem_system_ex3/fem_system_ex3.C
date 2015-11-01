@@ -43,6 +43,7 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/newmark_solver.h"
 #include "libmesh/steady_solver.h"
+#include "libmesh/elem.h"
 
 #define x_scaling 1.3
 

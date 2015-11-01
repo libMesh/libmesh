@@ -31,6 +31,7 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

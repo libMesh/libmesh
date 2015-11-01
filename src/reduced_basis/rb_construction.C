@@ -20,6 +20,8 @@
 // rbOOmit includes
 #include "libmesh/rb_construction.h"
 #include "libmesh/rb_assembly_expansion.h"
+#include "libmesh/rb_evaluation.h"
+#include "libmesh/elem_assembly.h"
 
 // LibMesh includes
 #include "libmesh/numeric_vector.h"

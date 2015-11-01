@@ -53,10 +53,8 @@ class DofObject;
 class Elem;
 class FEType;
 class MeshBase;
-class Mesh;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
-namespace SparsityPattern { class Build; }
 class System;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;

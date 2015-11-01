@@ -27,6 +27,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/parallel.h"
+#include "libmesh/mesh_base.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 

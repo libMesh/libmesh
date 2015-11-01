@@ -20,12 +20,14 @@
 
 // Local includes
 #include "libmesh/xdr_head.h" // for base class
-#include "libmesh/xdr_soln.h" // for friend
 
 // C++ includes
 
 namespace libMesh
 {
+
+// Forward declarations
+class XdrSOLN;
 
 /**
  * The \p XdrSHEAD class.  This class is responsible for

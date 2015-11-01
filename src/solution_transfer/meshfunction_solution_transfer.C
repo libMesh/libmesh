@@ -22,8 +22,10 @@
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/mesh_function.h"
+#include "libmesh/node.h"
 
-namespace libMesh {
+namespace libMesh
+{
 
 MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator &comm_in) :
   SolutionTransfer(comm_in)
@@ -54,7 +56,8 @@ MeshFunctionSolutionTransfer::transfer(const Variable & from_var, const Variable
   NumericVector<Number> * serialized_solution = NumericVector<Number>::build(from_sys->get_mesh().comm()).release();
   serialized_solution->init(from_sys->n_dofs(), false, SERIAL);
 
-  // Need to pull down a full copy of this vector on every processor so we can get values in parallel
+  // Need to pull down a full copy of this vector on every processor
+  // so we can get values in parallel
   from_sys->solution->localize(*serialized_solution);
 
   MeshFunction from_func(from_es, *serialized_solution, from_sys->get_dof_map(), to_var_num);

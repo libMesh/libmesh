@@ -34,6 +34,8 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/transient_system.h"
+#include "libmesh/node.h"
+#include "libmesh/elem.h"
 
 #include "nonlinear_neohooke_cc.h"
 #include "solid_system.h"

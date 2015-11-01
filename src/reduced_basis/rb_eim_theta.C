@@ -19,6 +19,7 @@
 
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parameters.h"
+#include "libmesh/rb_eim_evaluation.h"
 
 namespace libMesh
 {

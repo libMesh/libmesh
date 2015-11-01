@@ -34,7 +34,6 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 class ParallelMesh;
-class BoundaryInfo;
 
 /**
  * This is the \p MeshCommunication class.  It handles all the details

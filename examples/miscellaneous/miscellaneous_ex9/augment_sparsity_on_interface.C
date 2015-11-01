@@ -3,6 +3,7 @@
 
 // libMesh includes
 #include "libmesh/linear_implicit_system.h"
+#include "libmesh/elem.h"
 
 using namespace libMesh;
 

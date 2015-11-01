@@ -30,7 +30,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/system.h"
-
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

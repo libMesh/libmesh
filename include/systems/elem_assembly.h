@@ -19,14 +19,13 @@
 #define LIBMESH_ELEM_ASSEMBLY_H
 
 #include "libmesh/reference_counted_object.h"
-#include "libmesh/system.h"
-#include "libmesh/node.h"
-
 
 namespace libMesh
 {
 
 class FEMContext;
+class System;
+class Node;
 
 /**
  * ElemAssembly provides a per-element (interior and boundary) assembly

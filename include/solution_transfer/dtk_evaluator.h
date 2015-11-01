@@ -25,9 +25,7 @@
 
 #ifdef LIBMESH_TRILINOS_HAVE_DTK
 
-#include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
-#include "libmesh/system.h"
 
 #include <DTK_MeshContainer.hpp>
 #include <DTK_FieldEvaluator.hpp>
@@ -40,6 +38,10 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class EquationSystems;
+class System;
 
 /**
  * Implements the evaluate() function to compute FE solution values at

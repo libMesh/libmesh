@@ -24,7 +24,6 @@
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/elem.h"
 
@@ -32,6 +31,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class MeshBase;
 
 // ------------------------------------------------------------
 // MeshTools::Subdivision namespace

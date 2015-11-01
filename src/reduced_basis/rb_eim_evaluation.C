@@ -30,6 +30,7 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/serial_mesh.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

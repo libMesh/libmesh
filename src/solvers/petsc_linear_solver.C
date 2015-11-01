@@ -34,6 +34,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/system.h"
 #include "libmesh/petsc_auto_fieldsplit.h"
+#include "libmesh/solver_configuration.h"
 
 namespace libMesh
 {

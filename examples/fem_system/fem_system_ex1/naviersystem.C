@@ -28,6 +28,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

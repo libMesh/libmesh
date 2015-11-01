@@ -17,6 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// C++ includes
+#include <fstream>
+#include <sstream>
+
 // LibMesh includes
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
@@ -33,10 +37,9 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/getpot.h"
-#include <fstream>
-#include <sstream>
 #include "libmesh/exodusII_io.h"
 #include "libmesh/fem_context.h"
+#include "libmesh/elem.h"
 
 #include "libmesh/rb_eim_construction.h"
 #include "libmesh/rb_eim_evaluation.h"

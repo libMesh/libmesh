@@ -34,10 +34,7 @@
 namespace libMesh
 {
 // Forward declarations
-class MeshBase;
-class MeshData;
 class Xdr;
-class Elem;
 
 /**
  * The CheckpointIO class can be used to write simplified restart

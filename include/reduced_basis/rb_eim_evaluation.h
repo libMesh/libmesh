@@ -24,8 +24,8 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/point.h"
 #include "libmesh/rb_evaluation.h"
-#include "libmesh/elem.h"
 #include "libmesh/serial_mesh.h"
+#include "libmesh/rb_theta_expansion.h"
 
 // C++ includes
 
@@ -34,6 +34,8 @@ namespace libMesh
 
 class RBParameters;
 class RBParametrizedFunction;
+class Elem;
+class RBTheta;
 
 /**
  * This class is part of the rbOOmit framework.

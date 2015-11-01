@@ -4,6 +4,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/serial_mesh.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/mesh_refinement.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.

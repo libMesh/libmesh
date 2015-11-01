@@ -24,7 +24,6 @@
 
 
 // Local includes
-#include "libmesh/elem.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/point.h" // used for specifying holes
 
@@ -39,6 +38,7 @@ namespace libMesh
 // Forward Declarations
 class UnstructuredMesh;
 class TetGenWrapper;
+class Elem;
 
 /**
  * Class \p TetGenMeshInterface provides an interface for

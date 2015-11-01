@@ -24,11 +24,12 @@
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
-#include "libmesh/parsed_function.h"
-#include "libmesh/parsed_fem_function.h"
 
 namespace libMesh
 {
+
+// Forward declarations
+template <typename T> class ParsedFEMFunction;
 
 /**
  * Accessor object allowing reading and modification of the

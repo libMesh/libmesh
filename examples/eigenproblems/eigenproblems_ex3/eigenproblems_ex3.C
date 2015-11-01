@@ -64,6 +64,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/getpot.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

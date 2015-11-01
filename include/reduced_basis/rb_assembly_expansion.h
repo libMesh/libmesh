@@ -21,7 +21,6 @@
 #define LIBMESH_RB_ASSEMBLY_EXPANSION_H
 
 // libMesh includes
-#include "libmesh/elem_assembly.h"
 #include "libmesh/reference_counted_object.h"
 
 // C++ includes
@@ -30,6 +29,10 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class ElemAssembly;
+class FEMContext;
 
 /**
  * This class stores the set of ElemAssembly functor objects that define

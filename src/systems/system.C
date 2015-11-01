@@ -35,6 +35,8 @@
 #include "libmesh/system.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/utility.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe_type.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"

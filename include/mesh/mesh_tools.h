@@ -39,8 +39,6 @@ namespace libMesh
 {
 
 // forward declarations
-class SerialMesh;
-class ParallelMesh;
 class Sphere;
 class Elem;
 

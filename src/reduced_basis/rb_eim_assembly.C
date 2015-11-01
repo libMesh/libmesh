@@ -20,6 +20,7 @@
 // rbOOmit includes
 #include "libmesh/rb_eim_assembly.h"
 #include "libmesh/rb_eim_construction.h"
+#include "libmesh/rb_evaluation.h"
 
 // libMesh includes
 #include "libmesh/fem_context.h"

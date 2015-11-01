@@ -36,6 +36,7 @@
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
+#include "libmesh/fe_type.h"
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations

@@ -22,9 +22,12 @@
 
 #include "libmesh/dense_vector.h"
 #include "libmesh/fem_function_base.h"
-#include "libmesh/point.h"
 
-namespace libMesh {
+namespace libMesh
+{
+
+// Forward declarations
+class Point;
 
 template <typename Output=Number>
 class ConstFEMFunction : public FEMFunctionBase<Output>

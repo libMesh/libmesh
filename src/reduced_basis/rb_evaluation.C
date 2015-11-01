@@ -19,6 +19,7 @@
 
 // rbOOmit includes
 #include "libmesh/rb_evaluation.h"
+#include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
 #include "libmesh/libmesh_version.h"
