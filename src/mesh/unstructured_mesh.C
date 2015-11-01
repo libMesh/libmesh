@@ -548,6 +548,71 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
         }
     }
 
+  //Automatically set interior parents
+  std::vector< std::vector<dof_id_type> > node_to_elem;
+  MeshTools::build_nodes_to_elem_map(*this,node_to_elem);
+
+  for(element_iterator it = this->active_elements_begin();
+      it != this->active_elements_end(); it++)
+    {
+      Elem * element = *it;
+
+      if(element->dim()>=LIBMESH_DIM || element->interior_parent())
+        continue;
+
+      std::vector< std::set<dof_id_type> > neighbors( element->n_vertices() );
+
+      bool found_interior_parents = false;
+
+      for(dof_id_type n=0; n < element->n_vertices(); n++)
+        {
+          std::vector<dof_id_type> &element_ids = node_to_elem[element->node(n)];
+          for(std::vector<dof_id_type>::iterator e_it = element_ids.begin();
+              e_it != element_ids.end(); e_it++)
+            {
+              dof_id_type eid = *e_it;
+              if(this->elem(eid)->dim() == element->dim()+1)
+                neighbors[n].insert(eid);
+            }
+          if(neighbors[n].size()>0)
+            {
+              found_interior_parents = true;
+            }
+          else
+            {
+              found_interior_parents = false;
+              break;
+            }
+        }
+      if(found_interior_parents)
+        {
+          std::set<dof_id_type> &neighbors_0 = neighbors[0];
+          for(std::set<dof_id_type>::iterator e_it = neighbors_0.begin();
+              e_it != neighbors_0.end(); e_it++)
+            {
+              found_interior_parents=false;
+              dof_id_type int_prnt = *e_it;
+              for(dof_id_type n=1; n < element->n_vertices(); n++)
+                {
+                  if(neighbors[n].find(int_prnt)!=neighbors[n].end())
+                    {
+                      found_interior_parents=true;
+                    }
+                  else
+                    {
+                      found_interior_parents=false;
+                      break;
+                    }
+                }
+              if(found_interior_parents)
+              {
+                element->set_interior_parent(this->elem(int_prnt));
+                break;
+              }
+            }
+        }
+    }
+
 #endif // AMR
 
 
