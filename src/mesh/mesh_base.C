@@ -35,6 +35,8 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/threads.h"
 
+#include LIBMESH_INCLUDE_UNORDERED_MAP
+
 namespace libMesh
 {
 
@@ -166,6 +168,14 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   if(!skip_find_neighbors)
     this->find_neighbors();
 
+  // Search the mesh for all the dimensions of the elements
+  // and cache them.
+  this->cache_elem_dims();
+
+  // Search the mesh for elements that have a neighboring element
+  // of dim+1 and set that element as the interior parent
+  this->detect_interior_parents();
+
   // Partition the mesh.
   this->partition();
 
@@ -179,10 +189,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
-
-  // Search the mesh for all the dimensions of the elements
-  // and cache them.
-  this->cache_elem_dims();
 
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.
@@ -505,14 +511,116 @@ void MeshBase::cache_elem_dims()
   // particular dimension have been deleted.
   _elem_dims.clear();
 
-  const_element_iterator el  = this->active_local_elements_begin();
-  const_element_iterator end = this->active_local_elements_end();
+  const_element_iterator el  = this->active_elements_begin();
+  const_element_iterator end = this->active_elements_end();
 
   for (; el!=end; ++el)
     _elem_dims.insert((*el)->dim());
 
   // Some different dimension elements may only live on other processors
   this->comm().set_union(_elem_dims);
+}
+
+void MeshBase::detect_interior_parents()
+{
+  // This requires an inspection on every processor
+  parallel_object_only();
+
+  // Check if the mesh contains mixed dimensions. If so, then set interior parents, otherwise return.
+  if( this->elem_dimensions().size() == 1 )
+    return;
+
+  //This map will be used to set interior parents
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::vector<dof_id_type> > node_to_elem;
+
+  const_element_iterator el  = this->active_elements_begin();
+  const_element_iterator end = this->active_elements_end();
+
+  for (; el!=end; ++el)
+    {
+      //Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
+      for (unsigned int n=0; n<(*el)->n_vertices(); n++)
+        {
+          libmesh_assert_less ((*el)->id(), this->max_elem_id());
+
+          node_to_elem[(*el)->node(n)].push_back((*el)->id());
+        }
+    }
+
+  // Automatically set interior parents
+  el = this->elements_begin();
+  for( ; el!=end; ++el )
+    {
+      Elem * element = *el;
+
+      //Ignore an 3D element or an element that already has an interior parent
+      if( element->dim()>=LIBMESH_DIM || element->interior_parent() )
+        continue;
+
+      // Start by generating a SET of elements that are dim+1 to the current
+      // element at each vertex of the current element, thus ignoring interior nodes.
+      // If one of the SET of elements is empty, then we will not have an interior parent
+      // since an interior parent must be connected to all vertices of the current element
+      std::vector< std::set<dof_id_type> > neighbors( element->n_vertices() );
+
+      bool found_interior_parents = false;
+
+      for( dof_id_type n=0; n < element->n_vertices(); n++ )
+        {
+          std::vector<dof_id_type> &element_ids = node_to_elem[element->node(n)];
+          for( std::vector<dof_id_type>::iterator e_it = element_ids.begin();
+               e_it != element_ids.end(); e_it++)
+            {
+              dof_id_type eid = *e_it;
+              if( this->elem(eid)->dim() == element->dim()+1 )
+                neighbors[n].insert(eid);
+            }
+          if( neighbors[n].size()>0 )
+            {
+              found_interior_parents = true;
+            }
+          else
+            {
+              // We have found an empty set, no reason to continue
+              // Ensure we set this flag to false before the break since it could have
+              // been set to true for previous vertex
+              found_interior_parents = false;
+              break;
+            }
+        }
+
+      // If we have successfully generated a set of elements for each vertex, we will compare
+      // the set for vertex 0 will the sets for the vertices until we find a id that exists in
+      // all sets.  If found, this is our an interior parent id.  The interior parent id found
+      // will be the lowest element id if there is potential for multiple interior parents.
+      if(found_interior_parents)
+        {
+          std::set<dof_id_type> &neighbors_0 = neighbors[0];
+          for(std::set<dof_id_type>::iterator e_it = neighbors_0.begin();
+              e_it != neighbors_0.end(); e_it++)
+            {
+              found_interior_parents=false;
+              dof_id_type interior_parent_id = *e_it;
+              for(dof_id_type n=1; n < element->n_vertices(); n++)
+                {
+                  if(neighbors[n].find(interior_parent_id)!=neighbors[n].end())
+                    {
+                      found_interior_parents=true;
+                    }
+                  else
+                    {
+                      found_interior_parents=false;
+                      break;
+                    }
+                }
+              if(found_interior_parents)
+              {
+                element->set_interior_parent( this->elem(interior_parent_id) );
+                break;
+              }
+            }
+        }
+    }
 }
 
 } // namespace libMesh
