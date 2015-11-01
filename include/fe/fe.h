@@ -212,7 +212,7 @@ public:
    * @returns the number of shape functions associated with
    * this finite element.
    */
-  virtual unsigned int n_shape_functions () const;
+  virtual unsigned int n_shape_functions () const libmesh_override;
 
   /**
    * @returns the number of shape functions associated with
@@ -255,13 +255,13 @@ public:
   /**
    * @returns the continuity level of the finite element.
    */
-  virtual FEContinuity get_continuity() const;
+  virtual FEContinuity get_continuity() const libmesh_override;
 
   /**
    * @returns true if the finite element's higher order shape functions are
    * hierarchic
    */
-  virtual bool is_hierarchic() const;
+  virtual bool is_hierarchic() const libmesh_override;
 
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -326,7 +326,7 @@ public:
    */
   virtual void reinit (const Elem* elem,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL);
+                       const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -341,7 +341,7 @@ public:
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL);
+                       const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -356,7 +356,7 @@ public:
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
                             const std::vector<Point>* const pts = NULL,
-                            const std::vector<Real>* const weights = NULL);
+                            const std::vector<Real>* const weights = NULL) libmesh_override;
 
   /**
    * Computes the reference space quadrature points on the side of
@@ -366,21 +366,21 @@ public:
                          const Elem* side,
                          const unsigned int s,
                          const std::vector<Point>& reference_side_points,
-                         std::vector<Point>&       reference_points);
+                         std::vector<Point>&       reference_points) libmesh_override;
 
   /**
    * Provides the class with the quadrature rule, which provides the
    * locations (on a reference element) where the shape functions are
    * to be calculated.
    */
-  virtual void attach_quadrature_rule (QBase* q);
+  virtual void attach_quadrature_rule (QBase* q) libmesh_override;
 
   /**
    * @returns the total number of quadrature points.  Call this
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
-  virtual unsigned int n_quadrature_points () const;
+  virtual unsigned int n_quadrature_points () const libmesh_override;
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -401,7 +401,7 @@ public:
    * element, and therefore needs to be re-initialized
    * for each new element.  \p false otherwise.
    */
-  virtual bool shapes_need_reinit() const;
+  virtual bool shapes_need_reinit() const libmesh_override;
 
   /**
    * @returns the location (in physical space) of the point
