@@ -38,33 +38,22 @@
 namespace libMesh
 {
 
-
-
-
-// ------------------------------------------------------------
-// UCDIO class members
 void UCDIO::read (const std::string& file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
-
       igzstream in_stream (file_name.c_str());
       this->read_implementation (in_stream);
-
 #else
-
       libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
-
 #endif
-      return;
     }
 
   else
     {
       std::ifstream in_stream (file_name.c_str());
       this->read_implementation (in_stream);
-      return;
     }
 }
 
@@ -75,23 +64,17 @@ void UCDIO::write (const std::string& file_name)
   if (file_name.rfind(".gz") < file_name.size())
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
-
       ogzstream out_stream (file_name.c_str());
       this->write_implementation (out_stream);
-
 #else
-
       libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
-
 #endif
-      return;
     }
 
   else
     {
       std::ofstream out_stream (file_name.c_str());
       this->write_implementation (out_stream);
-      return;
     }
 }
 
@@ -145,8 +128,6 @@ void UCDIO::read_implementation (std::istream& in)
       }
   }
 
-
-
   // Read the elements from the stream. Notice that the UCD node-numbering
   // scheme is 1-based, and we just created a 0-based scheme above
   // (which is of course what we want). So, when we read in the nodal
@@ -162,12 +143,10 @@ void UCDIO::read_implementation (std::istream& in)
 
         libmesh_assert (in.good());
 
+        // The cell type can be either tri, quad, tet, hex, or prism.
         in >> dummy        // Cell number, means nothing to us
            >> material_id  // doesn't mean anything at present, might later
-           >> type;        // string describing cell type:
-        // either tri, quad, tet, hex, or prism for the
-        // obvious cases
-
+           >> type;        // string describing cell type
 
         // Now read the connectivity.
         if (type == "quad")
@@ -192,8 +171,8 @@ void UCDIO::read_implementation (std::istream& in)
 
             libmesh_assert_less (node, mesh.n_nodes());
 
-            elem->set_node(n) =
-              mesh.node_ptr(node); // assign the node
+            // assign the node
+            elem->set_node(n) = mesh.node_ptr(node);
           }
 
         elems_of_dimension[elem->dim()] = true;
@@ -227,29 +206,30 @@ void UCDIO::write_implementation (std::ostream& out_stream)
 
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
-  // UCD doesn't work in 1D
-  libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
-  if(mesh.mesh_dimension() != 3)
+  // UCD doesn't work any dimension except 3?
+  if (mesh.mesh_dimension() != 3)
     libmesh_error_msg("Error: Can't write boundary elements for meshes of dimension less than 3. " \
                       << "Mesh dimension = " << mesh.mesh_dimension());
 
   // Write header
-  this->write_header(out_stream,mesh,mesh.n_elem(),0);
+  this->write_header(out_stream, mesh, mesh.n_elem(), 0);
 
   // Write the node coordinates
-  this->write_nodes(out_stream,mesh);
+  this->write_nodes(out_stream, mesh);
 
   // Write the elements
-  this->write_interior_elems(out_stream,mesh);
-
-  return;
+  this->write_interior_elems(out_stream, mesh);
 }
 
-void UCDIO::write_header(std::ostream& out_stream, const MeshBase& mesh,
-                         dof_id_type n_elems, unsigned int n_vars )
+
+
+void UCDIO::write_header(std::ostream& out_stream,
+                         const MeshBase& mesh,
+                         dof_id_type n_elems,
+                         unsigned int n_vars)
 {
   libmesh_assert (out_stream.good());
-  // TODO: We used to print out the SVN revision here when we did keyword expansions...
+  // TODO: We could print out the libmesh revision used to write this file here.
   out_stream << "# For a description of the UCD format see the AVS Developer's guide.\n"
              << "#\n";
 
@@ -258,15 +238,18 @@ void UCDIO::write_header(std::ostream& out_stream, const MeshBase& mesh,
              << n_elems  << " "
              << n_vars << " "
              << " 0 0\n";
-  return;
 }
 
-void UCDIO::write_nodes(std::ostream& out_stream, const MeshBase& mesh)
+
+
+void UCDIO::write_nodes(std::ostream& out_stream,
+                        const MeshBase& mesh)
 {
   MeshBase::const_node_iterator       it  = mesh.nodes_begin();
   const MeshBase::const_node_iterator end = mesh.nodes_end();
 
-  unsigned int n=1; // 1-based node number for UCD
+  // 1-based node number for UCD
+  unsigned int n=1;
 
   // Write the node coordinates
   for (; it != end; ++it)
@@ -276,11 +259,12 @@ void UCDIO::write_nodes(std::ostream& out_stream, const MeshBase& mesh)
       out_stream << n++ << "\t";
       (*it)->write_unformatted(out_stream);
     }
-
-  return;
 }
 
-void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
+
+
+void UCDIO::write_interior_elems(std::ostream& out_stream,
+                                 const MeshBase& mesh)
 {
   std::string type[] =
     { "edge",  "edge",  "edge",
@@ -294,27 +278,30 @@ void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
   MeshBase::const_element_iterator it  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
 
-  unsigned int e=1; // 1-based element number for UCD
+  // 1-based element number for UCD
+  unsigned int e=1;
 
   // Write element information
   for (; it != end; ++it)
     {
       libmesh_assert (out_stream.good());
 
+      // Get pointer to Elem for convenience.
+      const Elem * elem = *it;
+
       // PB: I believe these are the only supported ElemTypes.
-      const ElemType etype = (*it)->type();
+      const ElemType etype = elem->type();
       if( (etype != TRI3) && (etype != QUAD4) &&
           (etype != TET4) && (etype != HEX8) &&
           (etype != PRISM6) && (etype != PYRAMID5) )
         libmesh_error_msg("Error: Unsupported ElemType for UCDIO.");
 
       out_stream << e++ << " 0 " << type[etype] << "\t";
-      // (*it)->write_ucd_connectivity(out_stream);
-      (*it)->write_connectivity(out_stream, UCD);
+      elem->write_connectivity(out_stream, UCD);
     }
-
-  return;
 }
+
+
 
 void UCDIO::write_nodal_data(const std::string& fname,
                              const std::vector<Number>&soln,
@@ -338,18 +325,19 @@ void UCDIO::write_nodal_data(const std::string& fname,
                      cast_int<unsigned int>(names.size()));
 
   // Write the node coordinates
-  this->write_nodes(out_stream,mesh);
+  this->write_nodes(out_stream, mesh);
 
   // Write the elements
-  this->write_interior_elems(out_stream,mesh);
+  this->write_interior_elems(out_stream, mesh);
 
   // Write the solution
-  this->write_soln(out_stream,mesh,names,soln);
-
-  return;
+  this->write_soln(out_stream, mesh, names, soln);
 }
 
-void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
+
+
+void UCDIO::write_soln(std::ostream& out_stream,
+                       const MeshBase& mesh,
                        const std::vector<std::string>& names,
                        const std::vector<Number>&soln)
 {
@@ -357,7 +345,7 @@ void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
 
   // First write out how many variables and how many components per variable
   out_stream << names.size();
-  for( unsigned int i = 0; i < names.size(); i++ )
+  for (unsigned int i = 0; i < names.size(); i++)
     {
       libmesh_assert (out_stream.good());
       // Each named variable has only 1 component
@@ -367,23 +355,24 @@ void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
 
   // Now write out variable names and units. Since we don't store units
   // We just write out dummy.
-  for( std::vector<std::string>::const_iterator var = names.begin();
-       var != names.end();
-       ++var)
-    {
-      libmesh_assert (out_stream.good());
-      out_stream << (*var) << ", dummy" << std::endl;
-    }
+  {
+    std::vector<std::string>::const_iterator var = names.begin();
+    for (; var != names.end(); ++var)
+      {
+        libmesh_assert (out_stream.good());
+        out_stream << *var << ", dummy" << std::endl;
+      }
+  }
 
-  // Now, for each node, write out the solution variables
+  // Now, for each node, write out the solution variables.
+  // We use a 1-based node numbering for UCD.
   std::size_t nv = names.size();
-  for( std::size_t n = 1; // 1-based node number for UCD
-       n <= mesh.n_nodes(); n++)
+  for (std::size_t n = 1; n <= mesh.n_nodes(); n++)
     {
       libmesh_assert (out_stream.good());
       out_stream << n;
 
-      for( std::size_t var = 0; var != nv; var++ )
+      for (std::size_t var = 0; var != nv; var++)
         {
           std::size_t idx = nv*(n-1) + var;
 
@@ -391,8 +380,6 @@ void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
         }
       out_stream << std::endl;
     }
-
-  return;
 }
 
 } // namespace libMesh
