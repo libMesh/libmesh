@@ -21,12 +21,13 @@
 #define LIBMESH_UCD_IO_H
 
 // C++ includes
+#include <map>
 
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
-#include "libmesh/boundary_info.h"
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {
@@ -50,14 +51,19 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  UCDIO (MeshBase&);
+  UCDIO (MeshBase& mesh) :
+    MeshInput<MeshBase> (mesh),
+    MeshOutput<MeshBase>(mesh)
+  {}
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
   explicit
-  UCDIO (const MeshBase&);
+  UCDIO (const MeshBase& mesh) :
+    MeshOutput<MeshBase> (mesh)
+  {}
 
   /**
    * This method implements reading a mesh from a specified file
@@ -99,47 +105,45 @@ private:
   /**
    * Write UCD format header
    */
-  void write_header(std::ostream& out, const MeshBase& mesh,
-                    dof_id_type n_elems, unsigned int n_vars );
+  void write_header(std::ostream& out,
+                    const MeshBase& mesh,
+                    dof_id_type n_elems,
+                    unsigned int n_vars);
 
   /**
    * Write node information
    */
-  void write_nodes(std::ostream& out, const MeshBase& mesh);
+  void write_nodes(std::ostream& out,
+                   const MeshBase& mesh);
 
   /**
    * Write element information
    */
-  void write_interior_elems(std::ostream& out, const MeshBase& mesh);
+  void write_interior_elems(std::ostream& out,
+                            const MeshBase& mesh);
 
   /**
    * Writes all nodal solution variables
    */
-  void write_soln(std::ostream& out, const MeshBase& mesh,
+  void write_soln(std::ostream& out,
+                  const MeshBase& mesh,
                   const std::vector<std::string>& names,
-                  const std::vector<Number>&soln);
+                  const std::vector<Number>& soln);
 
+  // Static map from libmesh ElementType -> UCD description string for
+  // use during writing.
+  static std::map<ElemType, std::string> _writing_element_map;
+
+  // Static map from libmesh UCD description string -> ElementType for
+  // use during reading.
+  static std::map<std::string, ElemType> _reading_element_map;
+
+  // Static function used to build the _writing_element_map.
+  static std::map<ElemType, std::string> build_writing_element_map();
+
+  // Static function used to build the _reading_element_map.
+  static std::map<std::string, ElemType> build_reading_element_map();
 };
-
-
-
-// ------------------------------------------------------------
-// UCDIO inline members
-inline
-UCDIO::UCDIO (MeshBase& mesh) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh)
-{
-}
-
-
-
-inline
-UCDIO::UCDIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh)
-{
-}
-
 
 } // namespace libMesh
 
