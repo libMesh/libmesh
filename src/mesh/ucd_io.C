@@ -180,7 +180,7 @@ void UCDIO::read_implementation (std::istream& in)
 
         // The cell type can be either tri, quad, tet, hex, or prism.
         in >> dummy        // Cell number, means nothing to us
-           >> material_id  // doesn't mean anything at present, might later
+           >> material_id  // We'll use this for the element subdomain id.
            >> type;        // string describing cell type
 
         // Convert the UCD type string to a libmesh ElementType
@@ -205,6 +205,9 @@ void UCDIO::read_implementation (std::istream& in)
           }
 
         elems_of_dimension[elem->dim()] = true;
+
+        // Set the element's subdomain ID based on the material_id.
+        elem->subdomain_id() = cast_int<subdomain_id_type>(material_id);
 
         // Add the element to the mesh
         elem->set_id(i);
@@ -315,7 +318,8 @@ void UCDIO::write_interior_elems(std::ostream& out_stream,
       if (it == _writing_element_map.end())
         libmesh_error_msg("Error: Unsupported ElemType " << etype << " for UCDIO.");
 
-      out_stream << e++ << " 0 " << it->second << "\t";
+      // Write the element's subdomain ID as the UCD "material_id".
+      out_stream << e++ << " " << elem->subdomain_id() << " " << it->second << "\t";
       elem->write_connectivity(out_stream, UCD);
     }
 }
