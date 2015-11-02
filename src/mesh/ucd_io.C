@@ -38,6 +38,43 @@
 namespace libMesh
 {
 
+// Initialize the static data members by calling the static build functions.
+std::map<ElemType, std::string> UCDIO::_writing_element_map = UCDIO::build_writing_element_map();
+std::map<std::string, ElemType> UCDIO::_reading_element_map = UCDIO::build_reading_element_map();
+
+
+
+// Static function used to build the _writing_element_map.
+std::map<ElemType, std::string> UCDIO::build_writing_element_map()
+{
+  std::map<ElemType, std::string> ret;
+  ret[EDGE2]    = "edge";
+  ret[TRI3]     = "tri";
+  ret[QUAD4]    = "quad";
+  ret[TET4]     = "tet";
+  ret[HEX8]     = "hex";
+  ret[PRISM6]   = "prism";
+  ret[PYRAMID5] = "pyramid";
+  return ret;
+}
+
+
+
+// Static function used to build the _reading_element_map.
+std::map<std::string, ElemType> UCDIO::build_reading_element_map()
+{
+  std::map<std::string, ElemType> ret;
+  ret["edge"]    = EDGE2;
+  ret["tri"]     = TRI3;
+  ret["quad"]    = QUAD4;
+  ret["tet"]     = TET4;
+  ret["hex"]     = HEX8;
+  ret["prism"]   = PRISM6;
+  ret["pyramid"] = PYRAMID5;
+  return ret;
+}
+
+
 void UCDIO::read (const std::string& file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
@@ -139,8 +176,6 @@ void UCDIO::read_implementation (std::istream& in)
 
     for (unsigned int i=0; i<nElem; i++)
       {
-        Elem* elem = NULL;
-
         libmesh_assert (in.good());
 
         // The cell type can be either tri, quad, tet, hex, or prism.
@@ -148,19 +183,13 @@ void UCDIO::read_implementation (std::istream& in)
            >> material_id  // doesn't mean anything at present, might later
            >> type;        // string describing cell type
 
-        // Now read the connectivity.
-        if (type == "quad")
-          elem = new Quad4;
-        else if (type == "tri")
-          elem = new Tri3;
-        else if (type == "hex")
-          elem = new Hex8;
-        else if (type == "tet")
-          elem = new Tet4;
-        else if (type == "prism")
-          elem = new Prism6;
-        else
+        // Convert the UCD type string to a libmesh ElementType
+        std::map<std::string, ElemType>::iterator it = _reading_element_map.find(type);
+        if (it == _reading_element_map.end())
           libmesh_error_msg("Unsupported element type = " << type);
+
+        // Build the required type and release it into our custody.
+        Elem * elem = Elem::build(it->second).release();
 
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
@@ -266,15 +295,6 @@ void UCDIO::write_nodes(std::ostream& out_stream,
 void UCDIO::write_interior_elems(std::ostream& out_stream,
                                  const MeshBase& mesh)
 {
-  std::string type[] =
-    { "edge",  "edge",  "edge",
-      "tri",   "tri",
-      "quad",  "quad",  "quad",
-      "tet",   "tet",
-      "hex",   "hex",   "hex",
-      "prism", "prism", "prism",
-      "pyramid" };
-
   MeshBase::const_element_iterator it  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
 
@@ -289,14 +309,13 @@ void UCDIO::write_interior_elems(std::ostream& out_stream,
       // Get pointer to Elem for convenience.
       const Elem * elem = *it;
 
-      // PB: I believe these are the only supported ElemTypes.
+      // Look up the corresponding UCD element type in the static map.
       const ElemType etype = elem->type();
-      if( (etype != TRI3) && (etype != QUAD4) &&
-          (etype != TET4) && (etype != HEX8) &&
-          (etype != PRISM6) && (etype != PYRAMID5) )
-        libmesh_error_msg("Error: Unsupported ElemType for UCDIO.");
+      std::map<ElemType, std::string>::iterator it = _writing_element_map.find(etype);
+      if (it == _writing_element_map.end())
+        libmesh_error_msg("Error: Unsupported ElemType " << etype << " for UCDIO.");
 
-      out_stream << e++ << " 0 " << type[etype] << "\t";
+      out_stream << e++ << " 0 " << it->second << "\t";
       elem->write_connectivity(out_stream, UCD);
     }
 }

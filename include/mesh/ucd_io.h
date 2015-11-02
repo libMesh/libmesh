@@ -21,11 +21,13 @@
 #define LIBMESH_UCD_IO_H
 
 // C++ includes
+#include <map>
 
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {
@@ -127,6 +129,20 @@ private:
                   const MeshBase& mesh,
                   const std::vector<std::string>& names,
                   const std::vector<Number>& soln);
+
+  // Static map from libmesh ElementType -> UCD description string for
+  // use during writing.
+  static std::map<ElemType, std::string> _writing_element_map;
+
+  // Static map from libmesh UCD description string -> ElementType for
+  // use during reading.
+  static std::map<std::string, ElemType> _reading_element_map;
+
+  // Static function used to build the _writing_element_map.
+  static std::map<ElemType, std::string> build_writing_element_map();
+
+  // Static function used to build the _reading_element_map.
+  static std::map<std::string, ElemType> build_reading_element_map();
 };
 
 } // namespace libMesh
