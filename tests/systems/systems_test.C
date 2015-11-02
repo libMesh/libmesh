@@ -67,9 +67,9 @@ public:
     for (Real x = 0.1; x < 1; x += 0.2)
       {
         Point p(x);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (sys.point_value(0,p),
-           cubic_test(p,es.parameters,"",""), TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                     libmesh_real(cubic_test(p,es.parameters,"","")),
+                                     TOLERANCE*TOLERANCE);
       }
   }
 
@@ -95,9 +95,9 @@ public:
       for (Real y = 0.1; y < 1; y += 0.2)
         {
           Point p(x,y);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL
-            (sys.point_value(0,p),
-             cubic_test(p,es.parameters,"",""), TOLERANCE*TOLERANCE);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                       libmesh_real(cubic_test(p,es.parameters,"","")),
+                                       TOLERANCE*TOLERANCE);
         }
   }
 
@@ -123,9 +123,9 @@ public:
         for (Real z = 0.1; z < 1; z += 0.2)
           {
             Point p(x,y,z);
-            CPPUNIT_ASSERT_DOUBLES_EQUAL
-              (sys.point_value(0,p),
-               cubic_test(p,es.parameters,"",""), TOLERANCE*TOLERANCE);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                         libmesh_real(cubic_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
           }
   }
 
