@@ -144,7 +144,24 @@ int main (int argc, char** argv)
       // Compute the reduced basis space by computing "snapshots", i.e.
       // "truth" solves, at well-chosen parameter values and employing
       // these snapshots as basis functions.
-      rb_con.train_reduced_basis();
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+      try
+        {
+#endif
+          rb_con.train_reduced_basis();
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+        }
+      catch (LogicError & e)
+        {
+          libMesh::err << "\n\n"
+                       << "********************************************************************************\n"
+                       << "Training reduced basis failed, this example requires a direct solver.\n"
+                       << "Try running with -ksp_type preonly -pc_type lu instead.\n"
+                       << "********************************************************************************"
+                       << std::endl;
+          return 1;
+        }
+#endif
 
       // Write out the data that will subsequently be required for the Evaluation stage
 #if defined(LIBMESH_HAVE_CAPNPROTO)
