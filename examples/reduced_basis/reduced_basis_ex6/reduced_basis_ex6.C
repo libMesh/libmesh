@@ -119,6 +119,10 @@ int main (int argc, char** argv)
 #elif defined(LIBMESH_DEFAULT_TRIPLE_PRECISION)
   // I have no idea why long double isn't working here... [RHS]
   libmesh_example_requires(false, "double precision");
+#elif defined(LIBMESH_ENABLE_BLOCKED_STORAGE)
+  // This example dies with "New nonzero at (0,2) caused a malloc"
+  // when blocked storage is enabled.
+  libmesh_example_requires(false, "--disable-blocked-storage");
 #endif
 
   // This is a 3D example
