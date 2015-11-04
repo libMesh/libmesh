@@ -67,9 +67,8 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
     for (; it != end; ++it)
       {
         const Node * other_node = it->first;
-        _boundary_node_id.insert
-          (std::pair<const Node*, boundary_id_type>
-           (_mesh.node_ptr(other_node->id()), it->second) );
+        _boundary_node_id.insert(std::make_pair(_mesh.node_ptr(other_node->id()),
+                                                it->second));
       }
   }
 
@@ -81,9 +80,8 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
     for (; it != end; ++it)
       {
         const Elem * other_elem = it->first;
-        _boundary_edge_id.insert
-          (std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
-           (_mesh.elem(other_elem->id()), it->second) );
+        _boundary_edge_id.insert(std::make_pair(_mesh.elem(other_elem->id()),
+                                                it->second));
       }
   }
 
@@ -95,9 +93,8 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
     for (; it != end; ++it)
       {
         const Elem * other_elem = it->first;
-        _boundary_side_id.insert
-          (std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
-           (_mesh.elem(other_elem->id()), it->second) );
+        _boundary_side_id.insert(std::make_pair(_mesh.elem(other_elem->id()),
+                                                it->second));
       }
   }
 
@@ -497,9 +494,7 @@ void BoundaryInfo::add_node(const Node* node,
     if (pos.first->second == id)
       return;
 
-  std::pair<const Node*, boundary_id_type> kv (node, id);
-
-  _boundary_node_id.insert(kv);
+  _boundary_node_id.insert(std::make_pair(node, id));
   _boundary_ids.insert(id);
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
 }
@@ -590,11 +585,7 @@ void BoundaryInfo::add_edge(const Elem* elem,
         pos.first->second.second == id)
       return;
 
-  std::pair<unsigned short int, boundary_id_type> p(edge,id);
-  std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
-    kv (elem, p);
-
-  _boundary_edge_id.insert(kv);
+  _boundary_edge_id.insert(std::make_pair(elem, std::make_pair(edge, id)));
   _boundary_ids.insert(id);
   _edge_boundary_ids.insert(id); // Also add this ID to the set of edge boundary IDs
 }
@@ -686,11 +677,7 @@ void BoundaryInfo::add_side(const Elem* elem,
         pos.first->second.second == id)
       return;
 
-  std::pair<unsigned short int, boundary_id_type> p(side,id);
-  std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
-    kv (elem, p);
-
-  _boundary_side_id.insert(kv);
+  _boundary_side_id.insert(std::make_pair(elem, std::make_pair(side, id)));
   _boundary_ids.insert(id);
   _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
 }
