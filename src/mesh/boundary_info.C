@@ -516,21 +516,27 @@ void BoundaryInfo::add_node(const Node* node,
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
 }
 
+
+
 void BoundaryInfo::add_node(const Node* node,
                             const std::vector<boundary_id_type>& ids)
 {
-  if (ids.empty())
+  libmesh_deprecated();
+  this->add_node(node, std::set<boundary_id_type>(ids.begin(), ids.end()));
+}
+
+
+
+void BoundaryInfo::add_node(const Node* node,
+                            const std::set<boundary_id_type>& ids_set)
+{
+  if (ids_set.empty())
     return;
 
   libmesh_assert(node);
 
   // A convenient typedef
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
-
-  // The following logic requires that the entries in the ids vector
-  // be unique, so guarantee that's the case by constructing a
-  // std::set.
-  std::set<boundary_id_type> ids_set(ids.begin(), ids.end());
 
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
@@ -560,6 +566,7 @@ void BoundaryInfo::add_node(const Node* node,
       _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
     }
 }
+
 
 
 void BoundaryInfo::clear_boundary_node_ids()
@@ -617,7 +624,17 @@ void BoundaryInfo::add_edge(const Elem* elem,
                             const unsigned short int edge,
                             const std::vector<boundary_id_type>& ids)
 {
-  if (ids.empty())
+  libmesh_deprecated();
+  this->add_edge(elem, edge, std::set<boundary_id_type>(ids.begin(), ids.end()));
+}
+
+
+
+void BoundaryInfo::add_edge(const Elem* elem,
+                            const unsigned short int edge,
+                            const std::set<boundary_id_type>& ids_set)
+{
+  if (ids_set.empty())
     return;
 
   libmesh_assert(elem);
@@ -632,9 +649,10 @@ void BoundaryInfo::add_edge(const Elem* elem,
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_edge_id.equal_range(elem);
 
-  for (unsigned int i=0; i!= ids.size(); ++i)
+  std::set<boundary_id_type>::iterator it = ids_set.begin();
+  for (; it != ids_set.end(); ++it)
     {
-      boundary_id_type id=ids[i];
+      boundary_id_type id = *it;
 
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
@@ -652,15 +670,13 @@ void BoundaryInfo::add_edge(const Elem* elem,
       if (already_inserted)
         continue;
 
-      std::pair<unsigned short int, boundary_id_type> p(edge,id);
-      std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
-        kv (elem, p);
-
-      _boundary_edge_id.insert(kv);
+      _boundary_edge_id.insert(std::make_pair(elem, std::make_pair(edge, id)));
       _boundary_ids.insert(id);
       _edge_boundary_ids.insert(id); // Also add this ID to the set of edge boundary IDs
     }
 }
+
+
 
 void BoundaryInfo::add_side(const dof_id_type e,
                             const unsigned short int side,
@@ -712,7 +728,17 @@ void BoundaryInfo::add_side(const Elem* elem,
                             const unsigned short int side,
                             const std::vector<boundary_id_type>& ids)
 {
-  if (ids.empty())
+  libmesh_deprecated();
+  this->add_side(elem, side, std::set<boundary_id_type>(ids.begin(), ids.end()));
+}
+
+
+
+void BoundaryInfo::add_side(const Elem* elem,
+                            const unsigned short int side,
+                            const std::set<boundary_id_type>& ids_set)
+{
+  if (ids_set.empty())
     return;
 
   libmesh_assert(elem);
@@ -723,11 +749,6 @@ void BoundaryInfo::add_side(const Elem* elem,
   // A convenient typedef
   typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
     const_iterator Iter;
-
-  // The following logic requires that the entries in the ids vector
-  // be unique, so guarantee that's the case by constructing a
-  // std::set.
-  std::set<boundary_id_type> ids_set(ids.begin(), ids.end());
 
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(elem);

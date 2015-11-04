@@ -388,7 +388,10 @@ void UnstructuredMesh::all_first_order ()
           const std::vector<boundary_id_type> boundary_ids =
             this->get_boundary_info().raw_boundary_ids (so_elem, s);
 
-          this->get_boundary_info().add_side (lo_elem, s, boundary_ids);
+          this->get_boundary_info().add_side (lo_elem,
+                                              s,
+                                              std::set<boundary_id_type>(boundary_ids.begin(),
+                                                                         boundary_ids.end()));
         }
 
       /*
@@ -676,7 +679,10 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
           const std::vector<boundary_id_type> boundary_ids =
             this->get_boundary_info().raw_boundary_ids (lo_elem, s);
 
-          this->get_boundary_info().add_side (so_elem, s, boundary_ids);
+          this->get_boundary_info().add_side (so_elem,
+                                              s,
+                                              std::set<boundary_id_type>(boundary_ids.begin(),
+                                                                         boundary_ids.end()));
 
           if (lo_elem->neighbor(s) == remote_elem)
             so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
@@ -1505,8 +1511,10 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
             mesh.get_boundary_info().boundary_ids(elem->get_node(n));
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
-              std::vector<boundary_id_type> new_ids(old_ids);
-              std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
+              std::set<boundary_id_type> new_ids(old_ids.begin(), old_ids.end());
+              // Replace the old_id, if it exists, with the new ID.
+              if (new_ids.erase(old_id))
+                new_ids.insert(new_id);
               mesh.get_boundary_info().remove(elem->get_node(n));
               mesh.get_boundary_info().add_node(elem->get_node(n), new_ids);
             }
@@ -1519,8 +1527,10 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
             mesh.get_boundary_info().edge_boundary_ids(elem, edge);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
-              std::vector<boundary_id_type> new_ids(old_ids);
-              std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
+              std::set<boundary_id_type> new_ids(old_ids.begin(), old_ids.end());
+              // Replace the old_id, if it exists, with the new ID.
+              if (new_ids.erase(old_id))
+                new_ids.insert(new_id);
               mesh.get_boundary_info().remove_edge(elem, edge);
               mesh.get_boundary_info().add_edge(elem, edge, new_ids);
             }
@@ -1533,8 +1543,10 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
             mesh.get_boundary_info().boundary_ids(elem, s);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
-              std::vector<boundary_id_type> new_ids(old_ids);
-              std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
+              std::set<boundary_id_type> new_ids(old_ids.begin(), old_ids.end());
+              // Replace the old_id, if it exists, with the new ID.
+              if (new_ids.erase(old_id))
+                new_ids.insert(new_id);
               mesh.get_boundary_info().remove_side(elem, s);
               mesh.get_boundary_info().add_side(elem, s, new_ids);
             }

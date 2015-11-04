@@ -2001,7 +2001,9 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           const std::vector<boundary_id_type> ids_to_copy =
             cross_section_boundary_info.boundary_ids(node);
 
-          boundary_info.add_node(new_node, ids_to_copy);
+          boundary_info.add_node(new_node,
+                                 std::set<boundary_id_type>(ids_to_copy.begin(),
+                                                            ids_to_copy.end()));
         }
     }
 

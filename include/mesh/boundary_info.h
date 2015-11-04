@@ -153,9 +153,18 @@ public:
   /**
    * Add \p Node \p node with boundary ids \p ids to the boundary
    * information data structure.
+   *
+   * This function is now deprecated, call the version which takes a
+   * reference to a std::set instead.
    */
   void add_node (const Node* node,
                  const std::vector<boundary_id_type>& ids);
+
+  /**
+   * Non-deprecated version of the add_node() function taking a set of ids.
+   */
+  void add_node (const Node* node,
+                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh
@@ -184,10 +193,20 @@ public:
    * Add edge \p edge of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
    * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This function is now deprecated, call the version which takes a
+   * reference to a std::set instead.
    */
   void add_edge (const Elem* elem,
                  const unsigned short int edge,
                  const std::vector<boundary_id_type>& ids);
+
+  /**
+   * Non-deprecated version of the add_side() function taking a set of ids.
+   */
+  void add_edge (const Elem* elem,
+                 const unsigned short int edge,
+                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Add side \p side of element number \p elem with boundary id \p id
@@ -208,10 +227,20 @@ public:
   /**
    * Add side \p side of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
+   *
+   * This function is now deprecated, call the version which takes a
+   * reference to a std::set instead.
    */
   void add_side (const Elem* elem,
                  const unsigned short int side,
                  const std::vector<boundary_id_type>& ids);
+
+  /**
+   * Non-deprecated version of the add_side() function taking a set of ids.
+   */
+  void add_side (const Elem* elem,
+                 const unsigned short int side,
+                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Removes the boundary conditions associated with node \p node,
