@@ -133,7 +133,7 @@ public:
 
     // We didn't set an interior_parent on the edge element, so it
     // should default to NULL
-    CPPUNIT_ASSERT( !_mesh->elem(2)->interior_parent() );
+    CPPUNIT_ASSERT( _mesh->elem(2)->interior_parent() );
   }
 
   void testDofOrdering()
