@@ -268,9 +268,6 @@ public:
      */
     this->build_mesh();
 
-    // Let's set an interior_parent() this time for testing
-    _mesh->elem(2)->set_interior_parent(_mesh->elem(0));
-
 #ifdef LIBMESH_ENABLE_AMR
     MeshRefinement(*_mesh).uniformly_refine(1);
 #endif
@@ -494,13 +491,11 @@ protected:
       edge->subdomain_id() = 1;
     }
 
-    // Let's set an interior_parent() this time for testing
-    _mesh->elem(4)->set_interior_parent(_mesh->elem(0));
-
     // libMesh will renumber, but we numbered according to its scheme
     // anyway. We do this because when we call uniformly_refine subsequenly,
     // it's going use skip_renumber=false.
     _mesh->prepare_for_use(false /*skip_renumber*/);
+
 
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement
@@ -711,10 +706,6 @@ protected:
     // it's going use skip_renumber=false.
     _mesh->prepare_for_use(false /*skip_renumber*/);
 
-    // Let's set an interior_parent() this time for testing
-    _mesh->elem(4)->set_interior_parent(_mesh->elem(0));
-
-
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement
     _mesh->elem(4)->set_refinement_flag(Elem::REFINE);
@@ -910,9 +901,6 @@ protected:
       // 2D elements will have subdomain id 0, this one will have 1
       quad->subdomain_id() = 1;
     }
-
-    // Let's set an interior_parent() this time for testing
-    _mesh->elem(36)->set_interior_parent(_mesh->elem(13));
 
     // libMesh will renumber, but we numbered according to its scheme
     // anyway. We do this because when we call uniformly_refine subsequently,
