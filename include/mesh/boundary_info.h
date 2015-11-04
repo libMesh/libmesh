@@ -563,6 +563,11 @@ private:
                 boundary_id_type> _boundary_node_id;
 
   /**
+   * Typdef for iterators into the _boundary_node_id container.
+   */
+  typedef std::multimap<const Node*, boundary_id_type>::const_iterator boundary_node_iter;
+
+  /**
    * Data structure that maps edges of elements
    * to boundary ids. This is only relevant in 3D.
    */
@@ -571,12 +576,24 @@ private:
   _boundary_edge_id;
 
   /**
+   * Typdef for iterators into the _boundary_edge_id container.
+   */
+  typedef std::multimap<const Elem*,
+                        std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_edge_iter;
+
+  /**
    * Data structure that maps sides of elements
    * to boundary ids.
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, boundary_id_type> >
   _boundary_side_id;
+
+  /**
+   * Typdef for iterators into the _boundary_side_id container.
+   */
+  typedef std::multimap<const Elem*,
+                        std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_side_iter;
 
   /**
    * A collection of user-specified boundary ids for sides, edges and nodes.
