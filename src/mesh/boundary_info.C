@@ -527,12 +527,18 @@ void BoundaryInfo::add_node(const Node* node,
   // A convenient typedef
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
 
+  // The following logic requires that the entries in the ids vector
+  // be unique, so guarantee that's the case by constructing a
+  // std::set.
+  std::set<boundary_id_type> ids_set(ids.begin(), ids.end());
+
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
 
-  for (unsigned int i=0; i!= ids.size(); ++i)
+  std::set<boundary_id_type>::iterator it = ids_set.begin();
+  for (; it != ids_set.end(); ++it)
     {
-      boundary_id_type id=ids[i];
+      boundary_id_type id = *it;
 
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
@@ -549,9 +555,7 @@ void BoundaryInfo::add_node(const Node* node,
       if (already_inserted)
         continue;
 
-      std::pair<const Node*, boundary_id_type> kv (node, id);
-
-      _boundary_node_id.insert(kv);
+      _boundary_node_id.insert(std::make_pair(node,id));
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
     }
@@ -720,12 +724,18 @@ void BoundaryInfo::add_side(const Elem* elem,
   typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
     const_iterator Iter;
 
+  // The following logic requires that the entries in the ids vector
+  // be unique, so guarantee that's the case by constructing a
+  // std::set.
+  std::set<boundary_id_type> ids_set(ids.begin(), ids.end());
+
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(elem);
 
-  for (unsigned int i=0; i!= ids.size(); ++i)
+  std::set<boundary_id_type>::iterator it = ids_set.begin();
+  for (; it != ids_set.end(); ++it)
     {
-      boundary_id_type id=ids[i];
+      boundary_id_type id = *it;
 
       if (id == invalid_id)
         libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
@@ -733,9 +743,8 @@ void BoundaryInfo::add_side(const Elem* elem,
                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
-      for (Iter p = pos.first;p != pos.second; ++p)
-        if (p->second.first == side &&
-            p->second.second == id)
+      for (Iter p = pos.first; p != pos.second; ++p)
+        if (p->second.first == side && p->second.second == id)
           {
             already_inserted = true;
             break;
@@ -743,11 +752,7 @@ void BoundaryInfo::add_side(const Elem* elem,
       if (already_inserted)
         continue;
 
-      std::pair<unsigned short int, boundary_id_type> p(side,id);
-      std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
-        kv (elem, p);
-
-      _boundary_side_id.insert(kv);
+      _boundary_side_id.insert(std::make_pair(elem, std::make_pair(side, id)));
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
     }
