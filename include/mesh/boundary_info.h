@@ -636,44 +636,6 @@ private:
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
 
-
-  //   /**
-  //    * Functor class for printing a single node's info
-  //    * To be used with "for_each".
-  //    */
-  //   class PrintNodeInfo
-  //   {
-  //   public:
-  //     inline
-  //     void operator() (const std::pair<const Node*, short int>& np) const
-  //     {
-  //       libMesh::out << "  (" << np.first->id()
-  //      << ", "  << np.second
-  //      << ")"  << std::endl;
-  //     }
-  //   };
-
-
-  //   /**
-  //    * Functor class for printing a single side's info.
-  //    * To be used with "for_each".
-  //    */
-  //   class PrintSideInfo
-  //   {
-  //   public:
-  //     PrintSideInfo() {}
-  //     inline
-  //     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
-  //     {
-  //       libMesh::out << "  (" << sp.first->id()
-  //      << ", "  << sp.second.first
-  //      << ", "  << sp.second.second
-  //      << ")"   << std::endl;
-  //     }
-  //   };
-
-
-
   /**
    * Functor class for initializing a map.
    * The entries being added to the map
