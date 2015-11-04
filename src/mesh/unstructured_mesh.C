@@ -591,10 +591,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
               e_it != neighbors_0.end(); e_it++)
             {
               found_interior_parents=false;
-              dof_id_type int_prnt = *e_it;
+              dof_id_type interior_parent_id = *e_it;
               for(dof_id_type n=1; n < element->n_vertices(); n++)
                 {
-                  if(neighbors[n].find(int_prnt)!=neighbors[n].end())
+                  if(neighbors[n].find(interior_parent_id)!=neighbors[n].end())
                     {
                       found_interior_parents=true;
                     }
@@ -606,7 +606,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 }
               if(found_interior_parents)
               {
-                element->set_interior_parent(this->elem(int_prnt));
+                element->set_interior_parent(this->elem(interior_parent_id));
                 break;
               }
             }
