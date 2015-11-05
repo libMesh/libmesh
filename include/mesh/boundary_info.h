@@ -122,15 +122,21 @@ public:
              MeshData* boundary_mesh_data=NULL,
              MeshData* this_mesh_data=NULL);
 
-
   /**
-   * Same as above, except in this case we fill \p node_id_map and \p side_id_map.
+   * Suppose we have used sync to create \p boundary_mesh. Then each
+   * element in \p boundary_mesh will have interior_parent defined.
+   * This method gets extra data for us:
+   *  - \p node_id_map stores a map from the node ids on the interior mesh
+   *    to the corresponding node ids of \p boundary_mesh.
+   *  - \p side_id_map stores a map from the element ids of the boundary mesh
+   *    to the side index of the interior_parent that the boundary element
+   *    corresponds to.
+   * \p tolerance is used to identify when we have matching elements.
    */
-  void sync (const std::set<boundary_id_type> &requested_boundary_ids,
-             UnstructuredMesh& boundary_mesh,
-             std::map<dof_id_type, dof_id_type>& node_id_map,
-             std::map<std::pair<dof_id_type, unsigned char>, dof_id_type>& side_id_map);
-
+  void get_side_and_node_maps (UnstructuredMesh& boundary_mesh,
+                               std::map<dof_id_type, dof_id_type>& node_id_map,
+                               std::map<dof_id_type, unsigned char>& side_id_map,
+                               Real tolerance=1.e-6);
 
   /**
    * Generates \p elements along the boundary of our _mesh, which
@@ -547,17 +553,6 @@ public:
 
 
 private:
-
-  /**
-   * Helper method for that actually performs the syncing between the interior
-   * mesh and the boundary mesh.
-   */
-  void sync_helper (const std::set<boundary_id_type> &requested_boundary_ids,
-                    UnstructuredMesh& boundary_mesh,
-                    MeshData* boundary_mesh_data,
-                    MeshData* this_mesh_data,
-                    std::map<dof_id_type, dof_id_type>* node_id_map_ptr,
-                    std::map<std::pair<dof_id_type, unsigned char>, dof_id_type>* side_id_map_ptr);
 
   /**
    * Helper method for finding consistent maps of interior to boundary
