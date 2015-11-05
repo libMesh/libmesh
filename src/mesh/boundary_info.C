@@ -140,16 +140,49 @@ void BoundaryInfo::sync (UnstructuredMesh& boundary_mesh,
   if (!_mesh.is_serial())
     this->comm().set_union(request_boundary_ids);
 
-  this->sync(request_boundary_ids, boundary_mesh,
-             boundary_mesh_data, this_mesh_data);
+  this->sync_helper(request_boundary_ids,
+                    boundary_mesh,
+                    boundary_mesh_data,
+                    this_mesh_data,
+                    NULL,
+                    NULL);
 }
-
 
 
 void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_ids,
                          UnstructuredMesh& boundary_mesh,
                          MeshData*     boundary_mesh_data,
                          MeshData*     this_mesh_data)
+{
+  this->sync_helper(requested_boundary_ids,
+                    boundary_mesh,
+                    boundary_mesh_data,
+                    this_mesh_data,
+                    NULL,
+                    NULL);
+}
+
+
+void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_ids,
+                         UnstructuredMesh& boundary_mesh,
+                         std::map<dof_id_type, dof_id_type>& node_id_map,
+                         std::map<std::pair<dof_id_type, unsigned char>, dof_id_type>& side_id_map)
+{
+  this->sync_helper(requested_boundary_ids,
+                    boundary_mesh,
+                    NULL,
+                    NULL,
+                    &node_id_map,
+                    &side_id_map);
+}
+
+
+void BoundaryInfo::sync_helper (const std::set<boundary_id_type> &requested_boundary_ids,
+                                UnstructuredMesh& boundary_mesh,
+                                MeshData*     boundary_mesh_data,
+                                MeshData*     this_mesh_data,
+                                std::map<dof_id_type, dof_id_type>* node_id_map_ptr,
+                                std::map<std::pair<dof_id_type, unsigned char>, dof_id_type>* side_id_map_ptr)
 {
   START_LOG("sync()", "BoundaryInfo");
 
@@ -258,6 +291,15 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 
   // and finally distribute element partitioning to the nodes
   Partitioner::set_node_processor_ids(boundary_mesh);
+
+  if(node_id_map_ptr)
+  {
+    node_id_map_ptr->swap(node_id_map);
+  }
+  if(side_id_map_ptr)
+  {
+    side_id_map_ptr->swap(side_id_map);
+  }
 
   STOP_LOG("sync()", "BoundaryInfo");
 }
