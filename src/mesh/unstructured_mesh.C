@@ -566,6 +566,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     {
       Elem * element = *it;
 
+      //Ignore an 3D element or an element that already has an interior parent
       if(element->dim()>=LIBMESH_DIM || element->interior_parent())
         continue;
 
@@ -589,10 +590,18 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             }
           else
             {
+              // We have found an empty set, no reason to continue
+              // Ensure we set this flag to false before the break since it could have
+              // been set to true for previous vertex
               found_interior_parents = false;
               break;
             }
         }
+
+      // If we have successfully generated a set of elements for each vertex, we will compare
+      // the set for vertex 0 will the sets for the vertices until we find a id that exists in
+      // all sets.  If found, this is our an interior parent id.  The interior parent id found
+      // will be the lowest element id if there is potential for multiple interior parents.
       if(found_interior_parents)
         {
           std::set<dof_id_type> &neighbors_0 = neighbors[0];
