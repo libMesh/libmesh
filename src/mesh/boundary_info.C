@@ -133,12 +133,10 @@ void BoundaryInfo::sync (UnstructuredMesh& boundary_mesh,
   if (!_mesh.is_serial())
     this->comm().set_union(request_boundary_ids);
 
-  this->sync_helper(request_boundary_ids,
-                    boundary_mesh,
-                    boundary_mesh_data,
-                    this_mesh_data,
-                    NULL,
-                    NULL);
+  this->sync(request_boundary_ids,
+             boundary_mesh,
+             boundary_mesh_data,
+             this_mesh_data);
 }
 
 
@@ -146,36 +144,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                          UnstructuredMesh& boundary_mesh,
                          MeshData*     boundary_mesh_data,
                          MeshData*     this_mesh_data)
-{
-  this->sync_helper(requested_boundary_ids,
-                    boundary_mesh,
-                    boundary_mesh_data,
-                    this_mesh_data,
-                    NULL,
-                    NULL);
-}
-
-
-void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_ids,
-                         UnstructuredMesh& boundary_mesh,
-                         std::map<dof_id_type, dof_id_type>& node_id_map,
-                         std::map<std::pair<dof_id_type, unsigned char>, dof_id_type>& side_id_map)
-{
-  this->sync_helper(requested_boundary_ids,
-                    boundary_mesh,
-                    NULL,
-                    NULL,
-                    &node_id_map,
-                    &side_id_map);
-}
-
-
-void BoundaryInfo::sync_helper (const std::set<boundary_id_type> &requested_boundary_ids,
-                                UnstructuredMesh& boundary_mesh,
-                                MeshData*     boundary_mesh_data,
-                                MeshData*     this_mesh_data,
-                                std::map<dof_id_type, dof_id_type>* node_id_map_ptr,
-                                std::map<std::pair<dof_id_type, unsigned char>, dof_id_type>* side_id_map_ptr)
 {
   START_LOG("sync()", "BoundaryInfo");
 
@@ -285,18 +253,67 @@ void BoundaryInfo::sync_helper (const std::set<boundary_id_type> &requested_boun
   // and finally distribute element partitioning to the nodes
   Partitioner::set_node_processor_ids(boundary_mesh);
 
-  if(node_id_map_ptr)
-  {
-    node_id_map_ptr->swap(node_id_map);
-  }
-  if(side_id_map_ptr)
-  {
-    side_id_map_ptr->swap(side_id_map);
-  }
-
   STOP_LOG("sync()", "BoundaryInfo");
 }
 
+
+void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh& boundary_mesh,
+                                           std::map<dof_id_type, dof_id_type>& node_id_map,
+                                           std::map<dof_id_type, unsigned char>& side_id_map,
+                                           Real tolerance)
+{
+  START_LOG("get_side_and_node_maps()", "BoundaryInfo");
+
+  node_id_map.clear();
+  side_id_map.clear();
+
+  MeshBase::const_element_iterator el =
+    boundary_mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el =
+    boundary_mesh.active_elements_end();
+
+  for (; el != end_el; ++el)
+    {
+      const Elem* boundary_elem = *el;
+      const Elem* interior_parent = boundary_elem->interior_parent();
+
+      // Find out which side of interior_parent boundary_elem correponds to.
+      // Use centroid comparison as a way to check.
+      unsigned char interior_parent_side_index = 0;
+      bool found_matching_sides = false;
+      for(unsigned char side=0; side<interior_parent->n_sides(); side++)
+        {
+          UniquePtr<Elem> interior_parent_side = interior_parent->build_side(side);
+          Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).size();
+
+          if( centroid_distance < (tolerance * boundary_elem->hmin()) )
+            {
+              interior_parent_side_index = side;
+              found_matching_sides = true;
+              break;
+            }
+        }
+
+      if(!found_matching_sides)
+        {
+          libmesh_error_msg("No matching side found within the specified tolerance");
+        }
+
+      side_id_map[boundary_elem->id()] = interior_parent_side_index;
+
+      UniquePtr<Elem> interior_parent_side = interior_parent->build_side(interior_parent_side_index);
+      for(unsigned char local_node_index=0; local_node_index<boundary_elem->n_nodes(); local_node_index++)
+        {
+          dof_id_type boundary_node_id = boundary_elem->node(local_node_index);
+          dof_id_type interior_node_id = interior_parent_side->node(local_node_index);
+
+          node_id_map[interior_node_id] = boundary_node_id;
+        }
+
+    }
+
+  STOP_LOG("get_side_and_node_maps()", "BoundaryInfo");
+}
 
 
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> &requested_boundary_ids,
