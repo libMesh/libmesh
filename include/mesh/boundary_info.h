@@ -162,9 +162,18 @@ public:
   /**
    * Add \p Node \p node with boundary ids \p ids to the boundary
    * information data structure.
+   *
+   * This function is now deprecated, call the version which takes a
+   * reference to a std::set instead.
    */
   void add_node (const Node* node,
                  const std::vector<boundary_id_type>& ids);
+
+  /**
+   * Non-deprecated version of the add_node() function taking a set of ids.
+   */
+  void add_node (const Node* node,
+                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh
@@ -193,10 +202,20 @@ public:
    * Add edge \p edge of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
    * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This function is now deprecated, call the version which takes a
+   * reference to a std::set instead.
    */
   void add_edge (const Elem* elem,
                  const unsigned short int edge,
                  const std::vector<boundary_id_type>& ids);
+
+  /**
+   * Non-deprecated version of the add_side() function taking a set of ids.
+   */
+  void add_edge (const Elem* elem,
+                 const unsigned short int edge,
+                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Add side \p side of element number \p elem with boundary id \p id
@@ -217,10 +236,20 @@ public:
   /**
    * Add side \p side of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
+   *
+   * This function is now deprecated, call the version which takes a
+   * reference to a std::set instead.
    */
   void add_side (const Elem* elem,
                  const unsigned short int side,
                  const std::vector<boundary_id_type>& ids);
+
+  /**
+   * Non-deprecated version of the add_side() function taking a set of ids.
+   */
+  void add_side (const Elem* elem,
+                 const unsigned short int side,
+                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Removes the boundary conditions associated with node \p node,
@@ -554,6 +583,11 @@ private:
                 boundary_id_type> _boundary_node_id;
 
   /**
+   * Typdef for iterators into the _boundary_node_id container.
+   */
+  typedef std::multimap<const Node*, boundary_id_type>::const_iterator boundary_node_iter;
+
+  /**
    * Data structure that maps edges of elements
    * to boundary ids. This is only relevant in 3D.
    */
@@ -562,12 +596,24 @@ private:
   _boundary_edge_id;
 
   /**
+   * Typdef for iterators into the _boundary_edge_id container.
+   */
+  typedef std::multimap<const Elem*,
+                        std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_edge_iter;
+
+  /**
    * Data structure that maps sides of elements
    * to boundary ids.
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, boundary_id_type> >
   _boundary_side_id;
+
+  /**
+   * Typdef for iterators into the _boundary_side_id container.
+   */
+  typedef std::multimap<const Elem*,
+                        std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_side_iter;
 
   /**
    * A collection of user-specified boundary ids for sides, edges and nodes.
@@ -609,44 +655,6 @@ private:
    * this is only implemented for ExodusII
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
-
-
-  //   /**
-  //    * Functor class for printing a single node's info
-  //    * To be used with "for_each".
-  //    */
-  //   class PrintNodeInfo
-  //   {
-  //   public:
-  //     inline
-  //     void operator() (const std::pair<const Node*, short int>& np) const
-  //     {
-  //       libMesh::out << "  (" << np.first->id()
-  //      << ", "  << np.second
-  //      << ")"  << std::endl;
-  //     }
-  //   };
-
-
-  //   /**
-  //    * Functor class for printing a single side's info.
-  //    * To be used with "for_each".
-  //    */
-  //   class PrintSideInfo
-  //   {
-  //   public:
-  //     PrintSideInfo() {}
-  //     inline
-  //     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
-  //     {
-  //       libMesh::out << "  (" << sp.first->id()
-  //      << ", "  << sp.second.first
-  //      << ", "  << sp.second.second
-  //      << ")"   << std::endl;
-  //     }
-  //   };
-
-
 
   /**
    * Functor class for initializing a map.

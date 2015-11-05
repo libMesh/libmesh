@@ -1248,10 +1248,9 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
             {
               const std::vector<boundary_id_type>& ids =
                 other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n));
-              if (!ids.empty())
-                {
-                  this->get_boundary_info().add_node(this_elem->get_node(n), ids);
-                }
+              this->get_boundary_info().add_node(this_elem->get_node(n),
+                                                 std::set<boundary_id_type>(ids.begin(),
+                                                                            ids.end()));
             }
 
           // Copy edge boundary info
@@ -1260,10 +1259,10 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
             {
               const std::vector<boundary_id_type>& ids =
                 other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge);
-              if (!ids.empty())
-                {
-                  this->get_boundary_info().add_edge( this_elem, edge, ids);
-                }
+              this->get_boundary_info().add_edge(this_elem,
+                                                 edge,
+                                                 std::set<boundary_id_type>(ids.begin(),
+                                                                            ids.end()));
             }
 
           unsigned int n_sides = other_elem->n_sides();
@@ -1271,10 +1270,10 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
             {
               const std::vector<boundary_id_type>& ids =
                 other_mesh->get_boundary_info().boundary_ids(other_elem, s);
-              if (!ids.empty())
-                {
-                  this->get_boundary_info().add_side( this_elem, s, ids);
-                }
+              this->get_boundary_info().add_side(this_elem,
+                                                 s,
+                                                 std::set<boundary_id_type>(ids.begin(),
+                                                                            ids.end()));
             }
 
         }
@@ -1311,7 +1310,9 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
           el->set_node(local_node_index) = &target_node;
 
-          this->get_boundary_info().add_node(&target_node, ids);
+          this->get_boundary_info().add_node(&target_node,
+                                             std::set<boundary_id_type>(ids.begin(),
+                                                                        ids.end()));
         }
     }
 
