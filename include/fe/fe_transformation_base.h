@@ -19,7 +19,6 @@
 #define LIBMESH_FE_TRANSFORMATION_BASE_H
 
 #include "libmesh/fe_base.h"
-#include "libmesh/fe_type.h"
 
 namespace libMesh
 {
@@ -28,6 +27,7 @@ namespace libMesh
 template< typename T > class FEGenericBase;
 template< typename T > class H1FETransformation;
 template< typename T > class HCurlFETransformation;
+class FEType;
 
 /**
  * This class handles the computation of the shape functions in the physical domain.

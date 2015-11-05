@@ -21,11 +21,12 @@
 #define LIBMESH_MESH_GENERATION_H
 
 // Local Includes -----------------------------------
-// #include "libmesh/libmesh_common.h" // needed for Real
 #include "libmesh/libmesh.h"
 #include "libmesh/enum_elem_type.h"
-#include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/vector_value.h"
+#ifdef LIBMESH_HAVE_TRIANGLE
+#include "libmesh/mesh_triangle_interface.h"
+#endif
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -38,7 +39,6 @@ namespace libMesh
 class MeshBase;
 class UnstructuredMesh;
 class Elem;
-
 
 
 // ------------------------------------------------------------

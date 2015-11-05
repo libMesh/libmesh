@@ -25,7 +25,6 @@
 // Local includes
 #include "libmesh/mesh_generation.h"
 #include "libmesh/unstructured_mesh.h"
-// #include "libmesh/elem.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_edge3.h"

@@ -18,6 +18,7 @@
 #include "libmesh/fe_transformation_base.h"
 #include "libmesh/h1_fe_transformation.h"
 #include "libmesh/hcurl_fe_transformation.h"
+#include "libmesh/fe_type.h"
 
 namespace libMesh
 {

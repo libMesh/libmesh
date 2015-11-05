@@ -9,6 +9,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
+#include "libmesh/elem.h"
 
 // Example includes
 #include "biharmonic_jr.h"

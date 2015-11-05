@@ -24,8 +24,8 @@
 #ifdef LIBMESH_ENABLE_VSMOOTHER
 
 // Local Includes -----------------------------------
+#include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_smoother.h"
-#include "libmesh/unstructured_mesh.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -35,6 +35,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class UnstructuredMesh;
 
 /**
  * This is an implementation of Larisa Branets' smoothing algorithms.

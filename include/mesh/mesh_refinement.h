@@ -30,8 +30,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/topology_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/point_locator_base.h"
 #include "libmesh/parallel_object.h"
 
 // C++ Includes   -----------------------------------
@@ -46,6 +44,8 @@ class Point;
 class Node;
 class ErrorVector;
 class PeriodicBoundaries;
+class Elem;
+class PointLocatorBase;
 
 /**
  * This is the \p MeshRefinement class.  This class implements

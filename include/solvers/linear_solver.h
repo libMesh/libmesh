@@ -31,7 +31,6 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/auto_ptr.h"
-#include "libmesh/solver_configuration.h"
 
 // C++ includes
 #include <cstddef>
@@ -46,6 +45,7 @@ template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 template <typename T> class Preconditioner;
 class System;
+class SolverConfiguration;
 
 /**
  * This class provides a uniform interface for linear solvers.  This base

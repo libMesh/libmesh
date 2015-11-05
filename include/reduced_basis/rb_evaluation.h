@@ -22,7 +22,6 @@
 
 // rbOOmit includes
 #include "libmesh/rb_parametrized.h"
-#include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
 #include "libmesh/dense_matrix.h"
@@ -37,6 +36,7 @@ namespace libMesh
 
 class System;
 template <typename T> class NumericVector;
+class RBThetaExpansion;
 
 /**
  * This class is part of the rbOOmit framework.

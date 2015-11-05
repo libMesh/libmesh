@@ -32,6 +32,7 @@
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/point.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

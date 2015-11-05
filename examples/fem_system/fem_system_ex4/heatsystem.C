@@ -10,6 +10,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/elem.h"
 
 using namespace libMesh;
 

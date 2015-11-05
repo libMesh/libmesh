@@ -26,6 +26,7 @@
 
 #include "libmesh/rb_scm_construction.h"
 #include "libmesh/rb_construction.h"
+#include "libmesh/rb_scm_evaluation.h"
 
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"

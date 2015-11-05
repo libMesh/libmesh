@@ -26,6 +26,8 @@
 #include "libmesh/rb_scm_construction.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/rb_evaluation.h"
+#include "libmesh/rb_scm_evaluation.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.

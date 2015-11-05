@@ -33,6 +33,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/threads.h"
+#include "libmesh/node.h"
 #include "meshless_interpolation_function.h"
 
 // C++ includes

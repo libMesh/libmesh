@@ -30,6 +30,7 @@
 #include "libmesh/preconditioner.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/solver_configuration.h"
 
 namespace libMesh
 {

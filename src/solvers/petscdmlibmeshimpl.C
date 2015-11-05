@@ -21,6 +21,7 @@
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
+#include "libmesh/elem.h"
 
 
 using namespace libMesh;

@@ -20,7 +20,6 @@
 
 // Local includes
 #include "libmesh/xdr_head.h" // for base class
-#include "libmesh/xdr_mesh.h" // for friend
 #include "libmesh/enum_elem_type.h" // for ElemType
 
 // C++ includes
@@ -28,6 +27,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class XdrMESH;
 
 /**
  * The \p XdrMHEAD class.

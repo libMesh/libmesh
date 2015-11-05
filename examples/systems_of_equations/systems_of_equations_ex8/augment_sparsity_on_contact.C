@@ -4,6 +4,7 @@
 // libMesh includes
 #include "libmesh/linear_implicit_system.h"
 #include LIBMESH_INCLUDE_UNORDERED_SET
+#include "libmesh/elem.h"
 
 using namespace libMesh;
 

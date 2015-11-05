@@ -25,6 +25,7 @@
 #include "libmesh/system.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

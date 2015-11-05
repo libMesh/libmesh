@@ -22,14 +22,12 @@
 
 // rbOOmit includes
 #include "libmesh/rb_construction_base.h"
-#include "libmesh/rb_evaluation.h"
 
 // libMesh includes
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dg_fem_context.h"
-#include "libmesh/elem_assembly.h"
 #include "libmesh/dirichlet_boundaries.h"
 
 // C++ includes
@@ -39,6 +37,8 @@ namespace libMesh
 
 class RBThetaExpansion;
 class RBAssemblyExpansion;
+class RBEvaluation;
+class ElemAssembly;
 
 /**
  * This class is part of the rbOOmit framework.

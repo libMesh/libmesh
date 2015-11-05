@@ -15,6 +15,7 @@
 #include "libmesh/elem_assembly.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/node.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.

@@ -32,6 +32,7 @@
 #include "libmesh/elem_range.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/point.h"
 
 // C++ Includes   -----------------------------------
 #include <algorithm>
@@ -53,10 +54,8 @@ class DofObject;
 class Elem;
 class FEType;
 class MeshBase;
-class Mesh;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
-namespace SparsityPattern { class Build; }
 class System;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;

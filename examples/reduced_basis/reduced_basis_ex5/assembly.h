@@ -6,6 +6,7 @@
 #include "libmesh/rb_theta.h"
 #include "libmesh/rb_theta_expansion.h"
 #include "libmesh/rb_assembly_expansion.h"
+#include "libmesh/elem_assembly.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.

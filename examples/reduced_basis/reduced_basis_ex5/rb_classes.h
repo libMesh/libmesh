@@ -6,6 +6,7 @@
 
 // rbOOmit includes
 #include "libmesh/rb_construction.h"
+#include "libmesh/rb_evaluation.h"
 
 // libMesh includes
 #include "libmesh/fe_base.h"

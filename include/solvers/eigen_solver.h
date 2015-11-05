@@ -32,7 +32,6 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/auto_ptr.h"
-#include "libmesh/solver_configuration.h"
 
 // C++ includes
 
@@ -43,7 +42,7 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
 template <typename T> class NumericVector;
-
+class SolverConfiguration;
 
 /**
  * This class provides an interface to solvers for eigenvalue

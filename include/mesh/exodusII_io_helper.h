@@ -23,9 +23,9 @@
 #ifdef LIBMESH_HAVE_EXODUS_API
 
 // Local includes
-#include "libmesh/mesh_base.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
+#include "libmesh/elem_type.h"
 
 // C++ includes
 #include <iostream>
@@ -52,6 +52,8 @@
 namespace libMesh
 {
 
+// Forward declarations
+class MeshBase;
 
 namespace exII {
 extern "C" {

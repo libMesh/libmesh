@@ -26,6 +26,7 @@
 
 // rbOOmit includes
 #include "libmesh/rb_scm_evaluation.h"
+#include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
 #include "libmesh/libmesh_logging.h"

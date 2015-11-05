@@ -29,7 +29,6 @@
 
 // rbOOmit includes
 #include "libmesh/rb_construction_base.h"
-#include "libmesh/rb_scm_evaluation.h"
 
 // libMesh includes
 #include "libmesh/condensed_eigen_system.h"
@@ -38,6 +37,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class RBSCMEvaluation;
 
 /**
  * This class is part of the rbOOmit framework.

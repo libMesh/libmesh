@@ -28,7 +28,6 @@
 
 // rbOOmit includes
 #include "libmesh/rb_parametrized.h"
-#include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
 #include "libmesh/parallel_object.h"
@@ -37,6 +36,9 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+class RBThetaExpansion;
 
 /**
  * This class is part of the rbOOmit framework.

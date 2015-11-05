@@ -24,7 +24,6 @@
 // Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
-#include "libmesh/diff_context.h"
 
 // C++ includes
 #include <vector>
@@ -34,9 +33,7 @@ namespace libMesh
 
 // Forward Declarations
 class System;
-class TimeSolver;
-
-template <typename T> class NumericVector;
+class DiffContext;
 
 /**
  * This class provides a specific system class.  It aims

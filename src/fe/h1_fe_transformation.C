@@ -18,6 +18,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/h1_fe_transformation.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

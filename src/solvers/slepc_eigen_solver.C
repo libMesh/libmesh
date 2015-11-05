@@ -31,6 +31,7 @@
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/solver_configuration.h"
 
 namespace libMesh
 {

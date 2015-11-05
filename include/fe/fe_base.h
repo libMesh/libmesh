@@ -27,7 +27,6 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_abstract.h"
 #include "libmesh/fe_transformation_base.h"
-#include "libmesh/fe_type.h"
 #include "libmesh/point.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_tools.h"
@@ -54,6 +53,7 @@ class MeshBase;
 template <typename T> class NumericVector;
 class QBase;
 template <typename T> class FETransformationBase;
+class FEType;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 class NodeConstraints;

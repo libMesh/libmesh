@@ -22,13 +22,15 @@
 
 // Local includes
 #include "libmesh/mesh_base.h"
-#include "libmesh/node.h"
 #include "libmesh/stored_range.h"
 
 // C++ includes
 
 namespace libMesh
 {
+
+// Forward declarations
+class Node;
 
 typedef StoredRange<MeshBase::node_iterator,             Node*>      NodeRange;
 typedef StoredRange<MeshBase::const_node_iterator, const Node*> ConstNodeRange;

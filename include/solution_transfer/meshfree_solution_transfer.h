@@ -24,10 +24,13 @@
 
 #include <string>
 
-namespace libMesh {
+namespace libMesh
+{
 
 /**
- * Implementation of a SolutionTransfer object that utilizes the MeshfreeInterpolation system to interpolate one solution to another.
+ * Implementation of a SolutionTransfer object that utilizes the
+ * MeshfreeInterpolation system to interpolate one solution to
+ * another.
  */
 class MeshfreeSolutionTransfer : public SolutionTransfer
 {

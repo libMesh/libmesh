@@ -35,6 +35,7 @@
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_composite.h"
 #include "libmesh/fe.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

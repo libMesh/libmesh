@@ -21,12 +21,14 @@
 #define LIBMESH_ELEM_RANGE_H
 
 // Local includes
-#include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/stored_range.h"
 
 namespace libMesh
 {
+
+// Forward declarations
+class Elem;
 
 typedef StoredRange<MeshBase::element_iterator,             Elem*>      ElemRange;
 typedef StoredRange<MeshBase::const_element_iterator, const Elem*> ConstElemRange;

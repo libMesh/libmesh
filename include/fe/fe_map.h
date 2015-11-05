@@ -26,13 +26,13 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/auto_ptr.h"
-#include "libmesh/node.h"
 
 namespace libMesh
 {
 
 // forward declarations
 class Elem;
+class Node;
 
 class FEMap
 {

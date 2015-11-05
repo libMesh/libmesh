@@ -25,6 +25,8 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/system.h"
 
 #include <string>
 

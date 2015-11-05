@@ -23,6 +23,7 @@
 #include "libmesh/rb_construction.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/rb_evaluation.h"
 
 // local include
 #include "assembly.h"
