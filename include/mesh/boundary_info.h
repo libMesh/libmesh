@@ -611,6 +611,13 @@ private:
                         std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_side_iter;
 
   /**
+   * Some older compilers don't support erasing from a map with
+   * const_iterators, so we need to use a non-const iterator in those
+   * situations.
+   */
+  typedef std::multimap<const Elem*,
+                        std::pair<unsigned short int, boundary_id_type> >::iterator erase_iter;
+  /**
    * A collection of user-specified boundary ids for sides, edges and nodes.
    * See _side_boundary_ids, _edge_boundary_ids and _node_boundary_ids
    * for sets containing IDs for only sides and only nodes, respectively.

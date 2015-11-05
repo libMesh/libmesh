@@ -1209,7 +1209,9 @@ void BoundaryInfo::remove_edge (const Elem* elem,
   // id
   libmesh_assert_equal_to (elem->level(), 0);
 
-  std::pair<boundary_edge_iter, boundary_edge_iter>
+  // Some older compilers don't support erasing from a map with
+  // const_iterators, so we explicitly use non-const iterators here.
+  std::pair<erase_iter, erase_iter>
     e = _boundary_edge_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1239,7 +1241,9 @@ void BoundaryInfo::remove_edge (const Elem* elem,
   // id
   libmesh_assert_equal_to (elem->level(), 0);
 
-  std::pair<boundary_edge_iter, boundary_edge_iter>
+  // Some older compilers don't support erasing from a map with
+  // const_iterators, so we explicitly use non-const iterators here.
+  std::pair<erase_iter, erase_iter>
     e = _boundary_edge_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1267,7 +1271,9 @@ void BoundaryInfo::remove_side (const Elem* elem,
   // id
   libmesh_assert_equal_to (elem->level(), 0);
 
-  std::pair<boundary_side_iter, boundary_side_iter>
+  // Some older compilers don't support erasing from a map with
+  // const_iterators, so we explicitly use non-const iterators here.
+  std::pair<erase_iter, erase_iter>
     e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
@@ -1293,9 +1299,9 @@ void BoundaryInfo::remove_side (const Elem* elem,
 {
   libmesh_assert(elem);
 
-  // The user shouldn't be trying to remove only one child's boundary
-  // id
-  std::pair<boundary_side_iter, boundary_side_iter>
+  // Some older compilers don't support erasing from a map with
+  // const_iterators, so we explicitly use non-const iterators here.
+  std::pair<erase_iter, erase_iter>
     e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurrences
