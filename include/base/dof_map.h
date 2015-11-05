@@ -32,6 +32,7 @@
 #include "libmesh/elem_range.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/point.h"
 
 // C++ Includes   -----------------------------------
 #include <algorithm>
