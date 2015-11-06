@@ -1054,28 +1054,37 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const elem,
                                                               const unsigned short int side) const
 {
+  libmesh_deprecated();
+
+  std::set<boundary_id_type> ids_set;
+  this->raw_boundary_ids(elem, side, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::raw_boundary_ids (const Elem* const elem,
+                                     const unsigned short int side,
+                                     std::set<boundary_id_type> & set_to_fill) const
+{
   libmesh_assert(elem);
 
-  std::vector<boundary_id_type> ids;
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.
   if (elem->parent())
-    return ids;
+    return;
 
   std::pair<boundary_side_iter, boundary_side_iter>
     e = _boundary_side_id.equal_range(elem);
 
-  // Check any occurrences
+  // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side of the element
     if (e.first->second.first == side)
-      ids.push_back(e.first->second.second);
-
-  // if nothing got pushed back, we didn't find elem in the data
-  // structure with the requested side, so return the default empty
-  // vector
-  return ids;
+      set_to_fill.insert(e.first->second.second);
 }
+
 
 
 void BoundaryInfo::remove_edge (const Elem* elem,

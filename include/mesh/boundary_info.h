@@ -420,9 +420,24 @@ public:
    * side of element \p elem.  These ids are ``raw'' because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> raw_boundary_ids (const Elem* const elem,
                                                   const unsigned short int side) const;
+
+  /**
+   * Returns the list of raw boundary ids associated with the \p side
+   * side of element \p elem.  These ids are ``raw'' because they
+   * exclude ids which are implicit, such as a child's inheritance of
+   * its ancestors' boundary id.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void raw_boundary_ids (const Elem* const elem,
+                         const unsigned short int side,
+                         std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns a side of element \p elem whose associated boundary id is
