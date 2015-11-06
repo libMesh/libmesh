@@ -330,18 +330,18 @@ void assemble_elasticity(EquationSystems& es,
         }
 
       {
+        std::set<boundary_id_type> bc_ids;
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (elem->neighbor(side) == NULL)
             {
-              const std::vector<boundary_id_type> bc_ids =
-                mesh.get_boundary_info().boundary_ids (elem,side);
+              mesh.get_boundary_info().boundary_ids (elem, side, bc_ids);
 
               const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
               const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
               fe_face->reinit(elem, side);
 
-              for (std::vector<boundary_id_type>::const_iterator b =
+              for (std::set<boundary_id_type>::const_iterator b =
                      bc_ids.begin(); b != bc_ids.end(); ++b)
                 {
                   const boundary_id_type bc_id = *b;
