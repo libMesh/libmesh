@@ -1526,16 +1526,15 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
       unsigned int n_edges = elem->n_edges();
       for (unsigned short edge=0; edge != n_edges; ++edge)
         {
-          const std::vector<boundary_id_type>& old_ids =
-            mesh.get_boundary_info().edge_boundary_ids(elem, edge);
-          if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
+          mesh.get_boundary_info().edge_boundary_ids(elem, edge, bndry_ids);
+
+          // If the old ID was present, erase it, insert the new one,
+          // and update the BoundaryInfo accordingly.
+          if (bndry_ids.erase(old_id))
             {
-              std::set<boundary_id_type> new_ids(old_ids.begin(), old_ids.end());
-              // Replace the old_id, if it exists, with the new ID.
-              if (new_ids.erase(old_id))
-                new_ids.insert(new_id);
+              bndry_ids.insert(new_id);
               mesh.get_boundary_info().remove_edge(elem, edge);
-              mesh.get_boundary_info().add_edge(elem, edge, new_ids);
+              mesh.get_boundary_info().add_edge(elem, edge, bndry_ids);
             }
         }
 
