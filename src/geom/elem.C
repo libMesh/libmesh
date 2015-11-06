@@ -1054,10 +1054,9 @@ Elem* Elem::topological_neighbor (const unsigned int i,
       // Since the neighbor is NULL it must be on a boundary. We need
       // see if this is a periodic boundary in which case it will have a
       // topological neighbor
-
-      std::vector<boundary_id_type> boundary_ids =
-        mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i));
-      for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+      std::set<boundary_id_type> bc_ids;
+      mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i), bc_ids);
+      for (std::set<boundary_id_type>::iterator j = bc_ids.begin(); j != bc_ids.end(); ++j)
         if (pb->boundary(*j))
           {
             // Since the point locator inside of periodic boundaries
@@ -1093,10 +1092,9 @@ const Elem* Elem::topological_neighbor (const unsigned int i,
       // Since the neighbor is NULL it must be on a boundary. We need
       // see if this is a periodic boundary in which case it will have a
       // topological neighbor
-
-      std::vector<boundary_id_type> boundary_ids =
-        mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i));
-      for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+      std::set<boundary_id_type> bc_ids;
+      mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i), bc_ids);
+      for (std::set<boundary_id_type>::iterator j = bc_ids.begin(); j != bc_ids.end(); ++j)
         if (pb->boundary(*j))
           {
             // Since the point locator inside of periodic boundaries
