@@ -964,51 +964,16 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
   // instead.
   libmesh_deprecated();
 
-  libmesh_assert(elem);
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
 
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element, one of its parent elements may have either internal
-  // or external boundary IDs.  We find that parent now.
-  const Elem*  searched_elem = elem;
-  if (elem->level() != 0)
-    {
-      // Child element on external side: the top_parent will have the BCs
-      if (elem->neighbor(side) == NULL)
-        searched_elem = elem->top_parent ();
-
-#ifdef LIBMESH_ENABLE_AMR
-      // Child element is not on external side, but it may have internal
-      // "boundary" IDs.  We will walk up the tree, at each level checking that
-      // the current child is actually on the same side of the parent that is
-      // currently being searched for (i.e. that was passed in as "side").
-      else
-        while (searched_elem->parent() != NULL)
-          {
-            const Elem * parent = searched_elem->parent();
-            if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return invalid_id;
-            searched_elem = parent;
-          }
-#endif
-    }
-
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
-  // elem not in the data structure
-  if (e.first == e.second)
+  // If the set is empty, return invalid_id
+  if (ids_set.empty())
     return invalid_id;
 
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side
-    // of the element and want to return the id
-    if (e.first->second.first == side)
-      return e.first->second.second;
-
-  // if we get here, we found elem in the data structure but not
-  // the requested side, so return the default value
-  return invalid_id;
+  // Otherwise, just return the first id we came across for this
+  // element on this side.
+  return *(ids_set.begin());
 }
 
 
