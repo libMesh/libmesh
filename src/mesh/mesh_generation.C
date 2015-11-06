@@ -1983,6 +1983,9 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
   mesh.reserve_nodes((order*nz+1)*orig_nodes);
 
+  // Container to catch the boundary IDs handed back by the BoundaryInfo object
+  std::set<boundary_id_type> ids_to_copy;
+
   MeshBase::const_node_iterator       nd  = cross_section.nodes_begin();
   const MeshBase::const_node_iterator nend = cross_section.nodes_end();
   for (; nd!=nend; ++nd)
@@ -1997,12 +2000,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                            node->id() + (k * orig_nodes),
                            node->processor_id());
 
-          const std::vector<boundary_id_type> ids_to_copy =
-            cross_section_boundary_info.boundary_ids(node);
-
-          boundary_info.add_node(new_node,
-                                 std::set<boundary_id_type>(ids_to_copy.begin(),
-                                                            ids_to_copy.end()));
+          cross_section_boundary_info.boundary_ids(node, ids_to_copy);
+          boundary_info.add_node(new_node, ids_to_copy);
         }
     }
 
@@ -2150,8 +2149,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           // Copy any old boundary ids on all sides
           for (unsigned short s = 0; s != elem->n_sides(); ++s)
             {
-              const std::vector<boundary_id_type> ids_to_copy =
-                cross_section_boundary_info.boundary_ids(elem, s);
+              cross_section_boundary_info.boundary_ids(elem, s, ids_to_copy);
 
               if (new_elem->dim() == 3)
                 {
@@ -2159,9 +2157,9 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                   // for side s on the old element to side s+1 on the
                   // new element.  This is just a happy coincidence as
                   // far as I can tell...
-                  boundary_info.add_side
-                    (new_elem, cast_int<unsigned short>(s+1),
-                     ids_to_copy);
+                  boundary_info.add_side(new_elem,
+                                         cast_int<unsigned short>(s+1),
+                                         ids_to_copy);
                 }
               else
                 {
