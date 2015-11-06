@@ -311,7 +311,8 @@ public:
   /**
    * Returns the boundary ids associated with \p Node \p node.
    *
-   * This function has been deprecated.  See instead: boundary_ids_set(const Node*).
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
 
@@ -341,9 +342,23 @@ public:
    * Returns the list of boundary ids associated with the \p edge edge of
    * element \p elem.
    * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
                                                    const unsigned short int edge) const;
+
+  /**
+   * Returns the list of boundary ids associated with the \p edge edge of
+   * element \p elem.
+   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void edge_boundary_ids (const Elem* const elem,
+                          const unsigned short int edge,
+                          std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p edge

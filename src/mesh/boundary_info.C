@@ -849,9 +849,23 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
 std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const elem,
                                                                const unsigned short int edge) const
 {
+  libmesh_deprecated();
+
+  std::set<boundary_id_type> ids_set;
+  this->edge_boundary_ids(elem, edge, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
+                                      const unsigned short int edge,
+                                      std::set<boundary_id_type> & set_to_fill) const
+{
   libmesh_assert(elem);
 
-  std::vector<boundary_id_type> ids;
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -865,7 +879,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
       bool found_boundary_edge = false;
       for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if(elem->is_edge_on_side(edge,side))
+          if (elem->is_edge_on_side(edge,side))
             {
               if (elem->neighbor(side) == NULL)
                 {
@@ -886,7 +900,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
             {
               const Elem * parent = searched_elem->parent();
               if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
-                return ids;
+                return;
               searched_elem = parent;
             }
         }
@@ -896,19 +910,11 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
   std::pair<boundary_edge_iter, boundary_edge_iter>
     e = _boundary_edge_id.equal_range(searched_elem);
 
-  // elem not in the data structure
-  if (e.first == e.second)
-    return ids;
-
   // elem is there, maybe multiple occurrences
   for (; e.first != e.second; ++e.first)
     // if this is true we found the requested edge of the element
     if (e.first->second.first == edge)
-      ids.push_back(e.first->second.second);
-
-  // Whether or not we found anything, return "ids".  If it's empty, it
-  // means no valid bounary IDs were found for "edge"
-  return ids;
+      set_to_fill.insert(e.first->second.second);
 }
 
 
