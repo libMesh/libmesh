@@ -813,14 +813,26 @@ bool BoundaryInfo::has_boundary_id(const Node* const node,
 
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node* node) const
 {
-  std::vector<boundary_id_type> ids;
+  libmesh_deprecated();
 
-  std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(node, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::boundary_ids (const Node* node,
+                                 std::set<boundary_id_type> & set_to_fill) const
+{
+  // Clear out any previous contents
+  set_to_fill.clear();
+
+  std::pair<boundary_node_iter, boundary_node_iter>
+    pos = _boundary_node_id.equal_range(node);
 
   for (; pos.first != pos.second; ++pos.first)
-    ids.push_back(pos.first->second);
-
-  return ids;
+    set_to_fill.insert(pos.first->second);
 }
 
 

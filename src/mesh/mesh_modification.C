@@ -1500,6 +1500,10 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
   // Only level-0 elements store BCs.  Loop over them.
   MeshBase::element_iterator           el = mesh.level_elements_begin(0);
   const MeshBase::element_iterator end_el = mesh.level_elements_end(0);
+
+  // Container used to hold boundary ids for different geometric entities.
+  std::set<boundary_id_type> bndry_ids;
+
   for (; el != end_el; ++el)
     {
       Elem *elem = *el;
@@ -1507,16 +1511,15 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
       unsigned int n_nodes = elem->n_nodes();
       for (unsigned int n=0; n != n_nodes; ++n)
         {
-          const std::vector<boundary_id_type>& old_ids =
-            mesh.get_boundary_info().boundary_ids(elem->get_node(n));
-          if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
+          mesh.get_boundary_info().boundary_ids(elem->get_node(n), bndry_ids);
+
+          // If the old ID was present, erase it, insert the new one,
+          // and update the BoundaryInfo accordingly.
+          if (bndry_ids.erase(old_id))
             {
-              std::set<boundary_id_type> new_ids(old_ids.begin(), old_ids.end());
-              // Replace the old_id, if it exists, with the new ID.
-              if (new_ids.erase(old_id))
-                new_ids.insert(new_id);
+              bndry_ids.insert(new_id);
               mesh.get_boundary_info().remove(elem->get_node(n));
-              mesh.get_boundary_info().add_node(elem->get_node(n), new_ids);
+              mesh.get_boundary_info().add_node(elem->get_node(n), bndry_ids);
             }
         }
 

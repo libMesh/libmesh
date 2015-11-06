@@ -310,8 +310,19 @@ public:
 
   /**
    * Returns the boundary ids associated with \p Node \p node.
+   *
+   * This function has been deprecated.  See instead: boundary_ids_set(const Node*).
    */
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
+
+  /**
+   * Fills a user-provided std::set with the boundary ids associated
+   * with \p Node \p node.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void boundary_ids (const Node* node,
+                     std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns the number of boundary ids associated with \p Node \p node.
