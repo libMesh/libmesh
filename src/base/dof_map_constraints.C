@@ -434,14 +434,20 @@ private:
 
         // We also maintain a separate list of nodeset-based boundary nodes
         std::vector<bool> is_boundary_nodeset(elem->n_nodes(), false);
+
+        // Container to catch boundary ids handed back for sides,
+        // nodes, and edges in the loops below.
+        std::set<boundary_id_type> ids_set;
+
         for (unsigned char s=0; s != elem->n_sides(); ++s)
           {
             // First see if this side has been requested
-            const std::vector<boundary_id_type>& bc_ids =
-              boundary_info.boundary_ids (elem, s);
+            boundary_info.boundary_ids (elem, s, ids_set);
+
             bool do_this_side = false;
-            for (std::size_t i=0; i != bc_ids.size(); ++i)
-              if (b.count(bc_ids[i]))
+            for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
+                 bc_it != ids_set.end(); ++bc_it)
+              if (b.count(*bc_it))
                 {
                   do_this_side = true;
                   break;
@@ -464,11 +470,11 @@ private:
         // also independently check whether the nodes have been requested
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            const std::vector<boundary_id_type>& bc_ids =
-              boundary_info.boundary_ids (elem->get_node(n));
+            boundary_info.boundary_ids (elem->get_node(n), ids_set);
 
-            for (std::size_t i=0; i != bc_ids.size(); ++i)
-              if (b.count(bc_ids[i]))
+            for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
+                 bc_it != ids_set.end(); ++bc_it)
+              if (b.count(*bc_it))
                 {
                   is_boundary_node[n] = true;
                   is_boundary_nodeset[n] = true;
@@ -479,11 +485,11 @@ private:
         // also independently check whether the edges have been requested
         for (unsigned short e=0; e != elem->n_edges(); ++e)
           {
-            const std::vector<boundary_id_type>& bc_ids =
-              boundary_info.edge_boundary_ids (elem, e);
+            boundary_info.edge_boundary_ids (elem, e, ids_set);
 
-            for (std::size_t i=0; i != bc_ids.size(); ++i)
-              if (b.count(bc_ids[i]))
+            for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
+                 bc_it != ids_set.end(); ++bc_it)
+              if (b.count(*bc_it))
                 is_boundary_edge[e] = true;
           }
 
