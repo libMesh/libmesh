@@ -856,18 +856,18 @@ void XdrIO::write_serialized_bcs (Xdr &io, const header_id_type n_bcs) const
     it  = mesh.local_level_elements_begin(0),
     end = mesh.local_level_elements_end(0);
 
+  // Container to catch boundary IDs handed back by BoundaryInfo
+  std::set<boundary_id_type> bc_ids;
+
   dof_id_type n_local_level_0_elem=0;
   for (; it!=end; ++it, n_local_level_0_elem++)
     {
       const Elem *elem = *it;
 
       for (unsigned short s=0; s<elem->n_sides(); s++)
-        // We're supporting boundary ids on internal sides now
-        //if (elem->neighbor(s) == NULL)
         {
-          const std::vector<boundary_id_type>& bc_ids =
-            boundary_info.boundary_ids (elem, s);
-          for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+          boundary_info.boundary_ids (elem, s, bc_ids);
+          for (std::set<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
             {
               const boundary_id_type bc_id = *id_it;
               if (bc_id != BoundaryInfo::invalid_id)
