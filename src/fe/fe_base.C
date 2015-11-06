@@ -120,6 +120,10 @@ const Elem* primary_boundary_edge_neighbor
 
   std::set<const Elem*> edge_neighbors;
   elem->find_edge_neighbors(p1, p2, edge_neighbors);
+
+  // Container to catch boundary IDs handed back by BoundaryInfo
+  std::set<boundary_id_type> bc_ids;
+
   for (std::set<const Elem*>::const_iterator edge_neighbors_iter =
          edge_neighbors.begin();
        edge_neighbors_iter != edge_neighbors.end(); ++edge_neighbors_iter)
@@ -142,14 +146,12 @@ const Elem* primary_boundary_edge_neighbor
       for (unsigned short int ns = 0;
            ns != e_neighbor->n_sides(); ++ns)
         {
-          const std::vector<boundary_id_type>& bc_ids =
-            boundary_info.boundary_ids (e_neighbor, ns);
+          boundary_info.boundary_ids (e_neighbor, ns, bc_ids);
 
           bool on_relevant_boundary = false;
           for (std::set<boundary_id_type>::const_iterator i =
                  boundary_ids.begin(); i != boundary_ids.end(); ++i)
-            if (std::find(bc_ids.begin(), bc_ids.end(), *i)
-                != bc_ids.end())
+            if (bc_ids.count(*i))
               on_relevant_boundary = true;
 
           if (!on_relevant_boundary)
