@@ -939,6 +939,9 @@ void XdrIO::write_serialized_nodesets (Xdr &io, const header_id_type n_nodesets)
   std::vector<xdr_id_type> xfer_bcs, recv_bcs;
   std::vector<std::size_t> bc_sizes(this->n_processors());
 
+  // Container to catch boundary IDs handed back by BoundaryInfo
+  std::set<boundary_id_type> nodeset_ids;
+
   MeshBase::const_node_iterator
     it  = mesh.local_nodes_begin(),
     end = mesh.local_nodes_end();
@@ -947,9 +950,8 @@ void XdrIO::write_serialized_nodesets (Xdr &io, const header_id_type n_nodesets)
   for (; it!=end; ++it)
     {
       const Node *node = *it;
-      const std::vector<boundary_id_type>& nodeset_ids =
-        boundary_info.boundary_ids (node);
-      for (std::vector<boundary_id_type>::const_iterator id_it=nodeset_ids.begin(); id_it!=nodeset_ids.end(); ++id_it)
+      boundary_info.boundary_ids (node, nodeset_ids);
+      for (std::set<boundary_id_type>::const_iterator id_it=nodeset_ids.begin(); id_it!=nodeset_ids.end(); ++id_it)
         {
           const boundary_id_type bc_id = *id_it;
           if (bc_id != BoundaryInfo::invalid_id)
