@@ -1017,38 +1017,9 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
                                    const unsigned short int side,
                                    const boundary_id_type id) const
 {
-  libmesh_assert(elem);
-
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
-  const Elem*  searched_elem = elem;
-  if (elem->level() != 0)
-    {
-      if (elem->neighbor(side) == NULL)
-        searched_elem = elem->top_parent ();
-#ifdef LIBMESH_ENABLE_AMR
-      else
-        while (searched_elem->parent() != NULL)
-          {
-            const Elem * parent = searched_elem->parent();
-            if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return false;
-            searched_elem = parent;
-          }
-#endif
-    }
-
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested id on this side of the element
-    if (e.first->second.first == side &&
-        e.first->second.second == id)
-      return true;
-
-  return false;
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
+  return (ids_set.find(id) != ids_set.end());
 }
 
 
