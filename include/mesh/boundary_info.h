@@ -50,8 +50,6 @@ class MeshData;
  * element faces and nodes with ids useful for identifying the
  * type of boundary condtion.  It can also build a mesh that
  * just includes boundary elements/faces.
- *
- * TODO[JWP]: Generalize this to work with MeshBase again.
  */
 class BoundaryInfo : public ParallelObject
 {
