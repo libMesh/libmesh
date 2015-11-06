@@ -1374,6 +1374,9 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   std::vector<boundary_id_type>   saved_bc_ids;
   std::vector<unsigned short int> saved_bc_sides;
 
+  // Container to catch boundary ids passed back by BoundaryInfo
+  std::set<boundary_id_type> bc_ids;
+
   // Reserve a reasonable amt. of space for each
   new_elements.reserve(mesh.n_active_elem());
   saved_boundary_elements.reserve(mesh.get_boundary_info().n_boundary_conds());
@@ -1410,9 +1413,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
             if (elem->neighbor(s) == remote_elem)
               copy->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 
-            const std::vector<boundary_id_type>& bc_ids =
-              mesh.get_boundary_info().boundary_ids(elem,s);
-            for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+            mesh.get_boundary_info().boundary_ids(elem, s, bc_ids);
+            for (std::set<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
               {
                 const boundary_id_type bc_id = *id_it;
 
