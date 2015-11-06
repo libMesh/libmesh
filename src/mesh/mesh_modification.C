@@ -383,15 +383,11 @@ void UnstructuredMesh::all_first_order ()
        */
       libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
+      std::set<boundary_id_type> bndry_ids;
       for (unsigned short s=0; s<so_elem->n_sides(); s++)
         {
-          const std::vector<boundary_id_type> boundary_ids =
-            this->get_boundary_info().raw_boundary_ids (so_elem, s);
-
-          this->get_boundary_info().add_side (lo_elem,
-                                              s,
-                                              std::set<boundary_id_type>(boundary_ids.begin(),
-                                                                         boundary_ids.end()));
+          this->get_boundary_info().raw_boundary_ids (so_elem, s, bndry_ids);
+          this->get_boundary_info().add_side (lo_elem, s, bndry_ids);
         }
 
       /*
@@ -674,15 +670,11 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
+      std::set<boundary_id_type> bndry_ids;
       for (unsigned short s=0; s<lo_elem->n_sides(); s++)
         {
-          const std::vector<boundary_id_type> boundary_ids =
-            this->get_boundary_info().raw_boundary_ids (lo_elem, s);
-
-          this->get_boundary_info().add_side (so_elem,
-                                              s,
-                                              std::set<boundary_id_type>(boundary_ids.begin(),
-                                                                         boundary_ids.end()));
+          this->get_boundary_info().raw_boundary_ids (lo_elem, s, bndry_ids);
+          this->get_boundary_info().add_side (so_elem, s, bndry_ids);
 
           if (lo_elem->neighbor(s) == remote_elem)
             so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
