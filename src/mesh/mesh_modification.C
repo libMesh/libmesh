@@ -930,11 +930,14 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
             if (mesh_has_boundary_data)
               {
+                // Container to catch the boundary IDs handed back by the BoundaryInfo object.
+                std::set<boundary_id_type> bc_ids;
+
                 for (unsigned short sn=0; sn<elem->n_sides(); ++sn)
                   {
-                    const std::vector<boundary_id_type>& bc_ids =
-                      mesh.get_boundary_info().boundary_ids(*el, sn);
-                    for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                    mesh.get_boundary_info().boundary_ids(*el, sn, bc_ids);
+
+                    for (std::set<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                       {
                         const boundary_id_type b_id = *id_it;
 
