@@ -139,6 +139,11 @@ void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase
   _initial_accel_set = true;
 }
 
+void NewmarkSolver::set_initial_accel_avail( bool initial_accel_set )
+{
+  _initial_accel_set = initial_accel_set;
+}
+
 void NewmarkSolver::solve ()
 {
   // First, check that the initial accel was set one way or another
