@@ -910,9 +910,8 @@ void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
   std::pair<boundary_edge_iter, boundary_edge_iter>
     e = _boundary_edge_id.equal_range(searched_elem);
 
-  // elem is there, maybe multiple occurrences
+  // Check each element in the range to see if its edge matches the requested edge.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested edge of the element
     if (e.first->second.first == edge)
       set_to_fill.insert(e.first->second.second);
 }
@@ -1108,13 +1107,27 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem,
                                                           const unsigned short int side) const
 {
+  libmesh_deprecated();
+
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::boundary_ids (const Elem* const elem,
+                                 const unsigned short int side,
+                                 std::set<boundary_id_type> & set_to_fill) const
+{
   libmesh_assert(elem);
 
-  std::vector<boundary_id_type> ids;
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
-  const Elem*  searched_elem = elem;
+  const Elem* searched_elem = elem;
   if (elem->level() != 0)
     {
       if (elem->neighbor(side) == NULL)
@@ -1125,7 +1138,7 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
           {
             const Elem * parent = searched_elem->parent();
             if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return ids;
+              return;
             searched_elem = parent;
           }
 #endif
@@ -1134,20 +1147,12 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
   std::pair<boundary_side_iter, boundary_side_iter>
     e = _boundary_side_id.equal_range(searched_elem);
 
-  // elem not in the data structure
-  if (e.first == e.second)
-    return ids;
-
-  // elem is there, maybe multiple occurrences
+  // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side of the element
     if (e.first->second.first == side)
-      ids.push_back(e.first->second.second);
-
-  // Whether or not we found anything, return "ids".  If it's empty, it
-  // means no valid bounary IDs were found for "side"
-  return ids;
+      set_to_fill.insert(e.first->second.second);
 }
+
 
 
 
