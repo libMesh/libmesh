@@ -921,60 +921,9 @@ void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
 unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
                                                 const unsigned short int edge) const
 {
-  libmesh_assert(elem);
-
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
-  const Elem* searched_elem = elem;
-#ifdef LIBMESH_ENABLE_AMR
-  if (elem->level() != 0)
-    {
-      // Find all the sides that contain edge. If one of those is a boundary
-      // side, then this must be a boundary edge. In that case, we just use the
-      // top-level parent.
-      bool found_boundary_edge = false;
-      for(unsigned int side=0; side<elem->n_sides(); side++)
-        {
-          if(elem->is_edge_on_side(edge,side))
-            {
-              if (elem->neighbor(side) == NULL)
-                {
-                  searched_elem = elem->top_parent ();
-                  found_boundary_edge = true;
-                  break;
-                }
-            }
-        }
-
-      if(!found_boundary_edge)
-        {
-          // Child element is not on external edge, but it may have internal
-          // "boundary" IDs.  We will walk up the tree, at each level checking that
-          // the current child is actually on the same edge of the parent that is
-          // currently being searched for (i.e. that was passed in as "edge").
-          while (searched_elem->parent() != NULL)
-            {
-              const Elem * parent = searched_elem->parent();
-              if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
-                return 0;
-              searched_elem = parent;
-            }
-        }
-    }
-#endif
-
-  std::pair<boundary_edge_iter, boundary_edge_iter>
-    e = _boundary_edge_id.equal_range(searched_elem);
-
-  unsigned int n_ids = 0;
-
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested edge of the element
-    if (e.first->second.first == edge)
-      n_ids++;
-
-  return n_ids;
+  std::set<boundary_id_type> ids_set;
+  this->edge_boundary_ids(elem, edge, ids_set);
+  return ids_set.size();
 }
 
 
