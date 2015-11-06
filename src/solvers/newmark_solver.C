@@ -126,7 +126,7 @@ void NewmarkSolver::compute_initial_accel()
   // We're done, so no longer doing an acceleration solve
   this->_is_accel_solve = false;
 
-  _initial_accel_set = true;
+  this->set_initial_accel_avail(true);
 }
 
 void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g )
@@ -136,7 +136,7 @@ void NewmarkSolver::project_initial_accel( FunctionBase<Number> *f, FunctionBase
 
   _system.project_vector( old_solution_accel, f, g );
 
-  _initial_accel_set = true;
+  this->set_initial_accel_avail(true);
 }
 
 void NewmarkSolver::set_initial_accel_avail( bool initial_accel_set )
