@@ -1723,6 +1723,9 @@ compute_periodic_constraints (DofConstraints &constraints,
   DenseVector<Real> Fe;
   std::vector<DenseVector<Real> > Ue;
 
+  // Container to catch the boundary ids that BoundaryInfo hands us.
+  std::set<boundary_id_type> bc_ids;
+
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned short int s=0; s<elem->n_sides(); s++)
@@ -1730,9 +1733,9 @@ compute_periodic_constraints (DofConstraints &constraints,
       if (elem->neighbor(s))
         continue;
 
-      const std::vector<boundary_id_type>& bc_ids =
-        mesh.get_boundary_info().boundary_ids (elem, s);
-      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
+
+      for (std::set<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
@@ -1923,6 +1926,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // intersect.
                   std::set<dof_id_type> my_constrained_dofs;
 
+                  // Container to catch boundary IDs handed back by BoundaryInfo.
+                  std::set<boundary_id_type> new_bc_ids;
+
                   for (unsigned int n = 0; n != elem->n_nodes(); ++n)
                     {
                       if (!elem->is_node_on_side(n,s))
@@ -1943,9 +1949,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (!elem->is_node_on_side(n,new_s))
                                 continue;
 
-                              const std::vector<boundary_id_type> new_bc_ids =
-                                mesh.get_boundary_info().boundary_ids (elem, s);
-                              for (std::vector<boundary_id_type>::const_iterator
+                              mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
+
+                              for (std::set<boundary_id_type>::const_iterator
                                      new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
@@ -2087,9 +2093,10 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (!elem->is_node_on_side(n,new_s))
                                 continue;
 
-                              const std::vector<boundary_id_type>& new_bc_ids =
-                                mesh.get_boundary_info().boundary_ids (elem, s);
-                              for (std::vector<boundary_id_type>::const_iterator
+                              // We're reusing the new_bc_ids vector created outside the loop over nodes.
+                              mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
+
+                              for (std::set<boundary_id_type>::const_iterator
                                      new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
