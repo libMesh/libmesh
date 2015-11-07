@@ -93,6 +93,14 @@ public:
   void project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
 
   /**
+   * Allow the user to (re)set whether the initial acceleration is available.
+   * This is not needed if either compute_initial_accel() or project_initial_accel()
+   * are called. This is useful is the user is restarting a calculation and the acceleration
+   * is available from the restart.
+   */
+  void set_initial_accel_avail( bool initial_accel_set );
+
+  /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
    */
   virtual Real error_order() const libmesh_override;
