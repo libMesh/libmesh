@@ -80,8 +80,16 @@ public:
 
   /**
    * Lists the boundary ids found on the current side
+   *
+   * This function is now deprecated. Instead, use the version that
+   * takes a reference to a std::set.
    */
   std::vector<boundary_id_type> side_boundary_ids() const;
+
+  /**
+   * As above, but fills in the std::set provided by the user.
+   */
+  void side_boundary_ids(std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature

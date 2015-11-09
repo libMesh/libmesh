@@ -813,14 +813,26 @@ bool BoundaryInfo::has_boundary_id(const Node* const node,
 
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node* node) const
 {
-  std::vector<boundary_id_type> ids;
+  libmesh_deprecated();
 
-  std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(node, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::boundary_ids (const Node* node,
+                                 std::set<boundary_id_type> & set_to_fill) const
+{
+  // Clear out any previous contents
+  set_to_fill.clear();
+
+  std::pair<boundary_node_iter, boundary_node_iter>
+    pos = _boundary_node_id.equal_range(node);
 
   for (; pos.first != pos.second; ++pos.first)
-    ids.push_back(pos.first->second);
-
-  return ids;
+    set_to_fill.insert(pos.first->second);
 }
 
 
@@ -837,9 +849,23 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
 std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const elem,
                                                                const unsigned short int edge) const
 {
+  libmesh_deprecated();
+
+  std::set<boundary_id_type> ids_set;
+  this->edge_boundary_ids(elem, edge, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
+                                      const unsigned short int edge,
+                                      std::set<boundary_id_type> & set_to_fill) const
+{
   libmesh_assert(elem);
 
-  std::vector<boundary_id_type> ids;
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -853,7 +879,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
       bool found_boundary_edge = false;
       for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if(elem->is_edge_on_side(edge,side))
+          if (elem->is_edge_on_side(edge,side))
             {
               if (elem->neighbor(side) == NULL)
                 {
@@ -874,7 +900,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
             {
               const Elem * parent = searched_elem->parent();
               if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
-                return ids;
+                return;
               searched_elem = parent;
             }
         }
@@ -884,19 +910,10 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
   std::pair<boundary_edge_iter, boundary_edge_iter>
     e = _boundary_edge_id.equal_range(searched_elem);
 
-  // elem not in the data structure
-  if (e.first == e.second)
-    return ids;
-
-  // elem is there, maybe multiple occurrences
+  // Check each element in the range to see if its edge matches the requested edge.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested edge of the element
     if (e.first->second.first == edge)
-      ids.push_back(e.first->second.second);
-
-  // Whether or not we found anything, return "ids".  If it's empty, it
-  // means no valid bounary IDs were found for "edge"
-  return ids;
+      set_to_fill.insert(e.first->second.second);
 }
 
 
@@ -904,60 +921,9 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
 unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
                                                 const unsigned short int edge) const
 {
-  libmesh_assert(elem);
-
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
-  const Elem* searched_elem = elem;
-#ifdef LIBMESH_ENABLE_AMR
-  if (elem->level() != 0)
-    {
-      // Find all the sides that contain edge. If one of those is a boundary
-      // side, then this must be a boundary edge. In that case, we just use the
-      // top-level parent.
-      bool found_boundary_edge = false;
-      for(unsigned int side=0; side<elem->n_sides(); side++)
-        {
-          if(elem->is_edge_on_side(edge,side))
-            {
-              if (elem->neighbor(side) == NULL)
-                {
-                  searched_elem = elem->top_parent ();
-                  found_boundary_edge = true;
-                  break;
-                }
-            }
-        }
-
-      if(!found_boundary_edge)
-        {
-          // Child element is not on external edge, but it may have internal
-          // "boundary" IDs.  We will walk up the tree, at each level checking that
-          // the current child is actually on the same edge of the parent that is
-          // currently being searched for (i.e. that was passed in as "edge").
-          while (searched_elem->parent() != NULL)
-            {
-              const Elem * parent = searched_elem->parent();
-              if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
-                return 0;
-              searched_elem = parent;
-            }
-        }
-    }
-#endif
-
-  std::pair<boundary_edge_iter, boundary_edge_iter>
-    e = _boundary_edge_id.equal_range(searched_elem);
-
-  unsigned int n_ids = 0;
-
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested edge of the element
-    if (e.first->second.first == edge)
-      n_ids++;
-
-  return n_ids;
+  std::set<boundary_id_type> ids_set;
+  this->edge_boundary_ids(elem, edge, ids_set);
+  return ids_set.size();
 }
 
 
@@ -965,28 +931,37 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
                                                                    const unsigned short int edge) const
 {
+  libmesh_deprecated();
+
+  std::set<boundary_id_type> ids_set;
+  this->raw_edge_boundary_ids(elem, edge, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
+                                          const unsigned short int edge,
+                                          std::set<boundary_id_type> & set_to_fill) const
+{
   libmesh_assert(elem);
 
-  std::vector<boundary_id_type> ids;
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.
   if (elem->parent())
-    return ids;
+    return;
 
   std::pair<boundary_edge_iter, boundary_edge_iter>
     e = _boundary_edge_id.equal_range(elem);
 
-  // Check any occurrences
+  // Check each element in the range to see if its edge matches the requested edge.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested edge of the element
     if (e.first->second.first == edge)
-      ids.push_back(e.first->second.second);
-
-  // if nothing got pushed back, we didn't find elem in the data
-  // structure with the requested edge, so return the default empty
-  // vector
-  return ids;
+      set_to_fill.insert(e.first->second.second);
 }
+
 
 
 boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
@@ -998,51 +973,16 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
   // instead.
   libmesh_deprecated();
 
-  libmesh_assert(elem);
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
 
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element, one of its parent elements may have either internal
-  // or external boundary IDs.  We find that parent now.
-  const Elem*  searched_elem = elem;
-  if (elem->level() != 0)
-    {
-      // Child element on external side: the top_parent will have the BCs
-      if (elem->neighbor(side) == NULL)
-        searched_elem = elem->top_parent ();
-
-#ifdef LIBMESH_ENABLE_AMR
-      // Child element is not on external side, but it may have internal
-      // "boundary" IDs.  We will walk up the tree, at each level checking that
-      // the current child is actually on the same side of the parent that is
-      // currently being searched for (i.e. that was passed in as "side").
-      else
-        while (searched_elem->parent() != NULL)
-          {
-            const Elem * parent = searched_elem->parent();
-            if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return invalid_id;
-            searched_elem = parent;
-          }
-#endif
-    }
-
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
-  // elem not in the data structure
-  if (e.first == e.second)
+  // If the set is empty, return invalid_id
+  if (ids_set.empty())
     return invalid_id;
 
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side
-    // of the element and want to return the id
-    if (e.first->second.first == side)
-      return e.first->second.second;
-
-  // if we get here, we found elem in the data structure but not
-  // the requested side, so return the default value
-  return invalid_id;
+  // Otherwise, just return the first id we came across for this
+  // element on this side.
+  return *(ids_set.begin());
 }
 
 
@@ -1051,38 +991,9 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
                                    const unsigned short int side,
                                    const boundary_id_type id) const
 {
-  libmesh_assert(elem);
-
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
-  const Elem*  searched_elem = elem;
-  if (elem->level() != 0)
-    {
-      if (elem->neighbor(side) == NULL)
-        searched_elem = elem->top_parent ();
-#ifdef LIBMESH_ENABLE_AMR
-      else
-        while (searched_elem->parent() != NULL)
-          {
-            const Elem * parent = searched_elem->parent();
-            if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return false;
-            searched_elem = parent;
-          }
-#endif
-    }
-
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested id on this side of the element
-    if (e.first->second.first == side &&
-        e.first->second.second == id)
-      return true;
-
-  return false;
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
+  return (ids_set.find(id) != ids_set.end());
 }
 
 
@@ -1090,53 +1001,23 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem,
                                                           const unsigned short int side) const
 {
-  libmesh_assert(elem);
+  libmesh_deprecated();
 
-  std::vector<boundary_id_type> ids;
-
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
-  const Elem*  searched_elem = elem;
-  if (elem->level() != 0)
-    {
-      if (elem->neighbor(side) == NULL)
-        searched_elem = elem->top_parent ();
-#ifdef LIBMESH_ENABLE_AMR
-      else
-        while (searched_elem->parent() != NULL)
-          {
-            const Elem * parent = searched_elem->parent();
-            if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return ids;
-            searched_elem = parent;
-          }
-#endif
-    }
-
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
-  // elem not in the data structure
-  if (e.first == e.second)
-    return ids;
-
-  // elem is there, maybe multiple occurrences
-  for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side of the element
-    if (e.first->second.first == side)
-      ids.push_back(e.first->second.second);
-
-  // Whether or not we found anything, return "ids".  If it's empty, it
-  // means no valid bounary IDs were found for "side"
-  return ids;
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
 }
 
 
 
-unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
-                                           const unsigned short int side) const
+void BoundaryInfo::boundary_ids (const Elem* const elem,
+                                 const unsigned short int side,
+                                 std::set<boundary_id_type> & set_to_fill) const
 {
   libmesh_assert(elem);
+
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -1151,7 +1032,7 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
           {
             const Elem * parent = searched_elem->parent();
             if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return 0;
+              return;
             searched_elem = parent;
           }
 #endif
@@ -1160,15 +1041,21 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
   std::pair<boundary_side_iter, boundary_side_iter>
     e = _boundary_side_id.equal_range(searched_elem);
 
-  unsigned int n_ids = 0;
-
-  // elem is there, maybe multiple occurrences
+  // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side of the element
     if (e.first->second.first == side)
-      n_ids++;
+      set_to_fill.insert(e.first->second.second);
+}
 
-  return n_ids;
+
+
+
+unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
+                                           const unsigned short int side) const
+{
+  std::set<boundary_id_type> ids_set;
+  this->boundary_ids(elem, side, ids_set);
+  return ids_set.size();
 }
 
 
@@ -1176,28 +1063,37 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const elem,
                                                               const unsigned short int side) const
 {
+  libmesh_deprecated();
+
+  std::set<boundary_id_type> ids_set;
+  this->raw_boundary_ids(elem, side, ids_set);
+  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+}
+
+
+
+void BoundaryInfo::raw_boundary_ids (const Elem* const elem,
+                                     const unsigned short int side,
+                                     std::set<boundary_id_type> & set_to_fill) const
+{
   libmesh_assert(elem);
 
-  std::vector<boundary_id_type> ids;
+  // Clear out any previous contents
+  set_to_fill.clear();
 
   // Only level-0 elements store BCs.
   if (elem->parent())
-    return ids;
+    return;
 
   std::pair<boundary_side_iter, boundary_side_iter>
     e = _boundary_side_id.equal_range(elem);
 
-  // Check any occurrences
+  // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
-    // if this is true we found the requested side of the element
     if (e.first->second.first == side)
-      ids.push_back(e.first->second.second);
-
-  // if nothing got pushed back, we didn't find elem in the data
-  // structure with the requested side, so return the default empty
-  // vector
-  return ids;
+      set_to_fill.insert(e.first->second.second);
 }
+
 
 
 void BoundaryInfo::remove_edge (const Elem* elem,

@@ -266,26 +266,27 @@ void pack (const Elem* elem,
   // Add any element side boundary condition ids
   if (elem->level() == 0)
     {
+      std::set<boundary_id_type> bcs;
       for (unsigned short s = 0; s != elem->n_sides(); ++s)
         {
-          std::vector<boundary_id_type> bcs =
-            mesh->get_boundary_info().boundary_ids(elem, s);
+          mesh->get_boundary_info().boundary_ids(elem, s, bcs);
 
           data.push_back(bcs.size());
 
-          for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
-            data.push_back(bcs[bc_it]);
+          for (std::set<boundary_id_type>::iterator bc_it=bcs.begin();
+               bc_it != bcs.end(); ++bc_it)
+            data.push_back(*bc_it);
         }
 
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
-          std::vector<boundary_id_type> bcs =
-            mesh->get_boundary_info().edge_boundary_ids(elem, e);
+          mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs);
 
           data.push_back(bcs.size());
 
-          for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
-            data.push_back(bcs[bc_it]);
+          for (std::set<boundary_id_type>::iterator bc_it=bcs.begin();
+               bc_it != bcs.end(); ++bc_it)
+            data.push_back(*bc_it);
         }
     }
 }

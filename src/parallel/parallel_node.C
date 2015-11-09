@@ -162,15 +162,16 @@ void pack (const Node* node,
                            data.size() - start_indices);
 
   // Add any nodal boundary condition ids
-  std::vector<boundary_id_type> bcs =
-    mesh->get_boundary_info().boundary_ids(node);
+  std::set<boundary_id_type> bcs;
+  mesh->get_boundary_info().boundary_ids(node, bcs);
 
   libmesh_assert(bcs.size() < std::numeric_limits<largest_id_type>::max());
 
   data.push_back(bcs.size());
 
-  for (std::size_t bc_it=0; bc_it < bcs.size(); bc_it++)
-    data.push_back(bcs[bc_it]);
+  for (std::set<boundary_id_type>::iterator bc_it=bcs.begin();
+       bc_it != bcs.end(); ++bc_it)
+    data.push_back(*bc_it);
 }
 
 

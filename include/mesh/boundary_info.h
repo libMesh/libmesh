@@ -50,8 +50,6 @@ class MeshData;
  * element faces and nodes with ids useful for identifying the
  * type of boundary condtion.  It can also build a mesh that
  * just includes boundary elements/faces.
- *
- * TODO[JWP]: Generalize this to work with MeshBase again.
  */
 class BoundaryInfo : public ParallelObject
 {
@@ -312,8 +310,20 @@ public:
 
   /**
    * Returns the boundary ids associated with \p Node \p node.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
+
+  /**
+   * Fills a user-provided std::set with the boundary ids associated
+   * with \p Node \p node.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void boundary_ids (const Node* node,
+                     std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns the number of boundary ids associated with \p Node \p node.
@@ -332,9 +342,23 @@ public:
    * Returns the list of boundary ids associated with the \p edge edge of
    * element \p elem.
    * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
                                                    const unsigned short int edge) const;
+
+  /**
+   * Returns the list of boundary ids associated with the \p edge edge of
+   * element \p elem.
+   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void edge_boundary_ids (const Elem* const elem,
+                          const unsigned short int edge,
+                          std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p edge
@@ -342,9 +366,25 @@ public:
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem* const elem,
                                                        const unsigned short int edge) const;
+
+  /**
+   * Returns the list of raw boundary ids associated with the \p edge
+   * edge of element \p elem.  These ids are ``raw'' because they
+   * exclude ids which are implicit, such as a child's inheritance of
+   * its ancestors' boundary id.
+   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void raw_edge_boundary_ids (const Elem* const elem,
+                              const unsigned short int edge,
+                              std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns true iff the given side of the given element is
@@ -374,18 +414,46 @@ public:
   /**
    * Returns the list of boundary ids associated with the \p side side of
    * element \p elem.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> boundary_ids (const Elem* const elem,
                                               const unsigned short int side) const;
+
+  /**
+   * Returns the list of boundary ids associated with the \p side side of
+   * element \p elem.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void boundary_ids (const Elem* const elem,
+                     const unsigned short int side,
+                     std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p side
    * side of element \p elem.  These ids are ``raw'' because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
+   *
+   * This function has been deprecated.  Instead, use the version of
+   * this function that fills a std::set.
    */
   std::vector<boundary_id_type> raw_boundary_ids (const Elem* const elem,
                                                   const unsigned short int side) const;
+
+  /**
+   * Returns the list of raw boundary ids associated with the \p side
+   * side of element \p elem.  These ids are ``raw'' because they
+   * exclude ids which are implicit, such as a child's inheritance of
+   * its ancestors' boundary id.
+   *
+   * This is the non-deprecated version of the function.
+   */
+  void raw_boundary_ids (const Elem* const elem,
+                         const unsigned short int side,
+                         std::set<boundary_id_type> & set_to_fill) const;
 
   /**
    * Returns a side of element \p elem whose associated boundary id is
