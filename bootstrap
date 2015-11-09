@@ -36,7 +36,7 @@ function check_autotool_prerequisites ()
     # prerequisite versions
     automake_major=1
     automake_minor=12
-    
+
     autoconf_major=2
     autoconf_minor=61
 
@@ -61,15 +61,15 @@ function check_autotool_prerequisites ()
 	build_autotools=1
     fi
 
-    
-    libtool=`which glibtool 2>/dev/null`   
+
+    libtool=`which glibtool 2>/dev/null`
     if (test "x$libtool" = "x"); then
 	libtool=`which libtool 2>/dev/null`
     fi
     if (test "x$libtool" != "x"); then
 	if (test -x $libtool); then
 	    libtool_version=`$libtool --version 2>&1 | grep "(GNU libtool)"`
-	    
+
 	    case "$libtool_version" in
 		*2.4* | *2.2*)
 		    echo "Using libtool ($libtool_version)"
@@ -85,7 +85,7 @@ function check_autotool_prerequisites ()
 	build_autotools=1
     fi
 
-    
+
     automake=`which automake 2>/dev/null`
     if (test "x$automake" != "x"); then
 	if (test -x $automake); then
@@ -103,7 +103,7 @@ function check_autotool_prerequisites ()
     else
 	build_autotools=1
     fi
-    
+
 
     return $build_autotools
 }
@@ -136,16 +136,16 @@ if (test "x$build_autotools" = "x1"); then
     # set the path to use the new tools as they are installed.
     # for example, the new autoconf is needed to build automake.
 	PATH=$autotools_distdir/bin:$PATH
-	for tool in autoconf-2.69 automake-1.12.5 libtool-2.4.2 ; do
+	for tool in autoconf-2.69 automake-1.12.5 libtool-2.4.6 ; do
 	    cd $autotools_distdir
 	    echo "  building $tool in $autotools_distdir"
 	    tar zxf $tool.tar.gz
 	    cd $tool && ./configure --prefix=$autotools_distdir >/dev/null && make install >/dev/null
 	    cd .. && rm -rf $tool
 	done
-	
+
 	cd $top_srcdir
-	
+
 	if (test -x $autotools_distdir/bin/autoreconf -a -x $autotools_distdir/bin/automake -a -x $autotools_distdir/bin/libtool); then
 	    echo " "
 	    echo " --> successfully installed autoreconf in $autotools_distdir/bin - please update your PATH and try again!"
