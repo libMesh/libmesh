@@ -699,7 +699,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   libmesh_assert_not_equal_to (this->n_elem(), 0);
 
   // Container to catch boundary IDs handed back by BoundaryInfo
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
 
   for (; it != it_end; ++it)
     {
@@ -736,7 +736,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       // Maybe add boundary conditions for this element
       for (unsigned short s=0; s<old_elem->n_sides(); s++)
         {
-          this->get_boundary_info().boundary_ids(old_elem, s, bc_ids);
+          bc_ids = this->get_boundary_info().boundary_ids(old_elem, s);
           new_mesh.get_boundary_info().add_side (new_elem, s, bc_ids);
         }
     } // end loop over elements

@@ -1232,7 +1232,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
         }
 
       // Container to catch boundary IDs passed back from BoundaryInfo.
-      std::set<boundary_id_type> bc_ids;
+      std::vector<boundary_id_type> bc_ids;
 
       elem_it  = other_mesh->elements_begin();
       elem_end = other_mesh->elements_end();
@@ -1250,7 +1250,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           unsigned int other_n_nodes = other_elem->n_nodes();
           for (unsigned int n=0; n != other_n_nodes; ++n)
             {
-              other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n), bc_ids);
+              bc_ids = other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n));
               this->get_boundary_info().add_node(this_elem->get_node(n), bc_ids);
             }
 
@@ -1258,14 +1258,14 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           unsigned int n_edges = other_elem->n_edges();
           for (unsigned short edge=0; edge != n_edges; ++edge)
             {
-              other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge, bc_ids);
+              bc_ids = other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge);
               this->get_boundary_info().add_edge(this_elem, edge, bc_ids);
             }
 
           unsigned int n_sides = other_elem->n_sides();
           for (unsigned short s=0; s != n_sides; ++s)
             {
-              other_mesh->get_boundary_info().boundary_ids(other_elem, s, bc_ids);
+              bc_ids = other_mesh->get_boundary_info().boundary_ids(other_elem, s);
               this->get_boundary_info().add_side(this_elem, s, bc_ids);
             }
         }

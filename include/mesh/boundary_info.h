@@ -240,20 +240,10 @@ public:
   /**
    * Add side \p side of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
-   *
-   * This function is now deprecated, call the version which takes a
-   * reference to a std::set instead.
    */
   void add_side (const Elem* elem,
                  const unsigned short int side,
                  const std::vector<boundary_id_type>& ids);
-
-  /**
-   * Non-deprecated version of the add_side() function taking a set of ids.
-   */
-  void add_side (const Elem* elem,
-                 const unsigned short int side,
-                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Removes the boundary conditions associated with node \p node,

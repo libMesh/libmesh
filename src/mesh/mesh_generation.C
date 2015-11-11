@@ -1984,7 +1984,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   mesh.reserve_nodes((order*nz+1)*orig_nodes);
 
   // Container to catch the boundary IDs handed back by the BoundaryInfo object
-  std::set<boundary_id_type> ids_to_copy;
+  std::vector<boundary_id_type> ids_to_copy;
 
   MeshBase::const_node_iterator       nd  = cross_section.nodes_begin();
   const MeshBase::const_node_iterator nend = cross_section.nodes_end();
@@ -2000,7 +2000,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                            node->id() + (k * orig_nodes),
                            node->processor_id());
 
-          cross_section_boundary_info.boundary_ids(node, ids_to_copy);
+          ids_to_copy = cross_section_boundary_info.boundary_ids(node);
           boundary_info.add_node(new_node, ids_to_copy);
         }
     }
@@ -2149,7 +2149,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           // Copy any old boundary ids on all sides
           for (unsigned short s = 0; s != elem->n_sides(); ++s)
             {
-              cross_section_boundary_info.boundary_ids(elem, s, ids_to_copy);
+              ids_to_copy = cross_section_boundary_info.boundary_ids(elem, s);
 
               if (new_elem->dim() == 3)
                 {

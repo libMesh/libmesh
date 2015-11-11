@@ -748,17 +748,7 @@ void BoundaryInfo::add_side(const Elem* elem,
                             const unsigned short int side,
                             const std::vector<boundary_id_type>& ids)
 {
-  libmesh_deprecated();
-  this->add_side(elem, side, std::set<boundary_id_type>(ids.begin(), ids.end()));
-}
-
-
-
-void BoundaryInfo::add_side(const Elem* elem,
-                            const unsigned short int side,
-                            const std::set<boundary_id_type>& ids_set)
-{
-  if (ids_set.empty())
+  if (ids.empty())
     return;
 
   libmesh_assert(elem);
@@ -769,8 +759,18 @@ void BoundaryInfo::add_side(const Elem* elem,
   // Don't add the same ID twice
   std::pair<boundary_side_iter, boundary_side_iter> pos = _boundary_side_id.equal_range(elem);
 
-  std::set<boundary_id_type>::iterator it = ids_set.begin();
-  for (; it != ids_set.end(); ++it)
+  // The entries in the ids vector may be non-unique.  If we expected
+  // *lots* of ids, it might be fastest to construct a std::set from
+  // the entries, but for a small number of entries, which is more
+  // typical, it is probably faster to copy the vector and do sort+unique.
+  // http://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+  std::vector<boundary_id_type> unique_ids(ids.begin(), ids.end());
+  std::sort(unique_ids.begin(), unique_ids.end());
+  std::vector<boundary_id_type>::iterator new_end =
+    std::unique(unique_ids.begin(), unique_ids.end());
+
+  std::vector<boundary_id_type>::const_iterator it = unique_ids.begin();
+  for (; it != new_end; ++it)
     {
       boundary_id_type id = *it;
 
