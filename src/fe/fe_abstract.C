@@ -953,14 +953,14 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
   for (unsigned short int s=0; s<elem->n_sides(); s++)
     {
       if (elem->neighbor(s))
         continue;
 
       mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
-      for (std::set<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);

@@ -2000,7 +2000,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                            node->id() + (k * orig_nodes),
                            node->processor_id());
 
-          ids_to_copy = cross_section_boundary_info.boundary_ids(node);
+          cross_section_boundary_info.boundary_ids(node, ids_to_copy);
           boundary_info.add_node(new_node, ids_to_copy);
         }
     }
@@ -2149,7 +2149,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           // Copy any old boundary ids on all sides
           for (unsigned short s = 0; s != elem->n_sides(); ++s)
             {
-              ids_to_copy = cross_section_boundary_info.boundary_ids(elem, s);
+              cross_section_boundary_info.boundary_ids(elem, s, ids_to_copy);
 
               if (new_elem->dim() == 3)
                 {

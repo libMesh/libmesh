@@ -1250,7 +1250,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           unsigned int other_n_nodes = other_elem->n_nodes();
           for (unsigned int n=0; n != other_n_nodes; ++n)
             {
-              bc_ids = other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n));
+              other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n), bc_ids);
               this->get_boundary_info().add_node(this_elem->get_node(n), bc_ids);
             }
 
@@ -1258,14 +1258,14 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           unsigned int n_edges = other_elem->n_edges();
           for (unsigned short edge=0; edge != n_edges; ++edge)
             {
-              bc_ids = other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge);
+              other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge, bc_ids);
               this->get_boundary_info().add_edge(this_elem, edge, bc_ids);
             }
 
           unsigned int n_sides = other_elem->n_sides();
           for (unsigned short s=0; s != n_sides; ++s)
             {
-              bc_ids = other_mesh->get_boundary_info().boundary_ids(other_elem, s);
+              other_mesh->get_boundary_info().boundary_ids(other_elem, s, bc_ids);
               this->get_boundary_info().add_side(this_elem, s, bc_ids);
             }
         }
@@ -1301,7 +1301,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
           // We also need to copy over the nodeset info here,
           // because the node will get deleted below
-          bc_ids = this->get_boundary_info().boundary_ids(el->get_node(local_node_index));
+          this->get_boundary_info().boundary_ids(el->get_node(local_node_index), bc_ids);
           el->set_node(local_node_index) = &target_node;
           this->get_boundary_info().add_node(&target_node, bc_ids);
         }

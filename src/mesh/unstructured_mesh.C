@@ -736,7 +736,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       // Maybe add boundary conditions for this element
       for (unsigned short s=0; s<old_elem->n_sides(); s++)
         {
-          bc_ids = this->get_boundary_info().boundary_ids(old_elem, s);
+          this->get_boundary_info().boundary_ids(old_elem, s, bc_ids);
           new_mesh.get_boundary_info().add_side (new_elem, s, bc_ids);
         }
     } // end loop over elements

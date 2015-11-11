@@ -192,11 +192,9 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
         boundary_mesh.add_point(*node, node_id_map[node_id], node->processor_id());
 
         // Copy over all the node's boundary IDs to boundary_mesh
-        std::vector<boundary_id_type> node_boundary_ids =
-          this->boundary_ids(node);
-        for(unsigned int index=0;
-            index<node_boundary_ids.size();
-            index++)
+        std::vector<boundary_id_type> node_boundary_ids;
+        this->boundary_ids(node, node_boundary_ids);
+        for (unsigned int index=0; index<node_boundary_ids.size(); index++)
           {
             boundary_mesh.boundary_info->add_node(
               node_id_map[node_id], node_boundary_ids[index]);

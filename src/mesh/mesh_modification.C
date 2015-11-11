@@ -1514,7 +1514,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
           const Node * node = mesh.node_ptr(node_list[idx]);
 
           // Get all the current IDs for this node.
-          bndry_ids = bi.boundary_ids(node);
+          bi.boundary_ids(node, bndry_ids);
 
           // Update the IDs accordingly
           std::replace(bndry_ids.begin(), bndry_ids.end(), old_id, new_id);
@@ -1548,7 +1548,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
           unsigned short int edge = edge_list[idx];
 
           // Get all the current IDs for the edge in question.
-          bndry_ids = bi.edge_boundary_ids(elem, edge);
+          bi.edge_boundary_ids(elem, edge, bndry_ids);
 
           // Update the IDs accordingly
           std::replace(bndry_ids.begin(), bndry_ids.end(), old_id, new_id);
@@ -1582,7 +1582,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
           unsigned short int side = side_list[idx];
 
           // Get all the current IDs for the side in question.
-          bndry_ids = bi.boundary_ids(elem, side);
+          bi.boundary_ids(elem, side, bndry_ids);
 
           // Update the IDs accordingly
           std::replace(bndry_ids.begin(), bndry_ids.end(), old_id, new_id);
