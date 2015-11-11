@@ -288,7 +288,7 @@ public:
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
 
   /**
-   * Fills a user-provided std::set with the boundary ids associated
+   * Fills a user-provided std::vector with the boundary ids associated
    * with \p Node \p node.
    *
    * This is the non-deprecated version of the function.
@@ -409,7 +409,7 @@ public:
    * its ancestors' boundary id.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> raw_boundary_ids (const Elem* const elem,
                                                   const unsigned short int side) const;
@@ -424,7 +424,7 @@ public:
    */
   void raw_boundary_ids (const Elem* const elem,
                          const unsigned short int side,
-                         std::set<boundary_id_type> & set_to_fill) const;
+                         std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns a side of element \p elem whose associated boundary id is

@@ -386,7 +386,7 @@ void UnstructuredMesh::all_first_order ()
       std::vector<boundary_id_type> bndry_ids;
       for (unsigned short s=0; s<so_elem->n_sides(); s++)
         {
-          bndry_ids = this->get_boundary_info().raw_boundary_ids (so_elem, s);
+          this->get_boundary_info().raw_boundary_ids (so_elem, s, bndry_ids);
           this->get_boundary_info().add_side (lo_elem, s, bndry_ids);
         }
 
@@ -673,7 +673,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       std::vector<boundary_id_type> bndry_ids;
       for (unsigned short s=0; s<lo_elem->n_sides(); s++)
         {
-          bndry_ids = this->get_boundary_info().raw_boundary_ids (lo_elem, s);
+          this->get_boundary_info().raw_boundary_ids (lo_elem, s, bndry_ids);
           this->get_boundary_info().add_side (so_elem, s, bndry_ids);
 
           if (lo_elem->neighbor(s) == remote_elem)
