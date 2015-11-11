@@ -934,21 +934,21 @@ std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem* c
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->raw_edge_boundary_ids(elem, edge, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->raw_edge_boundary_ids(elem, edge, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
                                           const unsigned short int edge,
-                                          std::set<boundary_id_type> & set_to_fill) const
+                                          std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   // Only level-0 elements store BCs.
   if (elem->parent())
@@ -960,7 +960,7 @@ void BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
   // Check each element in the range to see if its edge matches the requested edge.
   for (; e.first != e.second; ++e.first)
     if (e.first->second.first == edge)
-      set_to_fill.insert(e.first->second.second);
+      vec_to_fill.push_back(e.first->second.second);
 }
 
 
