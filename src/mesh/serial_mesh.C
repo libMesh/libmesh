@@ -1457,18 +1457,4 @@ dof_id_type SerialMesh::n_active_elem () const
 }
 
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-void SerialMesh::assign_unique_ids()
-{
-  for (dof_id_type i=0; i<_elements.size(); ++i)
-    if (_elements[i] && ! _elements[i]->valid_unique_id())
-      _elements[i]->set_unique_id() = _next_unique_id++;
-
-  for (dof_id_type i=0; i<_nodes.size(); ++i)
-    if (_nodes[i] && ! _nodes[i]->valid_unique_id())
-      _nodes[i]->set_unique_id() = _next_unique_id++;
-}
-#endif
-
-
 } // namespace libMesh

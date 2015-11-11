@@ -407,14 +407,6 @@ public:
 protected:
 
   /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
-   */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  virtual void assign_unique_ids() libmesh_override;
-#endif
-
-  /**
    * The verices (spatial coordinates) of the mesh.
    */
   mapvector<Node*,dof_id_type> _nodes;

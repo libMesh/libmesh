@@ -979,14 +979,6 @@ public:
 protected:
 
   /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
-   */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  virtual void assign_unique_ids() = 0;
-#endif
-
-  /**
    * Returns a writeable reference to the number of partitions.
    */
   unsigned int& set_n_partitions ()
