@@ -974,16 +974,16 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
   // instead.
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
 
   // If the set is empty, return invalid_id
-  if (ids_set.empty())
+  if (ids.empty())
     return invalid_id;
 
   // Otherwise, just return the first id we came across for this
   // element on this side.
-  return *(ids_set.begin());
+  return *(ids.begin());
 }
 
 
@@ -992,9 +992,9 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
                                    const unsigned short int side,
                                    const boundary_id_type id) const
 {
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
-  return (ids_set.find(id) != ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
+  return (std::find(ids.begin(), ids.end(), id) != ids.end());
 }
 
 
@@ -1004,21 +1004,21 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::boundary_ids (const Elem* const elem,
                                  const unsigned short int side,
-                                 std::set<boundary_id_type> & set_to_fill) const
+                                 std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -1045,7 +1045,7 @@ void BoundaryInfo::boundary_ids (const Elem* const elem,
   // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
     if (e.first->second.first == side)
-      set_to_fill.insert(e.first->second.second);
+      vec_to_fill.push_back(e.first->second.second);
 }
 
 
@@ -1054,9 +1054,9 @@ void BoundaryInfo::boundary_ids (const Elem* const elem,
 unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
                                            const unsigned short int side) const
 {
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
-  return ids_set.size();
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
+  return ids.size();
 }
 
 

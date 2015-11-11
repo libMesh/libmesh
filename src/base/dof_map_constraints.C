@@ -437,16 +437,16 @@ private:
 
         // Container to catch boundary ids handed back for sides,
         // nodes, and edges in the loops below.
-        std::set<boundary_id_type> ids_set;
+        std::vector<boundary_id_type> ids_vec;
 
         for (unsigned char s=0; s != elem->n_sides(); ++s)
           {
             // First see if this side has been requested
-            boundary_info.boundary_ids (elem, s, ids_set);
+            boundary_info.boundary_ids (elem, s, ids_vec);
 
             bool do_this_side = false;
-            for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
-                 bc_it != ids_set.end(); ++bc_it)
+            for (std::vector<boundary_id_type>::iterator bc_it = ids_vec.begin();
+                 bc_it != ids_vec.end(); ++bc_it)
               if (b.count(*bc_it))
                 {
                   do_this_side = true;
@@ -470,6 +470,7 @@ private:
         // also independently check whether the nodes have been requested
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
+            std::set<boundary_id_type> ids_set;
             boundary_info.boundary_ids (elem->get_node(n), ids_set);
 
             for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
@@ -485,6 +486,7 @@ private:
         // also independently check whether the edges have been requested
         for (unsigned short e=0; e != elem->n_edges(); ++e)
           {
+            std::set<boundary_id_type> ids_set;
             boundary_info.edge_boundary_ids (elem, e, ids_set);
 
             for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();

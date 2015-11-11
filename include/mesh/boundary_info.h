@@ -387,7 +387,7 @@ public:
    * element \p elem.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> boundary_ids (const Elem* const elem,
                                               const unsigned short int side) const;
@@ -400,7 +400,7 @@ public:
    */
   void boundary_ids (const Elem* const elem,
                      const unsigned short int side,
-                     std::set<boundary_id_type> & set_to_fill) const;
+                     std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p side

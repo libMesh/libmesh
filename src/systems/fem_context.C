@@ -187,9 +187,9 @@ std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 }
 
 
-void FEMContext::side_boundary_ids(std::set<boundary_id_type> & set_to_fill) const
+void FEMContext::side_boundary_ids(std::vector<boundary_id_type> & vec_to_fill) const
 {
-  _boundary_info.boundary_ids(&(this->get_elem()), side, set_to_fill);
+  _boundary_info.boundary_ids(&(this->get_elem()), side, vec_to_fill);
 }
 
 
