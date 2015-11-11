@@ -816,24 +816,24 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node* node) const
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(node, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(node, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::boundary_ids (const Node* node,
-                                 std::set<boundary_id_type> & set_to_fill) const
+                                 std::vector<boundary_id_type> & vec_to_fill) const
 {
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   std::pair<boundary_node_iter, boundary_node_iter>
     pos = _boundary_node_id.equal_range(node);
 
   for (; pos.first != pos.second; ++pos.first)
-    set_to_fill.insert(pos.first->second);
+    vec_to_fill.push_back(pos.first->second);
 }
 
 

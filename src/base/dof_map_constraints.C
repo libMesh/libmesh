@@ -470,11 +470,10 @@ private:
         // also independently check whether the nodes have been requested
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            std::set<boundary_id_type> ids_set;
-            boundary_info.boundary_ids (elem->get_node(n), ids_set);
+            boundary_info.boundary_ids (elem->get_node(n), ids_vec);
 
-            for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
-                 bc_it != ids_set.end(); ++bc_it)
+            for (std::vector<boundary_id_type>::iterator bc_it = ids_vec.begin();
+                 bc_it != ids_vec.end(); ++bc_it)
               if (b.count(*bc_it))
                 {
                   is_boundary_node[n] = true;
