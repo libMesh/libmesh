@@ -70,6 +70,24 @@ public:
 
 
 } // namespace Parallel
+
+
+
+// This has to be in libMesh namespace for Koenig lookup to work
+// g++ doesn't find it if it's in the global namespace.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+inline
+std::ostream&
+operator <<
+  (std::ostream& os,
+   const libMesh::Parallel::DofObjectKey & hilbert_pair)
+{
+  os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;
+  return os;
+}
+#endif
+
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
