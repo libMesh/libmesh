@@ -166,18 +166,9 @@ public:
   /**
    * Add \p Node \p node with boundary ids \p ids to the boundary
    * information data structure.
-   *
-   * This function is now deprecated, call the version which takes a
-   * reference to a std::set instead.
    */
   void add_node (const Node* node,
                  const std::vector<boundary_id_type>& ids);
-
-  /**
-   * Non-deprecated version of the add_node() function taking a set of ids.
-   */
-  void add_node (const Node* node,
-                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh

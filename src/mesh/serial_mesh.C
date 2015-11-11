@@ -1280,7 +1280,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
   // duplicate nodes that came from other_mesh.
 
   // Container to catch boundary IDs passed back from BoundaryInfo.
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
 
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
@@ -1301,7 +1301,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
           // We also need to copy over the nodeset info here,
           // because the node will get deleted below
-          this->get_boundary_info().boundary_ids(el->get_node(local_node_index), bc_ids);
+          bc_ids = this->get_boundary_info().boundary_ids(el->get_node(local_node_index));
           el->set_node(local_node_index) = &target_node;
           this->get_boundary_info().add_node(&target_node, bc_ids);
         }
