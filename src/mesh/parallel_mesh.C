@@ -107,6 +107,8 @@ ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
   _next_free_unpartitioned_elem_id =
     other_mesh._next_free_unpartitioned_elem_id;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id =
+    other_mesh._next_unique_id;
   _next_unpartitioned_unique_id =
     other_mesh._next_unpartitioned_unique_id;
 #endif
@@ -132,6 +134,9 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh & other_mesh) :
   this->copy_nodes_and_elements(other_mesh);
   this->get_boundary_info() = other_mesh.get_boundary_info();
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = other_mesh.parallel_max_unique_id();
+#endif
   this->update_parallel_id_counts();
 }
 

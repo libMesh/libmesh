@@ -160,6 +160,9 @@ SerialMesh::SerialMesh (const SerialMesh & other_mesh) :
 {
   this->copy_nodes_and_elements(other_mesh);
   this->get_boundary_info() = other_mesh.get_boundary_info();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  this->_next_unique_id = other_mesh._next_unique_id;
+#endif
 }
 
 
