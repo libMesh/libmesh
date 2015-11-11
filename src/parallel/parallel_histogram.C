@@ -21,11 +21,9 @@
 
 // Local includes
 #include "libmesh/parallel_histogram.h"
-#ifdef LIBMESH_HAVE_LIBHILBERT
-#  include "hilbert.h"
-#endif
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_conversion_utils.h"
+#include "libmesh/parallel_hilbert.h"
 
 namespace libMesh
 {
@@ -78,8 +76,10 @@ void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
     {
       bin_bounds[b] = Parallel::Utils::to_double(min) + bin_width * b;
 
-      bin_iters[b]  = std::lower_bound (bin_iters[b-1], data.end(),
-                                        Parallel::Utils::to_key_type<KeyType>(bin_bounds[b]));
+      bin_iters[b] =
+        std::lower_bound (bin_iters[b-1], data.end(),
+                          Parallel::Utils::Convert<KeyType>::to_key_type
+                            (bin_bounds[b]));
     }
 
   bin_iters[nbins]  = data.end();
@@ -111,7 +111,7 @@ void Histogram<KeyType,IdxType>::build_histogram ()
 template class Parallel::Histogram<int,    unsigned int>;
 template class Parallel::Histogram<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::Histogram<Hilbert::HilbertIndices, unsigned int>;
+template class Parallel::Histogram<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh
