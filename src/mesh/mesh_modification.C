@@ -396,6 +396,9 @@ void UnstructuredMesh::all_first_order ()
        * the second-order element.
        */
       lo_elem->set_id(so_elem->id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      lo_elem->set_unique_id() = so_elem->unique_id();
+#endif
       lo_elem->processor_id() = so_elem->processor_id();
       lo_elem->subdomain_id() = so_elem->subdomain_id();
       this->insert_elem(lo_elem);
@@ -686,6 +689,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * the first-order element.
        */
       so_elem->set_id(lo_elem->id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      so_elem->set_unique_id() = lo_elem->unique_id();
+#endif
       so_elem->processor_id() = lo_elem->processor_id();
       so_elem->subdomain_id() = lo_elem->subdomain_id();
       this->insert_elem(so_elem);
@@ -1113,13 +1119,25 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                   } // end if (elem->neighbor(sn) == remote_elem)
               } // end for loop over sides
 
+            // The number of elements in the original mesh before any additions
+            // or deletions.
+            const dof_id_type max_elem_id = mesh.max_elem_id();
+
             // Determine new IDs for the split elements which will be
             // the same on all processors, therefore keeping the Mesh
-            // in sync.  Note: we offset the new IDs by n_orig_elem to
-            // avoid overwriting any of the original IDs, this assumes
-            // they were contiguously-numbered to begin with...
-            tri0->set_id( n_orig_elem + 2*elem->id() + 0 );
-            tri1->set_id( n_orig_elem + 2*elem->id() + 1 );
+            // in sync.  Note: we offset the new IDs by the max of the
+            // pre-existing ids to avoid conflicting with originals.
+            tri0->set_id( max_elem_id + 2*elem->id());
+            tri1->set_id( max_elem_id + 2*elem->id() + 1 );
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+            unique_id_type max_unique_id =
+              mesh.parallel_max_unique_id();
+            tri0->set_unique_id() =
+              max_unique_id + 2*elem->unique_id();
+            tri1->set_unique_id() =
+              max_unique_id + 2*elem->unique_id() + 1;
+#endif
 
             // Add the newly-created triangles to the temporary vector of new elements.
             new_elements.push_back(tri0);
@@ -1401,9 +1419,12 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
         copy->processor_id() = elem->processor_id();
         copy->subdomain_id() = elem->subdomain_id();
 
-        // Retain the original element's ID as well, otherwise ParallelMesh will
-        // try to create one for you...
+        // Retain the original element's ID(s) as well, otherwise
+        // the Mesh may try to create them for you...
         copy->set_id( elem->id() );
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+        copy->set_unique_id() = elem->unique_id();
+#endif
 
         // This element could have boundary info or ParallelMesh
         // remote_elem links as well.  We need to save the (elem,
