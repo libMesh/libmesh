@@ -1320,7 +1320,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
         {
           const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          unique_id_type unique_id = 0;
+          unique_id_type unique_id = DofObject::invalid_unique_id;
 #endif
           if (read_unique_id)
             {
