@@ -39,6 +39,9 @@ ParallelMesh::ParallelMesh (const Parallel::Communicator & comm_in,
   _next_free_local_elem_id(this->processor_id()),
   _next_free_unpartitioned_node_id(this->n_processors()),
   _next_free_unpartitioned_elem_id(this->n_processors())
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  , _next_unpartitioned_unique_id(this->n_processors())
+#endif
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = this->processor_id();
@@ -59,6 +62,9 @@ ParallelMesh::ParallelMesh (unsigned char d) :
   _next_free_local_elem_id(this->processor_id()),
   _next_free_unpartitioned_node_id(this->n_processors()),
   _next_free_unpartitioned_elem_id(this->n_processors())
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  , _next_unpartitioned_unique_id(this->n_processors())
+#endif
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = this->processor_id();
@@ -100,6 +106,10 @@ ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
     other_mesh._next_free_unpartitioned_node_id;
   _next_free_unpartitioned_elem_id =
     other_mesh._next_free_unpartitioned_elem_id;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unpartitioned_unique_id =
+    other_mesh._next_unpartitioned_unique_id;
+#endif
   this->get_boundary_info() = other_mesh.get_boundary_info();
 
   // Need to copy extra_ghost_elems
@@ -157,6 +167,16 @@ void ParallelMesh::update_parallel_id_counts()
     _next_free_local_node_id =
       ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
       (this->n_processors() + 1) + this->processor_id();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = this->parallel_max_unique_id();
+  _next_unpartitioned_unique_id =
+    ((_next_unique_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_unique_id =
+    ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
+#endif
 }
 
 
@@ -185,6 +205,21 @@ dof_id_type ParallelMesh::parallel_max_elem_id() const
   this->comm().max(max_local);
   return max_local;
 }
+
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+unique_id_type ParallelMesh::parallel_max_unique_id() const
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  unique_id_type max_local = std::max(_next_unique_id,
+                                      _next_unpartitioned_unique_id);
+  this->comm().max(max_local);
+  return max_local;
+}
+#endif
 
 
 
@@ -420,10 +455,18 @@ Elem * ParallelMesh::add_elem (Elem * e)
     _n_elem++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!e->valid_unique_id() && processor_id() == e->processor_id())
+  if (!e->valid_unique_id())
     {
-      e->set_unique_id() = _next_unique_id;
-      _next_unique_id += this->n_processors();
+      if (processor_id() == e->processor_id())
+        {
+          e->set_unique_id() = _next_unique_id;
+          _next_unique_id += this->n_processors() + 1;
+        }
+      else
+        {
+          e->set_unique_id() = _next_unpartitioned_unique_id;
+          _next_unpartitioned_unique_id += this->n_processors() + 1;
+        }
     }
 #endif
 
@@ -594,10 +637,18 @@ Node * ParallelMesh::add_node (Node * n)
     _n_nodes++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!n->valid_unique_id() && processor_id() == n->processor_id())
+  if (!n->valid_unique_id())
     {
-      n->set_unique_id() = _next_unique_id;
-      _next_unique_id += this->n_processors();
+      if (processor_id() == n->processor_id())
+        {
+          n->set_unique_id() = _next_unique_id;
+          _next_unique_id += this->n_processors();
+        }
+      else
+        {
+          n->set_unique_id() = _next_unpartitioned_unique_id;
+          _next_unpartitioned_unique_id += this->n_processors() + 1;
+        }
     }
 #endif
 
