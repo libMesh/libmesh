@@ -118,7 +118,9 @@ public:
   explicit
   StandardType(const std::pair<T1, T2> * example = NULL) {
     // We need an example for MPI_Address to use
-    libmesh_assert(example);
+    static const std::pair<T1, T2> p;
+    if (!example)
+      example = &p;
 
     // _static_type never gets freed, but it only gets committed once
     // per T, so it's not a *huge* memory leak...
