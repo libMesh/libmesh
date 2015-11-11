@@ -349,6 +349,11 @@ Elem* SerialMesh::add_elem (Elem* e)
 
 Elem* SerialMesh::insert_elem (Elem* e)
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!e->valid_unique_id())
+    e->set_unique_id() = _next_unique_id++;
+#endif
+
   dof_id_type eid = e->id();
   libmesh_assert_less (eid, _elements.size());
   Elem *oldelem = _elements[eid];
@@ -457,6 +462,11 @@ Node* SerialMesh::add_point (const Point& p,
                       cast_int<dof_id_type>(_nodes.size()-1) : id).release();
       n->processor_id() = proc_id;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      if (!n->valid_unique_id())
+        n->set_unique_id() = _next_unique_id++;
+#endif
+
       if (id == DofObject::invalid_id)
         _nodes.back() = n;
       else
@@ -518,6 +528,10 @@ Node* SerialMesh::insert_node(Node* n)
       _nodes.resize(n->id() + 1);
     }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!n->valid_unique_id())
+    n->set_unique_id() = _next_unique_id++;
+#endif
 
   // We have enough space and this spot isn't already occupied by
   // another node, so go ahead and add it.

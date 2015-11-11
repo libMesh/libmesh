@@ -493,6 +493,22 @@ Elem* ParallelMesh::insert_elem (Elem* e)
   if (_elements[e->id()])
     this->delete_elem(_elements[e->id()]);
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!e->valid_unique_id())
+    {
+      if (processor_id() == e->processor_id())
+        {
+          e->set_unique_id() = _next_unique_id;
+          _next_unique_id += this->n_processors() + 1;
+        }
+      else
+        {
+          e->set_unique_id() = _next_unpartitioned_unique_id;
+          _next_unpartitioned_unique_id += this->n_processors() + 1;
+        }
+    }
+#endif
+
   // Try to make the cached elem data more accurate
   processor_id_type elem_procid = e->processor_id();
   if (elem_procid == this->processor_id() ||
