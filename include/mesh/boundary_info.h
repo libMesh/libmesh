@@ -197,20 +197,10 @@ public:
    * Add edge \p edge of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
    * Edge-based boundary IDs should only be used in 3D.
-   *
-   * This function is now deprecated, call the version which takes a
-   * reference to a std::set instead.
    */
   void add_edge (const Elem* elem,
                  const unsigned short int edge,
                  const std::vector<boundary_id_type>& ids);
-
-  /**
-   * Non-deprecated version of the add_side() function taking a set of ids.
-   */
-  void add_edge (const Elem* elem,
-                 const unsigned short int edge,
-                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Add side \p side of element number \p elem with boundary id \p id
