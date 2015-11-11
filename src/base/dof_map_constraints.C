@@ -485,11 +485,10 @@ private:
         // also independently check whether the edges have been requested
         for (unsigned short e=0; e != elem->n_edges(); ++e)
           {
-            std::set<boundary_id_type> ids_set;
-            boundary_info.edge_boundary_ids (elem, e, ids_set);
+            boundary_info.edge_boundary_ids (elem, e, ids_vec);
 
-            for (std::set<boundary_id_type>::iterator bc_it = ids_set.begin();
-                 bc_it != ids_set.end(); ++bc_it)
+            for (std::vector<boundary_id_type>::iterator bc_it = ids_vec.begin();
+                 bc_it != ids_vec.end(); ++bc_it)
               if (b.count(*bc_it))
                 is_boundary_edge[e] = true;
           }

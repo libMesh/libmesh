@@ -278,15 +278,14 @@ void pack (const Elem* elem,
             data.push_back(*bc_it);
         }
 
-      std::set<boundary_id_type> bcs_set;
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
-          mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs_set);
+          mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs);
 
-          data.push_back(bcs_set.size());
+          data.push_back(bcs.size());
 
-          for (std::set<boundary_id_type>::iterator bc_it=bcs_set.begin();
-               bc_it != bcs_set.end(); ++bc_it)
+          for (std::vector<boundary_id_type>::iterator bc_it=bcs.begin();
+               bc_it != bcs.end(); ++bc_it)
             data.push_back(*bc_it);
         }
     }

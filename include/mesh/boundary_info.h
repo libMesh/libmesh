@@ -315,7 +315,7 @@ public:
    * Edge-based boundary IDs should only be used in 3D.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
                                                    const unsigned short int edge) const;
@@ -329,7 +329,7 @@ public:
    */
   void edge_boundary_ids (const Elem* const elem,
                           const unsigned short int edge,
-                          std::set<boundary_id_type> & set_to_fill) const;
+                          std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p edge

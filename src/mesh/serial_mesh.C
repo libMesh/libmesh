@@ -966,10 +966,9 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                           if(el->is_edge_on_side(edge_id, side_id))
                             {
                               // Get *all* boundary IDs on this edge, not just the first one!
-                              std::set<boundary_id_type> bc_ids_set;
-                              mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids_set);
+                              mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids);
 
-                              if (bc_ids_set.count(id_array[i]))
+                              if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
                                   UniquePtr<Elem> edge (el->build_edge(edge_id));
                                   for (unsigned int node_id=0; node_id<edge->n_nodes(); ++node_id)
