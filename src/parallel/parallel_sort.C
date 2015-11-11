@@ -26,9 +26,6 @@
 #include "libmesh/parallel_hilbert.h"
 #include "libmesh/parallel_sort.h"
 #include "libmesh/parallel_bin_sorter.h"
-#ifdef LIBMESH_HAVE_LIBHILBERT
-#  include "hilbert.h"
-#endif
 
 namespace libMesh
 {
@@ -130,18 +127,25 @@ void Sort<KeyType,IdxType>::binsort()
 // code duplication here that could potentially be consolidated with the
 // above method
 template <>
-void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
+void Sort<Parallel::DofObjectKey,unsigned int>::binsort()
 {
   // Find the global min and max from all the
   // processors.  Do this using MPI_Allreduce.
-  Hilbert::HilbertIndices
+  Parallel::DofObjectKey
     local_min,  local_max,
     global_min, global_max;
 
   if (_data.empty())
     {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      local_min.first.rack0 = local_min.first.rack1 = local_min.first.rack2 = static_cast<Hilbert::inttype>(-1);
+      local_min.second = std::numeric_limits<unique_id_type>::max();
+      local_max.first.rack0 = local_max.first.rack1 = local_max.first.rack2 = 0;
+      local_max.second = 0;
+#else
       local_min.rack0 = local_min.rack1 = local_min.rack2 = static_cast<Hilbert::inttype>(-1);
       local_max.rack0 = local_max.rack1 = local_max.rack2 = 0;
+#endif
     }
   else
     {
@@ -151,22 +155,22 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
 
   MPI_Op hilbert_max, hilbert_min;
 
-  MPI_Op_create       ((MPI_User_function*)__hilbert_max_op, true, &hilbert_max);
-  MPI_Op_create       ((MPI_User_function*)__hilbert_min_op, true, &hilbert_min);
+  MPI_Op_create       ((MPI_User_function*)dofobjectkey_max_op, true, &hilbert_max);
+  MPI_Op_create       ((MPI_User_function*)dofobjectkey_min_op, true, &hilbert_min);
 
   // Communicate to determine the global
   // min and max for all processors.
   MPI_Allreduce(&local_min,
                 &global_min,
                 1,
-                Parallel::StandardType<Hilbert::HilbertIndices>(),
+                Parallel::StandardType<Parallel::DofObjectKey>(&local_min),
                 hilbert_min,
                 this->comm().get());
 
   MPI_Allreduce(&local_max,
                 &global_max,
                 1,
-                Parallel::StandardType<Hilbert::HilbertIndices>(),
+                Parallel::StandardType<Parallel::DofObjectKey>(&local_max),
                 hilbert_max,
                 this->comm().get());
 
@@ -174,7 +178,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
   MPI_Op_free   (&hilbert_min);
 
   // Bin-Sort based on the global min and max
-  Parallel::BinSorter<Hilbert::HilbertIndices> bs(this->comm(),_data);
+  Parallel::BinSorter<Parallel::DofObjectKey> bs(this->comm(),_data);
   bs.binsort(_n_procs, global_max, global_min);
 
   // Now save the local bin sizes in a vector so
@@ -238,14 +242,16 @@ void Sort<KeyType,IdxType>::communicate_bins()
       if (sendbuf == NULL && _local_bin_sizes[i] != 0)
         libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
 
+      KeyType example;
+
       MPI_Gatherv(sendbuf,
-                  _local_bin_sizes[i],               // How much data is in the bin being sent.
-                  Parallel::StandardType<KeyType>(), // The data type we are sorting
+                  _local_bin_sizes[i],                       // How much data is in the bin being sent.
+                  Parallel::StandardType<KeyType>(&example), // The data type we are sorting
                   recvbuf,
                   &proc_bin_size[0],          // How much is to be received from each processor
                   &displacements[0],          // Offsets into the receive buffer
-                  Parallel::StandardType<KeyType>(), // The data type we are sorting
-                  i,                                 // The root process (we do this once for each proc)
+                  Parallel::StandardType<KeyType>(&example), // The data type we are sorting
+                  i,                                         // The root process (we do this once for each proc)
                   this->comm().get());
 
       // Copy the destination buffer if it
@@ -266,7 +272,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
 // code duplication here that could potentially be consolidated with the
 // above method
 template <>
-void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
+void Sort<Parallel::DofObjectKey,unsigned int>::communicate_bins()
 {
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
@@ -288,7 +294,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
   // processor is being MPI_Gatherv'd.
-  std::vector<Hilbert::HilbertIndices> dest;
+  std::vector<Parallel::DofObjectKey> dest;
 
   unsigned int local_offset = 0;
 
@@ -332,13 +338,15 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
       if (sendbuf == NULL && _local_bin_sizes[i] != 0)
         libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
 
+      Parallel::DofObjectKey example;
+
       MPI_Gatherv(sendbuf,
                   _local_bin_sizes[i],      // How much data is in the bin being sent.
-                  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
+                  Parallel::StandardType<Parallel::DofObjectKey>(&example), // The data type we are sorting
                   recvbuf,
                   &proc_bin_size[0], // How much is to be received from each processor
                   &displacements[0], // Offsets into the receive buffer
-                  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
+                  Parallel::StandardType<Parallel::DofObjectKey>(&example), // The data type we are sorting
                   i,                        // The root process (we do this once for each proc)
                   this->comm().get());
 
@@ -383,7 +391,7 @@ const std::vector<KeyType>& Sort<KeyType,IdxType>::bin()
 template class Parallel::Sort<int, unsigned int>;
 template class Parallel::Sort<double, unsigned int>;
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
-template class Parallel::Sort<Hilbert::HilbertIndices, unsigned int>;
+template class Parallel::Sort<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh
