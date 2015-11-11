@@ -703,9 +703,10 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   STOP_LOG("all_second_order()", "Mesh");
 
-  // In a ParallelMesh our ghost node processor ids may be bad and
-  // the ids of nodes touching remote elements may be inconsistent.
-  // Fix them.
+  // In a ParallelMesh our ghost node processor ids may be bad,
+  // the ids of nodes touching remote elements may be inconsistent,
+  // and unique_ids of newly added non-local nodes remain unset.
+  // make_nodes_parallel_consistent() will fix all this.
   if (!this->is_serial())
     MeshCommunication().make_nodes_parallel_consistent (*this);
 
@@ -739,6 +740,11 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   std::vector<Elem*> new_bndry_elements;
   std::vector<unsigned short int> new_bndry_sides;
   std::vector<boundary_id_type> new_bndry_ids;
+
+  // We may need to add new points if we run into a 1.5th order
+  // element; if we do that on a ParallelMesh in a ghost element then
+  // we will need to fix their ids / unique_ids
+  bool added_new_ghost_point = false;
 
   // Iterate over the elements, splitting QUADS into
   // pairs of conforming triangles.
@@ -810,6 +816,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
           case QUAD8:
             {
               split_elem =  true;
+              if (elem->processor_id() != mesh.processor_id())
+                added_new_ghost_point = true;
 
               tri0 = new Tri6;
               tri1 = new Tri6;
@@ -817,8 +825,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
               Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
                                                 mesh.node(elem->node(1)) +
                                                 mesh.node(elem->node(2)) +
-                                                mesh.node(elem->node(3)) / 4)
-                                               );
+                                                mesh.node(elem->node(3))
+                                                / 4),
+                                               DofObject::invalid_id,
+                                               elem->processor_id());
 
               // Check for possible edge swap
               if ((elem->point(0) - elem->point(2)).size() <
@@ -1182,6 +1192,19 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                                           new_bndry_sides[s],
                                           new_bndry_ids[s]);
     }
+
+  // In a ParallelMesh any newly added ghost node ids may be
+  // inconsistent, and unique_ids of newly added ghost nodes remain
+  // unset.
+  // make_nodes_parallel_consistent() will fix all this.
+  if (!mesh.is_serial())
+    {
+      mesh.comm().max(added_new_ghost_point);
+
+      if (added_new_ghost_point)
+        MeshCommunication().make_nodes_parallel_consistent (mesh);
+    }
+
 
 
   // Prepare the newly created mesh for use.
