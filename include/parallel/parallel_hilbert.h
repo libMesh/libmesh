@@ -58,6 +58,17 @@ public:
     _datatype = _static_type;
   }
 };
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  typedef
+  std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
+#else
+  typedef
+  Hilbert::HilbertIndices DofObjectKey;
+#endif
+
+
 } // namespace Parallel
 } // namespace libMesh
 
