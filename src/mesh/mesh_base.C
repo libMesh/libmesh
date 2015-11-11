@@ -182,11 +182,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // If we're using ParallelMesh, we'll want it parallelized.
   this->delete_remote_elements();
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  // Assign DOF object unique ids
-  this->assign_unique_ids();
-#endif
-
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 

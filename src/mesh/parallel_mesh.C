@@ -1409,34 +1409,5 @@ void ParallelMesh::allgather()
 #endif
 }
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-void ParallelMesh::assign_unique_ids()
-{
-  {
-    elem_iterator_imp        it = _elements.begin();
-    const elem_iterator_imp end = _elements.end();
-
-    for (; it != end; ++it)
-      if ((*it) && ! (*it)->valid_unique_id() && processor_id() == (*it)->processor_id())
-        {
-          (*it)->set_unique_id() = _next_unique_id;
-          _next_unique_id += this->n_processors();
-        }
-  }
-
-  {
-    node_iterator_imp it  = _nodes.begin();
-    node_iterator_imp end = _nodes.end();
-
-    for (; it != end; ++it)
-      if ((*it) && ! (*it)->valid_unique_id() && processor_id() == (*it)->processor_id())
-        {
-          (*it)->set_unique_id() = _next_unique_id;
-          _next_unique_id += this->n_processors();
-        }
-  }
-}
-#endif
-
 
 } // namespace libMesh
