@@ -42,6 +42,11 @@ namespace libMesh
 // Forward declarations
 class EquationSystems;
 class System;
+class DofMap;
+class MeshBase;
+class FEType;
+
+template <typename T> class NumericVector;
 
 /**
  * Implements the evaluate() function to compute FE solution values at

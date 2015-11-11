@@ -27,6 +27,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
 
 #include <DTK_MeshTypes.hpp>
 #include <Teuchos_Comm.hpp>
