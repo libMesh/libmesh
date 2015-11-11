@@ -405,6 +405,15 @@ void libmesh_assert_connected_nodes (const MeshBase &mesh);
  */
 void libmesh_assert_valid_dof_ids (const MeshBase &mesh);
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+/**
+ * A function for verifying that unique ids match across processors.
+ *
+ * FIXME: we ought to check for uniqueness too.
+ */
+void libmesh_assert_valid_unique_ids (const MeshBase &mesh);
+#endif
+
 /**
  * A function for verifying that processor assignment is
  * self-consistent on nodes (each node part of an active element on
