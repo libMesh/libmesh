@@ -30,6 +30,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
@@ -191,6 +192,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   // The mesh is now prepared for use.
   _is_prepared = true;
+
+#if defined(DEBUG) && defined(LIBMESH_ENABLE_UNIQUE_ID)
+  MeshTools::libmesh_assert_valid_unique_ids(*this);
+#endif
 }
 
 
