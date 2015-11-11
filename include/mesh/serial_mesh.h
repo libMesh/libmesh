@@ -116,6 +116,11 @@ public:
   virtual dof_id_type max_elem_id () const libmesh_override
   { return cast_int<dof_id_type>(_elements.size()); }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  virtual unique_id_type parallel_max_unique_id () const libmesh_override
+  { return _next_unique_id; }
+#endif
+
   virtual void reserve_elem (const dof_id_type ne) libmesh_override
   { _elements.reserve (ne); }
 

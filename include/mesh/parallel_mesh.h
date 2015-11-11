@@ -194,7 +194,7 @@ public:
   dof_id_type parallel_max_elem_id () const;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  unique_id_type parallel_max_unique_id () const;
+  virtual unique_id_type parallel_max_unique_id () const libmesh_override;
 #endif
 
   virtual const Point& point (const dof_id_type i) const libmesh_override;

@@ -262,6 +262,14 @@ public:
   virtual dof_id_type max_elem_id () const = 0;
 
   /**
+   * Returns a number greater than or equal to the maximum unique_id in the
+   * mesh.
+   */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  virtual unique_id_type parallel_max_unique_id () const = 0;
+#endif
+
+  /**
    * Reserves space for a known number of elements.
    * Note that this method may or may not do anything, depending
    * on the actual \p Mesh implementation.  If you know the number
