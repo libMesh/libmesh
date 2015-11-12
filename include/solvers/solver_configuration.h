@@ -51,6 +51,13 @@ public:
   virtual ~SolverConfiguration () {}
 
   /**
+   * Apply options during initialization of a solver.
+   * Default is a no-op. Override in subclasses to provide
+   * specific behavior.
+   */
+  virtual void set_options_during_init() {}
+
+  /**
    * Apply solver options to a particular solver.
    * Override in subclasses to provide specific behavior.
    */

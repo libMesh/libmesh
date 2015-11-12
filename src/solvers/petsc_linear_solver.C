@@ -215,6 +215,13 @@ void PetscLinearSolver<T>::init (const char *name)
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
 
+      // If the SolverConfiguration object is provided, use it to set
+      // options during solver initialization.
+      if(this->_solver_configuration)
+        {
+          this->_solver_configuration->set_options_during_init();
+        }
+
       // Set the options from user-input
       // Set runtime options, e.g.,
       //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
@@ -344,6 +351,13 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix,
 
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
+
+      // If the SolverConfiguration object is provided, use it to set
+      // options during solver initialization.
+      if(this->_solver_configuration)
+        {
+          this->_solver_configuration->set_options_during_init();
+        }
 
       // Set the options from user-input
       // Set runtime options, e.g.,
