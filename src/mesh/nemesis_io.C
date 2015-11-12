@@ -792,7 +792,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // Instantiate the ElementMaps interface.  This is what translates LibMesh's
   // element numbering scheme to Exodus's.
-  ExodusII_IO_Helper::ElementMaps em;
+  ExodusII_IO_Helper::ElementMaps em(*nemhelper);
 
   // Read in the element connectivity for each block by
   // looping over all the blocks.

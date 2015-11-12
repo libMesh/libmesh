@@ -764,9 +764,23 @@ class ExodusII_IO_Helper::ElementMaps
 public:
 
   /**
-   * Constructor.
+   * Constructor.  Takes a const reference to an ExodusII_IO_Helper
+   * helper object.  The functionality of ElementMaps should probably
+   * just be moved into the Helper, I have no idea why it's separate
+   * currently.
    */
-  ElementMaps() {}
+  ElementMaps(const ExodusII_IO_Helper & helper) :
+    _helper(helper)
+  {}
+
+private:
+  /**
+   * We can work around bugs in certain types of Exodus files if we
+   * have a bit more information from the Helper.
+   */
+  const ExodusII_IO_Helper & _helper;
+
+public:
 
   /**
    * 1D node maps.  These define mappings from ExodusII-formatted

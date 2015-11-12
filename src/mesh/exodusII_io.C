@@ -125,7 +125,7 @@ void ExodusII_IO::read (const std::string& fname)
 #endif
 
   // Instantiate the ElementMaps interface
-  ExodusII_IO_Helper::ElementMaps em;
+  ExodusII_IO_Helper::ElementMaps em(*exio_helper);
 
   // Open the exodus file in EX_READ mode
   exio_helper->open(fname.c_str(), /*read_only=*/true);

@@ -1317,7 +1317,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Get a reference to a vector of element IDs for this subdomain.
       subdomain_map_type::mapped_type& tmp_vec = (*it).second;
 
-      ExodusII_IO_Helper::ElementMaps em;
+      ExodusII_IO_Helper::ElementMaps em(*this);
 
       //Use the first element in this block to get representative information.
       //Note that Exodus assumes all elements in a block are of the same type!
@@ -1420,7 +1420,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ExodusII_IO_Helper::ElementMaps em;
+  ExodusII_IO_Helper::ElementMaps em(*this);
 
   std::vector< dof_id_type > el;
   std::vector< unsigned short int > sl;
