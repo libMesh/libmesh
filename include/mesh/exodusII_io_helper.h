@@ -859,6 +859,13 @@ public:
   static const int tri_edge_map[3];
 
   /**
+   * Workaround triangle edge map for Cubit-14 meshes with TRI3
+   * elements in 3D.  In this scenario, they are treated as TRISHELL
+   * elements which have 5 sides.
+   */
+  static const int cubit14_workaround_tri_edge_map[5];
+
+  /**
    * Maps the Exodus edge numbering for quadrilaterals.  Useful for
    * reading sideset information.
    */

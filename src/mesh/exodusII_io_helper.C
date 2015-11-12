@@ -162,6 +162,7 @@ const int ExodusII_IO_Helper::ElementMaps::tri6_node_map[6]  = {0, 1, 2, 3, 4, 5
 // 2D edge map definitions
 const int ExodusII_IO_Helper::ElementMaps::tri_edge_map[3] = {0, 1, 2};
 const int ExodusII_IO_Helper::ElementMaps::quad_edge_map[4] = {0, 1, 2, 3};
+const int ExodusII_IO_Helper::ElementMaps::cubit14_workaround_tri_edge_map[5] = {99, 99, 0, 1, 2};
 
 //These take a libMesh ID and turn it into an Exodus ID
 const int ExodusII_IO_Helper::ElementMaps::tri_inverse_edge_map[3] = {1, 2, 3};
@@ -1974,7 +1975,25 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
     case TRI3:
       {
-        const Conversion conv(tri3_node_map,
+        // We use the workaround conversion object if we're using
+        // Cubit 14 *and* it's a 3D Exodus file.
+        if (_helper.is_cubit14 && _helper.num_dim==3)
+          {
+            return Conversion(tri3_node_map,
+                              ARRAY_LENGTH(tri3_node_map),
+                              tri3_node_map,
+                              ARRAY_LENGTH(tri3_node_map),
+                              // Use mapping which works around TRISHELL side numbering on TRI3 elements in 3D.
+                              cubit14_workaround_tri_edge_map,
+                              ARRAY_LENGTH(cubit14_workaround_tri_edge_map),
+                              tri_inverse_edge_map,
+                              ARRAY_LENGTH(tri_inverse_edge_map),
+                              TRI3,
+                              "TRI3");
+          }
+        else
+          {
+            return Conversion(tri3_node_map,
                               ARRAY_LENGTH(tri3_node_map),
                               tri3_node_map, // inverse node map same as forward node map
                               ARRAY_LENGTH(tri3_node_map),
@@ -1984,7 +2003,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
                               ARRAY_LENGTH(tri_inverse_edge_map),
                               TRI3,
                               "TRI3");
-        return conv;
+          }
       }
 
     case TRI3SUBDIVISION:
