@@ -94,9 +94,9 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    std::set<boundary_id_type> bc_ids;
+    std::vector<boundary_id_type> bc_ids;
     rb_con->get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::set<boundary_id_type>::const_iterator b =
+    for (std::vector<boundary_id_type>::const_iterator b =
            bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 1 || *b == 2 || *b == 3 || *b == 4 )
         {
@@ -135,9 +135,9 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    std::set<boundary_id_type> bc_ids;
+    std::vector<boundary_id_type> bc_ids;
     rb_con->get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::set<boundary_id_type>::const_iterator b =
+    for (std::vector<boundary_id_type>::const_iterator b =
            bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 1 || *b == 3 ) // y == -0.2, y == 0.2
         {
@@ -182,9 +182,9 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    std::set<boundary_id_type> bc_ids;
+    std::vector<boundary_id_type> bc_ids;
     rb_con->get_mesh().get_boundary_info().boundary_ids (&c.get_elem(), c.side, bc_ids);
-    for (std::set<boundary_id_type>::const_iterator b =
+    for (std::vector<boundary_id_type>::const_iterator b =
            bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 2 || *b == 4) // x == 0.2, x == -0.2
         {
