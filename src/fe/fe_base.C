@@ -56,7 +56,7 @@ const Elem* primary_boundary_point_neighbor
   const Elem *primary = elem;
 
   // Container to catch boundary IDs passed back by BoundaryInfo.
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
 
   std::set<const Elem*> point_neighbors;
   elem->find_point_neighbors(p, point_neighbors);
@@ -87,7 +87,7 @@ const Elem* primary_boundary_point_neighbor
           bool on_relevant_boundary = false;
           for (std::set<boundary_id_type>::const_iterator i =
                  boundary_ids.begin(); i != boundary_ids.end(); ++i)
-            if (bc_ids.count(*i))
+            if (std::find(bc_ids.begin(), bc_ids.end(), *i) != bc_ids.end())
               on_relevant_boundary = true;
 
           if (!on_relevant_boundary)
@@ -123,7 +123,7 @@ const Elem* primary_boundary_edge_neighbor
   elem->find_edge_neighbors(p1, p2, edge_neighbors);
 
   // Container to catch boundary IDs handed back by BoundaryInfo
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
 
   for (std::set<const Elem*>::const_iterator edge_neighbors_iter =
          edge_neighbors.begin();
@@ -152,7 +152,7 @@ const Elem* primary_boundary_edge_neighbor
           bool on_relevant_boundary = false;
           for (std::set<boundary_id_type>::const_iterator i =
                  boundary_ids.begin(); i != boundary_ids.end(); ++i)
-            if (bc_ids.count(*i))
+            if (std::find(bc_ids.begin(), bc_ids.end(), *i) != bc_ids.end())
               on_relevant_boundary = true;
 
           if (!on_relevant_boundary)
@@ -1725,7 +1725,7 @@ compute_periodic_constraints (DofConstraints &constraints,
   std::vector<DenseVector<Real> > Ue;
 
   // Container to catch the boundary ids that BoundaryInfo hands us.
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -1736,7 +1736,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
       mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
 
-      for (std::set<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
@@ -1928,7 +1928,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                   std::set<dof_id_type> my_constrained_dofs;
 
                   // Container to catch boundary IDs handed back by BoundaryInfo.
-                  std::set<boundary_id_type> new_bc_ids;
+                  std::vector<boundary_id_type> new_bc_ids;
 
                   for (unsigned int n = 0; n != elem->n_nodes(); ++n)
                     {
@@ -1952,7 +1952,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                               mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
 
-                              for (std::set<boundary_id_type>::const_iterator
+                              for (std::vector<boundary_id_type>::const_iterator
                                      new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
@@ -2097,7 +2097,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               // We're reusing the new_bc_ids vector created outside the loop over nodes.
                               mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
 
-                              for (std::set<boundary_id_type>::const_iterator
+                              for (std::vector<boundary_id_type>::const_iterator
                                      new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;

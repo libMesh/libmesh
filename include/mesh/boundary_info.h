@@ -166,18 +166,9 @@ public:
   /**
    * Add \p Node \p node with boundary ids \p ids to the boundary
    * information data structure.
-   *
-   * This function is now deprecated, call the version which takes a
-   * reference to a std::set instead.
    */
   void add_node (const Node* node,
                  const std::vector<boundary_id_type>& ids);
-
-  /**
-   * Non-deprecated version of the add_node() function taking a set of ids.
-   */
-  void add_node (const Node* node,
-                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh
@@ -206,20 +197,10 @@ public:
    * Add edge \p edge of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
    * Edge-based boundary IDs should only be used in 3D.
-   *
-   * This function is now deprecated, call the version which takes a
-   * reference to a std::set instead.
    */
   void add_edge (const Elem* elem,
                  const unsigned short int edge,
                  const std::vector<boundary_id_type>& ids);
-
-  /**
-   * Non-deprecated version of the add_side() function taking a set of ids.
-   */
-  void add_edge (const Elem* elem,
-                 const unsigned short int edge,
-                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Add side \p side of element number \p elem with boundary id \p id
@@ -240,20 +221,10 @@ public:
   /**
    * Add side \p side of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
-   *
-   * This function is now deprecated, call the version which takes a
-   * reference to a std::set instead.
    */
   void add_side (const Elem* elem,
                  const unsigned short int side,
                  const std::vector<boundary_id_type>& ids);
-
-  /**
-   * Non-deprecated version of the add_side() function taking a set of ids.
-   */
-  void add_side (const Elem* elem,
-                 const unsigned short int side,
-                 const std::set<boundary_id_type>& ids_set);
 
   /**
    * Removes the boundary conditions associated with node \p node,
@@ -312,18 +283,18 @@ public:
    * Returns the boundary ids associated with \p Node \p node.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
 
   /**
-   * Fills a user-provided std::set with the boundary ids associated
+   * Fills a user-provided std::vector with the boundary ids associated
    * with \p Node \p node.
    *
    * This is the non-deprecated version of the function.
    */
   void boundary_ids (const Node* node,
-                     std::set<boundary_id_type> & set_to_fill) const;
+                     std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the number of boundary ids associated with \p Node \p node.
@@ -344,7 +315,7 @@ public:
    * Edge-based boundary IDs should only be used in 3D.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
                                                    const unsigned short int edge) const;
@@ -358,7 +329,7 @@ public:
    */
   void edge_boundary_ids (const Elem* const elem,
                           const unsigned short int edge,
-                          std::set<boundary_id_type> & set_to_fill) const;
+                          std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p edge
@@ -368,7 +339,7 @@ public:
    * Edge-based boundary IDs should only be used in 3D.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem* const elem,
                                                        const unsigned short int edge) const;
@@ -384,7 +355,7 @@ public:
    */
   void raw_edge_boundary_ids (const Elem* const elem,
                               const unsigned short int edge,
-                              std::set<boundary_id_type> & set_to_fill) const;
+                              std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns true iff the given side of the given element is
@@ -416,7 +387,7 @@ public:
    * element \p elem.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> boundary_ids (const Elem* const elem,
                                               const unsigned short int side) const;
@@ -429,7 +400,7 @@ public:
    */
   void boundary_ids (const Elem* const elem,
                      const unsigned short int side,
-                     std::set<boundary_id_type> & set_to_fill) const;
+                     std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the list of raw boundary ids associated with the \p side
@@ -438,7 +409,7 @@ public:
    * its ancestors' boundary id.
    *
    * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::set.
+   * this function that fills a std::vector.
    */
   std::vector<boundary_id_type> raw_boundary_ids (const Elem* const elem,
                                                   const unsigned short int side) const;
@@ -453,7 +424,7 @@ public:
    */
   void raw_boundary_ids (const Elem* const elem,
                          const unsigned short int side,
-                         std::set<boundary_id_type> & set_to_fill) const;
+                         std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns a side of element \p elem whose associated boundary id is

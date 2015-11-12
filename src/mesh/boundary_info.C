@@ -192,11 +192,9 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
         boundary_mesh.add_point(*node, node_id_map[node_id], node->processor_id());
 
         // Copy over all the node's boundary IDs to boundary_mesh
-        std::vector<boundary_id_type> node_boundary_ids =
-          this->boundary_ids(node);
-        for(unsigned int index=0;
-            index<node_boundary_ids.size();
-            index++)
+        std::vector<boundary_id_type> node_boundary_ids;
+        this->boundary_ids(node, node_boundary_ids);
+        for (unsigned int index=0; index<node_boundary_ids.size(); index++)
           {
             boundary_mesh.boundary_info->add_node(
               node_id_map[node_id], node_boundary_ids[index]);
@@ -564,16 +562,7 @@ void BoundaryInfo::add_node(const Node* node,
 void BoundaryInfo::add_node(const Node* node,
                             const std::vector<boundary_id_type>& ids)
 {
-  libmesh_deprecated();
-  this->add_node(node, std::set<boundary_id_type>(ids.begin(), ids.end()));
-}
-
-
-
-void BoundaryInfo::add_node(const Node* node,
-                            const std::set<boundary_id_type>& ids_set)
-{
-  if (ids_set.empty())
+  if (ids.empty())
     return;
 
   libmesh_assert(node);
@@ -581,8 +570,18 @@ void BoundaryInfo::add_node(const Node* node,
   // Don't add the same ID twice
   std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
 
-  std::set<boundary_id_type>::iterator it = ids_set.begin();
-  for (; it != ids_set.end(); ++it)
+  // The entries in the ids vector may be non-unique.  If we expected
+  // *lots* of ids, it might be fastest to construct a std::set from
+  // the entries, but for a small number of entries, which is more
+  // typical, it is probably faster to copy the vector and do sort+unique.
+  // http://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+  std::vector<boundary_id_type> unique_ids(ids.begin(), ids.end());
+  std::sort(unique_ids.begin(), unique_ids.end());
+  std::vector<boundary_id_type>::iterator new_end =
+    std::unique(unique_ids.begin(), unique_ids.end());
+
+  std::vector<boundary_id_type>::iterator it = unique_ids.begin();
+  for (; it != new_end; ++it)
     {
       boundary_id_type id = *it;
 
@@ -656,17 +655,7 @@ void BoundaryInfo::add_edge(const Elem* elem,
                             const unsigned short int edge,
                             const std::vector<boundary_id_type>& ids)
 {
-  libmesh_deprecated();
-  this->add_edge(elem, edge, std::set<boundary_id_type>(ids.begin(), ids.end()));
-}
-
-
-
-void BoundaryInfo::add_edge(const Elem* elem,
-                            const unsigned short int edge,
-                            const std::set<boundary_id_type>& ids_set)
-{
-  if (ids_set.empty())
+  if (ids.empty())
     return;
 
   libmesh_assert(elem);
@@ -677,8 +666,18 @@ void BoundaryInfo::add_edge(const Elem* elem,
   // Don't add the same ID twice
   std::pair<boundary_edge_iter, boundary_edge_iter> pos = _boundary_edge_id.equal_range(elem);
 
-  std::set<boundary_id_type>::iterator it = ids_set.begin();
-  for (; it != ids_set.end(); ++it)
+  // The entries in the ids vector may be non-unique.  If we expected
+  // *lots* of ids, it might be fastest to construct a std::set from
+  // the entries, but for a small number of entries, which is more
+  // typical, it is probably faster to copy the vector and do sort+unique.
+  // http://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+  std::vector<boundary_id_type> unique_ids(ids.begin(), ids.end());
+  std::sort(unique_ids.begin(), unique_ids.end());
+  std::vector<boundary_id_type>::iterator new_end =
+    std::unique(unique_ids.begin(), unique_ids.end());
+
+  std::vector<boundary_id_type>::iterator it = unique_ids.begin();
+  for (; it != new_end; ++it)
     {
       boundary_id_type id = *it;
 
@@ -748,17 +747,7 @@ void BoundaryInfo::add_side(const Elem* elem,
                             const unsigned short int side,
                             const std::vector<boundary_id_type>& ids)
 {
-  libmesh_deprecated();
-  this->add_side(elem, side, std::set<boundary_id_type>(ids.begin(), ids.end()));
-}
-
-
-
-void BoundaryInfo::add_side(const Elem* elem,
-                            const unsigned short int side,
-                            const std::set<boundary_id_type>& ids_set)
-{
-  if (ids_set.empty())
+  if (ids.empty())
     return;
 
   libmesh_assert(elem);
@@ -769,8 +758,18 @@ void BoundaryInfo::add_side(const Elem* elem,
   // Don't add the same ID twice
   std::pair<boundary_side_iter, boundary_side_iter> pos = _boundary_side_id.equal_range(elem);
 
-  std::set<boundary_id_type>::iterator it = ids_set.begin();
-  for (; it != ids_set.end(); ++it)
+  // The entries in the ids vector may be non-unique.  If we expected
+  // *lots* of ids, it might be fastest to construct a std::set from
+  // the entries, but for a small number of entries, which is more
+  // typical, it is probably faster to copy the vector and do sort+unique.
+  // http://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+  std::vector<boundary_id_type> unique_ids(ids.begin(), ids.end());
+  std::sort(unique_ids.begin(), unique_ids.end());
+  std::vector<boundary_id_type>::iterator new_end =
+    std::unique(unique_ids.begin(), unique_ids.end());
+
+  std::vector<boundary_id_type>::const_iterator it = unique_ids.begin();
+  for (; it != new_end; ++it)
     {
       boundary_id_type id = *it;
 
@@ -815,24 +814,24 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node* node) const
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(node, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(node, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::boundary_ids (const Node* node,
-                                 std::set<boundary_id_type> & set_to_fill) const
+                                 std::vector<boundary_id_type> & vec_to_fill) const
 {
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   std::pair<boundary_node_iter, boundary_node_iter>
     pos = _boundary_node_id.equal_range(node);
 
   for (; pos.first != pos.second; ++pos.first)
-    set_to_fill.insert(pos.first->second);
+    vec_to_fill.push_back(pos.first->second);
 }
 
 
@@ -851,21 +850,21 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->edge_boundary_ids(elem, edge, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->edge_boundary_ids(elem, edge, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
                                       const unsigned short int edge,
-                                      std::set<boundary_id_type> & set_to_fill) const
+                                      std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -913,7 +912,7 @@ void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
   // Check each element in the range to see if its edge matches the requested edge.
   for (; e.first != e.second; ++e.first)
     if (e.first->second.first == edge)
-      set_to_fill.insert(e.first->second.second);
+      vec_to_fill.push_back(e.first->second.second);
 }
 
 
@@ -921,9 +920,9 @@ void BoundaryInfo::edge_boundary_ids (const Elem* const elem,
 unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
                                                 const unsigned short int edge) const
 {
-  std::set<boundary_id_type> ids_set;
-  this->edge_boundary_ids(elem, edge, ids_set);
-  return ids_set.size();
+  std::vector<boundary_id_type> ids;
+  this->edge_boundary_ids(elem, edge, ids);
+  return ids.size();
 }
 
 
@@ -933,21 +932,21 @@ std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem* c
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->raw_edge_boundary_ids(elem, edge, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->raw_edge_boundary_ids(elem, edge, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
                                           const unsigned short int edge,
-                                          std::set<boundary_id_type> & set_to_fill) const
+                                          std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   // Only level-0 elements store BCs.
   if (elem->parent())
@@ -959,7 +958,7 @@ void BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
   // Check each element in the range to see if its edge matches the requested edge.
   for (; e.first != e.second; ++e.first)
     if (e.first->second.first == edge)
-      set_to_fill.insert(e.first->second.second);
+      vec_to_fill.push_back(e.first->second.second);
 }
 
 
@@ -973,16 +972,16 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
   // instead.
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
 
   // If the set is empty, return invalid_id
-  if (ids_set.empty())
+  if (ids.empty())
     return invalid_id;
 
   // Otherwise, just return the first id we came across for this
   // element on this side.
-  return *(ids_set.begin());
+  return *(ids.begin());
 }
 
 
@@ -991,9 +990,9 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
                                    const unsigned short int side,
                                    const boundary_id_type id) const
 {
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
-  return (ids_set.find(id) != ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
+  return (std::find(ids.begin(), ids.end(), id) != ids.end());
 }
 
 
@@ -1003,21 +1002,21 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::boundary_ids (const Elem* const elem,
                                  const unsigned short int side,
-                                 std::set<boundary_id_type> & set_to_fill) const
+                                 std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -1044,7 +1043,7 @@ void BoundaryInfo::boundary_ids (const Elem* const elem,
   // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
     if (e.first->second.first == side)
-      set_to_fill.insert(e.first->second.second);
+      vec_to_fill.push_back(e.first->second.second);
 }
 
 
@@ -1053,9 +1052,9 @@ void BoundaryInfo::boundary_ids (const Elem* const elem,
 unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
                                            const unsigned short int side) const
 {
-  std::set<boundary_id_type> ids_set;
-  this->boundary_ids(elem, side, ids_set);
-  return ids_set.size();
+  std::vector<boundary_id_type> ids;
+  this->boundary_ids(elem, side, ids);
+  return ids.size();
 }
 
 
@@ -1065,21 +1064,21 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const 
 {
   libmesh_deprecated();
 
-  std::set<boundary_id_type> ids_set;
-  this->raw_boundary_ids(elem, side, ids_set);
-  return std::vector<boundary_id_type>(ids_set.begin(), ids_set.end());
+  std::vector<boundary_id_type> ids;
+  this->raw_boundary_ids(elem, side, ids);
+  return ids;
 }
 
 
 
 void BoundaryInfo::raw_boundary_ids (const Elem* const elem,
                                      const unsigned short int side,
-                                     std::set<boundary_id_type> & set_to_fill) const
+                                     std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
   // Clear out any previous contents
-  set_to_fill.clear();
+  vec_to_fill.clear();
 
   // Only level-0 elements store BCs.
   if (elem->parent())
@@ -1091,7 +1090,7 @@ void BoundaryInfo::raw_boundary_ids (const Elem* const elem,
   // Check each element in the range to see if its side matches the requested side.
   for (; e.first != e.second; ++e.first)
     if (e.first->second.first == side)
-      set_to_fill.insert(e.first->second.second);
+      vec_to_fill.push_back(e.first->second.second);
 }
 
 

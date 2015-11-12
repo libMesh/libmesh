@@ -699,7 +699,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   libmesh_assert_not_equal_to (this->n_elem(), 0);
 
   // Container to catch boundary IDs handed back by BoundaryInfo
-  std::set<boundary_id_type> bc_ids;
+  std::vector<boundary_id_type> bc_ids;
 
   for (; it != it_end; ++it)
     {

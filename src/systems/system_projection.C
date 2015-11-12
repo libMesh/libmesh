@@ -2067,7 +2067,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
       std::vector<unsigned int> side_dofs;
 
       // Container to catch IDs passed back from BoundaryInfo.
-      std::set<boundary_id_type> bc_ids;
+      std::vector<boundary_id_type> bc_ids;
 
       // Iterate over all the elements in the range
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
@@ -2089,7 +2089,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
               // First see if this side has been requested
               boundary_info.boundary_ids (elem, s, bc_ids);
               bool do_this_side = false;
-              for (std::set<boundary_id_type>::iterator i=bc_ids.begin();
+              for (std::vector<boundary_id_type>::iterator i=bc_ids.begin();
                    i!=bc_ids.end(); ++i)
                 if (b.count(*i))
                   {

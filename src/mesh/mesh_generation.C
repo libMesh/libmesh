@@ -1984,7 +1984,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   mesh.reserve_nodes((order*nz+1)*orig_nodes);
 
   // Container to catch the boundary IDs handed back by the BoundaryInfo object
-  std::set<boundary_id_type> ids_to_copy;
+  std::vector<boundary_id_type> ids_to_copy;
 
   MeshBase::const_node_iterator       nd  = cross_section.nodes_begin();
   const MeshBase::const_node_iterator nend = cross_section.nodes_end();

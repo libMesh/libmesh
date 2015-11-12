@@ -89,7 +89,7 @@ public:
   /**
    * As above, but fills in the std::set provided by the user.
    */
-  void side_boundary_ids(std::set<boundary_id_type> & set_to_fill) const;
+  void side_boundary_ids(std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature

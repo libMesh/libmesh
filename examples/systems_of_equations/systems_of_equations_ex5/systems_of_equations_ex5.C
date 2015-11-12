@@ -330,7 +330,7 @@ void assemble_elasticity(EquationSystems& es,
         }
 
       {
-        std::set<boundary_id_type> bc_ids;
+        std::vector<boundary_id_type> bc_ids;
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (elem->neighbor(side) == NULL)
             {
@@ -341,7 +341,7 @@ void assemble_elasticity(EquationSystems& es,
 
               fe_face->reinit(elem, side);
 
-              for (std::set<boundary_id_type>::const_iterator b =
+              for (std::vector<boundary_id_type>::const_iterator b =
                      bc_ids.begin(); b != bc_ids.end(); ++b)
                 {
                   const boundary_id_type bc_id = *b;
