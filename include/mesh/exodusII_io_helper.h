@@ -678,6 +678,11 @@ public:
    */
   std::string exodus_elem_type() const { return exodus_type; }
 
+  /**
+   * An invalid_id that can be returned to signal failure in case
+   * something goes wrong.
+   */
+  static const int invalid_id;
 
 private:
   /**

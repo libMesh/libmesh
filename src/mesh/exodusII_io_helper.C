@@ -226,6 +226,10 @@ const int ExodusII_IO_Helper::ElementMaps::prism_inverse_face_map[5]   = {4, 1, 
 const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,-1,-1,-1}; // Not Implemented!
 
 
+
+// ExodusII_IO_Helper::Conversion static data
+const int ExodusII_IO_Helper::Conversion::invalid_id = std::numeric_limits<int>::max();
+
 // ------------------------------------------------------------
 // ExodusII_IO_Helper class members
 
@@ -2135,7 +2139,11 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
 {
-  libmesh_assert_less (static_cast<size_t>(i), side_map_size);
+  // If we asked for a side that doesn't exist, return an invalid_id
+  // and allow higher-level code to handle it.
+  if (static_cast<size_t>(i) >= side_map_size)
+    return invalid_id;
+
   return side_map[i];
 }
 

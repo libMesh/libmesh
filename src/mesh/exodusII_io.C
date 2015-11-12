@@ -33,6 +33,7 @@
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/exodusII_io_helper.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -306,11 +307,20 @@ void ExodusII_IO::read (const std::string& fname)
 
         const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem->type());
 
+        // Map the zero-based Exodus side numbering to the libmesh side numbering
+        int mapped_side = conv.get_side_map(exio_helper->side_list[e]-1);
+
+        // Check for errors
+        if (mapped_side == ExodusII_IO_Helper::Conversion::invalid_id)
+          libmesh_error_msg("Invalid 1-based side id: "                 \
+                            << exio_helper->side_list[e]                \
+                            << " detected for "                         \
+                            << Utility::enum_to_string(elem->type()));
+
         // Add this (elem,side,id) triplet to the BoundaryInfo object.
-        mesh.get_boundary_info().add_side
-          (libmesh_elem_id,
-           cast_int<unsigned short>(conv.get_side_map(exio_helper->side_list[e]-1)),
-           cast_int<boundary_id_type>(exio_helper->id_list[e]));
+        mesh.get_boundary_info().add_side (libmesh_elem_id,
+                                           cast_int<unsigned short>(mapped_side),
+                                           cast_int<boundary_id_type>(exio_helper->id_list[e]));
       }
   }
 
