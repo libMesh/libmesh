@@ -2133,6 +2133,14 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 
 
+int ExodusII_IO_Helper::Conversion::get_side_map(int i) const
+{
+  libmesh_assert_less (static_cast<size_t>(i), side_map_size);
+  return side_map[i];
+}
+
+
+
 ExodusII_IO_Helper::NamesData::NamesData(size_t n_strings, size_t string_length) :
   data_table(n_strings),
   data_table_pointers(n_strings),
