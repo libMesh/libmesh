@@ -133,6 +133,9 @@ void ExodusII_IO::read (const std::string& fname)
   // Get header information from exodus file
   exio_helper->read_header();
 
+  // Read the QA records
+  exio_helper->read_qa_records();
+
   // Print header information
   exio_helper->print_header();
 

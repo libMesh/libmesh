@@ -362,6 +362,52 @@ void ExodusII_IO_Helper::read_header()
 
 
 
+void ExodusII_IO_Helper::read_qa_records()
+{
+  // The QA records are four MAX_STR_LENGTH-byte character strings.
+  int num_qa_rec =
+    this->inquire(exII::EX_INQ_QA, "Error retrieving number of QA records");
+
+  if (verbose)
+    libMesh::out << "Found "
+                 << num_qa_rec
+                 << " QA record(s) in the Exodus file."
+                 << std::endl;
+
+  if (num_qa_rec > 0)
+    {
+      // How to dynamically allocate an array of fixed-size char* arrays in C++.
+      // http://stackoverflow.com/questions/8529359/creating-a-dynamic-sized-array-of-fixed-sized-int-arrays-in-c
+      typedef char * inner_array_t[4];
+      inner_array_t * qa_record = new inner_array_t[num_qa_rec];
+
+      for (int i=0; i<num_qa_rec; i++)
+        for (int j=0; j<4; j++)
+          qa_record[i][j] = new char[MAX_STR_LENGTH+1];
+
+      ex_err = exII::ex_get_qa (ex_id, qa_record);
+      EX_CHECK_ERR(ex_err, "Error reading the QA records.");
+
+      // Print the QA records
+      for (int i=0; i<num_qa_rec; i++)
+        {
+          libMesh::out << "QA Record: " << i << std::endl;
+          for (int j=0; j<4; j++)
+            libMesh::out << qa_record[i][j] << std::endl;
+        }
+
+      // Clean up dynamically-allocated memory
+      for (int i=0; i<num_qa_rec; i++)
+        for (int j=0; j<4; j++)
+          delete [] qa_record[i][j];
+
+      delete [] qa_record;
+    }
+}
+
+
+
+
 void ExodusII_IO_Helper::print_header()
 {
   if (verbose)

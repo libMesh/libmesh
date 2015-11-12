@@ -107,6 +107,13 @@ public:
   void read_header();
 
   /**
+   * Reads the QA records from an ExodusII file.  We can use this to
+   * detect when e.g. CUBIT 14 was used to generate a Mesh file, and
+   * work around certain known bugs in that version.
+   */
+  void read_qa_records();
+
+  /**
    * Prints the \p ExodusII mesh file header, which includes the mesh
    * title, the number of nodes, number of elements, mesh dimension,
    * number of sidesets, and number of nodesets.
