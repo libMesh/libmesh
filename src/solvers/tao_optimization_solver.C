@@ -500,8 +500,11 @@ void TaoOptimizationSolver<T>::solve ()
   // ||g(X)|| / ||g(X0)||                <= gttol
   // Command line equivalents: -tao_fatol, -tao_frtol, -tao_gatol, -tao_grtol, -tao_gttol
   ierr = TaoSetTolerances(_tao,
+#if PETSC_RELEASE_LESS_THAN(3,6,3)
+                          // Releases up to 3.6.2 had fatol and frtol, after that they were removed.
                           /*fatol=*/PETSC_DEFAULT,
                           /*frtol=*/this->objective_function_relative_tolerance,
+#endif
                           /*gatol=*/PETSC_DEFAULT,
                           /*grtol=*/PETSC_DEFAULT,
                           /*gttol=*/PETSC_DEFAULT);
