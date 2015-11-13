@@ -867,24 +867,21 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *,
     {
       T * obj = objects[i]; // Returns NULL if there's no map entry
 
-      dof_id_type dofid = obj && obj->valid_id() ?
-        obj->id() : DofObject::invalid_id;
       // Local lookups by id should return the requested object
       libmesh_assert(!obj || obj->id() == i);
 
-      dof_id_type min_dofid = dofid;
-      this->comm().min(min_dofid);
       // All processors with an object should agree on id
-      libmesh_assert (!obj || dofid == min_dofid);
+      const dof_id_type dofid = obj && obj->valid_id() ?
+        obj->id() : DofObject::invalid_id;
+      libmesh_assert(this->comm().semiverify(obj ? &dofid : NULL));
 
-      dof_id_type procid = obj && obj->valid_processor_id() ?
+      // All processors with an object should agree on processor id
+      const dof_id_type procid = obj && obj->valid_processor_id() ?
         obj->processor_id() : DofObject::invalid_processor_id;
+      libmesh_assert(this->comm().semiverify(obj ? &procid : NULL));
 
       dof_id_type min_procid = procid;
       this->comm().min(min_procid);
-
-      // All processors with an object should agree on processor id
-      libmesh_assert (!obj || procid == min_procid);
 
       // Either:
       // 1.) I own this elem (min_procid == this->processor_id()) *and* I have a valid pointer to it (obj != NULL)
@@ -900,6 +897,12 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *,
                       ||
                       (min_procid != this->processor_id())
                       );
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      // All processors with an object should agree on unique id
+      const unique_id_type uniqueid = obj ? obj->unique_id() : 0;
+      libmesh_assert(this->comm().semiverify(obj ? &uniqueid : NULL));
+#endif
     }
 }
 
