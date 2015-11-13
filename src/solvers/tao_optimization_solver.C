@@ -415,7 +415,7 @@ template <typename T>
 TaoOptimizationSolver<T>::TaoOptimizationSolver (OptimizationSystem& system_in)
   :
   OptimizationSolver<T>(system_in),
-  _reason(TAO_CONVERGED_FATOL/*==0*/) // Arbitrary initial value...
+  _reason(TAO_CONVERGED_USER) // Arbitrary initial value...
 {
 }
 
