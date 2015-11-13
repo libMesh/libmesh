@@ -384,6 +384,10 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           }
     }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  unique_id_type old_max_unique_id = boundary_mesh.parallel_max_unique_id();
+#endif
+
   for (side_container::const_iterator it = sides_to_add.begin();
        it != sides_to_add.end(); ++it)
     {
@@ -402,7 +406,13 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
       libmesh_assert(side_id_map.count(side_pair));
 
-      side->set_id(side_id_map[side_pair]);
+      const dof_id_type new_side_id = side_id_map[side_pair];
+
+      side->set_id(new_side_id);
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      side->set_unique_id() = old_max_unique_id + new_side_id;
+#endif
 
       // Add the side
       Elem * new_elem = boundary_mesh.add_elem(side.release());
