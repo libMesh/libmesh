@@ -63,7 +63,6 @@ RBConstruction::RBConstruction (EquationSystems& es,
     inner_product_solver(LinearSolver<Number>::build(es.comm())),
     extra_linear_solver(NULL),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
-    non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
     impose_internal_fluxes(false),
@@ -532,10 +531,6 @@ void RBConstruction::allocate_data_structures()
     // We also need to initialize a second set of non-Dirichlet operators
     if(store_non_dirichlet_operators)
       {
-        dof_map.attach_matrix(*non_dirichlet_inner_product_matrix);
-        non_dirichlet_inner_product_matrix->init();
-        non_dirichlet_inner_product_matrix->zero();
-
         non_dirichlet_Aq_vector.resize(get_rb_theta_expansion().get_n_A_terms());
         for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
           {
@@ -899,12 +894,6 @@ void RBConstruction::assemble_misc_matrices()
 {
   libMesh::out << "Assembling inner product matrix" << std::endl;
   assemble_inner_product_matrix(inner_product_matrix.get());
-
-  if(store_non_dirichlet_operators)
-    {
-      libMesh::out << "Assembling non-Dirichlet inner product matrix" << std::endl;
-      assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), /* apply_dof_constraints = */ false);
-    }
 }
 
 void RBConstruction::assemble_all_affine_operators()
@@ -1792,14 +1781,6 @@ SparseMatrix<Number>* RBConstruction::get_inner_product_matrix()
   return inner_product_matrix.get();
 }
 
-SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
-{
-  if(!store_non_dirichlet_operators)
-    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_inner_product_matrix.");
-
-  return non_dirichlet_inner_product_matrix.get();
-}
-
 SparseMatrix<Number>* RBConstruction::get_Aq(unsigned int q)
 {
   if(q >= get_rb_theta_expansion().get_n_A_terms())
@@ -1861,12 +1842,6 @@ void RBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number>
   all_matrices.clear();
 
   all_matrices["inner_product"] = get_inner_product_matrix();
-
-  if (store_non_dirichlet_operators)
-    {
-      all_matrices["inner_product_non_dirichlet"] =
-        get_non_dirichlet_inner_product_matrix();
-    }
 
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     {

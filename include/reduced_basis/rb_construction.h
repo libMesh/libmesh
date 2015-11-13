@@ -220,16 +220,6 @@ public:
   SparseMatrix<Number>* get_inner_product_matrix();
 
   /**
-   * Get a pointer to non_dirichlet_inner_product_matrix.
-   * Accessing via this function, rather than directly through
-   * the class member allows us to do error checking (e.g.
-   * non_dirichlet_inner_product_matrix is not
-   * defined in low-memory mode, and we need
-   * store_non_dirichlet_operators==true).
-   */
-  SparseMatrix<Number>* get_non_dirichlet_inner_product_matrix();
-
-  /**
    * Get a pointer to Aq.
    */
   SparseMatrix<Number>* get_Aq(unsigned int q);
@@ -445,12 +435,6 @@ public:
    * The inner product matrix.
    */
   UniquePtr< SparseMatrix<Number> > inner_product_matrix;
-
-  /**
-   * The inner product matrix without Dirichlet conditions enforced.
-   * (This is only computed if store_non_dirichlet_operators == true.)
-   */
-  UniquePtr< SparseMatrix<Number> > non_dirichlet_inner_product_matrix;
 
   /**
    * Vector storing the truth output values from the most
