@@ -1610,7 +1610,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
               if (elem->neighbor(n))
                 my_neighbor = elem->neighbor(n)->id();
             }
-          mesh.comm().semiverify(p_my_neighbor);
+          libmesh_assert(mesh.comm().semiverify(p_my_neighbor));
         }
     }
 }
