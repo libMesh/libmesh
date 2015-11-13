@@ -30,6 +30,7 @@
 #include <iomanip>
 
 // Basic include files
+#include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/exact_solution.h"
@@ -131,6 +132,21 @@ int main (int argc, char** argv)
     bcids.insert(bcid);
     mesh.get_boundary_info().add_elements(bcids, mesh);
     mesh.prepare_for_use();
+  }
+
+  // To work around ExodusII file format limitations, we need elements
+  // of different dimensionality to belong to different subdomains.
+  // Our interior elements defaulted to subdomain id 0, so we'll set
+  // boundary elements to subdomain 1.
+  {
+    const MeshBase::element_iterator end_el = mesh.elements_end();
+    for (MeshBase::element_iterator el = mesh.elements_begin();
+         el != end_el; ++el)
+      {
+        Elem * elem = *el;
+        if (elem->dim() < dim)
+          elem->subdomain_id() = 1;
+      }
   }
 
   mesh_refinement.uniformly_refine(coarserefinements);
@@ -274,9 +290,8 @@ int main (int argc, char** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
   // We want to write the file in the ExodusII format, but we don't
   // yet support mixed-dimension meshes there?
-/*  ExodusII_IO(mesh).write_equation_systems
+  ExodusII_IO(mesh).write_equation_systems
     ("out.e", equation_systems);
-*/
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
 #ifdef LIBMESH_HAVE_GMV
