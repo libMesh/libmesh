@@ -28,6 +28,7 @@
 // http://stackoverflow.com/questions/237370/does-stdsize-t-make-sense-in-c
 #include <stddef.h>
 #include <stdint.h> // uint32_t, uint64_t
+#include <vector>
 
 #include "libmesh_common.h" // libmesh_error_msg()
 
@@ -171,6 +172,14 @@ uint32_t hashword(const uint32_t *k, size_t length, uint32_t initval=0)
 }
 
 
+
+// Calls function above with slightly more convenient std::vector interface.
+inline
+uint32_t hashword(const std::vector<uint32_t> & keys, uint32_t initval=0)
+{
+  return hashword(&keys[0], keys.size(), initval);
+}
+
 // This is a hard-coded version of hashword for hashing exactly 2 numbers
 // \author Bob Jenkins
 // \date May 2006
@@ -215,6 +224,15 @@ inline
 uint64_t hashword(const uint64_t *k, size_t length)
 {
   return fnv_64_buf(k, 8*length);
+}
+
+
+
+// Calls function above with slightly more convenient std::vector interface.
+inline
+uint64_t hashword(const std::vector<uint64_t> & keys)
+{
+  return hashword(&keys[0], keys.size());
 }
 
 // In a personal communication from Bob Jenkins, he recommended using

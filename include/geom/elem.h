@@ -206,6 +206,14 @@ public:
   virtual dof_id_type key (const unsigned int s) const = 0;
 
   /**
+   * @returns an id associated with the global node ids of this
+   * element.  The id is not necessariy unique, but should be
+   * close. Uses the same hash as the key(s) function, so for example
+   * if "tri3" is side 0 of "tet4", then tri3->key()==tet4->key(0).
+   */
+  virtual dof_id_type key () const;
+
+  /**
    * @returns true if two elements are identical, false otherwise.
    * This is true if the elements are connected to identical global
    * nodes, regardless of how those nodes might be numbered local

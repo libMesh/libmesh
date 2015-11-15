@@ -463,6 +463,22 @@ Real Elem::length(const unsigned int n1,
 
 
 
+dof_id_type Elem::key () const
+{
+  std::vector<dof_id_type> node_ids(this->n_nodes());
+
+  for (unsigned n=0; n<this->n_nodes(); n++)
+    node_ids[n] = this->node(n);
+
+  // Always sort, so that different local node numberings hash to the
+  // same value.
+  std::sort (node_ids.begin(), node_ids.end());
+
+  return Utility::hashword(node_ids);
+}
+
+
+
 bool Elem::operator == (const Elem& rhs) const
 {
 
