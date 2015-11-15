@@ -503,10 +503,10 @@ void TaoOptimizationSolver<T>::solve ()
 #if PETSC_RELEASE_LESS_THAN(3,6,3)
                           // Releases up to 3.6.2 had fatol and frtol, after that they were removed.
                           /*fatol=*/PETSC_DEFAULT,
-                          /*frtol=*/this->objective_function_relative_tolerance,
+                          /*frtol=*/PETSC_DEFAULT,
 #endif
                           /*gatol=*/PETSC_DEFAULT,
-                          /*grtol=*/PETSC_DEFAULT,
+                          /*grtol=*/this->objective_function_relative_tolerance,
                           /*gttol=*/PETSC_DEFAULT);
   LIBMESH_CHKERR(ierr);
 
