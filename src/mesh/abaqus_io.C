@@ -945,14 +945,23 @@ void AbaqusIO::assign_sideset_ids()
   {
     unsigned char max_dim = this->max_elem_dimension_seen();
 
-    // multimap from "vector-of-lower-dimensional-element-node-ids" to subdomain ID which should be applied.
-    // We use a multimap because the lower-dimensional elements can belong to more than 1 sideset.
-    typedef std::multimap<std::vector<dof_id_type>, unsigned> provide_bcs_t;
+    // multimap from lower-dimensional-element-hash-key to
+    // pair(lower-dimensional-element, boundary_id).  The
+    // lower-dimensional element is used to verify the results of the
+    // hash table search.  The boundary_id will be used to set a
+    // boundary ID on a higher-dimensional element.  We use a multimap
+    // because the lower-dimensional elements can belong to more than
+    // 1 sideset, and multiple lower-dimensional elements can hash to
+    // the same value, but this is very rare.
+    typedef std::multimap<dof_id_type,
+                          std::pair<Elem*, boundary_id_type> > provide_bcs_t;
     provide_bcs_t provide_bcs;
 
-    // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
+    // The elemset_id counter assigns a logical numbering to the
+    // _elemset_ids keys.  We are going to use these ids as boundary
+    // ids, so elemset_id is of type boundary_id_type.
     container_t::iterator it = _elemset_ids.begin();
-    for (unsigned short elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
+    for (boundary_id_type elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
       {
         // Grab a reference to the vector of IDs
         std::vector<dof_id_type>& id_vector = it->second;
@@ -982,18 +991,10 @@ void AbaqusIO::assign_sideset_ids()
             if (elem->dim()+1 != max_dim)
               libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem->dim());
 
-            // To be pushed into the provide_bcs data container
-            std::vector<dof_id_type> elem_node_ids(elem->n_nodes());
-
-            // Save node IDs in a local vector which will be used as a key for the map.
-            for (unsigned n=0; n<elem->n_nodes(); n++)
-              elem_node_ids[n] = elem->node(n);
-
-            // Sort before putting into the map
-            std::sort(elem_node_ids.begin(), elem_node_ids.end());
-
-            // Insert the (key, id) pair into the multimap
-            provide_bcs.insert(std::make_pair(elem_node_ids, elemset_id));
+            // Insert the current (key, pair(elem,id)) into the multimap.
+            provide_bcs.insert(std::make_pair(elem->key(),
+                                              std::make_pair(elem,
+                                                             elemset_id)));
 
             // Associate the name of this sideset with the ID we've
             // chosen.  It's not necessary to do this for every
@@ -1021,25 +1022,28 @@ void AbaqusIO::assign_sideset_ids()
               // this algorithm...
               for (unsigned short sn=0; sn<elem->n_sides(); sn++)
                 {
-                  UniquePtr<Elem> side (elem->build_side(sn));
-
-                  // Build up a node_ids vector, which is the key
-                  std::vector<dof_id_type> node_ids(side->n_nodes());
-                  for (unsigned n=0; n<side->n_nodes(); n++)
-                    node_ids[n] = side->node(n);
-
-                  // Sort the vector before using it as a key
-                  std::sort(node_ids.begin(), node_ids.end());
-
-                  // Look for this key in the provide_bcs multimap
-                  std::pair<provide_bcs_t::const_iterator, provide_bcs_t::const_iterator>
-                    range = provide_bcs.equal_range (node_ids);
+                  std::pair<provide_bcs_t::const_iterator,
+                            provide_bcs_t::const_iterator>
+                    range = provide_bcs.equal_range (elem->key(sn));
 
                   // Add boundary information for each side in the range.
                   for (provide_bcs_t::const_iterator s_it = range.first;
                        s_it != range.second; ++s_it)
-                    the_mesh.get_boundary_info().add_side
-                      (elem, sn, cast_int<unsigned short>(s_it->second));
+                    {
+                      // We'll need to compare the lower dimensional element against the current side.
+                      UniquePtr<Elem> side (elem->build_side(sn));
+
+                      // Get the value mapped by the iterator.
+                      std::pair<Elem*, boundary_id_type> p = s_it->second;
+
+                      // Extract the relevant data from the iterator.
+                      Elem* lower_dim_elem = p.first;
+                      boundary_id_type bid = p.second;
+
+                      // This was a hash, so it might not be perfect.  Let's verify...
+                      if (*lower_dim_elem == *side)
+                        the_mesh.get_boundary_info().add_side(elem, sn, bid);
+                    }
                 }
             }
         }
