@@ -176,6 +176,11 @@ public:
   std::pair<Real, Real> min_and_max_angle() const;
 
   /**
+   * Don't hide Tet::key(side) defined in the base class.
+   */
+  using Tet::key;
+
+  /**
    * @returns an id associated with the global node ids of this
    * element.  The id is not necessariy unique, but should be
    * close.

@@ -136,6 +136,11 @@ public:
 #endif
 
   /**
+   * Don't hide Edge::key(side) defined in the base class.
+   */
+  using Edge::key;
+
+  /**
    * @returns an id associated with the global node ids of this
    * element.  The id is not necessariy unique, but should be
    * close.
