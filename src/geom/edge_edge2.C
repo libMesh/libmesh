@@ -114,4 +114,12 @@ Real Edge2::volume () const
   return (this->point(1) - this->point(0)).size();
 }
 
+
+
+dof_id_type Edge2::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1));
+}
+
 } // namespace libMesh

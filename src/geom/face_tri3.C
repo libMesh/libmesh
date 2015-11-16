@@ -227,4 +227,13 @@ std::pair<Real, Real> Tri3::min_and_max_angle() const
                         std::max(theta0, std::max(theta1,theta2)));
 }
 
+
+
+dof_id_type Tri3::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1),
+                           this->node(2));
+}
+
 } // namespace libMesh

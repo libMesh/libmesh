@@ -196,4 +196,14 @@ Real Edge3::volume () const
                            );
 }
 
+
+
+dof_id_type Edge3::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1),
+                           this->node(2));
+}
+
+
 } // namespace libMesh

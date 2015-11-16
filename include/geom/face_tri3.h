@@ -144,6 +144,13 @@ public:
    */
   std::pair<Real, Real> min_and_max_angle() const;
 
+  /**
+   * @returns an id associated with the global node ids of this
+   * element.  The id is not necessariy unique, but should be
+   * close.
+   */
+  virtual dof_id_type key () const libmesh_override;
+
 protected:
 
   /**
