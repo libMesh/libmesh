@@ -162,4 +162,14 @@ void Edge4::connectivity(const unsigned int sc,
     }
 }
 
+
+
+dof_id_type Edge4::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1),
+                           this->node(2),
+                           this->node(3));
+}
+
 } // namespace libMesh

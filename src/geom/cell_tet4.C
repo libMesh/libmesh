@@ -400,6 +400,13 @@ float Tet4::embedding_matrix (const unsigned int i,
 
 
 
+dof_id_type Tet4::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1),
+                           this->node(2),
+                           this->node(3));
+}
 
 
 

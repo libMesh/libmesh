@@ -29,7 +29,6 @@
 #include "libmesh/gmsh_io.h"
 #include "libmesh/mesh_base.h"
 
-
 namespace libMesh
 {
 
@@ -509,8 +508,11 @@ void GmshIO::read_mesh(std::istream& in)
 
               if (n_dims_seen > 1)
                 {
-                  // map from (node ids) -> elem of lower dimensional elements that can provide boundary conditions
-                  typedef std::map<std::vector<dof_id_type>, Elem*> provide_container_t;
+                  // Store lower-dimensional elements in a map sorted
+                  // by Elem::key().  Bob Jenkins' hash functions are
+                  // very good, but it's not possible for them to be
+                  // perfect... so we use a multimap.
+                  typedef std::multimap<dof_id_type, Elem*> provide_container_t;
                   provide_container_t provide_bcs;
 
                   // 1st loop over active elements - get info about lower-dimensional elements.
@@ -524,50 +526,29 @@ void GmshIO::read_mesh(std::istream& in)
                         if (elem->dim() < max_elem_dimension_seen &&
                             !lower_dimensional_blocks.count(elem->subdomain_id()))
                           {
-                            // Debugging status
-                            // libMesh::out << "Processing Elem " << elem->id() << " as a boundary element." << std::endl;
-
-                            // To be pushed into the provide_bcs data structure
-                            std::vector<dof_id_type> node_ids(elem->n_nodes());
-
-                            // To be consistent with the previous GmshIO behavior, add all the lower-dimensional elements' nodes to
-                            // the Mesh's BoundaryInfo object with the lower-dimensional element's subdomain ID.
+                            // To be consistent with the previous
+                            // GmshIO behavior, add all the
+                            // lower-dimensional elements' nodes to
+                            // the Mesh's BoundaryInfo object with the
+                            // lower-dimensional element's subdomain
+                            // ID.
                             for (unsigned n=0; n<elem->n_nodes(); n++)
-                              {
-                                mesh.get_boundary_info().add_node
-                                  (elem->node(n), elem->subdomain_id());
+                              mesh.get_boundary_info().add_node(elem->node(n),
+                                                                elem->subdomain_id());
 
-                                // And save for our local data structure
-                                node_ids[n] = elem->node(n);
-                              }
-
-                            // Sort before putting into the map
-                            std::sort(node_ids.begin(), node_ids.end());
-                            provide_bcs[node_ids] = elem;
+                            // Store this elem in a quickly-searchable
+                            // container to use it to assign boundary
+                            // conditions later.
+                            provide_bcs.insert(std::make_pair(elem->key(), elem));
                           }
                       }
-                  } // end 1st loop over active elements
-
-                  // Debugging: What did we put in the provide_bcs data structure?
-                  // {
-                  //   provide_container_t::iterator provide_it = provide_bcs.begin();
-                  //   provide_container_t::iterator provide_end = provide_bcs.end();
-                  //   for ( ; provide_it != provide_end; ++provide_it)
-                  //     {
-                  //       std::vector<dof_id_type> node_list = (*provide_it).first;
-                  //       Elem* elem = (*provide_it).second;
-                  //
-                  //       libMesh::out << "Elem " << elem->id() << " provides BCs for the face: ";
-                  //       for (unsigned i=0; i<node_list.size(); ++i)
-                  //         libMesh::out << node_list[i] << " ";
-                  //       libMesh::out << std::endl;
-                  //     }
-                  // }
+                  }
 
                   // 2nd loop over active elements - use lower dimensional element data to set BCs for higher dimensional elements
                   {
                     MeshBase::element_iterator       it  = mesh.active_elements_begin();
                     const MeshBase::element_iterator end = mesh.active_elements_end();
+
                     for ( ; it != end; ++it)
                       {
                         Elem* elem = *it;
@@ -582,39 +563,33 @@ void GmshIO::read_mesh(std::istream& in)
                             // Note that we have not yet called
                             // find_neighbors(), so we can't use
                             // elem->neighbor(sn) in this algorithm...
-
-                            for (unsigned short sn=0;
-                                 sn<elem->n_sides(); sn++)
+                            for (unsigned short sn=0; sn<elem->n_sides(); sn++)
                               {
                                 UniquePtr<Elem> side (elem->build_side(sn));
 
-                                // Build up a node_ids vector, which is the key
-                                std::vector<dof_id_type> node_ids(side->n_nodes());
-                                for (unsigned n=0; n<side->n_nodes(); n++)
-                                  node_ids[n] = side->node(n);
+                                // Look for the current side in the provide_bcs multimap.
+                                std::pair<provide_container_t::iterator,
+                                          provide_container_t::iterator>
+                                  rng = provide_bcs.equal_range(elem->key(sn));
 
-                                // Sort the vector before using it as a key
-                                std::sort(node_ids.begin(), node_ids.end());
-
-                                // Look for this key in the provide_bcs map
-                                provide_container_t::iterator iter = provide_bcs.find(node_ids);
-
-                                if (iter != provide_bcs.end())
+                                for (provide_container_t::iterator iter = rng.first;
+                                     iter != rng.second; ++iter)
                                   {
-                                    Elem* lower_dim_elem = (*iter).second;
+                                    Elem* lower_dim_elem = iter->second;
 
-                                    // libMesh::out << "Elem "
-                                    //              << lower_dim_elem->id()
-                                    //              << " provides BCs for side "
-                                    //              << sn
-                                    //              << " of Elem "
-                                    //              << elem->id()
-                                    //              << std::endl;
+                                    // This was a hash, so it might not be perfect.  Let's verify...
+                                    if (*lower_dim_elem == *side)
+                                      {
+                                        // Add the lower-dimensional
+                                        // element's subdomain_id as a
+                                        // boundary_id for the
+                                        // higher-dimensional element.
+                                        boundary_id_type bid = cast_int<boundary_id_type>(lower_dim_elem->subdomain_id());
+                                        mesh.get_boundary_info().add_side(elem, sn, bid);
 
-                                    // Add boundary information based on the lower-dimensional element's subdomain id.
-                                    mesh.get_boundary_info().add_side(elem,
-                                                                      sn,
-                                                                      cast_int<boundary_id_type>(lower_dim_elem->subdomain_id()));
+                                        // We only allow one match, so break out of for loop.
+                                        break;
+                                      }
                                   }
                               }
                           }

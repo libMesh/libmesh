@@ -428,8 +428,11 @@ void UNVIO::groups_in (std::istream& in_file)
   // Record the max and min element dimension seen while reading the file.
   unsigned char max_dim = this->max_elem_dimension_seen();
 
-  // map from (node ids) to elem of lower dimensional elements that can provide boundary conditions
-  typedef std::map<std::vector<dof_id_type>, Elem*> provide_bcs_t;
+  // multimap from Elem hash key to Elem* that can provide boundary
+  // conditions.  We need to use a multimap and check the result when
+  // searching because the hash function (while good) can't be
+  // guaranteed to be perfect.
+  typedef std::multimap<dof_id_type, Elem*> provide_bcs_t;
   provide_bcs_t provide_bcs;
 
   // Read groups until there aren't any more to read...
@@ -518,36 +521,16 @@ void UNVIO::groups_in (std::istream& in_file)
                     // dimension.  Not sure if "edge" BCs in 3D
                     // actually make sense/are required...
                     if (group_elem->dim()+1 != max_dim)
-                      libmesh_error_msg
-                        ("ERROR: Expected boundary element of dimension " <<
-                         max_dim-1 << " but got " << group_elem->dim());
-
-                    // To be pushed into the provide_bcs data container
-                    std::vector<dof_id_type> group_elem_node_ids(group_elem->n_nodes());
-
-                    // Save node IDs in a local vector which will be used as a key for the map.
-                    for (unsigned n=0; n<group_elem->n_nodes(); n++)
-                      group_elem_node_ids[n] = group_elem->node(n);
+                      libmesh_error_msg("ERROR: Expected boundary element of dimension " \
+                                        << max_dim-1 << " but got " << group_elem->dim());
 
                     // Set the current group number as the lower-dimensional element's subdomain ID.
                     // We will use this later to set a boundary ID.
                     group_elem->subdomain_id() =
                       cast_int<subdomain_id_type>(group_number);
 
-                    // Sort before putting into the map
-                    std::sort(group_elem_node_ids.begin(), group_elem_node_ids.end());
-
-                    // Ensure that this key doesn't already exist when
-                    // inserting it.  We would need to use a multimap if
-                    // the same element appears in multiple group numbers!
-                    // This actually seems like it could be relatively
-                    // common, but I don't have a test for it at the
-                    // moment...
-                    std::pair<provide_bcs_t::iterator, bool> result =
-                      provide_bcs.insert(std::make_pair(group_elem_node_ids, group_elem));
-
-                    if (!result.second)
-                      libmesh_error_msg("Boundary element " << group_elem->id() << " was not inserted, it was already in the map!");
+                    // Put the lower-dimensional element into the multimap.
+                    provide_bcs.insert(std::make_pair(group_elem->key(), group_elem));
                   }
 
                 // dim == max_dim means this group defines a subdomain ID
@@ -559,9 +542,8 @@ void UNVIO::groups_in (std::istream& in_file)
                   }
 
                 else
-                  libmesh_error_msg("ERROR: Found an elem with dim="
-                                    << group_elem->dim() << " > " <<
-                                    "max_dim=" << +max_dim);
+                  libmesh_error_msg("ERROR: Found an elem with dim=" \
+                                    << group_elem->dim() << " > " << "max_dim=" << +max_dim);
               }
             else
               libMesh::err << "WARNING: UNV Element " << entity_tag << " not found while parsing groups." << std::endl;
@@ -597,26 +579,24 @@ void UNVIO::groups_in (std::istream& in_file)
             // this algorithm...
             for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
-                UniquePtr<Elem> side (elem->build_side(sn));
-
-                // Build up a node_ids vector, which is the key
-                std::vector<dof_id_type> node_ids(side->n_nodes());
-                for (unsigned n=0; n<side->n_nodes(); n++)
-                  node_ids[n] = side->node(n);
-
-                // Sort the vector before using it as a key
-                std::sort(node_ids.begin(), node_ids.end());
-
                 // Look for this key in the provide_bcs map
-                provide_bcs_t::iterator iter = provide_bcs.find(node_ids);
+                std::pair<provide_bcs_t::const_iterator,
+                          provide_bcs_t::const_iterator>
+                  range = provide_bcs.equal_range (elem->key(sn));
 
-                if (iter != provide_bcs.end())
+                // Add boundary information for each side in the range.
+                for (provide_bcs_t::const_iterator iter = range.first;
+                     iter != range.second; ++iter)
                   {
+                    // We'll need to compare the lower dimensional element against the current side.
+                    UniquePtr<Elem> side (elem->build_side(sn));
+
+                    // Get a pointer to the lower-dimensional element
                     Elem* lower_dim_elem = iter->second;
 
-                    // Add boundary information based on the lower-dimensional element's subdomain id.
-                    mesh.get_boundary_info().add_side
-                      (elem, sn, lower_dim_elem->subdomain_id());
+                    // This was a hash, so it might not be perfect.  Let's verify...
+                    if (*lower_dim_elem == *side)
+                      mesh.get_boundary_info().add_side(elem, sn, lower_dim_elem->subdomain_id());
                   }
               }
           }
