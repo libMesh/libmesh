@@ -30,6 +30,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
@@ -176,6 +177,16 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // Search the mesh for elements that have a neighboring element
   // of dim+1 and set that element as the interior parent
   this->detect_interior_parents();
+
+  // Fix up node unique ids in case mesh generation code didn't take
+  // exceptional care to do so.
+//  MeshCommunication().make_node_unique_ids_parallel_consistent(*this);
+
+  // We're going to still require that mesh generation code gets
+  // element unique ids consistent.
+#if defined(DEBUG) && defined(LIBMESH_ENABLE_UNIQUE_ID)
+  MeshTools::libmesh_assert_valid_unique_ids(*this);
+#endif
 
   // Partition the mesh.
   this->partition();
