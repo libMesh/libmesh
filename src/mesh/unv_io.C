@@ -16,13 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <iomanip>
-#include <algorithm> // for std::sort
-#include <fstream>
-#include <ctype.h> // isspace
-#include <sstream> // std::istringstream
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
@@ -41,6 +34,14 @@
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
 
+// C++ includes
+#include <iomanip>
+#include <algorithm> // for std::sort
+#include <fstream>
+#include <ctype.h> // isspace
+#include <sstream> // std::istringstream
+#include LIBMESH_INCLUDE_UNORDERED_MULTISET
+
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams
 #endif
@@ -49,8 +50,6 @@
 
 namespace libMesh
 {
-
-
 
 //-----------------------------------------------------------------------------
 // UNVIO class static members
@@ -428,11 +427,11 @@ void UNVIO::groups_in (std::istream& in_file)
   // Record the max and min element dimension seen while reading the file.
   unsigned char max_dim = this->max_elem_dimension_seen();
 
-  // multimap from Elem hash key to Elem* that can provide boundary
-  // conditions.  We need to use a multimap and check the result when
+  // multiset based on elem->key() that can provide boundary
+  // conditions.  We need to use a multiset and check the result when
   // searching because the hash function (while good) can't be
   // guaranteed to be perfect.
-  typedef std::multimap<dof_id_type, Elem*> provide_bcs_t;
+  typedef LIBMESH_BEST_UNORDERED_MULTISET<Elem*, ElemHashUtils, ElemHashUtils> provide_bcs_t;
   provide_bcs_t provide_bcs;
 
   // Read groups until there aren't any more to read...
@@ -529,8 +528,8 @@ void UNVIO::groups_in (std::istream& in_file)
                     group_elem->subdomain_id() =
                       cast_int<subdomain_id_type>(group_number);
 
-                    // Put the lower-dimensional element into the multimap.
-                    provide_bcs.insert(std::make_pair(group_elem->key(), group_elem));
+                    // Store the lower-dimensional element in the provide_bcs container.
+                    provide_bcs.insert(group_elem);
                   }
 
                 // dim == max_dim means this group defines a subdomain ID
@@ -579,20 +578,20 @@ void UNVIO::groups_in (std::istream& in_file)
             // this algorithm...
             for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
+                // We'll need to compare the lower dimensional element against the current side.
+                UniquePtr<Elem> side (elem->build_side(sn));
+
                 // Look for this key in the provide_bcs map
                 std::pair<provide_bcs_t::const_iterator,
                           provide_bcs_t::const_iterator>
-                  range = provide_bcs.equal_range (elem->key(sn));
+                  range = provide_bcs.equal_range (side.get());
 
                 // Add boundary information for each side in the range.
                 for (provide_bcs_t::const_iterator iter = range.first;
                      iter != range.second; ++iter)
                   {
-                    // We'll need to compare the lower dimensional element against the current side.
-                    UniquePtr<Elem> side (elem->build_side(sn));
-
                     // Get a pointer to the lower-dimensional element
-                    Elem* lower_dim_elem = iter->second;
+                    Elem* lower_dim_elem = *iter;
 
                     // This was a hash, so it might not be perfect.  Let's verify...
                     if (*lower_dim_elem == *side)
