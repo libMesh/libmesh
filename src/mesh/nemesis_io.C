@@ -836,6 +836,9 @@ void Nemesis_IO::read (const std::string & base_filename)
           elem->subdomain_id() = subdomain_id;
           elem->processor_id() = this->processor_id();
           elem->set_id()       = my_next_elem++;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          elem->set_unique_id() = elem->id();
+#endif
 
           // Mark that we have seen an element of the current element's
           // dimension.
