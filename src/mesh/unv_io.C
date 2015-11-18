@@ -33,6 +33,7 @@
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
+#include "libmesh/elem_hash.h"
 
 // C++ includes
 #include <iomanip>
@@ -40,7 +41,6 @@
 #include <fstream>
 #include <ctype.h> // isspace
 #include <sstream> // std::istringstream
-#include LIBMESH_INCLUDE_UNORDERED_MULTISET
 
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams
@@ -431,8 +431,7 @@ void UNVIO::groups_in (std::istream& in_file)
   // conditions.  We need to use a multiset and check the result when
   // searching because the hash function (while good) can't be
   // guaranteed to be perfect.
-  typedef LIBMESH_BEST_UNORDERED_MULTISET<Elem*, ElemHashUtils, ElemHashUtils> provide_bcs_t;
-  provide_bcs_t provide_bcs;
+  unordered_multiset_elem provide_bcs;
 
   // Read groups until there aren't any more to read...
   while (true)
@@ -582,12 +581,12 @@ void UNVIO::groups_in (std::istream& in_file)
                 UniquePtr<Elem> side (elem->build_side(sn));
 
                 // Look for this key in the provide_bcs map
-                std::pair<provide_bcs_t::const_iterator,
-                          provide_bcs_t::const_iterator>
+                std::pair<unordered_multiset_elem::const_iterator,
+                          unordered_multiset_elem::const_iterator>
                   range = provide_bcs.equal_range (side.get());
 
                 // Add boundary information for each side in the range.
-                for (provide_bcs_t::const_iterator iter = range.first;
+                for (unordered_multiset_elem::const_iterator iter = range.first;
                      iter != range.second; ++iter)
                   {
                     // Get a pointer to the lower-dimensional element

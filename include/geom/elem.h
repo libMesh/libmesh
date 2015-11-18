@@ -1381,39 +1381,6 @@ protected:
 };
 
 
-// This struct defines functions used for the "Hash" and "Pred" template arguments
-// of the various "unordered" containers, e.g.
-// template <class Key,                         // unordered_multiset::key_type/value_type
-//           class Hash = hash<Key>,            // unordered_multiset::hasher
-//           class Pred = equal_to<Key>,        // unordered_multiset::key_equal
-//           class Alloc = allocator<Key>       // unordered_multiset::allocator_type
-//           > class unordered_multiset;
-//
-// You would use this to declare the type of set as e.g.
-// LIBMESH_BEST_UNORDERED_MULTISET<Elem*, ElemHashUtils, ElemHashUtils>
-struct ElemHashUtils
-{
-public:
-  // A custom hash functor that can be used with the "unordered"
-  // container types.  Simply returns elem->key() as the hash.
-  inline
-  std::size_t operator()(const Elem* elem) const
-  {
-    return cast_int<std::size_t>(elem->key());
-  }
-
-  // A binary predicate that takes two arguments of the same type as
-  // the elements and returns a bool.  We need to specify this in
-  // order to use the unordered_multiset, otherwise it just uses
-  // std::equal_to to compare two pointers...
-  inline
-  bool operator()(const Elem * lhs, const Elem * rhs) const
-  {
-    return lhs->key() == rhs->key();
-  }
-};
-
-
 
 // ------------------------------------------------------------
 // global Elem functions
