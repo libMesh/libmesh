@@ -28,6 +28,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/gmsh_io.h"
 #include "libmesh/mesh_base.h"
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 namespace libMesh
 {
@@ -512,7 +513,7 @@ void GmshIO::read_mesh(std::istream& in)
                   // by Elem::key().  Bob Jenkins' hash functions are
                   // very good, but it's not possible for them to be
                   // perfect... so we use a multimap.
-                  typedef std::multimap<dof_id_type, Elem*> provide_container_t;
+                  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type, Elem*> provide_container_t;
                   provide_container_t provide_bcs;
 
                   // 1st loop over active elements - get info about lower-dimensional elements.
@@ -565,8 +566,6 @@ void GmshIO::read_mesh(std::istream& in)
                             // elem->neighbor(sn) in this algorithm...
                             for (unsigned short sn=0; sn<elem->n_sides(); sn++)
                               {
-                                UniquePtr<Elem> side (elem->build_side(sn));
-
                                 // Look for the current side in the provide_bcs multimap.
                                 std::pair<provide_container_t::iterator,
                                           provide_container_t::iterator>
@@ -575,6 +574,10 @@ void GmshIO::read_mesh(std::istream& in)
                                 for (provide_container_t::iterator iter = rng.first;
                                      iter != rng.second; ++iter)
                                   {
+                                    // Construct the side for hash verification.
+                                    UniquePtr<Elem> side (elem->build_side(sn));
+
+                                    // Construct the lower-dimensional element to compare to the side.
                                     Elem* lower_dim_elem = iter->second;
 
                                     // This was a hash, so it might not be perfect.  Let's verify...
