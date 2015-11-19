@@ -50,7 +50,13 @@ DifferentiableSystem::DifferentiableSystem
 
 DifferentiableSystem::~DifferentiableSystem ()
 {
-  this->clear();
+  // If we had an attached Physics object, delete it.
+  if (this->_diff_physics != this)
+    delete this->_diff_physics;
+
+  // If we had an attached QoI object, delete it.
+  if (this->diff_qoi != this)
+    delete this->diff_qoi;
 }
 
 
