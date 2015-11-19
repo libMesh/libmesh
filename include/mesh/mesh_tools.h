@@ -442,8 +442,13 @@ void libmesh_assert_valid_refinement_tree (const MeshBase &mesh);
  * element is a neighbor of or descendant of a neighbor of its neighbors)
  * and consistent (each neighbor link goes to either the same neighbor
  * or to a RemoteElem on each processor)
+ *
+ * If assert_valid_remote_elems is set to false, then no error will be
+ * thrown for neighbor links where a remote_elem should exist but NULL
+ * exists instead.
  */
-void libmesh_assert_valid_neighbors (const MeshBase &mesh);
+void libmesh_assert_valid_neighbors (const MeshBase &mesh,
+                                     bool assert_valid_remote_elems=true);
 #endif
 
 // There is no reason for users to call functions in the MeshTools::Private namespace.
