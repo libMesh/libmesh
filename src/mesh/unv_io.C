@@ -33,7 +33,7 @@
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
-#include "libmesh/elem_hash.h"
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 // C++ includes
 #include <iomanip>
@@ -427,11 +427,14 @@ void UNVIO::groups_in (std::istream& in_file)
   // Record the max and min element dimension seen while reading the file.
   unsigned char max_dim = this->max_elem_dimension_seen();
 
-  // multiset based on elem->key() that can provide boundary
-  // conditions.  We need to use a multiset and check the result when
-  // searching because the hash function (while good) can't be
-  // guaranteed to be perfect.
-  unordered_multiset_elem provide_bcs;
+  // Container which stores lower-dimensional elements (based on
+  // Elem::key()) for later assignment of boundary conditions.  We
+  // could use e.g. an unordered_set with Elems as keys for this, but
+  // this turns out to be much slower on the search side, since we
+  // have to build an entire side in order to search, rather than just
+  // calling elem->key(side) to compute a key.
+  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type, Elem *> map_type;
+  map_type provide_bcs;
 
   // Read groups until there aren't any more to read...
   while (true)
@@ -528,7 +531,7 @@ void UNVIO::groups_in (std::istream& in_file)
                       cast_int<subdomain_id_type>(group_number);
 
                     // Store the lower-dimensional element in the provide_bcs container.
-                    provide_bcs.insert(group_elem);
+                    provide_bcs.insert(std::make_pair(group_elem->key(), group_elem));
                   }
 
                 // dim == max_dim means this group defines a subdomain ID
@@ -577,20 +580,20 @@ void UNVIO::groups_in (std::istream& in_file)
             // this algorithm...
             for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
-                // We'll need to compare the lower dimensional element against the current side.
-                UniquePtr<Elem> side (elem->build_side(sn));
-
                 // Look for this key in the provide_bcs map
-                std::pair<unordered_multiset_elem::const_iterator,
-                          unordered_multiset_elem::const_iterator>
-                  range = provide_bcs.equal_range (side.get());
+                std::pair<map_type::const_iterator,
+                          map_type::const_iterator>
+                  range = provide_bcs.equal_range (elem->key(sn));
 
                 // Add boundary information for each side in the range.
-                for (unordered_multiset_elem::const_iterator iter = range.first;
+                for (map_type::const_iterator iter = range.first;
                      iter != range.second; ++iter)
                   {
+                    // Build a side to confirm the hash mapped to the correct side.
+                    UniquePtr<Elem> side (elem->build_side(sn));
+
                     // Get a pointer to the lower-dimensional element
-                    Elem* lower_dim_elem = *iter;
+                    Elem* lower_dim_elem = iter->second;
 
                     // This was a hash, so it might not be perfect.  Let's verify...
                     if (*lower_dim_elem == *side)
