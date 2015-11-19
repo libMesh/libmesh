@@ -560,7 +560,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 
 #ifdef DEBUG
-  MeshTools::libmesh_assert_valid_neighbors(*this);
+  MeshTools::libmesh_assert_valid_neighbors(*this,
+                                            !reset_remote_elements);
   MeshTools::libmesh_assert_valid_amr_interior_parents(*this);
 #endif
 
