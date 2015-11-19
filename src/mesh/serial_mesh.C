@@ -638,6 +638,29 @@ void SerialMesh::clear ()
 
 
 
+void SerialMesh::update_parallel_id_counts()
+{
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = this->parallel_max_unique_id();
+#endif
+}
+
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+unique_id_type SerialMesh::parallel_max_unique_id() const
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  unique_id_type max_local = _next_unique_id;
+  this->comm().max(max_local);
+  return max_local;
+}
+#endif
+
+
+
 void SerialMesh::renumber_nodes_and_elements ()
 {
 
@@ -791,6 +814,8 @@ void SerialMesh::renumber_nodes_and_elements ()
 
   libmesh_assert_equal_to (next_free_elem, _elements.size());
   libmesh_assert_equal_to (next_free_node, _nodes.size());
+
+  this->update_parallel_id_counts();
 
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
