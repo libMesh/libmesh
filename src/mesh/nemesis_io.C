@@ -1138,6 +1138,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // For ParallelMesh, it seems that _is_serial is true by default.  A hack to
   // make the Mesh think it's parallel might be to call:
   mesh.update_post_partitioning();
+  MeshCommunication().make_node_unique_ids_parallel_consistent(mesh);
   mesh.delete_remote_elements();
 
   // And if that didn't work, then we're actually reading into a
