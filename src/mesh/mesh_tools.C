@@ -1575,7 +1575,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 
 
 
-void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh)
+void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
+                                               bool assert_valid_remote_elems)
 {
   const MeshBase::const_element_iterator el_end = mesh.elements_end();
   for (MeshBase::const_element_iterator el = mesh.elements_begin();
@@ -1605,11 +1606,22 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh)
         {
           dof_id_type my_neighbor = DofObject::invalid_id; // NULL
           dof_id_type * p_my_neighbor = NULL;
+
+          // If we have a non-remote_elem neighbor link, then we can
+          // verify it.
           if (elem && elem->neighbor(n) != remote_elem)
             {
               p_my_neighbor = &my_neighbor;
               if (elem->neighbor(n))
                 my_neighbor = elem->neighbor(n)->id();
+
+              // But wait - if we haven't set remote_elem links yet then
+              // some NULL links on ghost elements might be
+              // future-remote_elem links, so we can't verify those.
+              if (!assert_valid_remote_elems &&
+                  !elem->neighbor(n) &&
+                  elem->processor_id() != mesh.processor_id())
+                p_my_neighbor = NULL;
             }
           libmesh_assert(mesh.comm().semiverify(p_my_neighbor));
         }
