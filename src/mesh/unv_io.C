@@ -16,13 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <iomanip>
-#include <algorithm> // for std::sort
-#include <fstream>
-#include <ctype.h> // isspace
-#include <sstream> // std::istringstream
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
@@ -40,6 +33,14 @@
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
+#include LIBMESH_INCLUDE_UNORDERED_MAP
+
+// C++ includes
+#include <iomanip>
+#include <algorithm> // for std::sort
+#include <fstream>
+#include <ctype.h> // isspace
+#include <sstream> // std::istringstream
 
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams
@@ -49,8 +50,6 @@
 
 namespace libMesh
 {
-
-
 
 //-----------------------------------------------------------------------------
 // UNVIO class static members
@@ -428,12 +427,14 @@ void UNVIO::groups_in (std::istream& in_file)
   // Record the max and min element dimension seen while reading the file.
   unsigned char max_dim = this->max_elem_dimension_seen();
 
-  // multimap from Elem hash key to Elem* that can provide boundary
-  // conditions.  We need to use a multimap and check the result when
-  // searching because the hash function (while good) can't be
-  // guaranteed to be perfect.
-  typedef std::multimap<dof_id_type, Elem*> provide_bcs_t;
-  provide_bcs_t provide_bcs;
+  // Container which stores lower-dimensional elements (based on
+  // Elem::key()) for later assignment of boundary conditions.  We
+  // could use e.g. an unordered_set with Elems as keys for this, but
+  // this turns out to be much slower on the search side, since we
+  // have to build an entire side in order to search, rather than just
+  // calling elem->key(side) to compute a key.
+  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type, Elem *> map_type;
+  map_type provide_bcs;
 
   // Read groups until there aren't any more to read...
   while (true)
@@ -529,7 +530,7 @@ void UNVIO::groups_in (std::istream& in_file)
                     group_elem->subdomain_id() =
                       cast_int<subdomain_id_type>(group_number);
 
-                    // Put the lower-dimensional element into the multimap.
+                    // Store the lower-dimensional element in the provide_bcs container.
                     provide_bcs.insert(std::make_pair(group_elem->key(), group_elem));
                   }
 
@@ -580,15 +581,15 @@ void UNVIO::groups_in (std::istream& in_file)
             for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
                 // Look for this key in the provide_bcs map
-                std::pair<provide_bcs_t::const_iterator,
-                          provide_bcs_t::const_iterator>
+                std::pair<map_type::const_iterator,
+                          map_type::const_iterator>
                   range = provide_bcs.equal_range (elem->key(sn));
 
                 // Add boundary information for each side in the range.
-                for (provide_bcs_t::const_iterator iter = range.first;
+                for (map_type::const_iterator iter = range.first;
                      iter != range.second; ++iter)
                   {
-                    // We'll need to compare the lower dimensional element against the current side.
+                    // Build a side to confirm the hash mapped to the correct side.
                     UniquePtr<Elem> side (elem->build_side(sn));
 
                     // Get a pointer to the lower-dimensional element

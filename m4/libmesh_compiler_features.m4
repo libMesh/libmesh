@@ -169,11 +169,13 @@ AC_ARG_ENABLE(unordered-containers,
     # various quasi-standard hash containers.
     ACX_BEST_UNORDERED_MULTIMAP
     ACX_BEST_UNORDERED_MAP
+    ACX_BEST_UNORDERED_MULTISET
     ACX_BEST_UNORDERED_SET
   else
     ACX_STD_MAP
     ACX_STD_MULTIMAP
     ACX_STD_SET
+    ACX_STD_MULTISET
   fi
 
 # Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available

@@ -28,6 +28,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 // Anonymous namespace to hold mapping Data for Abaqus/libMesh element types
 namespace
@@ -953,8 +954,8 @@ void AbaqusIO::assign_sideset_ids()
     // because the lower-dimensional elements can belong to more than
     // 1 sideset, and multiple lower-dimensional elements can hash to
     // the same value, but this is very rare.
-    typedef std::multimap<dof_id_type,
-                          std::pair<Elem*, boundary_id_type> > provide_bcs_t;
+    typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type,
+                                            std::pair<Elem*, boundary_id_type> > provide_bcs_t;
     provide_bcs_t provide_bcs;
 
     // The elemset_id counter assigns a logical numbering to the

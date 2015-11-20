@@ -9,6 +9,9 @@
 /* definition of the final detected unordered_multimap type */
 #undef BEST_UNORDERED_MULTIMAP
 
+/* definition of the final detected unordered_multiset type */
+#undef BEST_UNORDERED_MULTISET
+
 /* definition of the final detected unordered_set type */
 #undef BEST_UNORDERED_SET
 
@@ -249,6 +252,9 @@
 /* define if the compiler supports __gnu_cxx::hash_multimap */
 #undef HAVE_EXT_HASH_MULTIMAP
 
+/* define if the compiler supports __gnu_cxx::hash_multiset */
+#undef HAVE_EXT_HASH_MULTISET
+
 /* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
@@ -298,6 +304,9 @@
 
 /* define if the compiler supports std::hash_multimap */
 #undef HAVE_HASH_MULTIMAP
+
+/* define if the compiler supports std::hash_multiset */
+#undef HAVE_HASH_MULTISET
 
 /* define if the compiler supports std::hash_set */
 #undef HAVE_HASH_SET
@@ -411,6 +420,9 @@
 /* define if the compiler supports std::unordered_multimap */
 #undef HAVE_STD_UNORDERED_MULTIMAP
 
+/* define if the compiler supports std::unordered_multiset */
+#undef HAVE_STD_UNORDERED_MULTISET
+
 /* define if the compiler supports std::unordered_set */
 #undef HAVE_STD_UNORDERED_SET
 
@@ -461,6 +473,9 @@
 /* define if the compiler supports std::tr1::unordered_multimap */
 #undef HAVE_TR1_UNORDERED_MULTIMAP
 
+/* define if the compiler supports std::tr1::unordered_multiset */
+#undef HAVE_TR1_UNORDERED_MULTISET
+
 /* define if the compiler supports std::tr1::unordered_set */
 #undef HAVE_TR1_UNORDERED_SET
 
@@ -498,6 +513,9 @@
 
 /* header file for the final detected unordered_multimap type */
 #undef INCLUDE_UNORDERED_MULTIMAP
+
+/* header file for the final detected unordered_multiset type */
+#undef INCLUDE_UNORDERED_MULTISET
 
 /* header file for the final detected unordered_set type */
 #undef INCLUDE_UNORDERED_SET

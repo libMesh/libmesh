@@ -80,6 +80,48 @@ fi
 
 dnl ----------------------------------------------------------------------------
 dnl Check to see if the compiler can compile a test program using
+dnl std::tr1::unordered_multiset
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_TR1_UNORDERED_MULTISET],
+[AC_CACHE_CHECK(whether the compiler supports std::tr1::unordered_multiset,
+ac_cv_cxx_tr1_unordered_multiset,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([@%:@include <tr1/unordered_set>],
+[
+  std::tr1::unordered_multiset<int> s;
+  s.insert(1);
+  s.insert(1);
+  if (s.size() != 2) return 1;
+],
+ ac_cv_cxx_tr1_unordered_multiset=yes,
+ ac_cv_cxx_tr1_unordered_multiset=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_tr1_unordered_multiset" = yes; then
+  AC_DEFINE(HAVE_TR1_UNORDERED_MULTISET,1,
+            [define if the compiler supports std::tr1::unordered_multiset])
+  AC_DEFINE(BEST_UNORDERED_MULTISET,std::tr1::unordered_multiset,
+            [definition of the final detected unordered_multiset type])
+  AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<tr1/unordered_set>,
+            [header file for the final detected unordered_multiset type])
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+    AC_DEFINE(DEFINE_HASH_POINTERS,,
+              [workaround for potentially missing hash<T*>])
+  fi
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl Check to see if the compiler can compile a test program using
 dnl std::tr1::unordered_set
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_TR1_UNORDERED_SET],
@@ -221,6 +263,48 @@ if test "$ac_cv_cxx_unordered_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<unordered_map>,
             [header file for the final detected unordered_multimap type])
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+    AC_DEFINE(DEFINE_HASH_POINTERS,,
+              [workaround for potentially missing hash<T*>])
+  fi
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl Check to see if the compiler can compile a test program using
+dnl std::unordered_multiset
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_STD_UNORDERED_MULTISET],
+[AC_CACHE_CHECK(whether the compiler supports std::unordered_multiset,
+ac_cv_cxx_unordered_multiset,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([@%:@include <unordered_set>],
+[
+  std::unordered_multiset<int> s;
+  s.insert(1);
+  s.insert(1);
+  if (s.size() != 2) return 1;
+],
+ ac_cv_cxx_unordered_multiset=yes,
+ ac_cv_cxx_unordered_multiset=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_unordered_multiset" = yes; then
+  AC_DEFINE(HAVE_STD_UNORDERED_MULTISET,1,
+            [define if the compiler supports std::unordered_multiset])
+  AC_DEFINE(BEST_UNORDERED_MULTISET,std::unordered_multiset,
+            [definition of the final detected unordered_multiset type])
+  AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<unordered_set>,
+            [header file for the final detected unordered_multiset type])
   if test "$ac_cv_cxx_hash_specializations" != yes; then
     AC_DEFINE(DEFINE_HASH_STRING,,
               [workaround for potentially missing hash<string>])
@@ -396,6 +480,47 @@ fi
 
 dnl ----------------------------------------------------------------------------
 dnl Check to see if the compiler can compile a test program using
+dnl __gnu_cxx::hash_multiset
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_EXT_HASH_MULTISET],
+[AC_CACHE_CHECK(whether the compiler supports __gnu_cxx::hash_multiset,
+ac_cv_cxx_ext_hash_multiset,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([@%:@include <ext/hash_set>],
+[
+  __gnu_cxx::hash_multiset<int> s;
+  s.insert(1);
+  s.insert(1);
+  if (s.size() != 2) return 1;
+],
+ ac_cv_cxx_ext_hash_multiset=yes,
+ ac_cv_cxx_ext_hash_multiset=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_ext_hash_multiset" = yes; then
+  AC_DEFINE(HAVE_EXT_HASH_MULTISET,1,
+            [define if the compiler supports __gnu_cxx::hash_multiset])
+  AC_DEFINE(BEST_UNORDERED_MULTISET,__gnu_cxx::hash_multiset,
+            [definition of the final detected unordered_multiset type])
+  AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<ext/hash_set>,
+            [header file for the final detected unordered_multiset type])
+  AC_DEFINE(DEFINE_HASH_STRING,[namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}],
+            [workaround for potentially missing hash<string>])
+  AC_DEFINE(DEFINE_HASH_POINTERS,[namespace __gnu_cxx {template<typename T> struct hash<T*>{size_t operator()(const T* p)const{return hash<size_t>()(reinterpret_cast<size_t>(p));}};}],
+            [workaround for potentially missing hash<T*>])
+  ac_cv_cxx_hash_specializations=yes
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl Check to see if the compiler can compile a test program using
 dnl __gnu_cxx::hash_set
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_EXT_HASH_SET],
@@ -549,6 +674,46 @@ fi
 
 
 dnl ----------------------------------------------------------------------------
+dnl Check to see if the compiler can compile a test program using
+dnl std::hash_multiset (This is unlikely...)
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_HASH_MULTISET],
+[AC_CACHE_CHECK(whether the compiler supports std::hash_multiset,
+ac_cv_cxx_hash_multiset,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([@%:@include <hash_set>],
+[
+  std::hash_multiset<int> s;
+  s.insert(1);
+],
+ ac_cv_cxx_hash_multiset=yes,
+ ac_cv_cxx_hash_multiset=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_hash_multiset" = yes; then
+  AC_DEFINE(HAVE_HASH_MULTISET,1,
+            [define if the compiler supports std::hash_multiset])
+  AC_DEFINE(BEST_UNORDERED_MULTISET,std::hash_multiset,
+            [definition of the final detected unordered_multiset type])
+  AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<hash_set>,
+            [header file for the final detected unordered_multiset type])
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+    AC_DEFINE(DEFINE_HASH_POINTERS,,
+              [workaround for potentially missing hash<T*>])
+  fi
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
+
+
+dnl ----------------------------------------------------------------------------
 dnl Make sure the compiler can compile a test program using
 dnl std::set as a "fall-back" unordered_set
 dnl ----------------------------------------------------------------------------
@@ -660,6 +825,43 @@ fi
 
 dnl ----------------------------------------------------------------------------
 dnl Check to see if the compiler can compile a test program using
+dnl std::multiset as a "fall-back" unordered_multiset
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_STD_MULTISET],
+[AC_CACHE_CHECK(whether the compiler supports std::multiset,
+ac_cv_cxx_multiset,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([@%:@include <set>],
+[
+  std::multiset<int, int> s;
+  m.insert(1);
+],
+ ac_cv_cxx_multiset=yes, ac_cv_cxx_multiset=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_multiset" = yes; then
+  AC_DEFINE(BEST_UNORDERED_MULTISET,std::multiset,
+            [definition of the final detected unordered_multiset type])
+  AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<set>,
+            [header file for the final detected unordered_multiset type])
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+    AC_DEFINE(DEFINE_HASH_POINTERS,,
+              [workaround for potentially missing hash<T*>])
+  fi
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl Check to see if the compiler can compile a test program using
 dnl std::hash_set (This is unlikely...)
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_HASH_SET],
@@ -735,6 +937,20 @@ ACX_TR1_UNORDERED_SET([],
 ACX_EXT_HASH_SET([],
 ACX_HASH_SET([],
 ACX_STD_SET([],[])))))
+])
+
+
+
+dnl ----------------------------------------------------------------------------
+dnl Choose the best unordered_multiset implementation available
+dnl ----------------------------------------------------------------------------
+AC_DEFUN([ACX_BEST_UNORDERED_MULTISET],
+[
+ACX_STD_UNORDERED_MULTISET([],
+ACX_TR1_UNORDERED_MULTISET([],
+ACX_EXT_HASH_MULTISET([],
+ACX_HASH_MULTISET([],
+ACX_STD_MULTISET([],[])))))
 ])
 
 

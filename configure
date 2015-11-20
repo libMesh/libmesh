@@ -27993,6 +27993,336 @@ fi
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::unordered_multiset" >&5
+$as_echo_n "checking whether the compiler supports std::unordered_multiset... " >&6; }
+if ${ac_cv_cxx_unordered_multiset+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <unordered_set>
+int
+main ()
+{
+
+  std::unordered_multiset<int> s;
+  s.insert(1);
+  s.insert(1);
+  if (s.size() != 2) return 1;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_unordered_multiset=yes
+else
+  ac_cv_cxx_unordered_multiset=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_unordered_multiset" >&5
+$as_echo "$ac_cv_cxx_unordered_multiset" >&6; }
+if test "$ac_cv_cxx_unordered_multiset" = yes; then
+
+$as_echo "#define HAVE_STD_UNORDERED_MULTISET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_MULTISET std::unordered_multiset" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTISET <unordered_set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_multiset" >&5
+$as_echo_n "checking whether the compiler supports std::tr1::unordered_multiset... " >&6; }
+if ${ac_cv_cxx_tr1_unordered_multiset+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <tr1/unordered_set>
+int
+main ()
+{
+
+  std::tr1::unordered_multiset<int> s;
+  s.insert(1);
+  s.insert(1);
+  if (s.size() != 2) return 1;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_tr1_unordered_multiset=yes
+else
+  ac_cv_cxx_tr1_unordered_multiset=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_multiset" >&5
+$as_echo "$ac_cv_cxx_tr1_unordered_multiset" >&6; }
+if test "$ac_cv_cxx_tr1_unordered_multiset" = yes; then
+
+$as_echo "#define HAVE_TR1_UNORDERED_MULTISET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_MULTISET std::tr1::unordered_multiset" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTISET <tr1/unordered_set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_multiset" >&5
+$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_multiset... " >&6; }
+if ${ac_cv_cxx_ext_hash_multiset+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ext/hash_set>
+int
+main ()
+{
+
+  __gnu_cxx::hash_multiset<int> s;
+  s.insert(1);
+  s.insert(1);
+  if (s.size() != 2) return 1;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_ext_hash_multiset=yes
+else
+  ac_cv_cxx_ext_hash_multiset=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_multiset" >&5
+$as_echo "$ac_cv_cxx_ext_hash_multiset" >&6; }
+if test "$ac_cv_cxx_ext_hash_multiset" = yes; then
+
+$as_echo "#define HAVE_EXT_HASH_MULTISET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_MULTISET __gnu_cxx::hash_multiset" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTISET <ext/hash_set>" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS namespace __gnu_cxx {template<typename T> struct hash<T*>{size_t operator()(const T* p)const{return hash<size_t>()(reinterpret_cast<size_t>(p));}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_specializations=yes
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_multiset" >&5
+$as_echo_n "checking whether the compiler supports std::hash_multiset... " >&6; }
+if ${ac_cv_cxx_hash_multiset+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <hash_set>
+int
+main ()
+{
+
+  std::hash_multiset<int> s;
+  s.insert(1);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_hash_multiset=yes
+else
+  ac_cv_cxx_hash_multiset=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_multiset" >&5
+$as_echo "$ac_cv_cxx_hash_multiset" >&6; }
+if test "$ac_cv_cxx_hash_multiset" = yes; then
+
+$as_echo "#define HAVE_HASH_MULTISET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_MULTISET std::hash_multiset" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTISET <hash_set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::multiset" >&5
+$as_echo_n "checking whether the compiler supports std::multiset... " >&6; }
+if ${ac_cv_cxx_multiset+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <set>
+int
+main ()
+{
+
+  std::multiset<int, int> s;
+  m.insert(1);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_multiset=yes
+else
+  ac_cv_cxx_multiset=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_multiset" >&5
+$as_echo "$ac_cv_cxx_multiset" >&6; }
+if test "$ac_cv_cxx_multiset" = yes; then
+
+$as_echo "#define BEST_UNORDERED_MULTISET std::multiset" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTISET <set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::unordered_set" >&5
 $as_echo_n "checking whether the compiler supports std::unordered_set... " >&6; }
 if ${ac_cv_cxx_unordered_set+:} false; then :
@@ -28492,6 +28822,69 @@ $as_echo "#define BEST_UNORDERED_SET std::set" >>confdefs.h
 
 
 $as_echo "#define INCLUDE_UNORDERED_SET <set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+
+fi
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::multiset" >&5
+$as_echo_n "checking whether the compiler supports std::multiset... " >&6; }
+if ${ac_cv_cxx_multiset+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <set>
+int
+main ()
+{
+
+  std::multiset<int, int> s;
+  m.insert(1);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_multiset=yes
+else
+  ac_cv_cxx_multiset=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_multiset" >&5
+$as_echo "$ac_cv_cxx_multiset" >&6; }
+if test "$ac_cv_cxx_multiset" = yes; then
+
+$as_echo "#define BEST_UNORDERED_MULTISET std::multiset" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTISET <set>" >>confdefs.h
 
   if test "$ac_cv_cxx_hash_specializations" != yes; then
 

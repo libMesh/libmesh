@@ -115,6 +115,7 @@ BUILT_SOURCES = \
         edge_inf_edge2.h \
         elem.h \
         elem_cutter.h \
+        elem_hash.h \
         elem_quality.h \
         elem_range.h \
         elem_type.h \
@@ -847,6 +848,9 @@ elem.h: $(top_srcdir)/include/geom/elem.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_cutter.h: $(top_srcdir)/include/geom/elem_cutter.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+elem_hash.h: $(top_srcdir)/include/geom/elem_hash.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_quality.h: $(top_srcdir)/include/geom/elem_quality.h
