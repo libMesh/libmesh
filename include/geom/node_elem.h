@@ -100,6 +100,11 @@ public:
   virtual unsigned int n_children() const libmesh_override { return 1; }
 
   /**
+   * Don't hide Elem::key() defined in the base class.
+   */
+  using Elem::key;
+
+  /**
    * @returns an id associated with the \p s side of this element.
    * This should never be important for NodeElems
    */

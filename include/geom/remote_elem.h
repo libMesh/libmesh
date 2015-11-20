@@ -76,6 +76,11 @@ public:
   virtual Node* & set_node (const unsigned int i) libmesh_override
   { libmesh_not_implemented(); return Elem::set_node(i); }
 
+  /**
+   * Don't hide Elem::key() defined in the base class.
+   */
+  using Elem::key;
+
   virtual dof_id_type key (const unsigned int) const libmesh_override
   { libmesh_not_implemented(); return 0; }
 
