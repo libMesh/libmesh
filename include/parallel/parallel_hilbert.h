@@ -114,7 +114,7 @@ void dofobjectkey_min_op (libMesh::Parallel::DofObjectKey *in,
   // When (*in >= *inout), then inout already contains min(*in,*inout)
   // Otherwise we need to copy from in.
   for (int i=0; i<*len; i++, in++, inout++)
-    if (*inout > *in)
+    if (*in < *inout)
       *inout = *in;
 }
 
