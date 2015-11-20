@@ -683,7 +683,7 @@ void LinearElasticityWithContact::residual_and_jacobian (
                   &inverse_intersection_point_vec);
 
                 std::vector<dof_id_type> neighbor_dof_indices;
-                std::vector< std::vector<unsigned int> > neighbor_dof_indices_var(3);
+                std::vector< std::vector<dof_id_type> > neighbor_dof_indices_var(3);
                 dof_map.dof_indices (contact_neighbor, neighbor_dof_indices);
                 for(unsigned int var=0; var<3; var++)
                 {
