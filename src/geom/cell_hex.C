@@ -75,63 +75,10 @@ dof_id_type Hex::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
-  switch (s)
-    {
-    case 0:  // the face at z = -1
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(3),
-                           this->node(2),
-                           this->node(1));
-
-    case 1:  // the face at y = -1
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(5),
-                           this->node(4));
-
-    case 2:  // the face at x = 1
-
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(6),
-                           this->node(5));
-
-    case 3: // the face at y = 1
-
-      return
-        this->compute_key (this->node(2),
-                           this->node(3),
-                           this->node(7),
-                           this->node(6));
-
-    case 4: // the face at x = -1
-
-      return
-        this->compute_key (this->node(3),
-                           this->node(0),
-                           this->node(4),
-                           this->node(7));
-
-    case 5: // the face at z = 1
-
-      return
-        this->compute_key (this->node(4),
-                           this->node(5),
-                           this->node(6),
-                           this->node(7));
-
-    default:
-      libmesh_error_msg("Invalid s = " << s);
-    }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  return this->compute_key(this->node(Hex8::side_nodes_map[s][0]),
+                           this->node(Hex8::side_nodes_map[s][1]),
+                           this->node(Hex8::side_nodes_map[s][2]),
+                           this->node(Hex8::side_nodes_map[s][3]));
 }
 
 
