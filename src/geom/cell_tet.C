@@ -56,38 +56,9 @@ dof_id_type Tet::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-    case 0:
-      return
-        this->compute_key (this->node(0),
-                           this->node(2),
-                           this->node(1));
-
-    case 1:
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(3));
-
-    case 2:
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(3));
-
-    case 3:
-      return
-        this->compute_key (this->node(2),
-                           this->node(0),
-                           this->node(3));
-
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
-    }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  return this->compute_key(this->node(Tet4::side_nodes_map[s][0]),
+                           this->node(Tet4::side_nodes_map[s][1]),
+                           this->node(Tet4::side_nodes_map[s][2]));
 }
 
 
