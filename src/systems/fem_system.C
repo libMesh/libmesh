@@ -830,14 +830,6 @@ FEMSystem::FEMSystem (EquationSystems& es,
 
 FEMSystem::~FEMSystem ()
 {
-  this->clear();
-}
-
-
-
-void FEMSystem::clear()
-{
-  Parent::clear();
 }
 
 

@@ -78,12 +78,6 @@ public:
   typedef DifferentiableSystem Parent;
 
   /**
-   * Clear all the data structures associated with
-   * the system.
-   */
-  virtual void clear () libmesh_override;
-
-  /**
    * Prepares \p matrix or \p rhs for matrix assembly.
    * Users may reimplement this to add pre- or post-assembly
    * code before or after calling FEMSystem::assembly()
