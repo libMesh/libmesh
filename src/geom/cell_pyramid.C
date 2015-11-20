@@ -60,41 +60,19 @@ dof_id_type Pyramid::key (const unsigned int s) const
 
   switch (s)
     {
-    case 0:  // triangular face 1
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(4));
-
-    case 1:  // triangular face 2
-
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(4));
-
-    case 2:  // triangular face 3
-
-      return
-        this->compute_key (this->node(2),
-                           this->node(3),
-                           this->node(4));
-
-    case 3:  // triangular face 4
-
-      return
-        this->compute_key (this->node(3),
-                           this->node(0),
-                           this->node(4));
+    case 0: // triangular face 1
+    case 1: // triangular face 2
+    case 2: // triangular face 3
+    case 3: // triangular face 4
+      return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
+                                this->node(Pyramid5::side_nodes_map[s][1]),
+                                this->node(Pyramid5::side_nodes_map[s][2]));
 
     case 4:  // the quad face at z=0
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(3),
-                           this->node(2),
-                           this->node(1));
+      return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
+                                this->node(Pyramid5::side_nodes_map[s][1]),
+                                this->node(Pyramid5::side_nodes_map[s][2]),
+                                this->node(Pyramid5::side_nodes_map[s][3]));
 
     default:
       libmesh_error_msg("Invalid side s = " << s);
