@@ -171,7 +171,7 @@ public:
    */
   void make_elems_parallel_consistent (MeshBase &);
 
-   /**
+  /**
    * Assuming all ids on local nodes are globally unique, and
    * assuming all processor ids are parallel consistent, this function makes
    * all other ids parallel consistent.
