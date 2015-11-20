@@ -288,8 +288,6 @@ int main (int argc, char** argv)
 
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  // We want to write the file in the ExodusII format, but we don't
-  // yet support mixed-dimension meshes there?
   ExodusII_IO(mesh).write_equation_systems
     ("out.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
