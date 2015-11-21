@@ -73,55 +73,12 @@ dof_id_type InfHex::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-    case 0:  // the face at z = -1
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(2),
-                           this->node(3));
-
-    case 1:  // the face at y = -1
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(5),
-                           this->node(4));
-
-    case 2:  // the face at x = 1
-
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(6),
-                           this->node(5));
-
-    case 3: // the face at y = 1
-
-      return
-        this->compute_key (this->node(2),
-                           this->node(3),
-                           this->node(7),
-                           this->node(6));
-
-
-    case 4: // the face at x = -1
-
-      return
-        this->compute_key (this->node(3),
-                           this->node(0),
-                           this->node(4),
-                           this->node(7));
-
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
-    }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  // The order of the node ids does not matter, they are sorted by the
+  // compute_key() function.
+  return this->compute_key(this->node(InfHex8::side_nodes_map[s][0]),
+                           this->node(InfHex8::side_nodes_map[s][1]),
+                           this->node(InfHex8::side_nodes_map[s][2]),
+                           this->node(InfHex8::side_nodes_map[s][3]));
 }
 
 
@@ -150,64 +107,26 @@ UniquePtr<Elem> InfHex::side (const unsigned int i) const
         // which in turn _has_ to build the face in this
         // way as to enable the cool way \p InfFE re-uses \p FE.
         face = new Quad4;
-        face->set_node(0) = this->get_node(0);
-        face->set_node(1) = this->get_node(1);
-        face->set_node(2) = this->get_node(2);
-        face->set_node(3) = this->get_node(3);
         break;
       }
 
-      // the face at y = -1
-      // this face connects to another infinite element
-    case 1:
+      // These faces connect to other infinite elements.
+    case 1: // the face at y = -1
+    case 2: // the face at x = 1
+    case 3: // the face at y = 1
+    case 4: // the face at x = -1
       {
         face = new InfQuad4;
-        face->set_node(0) = this->get_node(0);
-        face->set_node(1) = this->get_node(1);
-        face->set_node(2) = this->get_node(4);
-        face->set_node(3) = this->get_node(5);
-        break;
-      }
-
-      // the face at x = 1
-      // this face connects to another infinite element
-    case 2:
-      {
-        face = new InfQuad4;
-        face->set_node(0) = this->get_node(1);
-        face->set_node(1) = this->get_node(2);
-        face->set_node(2) = this->get_node(5);
-        face->set_node(3) = this->get_node(6);
-        break;
-      }
-
-      // the face at y = 1
-      // this face connects to another infinite element
-    case 3:
-      {
-        face = new InfQuad4;
-        face->set_node(0) = this->get_node(2);
-        face->set_node(1) = this->get_node(3);
-        face->set_node(2) = this->get_node(6);
-        face->set_node(3) = this->get_node(7);
-        break;
-      }
-
-      // the face at x = -1
-      // this face connects to another infinite element
-    case 4:
-      {
-        face = new InfQuad4;
-        face->set_node(0) = this->get_node(3);
-        face->set_node(1) = this->get_node(0);
-        face->set_node(2) = this->get_node(7);
-        face->set_node(3) = this->get_node(4);
         break;
       }
 
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
+
+  // Set the nodes
+  for (unsigned n=0; n<face->n_nodes(); ++n)
+    face->set_node(n) = this->get_node(InfHex8::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }
