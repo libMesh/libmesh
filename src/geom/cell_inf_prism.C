@@ -64,36 +64,18 @@ dof_id_type InfPrism::key (const unsigned int s) const
 
   switch (s)
     {
-    case 0:  // the triangular face at z=-1, base face
+    case 0: // the triangular face at z=-1, base face
+      return this->compute_key (this->node(InfPrism6::side_nodes_map[s][0]),
+                                this->node(InfPrism6::side_nodes_map[s][1]),
+                                this->node(InfPrism6::side_nodes_map[s][2]));
 
-      return
-        this->compute_key (this->node(0),
-                           this->node(2),
-                           this->node(1));
-
-    case 1:  // the quad face at y=0
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(4),
-                           this->node(3));
-
-    case 2:  // the other quad face
-
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(5),
-                           this->node(4));
-
+    case 1: // the quad face at y=0
+    case 2: // the other quad face
     case 3: // the quad face at x=0
-
-      return
-        this->compute_key (this->node(2),
-                           this->node(0),
-                           this->node(3),
-                           this->node(5));
+      return this->compute_key (this->node(InfPrism6::side_nodes_map[s][0]),
+                                this->node(InfPrism6::side_nodes_map[s][1]),
+                                this->node(InfPrism6::side_nodes_map[s][2]),
+                                this->node(InfPrism6::side_nodes_map[s][3]));
 
     default:
       libmesh_error_msg("Invalid side s = " << s);
