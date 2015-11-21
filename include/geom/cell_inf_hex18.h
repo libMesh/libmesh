@@ -146,6 +146,11 @@ public:
   virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
 
   /**
+   * Don't hide Elem::key() defined in the base class.
+   */
+  using Elem::key;
+
+  /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
