@@ -71,36 +71,26 @@ UniquePtr<Elem> InfQuad::side (const unsigned int i) const
 
   switch (i)
     {
-    case 0:
+    case 0: // base face
       {
-        // base face
         edge = new Edge2;
-        edge->set_node(0) = this->get_node(0);
-        edge->set_node(1) = this->get_node(1);
         break;
       }
 
-    case 1:
+    case 1: // adjacent to another infinite element
+    case 2: // adjacent to another infinite element
       {
-        // adjacent to another infinite element
         edge = new InfEdge2;
-        edge->set_node(0) = this->get_node(1);
-        edge->set_node(1) = this->get_node(3);
-        break;
-      }
-
-    case 2:
-      {
-        // adjacent to another infinite element
-        edge = new InfEdge2;
-        edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-        edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
         break;
       }
 
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
+
+  // Set the nodes
+  for (unsigned n=0; n<edge->n_nodes(); ++n)
+    edge->set_node(n) = this->get_node(InfQuad4::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(edge);
 }
