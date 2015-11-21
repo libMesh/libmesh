@@ -139,39 +139,8 @@ UniquePtr<Elem> Tet4::build_side (const unsigned int i,
       Elem* face = new Tri3;
       face->subdomain_id() = this->subdomain_id();
 
-      switch (i)
-        {
-        case 0:
-          {
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(1);
-            break;
-          }
-        case 1:
-          {
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(3);
-            break;
-          }
-        case 2:
-          {
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(3);
-            break;
-          }
-        case 3:
-          {
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(3);
-            break;
-          }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
+      for (unsigned n=0; n<face->n_nodes(); ++n)
+        face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }
