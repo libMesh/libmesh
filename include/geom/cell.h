@@ -49,7 +49,7 @@ public:
   /**
    * @returns 3, the dimensionality of the object.
    */
-  unsigned int dim () const { return 3; }
+  virtual unsigned int dim () const libmesh_override { return 3; }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
