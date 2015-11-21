@@ -159,75 +159,17 @@ UniquePtr<Elem> Prism15::build_side (const unsigned int i,
 
       switch (i)
         {
-        case 0:  // the triangular face at z=-1
-          {
-            face = new Tri6;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(1);
-            face->set_node(3) = this->get_node(8);
-            face->set_node(4) = this->get_node(7);
-            face->set_node(5) = this->get_node(6);
-
-            break;
-          }
-        case 1:  // the quad face at y=0
-          {
-            face = new Quad8;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(3);
-            face->set_node(4) = this->get_node(6);
-            face->set_node(5) = this->get_node(10);
-            face->set_node(6) = this->get_node(12);
-            face->set_node(7) = this->get_node(9);
-
-            break;
-          }
-        case 2:  // the other quad face
-          {
-            face = new Quad8;
-
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(5);
-            face->set_node(3) = this->get_node(4);
-            face->set_node(4) = this->get_node(7);
-            face->set_node(5) = this->get_node(11);
-            face->set_node(6) = this->get_node(13);
-            face->set_node(7) = this->get_node(10);
-
-            break;
-          }
-        case 3: // the quad face at x=0
-          {
-            face = new Quad8;
-
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(3);
-            face->set_node(3) = this->get_node(5);
-            face->set_node(4) = this->get_node(8);
-            face->set_node(5) = this->get_node(9);
-            face->set_node(6) = this->get_node(14);
-            face->set_node(7) = this->get_node(11);
-
-            break;
-          }
+        case 0: // the triangular face at z=-1
         case 4: // the triangular face at z=1
           {
             face = new Tri6;
-
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(4);
-            face->set_node(2) = this->get_node(5);
-            face->set_node(3) = this->get_node(12);
-            face->set_node(4) = this->get_node(13);
-            face->set_node(5) = this->get_node(14);
-
+            break;
+          }
+        case 1: // the quad face at y=0
+        case 2: // the other quad face
+        case 3: // the quad face at x=0
+          {
+            face = new Quad8;
             break;
           }
         default:
@@ -235,6 +177,11 @@ UniquePtr<Elem> Prism15::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
+
+      // Set the nodes
+      for (unsigned n=0; n<face->n_nodes(); ++n)
+        face->set_node(n) = this->get_node(Prism15::side_nodes_map[i][n]);
+
       return UniquePtr<Elem>(face);
     }
 
