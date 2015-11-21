@@ -20,7 +20,7 @@
 // Local includes
 #include "libmesh/face_quad.h"
 #include "libmesh/edge_edge2.h"
-
+#include "libmesh/face_quad4.h"
 
 
 namespace libMesh
@@ -54,34 +54,8 @@ dof_id_type Quad::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-    case 0:
-      return
-        this->compute_key (this->node(0),
-                           this->node(1));
-
-    case 1:
-      return
-        this->compute_key (this->node(1),
-                           this->node(2));
-
-    case 2:
-      return
-        this->compute_key (this->node(2),
-                           this->node(3));
-
-    case 3:
-      return
-        this->compute_key (this->node(3),
-                           this->node(0));
-
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
-    }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  return this->compute_key(this->node(Quad4::side_nodes_map[s][0]),
+                           this->node(Quad4::side_nodes_map[s][1]));
 }
 
 
@@ -92,35 +66,8 @@ UniquePtr<Elem> Quad::side (const unsigned int i) const
 
   Elem* edge = new Edge2;
 
-  switch (i)
-    {
-    case 0:
-      {
-        edge->set_node(0) = this->get_node(0);
-        edge->set_node(1) = this->get_node(1);
-        break;
-      }
-    case 1:
-      {
-        edge->set_node(0) = this->get_node(1);
-        edge->set_node(1) = this->get_node(2);
-        break;
-      }
-    case 2:
-      {
-        edge->set_node(0) = this->get_node(2);
-        edge->set_node(1) = this->get_node(3);
-        break;
-      }
-    case 3:
-      {
-        edge->set_node(0) = this->get_node(3);
-        edge->set_node(1) = this->get_node(0);
-        break;
-      }
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
-    }
+  for (unsigned n=0; n<edge->n_nodes(); ++n)
+    edge->set_node(n) = this->get_node(Quad4::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(edge);
 }
