@@ -148,72 +148,17 @@ UniquePtr<Elem> Pyramid14::build_side (const unsigned int i, bool proxy) const
 
       switch (i)
         {
-        case 0:  // triangular face 1
+        case 0: // triangular face 1
+        case 1: // triangular face 2
+        case 2: // triangular face 3
+        case 3: // triangular face 4
           {
             face = new Tri6;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(5);
-            face->set_node(4) = this->get_node(10);
-            face->set_node(5) = this->get_node(9);
-
             break;
           }
-        case 1:  // triangular face 2
-          {
-            face = new Tri6;
-
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(6);
-            face->set_node(4) = this->get_node(11);
-            face->set_node(5) = this->get_node(10);
-
-            break;
-          }
-        case 2:  // triangular face 3
-          {
-            face = new Tri6;
-
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(7);
-            face->set_node(4) = this->get_node(12);
-            face->set_node(5) = this->get_node(11);
-
-            break;
-          }
-        case 3:  // triangular face 4
-          {
-            face = new Tri6;
-
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(8);
-            face->set_node(4) = this->get_node(9);
-            face->set_node(5) = this->get_node(12);
-
-            break;
-          }
-        case 4:  // the quad face at z=0
+        case 4: // the quad face at z=0
           {
             face = new Quad9;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(2);
-            face->set_node(3) = this->get_node(1);
-            face->set_node(4) = this->get_node(8);
-            face->set_node(5) = this->get_node(7);
-            face->set_node(6) = this->get_node(6);
-            face->set_node(7) = this->get_node(5);
-            face->set_node(8) = this->get_node(13);
-
             break;
           }
         default:
@@ -221,6 +166,11 @@ UniquePtr<Elem> Pyramid14::build_side (const unsigned int i, bool proxy) const
         }
 
       face->subdomain_id() = this->subdomain_id();
+
+      // Set the nodes
+      for (unsigned n=0; n<face->n_nodes(); ++n)
+        face->set_node(n) = this->get_node(Pyramid14::side_nodes_map[i][n]);
+
       return UniquePtr<Elem>(face);
     }
 

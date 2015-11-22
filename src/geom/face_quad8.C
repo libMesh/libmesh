@@ -203,39 +203,9 @@ UniquePtr<Elem> Quad8::build_side (const unsigned int i,
       Elem* edge = new Edge3;
       edge->subdomain_id() = this->subdomain_id();
 
-      switch (i)
-        {
-        case 0:
-          {
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(1);
-            edge->set_node(2) = this->get_node(4);
-            break;
-          }
-        case 1:
-          {
-            edge->set_node(0) = this->get_node(1);
-            edge->set_node(1) = this->get_node(2);
-            edge->set_node(2) = this->get_node(5);
-            break;
-          }
-        case 2:
-          {
-            edge->set_node(0) = this->get_node(2);
-            edge->set_node(1) = this->get_node(3);
-            edge->set_node(2) = this->get_node(6);
-            break;
-          }
-        case 3:
-          {
-            edge->set_node(0) = this->get_node(3);
-            edge->set_node(1) = this->get_node(0);
-            edge->set_node(2) = this->get_node(7);
-            break;
-          }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
+      // Set the nodes
+      for (unsigned n=0; n<edge->n_nodes(); ++n)
+        edge->set_node(n) = this->get_node(Quad8::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }

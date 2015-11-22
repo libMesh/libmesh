@@ -138,61 +138,16 @@ UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
         case 0: // the base face
           {
             face = new Quad4;
-
-            // Only here, the face element's normal points inward
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(2);
-            face->set_node(3) = this->get_node(3);
-
             break;
           }
 
-        case 1:  // connecting to another infinite element
+          // connecting to another infinite element
+        case 1:
+        case 2:
+        case 3:
+        case 4:
           {
             face = new InfQuad4;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(5);
-
-            break;
-          }
-
-        case 2:  // connecting to another infinite element
-          {
-            face = new InfQuad4;
-
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(5);
-            face->set_node(3) = this->get_node(6);
-
-            break;
-          }
-
-        case 3:  // connecting to another infinite element
-          {
-            face = new InfQuad4;
-
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(6);
-            face->set_node(3) = this->get_node(7);
-
-            break;
-          }
-
-        case 4:  // connecting to another infinite element
-          {
-            face = new InfQuad4;
-
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(7);
-            face->set_node(3) = this->get_node(4);
-
             break;
           }
 
@@ -201,6 +156,11 @@ UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
+
+      // Set the nodes
+      for (unsigned n=0; n<face->n_nodes(); ++n)
+        face->set_node(n) = this->get_node(InfHex8::side_nodes_map[i][n]);
+
       return UniquePtr<Elem>(face);
     }
 

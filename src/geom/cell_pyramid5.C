@@ -135,55 +135,17 @@ UniquePtr<Elem> Pyramid5::build_side (const unsigned int i,
 
       switch (i)
         {
-        case 0:  // triangular face 1
+        case 0: // triangular face 1
+        case 1: // triangular face 2
+        case 2: // triangular face 3
+        case 3: // triangular face 4
           {
             face = new Tri3;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-
             break;
           }
-        case 1:  // triangular face 2
-          {
-            face = new Tri3;
-
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(4);
-
-            break;
-          }
-        case 2:  // triangular face 3
-          {
-            face = new Tri3;
-
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(4);
-
-            break;
-          }
-        case 3:  // triangular face 4
-          {
-            face = new Tri3;
-
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(4);
-
-            break;
-          }
-        case 4:  // the quad face at z=0
+        case 4: // the quad face at z=0
           {
             face = new Quad4;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(2);
-            face->set_node(3) = this->get_node(1);
-
             break;
           }
         default:
@@ -191,6 +153,11 @@ UniquePtr<Elem> Pyramid5::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
+
+      // Set the nodes
+      for (unsigned n=0; n<face->n_nodes(); ++n)
+        face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
+
       return UniquePtr<Elem>(face);
     }
 

@@ -146,57 +146,17 @@ UniquePtr<Elem> Prism6::build_side (const unsigned int i,
 
       switch (i)
         {
-        case 0:  // the triangular face at z=-1
-          {
-            face = new Tri3;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(1);
-
-            break;
-          }
-        case 1:  // the quad face at y=0
-          {
-            face = new Quad4;
-
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(3);
-
-            break;
-          }
-        case 2:  // the other quad face
-          {
-            face = new Quad4;
-
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(5);
-            face->set_node(3) = this->get_node(4);
-
-            break;
-          }
-        case 3: // the quad face at x=0
-          {
-            face = new Quad4;
-
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(3);
-            face->set_node(3) = this->get_node(5);
-
-            break;
-          }
+        case 0: // the triangular face at z=-1
         case 4: // the triangular face at z=1
           {
             face = new Tri3;
-
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(4);
-            face->set_node(2) = this->get_node(5);
-
+            break;
+          }
+        case 1: // the quad face at y=0
+        case 2: // the other quad face
+        case 3: // the quad face at x=0
+          {
+            face = new Quad4;
             break;
           }
         default:
@@ -204,6 +164,11 @@ UniquePtr<Elem> Prism6::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
+
+      // Set the nodes
+      for (unsigned n=0; n<face->n_nodes(); ++n)
+        face->set_node(n) = this->get_node(Prism6::side_nodes_map[i][n]);
+
       return UniquePtr<Elem>(face);
     }
 

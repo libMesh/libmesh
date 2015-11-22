@@ -196,33 +196,27 @@ UniquePtr<Elem> InfQuad4::build_side (const unsigned int i,
         case 0:
           {
             edge = new Edge2;
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(1);
             break;
           }
 
+          // adjacent to another infinite element
         case 1:
-          {
-            // adjacent to another infinite element
-            edge = new InfEdge2;
-            edge->set_node(0) = this->get_node(1);
-            edge->set_node(1) = this->get_node(3);
-            break;
-          }
-
         case 2:
           {
-            // adjacent to another infinite element
             edge = new InfEdge2;
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(2);
             break;
           }
+
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
 
       edge->subdomain_id() = this->subdomain_id();
+
+      // Set the nodes
+      for (unsigned n=0; n<edge->n_nodes(); ++n)
+        edge->set_node(n) = this->get_node(InfQuad4::side_nodes_map[i][n]);
+
       return UniquePtr<Elem>(edge);
     }
 
