@@ -958,6 +958,12 @@ public:
    */
   void cache_elem_dims();
 
+  /**
+   * Search the mesh for elements that have a neighboring element
+   * of dim+1 and set that element as the interior parent
+   */
+  void detect_interior_parents();
+
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,

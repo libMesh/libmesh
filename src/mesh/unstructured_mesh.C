@@ -231,9 +231,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
   START_LOG("find_neighbors()", "Mesh");
 
-  //This map will be used to set interior parents
-  std::vector< std::vector<dof_id_type> > node_to_elem ( this->n_nodes() );
-
   const element_iterator el_end = this->elements_end();
 
   //TODO:[BSK] This should be removed later?!
@@ -266,15 +263,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
       {
         Elem* element = *el;
-
-        //Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
-        for (unsigned int n=0; n<(*el)->n_vertices(); n++)
-          {
-            libmesh_assert_less ((*el)->node(n), node_to_elem.size());
-            libmesh_assert_less ((*el)->id(), this->n_elem());
-
-            node_to_elem[(*el)->node(n)].push_back((*el)->id());
-          }
 
         for (unsigned char ms=0; ms<element->n_neighbors(); ms++)
           {
@@ -557,77 +545,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
           // We should have found *some* interior_parent at this
           // point, whether semilocal or remote.
           libmesh_assert(current_elem->interior_parent());
-        }
-    }
-
-  // Automatically set interior parents
-  for(element_iterator it = this->active_elements_begin();
-      it != this->active_elements_end(); it++)
-    {
-      Elem * element = *it;
-
-      //Ignore an 3D element or an element that already has an interior parent
-      if(element->dim()>=LIBMESH_DIM || element->interior_parent())
-        continue;
-
-      std::vector< std::set<dof_id_type> > neighbors( element->n_vertices() );
-
-      bool found_interior_parents = false;
-
-      for(dof_id_type n=0; n < element->n_vertices(); n++)
-        {
-          std::vector<dof_id_type> &element_ids = node_to_elem[element->node(n)];
-          for(std::vector<dof_id_type>::iterator e_it = element_ids.begin();
-              e_it != element_ids.end(); e_it++)
-            {
-              dof_id_type eid = *e_it;
-              if(this->elem(eid)->dim() == element->dim()+1)
-                neighbors[n].insert(eid);
-            }
-          if(neighbors[n].size()>0)
-            {
-              found_interior_parents = true;
-            }
-          else
-            {
-              // We have found an empty set, no reason to continue
-              // Ensure we set this flag to false before the break since it could have
-              // been set to true for previous vertex
-              found_interior_parents = false;
-              break;
-            }
-        }
-
-      // If we have successfully generated a set of elements for each vertex, we will compare
-      // the set for vertex 0 will the sets for the vertices until we find a id that exists in
-      // all sets.  If found, this is our an interior parent id.  The interior parent id found
-      // will be the lowest element id if there is potential for multiple interior parents.
-      if(found_interior_parents)
-        {
-          std::set<dof_id_type> &neighbors_0 = neighbors[0];
-          for(std::set<dof_id_type>::iterator e_it = neighbors_0.begin();
-              e_it != neighbors_0.end(); e_it++)
-            {
-              found_interior_parents=false;
-              dof_id_type interior_parent_id = *e_it;
-              for(dof_id_type n=1; n < element->n_vertices(); n++)
-                {
-                  if(neighbors[n].find(interior_parent_id)!=neighbors[n].end())
-                    {
-                      found_interior_parents=true;
-                    }
-                  else
-                    {
-                      found_interior_parents=false;
-                      break;
-                    }
-                }
-              if(found_interior_parents)
-              {
-                element->set_interior_parent(this->elem(interior_parent_id));
-                break;
-              }
-            }
         }
     }
 
