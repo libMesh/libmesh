@@ -311,11 +311,9 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
 
   _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
 
-  // Load the singular values into sigma, ignore U_val and VT_val
-  const unsigned int n_sigma_vals =
-    cast_int<unsigned int>(sigma_val.size());
-  sigma.resize(n_sigma_vals);
-  for(unsigned int i=0; i<n_sigma_vals; i++)
+  // Copy the singular values into sigma, ignore U_val and VT_val
+  sigma.resize(cast_int<unsigned int>(sigma_val.size()));
+  for (unsigned int i=0; i<sigma.size(); i++)
     sigma(i) = sigma_val[i];
 
 }
@@ -350,38 +348,37 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
   //                  computed.
   char JOBVT = 'S';
 
+  // Note: Lapack is going to compute the singular values of A^T.  If
+  // A=U * S * V^T, then A^T = V * S * U^T, which means that the
+  // values returned in the "U_val" array actually correspond to the
+  // entries of the V matrix, and the values returned in the VT_val
+  // array actually correspond to the entries of U^T.  Therefore, we
+  // pass VT in the place of U and U in the place of VT below!
   std::vector<T> sigma_val;
-  std::vector<T> U_val;
-  std::vector<T> VT_val;
-
-  _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
-
-  // Load the singular values into sigma, ignore U_val and VT_val
-  const unsigned int n_sigma_vals =
-    cast_int<unsigned int>(sigma_val.size());
-  sigma.resize(n_sigma_vals);
-  for(unsigned int i=0; i<n_sigma_vals; i++)
-    sigma(i) = sigma_val[i];
-
   int M = this->n();
   int N = this->m();
   int min_MN = (M < N) ? M : N;
-  U.resize(M,min_MN);
-  for(unsigned int i=0; i<U.m(); i++)
-    for(unsigned int j=0; j<U.n(); j++)
-      {
-        unsigned int index = i + j*U.n();  // Column major storage
-        U(i,j) = U_val[index];
-      }
 
-  VT.resize(min_MN,N);
-  for(unsigned int i=0; i<VT.m(); i++)
-    for(unsigned int j=0; j<VT.n(); j++)
-      {
-        unsigned int index = i + j*U.n(); // Column major storage
-        VT(i,j) = VT_val[index];
-      }
+  // Size user-provided storage appropriately. Inside svd_helper:
+  // U_val is sized to (M x min_MN)
+  // VT_val is sized to (min_MN x N)
+  // So, we set up U to have the shape of "VT_val^T", and VT to
+  // have the shape of "U_val^T".
+  //
+  // Finally, since the results are stored in column-major order by
+  // Lapack, but we actually want the transpose of what Lapack
+  // returns, this means (conveniently) that we don't even have to
+  // copy anything after the call to _svd_helper, it should already be
+  // in the correct order!
+  U.resize(N, min_MN);
+  VT.resize(min_MN, M);
 
+  _svd_helper(JOBU, JOBVT, sigma_val, VT.get_values(), U.get_values());
+
+  // Copy the singular values into sigma.
+  sigma.resize(cast_int<unsigned int>(sigma_val.size()));
+  for (unsigned int i=0; i<sigma.size(); i++)
+    sigma(i) = sigma_val[i];
 }
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
@@ -439,12 +436,17 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //          if JOBU = 'S', U contains the first min(m,n) columns of U
   //          (the left singular vectors, stored columnwise);
   //          if JOBU = 'N' or 'O', U is not referenced.
-  U_val.resize( LDU*M );
+  if (JOBU == 'S')
+    U_val.resize( LDU*min_MN );
+  else
+    U_val.resize( LDU*M );
 
   //  LDVT    (input) INTEGER
   //          The leading dimension of the array VT.  LDVT >= 1; if
   //          JOBVT = 'A', LDVT >= N; if JOBVT = 'S', LDVT >= min(M,N).
   int LDVT = N;
+  if (JOBVT == 'S')
+    LDVT = min_MN;
 
   //  VT      (output) DOUBLE PRECISION array, dimension (LDVT,N)
   //          If JOBVT = 'A', VT contains the N-by-N orthogonal matrix
