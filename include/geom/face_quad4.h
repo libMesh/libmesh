@@ -135,7 +135,7 @@ public:
 
   /**
    * @returns an id associated with the global node ids of this
-   * element.  The id is not necessariy unique, but should be
+   * element.  The id is not necessarily unique, but should be
    * close.
    */
   virtual dof_id_type key () const libmesh_override;
