@@ -126,7 +126,7 @@ public:
 
   /**
    * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
+   * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    *
    * We reimplemenet this method here for the \p Quad9 since we can
@@ -134,6 +134,14 @@ public:
    * key.
    */
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
+
+  /**
+   * Compute a unique key for this element which is suitable for
+   * hashing (not necessarily unique, but close).  The key is based
+   * solely on the mid-face node's global id, to be consistent with 3D
+   * elements that have Quad9 faces (Hex27, Prism18, etc.).
+   */
+  virtual dof_id_type key () const libmesh_override;
 
   virtual UniquePtr<Elem> build_side (const unsigned int i,
                                       bool proxy) const libmesh_override;
