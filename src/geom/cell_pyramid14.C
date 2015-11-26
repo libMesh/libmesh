@@ -119,6 +119,31 @@ bool Pyramid14::has_affine_map() const
 
 
 
+dof_id_type Pyramid14::key (const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_sides());
+
+  switch (s)
+    {
+    case 0: // triangular face 1
+    case 1: // triangular face 2
+    case 2: // triangular face 3
+    case 3: // triangular face 4
+      return Pyramid::key(s);
+
+    case 4:  // the quad face at z=0
+      return this->compute_key (this->node(13));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
+    }
+
+  libmesh_error_msg("We'll never get here!");
+  return 0;
+}
+
+
+
 UniquePtr<Elem> Pyramid14::build_side (const unsigned int i, bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
