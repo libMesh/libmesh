@@ -128,6 +128,13 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
+   * @returns an id associated with the global node ids of this
+   * element.  The id is not necessarily unique, but should be
+   * close.
+   */
+  virtual dof_id_type key () const libmesh_override;
+
+  /**
    * @returns a primitive (2-noded) edge for
    * edge i.
    */
