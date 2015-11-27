@@ -250,14 +250,4 @@ Real Quad4::volume () const
     }
 }
 
-
-
-dof_id_type Quad4::key () const
-{
-  return this->compute_key(this->node(0),
-                           this->node(1),
-                           this->node(2),
-                           this->node(3));
-}
-
 } // namespace libMesh

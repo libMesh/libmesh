@@ -128,18 +128,6 @@ public:
    */
   virtual Real volume () const libmesh_override;
 
-  /**
-   * Don't hide Quad::key(side) defined in the base class.
-   */
-  using Quad::key;
-
-  /**
-   * @returns an id associated with the global node ids of this
-   * element.  The id is not necessarily unique, but should be
-   * close.
-   */
-  virtual dof_id_type key () const libmesh_override;
-
 protected:
 
   /**
