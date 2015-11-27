@@ -108,6 +108,31 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 
 
+dof_id_type InfQuad6::key (const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_sides());
+
+  switch (s)
+    {
+      // Edge3 side
+    case 0:
+      return this->compute_key (this->node(4));
+
+      // InfEdge
+    case 1:
+    case 2:
+      return InfQuad::key(s);
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
+    }
+
+  libmesh_error_msg("We'll never get here!");
+  return 0;
+}
+
+
+
 UniquePtr<Elem> InfQuad6::build_side (const unsigned int i,
                                       bool proxy) const
 {
