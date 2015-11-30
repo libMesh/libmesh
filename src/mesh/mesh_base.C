@@ -527,7 +527,7 @@ void MeshBase::detect_interior_parents()
   parallel_object_only();
 
   // Check if the mesh contains mixed dimensions. If so, then set interior parents, otherwise return.
-  if( this->elem_dimensions().size() == 1 )
+  if (this->elem_dimensions().size() == 1)
     return;
 
   //This map will be used to set interior parents
@@ -538,23 +538,25 @@ void MeshBase::detect_interior_parents()
 
   for (; el!=end; ++el)
     {
-      //Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
-      for (unsigned int n=0; n<(*el)->n_vertices(); n++)
-        {
-          libmesh_assert_less ((*el)->id(), this->max_elem_id());
+      const Elem * elem = *el;
 
-          node_to_elem[(*el)->node(n)].push_back((*el)->id());
+      // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
+      for (unsigned int n=0; n<elem->n_vertices(); n++)
+        {
+          libmesh_assert_less (elem->id(), this->max_elem_id());
+
+          node_to_elem[elem->node(n)].push_back(elem->id());
         }
     }
 
   // Automatically set interior parents
   el = this->elements_begin();
-  for( ; el!=end; ++el )
+  for (; el!=end; ++el)
     {
       Elem * element = *el;
 
-      //Ignore an 3D element or an element that already has an interior parent
-      if( element->dim()>=LIBMESH_DIM || element->interior_parent() )
+      // Ignore an 3D element or an element that already has an interior parent
+      if (element->dim()>=LIBMESH_DIM || element->interior_parent())
         continue;
 
       // Start by generating a SET of elements that are dim+1 to the current
@@ -565,17 +567,17 @@ void MeshBase::detect_interior_parents()
 
       bool found_interior_parents = false;
 
-      for( dof_id_type n=0; n < element->n_vertices(); n++ )
+      for (dof_id_type n=0; n < element->n_vertices(); n++)
         {
           std::vector<dof_id_type> &element_ids = node_to_elem[element->node(n)];
-          for( std::vector<dof_id_type>::iterator e_it = element_ids.begin();
+          for (std::vector<dof_id_type>::iterator e_it = element_ids.begin();
                e_it != element_ids.end(); e_it++)
             {
               dof_id_type eid = *e_it;
-              if( this->elem(eid)->dim() == element->dim()+1 )
+              if (this->elem(eid)->dim() == element->dim()+1)
                 neighbors[n].insert(eid);
             }
-          if( neighbors[n].size()>0 )
+          if (neighbors[n].size()>0)
             {
               found_interior_parents = true;
             }
@@ -593,17 +595,17 @@ void MeshBase::detect_interior_parents()
       // the set for vertex 0 will the sets for the vertices until we find a id that exists in
       // all sets.  If found, this is our an interior parent id.  The interior parent id found
       // will be the lowest element id if there is potential for multiple interior parents.
-      if(found_interior_parents)
+      if (found_interior_parents)
         {
           std::set<dof_id_type> &neighbors_0 = neighbors[0];
-          for(std::set<dof_id_type>::iterator e_it = neighbors_0.begin();
+          for (std::set<dof_id_type>::iterator e_it = neighbors_0.begin();
               e_it != neighbors_0.end(); e_it++)
             {
               found_interior_parents=false;
               dof_id_type interior_parent_id = *e_it;
-              for(dof_id_type n=1; n < element->n_vertices(); n++)
+              for (dof_id_type n=1; n < element->n_vertices(); n++)
                 {
-                  if(neighbors[n].find(interior_parent_id)!=neighbors[n].end())
+                  if (neighbors[n].find(interior_parent_id)!=neighbors[n].end())
                     {
                       found_interior_parents=true;
                     }
@@ -613,11 +615,11 @@ void MeshBase::detect_interior_parents()
                       break;
                     }
                 }
-              if(found_interior_parents)
-              {
-                element->set_interior_parent( this->elem(interior_parent_id) );
-                break;
-              }
+              if (found_interior_parents)
+                {
+                  element->set_interior_parent(this->elem(interior_parent_id));
+                  break;
+                }
             }
         }
     }
