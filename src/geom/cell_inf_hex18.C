@@ -103,6 +103,8 @@ bool InfHex18::is_node_on_edge(const unsigned int n,
   return false;
 }
 
+
+
 dof_id_type InfHex18::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
@@ -111,42 +113,14 @@ dof_id_type InfHex18::key (const unsigned int s) const
   switch (s)
     {
     case 0: // the base face
+      return this->compute_key (this->node(16));
 
-      return
-        this->compute_key (this->node(16));
-
-
-    case 1:  // the face at y = -1
-
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(5),
-                           this->node(4));
-
-    case 2:  // the face at x = 1
-
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(6),
-                           this->node(5));
-
+    case 1: // the face at y = -1
+    case 2: // the face at x = 1
     case 3: // the face at y = 1
-
-      return
-        this->compute_key (this->node(2),
-                           this->node(3),
-                           this->node(7),
-                           this->node(6));
-
     case 4: // the face at x = -1
+      return InfHex::key(s);
 
-      return
-        this->compute_key (this->node(3),
-                           this->node(0),
-                           this->node(4),
-                           this->node(7));
     default:
       libmesh_error_msg("Invalid side s = " << s);
     }

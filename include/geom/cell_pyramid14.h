@@ -138,6 +138,22 @@ public:
   virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
+   * Don't hide Pyramid::key() defined in the base class.
+   */
+  using Pyramid::key;
+
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessarily unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   *
+   * We reimplemenet this method here for the \p Pyramid14 since we can
+   * use the center node of the base face to provide a perfect (unique)
+   * key.
+   */
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
+
+  /**
    * Builds a \p QUAD9 or \p TRI6 coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */

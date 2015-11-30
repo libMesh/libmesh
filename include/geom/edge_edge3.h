@@ -170,9 +170,10 @@ public:
   using Edge::key;
 
   /**
-   * @returns an id associated with the global node ids of this
-   * element.  The id is not necessariy unique, but should be
-   * close.
+   * Compute a unique key for this element which is suitable for
+   * hashing (not necessarily unique, but close).  The key is based
+   * solely on the mid-edge node's global id, to be consistent with 2D
+   * elements that have Edge3 sides (Quad9, Quad8, etc.).
    */
   virtual dof_id_type key () const libmesh_override;
 

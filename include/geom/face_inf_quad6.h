@@ -113,6 +113,16 @@ public:
   virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessarily unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   *
+   * We override this function to return a key for the Edge3 side
+   * which is consistent which Edge3::key().
+   */
+  virtual dof_id_type key (const unsigned int s) const libmesh_override;
+
+  /**
    * Creates and returns an \p Edge3 for the base (0) side, and an \p InfEdge2 for
    * the sides 1, 2.
    */

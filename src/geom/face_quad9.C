@@ -201,6 +201,13 @@ dof_id_type Quad9::key (const unsigned int s) const
 
 
 
+dof_id_type Quad9::key () const
+{
+  return this->compute_key(this->node(8));
+}
+
+
+
 UniquePtr<Elem> Quad9::build_side (const unsigned int i,
                                    bool proxy) const
 {

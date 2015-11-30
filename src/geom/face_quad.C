@@ -60,6 +60,16 @@ dof_id_type Quad::key (const unsigned int s) const
 
 
 
+dof_id_type Quad::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1),
+                           this->node(2),
+                           this->node(3));
+}
+
+
+
 UniquePtr<Elem> Quad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());

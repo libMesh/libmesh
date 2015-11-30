@@ -200,14 +200,14 @@ public:
 
   /**
    * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
+   * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
   virtual dof_id_type key (const unsigned int s) const = 0;
 
   /**
    * @returns an id associated with the global node ids of this
-   * element.  The id is not necessariy unique, but should be
+   * element.  The id is not necessarily unique, but should be
    * close. Uses the same hash as the key(s) function, so for example
    * if "tri3" is side 0 of "tet4", then tri3->key()==tet4->key(0).
    */

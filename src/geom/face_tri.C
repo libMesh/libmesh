@@ -59,6 +59,15 @@ dof_id_type Tri::key (const unsigned int s) const
 
 
 
+dof_id_type Tri::key () const
+{
+  return this->compute_key(this->node(0),
+                           this->node(1),
+                           this->node(2));
+}
+
+
+
 UniquePtr<Elem> Tri::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
