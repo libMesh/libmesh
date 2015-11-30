@@ -83,7 +83,7 @@ void DenseMatrixBase<T>::condense(const unsigned int iv,
 
 
 template<typename T>
-void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
+void DenseMatrixBase<T>::print_scientific (std::ostream& os, unsigned precision) const
 {
 #ifndef LIBMESH_BROKEN_IOSTREAM
 
@@ -96,7 +96,7 @@ void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
       for (unsigned int j=0; j<this->n(); j++)
         os << std::setw(15)
            << std::scientific
-           << std::setprecision(8)
+           << std::setprecision(precision)
            << this->el(i,j) << " ";
 
       os << std::endl;
@@ -111,7 +111,7 @@ void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-        os << std::setprecision(8)
+        os << std::setprecision(precision)
            << this->el(i,j)
            << " ";
 
