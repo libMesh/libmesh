@@ -91,9 +91,14 @@ AC_DEFUN([CONFIGURE_PETSC],
 
       # Determine if PETSc has been built with debugging enabled.
       # Note that this token will appear as LIBMESH_PETSC_USE_DEBUG in
-      # our header, so it won't collide with PETSc's.
-      petsc_use_debug=`grep -c PETSC_USE_DEBUG $PETSC_DIR/include/petscconf.h`
-      if (test $petsc_use_debug -gt 0); then
+      # our header, so it won't collide with PETSc's.  We look for
+      # petscconf.h in both $PETSC_DIR/include and
+      # $PETSC_DIR/$PETSC_ARCH/include, since it can appear in either.
+      petsc_use_debug=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_DEBUG`
+
+      # It is safe to test the value of $petsc_use_debug, it is
+      # guaranteed to be either 0 or nonzero.
+      if (test $petsc_use_debug -gt 0) ; then
         AC_DEFINE(PETSC_USE_DEBUG, 1, [Flag indicating whether or not PETSc was configured with debugging enabled])
       fi
     else # petscversion.h was not readable
