@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 template<typename T>
-void DenseVectorBase<T>::print_scientific (std::ostream& os) const
+void DenseVectorBase<T>::print_scientific (std::ostream& os, unsigned precision) const
 {
 #ifndef LIBMESH_BROKEN_IOSTREAM
 
@@ -38,7 +38,7 @@ void DenseVectorBase<T>::print_scientific (std::ostream& os) const
   for (unsigned int i=0; i<this->size(); i++)
     os << std::setw(10)
        << std::scientific
-       << std::setprecision(8)
+       << std::setprecision(precision)
        << this->el(i)
        << std::endl;
 
@@ -49,7 +49,7 @@ void DenseVectorBase<T>::print_scientific (std::ostream& os) const
 
   // Print the matrix entries.
   for (unsigned int i=0; i<this->size(); i++)
-    os << std::setprecision(8)
+    os << std::setprecision(precision)
        << this->el(i)
        << std::endl;
 

@@ -97,7 +97,7 @@ public:
    * Prints the entries of the vector with additional
    * decimal places in scientific notation.
    */
-  void print_scientific(std::ostream& os) const;
+  void print_scientific(std::ostream& os, unsigned precision=8) const;
 
 };
 

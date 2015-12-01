@@ -121,7 +121,7 @@ public:
    * Prints the matrix entries with more decimal places in
    * scientific notation.
    */
-  void print_scientific(std::ostream& os) const;
+  void print_scientific(std::ostream& os, unsigned precision=8) const;
 
   /**
    * Adds \p factor to every element in the matrix.
