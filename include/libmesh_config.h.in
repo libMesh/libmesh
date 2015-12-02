@@ -79,6 +79,12 @@
 /* PETSc's subminor version number, as detected by petsc.m4 */
 #undef DETECTED_PETSC_VERSION_SUBMINOR
 
+/* TBB's major version number, as detected by tbb.m4 */
+#undef DETECTED_TBB_VERSION_MAJOR
+
+/* TBB's minor version number, as detected by tbb.m4 */
+#undef DETECTED_TBB_VERSION_MINOR
+
 /* VTK's major version number, as detected by vtk.m4 */
 #undef DETECTED_VTK_VERSION_MAJOR
 
