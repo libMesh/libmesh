@@ -35055,6 +35055,22 @@ fi
         TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
       fi
 
+                        tbbmajor=`grep "define TBB_VERSION_MAJOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MAJOR[ ]*//g"`
+      tbbminor=`grep "define TBB_VERSION_MINOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MINOR[ ]*//g"`
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_TBB_VERSION_MAJOR $tbbmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_TBB_VERSION_MINOR $tbbminor
+_ACEOF
+
+
+
 
 
 
