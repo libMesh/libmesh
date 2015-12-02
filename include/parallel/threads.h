@@ -35,6 +35,10 @@
 #  include "tbb/spin_mutex.h"
 #  include "tbb/recursive_mutex.h"
 #  include "tbb/atomic.h"
+
+#define TBB_VERSION_LESS_THAN(major,minor)                              \
+  ((LIBMESH_DETECTED_TBB_VERSION_MAJOR < (major) ||                     \
+    (LIBMESH_DETECTED_TBB_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_TBB_VERSION_MINOR < (minor)))) ? 1 : 0)
 #endif
 
 // C++ includes
