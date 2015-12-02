@@ -47,6 +47,19 @@ AC_DEFUN([CONFIGURE_TBB],
         TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
       fi
 
+      dnl Extract TBB_VERSION_MAJOR and TBB_VERSION_MINOR from
+      dnl tbb_stddef.h.  This will allow us to set up a
+      dnl TBB_VERSION_LESS_THAN macro.
+      tbbmajor=`grep "define TBB_VERSION_MAJOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MAJOR[ ]*//g"`
+      tbbminor=`grep "define TBB_VERSION_MINOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MINOR[ ]*//g"`
+
+      AC_DEFINE_UNQUOTED(DETECTED_TBB_VERSION_MAJOR, [$tbbmajor],
+        [TBB's major version number, as detected by tbb.m4])
+
+      AC_DEFINE_UNQUOTED(DETECTED_TBB_VERSION_MINOR, [$tbbminor],
+        [TBB's minor version number, as detected by tbb.m4])
+
+
       AC_SUBST(TBB_LIBRARY)
       AC_SUBST(TBB_INCLUDE)
       AC_DEFINE(USING_THREADS, 1,
