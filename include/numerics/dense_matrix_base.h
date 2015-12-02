@@ -137,14 +137,15 @@ public:
 protected:
 
   /**
+   * Helper function -
    * Performs the computation M1 = M2 * M3 where:
    * M1 = (m x n)
    * M2 = (m x p)
    * M3 = (p x n)
    */
-  void multiply (DenseMatrixBase<T>& M1,
-                 const DenseMatrixBase<T>& M2,
-                 const DenseMatrixBase<T>& M3);
+  static void multiply (DenseMatrixBase<T>& M1,
+                        const DenseMatrixBase<T>& M2,
+                        const DenseMatrixBase<T>& M3);
 
   /**
    * Condense-out the \p (i,j) entry of the matrix, forcing
