@@ -48,10 +48,6 @@
 // specialized quadrature rules will be built.
 #include "libmesh/quadrature.h"
 
-// Include the namespace \p QuadratureRules for
-// some handy descriptions.
-#include "libmesh/quadrature_rules.h"
-
 // Define useful datatypes for finite element
 // matrix and vector components.
 #include "libmesh/sparse_matrix.h"
@@ -114,22 +110,8 @@ int main (int argc, char** argv)
   // must be given at run time.
   if (argc < 3)
     {
-      if (init.comm().rank() == 0)
-        {
-          libMesh::err << "Usage: " << argv[0] << " -q n\n"
-                       << "  where n is one of:" << std::endl;
-
-          // Note that only some of all quadrature rules are
-          // valid choices.  For example, the Jacobi quadrature
-          // is actually a "helper" for higher-order rules,
-          // included in QGauss.
-          for (unsigned int n=0; n<QuadratureRules::num_valid_elem_rules; n++)
-            libMesh::err << "  " << QuadratureRules::valid_elem_rules[n] << "    "
-                         << QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
-                         << std::endl;
-        }
-
-      libmesh_error_msg("Error, must choose a valid quadrature rule.");
+      libmesh_error_msg("Usage: " << argv[0] << " -q <rule>\n"          \
+                        << "  where <rule> is one of QGAUSS, QSIMPSON, or QTRAP.");
     }
 
 
