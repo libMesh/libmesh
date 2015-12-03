@@ -238,19 +238,23 @@ protected:
           }
         else if (elem.refinement_flag() == Elem::JUST_COARSENED)
           {
-            // Find the child with this point.  Use a large tolerance
-            // to allow for out-of-element finite differencing of
-            // mixed gradient terms.  Pray we have no quadrature
-            // locations like 0.49999999 on C0 elements.
+            // Find the child with this point.  Use out_of_elem_tol
+            // (in physical space, which may correspond to a large
+            // tolerance in master space!) to allow for out-of-element
+            // finite differencing of mixed gradient terms.  Pray we
+            // have no quadrature locations like 0.49999999 on C0
+            // elements.
+            const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
+
             for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child(c)->close_to_point(p, out_of_elem_tol))
+              if (elem.child(c)->close_to_point(p, master_tol))
                 {
                   old_context.pre_fe_reinit(sys, elem.child(c));
                   break;
                 }
 
             libmesh_assert
-              (old_context.get_elem().close_to_point(p, out_of_elem_tol));
+              (old_context.get_elem().close_to_point(p, master_tol));
           }
         else
           {
@@ -269,20 +273,22 @@ protected:
       {
         libmesh_assert(old_context.has_elem());
 
-        if (!old_context.get_elem().close_to_point(p, out_of_elem_tol))
+        const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
+
+        if (!old_context.get_elem().close_to_point(p, master_tol))
           {
             libmesh_assert_equal_to
               (elem.refinement_flag(), Elem::JUST_COARSENED);
 
             for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child(c)->close_to_point(p, out_of_elem_tol))
+              if (elem.child(c)->close_to_point(p, master_tol))
                 {
                   old_context.pre_fe_reinit(sys, elem.child(c));
                   break;
                 }
 
             libmesh_assert
-              (old_context.get_elem().close_to_point(p, out_of_elem_tol));
+              (old_context.get_elem().close_to_point(p, master_tol));
           }
       }
 
