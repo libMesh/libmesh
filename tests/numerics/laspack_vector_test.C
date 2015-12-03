@@ -9,8 +9,7 @@
 
 using namespace libMesh;
 
-class LaspackVectorTest : public NumericVectorTest<LaspackVector<Number> >
-{
+class LaspackVectorTest : public NumericVectorTest<LaspackVector<Real> > {
 public:
   void setUp()
   {
