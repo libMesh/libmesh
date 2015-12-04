@@ -65,22 +65,6 @@ AC_DEFUN([CONFIGURE_PETSC],
       petscversion=$petscmajor.$petscminor.$petscsubminor
       petscmajorminor=$petscmajor.$petscminor.x
 
-      AC_SUBST(petscversion)
-      AC_SUBST(petscmajor)
-      AC_SUBST(petscmajorminor)
-
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
-        [PETSc's major version number, as detected by petsc.m4])
-
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MINOR, [$petscminor],
-        [PETSc's minor version number, as detected by petsc.m4])
-
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
-        [PETSc's subminor version number, as detected by petsc.m4])
-
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_RELEASE, [$petscrelease],
-        [PETSc release (1) or petsc-dev (0), as detected by petsc.m4])
-
       if test $petscmajor = 2; then
         if test "x$PETSC_ARCH" = x ; then
           enablepetsc=no
@@ -89,27 +73,16 @@ AC_DEFUN([CONFIGURE_PETSC],
         fi
       fi
 
-      # Determine if PETSc has been built with debugging enabled.
-      # Note that this token will appear as LIBMESH_PETSC_USE_DEBUG in
-      # our header, so it won't collide with PETSc's.  We look for
-      # petscconf.h in both $PETSC_DIR/include and
+      # We look for petscconf.h in both $PETSC_DIR/include and
       # $PETSC_DIR/$PETSC_ARCH/include, since it can appear in either.
       petsc_use_debug=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_DEBUG`
 
-      # It is safe to test the value of $petsc_use_debug, it is
-      # guaranteed to be either 0 or nonzero.
-      if (test $petsc_use_debug -gt 0) ; then
-        AC_DEFINE(PETSC_USE_DEBUG, 1, [Flag indicating whether or not PETSc was configured with debugging enabled])
-      fi
     else # petscversion.h was not readable
         enablepetsc=no
     fi
 
     # If we haven't been disabled yet, carry on!
     if (test $enablepetsc != no) ; then
-
-        AC_SUBST(PETSC_ARCH) # Note: may be empty...
-        AC_SUBST(PETSC_DIR)
 
         # Check for snoopable MPI
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
@@ -128,7 +101,6 @@ AC_DEFUN([CONFIGURE_PETSC],
 
         # If we couldn't snoop MPI from PETSc, fall back on ACX_MPI.
         if test "x$PETSC_MPI" != x ; then
-          AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
           MPI_IMPL="petsc_snooped"
           AC_MSG_RESULT(<<< Attempting to configure library with MPI from PETSC config... >>>)
         else
@@ -220,14 +192,6 @@ AC_DEFUN([CONFIGURE_PETSC],
         # PETSc-snooped MPI
         PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
 
-        # FIXME: Don't do AC_SUBST if PETSc test program fails to compile?
-        AC_SUBST(PETSCLINKLIBS)
-        AC_SUBST(PETSCINCLUDEDIRS)
-        AC_SUBST(PETSC_CC_INCLUDES)
-        AC_SUBST(PETSC_FC_INCLUDES)
-
-        AC_SUBST(MPI_IMPL)
-
         # Check for Hypre
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
           HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
@@ -238,7 +202,6 @@ AC_DEFUN([CONFIGURE_PETSC],
         fi
 
         if test "x$HYPRE_LIB" != x ; then
-          AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])
           AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
         fi
 
@@ -267,9 +230,9 @@ AC_DEFUN([CONFIGURE_PETSC],
         }
         ]])],[
           AC_MSG_RESULT(yes)
-          AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
         ],[
           AC_MSG_RESULT(no)
+          enablepetsc=no
         ])
 
         # Return CXXFLAGS to their original state.
@@ -279,6 +242,7 @@ AC_DEFUN([CONFIGURE_PETSC],
 
 
         # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
+        petsc_have_tao=no
         AC_MSG_CHECKING(for TAO support via PETSc)
         AC_LANG_PUSH([C])
 
@@ -303,7 +267,7 @@ AC_DEFUN([CONFIGURE_PETSC],
         }
         ]])],[
           AC_MSG_RESULT(yes)
-          AC_DEFINE(HAVE_PETSC_TAO, 1, [Flag indicating whether or not the Toolkit for Advanced Optimization (TAO) is available via PETSc])
+          petsc_have_tao=yes
         ],[
           AC_MSG_RESULT(no)
         ])
@@ -335,5 +299,57 @@ AC_DEFUN([CONFIGURE_PETSC],
   fi
 
   AC_SUBST(enablepetsc)
-])
 
+  # If PETSc is still enabled at this point, do the required AC_SUBST
+  # and AC_DEFINE commands.  This prevents libmesh_config.h from having
+  # confusing information in it if the test compilation steps fail.
+  if (test $enablepetsc != no) ; then
+    AC_SUBST(petscversion)
+    AC_SUBST(petscmajor)
+    AC_SUBST(petscmajorminor)
+
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
+      [PETSc's major version number, as detected by petsc.m4])
+
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MINOR, [$petscminor],
+      [PETSc's minor version number, as detected by petsc.m4])
+
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
+      [PETSc's subminor version number, as detected by petsc.m4])
+
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_RELEASE, [$petscrelease],
+      [PETSc release (1) or petsc-dev (0), as detected by petsc.m4])
+
+    # Set a #define if PETSc was built with debugging enabled.  Note
+    # that this token will appear as LIBMESH_PETSC_USE_DEBUG in our
+    # header, so it won't collide with PETSc's.  It is safe to test
+    # the value of $petsc_use_debug, it is guaranteed to be either 0
+    # or nonzero.
+    if (test $petsc_use_debug -gt 0) ; then
+      AC_DEFINE(PETSC_USE_DEBUG, 1, [Flag indicating whether or not PETSc was configured with debugging enabled])
+    fi
+
+    AC_SUBST(PETSC_ARCH) # Note: may be empty...
+    AC_SUBST(PETSC_DIR)
+
+    AC_SUBST(PETSCLINKLIBS)
+    AC_SUBST(PETSCINCLUDEDIRS)
+    AC_SUBST(PETSC_CC_INCLUDES)
+    AC_SUBST(PETSC_FC_INCLUDES)
+    AC_SUBST(MPI_IMPL)
+
+    if test "x$PETSC_MPI" != x ; then
+      AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+    fi
+
+    if test "x$HYPRE_LIB" != x ; then
+      AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])
+    fi
+
+    AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
+
+    if (test $petsc_have_tao != no) ; then
+      AC_DEFINE(HAVE_PETSC_TAO, 1, [Flag indicating whether or not the Toolkit for Advanced Optimization (TAO) is available via PETSc])
+    fi
+  fi
+])
