@@ -125,6 +125,42 @@ AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)
 
 
 # -------------------------------------------------------------
+# Check for inconsistencies between PETSc and libmesh's scalar
+# and index datatypes.
+# -------------------------------------------------------------
+if (test $enablepetsc != no) ; then
+  petsc_use_64bit_indices=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_64BIT_INDICES`
+
+  # If PETSc is using 64-bit indices, make sure that
+  # $dof_bytes==8, or else print an informative message and
+  # disable PETSc.
+  if (test $petsc_use_64bit_indices -gt 0) ; then
+    if (test $dof_bytes != 8) ; then
+      AC_MSG_ERROR([<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>])
+    fi
+
+  # Otherwise, PETSc is using 32-bit indices, so make sure that
+  # libmesh's $dof_bytes<=4.
+  elif (test $dof_bytes -gt 4) ; then
+    AC_MSG_ERROR([<<< PETSc is using 32-bit indices, you must configure libmesh with --with-dof-id-bytes=<1|2|4>. >>>])
+  fi
+
+  # Libmesh must use {complex,real} scalars when PETSc uses {complex,real} scalars.
+  petsc_use_complex=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_COMPLEX`
+
+  if (test $petsc_use_complex -gt 0) ; then
+    if (test $enablecomplex = no) ; then
+      AC_MSG_ERROR([<<< PETSc was built with complex scalars, you must configure libmesh with --enable-complex. >>>])
+    fi
+
+  elif (test $enablecomplex = yes) ; then
+    AC_MSG_ERROR([<<< PETSc was built with real scalars, you must configure libmesh with --disable-complex. >>>])
+  fi
+fi
+
+
+
+# -------------------------------------------------------------
 # SLEPc -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_SLEPC

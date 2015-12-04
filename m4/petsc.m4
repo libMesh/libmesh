@@ -105,21 +105,6 @@ AC_DEFUN([CONFIGURE_PETSC],
         enablepetsc=no
     fi
 
-    # If PETSc is using 64-bit indices, make sure that
-    # $dof_bytes==8, or else print an informative message and
-    # disable PETSc.
-    if (test $enablepetsc != no) ; then
-      petsc_use_64bit_indices=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_64BIT_INDICES`
-
-      if (test $petsc_use_64bit_indices -gt 0) ; then
-        if (test $dof_bytes != 8) ; then
-          AC_MSG_RESULT([<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>])
-          enablepetsc=no
-        fi
-      fi
-    fi
-
-
     # If we haven't been disabled yet, carry on!
     if (test $enablepetsc != no) ; then
 
