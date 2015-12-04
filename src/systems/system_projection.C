@@ -242,8 +242,9 @@ protected:
             // (in physical space, which may correspond to a large
             // tolerance in master space!) to allow for out-of-element
             // finite differencing of mixed gradient terms.  Pray we
-            // have no quadrature locations like 0.49999999 on C0
-            // elements.
+            // have no quadrature locations which are within 1e-5 of
+            // the element subdivision boundary but are not exactly on
+            // that boundary.
             const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
 
             for (unsigned int c=0; c != elem.n_children(); ++c)
@@ -387,13 +388,13 @@ template <>
 const Real
 OldSolutionValue
   <Number, &FEMContext::point_value>::out_of_elem_tol =
-  3*TOLERANCE;
+  10*TOLERANCE;
 
 template <>
 const Real
 OldSolutionValue
   <Gradient, &FEMContext::point_gradient>::out_of_elem_tol =
-  3*TOLERANCE;
+  10*TOLERANCE;
 
 
 /**
