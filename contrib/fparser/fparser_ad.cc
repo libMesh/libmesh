@@ -12,6 +12,14 @@ using namespace FPoptimizer_CodeTree;
 
 #include <iostream>
 
+#include <sys/time.h>
+
+struct timeval tp;
+long int timestamp() {
+  gettimeofday(&tp, NULL);
+  return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+}
+
 #if LIBMESH_HAVE_FPARSER_JIT
 #  include <fstream>
 #  include <cstdio>
@@ -383,13 +391,45 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
 }
 
 template<typename Value_t>
-int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
+int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name, bool cached)
 {
   this->CopyOnWrite();
 
   try
   {
-    return ad->AutoDiff(LookUpVarOpcode(var_name), this->mData);
+    unsigned int var_number = LookUpVarOpcode(var_name);
+
+    std::string cache_file;
+    if (cached)
+    {
+      // generate a sha1 hash of the Value type size, byte code, and immediate list
+      SHA1 *sha1 = new SHA1();
+      char result[41]; // 40 sha1 chars plus null
+      size_t value_t_size = sizeof(Value_t);
+      sha1->addBytes((char*) &value_t_size, sizeof(value_t_size));
+      sha1->addBytes((char*) &this->mData->mByteCode[0], this->mData->mByteCode.size() * sizeof(unsigned));
+      sha1->addBytes((char*) &this->mData->mImmed[0], this->mData->mImmed.size() * sizeof(Value_t));
+
+      unsigned char* digest = sha1->getDigest();
+      for (unsigned int i = 0; i<20; ++i)
+        sprintf(&(result[i*2]), "%02x", digest[i]);
+      free(digest);
+      delete sha1;
+
+      // variable number
+      char var_number_string[sizeof(unsigned int) * 2 + 1]; // two hex chars per byte plus null
+      sprintf(var_number_string, "%x", var_number - VarBegin);
+
+      // function name
+      cache_file = "d_";
+      cache_file += result;
+      cache_file += "_";
+      cache_file += var_number_string;
+
+      std::cout << "Derivative cache file: '" << cache_file << "'\n";
+    }
+
+    return ad->AutoDiff(var_number, this->mData);
   }
   catch(std::exception &e)
   {
@@ -440,7 +480,7 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
   std::vector<CodeTree<Value_t> > var_trees;
   var_trees.reserve(mData->mVariablesAmount);
   for(unsigned n=0; n<mData->mVariablesAmount; ++n)
-    var_trees.push_back( CodeTreeVar<Value_t> (n+VarBegin) );
+    var_trees.push_back(CodeTreeVar<Value_t>(n + VarBegin));
 
   orig.GenerateFrom(*mData, var_trees, false);
 
@@ -449,6 +489,7 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
 
   // start recursing the code tree
   CodeTree<Value_t> diff = D(orig);
+  FPoptimizer_Optimize::ApplyGrammars(diff);
 
   std::vector<unsigned> byteCode;
   std::vector<Value_t> immed;
@@ -919,6 +960,65 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 }
 #endif
 
+template<typename Value_t>
+void FunctionParserADBase<Value_t>::Serialize(std::ostream & ostr)
+{
+  // write version header
+  const int version = 1;
+  ostr.write((char*)&version, sizeof(version));
+
+  // write bytecode buffer
+  const size_t byte_code_size = this->mData->mByteCode.size();
+  ostr.write((char*)&byte_code_size, sizeof(byte_code_size));
+  ostr.write((char*)&this->mData->mByteCode[0], byte_code_size * sizeof(unsigned));
+
+  // write immediates
+  const size_t immed_size = this->mData->mImmed.size();
+  ostr.write((char*)&immed_size, sizeof(immed_size));
+  ostr.write((char*)&this->mData->mImmed[0], immed_size * sizeof(Value_t));
+
+  // write stacktop max
+  ostr.write((char*)&this->mData->mStackSize, sizeof(this->mData->mStackSize));
+}
+
+template<typename Value_t>
+void FunctionParserADBase<Value_t>::Unserialize(std::istream & istr)
+{
+  // read version header
+  int version;
+  istr.read((char*)&version, sizeof(version));
+  if (version != 1) throw UnknownSerializationVersionException;
+
+  // read bytecode buffer
+  std::vector<unsigned> byteCode;
+  size_t byte_code_size;
+  istr.read((char*)&byte_code_size, sizeof(byte_code_size));
+  byteCode.resize(byte_code_size);
+  istr.read((char*)&byteCode[0], byte_code_size * sizeof(unsigned));
+
+  // read immediates
+  std::vector<Value_t> immed;
+  size_t immed_size;
+  istr.read((char*)&immed_size, sizeof(immed_size));
+  immed.resize(immed_size);
+  istr.read((char*)&immed[0], immed_size * sizeof(Value_t));
+
+  // read stacktop
+  unsigned stacktop_max;
+  istr.read((char*)&stacktop_max, sizeof(unsigned));
+
+  if(this->mData->mStackSize != stacktop_max)
+  {
+      this->mData->mStackSize = stacktop_max;
+  #if !defined(FP_USE_THREAD_SAFE_EVAL) && \
+  !defined(FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA)
+      this->mData->mStack.resize(stacktop_max);
+  #endif
+  }
+
+  this->mData->mByteCode.swap(byteCode);
+  this->mData->mImmed.swap(immed);
+}
 
 #define FUNCTIONPARSERAD_INSTANTIATE_CLASS(type) \
     template class FunctionParserADBase< type >; \

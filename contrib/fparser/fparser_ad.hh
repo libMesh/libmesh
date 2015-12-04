@@ -18,7 +18,7 @@ public:
   /**
    * auto-differentiate for var
    */
-  int AutoDiff(const std::string & var_name);
+  int AutoDiff(const std::string & var_name, bool cached = false);
 
   /**
    * add another variable
@@ -56,6 +56,16 @@ public:
    * the compilation after Optimization
    */
   void Optimize();
+
+  /**
+   * write the full state of the current FParser object to a stream
+   */
+  void Serialize(std::ostream &);
+
+  /**
+   * restore the full state of the current FParser object from a stream
+   */
+  void Unserialize(std::istream &);
 
 #if LIBMESH_HAVE_FPARSER_JIT
   /**
@@ -114,6 +124,9 @@ private:
   class UnknownVariable : public std::exception {
     virtual const char* what() const throw() { return "Unknown variable"; }
   } UnknownVariableException;
+  class UnknownSerializationVersion : public std::exception {
+    virtual const char* what() const throw() { return "Unknown serialization file version"; }
+  } UnknownSerializationVersionException;
 };
 
 
