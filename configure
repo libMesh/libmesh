@@ -821,11 +821,14 @@ SLEPC_INCLUDE
 SLEPC_DIR
 LIBMESH_ENABLE_PETSC_FALSE
 LIBMESH_ENABLE_PETSC_TRUE
-enablepetsc
 PETSC_FC_INCLUDES
 PETSC_CC_INCLUDES
 PETSCINCLUDEDIRS
 PETSCLINKLIBS
+petscmajorminor
+petscmajor
+petscversion
+enablepetsc
 MPI_INCLUDES_PATHS
 MPI_INCLUDES_PATH
 MPI_LIBS_PATHS
@@ -833,9 +836,6 @@ MPI_LIBS_PATH
 MPI_LIBS
 MPI_IMPL
 MPI
-petscmajorminor
-petscmajor
-petscversion
 PETSCARCH
 PETSC_ARCH
 PETSC_DIR
@@ -31703,34 +31703,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
       petscversion=$petscmajor.$petscminor.$petscsubminor
       petscmajorminor=$petscmajor.$petscminor.x
 
-
-
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_PETSC_VERSION_MAJOR $petscmajor
-_ACEOF
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_PETSC_VERSION_MINOR $petscminor
-_ACEOF
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_PETSC_VERSION_SUBMINOR $petscsubminor
-_ACEOF
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_PETSC_VERSION_RELEASE $petscrelease
-_ACEOF
-
-
       if test $petscmajor = 2; then
         if test "x$PETSC_ARCH" = x ; then
           enablepetsc=no
@@ -31740,32 +31712,16 @@ $as_echo "<<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. 
         fi
       fi
 
-      # Determine if PETSc has been built with debugging enabled.
-      # Note that this token will appear as LIBMESH_PETSC_USE_DEBUG in
-      # our header, so it won't collide with PETSc's.  We look for
-      # petscconf.h in both $PETSC_DIR/include and
+      # We look for petscconf.h in both $PETSC_DIR/include and
       # $PETSC_DIR/$PETSC_ARCH/include, since it can appear in either.
       petsc_use_debug=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_DEBUG`
 
-      # It is safe to test the value of $petsc_use_debug, it is
-      # guaranteed to be either 0 or nonzero.
-      if (test $petsc_use_debug -gt 0) ; then
-
-$as_echo "#define PETSC_USE_DEBUG 1" >>confdefs.h
-
-      fi
     else # petscversion.h was not readable
         enablepetsc=no
     fi
 
-
-
-
     # If we haven't been disabled yet, carry on!
     if (test $enablepetsc != no) ; then
-
-         # Note: may be empty...
-
 
         # Check for snoopable MPI
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
@@ -31784,9 +31740,6 @@ $as_echo "#define PETSC_USE_DEBUG 1" >>confdefs.h
 
         # If we couldn't snoop MPI from PETSc, fall back on ACX_MPI.
         if test "x$PETSC_MPI" != x ; then
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
           MPI_IMPL="petsc_snooped"
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Attempting to configure library with MPI from PETSC config... >>>" >&5
 $as_echo "<<< Attempting to configure library with MPI from PETSC config... >>>" >&6; }
@@ -32391,14 +32344,6 @@ $as_echo "<<< Could not find a viable PETSc Makefile to determine PETSC_CC_INCLU
         # PETSc-snooped MPI
         PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
 
-        # FIXME: Don't do AC_SUBST if PETSc test program fails to compile?
-
-
-
-
-
-
-
         # Check for Hypre
         if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
           HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
@@ -32409,9 +32354,6 @@ $as_echo "<<< Could not find a viable PETSc Makefile to determine PETSC_CC_INCLU
         fi
 
         if test "x$HYPRE_LIB" != x ; then
-
-$as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
-
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Hypre support >>>" >&5
 $as_echo "<<< Configuring library with Hypre support >>>" >&6; }
         fi
@@ -32454,13 +32396,11 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-$as_echo "#define HAVE_PETSC 1" >>confdefs.h
-
-
 else
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+          enablepetsc=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -32477,6 +32417,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
         # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
+        petsc_have_tao=no
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TAO support via PETSc" >&5
 $as_echo_n "checking for TAO support via PETSc... " >&6; }
         ac_ext=c
@@ -32513,9 +32454,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_PETSC_TAO 1" >>confdefs.h
-
+          petsc_have_tao=yes
 
 else
 
@@ -34087,6 +34026,81 @@ fi
 
 
 
+  # If PETSc is still enabled at this point, do the required AC_SUBST
+  # and AC_DEFINE commands.  This prevents libmesh_config.h from having
+  # confusing information in it if the test compilation steps fail.
+  if (test $enablepetsc != no) ; then
+
+
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_PETSC_VERSION_MAJOR $petscmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_PETSC_VERSION_MINOR $petscminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_PETSC_VERSION_SUBMINOR $petscsubminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_PETSC_VERSION_RELEASE $petscrelease
+_ACEOF
+
+
+    # Set a #define if PETSc was built with debugging enabled.  Note
+    # that this token will appear as LIBMESH_PETSC_USE_DEBUG in our
+    # header, so it won't collide with PETSc's.  It is safe to test
+    # the value of $petsc_use_debug, it is guaranteed to be either 0
+    # or nonzero.
+    if (test $petsc_use_debug -gt 0) ; then
+
+$as_echo "#define PETSC_USE_DEBUG 1" >>confdefs.h
+
+    fi
+
+     # Note: may be empty...
+
+
+
+
+
+
+
+
+    if test "x$PETSC_MPI" != x ; then
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+    fi
+
+    if test "x$HYPRE_LIB" != x ; then
+
+$as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
+
+    fi
+
+
+$as_echo "#define HAVE_PETSC 1" >>confdefs.h
+
+
+    if (test $petsc_have_tao != no) ; then
+
+$as_echo "#define HAVE_PETSC_TAO 1" >>confdefs.h
+
+    fi
+  fi
+
 if (test $enablempi != no) ; then
   libmesh_optional_INCLUDES="$MPI_INCLUDES_PATHS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$MPI_LIBS_PATHS $MPI_LIBS $libmesh_optional_LIBS"
@@ -34104,6 +34118,42 @@ else
 fi
 
 # -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# Check for inconsistencies between PETSc and libmesh's scalar
+# and index datatypes.
+# -------------------------------------------------------------
+if (test $enablepetsc != no) ; then
+  petsc_use_64bit_indices=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_64BIT_INDICES`
+
+  # If PETSc is using 64-bit indices, make sure that
+  # $dof_bytes==8, or else print an informative message and
+  # disable PETSc.
+  if (test $petsc_use_64bit_indices -gt 0) ; then
+    if (test $dof_bytes != 8) ; then
+      as_fn_error $? "<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>" "$LINENO" 5
+    fi
+
+  # Otherwise, PETSc is using 32-bit indices, so make sure that
+  # libmesh's $dof_bytes<=4.
+  elif (test $dof_bytes -gt 4) ; then
+    as_fn_error $? "<<< PETSc is using 32-bit indices, you must configure libmesh with --with-dof-id-bytes=<1|2|4>. >>>" "$LINENO" 5
+  fi
+
+  # Libmesh must use {complex,real} scalars when PETSc uses {complex,real} scalars.
+  petsc_use_complex=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_COMPLEX`
+
+  if (test $petsc_use_complex -gt 0) ; then
+    if (test $enablecomplex = no) ; then
+      as_fn_error $? "<<< PETSc was built with complex scalars, you must configure libmesh with --enable-complex. >>>" "$LINENO" 5
+    fi
+
+  elif (test $enablecomplex = yes) ; then
+    as_fn_error $? "<<< PETSc was built with real scalars, you must configure libmesh with --disable-complex. >>>" "$LINENO" 5
+  fi
+fi
 
 
 
