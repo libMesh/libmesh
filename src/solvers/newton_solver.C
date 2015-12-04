@@ -371,6 +371,9 @@ unsigned int NewtonSolver::solve()
           current_linear_tolerance = minimum_linear_tolerance;
         }
 
+      // If starting the nonlinear solve with a really good initial guess, we dont want to set an absurd linear tolerance
+      current_linear_tolerance = std::max(current_linear_tolerance, absolute_residual_tolerance / current_residual / 10.0);
+
       // At this point newton_iterate is the current guess, and
       // linear_solution is now about to become the NEGATIVE of the next
       // Newton step.
