@@ -388,13 +388,13 @@ template <>
 const Real
 OldSolutionValue
   <Number, &FEMContext::point_value>::out_of_elem_tol =
-  3*TOLERANCE;
+  10*TOLERANCE;
 
 template <>
 const Real
 OldSolutionValue
   <Gradient, &FEMContext::point_gradient>::out_of_elem_tol =
-  3*TOLERANCE;
+  10*TOLERANCE;
 
 
 /**
