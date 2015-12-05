@@ -21,9 +21,6 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/petsc_matrix.h"
-#ifdef LIBMESH_HAVE_PETSC
-#  include "petscmat.h"
-#endif
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 // The nonlinear solver and system we will be using
@@ -32,32 +29,14 @@
 
 using namespace libMesh;
 
-bool operator< (QuadraturePointOnSideId const& a, QuadraturePointOnSideId const& b)
-{
-  if( (a._element_id == b._element_id) && (a._side_index == b._side_index) )
-  {
-    return (a._qp < b._qp);
-  }
-  else if(a._element_id == b._element_id)
-  {
-    return (a._side_index < b._side_index);
-  }
-  else
-  {
-    return (a._element_id < b._element_id);
-  }
-}
-
 LinearElasticityWithContact::LinearElasticityWithContact
   (NonlinearImplicitSystem &sys_in,
-   Real contact_penalty_in,
-   Real contact_proximity_tol_in) :
+   Real contact_penalty_in) :
     _sys(sys_in),
-    _contact_penalty(contact_penalty_in),
-    _contact_proximity_tol(contact_proximity_tol_in),
-    _contains_point_tol(TOLERANCE),
-    _augment_sparsity(_sys)
-{}
+    _augment_sparsity(_sys),
+    _contact_penalty(contact_penalty_in)
+{
+}
 
 AugmentSparsityOnContact& LinearElasticityWithContact::get_augment_sparsity()
 {
@@ -73,52 +52,6 @@ void LinearElasticityWithContact::set_contact_penalty(
 Real LinearElasticityWithContact::get_contact_penalty() const
 {
   return _contact_penalty;
-}
-
-void LinearElasticityWithContact::clear_contact_data()
-{
-  _contact_intersection_data.clear();
-}
-
-void LinearElasticityWithContact::set_contact_data(
-  dof_id_type element_id,
-  unsigned char side_index,
-  unsigned int qp,
-  IntersectionPointData intersection_pt_data)
-{
-  QuadraturePointOnSideId elem_side_qp(element_id, side_index, qp);
-  _contact_intersection_data[elem_side_qp] = intersection_pt_data;
-}
-
-bool LinearElasticityWithContact::is_contact_detected(
-  dof_id_type element_id,
-  unsigned char side_index,
-  unsigned int qp)
-{
-  QuadraturePointOnSideId elem_side_qp(element_id, side_index, qp);
-
-  std::map<QuadraturePointOnSideId, IntersectionPointData>::iterator it =
-    _contact_intersection_data.find(elem_side_qp);
-
-  return (it != _contact_intersection_data.end());
-}
-
-IntersectionPointData LinearElasticityWithContact::get_contact_data(
-  dof_id_type element_id,
-  unsigned char side_index,
-  unsigned int qp)
-{
-  QuadraturePointOnSideId elem_side_qp(element_id, side_index, qp);
-
-  std::map<QuadraturePointOnSideId, IntersectionPointData>::iterator it =
-    _contact_intersection_data.find(elem_side_qp);
-
-  if(it == _contact_intersection_data.end())
-  {
-    libmesh_error_msg("Contact intersection point not found.");
-  }
-
-  return it->second;
 }
 
 Real LinearElasticityWithContact::kronecker_delta(
@@ -183,16 +116,7 @@ void LinearElasticityWithContact::move_mesh(
       uvw_names[2] = "w";
 
       {
-        // Inverse map node to reference element
-        // Get local coordinates to feed these into compute_data().
-        // Note that the fe_type can safely be used from the 0-variable,
-        // since the inverse mapping is the same for all FEFamilies.
-        const Point reference_point (
-          FEInterface::inverse_map (
-            elem->dim(),
-            _sys.get_dof_map().variable_type(0),
-            elem,
-            *node));
+        const Point master_point = elem->master_point(node_id);
 
         Point uvw;
         for (unsigned int index=0; index<uvw_names.size(); index++)
@@ -200,7 +124,7 @@ void LinearElasticityWithContact::move_mesh(
           const unsigned int var = _sys.variable_number(uvw_names[index]);
           const FEType& fe_type = _sys.get_dof_map().variable_type(var);
 
-          FEComputeData data (_sys.get_equation_systems(), reference_point);
+          FEComputeData data (_sys.get_equation_systems(), master_point);
 
           FEInterface::compute_data(elem->dim(),
                                     fe_type,
@@ -230,6 +154,90 @@ void LinearElasticityWithContact::move_mesh(
   }
 }
 
+void LinearElasticityWithContact::initialize_contact_load_paths()
+{
+  const MeshBase& mesh = _sys.get_mesh();
+
+  std::vector<dof_id_type> nodes_on_lower_surface;
+  std::vector<dof_id_type> nodes_on_upper_surface;
+
+  MeshBase::const_element_iterator       el     = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+
+  _lambdas.clear();
+  for ( ; el != end_el; ++el)
+  {
+    const Elem* elem = *el;
+
+    for (unsigned int side=0; side<elem->n_sides(); side++)
+    {
+      if (elem->neighbor(side) == NULL)
+      {
+        bool on_lower_contact_surface =
+          mesh.get_boundary_info().has_boundary_id
+              (elem, side, CONTACT_BOUNDARY_LOWER);
+
+        bool on_upper_contact_surface =
+          mesh.get_boundary_info().has_boundary_id
+              (elem, side, CONTACT_BOUNDARY_UPPER);
+
+        if( on_lower_contact_surface && on_upper_contact_surface )
+        {
+          libmesh_error_msg("Should not be on both surfaces at the same time");
+        }
+
+        if( on_lower_contact_surface || on_upper_contact_surface )
+        {
+          for(unsigned int node_index=0; node_index<elem->n_nodes(); node_index++)
+          {
+            if(elem->is_node_on_side(node_index, side))
+            {
+              if(on_lower_contact_surface)
+              {
+                nodes_on_lower_surface.push_back(elem->node(node_index));
+              }
+              else
+              {
+                _lambdas[elem->node(node_index)] = 0.;
+                nodes_on_upper_surface.push_back(elem->node(node_index));
+              }
+            }
+          }
+        }
+
+      } // end if nieghbor(side_) != NULL
+    } // end for side
+  } // end for el
+
+  // In this example, we expect the number of upper and lower nodes to match
+  libmesh_assert(nodes_on_lower_surface.size() == nodes_on_upper_surface.size());
+
+  // Do an N^2 search to match the contact nodes
+  _augment_sparsity.clear_contact_node_map();
+  for(unsigned int i=0; i<nodes_on_lower_surface.size(); i++)
+  {
+    dof_id_type lower_node_id = nodes_on_lower_surface[i];
+    Point p_lower = mesh.point(lower_node_id);
+
+    Real min_distance = std::numeric_limits<Real>::max();
+
+    for(unsigned int j=0; j<nodes_on_upper_surface.size(); j++)
+    {
+      dof_id_type upper_node_id = nodes_on_upper_surface[j];
+      Point p_upper = mesh.point(upper_node_id);
+
+      Real distance = (p_upper - p_lower).size();
+
+      if(distance < min_distance)
+      {
+        _augment_sparsity.add_contact_node(lower_node_id, upper_node_id);
+        min_distance = distance;
+      }
+    }
+  }
+
+}
+
 void LinearElasticityWithContact::residual_and_jacobian (
   const NumericVector<Number>& soln,
   NumericVector<Number>* residual,
@@ -239,7 +247,6 @@ void LinearElasticityWithContact::residual_and_jacobian (
   EquationSystems& es = _sys.get_equation_systems();
   const Real young_modulus = es.parameters.get<Real>("young_modulus");
   const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
-  const Real forcing_magnitude = es.parameters.get<Real>("forcing_magnitude");
 
   const MeshBase& mesh = _sys.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
@@ -261,206 +268,11 @@ void LinearElasticityWithContact::residual_and_jacobian (
   fe_neighbor_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
-  const std::vector<Real>& JxW_face = fe_face->get_JxW();
-  const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
-  const std::vector<Point>& face_normals = fe_face->get_normals();
-  const std::vector<Point>& face_xyz = fe_face->get_xyz();
-
-  const std::vector<std::vector<Real> >& phi_neighbor_face = fe_neighbor_face->get_phi();
-
-  // 1. Move mesh_clone based on soln.
-  // 2. Compute and store all contact forces.
-  // 3. Augment the sparsity pattern.
-  {
-    UniquePtr<MeshBase> mesh_clone = mesh.clone();
-    move_mesh(*mesh_clone, soln);
-
-    _augment_sparsity.clear_contact_element_map();
-    clear_contact_data();
-
-    MeshBase::const_element_iterator       el     = mesh_clone->active_elements_begin();
-    const MeshBase::const_element_iterator end_el = mesh_clone->active_elements_end();
-
-    for ( ; el != end_el; ++el)
-    {
-      const Elem* elem = *el;
-
-      for (unsigned int side=0; side<elem->n_sides(); side++)
-      {
-        if (elem->neighbor(side) == NULL)
-        {
-          bool on_lower_contact_surface =
-            mesh_clone->get_boundary_info().has_boundary_id
-                (elem, side, CONTACT_BOUNDARY_LOWER);
-
-          bool on_upper_contact_surface =
-            mesh_clone->get_boundary_info().has_boundary_id
-                (elem, side, CONTACT_BOUNDARY_UPPER);
-
-          if( on_lower_contact_surface && on_upper_contact_surface )
-          {
-            libmesh_error_msg("Should not be on both surfaces at the same time");
-          }
-
-          if( on_lower_contact_surface || on_upper_contact_surface )
-          {
-            fe_face->reinit(elem, side);
-
-            // Let's stash xyz and normals because we reinit on other_elem below
-            std::vector<Point> face_normals_stashed = fe_face->get_normals();
-            std::vector<Point> face_xyz_stashed = fe_face->get_xyz();
-
-            for (unsigned int qp=0; qp<qface.n_points(); qp++)
-            {
-              Point line_point = face_xyz_stashed[qp];
-              Point line_direction = face_normals_stashed[qp];
-
-              // find an element which the line intersects, based on the plane
-              // defined by the normal at the centroid of the other element
-              bool found_other_elem = false;
-
-              // Note that here we loop over all elements (not just local elements)
-              // to be sure we find the appropriate other element.
-              MeshBase::const_element_iterator       other_el     = mesh_clone->active_elements_begin();
-              const MeshBase::const_element_iterator other_end_el = mesh_clone->active_elements_end();
-              for ( ; other_el != other_end_el; ++other_el)
-              {
-                const Elem* other_elem = *other_el;
-
-                if( other_elem->close_to_point(line_point, _contact_proximity_tol) )
-                {
-                  for (unsigned int other_side=0; other_side<other_elem->n_sides(); other_side++)
-                    if (other_elem->neighbor(other_side) == NULL)
-                    {
-                      boundary_id_type other_surface_id =
-                        on_lower_contact_surface ?
-                          CONTACT_BOUNDARY_UPPER : CONTACT_BOUNDARY_LOWER;
-
-                      if( mesh_clone->get_boundary_info().has_boundary_id
-                            (other_elem, other_side, other_surface_id) )
-                      {
-                        UniquePtr<Elem> other_side_elem = other_elem->build_side(other_side);
-
-                        // Define a plane based on the normal at the centroid of other_side_elem
-                        // and check where line_point + s * line_direction (s \in R) intersects
-                        // this plane.
-
-                        const Point reference_centroid (
-                          FEInterface::inverse_map (
-                            other_elem->dim(),
-                            _sys.get_dof_map().variable_type(0),
-                            other_elem,
-                            other_side_elem->centroid()));
-
-                        std::vector<Point> reference_centroid_vector;
-                        reference_centroid_vector.push_back(reference_centroid);
-
-                        fe_face->reinit(
-                          other_elem,
-                          other_side,
-                          TOLERANCE,
-                          &reference_centroid_vector);
-
-                        Point plane_normal = face_normals[0];
-                        Point plane_point = face_xyz[0];
-
-                        // line_direction.dot(plane_normal) == 0.0 if the line and plane are
-                        // parallel. Ignore this case since it should give zero contact force.
-                        if( (line_direction * plane_normal) != 0. )
-                        {
-                          // The signed distance between the line and the plane
-                          Real signed_distance =
-                            ( (plane_point - line_point) * plane_normal) /
-                              (line_direction * plane_normal);
-
-                          Point intersection_point = line_point + signed_distance * line_direction;
-
-                          // Note that signed_distance = (intersection_point - line_point) dot line_direction
-                          // since line_direction is a unit vector.
-
-                          if(other_side_elem->close_to_point(intersection_point, _contains_point_tol))
-                          {
-                            // If the signed distance is negative then we have overlapping elements
-                            // i.e. we have detected contact.
-                            if(signed_distance < 0.0)
-                            {
-                              // We need to store the intersection point, and the element/side
-                              // that it belongs to. We can use this to calculate the contact
-                              // force later on.
-
-                              std::vector<Point> intersection_point_vec;
-                              intersection_point_vec.push_back(intersection_point);
-                              std::vector<Point> inverse_intersection_point_vec;
-
-                              FEInterface::inverse_map(
-                                other_elem->dim(),
-                                fe->get_fe_type(),
-                                other_elem,
-                                intersection_point_vec,
-                                inverse_intersection_point_vec);
-
-                              IntersectionPointData contact_intersection_pt_data(
-                                other_elem->id(),
-                                other_side,
-                                intersection_point,
-                                inverse_intersection_point_vec[0],
-                                line_point,
-                                line_direction);
-
-                              set_contact_data(
-                                elem->id(),
-                                side,
-                                qp,
-                                contact_intersection_pt_data);
-
-                              // We also need to keep track of which elements
-                              // are coupled in order to augment the sparsity pattern
-                              // appropriately later on.
-                              _augment_sparsity.add_contact_element(
-                                elem->id(),
-                                other_elem->id());
-                            }
-
-                            // If we've found an element that contains
-                            // intersection_point then we're done for
-                            // the current quadrature point hence break
-                            // out to the next qp.
-                            found_other_elem = true;
-                            break;
-                          }
-                        }
-                      }
-                    }
-                }
-
-                if(found_other_elem)
-                {
-                  break;
-                }
-              } // end for other_el
-            } // end for qp
-          } // end if on_contact_surface
-        } // end if nieghbor(side_) != NULL
-      } // end for side
-    } // end for el
-  }
-
-  // Clear the Jacobian matrix and reinitialize it so that
-  // we get the updated sparsity pattern
   if(jacobian)
   {
-    dof_map.clear_sparsity();
-    dof_map.compute_sparsity(mesh);
-
-#ifdef LIBMESH_HAVE_PETSC
-    PetscMatrix<Number>* petsc_jacobian = cast_ptr<PetscMatrix<Number>*>(jacobian);
-    petsc_jacobian->update_preallocation_and_zero();
-#else
-    libmesh_error();
-#endif
+    jacobian->zero();
   }
 
   if(residual)
@@ -479,14 +291,6 @@ void LinearElasticityWithContact::residual_and_jacobian (
       {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)},
       {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)},
       {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)}
-    };
-
-  DenseMatrix<Number> Ke_en;
-  DenseSubMatrix<Number> Ke_var_en[3][3] =
-    {
-      {DenseSubMatrix<Number>(Ke_en), DenseSubMatrix<Number>(Ke_en), DenseSubMatrix<Number>(Ke_en)},
-      {DenseSubMatrix<Number>(Ke_en), DenseSubMatrix<Number>(Ke_en), DenseSubMatrix<Number>(Ke_en)},
-      {DenseSubMatrix<Number>(Ke_en), DenseSubMatrix<Number>(Ke_en), DenseSubMatrix<Number>(Ke_en)}
     };
 
   std::vector<dof_id_type> dof_indices;
@@ -552,23 +356,6 @@ void LinearElasticityWithContact::residual_and_jacobian (
                 }
       }
 
-      if( (elem->subdomain_id() == TOP_SUBDOMAIN) )
-      {
-        // assemble \int_Omega f_i v_i \dx
-        DenseVector<Number> f_vec(3);
-        f_vec(0) =  forcing_magnitude/10.;
-        f_vec(1) =  0.0;
-        f_vec(2) = -forcing_magnitude;
-        for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-        {
-          for(unsigned int i=0; i<3; i++)
-          {
-            Re_var[i](dof_i) += JxW[qp] *
-              ( f_vec(i) * phi[dof_i][qp] );
-          }
-        }
-      }
-
       // assemble \int_Omega C_ijkl u_k,l v_i,j \dx
       for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
         for (unsigned int dof_j=0; dof_j<n_var_dofs; dof_j++)
@@ -586,147 +373,6 @@ void LinearElasticityWithContact::residual_and_jacobian (
         }
     }
 
-    // Add contribution due to contact penalty forces
-    for (unsigned int side=0; side<elem->n_sides(); side++)
-      if (elem->neighbor(side) == NULL)
-      {
-        bool on_lower_contact_surface =
-          mesh.get_boundary_info().has_boundary_id
-              (elem, side, CONTACT_BOUNDARY_LOWER);
-
-        bool on_upper_contact_surface =
-          mesh.get_boundary_info().has_boundary_id
-              (elem, side, CONTACT_BOUNDARY_UPPER);
-
-        if( on_lower_contact_surface && on_upper_contact_surface )
-        {
-          libmesh_error_msg("Should not be on both surfaces at the same time");
-        }
-
-        if( on_lower_contact_surface || on_upper_contact_surface )
-        {
-          fe_face->reinit(elem, side);
-          for (unsigned int qp=0; qp<qface.n_points(); qp++)
-          {
-            bool contact_detected =
-              is_contact_detected(
-                elem->id(),
-                side,
-                qp);
-
-            if(contact_detected)
-            {
-              IntersectionPointData intersection_pt_data =
-                get_contact_data(
-                  elem->id(),
-                  side,
-                  qp);
-              Point intersection_point = intersection_pt_data._intersection_point;
-              Point line_point = intersection_pt_data._line_point;
-              Point line_direction = intersection_pt_data._line_direction;
-
-              // signed_distance = (intersection_point - line_point) dot line_direction,
-              // hence we use this to get the contact force
-              Real contact_force =
-                get_contact_penalty() *
-                ( (intersection_point - line_point) * line_direction );
-
-              for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-              {
-                for(unsigned int i=0; i<3; i++)
-                {
-                  Re_var[i](dof_i) += JxW_face[qp] *
-                    ( contact_force * face_normals[qp](i) * phi_face[dof_i][qp] );
-                }
-              }
-
-              // Differentiate contact_force wrt solution coefficients to get
-              // the Jacobian entries.
-              //
-              // Note that intersection_point and line_point
-              // are linear functions of the solution.
-              //
-              // Also, line_direction is a function of the solution, but let's
-              // neglect that for now to make it easier to get the Jacobian.
-              // This is probably fine anyway, since this approximation will
-              // have negligible effect as we approach convergence.
-
-              // dofs local to this element, due to differentiating line_point
-              for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-                for (unsigned int dof_j=0; dof_j<n_var_dofs; dof_j++)
-                {
-                  for(unsigned int i=0; i<3; i++)
-                    for(unsigned int j=0; j<3; j++)
-                    {
-                      Ke_var[i][j](dof_i,dof_j) += JxW_face[qp] *
-                        ( get_contact_penalty() * (-phi_face[dof_j][qp] * line_direction(j)) *
-                           face_normals[qp](i) * phi_face[dof_i][qp] );
-                    }
-                }
-
-              // contribution due to dofs on the remote element, due to
-              // differentiating intersection_point
-              {
-                dof_id_type neighbor_elem_id = intersection_pt_data._neighbor_element_id;
-                const Elem* contact_neighbor = mesh.elem(neighbor_elem_id);
-
-                unsigned char neighbor_side_index = intersection_pt_data._neighbor_side_index;
-
-                std::vector<Point> inverse_intersection_point_vec;
-                inverse_intersection_point_vec.push_back(
-                  intersection_pt_data._inverse_mapped_intersection_point);
-
-                fe_neighbor_face->reinit(
-                  contact_neighbor,
-                  neighbor_side_index,
-                  TOLERANCE,
-                  &inverse_intersection_point_vec);
-
-                std::vector<dof_id_type> neighbor_dof_indices;
-                std::vector< std::vector<dof_id_type> > neighbor_dof_indices_var(3);
-                dof_map.dof_indices (contact_neighbor, neighbor_dof_indices);
-                for(unsigned int var=0; var<3; var++)
-                {
-                  dof_map.dof_indices (contact_neighbor, neighbor_dof_indices_var[var], var);
-                }
-                const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
-                const unsigned int n_neighbor_var_dofs = neighbor_dof_indices_var[0].size();
-
-                Ke_en.resize (n_dofs,n_neighbor_dofs);
-                for(unsigned int var_i=0; var_i<3; var_i++)
-                  for(unsigned int var_j=0; var_j<3; var_j++)
-                  {
-                    Ke_var_en[var_i][var_j].reposition(
-                      var_i*n_var_dofs,
-                      var_j*n_neighbor_var_dofs,
-                      n_var_dofs,
-                      n_neighbor_var_dofs);
-                  }
-
-                for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-                  for (unsigned int dof_j=0; dof_j<n_neighbor_var_dofs; dof_j++)
-                  {
-                    for(unsigned int i=0; i<3; i++)
-                      for(unsigned int j=0; j<3; j++)
-                      {
-                        Ke_var_en[i][j](dof_i,dof_j) += JxW_face[qp] *
-                          ( get_contact_penalty() * (phi_neighbor_face[dof_j][0] * line_direction(j)) *
-                            face_normals[qp](i) * phi_face[dof_i][qp] );
-                      }
-                  }
-
-                if(jacobian)
-                {
-                  jacobian->add_matrix(Ke_en,dof_indices,neighbor_dof_indices);
-                }
-              }
-
-            }
-
-          }
-        }
-      }
-
     dof_map.constrain_element_matrix_and_vector (Ke, Re, dof_indices);
 
     if(jacobian)
@@ -738,6 +384,151 @@ void LinearElasticityWithContact::residual_and_jacobian (
     {
       residual->add_vector (Re, dof_indices);
     }
+  }
+
+  // Move a copy of the mesh based on the solution. This is used to get
+  // the contact forces.
+  UniquePtr<MeshBase> mesh_clone = mesh.clone();
+  move_mesh(*mesh_clone, soln);
+
+  // Add contributions due to contact penalty forces. Only need to do this on
+  // one processor.
+  _lambda_plus_penalty_values.clear();
+
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it =
+    _augment_sparsity._contact_node_map.begin();
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it_end =
+    _augment_sparsity._contact_node_map.end();
+  for( ; it != it_end; ++it)
+  {
+    dof_id_type lower_point_id = it->first;
+    dof_id_type upper_point_id = it->second;
+
+    Point upper_to_lower;
+    {
+      Point lower_node_moved = mesh_clone->point(lower_point_id);
+      Point upper_node_moved = mesh_clone->node(upper_point_id);
+
+      upper_to_lower = (lower_node_moved - upper_node_moved);
+    }
+
+    // Set the contact force direction. Usually this would be calculated
+    // separately on each master node, but here we just set it to (0,0,1)
+    // everywhere.
+    Point contact_force_direction(0.,0.,1.);
+
+    // gap_function > 0. means that contact has been detected
+    // gap_function < 0. means that we have a gap
+    // This sign convention matches Simo & Laursen (1992).
+    Real gap_function = upper_to_lower * contact_force_direction;
+
+    // We use the sign of lambda_plus_penalty to determine whether or
+    // not we need to impose a contact force.
+    Real lambda_plus_penalty =
+      (_lambdas[upper_point_id] + gap_function * _contact_penalty);
+
+    if(lambda_plus_penalty < 0.)
+    {
+      lambda_plus_penalty = 0.;
+    }
+
+    // Store lambda_plus_penalty, we'll need to use it later to update _lambdas
+    _lambda_plus_penalty_values[upper_point_id] = lambda_plus_penalty;
+
+    const Node& lower_node = mesh.node(lower_point_id);
+    const Node& upper_node = mesh.node(upper_point_id);
+
+    std::vector<dof_id_type> dof_indices_on_lower_node(3);
+    std::vector<dof_id_type> dof_indices_on_upper_node(3);
+    DenseVector<Number> lower_contact_force_vec(3);
+    DenseVector<Number> upper_contact_force_vec(3);
+
+    for (unsigned int var=0; var<3; var++)
+    {
+      dof_indices_on_lower_node[var] = lower_node.dof_number(_sys.number(), var, 0);
+      lower_contact_force_vec(var) = -lambda_plus_penalty * contact_force_direction(var);
+
+      dof_indices_on_upper_node[var] = upper_node.dof_number(_sys.number(), var, 0);
+      upper_contact_force_vec(var) = lambda_plus_penalty * contact_force_direction(var);
+    }
+
+    if(lambda_plus_penalty > 0.)
+    {
+      if( residual && (_sys.comm().rank() == 0) )
+      {
+        residual->add_vector (lower_contact_force_vec, dof_indices_on_lower_node);
+        residual->add_vector (upper_contact_force_vec, dof_indices_on_upper_node);
+      }
+
+      // Add the Jacobian terms due to the contact forces. The lambda contribution
+      // is not relevant here because it doesn't depend on the solution.
+      if(jacobian && (_sys.comm().rank() == 0) )
+      {
+        for(unsigned int var=0; var<3; var++)
+        {
+          for(unsigned int j=0; j<3; j++)
+          {
+            jacobian->add(
+              dof_indices_on_lower_node[var],
+              dof_indices_on_upper_node[j],
+              _contact_penalty * contact_force_direction(j) * contact_force_direction(var) );
+
+            jacobian->add(
+              dof_indices_on_lower_node[var],
+              dof_indices_on_lower_node[j],
+              -_contact_penalty * contact_force_direction(j) * contact_force_direction(var) );
+
+            jacobian->add(
+              dof_indices_on_upper_node[var],
+              dof_indices_on_lower_node[j],
+               _contact_penalty * contact_force_direction(j) * contact_force_direction(var) );
+
+            jacobian->add(
+              dof_indices_on_upper_node[var],
+              dof_indices_on_upper_node[j],
+              -_contact_penalty * contact_force_direction(j) * contact_force_direction(var) );
+          }
+        }
+      }
+    }
+    else
+    {
+      // We add zeros to the matrix even when lambda_plus_penalty = 0.
+      // We do this because some linear algebra libraries (e.g. PETSc)
+      // will condense out any unused entries from the sparsity pattern,
+      // so adding these zeros in ensures that these entries are not
+      // condensed out.
+      if(jacobian && (_sys.comm().rank() == 0) )
+      {
+        for(unsigned int var=0; var<3; var++)
+        {
+          for(unsigned int j=0; j<3; j++)
+          {
+            jacobian->add(
+              dof_indices_on_lower_node[var],
+              dof_indices_on_upper_node[j],
+              0. );
+
+            jacobian->add(
+              dof_indices_on_lower_node[var],
+              dof_indices_on_lower_node[j],
+              0. );
+
+            jacobian->add(
+              dof_indices_on_upper_node[var],
+              dof_indices_on_lower_node[j],
+               0. );
+
+            jacobian->add(
+              dof_indices_on_upper_node[var],
+              dof_indices_on_upper_node[j],
+              0. );
+          }
+        }
+      }
+    }
+
+
   }
 
 }
@@ -877,4 +668,89 @@ void LinearElasticityWithContact::compute_stresses()
   // Should call close and update when we set vector entries directly
   stress_system.solution->close();
   stress_system.update();
+}
+
+std::pair<Real,Real> LinearElasticityWithContact::update_lambdas()
+{
+  Real max_delta_lambda = 0.;
+  Real max_new_lambda = 0.;
+
+  std::map<dof_id_type, Real>::iterator it = _lambdas.begin();
+  std::map<dof_id_type, Real>::iterator it_end = _lambdas.end();
+  for( ; it != it_end; ++it )
+  {
+    dof_id_type upper_node_id = it->first;
+
+    auto new_lambda_it = _lambda_plus_penalty_values.find(upper_node_id);
+    if(new_lambda_it == _lambda_plus_penalty_values.end())
+    {
+      libmesh_error_msg("New lambda value not found");
+    }
+
+    Real new_lambda = new_lambda_it->second;
+    Real old_lambda = it->second;
+
+    it->second = new_lambda;
+
+    Real delta_lambda = std::abs(new_lambda-old_lambda);
+    if(delta_lambda > max_delta_lambda)
+    {
+      max_delta_lambda = delta_lambda;
+    }
+    if(std::abs(new_lambda) > max_new_lambda)
+    {
+      max_new_lambda = std::abs(new_lambda);
+    }
+  }
+
+  return std::make_pair(max_delta_lambda, max_new_lambda);
+}
+
+std::pair<Real,Real> LinearElasticityWithContact::get_least_and_max_gap_function()
+{
+  UniquePtr<MeshBase> mesh_clone = _sys.get_mesh().clone();
+  move_mesh(*mesh_clone, *_sys.solution);
+
+  Real least_value = std::numeric_limits<Real>::max();
+  Real max_value = std::numeric_limits<Real>::lowest();
+
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it =
+    _augment_sparsity._contact_node_map.begin();
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it_end =
+    _augment_sparsity._contact_node_map.end();
+  for( ; it != it_end; ++it)
+  {
+    dof_id_type lower_point_id = it->first;
+    dof_id_type upper_point_id = it->second;
+
+    Point upper_to_lower;
+    {
+      Point lower_node_moved = mesh_clone->point(lower_point_id);
+      Point upper_node_moved = mesh_clone->node(upper_point_id);
+
+      upper_to_lower = (lower_node_moved - upper_node_moved);
+    }
+
+    // Set the contact force direction. Usually this would be calculated
+    // separately on each master node, but here we just set it to (0,0,1)
+    // everywhere.
+    Point contact_force_direction(0.,0.,1.);
+
+    // gap_function > 0. means that contact has been detected
+    // gap_function < 0. means that we have a gap
+    // This sign convention matches Simo & Laursen (1992).
+    Real gap_function = upper_to_lower * contact_force_direction;
+
+    if(gap_function < least_value)
+    {
+      least_value = gap_function;
+    }
+    if(gap_function > max_value)
+    {
+      max_value = gap_function;
+    }
+  }
+
+  std::pair<Real,Real> least_and_max_gap_function(least_value, max_value);
+  return least_and_max_gap_function;
 }
