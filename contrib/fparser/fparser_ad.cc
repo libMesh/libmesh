@@ -20,12 +20,13 @@ long int timestamp() {
   return tp.tv_sec * 1000 + tp.tv_usec / 1000;
 }
 
+#include "lib/sha1.h"
+
 #if LIBMESH_HAVE_FPARSER_JIT
 #  include <fstream>
 #  include <cstdio>
 #  include <unistd.h>
 #  include <dlfcn.h>
-#  include "lib/sha1.h"
 #  include <errno.h>
 #  include <sys/stat.h>
 #endif
@@ -399,7 +400,9 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name, bool ca
   {
     unsigned int var_number = LookUpVarOpcode(var_name);
 
+    // should and cen we load a cached derivative?
     std::string cache_file;
+    const std::string jitdir = ".jitdir";
     if (cached)
     {
       // generate a sha1 hash of the Value type size, byte code, and immediate list
@@ -408,7 +411,8 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name, bool ca
       size_t value_t_size = sizeof(Value_t);
       sha1->addBytes((char*) &value_t_size, sizeof(value_t_size));
       sha1->addBytes((char*) &this->mData->mByteCode[0], this->mData->mByteCode.size() * sizeof(unsigned));
-      sha1->addBytes((char*) &this->mData->mImmed[0], this->mData->mImmed.size() * sizeof(Value_t));
+      if (!this->mData->mImmed.empty())
+        sha1->addBytes((char*) &this->mData->mImmed[0], this->mData->mImmed.size() * sizeof(Value_t));
 
       unsigned char* digest = sha1->getDigest();
       for (unsigned int i = 0; i<20; ++i)
@@ -421,15 +425,44 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name, bool ca
       sprintf(var_number_string, "%x", var_number - VarBegin);
 
       // function name
-      cache_file = "d_";
+      cache_file = jitdir + "/d_";
       cache_file += result;
       cache_file += "_";
       cache_file += var_number_string;
 
-      std::cout << "Derivative cache file: '" << cache_file << "'\n";
+      // try to open cache file
+      std::ifstream istr;
+      istr.open(cache_file, std::ios::in | std::ios::binary);
+      if (istr)
+      {
+        Unserialize(istr);
+        return -1;
+      }
     }
 
-    return ad->AutoDiff(var_number, this->mData);
+    // build derivative
+    int result = ad->AutoDiff(var_number, this->mData);
+
+    // save the derivative if cacheing is enabled and derivative was successfully taken
+    if (cached && result == -1)
+    {
+      // create cache directory
+      if (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)
+      {
+        // save to a temporary name and rename only when the file is fully written
+        std::string cache_file_tmp = cache_file + ".tmp";
+        std::ofstream ostr;
+        ostr.open(cache_file_tmp, std::ios::out | std::ios::binary);
+        if (ostr)
+        {
+          Serialize(ostr);
+          ostr.close();
+          std::rename(cache_file_tmp.c_str(), cache_file.c_str());
+        }
+      }
+    }
+
+    return result;
   }
   catch(std::exception &e)
   {
@@ -594,7 +627,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
       }
     }
   }
-  // opening the cached file did nbot work. (re)build it.
+  // opening the cached file did not work. (re)build it.
 
   // tmp filenames
   char ccname[] = "./tmp_jit_XXXXXX";
@@ -975,7 +1008,8 @@ void FunctionParserADBase<Value_t>::Serialize(std::ostream & ostr)
   // write immediates
   const size_t immed_size = this->mData->mImmed.size();
   ostr.write((char*)&immed_size, sizeof(immed_size));
-  ostr.write((char*)&this->mData->mImmed[0], immed_size * sizeof(Value_t));
+  if (immed_size > 0)
+    ostr.write((char*)&this->mData->mImmed[0], immed_size * sizeof(Value_t));
 
   // write stacktop max
   ostr.write((char*)&this->mData->mStackSize, sizeof(this->mData->mStackSize));
