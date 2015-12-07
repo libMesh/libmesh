@@ -395,6 +395,26 @@ public:
    */
   void svd(DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<T>& VT);
 
+  /**
+   * Solve the system of equations A*x = rhs for x in the
+   * least-squares sense. $A$ may be non-square and/or rank-deficient.
+   * You can control which singular values are treated as zero by
+   * changing the "rcond" parameter.  Singular values S(i) for which
+   * S(i) <= rcond*S(1) are treated as zero for purposes of the solve.
+   * Passing a negative number for rcond forces a "machine precision"
+   * value to be used instead.
+   *
+   * This function is marked const, since due to various
+   * implementation details, we do not need to modify the contents of
+   * A in order to compute the SVD (a copy is made internally
+   * instead).
+   *
+   * Requires PETSc >= 3.1 since this was the first version to provide
+   * the LAPACKgelss_ wrapper.
+   */
+  void svd_solve(const DenseVector<T> & rhs,
+                 DenseVector<T> & x,
+                 Real rcond=std::numeric_limits<Real>::epsilon()) const;
 
   /**
    * Compute the eigenvalues (both real and imaginary parts) of a general matrix.
@@ -531,6 +551,13 @@ private:
   void _svd_lapack(DenseVector<T>& sigma,
                    DenseMatrix<T>& U,
                    DenseMatrix<T>& VT);
+
+  /**
+   * Called by svd_solve(rhs).
+   */
+  void _svd_solve_lapack(const DenseVector<T> & rhs,
+                         DenseVector<T> & x,
+                         Real rcond) const;
 
   /**
    * Helper function that actually performs the SVD.

@@ -513,6 +513,173 @@ void DenseMatrix<T>::_svd_helper (char,
 
 
 
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+#if !PETSC_VERSION_LESS_THAN(3,1,0)
+
+template<typename T>
+void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
+                                       DenseVector<T> & x,
+                                       Real rcond) const
+{
+  // Since BLAS is expecting column-major storage, we first need to
+  // make a transposed copy of *this, then pass it to the gelss
+  // routine instead of the original.  This extra copy is kind of a
+  // bummer, it might be better if we could use the full SVD to
+  // compute the least-squares solution instead...  Note that it isn't
+  // completely terrible either, since A_trans gets overwritten by
+  // Lapack, and we usually would end up making a copy of A outside
+  // the function call anyway.
+  DenseMatrix<T> A_trans;
+  this->get_transpose(A_trans);
+
+  // M is INTEGER
+  // The number of rows of the input matrix. M >= 0.
+  // This is actually the number of *columns* of A_trans.
+  int M = A_trans.n();
+
+  // N is INTEGER
+  // The number of columns of the matrix A. N >= 0.
+  // This is actually the number of *rows* of A_trans.
+  int N = A_trans.m();
+
+  // We'll use the min and max of (M,N) several times below.
+  int max_MN = std::max(M,N);
+  int min_MN = std::min(M,N);
+
+  // NRHS is INTEGER
+  // The number of right hand sides, i.e., the number of columns
+  // of the matrices B and X. NRHS >= 0.
+  // This could later be generalized to solve for multiple right-hand
+  // sides...
+  int NRHS = 1;
+
+  // A is DOUBLE PRECISION array, dimension (LDA,N)
+  // On entry, the M-by-N matrix A.
+  // On exit, the first min(m,n) rows of A are overwritten with
+  // its right singular vectors, stored rowwise.
+  //
+  // The data vector that will be passed to Lapack.
+  std::vector<T> & A_trans_vals = A_trans.get_values();
+
+  // LDA is INTEGER
+  // The leading dimension of the array A.  LDA >= max(1,M).
+  int LDA = M;
+
+  // B is DOUBLE PRECISION array, dimension (LDB,NRHS)
+  // On entry, the M-by-NRHS right hand side matrix B.
+  // On exit, B is overwritten by the N-by-NRHS solution
+  // matrix X.  If m >= n and RANK = n, the residual
+  // sum-of-squares for the solution in the i-th column is given
+  // by the sum of squares of elements n+1:m in that column.
+  //
+  // Since we don't want the user's rhs vector to be overwritten by
+  // the solution, we copy the rhs values into the solution vector "x"
+  // now.  x needs to be long enough to hold both the (Nx1) solution
+  // vector or the (Mx1) rhs, so size it to the max of those.
+  x.resize(max_MN);
+  for (unsigned i=0; i<rhs.size(); ++i)
+    x(i) = rhs(i);
+
+  // Make the syntax below simpler by grabbing a reference to this array.
+  std::vector<T> & B = x.get_values();
+
+  // LDB is INTEGER
+  // The leading dimension of the array B. LDB >= max(1,max(M,N)).
+  int LDB = x.size();
+
+  // S is DOUBLE PRECISION array, dimension (min(M,N))
+  // The singular values of A in decreasing order.
+  // The condition number of A in the 2-norm = S(1)/S(min(m,n)).
+  std::vector<T> S(min_MN);
+
+  // RCOND is DOUBLE PRECISION
+  // RCOND is used to determine the effective rank of A.
+  // Singular values S(i) <= RCOND*S(1) are treated as zero.
+  // If RCOND < 0, machine precision is used instead.
+  Real RCOND = rcond;
+
+  // RANK is INTEGER
+  // The effective rank of A, i.e., the number of singular values
+  // which are greater than RCOND*S(1).
+  int RANK = 0;
+
+  // LWORK is INTEGER
+  // The dimension of the array WORK. LWORK >= 1, and also:
+  // LWORK >= 3*min(M,N) + max( 2*min(M,N), max(M,N), NRHS )
+  // For good performance, LWORK should generally be larger.
+  //
+  // If LWORK = -1, then a workspace query is assumed; the routine
+  // only calculates the optimal size of the WORK array, returns
+  // this value as the first entry of the WORK array, and no error
+  // message related to LWORK is issued by XERBLA.
+  //
+  // The factor of 1.5 is arbitrary and is used to satisfy the "should
+  // generally be larger" clause.
+  int LWORK = 1.5 * (3*min_MN + std::max(2*min_MN, std::max(max_MN, NRHS)));
+
+  // WORK is DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+  // On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
+  std::vector<T> WORK(LWORK);
+
+  // INFO is INTEGER
+  // = 0:  successful exit
+  // < 0:  if INFO = -i, the i-th argument had an illegal value.
+  // > 0:  the algorithm for computing the SVD failed to converge;
+  //       if INFO = i, i off-diagonal elements of an intermediate
+  //       bidiagonal form did not converge to zero.
+  int INFO = 0;
+
+  // LAPACKgelss_(const PetscBLASInt*, // M
+  //              const PetscBLASInt*, // N
+  //              const PetscBLASInt*, // NRHS
+  //              PetscScalar*,        // A
+  //              const PetscBLASInt*, // LDA
+  //              PetscScalar*,        // B
+  //              const PetscBLASInt*, // LDB
+  //              PetscReal*,          // S(out) = singular values of A in increasing order
+  //              const PetscReal*,    // RCOND = tolerance for singular values
+  //              PetscBLASInt*,       // RANK(out) = number of "non-zero" singular values
+  //              PetscScalar*,        // WORK
+  //              const PetscBLASInt*, // LWORK
+  //              PetscBLASInt*);      // INFO
+  LAPACKgelss_(&M, &N, &NRHS, &A_trans_vals[0], &LDA, &B[0], &LDB, &S[0], &RCOND, &RANK, &WORK[0], &LWORK, &INFO);
+
+  // Check for errors in the Lapack call
+  if (INFO < 0)
+    libmesh_error_msg("Error, argument " << -INFO << " to LAPACKgelss_ had an illegal value.");
+  if (INFO > 0)
+    libmesh_error_msg("The algorithm for computing the SVD failed to converge!");
+
+  // Debugging: print singular values and information about condition number:
+  // libMesh::err << "RCOND=" << RCOND << std::endl;
+  // libMesh::err << "Singular values: " << std::endl;
+  // for (unsigned i=0; i<S.size(); ++i)
+  //   libMesh::err << S[i] << std::endl;
+  // libMesh::err << "The condition number of A is approximately: " << S[0]/S.back() << std::endl;
+
+  // Lapack has already written the solution into B, but it will be
+  // the wrong size for non-square problems, so we need to resize it
+  // correctly.  The size of the solution vector should be the number
+  // of columns of the original A matrix.  Unfortunately, resizing a
+  // DenseVector currently also zeros it out (unlike a std::vector) so
+  // we'll resize the underlying storage directly (the size is not
+  // stored independently elsewhere).
+  x.get_values().resize(this->n());
+}
+
+#else
+
+template<typename T>
+void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
+                                       DenseVector<T> & /*x*/) const
+{
+  libmesh_error_msg("svd_solve() requires PETSc >= 3.1!");
+}
+
+#endif // !PETSC_VERSION_LESS_THAN(3,1,0)
+#endif // (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+
+
 
 #if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
 
@@ -890,9 +1057,12 @@ template void DenseMatrix<Real>::_matvec_blas(Real, Real,
                                               bool ) const;
 template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&);
 template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&, DenseMatrix<Real>&, DenseMatrix<Real>&);
-template void DenseMatrix<Real>::_svd_helper (char, char, std::vector<Real>&,
+template void DenseMatrix<Real>::_svd_helper (char,
+                                              char,
                                               std::vector<Real>&,
-                                              std::vector<Real>& );
+                                              std::vector<Real>&,
+                                              std::vector<Real>&);
+template void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real>&, DenseVector<Real>&, Real) const;
 template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real>&, DenseVector<Real>&);
 
 #if !(LIBMESH_USE_REAL_NUMBERS)
@@ -906,9 +1076,12 @@ template void DenseMatrix<Number>::_matvec_blas(Number, Number,
                                                 bool ) const;
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&);
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix<Number>&, DenseMatrix<Number>&);
-template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&,
+template void DenseMatrix<Number>::_svd_helper (char,
+                                                char,
                                                 std::vector<Number>&,
-                                                std::vector<Number>& );
+                                                std::vector<Number>&,
+                                                std::vector<Number>&);
+template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number>&, DenseVector<Real>&, Real) const;
 template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number>&, DenseVector<Number>&);
 
 #endif

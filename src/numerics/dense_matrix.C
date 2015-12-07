@@ -789,6 +789,16 @@ void DenseMatrix<T>::svd (DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<
 
 
 template<typename T>
+void DenseMatrix<T>::svd_solve(const DenseVector<T> & rhs,
+                               DenseVector<T> & x,
+                               Real rcond) const
+{
+  _svd_solve_lapack(rhs, x, rcond);
+}
+
+
+
+template<typename T>
 void DenseMatrix<T>::evd (DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag)
 {
   // We use the LAPACK eigenvalue problem implementation
