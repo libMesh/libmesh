@@ -425,7 +425,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 
       // try to open cache file
       std::ifstream istr;
-      istr.open(cache_file, std::ios::in | std::ios::binary);
+      istr.open(cache_file.c_str(), std::ios::in | std::ios::binary);
       if (istr)
       {
         Unserialize(istr);
@@ -449,7 +449,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
         // save to a temporary name and rename only when the file is fully written
         std::string cache_file_tmp = cache_file + ".tmp";
         std::ofstream ostr;
-        ostr.open(cache_file_tmp, std::ios::out | std::ios::binary);
+        ostr.open(cache_file_tmp.c_str(), std::ios::out | std::ios::binary);
         if (ostr)
         {
           Serialize(ostr);
