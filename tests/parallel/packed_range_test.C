@@ -50,7 +50,7 @@ static unsigned int packable_size
 
 template <typename Iter>
 static void pack (const std::basic_string<T> & b, Iter data_out,
-                  const void * f)
+                  const void *)
 {
   unsigned int string_len = b.size();
   for (unsigned int i=0; i != size_bytes; ++i)
@@ -62,7 +62,7 @@ static void pack (const std::basic_string<T> & b, Iter data_out,
 }
 
 static std::basic_string<T> unpack
-  (typename std::vector<T>::const_iterator in, void * f)
+  (typename std::vector<T>::const_iterator in, void *)
 {
   unsigned int string_len = get_string_len(in);
 
