@@ -526,80 +526,54 @@ inline void wait (std::vector<Request> & r)
 
 
 /**
- * Define the data type to be used for data arrays whne encoding
- * a potentially-variable-size object of type T.
+ * Define data types and (un)serialization functions for use when
+ * encoding a potentially-variable-size object of type T.
+ *
+ * Users will need to specialize this class for their particular data
+ * types.
  */
 template <typename T>
-struct BufferType;
+class Packing {
+public:
+  // Should be an MPI sendable type in specializations, e.g.
+  // typedef char buffer_type;
+  // typedef unsigned int buffer_type;
 
-/**
- * Encoding non-const T * always uses the same buffer type as
- * encoding const T *, so other classes only have to specialize the
- * latter.
- */
-template <typename T>
-struct BufferType<T *> {
-  typedef typename BufferType<const T *>::type type;
+  // Should copy an encoding of the provided object into the provided
+  // output iterator (which is of type buffer_type)
+  template <typename OutputIter, typename Context>
+  static void pack(const T & object,
+                   OutputIter data_out,
+                   const Context * context);
+
+  // Should return the number of array entries (of type buffer_type)
+  // required to encode the provided object
+  template <typename Context>
+  static unsigned int packable_size(const T & object,
+                                    const Context * context);
+
+  // Should return the number of array entries which were used to
+  // encode the provided serialization of an object which begins at
+  // \p iter
+  template <typename BufferIter>
+  static unsigned int packed_size(BufferIter iter);
+
+  // Decode a potentially-variable-size object from a subsequence of a
+  // data array, returning a heap-allocated pointer to the result.
+  template <typename BufferIter, typename Context>
+  static T unpack(BufferIter in, Context * ctx);
 };
 
-/**
- * Encode a potentially-variable-size object at the end of a data
- * array.
- *
- * Parallel::pack() has no default implementation, and must be
- * specialized for each class which is to be communicated via packed
- * ranges.
- */
-template <typename T, typename buffertype, typename Context>
-void pack(const T * object,
-          typename std::vector<buffertype> & data,
-          const Context * context);
-
-/**
- * Output the number of integers required to encode a
- * potentially-variable-size object into a data array.
- *
- * Parallel::packable_size() has no default implementation, and must
- * be specialized for each class which is to be communicated via
- * packed ranges.
- */
-template <typename T, typename Context>
-unsigned int packable_size(const T *, const Context *);
-
-/**
- * Output the number of integers that were used to encode the next
- * variable-size object in the data array.
- *
- * Parallel::packed_size() has no default implementation, and must
- * be specialized for each class which is to be communicated via
- * packed ranges.
- *
- * The output of this method should be based *only* on the data
- * array; the T * argument is solely for function specialization.
- */
-template <typename T, typename BufferIter>
-unsigned int packed_size(const T *,
-                         BufferIter);
-
-/**
- * Decode a potentially-variable-size object from a subsequence of a
- * data array.
- *
- * Parallel::unpack() has no default implementation, and must be
- * specialized for each class which is to be communicated via packed
- * ranges.
- */
-template <typename T, typename BufferIter, typename Context>
-void unpack(BufferIter in, T ** out, Context * ctx);
 
 /**
  * Decode a range of potentially-variable-size objects from a data
  * array.
  */
-template <typename Context, typename buffertype, typename OutputIter>
+template <typename Context, typename buffertype, typename OutputIter, typename T>
 inline void unpack_range (const typename std::vector<buffertype> & buffer,
                           Context * context,
-                          OutputIter out);
+                          OutputIter out,
+                          T * output_type /* used only to infer T */);
 
 /**
  * Encode a range of potentially-variable-size objects to a data
@@ -976,10 +950,11 @@ public:
    *                                    vector<int>::const_iterator)
    * is used to advance to the beginning of the next object's data.
    */
-  template <typename Context, typename OutputIter>
+  template <typename Context, typename OutputIter, typename T>
   void receive_packed_range (const unsigned int dest_processor_id,
                              Context * context,
                              OutputIter out,
+                             T * output_type, // used only to infer T
                              const MessageTag & tag=any_tag) const;
 
   /**
@@ -1041,14 +1016,16 @@ public:
    *                                    vector<int>::const_iterator)
    * is used to advance to the beginning of the next object's data.
    */
-  template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
+  template <typename Context1, typename RangeIter, typename Context2,
+            typename OutputIter, typename T>
   void send_receive_packed_range(const unsigned int dest_processor_id,
-                                 const Context1* context1,
+                                 const Context1 * context1,
                                  RangeIter send_begin,
                                  const RangeIter send_end,
                                  const unsigned int source_processor_id,
-                                 Context2* context2,
+                                 Context2 * context2,
                                  OutputIter out,
+                                 T * output_type,
                                  const MessageTag & send_tag = no_tag,
                                  const MessageTag & recv_tag = any_tag) const;
 
@@ -1242,12 +1219,15 @@ private:
 };
 
 // PostWaitWork specialization for unpacking received buffers.
-template <typename Container, typename Context, typename OutputIter>
+template <typename Container, typename Context, typename OutputIter,
+          typename T>
 struct PostWaitUnpackBuffer : public PostWaitWork {
   PostWaitUnpackBuffer(const Container & buffer, Context * context, OutputIter out) :
     _buf(buffer), _context(context), _out(out) {}
 
-  virtual void run() libmesh_override { Parallel::unpack_range(_buf, _context, _out); }
+  virtual void run() libmesh_override {
+    Parallel::unpack_range(_buf, _context, _out, (T*)NULL);
+  }
 
 private:
   const Container & _buf;

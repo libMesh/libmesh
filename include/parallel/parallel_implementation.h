@@ -445,12 +445,14 @@ inline std::size_t packed_range_size (const Context * context,
                                       Iter range_begin,
                                       const Iter range_end)
 {
+  typedef typename std::iterator_traits<Iter>::value_type T;
+
   std::size_t buffer_size = 0;
   for (Iter range_count = range_begin;
        range_count != range_end;
        ++range_count)
     {
-      buffer_size += Parallel::packable_size(*range_count, context);
+      buffer_size += Parallel::Packing<T>::packable_size(*range_count, context);
     }
   return buffer_size;
 }
@@ -465,6 +467,8 @@ inline Iter pack_range (const Context * context,
                         const Iter range_end,
                         std::vector<buffertype> & buffer)
 {
+  typedef typename std::iterator_traits<Iter>::value_type T;
+
   // When we serialize into buffers, we need to use large buffers to optimize MPI
   // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
   // is measured in number of buffer type entries; number of bytes may be 4 or 8
@@ -480,7 +484,7 @@ inline Iter pack_range (const Context * context,
   for (; range_stop != range_end; ++range_stop)
     {
       std::size_t next_buffer_size =
-        Parallel::packable_size(*range_stop, context);
+        Parallel::Packing<T>::packable_size(*range_stop, context);
       if (buffer_size + next_buffer_size >= max_buffer_size)
         break;
       else
@@ -495,14 +499,14 @@ inline Iter pack_range (const Context * context,
       std::size_t old_size = buffer.size();
 #endif
 
-      Parallel::pack(*range_begin, buffer, context);
+      Parallel::Packing<T>::pack
+        (*range_begin, back_inserter(buffer), context);
 
 #ifndef NDEBUG
       unsigned int my_packable_size =
-        Parallel::packable_size(*range_begin, context);
+        Parallel::Packing<T>::packable_size(*range_begin, context);
       unsigned int my_packed_size =
-        Parallel::packed_size (*range_begin, buffer.begin() +
-                               old_size);
+        Parallel::Packing<T>::packed_size (buffer.begin() + old_size);
       libmesh_assert_equal_to (my_packable_size, my_packed_size);
       libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
 #endif
@@ -516,15 +520,12 @@ inline Iter pack_range (const Context * context,
 /**
  * Helper function for range unpacking
  */
-template <typename Context, typename buffertype, typename OutputIter>
+template <typename Context, typename buffertype, typename OutputIter, typename T>
 inline void unpack_range (const std::vector<buffertype> & buffer,
                           Context * context,
-                          OutputIter out)
+                          OutputIter out,
+                          T * /* output_type */)
 {
-  // Our objects should be of the correct type to be assigned to the
-  // output iterator
-  typedef typename std::iterator_traits<OutputIter>::value_type T;
-
   // Loop through the buffer and unpack each object, returning the
   // object pointer via the output iterator
   typename std::vector<buffertype>::const_iterator
@@ -532,11 +533,9 @@ inline void unpack_range (const std::vector<buffertype> & buffer,
 
   while (next_object_start < buffer.end())
     {
-      T * obj;
-      Parallel::unpack(next_object_start, &obj, context);
-      libmesh_assert(obj);
-      next_object_start += Parallel::packed_size(obj, next_object_start);
-      *out++ = obj;
+      *out++ = Parallel::Packing<T>::unpack(next_object_start, context);
+      next_object_start +=
+        Parallel::Packing<T>::packed_size(next_object_start);
     }
 
   // We should have used up the exact amount of data in the buffer
@@ -1114,9 +1113,13 @@ template <typename Context, typename OutputIter>
 inline void receive_packed_range (const unsigned int src_processor_id,
                                   Context * context,
                                   OutputIter out,
+                                  T * output_type,
                                   const MessageTag & tag=any_tag,
                                   const Communicator & comm = Communicator_World)
-{ comm.receive_packed_range (src_processor_id, context, out, tag); }
+{
+  comm.receive_packed_range (src_processor_id, context, out,
+                             output_type, tag);
+}
 
 // template <typename Context, typename OutputIter>
 // inline void receive_packed_range (const unsigned int src_processor_id,
@@ -1163,11 +1166,16 @@ inline void send_receive_packed_range(const unsigned int dest_processor_id,
                                       const unsigned int source_processor_id,
                                       Context2 * context2,
                                       OutputIter out,
+                                      T * output_type,
                                       const MessageTag & send_tag = no_tag,
                                       const MessageTag & recv_tag = any_tag,
                                       const Communicator & comm = Communicator_World)
-{ comm.send_receive_packed_range(dest_processor_id, context1, send_begin, send_end,
-                                 source_processor_id, context2, out, send_tag, recv_tag); }
+{
+  comm.send_receive_packed_range(dest_processor_id, context1,
+                                 send_begin, send_end,
+                                 source_processor_id, context2, out,
+                                 output_type, send_tag, recv_tag);
+}
 
 template <typename T1, typename T2>
 inline void send_receive(const unsigned int dest_processor_id,
@@ -2284,7 +2292,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   typedef typename std::iterator_traits<Iter>::value_type T;
 
   std::size_t total_buffer_size =
-    Parallel::packed_range_size(context, range_begin, range_end);
+    Parallel::packed_range_size (context, range_begin, range_end);
 
   this->send(dest_processor_id, total_buffer_size, tag);
 
@@ -2294,9 +2302,10 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
   while (range_begin != range_end)
     {
-      std::vector<typename Parallel::BufferType<T>::type> buffer;
+      std::vector<typename Parallel::Packing<T>::buffer_type> buffer;
 
-      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
+      range_begin = Parallel::pack_range
+        (context, range_begin, range_end, buffer);
 
 #ifdef DEBUG
       used_buffer_size += buffer.size();
@@ -2323,10 +2332,10 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   // Allocate a buffer on the heap so we don't have to free it until
   // after the Request::wait()
   typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
 
   std::size_t total_buffer_size =
-    Parallel::packed_range_size(context, range_begin, range_end);
+    Parallel::packed_range_size (context, range_begin, range_end);
 
   // That local variable will be gone soon; we need a send buffer that
   // will stick around.  I heard you like buffering so I put a buffer
@@ -2352,7 +2361,11 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
     {
       std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
 
-      range_begin = Parallel::pack_range(context, range_begin, range_end, *buffer);
+      range_begin =
+        Parallel::pack_range(context,
+                             range_begin,
+                             range_end,
+                             *buffer);
 
 #ifdef DEBUG
       used_buffer_size += buffer->size();
@@ -2610,14 +2623,14 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 }
 
 
-template <typename Context, typename OutputIter>
+template <typename Context, typename OutputIter, typename T>
 inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
                                                 Context * context,
                                                 OutputIter out,
+                                                T * output_type,
                                                 const MessageTag & tag) const
 {
-  typedef typename std::iterator_traits<OutputIter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
 
   // Receive serialized variable size objects as sequences of buffer_t
   std::size_t total_buffer_size = 0;
@@ -2633,7 +2646,8 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
       std::vector<buffer_t> buffer;
       this->receive(stat.source(), buffer, MessageTag(stat.tag()));
       received_buffer_size += buffer.size();
-      Parallel::unpack_range(buffer, context, out);
+      Parallel::unpack_range
+        (buffer, context, out, output_type);
     }
 }
 
@@ -2647,7 +2661,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 //                                                 const MessageTag & tag) const
 // {
 //   typedef typename std::iterator_traits<OutputIter>::value_type T;
-//   typedef typename Parallel::BufferType<T>::type buffer_t;
+//   typedef typename Parallel::Packing<T>::buffer_type buffer_t;
 //
 //   // Receive serialized variable size objects as a sequence of
 //   // buffer_t.
@@ -2836,16 +2850,19 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 
 
 
-template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
-inline void Communicator::send_receive_packed_range(const unsigned int dest_processor_id,
-                                                    const Context1 * context1,
-                                                    RangeIter send_begin,
-                                                    const RangeIter send_end,
-                                                    const unsigned int source_processor_id,
-                                                    Context2 * context2,
-                                                    OutputIter out,
-                                                    const MessageTag & send_tag,
-                                                    const MessageTag & recv_tag) const
+template <typename Context1, typename RangeIter, typename Context2,
+          typename OutputIter, typename T>
+inline void
+Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
+                                         const Context1 * context1,
+                                         RangeIter send_begin,
+                                         const RangeIter send_end,
+                                         const unsigned int source_processor_id,
+                                         Context2 * context2,
+                                         OutputIter out,
+                                         T * output_type,
+                                         const MessageTag & send_tag,
+                                         const MessageTag & recv_tag) const
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -2854,7 +2871,8 @@ inline void Communicator::send_receive_packed_range(const unsigned int dest_proc
   this->send_packed_range (dest_processor_id, context1, send_begin, send_end,
                            req, send_tag);
 
-  this->receive_packed_range (source_processor_id, context2, out, recv_tag);
+  this->receive_packed_range (source_processor_id, context2, out,
+                              output_type, recv_tag);
 
   req.wait();
 
@@ -3053,7 +3071,7 @@ inline void Communicator::gather_packed_range(const unsigned int root_id,
                                               OutputIter out) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
 
   bool nonempty_range = (range_begin != range_end);
   this->max(nonempty_range);
@@ -3064,11 +3082,13 @@ inline void Communicator::gather_packed_range(const unsigned int root_id,
       // *range_end as a sequence of ints in this buffer
       std::vector<buffer_t> buffer;
 
-      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
+      range_begin = Parallel::pack_range
+        (context, range_begin, range_end, buffer);
 
       this->gather(root_id, buffer);
 
-      Parallel::unpack_range(buffer, context, out);
+      Parallel::unpack_range
+        (buffer, context, out, (T*)(NULL));
 
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
@@ -3083,7 +3103,7 @@ inline void Communicator::allgather_packed_range(Context * context,
                                                  OutputIter out) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
 
   bool nonempty_range = (range_begin != range_end);
   this->max(nonempty_range);
@@ -3094,13 +3114,15 @@ inline void Communicator::allgather_packed_range(Context * context,
       // *range_end as a sequence of ints in this buffer
       std::vector<buffer_t> buffer;
 
-      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
+      range_begin = Parallel::pack_range
+        (context, range_begin, range_end, buffer);
 
       this->allgather(buffer, false);
 
       libmesh_assert(buffer.size());
 
-      Parallel::unpack_range(buffer, context, out);
+      Parallel::unpack_range
+        (buffer, context, out, (T*)NULL);
 
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
@@ -3421,7 +3443,7 @@ inline void Communicator::broadcast_packed_range(const Context * context1,
                                                  const unsigned int root_id) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
 
   do
     {
@@ -3430,7 +3452,8 @@ inline void Communicator::broadcast_packed_range(const Context * context1,
       std::vector<buffer_t> buffer;
 
       if (this->rank() == root_id)
-        range_begin = Parallel::pack_range(context1, range_begin, range_end, buffer);
+        range_begin = Parallel::pack_range
+          (context1, range_begin, range_end, buffer);
 
       // this->broadcast(vector) requires the receiving vectors to
       // already be the appropriate size
@@ -3447,7 +3470,8 @@ inline void Communicator::broadcast_packed_range(const Context * context1,
       this->broadcast (buffer, root_id);
 
       if (this->rank() != root_id)
-        Parallel::unpack_range(buffer, context2, out);
+        Parallel::unpack_range
+          (buffer, context2, out, (T*)NULL);
     } while (true);  // break above when we reach buffer_size==0
 }
 
@@ -3576,11 +3600,13 @@ inline void Communicator::receive(const unsigned int,
                                   const MessageTag &) const
 { libmesh_not_implemented(); }
 
-template <typename Context, typename OutputIter>
-inline void Communicator::receive_packed_range(const unsigned int,
-                                               Context *,
-                                               OutputIter,
-                                               const MessageTag &) const
+template <typename Context, typename OutputIter, typename T>
+inline void
+Communicator::receive_packed_range(const unsigned int,
+                                   Context *,
+                                   OutputIter,
+                                   const T *,
+                                   const MessageTag &) const
 { libmesh_not_implemented(); }
 
 // template <typename Context, typename OutputIter>
@@ -3610,15 +3636,16 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
  */
 template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter>
-inline void Communicator::send_receive_packed_range(const unsigned int /* dest_processor_id */,
-                                                    const Context1 *,
-                                                    RangeIter /* send_begin */,
-                                                    const RangeIter /* send_end */,
-                                                    const unsigned int /* source_processor_id */,
-                                                    Context2 *,
-                                                    OutputIter /* out */,
-                                                    const MessageTag &,
-                                                    const MessageTag &) const
+inline void
+Communicator::send_receive_packed_range (const unsigned int /* dest_processor_id */,
+                                         const Context1 *,
+                                         RangeIter /* send_begin */,
+                                         const RangeIter /* send_end */,
+                                         const unsigned int /* source_processor_id */,
+                                         Context2 *,
+                                         OutputIter /* out */, T* /* output_type */,
+                                         const MessageTag &,
+                                         const MessageTag &) const
 { libmesh_not_implemented(); }
 
 /**
