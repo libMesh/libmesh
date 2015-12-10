@@ -19,3 +19,12 @@ namespace FPoptimizer_CodeTree
 
 }
 
+namespace FPoptimizer_Optimize
+{
+
+#define FP_INSTANTIATE(type) \
+    template void ApplyGrammars<type>(FPoptimizer_CodeTree::CodeTree<type>&);
+    FPOPTIMIZER_EXPLICITLY_INSTANTIATE(FP_INSTANTIATE)
+#undef FP_INSTANTIATE
+
+}

@@ -17,10 +17,11 @@ using namespace FPoptimizer_CodeTree;
 #  include <cstdio>
 #  include <unistd.h>
 #  include <dlfcn.h>
-#  include "lib/sha1.h"
 #  include <errno.h>
 #  include <sys/stat.h>
 #endif
+
+#include "lib/sha1.h"
 
 /**
  * The internals of the automatic differentiation algorithm are encapsulated in this class
@@ -38,7 +39,7 @@ public:
       parser(_parser),
       UnsupportedOpcodeException(),
       RefuseToTakeCrazyDerivativeException() {}
-  int AutoDiff(unsigned int, typename FunctionParserADBase<Value_t>::Data * mData);
+  int AutoDiff(unsigned int, typename FunctionParserADBase<Value_t>::Data * mData, bool autoOptimize);
 
 private:
   /**
@@ -82,8 +83,8 @@ template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     compiledFunction(NULL),
-    mSilenceErrors(false),
     mFPlog(this->mData->mFuncPtrs.size()),
+    mADFlags(ADJITCache),
     mRegisteredDerivatives(),
     ad(new ADImplementation<Value_t>(this))
 {
@@ -94,8 +95,8 @@ template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& cpy) :
     FunctionParserBase<Value_t>(cpy),
     compiledFunction(cpy.compiledFunction),
-    mSilenceErrors(cpy.mSilenceErrors),
     mFPlog(cpy.mFPlog),
+    mADFlags(cpy.mADFlags),
     mRegisteredDerivatives(cpy.mRegisteredDerivatives),
     ad(new ADImplementation<Value_t>(this))
 {
@@ -386,15 +387,85 @@ template<typename Value_t>
 int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 {
   this->CopyOnWrite();
+  const bool cached = mADFlags & ADCacheDerivatives;
 
   try
   {
-    return ad->AutoDiff(LookUpVarOpcode(var_name), this->mData);
+    unsigned int var_number = LookUpVarOpcode(var_name);
+
+    // should and can we load a cached derivative?
+    std::string cache_file;
+    const std::string jitdir = ".jitdir";
+    if (cached)
+    {
+      // generate a sha1 hash of the Value type size, byte code, and immediate list
+      SHA1 *sha1 = new SHA1();
+      char result[41]; // 40 sha1 chars plus null
+      size_t value_t_size = sizeof(Value_t);
+      sha1->addBytes(reinterpret_cast<const char *>(&value_t_size), sizeof(value_t_size));
+      sha1->addBytes(reinterpret_cast<const char *>(&this->mData->mByteCode[0]), this->mData->mByteCode.size() * sizeof(unsigned));
+      if (!this->mData->mImmed.empty())
+        sha1->addBytes(reinterpret_cast<const char *>(&this->mData->mImmed[0]), this->mData->mImmed.size() * sizeof(Value_t));
+
+      unsigned char* digest = sha1->getDigest();
+      for (unsigned int i = 0; i<20; ++i)
+        sprintf(&(result[i*2]), "%02x", digest[i]);
+      free(digest);
+      delete sha1;
+
+      // variable number
+      char var_number_string[sizeof(unsigned int) * 2 + 1]; // two hex chars per byte plus null
+      sprintf(var_number_string, "%x", var_number - VarBegin);
+
+      // function name
+      cache_file = jitdir + "/d_";
+      cache_file += result;
+      cache_file += "_";
+      cache_file += var_number_string;
+
+      // try to open cache file
+      std::ifstream istr;
+      istr.open(cache_file.c_str(), std::ios::in | std::ios::binary);
+      if (istr)
+      {
+        Unserialize(istr);
+        // only claim success if the stream is not in a bad state
+        if (istr.good()) return -1;
+      }
+    }
+
+    // immediately optimize the derivative tree representation?
+    const bool autoOptimize = mADFlags & ADAutoOptimize;
+
+    // build derivative
+    int result = ad->AutoDiff(var_number, this->mData, autoOptimize);
+
+    // save the derivative if cacheing is enabled and derivative was successfully taken
+    if (cached && result == -1)
+    {
+      // create cache directory
+      if (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)
+      {
+        // save to a temporary name and rename only when the file is fully written
+        std::string cache_file_tmp = cache_file + ".tmp";
+        std::ofstream ostr;
+        ostr.open(cache_file_tmp.c_str(), std::ios::out | std::ios::binary);
+        if (ostr)
+        {
+          Serialize(ostr);
+          ostr.close();
+          std::rename(cache_file_tmp.c_str(), cache_file.c_str());
+        }
+      }
+    }
+
+    return result;
   }
   catch(std::exception &e)
   {
     static bool printed_error = false;
-    if (!printed_error && !mSilenceErrors)
+    const bool silence_errors = mADFlags & ADSilenceErrors;
+    if (!printed_error && !silence_errors)
     {
       std::cerr << "AutoDiff exception: " << e.what() << " (this message will only be shown once per process)"<< std::endl;
       printed_error = true;
@@ -433,14 +504,14 @@ FunctionParserADBase<Value_t>::RegisterDerivative(const std::string & a, const s
 }
 
 template<typename Value_t>
-int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionParserADBase<Value_t>::Data * mData)
+int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionParserADBase<Value_t>::Data * mData, bool autoOptimize)
 {
   CodeTreeAD orig;
 
   std::vector<CodeTree<Value_t> > var_trees;
   var_trees.reserve(mData->mVariablesAmount);
   for(unsigned n=0; n<mData->mVariablesAmount; ++n)
-    var_trees.push_back( CodeTreeVar<Value_t> (n+VarBegin) );
+    var_trees.push_back(CodeTreeVar<Value_t>(n + VarBegin));
 
   orig.GenerateFrom(*mData, var_trees, false);
 
@@ -449,6 +520,10 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
 
   // start recursing the code tree
   CodeTree<Value_t> diff = D(orig);
+#ifndef FP_DUMMY_OPTIMIZER
+  if (autoOptimize)
+    FPoptimizer_Optimize::ApplyGrammars(diff);
+#endif
 
   std::vector<unsigned> byteCode;
   std::vector<Value_t> immed;
@@ -458,10 +533,10 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
 
   if(mData->mStackSize != stacktop_max)
   {
-      mData->mStackSize = unsigned(stacktop_max); // Note: Ignoring GCC warning here.
+    mData->mStackSize = unsigned(stacktop_max); // Note: Ignoring GCC warning here.
   #if !defined(FP_USE_THREAD_SAFE_EVAL) && \
   !defined(FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA)
-      mData->mStack.resize(stacktop_max);
+    mData->mStack.resize(stacktop_max);
   #endif
   }
 
@@ -480,7 +555,7 @@ void FunctionParserADBase<Value_t>::Optimize()
 }
 
 template<typename Value_t>
-bool FunctionParserADBase<Value_t>::JITCompile(bool)
+bool FunctionParserADBase<Value_t>::JITCompile()
 {
   // JIT compile attempted for an unsupported value type
   return false;
@@ -489,11 +564,11 @@ bool FunctionParserADBase<Value_t>::JITCompile(bool)
 #if LIBMESH_HAVE_FPARSER_JIT
 // JIT compile for supported types
 template<>
-bool FunctionParserADBase<double>::JITCompile(bool cacheFunction) { return JITCompileHelper("double", cacheFunction); }
+bool FunctionParserADBase<double>::JITCompile() { return JITCompileHelper("double"); }
 template<>
-bool FunctionParserADBase<float>::JITCompile(bool cacheFunction) { return JITCompileHelper("float", cacheFunction); }
+bool FunctionParserADBase<float>::JITCompile() { return JITCompileHelper("float"); }
 template<>
-bool FunctionParserADBase<long double>::JITCompile(bool cacheFunction) { return JITCompileHelper("long double", cacheFunction); }
+bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
 
 template<typename Value_t>
 Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
@@ -505,8 +580,11 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
 }
 
 template<typename Value_t>
-bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name, bool cacheFunction)
+bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name)
 {
+  // use the file cache for compiled functions?
+  const bool cacheFunction = mADFlags & ADJITCache;
+
   // set compiled function pointer to zero to avoid stale values if JIT compilation fails
   compiledFunction = NULL;
 
@@ -523,7 +601,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   // generate a sha1 hash of the current program and the Value type name
   SHA1 *sha1 = new SHA1();
   char result[41];
-  sha1->addBytes((char*) &(ByteCode[0]), ByteCode.size() * sizeof(unsigned));
+  sha1->addBytes(reinterpret_cast<const char *>(&ByteCode[0]), ByteCode.size() * sizeof(unsigned));
   sha1->addBytes(Value_t_name.c_str(), Value_t_name.size());
   unsigned char* digest = sha1->getDigest();
   for (unsigned int i = 0; i<20; ++i)
@@ -553,7 +631,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
       }
     }
   }
-  // opening the cached file did nbot work. (re)build it.
+  // opening the cached file did not work. (re)build it.
 
   // tmp filenames
   char ccname[] = "./tmp_jit_XXXXXX";
@@ -919,6 +997,67 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 }
 #endif
 
+template<typename Value_t>
+void FunctionParserADBase<Value_t>::Serialize(std::ostream & ostr)
+{
+  // write version header
+  const int version = 1;
+  ostr.write(reinterpret_cast<const char *>(&version), sizeof(version));
+
+  // write bytecode buffer
+  const size_t byte_code_size = this->mData->mByteCode.size();
+  ostr.write(reinterpret_cast<const char *>(&byte_code_size), sizeof(byte_code_size));
+  if (byte_code_size > 0  )
+    ostr.write(reinterpret_cast<const char *>(&this->mData->mByteCode[0]), byte_code_size * sizeof(unsigned));
+
+  // write immediates
+  const size_t immed_size = this->mData->mImmed.size();
+  ostr.write(reinterpret_cast<const char *>(&immed_size), sizeof(immed_size));
+  if (immed_size > 0)
+    ostr.write(reinterpret_cast<const char *>(&this->mData->mImmed[0]), immed_size * sizeof(Value_t));
+
+  // write stacktop max
+  ostr.write(reinterpret_cast<const char *>(&this->mData->mStackSize), sizeof(this->mData->mStackSize));
+}
+
+template<typename Value_t>
+void FunctionParserADBase<Value_t>::Unserialize(std::istream & istr)
+{
+  // read version header
+  int version;
+  istr.read(reinterpret_cast<char *>(&version), sizeof(version));
+  if (version != 1) throw UnknownSerializationVersionException;
+
+  // read bytecode buffer
+  std::vector<unsigned> byteCode;
+  size_t byte_code_size;
+  istr.read(reinterpret_cast<char *>(&byte_code_size), sizeof(byte_code_size));
+  byteCode.resize(byte_code_size);
+  istr.read(reinterpret_cast<char *>(&byteCode[0]), byte_code_size * sizeof(unsigned));
+
+  // read immediates
+  std::vector<Value_t> immed;
+  size_t immed_size;
+  istr.read(reinterpret_cast<char *>(&immed_size), sizeof(immed_size));
+  immed.resize(immed_size);
+  istr.read(reinterpret_cast<char *>(&immed[0]), immed_size * sizeof(Value_t));
+
+  // read stacktop
+  unsigned stacktop_max;
+  istr.read(reinterpret_cast<char *>(&stacktop_max), sizeof(unsigned));
+
+  if(this->mData->mStackSize != stacktop_max)
+  {
+    this->mData->mStackSize = stacktop_max;
+  #if !defined(FP_USE_THREAD_SAFE_EVAL) && \
+  !defined(FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA)
+    this->mData->mStack.resize(stacktop_max);
+  #endif
+  }
+
+  this->mData->mByteCode.swap(byteCode);
+  this->mData->mImmed.swap(immed);
+}
 
 #define FUNCTIONPARSERAD_INSTANTIATE_CLASS(type) \
     template class FunctionParserADBase< type >; \

@@ -494,37 +494,35 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string& expre
 
       // use of derivatives is optional. suppress error output on the console
       // use the has_derivatives() method to check if AutoDiff was successful.
-      fp.silenceAutoDiffErrors();
+      // also enable immediate optimization
+      fp.SetADFlags(FunctionParserADBase<Output>::ADSilenceErrors |
+                    FunctionParserADBase<Output>::ADAutoOptimize);
+
+      // optimize original function
+      fp.Optimize();
+      parsers.push_back(fp);
 
       // generate derivatives through automatic differentiation
       FunctionParserADBase<Output> dx_fp(fp);
       if (dx_fp.AutoDiff("x") != -1) // -1 for success
         _valid_derivatives = false;
-      dx_fp.Optimize();
       dx_parsers.push_back(dx_fp);
 #if LIBMESH_DIM > 1
       FunctionParserADBase<Output> dy_fp(fp);
       if (dy_fp.AutoDiff("y") != -1) // -1 for success
         _valid_derivatives = false;
-      dy_fp.Optimize();
       dy_parsers.push_back(dy_fp);
 #endif
 #if LIBMESH_DIM > 2
       FunctionParserADBase<Output> dz_fp(fp);
       if (dz_fp.AutoDiff("z") != -1) // -1 for success
         _valid_derivatives = false;
-      dz_fp.Optimize();
       dz_parsers.push_back(dz_fp);
 #endif
       FunctionParserADBase<Output> dt_fp(fp);
       if (dt_fp.AutoDiff("t") != -1) // -1 for success
         _valid_derivatives = false;
-      dt_fp.Optimize();
       dt_parsers.push_back(dt_fp);
-
-      // now optimise original function (after derivatives are taken)
-      fp.Optimize();
-      parsers.push_back(fp);
 
       // If at end, use nextstart=maxSize.  Else start at next
       // character.

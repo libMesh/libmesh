@@ -38,10 +38,41 @@ public:
    */
   void setZero();
 
+  // feature flags for this parser
+  enum ADFlags {
+    /**
+     * In certain applications derivatives are built proactively and may never be used.
+     * We silence all AutoDiff exceptions in that case to avoid confusing the user.
+     */
+    ADSilenceErrors = 1,
+    /**
+     * Immediately apply the optimizer grammars to the derivative tree structure.
+     * This saves a round trip to byte code.
+     */
+    ADAutoOptimize = 2,
+    /**
+     * Use cached JIT compiled function files, This bypasses the compilation stage
+     * for all further runs, after the JIT compilation ran successfully at least once.
+     */
+    ADJITCache = 4,
+    /**
+     * Use cached bytecode for the derivatives. This bypasses the automatic differentiation,
+     * (optimization), and byte code synthesis.
+     */
+    ADCacheDerivatives = 8
+  };
+
   /**
-   * Do not report any error messages to the console
+   * Set the feature flags for this parser (this way gives us better control over default values)
    */
-  void silenceAutoDiffErrors(bool _silence = true) { mSilenceErrors = _silence; }
+  void SetADFlags(int flags, bool turnon = true) {
+    if (turnon)
+      mADFlags |= flags;
+    else
+      mADFlags &= ~flags;
+  }
+  void UnsetADFlags(int flags) { mADFlags &= ~flags; }
+  void ClearADFlags() { mADFlags = 0; }
 
   /**
    * compile the current function, or load a previously compiled copy.
@@ -49,13 +80,23 @@ public:
    *          the previously JIT compiled function will continue to be Evaled until the
    *          JITCompile method is called again.
    */
-  bool JITCompile(bool cacheFunction = true);
+  bool JITCompile();
 
   /**
    * wrap Optimize of the parent class to check for a JIT compiled version and redo
    * the compilation after Optimization
    */
   void Optimize();
+
+  /**
+   * write the full state of the current FParser object to a stream
+   */
+  void Serialize(std::ostream &);
+
+  /**
+   * restore the full state of the current FParser object from a stream
+   */
+  void Unserialize(std::istream &);
 
 #if LIBMESH_HAVE_FPARSER_JIT
   /**
@@ -78,7 +119,7 @@ public:
 
 private:
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
-  bool JITCompileHelper(const std::string &, bool);
+  bool JITCompileHelper(const std::string &);
 
   /// JIT function pointer
   Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
@@ -86,17 +127,14 @@ private:
   /// pointer to the mImmed values (or NULL if the mImmed vector is empty)
   Value_t * pImmed;
 
-  /**
-   * In certain applications derivatives are built proactively and may never be used.
-   * We silence all AutoDiff exceptions in that case to avoid confusing the user.
-   */
-  bool mSilenceErrors;
-
   // user function plog
   static Value_t fp_plog(const Value_t * params);
 
   // function ID for the plog function
   unsigned int mFPlog;
+
+  // flags that control cache bahavior, optimization, and error reporting
+  int mADFlags;
 
   // registered derivative table, and entry structure
   struct VariableDerivative {
@@ -114,6 +152,9 @@ private:
   class UnknownVariable : public std::exception {
     virtual const char* what() const throw() { return "Unknown variable"; }
   } UnknownVariableException;
+  class UnknownSerializationVersion : public std::exception {
+    virtual const char* what() const throw() { return "Unknown serialization file version"; }
+  } UnknownSerializationVersionException;
 };
 
 
