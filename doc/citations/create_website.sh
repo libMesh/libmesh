@@ -14,8 +14,8 @@ if [ "x`which bibtex2html`" == "x" ]; then
 fi
 
 # Declare array of year names and numbers.  Zero-based indexing!
-year_names=( libmesh theses preprints fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
-year_numbers=( 'Please use the following citation to reference libMesh' 'Dissertations & Theses' Preprints 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
+year_names=( libmesh theses preprints sixteen fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
+year_numbers=( 'Please use the following citation to reference libMesh' 'Dissertations & Theses' Preprints 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
 link_names=( 'skip me' 'Dissertations' 'Preprints' 'Articles' )
 
 # Length of the arrays
