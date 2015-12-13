@@ -120,19 +120,12 @@ public:
 #endif
 
   /**
-   * Initialization of the \p xdr file.
-   * This function performs the following
-   * operations:
-   * @begin{itemize}
-   * @item Closes the old \p xdr file if necessary.
-   *
-   * @item Creates a new \p xdr file name and opens this file.
-   *
-   * @item Opens the appropriate \p xdr file handle.
-   *
-   * @item Reads/Writes a signature to the file.
-   *
-   * @end{itemize}
+   * Initialization of the \p xdr file.  This function performs the
+   * following operations:
+   * - Closes the old \p xdr file if necessary.
+   * - Creates a new \p xdr file name and opens this file.
+   * - Opens the appropriate \p xdr file handle.
+   * - Reads/Writes a signature to the file.
    */
   void init(XdrIO_TYPE t, const char* fn, const char* type, int icnt);
 
@@ -154,8 +147,7 @@ public:
   void fini();
 
   /**
-   * Reads/Writes a block of \p ints
-   * to/from the current \p xdr
+   * Reads/Writes a block of \p ints to/from the current \p xdr
    * file/file handle.
    * \param array Pointer to data to be read/written
    * \param numvar The total number of variables (size of the array)
@@ -199,15 +191,11 @@ protected:
   unsigned int _num_levels;
 
   /**
-   * Specifies the read/write
-   * permission for the current
-   * \p xdr file.  Possibilities
-   * are:
-   * @begin{itemize}
-   * @item \p UNKNOWN = -1
-   * @item \p ENCODE  = 0
-   * @item \p DECODE  = 1
-   * @end{itemize}
+   * Specifies the read/write permission for the current \p xdr file.
+   * Possibilities are:
+   * - \p UNKNOWN = -1
+   * - \p ENCODE  = 0
+   * - \p DECODE  = 1
    */
   XdrIO_TYPE m_type;
 
@@ -224,19 +212,13 @@ protected:
 #endif
 
   /**
-   * Flag indicating how much checking
-   * we need to do.  We can read in
-   * mgf meshes more quickly because
-   * there is only one type of element
-   * in these meshes.  Deal meshes
-   * on the other hand will require
-   * a check for each element to find
-   * out what type it is.  Possible
+   * Flag indicating how much checking we need to do.  We can read in
+   * mgf meshes more quickly because there is only one type of element
+   * in these meshes.  Deal meshes on the other hand will require a
+   * check for each element to find out what type it is.  Possible
    * values are:
-   * @begin{itemize}
-   * @item 0: It's an DEAL style mesh
-   * @item 1: It's a MGF style mesh
-   * @end{itemize}
+   * - 0: It's an DEAL style mesh
+   * - 1: It's a MGF style mesh
    */
   LegacyXdrIO::FileFormat orig_flag;
 

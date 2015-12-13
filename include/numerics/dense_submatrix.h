@@ -46,7 +46,7 @@ public:
   /**
    * Constructor.  Creates a dense submatrix of the matrix
    * \p parent.  The submatrix has dimensions \f$(m \times n)\f$,
-   * and the \f$(0,0) entry of the submatrix is located
+   * and the \f$(0,0)\f$ entry of the submatrix is located
    * at the \f$(ioff,joff)\f$ location in the parent matrix.
    */
   DenseSubMatrix(DenseMatrix<T>& new_parent,

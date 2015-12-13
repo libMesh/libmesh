@@ -44,7 +44,7 @@ public:
   /**
    * Constructor.  Creates a dense subvector of the vector
    * \p parent.  The subvector has dimensions \f$(m \times n)\f$,
-   * and the \f$(0,0) entry of the subvector is located
+   * and the \f$(0,0)\f$ entry of the subvector is located
    * at the \f$(ioff,joff)\f$ location in the parent vector.
    */
   DenseSubVector(DenseVector<T>& new_parent,

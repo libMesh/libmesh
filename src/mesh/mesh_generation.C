@@ -57,7 +57,7 @@ namespace MeshTools {
 namespace Generation {
 namespace Private {
 /**
- * A useful inline function which replaces the #defines
+ * A useful inline function which replaces the macros
  * used previously.  Not private since this is a namespace,
  * but would be if this were a class.  The first one returns
  * the proper node number for 2D elements while the second

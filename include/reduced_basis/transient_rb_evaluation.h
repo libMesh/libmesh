@@ -41,7 +41,7 @@ class TransientRBThetaExpansion;
  * to perform "online" RB evaluations for
  * Linear Time Invariant (LTI) transient problems.
  *
- * We can handle time controls on the RHS as h(t)*f(x,\mu).
+ * We can handle time controls on the RHS as h(t)*f(x,\f$ \mu \f$).
  * See Martin Grepl's thesis for more details.
  *
  * \author David J. Knezevic

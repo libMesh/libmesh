@@ -919,7 +919,7 @@ public:
 
 private:
   /**
-   * @sets the pointer to the \f$ i^{th} \f$ child for this element.
+   * Sets the pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
    */
   void set_child (unsigned int c, Elem *elem);

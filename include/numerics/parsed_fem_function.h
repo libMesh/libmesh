@@ -126,7 +126,7 @@ public:
   Output get_inline_value(const std::string& inline_var_name) const;
 
   /**
-   * @changes the value of an inline variable.  Forever after the
+   * Changes the value of an inline variable.  Forever after the
    * variable value will take the given constant, independent of input
    * variables, in every subexpression where it is already defined.
    * Currently only works if the inline variable is not redefined

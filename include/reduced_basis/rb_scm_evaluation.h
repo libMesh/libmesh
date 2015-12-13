@@ -199,7 +199,7 @@ public:
 
   /**
    * This matrix stores the infimizing vectors
-   * y_1(\mu),...,y_Q_a(\mu), for each \mu in
+   * y_1(\f$ \mu \f$),...,y_Q_a(\f$ \mu \f$), for each \f$ \mu \f$ in
    * C_J, which are used in computing the SCM
    * upper bounds.
    */

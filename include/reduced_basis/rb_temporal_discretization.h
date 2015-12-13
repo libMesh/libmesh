@@ -111,7 +111,7 @@ private:
 
   /**
    * The RHS control (scalar function of time).
-   * A function h(t) that is used in the RHS as h(t)*f(x,\mu).
+   * A function h(t) that is used in the RHS as h(t)*f(x,\f$ \mu \f$).
    * See Martin Grepl's thesis
    */
   std::vector<Real> _control;

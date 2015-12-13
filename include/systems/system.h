@@ -1559,7 +1559,7 @@ public:
    * this function is parallel-only.
    *
    * By default this method expects the point to reside inside the domain
-   * and will abort if no element can be found which contains \p.  The
+   * and will abort if no element can be found which contains \p p.  The
    * optional parameter \p insist_on_success can be set to false to allow
    * the method to return 0 when the point is not located.
    */
