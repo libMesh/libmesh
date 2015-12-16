@@ -713,35 +713,6 @@ private:
    * this is only implemented for ExodusII
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
-
-  /**
-   * Functor class for initializing a map.
-   * The entries being added to the map
-   * increase by exactly one each time.
-   * The desctructor also inserts the
-   * invalid_id entry.
-   */
-  class Fill
-  {
-  public:
-    Fill(std::map<boundary_id_type, dof_id_type>& im) : id_map(im), cnt(0) {}
-
-    ~Fill()
-    {
-      id_map[invalid_id] = cnt;
-    }
-
-    inline
-    void operator() (const boundary_id_type& pos)
-    {
-      id_map[pos] = cnt++;
-    }
-
-  private:
-    std::map<boundary_id_type, dof_id_type>& id_map;
-    dof_id_type cnt;
-  };
-
 };
 
 
