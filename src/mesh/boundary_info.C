@@ -1217,6 +1217,44 @@ void BoundaryInfo::remove_side (const Elem* elem,
 
 
 
+void BoundaryInfo::remove_id (boundary_id_type id)
+{
+  // Erase id from ids containers
+  _boundary_ids.erase(id);
+  _side_boundary_ids.erase(id);
+  _edge_boundary_ids.erase(id);
+  _node_boundary_ids.erase(id);
+  _ss_id_to_name.erase(id);
+  _ns_id_to_name.erase(id);
+
+  // Erase pointers to geometric entities with this id.
+  for (boundary_node_erase_iter it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
+    {
+      if (it->second == id)
+        _boundary_node_id.erase(it++);
+      else
+        ++it;
+    }
+
+  for (erase_iter it = _boundary_edge_id.begin(); it != _boundary_edge_id.end(); /*below*/)
+    {
+      if (it->second.second == id)
+        _boundary_edge_id.erase(it++);
+      else
+        ++it;
+    }
+
+  for (erase_iter it = _boundary_side_id.begin(); it != _boundary_side_id.end(); /*below*/)
+    {
+      if (it->second.second == id)
+        _boundary_side_id.erase(it++);
+      else
+        ++it;
+    }
+}
+
+
+
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
                                                  const boundary_id_type boundary_id_in) const
 {

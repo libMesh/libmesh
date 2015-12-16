@@ -269,6 +269,16 @@ public:
                     const boundary_id_type id);
 
   /**
+   * Removes all entities (nodes, sides, edges) with boundary id \p id
+   * from their respective containers and erases any record of \p id's
+   * existence from the BoundaryInfo object.  That is, after calling
+   * remove_id(), \p id will no longer be in the sets returned by
+   * get_boundary_ids(), get_side_boundary_ids(), etc., and will not
+   * be in the bc_id_list vector returned by build_side_list(), etc.
+   */
+  void remove_id (boundary_id_type id);
+
+  /**
    * Returns the number of user-specified boundary ids.
    */
   std::size_t n_boundary_ids () const { return _boundary_ids.size(); }
@@ -620,6 +630,13 @@ private:
    * Typdef for iterators into the _boundary_node_id container.
    */
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator boundary_node_iter;
+
+  /**
+   * Some older compilers don't support erasing from a map with
+   * const_iterators, so we need to use a non-const iterator in those
+   * situations.
+   */
+  typedef std::multimap<const Node*, boundary_id_type>::iterator boundary_node_erase_iter;
 
   /**
    * Data structure that maps edges of elements
