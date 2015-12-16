@@ -320,9 +320,6 @@
 /* no IEEE float on this platform */
 #undef NO_IEEE_FLOAT
 
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-#undef NO_MINUS_C_MINUS_O
-
 /* do not build the netCDF version 2 API */
 #undef NO_NETCDF_2
 
