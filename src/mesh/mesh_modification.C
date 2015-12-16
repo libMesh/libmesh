@@ -1594,6 +1594,10 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
           bi.add_side(elem, side, bndry_ids);
         }
   }
+
+  // Remove any remaining references to the old_id so it does not show
+  // up in lists of boundary ids, etc.
+  bi.remove_id(old_id);
 }
 
 
