@@ -1095,6 +1095,27 @@ void BoundaryInfo::raw_boundary_ids (const Elem* const elem,
 
 
 
+void BoundaryInfo::remove (const Node* node)
+{
+  libmesh_assert(node);
+
+  // Erase everything associated with node
+  _boundary_node_id.erase (node);
+}
+
+
+
+void BoundaryInfo::remove (const Elem* elem)
+{
+  libmesh_assert(elem);
+
+  // Erase everything associated with elem
+  _boundary_edge_id.erase (elem);
+  _boundary_side_id.erase (elem);
+}
+
+
+
 void BoundaryInfo::remove_edge (const Elem* elem,
                                 const unsigned short int edge)
 {

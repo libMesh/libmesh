@@ -715,34 +715,6 @@ private:
   std::map<boundary_id_type, std::string> _ns_id_to_name;
 };
 
-
-
-
-
-
-// ------------------------------------------------------------
-// BoundaryInfo inline methods
-inline
-void BoundaryInfo::remove (const Node* node)
-{
-  libmesh_assert(node);
-
-  // Erase everything associated with node
-  _boundary_node_id.erase (node);
-}
-
-
-
-inline
-void BoundaryInfo::remove (const Elem* elem)
-{
-  libmesh_assert(elem);
-
-  // Erase everything associated with elem
-  _boundary_edge_id.erase (elem);
-  _boundary_side_id.erase (elem);
-}
-
 } // namespace libMesh
 
 #endif // LIBMESH_BOUNDARY_INFO_H
