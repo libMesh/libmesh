@@ -115,7 +115,7 @@ public:
    * pass a pointer to both the boundary_mesh's MeshData object,
    * and the MeshData object used for this mesh.
    */
-  void sync (const std::set<boundary_id_type> &requested_boundary_ids,
+  void sync (const std::set<boundary_id_type>& requested_boundary_ids,
              UnstructuredMesh& boundary_mesh,
              MeshData* boundary_mesh_data=NULL,
              MeshData* this_mesh_data=NULL);
@@ -146,7 +146,7 @@ public:
    *
    * Only boundary elements with the specified ids are created.
    */
-  void add_elements (const std::set<boundary_id_type> &requested_boundary_ids,
+  void add_elements (const std::set<boundary_id_type>& requested_boundary_ids,
                      UnstructuredMesh& boundary_mesh);
 
   /**
@@ -450,12 +450,12 @@ public:
   /**
    * Builds the list of unique node boundary ids.
    */
-  void build_node_boundary_ids(std::vector<boundary_id_type> &b_ids) const;
+  void build_node_boundary_ids(std::vector<boundary_id_type>& b_ids) const;
 
   /**
    * Builds the list of unique side boundary ids.
    */
-  void build_side_boundary_ids(std::vector<boundary_id_type> &b_ids) const;
+  void build_side_boundary_ids(std::vector<boundary_id_type>& b_ids) const;
 
   /**
    * @returns the number of element-side-based boundary conditions.
@@ -492,13 +492,13 @@ public:
   void build_side_list_from_node_list();
 
   /**
-   * Creates a list of element numbers, sides, and  and ids for those sides.
+   * Creates a list of element numbers, sides, and ids for those sides.
    */
   void build_side_list (std::vector<dof_id_type>&        element_id_list,
                         std::vector<unsigned short int>& side_list,
                         std::vector<boundary_id_type>&   bc_id_list) const;
   /**
-   * Creates a list of active element numbers, sides, and  and ids for those sides.
+   * Creates a list of active element numbers, sides, and ids for those sides.
    */
   void build_active_side_list (std::vector<dof_id_type>&        element_id_list,
                                std::vector<unsigned short int>& side_list,
@@ -608,7 +608,7 @@ private:
    * dof_object ids.  Either node_id_map or side_id_map can be NULL,
    * in which case it will not be filled.
    */
-  void _find_id_maps (const std::set<boundary_id_type> &requested_boundary_ids,
+  void _find_id_maps (const std::set<boundary_id_type>& requested_boundary_ids,
                       dof_id_type first_free_node_id,
                       std::map<dof_id_type, dof_id_type> * node_id_map,
                       dof_id_type first_free_elem_id,

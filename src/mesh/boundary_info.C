@@ -315,7 +315,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh& boundary_mesh,
 }
 
 
-void BoundaryInfo::add_elements(const std::set<boundary_id_type> &requested_boundary_ids,
+void BoundaryInfo::add_elements(const std::set<boundary_id_type>& requested_boundary_ids,
                                 UnstructuredMesh& boundary_mesh)
 {
   START_LOG("add_elements()", "BoundaryInfo");
@@ -1424,8 +1424,8 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 
 
 
-void BoundaryInfo::build_node_list (std::vector<dof_id_type>& nl,
-                                    std::vector<boundary_id_type>&    il) const
+void BoundaryInfo::build_node_list (std::vector<dof_id_type>&      nl,
+                                    std::vector<boundary_id_type>& il) const
 {
   // Clear the input vectors, just in case they were used for
   // something else recently...
