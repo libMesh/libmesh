@@ -115,7 +115,7 @@ public:
    * pass a pointer to both the boundary_mesh's MeshData object,
    * and the MeshData object used for this mesh.
    */
-  void sync (const std::set<boundary_id_type> &requested_boundary_ids,
+  void sync (const std::set<boundary_id_type>& requested_boundary_ids,
              UnstructuredMesh& boundary_mesh,
              MeshData* boundary_mesh_data=NULL,
              MeshData* this_mesh_data=NULL);
@@ -146,7 +146,7 @@ public:
    *
    * Only boundary elements with the specified ids are created.
    */
-  void add_elements (const std::set<boundary_id_type> &requested_boundary_ids,
+  void add_elements (const std::set<boundary_id_type>& requested_boundary_ids,
                      UnstructuredMesh& boundary_mesh);
 
   /**
@@ -267,6 +267,16 @@ public:
   void remove_side (const Elem* elem,
                     const unsigned short int side,
                     const boundary_id_type id);
+
+  /**
+   * Removes all entities (nodes, sides, edges) with boundary id \p id
+   * from their respective containers and erases any record of \p id's
+   * existence from the BoundaryInfo object.  That is, after calling
+   * remove_id(), \p id will no longer be in the sets returned by
+   * get_boundary_ids(), get_side_boundary_ids(), etc., and will not
+   * be in the bc_id_list vector returned by build_side_list(), etc.
+   */
+  void remove_id (boundary_id_type id);
 
   /**
    * Returns the number of user-specified boundary ids.
@@ -440,12 +450,12 @@ public:
   /**
    * Builds the list of unique node boundary ids.
    */
-  void build_node_boundary_ids(std::vector<boundary_id_type> &b_ids) const;
+  void build_node_boundary_ids(std::vector<boundary_id_type>& b_ids) const;
 
   /**
    * Builds the list of unique side boundary ids.
    */
-  void build_side_boundary_ids(std::vector<boundary_id_type> &b_ids) const;
+  void build_side_boundary_ids(std::vector<boundary_id_type>& b_ids) const;
 
   /**
    * @returns the number of element-side-based boundary conditions.
@@ -482,13 +492,13 @@ public:
   void build_side_list_from_node_list();
 
   /**
-   * Creates a list of element numbers, sides, and  and ids for those sides.
+   * Creates a list of element numbers, sides, and ids for those sides.
    */
   void build_side_list (std::vector<dof_id_type>&        element_id_list,
                         std::vector<unsigned short int>& side_list,
                         std::vector<boundary_id_type>&   bc_id_list) const;
   /**
-   * Creates a list of active element numbers, sides, and  and ids for those sides.
+   * Creates a list of active element numbers, sides, and ids for those sides.
    */
   void build_active_side_list (std::vector<dof_id_type>&        element_id_list,
                                std::vector<unsigned short int>& side_list,
@@ -598,7 +608,7 @@ private:
    * dof_object ids.  Either node_id_map or side_id_map can be NULL,
    * in which case it will not be filled.
    */
-  void _find_id_maps (const std::set<boundary_id_type> &requested_boundary_ids,
+  void _find_id_maps (const std::set<boundary_id_type>& requested_boundary_ids,
                       dof_id_type first_free_node_id,
                       std::map<dof_id_type, dof_id_type> * node_id_map,
                       dof_id_type first_free_elem_id,
@@ -620,6 +630,13 @@ private:
    * Typdef for iterators into the _boundary_node_id container.
    */
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator boundary_node_iter;
+
+  /**
+   * Some older compilers don't support erasing from a map with
+   * const_iterators, so we need to use a non-const iterator in those
+   * situations.
+   */
+  typedef std::multimap<const Node*, boundary_id_type>::iterator boundary_node_erase_iter;
 
   /**
    * Data structure that maps edges of elements
@@ -696,64 +713,7 @@ private:
    * this is only implemented for ExodusII
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
-
-  /**
-   * Functor class for initializing a map.
-   * The entries being added to the map
-   * increase by exactly one each time.
-   * The desctructor also inserts the
-   * invalid_id entry.
-   */
-  class Fill
-  {
-  public:
-    Fill(std::map<boundary_id_type, dof_id_type>& im) : id_map(im), cnt(0) {}
-
-    ~Fill()
-    {
-      id_map[invalid_id] = cnt;
-    }
-
-    inline
-    void operator() (const boundary_id_type& pos)
-    {
-      id_map[pos] = cnt++;
-    }
-
-  private:
-    std::map<boundary_id_type, dof_id_type>& id_map;
-    dof_id_type cnt;
-  };
-
 };
-
-
-
-
-
-
-// ------------------------------------------------------------
-// BoundaryInfo inline methods
-inline
-void BoundaryInfo::remove (const Node* node)
-{
-  libmesh_assert(node);
-
-  // Erase everything associated with node
-  _boundary_node_id.erase (node);
-}
-
-
-
-inline
-void BoundaryInfo::remove (const Elem* elem)
-{
-  libmesh_assert(elem);
-
-  // Erase everything associated with elem
-  _boundary_edge_id.erase (elem);
-  _boundary_side_id.erase (elem);
-}
 
 } // namespace libMesh
 

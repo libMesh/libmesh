@@ -315,7 +315,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh& boundary_mesh,
 }
 
 
-void BoundaryInfo::add_elements(const std::set<boundary_id_type> &requested_boundary_ids,
+void BoundaryInfo::add_elements(const std::set<boundary_id_type>& requested_boundary_ids,
                                 UnstructuredMesh& boundary_mesh)
 {
   START_LOG("add_elements()", "BoundaryInfo");
@@ -1095,6 +1095,27 @@ void BoundaryInfo::raw_boundary_ids (const Elem* const elem,
 
 
 
+void BoundaryInfo::remove (const Node* node)
+{
+  libmesh_assert(node);
+
+  // Erase everything associated with node
+  _boundary_node_id.erase (node);
+}
+
+
+
+void BoundaryInfo::remove (const Elem* elem)
+{
+  libmesh_assert(elem);
+
+  // Erase everything associated with elem
+  _boundary_edge_id.erase (elem);
+  _boundary_side_id.erase (elem);
+}
+
+
+
 void BoundaryInfo::remove_edge (const Elem* elem,
                                 const unsigned short int edge)
 {
@@ -1212,6 +1233,44 @@ void BoundaryInfo::remove_side (const Elem* elem,
         }
       else
         ++e.first;
+    }
+}
+
+
+
+void BoundaryInfo::remove_id (boundary_id_type id)
+{
+  // Erase id from ids containers
+  _boundary_ids.erase(id);
+  _side_boundary_ids.erase(id);
+  _edge_boundary_ids.erase(id);
+  _node_boundary_ids.erase(id);
+  _ss_id_to_name.erase(id);
+  _ns_id_to_name.erase(id);
+
+  // Erase pointers to geometric entities with this id.
+  for (boundary_node_erase_iter it = _boundary_node_id.begin(); it != _boundary_node_id.end(); /*below*/)
+    {
+      if (it->second == id)
+        _boundary_node_id.erase(it++);
+      else
+        ++it;
+    }
+
+  for (erase_iter it = _boundary_edge_id.begin(); it != _boundary_edge_id.end(); /*below*/)
+    {
+      if (it->second.second == id)
+        _boundary_edge_id.erase(it++);
+      else
+        ++it;
+    }
+
+  for (erase_iter it = _boundary_side_id.begin(); it != _boundary_side_id.end(); /*below*/)
+    {
+      if (it->second.second == id)
+        _boundary_side_id.erase(it++);
+      else
+        ++it;
     }
 }
 
@@ -1365,9 +1424,14 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 
 
 
-void BoundaryInfo::build_node_list (std::vector<dof_id_type>& nl,
-                                    std::vector<boundary_id_type>&    il) const
+void BoundaryInfo::build_node_list (std::vector<dof_id_type>&      nl,
+                                    std::vector<boundary_id_type>& il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  nl.clear();
+  il.clear();
+
   // Reserve the size, then use push_back
   nl.reserve (_boundary_node_id.size());
   il.reserve (_boundary_node_id.size());
@@ -1477,6 +1541,12 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type>&        el,
                                     std::vector<unsigned short int>& sl,
                                     std::vector<boundary_id_type>&   il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  el.clear();
+  sl.clear();
+  il.clear();
+
   // Reserve the size, then use push_back
   el.reserve (_boundary_side_id.size());
   sl.reserve (_boundary_side_id.size());
@@ -1495,6 +1565,12 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type>&        el,
                                            std::vector<unsigned short int>& sl,
                                            std::vector<boundary_id_type>&   il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  el.clear();
+  sl.clear();
+  il.clear();
+
   boundary_side_iter pos = _boundary_side_id.begin();
   for (; pos != _boundary_side_id.end(); ++pos)
     {
@@ -1525,6 +1601,12 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type>&        el,
                                     std::vector<unsigned short int>& sl,
                                     std::vector<boundary_id_type>&   il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  el.clear();
+  sl.clear();
+  il.clear();
+
   // Reserve the size, then use push_back
   el.reserve (_boundary_side_id.size());
   sl.reserve (_boundary_side_id.size());

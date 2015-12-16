@@ -18,6 +18,7 @@ unit_tests_sources = \
 	geom/point_test.C \
 	geom/point_test.h \
 	mesh/boundary_mesh.C \
+	mesh/boundary_info.C \
 	mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C \

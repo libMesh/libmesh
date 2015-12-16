@@ -1,4 +1,4 @@
-// Ignore unused parameter warnings coming from cppuint headers
+// Ignore unused parameter warnings coming from cppunit headers
 #include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
