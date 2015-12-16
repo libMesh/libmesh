@@ -1427,6 +1427,11 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 void BoundaryInfo::build_node_list (std::vector<dof_id_type>& nl,
                                     std::vector<boundary_id_type>&    il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  nl.clear();
+  il.clear();
+
   // Reserve the size, then use push_back
   nl.reserve (_boundary_node_id.size());
   il.reserve (_boundary_node_id.size());
@@ -1536,6 +1541,12 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type>&        el,
                                     std::vector<unsigned short int>& sl,
                                     std::vector<boundary_id_type>&   il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  el.clear();
+  sl.clear();
+  il.clear();
+
   // Reserve the size, then use push_back
   el.reserve (_boundary_side_id.size());
   sl.reserve (_boundary_side_id.size());
@@ -1554,6 +1565,12 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type>&        el,
                                            std::vector<unsigned short int>& sl,
                                            std::vector<boundary_id_type>&   il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  el.clear();
+  sl.clear();
+  il.clear();
+
   boundary_side_iter pos = _boundary_side_id.begin();
   for (; pos != _boundary_side_id.end(); ++pos)
     {
@@ -1584,6 +1601,12 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type>&        el,
                                     std::vector<unsigned short int>& sl,
                                     std::vector<boundary_id_type>&   il) const
 {
+  // Clear the input vectors, just in case they were used for
+  // something else recently...
+  el.clear();
+  sl.clear();
+  il.clear();
+
   // Reserve the size, then use push_back
   el.reserve (_boundary_side_id.size());
   sl.reserve (_boundary_side_id.size());
