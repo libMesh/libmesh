@@ -1052,6 +1052,11 @@ protected:
   std::map<subdomain_id_type, std::string> _block_id_to_name;
 
   /**
+   * User-supplied mesh dimension.
+   */
+  unsigned char _user_dim;
+
+  /**
    * We cache the dimension of the elements present in the mesh.
    * So, if we have a mesh with 1D and 2D elements, this structure
    * will contain 1 and 2.
