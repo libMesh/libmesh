@@ -773,12 +773,12 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           // Compute the value of the error in the gradient at this
           // quadrature point
           typename FEGenericBase<OutputShape>::OutputNumberGradient exact_grad;
-          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, _mesh.spatial_dimension() );
+          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, LIBMESH_DIM );
           if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
             {
-              for( unsigned int c = 0; c < n_vec_dim; c++)
-                for( unsigned int d = 0; d < _mesh.spatial_dimension(); d++ )
-                  exact_grad_accessor(d + c*_mesh.spatial_dimension() ) =
+              for (unsigned int c = 0; c < n_vec_dim; c++)
+                for (unsigned int d = 0; d < LIBMESH_DIM; d++)
+                  exact_grad_accessor(d + c*LIBMESH_DIM) =
                     _exact_derivs[sys_num]->
                     component(var_component+c, q_point[qp], time)(d);
             }

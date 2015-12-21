@@ -953,8 +953,18 @@ void UNVIO::nodes_out (std::ostream & out_file)
 
       // The coordinates - always write out three coords regardless of LIBMESH_DIM
       Real x = (*current_node)(0);
-      Real y = mesh.spatial_dimension() > 1 ? (*current_node)(1) : 0.0;
-      Real z = mesh.spatial_dimension() > 2 ? (*current_node)(2) : 0.0;
+
+#if LIBMESH_DIM > 1
+      Real y = (*current_node)(1);
+#else
+      Real y = 0.;
+#endif
+
+#if LIBMESH_DIM > 2
+      Real z = (*current_node)(2);
+#else
+      Real z = 0.;
+#endif
 
       out_file << std::setw(25) << x
                << std::setw(25) << y
