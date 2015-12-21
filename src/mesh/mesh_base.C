@@ -58,7 +58,8 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false)
+  _skip_renumber_nodes_and_elements(false),
+  _spatial_dimension(d)
 {
   _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
@@ -79,7 +80,8 @@ MeshBase::MeshBase (unsigned char d) :
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false)
+  _skip_renumber_nodes_and_elements(false),
+  _spatial_dimension(d)
 {
   _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
@@ -102,7 +104,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
-  _elem_dims(other_mesh._elem_dims)
+  _elem_dims(other_mesh._elem_dims),
+  _spatial_dimension(other_mesh._spatial_dimension)
 {
   if(other_mesh._partitioner.get())
     {
@@ -119,12 +122,33 @@ MeshBase::~MeshBase()
   libmesh_exceptionless_assert (!libMesh::closed());
 }
 
+
+
 unsigned int MeshBase::mesh_dimension() const
 {
   if (!_elem_dims.empty())
     return cast_int<unsigned int>(*_elem_dims.rbegin());
   return 0;
 }
+
+
+
+unsigned int MeshBase::spatial_dimension () const
+{
+  return cast_int<unsigned int>(_spatial_dimension);
+}
+
+
+
+void MeshBase::set_spatial_dimension(unsigned char d)
+{
+  // The user can set the _spatial_dimension however they wish,
+  // libMesh will only *increase* the spatial dimension, however,
+  // never decrease it.
+  _spatial_dimension = d;
+}
+
+
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
@@ -530,6 +554,51 @@ void MeshBase::cache_elem_dims()
 
   // Some different dimension elements may only live on other processors
   this->comm().set_union(_elem_dims);
+
+  // If the largest element dimension found is larger than the current
+  // _spatial_dimension, increase _spatial_dimension.
+  unsigned int max_dim = this->mesh_dimension();
+  if (max_dim > _spatial_dimension)
+    _spatial_dimension = cast_int<unsigned char>(max_dim);
+
+  // _spatial_dimension may need to increase from 1->2 or 2->3 if the
+  // mesh is full of 1D elements but they are not x-aligned, or the
+  // mesh is full of 2D elements but they are not in the x-y plane.
+  // If the mesh is x-aligned or x-y planar, we will end up checking
+  // every node's coordinates and not breaking out of the loop
+  // early...
+  if (_spatial_dimension < 3)
+    {
+      const_node_iterator node_it  = this->nodes_begin();
+      const_node_iterator node_end = this->nodes_end();
+      for (; node_it != node_end; ++node_it)
+        {
+          Node & node = **node_it;
+
+          // Note: the exact floating point comparison is intentional,
+          // we don't want to get tripped up by tolerances.
+          if (node(1) != 0.)
+            {
+              _spatial_dimension = 2;
+#if LIBMESH_DIM == 2
+              // If libmesh is compiled in 2D mode, this is the
+              // largest spatial dimension possible so we can break
+              // out.
+              break;
+#endif
+            }
+
+#if LIBMESH_DIM > 2
+          if (node(2) != 0.)
+            {
+              // Spatial dimension can't get any higher than this, so
+              // we can break out.
+              _spatial_dimension = 3;
+              break;
+            }
+#endif
+        }
+    }
 }
 
 void MeshBase::detect_interior_parents()
