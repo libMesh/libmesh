@@ -24,6 +24,7 @@
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/trilinos_nox_nonlinear_solver.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/solver_configuration.h"
 
 namespace libMesh
 {
@@ -77,6 +78,12 @@ NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
     libmesh_error_msg("Preconditioner must be attached before the solver is initialized!");
 
   _preconditioner = preconditioner;
+}
+
+template <typename T>
+void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration& solver_configuration)
+{
+  _solver_configuration = &solver_configuration;
 }
 
 

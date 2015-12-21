@@ -39,6 +39,7 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class Preconditioner;
+class SolverConfiguration;
 
 /**
  * This class provides a uniform interface for nonlinear solvers.  This base
@@ -309,6 +310,11 @@ public:
    */
   bool converged;
 
+  /**
+   * Set the solver configuration object.
+   */
+  void set_solver_configuration(SolverConfiguration& solver_configuration);
+
 protected:
   /**
    * A reference to the system we are solving.
@@ -324,6 +330,12 @@ protected:
    * Holds the Preconditioner object to be used for the linear solves.
    */
   Preconditioner<T> * _preconditioner;
+
+  /**
+   * Optionally store a SolverOptions object that can be used
+   * to set parameters like solver type, tolerances and iteration limits.
+   */
+  SolverConfiguration* _solver_configuration;
 };
 
 
@@ -361,7 +373,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   converged(false),
   _system(s),
   _is_initialized (false),
-  _preconditioner (NULL)
+  _preconditioner (NULL),
+  _solver_configuration(NULL)
 {
 }
 

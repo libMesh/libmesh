@@ -32,6 +32,7 @@
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
+#include "libmesh/solver_configuration.h"
 
 /* DMlibMesh include. */
 #include "libmesh/petscdmlibmesh.h"
@@ -469,6 +470,13 @@ void PetscNonlinearSolver<T>::init (const char* name)
           LIBMESH_CHKERR(ierr);
         }
 
+      // If the SolverConfiguration object is provided, use it to set
+      // options during solver initialization.
+      if(this->_solver_configuration)
+        {
+          this->_solver_configuration->set_options_during_init();
+        }
+
 #if PETSC_VERSION_LESS_THAN(3,1,0)
       // Cannot call SNESSetOptions before SNESSetFunction when using
       // any matrix free options with PETSc 3.1.0+
@@ -690,6 +698,13 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
     {
       this->_preconditioner->set_matrix(jac_in);
       this->_preconditioner->init();
+    }
+
+  // If the SolverConfiguration object is provided, use it to override
+  // solver options.
+  if(this->_solver_configuration)
+    {
+      this->_solver_configuration->configure_solver();
     }
 
   //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
