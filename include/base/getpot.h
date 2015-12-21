@@ -77,7 +77,21 @@ extern "C" {
 #define getpot_file_error(filename) libmesh_file_error(filename)
 #define getpot_cast_int libMesh::cast_int
 
-#else // USE_LIBMESH
+// If libmesh detected the inverse hyperbolic trig functions, set
+// special #defines for getpot.h
+#ifdef LIBMESH_HAVE_CXX11_INVERSE_HYPERBOLIC_SINE
+#define HAVE_INVERSE_HYPERBOLIC_SINE
+#endif
+
+#ifdef LIBMESH_HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE
+#define HAVE_INVERSE_HYPERBOLIC_COSINE
+#endif
+
+#ifdef LIBMESH_HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT
+#define HAVE_INVERSE_HYPERBOLIC_TANGENT
+#endif
+
+#else // !USE_LIBMESH
 
 // Currently threaded GetPot use is only supported via libMesh Threads
 #define SCOPED_MUTEX
@@ -86,8 +100,6 @@ extern "C" {
 #define getpot_error() throw std::runtime_error(std::string("GetPot Error"))
 #define getpot_file_error(filename) getpot_error()
 #define getpot_cast_int static_cast
-
-#endif
 
 // Clang provides the __has_builtin macro, we define it for compilers
 // that don't...
@@ -109,6 +121,9 @@ extern "C" {
 #if __cplusplus > 199711L && (!defined(__clang__) || __has_builtin(atanh))
 #define HAVE_INVERSE_HYPERBOLIC_TANGENT
 #endif
+
+#endif // #ifdef USE_LIBMESH
+
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 

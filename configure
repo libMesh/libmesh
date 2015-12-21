@@ -895,6 +895,18 @@ EGREP
 GREP
 SED
 LIBTOOL
+HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE
+HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE
+HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_FALSE
+HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_TRUE
+HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_FALSE
+HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_TRUE
+HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_FALSE
+HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_TRUE
+HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_FALSE
+HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_TRUE
+HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_FALSE
+HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_TRUE
 HAVE_CXX11_TYPE_TRAITS_FALSE
 HAVE_CXX11_TYPE_TRAITS_TRUE
 HAVE_CXX11_THREAD_FALSE
@@ -8853,6 +8865,297 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX11_TYPE_TRAITS_TRUE='#'
   HAVE_CXX11_TYPE_TRAITS_FALSE=
+fi
+
+
+
+    have_cxx11_inverse_hyperbolic_sine=no
+    have_cxx11_inverse_hyperbolic_cosine=no
+    have_cxx11_inverse_hyperbolic_tangent=no
+
+    have_cxx11_inverse_hyperbolic_sine_complex=no
+    have_cxx11_inverse_hyperbolic_cosine_complex=no
+    have_cxx11_inverse_hyperbolic_tangent_complex=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      # Test for asinh
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh support in <cmath>" >&5
+$as_echo_n "checking for C++11 std::asinh support in <cmath>... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <cmath>
+
+int
+main ()
+{
+
+        double x = std::asinh(1.);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_SINE 1" >>confdefs.h
+
+        have_cxx11_inverse_hyperbolic_sine=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Test for acosh
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::acosh support in <cmath>" >&5
+$as_echo_n "checking for C++11 std::acosh support in <cmath>... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <cmath>
+
+int
+main ()
+{
+
+        double x = std::acosh(1.);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE 1" >>confdefs.h
+
+        have_cxx11_inverse_hyperbolic_cosine=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Test for atanh
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::atanh support in <cmath>" >&5
+$as_echo_n "checking for C++11 std::atanh support in <cmath>... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <cmath>
+
+int
+main ()
+{
+
+        double x = std::atanh(0.);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT 1" >>confdefs.h
+
+        have_cxx11_inverse_hyperbolic_tangent=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+      # Test for asinh(complex)
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh(complex) support in <complex>" >&5
+$as_echo_n "checking for C++11 std::asinh(complex) support in <complex>... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <complex>
+
+int
+main ()
+{
+
+        std::complex<double> z(0, -2);
+        std::complex<double> x = std::asinh(z);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX 1" >>confdefs.h
+
+        have_cxx11_inverse_hyperbolic_sine_complex=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Test for acosh(complex)
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::acosh(complex) support in <complex>" >&5
+$as_echo_n "checking for C++11 std::acosh(complex) support in <complex>... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <complex>
+
+int
+main ()
+{
+
+        std::complex<double> z(0.5, 0);
+        std::complex<double> x = std::acosh(z);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX 1" >>confdefs.h
+
+        have_cxx11_inverse_hyperbolic_cosine_complex=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Test for atanh(complex)
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::atanh(complex) support in <complex>" >&5
+$as_echo_n "checking for C++11 std::atanh(complex) support in <complex>... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <complex>
+
+int
+main ()
+{
+
+        std::complex<double> z(2, 0);
+        std::complex<double> x = std::atanh(z);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX 1" >>confdefs.h
+
+        have_cxx11_inverse_hyperbolic_tangent_complex=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    fi
+
+     if test x$have_cxx11_inverse_hyperbolic_sine == xyes; then
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_TRUE=
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_FALSE='#'
+else
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_TRUE='#'
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_FALSE=
+fi
+
+     if test x$have_cxx11_inverse_hyperbolic_cosine == xyes; then
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_TRUE=
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_FALSE='#'
+else
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_TRUE='#'
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_FALSE=
+fi
+
+     if test x$have_cxx11_inverse_hyperbolic_tangent == xyes; then
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_TRUE=
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_FALSE='#'
+else
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_TRUE='#'
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_FALSE=
+fi
+
+
+     if test x$have_cxx11_inverse_hyperbolic_sine_complex == xyes; then
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_TRUE=
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_FALSE='#'
+else
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_TRUE='#'
+  HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_FALSE=
+fi
+
+     if test x$have_cxx11_inverse_hyperbolic_cosine_complex == xyes; then
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_TRUE=
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_FALSE='#'
+else
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_TRUE='#'
+  HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_FALSE=
+fi
+
+     if test x$have_cxx11_inverse_hyperbolic_tangent_complex == xyes; then
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE=
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE='#'
+else
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE='#'
+  HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE=
 fi
 
 
@@ -40437,6 +40740,30 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_TYPE_TRAITS_TRUE}" && test -z "${HAVE_CXX11_TYPE_TRAITS_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_TYPE_TRAITS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_SINE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE}" && test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE}"; then

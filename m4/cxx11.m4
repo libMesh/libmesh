@@ -349,3 +349,119 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
 
     AM_CONDITIONAL(HAVE_CXX11_TYPE_TRAITS, test x$have_cxx11_type_traits == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS],
+  [
+    have_cxx11_inverse_hyperbolic_sine=no
+    have_cxx11_inverse_hyperbolic_cosine=no
+    have_cxx11_inverse_hyperbolic_tangent=no
+
+    have_cxx11_inverse_hyperbolic_sine_complex=no
+    have_cxx11_inverse_hyperbolic_cosine_complex=no
+    have_cxx11_inverse_hyperbolic_tangent_complex=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_LANG_PUSH([C++])
+
+      # Test for asinh
+      AC_MSG_CHECKING(for C++11 std::asinh support in <cmath>)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <cmath>
+      ]], [[
+        double x = std::asinh(1.);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE, 1, [Flag indicating whether compiler supports std::asinh])
+        have_cxx11_inverse_hyperbolic_sine=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      # Test for acosh
+      AC_MSG_CHECKING(for C++11 std::acosh support in <cmath>)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <cmath>
+      ]], [[
+        double x = std::acosh(1.);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE, 1, [Flag indicating whether compiler supports std::acosh])
+        have_cxx11_inverse_hyperbolic_cosine=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      # Test for atanh
+      AC_MSG_CHECKING(for C++11 std::atanh support in <cmath>)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <cmath>
+      ]], [[
+        double x = std::atanh(0.);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT, 1, [Flag indicating whether compiler supports std::atanh])
+        have_cxx11_inverse_hyperbolic_tangent=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+
+      # Test for asinh(complex)
+      AC_MSG_CHECKING(for C++11 std::asinh(complex) support in <complex>)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <complex>
+      ]], [[
+        std::complex<double> z(0, -2);
+        std::complex<double> x = std::asinh(z);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX, 1, [Flag indicating whether compiler supports std::asinh])
+        have_cxx11_inverse_hyperbolic_sine_complex=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      # Test for acosh(complex)
+      AC_MSG_CHECKING(for C++11 std::acosh(complex) support in <complex>)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <complex>
+      ]], [[
+        std::complex<double> z(0.5, 0);
+        std::complex<double> x = std::acosh(z);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX, 1, [Flag indicating whether compiler supports std::asinh])
+        have_cxx11_inverse_hyperbolic_cosine_complex=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      # Test for atanh(complex)
+      AC_MSG_CHECKING(for C++11 std::atanh(complex) support in <complex>)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <complex>
+      ]], [[
+        std::complex<double> z(2, 0);
+        std::complex<double> x = std::atanh(z);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX, 1, [Flag indicating whether compiler supports std::asinh])
+        have_cxx11_inverse_hyperbolic_tangent_complex=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE, test x$have_cxx11_inverse_hyperbolic_sine == xyes)
+    AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE, test x$have_cxx11_inverse_hyperbolic_cosine == xyes)
+    AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT, test x$have_cxx11_inverse_hyperbolic_tangent == xyes)
+
+    AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX, test x$have_cxx11_inverse_hyperbolic_sine_complex == xyes)
+    AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX, test x$have_cxx11_inverse_hyperbolic_cosine_complex == xyes)
+    AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX, test x$have_cxx11_inverse_hyperbolic_tangent_complex == xyes)
+  ])
