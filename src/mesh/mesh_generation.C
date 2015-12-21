@@ -307,13 +307,26 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   if (nz != 0)
-    mesh.set_mesh_dimension(3);
+    {
+      mesh.set_mesh_dimension(3);
+      mesh.set_spatial_dimension(3);
+    }
   else if (ny != 0)
-    mesh.set_mesh_dimension(2);
+    {
+      mesh.set_mesh_dimension(2);
+      mesh.set_spatial_dimension(2);
+    }
   else if (nx != 0)
-    mesh.set_mesh_dimension(1);
+    {
+      mesh.set_mesh_dimension(1);
+      mesh.set_spatial_dimension(1);
+    }
   else
-    mesh.set_mesh_dimension(0);
+    {
+      // Will we get here?
+      mesh.set_mesh_dimension(0);
+      mesh.set_spatial_dimension(0);
+    }
 
   switch (mesh.mesh_dimension())
     {
