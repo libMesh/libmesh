@@ -677,6 +677,15 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
 }
 
 #endif // !PETSC_VERSION_LESS_THAN(3,1,0)
+
+#else
+template<typename T>
+void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
+                                       DenseVector<T> & x,
+                                       Real rcond) const
+{
+  libmesh_not_implemented();
+}
 #endif // (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 
@@ -1081,7 +1090,7 @@ template void DenseMatrix<Number>::_svd_helper (char,
                                                 std::vector<Number>&,
                                                 std::vector<Number>&,
                                                 std::vector<Number>&);
-template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number>&, DenseVector<Real>&, Real) const;
+template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number>&, DenseVector<Number>&, Real) const;
 template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number>&, DenseVector<Number>&);
 
 #endif
