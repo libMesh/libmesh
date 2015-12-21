@@ -56,9 +56,10 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false)
+  _skip_renumber_nodes_and_elements(false),
+  _user_dim(d)
 {
-  _elem_dims.insert(d);
+  _elem_dims.insert(_user_dim);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
@@ -77,9 +78,10 @@ MeshBase::MeshBase (unsigned char d) :
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false)
+  _skip_renumber_nodes_and_elements(false),
+  _user_dim(d)
 {
-  _elem_dims.insert(d);
+  _elem_dims.insert(_user_dim);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
@@ -100,6 +102,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _user_dim(other_mesh._user_dim),
   _elem_dims(other_mesh._elem_dims)
 {
   if(other_mesh._partitioner.get())
@@ -510,6 +513,9 @@ void MeshBase::cache_elem_dims()
   // Need to clear _elem_dims first in case all elements of a
   // particular dimension have been deleted.
   _elem_dims.clear();
+
+  //Insert the user-supplied mesh dimension
+  _elem_dims.insert(_user_dim);
 
   const_element_iterator el  = this->active_elements_begin();
   const_element_iterator end = this->active_elements_end();
