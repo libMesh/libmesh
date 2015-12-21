@@ -383,6 +383,13 @@ void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 
 
 
+void ExodusII_IO::write_as_dimension(unsigned dim)
+{
+  exio_helper->write_as_dimension(dim);
+}
+
+
+
 void ExodusII_IO::set_coordinate_offset(Point p)
 {
   libmesh_deprecated();
@@ -966,6 +973,13 @@ void ExodusII_IO::verbose (bool)
 
 
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+void ExodusII_IO::write_as_dimension(unsigned)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }

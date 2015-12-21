@@ -196,6 +196,17 @@ public:
   void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
   /**
+   * Directly control the num_dim which is written to the Exodus file.
+   * If non-zero, this value supersedes all other dimensions, including:
+   * 1.) MeshBase::spatial_dimension()
+   * 2.) MeshBase::mesh_dimension()
+   * 3.) Any value passed to use_mesh_dimension_instead_of_spatial_dimension()
+   * This is useful/necessary for working around a bug in Paraview which
+   * prevents the "Plot Over Line" filter from working on 1D meshes.
+   */
+  void write_as_dimension(unsigned dim);
+
+  /**
    * Allows you to set a vector that is added to the coordinates of all
    * of the nodes.  Effectively, this "moves" the mesh to a particular position
    */

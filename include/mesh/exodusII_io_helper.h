@@ -329,6 +329,20 @@ public:
   void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
   /**
+   * Sets the value of _write_as_dimension.
+   *
+   * This directly controls the num_dim which is written to the Exodus
+   * file.  If non-zero, this value supersedes all other dimensions,
+   * including:
+   * 1.) MeshBase::spatial_dimension()
+   * 2.) MeshBase::mesh_dimension()
+   * 3.) Any value passed to use_mesh_dimension_instead_of_spatial_dimension()
+   * This is useful/necessary for working around a bug in Paraview which
+   * prevents the "Plot Over Line" filter from working on 1D meshes.
+   */
+  void write_as_dimension(unsigned dim);
+
+  /**
    * Allows you to set a vector that is added to the coordinates of all
    * of the nodes.  Effectively, this "moves" the mesh to a particular position
    */
@@ -571,6 +585,10 @@ protected:
   // of the elements comprising the mesh) instead of the mesh's
   // spatial dimension, when writing.  By default this is false.
   bool _use_mesh_dimension_instead_of_spatial_dimension;
+
+  // Use this for num_dim when writing the Exodus file.  If non-zero, supersedes
+  // any value set in _use_mesh_dimension_instead_of_spatial_dimension.
+  unsigned _write_as_dimension;
 
   // On output, shift every point by _coordinate_offset
   Point _coordinate_offset;

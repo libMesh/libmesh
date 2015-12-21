@@ -271,6 +271,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   _global_vars_initialized(false),
   _nodal_vars_initialized(false),
   _use_mesh_dimension_instead_of_spatial_dimension(false),
+  _write_as_dimension(0),
   _single_precision(single_precision)
 {
   title.resize(MAX_LINE_LENGTH+1);
@@ -1114,7 +1115,10 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  if (_use_mesh_dimension_instead_of_spatial_dimension)
+  // If _write_as_dimension is nonzero, use it to set num_dim in the Exodus file.
+  if (_write_as_dimension)
+    num_dim = _write_as_dimension;
+  else if (_use_mesh_dimension_instead_of_spatial_dimension)
     num_dim = mesh.mesh_dimension();
   else
     num_dim = mesh.spatial_dimension();
@@ -1905,6 +1909,15 @@ void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool va
 {
   _use_mesh_dimension_instead_of_spatial_dimension = val;
 }
+
+
+
+void ExodusII_IO_Helper::write_as_dimension(unsigned dim)
+{
+  _write_as_dimension = dim;
+}
+
+
 
 void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 {
