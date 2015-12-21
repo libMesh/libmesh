@@ -207,6 +207,15 @@
 /* Flag indicating whether compiler supports initializer lists */
 #undef HAVE_CXX11_INITIALIZER_LIST
 
+/* Flag indicating whether compiler supports std::acosh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE
+
+/* Flag indicating whether compiler supports std::asinh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_SINE
+
+/* Flag indicating whether compiler supports std::atanh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT
+
 /* Flag indicating whether compiler supports std::move */
 #undef HAVE_CXX11_MOVE
 
