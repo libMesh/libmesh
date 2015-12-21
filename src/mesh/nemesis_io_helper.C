@@ -917,7 +917,7 @@ void Nemesis_IO_Helper::write_exodus_initialization_info(const MeshBase & pmesh,
 {
   // This follows the convention of Exodus: we always write out the mesh as LIBMESH_DIM-dimensional,
   // even if it is 2D...
-  this->num_dim = pmesh.spatial_dimension();
+  this->num_dim = LIBMESH_DIM;
 
   this->num_elem = static_cast<unsigned int>(std::distance (pmesh.active_local_elements_begin(),
                                                             pmesh.active_local_elements_end()));

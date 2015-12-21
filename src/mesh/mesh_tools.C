@@ -495,7 +495,7 @@ MeshTools::subdomain_bounding_box (const MeshBase & mesh,
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     if (mesh.elem(e)->subdomain_id() == sid)
       for (unsigned int n=0; n<mesh.elem(e)->n_nodes(); n++)
-        for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
+        for (unsigned int i=0; i<LIBMESH_DIM; i++)
           {
             min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
             max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
