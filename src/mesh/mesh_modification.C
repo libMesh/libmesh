@@ -1494,6 +1494,12 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
                                                   const boundary_id_type old_id,
                                                   const boundary_id_type new_id)
 {
+  if(old_id == new_id)
+  {
+    // If the IDs are the same, this is a no-op.
+    return;
+  }
+
   // A reference to the Mesh's BoundaryInfo object, for convenience.
   BoundaryInfo & bi = mesh.get_boundary_info();
 
@@ -1606,6 +1612,12 @@ void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
                                                    const subdomain_id_type old_id,
                                                    const subdomain_id_type new_id)
 {
+  if(old_id == new_id)
+  {
+    // If the IDs are the same, this is a no-op.
+    return;
+  }
+
   MeshBase::element_iterator           el = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
 
