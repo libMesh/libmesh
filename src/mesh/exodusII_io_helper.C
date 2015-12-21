@@ -1035,7 +1035,12 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   num_elem = mesh.n_elem();
 
   if (!use_discontinuous)
-    num_nodes = mesh.n_nodes();
+    {
+      // Don't rely on mesh.n_nodes() here.  If nodes have been
+      // deleted recently, it will be incorrect.
+      num_nodes = cast_int<int>(std::distance(mesh.nodes_begin(),
+                                              mesh.nodes_end()));
+    }
   else
     {
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
@@ -1095,73 +1100,91 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // Make room in the coordinate vectors
-  x.resize(num_nodes);
-  y.resize(num_nodes);
-  z.resize(num_nodes);
+  // Clear existing data from any previous calls.
+  x.clear();
+  y.clear();
+  z.clear();
+  node_num_map.clear();
+
+  // Reserve space in the nodal coordinate vectors.  num_nodes is
+  // exact, this just allows us to do away with one potentially
+  // error-inducing loop index.
+  x.reserve(num_nodes);
+  y.reserve(num_nodes);
+  z.reserve(num_nodes);
 
   // And in the node_num_map - since the nodes aren't organized in
   // blocks, libmesh will always write out the identity map
-  // here... unless there has been some refinement and coarsening. If
-  // the nodes aren't renumbered after refinement and coarsening,
-  // there may be 'holes' in the numbering, so we write out the node
-  // map just to be on the safe side.
-  node_num_map.resize(num_nodes);
+  // here... unless there has been some refinement and coarsening, or
+  // node deletion without a corresponding call to contract(). You
+  // need to write this any time there could be 'holes' in the node
+  // numbering, so we write it every time.
+  node_num_map.reserve(num_nodes);
+
+  // Clear out any previously-mapped node IDs.
+  libmesh_node_num_to_exodus.clear();
 
   if (!use_discontinuous)
     {
       MeshBase::const_node_iterator it = mesh.nodes_begin();
       const MeshBase::const_node_iterator end = mesh.nodes_end();
-      for (unsigned i = 0; it != end; ++it, ++i)
+      for (; it != end; ++it)
         {
-          const Node* node = *it;
+          const Node & node = **it;
 
-          x[i] = (*node)(0) + _coordinate_offset(0);
+          x.push_back(node(0) + _coordinate_offset(0));
 
 #if LIBMESH_DIM > 1
-          y[i]=(*node)(1) + _coordinate_offset(1);
+          y.push_back(node(1) + _coordinate_offset(1));
 #else
-          y[i]=0.;
+          y.push_back(0.);
 #endif
 #if LIBMESH_DIM > 2
-          z[i]=(*node)(2) + _coordinate_offset(2);
+          z.push_back(node(2) + _coordinate_offset(2));
 #else
-          z[i]=0.;
+          z.push_back(0.);
 #endif
 
           // Fill in node_num_map entry with the proper (1-based) node id
-          node_num_map[i] = node->id() + 1;
+          node_num_map.push_back(node.id() + 1);
+
+          // Also map the zero-based libmesh node id to the 1-based
+          // Exodus ID it will be assigned (this is equivalent to the
+          // current size of the x vector).
+          libmesh_node_num_to_exodus[ cast_int<int>(node.id()) ] = cast_int<int>(x.size());
         }
     }
   else
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      MeshBase::const_element_iterator it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-      unsigned int i = 0;
       for (; it!=end; ++it)
-        for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-          {
-            x[i]=(*it)->point(n)(0);
+        {
+          const Elem * elem = *it;
+
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
+            {
+              x.push_back(elem->point(n)(0));
 #if LIBMESH_DIM > 1
-            y[i]=(*it)->point(n)(1);
+              y.push_back(elem->point(n)(1));
 #else
-            y[i]=0.;
+              y.push_back(0.);
 #endif
 #if LIBMESH_DIM > 2
-            z[i]=(*it)->point(n)(2);
+              z.push_back(elem->point(n)(2));
 #else
-            z[i]=0.;
+              z.push_back(0.);
 #endif
 
-            // Let's skip the node_num_map in the discontinuous case,
-            // since we're effectively duplicating nodes for the
-            // sake of discontinuous visualization, so it isn't clear
-            // how to deal with node_num_map here. It's only optional
-            // anyway, so no big deal.
-
-            i++;
-          }
+              // Let's skip the node_num_map in the discontinuous
+              // case, since we're effectively duplicating nodes for
+              // the sake of discontinuous visualization, so it isn't
+              // clear how to deal with node_num_map here. This means
+              // that writing discontinuous meshes won't work with
+              // element numberings that have "holes".
+            }
+        }
     }
 
   if (_single_precision)
@@ -1299,15 +1322,38 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
               unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
               if (verbose)
                 {
-                  libMesh::out << "Exodus node index: " << j
-                               << "=LibMesh node index " << elem_node_index << std::endl;
+                  libMesh::out << "Exodus node index " << j
+                               << " = LibMesh node index " << elem_node_index << std::endl;
                 }
 
-              // FIXME: We are hard-coding the 1-based node numbering assumption here.
               if (!use_discontinuous)
-                connect[connect_index] = elem->node(elem_node_index)+1;
+                {
+                  // The global id for the current node in libmesh.
+                  dof_id_type libmesh_node_id = elem->node(elem_node_index);
+
+                  // Find the zero-based libmesh id in the map, this
+                  // should be faster than doing linear searches on
+                  // the node_num_map.
+                  std::map<int, int>::iterator pos =
+                    libmesh_node_num_to_exodus.find(cast_int<int>(libmesh_node_id));
+
+                  // Make sure it was found.
+                  if (pos == libmesh_node_num_to_exodus.end())
+                    libmesh_error_msg("libmesh node id " << libmesh_node_id << " not found in node_num_map.");
+
+                  // Write the Exodus global node id associated with
+                  // this libmesh node number to the connectivity
+                  // array.
+                  connect[connect_index] = pos->second;
+                }
               else
-                connect[connect_index] = node_counter*num_nodes_per_elem+elem_node_index+1;
+                {
+                  // FIXME: We are hard-coding the 1-based node
+                  // numbering assumption here, so writing
+                  // "discontinuous" Exodus files won't work with node
+                  // numberings that have "holes".
+                  connect[connect_index] = node_counter*num_nodes_per_elem+elem_node_index+1;
+                }
             }
 
           node_counter++;
