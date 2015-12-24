@@ -621,7 +621,14 @@ void RBEIMConstruction::update_RB_system_matrices()
 
 Real RBEIMConstruction::get_RB_error_bound()
 {
-  return compute_best_fit_error();
+  Real best_fit_error = compute_best_fit_error();
+
+  if(use_relative_bound_in_greedy)
+    {
+      best_fit_error /= get_rb_evaluation().get_rb_solution_norm();
+    }
+
+  return best_fit_error;
 }
 
 void RBEIMConstruction::update_system()
