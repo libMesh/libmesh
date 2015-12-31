@@ -20,15 +20,55 @@ public:
 
 protected:
 
+  std::stringstream inputfile;
+
   GetPot input;
 
 public:
 
+  void setup_inputfile()
+  {
+
+    const char* text =
+"[Section1]\n"
+"\n"
+"  var1 = '5.0'\n"
+"\n"
+"  [./SubSection1]\n"
+"\n"
+"      var2 = 'blah'\n"
+"\n"
+"[]\n"
+"\n"
+"[Section2]\n"
+"\n"
+"   #var3 = '5'\n"
+"\n"
+"   [./Subsection2]\n"
+"\n"
+"       var4 = 'false'\n"
+"\n"
+"       [./Subsection3]\n"
+"\n"
+"           var5 = '6.02e23'\n"
+"\n"
+"   [../../Subsection4]\n"
+"\n"
+"           var6 = '42'\n"
+"\n"
+"[]\n"
+"\n"
+"[Section3]\n"
+"\n"
+"    unused_var = 'not_used'\n";
+
+      inputfile << text;
+  }
+
   void setUp()
   {
-    // @abs_top_srcdir@ will be substituted at configure time
-    // with the path for the top libMesh source tree
-    input.parse_input_file("@abs_top_srcdir@/tests/base/getpot_test_input.in");
+    this->setup_inputfile();
+    input.parse_input_stream(inputfile);
   }
 
   void testVariables()
