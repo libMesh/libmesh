@@ -165,6 +165,15 @@ public:
                 const std::string& CommentStart   = std::string("#"),
                 const std::string& CommentEnd     = std::string("\n"),
                 const std::string& FieldSeparator = std::string(" \t\n"));
+
+  /**
+   * This constructor is mainly for testing. The std::string based constructor
+   * should be preferred.
+   */
+  inline GetPot(std::istream& FileStream,
+                const std::string& CommentStart   = std::string("#"),
+                const std::string& CommentEnd     = std::string("\n"),
+                const std::string& FieldSeparator = std::string(" \t\n"));
   inline ~GetPot();
   inline GetPot& operator=(const GetPot&);
 
@@ -177,6 +186,11 @@ public:
                                const std::string& CommentStart=std::string("#"),
                                const std::string& CommentEnd=std::string("\n"),
                                const std::string& FieldSeparator=std::string(" \t\n"));
+
+  inline void parse_input_stream(std::istream& FileStream,
+                                 const std::string& CommentStart=std::string("#"),
+                                 const std::string& CommentEnd=std::string("\n"),
+                                 const std::string& FieldSeparator=std::string(" \t\n"));
 
   /**
    * absorbing contents of another GetPot object
@@ -856,8 +870,6 @@ GetPot::GetPot(const std::string& FileName,
   this->parse_input_file(FileName, CommentStart, CommentEnd, FieldSeparator);
 }
 
-
-
 inline void
 GetPot::parse_input_file(const std::string& FileName,
                          const std::string& CommentStart,
@@ -881,6 +893,66 @@ GetPot::parse_input_file(const std::string& FileName,
   _apriori_argv.push_back(FileName);
 
   STRING_VECTOR args = _read_in_file(FileName);
+  _apriori_argv.insert(_apriori_argv.begin()+1, args.begin(), args.end());
+  _parse_argument_vector(_apriori_argv);
+}
+
+
+inline
+GetPot::GetPot(std::istream& FileStream,
+               const std::string& CommentStart,
+               const std::string& CommentEnd,
+               const std::string& FieldSeparator) :
+  prefix(),
+  section(),
+  section_list(),
+  argv(),
+  cursor(),
+  search_loop_f(),
+  search_failed_f(),
+  nominus_cursor(),
+  idx_nominus(),
+  variables(),
+  _comment_start(),
+  _comment_end(),
+  _field_separator(),
+#if !defined(GETPOT_DISABLE_MUTEX)
+  _getpot_mtx(),
+#endif
+  _internal_string_container(),
+  _requested_arguments(),
+  _requested_variables(),
+  _requested_sections(),
+  request_recording_f()
+{
+  this->parse_input_stream(FileStream, CommentStart, CommentEnd, FieldSeparator);
+}
+
+
+inline void
+GetPot::parse_input_stream(std::istream& FileStream,
+                           const std::string& CommentStart,
+                           const std::string& CommentEnd,
+                           const std::string& FieldSeparator)
+{
+  _basic_initialization();
+
+  // overwrite default strings
+  _comment_start = std::string(CommentStart);
+  _comment_end   = std::string(CommentEnd);
+  _field_separator = FieldSeparator;
+
+  STRING_VECTOR _apriori_argv;
+  // -- the first element of the argument vector stores the name of
+  //    the first parsing source; however, this element is not
+  //    parsed for variable assignments or nominuses.
+  //
+  //    Regardless, we don't add more than one name to the argument
+  //    vector. In this case, we're parsing from a stream, so we'll
+  //    hardcode the "filename" to "ParsedFromStream"
+  _apriori_argv.push_back("ParsedFromStream");
+
+  STRING_VECTOR args = _read_in_stream(FileStream);
   _apriori_argv.insert(_apriori_argv.begin()+1, args.begin(), args.end());
   _parse_argument_vector(_apriori_argv);
 }
