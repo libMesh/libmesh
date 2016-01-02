@@ -34,8 +34,9 @@ data = [
     '\'12', 50,
     '\'13', 80,
     '\'14', 63,
-    '\'15', 54,
-    'P',    11, # Preprints
+    '\'15', 63,
+    '\'16',  4,
+    'P',     9, # Preprints
     'T',    42  # Theses
     ]
 
@@ -74,7 +75,7 @@ ax.set_xticks(np.linspace(1,N,N) + width/2)
 ax.set_xticklabels(xlabels)
 
 # Create a title string
-title_string = 'LibMesh Citations, (' + str(sum(n_papers)) + ' Total)'
+title_string = 'Papers by People Using LibMesh, (' + str(sum(n_papers)) + ' Total)'
 fig.suptitle(title_string)
 
 # Save as PDF
