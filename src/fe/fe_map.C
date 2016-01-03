@@ -32,6 +32,7 @@
 #include "libmesh/mesh_subdivision_support.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/tensor_value.h"
 
 namespace libMesh
 {
