@@ -592,19 +592,22 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       libmesh_assert_greater_equal (H1seminormsq, 0.);
                     }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                   // Compute the value of the error in the hessian at this
                   // quadrature point
                   if (system_i_norm.type(var) == H2 ||
                       system_i_norm.type(var) == H2_SEMINORM)
                     {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                       Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
                       H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
                         grad2_error.size_sq();
                       libmesh_assert_greater_equal (H2seminormsq, 0.);
-                    }
+#else
+                      libmesh_error_msg
+                        ("libMesh was not configured with --enable-second");
 #endif
+                    }
                 } // end qp loop
 
               if (system_i_norm.type(var) == L2 ||
@@ -618,10 +621,12 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                 (*err_vec)[e_id] +=
                   static_cast<ErrorVectorReal>(H1seminormsq);
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H2_SEMINORM)
                 (*err_vec)[e_id] +=
                   static_cast<ErrorVectorReal>(H2seminormsq);
+#endif
             } // End loop over active local elements
         } // End loop over variables
 
