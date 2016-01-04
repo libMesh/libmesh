@@ -43,8 +43,8 @@
 namespace libMesh
 {
 
-RBSCMConstruction::RBSCMConstruction (EquationSystems& es,
-                                      const std::string& name_in,
+RBSCMConstruction::RBSCMConstruction (EquationSystems & es,
+                                      const std::string & name_in,
                                       const unsigned int number_in)
   : Parent(es, name_in, number_in),
     SCM_training_tolerance(0.5),
@@ -72,12 +72,12 @@ void RBSCMConstruction::clear()
   Parent::clear();
 }
 
-void RBSCMConstruction::set_rb_scm_evaluation(RBSCMEvaluation& rb_scm_eval_in)
+void RBSCMConstruction::set_rb_scm_evaluation(RBSCMEvaluation & rb_scm_eval_in)
 {
   rb_scm_eval = &rb_scm_eval_in;
 }
 
-RBSCMEvaluation& RBSCMConstruction::get_rb_scm_evaluation()
+RBSCMEvaluation & RBSCMConstruction::get_rb_scm_evaluation()
 {
   if(!rb_scm_eval)
     libmesh_error_msg("Error: RBSCMEvaluation object hasn't been initialized yet");
@@ -85,12 +85,12 @@ RBSCMEvaluation& RBSCMConstruction::get_rb_scm_evaluation()
   return *rb_scm_eval;
 }
 
-RBThetaExpansion& RBSCMConstruction::get_rb_theta_expansion()
+RBThetaExpansion & RBSCMConstruction::get_rb_theta_expansion()
 {
   return get_rb_scm_evaluation().get_rb_theta_expansion();
 }
 
-void RBSCMConstruction::process_parameters_file(const std::string& parameters_filename)
+void RBSCMConstruction::process_parameters_file(const std::string & parameters_filename)
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -149,7 +149,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
   std::map<std::string,bool> log_scaling;
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
   RBParameters::const_iterator it     = mu.begin();
   RBParameters::const_iterator it_end = mu.end();
   unsigned int i=0;
@@ -216,8 +216,8 @@ void RBSCMConstruction::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
 {
   START_LOG("add_scaled_symm_Aq()", "RBSCMConstruction");
   // Load the operators from the RBConstruction
-  EquationSystems& es = this->get_equation_systems();
-  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
+  EquationSystems & es = this->get_equation_systems();
+  RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
   rb_system.add_scaled_Aq(scalar, q_a, matrix_A, true);
   STOP_LOG("add_scaled_symm_Aq()", "RBSCMConstruction");
 }
@@ -225,8 +225,8 @@ void RBSCMConstruction::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
 void RBSCMConstruction::load_matrix_B()
 {
   // Load the operators from the RBConstruction
-  EquationSystems& es = this->get_equation_systems();
-  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
+  EquationSystems & es = this->get_equation_systems();
+  RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
 
   matrix_B->zero();
   matrix_B->close();
@@ -242,8 +242,8 @@ void RBSCMConstruction::perform_SCM_greedy()
 
   // Get a list of constrained dofs from rb_system
   std::set<unsigned int> constrained_dofs_set;
-  EquationSystems& es = this->get_equation_systems();
-  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
+  EquationSystems & es = this->get_equation_systems();
+  RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
 
   for(unsigned int i=0; i<rb_system.n_dofs(); i++)
     {
@@ -410,7 +410,8 @@ void RBSCMConstruction::evaluate_stability_constant()
   STOP_LOG("evaluate_stability_constant()", "RBSCMConstruction");
 }
 
-Number RBSCMConstruction::B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const
+Number RBSCMConstruction::B_inner_product(const NumericVector<Number> & v,
+                                          const NumericVector<Number> & w) const
 {
   matrix_B->vector_mult(*inner_product_storage_vector, w);
 
@@ -418,8 +419,8 @@ Number RBSCMConstruction::B_inner_product(const NumericVector<Number>& v, const 
 }
 
 Number RBSCMConstruction::Aq_inner_product(unsigned int q,
-                                           const NumericVector<Number>& v,
-                                           const NumericVector<Number>& w)
+                                           const NumericVector<Number> & v,
+                                           const NumericVector<Number> & w)
 {
   if(q >= get_rb_theta_expansion().get_n_A_terms())
     libmesh_error_msg("Error: We must have q < Q_a in Aq_inner_product.");

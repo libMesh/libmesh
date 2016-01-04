@@ -54,7 +54,7 @@ public:
   /**
    * Constructor.
    */
-  TransientRBEvaluation (const Parallel::Communicator &comm_in
+  TransientRBEvaluation (const Parallel::Communicator & comm_in
                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -144,7 +144,7 @@ public:
    * Offline stage from the Online stage.
    * Note: This is a legacy method, use RBDataSerialization instead.
    */
-  virtual void legacy_write_offline_data_to_files(const std::string& directory_name = "offline_data",
+  virtual void legacy_write_offline_data_to_files(const std::string & directory_name = "offline_data",
                                                   const bool write_binary_data=true) libmesh_override;
 
   /**
@@ -152,7 +152,7 @@ public:
    * to initialize the system for Online solves.
    * Note: This is a legacy method, use RBDataSerialization instead.
    */
-  virtual void legacy_read_offline_data_from_files(const std::string& directory_name = "offline_data",
+  virtual void legacy_read_offline_data_from_files(const std::string & directory_name = "offline_data",
                                                    bool read_error_bound_data=true,
                                                    const bool read_binary_data=true) libmesh_override;
 
@@ -239,7 +239,7 @@ public:
    * Vector storing the mass matrix representors.
    * These are basis dependent and hence stored here.
    */
-  std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
+  std::vector< std::vector< NumericVector<Number> * > > M_q_representor;
 
   /**
    * Check that the data has been cached in case of using rb_solve_again

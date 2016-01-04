@@ -51,7 +51,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
+  RBEIMAssembly(RBEIMConstruction & rb_eim_con_in,
                 unsigned int basis_function_index_in);
 
   /**
@@ -64,24 +64,24 @@ public:
    * at the points \p qpoints. Fill \p values with the basis function values.
    */
   virtual void evaluate_basis_function(unsigned int var,
-                                       const Elem& element,
-                                       const QBase& element_qrule,
-                                       std::vector<Number>& values);
+                                       const Elem & element,
+                                       const QBase & element_qrule,
+                                       std::vector<Number> & values);
 
   /**
    * Get a reference to the RBEIMConstruction object.
    */
-  RBEIMConstruction& get_rb_eim_construction();
+  RBEIMConstruction & get_rb_eim_construction();
 
   /**
    * Get a reference to the ghosted_basis_function.
    */
-  NumericVector<Number>& get_ghosted_basis_function();
+  NumericVector<Number> & get_ghosted_basis_function();
 
   /**
    * Retrieve the FE object associated with variable \p var.
    */
-  FEBase& get_fe(unsigned int var);
+  FEBase & get_fe(unsigned int var);
 
 private:
 
@@ -93,7 +93,7 @@ private:
   /**
    * The RBEIMConstruction object that this RBEIMAssembly is based on.
    */
-  RBEIMConstruction& _rb_eim_con;
+  RBEIMConstruction & _rb_eim_con;
 
   /**
    * The EIM basis function index (from rb_eim_eval) for this assembly object.
@@ -105,19 +105,19 @@ private:
    * empirical interpolation approximation. This will be a GHOSTED
    * vector to facilitate interpolation in the case of multiple processors.
    */
-  UniquePtr< NumericVector<Number> > _ghosted_basis_function;
+  UniquePtr<NumericVector<Number> > _ghosted_basis_function;
 
   /**
    * We store an FE object for each variable in _rb_eim_con. This is used
    * in evaluate_basis_function. Note that by storing the FE objects (rather
    * than recreating them each time) we benefit from caching in fe.reinit().
    */
-  std::vector< FEBase* > _fe_var;
+  std::vector<FEBase *> _fe_var;
 
   /**
    * We also store the quadrature rule associated with each FE object.
    */
-  std::vector< QBase* > _fe_qrule;
+  std::vector<QBase *> _fe_qrule;
 
 };
 

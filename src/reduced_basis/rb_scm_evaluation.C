@@ -49,7 +49,7 @@
 namespace libMesh
 {
 
-RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator &comm_in) :
+RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in)
 {
   // Clear SCM data vectors
@@ -64,12 +64,12 @@ RBSCMEvaluation::~RBSCMEvaluation ()
 {
 }
 
-void RBSCMEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in)
+void RBSCMEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_in)
 {
   rb_theta_expansion = &rb_theta_expansion_in;
 }
 
-RBThetaExpansion& RBSCMEvaluation::get_rb_theta_expansion()
+RBThetaExpansion & RBSCMEvaluation::get_rb_theta_expansion()
 {
   if(!rb_theta_expansion)
     libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
@@ -122,7 +122,7 @@ Real RBSCMEvaluation::get_SCM_UB_vector(unsigned int j, unsigned int q)
   return SCM_UB_vectors[j][q];
 }
 
-const RBParameters& RBSCMEvaluation::get_C_J_entry(unsigned int j)
+const RBParameters & RBSCMEvaluation::get_C_J_entry(unsigned int j)
 {
   if(j >= C_J.size())
     libmesh_error_msg("Error: Input parameter j is too large in get_C_J.");
@@ -168,7 +168,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   START_LOG("get_SCM_LB()", "RBSCMEvaluation");
 
   // Initialize the LP
-  glp_prob *lp;
+  glp_prob * lp;
   lp = glp_create_prob();
   glp_set_obj_dir(lp,GLP_MIN);
 
@@ -331,7 +331,7 @@ void RBSCMEvaluation::reload_current_parameters()
   set_parameters(saved_parameters);
 }
 
-void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                          const bool write_binary_data)
 {
   START_LOG("legacy_write_offline_data_to_files()", "RBSCMEvaluation");
@@ -453,7 +453,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string& dire
 }
 
 
-void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
                                                           const bool read_binary_data)
 {
   START_LOG("legacy_read_offline_data_from_files()", "RBSCMEvaluation");

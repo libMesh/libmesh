@@ -55,7 +55,7 @@ public:
   /**
    * Constructor.
    */
-  RBEvaluation (const Parallel::Communicator &comm
+  RBEvaluation (const Parallel::Communicator & comm
                 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -72,12 +72,12 @@ public:
   /**
    * Set the RBThetaExpansion object.
    */
-  void set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in);
+  void set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_in);
 
   /**
    * Get a reference to the rb_theta_expansion.
    */
-  RBThetaExpansion& get_rb_theta_expansion();
+  RBThetaExpansion & get_rb_theta_expansion();
 
   /**
    * @return true if the theta expansion has been initialized.
@@ -97,7 +97,7 @@ public:
   /**
    * Get a reference to the i^th basis function.
    */
-  NumericVector<Number>& get_basis_function(unsigned int i);
+  NumericVector<Number> & get_basis_function(unsigned int i);
 
   /**
    * Perform online solve with the N RB basis functions, for the
@@ -132,7 +132,7 @@ public:
    * Evaluate the dual norm of output \p n
    * for the current parameters.
    */
-  Real eval_output_dual_norm(unsigned int n, const RBParameters& mu);
+  Real eval_output_dual_norm(unsigned int n, const RBParameters & mu);
 
   /**
    * Get a lower bound for the stability constant (e.g. coercivity constant or
@@ -164,7 +164,7 @@ public:
    * Offline stage from the Online stage.
    * Note: This is a legacy method, use RBDataSerialization instead.
    */
-  virtual void legacy_write_offline_data_to_files(const std::string& directory_name = "offline_data",
+  virtual void legacy_write_offline_data_to_files(const std::string & directory_name = "offline_data",
                                                   const bool write_binary_data=true);
 
   /**
@@ -172,7 +172,7 @@ public:
    * to initialize the system for Online solves.
    * Note: This is a legacy method, use RBDataSerialization instead.
    */
-  virtual void legacy_read_offline_data_from_files(const std::string& directory_name = "offline_data",
+  virtual void legacy_read_offline_data_from_files(const std::string & directory_name = "offline_data",
                                                    bool read_error_bound_data=true,
                                                    const bool read_binary_data=true);
 
@@ -183,18 +183,18 @@ public:
    * \p read_binary_basis_functions indicates whether to expect
    * binary or ASCII data
    */
-  virtual void write_out_basis_functions(System& sys,
-                                         const std::string& directory_name = "offline_data",
+  virtual void write_out_basis_functions(System & sys,
+                                         const std::string & directory_name = "offline_data",
                                          const bool write_binary_basis_functions = true);
 
   /**
    * Same as write_out_basis_functions, except in this case we pass in the vectors to be
    * written.
    */
-  virtual void write_out_vectors(System& sys,
-                                 std::vector<NumericVector<Number>*>& vectors,
-                                 const std::string& directory_name = "offline_data",
-                                 const std::string& data_name = "bf",
+  virtual void write_out_vectors(System & sys,
+                                 std::vector<NumericVector<Number> *> & vectors,
+                                 const std::string & directory_name = "offline_data",
+                                 const std::string & data_name = "bf",
                                  const bool write_binary_basis_functions = true);
 
   /**
@@ -204,8 +204,8 @@ public:
    * \p read_binary_basis_functions indicates whether to expect
    * binary or ASCII data
    */
-  virtual void read_in_basis_functions(System& sys,
-                                       const std::string& directory_name = "offline_data",
+  virtual void read_in_basis_functions(System & sys,
+                                       const std::string & directory_name = "offline_data",
                                        const bool read_binary_basis_functions = true);
 
   /**
@@ -213,10 +213,10 @@ public:
    * written. We assume that the size of vectors indicates the number of vectors
    * that need to be read in.
    */
-  void read_in_vectors(System& sys,
-                       std::vector<NumericVector<Number>*>& vectors,
-                       const std::string& directory_name,
-                       const std::string& data_name,
+  void read_in_vectors(System & sys,
+                       std::vector<NumericVector<Number> *> & vectors,
+                       const std::string & directory_name,
+                       const std::string & data_name,
                        const bool read_binary_vectors);
 
   /**
@@ -225,10 +225,10 @@ public:
    * way. This function only renumbers the dofs once at the start (and reverts
    * it at the end), which can save a lot of work compared to renumbering on every read.
    */
-  void read_in_vectors_from_multiple_files(System& sys,
-                                           std::vector< std::vector<NumericVector<Number>*>* > multiple_vectors,
-                                           const std::vector<std::string>& multiple_directory_names,
-                                           const std::vector<std::string>& multiple_data_names,
+  void read_in_vectors_from_multiple_files(System & sys,
+                                           std::vector<std::vector<NumericVector<Number> *> *> multiple_vectors,
+                                           const std::vector<std::string> & multiple_directory_names,
+                                           const std::vector<std::string> & multiple_data_names,
                                            const bool read_binary_vectors);
 
   /**
@@ -242,13 +242,13 @@ public:
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
-  std::vector< NumericVector<Number>* > basis_functions;
+  std::vector<NumericVector<Number> *> basis_functions;
 
   /**
    * The list of parameters selected by the Greedy algorithm in generating
    * the Reduced Basis associated with this RBEvaluation object.
    */
-  std::vector< RBParameters > greedy_param_list;
+  std::vector<RBParameters> greedy_param_list;
 
   /**
    * The inner product matrix. This should be close to the identity,
@@ -261,12 +261,12 @@ public:
   /**
    * Dense matrices for the RB computations.
    */
-  std::vector< DenseMatrix<Number> > RB_Aq_vector;
+  std::vector<DenseMatrix<Number> > RB_Aq_vector;
 
   /**
    * Dense vector for the RHS.
    */
-  std::vector< DenseVector<Number> > RB_Fq_vector;
+  std::vector<DenseVector<Number> > RB_Fq_vector;
 
   /**
    * The RB solution vector.
@@ -276,7 +276,7 @@ public:
   /**
    * The vectors storing the RB output vectors.
    */
-  std::vector< std::vector< DenseVector<Number> > > RB_output_vectors;
+  std::vector<std::vector<DenseVector<Number> > > RB_output_vectors;
 
   /**
    * The vectors storing the RB output values and
@@ -317,7 +317,7 @@ public:
    * These are basis dependent and hence stored here, whereas
    * the Fq_representors are stored in RBSystem.
    */
-  std::vector< std::vector< NumericVector<Number>* > > Aq_representor;
+  std::vector< std::vector< NumericVector<Number> *> > Aq_representor;
 
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
@@ -335,7 +335,7 @@ protected:
   /**
    * Helper function that checks if \p file_name exists.
    */
-  void assert_file_exists(const std::string& file_name);
+  void assert_file_exists(const std::string & file_name);
 
 private:
 
@@ -344,7 +344,7 @@ private:
    * This is not an UniquePtr since we may want to share it.
    * (Note: a shared_ptr would be a good option here.)
    */
-  RBThetaExpansion* rb_theta_expansion;
+  RBThetaExpansion * rb_theta_expansion;
 
 };
 

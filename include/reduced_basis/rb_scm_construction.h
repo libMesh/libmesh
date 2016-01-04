@@ -58,8 +58,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  RBSCMConstruction (EquationSystems& es,
-                     const std::string& name_in,
+  RBSCMConstruction (EquationSystems & es,
+                     const std::string & name_in,
                      const unsigned int number_in);
 
   /**
@@ -86,17 +86,17 @@ public:
   /**
    * Set the RBSCMEvaluation object.
    */
-  void set_rb_scm_evaluation(RBSCMEvaluation& rb_scm_eval_in);
+  void set_rb_scm_evaluation(RBSCMEvaluation & rb_scm_eval_in);
 
   /**
    * Get a reference to the RBSCMEvaluation object.
    */
-  RBSCMEvaluation& get_rb_scm_evaluation();
+  RBSCMEvaluation & get_rb_scm_evaluation();
 
   /**
    * Get a reference to the RBThetaExpansion object.
    */
-  RBThetaExpansion& get_rb_theta_expansion();
+  RBThetaExpansion & get_rb_theta_expansion();
 
   /**
    * Clear and resize the SCM data vectors. Overload
@@ -108,7 +108,7 @@ public:
    * Read in the parameters from file specified by \p parameters_filename
    * and set the this system's member variables accordingly.
    */
-  virtual void process_parameters_file(const std::string& parameters_filename);
+  virtual void process_parameters_file(const std::string & parameters_filename);
 
   /**
    * Print out info that describes the current setup of this RBSCMConstruction.
@@ -130,7 +130,7 @@ public:
    * Set the name of the associated RB system --- we need
    * this to load the (symmetrized) affine operators.
    */
-  void set_RB_system_name(const std::string& new_name)
+  void set_RB_system_name(const std::string & new_name)
   { RB_system_name = new_name; }
 
   /**
@@ -200,15 +200,15 @@ protected:
    * Compute the inner product between two vectors using the system's
    * matrix_B.
    */
-  Number B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const;
+  Number B_inner_product(const NumericVector<Number> & v, const NumericVector<Number> & w) const;
 
   /**
    * Compute the inner product between two vectors using
    * matrix Aq.
    */
   Number Aq_inner_product(unsigned int q,
-                          const NumericVector<Number>& v,
-                          const NumericVector<Number>& w);
+                          const NumericVector<Number> & v,
+                          const NumericVector<Number> & w);
 
   /**
    * Helper function which provides an error
@@ -235,7 +235,7 @@ private:
    * The current RBSCMEvaluation object we are using to
    * perform the Evaluation stage of the SCM.
    */
-  RBSCMEvaluation* rb_scm_eval;
+  RBSCMEvaluation * rb_scm_eval;
 };
 
 } // namespace libMesh

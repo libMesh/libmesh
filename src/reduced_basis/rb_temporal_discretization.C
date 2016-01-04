@@ -82,7 +82,7 @@ Real RBTemporalDiscretization::get_control(const unsigned int k) const
   return _control[k];
 }
 
-void RBTemporalDiscretization::set_control(const std::vector<Real>& control)
+void RBTemporalDiscretization::set_control(const std::vector<Real> & control)
 {
   libmesh_assert_less_equal(control.size(),_n_time_steps+1);
   _control = control;
@@ -90,7 +90,7 @@ void RBTemporalDiscretization::set_control(const std::vector<Real>& control)
   _control.resize(_n_time_steps+1);
 }
 
-void RBTemporalDiscretization::process_temporal_parameters_file (const std::string& parameters_filename)
+void RBTemporalDiscretization::process_temporal_parameters_file (const std::string & parameters_filename)
 {
   // Read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -107,7 +107,7 @@ void RBTemporalDiscretization::process_temporal_parameters_file (const std::stri
   set_time_step(0);
 }
 
-void RBTemporalDiscretization::pull_temporal_discretization_data(RBTemporalDiscretization& other)
+void RBTemporalDiscretization::pull_temporal_discretization_data(RBTemporalDiscretization & other)
 {
   this->set_delta_t( other.get_delta_t() );
   this->set_euler_theta( other.get_euler_theta() );

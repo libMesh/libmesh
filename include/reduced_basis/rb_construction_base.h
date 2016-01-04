@@ -59,8 +59,8 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  RBConstructionBase (EquationSystems& es,
-                      const std::string& name,
+  RBConstructionBase (EquationSystems & es,
+                      const std::string & name,
                       const unsigned int number);
 
   /**
@@ -109,8 +109,8 @@ public:
    * or random training parameters should be used and whether or
    * not we want the parameters to be scaled logarithmically.
    */
-  virtual void initialize_training_parameters(const RBParameters& mu_min,
-                                              const RBParameters& mu_max,
+  virtual void initialize_training_parameters(const RBParameters & mu_min,
+                                              const RBParameters & mu_max,
                                               unsigned int n_training_parameters,
                                               std::map<std::string, bool> log_param_scale,
                                               bool deterministic=true);
@@ -118,7 +118,7 @@ public:
   /**
    * Overwrite the training parameters with new_training_set.
    */
-  virtual void load_training_set(std::map< std::string, std::vector<Number> >& new_training_set);
+  virtual void load_training_set(std::map< std::string, std::vector<Number> > & new_training_set);
 
   /**
    * Broadcasts parameters on processor proc_id
@@ -143,12 +143,12 @@ public:
    * Set the name of the parameter that we will generate deterministic training parameters for.
    * Defaults to "NONE".
    */
-  void set_deterministic_training_parameter_name(const std::string& name);
+  void set_deterministic_training_parameter_name(const std::string & name);
 
   /**
    * Get the name of the parameter that we will generate deterministic training parameters for.
    */
-  const std::string& get_deterministic_training_parameter_name() const;
+  const std::string & get_deterministic_training_parameter_name() const;
 
   /**
    * Set the number of times each sample of the deterministic training parameter is repeated.
@@ -188,18 +188,18 @@ protected:
    * that is corresponds to the largest error on all
    * processors.
    */
-  static void get_global_max_error_pair(const Parallel::Communicator &communicator,
-                                        std::pair<unsigned int, Real>& error_pair);
+  static void get_global_max_error_pair(const Parallel::Communicator & communicator,
+                                        std::pair<unsigned int, Real> & error_pair);
 
   /**
    * Static helper function for generating a randomized set of parameters.
    */
-  static void generate_training_parameters_random(const Parallel::Communicator &communicator,
+  static void generate_training_parameters_random(const Parallel::Communicator & communicator,
                                                   std::map<std::string, bool> log_param_scale,
-                                                  std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                  std::map<std::string, NumericVector<Number> * > & training_parameters_in,
                                                   unsigned int n_training_samples_in,
-                                                  const RBParameters& min_parameters,
-                                                  const RBParameters& max_parameters,
+                                                  const RBParameters & min_parameters,
+                                                  const RBParameters & max_parameters,
                                                   int training_parameters_random_seed=-1,
                                                   bool serial_training_set=false);
 
@@ -207,12 +207,12 @@ protected:
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
-  static void generate_training_parameters_deterministic(const Parallel::Communicator &communicator,
+  static void generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                                          std::map<std::string, bool> log_param_scale,
-                                                         std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                         std::map< std::string, NumericVector<Number> * > & training_parameters_in,
                                                          unsigned int n_training_samples_in,
-                                                         const RBParameters& min_parameters,
-                                                         const RBParameters& max_parameters,
+                                                         const RBParameters & min_parameters,
+                                                         const RBParameters & max_parameters,
                                                          bool serial_training_set=false);
 
 
@@ -245,7 +245,7 @@ private:
   /**
    * The training samples.
    */
-  std::map< std::string, NumericVector<Number>* > training_parameters;
+  std::map< std::string, NumericVector<Number> * > training_parameters;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random

@@ -40,7 +40,7 @@
 namespace libMesh
 {
 
-RBEvaluation::RBEvaluation (const Parallel::Communicator &comm_in)
+RBEvaluation::RBEvaluation (const Parallel::Communicator & comm_in)
   :
   ParallelObject(comm_in),
   evaluate_RB_error_bound(true),
@@ -81,12 +81,12 @@ void RBEvaluation::clear()
   STOP_LOG("clear()", "RBEvaluation");
 }
 
-void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in)
+void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_in)
 {
   rb_theta_expansion = &rb_theta_expansion_in;
 }
 
-RBThetaExpansion& RBEvaluation::get_rb_theta_expansion()
+RBThetaExpansion & RBEvaluation::get_rb_theta_expansion()
 {
   if(!is_rb_theta_expansion_initialized())
     libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
@@ -203,7 +203,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
   STOP_LOG("resize_data_structures()", "RBEvaluation");
 }
 
-NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
+NumericVector<Number> & RBEvaluation::get_basis_function(unsigned int i)
 {
   libmesh_assert_less (i, basis_functions.size());
 
@@ -217,7 +217,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
   if(N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
   // Resize (and clear) the solution vector
   RB_solution.resize(N);
@@ -304,7 +304,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
@@ -392,7 +392,7 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters& mu)
+Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & mu)
 {
   Number output_bound_sq = 0.;
   unsigned int q=0;
@@ -426,7 +426,7 @@ void RBEvaluation::clear_riesz_representors()
 
 }
 
-void RBEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+void RBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                       const bool write_binary_data)
 {
   START_LOG("legacy_write_offline_data_to_files()", "RBEvaluation");
@@ -657,7 +657,7 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string& directo
   STOP_LOG("legacy_write_offline_data_to_files()", "RBEvaluation");
 }
 
-void RBEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+void RBEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
                                                        bool read_error_bound_data,
                                                        const bool read_binary_data)
 {
@@ -900,14 +900,14 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string& direct
   STOP_LOG("legacy_read_offline_data_from_files()", "RBEvaluation");
 }
 
-void RBEvaluation::assert_file_exists(const std::string& file_name)
+void RBEvaluation::assert_file_exists(const std::string & file_name)
 {
   if (!std::ifstream(file_name.c_str()))
     libmesh_error_msg("File missing: " + file_name);
 }
 
-void RBEvaluation::write_out_basis_functions(System& sys,
-                                             const std::string& directory_name,
+void RBEvaluation::write_out_basis_functions(System & sys,
+                                             const std::string & directory_name,
                                              const bool write_binary_basis_functions)
 {
   START_LOG("write_out_basis_functions()", "RBEvaluation");
@@ -921,10 +921,10 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   STOP_LOG("write_out_basis_functions()", "RBEvaluation");
 }
 
-void RBEvaluation::write_out_vectors(System& sys,
-                                     std::vector<NumericVector<Number>*>& vectors,
-                                     const std::string& directory_name,
-                                     const std::string& data_name,
+void RBEvaluation::write_out_vectors(System & sys,
+                                     std::vector<NumericVector<Number> *> & vectors,
+                                     const std::string & directory_name,
+                                     const std::string & data_name,
                                      const bool write_binary_vectors)
 {
   START_LOG("write_out_vectors()", "RBEvaluation");
@@ -984,8 +984,8 @@ void RBEvaluation::write_out_vectors(System& sys,
   // Write all vectors at once.
   {
     // Note the API wants pointers to constant vectors, hence this...
-    std::vector<const NumericVector<Number>*> bf_out(vectors.begin(),
-                                                     vectors.end());
+    std::vector<const NumericVector<Number> *> bf_out(vectors.begin(),
+                                                      vectors.end());
     // for(unsigned int i=0; i<vectors.size(); i++)
     //   bf_out.push_back(vectors[i]);
     sys.write_serialized_vectors (bf_data, bf_out);
@@ -1004,8 +1004,8 @@ void RBEvaluation::write_out_vectors(System& sys,
   STOP_LOG("write_out_vectors()", "RBEvaluation");
 }
 
-void RBEvaluation::read_in_basis_functions(System& sys,
-                                           const std::string& directory_name,
+void RBEvaluation::read_in_basis_functions(System & sys,
+                                           const std::string & directory_name,
                                            const bool read_binary_basis_functions)
 {
   START_LOG("read_in_basis_functions()", "RBEvaluation");
@@ -1019,13 +1019,13 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   STOP_LOG("read_in_basis_functions()", "RBEvaluation");
 }
 
-void RBEvaluation::read_in_vectors(System& sys,
-                                   std::vector<NumericVector<Number>*>& vectors,
-                                   const std::string& directory_name,
-                                   const std::string& data_name,
+void RBEvaluation::read_in_vectors(System & sys,
+                                   std::vector<NumericVector<Number> *> & vectors,
+                                   const std::string & directory_name,
+                                   const std::string & data_name,
                                    const bool read_binary_vectors)
 {
-  std::vector< std::vector<NumericVector<Number>*>* > vectors_vec;
+  std::vector<std::vector<NumericVector<Number> *> *> vectors_vec;
   vectors_vec.push_back(&vectors);
 
   std::vector<std::string> directory_name_vec;
@@ -1041,10 +1041,10 @@ void RBEvaluation::read_in_vectors(System& sys,
                                       read_binary_vectors);
 }
 
-void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
-                                                       std::vector< std::vector<NumericVector<Number>*>* > multiple_vectors,
-                                                       const std::vector<std::string>& multiple_directory_names,
-                                                       const std::vector<std::string>& multiple_data_names,
+void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
+                                                       std::vector< std::vector<NumericVector<Number> *> * > multiple_vectors,
+                                                       const std::vector<std::string> & multiple_directory_names,
+                                                       const std::vector<std::string> & multiple_data_names,
                                                        const bool read_binary_vectors)
 {
   START_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
@@ -1092,7 +1092,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
 
   for (unsigned int data_index=0; data_index<n_directories; data_index++)
     {
-      std::vector<NumericVector<Number>*>& vectors = *multiple_vectors[data_index];
+      std::vector<NumericVector<Number> *> & vectors = *multiple_vectors[data_index];
 
       // Allocate storage for each vector
       for (unsigned int i=0; i<vectors.size(); i++)

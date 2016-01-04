@@ -64,14 +64,14 @@ public:
   /**
    * Initialize the parameter ranges and set current_parameters.
    */
-  void initialize_parameters(const RBParameters& mu_min_in,
-                             const RBParameters& mu_max_in,
-                             const std::map< std::string, std::vector<Real> >& discrete_parameter_values);
+  void initialize_parameters(const RBParameters & mu_min_in,
+                             const RBParameters & mu_max_in,
+                             const std::map< std::string, std::vector<Real> > & discrete_parameter_values);
 
   /**
    * Initialize the parameter ranges and set current_parameters.
    */
-  void initialize_parameters(const RBParametrized& rb_parametrized);
+  void initialize_parameters(const RBParametrized & rb_parametrized);
 
   /**
    * Get the number of parameters.
@@ -96,34 +96,34 @@ public:
   /**
    * Get the current parameters.
    */
-  const RBParameters& get_parameters() const;
+  const RBParameters & get_parameters() const;
 
   /**
    * Set the current parameters to \p params
    */
-  void set_parameters(const RBParameters& params);
+  void set_parameters(const RBParameters & params);
 
   /**
    * Get an RBParameters object that specifies the minimum allowable value
    * for each parameter.
    */
-  const RBParameters& get_parameters_min() const;
+  const RBParameters & get_parameters_min() const;
 
   /**
    * Get an RBParameters object that specifies the maximum allowable value
    * for each parameter.
    */
-  const RBParameters& get_parameters_max() const;
+  const RBParameters & get_parameters_max() const;
 
   /**
    * Get minimum allowable value of parameter \p param_name.
    */
-  Real get_parameter_min(const std::string& param_name) const;
+  Real get_parameter_min(const std::string & param_name) const;
 
   /**
    * Get maximum allowable value of parameter \p param_name.
    */
-  Real get_parameter_max(const std::string& param_name) const;
+  Real get_parameter_max(const std::string & param_name) const;
 
   /**
    * Print the current parameters.
@@ -133,26 +133,26 @@ public:
   /**
    * Write out the parameter ranges to files.
    */
-  void write_parameter_data_to_files(const std::string& continuous_param_file_name,
-                                     const std::string& discrete_param_file_name,
+  void write_parameter_data_to_files(const std::string & continuous_param_file_name,
+                                     const std::string & discrete_param_file_name,
                                      const bool write_binary_data);
 
   /**
    * Read in the parameter ranges from files.
    */
-  void read_parameter_data_from_files(const std::string& continuous_param_file_name,
-                                      const std::string& discrete_param_file_name,
+  void read_parameter_data_from_files(const std::string & continuous_param_file_name,
+                                      const std::string & discrete_param_file_name,
                                       const bool read_binary_data);
 
   /**
    * Is parameter \p mu_name discrete?
    */
-  bool is_discrete_parameter(const std::string& mu_name) const;
+  bool is_discrete_parameter(const std::string & mu_name) const;
 
   /**
    * Get a const reference to the discrete parameter values.
    */
-  const std::map< std::string, std::vector<Real> >& get_discrete_parameter_values() const;
+  const std::map< std::string, std::vector<Real> > & get_discrete_parameter_values() const;
 
   /**
    * Print out all the discrete parameter values.
@@ -163,7 +163,7 @@ public:
    * Helper function that returns the closest entry to \p value from
    * \p list_of_values.
    */
-  static Real get_closest_value(Real value, const std::vector<Real>& list_of_values);
+  static Real get_closest_value(Real value, const std::vector<Real> & list_of_values);
 
   /**
    * Public boolean to toggle verbose mode.
@@ -175,42 +175,42 @@ private:
   /**
    * Write out the parameter ranges to file.
    */
-  void write_parameter_ranges_to_file(const std::string& file_name,
+  void write_parameter_ranges_to_file(const std::string & file_name,
                                       const bool write_binary);
 
   /**
    * Write out the discrete parameter values to file.
    */
-  void write_discrete_parameter_values_to_file(const std::string& file_name,
+  void write_discrete_parameter_values_to_file(const std::string & file_name,
                                                const bool write_binary_data);
 
   /**
    * Read in the parameter ranges from file. Initialize parameters
    * to the "minimum" parameter values.
    */
-  void read_parameter_ranges_from_file(const std::string& file_name,
+  void read_parameter_ranges_from_file(const std::string & file_name,
                                        const bool read_binary,
-                                       RBParameters& param_min,
-                                       RBParameters& param_max);
+                                       RBParameters & param_min,
+                                       RBParameters & param_max);
 
   /**
    * Read in the discrete parameter values from file, if we have any.
    */
-  void read_discrete_parameter_values_from_file(const std::string& file_name,
+  void read_discrete_parameter_values_from_file(const std::string & file_name,
                                                 const bool read_binary_data,
-                                                std::map< std::string, std::vector<Real> >& discrete_parameter_values_in);
+                                                std::map< std::string, std::vector<Real> > & discrete_parameter_values_in);
 
   /**
    * Helper function to check that \p params is valid.
    */
-  bool valid_params(const RBParameters& params);
+  bool valid_params(const RBParameters & params);
 
   /**
    * Helper function to check if the specified value
    * is in the list of values (within a tolerance given
    * by \p tol).
    */
-  static bool is_value_in_list(Real value, const std::vector<Real>& list_of_values, Real tol);
+  static bool is_value_in_list(Real value, const std::vector<Real> & list_of_values, Real tol);
 
   //--------------- PRIVATE DATA MEMBERS ---------------//
 

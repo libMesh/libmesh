@@ -63,7 +63,7 @@ public:
    * Default implementation is to return 1, overload
    * to provide problem dependent behavior.
    */
-  virtual Number evaluate(const RBParameters& ) { return 1.; }
+  virtual Number evaluate(const RBParameters &) { return 1.; }
 };
 
 }

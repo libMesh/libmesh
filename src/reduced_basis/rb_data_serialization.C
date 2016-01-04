@@ -68,7 +68,7 @@ namespace RBDataSerialization
 
 // ---- RBEvaluationSerialization (BEGIN) ----
 
-RBEvaluationSerialization::RBEvaluationSerialization(RBEvaluation& rb_eval)
+RBEvaluationSerialization::RBEvaluationSerialization(RBEvaluation & rb_eval)
   :
   _rb_eval(rb_eval)
 {
@@ -78,7 +78,7 @@ RBEvaluationSerialization::~RBEvaluationSerialization()
 {
 }
 
-void RBEvaluationSerialization::write_to_file(const std::string& path)
+void RBEvaluationSerialization::write_to_file(const std::string & path)
 {
   START_LOG("write_to_file()", "RBEvaluationSerialization");
 
@@ -116,7 +116,7 @@ void RBEvaluationSerialization::write_to_file(const std::string& path)
 // ---- TransientRBEvaluationSerialization (BEGIN) ----
 
 TransientRBEvaluationSerialization::
-TransientRBEvaluationSerialization(TransientRBEvaluation& trans_rb_eval) :
+TransientRBEvaluationSerialization(TransientRBEvaluation & trans_rb_eval) :
   _trans_rb_eval(trans_rb_eval)
 {
 }
@@ -125,7 +125,7 @@ TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization()
 {
 }
 
-void TransientRBEvaluationSerialization::write_to_file(const std::string& path)
+void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
 {
   START_LOG("write_to_file()", "TransientRBEvaluationSerialization");
 
@@ -168,7 +168,7 @@ void TransientRBEvaluationSerialization::write_to_file(const std::string& path)
 
 // ---- RBEIMEvaluationSerialization (BEGIN) ----
 
-RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eim_eval)
+RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation & rb_eim_eval)
   :
   _rb_eim_eval(rb_eim_eval)
 {
@@ -178,7 +178,7 @@ RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization()
 {
 }
 
-void RBEIMEvaluationSerialization::write_to_file(const std::string& path)
+void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
 {
   START_LOG("write_to_file()", "RBEIMEvaluationSerialization");
 
@@ -223,8 +223,7 @@ void RBEIMEvaluationSerialization::write_to_file(const std::string& path)
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
-RBSCMEvaluationSerialization::RBSCMEvaluationSerialization(
-                                                           RBSCMEvaluation& rb_scm_eval)
+RBSCMEvaluationSerialization::RBSCMEvaluationSerialization(RBSCMEvaluation & rb_scm_eval)
   :
   _rb_scm_eval(rb_scm_eval)
 {
@@ -234,8 +233,7 @@ RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization()
 {
 }
 
-void RBSCMEvaluationSerialization::write_to_file(
-                                                 const std::string& path)
+void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
 {
   START_LOG("write_to_file()", "RBSCMEvaluationSerialization");
 
@@ -269,9 +267,9 @@ void RBSCMEvaluationSerialization::write_to_file(
 
 // ---- Helper functions for adding data to capnp Builders (BEGIN) ----
 
-void add_parameter_ranges_to_builder(const RBParametrized& rb_evaluation,
-                                     RBData::ParameterRanges::Builder& parameter_ranges_list,
-                                     RBData::DiscreteParameterList::Builder& discrete_parameters_list)
+void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
+                                     RBData::ParameterRanges::Builder & parameter_ranges_list,
+                                     RBData::DiscreteParameterList::Builder & discrete_parameters_list)
 {
   // Continuous parameters
   {
@@ -281,11 +279,11 @@ void add_parameter_ranges_to_builder(const RBParametrized& rb_evaluation,
     auto maxs = parameter_ranges_list.initMaxValues(n_continuous_parameters);
 
     std::set<std::string> parameter_names = rb_evaluation.get_parameter_names();
-    const RBParameters& parameters_min = rb_evaluation.get_parameters_min();
-    const RBParameters& parameters_max = rb_evaluation.get_parameters_max();
+    const RBParameters & parameters_min = rb_evaluation.get_parameters_min();
+    const RBParameters & parameters_max = rb_evaluation.get_parameters_max();
 
     unsigned int count = 0;
-    for(const auto& parameter_name : parameter_names)
+    for(const auto & parameter_name : parameter_names)
       {
         if(!rb_evaluation.is_discrete_parameter(parameter_name))
           {
@@ -307,15 +305,15 @@ void add_parameter_ranges_to_builder(const RBParametrized& rb_evaluation,
     auto names = discrete_parameters_list.initNames(n_discrete_parameters);
     auto values_outer = discrete_parameters_list.initValues(n_discrete_parameters);
 
-    const std::map< std::string, std::vector<Real> >& discrete_parameters =
+    const std::map< std::string, std::vector<Real> > & discrete_parameters =
       rb_evaluation.get_discrete_parameter_values();
 
     unsigned int count = 0;
-    for(const auto& discrete_parameter : discrete_parameters)
+    for(const auto & discrete_parameter : discrete_parameters)
       {
         names.set(count, discrete_parameter.first);
 
-        const std::vector<Real>& values = discrete_parameter.second;
+        const std::vector<Real> & values = discrete_parameter.second;
         unsigned int n_values = values.size();
 
         values_outer.init(count, n_values);
@@ -334,10 +332,10 @@ void add_parameter_ranges_to_builder(const RBParametrized& rb_evaluation,
 }
 
 template <typename RBEvaluationBuilderNumber>
-void add_rb_evaluation_data_to_builder(RBEvaluation& rb_eval,
-                                       RBEvaluationBuilderNumber& rb_evaluation_builder)
+void add_rb_evaluation_data_to_builder(RBEvaluation & rb_eval,
+                                       RBEvaluationBuilderNumber & rb_evaluation_builder)
 {
-  const RBThetaExpansion& rb_theta_expansion = rb_eval.get_rb_theta_expansion();
+  const RBThetaExpansion & rb_theta_expansion = rb_eval.get_rb_theta_expansion();
 
   unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
   unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
@@ -480,9 +478,9 @@ void add_rb_evaluation_data_to_builder(RBEvaluation& rb_eval,
 }
 
 template <typename RBEvaluationBuilderNumber, typename TransRBEvaluationBuilderNumber>
-void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation& trans_rb_eval,
-                                                 RBEvaluationBuilderNumber& rb_eval_builder,
-                                                 TransRBEvaluationBuilderNumber& trans_rb_eval_builder)
+void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation & trans_rb_eval,
+                                                 RBEvaluationBuilderNumber & rb_eval_builder,
+                                                 TransRBEvaluationBuilderNumber & trans_rb_eval_builder)
 {
   add_rb_evaluation_data_to_builder(trans_rb_eval, rb_eval_builder);
 
@@ -508,8 +506,8 @@ void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation& trans_rb
         }
   }
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(trans_rb_eval.get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(trans_rb_eval.get_rb_theta_expansion());
   unsigned int n_M_terms = trans_theta_expansion.get_n_M_terms();
   // Mq matrices
   {
@@ -608,9 +606,9 @@ void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation& trans_rb
 }
 
 template <typename RBEvaluationBuilderNumber, typename RBEIMEvaluationBuilderNumber>
-void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation& rb_eim_evaluation,
-                                           RBEvaluationBuilderNumber& rb_evaluation_builder,
-                                           RBEIMEvaluationBuilderNumber& rb_eim_evaluation_builder)
+void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
+                                           RBEvaluationBuilderNumber & rb_evaluation_builder,
+                                           RBEIMEvaluationBuilderNumber & rb_eim_evaluation_builder)
 {
   add_rb_evaluation_data_to_builder(rb_eim_evaluation, rb_evaluation_builder);
 
@@ -678,7 +676,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation& rb_eim_evaluation,
 
     for(unsigned int i=0; i<n_interpolation_elems; ++i)
       {
-        const libMesh::Elem& elem = *rb_eim_evaluation.interpolation_points_elem[i];
+        const libMesh::Elem & elem = *rb_eim_evaluation.interpolation_points_elem[i];
         auto mesh_elem_builder = interpolation_points_elem_list[i];
         add_elem_to_builder(elem, mesh_elem_builder);
       }
@@ -691,8 +689,8 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation& rb_eim_evaluation,
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
-void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation& rb_scm_eval,
-                                           RBData::RBSCMEvaluation::Builder& rb_scm_eval_builder)
+void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
+                                           RBData::RBSCMEvaluation::Builder & rb_scm_eval_builder)
 {
   auto parameter_ranges_list =
     rb_scm_eval_builder.initParameterRanges();
@@ -772,7 +770,7 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation& rb_scm_eval,
 }
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
-void add_point_to_builder(const Point& point, RBData::Point3D::Builder point_builder)
+void add_point_to_builder(const Point & point, RBData::Point3D::Builder point_builder)
 {
   point_builder.setX(point(0));
 
@@ -783,7 +781,7 @@ void add_point_to_builder(const Point& point, RBData::Point3D::Builder point_bui
     point_builder.setZ(point(2));
 }
 
-void add_elem_to_builder(const libMesh::Elem& elem, RBData::MeshElem::Builder mesh_elem_builder)
+void add_elem_to_builder(const libMesh::Elem & elem, RBData::MeshElem::Builder mesh_elem_builder)
 {
   std::string elem_type_string = libMesh::Utility::enum_to_string(elem.type());
 

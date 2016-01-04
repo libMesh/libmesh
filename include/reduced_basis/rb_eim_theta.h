@@ -46,19 +46,19 @@ public:
   /**
    * Constructor.
    */
-  RBEIMTheta(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in);
+  RBEIMTheta(RBEIMEvaluation & rb_eim_eval_in, unsigned int index_in);
 
   /**
    * Evaluate this RBEIMTheta object at the parameter \p mu.
    * This entails solving the RB EIM approximation and picking
    * out the appropriate coefficient.
    */
-  virtual Number evaluate(const RBParameters& mu) libmesh_override;
+  virtual Number evaluate(const RBParameters & mu) libmesh_override;
 
   /**
    * The RBEIMEvaluation object that this RBEIMTheta is based on.
    */
-  RBEIMEvaluation& rb_eim_eval;
+  RBEIMEvaluation & rb_eim_eval;
 
   /**
    * The index of the RB_solution vector that we pick out

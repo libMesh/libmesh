@@ -55,8 +55,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  RBEIMConstruction (EquationSystems& es,
-                     const std::string& name,
+  RBEIMConstruction (EquationSystems & es,
+                     const std::string & name,
                      const unsigned int number);
 
   /**
@@ -83,13 +83,13 @@ public:
    * Read parameters in from file and set up this system
    * accordingly.
    */
-  virtual void process_parameters_file (const std::string& parameters_filename) libmesh_override;
+  virtual void process_parameters_file (const std::string & parameters_filename) libmesh_override;
 
   /**
    * Specify which type of "best fit" we use to guide the EIM
    * greedy algorithm.
    */
-  void set_best_fit_type_flag (const std::string& best_fit_type_string);
+  void set_best_fit_type_flag (const std::string & best_fit_type_string);
 
   /**
    * Print out info that describes the current setup of this RBConstruction.
@@ -132,7 +132,7 @@ public:
    * relevant to the projection calculations in
    * load_calN_parametrized_function.
    */
-  virtual void init_context(FEMContext &c) libmesh_override;
+  virtual void init_context(FEMContext & c) libmesh_override;
 
   /**
    * Evaluate the mesh function at the specified point and for the specified variable.
@@ -151,7 +151,7 @@ public:
   /**
    * @return the vector of assembly objects that point to this RBEIMConstruction.
    */
-  std::vector<ElemAssembly*> get_eim_assembly_objects();
+  std::vector<ElemAssembly *> get_eim_assembly_objects();
 
   /**
    * Build an element assembly object that will access basis function
@@ -236,14 +236,14 @@ protected:
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
-  std::vector< NumericVector<Number>* > _parametrized_functions_in_training_set;
+  std::vector< NumericVector<Number> * > _parametrized_functions_in_training_set;
 
 private:
 
   /**
    * A mesh function to interpolate on the mesh.
    */
-  MeshFunction* _mesh_function;
+  MeshFunction * _mesh_function;
 
   /**
    * This flag indicates that we're in the process of
@@ -269,7 +269,7 @@ private:
    * The vector of assembly objects that are created to point to
    * this RBEIMConstruction.
    */
-  std::vector<ElemAssembly*> _rb_eim_assembly_objects;
+  std::vector<ElemAssembly *> _rb_eim_assembly_objects;
 
 };
 

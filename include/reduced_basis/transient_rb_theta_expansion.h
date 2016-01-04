@@ -58,7 +58,7 @@ public:
    * in subclasses.
    */
   virtual Number eval_M_theta(unsigned int q,
-                              const RBParameters& mu);
+                              const RBParameters & mu);
 
   /**
    * Get Q_m, the number of terms in the affine
@@ -71,14 +71,14 @@ public:
    * Attach a pointer to a functor object that defines one
    * of the theta_q_m terms.
    */
-  virtual void attach_M_theta(RBTheta* theta_q_m);
+  virtual void attach_M_theta(RBTheta * theta_q_m);
 
 private:
 
   /**
    * Vector storing the pointers to the RBTheta functors.
    */
-  std::vector<RBTheta*> _M_theta_vector;
+  std::vector<RBTheta *> _M_theta_vector;
 };
 
 }
