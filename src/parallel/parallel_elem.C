@@ -54,7 +54,7 @@ namespace Parallel
 {
 
 template <>
-unsigned int packed_size (const Elem*,
+unsigned int packed_size (const Elem *,
                           std::vector<largest_id_type>::const_iterator in)
 {
 #ifndef NDEBUG
@@ -120,7 +120,7 @@ unsigned int packed_size (const Elem*,
 
 
 template <>
-unsigned int packed_size (const Elem* e,
+unsigned int packed_size (const Elem * e,
                           std::vector<largest_id_type>::iterator in)
 {
   return packed_size(e, std::vector<largest_id_type>::const_iterator(in));
@@ -129,7 +129,7 @@ unsigned int packed_size (const Elem* e,
 
 
 template <>
-unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
+unsigned int packable_size (const Elem * elem, const MeshBase * mesh)
 {
   unsigned int total_packed_bcs = 0;
   if (elem->level() == 0)
@@ -157,17 +157,17 @@ unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
 
 
 template <>
-unsigned int packable_size (const Elem* elem, const ParallelMesh* mesh)
+unsigned int packable_size (const Elem * elem, const ParallelMesh * mesh)
 {
-  return packable_size(elem, static_cast<const MeshBase*>(mesh));
+  return packable_size(elem, static_cast<const MeshBase *>(mesh));
 }
 
 
 
 template <>
-void pack (const Elem* elem,
-           std::vector<largest_id_type>& data,
-           const MeshBase* mesh)
+void pack (const Elem * elem,
+           std::vector<largest_id_type> & data,
+           const MeshBase * mesh)
 {
   libmesh_assert(elem);
 
@@ -241,7 +241,7 @@ void pack (const Elem* elem,
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
-      const Elem *neigh = elem->neighbor(n);
+      const Elem * neigh = elem->neighbor(n);
       if (neigh)
         data.push_back (neigh->id());
       else
@@ -294,11 +294,11 @@ void pack (const Elem* elem,
 
 
 template <>
-void pack (const Elem* elem,
-           std::vector<largest_id_type>& data,
-           const ParallelMesh* mesh)
+void pack (const Elem * elem,
+           std::vector<largest_id_type> & data,
+           const ParallelMesh * mesh)
 {
-  pack(elem, data, static_cast<const MeshBase*>(mesh));
+  pack(elem, data, static_cast<const MeshBase *>(mesh));
 }
 
 
@@ -306,8 +306,8 @@ void pack (const Elem* elem,
 // FIXME - this needs serious work to be 64-bit compatible
 template <>
 void unpack(std::vector<largest_id_type>::const_iterator in,
-            Elem** out,
-            MeshBase* mesh)
+            Elem ** out,
+            MeshBase * mesh)
 {
 #ifndef NDEBUG
   const std::vector<largest_id_type>::const_iterator original_in = in;
@@ -411,7 +411,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
   // plus the real data header
   libmesh_assert_equal_to (in - original_in, header_size + 1);
 
-  Elem *elem = mesh->query_elem(id);
+  Elem * elem = mesh->query_elem(id);
 
   // if we already have this element, make sure its
   // properties match, and update any missing neighbor
@@ -468,7 +468,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
           }
         else
           {
-            Elem *ip = mesh->query_elem(interior_parent_id);
+            Elem * ip = mesh->query_elem(interior_parent_id);
 
             // The sending processor sees an interior parent here, so
             // if we don't have that interior element, then we'd
@@ -524,7 +524,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
                 continue;
               }
 
-            Elem *neigh = mesh->query_elem(neighbor_id);
+            Elem * neigh = mesh->query_elem(neighbor_id);
 
             // The sending processor sees a neighbor here, so if we
             // don't have that neighboring element, then we'd better
@@ -562,7 +562,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       // We don't already have the element, so we need to create it.
 
       // Find the parent if necessary
-      Elem *parent = NULL;
+      Elem * parent = NULL;
 #ifdef LIBMESH_ENABLE_AMR
       // Find a child element's parent
       if (level > 0)
@@ -605,7 +605,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       // elements may overwrite that.
       if (has_children)
         for (unsigned int c=0; c != elem->n_children(); ++c)
-          elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
+          elem->add_child(const_cast<RemoteElem *>(remote_elem), c);
 
 #endif // LIBMESH_ENABLE_AMR
 
@@ -635,16 +635,16 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
         if (interior_parent_id == remote_elem->id())
           {
             elem->set_interior_parent
-              (const_cast<RemoteElem*>(remote_elem));
+              (const_cast<RemoteElem *>(remote_elem));
           }
         else if (interior_parent_id != DofObject::invalid_id)
           {
             // If we don't have the interior parent element, then it's
             // a remote_elem until we get it.
-            Elem *ip = mesh->query_elem(interior_parent_id);
+            Elem * ip = mesh->query_elem(interior_parent_id);
             if (!ip )
               elem->set_interior_parent
-                (const_cast<RemoteElem*>(remote_elem));
+                (const_cast<RemoteElem *>(remote_elem));
             else
               elem->set_interior_parent(ip);
           }
@@ -665,16 +665,16 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
           // packed element to give us better information.
           if (neighbor_id == remote_elem->id())
             {
-              elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
+              elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
               continue;
             }
 
           // If we don't have the neighbor element, then it's a
           // remote_elem until we get it.
-          Elem *neigh = mesh->query_elem(neighbor_id);
+          Elem * neigh = mesh->query_elem(neighbor_id);
           if (!neigh)
             {
-              elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
+              elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
               continue;
             }
 
@@ -724,10 +724,10 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 
 template <>
 void unpack(std::vector<largest_id_type>::const_iterator in,
-            Elem** out,
-            ParallelMesh* mesh)
+            Elem ** out,
+            ParallelMesh * mesh)
 {
-  unpack(in, out, static_cast<MeshBase*>(mesh));
+  unpack(in, out, static_cast<MeshBase *>(mesh));
 }
 
 } // namespace Parallel

@@ -41,8 +41,8 @@ namespace Parallel {
 // a Parallel::Sort object takes O(nlogn) time,
 // where n is the length of _data.
 template <typename KeyType, typename IdxType>
-Sort<KeyType,IdxType>::Sort(const Parallel::Communicator &comm_in,
-                            std::vector<KeyType>& d) :
+Sort<KeyType,IdxType>::Sort(const Parallel::Communicator & comm_in,
+                            std::vector<KeyType> & d) :
   ParallelObject(comm_in),
   _n_procs(cast_int<processor_id_type>(comm_in.size())),
   _proc_id(cast_int<processor_id_type>(comm_in.rank())),
@@ -365,7 +365,7 @@ void Sort<KeyType,IdxType>::sort_local_bin()
 
 
 template <typename KeyType, typename IdxType>
-const std::vector<KeyType>& Sort<KeyType,IdxType>::bin()
+const std::vector<KeyType> & Sort<KeyType,IdxType>::bin()
 {
   if (!_bin_is_sorted)
     {

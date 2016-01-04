@@ -56,8 +56,8 @@ public:
    * a Sort object takes O(nlogn) time,
    * where n is the length of the vector.
    */
-  Sort (const Parallel::Communicator &comm,
-        std::vector<KeyType>& d);
+  Sort (const Parallel::Communicator & comm,
+        std::vector<KeyType> & d);
 
 
   /**
@@ -73,7 +73,7 @@ public:
    * us to do things like check if sorting was successful
    * by printing _my_bin.
    */
-  const std::vector<KeyType>& bin();
+  const std::vector<KeyType> & bin();
 
 private:
 
@@ -97,7 +97,7 @@ private:
    * be sorted (in parallel) across all
    * processors.
    */
-  std::vector<KeyType>& _data;
+  std::vector<KeyType> & _data;
 
   /**
    * Vector which holds the size of each

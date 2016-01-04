@@ -47,7 +47,7 @@ namespace Utils {
  */
 template <typename KeyType>
 inline
-bool is_sorted (const std::vector<KeyType>& v)
+bool is_sorted (const std::vector<KeyType> & v)
 {
   if (v.empty())
     return true;
@@ -65,7 +65,7 @@ bool is_sorted (const std::vector<KeyType>& v)
  */
 template <typename KeyType>
 inline
-double to_double (const KeyType &k)
+double to_double (const KeyType & k)
 {
   return static_cast<double>(k);
 }
@@ -87,7 +87,7 @@ KeyType to_key_type (const double f)
 
 template <>
 inline
-double to_double (const Hilbert::HilbertIndices &bvt)
+double to_double (const Hilbert::HilbertIndices & bvt)
 {
   return static_cast<double>(bvt.rack2);
 }

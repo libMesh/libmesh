@@ -51,8 +51,8 @@ public:
 
   // Constructor
   explicit
-  Histogram (const Parallel::Communicator &comm,
-             const std::vector<KeyType>& d);
+  Histogram (const Parallel::Communicator & comm,
+             const std::vector<KeyType> & d);
 
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
@@ -66,7 +66,7 @@ public:
   void build_histogram ();
 
   // Return the raw histogram data to the user
-  const std::vector<IdxType>& get_histogram() const;
+  const std::vector<IdxType> & get_histogram() const;
 
   // The number of bins in the histogram
   IdxType n_bins () const;
@@ -88,11 +88,10 @@ public:
 private:
 
 
-  const std::vector<KeyType>& data;
-  std::vector<IdxType>        hist;        // The actual histogram
-  std::vector<double>         bin_bounds;  // The boundary values of each bin
-  std::vector<IterType>       bin_iters;   // Iterators to the bin boundaries
-                                           //  in data
+  const std::vector<KeyType> & data;
+  std::vector<IdxType> hist;        // The actual histogram
+  std::vector<double>  bin_bounds;  // The boundary values of each bin
+  std::vector<IterType> bin_iters;  // Iterators to the bin boundaries in data
 };
 
 
@@ -101,7 +100,7 @@ private:
 //--------------------------------------------------------------------------
 template <typename KeyType, typename IdxType>
 inline
-const std::vector<IdxType>& Histogram<KeyType,IdxType>::get_histogram () const
+const std::vector<IdxType> & Histogram<KeyType,IdxType>::get_histogram () const
 {
   return hist;
 }
