@@ -82,7 +82,7 @@ public:
    * must be mappable through the \p Utility::string_to_enum<>()
    * function.
    */
-  static UniquePtr<QBase> build (const std::string &name,
+  static UniquePtr<QBase> build (const std::string & name,
                                  const unsigned int _dim,
                                  const Order _order=INVALID_ORDER);
 
@@ -125,23 +125,23 @@ public:
    * @returns a \p std::vector containing the quadrature point locations
    * on a reference object.
    */
-  const std::vector<Point>& get_points() const { return _points;  }
+  const std::vector<Point> & get_points() const { return _points;  }
 
   /**
    * @returns a \p std::vector containing the quadrature point locations
    * on a reference object as a writeable reference.
    */
-  std::vector<Point>& get_points() { return _points;  }
+  std::vector<Point> & get_points() { return _points;  }
 
   /**
    * @returns a \p std::vector containing the quadrature weights.
    */
-  const std::vector<Real>& get_weights() const { return _weights; }
+  const std::vector<Real> & get_weights() const { return _weights; }
 
   /**
    * @returns a \p std::vector containing the quadrature weights.
    */
-  std::vector<Real>& get_weights() { return _weights; }
+  std::vector<Real> & get_weights() { return _weights; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
@@ -170,8 +170,8 @@ public:
    * cut the element into subelements, for example, and constuct a
    * composite quadrature rule for the cut element.
    */
-  virtual void init (const Elem &elem,
-                     const std::vector<Real> &vertex_distance_func,
+  virtual void init (const Elem & elem,
+                     const std::vector<Real> & vertex_distance_func,
                      unsigned int p_level=0);
 
   /**
@@ -183,7 +183,7 @@ public:
    * Prints information relevant to the quadrature rule, by default to
    * libMesh::out.
    */
-  void print_info(std::ostream& os=libMesh::out) const;
+  void print_info(std::ostream & os=libMesh::out) const;
 
   /**
    * Maps the points of a 1D interval quadrature rule (typically [-1,1])
@@ -197,7 +197,7 @@ public:
   /**
    * Same as above, but allows you to use the stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const QBase& q);
+  friend std::ostream & operator << (std::ostream & os, const QBase & q);
 
   /**
    * Returns true if the shape functions need to be recalculated.
@@ -289,7 +289,7 @@ protected:
    * Used in the init_2D routines for
    * quadrilateral element types.
    */
-  void tensor_product_quad (const QBase& q1D);
+  void tensor_product_quad (const QBase & q1D);
 
   /**
    * Computes the tensor product quadrature rule
@@ -297,7 +297,7 @@ protected:
    * Used in the init_3D routines for
    * hexahedral element types.
    */
-  void tensor_product_hex (const QBase& q1D);
+  void tensor_product_hex (const QBase & q1D);
 
   /**
    * Computes the tensor product of
@@ -306,7 +306,7 @@ protected:
    * Used in the init_3D routines for
    * prismatic element types.
    */
-  void tensor_product_prism (const QBase& q1D, const QBase& q2D);
+  void tensor_product_prism (const QBase & q1D, const QBase & q2D);
 
 
 
@@ -366,7 +366,7 @@ QBase::QBase(const unsigned int d,
 
 
 inline
-void QBase::print_info(std::ostream& os) const
+void QBase::print_info(std::ostream & os) const
 {
   libmesh_assert(!_points.empty());
   libmesh_assert(!_weights.empty());

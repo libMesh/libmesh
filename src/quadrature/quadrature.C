@@ -69,7 +69,7 @@ void QBase::init(const ElemType t,
 
 
 
-void QBase::init (const Elem &elem,
+void QBase::init (const Elem & elem,
                   const std::vector<Real> & /* vertex_distance_func */,
                   unsigned int p_level)
 {
@@ -124,7 +124,7 @@ void QBase::scale(std::pair<Real, Real> old_range,
 
 
 
-void QBase::tensor_product_quad(const QBase& q1D)
+void QBase::tensor_product_quad(const QBase & q1D)
 {
 
   const unsigned int np = q1D.n_points();
@@ -151,7 +151,7 @@ void QBase::tensor_product_quad(const QBase& q1D)
 
 
 
-void QBase::tensor_product_hex(const QBase& q1D)
+void QBase::tensor_product_hex(const QBase & q1D)
 {
   const unsigned int np = q1D.n_points();
 
@@ -178,7 +178,7 @@ void QBase::tensor_product_hex(const QBase& q1D)
 
 
 
-void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
+void QBase::tensor_product_prism(const QBase & q1D, const QBase & q2D)
 {
   const unsigned int n_points1D = q1D.n_points();
   const unsigned int n_points2D = q2D.n_points();
@@ -205,7 +205,7 @@ void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
 
 
 
-std::ostream& operator << (std::ostream& os, const QBase& q)
+std::ostream & operator << (std::ostream & os, const QBase & q)
 {
   q.print_info(os);
   return os;
