@@ -34,7 +34,7 @@ namespace libMesh
 // EigenSolver members
 template <typename T>
 UniquePtr<EigenSolver<T> >
-EigenSolver<T>::build(const Parallel::Communicator &comm,
+EigenSolver<T>::build(const Parallel::Communicator & comm,
                       const SolverPackage solver_package)
 {
   // Build the appropriate solver
@@ -55,7 +55,7 @@ EigenSolver<T>::build(const Parallel::Communicator &comm,
 
 
 template <typename T>
-void EigenSolver<T>::set_solver_configuration(SolverConfiguration& solver_configuration)
+void EigenSolver<T>::set_solver_configuration(SolverConfiguration & solver_configuration)
 {
   _solver_configuration = &solver_configuration;
 }

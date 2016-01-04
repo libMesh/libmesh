@@ -37,9 +37,9 @@ T SIGN(T a, T b)
 
 Real NewtonSolver::line_search(Real tol,
                                Real last_residual,
-                               Real &current_residual,
-                               NumericVector<Number> &newton_iterate,
-                               const NumericVector<Number> &linear_solution)
+                               Real & current_residual,
+                               NumericVector<Number> & newton_iterate,
+                               const NumericVector<Number> & linear_solution)
 {
   // Take a full step if we got a residual reduction or if we
   // aren't substepping
@@ -49,7 +49,7 @@ Real NewtonSolver::line_search(Real tol,
     return 1.;
 
   // The residual vector
-  NumericVector<Number> &rhs = *(_system.rhs);
+  NumericVector<Number> & rhs = *(_system.rhs);
 
   Real ax = 0.;  // First abscissa, don't take negative steps
   Real cx = 1.;  // Second abscissa, don't extrapolate steps
@@ -229,7 +229,7 @@ Real NewtonSolver::line_search(Real tol,
 }
 
 
-NewtonSolver::NewtonSolver (sys_type& s)
+NewtonSolver::NewtonSolver (sys_type & s)
   : Parent(s),
     require_residual_reduction(true),
     require_finite_residual(true),
@@ -281,11 +281,11 @@ unsigned int NewtonSolver::solve()
   // Reset any prior solve result
   _solve_result = INVALID_SOLVE_RESULT;
 
-  NumericVector<Number> &newton_iterate = *(_system.solution);
+  NumericVector<Number> & newton_iterate = *(_system.solution);
 
   UniquePtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.zero_clone();
-  NumericVector<Number> &linear_solution = *linear_solution_ptr;
-  NumericVector<Number> &rhs = *(_system.rhs);
+  NumericVector<Number> & linear_solution = *linear_solution_ptr;
+  NumericVector<Number> & rhs = *(_system.rhs);
 
   newton_iterate.close();
   linear_solution.close();
@@ -295,7 +295,7 @@ unsigned int NewtonSolver::solve()
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
-  SparseMatrix<Number> &matrix = *(_system.matrix);
+  SparseMatrix<Number> & matrix = *(_system.matrix);
 
   // Set starting linear tolerance
   Real current_linear_tolerance = initial_linear_tolerance;

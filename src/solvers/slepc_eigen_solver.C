@@ -97,7 +97,7 @@ void SlepcEigenSolver<T>::init ()
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
+SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
                                      int nev,                  // number of requested eigenpairs
                                      int ncv,                  // number of basis vectors
                                      const double tol,         // solver tolerance
@@ -108,7 +108,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T>* matrix_A   = cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T> * matrix_A   = cast_ptr<PetscMatrix<T> *>(&matrix_A_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -127,7 +127,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
+SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
                                      int nev,                  // number of requested eigenpairs
                                      int ncv,                  // number of basis vectors
                                      const double tol,         // solver tolerance
@@ -144,14 +144,14 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
                         shell_matrix.n(), // Specify the number of local columns
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix)),
                         &mat);
   LIBMESH_CHKERR(ierr);
 
   /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void*.  Inside the member function
+     does not accept a const void *.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T>*.  */
+     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -164,12 +164,11 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::_solve_standard_helper
-(Mat mat,
- int nev,                  // number of requested eigenpairs
- int ncv,                  // number of basis vectors
- const double tol,         // solver tolerance
- const unsigned int m_its) // maximum number of iterations
+SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
+                                            int nev,                  // number of requested eigenpairs
+                                            int ncv,                  // number of basis vectors
+                                            const double tol,         // solver tolerance
+                                            const unsigned int m_its) // maximum number of iterations
 {
   START_LOG("solve_standard()", "SlepcEigenSolver");
 
@@ -296,8 +295,8 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
-                                        SparseMatrix<T> &matrix_B_in,
+SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
+                                        SparseMatrix<T> & matrix_B_in,
                                         int nev,                  // number of requested eigenpairs
                                         int ncv,                  // number of basis vectors
                                         const double tol,         // solver tolerance
@@ -306,8 +305,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix_A   = cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
-  PetscMatrix<T>* matrix_B   = cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
+  PetscMatrix<T> * matrix_A   = cast_ptr<PetscMatrix<T> *>(&matrix_A_in);
+  PetscMatrix<T> * matrix_B   = cast_ptr<PetscMatrix<T> *>(&matrix_B_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -319,8 +318,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
-                                        SparseMatrix<T> &matrix_B_in,
+SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
+                                        SparseMatrix<T> & matrix_B_in,
                                         int nev,                  // number of requested eigenpairs
                                         int ncv,                  // number of basis vectors
                                         const double tol,         // solver tolerance
@@ -337,19 +336,19 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         shell_matrix_A.n(), // Specify the number of local columns
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix_A)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix_A)),
                         &mat_A);
   LIBMESH_CHKERR(ierr);
 
-  PetscMatrix<T>* matrix_B   = cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
+  PetscMatrix<T> * matrix_B   = cast_ptr<PetscMatrix<T> *>(&matrix_B_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_B->close ();
 
   /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void*.  Inside the member function
+     does not accept a const void *.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T>*.  */
+     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -361,8 +360,8 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
-                                        ShellMatrix<T> &shell_matrix_B,
+SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
+                                        ShellMatrix<T> & shell_matrix_B,
                                         int nev,                  // number of requested eigenpairs
                                         int ncv,                  // number of basis vectors
                                         const double tol,         // solver tolerance
@@ -372,7 +371,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 
   PetscErrorCode ierr=0;
 
-  PetscMatrix<T>* matrix_A = cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T> * matrix_A = cast_ptr<PetscMatrix<T> *>(&matrix_A_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -384,14 +383,14 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
                         shell_matrix_B.n(), // Specify the number of local columns
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix_B)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix_B)),
                         &mat_B);
   LIBMESH_CHKERR(ierr);
 
   /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void*.  Inside the member function
+     does not accept a const void *.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T>*.  */
+     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -403,8 +402,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 
 template <typename T>
 std::pair<unsigned int, unsigned int>
-SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
-                                        ShellMatrix<T> &shell_matrix_B,
+SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
+                                        ShellMatrix<T> & shell_matrix_B,
                                         int nev,                  // number of requested eigenpairs
                                         int ncv,                  // number of basis vectors
                                         const double tol,         // solver tolerance
@@ -421,7 +420,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         shell_matrix_A.n(), // Specify the number of local columns
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix_A)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix_A)),
                         &mat_A);
   LIBMESH_CHKERR(ierr);
 
@@ -431,14 +430,14 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         shell_matrix_B.n(), // Specify the number of local columns
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix_B)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix_B)),
                         &mat_B);
   LIBMESH_CHKERR(ierr);
 
   /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void*.  Inside the member function
+     does not accept a const void *.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T>*.  */
+     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -602,22 +601,22 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
   switch (this->_eigen_solver_type)
     {
     case POWER:
-      ierr = EPSSetType (_eps, (char*) EPSPOWER);    LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, (char *) EPSPOWER);    LIBMESH_CHKERR(ierr); return;
     case SUBSPACE:
-      ierr = EPSSetType (_eps, (char*) EPSSUBSPACE); LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, (char *) EPSSUBSPACE); LIBMESH_CHKERR(ierr); return;
     case LAPACK:
-      ierr = EPSSetType (_eps, (char*) EPSLAPACK);   LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, (char *) EPSLAPACK);   LIBMESH_CHKERR(ierr); return;
     case ARNOLDI:
-      ierr = EPSSetType (_eps, (char*) EPSARNOLDI);  LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, (char *) EPSARNOLDI);  LIBMESH_CHKERR(ierr); return;
     case LANCZOS:
-      ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, (char *) EPSLANCZOS);  LIBMESH_CHKERR(ierr); return;
 #if !SLEPC_VERSION_LESS_THAN(2,3,2)
       // EPSKRYLOVSCHUR added in 2.3.2
     case KRYLOVSCHUR:
-      ierr = EPSSetType (_eps, (char*) EPSKRYLOVSCHUR);  LIBMESH_CHKERR(ierr); return;
+      ierr = EPSSetType (_eps, (char *) EPSKRYLOVSCHUR);  LIBMESH_CHKERR(ierr); return;
 #endif
       // case ARPACK:
-      // ierr = EPSSetType (_eps, (char*) EPSARPACK);   LIBMESH_CHKERR(ierr); return;
+      // ierr = EPSSetType (_eps, (char *) EPSARPACK);   LIBMESH_CHKERR(ierr); return;
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
@@ -692,14 +691,14 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 
 template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
-                                                         NumericVector<T> &solution_in)
+                                                         NumericVector<T> & solution_in)
 {
   PetscErrorCode ierr=0;
 
   PetscReal re, im;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
 
   // real and imaginary part of the ith eigenvalue.
   PetscScalar kr, ki;
@@ -764,13 +763,13 @@ Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
 
 
 template <typename T>
-void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T>& deflation_vector_in)
+void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T> & deflation_vector_in)
 {
   this->init();
 
   PetscErrorCode ierr = 0;
-  Vec deflation_vector = (cast_ptr<PetscVector<T>*>(&deflation_vector_in))->vec();
-  Vec* deflation_space = &deflation_vector;
+  Vec deflation_vector = (cast_ptr<PetscVector<T> *>(&deflation_vector_in))->vec();
+  Vec * deflation_space = &deflation_vector;
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
   ierr = EPSAttachDeflationSpace(_eps, 1, deflation_space, PETSC_FALSE);
 #else
@@ -784,7 +783,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
 {
   /* Get the matrix context.  */
   PetscErrorCode ierr=0;
-  void* ctx;
+  void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
   Parallel::communicator comm;
@@ -792,7 +791,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   CHKERRABORT(comm,ierr);
 
   /* Get user shell matrix object.  */
-  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+  const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
 
   /* Make \p NumericVector instances around the vectors.  */
   PetscVector<T> arg_global(arg,   shell_matrix.comm());
@@ -809,7 +808,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
 {
   /* Get the matrix context.  */
   PetscErrorCode ierr=0;
-  void* ctx;
+  void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
   Parallel::communicator comm;
@@ -817,7 +816,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   CHKERRABORT(comm,ierr);
 
   /* Get user shell matrix object.  */
-  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+  const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
 
   /* Make \p NumericVector instances around the vector.  */
   PetscVector<T> dest_global(dest, shell_matrix.comm());

@@ -43,7 +43,7 @@ public:
    * to be solved.
    */
   explicit
-  SecondOrderUnsteadySolver (sys_type& s);
+  SecondOrderUnsteadySolver (sys_type & s);
 
   /**
    * Destructor.
@@ -84,7 +84,8 @@ public:
    * A gradient g is only required/used for projecting onto finite element spaces
    * with continuous derivatives.
    */
-  void project_initial_rate( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
+  void project_initial_rate(FunctionBase<Number> * f,
+                            FunctionBase<Gradient> * g = NULL);
 
   /**
    * @returns the solution rate at the previous time step, \f$\dot{u}_n\f$,

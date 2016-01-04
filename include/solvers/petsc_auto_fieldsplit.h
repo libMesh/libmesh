@@ -47,7 +47,7 @@ namespace libMesh
 // Forward declarations
 class System;
 
-void petsc_auto_fieldsplit (PC my_pc, const System &sys);
+void petsc_auto_fieldsplit (PC my_pc, const System & sys);
 
 } // namespace libMesh
 

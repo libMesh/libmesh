@@ -59,7 +59,7 @@ public:
    * to be solved.
    */
   explicit
-  AdaptiveTimeSolver (sys_type& s);
+  AdaptiveTimeSolver (sys_type & s);
 
   /**
    * Destructor.
@@ -83,30 +83,30 @@ public:
    * This method is passed on to the core_time_solver
    */
   virtual bool element_residual (bool get_jacobian,
-                                 DiffContext&) libmesh_override;
+                                 DiffContext &) libmesh_override;
 
   /**
    * This method is passed on to the core_time_solver
    */
   virtual bool side_residual (bool get_jacobian,
-                              DiffContext&) libmesh_override;
+                              DiffContext &) libmesh_override;
 
   /**
    * This method is passed on to the core_time_solver
    */
   virtual bool nonlocal_residual (bool get_jacobian,
-                                  DiffContext&) libmesh_override;
+                                  DiffContext &) libmesh_override;
 
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
-  virtual UniquePtr<DiffSolver> &diff_solver() libmesh_override;
+  virtual UniquePtr<DiffSolver> & diff_solver() libmesh_override;
 
   /**
    * An implicit linear solver to use for adjoint and sensitivity
    * problems.
    */
-  virtual UniquePtr<LinearSolver<Number> > &linear_solver() libmesh_override;
+  virtual UniquePtr<LinearSolver<Number> > & linear_solver() libmesh_override;
 
   /**
    * This object is used to take timesteps

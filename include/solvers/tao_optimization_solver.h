@@ -43,13 +43,13 @@ namespace libMesh
 // need access to these most of the time as they are used internally by this object.
 extern "C"
 {
-  PetscErrorCode __libmesh_tao_objective (Tao tao, Vec x, PetscReal* objective, void *ctx);
-  PetscErrorCode __libmesh_tao_gradient(Tao tao, Vec x, Vec g, void *ctx);
-  PetscErrorCode __libmesh_tao_hessian(Tao tao, Vec x, Mat h, Mat pc, void *ctx);
-  PetscErrorCode __libmesh_tao_equality_constraints(Tao tao, Vec x, Vec ce, void *ctx);
-  PetscErrorCode __libmesh_tao_equality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void *ctx);
-  PetscErrorCode __libmesh_tao_inequality_constraints(Tao tao, Vec x, Vec cineq, void *ctx);
-  PetscErrorCode __libmesh_tao_inequality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void *ctx);
+  PetscErrorCode __libmesh_tao_objective (Tao tao, Vec x, PetscReal * objective, void * ctx);
+  PetscErrorCode __libmesh_tao_gradient(Tao tao, Vec x, Vec g, void * ctx);
+  PetscErrorCode __libmesh_tao_hessian(Tao tao, Vec x, Mat h, Mat pc, void * ctx);
+  PetscErrorCode __libmesh_tao_equality_constraints(Tao tao, Vec x, Vec ce, void * ctx);
+  PetscErrorCode __libmesh_tao_equality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void * ctx);
+  PetscErrorCode __libmesh_tao_inequality_constraints(Tao tao, Vec x, Vec cineq, void * ctx);
+  PetscErrorCode __libmesh_tao_inequality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void * ctx);
 }
 
 /**
@@ -72,7 +72,7 @@ public:
    *  Constructor. Initializes Tao data structures.
    */
   explicit
-  TaoOptimizationSolver (sys_type& system);
+  TaoOptimizationSolver (sys_type & system);
 
   /**
    * Destructor.
@@ -137,13 +137,13 @@ protected:
 
 private:
 
-  friend PetscErrorCode __libmesh_tao_objective (Tao tao, Vec x, PetscReal* objective, void *ctx);
-  friend PetscErrorCode __libmesh_tao_gradient(Tao tao, Vec x, Vec g, void *ctx);
-  friend PetscErrorCode __libmesh_tao_hessian(Tao tao, Vec x, Mat h, Mat pc, void *ctx);
-  friend PetscErrorCode __libmesh_tao_equality_constraints(Tao tao, Vec x, Vec ce, void *ctx);
-  friend PetscErrorCode __libmesh_tao_equality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void *ctx);
-  friend PetscErrorCode __libmesh_tao_inequality_constraints(Tao tao, Vec x, Vec cineq, void *ctx);
-  friend PetscErrorCode __libmesh_tao_inequality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void *ctx);
+  friend PetscErrorCode __libmesh_tao_objective (Tao tao, Vec x, PetscReal * objective, void * ctx);
+  friend PetscErrorCode __libmesh_tao_gradient(Tao tao, Vec x, Vec g, void * ctx);
+  friend PetscErrorCode __libmesh_tao_hessian(Tao tao, Vec x, Mat h, Mat pc, void * ctx);
+  friend PetscErrorCode __libmesh_tao_equality_constraints(Tao tao, Vec x, Vec ce, void * ctx);
+  friend PetscErrorCode __libmesh_tao_equality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void * ctx);
+  friend PetscErrorCode __libmesh_tao_inequality_constraints(Tao tao, Vec x, Vec cineq, void * ctx);
+  friend PetscErrorCode __libmesh_tao_inequality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void * ctx);
 };
 
 

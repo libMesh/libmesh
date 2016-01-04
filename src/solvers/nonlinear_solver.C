@@ -35,7 +35,7 @@ namespace libMesh
 #if defined(LIBMESH_HAVE_PETSC) || defined(LIBMESH_TRILINOS_HAVE_NOX)
 template <typename T>
 UniquePtr<NonlinearSolver<T> >
-NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
+NonlinearSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -63,7 +63,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 
 template <typename T>
 UniquePtr<NonlinearSolver<T> >
-NonlinearSolver<T>::build(sys_type&, const SolverPackage)
+NonlinearSolver<T>::build(sys_type &, const SolverPackage)
 {
   libmesh_not_implemented_msg("ERROR: libMesh was compiled without nonlinear solver support");
 }
@@ -81,7 +81,7 @@ NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 }
 
 template <typename T>
-void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration& solver_configuration)
+void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_configuration)
 {
   _solver_configuration = &solver_configuration;
 }

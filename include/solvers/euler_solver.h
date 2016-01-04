@@ -53,7 +53,7 @@ public:
    * to be solved.
    */
   explicit
-  EulerSolver (sys_type& s);
+  EulerSolver (sys_type & s);
 
   /**
    * Destructor.
@@ -72,7 +72,7 @@ public:
    * it uses will depend on theta.
    */
   virtual bool element_residual (bool request_jacobian,
-                                 DiffContext&) libmesh_override;
+                                 DiffContext &) libmesh_override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -81,7 +81,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool side_residual (bool request_jacobian,
-                              DiffContext&) libmesh_override;
+                              DiffContext &) libmesh_override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -90,7 +90,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext&) libmesh_override;
+                                  DiffContext &) libmesh_override;
 
   /**
    * The value for the theta method to employ: 1.0 corresponds
@@ -106,7 +106,7 @@ protected:
    * residual methods.
    */
   virtual bool _general_residual (bool request_jacobian,
-                                  DiffContext&,
+                                  DiffContext &,
                                   ResFuncType mass,
                                   ResFuncType time_deriv,
                                   ResFuncType constraint,

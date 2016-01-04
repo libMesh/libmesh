@@ -58,7 +58,7 @@ public:
   /**
    *  Constructor. Initializes Solver data structures
    */
-  EigenSolver (const Parallel::Communicator &comm_in
+  EigenSolver (const Parallel::Communicator & comm_in
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -70,7 +70,7 @@ public:
    * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<EigenSolver<T> > build(const Parallel::Communicator &comm_in
+  static UniquePtr<EigenSolver<T> > build(const Parallel::Communicator & comm_in
                                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
                                           const SolverPackage solver_package = SLEPC_SOLVERS);
 
@@ -130,7 +130,7 @@ public:
    * \p SparseMatrix, and returns the number of converged
    * eigenpairs and the number of iterations.
    */
-  virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> &matrix_A,
+  virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> & matrix_A,
                                                                 int nev,
                                                                 int ncv,
                                                                 const double tol,
@@ -141,7 +141,7 @@ public:
    * \p ShellMatrix, and returns the number of converged
    * eigenpairs and the number of iterations.
    */
-  virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> &matrix_A,
+  virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> & matrix_A,
                                                                 int nev,
                                                                 int ncv,
                                                                 const double tol,
@@ -154,8 +154,8 @@ public:
    * number of converged eigenpairs and the number
    * of iterations.
    */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A,
-                                                                   SparseMatrix<T> &matrix_B,
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
+                                                                   SparseMatrix<T> & matrix_B,
                                                                    int nev,
                                                                    int ncv,
                                                                    const double tol,
@@ -165,8 +165,8 @@ public:
    * Solves the generalized eigen problem when matrix_A is
    * a ShellMatrix and matrix_B is a SparseMatrix.
    */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
-                                                                   SparseMatrix<T> &matrix_B,
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
+                                                                   SparseMatrix<T> & matrix_B,
                                                                    int nev,
                                                                    int ncv,
                                                                    const double tol,
@@ -176,8 +176,8 @@ public:
    * Solves the generalized eigen problem when matrix_A is
    * a SparseMatrix and matrix_B is a ShellMatrix.
    */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A,
-                                                                   ShellMatrix<T> &matrix_B,
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
+                                                                   ShellMatrix<T> & matrix_B,
                                                                    int nev,
                                                                    int ncv,
                                                                    const double tol,
@@ -187,8 +187,8 @@ public:
    * Solves the generalized eigen problem when both matrix_A
    * and matrix_B are of type ShellMatrix.
    */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
-                                                                   ShellMatrix<T> &matrix_B,
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
+                                                                   ShellMatrix<T> & matrix_B,
                                                                    int nev,
                                                                    int ncv,
                                                                    const double tol,
@@ -200,7 +200,7 @@ public:
    * and copies the \ ith eigen vector to the solution vector.
    */
   virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
-                                               NumericVector<T> &solution) = 0;
+                                               NumericVector<T> & solution) = 0;
 
   /**
    * Returns the \p ith eigenvalue (real and imaginary part).
@@ -211,12 +211,12 @@ public:
   /**
    * Attach a deflation space defined by a single vector.
    */
-  virtual void attach_deflation_space(NumericVector<T> &deflation_vector) = 0;
+  virtual void attach_deflation_space(NumericVector<T> & deflation_vector) = 0;
 
   /**
    * Set the solver configuration object.
    */
-  void set_solver_configuration(SolverConfiguration& solver_configuration);
+  void set_solver_configuration(SolverConfiguration & solver_configuration);
 
 protected:
 
@@ -244,7 +244,7 @@ protected:
    * Optionally store a SolverOptions object that can be used
    * to set parameters like solver type, tolerances and iteration limits.
    */
-  SolverConfiguration* _solver_configuration;
+  SolverConfiguration * _solver_configuration;
 
 };
 
@@ -254,7 +254,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-EigenSolver<T>::EigenSolver (const Parallel::Communicator &comm_in) :
+EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
   _eigen_solver_type    (ARNOLDI),
   _eigen_problem_type   (NHEP),

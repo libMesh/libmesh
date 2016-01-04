@@ -61,7 +61,7 @@ public:
    * Typedef for Stored Solutions iterator, a list of pairs of the current
    * system time, map of strings and saved vectors
    */
-  typedef std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > >::iterator stored_solutions_iterator;
+  typedef std::list<std::pair<Real, std::map<std::string, NumericVector<Number> *> > >::iterator stored_solutions_iterator;
 
   /**
    * Definition of the clone function needed for the setter function
@@ -75,7 +75,7 @@ private:
 
   // This list of pairs will hold the current time and stored vectors
   // from each timestep
-  std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > > stored_solutions;
+  std::list<std::pair<Real, std::map<std::string, NumericVector<Number> *> > > stored_solutions;
 
   // The stored solutions iterator
   stored_solutions_iterator stored_sols;

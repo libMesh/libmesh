@@ -54,7 +54,7 @@ public:
    * to be solved.
    */
   explicit
-  NewmarkSolver (sys_type& s);
+  NewmarkSolver (sys_type & s);
 
   /**
    * Destructor.
@@ -90,7 +90,8 @@ public:
    * A gradient g is only required/used for projecting onto finite element spaces
    * with continuous derivatives.
    */
-  void project_initial_accel( FunctionBase<Number> *f, FunctionBase<Gradient> *g = NULL );
+  void project_initial_accel (FunctionBase<Number> * f,
+                              FunctionBase<Gradient> * g = NULL);
 
   /**
    * Allow the user to (re)set whether the initial acceleration is available.
@@ -98,7 +99,7 @@ public:
    * are called. This is useful is the user is restarting a calculation and the acceleration
    * is available from the restart.
    */
-  void set_initial_accel_avail( bool initial_accel_set );
+  void set_initial_accel_avail (bool initial_accel_set);
 
   /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
@@ -119,7 +120,7 @@ public:
    * it uses will depend on theta.
    */
   virtual bool element_residual (bool request_jacobian,
-                                 DiffContext&) libmesh_override;
+                                 DiffContext &) libmesh_override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -128,7 +129,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool side_residual (bool request_jacobian,
-                              DiffContext&) libmesh_override;
+                              DiffContext &) libmesh_override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -137,7 +138,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext&) libmesh_override;
+                                  DiffContext &) libmesh_override;
 
 
 protected:
@@ -174,7 +175,7 @@ protected:
    * residual methods.
    */
   virtual bool _general_residual (bool request_jacobian,
-                                  DiffContext&,
+                                  DiffContext &,
                                   ResFuncType mass,
                                   ResFuncType damping,
                                   ResFuncType time_deriv,

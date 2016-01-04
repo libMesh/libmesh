@@ -50,7 +50,7 @@ extern "C"
 #if PETSC_RELEASE_LESS_THAN(3,0,1)
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
   {
-    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
     if (!preconditioner->initialized())
       libmesh_error_msg("Preconditioner not initialized!  Make sure you call init() before solve!");
@@ -61,9 +61,9 @@ extern "C"
   }
 
 
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(void *ctx, Vec x, Vec y)
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y)
   {
-    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
     PetscVector<Number> x_vec(x, preconditioner->comm());
     PetscVector<Number> y_vec(y, preconditioner->comm());
@@ -75,9 +75,9 @@ extern "C"
 #else
   PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
   {
-    void *ctx;
+    void * ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
-    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
     if (!preconditioner->initialized())
       libmesh_error_msg("Preconditioner not initialized!  Make sure you call init() before solve!");
@@ -89,9 +89,9 @@ extern "C"
 
   PetscErrorCode __libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
   {
-    void *ctx;
+    void * ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
-    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
+    Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
     PetscVector<Number> x_vec(x, preconditioner->comm());
     PetscVector<Number> y_vec(y, preconditioner->comm());
@@ -160,7 +160,7 @@ void PetscLinearSolver<T>::clear ()
 
 
 template <typename T>
-void PetscLinearSolver<T>::init (const char *name)
+void PetscLinearSolver<T>::init (const char * name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -276,7 +276,7 @@ void PetscLinearSolver<T>::init (const char *name)
       if(this->_preconditioner)
         {
           this->_preconditioner->init();
-          PCShellSetContext(_pc,(void*)this->_preconditioner);
+          PCShellSetContext(_pc,(void *)this->_preconditioner);
           PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
           PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
         }
@@ -285,8 +285,8 @@ void PetscLinearSolver<T>::init (const char *name)
 
 
 template <typename T>
-void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix,
-                                  const char *name)
+void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
+                                 const char * name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -411,7 +411,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix,
         {
           this->_preconditioner->set_matrix(*matrix);
           this->_preconditioner->init();
-          PCShellSetContext(_pc,(void*)this->_preconditioner);
+          PCShellSetContext(_pc,(void *)this->_preconditioner);
           PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
           PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
         }
@@ -422,7 +422,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix,
 
 template <typename T>
 void
-PetscLinearSolver<T>::init_names (const System& sys)
+PetscLinearSolver<T>::init_names (const System & sys)
 {
   petsc_auto_fieldsplit(this->pc(), sys);
 }
@@ -431,7 +431,7 @@ PetscLinearSolver<T>::init_names (const System& sys)
 
 template <typename T>
 void
-PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const dofs,
+PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const dofs,
                                          const SubsetSolveMode subset_solve_mode)
 {
   PetscErrorCode ierr=0;
@@ -446,7 +446,7 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const 
 
   if(dofs!=NULL)
     {
-      PetscInt* petsc_dofs = NULL;
+      PetscInt * petsc_dofs = NULL;
       ierr = PetscMalloc(dofs->size()*sizeof(PetscInt), &petsc_dofs);
       LIBMESH_CHKERR(ierr);
 
@@ -464,20 +464,20 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const 
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
-                             SparseMatrix<T>&  precond_in,
-                             NumericVector<T>& solution_in,
-                             NumericVector<T>& rhs_in,
+PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
+                             SparseMatrix<T> &  precond_in,
+                             NumericVector<T> & solution_in,
+                             NumericVector<T> & rhs_in,
                              const double tol,
                              const unsigned int m_its)
 {
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix   = cast_ptr<PetscMatrix<T>*>(&matrix_in);
-  PetscMatrix<T>* precond  = cast_ptr<PetscMatrix<T>*>(&precond_in);
-  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
+  PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
+  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&precond_in);
+  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
+  PetscVector<T> * rhs      = cast_ptr<PetscVector<T> *>(&rhs_in);
 
   this->init (matrix);
 
@@ -585,7 +585,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   Vec subrhs = NULL;
   Vec subsolution = NULL;
   VecScatter scatter = NULL;
-  PetscMatrix<Number>* subprecond_matrix = NULL;
+  PetscMatrix<Number> * subprecond_matrix = NULL;
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if neccessary.
@@ -824,20 +824,20 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
-                                     NumericVector<T>& solution_in,
-                                     NumericVector<T>& rhs_in,
+PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
+                                     NumericVector<T> & solution_in,
+                                     NumericVector<T> & rhs_in,
                                      const double tol,
                                      const unsigned int m_its)
 {
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix   = cast_ptr<PetscMatrix<T>*>(&matrix_in);
+  PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
   // Note that the matrix and precond matrix are the same
-  PetscMatrix<T>* precond  = cast_ptr<PetscMatrix<T>*>(&matrix_in);
-  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
+  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&matrix_in);
+  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
+  PetscVector<T> * rhs      = cast_ptr<PetscVector<T> *>(&rhs_in);
 
   this->init (matrix);
 
@@ -946,7 +946,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
   Vec subrhs = NULL;
   Vec subsolution = NULL;
   VecScatter scatter = NULL;
-  PetscMatrix<Number>* subprecond_matrix = NULL;
+  PetscMatrix<Number> * subprecond_matrix = NULL;
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if neccessary.
@@ -1179,9 +1179,9 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-                             NumericVector<T>& solution_in,
-                             NumericVector<T>& rhs_in,
+PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
+                             NumericVector<T> & solution_in,
+                             NumericVector<T> & rhs_in,
                              const double tol,
                              const unsigned int m_its)
 {
@@ -1207,8 +1207,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
+  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
+  PetscVector<T> * rhs      = cast_ptr<PetscVector<T> *>(&rhs_in);
 
   this->init ();
 
@@ -1232,12 +1232,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
                         solution_in.local_size(),
                         rhs_in.size(),
                         solution_in.size(),
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix)),
                         &mat);
   /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void*.  Inside the member function
+     does not accept a const void *.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T>*.  */
+     const ShellMatrix<T> *.  */
 
   LIBMESH_CHKERR(ierr);
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
@@ -1458,10 +1458,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-                             const SparseMatrix<T>& precond_matrix,
-                             NumericVector<T> &solution_in,
-                             NumericVector<T> &rhs_in,
+PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
+                             const SparseMatrix<T> & precond_matrix,
+                             NumericVector<T> & solution_in,
+                             NumericVector<T> & rhs_in,
                              const double tol,
                              const unsigned int m_its)
 {
@@ -1487,9 +1487,9 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  const PetscMatrix<T>* precond  = cast_ptr<const PetscMatrix<T>*>(&precond_matrix);
-  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
+  const PetscMatrix<T> * precond  = cast_ptr<const PetscMatrix<T> *>(&precond_matrix);
+  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
+  PetscVector<T> * rhs      = cast_ptr<PetscVector<T> *>(&rhs_in);
 
   this->init ();
 
@@ -1502,7 +1502,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   Vec subrhs = NULL;
   Vec subsolution = NULL;
   VecScatter scatter = NULL;
-  PetscMatrix<Number>* subprecond_matrix = NULL;
+  PetscMatrix<Number> * subprecond_matrix = NULL;
 
   // Close the matrices and vectors in case this wasn't already done.
   solution->close ();
@@ -1515,12 +1515,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
                         solution_in.local_size(),
                         rhs_in.size(),
                         solution_in.size(),
-                        const_cast<void*>(static_cast<const void*>(&shell_matrix)),
+                        const_cast<void *>(static_cast<const void *>(&shell_matrix)),
                         &mat);
   /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void*.  Inside the member function
+     does not accept a const void *.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T>*.  */
+     const ShellMatrix<T> *.  */
 
   LIBMESH_CHKERR(ierr);
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
@@ -1571,7 +1571,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
                              _restrict_solve_to_is,_restrict_solve_to_is,
                              MAT_INITIAL_MATRIX,&submat);
       LIBMESH_CHKERR(ierr);
-      ierr = MatGetSubMatrix(const_cast<PetscMatrix<T>*>(precond)->mat(),
+      ierr = MatGetSubMatrix(const_cast<PetscMatrix<T> *>(precond)->mat(),
                              _restrict_solve_to_is,_restrict_solve_to_is,
                              MAT_INITIAL_MATRIX,&subprecond);
       LIBMESH_CHKERR(ierr);
@@ -1667,16 +1667,16 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   else
     {
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat(),
+      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat(),
                              DIFFERENT_NONZERO_PATTERN);
 #else
-      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat());
+      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
 #endif
       LIBMESH_CHKERR(ierr);
 
       if(this->_preconditioner)
         {
-          this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+          this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number> &>(precond_matrix));
           this->_preconditioner->init();
         }
     }
@@ -1740,7 +1740,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
         {
           /* Before we delete subprecond_matrix, we should give the
              _preconditioner a different matrix.  */
-          this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+          this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number> &>(precond_matrix));
           this->_preconditioner->init();
           delete subprecond_matrix;
           subprecond_matrix = NULL;
@@ -1771,7 +1771,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
 
 template <typename T>
-void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
+void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
 {
   PetscErrorCode ierr = 0;
   PetscInt its  = 0;
@@ -1782,7 +1782,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
-  PetscReal* p;
+  PetscReal * p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
   LIBMESH_CHKERR(ierr);
 
@@ -1815,7 +1815,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
-  PetscReal* p;
+  PetscReal * p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
   LIBMESH_CHKERR(ierr);
 
@@ -1962,11 +1962,11 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
 {
   /* Get the matrix context.  */
   PetscErrorCode ierr=0;
-  void* ctx;
+  void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
   /* Get user shell matrix object.  */
-  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+  const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
   CHKERRABORT(shell_matrix.comm().get(), ierr);
 
   /* Make \p NumericVector instances around the vectors.  */
@@ -1986,11 +1986,11 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
 {
   /* Get the matrix context.  */
   PetscErrorCode ierr=0;
-  void* ctx;
+  void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
   /* Get user shell matrix object.  */
-  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+  const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
   CHKERRABORT(shell_matrix.comm().get(), ierr);
 
   /* Make \p NumericVector instances around the vectors.  */
@@ -2016,11 +2016,11 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
 {
   /* Get the matrix context.  */
   PetscErrorCode ierr=0;
-  void* ctx;
+  void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
   /* Get user shell matrix object.  */
-  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+  const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
   CHKERRABORT(shell_matrix.comm().get(), ierr);
 
   /* Make \p NumericVector instances around the vector.  */

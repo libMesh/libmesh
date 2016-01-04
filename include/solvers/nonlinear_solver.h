@@ -63,7 +63,7 @@ public:
    *  Constructor. Initializes Solver data structures
    */
   explicit
-  NonlinearSolver (sys_type& s);
+  NonlinearSolver (sys_type & s);
 
   /**
    * Destructor.
@@ -74,7 +74,7 @@ public:
    * Builds a \p NonlinearSolver using the nonlinear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<NonlinearSolver<T> > build(sys_type& s,
+  static UniquePtr<NonlinearSolver<T> > build(sys_type & s,
                                               const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
@@ -92,14 +92,14 @@ public:
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char* name = NULL) = 0;
+  virtual void init (const char * name = NULL) = 0;
 
   /**
    * Solves the nonlinear system.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Jacobian Matrix
-                                               NumericVector<T>&, // Solution vector
-                                               NumericVector<T>&, // Residual vector
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> &,  // System Jacobian Matrix
+                                               NumericVector<T> &, // Solution vector
+                                               NumericVector<T> &, // Residual vector
                                                const double,      // Stopping tolerance
                                                const unsigned int) = 0; // N. Iterations
 
@@ -125,29 +125,29 @@ public:
    * Function that computes the residual \p R(X) of the nonlinear system
    * at the input iterate \p X.
    */
-  void (* residual) (const NumericVector<Number>& X,
-                     NumericVector<Number>& R,
-                     sys_type& S);
+  void (* residual) (const NumericVector<Number> & X,
+                     NumericVector<Number> & R,
+                     sys_type & S);
 
   /**
    * Object that computes the residual \p R(X) of the nonlinear system
    * at the input iterate \p X.
    */
-  NonlinearImplicitSystem::ComputeResidual *residual_object;
+  NonlinearImplicitSystem::ComputeResidual * residual_object;
 
   /**
    * Function that computes the Jacobian \p J(X) of the nonlinear system
    * at the input iterate \p X.
    */
-  void (* jacobian) (const NumericVector<Number>& X,
-                     SparseMatrix<Number>& J,
-                     sys_type& S);
+  void (* jacobian) (const NumericVector<Number> & X,
+                     SparseMatrix<Number> & J,
+                     sys_type & S);
 
   /**
    * Object that computes the Jacobian \p J(X) of the nonlinear system
    * at the input iterate \p X.
    */
-  NonlinearImplicitSystem::ComputeJacobian *jacobian_object;
+  NonlinearImplicitSystem::ComputeJacobian * jacobian_object;
 
   /**
    * Function that computes either the residual \f$ R(X) \f$ or the
@@ -155,10 +155,10 @@ public:
    * iterate \f$ X \f$.  Note that either \p R or \p J could be
    * \p XSNULL.
    */
-  void (* matvec) (const NumericVector<Number>& X,
-                   NumericVector<Number>* R,
-                   SparseMatrix<Number>*  J,
-                   sys_type& S);
+  void (* matvec) (const NumericVector<Number> & X,
+                   NumericVector<Number> * R,
+                   SparseMatrix<Number> * J,
+                   sys_type & S);
 
   /**
    * Object that computes either the residual \f$ R(X) \f$ or the
@@ -166,18 +166,18 @@ public:
    * iterate \f$ X \f$.  Note that either \p R or \p J could be
    * \p XSNULL.
    */
-  NonlinearImplicitSystem::ComputeResidualandJacobian *residual_and_jacobian_object;
+  NonlinearImplicitSystem::ComputeResidualandJacobian * residual_and_jacobian_object;
 
   /**
    * Function that computes the lower and upper bounds \p XL and \p XU on the solution of the nonlinear system.
    */
-  void (* bounds) (NumericVector<Number>& XL,
-                   NumericVector<Number>& XU,
-                   sys_type& S);
+  void (* bounds) (NumericVector<Number> & XL,
+                   NumericVector<Number> & XU,
+                   sys_type & S);
   /**
    * Object that computes the bounds vectors  \f$ XL \f$ and \f$ XU \f$.
    */
-  NonlinearImplicitSystem::ComputeBounds *bounds_object;
+  NonlinearImplicitSystem::ComputeBounds * bounds_object;
 
   /**
    * Function that computes a basis for the Jacobian's nullspace --
@@ -185,7 +185,7 @@ public:
    * solving a degenerate problem iteratively, if the solver supports it
    * (e.g., PETSc's KSP).
    */
-  void (* nullspace) (std::vector<NumericVector<Number>*>& sp, sys_type& S);
+  void (* nullspace) (std::vector<NumericVector<Number> *> & sp, sys_type & S);
 
   /**
    * A callable object that computes a basis for the Jacobian's nullspace --
@@ -193,27 +193,27 @@ public:
    * solving a degenerate problem iteratively, if the solver supports it
    * (e.g., PETSc's KSP).
    */
-  NonlinearImplicitSystem::ComputeVectorSubspace *nullspace_object;
+  NonlinearImplicitSystem::ComputeVectorSubspace * nullspace_object;
 
   /**
    * Function that computes a basis for the Jacobian's near nullspace --
    * the set of "low energy modes" -- that can be used for AMG coarsening,
    * if the solver supports it (e.g., ML, PETSc's GAMG).
    */
-  void (* nearnullspace) (std::vector<NumericVector<Number>*>& sp, sys_type& S);
+  void (* nearnullspace) (std::vector<NumericVector<Number> *> & sp, sys_type & S);
 
   /**
    * A callable object that computes a basis for the Jacobian's near nullspace --
    * the set of "low energy modes" -- that can be used for AMG coarsening,
    * if the solver supports it (e.g., ML, PETSc's GAMG).
    */
-  NonlinearImplicitSystem::ComputeVectorSubspace *nearnullspace_object;
+  NonlinearImplicitSystem::ComputeVectorSubspace * nearnullspace_object;
 
   /**
    * Customizable function pointer which users can attach to the
    * solver.  Gets called prior to every call to solve().
    */
-  void (* user_presolve)(sys_type& S);
+  void (* user_presolve)(sys_type & S);
 
   /**
    * Function that performs a "check" on the Newton search direction
@@ -233,7 +233,7 @@ public:
    * iteration. Allows the user to modify both the search direction
    * and the solution vector in an application-specific way.
    */
-  NonlinearImplicitSystem::ComputePostCheck *postcheck_object;
+  NonlinearImplicitSystem::ComputePostCheck * postcheck_object;
 
   /**
    * @returns a constant reference to the system we are solving.
@@ -313,13 +313,13 @@ public:
   /**
    * Set the solver configuration object.
    */
-  void set_solver_configuration(SolverConfiguration& solver_configuration);
+  void set_solver_configuration(SolverConfiguration & solver_configuration);
 
 protected:
   /**
    * A reference to the system we are solving.
    */
-  sys_type& _system;
+  sys_type & _system;
 
   /**
    * Flag indicating if the data structures have been initialized.
@@ -335,7 +335,7 @@ protected:
    * Optionally store a SolverOptions object that can be used
    * to set parameters like solver type, tolerances and iteration limits.
    */
-  SolverConfiguration* _solver_configuration;
+  SolverConfiguration * _solver_configuration;
 };
 
 
@@ -344,7 +344,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
+NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   ParallelObject               (s),
   residual                     (NULL),
   residual_object              (NULL),

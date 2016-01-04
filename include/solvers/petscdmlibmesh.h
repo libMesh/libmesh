@@ -19,8 +19,8 @@
  *
  * Any implementation needs to register its creation routine, DMCreate_libMesh, with PETSc using DMRegister().
  */
-PETSC_EXTERN PetscErrorCode DMlibMeshSetSystem(DM,libMesh::NonlinearImplicitSystem&);
-PETSC_EXTERN PetscErrorCode DMlibMeshGetSystem(DM,libMesh::NonlinearImplicitSystem*&);
+PETSC_EXTERN PetscErrorCode DMlibMeshSetSystem(DM,libMesh::NonlinearImplicitSystem &);
+PETSC_EXTERN PetscErrorCode DMlibMeshGetSystem(DM,libMesh::NonlinearImplicitSystem *&);
 
 
 #define DMLIBMESH "libmesh"

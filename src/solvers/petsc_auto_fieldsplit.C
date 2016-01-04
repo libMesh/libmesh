@@ -34,14 +34,14 @@ EXTERN_C_FOR_PETSC_END
 namespace {
 using namespace libMesh;
 
-void indices_to_fieldsplit (const Parallel::Communicator& comm,
-                            const std::vector<dof_id_type>& indices,
+void indices_to_fieldsplit (const Parallel::Communicator & comm,
+                            const std::vector<dof_id_type> & indices,
                             PC my_pc,
-                            const std::string& field_name)
+                            const std::string & field_name)
 {
-  const PetscInt *idx = PETSC_NULL;
+  const PetscInt * idx = PETSC_NULL;
   if (!indices.empty())
-    idx = reinterpret_cast<const PetscInt*>(&indices[0]);
+    idx = reinterpret_cast<const PetscInt *>(&indices[0]);
 
   IS is;
   int ierr = ISCreateLibMesh(comm.get(), indices.size(),
@@ -58,7 +58,7 @@ namespace libMesh
 {
 
 void petsc_auto_fieldsplit (PC my_pc,
-                            const System &sys)
+                            const System & sys)
 {
   std::string sys_prefix = "--solver_group_";
 
@@ -73,7 +73,7 @@ void petsc_auto_fieldsplit (PC my_pc,
     {
       for (unsigned int v = 0; v != sys.n_vars(); ++v)
         {
-          const std::string& var_name = sys.variable_name(v);
+          const std::string & var_name = sys.variable_name(v);
 
           std::vector<dof_id_type> var_idx;
           sys.get_dof_map().local_variable_indices
@@ -88,7 +88,7 @@ void petsc_auto_fieldsplit (PC my_pc,
 
           if (group_name != empty_string)
             {
-              std::vector<dof_id_type> &indices =
+              std::vector<dof_id_type> & indices =
                 group_indices[group_name];
               const bool prior_indices = !indices.empty();
               indices.insert(indices.end(), var_idx.begin(),

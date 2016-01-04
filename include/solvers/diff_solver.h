@@ -39,11 +39,15 @@ template <typename T> class NumericVector;
 /**
  * Functor for use as callback in solve of nonlinear solver.
  */
-class LinearSolutionMonitor {
+class LinearSolutionMonitor
+{
 public:
-  virtual void operator() (const NumericVector<Number>& delta_u, const double &norm_delta_u,
-                           const NumericVector<Number>& u, const double &norm_u,
-                           const NumericVector<Number>& res, const double &norm_res,
+  virtual void operator() (const NumericVector<Number> & delta_u,
+                           const double & norm_delta_u,
+                           const NumericVector<Number> & u,
+                           const double & norm_u,
+                           const NumericVector<Number> & res,
+                           const double & norm_res,
                            const unsigned int iteration) = 0;
   virtual ~LinearSolutionMonitor();
 };
@@ -76,13 +80,13 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
-  DiffSolver (sys_type& s);
+  DiffSolver (sys_type & s);
 
   /**
    * Factory.  Requires a reference to the system
    * to be solved.  Returns a NewtonSolver by default
    */
-  static UniquePtr<DiffSolver> build(sys_type& s);
+  static UniquePtr<DiffSolver> build(sys_type & s);
 
   /**
    * Destructor.
@@ -309,7 +313,7 @@ protected:
   /**
    * A reference to the system we are solving.
    */
-  sys_type& _system;
+  sys_type & _system;
 
   /**
    * Initialized to zero.  solve_result is typically set internally in

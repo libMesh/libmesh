@@ -61,7 +61,7 @@ public:
    *  Constructor. Initializes Solver data structures
    */
   explicit
-  OptimizationSolver (sys_type& s);
+  OptimizationSolver (sys_type & s);
 
   /**
    * Destructor.
@@ -72,7 +72,7 @@ public:
    * Builds an \p OptimizationSolver using the package specified by
    * \p solver_package
    */
-  static UniquePtr<OptimizationSolver<T> > build(sys_type& s,
+  static UniquePtr<OptimizationSolver<T> > build(sys_type & s,
                                                  const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
@@ -123,46 +123,46 @@ public:
    * Object that computes the objective function f(X)
    * at the input iterate X.
    */
-  OptimizationSystem::ComputeObjective *objective_object;
+  OptimizationSystem::ComputeObjective * objective_object;
 
   /**
    * Object that computes the gradient grad_f(X) of the objective function
    * at the input iterate X.
    */
-  OptimizationSystem::ComputeGradient *gradient_object;
+  OptimizationSystem::ComputeGradient * gradient_object;
 
   /**
    * Object that computes the Hessian H_f(X) of the objective function
    * at the input iterate X.
    */
-  OptimizationSystem::ComputeHessian *hessian_object;
+  OptimizationSystem::ComputeHessian * hessian_object;
 
   /**
    * Object that computes the equality constraints vector C_eq(X).
    * This will lead to the constraints C_eq(X) = 0 being imposed.
    */
-  OptimizationSystem::ComputeEqualityConstraints *equality_constraints_object;
+  OptimizationSystem::ComputeEqualityConstraints * equality_constraints_object;
 
   /**
    * Object that computes the Jacobian of C_eq(X).
    */
-  OptimizationSystem::ComputeEqualityConstraintsJacobian *equality_constraints_jacobian_object;
+  OptimizationSystem::ComputeEqualityConstraintsJacobian * equality_constraints_jacobian_object;
 
   /**
    * Object that computes the inequality constraints vector C_ineq(X).
    * This will lead to the constraints C_ineq(X) >= 0 being imposed.
    */
-  OptimizationSystem::ComputeInequalityConstraints *inequality_constraints_object;
+  OptimizationSystem::ComputeInequalityConstraints * inequality_constraints_object;
 
   /**
    * Object that computes the Jacobian of C_ineq(X).
    */
-  OptimizationSystem::ComputeInequalityConstraintsJacobian *inequality_constraints_jacobian_object;
+  OptimizationSystem::ComputeInequalityConstraintsJacobian * inequality_constraints_jacobian_object;
 
   /**
    * Object that computes the lower and upper bounds vectors.
    */
-  OptimizationSystem::ComputeLowerAndUpperBounds *lower_and_upper_bounds_object;
+  OptimizationSystem::ComputeLowerAndUpperBounds * lower_and_upper_bounds_object;
 
   /**
    * @returns a constant reference to the system we are using to
@@ -196,7 +196,7 @@ protected:
   /**
    * A reference to the system we are solving.
    */
-  sys_type& _system;
+  sys_type & _system;
 
   /**
    * Flag indicating if the data structures have been initialized.
