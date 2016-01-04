@@ -65,7 +65,7 @@ public:
    * Initialize system qoi. By default, does nothing in order to maintain backward
    * compatibility for FEMSystem applications that control qoi.
    */
-  virtual void init_qoi( std::vector<Number>& /*sys_qoi*/){}
+  virtual void init_qoi( std::vector<Number> & /*sys_qoi*/){}
 
   /**
    * Clear all the data structures associated with
@@ -104,8 +104,8 @@ public:
    * Only qois included in the supplied \p QoISet need to be
    * assembled.
    */
-  virtual void element_qoi (DiffContext&,
-                            const QoISet&)
+  virtual void element_qoi (DiffContext &,
+                            const QoISet &)
   {}
 
   /**
@@ -116,8 +116,8 @@ public:
    * Only qois included in the supplied \p QoISet need their
    * derivatives assembled.
    */
-  virtual void element_qoi_derivative (DiffContext&,
-                                       const QoISet&)
+  virtual void element_qoi_derivative (DiffContext &,
+                                       const QoISet &)
   {}
 
   /**
@@ -127,8 +127,8 @@ public:
    * Only qois included in the supplied \p QoISet need to be
    * assembled.
    */
-  virtual void side_qoi (DiffContext&,
-                         const QoISet&)
+  virtual void side_qoi (DiffContext &,
+                         const QoISet &)
   {}
 
   /**
@@ -139,8 +139,8 @@ public:
    * Only qois included in the supplied \p QoISet need their
    * derivatives assembled.
    */
-  virtual void side_qoi_derivative (DiffContext&,
-                                    const QoISet&)
+  virtual void side_qoi_derivative (DiffContext &,
+                                    const QoISet &)
   {}
 
   /**
@@ -159,16 +159,18 @@ public:
   /**
    * Method to combine thread-local qois. By default, simply sums thread qois.
    */
-  virtual void thread_join( std::vector<Number>& qoi, const std::vector<Number>& other_qoi,
-                            const QoISet& qoi_indices );
+  virtual void thread_join(std::vector<Number> & qoi,
+                           const std::vector<Number> & other_qoi,
+                           const QoISet & qoi_indices);
 
   /**
    * Method to populate system qoi data structure with process-local qoi. By default, simply
    * sums process qois into system qoi.
    */
-  virtual void parallel_op(const Parallel::Communicator &communicator,
-                           std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
-                           const QoISet& qoi_indices );
+  virtual void parallel_op(const Parallel::Communicator & communicator,
+                           std::vector<Number> & sys_qoi,
+                           std::vector<Number> & local_qoi,
+                           const QoISet & qoi_indices);
 };
 
 } // namespace libMesh

@@ -37,7 +37,7 @@ void DifferentiablePhysics::clear_physics ()
 
 
 
-void DifferentiablePhysics::init_physics (const System& sys)
+void DifferentiablePhysics::init_physics (const System & sys)
 {
   // give us flags for every variable that might be time evolving
   _time_evolving.resize(sys.n_vars(), false);
@@ -46,9 +46,9 @@ void DifferentiablePhysics::init_physics (const System& sys)
 
 
 bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
-                                                   DiffContext &c)
+                                                   DiffContext & c)
 {
-  FEMContext &context = cast_ref<FEMContext&>(c);
+  FEMContext & context = cast_ref<FEMContext &>(c);
 
   for (unsigned int var = 0; var != context.n_vars(); ++var)
     {
@@ -58,16 +58,16 @@ bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
       if (c.get_system().variable(var).type().family != SCALAR)
         continue;
 
-      const std::vector<dof_id_type>& dof_indices =
+      const std::vector<dof_id_type> & dof_indices =
         context.get_dof_indices(var);
 
       const unsigned int n_dofs = cast_int<unsigned int>
         (dof_indices.size());
 
-      DenseSubVector<Number> &Fs = context.get_elem_residual(var);
-      DenseSubMatrix<Number> &Kss = context.get_elem_jacobian( var, var );
+      DenseSubVector<Number> & Fs = context.get_elem_residual(var);
+      DenseSubMatrix<Number> & Kss = context.get_elem_jacobian( var, var );
 
-      const libMesh::DenseSubVector<libMesh::Number> &Us =
+      const libMesh::DenseSubVector<libMesh::Number> & Us =
         context.get_elem_solution(var);
 
       for (unsigned int i=0; i != n_dofs; ++i)
@@ -85,7 +85,7 @@ bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
 
 
 bool DifferentiablePhysics::_eulerian_time_deriv (bool request_jacobian,
-                                                  DiffContext &context)
+                                                  DiffContext & context)
 {
   // For any problem we need time derivative terms
   request_jacobian =
