@@ -42,7 +42,7 @@ using namespace libMesh;
 
 
 // If there's a missing input argument, then print a help message
-void usage_error(const char *progname)
+void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
                << " --dim d               mesh dimension           [default: autodetect]\n"
@@ -60,10 +60,10 @@ void usage_error(const char *progname)
 
 // Get an input argument, or print a help message if it's missing
 template <typename T>
-T assert_argument (GetPot &cl,
-                   const std::string &argname,
-                   const char        *progname,
-                   const T&          defaultarg)
+T assert_argument (GetPot & cl,
+                   const std::string & argname,
+                   const char * progname,
+                   const T & defaultarg)
 {
   if(!cl.search(argname))
     {
@@ -74,7 +74,7 @@ T assert_argument (GetPot &cl,
 }
 
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
@@ -135,12 +135,12 @@ int main(int argc, char** argv)
 
   libmesh_assert_less(sysnum, n_systems);
 
-  System &old_sys = old_es.get_system(sysnum);
+  System & old_sys = old_es.get_system(sysnum);
   std::string current_sys_name = old_sys.name();
 
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
 
-  L2System &new_sys = new_es.add_system<L2System>(current_sys_name);
+  L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
 
   new_sys.time_solver =
     UniquePtr<TimeSolver>(new SteadySolver(new_sys));
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 
   new_es.init();
 
-  DiffSolver& solver = *(new_sys.time_solver->diff_solver().get());
+  DiffSolver & solver = *(new_sys.time_solver->diff_solver().get());
   solver.quiet = false;
   solver.verbose = true;
   solver.relative_step_tolerance = 1e-10;

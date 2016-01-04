@@ -38,7 +38,7 @@ using namespace libMesh;
 
 unsigned char dim = 2; // This gets overridden by most mesh formats
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
   es1.print_info();
 
   std::vector<std::string> sysnames;
-  std::vector<NumericVector<libMesh::Number>*> summed_solutions;
+  std::vector<NumericVector<libMesh::Number> *> summed_solutions;
 
   for (unsigned int s = 0; s != es1.n_systems(); ++s)
     {

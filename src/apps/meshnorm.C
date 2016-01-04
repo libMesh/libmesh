@@ -8,7 +8,7 @@
 
 using namespace libMesh;
 
-void output_norms(const System &sys, const NumericVector<Number>&vec, const std::string& vecname)
+void output_norms(const System & sys, const NumericVector<Number> & vec, const std::string & vecname)
 {
   for (unsigned int k = 0; k != sys.n_vars(); ++k)
     {
@@ -31,7 +31,7 @@ void output_norms(const System &sys, const NumericVector<Number>&vec, const std:
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 
   for (unsigned int i = 0; i != es.n_systems(); ++i)
     {
-      System &sys = es.get_system(i);
+      System & sys = es.get_system(i);
 
       output_norms(sys, *sys.solution, std::string("solution"));
       for (unsigned int j = 0; j != sys.n_vectors(); ++j)

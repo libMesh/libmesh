@@ -45,7 +45,7 @@ using namespace libMesh;
 /**
  * how to use this, and command line processor
  */
-void usage(char *progName)
+void usage(char * progName)
 {
   std::string baseName;
   static std::string helpList =
@@ -96,13 +96,14 @@ void usage(char *progName)
 
 
 
-void process_cmd_line(int argc, char **argv,
-                      std::vector<std::string>& names,
-                      unsigned char& dim,
-                      double& threshold,
-                      XdrMODE& format,
-                      bool& verbose,
-                      bool& quiet)
+void process_cmd_line(int argc,
+                      char ** argv,
+                      std::vector<std::string> & names,
+                      unsigned char & dim,
+                      double & threshold,
+                      XdrMODE & format,
+                      bool & verbose,
+                      bool & quiet)
 {
   char optionStr[] =
     "d:m:l:r:t:abvq?h";
@@ -268,8 +269,8 @@ void process_cmd_line(int argc, char **argv,
  * should _not_ go into EquationSystems::compare(),
  * can go in this do_compare().
  */
-bool do_compare (EquationSystems& les,
-                 EquationSystems& res,
+bool do_compare (EquationSystems & les,
+                 EquationSystems & res,
                  double threshold,
                  bool verbose)
 {
@@ -304,7 +305,7 @@ bool do_compare (EquationSystems& les,
 
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 

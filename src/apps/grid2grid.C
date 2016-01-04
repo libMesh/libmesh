@@ -37,7 +37,7 @@
 using namespace libMesh;
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
@@ -100,14 +100,14 @@ int main (int argc, char** argv)
     for (unsigned int e=0; e<mesh_coarse.n_elem(); e++)
     {
     libMesh::out << "looking for centroid of element " << e << std::endl;
-    const Elem* elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
+    const Elem * elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
 
     libmesh_assert(elem);
     }
     for (unsigned int n=0; n<mesh_coarse.n_nodes(); n++)
     {
     libMesh::out << "looking for node " << n << std::endl;
-    const Elem* elem = octree_coarse.find_element(mesh_coarse.vertex(n));
+    const Elem * elem = octree_coarse.find_element(mesh_coarse.vertex(n));
 
     libmesh_assert(elem);
     }
@@ -133,21 +133,21 @@ int main (int argc, char** argv)
     fe_coarse.attach_quadrature_rule (&qrule);
     fe_fine.attach_quadrature_rule   (&qrule);
 
-    const std::vector<Real>& JxW               = fe_fine.get_JxW();
-    const std::vector<Point>& q_point          = fe_fine.get_xyz();
-    const std::vector<std::vector<Real> >& phi = fe_fine.get_phi();
+    const std::vector<Real> & JxW               = fe_fine.get_JxW();
+    const std::vector<Point> & q_point          = fe_fine.get_xyz();
+    const std::vector<std::vector<Real> > & phi = fe_fine.get_phi();
     const int ivar = atoi(argv[1]);
     Number error = 0.;
 
     // Initial coarse element
-    Elem* coarse_element = mesh_coarse.elem(0);
+    Elem * coarse_element = mesh_coarse.elem(0);
     fe_coarse.reinit (coarse_element);
 
 
     // Loop over fine mesh elements
     for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
       {
-        const Elem* fine_element = mesh_fine.elem(e);
+        const Elem * fine_element = mesh_fine.elem(e);
 
         // Recompute the element--specific data for the current fine-mesh element.
         fe_fine.reinit(fine_element);
@@ -178,7 +178,7 @@ int main (int argc, char** argv)
                 perf_log.pause_event("gp_loop");
                 perf_log.start_event("element lookup");
 
-                coarse_element = const_cast<Elem*>(octree_coarse.find_element(q_point[gp]));
+                coarse_element = const_cast<Elem *>(octree_coarse.find_element(q_point[gp]));
 
                 libmesh_assert(coarse_element);
 
@@ -227,7 +227,7 @@ int main (int argc, char** argv)
 
       std::vector<unsigned char> already_done(mesh_fine.n_nodes(), 0);
 
-      Elem* coarse_element = mesh_coarse.elem(0);
+      Elem * coarse_element = mesh_coarse.elem(0);
 
       for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
         for (unsigned int n=0; n<mesh_fine.elem(e)->n_nodes(); n++)
@@ -238,14 +238,14 @@ int main (int argc, char** argv)
               {
                 already_done[gn] = 1;
 
-                const Point& p = mesh_fine.point(gn);
+                const Point & p = mesh_fine.point(gn);
 
                 if (!coarse_element->contains_point(p))
                   {
                     perf_log.pause_event ("diff_soln_loop");
                     perf_log.start_event ("element lookup 2");
 
-                    coarse_element = const_cast<Elem*>(octree_coarse.find_element(p));
+                    coarse_element = const_cast<Elem *>(octree_coarse.find_element(p));
 
                     libmesh_assert(coarse_element);
 

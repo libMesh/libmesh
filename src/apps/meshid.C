@@ -42,14 +42,14 @@
 void handle_error(int error, std::string message);
 
 // Report error in input flags and exit
-void usage_error(const char *progname);
+void usage_error(const char * progname);
 
 // Generate a random string, seed RNG with current time.
-void gen_random_string(std::string& s, const int len);
+void gen_random_string(std::string & s, const int len);
 
 
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   GetPot cl(argc, argv);
 
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
       std::cerr << "No --input argument found!" << std::endl;
       usage_error(argv[0]);
     }
-  const char* meshname = cl.next("");
+  const char * meshname = cl.next("");
 
   if(!cl.search("--oldid"))
     {
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 
   for (unsigned char mask = 8; mask; mask/=2)
     {
-      // These are char*'s #defined in exodsuII_int.h
+      // These are char *'s #defined in exodsuII_int.h
       switch (flags & mask)
         {
         case BLOCKS:
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 
 #else // LIBMESH_HAVE_EXODUS_API
 
-int main(int, char**)
+int main(int, char **)
 {
   std::cerr << "Error: meshid requires libMesh configured with --enable-exodus" << std::endl;
 }
@@ -230,7 +230,7 @@ void handle_error(int error, std::string message)
 
 
 
-void usage_error(const char *progname)
+void usage_error(const char * progname)
 {
   std::cout << "Usage: " << progname
             << " --input inputmesh --oldid <n> --newid <n> [--nodesetonly | --sidesetonly | --blockonly]"
@@ -240,7 +240,7 @@ void usage_error(const char *progname)
 
 
 
-void gen_random_string(std::string& s, const int len)
+void gen_random_string(std::string & s, const int len)
 {
   static const char alphanum[] =
     "0123456789"

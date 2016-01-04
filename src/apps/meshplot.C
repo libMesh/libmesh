@@ -15,7 +15,7 @@
 #include "libmesh/tecplot_io.h"
 #include "libmesh/vtk_io.h"
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   using namespace libMesh;
 

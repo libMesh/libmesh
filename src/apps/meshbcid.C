@@ -35,7 +35,7 @@
 
 using namespace libMesh;
 
-void usage_error(const char *progname)
+void usage_error(const char * progname)
 {
   libMesh::out << "Usage: " << progname
                << " --dim d --input inputmesh --output outputmesh --newbcid idnum --tests --moretests"
@@ -44,7 +44,7 @@ void usage_error(const char *progname)
   exit(1);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
       libMesh::err << "No --input argument found!" << std::endl;
       usage_error(argv[0]);
     }
-  const char* meshname = cl.next("mesh.xda");
+  const char * meshname = cl.next("mesh.xda");
 
   mesh.read(meshname);
   libMesh::out << "Loaded mesh " << meshname << std::endl;
@@ -137,14 +137,14 @@ int main(int argc, char** argv)
   UniquePtr<FEBase> fe = FEBase::build(dim, FEType(FIRST,LAGRANGE));
   QGauss qface(dim-1, CONSTANT);
   fe->attach_quadrature_rule(&qface);
-  const std::vector<Point> &face_points = fe->get_xyz();
-  const std::vector<Point> &face_normals = fe->get_normals();
+  const std::vector<Point> & face_points = fe->get_xyz();
+  const std::vector<Point> & face_normals = fe->get_normals();
 
   MeshBase::element_iterator           el = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
   for (; el != end_el; ++el)
     {
-      Elem *elem = *el;
+      Elem * elem = *el;
       unsigned int n_sides = elem->n_sides();
       for (unsigned short s=0; s != n_sides; ++s)
         {
@@ -152,8 +152,8 @@ int main(int argc, char** argv)
             continue;
 
           fe->reinit(elem,s);
-          const Point &p = face_points[0];
-          const Point &n = face_normals[0];
+          const Point & p = face_points[0];
+          const Point & n = face_normals[0];
 
           //libMesh::out << "elem = " << elem->id() << std::endl;
           //libMesh::out << "centroid = " << elem->centroid() << std::endl;
