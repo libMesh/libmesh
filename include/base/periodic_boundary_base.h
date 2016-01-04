@@ -60,7 +60,7 @@ public:
   /**
    * Copy constructor
    */
-  PeriodicBoundaryBase(const PeriodicBoundaryBase& other);
+  PeriodicBoundaryBase(const PeriodicBoundaryBase & other);
 
   /**
    * Destructor

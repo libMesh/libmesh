@@ -37,7 +37,7 @@ PeriodicBoundaryBase::PeriodicBoundaryBase() :
 
 
 
-PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase& o) :
+PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase & o) :
   myboundary(o.myboundary),
   pairedboundary(o.pairedboundary),
   variables(o.variables)

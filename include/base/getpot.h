@@ -1575,7 +1575,7 @@ GetPot::_convert_to_type(const std::string& String, const char*) const
 // be more liberal than std C++ in what we interpret as a boolean
 template<>
 inline bool
-GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) const
+GetPot::_convert_to_type<bool>(const std::string& String, const bool & Default) const
 {
   std::string newstring(String);
   //std::transform(newstring.begin(), newstring.end(), newstring.begin(), std::toupper);
@@ -1644,7 +1644,7 @@ GetPot::_convert_to_type_no_default(const char*, const std::string& String, cons
 // be more liberal than std C++ in what we interpret as a boolean
 template<>
 inline bool
-GetPot::_convert_to_type_no_default<bool>(const char* VarName, const std::string& String, const bool&) const
+GetPot::_convert_to_type_no_default<bool>(const char* VarName, const std::string& String, const bool &) const
 {
   std::string newstring(String);
   //std::transform(newstring.begin(), newstring.end(), newstring.begin(), std::toupper);

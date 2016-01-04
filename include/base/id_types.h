@@ -36,8 +36,8 @@ class TestClass {
 public:
   TestClass() : _c(0) {}
   TestClass(unsigned int c) : _c(c) {}
-  TestClass& operator=(unsigned int c) { _c = c; return *this; }
-  bool operator<(const TestClass &l) const { return _c < l._c; }
+  TestClass & operator=(unsigned int c) { _c = c; return *this; }
+  bool operator<(const TestClass & l) const { return _c < l._c; }
   operator int() const { return _c; }
 };
 typedef TestClass subdomain_id_type;
