@@ -40,7 +40,7 @@ public:
    * Default prismatic element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Prism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Prism(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -128,7 +128,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[6+(LIBMESH_DIM>3)];
+  Elem * _elemlinks_data[6+(LIBMESH_DIM>3)];
 
   /**
    * Matrix that tells which vertices define the location

@@ -75,7 +75,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Prism15 (Elem* p=NULL) :
+  Prism15 (Elem * p=NULL) :
     Prism(Prism15::n_nodes(), p, _nodelinks_data)
   {}
 
@@ -149,7 +149,7 @@ public:
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
   /**
    * @returns 2 for all \p n
    */
@@ -194,7 +194,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[15];
+  Node * _nodelinks_data[15];
 
 
 

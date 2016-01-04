@@ -73,7 +73,7 @@ public:
   virtual Point master_point (const unsigned int /*i*/) const libmesh_override
   { libmesh_not_implemented(); return Point(); }
 
-  virtual Node* & set_node (const unsigned int i) libmesh_override
+  virtual Node * & set_node (const unsigned int i) libmesh_override
   { libmesh_not_implemented(); return Elem::set_node(i); }
 
   /**
@@ -89,7 +89,7 @@ public:
 
   virtual void connectivity(const unsigned int,
                             const IOPackage,
-                            std::vector<dof_id_type>&) const libmesh_override
+                            std::vector<dof_id_type> &) const libmesh_override
   { libmesh_not_implemented(); }
 
   virtual ElemType type () const libmesh_override
@@ -185,11 +185,11 @@ protected:
   /**
    * Data for link to (NULL!) parent
    */
-  Elem* _elemlinks_data[1];
+  Elem * _elemlinks_data[1];
 };
 
 // Singleton RemoteElem
-extern const RemoteElem* remote_elem;
+extern const RemoteElem * remote_elem;
 
 } // namespace libMesh
 

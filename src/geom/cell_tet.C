@@ -67,7 +67,7 @@ UniquePtr<Elem> Tet::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  Elem* face = new Tri3;
+  Elem * face = new Tri3;
 
   for (unsigned n=0; n<face->n_nodes(); ++n)
     face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);

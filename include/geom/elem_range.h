@@ -30,8 +30,8 @@ namespace libMesh
 // Forward declarations
 class Elem;
 
-typedef StoredRange<MeshBase::element_iterator,             Elem*>      ElemRange;
-typedef StoredRange<MeshBase::const_element_iterator, const Elem*> ConstElemRange;
+typedef StoredRange<MeshBase::element_iterator,             Elem *>      ElemRange;
+typedef StoredRange<MeshBase::const_element_iterator, const Elem *> ConstElemRange;
 
 } // namespace libMesh
 

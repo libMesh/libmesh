@@ -28,8 +28,8 @@ namespace libMesh
 UniquePtr<Elem> Edge::side (const unsigned int i) const
 {
   libmesh_assert_less (i, 2);
-  const Elem* the_parent = this;
-  Elem *nodeelem = new NodeElem(const_cast<Elem*>(the_parent));
+  const Elem * the_parent = this;
+  Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
   nodeelem->set_node(0) = this->get_node(i);
   return UniquePtr<Elem>(nodeelem);
 }
@@ -38,8 +38,8 @@ UniquePtr<Elem> Edge::side (const unsigned int i) const
 UniquePtr<Elem> Edge::build_side (const unsigned int i, bool) const
 {
   libmesh_assert_less (i, 2);
-  const Elem* the_parent = this;
-  Elem *nodeelem = new NodeElem(const_cast<Elem*>(the_parent));
+  const Elem * the_parent = this;
+  Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
   nodeelem->set_node(0) = this->get_node(i);
   return UniquePtr<Elem>(nodeelem);
 }

@@ -56,8 +56,8 @@ ElemCutter::~ElemCutter()
 
 
 
-bool ElemCutter::is_inside (const Elem &elem,
-                            const std::vector<Real> &vertex_distance_func) const
+bool ElemCutter::is_inside (const Elem & elem,
+                            const std::vector<Real> & vertex_distance_func) const
 {
   libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
 
@@ -71,8 +71,8 @@ bool ElemCutter::is_inside (const Elem &elem,
 
 
 
-bool ElemCutter::is_outside (const Elem &elem,
-                             const std::vector<Real> &vertex_distance_func) const
+bool ElemCutter::is_outside (const Elem & elem,
+                             const std::vector<Real> & vertex_distance_func) const
 {
   libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
 
@@ -86,8 +86,8 @@ bool ElemCutter::is_outside (const Elem &elem,
 
 
 
-bool ElemCutter::is_cut (const Elem &elem,
-                         const std::vector<Real> &vertex_distance_func) const
+bool ElemCutter::is_cut (const Elem & elem,
+                         const std::vector<Real> & vertex_distance_func) const
 {
   libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
 
@@ -108,8 +108,8 @@ bool ElemCutter::is_cut (const Elem &elem,
 
 
 
-void ElemCutter::operator()(const Elem &elem,
-                            const std::vector<Real> &vertex_distance_func)
+void ElemCutter::operator()(const Elem & elem,
+                            const std::vector<Real> & vertex_distance_func)
 
 {
   libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
@@ -123,7 +123,7 @@ void ElemCutter::operator()(const Elem &elem,
     if (this->is_outside(elem, vertex_distance_func))
       {
         //std::cout << "element completely outside\n";
-        _outside_elem.push_back(&elem);
+        _outside_elem.push_back(& elem);
         return;
       }
 
@@ -153,8 +153,8 @@ void ElemCutter::operator()(const Elem &elem,
 
 
 
-void ElemCutter::find_intersection_points(const Elem &elem,
-                                          const std::vector<Real> &vertex_distance_func)
+void ElemCutter::find_intersection_points(const Elem & elem,
+                                          const std::vector<Real> & vertex_distance_func)
 {
   _intersection_pts.clear();
 
@@ -216,8 +216,8 @@ void ElemCutter::cut_1D (const Elem & /*elem*/,
 
 
 
-void ElemCutter::cut_2D (const Elem &elem,
-                         const std::vector<Real> &vertex_distance_func)
+void ElemCutter::cut_2D (const Elem & elem,
+                         const std::vector<Real> & vertex_distance_func)
 {
 #ifndef LIBMESH_HAVE_TRIANGLE
 
@@ -305,8 +305,8 @@ void ElemCutter::cut_2D (const Elem &elem,
 
 
 
-void ElemCutter::cut_3D (const Elem &elem,
-                         const std::vector<Real> &vertex_distance_func)
+void ElemCutter::cut_3D (const Elem & elem,
+                         const std::vector<Real> & vertex_distance_func)
 {
 #ifndef LIBMESH_HAVE_TETGEN
 

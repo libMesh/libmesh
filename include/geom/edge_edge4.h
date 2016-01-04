@@ -47,7 +47,7 @@ public:
    * Constructor. By default this element has no parent.
    */
   explicit
-  Edge4 (Elem* p=NULL) :
+  Edge4 (Elem * p=NULL) :
     Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
 
   /**
@@ -119,7 +119,7 @@ public:
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
    * FIXME: This function could be generalized to work for Edges.
@@ -161,7 +161,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[4];
+  Node * _nodelinks_data[4];
 
 
 

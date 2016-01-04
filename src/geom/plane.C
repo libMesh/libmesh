@@ -35,24 +35,24 @@ Plane::Plane ()
 
 
 
-Plane::Plane (const Point& p,
-              const Point& n)
+Plane::Plane (const Point & p,
+              const Point & n)
 {
   this->create_from_point_normal (p, n);
 }
 
 
 
-Plane::Plane (const Point& p0,
-              const Point& p1,
-              const Point& p2)
+Plane::Plane (const Point & p0,
+              const Point & p1,
+              const Point & p2)
 {
   this->create_from_three_points (p0, p1, p2);
 }
 
 
 
-Plane::Plane (const Plane& other_plane) :
+Plane::Plane (const Plane & other_plane) :
   Surface()
 {
   this->create_from_point_normal(other_plane._point,
@@ -67,7 +67,7 @@ Plane::~Plane ()
 
 
 
-void Plane::create_from_point_normal (const Point& p, const Point& n)
+void Plane::create_from_point_normal (const Point & p, const Point & n)
 {
   _normal = n.unit();
   _point  = p;
@@ -75,9 +75,9 @@ void Plane::create_from_point_normal (const Point& p, const Point& n)
 
 
 
-void Plane::create_from_three_points (const Point& p0,
-                                      const Point& p1,
-                                      const Point& p2)
+void Plane::create_from_three_points (const Point & p0,
+                                      const Point & p1,
+                                      const Point & p2)
 {
   // Just use p0 for the point.
   _point = p0;
@@ -124,7 +124,7 @@ void Plane::yz_plane (const Real xpos)
 
 
 
-bool Plane::above_surface (const Point& p) const
+bool Plane::above_surface (const Point & p) const
 {
   // Create a vector from the surface to point p;
   const Point w = p - _point;
@@ -141,14 +141,14 @@ bool Plane::above_surface (const Point& p) const
 
 
 
-bool Plane::below_surface (const Point& p) const
+bool Plane::below_surface (const Point & p) const
 {
   return ( !this->above_surface (p) );
 }
 
 
 
-bool Plane::on_surface (const Point& p) const
+bool Plane::on_surface (const Point & p) const
 {
   // Create a vector from the surface to point p;
   const Point w = p - _point;
@@ -166,7 +166,7 @@ bool Plane::on_surface (const Point& p) const
 
 
 
-Point Plane::closest_point (const Point& p) const
+Point Plane::closest_point (const Point & p) const
 {
   // Create a vector from the surface to point p;
   const Point w = p - _point;
@@ -181,7 +181,7 @@ Point Plane::closest_point (const Point& p) const
 
 
 
-Point Plane::unit_normal (const Point&) const
+Point Plane::unit_normal (const Point &) const
 {
   return _normal;
 }

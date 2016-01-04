@@ -127,7 +127,7 @@ UniquePtr<Elem> Hex8::build_side (const unsigned int i,
 
   else
     {
-      Elem* face = new Quad4;
+      Elem * face = new Quad4;
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
@@ -153,7 +153,7 @@ UniquePtr<Elem> Hex8::build_edge (const unsigned int i) const
 
 void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
                         const IOPackage iop,
-                        std::vector<dof_id_type>& conn) const
+                        std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -338,7 +338,7 @@ Real Hex8::volume () const
   // The centroid is a convenient point to use
   // for the apex of all the pyramids.
   const Point R = this->centroid();
-  Node* pyr_base[4];
+  Node * pyr_base[4];
 
   Real vol=0.;
 

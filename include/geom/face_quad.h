@@ -57,7 +57,7 @@ public:
    * Default quadrilateral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Quad (const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Quad (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Face(nn, Quad::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -168,7 +168,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[5+(LIBMESH_DIM>2)];
+  Elem * _elemlinks_data[5+(LIBMESH_DIM>2)];
 
   /**
    * Matrix that tells which vertices define the location

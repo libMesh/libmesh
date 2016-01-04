@@ -91,7 +91,7 @@ UniquePtr<Elem> InfPrism::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  Elem* face = NULL;
+  Elem * face = NULL;
 
   switch (i)
     {

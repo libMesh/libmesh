@@ -29,12 +29,12 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tri3 subdivision class member functions
 
-Tri3Subdivision::Tri3Subdivision(Elem *p) : Tri3(p), _subdivision_updated(true)
+Tri3Subdivision::Tri3Subdivision(Elem * p) : Tri3(p), _subdivision_updated(true)
 {
   if (p)
     {
       libmesh_assert_equal_to(p->type(), TRI3SUBDIVISION);
-      Tri3Subdivision* sd_elem = static_cast<Tri3Subdivision*>(p);
+      Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(p);
       _is_ghost = sd_elem->is_ghost();
 
       if (!_is_ghost)
@@ -110,7 +110,7 @@ unsigned int Tri3Subdivision::get_ordered_valence(unsigned int node_id) const
 }
 
 
-Node* Tri3Subdivision::get_ordered_node(unsigned int node_id) const
+Node * Tri3Subdivision::get_ordered_node(unsigned int node_id) const
 {
   libmesh_assert_less(node_id, 3);
   libmesh_assert(_subdivision_updated);

@@ -47,9 +47,9 @@ typedef Threads::spin_mutex InitMutex;
 InitMutex init_mtx;
 
 // map from ElemType to reference element file system object name
-typedef std::map<ElemType, const char*> FileMapType;
+typedef std::map<ElemType, const char *> FileMapType;
 FileMapType ref_elem_file;
-Elem* ref_elem_map[INVALID_ELEM];
+Elem * ref_elem_map[INVALID_ELEM];
 
 
 
@@ -75,18 +75,18 @@ public:
     node_list.clear();
   }
 
-  std::vector<Node*> node_list;
-  std::vector<Elem*> elem_list;
+  std::vector<Node *> node_list;
+  std::vector<Elem *> elem_list;
 };
 
 // singleton object, dynamically created and then
 // removed at program exit
-SingletonCache *singleton_cache = NULL;
+SingletonCache * singleton_cache = NULL;
 
 
 
-Elem* read_ref_elem (const ElemType Type,
-                     std::istream &in)
+Elem * read_ref_elem (const ElemType Type,
+                      std::istream & in)
 {
   libmesh_assert (singleton_cache != NULL);
 
@@ -113,7 +113,7 @@ Elem* read_ref_elem (const ElemType Type,
   libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type]);
 
   // Construct the elem
-  Elem *elem = Elem::build(static_cast<ElemType>(elem_type)).release();
+  Elem * elem = Elem::build(static_cast<ElemType>(elem_type)).release();
 
   // We are expecing an identity map, so assert it!
   for (unsigned int n=0; n<n_nodes; n++)
@@ -126,7 +126,7 @@ Elem* read_ref_elem (const ElemType Type,
     {
       in >> x >> y >> z;
 
-      Node *node = new Node(x,y,z,n);
+      Node * node = new Node(x,y,z,n);
       singleton_cache->node_list.push_back(node);
 
       elem->set_node(n) = node;

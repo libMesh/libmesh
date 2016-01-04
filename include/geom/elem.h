@@ -101,9 +101,9 @@ protected:
    */
   Elem (const unsigned int n_nodes,
         const unsigned int n_sides,
-        Elem* parent,
-        Elem** elemlinkdata,
-        Node** nodelinkdata);
+        Elem * parent,
+        Elem ** elemlinkdata,
+        Node ** nodelinkdata);
 
 public:
 
@@ -144,22 +144,22 @@ public:
    * @returns the local index for the \p Node pointer \p node_ptr,
    * or \p invalid_id if \p node_ptr is not a local node.
    */
-  unsigned int get_node_index (const Node* node_ptr) const;
+  unsigned int get_node_index (const Node * node_ptr) const;
 
   /**
    * @returns a pointer to an array of local node pointers.
    */
-  const Node* const * get_nodes () const;
+  const Node * const * get_nodes () const;
 
   /**
    * @returns the pointer to local \p Node \p i.
    */
-  Node* get_node (const unsigned int i) const;
+  Node * get_node (const unsigned int i) const;
 
   /**
    * @returns the pointer to local \p Node \p i as a writeable reference.
    */
-  virtual Node* & set_node (const unsigned int i);
+  virtual Node * & set_node (const unsigned int i);
 
   /**
    * @returns the subdomain that this element belongs to.
@@ -196,7 +196,7 @@ public:
    * object, so for example all \p Quad4 elements share the same
    * \p reference_elem().
    */
-  const Elem* reference_elem () const;
+  const Elem * reference_elem () const;
 
   /**
    * @returns an id associated with the \p s side of this element.
@@ -219,7 +219,7 @@ public:
    * nodes, regardless of how those nodes might be numbered local
    * to the elements.
    */
-  bool operator == (const Elem& rhs) const;
+  bool operator == (const Elem & rhs) const;
 
   /**
    * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
@@ -228,7 +228,7 @@ public:
    * has been called and this returns \p NULL then the side is on
    * a boundary of the domain.
    */
-  Elem* neighbor (const unsigned int i) const;
+  Elem * neighbor (const unsigned int i) const;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -237,10 +237,10 @@ public:
    * boundary, it will return a corresponding element on the opposite
    * side.
    */
-  const Elem* topological_neighbor (const unsigned int i,
-                                    const MeshBase& mesh,
-                                    const PointLocatorBase& point_locator,
-                                    const PeriodicBoundaries* pb) const;
+  const Elem * topological_neighbor (const unsigned int i,
+                                     const MeshBase & mesh,
+                                     const PointLocatorBase & point_locator,
+                                     const PeriodicBoundaries * pb) const;
 
   /**
    * @returns a writeable pointer to the \f$ i^{th} \f$ neighbor of
@@ -248,45 +248,45 @@ public:
    * periodic boundary, it will return a corresponding element on the
    * opposite side.
    */
-  Elem* topological_neighbor (const unsigned int i,
-                              MeshBase& mesh,
-                              const PointLocatorBase& point_locator,
-                              const PeriodicBoundaries* pb);
+  Elem * topological_neighbor (const unsigned int i,
+                               MeshBase & mesh,
+                               const PointLocatorBase & point_locator,
+                               const PeriodicBoundaries * pb);
 
   /**
    * @return \p true if the element \p elem in question is a neighbor or
    * topological neighbor of this element, \p false otherwise.
    */
-  bool has_topological_neighbor (const Elem* elem,
-                                 const MeshBase& mesh,
-                                 const PointLocatorBase& point_locator,
-                                 PeriodicBoundaries* pb) const;
+  bool has_topological_neighbor (const Elem * elem,
+                                 const MeshBase & mesh,
+                                 const PointLocatorBase & point_locator,
+                                 PeriodicBoundaries * pb) const;
 #endif
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
    */
-  void set_neighbor (const unsigned int i, Elem* n);
+  void set_neighbor (const unsigned int i, Elem * n);
 
   /**
    * @returns \p true if the element \p elem in question is a neighbor
    * of this element, \p false otherwise.
    */
-  bool has_neighbor (const Elem* elem) const;
+  bool has_neighbor (const Elem * elem) const;
 
   /**
    * If the element \p elem in question is a neighbor
    * of a child of this element, this returns a pointer
    * to that child.  Otherwise it returns NULL.
    */
-  Elem* child_neighbor (Elem* elem) const;
+  Elem * child_neighbor (Elem * elem) const;
 
   /**
    * If the element \p elem in question is a neighbor
    * of a child of this element, this returns a pointer
    * to that child.  Otherwise it returns NULL.
    */
-  const Elem* child_neighbor (const Elem* elem) const;
+  const Elem * child_neighbor (const Elem * elem) const;
 
   /**
    * @returns \p true if this element has a side coincident
@@ -306,7 +306,7 @@ public:
    * I.e. if s = a->which_neighbor_am_i(e); then
    * a->neighbor(s) will be an ancestor of e;
    */
-  unsigned int which_neighbor_am_i(const Elem *e) const;
+  unsigned int which_neighbor_am_i(const Elem * e) const;
 
   /**
    * This function tells you which side the boundary element \p e is.
@@ -315,20 +315,20 @@ public:
    *
    * Returns \p invalid_uint if \p e is not a side of \p this
    */
-  unsigned int which_side_am_i(const Elem *e) const;
+  unsigned int which_side_am_i(const Elem * e) const;
 
   /**
    * This function returns true iff a vertex of e is contained
    * in this element
    */
-  bool contains_vertex_of(const Elem *e) const;
+  bool contains_vertex_of(const Elem * e) const;
 
   /**
    * This function returns true iff an edge of \p e is contained in
    * this element.  (Internally, this is done by checking whether at
    * least two vertices of \p e are contained in this element).
    */
-  bool contains_edge_of(const Elem *e) const;
+  bool contains_edge_of(const Elem * e) const;
 
   /**
    * This function finds all active elements (including this one)
@@ -346,22 +346,22 @@ public:
    * considered to "touch" the current element and will not be found
    * with this method.
    */
-  void find_point_neighbors(const Point &p,
-                            std::set<const Elem *> &neighbor_set) const;
+  void find_point_neighbors(const Point & p,
+                            std::set<const Elem *> & neighbor_set) const;
 
   /**
    * This function finds all active elements (including this one) in
    * the same manifold as this element which touch this active element
    * at any point
    */
-  void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
+  void find_point_neighbors(std::set<const Elem *> & neighbor_set) const;
 
   /**
    * This function finds all active elements (including this one) in
    * the same manifold as start_elem (which must be active and must
    * touch this element) which touch this element at any point
    */
-  void find_point_neighbors(std::set<const Elem *> &neighbor_set,
+  void find_point_neighbors(std::set<const Elem *> & neighbor_set,
                             const Elem * start_elem) const;
 
   /**
@@ -369,9 +369,9 @@ public:
    * this element which touch the current active element along the
    * whole edge defined by the two points \p p1 and \p p2
    */
-  void find_edge_neighbors(const Point& p1,
-                           const Point& p2,
-                           std::set<const Elem *> &neighbor_set) const;
+  void find_edge_neighbors(const Point & p1,
+                           const Point & p2,
+                           std::set<const Elem *> & neighbor_set) const;
 
   /**
    * This function finds all active elements in the same manifold as
@@ -381,14 +381,14 @@ public:
    * In this case, elements are included even if they do not touch a
    * *whole* edge of this element.
    */
-  void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
+  void find_edge_neighbors(std::set<const Elem *> & neighbor_set) const;
 
   /**
    * This function finds all active elements (*not* including this
    * one) in the parent manifold of this element whose intersection
    * with this element has non-zero measure.
    */
-  void find_interior_neighbors(std::set<const Elem *> &neighbor_set) const;
+  void find_interior_neighbors(std::set<const Elem *> & neighbor_set) const;
 
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
@@ -428,7 +428,7 @@ public:
    */
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const = 0;
+                            std::vector<dof_id_type> & conn) const = 0;
 
   /**
    * Writes the element connectivity for various IO packages
@@ -437,7 +437,7 @@ public:
    * write_tecplot_connectivity(...) and write_ucd_connectivity(...)
    * routines.
    */
-  void write_connectivity (std::ostream& out,
+  void write_connectivity (std::ostream & out,
                            const IOPackage iop) const;
 
   /**
@@ -690,13 +690,13 @@ public:
    * is merely "nearby" an element to within some tolerance. For that,
    * use Elem::close_to_point() instead.
    */
-  virtual bool contains_point (const Point& p, Real tol=TOLERANCE) const;
+  virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const;
 
   /**
    * @returns true if this element is "close" to the point p, where
    * "close" is determined by the tolerance tol.
    */
-  virtual bool close_to_point(const Point& p, Real tol) const;
+  virtual bool close_to_point(const Point & p, Real tol) const;
 
 private:
   /**
@@ -705,7 +705,7 @@ private:
    * used in the bounding box optimization, the map_tol tolerance is used
    * in the calls to inverse_map() and on_reference_element().
    */
-  bool point_test(const Point& p, Real box_tol, Real map_tol) const;
+  bool point_test(const Point & p, Real box_tol, Real map_tol) const;
 
 public:
   /**
@@ -723,7 +723,7 @@ public:
   /**
    * Prints relevant information about the element.
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out) const;
 
   /**
    * Prints relevant information about the element to a string.
@@ -769,25 +769,25 @@ public:
    * child of a child of \p this, etc.
    * Always returns \p false if AMR is disabled.
    */
-  bool is_ancestor_of(const Elem *descendant) const;
+  bool is_ancestor_of(const Elem * descendant) const;
 
   /**
    * @returns a const pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
-  const Elem* parent () const;
+  const Elem * parent () const;
 
   /**
    * @returns a pointer to the element's parent.  Returns \p NULL if
    * the element was not created via refinement, i.e. was read from file.
    */
-  Elem* parent ();
+  Elem * parent ();
 
   /**
    * Sets the pointer to the element's parent.
    * Dangerous to use in high-level code.
    */
-  void set_parent (Elem *p);
+  void set_parent (Elem * p);
 
   /**
    * @returns a pointer to the element's top-most (i.e. level-0) parent.
@@ -795,7 +795,7 @@ public:
    * if this is a level-1 element, this element's grandparent if this is
    * a level-2 element, etc...
    */
-  const Elem* top_parent () const;
+  const Elem * top_parent () const;
 
   /**
    * In some cases it is desireable to extract the boundary (or a subset thereof)
@@ -809,15 +809,15 @@ public:
    * such cases no data storage for an interior parent pointer has
    * been allocated.
    */
-  const Elem* interior_parent () const;
+  const Elem * interior_parent () const;
 
-  Elem* interior_parent ();
+  Elem * interior_parent ();
 
   /**
    * Sets the pointer to the element's interior_parent.
    * Dangerous to use in high-level code.
    */
-  void set_interior_parent (Elem *p);
+  void set_interior_parent (Elem * p);
 
   /**
    * @returns the magnitude of the distance between nodes n1 and n2.
@@ -915,14 +915,14 @@ public:
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
    */
-  Elem* child (const unsigned int i) const;
+  Elem * child (const unsigned int i) const;
 
 private:
   /**
    * Sets the pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
    */
-  void set_child (unsigned int c, Elem *elem);
+  void set_child (unsigned int c, Elem * elem);
 
 public:
   /**
@@ -930,7 +930,7 @@ public:
    * I.e. if c = a->which_child_am_i(e); then
    * a->child(c) will be e;
    */
-  unsigned int which_child_am_i(const Elem *e) const;
+  unsigned int which_child_am_i(const Elem * e) const;
 
   /**
    * @returns true iff the specified child is on the
@@ -952,7 +952,7 @@ public:
    * memory in the parent's _children array, otherwise, it just sets
    * the pointer.
    */
-  void add_child (Elem* elem);
+  void add_child (Elem * elem);
 
   /**
    * Adds a new child pointer to the specified index in the array of
@@ -960,13 +960,13 @@ public:
    * this method allocates memory in the parent's _children array,
    * otherwise, it just sets the pointer.
    */
-  void add_child (Elem* elem, unsigned int c);
+  void add_child (Elem * elem, unsigned int c);
 
   /**
    * Replaces the child pointer at the specified index in the array of
    * children of this element.
    */
-  void replace_child (Elem* elem, unsigned int c);
+  void replace_child (Elem * elem, unsigned int c);
 
   /**
    * Fills the vector \p family with the children of this element,
@@ -979,14 +979,14 @@ public:
    * The family tree only includes ancestor and active elements; for
    * subactive elements as well, use total_family_tree.
    */
-  void family_tree (std::vector<const Elem*>& family,
+  void family_tree (std::vector<const Elem *> & family,
                     const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but also adds any subactive
    * descendants.
    */
-  void total_family_tree (std::vector<const Elem*>& active_family,
+  void total_family_tree (std::vector<const Elem *> & active_family,
                           const bool reset=true) const;
 
   /**
@@ -995,14 +995,14 @@ public:
    * elements from the vector created by \p family_tree, but is
    * implemented more efficiently.
    */
-  void active_family_tree (std::vector<const Elem*>& active_family,
+  void active_family_tree (std::vector<const Elem *> & active_family,
                            const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but only adds elements
    * which are next to \p side.
    */
-  void family_tree_by_side (std::vector<const Elem*>& family,
+  void family_tree_by_side (std::vector<const Elem *> & family,
                             const unsigned int side,
                             const bool reset=true) const;
 
@@ -1010,7 +1010,7 @@ public:
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p side.
    */
-  void active_family_tree_by_side (std::vector<const Elem*>& family,
+  void active_family_tree_by_side (std::vector<const Elem *> & family,
                                    const unsigned int side,
                                    const bool reset=true) const;
 
@@ -1018,8 +1018,8 @@ public:
    * Same as the \p family_tree() member, but only adds elements
    * which are next to \p neighbor.
    */
-  void family_tree_by_neighbor (std::vector<const Elem*>& family,
-                                const Elem *neighbor,
+  void family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                const Elem * neighbor,
                                 const bool reset=true) const;
 
   /**
@@ -1028,17 +1028,17 @@ public:
    * \p this->has_neighbor(neighbor) and
    * \p neighbor->is_ancestor(subneighbor)
    */
-  void family_tree_by_subneighbor (std::vector<const Elem*>& family,
-                                   const Elem *neighbor,
-                                   const Elem *subneighbor,
+  void family_tree_by_subneighbor (std::vector<const Elem *> & family,
+                                   const Elem * neighbor,
+                                   const Elem * subneighbor,
                                    const bool reset=true) const;
 
   /**
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p neighbor.
    */
-  void active_family_tree_by_neighbor (std::vector<const Elem*>& family,
-                                       const Elem *neighbor,
+  void active_family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                       const Elem * neighbor,
                                        const bool reset=true) const;
 
   /**
@@ -1072,7 +1072,7 @@ public:
    * are descended from this and which share a side with the
    * active \p neighbor
    */
-  unsigned int min_p_level_by_neighbor (const Elem* neighbor,
+  unsigned int min_p_level_by_neighbor (const Elem * neighbor,
                                         unsigned int current_min) const;
 
   /**
@@ -1081,7 +1081,7 @@ public:
    * descended from this and which share a side with the
    * active \p neighbor
    */
-  unsigned int min_new_p_level_by_neighbor (const Elem* neighbor,
+  unsigned int min_new_p_level_by_neighbor (const Elem * neighbor,
                                             unsigned int current_min) const;
 
   /**
@@ -1099,7 +1099,7 @@ public:
   /**
    * Refine the element.
    */
-  virtual void refine (MeshRefinement& mesh_refinement);
+  virtual void refine (MeshRefinement & mesh_refinement);
 
   /**
    * Coarsen the element.  This is not
@@ -1151,7 +1151,7 @@ public:
    * Useful iterator typedefs
    */
   typedef Predicates::multi_predicate Predicate;
-  //typedef variant_filter_iterator<Elem*, Predicate> side_iterator;
+  //typedef variant_filter_iterator<Elem *, Predicate> side_iterator;
 
   /**
    * Data structure for iterating over sides.  Defined at the end of
@@ -1204,7 +1204,7 @@ public:
    * \p UniquePtr<>
    */
   static UniquePtr<Elem> build (const ElemType type,
-                                Elem* p=NULL);
+                                Elem * p=NULL);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1221,7 +1221,7 @@ public:
    * should bracket node n of child c.
    */
   virtual
-  const std::vector<std::pair<unsigned char, unsigned char> >&
+  const std::vector<std::pair<unsigned char, unsigned char> > &
   parent_bracketing_nodes(unsigned int c,
                           unsigned int n) const;
 
@@ -1333,19 +1333,19 @@ protected:
   /**
    * Pointers to the nodes we are connected to.
    */
-  Node** _nodes;
+  Node ** _nodes;
 
   /**
    * Pointers to this element's parent and neighbors, and for
    * lower-dimensional elements interior_parent.
    */
-  Elem** _elemlinks;
+  Elem ** _elemlinks;
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Pointers to this element's children.
    */
-  Elem** _children;
+  Elem ** _children;
 #endif
 
   /**
@@ -1386,7 +1386,7 @@ protected:
 // global Elem functions
 
 inline
-std::ostream& operator << (std::ostream& os, const Elem& e)
+std::ostream & operator << (std::ostream & os, const Elem & e)
 {
   e.print_info(os);
   return os;
@@ -1398,9 +1398,9 @@ std::ostream& operator << (std::ostream& os, const Elem& e)
 inline
 Elem::Elem(const unsigned int nn,
            const unsigned int ns,
-           Elem* p,
-           Elem** elemlinkdata,
-           Node** nodelinkdata) :
+           Elem * p,
+           Elem ** elemlinkdata,
+           Node ** nodelinkdata) :
   _nodes(nodelinkdata),
   _elemlinks(elemlinkdata),
 #ifdef LIBMESH_ENABLE_AMR
@@ -1424,7 +1424,7 @@ Elem::Elem(const unsigned int nn,
     }
 
   // Initialize the neighbors/parent data structure
-  // _elemlinks = new Elem*[ns+1];
+  // _elemlinks = new Elem *[ns+1];
 
   if (_elemlinks)
     {
@@ -1528,7 +1528,7 @@ const Node * const * Elem::get_nodes () const
 
 
 inline
-Node* Elem::get_node (const unsigned int i) const
+Node * Elem::get_node (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1539,7 +1539,7 @@ Node* Elem::get_node (const unsigned int i) const
 
 
 inline
-unsigned int Elem::get_node_index (const Node* node_ptr) const
+unsigned int Elem::get_node_index (const Node * node_ptr) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     if (this->_nodes[n] == node_ptr)
@@ -1551,7 +1551,7 @@ unsigned int Elem::get_node_index (const Node* node_ptr) const
 
 
 inline
-Node* & Elem::set_node (const unsigned int i)
+Node * & Elem::set_node (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_nodes());
 
@@ -1577,7 +1577,7 @@ subdomain_id_type & Elem::subdomain_id ()
 
 
 inline
-Elem* Elem::neighbor (const unsigned int i) const
+Elem * Elem::neighbor (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_neighbors());
 
@@ -1587,7 +1587,7 @@ Elem* Elem::neighbor (const unsigned int i) const
 
 
 inline
-void Elem::set_neighbor (const unsigned int i, Elem* n)
+void Elem::set_neighbor (const unsigned int i, Elem * n)
 {
   libmesh_assert_less (i, this->n_neighbors());
 
@@ -1597,7 +1597,7 @@ void Elem::set_neighbor (const unsigned int i, Elem* n)
 
 
 inline
-bool Elem::has_neighbor (const Elem* elem) const
+bool Elem::has_neighbor (const Elem * elem) const
 {
   for (unsigned int n=0; n<this->n_neighbors(); n++)
     if (this->neighbor(n) == elem)
@@ -1609,7 +1609,7 @@ bool Elem::has_neighbor (const Elem* elem) const
 
 
 inline
-Elem* Elem::child_neighbor (Elem* elem) const
+Elem * Elem::child_neighbor (Elem * elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     if (elem->neighbor(n) &&
@@ -1622,7 +1622,7 @@ Elem* Elem::child_neighbor (Elem* elem) const
 
 
 inline
-const Elem* Elem::child_neighbor (const Elem* elem) const
+const Elem * Elem::child_neighbor (const Elem * elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     if (elem->neighbor(n) &&
@@ -1645,11 +1645,11 @@ bool Elem::on_boundary () const
 
 
 inline
-unsigned int Elem::which_neighbor_am_i (const Elem* e) const
+unsigned int Elem::which_neighbor_am_i (const Elem * e) const
 {
   libmesh_assert(e);
 
-  const Elem* eparent = e;
+  const Elem * eparent = e;
 
   while (eparent->level() > this->level())
     {
@@ -1667,7 +1667,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 
 
 inline
-unsigned int Elem::which_side_am_i (const Elem* e) const
+unsigned int Elem::which_side_am_i (const Elem * e) const
 {
   libmesh_assert(e);
 
@@ -1743,7 +1743,7 @@ bool Elem::subactive() const
     return false;
   if (!this->has_children())
     return true;
-  for (const Elem* my_ancestor = this->parent();
+  for (const Elem * my_ancestor = this->parent();
        my_ancestor != NULL;
        my_ancestor = my_ancestor->parent())
     if (my_ancestor->active())
@@ -1793,7 +1793,7 @@ bool Elem::is_ancestor_of(const Elem *
                           ) const
 {
 #ifdef LIBMESH_ENABLE_AMR
-  const Elem *e = descendant;
+  const Elem * e = descendant;
   while (e)
     {
       if (this == e)
@@ -1807,7 +1807,7 @@ bool Elem::is_ancestor_of(const Elem *
 
 
 inline
-const Elem* Elem::parent () const
+const Elem * Elem::parent () const
 {
   return _elemlinks[0];
 }
@@ -1815,7 +1815,7 @@ const Elem* Elem::parent () const
 
 
 inline
-Elem* Elem::parent ()
+Elem * Elem::parent ()
 {
   return _elemlinks[0];
 }
@@ -1823,7 +1823,7 @@ Elem* Elem::parent ()
 
 
 inline
-void Elem::set_parent (Elem *p)
+void Elem::set_parent (Elem * p)
 {
   _elemlinks[0] = p;
 }
@@ -1831,9 +1831,9 @@ void Elem::set_parent (Elem *p)
 
 
 inline
-const Elem* Elem::top_parent () const
+const Elem * Elem::top_parent () const
 {
-  const Elem* tp = this;
+  const Elem * tp = this;
 
   // Keep getting the element's parent
   // until that parent is at level-0
@@ -1897,7 +1897,7 @@ unsigned int Elem::p_level() const
 #ifdef LIBMESH_ENABLE_AMR
 
 inline
-Elem* Elem::child (const unsigned int i) const
+Elem * Elem::child (const unsigned int i) const
 {
   libmesh_assert(_children);
   libmesh_assert(_children[i]);
@@ -1908,7 +1908,7 @@ Elem* Elem::child (const unsigned int i) const
 
 
 inline
-void Elem::set_child (unsigned int c, Elem *elem)
+void Elem::set_child (unsigned int c, Elem * elem)
 {
   libmesh_assert (this->has_children());
 
@@ -1918,7 +1918,7 @@ void Elem::set_child (unsigned int c, Elem *elem)
 
 
 inline
-unsigned int Elem::which_child_am_i (const Elem* e) const
+unsigned int Elem::which_child_am_i (const Elem * e) const
 {
   libmesh_assert(e);
   libmesh_assert (this->has_children());
@@ -2122,7 +2122,7 @@ class Elem::SideIter
 public:
   // Constructor with arguments.
   SideIter(const unsigned int side_number,
-           Elem* parent)
+           Elem * parent)
     : _side(),
       _side_ptr(NULL),
       _parent(parent),
@@ -2140,7 +2140,7 @@ public:
 
 
   // Copy constructor
-  SideIter(const SideIter& other)
+  SideIter(const SideIter & other)
     : _side(),
       _side_ptr(NULL),
       _parent(other._parent),
@@ -2149,7 +2149,7 @@ public:
 
 
   // op=
-  SideIter& operator=(const SideIter& other)
+  SideIter & operator=(const SideIter & other)
   {
     this->_parent      = other._parent;
     this->_side_number = other._side_number;
@@ -2157,7 +2157,7 @@ public:
   }
 
   // unary op*
-  Elem*& operator*() const
+  Elem *& operator*() const
   {
     // Set the UniquePtr
     this->_update_side_ptr();
@@ -2167,7 +2167,7 @@ public:
   }
 
   // op++
-  SideIter& operator++()
+  SideIter & operator++()
   {
     ++_side_number;
     return *this;
@@ -2175,7 +2175,7 @@ public:
 
   // op==  Two side iterators are equal if they have
   // the same side number and the same parent element.
-  bool operator == (const SideIter& other) const
+  bool operator == (const SideIter & other) const
   {
     return (this->_side_number == other._side_number &&
             this->_parent      == other._parent);
@@ -2215,10 +2215,10 @@ private:
   // calls delete on the pointer passed back?  Well, this is an issue
   // which is not addressed by the iterators in libMesh.  Basically it
   // is a bad idea to ever call delete on an iterator from the library.
-  mutable Elem* _side_ptr;
+  mutable Elem * _side_ptr;
 
   // Pointer to the parent Elem class which generated this iterator
-  Elem* _parent;
+  Elem * _parent;
 
   // A counter variable which keeps track of the side number
   unsigned int _side_number;
@@ -2253,15 +2253,15 @@ Elem::SideIter Elem::_last_side()
  * The definition of the struct used for iterating over sides.
  */
 struct
-Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem*>
+Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
-  side_iterator (const IterType& d,
-                 const IterType& e,
-                 const PredType& p ) :
+  side_iterator (const IterType & d,
+                 const IterType & e,
+                 const PredType & p ) :
     variant_filter_iterator<Elem::Predicate,
-    Elem*>(d,e,p) {}
+    Elem *>(d,e,p) {}
 };
 
 

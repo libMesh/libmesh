@@ -89,7 +89,7 @@ UniquePtr<Elem> Pyramid::side (const unsigned int i) const
   libmesh_assert_less (i, this->n_sides());
 
   // To be returned wrapped in an UniquePtr
-  Elem* face = NULL;
+  Elem * face = NULL;
 
   // Set up the type of element
   switch (i)

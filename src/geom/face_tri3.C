@@ -116,7 +116,7 @@ UniquePtr<Elem> Tri3::build_side (const unsigned int i,
 
   else
     {
-      Elem* edge = new Edge2;
+      Elem * edge = new Edge2;
       edge->subdomain_id() = this->subdomain_id();
 
       // Set the nodes
@@ -133,7 +133,7 @@ UniquePtr<Elem> Tri3::build_side (const unsigned int i,
 
 void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
                         const IOPackage iop,
-                        std::vector<dof_id_type>& conn) const
+                        std::vector<dof_id_type> & conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);

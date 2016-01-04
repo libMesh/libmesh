@@ -54,9 +54,9 @@ public:
   /**
    * Constructor.  Creates a side from an element.
    */
-  Side (const Elem* parent_in,
+  Side (const Elem * parent_in,
         const unsigned int side_in) :
-    SideType(const_cast<Elem*>(parent_in)),
+    SideType(const_cast<Elem *>(parent_in)),
     _side_number(side_in)
   {
     libmesh_assert(parent_in);
@@ -72,7 +72,7 @@ public:
   /**
    * Setting a side node changes the node on the parent
    */
-  virtual Node* & set_node (const unsigned int i) libmesh_override
+  virtual Node * & set_node (const unsigned int i) libmesh_override
   {
     libmesh_assert_less (i, this->n_nodes());
     return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
@@ -117,9 +117,9 @@ public:
   /**
    * Constructor.  Creates a side from an element.
    */
-  SideEdge (const Elem* my_parent,
+  SideEdge (const Elem * my_parent,
             const unsigned int my_edge) :
-    EdgeType(const_cast<Elem*>(my_parent)),
+    EdgeType(const_cast<Elem *>(my_parent)),
     _edge_number(my_edge)
   {
     libmesh_assert(my_parent);
@@ -134,7 +134,7 @@ public:
   /**
    * Setting an edge node changes the node on the parent
    */
-  virtual Node* & set_node (const unsigned int i) libmesh_override
+  virtual Node * & set_node (const unsigned int i) libmesh_override
   {
     libmesh_assert_less (i, this->n_nodes());
     return this->parent()->set_node (ParentType::edge_nodes_map[_edge_number][i]);

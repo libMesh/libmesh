@@ -38,7 +38,7 @@ namespace libMesh
  */
 #ifdef LIBMESH_ENABLE_AMR
 
-void Elem::refine (MeshRefinement& mesh_refinement)
+void Elem::refine (MeshRefinement & mesh_refinement)
 {
   libmesh_assert_equal_to (this->refinement_flag(), Elem::REFINE);
   libmesh_assert (this->active());
@@ -46,13 +46,13 @@ void Elem::refine (MeshRefinement& mesh_refinement)
   // Create my children if necessary
   if (!_children)
     {
-      _children = new Elem*[this->n_children()];
+      _children = new Elem *[this->n_children()];
 
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {
           _children[c] = Elem::build(this->type(), this).release();
-          Elem *current_child = this->child(c);
+          Elem * current_child = this->child(c);
 
           current_child->set_refinement_flag(Elem::JUST_REFINED);
           current_child->set_p_level(parent_p_level);
@@ -60,7 +60,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 
           for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
             {
-              Node *node =
+              Node * node =
                 mesh_refinement.add_node(*this, c, nc,
                                          current_child->processor_id());
               node->set_n_systems (this->n_systems());
@@ -76,7 +76,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {
-          Elem *current_child = this->child(c);
+          Elem * current_child = this->child(c);
           libmesh_assert(current_child->subactive());
           current_child->set_refinement_flag(Elem::JUST_REFINED);
           current_child->set_p_level(parent_p_level);
@@ -112,7 +112,7 @@ void Elem::coarsen()
   // re-compute hanging node nodal locations
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      Elem *mychild = this->child(c);
+      Elem * mychild = this->child(c);
       if (mychild == remote_elem)
         continue;
       for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
@@ -147,7 +147,7 @@ void Elem::coarsen()
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      Elem *mychild = this->child(c);
+      Elem * mychild = this->child(c);
       if (mychild == remote_elem)
         continue;
       libmesh_assert_equal_to (mychild->refinement_flag(), Elem::COARSEN);

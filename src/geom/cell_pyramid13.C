@@ -140,7 +140,7 @@ UniquePtr<Elem> Pyramid13::build_side (const unsigned int i, bool proxy) const
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      Elem * face = NULL;
 
       switch (i)
         {
@@ -187,7 +187,7 @@ UniquePtr<Elem> Pyramid13::build_edge (const unsigned int i) const
 
 void Pyramid13::connectivity(const unsigned int libmesh_dbg_var(sc),
                              const IOPackage iop,
-                             std::vector<dof_id_type>& /*conn*/) const
+                             std::vector<dof_id_type> & /*conn*/) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

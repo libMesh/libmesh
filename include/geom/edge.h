@@ -48,8 +48,8 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Edge (const unsigned int nn,
-        Elem* p,
-        Node** nodelinkdata) :
+        Elem * p,
+        Node ** nodelinkdata) :
     Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -158,7 +158,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[3+(LIBMESH_DIM>1)];
+  Elem * _elemlinks_data[3+(LIBMESH_DIM>1)];
 
 #ifdef LIBMESH_ENABLE_AMR
 

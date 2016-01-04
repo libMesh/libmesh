@@ -54,7 +54,7 @@ namespace libMesh
 
 // Pointer to singleton Remote Element (to be created in
 // libMesh::init()
-const RemoteElem* remote_elem;
+const RemoteElem * remote_elem;
 
 
 RemoteElem::~RemoteElem()

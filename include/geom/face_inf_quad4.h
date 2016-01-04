@@ -56,7 +56,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfQuad4 (Elem* p=NULL) :
+  InfQuad4 (Elem * p=NULL) :
     InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
 
   /**
@@ -118,7 +118,7 @@ public:
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
    * @returns \p true when this element contains the point
@@ -126,7 +126,7 @@ public:
    * about the envelope can help avoiding slightly more
    * expensive computations.
    */
-  virtual bool contains_point (const Point& p, Real tol=TOLERANCE) const libmesh_override;
+  virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -140,7 +140,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[4];
+  Node * _nodelinks_data[4];
 
 
 

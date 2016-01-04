@@ -48,7 +48,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Edge2 (Elem* p=NULL) :
+  Edge2 (Elem * p=NULL) :
     Edge(Edge2::n_nodes(), p, _nodelinks_data) {}
 
   /**
@@ -119,7 +119,7 @@ public:
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
    * An optimized method for computing the length of a 2-node edge.
@@ -152,7 +152,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[2];
+  Node * _nodelinks_data[2];
 
 
 
