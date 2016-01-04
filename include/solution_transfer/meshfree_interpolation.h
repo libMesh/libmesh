@@ -64,12 +64,12 @@ public:
    * Other \p ParallelizationStrategy techniques will be implemented
    * as needed.
    */
-  enum ParallelizationStrategy { SYNC_SOURCES     = 0,
-                                 INVALID_STRATEGY};
+  enum ParallelizationStrategy {SYNC_SOURCES     = 0,
+                                INVALID_STRATEGY};
   /**
    * Constructor.
    */
-  MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm_in
+  MeshfreeInterpolation (const libMesh::Parallel::Communicator & comm_in
                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     ParallelObject(comm_in),
     _parallelization_strategy (SYNC_SOURCES)
@@ -79,13 +79,13 @@ public:
    * Prints information about this object, by default to
    * libMesh::out.
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out) const;
 
   /**
    * Same as above, but allows you to also use stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os,
-                                    const MeshfreeInterpolation& mfi);
+  friend std::ostream & operator << (std::ostream & os,
+                                     const MeshfreeInterpolation & mfi);
 
   /**
    * Clears all internal data structures and restores to a
@@ -103,7 +103,7 @@ public:
    * Defines the field variable(s) we are responsible for,
    * and importantly their assumed ordering.
    */
-  void set_field_variables (const std::vector<std::string> &names)
+  void set_field_variables (const std::vector<std::string> & names)
   { _names = names; }
 
   /**
@@ -127,9 +127,9 @@ public:
   /**
    * Sets source data at specified points.
    */
-  virtual void add_field_data (const std::vector<std::string> &field_names,
-                               const std::vector<Point>  &pts,
-                               const std::vector<Number> &vals);
+  virtual void add_field_data (const std::vector<std::string> & field_names,
+                               const std::vector<Point>  & pts,
+                               const std::vector<Number> & vals);
 
   /**
    * Prepares data structures for use.
@@ -143,9 +143,9 @@ public:
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.
    */
-  virtual void interpolate_field_data (const std::vector<std::string> &field_names,
-                                       const std::vector<Point>  &tgt_pts,
-                                       std::vector<Number> &tgt_vals) const = 0;
+  virtual void interpolate_field_data (const std::vector<std::string> & field_names,
+                                       const std::vector<Point>  & tgt_pts,
+                                       std::vector<Number> & tgt_vals) const = 0;
 
 protected:
 
@@ -186,10 +186,10 @@ protected:
   class PointListAdaptor
   {
   private:
-    const std::vector<Point> &_pts;
+    const std::vector<Point> & _pts;
 
   public:
-    PointListAdaptor (const std::vector<Point> &pts) :
+    PointListAdaptor (const std::vector<Point> & pts) :
       _pts(pts)
     {}
 
@@ -207,12 +207,12 @@ protected:
      * Returns the distance between the vector "p1[0:size-1]"
      * and the data point with index "idx_p2" stored in the class
      */
-    inline coord_t kdtree_distance(const coord_t *p1, const size_t idx_p2, size_t size) const
+    inline coord_t kdtree_distance(const coord_t * p1, const size_t idx_p2, size_t size) const
     {
       libmesh_assert_equal_to (size, PLDim);
       libmesh_assert_less (idx_p2, _pts.size());
 
-      const Point &p2(_pts[idx_p2]);
+      const Point & p2(_pts[idx_p2]);
 
       switch (size)
         {
@@ -258,7 +258,7 @@ protected:
       libmesh_assert_less (idx, _pts.size());
       libmesh_assert_less (dim, 3);
 
-      const Point &p(_pts[idx]);
+      const Point & p(_pts[idx]);
 
       if (dim==0) return p(0);
       if (dim==1) return p(1);
@@ -300,10 +300,10 @@ protected:
    * Performs inverse distance interpolation at the input point from
    * the specified points.
    */
-  virtual void interpolate (const Point               &pt,
-                            const std::vector<size_t> &src_indices,
-                            const std::vector<Real>   &src_dist_sqr,
-                            std::vector<Number>::iterator &out_it) const;
+  virtual void interpolate (const Point               & pt,
+                            const std::vector<size_t> & src_indices,
+                            const std::vector<Real>   & src_dist_sqr,
+                            std::vector<Number>::iterator & out_it) const;
 
   const Real         _half_power;
   const unsigned int _n_interp_pts;
@@ -319,7 +319,7 @@ public:
    * Constructor. Takes the inverse distance power,
    * which defaults to 2.
    */
-  InverseDistanceInterpolation (const libMesh::Parallel::Communicator &comm_in,
+  InverseDistanceInterpolation (const libMesh::Parallel::Communicator & comm_in,
                                 const unsigned int n_interp_pts = 8,
                                 const Real  power               = 2) :
     MeshfreeInterpolation(comm_in),
@@ -340,9 +340,9 @@ public:
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.
    */
-  virtual void interpolate_field_data (const std::vector<std::string> &field_names,
-                                       const std::vector<Point>  &tgt_pts,
-                                       std::vector<Number> &tgt_vals) const libmesh_override;
+  virtual void interpolate_field_data (const std::vector<std::string> & field_names,
+                                       const std::vector<Point>  & tgt_pts,
+                                       std::vector<Number> & tgt_vals) const libmesh_override;
 };
 
 } // namespace libMesh

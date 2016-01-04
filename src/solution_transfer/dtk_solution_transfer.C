@@ -45,7 +45,7 @@
 namespace libMesh
 {
 
-DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm) :
+DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator & comm) :
   SolutionTransfer(comm)
 {
   //comm_default = Teuchos::DefaultComm<int>::getComm();
@@ -59,14 +59,15 @@ DTKSolutionTransfer::~DTKSolutionTransfer()
       ++it)
     delete it->second;
 
-  for(std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type * >::iterator it = dtk_maps.begin();
+  for(std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type *>::iterator it = dtk_maps.begin();
       it != dtk_maps.end();
       ++it)
     delete it->second;
 }
 
 void
-DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
+DTKSolutionTransfer::transfer(const Variable & from_var,
+                              const Variable & to_var)
 {
   libmesh_experimental();
 
