@@ -73,9 +73,9 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
+  virtual void estimate_error (const System & system,
+                               ErrorVector & error_per_cell,
+                               const NumericVector<Number> * solution_vector = NULL,
                                bool estimate_parent_error = false) libmesh_override;
 
   /**
@@ -104,7 +104,7 @@ protected:
    * An initialization function, to give derived classes a chance to
    * request specific data from the FE objects
    */
-  virtual void init_context(FEMContext &c);
+  virtual void init_context(FEMContext & c);
 
   /**
    * The function, to be implemented by derived classes, which calculates an error

@@ -77,9 +77,9 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
+  virtual void estimate_error (const System & system,
+                               ErrorVector & error_per_cell,
+                               const NumericVector<Number> * solution_vector = NULL,
                                bool estimate_parent_error = false) libmesh_override;
 
   /**
@@ -89,10 +89,10 @@ public:
    * This function is named estimate_errors instead of estimate_error
    * because otherwise C++ can get confused.
    */
-  virtual void estimate_errors (const EquationSystems& equation_systems,
-                                ErrorVector& error_per_cell,
-                                const std::map<const System*, SystemNorm>& error_norms,
-                                const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
+  virtual void estimate_errors (const EquationSystems & equation_systems,
+                                ErrorVector & error_per_cell,
+                                const std::map<const System *, SystemNorm> & error_norms,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = NULL,
                                 bool estimate_parent_error = false) libmesh_override;
 
   /**
@@ -103,9 +103,9 @@ public:
    * vectors: If errors_per_cell[&system][v] exists, it will be filled with the
    * error values in variable \p v of \p system
    */
-  virtual void estimate_errors (const EquationSystems& equation_systems,
-                                ErrorMap& errors_per_cell,
-                                const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
+  virtual void estimate_errors (const EquationSystems & equation_systems,
+                                ErrorMap & errors_per_cell,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = NULL,
                                 bool estimate_parent_error = false) libmesh_override;
 
   virtual ErrorEstimatorType type() const libmesh_override
@@ -126,12 +126,12 @@ protected:
    * The code for estimate_error and both estimate_errors versions is very
    * similar, so we use the same function for all three
    */
-  virtual void _estimate_error (const EquationSystems *equation_systems,
-                                const System* system,
-                                ErrorVector* error_per_cell,
-                                std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
-                                const std::map<const System*, SystemNorm >* error_norms,
-                                const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
+  virtual void _estimate_error (const EquationSystems * equation_systems,
+                                const System * system,
+                                ErrorVector * error_per_cell,
+                                std::map<std::pair<const System *, unsigned int>, ErrorVector *> * errors_per_cell,
+                                const std::map<const System *, SystemNorm > * error_norms,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = NULL,
                                 bool estimate_parent_error = false);
 };
 

@@ -33,12 +33,12 @@ namespace libMesh
 // HPSingularity implementations
 
 
-void HPSingularity::select_refinement (System &system)
+void HPSingularity::select_refinement (System & system)
 {
   START_LOG("select_refinement()", "HPSingularity");
 
   // The current mesh
-  MeshBase& mesh = system.get_mesh();
+  MeshBase & mesh = system.get_mesh();
 
   MeshBase::element_iterator       elem_it  =
     mesh.active_local_elements_begin();
@@ -47,7 +47,7 @@ void HPSingularity::select_refinement (System &system)
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem* elem = *elem_it;
+      Elem * elem = *elem_it;
 
       // We're only checking elements that are already flagged for h
       // refinement

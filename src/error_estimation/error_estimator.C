@@ -30,8 +30,8 @@ namespace libMesh
 {
 
 // ErrorEstimator functions
-void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell,
-                                   const Parallel::Communicator &comm) const
+void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal> & error_per_cell,
+                                   const Parallel::Communicator & comm) const
 {
   // This function must be run on all processors at once
   // parallel_object_only();
@@ -45,10 +45,10 @@ void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell,
 
 
 
-void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
-                                     ErrorVector& error_per_cell,
-                                     const std::map<const System*, SystemNorm>& error_norms,
-                                     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
+                                     ErrorVector & error_per_cell,
+                                     const std::map<const System *, SystemNorm> & error_norms,
+                                     const std::map<const System *, const NumericVector<Number> *> * solution_vectors,
                                      bool estimate_parent_error)
 {
   SystemNorm old_error_norm = this->error_norm;
@@ -57,13 +57,13 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
   for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
     {
       ErrorVector system_error_per_cell;
-      const System &sys = equation_systems.get_system(s);
+      const System & sys = equation_systems.get_system(s);
       if (error_norms.find(&sys) == error_norms.end())
         this->error_norm = old_error_norm;
       else
         this->error_norm = error_norms.find(&sys)->second;
 
-      const NumericVector<Number>* solution_vector = NULL;
+      const NumericVector<Number> * solution_vector = NULL;
       if (solution_vectors &&
           solution_vectors->find(&sys) != solution_vectors->end())
         solution_vector = solution_vectors->find(&sys)->second;
@@ -91,9 +91,9 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
  * FIXME: This is a default implementation - derived classes should
  * reimplement it for efficiency.
  */
-void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
-                                     ErrorMap& errors_per_cell,
-                                     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
+                                     ErrorMap & errors_per_cell,
+                                     const std::map<const System *, const NumericVector<Number> *> * solution_vectors,
                                      bool estimate_parent_error)
 {
   SystemNorm old_error_norm = this->error_norm;
@@ -101,7 +101,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
   // Find the requested error values from each system
   for (unsigned int s = 0; s != equation_systems.n_systems(); ++s)
     {
-      const System &sys = equation_systems.get_system(s);
+      const System & sys = equation_systems.get_system(s);
 
       unsigned int n_vars = sys.n_vars();
 
@@ -119,7 +119,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
             SystemNorm(std::vector<FEMNormType>(n_vars, old_error_norm.type(v)),
                        weights);
 
-          const NumericVector<Number>* solution_vector = NULL;
+          const NumericVector<Number> * solution_vector = NULL;
           if (solution_vectors &&
               solution_vectors->find(&sys) != solution_vectors->end())
             solution_vector = solution_vectors->find(&sys)->second;

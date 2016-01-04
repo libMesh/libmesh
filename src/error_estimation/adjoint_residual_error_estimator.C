@@ -48,15 +48,15 @@ AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
 
 
 
-void AdjointResidualErrorEstimator::estimate_error (const System& _system,
-                                                    ErrorVector& error_per_cell,
-                                                    const NumericVector<Number>* solution_vector,
+void AdjointResidualErrorEstimator::estimate_error (const System & _system,
+                                                    ErrorVector & error_per_cell,
+                                                    const NumericVector<Number> * solution_vector,
                                                     bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "AdjointResidualErrorEstimator");
 
   // The current mesh
-  const MeshBase& mesh = _system.get_mesh();
+  const MeshBase & mesh = _system.get_mesh();
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
@@ -67,7 +67,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   unsigned int n_vars = _system.n_vars();
 
   // We need to make a map of the pointer to the solution vector
-  std::map<const System*, const NumericVector<Number>*>solutionvecs;
+  std::map<const System *, const NumericVector<Number> *>solutionvecs;
   solutionvecs[&_system] = _system.solution.get();
 
   // Solve the dual problem if we have to
@@ -75,7 +75,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
     {
       // FIXME - we'll need to change a lot of APIs to make this trick
       // work with a const System...
-      System&  system = const_cast<System&>(_system);
+      System &  system = const_cast<System &>(_system);
       system.adjoint_solve(_qoi_set);
     }
 
@@ -121,7 +121,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
           Real error_weight = _qoi_set.weight(i);
 
           // We need to make a map of the pointer to the adjoint solution vector
-          std::map<const System*, const NumericVector<Number>*>adjointsolutionvecs;
+          std::map<const System *, const NumericVector<Number> *>adjointsolutionvecs;
           adjointsolutionvecs[&_system] = &_system.get_adjoint_solution(i);
 
           // Have we been asked to weight the variable error contributions in any specific manner

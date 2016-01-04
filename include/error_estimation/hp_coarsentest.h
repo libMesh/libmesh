@@ -89,7 +89,7 @@ public:
    * refinement and potentially change the desired
    * refinement type.
    */
-  virtual void select_refinement (System& system) libmesh_override;
+  virtual void select_refinement (System & system) libmesh_override;
 
   /**
    * Because the coarsening test seems to always choose p refinement, we're
@@ -102,12 +102,12 @@ protected:
    * The helper function which adds individual fine element data to
    * the coarse element projection
    */
-  void add_projection(const System&, const Elem*, unsigned int var);
+  void add_projection(const System &, const Elem *, unsigned int var);
 
   /**
    * The coarse element on which a solution projection is cached
    */
-  const Elem *coarse;
+  const Elem * coarse;
 
   /**
    * Global DOF indices for fine elements
@@ -122,19 +122,19 @@ protected:
   /**
    * The shape functions and their derivatives
    */
-  const std::vector<std::vector<Real> > *phi, *phi_coarse;
-  const std::vector<std::vector<RealGradient> > *dphi, *dphi_coarse;
-  const std::vector<std::vector<RealTensor> > *d2phi, *d2phi_coarse;
+  const std::vector<std::vector<Real> > * phi, * phi_coarse;
+  const std::vector<std::vector<RealGradient> > * dphi, * dphi_coarse;
+  const std::vector<std::vector<RealTensor> > * d2phi, * d2phi_coarse;
 
   /**
    * Mapping jacobians
    */
-  const std::vector<Real> *JxW;
+  const std::vector<Real> * JxW;
 
   /**
    * Quadrature locations
    */
-  const std::vector<Point> *xyz_values;
+  const std::vector<Point> * xyz_values;
   std::vector<Point> coarse_qpoints;
 
   /**

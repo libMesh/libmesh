@@ -66,7 +66,7 @@ public:
    * refinement and potentially change the desired
    * refinement type.
    */
-  virtual void select_refinement (System& system) = 0;
+  virtual void select_refinement (System & system) = 0;
 
   /**
    * This vector can be used to "scale" certain

@@ -70,7 +70,7 @@ public:
    * object.
    */
   explicit
-  ExactSolution (const EquationSystems& es);
+  ExactSolution (const EquationSystems & es);
 
   /**
    * Destructor.
@@ -83,7 +83,7 @@ public:
    * allows the user to attach a second EquationSystems
    * object with a reference fine grid solution.
    */
-  void attach_reference_solution (const EquationSystems* es_fine);
+  void attach_reference_solution (const EquationSystems * es_fine);
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -96,16 +96,16 @@ public:
    * value of the system \p sys_num solution at any point.
    */
   void attach_exact_value (unsigned int sys_num,
-                           FunctionBase<Number>* f);
+                           FunctionBase<Number> * f);
 
   /**
    * Attach an arbitrary function which computes the exact value of
    * the solution at any point.
    */
-  void attach_exact_value (Number fptr(const Point& p,
-                                       const Parameters& Parameters,
-                                       const std::string& sys_name,
-                                       const std::string& unknown_name));
+  void attach_exact_value (Number fptr(const Point & p,
+                                       const Parameters & Parameters,
+                                       const std::string & sys_name,
+                                       const std::string & unknown_name));
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -118,16 +118,16 @@ public:
    * gradient of the system \p sys_num solution at any point.
    */
   void attach_exact_deriv (unsigned int sys_num,
-                           FunctionBase<Gradient>* g);
+                           FunctionBase<Gradient> * g);
 
   /**
    * Attach an arbitrary function which computes the exact gradient of
    * the solution at any point.
    */
-  void attach_exact_deriv (Gradient gptr(const Point& p,
-                                         const Parameters& parameters,
-                                         const std::string& sys_name,
-                                         const std::string& unknown_name));
+  void attach_exact_deriv (Gradient gptr(const Point & p,
+                                         const Parameters & parameters,
+                                         const std::string & sys_name,
+                                         const std::string & unknown_name));
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -140,16 +140,16 @@ public:
    * second derivatives of the system \p sys_num solution at any point.
    */
   void attach_exact_hessian (unsigned int sys_num,
-                             FunctionBase<Tensor>* h);
+                             FunctionBase<Tensor> * h);
 
   /**
    * Attach an arbitrary function which computes the exact second
    * derivatives of the solution at any point.
    */
-  void attach_exact_hessian (Tensor hptr(const Point& p,
-                                         const Parameters& parameters,
-                                         const std::string& sys_name,
-                                         const std::string& unknown_name));
+  void attach_exact_hessian (Tensor hptr(const Point & p,
+                                         const Parameters & parameters,
+                                         const std::string & sys_name,
+                                         const std::string & unknown_name));
 
   /**
    * Increases or decreases the order of the quadrature rule used for numerical
@@ -165,24 +165,24 @@ public:
    * any value.  For that you need to call the l2_error(), h1_error()
    * or h2_error() functions respectively.
    */
-  void compute_error(const std::string& sys_name,
-                     const std::string& unknown_name);
+  void compute_error(const std::string & sys_name,
+                     const std::string & unknown_name);
 
   /**
    * This function returns the integrated L2 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real l2_error(const std::string& sys_name,
-                const std::string& unknown_name);
+  Real l2_error(const std::string & sys_name,
+                const std::string & unknown_name);
 
   /**
    * This function returns the integrated L1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real l1_error(const std::string& sys_name,
-                const std::string& unknown_name);
+  Real l1_error(const std::string & sys_name,
+                const std::string & unknown_name);
 
   /**
    * This function returns the L_INF error for the system sys_name for
@@ -193,16 +193,16 @@ public:
    * to compute it, we take the max of the absolute value of the error
    * over all the quadrature points.
    */
-  Real l_inf_error(const std::string& sys_name,
-                   const std::string& unknown_name);
+  Real l_inf_error(const std::string & sys_name,
+                   const std::string & unknown_name);
 
   /**
    * This function computes and returns the H1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real h1_error(const std::string& sys_name,
-                const std::string& unknown_name);
+  Real h1_error(const std::string & sys_name,
+                const std::string & unknown_name);
 
   /**
    * This function computes and returns the HCurl error for the system
@@ -211,8 +211,8 @@ public:
    * is only valid for vector-valued element. An error is thrown if requested
    * for scalar-valued elements.
    */
-  Real hcurl_error(const std::string& sys_name,
-                   const std::string& unknown_name);
+  Real hcurl_error(const std::string & sys_name,
+                   const std::string & unknown_name);
 
   /**
    * This function computes and returns the HDiv error for the system
@@ -221,16 +221,16 @@ public:
    * is only valid for vector-valued element. An error is thrown if requested
    * for scalar-valued elements.
    */
-  Real hdiv_error(const std::string& sys_name,
-                  const std::string& unknown_name);
+  Real hdiv_error(const std::string & sys_name,
+                  const std::string & unknown_name);
 
   /**
    * This function computes and returns the H2 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
    */
-  Real h2_error(const std::string& sys_name,
-                const std::string& unknown_name);
+  Real h2_error(const std::string & sys_name,
+                const std::string & unknown_name);
 
   /**
    * This function returns the error in the requested norm for the system
@@ -239,9 +239,9 @@ public:
    * Note also that the result is not exact, but an approximation
    * based on the chosen quadrature rule.
    */
-  Real error_norm(const std::string& sys_name,
-                  const std::string& unknown_name,
-                  const FEMNormType& norm);
+  Real error_norm(const std::string & sys_name,
+                  const std::string & unknown_name,
+                  const FEMNormType & norm);
 private:
 
   /**
@@ -251,17 +251,17 @@ private:
    * solving for several unknowns in several systems.
    */
   template<typename OutputShape>
-  void _compute_error(const std::string& sys_name,
-                      const std::string& unknown_name,
-                      std::vector<Real>& error_vals);
+  void _compute_error(const std::string & sys_name,
+                      const std::string & unknown_name,
+                      std::vector<Real> & error_vals);
 
   /**
    * This function is responsible for checking the validity of
    * the sys_name and unknown_name inputs, and returning a
    * reference to the proper vector for storing the values.
    */
-  std::vector<Real>& _check_inputs(const std::string& sys_name,
-                                   const std::string& unknown_name);
+  std::vector<Real> & _check_inputs(const std::string & sys_name,
+                                    const std::string & unknown_name);
 
   /**
    * User-provided functors which compute the exact value of the
@@ -303,13 +303,13 @@ private:
    * Constant reference to the \p EquationSystems object
    * used for the simulation.
    */
-  const EquationSystems& _equation_systems;
+  const EquationSystems & _equation_systems;
 
   /**
    * Constant pointer to the \p EquationSystems object
    * containing the fine grid solution.
    */
-  const EquationSystems* _equation_systems_fine;
+  const EquationSystems * _equation_systems_fine;
 
   /**
    * Extra order to use for quadrature rule

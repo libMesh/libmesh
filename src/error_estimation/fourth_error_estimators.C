@@ -44,7 +44,7 @@ namespace libMesh
 
 
 void
-LaplacianErrorEstimator::init_context(FEMContext& c)
+LaplacianErrorEstimator::init_context(FEMContext & c)
 {
   const unsigned int n_vars = c.n_vars();
   for (unsigned int v=0; v<n_vars; v++)
@@ -53,9 +53,9 @@ LaplacianErrorEstimator::init_context(FEMContext& c)
       if (error_norm.weight(v) == 0.0) continue;
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase* side_fe = NULL;
+      FEBase * side_fe = NULL;
 
-      const std::set<unsigned char>& elem_dims =
+      const std::set<unsigned char> & elem_dims =
         c.elem_dimensions();
 
       for (std::set<unsigned char>::const_iterator dim_it =
@@ -76,18 +76,18 @@ LaplacianErrorEstimator::init_context(FEMContext& c)
 void
 LaplacianErrorEstimator::internal_side_integration ()
 {
-  const Elem& coarse_elem = coarse_context->get_elem();
-  const Elem& fine_elem   = fine_context->get_elem();
+  const Elem & coarse_elem = coarse_context->get_elem();
+  const Elem & fine_elem   = fine_context->get_elem();
 
-  const DenseVector<Number>& Ucoarse = coarse_context->get_elem_solution();
-  const DenseVector<Number>& Ufine   = fine_context->get_elem_solution();
+  const DenseVector<Number> & Ucoarse = coarse_context->get_elem_solution();
+  const DenseVector<Number> & Ufine   = fine_context->get_elem_solution();
 
   unsigned int dim = fine_elem.dim();
 
-  FEBase* fe_fine = NULL;
+  FEBase * fe_fine = NULL;
   fine_context->get_side_fe( var, fe_fine, dim );
 
-  FEBase* fe_coarse = NULL;
+  FEBase * fe_coarse = NULL;
   coarse_context->get_side_fe( var, fe_coarse, dim );
 
   Real error = 1.e-30;

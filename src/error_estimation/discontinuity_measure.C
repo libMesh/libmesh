@@ -39,7 +39,7 @@ namespace libMesh
 {
 
 void
-DiscontinuityMeasure::init_context(FEMContext& c)
+DiscontinuityMeasure::init_context(FEMContext & c)
 {
   const unsigned int n_vars = c.n_vars();
   for (unsigned int v=0; v<n_vars; v++)
@@ -48,9 +48,9 @@ DiscontinuityMeasure::init_context(FEMContext& c)
       if (error_norm.weight(v) == 0.0) continue;
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase* side_fe = NULL;
+      FEBase * side_fe = NULL;
 
-      const std::set<unsigned char>& elem_dims =
+      const std::set<unsigned char> & elem_dims =
         c.elem_dimensions();
 
       for (std::set<unsigned char>::const_iterator dim_it =
@@ -71,13 +71,13 @@ DiscontinuityMeasure::init_context(FEMContext& c)
 void
 DiscontinuityMeasure::internal_side_integration ()
 {
-  const Elem& coarse_elem = coarse_context->get_elem();
-  const Elem& fine_elem = fine_context->get_elem();
+  const Elem & coarse_elem = coarse_context->get_elem();
+  const Elem & fine_elem = fine_context->get_elem();
 
-  FEBase* fe_fine = NULL;
+  FEBase * fe_fine = NULL;
   fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
 
-  FEBase* fe_coarse = NULL;
+  FEBase * fe_coarse = NULL;
   coarse_context->get_side_fe( var, fe_coarse, fine_elem.dim() );
 
   Real error = 1.e-30;
@@ -114,12 +114,12 @@ DiscontinuityMeasure::internal_side_integration ()
 bool
 DiscontinuityMeasure::boundary_side_integration ()
 {
-  const Elem& fine_elem = fine_context->get_elem();
+  const Elem & fine_elem = fine_context->get_elem();
 
-  FEBase* fe_fine = NULL;
+  FEBase * fe_fine = NULL;
   fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
 
-  const std::string &var_name =
+  const std::string & var_name =
     fine_context->get_system().variable_name(var);
 
   std::vector<std::vector<Real> > phi_fine = fe_fine->get_phi();
@@ -183,10 +183,9 @@ DiscontinuityMeasure::boundary_side_integration ()
 
 
 void
-DiscontinuityMeasure::attach_essential_bc_function
-(std::pair<bool,Real> fptr(const System& system,
-                           const Point& p,
-                           const std::string& var_name))
+DiscontinuityMeasure::attach_essential_bc_function (std::pair<bool,Real> fptr(const System & system,
+                                                                              const Point & p,
+                                                                              const std::string & var_name))
 {
   _bc_function = fptr;
 

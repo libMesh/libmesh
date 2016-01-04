@@ -64,7 +64,7 @@ protected:
    * An initialization function, for requesting specific data from the FE
    * objects
    */
-  virtual void init_context(FEMContext &c) libmesh_override;
+  virtual void init_context(FEMContext & c) libmesh_override;
 
   /**
    * The function which calculates a laplacian jump based error

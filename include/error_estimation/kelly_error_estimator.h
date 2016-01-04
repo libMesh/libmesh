@@ -83,9 +83,9 @@ public:
    * Register a user function to use in computing the flux BCs.
    * The return value is std::pair<bool, Real>
    */
-  void attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
-                                                          const Point& p,
-                                                          const std::string& var_name));
+  void attach_flux_bc_function (std::pair<bool,Real> fptr(const System & system,
+                                                          const Point & p,
+                                                          const std::string & var_name));
 
   virtual ErrorEstimatorType type() const libmesh_override
   { return KELLY;}
@@ -96,7 +96,7 @@ protected:
    * An initialization function, for requesting specific data from the FE
    * objects
    */
-  virtual void init_context(FEMContext &c) libmesh_override;
+  virtual void init_context(FEMContext & c) libmesh_override;
 
   /**
    * The function which calculates a normal derivative jump based error
@@ -114,9 +114,9 @@ protected:
   /**
    * Pointer to function that returns BC information.
    */
-  std::pair<bool,Real> (* _bc_function) (const System& system,
-                                         const Point& p,
-                                         const std::string& var_name);
+  std::pair<bool,Real> (* _bc_function) (const System & system,
+                                         const Point & p,
+                                         const std::string & var_name);
 };
 
 

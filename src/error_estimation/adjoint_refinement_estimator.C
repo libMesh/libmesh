@@ -66,19 +66,19 @@ namespace libMesh
 // Note that the element wise error indicators slightly over estimate the error in
 // each element
 
-void AdjointRefinementEstimator::estimate_error (const System& _system,
-                                                 ErrorVector& error_per_cell,
-                                                 const NumericVector<Number>* solution_vector,
+void AdjointRefinementEstimator::estimate_error (const System & _system,
+                                                 ErrorVector & error_per_cell,
+                                                 const NumericVector<Number> * solution_vector,
                                                  bool /*estimate_parent_error*/)
 {
   // We have to break the rules here, because we can't refine a const System
-  System& system = const_cast<System&>(_system);
+  System & system = const_cast<System &>(_system);
 
   // An EquationSystems reference will be convenient.
-  EquationSystems& es = system.get_equation_systems();
+  EquationSystems & es = system.get_equation_systems();
 
   // The current mesh
-  MeshBase& mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialized to 0.
@@ -91,7 +91,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
          system.vectors_end(); ++vec)
     {
       // The (string) name of this vector
-      const std::string& var_name = vec->first;
+      const std::string & var_name = vec->first;
 
       coarse_vectors[var_name] = vec->second->clone().release();
     }
@@ -118,8 +118,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // Use a non-standard solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
     {
-      NumericVector<Number> *newsol =
-        const_cast<NumericVector<Number>*> (solution_vector);
+      NumericVector<Number> * newsol =
+        const_cast<NumericVector<Number> *> (solution_vector);
       newsol->swap(*system.solution);
       system.update();
     }
@@ -150,7 +150,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
         {
           std::ostringstream liftfunc_name;
           liftfunc_name << "adjoint_lift_function" << j;
-          NumericVector<Number> &liftvec =
+          NumericVector<Number> & liftvec =
             system.add_vector(liftfunc_name.str());
 
           system.get_dof_map().enforce_constraints_exactly
@@ -194,7 +194,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     {
       if (_qoi_set.has_index(j))
         {
-          NumericVector<Number> *coarse_adjoint =
+          NumericVector<Number> * coarse_adjoint =
             NumericVector<Number>::build(mesh.comm()).release();
 
           // Can do "fast" init since we're overwriting this in a sec
@@ -212,8 +212,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     }
 
   // Rebuild the rhs with the projected primal solution
-  (dynamic_cast<ImplicitSystem&>(system)).assembly(true, false);
-  NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem&>(system)).get_vector("RHS Vector");
+  (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+  NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
   projected_residual.close();
 
   // Solve the adjoint problem(s) on the refined FE space
@@ -274,13 +274,13 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     for(; elem_it != elem_end; ++elem_it)
       {
         // Pointer to this element
-        const Elem* elem = *elem_it;
+        const Elem * elem = *elem_it;
 
         // Loop over the nodes in the element
         for(unsigned int n=0; n != elem->n_nodes(); ++n)
           {
             // Get a pointer to the current node
-            Node* node = elem->get_node(n);
+            Node * node = elem->get_node(n);
 
             // Get the id of this node
             dof_id_type node_id = node->id();
@@ -298,17 +298,17 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
                 std::vector<dof_id_type> coarse_grid_neighbors;
 
                 // Iterators over the fine grid neighbors set
-                std::set<const Elem*>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
-                const std::set<const Elem*>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
+                std::set<const Elem *>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
+                const std::set<const Elem *>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
 
                 // Loop over all the fine neighbors of this node
                 for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
                   {
                     // Pointer to the current fine neighbor element
-                    const Elem* fine_elem = *fine_neighbor_it;
+                    const Elem * fine_elem = *fine_neighbor_it;
 
                     // Find the element id for the corresponding coarse grid element
-                    const Elem* coarse_elem = fine_elem;
+                    const Elem * coarse_elem = fine_elem;
                     for (unsigned int j = 0; j != number_h_refinements; ++j)
                       {
                         libmesh_assert (coarse_elem->parent());
@@ -354,7 +354,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   }
 
   // Get a DoF map, will be used to get the nodal dof_indices for each element
-  DofMap &dof_map = system.get_dof_map();
+  DofMap & dof_map = system.get_dof_map();
 
   // The global DOF indices, we will use these later on when we compute the element wise indicators
   std::vector<dof_id_type> dof_indices;
@@ -389,10 +389,10 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
           for(; elem_it != elem_end; ++elem_it)
             {
               // Pointer to the element
-              const Elem* elem = *elem_it;
+              const Elem * elem = *elem_it;
 
               // Go up number_h_refinements levels up to find the coarse parent
-              const Elem* coarse = elem;
+              const Elem * coarse = elem;
 
               for (unsigned int j = 0; j != number_h_refinements; ++j)
                 {
@@ -473,7 +473,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
          system.vectors_end(); ++vec)
     {
       // The (string) name of this vector
-      const std::string& var_name = vec->first;
+      const std::string & var_name = vec->first;
 
       // If it's a vector we already had (and not a newly created
       // vector like an adjoint rhs), we need to restore it.
@@ -481,7 +481,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
         coarse_vectors.find(var_name);
       if (it != coarse_vectors.end())
         {
-          NumericVector<Number> *coarsevec = it->second;
+          NumericVector<Number> * coarsevec = it->second;
           system.get_vector(var_name) = *coarsevec;
 
           coarsevec->clear();

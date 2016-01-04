@@ -97,16 +97,16 @@ public:
    * value of the system \p sys_num solution at any point.
    */
   void attach_exact_value (unsigned int sys_num,
-                           FunctionBase<Number>* f);
+                           FunctionBase<Number> * f);
 
   /**
    * Attach an arbitrary function which computes the exact value of
    * the solution at any point.
    */
-  void attach_exact_value ( Number fptr(const Point& p,
-                                        const Parameters& Parameters,
-                                        const std::string& sys_name,
-                                        const std::string& unknown_name));
+  void attach_exact_value ( Number fptr(const Point & p,
+                                        const Parameters & Parameters,
+                                        const std::string & sys_name,
+                                        const std::string & unknown_name));
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -119,16 +119,16 @@ public:
    * gradient of the system \p sys_num solution at any point.
    */
   void attach_exact_deriv (unsigned int sys_num,
-                           FunctionBase<Gradient>* g);
+                           FunctionBase<Gradient> * g);
 
   /**
    * Attach an arbitrary function which computes the exact gradient of
    * the solution at any point.
    */
-  void attach_exact_deriv ( Gradient gptr(const Point& p,
-                                          const Parameters& parameters,
-                                          const std::string& sys_name,
-                                          const std::string& unknown_name));
+  void attach_exact_deriv ( Gradient gptr(const Point & p,
+                                          const Parameters & parameters,
+                                          const std::string & sys_name,
+                                          const std::string & unknown_name));
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -141,23 +141,23 @@ public:
    * second derivatives of the system \p sys_num solution at any point.
    */
   void attach_exact_hessian (unsigned int sys_num,
-                             FunctionBase<Tensor>* h);
+                             FunctionBase<Tensor> * h);
 
   /**
    * Attach an arbitrary function which computes the exact second
    * derivatives of the solution at any point.
    */
-  void attach_exact_hessian ( Tensor hptr(const Point& p,
-                                          const Parameters& parameters,
-                                          const std::string& sys_name,
-                                          const std::string& unknown_name));
+  void attach_exact_hessian ( Tensor hptr(const Point & p,
+                                          const Parameters & parameters,
+                                          const std::string & sys_name,
+                                          const std::string & unknown_name));
 
   /**
    * Attach function similar to system.h which
    * allows the user to attach a second EquationSystems
    * object with a reference fine grid solution.
    */
-  void attach_reference_solution (EquationSystems* es_fine);
+  void attach_reference_solution (EquationSystems * es_fine);
 
 
   /**
@@ -181,9 +181,9 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
+  virtual void estimate_error (const System & system,
+                               ErrorVector & error_per_cell,
+                               const NumericVector<Number> * solution_vector = NULL,
                                bool estimate_parent_error = false) libmesh_override;
 
   virtual ErrorEstimatorType type() const libmesh_override
@@ -195,28 +195,28 @@ private:
    * Function pointer to user-provided function which
    * computes the exact value of the solution.
    */
-  Number (* _exact_value) (const Point& p,
-                           const Parameters& parameters,
-                           const std::string& sys_name,
-                           const std::string& unknown_name);
+  Number (* _exact_value) (const Point & p,
+                           const Parameters & parameters,
+                           const std::string & sys_name,
+                           const std::string & unknown_name);
 
   /**
    * Function pointer to user-provided function which
    * computes the exact derivative of the solution.
    */
-  Gradient (* _exact_deriv) (const Point& p,
-                             const Parameters& parameters,
-                             const std::string& sys_name,
-                             const std::string& unknown_name);
+  Gradient (* _exact_deriv) (const Point & p,
+                             const Parameters & parameters,
+                             const std::string & sys_name,
+                             const std::string & unknown_name);
 
   /**
    * Function pointer to user-provided function which
    * computes the exact hessian of the solution.
    */
-  Tensor (* _exact_hessian) (const Point& p,
-                             const Parameters& parameters,
-                             const std::string& sys_name,
-                             const std::string& unknown_name);
+  Tensor (* _exact_hessian) (const Point & p,
+                             const Parameters & parameters,
+                             const std::string & sys_name,
+                             const std::string & unknown_name);
 
   /**
    * User-provided functors which compute the exact value of the
@@ -240,17 +240,17 @@ private:
    * Constant pointer to the \p EquationSystems object
    * containing a fine grid solution.
    */
-  EquationSystems* _equation_systems_fine;
+  EquationSystems * _equation_systems_fine;
 
   /**
    * Helper method for calculating on each element
    */
-  Real find_squared_element_error (const System& system,
-                                   const std::string& var_name,
-                                   const Elem *elem,
-                                   const DenseVector<Number> &Uelem,
-                                   FEBase *fe,
-                                   MeshFunction *fine_values) const;
+  Real find_squared_element_error (const System & system,
+                                   const std::string & var_name,
+                                   const Elem * elem,
+                                   const DenseVector<Number> & Uelem,
+                                   FEBase * fe,
+                                   MeshFunction * fine_values) const;
 
   /**
    * Helper method for cleanup
