@@ -26,8 +26,8 @@
 namespace libMesh
 {
 
-ContinuationSystem::ContinuationSystem (EquationSystems& es,
-                                        const std::string& name_in,
+ContinuationSystem::ContinuationSystem (EquationSystems & es,
+                                        const std::string & name_in,
                                         const unsigned int number_in) :
   Parent(es, name_in, number_in),
   continuation_parameter(NULL),
@@ -385,7 +385,7 @@ void ContinuationSystem::continuation_solve()
 
   // Set pointer to underlying Newton solver
   if (!newton_solver)
-    newton_solver = cast_ptr<NewtonSolver*> (this->time_solver->diff_solver().get());
+    newton_solver = cast_ptr<NewtonSolver *> (this->time_solver->diff_solver().get());
 
   // A pair for catching return values from linear system solves.
   std::pair<unsigned int, Real> rval;
@@ -961,7 +961,7 @@ void ContinuationSystem::solve_tangent()
   // Set pointer to underlying Newton solver
   if (!newton_solver)
     newton_solver =
-      cast_ptr<NewtonSolver*> (this->time_solver->diff_solver().get());
+      cast_ptr<NewtonSolver *> (this->time_solver->diff_solver().get());
 
   // Assemble the system matrix AND rhs, with rhs = G_{\lambda}
   this->rhs_mode = G_Lambda;

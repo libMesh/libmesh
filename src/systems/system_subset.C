@@ -28,7 +28,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // SystemSubset implementation
-SystemSubset::SystemSubset (const System& system):
+SystemSubset::SystemSubset (const System & system):
   _system(system)
 {
 }
@@ -39,7 +39,7 @@ SystemSubset::~SystemSubset (void)
 }
 
 
-const System&
+const System &
 SystemSubset::get_system(void)const
 {
   return _system;

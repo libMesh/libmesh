@@ -59,8 +59,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  ContinuationSystem (EquationSystems& es,
-                      const std::string& name,
+  ContinuationSystem (EquationSystems & es,
+                      const std::string & name,
                       const unsigned int number);
 
   /**
@@ -112,7 +112,7 @@ public:
    *
    * Also sometimes referred to as "lambda" in the code comments.
    */
-  Real* continuation_parameter;
+  Real * continuation_parameter;
 
   /**
    * If quiet==false, the System prints extra information about what
@@ -335,39 +335,39 @@ private:
    *
    * The "solution" tangent vector du/ds.
    */
-  NumericVector<Number>* du_ds;
+  NumericVector<Number> * du_ds;
 
   /**
    * The value of du_ds from the previous solution
    */
-  NumericVector<Number>* previous_du_ds;
+  NumericVector<Number> * previous_du_ds;
 
   /**
    * The solution at the previous value of the continuation variable.
    */
-  NumericVector<Number>* previous_u;
+  NumericVector<Number> * previous_u;
 
   /**
    * Temporary vector "y" ... stores -du/dlambda, the solution of \f$ Ay=G_{\lambda} \f$.
    */
-  NumericVector<Number>* y;
+  NumericVector<Number> * y;
 
   /**
    * Temporary vector "y_old" ... stores the previous value of -du/dlambda,
    * which is the solution of \f$ Ay=G_{\lambda} \f$.
    */
-  NumericVector<Number>* y_old;
+  NumericVector<Number> * y_old;
 
   /**
    * Temporary vector "z" ... the solution of \f$ Az = -G \f$
    */
-  NumericVector<Number>* z;
+  NumericVector<Number> * z;
 
   /**
    * Temporary vector "delta u" ... the Newton step update in our custom
    * augmented PDE solve.
    */
-  NumericVector<Number>* delta_u;
+  NumericVector<Number> * delta_u;
 
   /**
    * We maintain our own linear solver interface, for solving
@@ -386,7 +386,7 @@ private:
    * From this pointer, we can get access to all the parameters and options
    * which are available to the "normal" Newton solver.
    */
-  NewtonSolver* newton_solver;
+  NewtonSolver * newton_solver;
 
   /**
    * The most recent value of the derivative of the continuation parameter

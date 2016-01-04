@@ -53,8 +53,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  EigenSystem (EquationSystems& es,
-               const std::string& name_in,
+  EigenSystem (EquationSystems & es,
+               const std::string & name_in,
                const unsigned int number_in);
 
   /**
@@ -145,12 +145,12 @@ public:
   /**
    * The system matrix for standard eigenvalue problems.
    */
-  SparseMatrix<Number> *matrix_A;
+  SparseMatrix<Number> * matrix_A;
 
   /**
    * A second system matrix for generalized eigenvalue problems.
    */
-  SparseMatrix<Number> *matrix_B;
+  SparseMatrix<Number> * matrix_B;
 
   /**
    * The EigenSolver, definig which interface, i.e solver

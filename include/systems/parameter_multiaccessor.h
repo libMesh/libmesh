@@ -51,7 +51,7 @@ public:
   /**
    * Constructor: take the first sub-accessor for the parameter
    */
-  ParameterMultiAccessor(const ParameterAccessor<T>& param_accessor) :
+  ParameterMultiAccessor(const ParameterAccessor<T> & param_accessor) :
     _accessors(1, param_accessor.clone()) {}
 
   /*
@@ -80,7 +80,7 @@ public:
     libmesh_assert(!_accessors.empty());
 #ifndef NDEBUG
     // Compare other values to the last one we'll change
-    const T& val = _accessors.back()->get();
+    const T & val = _accessors.back()->get();
 #endif
     for (unsigned int i=0; i != _accessors.size(); ++i)
       {
@@ -94,10 +94,10 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const libmesh_override
+  virtual const T & get () const libmesh_override
   {
     libmesh_assert(!_accessors.empty());
-    const T& val = _accessors[0]->get();
+    const T & val = _accessors[0]->get();
 #ifndef NDEBUG
     // If you're already using inconsistent parameters we can't help
     // you.
@@ -112,7 +112,7 @@ public:
    */
   virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
   {
-    ParameterMultiAccessor *pmp = new ParameterMultiAccessor<T>();
+    ParameterMultiAccessor * pmp = new ParameterMultiAccessor<T>();
     for (unsigned int i=0; i != _accessors.size(); ++i)
       pmp->_accessors.push_back(_accessors[i]->clone().release());
 

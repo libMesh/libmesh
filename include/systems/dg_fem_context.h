@@ -40,7 +40,7 @@ public:
    * Constructor.  Allocates some but fills no data structures.
    */
   explicit
-  DGFEMContext (const System &sys);
+  DGFEMContext (const System & sys);
 
   /**
    * Destructor.
@@ -64,144 +64,144 @@ public:
   /**
    * Accessor for neighbor dof indices
    */
-  const std::vector<dof_id_type>& get_neighbor_dof_indices() const
+  const std::vector<dof_id_type> & get_neighbor_dof_indices() const
   { return _neighbor_dof_indices; }
 
   /**
    * Accessor for element dof indices of a particular variable corresponding
    * to the index argument.
    */
-  const std::vector<dof_id_type>& get_neighbor_dof_indices( unsigned int var ) const
+  const std::vector<dof_id_type> & get_neighbor_dof_indices( unsigned int var ) const
   { return _neighbor_dof_indices_var[var]; }
 
   /**
    * Const accessor for neighbor residual.
    */
-  const DenseVector<Number>& get_neighbor_residual() const
+  const DenseVector<Number> & get_neighbor_residual() const
   { return _neighbor_residual; }
 
   /**
    * Non-const accessor for neighbor residual.
    */
-  DenseVector<Number>& get_neighbor_residual()
+  DenseVector<Number> & get_neighbor_residual()
   { return _neighbor_residual; }
 
   /**
    * Const accessor for neighbor residual of a particular variable corresponding
    * to the variable index argument.
    */
-  const DenseSubVector<Number>& get_neighbor_residual( unsigned int var ) const
+  const DenseSubVector<Number> & get_neighbor_residual( unsigned int var ) const
   { return *(_neighbor_subresiduals[var]); }
 
   /**
    * Non-const accessor for neighbor residual of a particular variable corresponding
    * to the variable index argument.
    */
-  DenseSubVector<Number>& get_neighbor_residual( unsigned int var )
+  DenseSubVector<Number> & get_neighbor_residual( unsigned int var )
   { return *(_neighbor_subresiduals[var]); }
 
   /**
    * Const accessor for element-element Jacobian.
    */
-  const DenseMatrix<Number>& get_elem_elem_jacobian() const
+  const DenseMatrix<Number> & get_elem_elem_jacobian() const
   { return _elem_elem_jacobian; }
 
   /**
    * Non-const accessor for element-element Jacobian.
    */
-  DenseMatrix<Number>& get_elem_elem_jacobian()
+  DenseMatrix<Number> & get_elem_elem_jacobian()
   { return _elem_elem_jacobian; }
 
   /**
    * Const accessor for element-element Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  const DenseSubMatrix<Number>& get_elem_elem_jacobian( unsigned int var1, unsigned int var2 ) const
+  const DenseSubMatrix<Number> & get_elem_elem_jacobian( unsigned int var1, unsigned int var2 ) const
   { return *(_elem_elem_subjacobians[var1][var2]); }
 
   /**
    * Non-const accessor for element-element Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  DenseSubMatrix<Number>& get_elem_elem_jacobian( unsigned int var1, unsigned int var2 )
+  DenseSubMatrix<Number> & get_elem_elem_jacobian( unsigned int var1, unsigned int var2 )
   { return *(_elem_elem_subjacobians[var1][var2]); }
 
   /**
    * Const accessor for element-neighbor Jacobian.
    */
-  const DenseMatrix<Number>& get_elem_neighbor_jacobian() const
+  const DenseMatrix<Number> & get_elem_neighbor_jacobian() const
   { return _elem_neighbor_jacobian; }
 
   /**
    * Non-const accessor for element -neighborJacobian.
    */
-  DenseMatrix<Number>& get_elem_neighbor_jacobian()
+  DenseMatrix<Number> & get_elem_neighbor_jacobian()
   { return _elem_neighbor_jacobian; }
 
   /**
    * Const accessor for element-neighbor Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  const DenseSubMatrix<Number>& get_elem_neighbor_jacobian( unsigned int var1, unsigned int var2 ) const
+  const DenseSubMatrix<Number> & get_elem_neighbor_jacobian( unsigned int var1, unsigned int var2 ) const
   { return *(_elem_neighbor_subjacobians[var1][var2]); }
 
   /**
    * Non-const accessor for element-neighbor Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  DenseSubMatrix<Number>& get_elem_neighbor_jacobian( unsigned int var1, unsigned int var2 )
+  DenseSubMatrix<Number> & get_elem_neighbor_jacobian( unsigned int var1, unsigned int var2 )
   { return *(_elem_neighbor_subjacobians[var1][var2]); }
 
   /**
    * Const accessor for element-neighbor Jacobian.
    */
-  const DenseMatrix<Number>& get_neighbor_elem_jacobian() const
+  const DenseMatrix<Number> & get_neighbor_elem_jacobian() const
   { return _neighbor_elem_jacobian; }
 
   /**
    * Non-const accessor for element Jacobian.
    */
-  DenseMatrix<Number>& get_neighbor_elem_jacobian()
+  DenseMatrix<Number> & get_neighbor_elem_jacobian()
   { return _neighbor_elem_jacobian; }
 
   /**
    * Const accessor for neighbor-element Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  const DenseSubMatrix<Number>& get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 ) const
+  const DenseSubMatrix<Number> & get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 ) const
   { return *(_neighbor_elem_subjacobians[var1][var2]); }
 
   /**
    * Non-const accessor for neighbor-element Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  DenseSubMatrix<Number>& get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 )
+  DenseSubMatrix<Number> & get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 )
   { return *(_neighbor_elem_subjacobians[var1][var2]); }
 
   /**
    * Const accessor for element-neighbor Jacobian.
    */
-  const DenseMatrix<Number>& get_neighbor_neighbor_jacobian() const
+  const DenseMatrix<Number> & get_neighbor_neighbor_jacobian() const
   { return _neighbor_neighbor_jacobian; }
 
   /**
    * Non-const accessor for element Jacobian.
    */
-  DenseMatrix<Number>& get_neighbor_neighbor_jacobian()
+  DenseMatrix<Number> & get_neighbor_neighbor_jacobian()
   { return _neighbor_neighbor_jacobian; }
 
   /**
    * Const accessor for neighbor-neighbor Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  const DenseSubMatrix<Number>& get_neighbor_neighbor_jacobian( unsigned int var1, unsigned int var2 ) const
+  const DenseSubMatrix<Number> & get_neighbor_neighbor_jacobian( unsigned int var1, unsigned int var2 ) const
   { return *(_neighbor_neighbor_subjacobians[var1][var2]); }
 
   /**
    * Non-const accessor for neighbor-neighbor Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
-  DenseSubMatrix<Number>& get_neighbor_neighbor_jacobian( unsigned int var1, unsigned int var2 )
+  DenseSubMatrix<Number> & get_neighbor_neighbor_jacobian( unsigned int var1, unsigned int var2 )
   { return *(_neighbor_neighbor_subjacobians[var1][var2]); }
 
   /**
@@ -212,13 +212,13 @@ public:
    * case, we need to be able to specify the neighbor element manually.
    * Also, this should give us more flexibility to handle non-conforming meshes.
    */
-  void set_neighbor(const Elem& neighbor)
+  void set_neighbor(const Elem & neighbor)
   { _neighbor = &neighbor; }
 
   /**
    * Accessor for current neighbor Elem object for assembling DG terms.
    */
-  const Elem& get_neighbor() const
+  const Elem & get_neighbor() const
   { return *_neighbor; }
 
   /**
@@ -238,7 +238,7 @@ private:
   /**
    * Current neighbor element for assembling DG terms.
    */
-  const Elem *_neighbor;
+  const Elem * _neighbor;
 
   /**
    * Residual vector of the neighbor component.
@@ -296,7 +296,7 @@ inline
 void DGFEMContext::get_neighbor_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
 {
   libmesh_assert_less ( var, _neighbor_side_fe_var.size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( _neighbor_side_fe_var[var] );
+  fe = cast_ptr<FEGenericBase<OutputShape> *>( _neighbor_side_fe_var[var] );
 }
 
 } // namespace libMesh

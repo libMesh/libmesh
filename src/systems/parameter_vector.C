@@ -42,7 +42,7 @@ ParameterVector::ParameterVector(const std::vector<Number *> &params)
 
 
 
-void ParameterVector::deep_copy(ParameterVector &target) const
+void ParameterVector::deep_copy(ParameterVector & target) const
 {
   const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
@@ -59,7 +59,7 @@ void ParameterVector::deep_copy(ParameterVector &target) const
 
 
 
-void ParameterVector::shallow_copy(ParameterVector &target) const
+void ParameterVector::shallow_copy(ParameterVector & target) const
 {
   target._my_data.clear();
   target._params = this->_params;
@@ -68,7 +68,7 @@ void ParameterVector::shallow_copy(ParameterVector &target) const
 
 
 
-void ParameterVector::value_copy(ParameterVector &target) const
+void ParameterVector::value_copy(ParameterVector & target) const
 {
   const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
@@ -114,7 +114,7 @@ void ParameterVector::deep_resize(unsigned int s)
 
 
 
-ParameterVector& ParameterVector::operator *= (const Number a)
+ParameterVector & ParameterVector::operator *= (const Number a)
 {
   const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
@@ -125,7 +125,7 @@ ParameterVector& ParameterVector::operator *= (const Number a)
 
 
 
-ParameterVector& ParameterVector::operator += (const ParameterVector& a)
+ParameterVector & ParameterVector::operator += (const ParameterVector & a)
 {
   const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());

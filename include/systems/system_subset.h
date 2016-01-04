@@ -47,7 +47,7 @@ public:
    * Constructor.
    */
   explicit
-  SystemSubset (const System& system);
+  SystemSubset (const System & system);
 
   /**
    * Destructor.
@@ -59,19 +59,19 @@ public:
    * consists of.  The result must contain local dofs on each
    * processor only and must not contain duplictates.
    */
-  virtual const std::vector<unsigned int>& dof_ids () const = 0;
+  virtual const std::vector<unsigned int> & dof_ids () const = 0;
 
   /**
    * Returns the \p System to which we belong.
    */
-  const System& get_system () const;
+  const System & get_system () const;
 
 protected:
 
   /**
    * A reference to the \p System we belong to.
    */
-  const System& _system;
+  const System & _system;
 
 private:
   /**
@@ -80,7 +80,7 @@ private:
    * We won't even bother implementing this; we'll just make sure that
    * the compiler doesn't implement a default.
    */
-  SystemSubset(const SystemSubset&);
+  SystemSubset(const SystemSubset &);
 
   /**
    * This isn't a copyable object, so let's make sure nobody tries.
@@ -88,7 +88,7 @@ private:
    * We won't even bother implementing this; we'll just make sure that
    * the compiler doesn't implement a default.
    */
-  SystemSubset& operator= (const SystemSubset&);
+  SystemSubset & operator= (const SystemSubset &);
 }; // class SystemSubset
 
 } // namespace libMesh

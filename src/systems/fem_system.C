@@ -46,11 +46,10 @@ ConstElemRange elem_range;
 typedef Threads::spin_mutex femsystem_mutex;
 femsystem_mutex assembly_mutex;
 
-void assemble_unconstrained_element_system
-(const FEMSystem& _sys,
- const bool _get_jacobian,
- const bool _constrain_heterogeneously,
- FEMContext &_femcontext)
+void assemble_unconstrained_element_system(const FEMSystem & _sys,
+                                           const bool _get_jacobian,
+                                           const bool _constrain_heterogeneously,
+                                           FEMContext & _femcontext)
 {
   if (_sys.print_element_solutions)
     {
@@ -241,12 +240,11 @@ void assemble_unconstrained_element_system
     }
 }
 
-void add_element_system
-(const FEMSystem& _sys,
- const bool _get_residual,
- const bool _get_jacobian,
- const bool _constrain_heterogeneously,
- FEMContext &_femcontext)
+void add_element_system(const FEMSystem & _sys,
+                        const bool _get_residual,
+                        const bool _get_jacobian,
+                        const bool _constrain_heterogeneously,
+                        FEMContext & _femcontext)
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   if (_get_residual && _sys.print_element_residuals)
@@ -340,7 +338,7 @@ public:
   /**
    * constructor to set context
    */
-  AssemblyContributions(FEMSystem &sys,
+  AssemblyContributions(FEMSystem & sys,
                         bool get_residual,
                         bool get_jacobian,
                         bool constrain_heterogeneously) :
@@ -352,16 +350,16 @@ public:
   /**
    * operator() for use with Threads::parallel_for().
    */
-  void operator()(const ConstElemRange &range) const
+  void operator()(const ConstElemRange & range) const
   {
     UniquePtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+    FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
     _sys.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
       {
-        Elem *el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(*elem_it);
 
         _femcontext.pre_fe_reinit(_sys, el);
         _femcontext.elem_fe_reinit();
@@ -378,7 +376,7 @@ public:
 
 private:
 
-  FEMSystem& _sys;
+  FEMSystem & _sys;
 
   const bool _get_residual, _get_jacobian, _constrain_heterogeneously;
 };
@@ -390,21 +388,21 @@ public:
    * constructor to set context
    */
   explicit
-  PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
+  PostprocessContributions(FEMSystem & sys) : _sys(sys) {}
 
   /**
    * operator() for use with Threads::parallel_for().
    */
-  void operator()(const ConstElemRange &range) const
+  void operator()(const ConstElemRange & range) const
   {
     UniquePtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+    FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
     _sys.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
       {
-        Elem *el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(*elem_it);
         _femcontext.pre_fe_reinit(_sys, el);
 
         // Optionally initialize all the interior FE objects on elem.
@@ -434,7 +432,7 @@ public:
 
 private:
 
-  FEMSystem& _sys;
+  FEMSystem & _sys;
 };
 
 class QoIContributions
@@ -444,24 +442,25 @@ public:
    * constructor to set context
    */
   explicit
-  QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi,
-                   const QoISet &qoi_indices) :
+  QoIContributions(FEMSystem & sys,
+                   DifferentiableQoI & diff_qoi,
+                   const QoISet & qoi_indices) :
     qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
 
   /**
    * splitting constructor
    */
-  QoIContributions(const QoIContributions &other,
+  QoIContributions(const QoIContributions & other,
                    Threads::split) :
     qoi(other._sys.qoi.size(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
 
   /**
    * operator() for use with Threads::parallel_reduce().
    */
-  void operator()(const ConstElemRange &range)
+  void operator()(const ConstElemRange & range)
   {
     UniquePtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+    FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
     _diff_qoi.init_context(_femcontext);
 
     bool have_some_heterogenous_qoi_bc = false;
@@ -482,7 +481,7 @@ public:
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
       {
-        Elem *el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(*elem_it);
 
         _femcontext.pre_fe_reinit(_sys, el);
 
@@ -559,7 +558,7 @@ public:
     this->_diff_qoi.thread_join( this->qoi, _femcontext.get_qois(), _qoi_indices );
   }
 
-  void join (const QoIContributions& other)
+  void join (const QoIContributions & other)
   {
     libmesh_assert_equal_to (this->qoi.size(), other.qoi.size());
     this->_diff_qoi.thread_join( this->qoi, other.qoi, _qoi_indices );
@@ -569,8 +568,8 @@ public:
 
 private:
 
-  FEMSystem& _sys;
-  DifferentiableQoI& _diff_qoi;
+  FEMSystem & _sys;
+  DifferentiableQoI & _diff_qoi;
 
   const QoISet _qoi_indices;
 };
@@ -581,10 +580,11 @@ public:
   /**
    * constructor to set context
    */
-  QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices,
-                             DifferentiableQoI &qoi,
+  QoIDerivativeContributions(FEMSystem & sys,
+                             const QoISet & qoi_indices,
+                             DifferentiableQoI & qoi,
                              bool include_liftfunc,
-                             bool apply_constraints ) :
+                             bool apply_constraints) :
     _sys(sys),
     _qoi_indices(qoi_indices),
     _qoi(qoi),
@@ -594,10 +594,10 @@ public:
   /**
    * operator() for use with Threads::parallel_for().
    */
-  void operator()(const ConstElemRange &range) const
+  void operator()(const ConstElemRange & range) const
   {
     UniquePtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+    FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
     _qoi.init_context(_femcontext);
 
     bool have_some_heterogenous_qoi_bc = false;
@@ -619,7 +619,7 @@ public:
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
       {
-        Elem *el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(*elem_it);
 
         _femcontext.pre_fe_reinit(_sys, el);
 
@@ -800,9 +800,9 @@ public:
 
 private:
 
-  FEMSystem& _sys;
-  const QoISet& _qoi_indices;
-  DifferentiableQoI& _qoi;
+  FEMSystem & _sys;
+  const QoISet & _qoi_indices;
+  DifferentiableQoI & _qoi;
   bool _include_liftfunc, _apply_constraints;
 };
 
@@ -817,8 +817,8 @@ namespace libMesh
 
 
 
-FEMSystem::FEMSystem (EquationSystems& es,
-                      const std::string& name_in,
+FEMSystem::FEMSystem (EquationSystems & es,
+                      const std::string & name_in,
                       const unsigned int number_in)
   : Parent(es, name_in, number_in),
     fe_reinit_during_postprocess(true),
@@ -855,7 +855,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   START_LOG(log_name, "FEMSystem");
 
-  const MeshBase& mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   //  this->get_vector("_nonlinear_solution").localize
   //    (*current_local_nonlinear_solution,
@@ -931,7 +931,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   if ( this->processor_id() == (this->n_processors()-1) && have_scalar )
     {
       UniquePtr<DiffContext> con = this->build_context();
-      FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+      FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
       this->init_context(_femcontext);
       _femcontext.pre_fe_reinit(*this, NULL);
 
@@ -1057,10 +1057,10 @@ void FEMSystem::mesh_position_set()
   if (_mesh_sys != this)
     return;
 
-  MeshBase& mesh = this->get_mesh();
+  MeshBase & mesh = this->get_mesh();
 
   UniquePtr<DiffContext> con = this->build_context();
-  FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+  FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(_femcontext);
 
   // Move every mesh element we can
@@ -1100,7 +1100,7 @@ void FEMSystem::postprocess ()
 {
   START_LOG("postprocess()", "FEMSystem");
 
-  const MeshBase& mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   this->update();
 
@@ -1118,11 +1118,11 @@ void FEMSystem::postprocess ()
 
 
 
-void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
+void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
 {
   START_LOG("assemble_qoi()", "FEMSystem");
 
-  const MeshBase& mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   this->update();
 
@@ -1150,13 +1150,13 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
 
 
-void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices,
+void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                          bool include_liftfunc,
                                          bool apply_constraints)
 {
   START_LOG("assemble_qoi_derivative()", "FEMSystem");
 
-  const MeshBase& mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   this->update();
 
@@ -1180,7 +1180,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices,
 
 
 void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
-                                    FEMContext &context) const
+                                    FEMContext & context) const
 {
   // Logging is done by numerical_elem_jacobian
   // or numerical_side_jacobian
@@ -1222,7 +1222,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           context.get_elem_solution(v)(j) -= my_h;
 
           // Make sure to catch any moving mesh terms
-          Real *coord = NULL;
+          Real * coord = NULL;
           if (_mesh_sys == this)
             {
               if (_mesh_x_var == v)
@@ -1289,7 +1289,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
 
 
-void FEMSystem::numerical_elem_jacobian (FEMContext &context) const
+void FEMSystem::numerical_elem_jacobian (FEMContext & context) const
 {
   START_LOG("numerical_elem_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::element_residual, context);
@@ -1298,7 +1298,7 @@ void FEMSystem::numerical_elem_jacobian (FEMContext &context) const
 
 
 
-void FEMSystem::numerical_side_jacobian (FEMContext &context) const
+void FEMSystem::numerical_side_jacobian (FEMContext & context) const
 {
   START_LOG("numerical_side_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::side_residual, context);
@@ -1307,7 +1307,7 @@ void FEMSystem::numerical_side_jacobian (FEMContext &context) const
 
 
 
-void FEMSystem::numerical_nonlocal_jacobian (FEMContext &context) const
+void FEMSystem::numerical_nonlocal_jacobian (FEMContext & context) const
 {
   START_LOG("numerical_nonlocal_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::nonlocal_residual, context);
@@ -1318,9 +1318,9 @@ void FEMSystem::numerical_nonlocal_jacobian (FEMContext &context) const
 
 UniquePtr<DiffContext> FEMSystem::build_context ()
 {
-  FEMContext* fc = new FEMContext(*this);
+  FEMContext * fc = new FEMContext(*this);
 
-  DifferentiablePhysics* phys = this->get_physics();
+  DifferentiablePhysics * phys = this->get_physics();
 
   libmesh_assert (phys);
 
@@ -1340,7 +1340,7 @@ UniquePtr<DiffContext> FEMSystem::build_context ()
 
 
 
-void FEMSystem::init_context(DiffContext &c)
+void FEMSystem::init_context(DiffContext & c)
 {
   // Parent::init_context(c);  // may be a good idea in derived classes
 
@@ -1354,7 +1354,7 @@ void FEMSystem::init_context(DiffContext &c)
   // overloads.
   c.set_deltat_pointer ( &deltat );
 
-  FEMContext &context = cast_ref<FEMContext&>(c);
+  FEMContext & context = cast_ref<FEMContext &>(c);
 
   // Make sure we're prepared to do mass integration
   for (unsigned int var = 0; var != this->n_vars(); ++var)
@@ -1365,7 +1365,7 @@ void FEMSystem::init_context(DiffContext &c)
           {
           case( TYPE_SCALAR ):
             {
-              FEBase* elem_fe = NULL;
+              FEBase * elem_fe = NULL;
               context.get_element_fe(var, elem_fe);
               elem_fe->get_JxW();
               elem_fe->get_phi();
@@ -1373,7 +1373,7 @@ void FEMSystem::init_context(DiffContext &c)
             break;
           case( TYPE_VECTOR ):
             {
-              FEGenericBase<RealGradient>* elem_fe = NULL;
+              FEGenericBase<RealGradient> * elem_fe = NULL;
               context.get_element_fe(var, elem_fe);
               elem_fe->get_JxW();
               elem_fe->get_phi();
@@ -1399,7 +1399,7 @@ void FEMSystem::mesh_position_get()
     libmesh_not_implemented();
 
   // Loop over every active mesh element on this processor
-  const MeshBase& mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   MeshBase::const_element_iterator el =
     mesh.active_local_elements_begin();
@@ -1407,7 +1407,7 @@ void FEMSystem::mesh_position_get()
     mesh.active_local_elements_end();
 
   UniquePtr<DiffContext> con = this->build_context();
-  FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+  FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(_femcontext);
 
   // Get the solution's mesh variables from every element

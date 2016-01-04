@@ -71,7 +71,7 @@ public:
     libmesh_assert(!_ptrs.empty());
 #ifndef NDEBUG
     // Compare other values to the last one we'll change
-    const T& val = *_ptrs.back();
+    const T & val = *_ptrs.back();
 #endif
     for (unsigned int i=0; i != _ptrs.size(); ++i)
       {
@@ -85,10 +85,10 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const libmesh_override
+  virtual const T & get () const libmesh_override
   {
     libmesh_assert(!_ptrs.empty());
-    T& val = *_ptrs[0];
+    T & val = *_ptrs[0];
 #ifndef NDEBUG
     // If you're already using inconsistent parameters we can't help
     // you.
@@ -103,13 +103,13 @@ public:
    */
   virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
   {
-    ParameterMultiPointer *pmp = new ParameterMultiPointer<T>();
+    ParameterMultiPointer * pmp = new ParameterMultiPointer<T>();
     pmp->_ptrs = _ptrs;
 
     return UniquePtr<ParameterAccessor<T> >(pmp);
   }
 
-  void push_back (T* new_ptr) { _ptrs.push_back(new_ptr); }
+  void push_back (T * new_ptr) { _ptrs.push_back(new_ptr); }
 
   /**
    * Returns the number of data associated with this parameter.
@@ -118,7 +118,7 @@ public:
   std::size_t size() const { return _ptrs.size(); }
 
 private:
-  std::vector<T*> _ptrs;
+  std::vector<T *> _ptrs;
 };
 
 } // namespace libMesh

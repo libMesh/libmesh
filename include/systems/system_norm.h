@@ -57,7 +57,7 @@ public:
    * This is deliberately an implicit constructor; we want user code
    * to be able to include lines like "error_norm = L2"
    */
-  SystemNorm(const FEMNormType &t);
+  SystemNorm(const FEMNormType & t);
 
   /**
    * Constructor, for unweighted sobolev norms on systems with multiple
@@ -67,7 +67,7 @@ public:
    * n-vector of the norms in each variable.
    */
   explicit
-  SystemNorm(const std::vector<FEMNormType> &norms);
+  SystemNorm(const std::vector<FEMNormType> & norms);
 
   /**
    * Constructor, for weighted sobolev norms on systems with multiple
@@ -76,7 +76,8 @@ public:
    * For a system with n variables, the final norm will be the l2 norm of the
    * n-vector of the norms in each variable, each multiplied by weight.
    */
-  SystemNorm(const std::vector<FEMNormType> &norms, std::vector<Real> &weights);
+  SystemNorm(const std::vector<FEMNormType> & norms,
+             std::vector<Real> & weights);
 
   /**
    * Constructor, for weighted sobolev norms on systems with multiple
@@ -85,12 +86,13 @@ public:
    * For a system with n variables, the final norm computed will be of the form
    * norm_u^T*R*norm_z where R is a scaling matrix
    */
-  SystemNorm(const std::vector<FEMNormType> &norms, std::vector<std::vector<Real> > &weights);
+  SystemNorm(const std::vector<FEMNormType> & norms,
+             std::vector<std::vector<Real> > & weights);
 
   /**
    * Copy Constructor
    */
-  SystemNorm(const SystemNorm &s);
+  SystemNorm(const SystemNorm & s);
 
   /**
    * Returns true if this is purely a discrete norm
@@ -101,12 +103,13 @@ public:
    * Returns the weighted norm v^T*W*v where W represents our
    * weights matrix or weights vector times identity matrix.
    */
-  Real calculate_norm(const std::vector<Real>& v);
+  Real calculate_norm(const std::vector<Real> & v);
 
   /**
    * Returns the weighted inner product v1^T*W*v2 where R is our weights
    */
-  Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
+  Real calculate_norm(const std::vector<Real> & v1,
+                      const std::vector<Real> & v2);
 
   /**
    * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
@@ -121,7 +124,7 @@ public:
   /**
    * Sets the type of the norm in variable \p var
    */
-  void set_type(unsigned int var, const FEMNormType& t);
+  void set_type(unsigned int var, const FEMNormType & t);
 
   /**
    * Returns the weight corresponding to the norm in variable \p var
@@ -172,14 +175,14 @@ SystemNorm::SystemNorm() :
 
 
 inline
-SystemNorm::SystemNorm(const FEMNormType &t) :
+SystemNorm::SystemNorm(const FEMNormType & t) :
   _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
 }
 
 
 inline
-SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
+SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms) :
   _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
   if (_norms.empty())
@@ -188,8 +191,8 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
 
 
 inline
-SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-                       std::vector<Real> &weights) :
+SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
+                       std::vector<Real> & weights) :
   _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
 {
   if (_norms.empty())
@@ -206,8 +209,8 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 }
 
 inline
-SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-                       std::vector<std::vector<Real> > &weights):
+SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
+                       std::vector<std::vector<Real> > & weights):
   _norms(norms),
   _weights(weights.size()),
   _weights_sq(weights.size()),
@@ -241,7 +244,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 }
 
 inline
-SystemNorm::SystemNorm(const SystemNorm &s) :
+SystemNorm::SystemNorm(const SystemNorm & s) :
   _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
 {
 }
@@ -274,7 +277,7 @@ FEMNormType SystemNorm::type(unsigned int var) const
 
 
 inline
-void SystemNorm::set_type(unsigned int var, const FEMNormType &t)
+void SystemNorm::set_type(unsigned int var, const FEMNormType & t)
 {
   libmesh_assert (!_norms.empty());
 
@@ -310,7 +313,9 @@ void SystemNorm::set_weight(unsigned int var, Real w)
 }
 
 inline
-void SystemNorm::set_off_diagonal_weight(unsigned int i, unsigned int j, Real w)
+void SystemNorm::set_off_diagonal_weight(unsigned int i,
+                                         unsigned int j,
+                                         Real w)
 {
   libmesh_assert (!_weights.empty());
 
@@ -339,7 +344,8 @@ Real SystemNorm::weight_sq(unsigned int var) const
 
 
 inline
-Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2)
+Real SystemNorm::calculate_norm(const std::vector<Real> & v1,
+                                const std::vector<Real> & v2)
 {
   // The vectors are assumed to both be vectors of the (same number
   // of) components
@@ -386,7 +392,7 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
 }
 
 inline
-Real SystemNorm::calculate_norm(const std::vector<Real>& v1)
+Real SystemNorm::calculate_norm(const std::vector<Real> & v1)
 {
   return this->calculate_norm(v1,v1);
 }

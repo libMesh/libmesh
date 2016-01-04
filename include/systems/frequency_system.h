@@ -68,8 +68,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  FrequencySystem (EquationSystems& es,
-                   const std::string& name_in,
+  FrequencySystem (EquationSystems & es,
+                   const std::string & name_in,
                    const unsigned int number_in);
   /**
    * Destructor.
@@ -162,7 +162,7 @@ public:
    * to a separate \p NumericVector.  This feature
    * can be disabled with \p allocate_solution_duplicates=false.
    */
-  void set_frequencies (const std::vector<Real>& frequencies,
+  void set_frequencies (const std::vector<Real> & frequencies,
                         const bool allocate_solution_duplicates=true);
 
   /**
@@ -176,14 +176,14 @@ public:
    * work of \p FrequencySystem, at least @e this function has to be provided
    * by the user.
    */
-  void attach_solve_function(void fptr(EquationSystems& es,
-                                       const std::string& name));
+  void attach_solve_function(void fptr(EquationSystems & es,
+                                       const std::string & name));
 
   /**
    * Function that computes frequency-dependent data of the system.
    */
-  void (* solve_system) (EquationSystems& es,
-                         const std::string& name);
+  void (* solve_system) (EquationSystems & es,
+                         const std::string & name);
 
   /**
    * @returns the number of iterations and the final residual.

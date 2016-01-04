@@ -54,8 +54,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // System implementation
-System::System (EquationSystems& es,
-                const std::string& name_in,
+System::System (EquationSystems & es,
+                const std::string & name_in,
                 const unsigned int number_in) :
 
   ParallelObject                    (es),
@@ -95,7 +95,7 @@ System::System (EquationSystems& es,
 
 
 // No copy construction of System objects!
-System::System (const System& other) :
+System::System (const System & other) :
   ReferenceCountedObject<System>(),
   ParallelObject(other),
   _equation_systems(other._equation_systems),
@@ -107,7 +107,7 @@ System::System (const System& other) :
 
 
 
-System& System::operator= (const System&)
+System & System::operator= (const System &)
 {
   libmesh_not_implemented();
 }
@@ -254,7 +254,7 @@ void System::init ()
 
 void System::init_data ()
 {
-  MeshBase &mesh = this->get_mesh();
+  MeshBase & mesh = this->get_mesh();
 
   // Add all variable groups to our underlying DofMap
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
@@ -320,7 +320,7 @@ void System::restrict_vectors ()
   // Restrict the _vectors on the coarsened cells
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
     {
-      NumericVector<Number>* v = pos->second;
+      NumericVector<Number> * v = pos->second;
 
       if (_vector_projections[pos->first])
         {
@@ -345,7 +345,7 @@ void System::restrict_vectors ()
         }
     }
 
-  const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
+  const std::vector<dof_id_type> & send_list = _dof_map->get_send_list ();
 
   // Restrict the solution on the coarsened cells
   if (_solution_projection)
@@ -421,7 +421,7 @@ void System::update ()
 {
   libmesh_assert(solution->closed());
 
-  const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
+  const std::vector<dof_id_type> & send_list = _dof_map->get_send_list ();
 
   // Check sizes
   libmesh_assert_equal_to (current_local_solution->size(), solution->size());
@@ -446,7 +446,7 @@ void System::re_update ()
   if(!this->n_vars())
     return;
 
-  const std::vector<dof_id_type>& send_list = this->get_dof_map().get_send_list ();
+  const std::vector<dof_id_type> & send_list = this->get_dof_map().get_send_list ();
 
   // Check sizes
   libmesh_assert_equal_to (current_local_solution->size(), solution->size());
@@ -462,7 +462,7 @@ void System::re_update ()
 
 
 
-void System::restrict_solve_to (const SystemSubset* subset,
+void System::restrict_solve_to (const SystemSubset * subset,
                                 const SubsetSolveMode /*subset_solve_mode*/)
 {
   if(subset!=NULL)
@@ -487,7 +487,7 @@ void System::assemble ()
 
 
 
-void System::assemble_qoi (const QoISet& qoi_indices)
+void System::assemble_qoi (const QoISet & qoi_indices)
 {
   // Log how long the user's assembly code takes
   START_LOG("assemble_qoi()", "System");
@@ -501,7 +501,7 @@ void System::assemble_qoi (const QoISet& qoi_indices)
 
 
 
-void System::assemble_qoi_derivative(const QoISet& qoi_indices,
+void System::assemble_qoi_derivative(const QoISet & qoi_indices,
                                      bool include_liftfunc,
                                      bool apply_constraints)
 {
@@ -518,10 +518,9 @@ void System::assemble_qoi_derivative(const QoISet& qoi_indices,
 
 
 
-void System::qoi_parameter_sensitivity
-(const QoISet& qoi_indices,
- const ParameterVector& parameters,
- SensitivityData& sensitivities)
+void System::qoi_parameter_sensitivity (const QoISet & qoi_indices,
+                                        const ParameterVector & parameters,
+                                        SensitivityData & sensitivities)
 {
   // Forward sensitivities are more efficient for Nq > Np
   if (qoi_indices.size(*this) > parameters.size())
@@ -535,7 +534,7 @@ void System::qoi_parameter_sensitivity
 
 
 
-bool System::compare (const System& other_system,
+bool System::compare (const System & other_system,
                       const Real threshold,
                       const bool verbose) const
 {
@@ -609,7 +608,7 @@ bool System::compare (const System& other_system,
                          << pos->first << "\" ...";
 
           // assume they have the same name
-          const NumericVector<Number>& other_system_vector =
+          const NumericVector<Number> & other_system_vector =
             other_system.get_vector(pos->first);
 
           ov_result.push_back(pos->second->compare (other_system_vector,
@@ -666,7 +665,7 @@ bool System::compare (const System& other_system,
 
 
 
-void System::update_global_solution (std::vector<Number>& global_soln) const
+void System::update_global_solution (std::vector<Number> & global_soln) const
 {
   global_soln.resize (solution->size());
 
@@ -675,7 +674,7 @@ void System::update_global_solution (std::vector<Number>& global_soln) const
 
 
 
-void System::update_global_solution (std::vector<Number>& global_soln,
+void System::update_global_solution (std::vector<Number> & global_soln,
                                      const processor_id_type dest_proc) const
 {
   global_soln.resize        (solution->size());
@@ -685,7 +684,7 @@ void System::update_global_solution (std::vector<Number>& global_soln,
 
 
 
-NumericVector<Number> & System::add_vector (const std::string& vec_name,
+NumericVector<Number> & System::add_vector (const std::string & vec_name,
                                             const bool projections,
                                             const ParallelType type)
 {
@@ -694,7 +693,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
     return *(_vectors[vec_name]);
 
   // Otherwise build the vector
-  NumericVector<Number>* buf = NumericVector<Number>::build(this->comm()).release();
+  NumericVector<Number> * buf = NumericVector<Number>::build(this->comm()).release();
   _vectors.insert (std::make_pair (vec_name, buf));
   _vector_projections.insert (std::make_pair (vec_name, projections));
 
@@ -723,7 +722,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
   return *buf;
 }
 
-void System::remove_vector (const std::string& vec_name)
+void System::remove_vector (const std::string & vec_name)
 {
   //Return if the vector does not exist
   if ( !(this->have_vector(vec_name)) )
@@ -739,7 +738,7 @@ void System::remove_vector (const std::string& vec_name)
   _vector_types.erase(vec_name);
 }
 
-const NumericVector<Number> * System::request_vector (const std::string& vec_name) const
+const NumericVector<Number> * System::request_vector (const std::string & vec_name) const
 {
   const_vectors_iterator pos = _vectors.find(vec_name);
 
@@ -751,7 +750,7 @@ const NumericVector<Number> * System::request_vector (const std::string& vec_nam
 
 
 
-NumericVector<Number> * System::request_vector (const std::string& vec_name)
+NumericVector<Number> * System::request_vector (const std::string & vec_name)
 {
   vectors_iterator pos = _vectors.find(vec_name);
 
@@ -797,7 +796,7 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
 
 
 
-const NumericVector<Number> & System::get_vector (const std::string& vec_name) const
+const NumericVector<Number> & System::get_vector (const std::string & vec_name) const
 {
   // Make sure the vector exists
   const_vectors_iterator pos = _vectors.find(vec_name);
@@ -810,7 +809,7 @@ const NumericVector<Number> & System::get_vector (const std::string& vec_name) c
 
 
 
-NumericVector<Number> & System::get_vector (const std::string& vec_name)
+NumericVector<Number> & System::get_vector (const std::string & vec_name)
 {
   // Make sure the vector exists
   vectors_iterator pos = _vectors.find(vec_name);
@@ -855,7 +854,7 @@ NumericVector<Number> & System::get_vector (const unsigned int vec_num)
 
 
 
-const std::string& System::vector_name (const unsigned int vec_num) const
+const std::string & System::vector_name (const unsigned int vec_num) const
 {
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
@@ -890,7 +889,7 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
 
 
-void System::set_vector_preservation (const std::string &vec_name,
+void System::set_vector_preservation (const std::string & vec_name,
                                       bool preserve)
 {
   _vector_projections[vec_name] = preserve;
@@ -898,7 +897,7 @@ void System::set_vector_preservation (const std::string &vec_name,
 
 
 
-bool System::vector_preservation (const std::string &vec_name) const
+bool System::vector_preservation (const std::string & vec_name) const
 {
   if (_vector_projections.find(vec_name) == _vector_projections.end())
     return false;
@@ -908,7 +907,7 @@ bool System::vector_preservation (const std::string &vec_name) const
 
 
 
-void System::set_vector_as_adjoint (const std::string &vec_name,
+void System::set_vector_as_adjoint (const std::string & vec_name,
                                     int qoi_num)
 {
   // We reserve -1 for vectors which get primal constraints, -2 for
@@ -919,7 +918,7 @@ void System::set_vector_as_adjoint (const std::string &vec_name,
 
 
 
-int System::vector_is_adjoint (const std::string &vec_name) const
+int System::vector_is_adjoint (const std::string & vec_name) const
 {
   libmesh_assert(_vector_is_adjoint.find(vec_name) !=
                  _vector_is_adjoint.end());
@@ -985,7 +984,7 @@ NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
   std::ostringstream adjoint_name;
   adjoint_name << "adjoint_solution" << i;
 
-  NumericVector<Number> &returnval = this->add_vector(adjoint_name.str());
+  NumericVector<Number> & returnval = this->add_vector(adjoint_name.str());
   this->set_vector_as_adjoint(adjoint_name.str(), i);
   return returnval;
 }
@@ -1017,7 +1016,7 @@ NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsig
   std::ostringstream adjoint_name;
   adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
-  NumericVector<Number> &returnval = this->add_vector(adjoint_name.str());
+  NumericVector<Number> & returnval = this->add_vector(adjoint_name.str());
   this->set_vector_as_adjoint(adjoint_name.str(), i);
   return returnval;
 }
@@ -1104,8 +1103,8 @@ const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
 
 
 
-unsigned int System::add_variable (const std::string& var,
-                                   const FEType& type,
+unsigned int System::add_variable (const std::string & var,
+                                   const FEType & type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
   libmesh_assert(!this->is_initialized());
@@ -1135,7 +1134,7 @@ unsigned int System::add_variable (const std::string& var,
 
   else
     {
-      VariableGroup &vg(_variable_groups.back());
+      VariableGroup & vg(_variable_groups.back());
 
       // get a pointer to their subdomain restriction, if any.
       const std::set<subdomain_id_type> * const
@@ -1182,7 +1181,7 @@ unsigned int System::add_variable (const std::string& var,
 
 
 
-unsigned int System::add_variable (const std::string& var,
+unsigned int System::add_variable (const std::string & var,
                                    const Order order,
                                    const FEFamily family,
                                    const std::set<subdomain_id_type> * const active_subdomains)
@@ -1194,8 +1193,8 @@ unsigned int System::add_variable (const std::string& var,
 
 
 
-unsigned int System::add_variables (const std::vector<std::string> &vars,
-                                    const FEType& type,
+unsigned int System::add_variables (const std::vector<std::string> & vars,
+                                    const FEType & type,
                                     const std::set<subdomain_id_type> * const active_subdomains)
 {
   libmesh_assert(!this->is_initialized());
@@ -1224,7 +1223,7 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
                              VariableGroup(this, vars, curr_n_vars,
                                            next_first_component, type, *active_subdomains));
 
-  const VariableGroup &vg (_variable_groups.back());
+  const VariableGroup & vg (_variable_groups.back());
 
   // Add each component of the group individually
   for (unsigned short v=0; v<vars.size(); v++)
@@ -1247,7 +1246,7 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 
 
 
-unsigned int System::add_variables (const std::vector<std::string> &vars,
+unsigned int System::add_variables (const std::vector<std::string> & vars,
                                     const Order order,
                                     const FEFamily family,
                                     const std::set<subdomain_id_type> * const active_subdomains)
@@ -1259,14 +1258,14 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 
 
 
-bool System::has_variable (const std::string& var) const
+bool System::has_variable (const std::string & var) const
 {
   return _variable_numbers.count(var);
 }
 
 
 
-unsigned short int System::variable_number (const std::string& var) const
+unsigned short int System::variable_number (const std::string & var) const
 {
   // Make sure the variable exists
   std::map<std::string, unsigned short int>::const_iterator
@@ -1281,7 +1280,7 @@ unsigned short int System::variable_number (const std::string& var) const
 }
 
 
-void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_numbers) const
+void System::get_all_variable_numbers(std::vector<unsigned int> & all_variable_numbers) const
 {
   all_variable_numbers.resize(n_vars());
 
@@ -1320,7 +1319,7 @@ void System::local_dof_indices(const unsigned int var,
 
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       this->get_dof_map().dof_indices (elem, dof_indices, var);
 
       for(unsigned int i=0; i<dof_indices.size(); i++)
@@ -1336,13 +1335,14 @@ void System::local_dof_indices(const unsigned int var,
 
 
 
-void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) const
+void System::zero_variable (NumericVector<Number> & v,
+                            unsigned int var_num) const
 {
   /* Make sure the call makes sense.  */
   libmesh_assert_less (var_num, this->n_vars());
 
   /* Get a reference to the mesh.  */
-  const MeshBase& mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   /* Check which system we are.  */
   const unsigned int sys_num = this->number();
@@ -1353,7 +1353,7 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
     const MeshBase::const_node_iterator end_it = mesh.local_nodes_end();
     for ( ; it != end_it; ++it)
       {
-        const Node* node = *it;
+        const Node * node = *it;
         unsigned int n_comp = node->n_comp(sys_num,var_num);
         for(unsigned int i=0; i<n_comp; i++)
           {
@@ -1369,7 +1369,7 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
     const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end();
     for ( ; it != end_it; ++it)
       {
-        const Elem* elem = *it;
+        const Elem * elem = *it;
         unsigned int n_comp = elem->n_comp(sys_num,var_num);
         for(unsigned int i=0; i<n_comp; i++)
           {
@@ -1382,7 +1382,7 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
 
 
 
-Real System::discrete_var_norm(const NumericVector<Number>& v,
+Real System::discrete_var_norm(const NumericVector<Number> & v,
                                unsigned int var,
                                FEMNormType norm_type) const
 {
@@ -1401,7 +1401,7 @@ Real System::discrete_var_norm(const NumericVector<Number>& v,
 
 
 
-Real System::calculate_norm(const NumericVector<Number>& v,
+Real System::calculate_norm(const NumericVector<Number> & v,
                             unsigned int var,
                             FEMNormType norm_type) const
 {
@@ -1422,8 +1422,8 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
 
 
-Real System::calculate_norm(const NumericVector<Number>& v,
-                            const SystemNorm &norm) const
+Real System::calculate_norm(const NumericVector<Number> & v,
+                            const SystemNorm & norm) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1515,15 +1515,15 @@ Real System::calculate_norm(const NumericVector<Number>& v,
       else
         libmesh_not_implemented();
 
-      const FEType& fe_type = this->get_dof_map().variable_type(var);
+      const FEType & fe_type = this->get_dof_map().variable_type(var);
       UniquePtr<QBase> qrule =
         fe_type.default_quadrature_rule (dim);
       UniquePtr<FEBase> fe
         (FEBase::build(dim, fe_type));
       fe->attach_quadrature_rule (qrule.get());
 
-      const std::vector<Real>&               JxW = fe->get_JxW();
-      const std::vector<std::vector<Real> >* phi = NULL;
+      const std::vector<Real> &               JxW = fe->get_JxW();
+      const std::vector<std::vector<Real> > * phi = NULL;
       if (norm_type == H1 ||
           norm_type == H2 ||
           norm_type == L2 ||
@@ -1531,14 +1531,14 @@ Real System::calculate_norm(const NumericVector<Number>& v,
           norm_type == L_INF)
         phi = &(fe->get_phi());
 
-      const std::vector<std::vector<RealGradient> >* dphi = NULL;
+      const std::vector<std::vector<RealGradient> > * dphi = NULL;
       if (norm_type == H1 ||
           norm_type == H2 ||
           norm_type == H1_SEMINORM ||
           norm_type == W1_INF_SEMINORM)
         dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
+      const std::vector<std::vector<RealTensor> > *   d2phi = NULL;
       if (norm_type == H2 ||
           norm_type == H2_SEMINORM ||
           norm_type == W2_INF_SEMINORM)
@@ -1555,7 +1555,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
       for ( ; el != end_el; ++el)
         {
-          const Elem* elem = *el;
+          const Elem * elem = *el;
 
           fe->reinit (elem);
 
@@ -1661,7 +1661,7 @@ std::string System::get_info() const
   std::ostringstream oss;
 
 
-  const std::string& sys_name = this->name();
+  const std::string & sys_name = this->name();
 
   oss << "   System #"  << this->number() << ", \"" << sys_name << "\"\n"
       << "    Type \""  << this->system_type() << "\"\n"
@@ -1669,7 +1669,7 @@ std::string System::get_info() const
 
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     {
-      const VariableGroup &vg_description (this->variable_group(vg));
+      const VariableGroup & vg_description (this->variable_group(vg));
 
       if (vg_description.n_variables() > 1) oss << "{ ";
       for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
@@ -1740,8 +1740,8 @@ std::string System::get_info() const
 
 
 
-void System::attach_init_function (void fptr(EquationSystems& es,
-                                             const std::string& name))
+void System::attach_init_function (void fptr(EquationSystems & es,
+                                             const std::string & name))
 {
   libmesh_assert(fptr);
 
@@ -1759,7 +1759,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 
 
 
-void System::attach_init_object (System::Initialization& init_in)
+void System::attach_init_object (System::Initialization & init_in)
 {
   if (_init_system_function != NULL)
     {
@@ -1775,8 +1775,8 @@ void System::attach_init_object (System::Initialization& init_in)
 
 
 
-void System::attach_assemble_function (void fptr(EquationSystems& es,
-                                                 const std::string& name))
+void System::attach_assemble_function (void fptr(EquationSystems & es,
+                                                 const std::string & name))
 {
   libmesh_assert(fptr);
 
@@ -1794,7 +1794,7 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 
 
 
-void System::attach_assemble_object (System::Assembly& assemble_in)
+void System::attach_assemble_object (System::Assembly & assemble_in)
 {
   if (_assemble_system_function != NULL)
     {
@@ -1810,8 +1810,8 @@ void System::attach_assemble_object (System::Assembly& assemble_in)
 
 
 
-void System::attach_constraint_function(void fptr(EquationSystems& es,
-                                                  const std::string& name))
+void System::attach_constraint_function(void fptr(EquationSystems & es,
+                                                  const std::string & name))
 {
   libmesh_assert(fptr);
 
@@ -1829,7 +1829,7 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 
 
 
-void System::attach_constraint_object (System::Constraint& constrain)
+void System::attach_constraint_object (System::Constraint & constrain)
 {
   if (_constrain_system_function != NULL)
     {
@@ -1845,9 +1845,9 @@ void System::attach_constraint_object (System::Constraint& constrain)
 
 
 
-void System::attach_QOI_function(void fptr(EquationSystems&,
-                                           const std::string&,
-                                           const QoISet&))
+void System::attach_QOI_function(void fptr(EquationSystems &,
+                                           const std::string &,
+                                           const QoISet &))
 {
   libmesh_assert(fptr);
 
@@ -1865,7 +1865,7 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
 
 
 
-void System::attach_QOI_object (QOI& qoi_in)
+void System::attach_QOI_object (QOI & qoi_in)
 {
   if (_qoi_evaluate_function != NULL)
     {
@@ -1881,8 +1881,8 @@ void System::attach_QOI_object (QOI& qoi_in)
 
 
 
-void System::attach_QOI_derivative(void fptr(EquationSystems&, const std::string&,
-                                             const QoISet&, bool, bool))
+void System::attach_QOI_derivative(void fptr(EquationSystems &, const std::string &,
+                                             const QoISet &, bool, bool))
 {
   libmesh_assert(fptr);
 
@@ -1900,7 +1900,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&, const std::string
 
 
 
-void System::attach_QOI_derivative_object (QOIDerivative& qoi_derivative)
+void System::attach_QOI_derivative_object (QOIDerivative & qoi_derivative)
 {
   if (_qoi_evaluate_derivative_function != NULL)
     {
@@ -1958,7 +1958,7 @@ void System::user_constrain ()
 
 
 
-void System::user_QOI (const QoISet& qoi_indices)
+void System::user_QOI (const QoISet & qoi_indices)
 {
   // Call the user-provided quantity of interest function,
   // if it was provided
@@ -1972,7 +1972,7 @@ void System::user_QOI (const QoISet& qoi_indices)
 
 
 
-void System::user_QOI_derivative(const QoISet& qoi_indices,
+void System::user_QOI_derivative(const QoISet & qoi_indices,
                                  bool include_liftfunc,
                                  bool apply_constraints)
 {
@@ -1991,7 +1991,7 @@ void System::user_QOI_derivative(const QoISet& qoi_indices,
 
 
 
-Number System::point_value(unsigned int var, const Point &p, const bool insist_on_success) const
+Number System::point_value(unsigned int var, const Point & p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -2010,17 +2010,17 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
-  const MeshBase &mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   // Use an existing PointLocator or create a new one
   UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
-  PointLocatorBase& locator = *locator_ptr;
+  PointLocatorBase & locator = *locator_ptr;
 
   if (!insist_on_success)
     locator.enable_out_of_mesh_mode();
 
   // Get a pointer to the element that contains P
-  const Elem *e = locator(p);
+  const Elem * e = locator(p);
 
   Number u = 0;
 
@@ -2044,7 +2044,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   return u;
 }
 
-Number System::point_value(unsigned int var, const Point &p, const Elem &e) const
+Number System::point_value(unsigned int var, const Point & p, const Elem & e) const
 {
   libmesh_assert_equal_to (e.processor_id(), this->processor_id());
 
@@ -2054,7 +2054,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   libmesh_assert (e.contains_point(p));
 
   // Get the dof map to get the proper indices for our computation
-  const DofMap& dof_map = this->get_dof_map();
+  const DofMap & dof_map = this->get_dof_map();
 
   // Need dof_indices for phi[i][j]
   std::vector<dof_id_type> dof_indices;
@@ -2076,7 +2076,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
 
   // Get the shape function values
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);
@@ -2094,7 +2094,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
 
 
 
-Gradient System::point_gradient(unsigned int var, const Point &p, const bool insist_on_success) const
+Gradient System::point_gradient(unsigned int var, const Point & p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -2113,17 +2113,17 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
-  const MeshBase &mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   // Use an existing PointLocator or create a new one
   UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
-  PointLocatorBase& locator = *locator_ptr;
+  PointLocatorBase & locator = *locator_ptr;
 
   if (!insist_on_success)
     locator.enable_out_of_mesh_mode();
 
   // Get a pointer to the element that contains P
-  const Elem *e = locator(p);
+  const Elem * e = locator(p);
 
   Gradient grad_u;
 
@@ -2148,7 +2148,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 }
 
 
-Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e) const
+Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & e) const
 {
   libmesh_assert_equal_to (e.processor_id(), this->processor_id());
 
@@ -2158,7 +2158,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   libmesh_assert (e.contains_point(p));
 
   // Get the dof map to get the proper indices for our computation
-  const DofMap& dof_map = this->get_dof_map();
+  const DofMap & dof_map = this->get_dof_map();
 
   // Need dof_indices for phi[i][j]
   std::vector<dof_id_type> dof_indices;
@@ -2180,7 +2180,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > &  dphi = fe->get_dphi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);
@@ -2199,7 +2199,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
 
 // We can only accumulate a hessian with --enable-second
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist_on_success) const
+Tensor System::point_hessian(unsigned int var, const Point & p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -2218,17 +2218,17 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
-  const MeshBase &mesh = this->get_mesh();
+  const MeshBase & mesh = this->get_mesh();
 
   // Use an existing PointLocator or create a new one
   UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
-  PointLocatorBase& locator = *locator_ptr;
+  PointLocatorBase & locator = *locator_ptr;
 
   if (!insist_on_success)
     locator.enable_out_of_mesh_mode();
 
   // Get a pointer to the element that contains P
-  const Elem *e = locator(p);
+  const Elem * e = locator(p);
 
   Tensor hess_u;
 
@@ -2252,7 +2252,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   return hess_u;
 }
 
-Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
+Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) const
 {
   libmesh_assert_equal_to (e.processor_id(), this->processor_id());
 
@@ -2262,7 +2262,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   libmesh_assert (e.contains_point(p));
 
   // Get the dof map to get the proper indices for our computation
-  const DofMap& dof_map = this->get_dof_map();
+  const DofMap & dof_map = this->get_dof_map();
 
   // Need dof_indices for phi[i][j]
   std::vector<dof_id_type> dof_indices;
@@ -2284,7 +2284,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
+  const std::vector<std::vector<RealTensor> > &  d2phi = fe->get_d2phi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);

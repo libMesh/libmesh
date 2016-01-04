@@ -29,8 +29,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ExplicitSystem implementation
-ExplicitSystem::ExplicitSystem (EquationSystems& es,
-                                const std::string& name_in,
+ExplicitSystem::ExplicitSystem (EquationSystems & es,
+                                const std::string & name_in,
                                 const unsigned int number_in) :
   Parent (es, name_in, number_in),
   rhs(NULL)
@@ -86,7 +86,7 @@ void ExplicitSystem::reinit ()
 
 
 
-void ExplicitSystem::assemble_qoi (const QoISet& qoi_indices)
+void ExplicitSystem::assemble_qoi (const QoISet & qoi_indices)
 {
   // The user quantity of interest assembly gets to expect to
   // accumulate on initially zero values
@@ -99,7 +99,7 @@ void ExplicitSystem::assemble_qoi (const QoISet& qoi_indices)
 
 
 
-void ExplicitSystem::assemble_qoi_derivative (const QoISet& qoi_indices,
+void ExplicitSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                               bool include_liftfunc,
                                               bool apply_constraints)
 {

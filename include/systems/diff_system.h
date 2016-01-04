@@ -60,8 +60,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  DifferentiableSystem (EquationSystems& es,
-                        const std::string& name,
+  DifferentiableSystem (EquationSystems & es,
+                        const std::string & name,
                         const unsigned int number);
 
   /**
@@ -101,7 +101,7 @@ public:
    * Returns a pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    */
-  virtual LinearSolver<Number> *get_linear_solver() const libmesh_override;
+  virtual LinearSolver<Number> * get_linear_solver() const libmesh_override;
 
   /**
    * Returns an integer corresponding to the upper iteration count
@@ -137,7 +137,7 @@ public:
    * true and then calls the adjoint_solve in implicit system
    */
   virtual std::pair<unsigned int, Real>
-  adjoint_solve (const QoISet& qoi_indices = QoISet()) libmesh_override;
+  adjoint_solve (const QoISet & qoi_indices = QoISet()) libmesh_override;
 
   /**
    * We don't allow systems to be attached to each other
@@ -164,20 +164,20 @@ public:
    * that if no external Physics object is attached, the default is
    * this.
    */
-  const DifferentiablePhysics* get_physics() const
+  const DifferentiablePhysics * get_physics() const
   { return this->_diff_physics; }
 
   /**
    * Returns reference to DifferentiablePhysics object. Note that if
    * no external Physics object is attached, the default is this.
    */
-  DifferentiablePhysics* get_physics()
+  DifferentiablePhysics * get_physics()
   { return this->_diff_physics; }
 
   /**
    * Attach external Physics object.
    */
-  void attach_physics( DifferentiablePhysics* physics_in )
+  void attach_physics( DifferentiablePhysics * physics_in )
   { this->_diff_physics = (physics_in->clone_physics()).release();
     this->_diff_physics->init_physics(*this);}
 
@@ -185,20 +185,20 @@ public:
    * Returns const reference to DifferentiableQoI object. Note that if no external
    * QoI object is attached, the default is this.
    */
-  const DifferentiableQoI* get_qoi() const
+  const DifferentiableQoI * get_qoi() const
   { return this->diff_qoi; }
 
   /**
    * Returns reference to DifferentiableQoI object. Note that if no external
    * QoI object is attached, the default is this.
    */
-  DifferentiableQoI* get_qoi()
+  DifferentiableQoI * get_qoi()
   { return this->diff_qoi; }
 
   /**
    * Attach external QoI object.
    */
-  void attach_qoi( DifferentiableQoI* qoi_in )
+  void attach_qoi( DifferentiableQoI * qoi_in )
   { this->diff_qoi = (qoi_in->clone()).release();
     // User needs to resize qoi system qoi accordingly
     this->diff_qoi->init_qoi( this->qoi );}
@@ -223,12 +223,12 @@ public:
   /**
    * Returns a pointer to the time solver attached to the calling system
    */
-  TimeSolver& get_time_solver();
+  TimeSolver & get_time_solver();
 
   /**
    * Non-const version of the above
    */
-  const TimeSolver& get_time_solver() const;
+  const TimeSolver & get_time_solver() const;
 
   /**
    * For time-dependent problems, this is the amount delta t to advance the
@@ -323,14 +323,14 @@ protected:
    * Defaults to \p this for backwards compatibility; in the future
    * users should create separate physics objects.
    */
-  DifferentiablePhysics *_diff_physics;
+  DifferentiablePhysics * _diff_physics;
 
   /**
    * Pointer to object to use for quantity of interest assembly
    * evaluations.  Defaults to \p this for backwards compatibility; in
    * the future users should create separate physics objects.
    */
-  DifferentiableQoI* diff_qoi;
+  DifferentiableQoI * diff_qoi;
 
   /**
    * Initializes the member data fields associated with
@@ -342,7 +342,7 @@ protected:
 // --------------------------------------------------------------
 // DifferentiableSystem inline methods
 inline
-TimeSolver& DifferentiableSystem::get_time_solver()
+TimeSolver & DifferentiableSystem::get_time_solver()
 {
   libmesh_assert(time_solver.get());
   libmesh_assert_equal_to (&(time_solver->system()), this);
@@ -350,7 +350,7 @@ TimeSolver& DifferentiableSystem::get_time_solver()
 }
 
 inline
-const TimeSolver& DifferentiableSystem::get_time_solver() const
+const TimeSolver & DifferentiableSystem::get_time_solver() const
 {
   libmesh_assert(time_solver.get());
   libmesh_assert_equal_to (&(time_solver->system()), this);

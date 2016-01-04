@@ -42,8 +42,8 @@ const Real NewmarkSystem::_default_timestep = 1.;
 
 // ------------------------------------------------------------
 // NewmarkSystem implementation
-NewmarkSystem::NewmarkSystem (EquationSystems& es,
-                              const std::string& name_in,
+NewmarkSystem::NewmarkSystem (EquationSystems & es,
+                              const std::string & name_in,
                               const unsigned int number_in) :
   LinearImplicitSystem (es, name_in, number_in),
   _a_0                 (1./(_default_alpha*_default_timestep*_default_timestep)),
@@ -109,7 +109,7 @@ void NewmarkSystem::clear ()
   LinearImplicitSystem::clear();
 
   // Get a reference to the EquationSystems
-  EquationSystems& es =
+  EquationSystems & es =
     this->get_equation_systems();
 
   // default values of the newmark parameters
@@ -195,12 +195,12 @@ void NewmarkSystem::update_rhs ()
   START_LOG("update_rhs ()", "NewmarkSystem");
 
   // zero the rhs-vector
-  NumericVector<Number>& the_rhs = *this->rhs;
+  NumericVector<Number> & the_rhs = *this->rhs;
   the_rhs.zero();
 
   // get writable references to some vectors
-  NumericVector<Number>& rhs_m = this->get_vector("rhs_m");
-  NumericVector<Number>& rhs_c = this->get_vector("rhs_c");
+  NumericVector<Number> & rhs_m = this->get_vector("rhs_m");
+  NumericVector<Number> & rhs_c = this->get_vector("rhs_c");
 
 
   // zero the vectors for matrix-vector product
@@ -231,13 +231,13 @@ void NewmarkSystem::update_u_v_a ()
   START_LOG("update_u_v_a ()", "NewmarkSystem");
 
   // get some references for convenience
-  const NumericVector<Number>&  solu = *this->solution;
+  const NumericVector<Number> &  solu = *this->solution;
 
-  NumericVector<Number>&  disp_vec   = this->get_vector("displacement");
-  NumericVector<Number>&  vel_vec    = this->get_vector("velocity");
-  NumericVector<Number>&  acc_vec    = this->get_vector("acceleration");
-  NumericVector<Number>&  old_acc    = this->get_vector("old_acceleration");
-  NumericVector<Number>&  old_solu   = this->get_vector("old_solution");
+  NumericVector<Number> &  disp_vec   = this->get_vector("displacement");
+  NumericVector<Number> &  vel_vec    = this->get_vector("velocity");
+  NumericVector<Number> &  acc_vec    = this->get_vector("acceleration");
+  NumericVector<Number> &  old_acc    = this->get_vector("old_acceleration");
+  NumericVector<Number> &  old_solu   = this->get_vector("old_solution");
 
   // copy data
   old_solu = disp_vec;
@@ -266,7 +266,7 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
   libmesh_assert_not_equal_to (delta_T, 0.);
 
   // Get a reference to the EquationSystems
-  EquationSystems& es =
+  EquationSystems & es =
     this->get_equation_systems();
 
   // the newmark parameters

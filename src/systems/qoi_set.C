@@ -31,11 +31,11 @@ namespace libMesh
 // QoISet implementation
 
 
-QoISet::QoISet(const System &sys) : _indices(sys.qoi.size(), true) {}
+QoISet::QoISet(const System & sys) : _indices(sys.qoi.size(), true) {}
 
 
 
-unsigned int QoISet::size (const System& sys) const
+unsigned int QoISet::size (const System & sys) const
 {
   unsigned int qoi_count = 0;
   for (unsigned int i=0; i != sys.qoi.size(); ++i)
@@ -46,7 +46,7 @@ unsigned int QoISet::size (const System& sys) const
 
 
 
-void QoISet::add_indices(const std::vector<unsigned int> &indices)
+void QoISet::add_indices(const std::vector<unsigned int> & indices)
 {
   unsigned int max_size = 0;
   for (std::vector<unsigned int>::const_iterator i = indices.begin();
@@ -63,7 +63,7 @@ void QoISet::add_indices(const std::vector<unsigned int> &indices)
 
 
 inline
-void QoISet::remove_indices(const std::vector<unsigned int> &indices)
+void QoISet::remove_indices(const std::vector<unsigned int> & indices)
 {
   for (std::vector<unsigned int>::const_iterator i = indices.begin();
        i != indices.end(); ++i)

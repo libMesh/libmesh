@@ -53,7 +53,7 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const libmesh_override
+  virtual const T & get () const libmesh_override
   { libmesh_assert(_ptr); return *_ptr; }
 
   /**
@@ -77,7 +77,7 @@ public:
   }
 
 private:
-  T* _ptr;
+  T * _ptr;
 };
 
 } // namespace libMesh

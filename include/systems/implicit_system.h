@@ -50,8 +50,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  ImplicitSystem (EquationSystems& es,
-                  const std::string& name,
+  ImplicitSystem (EquationSystems & es,
+                  const std::string & name,
                   const unsigned int number);
 
   /**
@@ -113,7 +113,7 @@ public:
    * but it may be overridden in derived systems, e.g. to set solver
    * parameters
    */
-  virtual LinearSolver<Number> *get_linear_solver() const;
+  virtual LinearSolver<Number> * get_linear_solver() const;
 
   /**
    * Returns an integer corresponding to the upper iteration count
@@ -152,7 +152,7 @@ public:
    *
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters) libmesh_override;
+  virtual void assemble_residual_derivatives (const ParameterVector & parameters) libmesh_override;
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_p = -dR/dp, for
@@ -162,7 +162,7 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-  sensitivity_solve (const ParameterVector& parameters) libmesh_override;
+  sensitivity_solve (const ParameterVector & parameters) libmesh_override;
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
@@ -173,8 +173,8 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-  weighted_sensitivity_solve (const ParameterVector& parameters,
-                              const ParameterVector& weights) libmesh_override;
+  weighted_sensitivity_solve (const ParameterVector & parameters,
+                              const ParameterVector & weights) libmesh_override;
 
   /**
    * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
@@ -186,7 +186,7 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-  adjoint_solve (const QoISet& qoi_indices = QoISet()) libmesh_override;
+  adjoint_solve (const QoISet & qoi_indices = QoISet()) libmesh_override;
 
   /**
    * Assembles & solves the linear system(s)
@@ -201,9 +201,9 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-  weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
-                                      const ParameterVector& weights,
-                                      const QoISet& qoi_indices = QoISet()) libmesh_override;
+  weighted_sensitivity_adjoint_solve (const ParameterVector & parameters,
+                                      const ParameterVector & weights,
+                                      const QoISet & qoi_indices = QoISet()) libmesh_override;
 
   /**
    * Solves for the derivative of each of the system's quantities of
@@ -216,9 +216,9 @@ public:
    * Currently uses finite differenced derivatives (partial q /
    * partial p) and (partial R / partial p).
    */
-  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities) libmesh_override;
+  virtual void adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indices,
+                                                  const ParameterVector & parameters,
+                                                  SensitivityData & sensitivities) libmesh_override;
 
   /**
    * Solves for the derivative of each of the system's quantities of
@@ -231,9 +231,9 @@ public:
    * Currently uses finite differenced derivatives (partial q /
    * partial p) and (partial R / partial p).
    */
-  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities) libmesh_override;
+  virtual void forward_qoi_parameter_sensitivity (const QoISet & qoi_indices,
+                                                  const ParameterVector & parameters,
+                                                  SensitivityData & sensitivities) libmesh_override;
 
   /**
    * For each of the system's quantities of interest q in
@@ -243,9 +243,9 @@ public:
    * This Hessian is the output of this method, where for each q_i,
    * H_jk is stored in \p hessian.second_derivative(i,j,k).
    */
-  virtual void qoi_parameter_hessian(const QoISet& qoi_indices,
-                                     const ParameterVector& parameters,
-                                     SensitivityData& hessian) libmesh_override;
+  virtual void qoi_parameter_hessian(const QoISet & qoi_indices,
+                                     const ParameterVector & parameters,
+                                     SensitivityData & hessian) libmesh_override;
 
   /**
    * For each of the system's quantities of interest q in
@@ -257,16 +257,16 @@ public:
    * This product is the output of this method, where for each q_i,
    * S_j is stored in \p sensitivities[i][j].
    */
-  virtual void qoi_parameter_hessian_vector_product(const QoISet& qoi_indices,
-                                                    const ParameterVector& parameters,
-                                                    const ParameterVector& vector,
-                                                    SensitivityData& product) libmesh_override;
+  virtual void qoi_parameter_hessian_vector_product(const QoISet & qoi_indices,
+                                                    const ParameterVector & parameters,
+                                                    const ParameterVector & vector,
+                                                    SensitivityData & product) libmesh_override;
 
   /**
    * Matrix iterator typedefs.
    */
-  typedef std::map<std::string, SparseMatrix<Number>* >::iterator        matrices_iterator;
-  typedef std::map<std::string, SparseMatrix<Number>* >::const_iterator  const_matrices_iterator;
+  typedef std::map<std::string, SparseMatrix<Number> *>::iterator        matrices_iterator;
+  typedef std::map<std::string, SparseMatrix<Number> *>::const_iterator  const_matrices_iterator;
 
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
@@ -276,27 +276,27 @@ public:
    * initialize the mayor matrix, then all the additional matrices,
    * if existent, have to be initialized by the user, too.
    */
-  SparseMatrix<Number> & add_matrix (const std::string& mat_name);
+  SparseMatrix<Number> & add_matrix (const std::string & mat_name);
 
   /**
    * @returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
-  bool have_matrix (const std::string& mat_name) const;
+  bool have_matrix (const std::string & mat_name) const;
 
   /**
    * @returns a const pointer to this system's @e additional matrix
    * named \p mat_name, or returns \p NULL if no matrix by that name
    * exists.
    */
-  const SparseMatrix<Number> * request_matrix (const std::string& mat_name) const;
+  const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
 
   /**
    * @returns a writable pointer to this system's @e additional matrix
    * named \p mat_name, or returns \p NULL if no matrix by that name
    * exists.
    */
-  SparseMatrix<Number> * request_matrix (const std::string& mat_name);
+  SparseMatrix<Number> * request_matrix (const std::string & mat_name);
 
   /**
    * @returns a const reference to this system's @e additional matrix
@@ -304,7 +304,7 @@ public:
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
-  const SparseMatrix<Number> & get_matrix (const std::string& mat_name) const;
+  const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
 
   /**
    * @returns a writeable reference to this system's @e additional matrix
@@ -312,7 +312,7 @@ public:
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
-  SparseMatrix<Number> & get_matrix (const std::string& mat_name);
+  SparseMatrix<Number> & get_matrix (const std::string & mat_name);
 
   /**
    * @returns the number of matrices handled by this system
@@ -354,7 +354,7 @@ private:
   /**
    * Some systems need an arbitrary number of matrices.
    */
-  std::map<std::string, SparseMatrix<Number>* > _matrices;
+  std::map<std::string, SparseMatrix<Number> *> _matrices;
 
   /**
    * \p true when additional matrices may still be added, \p false otherwise.
@@ -367,7 +367,7 @@ private:
 // ------------------------------------------------------------
 // ImplicitSystem inline methods
 inline
-bool ImplicitSystem::have_matrix (const std::string& mat_name) const
+bool ImplicitSystem::have_matrix (const std::string & mat_name) const
 {
   return (_matrices.count(mat_name));
 }

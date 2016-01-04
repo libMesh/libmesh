@@ -69,7 +69,7 @@ public:
      * Method that decides whether a given subdomain id is included in
      * the subset or nor.
      */
-    virtual bool operator() (const subdomain_id_type& subdomain_id) const = 0;
+    virtual bool operator() (const subdomain_id_type & subdomain_id) const = 0;
 
   private:
     /**
@@ -78,7 +78,7 @@ public:
      * We won't even bother implementing this; we'll just make sure
      * that the compiler doesn't implement a default.
      */
-    SubdomainSelection (const SubdomainSelection&);
+    SubdomainSelection (const SubdomainSelection &);
 
     /**
      * This isn't a copyable object, so let's make sure nobody tries.
@@ -86,7 +86,7 @@ public:
      * We won't even bother implementing this; we'll just make sure
      * that the compiler doesn't implement a default.
      */
-    SubdomainSelection& operator = (const SubdomainSelection&);
+    SubdomainSelection & operator = (const SubdomainSelection &);
   }; // subclass \p SubdomainSelection
 
 
@@ -102,19 +102,19 @@ public:
      * that the \p list does not go out of scope before \p *this does.
      */
     explicit
-    SubdomainSelectionByList (const std::set<subdomain_id_type>& list);
+    SubdomainSelectionByList (const std::set<subdomain_id_type> & list);
 
     /**
      * Method that decides whether a given subdomain id is included in
      * the subset or nor.
      */
-    virtual bool operator() (const subdomain_id_type& subdomain_id) const libmesh_override;
+    virtual bool operator() (const subdomain_id_type & subdomain_id) const libmesh_override;
 
   protected:
     /**
      * The actual list.
      */
-    const std::set<subdomain_id_type>& _list;
+    const std::set<subdomain_id_type> & _list;
   };
 
   /**
@@ -125,9 +125,9 @@ public:
    * that is not contained in \p var_nums will not contain to the
    * subset, no matter what elements they belong to.
    */
-  SystemSubsetBySubdomain (const System& system,
-                           const SubdomainSelection& subdomain_selection,
-                           const std::set<unsigned int>* const var_nums = NULL);
+  SystemSubsetBySubdomain (const System & system,
+                           const SubdomainSelection & subdomain_selection,
+                           const std::set<unsigned int> * const var_nums = NULL);
 
   /**
    * Constructor.  The subset will consist of those dofs which are
@@ -137,9 +137,9 @@ public:
    * that is not contained in \p var_nums will not contain to the
    * subset, no matter what elements they belong to.
    */
-  SystemSubsetBySubdomain (const System& system,
-                           const std::set<subdomain_id_type>& subdomain_ids,
-                           const std::set<unsigned int>* const var_nums = NULL);
+  SystemSubsetBySubdomain (const System & system,
+                           const std::set<subdomain_id_type> & subdomain_ids,
+                           const std::set<unsigned int> * const var_nums = NULL);
 
   /**
    * Destructor.
@@ -151,7 +151,7 @@ public:
    * consists of.  The result will contain local dofs on each
    * processor only and will not contain duplictates.
    */
-  virtual const std::vector<unsigned int>& dof_ids () const libmesh_override;
+  virtual const std::vector<unsigned int> & dof_ids () const libmesh_override;
 
   /**
    * Initializes the class.  Will be called by the constructors.  Can
@@ -160,7 +160,7 @@ public:
    * meantime and you want these changes to take effect, or (b) you
    * want to use a different \p SubdomainSelection object now.
    */
-  void init (const SubdomainSelection& subdomain_selection);
+  void init (const SubdomainSelection & subdomain_selection);
 
   /**
    * Initializes the class.  Will be called by the constructors.  Can
@@ -169,7 +169,7 @@ public:
    * meantime and you want these changes to take effect, or (b) you
    * want to use a different list of subdomain ids now.
    */
-  void init (const std::set<subdomain_id_type>& subdomain_ids);
+  void init (const std::set<subdomain_id_type> & subdomain_ids);
 
 protected:
 
@@ -177,7 +177,7 @@ protected:
    * Sets \p _var_nums to either a copy of \p var_nums or, if that is
    * \p NULL, a set of all variable numbers that occur in the system.
    */
-  void set_var_nums (const std::set<unsigned int>* const var_nums);
+  void set_var_nums (const std::set<unsigned int> * const var_nums);
 
   /**
    * The set of all variable numbers that are contained in the subset.

@@ -26,7 +26,7 @@ namespace libMesh
 
 
 
-DiffContext::DiffContext (const System& sys) :
+DiffContext::DiffContext (const System & sys) :
   time(sys.time),
   system_time(sys.time),
   elem_solution_derivative(1.),
@@ -68,7 +68,7 @@ DiffContext::DiffContext (const System& sys) :
 
       // Only make space for these if we're using DiffSystem
       // This is assuming *only* DiffSystem is using elem_solution_rate/accel
-      const DifferentiableSystem* diff_system = dynamic_cast<const DifferentiableSystem*>(&sys);
+      const DifferentiableSystem * diff_system = dynamic_cast<const DifferentiableSystem *>(&sys);
       if(diff_system)
         {
           // Now, we only need these if the solver is unsteady
@@ -77,7 +77,7 @@ DiffContext::DiffContext (const System& sys) :
               _elem_subsolution_rates.push_back(new DenseSubVector<Number>(_elem_solution_rate));
 
               // We only need accel space if the TimeSolver is second order
-              const UnsteadySolver& time_solver = cast_ref<const UnsteadySolver&>(diff_system->get_time_solver());
+              const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
               if( time_solver.time_order() >= 2 )
                 _elem_subsolution_accels.push_back(new DenseSubVector<Number>(_elem_solution_accel));
@@ -119,14 +119,14 @@ DiffContext::~DiffContext ()
 
   // We also need to delete all the DenseSubVectors from the localized_vectors map
   // localized_vectors iterators
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_it = _localized_vectors.begin();
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_end = _localized_vectors.end();
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::iterator localized_vectors_it = _localized_vectors.begin();
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::iterator localized_vectors_end = _localized_vectors.end();
 
   // Loop over every localized_vector
   for(; localized_vectors_it != localized_vectors_end; ++localized_vectors_it)
     {
       // Grab the DenseSubVector to be deleted
-      std::vector<DenseSubVector<Number>* >&  localized_vector_dsv = localized_vectors_it->second.second;
+      std::vector<DenseSubVector<Number> * > &  localized_vector_dsv = localized_vectors_it->second.second;
 
       // Loop over that vector and delete each entry
       for(std::size_t i=0; i != localized_vector_dsv.size(); ++i)
@@ -135,7 +135,7 @@ DiffContext::~DiffContext ()
 }
 
 
-void DiffContext::set_deltat_pointer(Real* dt)
+void DiffContext::set_deltat_pointer(Real * dt)
 {
   // We may actually want to be able to set this pointer to NULL, so
   // don't report an error for that.
@@ -154,7 +154,7 @@ Real DiffContext::get_deltat_value()
 void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector, const System & sys)
 {
   // Make an empty pair keyed with a reference to this _localized_vector
-  _localized_vectors[&localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number>*>());
+  _localized_vectors[&localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number> *>());
 
   unsigned int nv = sys.n_vars();
 
@@ -166,30 +166,30 @@ void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector
 }
 
 
-DenseVector<Number>& DiffContext::get_localized_vector (const NumericVector<Number> & localized_vector)
+DenseVector<Number> & DiffContext::get_localized_vector (const NumericVector<Number> & localized_vector)
 {
   return _localized_vectors[&localized_vector].first;
 }
 
 
-const DenseVector<Number>& DiffContext::get_localized_vector (const NumericVector<Number> & localized_vector) const
+const DenseVector<Number> & DiffContext::get_localized_vector (const NumericVector<Number> & localized_vector) const
 {
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::const_iterator
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::const_iterator
     localized_vectors_it = _localized_vectors.find(&localized_vector);
   libmesh_assert(localized_vectors_it != _localized_vectors.end());
   return localized_vectors_it->second.first;
 }
 
 
-DenseSubVector<Number>& DiffContext::get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var)
+DenseSubVector<Number> & DiffContext::get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var)
 {
   return *_localized_vectors[&localized_vector].second[var];
 }
 
 
-const DenseSubVector<Number>& DiffContext::get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var) const
+const DenseSubVector<Number> & DiffContext::get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var) const
 {
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::const_iterator
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::const_iterator
     localized_vectors_it = _localized_vectors.find(&localized_vector);
   libmesh_assert(localized_vectors_it != _localized_vectors.end());
   return *localized_vectors_it->second.second[var];

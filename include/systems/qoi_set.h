@@ -44,7 +44,7 @@ public:
   class iterator
   {
   public:
-    iterator(unsigned int i, const std::vector<bool>& v) : _i(i), _vecbool(v)
+    iterator(unsigned int i, const std::vector<bool> & v) : _i(i), _vecbool(v)
     {
       while (_i < _vecbool.size() && !_vecbool[_i])
         _i++;
@@ -52,7 +52,7 @@ public:
 
     unsigned int operator*() const { return _i; }
 
-    iterator& operator++()
+    iterator & operator++()
     {
       do {
         _i++;
@@ -66,12 +66,12 @@ public:
       return it;
     }
 
-    bool operator==(const iterator &other) const {
+    bool operator==(const iterator & other) const {
       libmesh_assert_equal_to (&_vecbool, &other._vecbool);
       return _i == other._i;
     }
 
-    bool operator!=(const iterator &other) const {
+    bool operator!=(const iterator & other) const {
       libmesh_assert_equal_to (&_vecbool, &other._vecbool);
       return _i != other._i;
     }
@@ -80,7 +80,7 @@ public:
 
     unsigned int _i;
 
-    const std::vector<bool>& _vecbool;
+    const std::vector<bool> & _vecbool;
   };
 
   /**
@@ -97,14 +97,14 @@ public:
    * "give every QoI weight 1.0"
    */
   explicit
-  QoISet(const System &sys);
+  QoISet(const System & sys);
 
   /**
    * Constructor-from-vector-of-bool: "calculate the QoIs for which
    * \p indices[q] is true"
    */
   explicit
-  QoISet(const std::vector<bool> &indices) :
+  QoISet(const std::vector<bool> & indices) :
     _indices(indices), _weights() {}
 
   /**
@@ -112,7 +112,7 @@ public:
    * QoI weight 1.0"
    */
   explicit
-  QoISet(const std::vector<unsigned int> &indices);
+  QoISet(const std::vector<unsigned int> & indices);
 
   /**
    * Resets to "calculate all QoIs, give every QoI weight 1.0"
@@ -123,12 +123,12 @@ public:
    * Returns the number of QoIs that would be computed for the
    * System \p sys
    */
-  unsigned int size(const System& sys) const;
+  unsigned int size(const System & sys) const;
 
   /**
    * Add this indices to the set to be calculated
    */
-  void add_indices(const std::vector<unsigned int> &indices);
+  void add_indices(const std::vector<unsigned int> & indices);
 
   /**
    * Add this index to the set to be calculated
@@ -138,7 +138,7 @@ public:
   /**
    * Remove these indices from the set to be calculated
    */
-  void remove_indices(const std::vector<unsigned int> &indices);
+  void remove_indices(const std::vector<unsigned int> & indices);
 
   /**
    * Remove this index from the set to be calculated
@@ -185,7 +185,7 @@ private:
 
 
 inline
-QoISet::QoISet(const std::vector<unsigned int> &indices) :
+QoISet::QoISet(const std::vector<unsigned int> & indices) :
   _indices(), _weights()
 {
   this->add_indices(indices);
