@@ -71,7 +71,7 @@ public:
 
 
 
-  IndexType& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
+  IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
   {
     libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 
@@ -80,7 +80,7 @@ public:
 
 
 
-  const IndexType& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+  const IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
   {
     libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 
