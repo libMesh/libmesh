@@ -107,7 +107,7 @@ protected:
    * cannot be explicitly instantiated.
    */
   FEGenericBase (const unsigned int dim,
-                 const FEType& fet);
+                 const FEType & fet);
 
 public:
 
@@ -125,7 +125,7 @@ public:
    * compatible with the output required for the requested \p type
    */
   static UniquePtr<FEGenericBase> build (const unsigned int dim,
-                                         const FEType& type);
+                                         const FEType & type);
 
   /**
    * Convenient typedefs for gradients of output, hessians of output,
@@ -153,7 +153,7 @@ public:
    * compatible with the output required for the requested \p type
    */
   static UniquePtr<FEGenericBase> build_InfFE (const unsigned int dim,
-                                               const FEType& type);
+                                               const FEType & type);
 
 #endif
 
@@ -165,10 +165,10 @@ public:
    * variable number \p var_number, using generic
    * projections.
    */
-  static void compute_proj_constraints (DofConstraints &constraints,
-                                        DofMap &dof_map,
+  static void compute_proj_constraints (DofConstraints & constraints,
+                                        DofMap & dof_map,
                                         const unsigned int variable_number,
-                                        const Elem* elem);
+                                        const Elem * elem);
 
   /**
    * Creates a local projection on \p coarse_elem, based on the
@@ -177,10 +177,10 @@ public:
    * single given \p var
    */
 
-  static void coarsened_dof_values(const NumericVector<Number> &global_vector,
-                                   const DofMap &dof_map,
-                                   const Elem *coarse_elem,
-                                   DenseVector<Number> &coarse_dofs,
+  static void coarsened_dof_values(const NumericVector<Number> & global_vector,
+                                   const DofMap & dof_map,
+                                   const Elem * coarse_elem,
+                                   DenseVector<Number> & coarse_dofs,
                                    const unsigned int var,
                                    const bool use_old_dof_indices = false);
 
@@ -190,10 +190,10 @@ public:
    * vector of coefficients corresponding to all dof_indices.
    */
 
-  static void coarsened_dof_values(const NumericVector<Number> &global_vector,
-                                   const DofMap &dof_map,
-                                   const Elem *coarse_elem,
-                                   DenseVector<Number> &coarse_dofs,
+  static void coarsened_dof_values(const NumericVector<Number> & global_vector,
+                                   const DofMap & dof_map,
+                                   const Elem * coarse_elem,
+                                   DenseVector<Number> & coarse_dofs,
                                    const bool use_old_dof_indices = false);
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
@@ -205,13 +205,13 @@ public:
    * meshes with periodic boundary conditions) corresponding to
    * variable number \p var_number, using generic projections.
    */
-  static void compute_periodic_constraints (DofConstraints &constraints,
-                                            DofMap &dof_map,
-                                            const PeriodicBoundaries &boundaries,
-                                            const MeshBase& mesh,
-                                            const PointLocatorBase* point_locator,
+  static void compute_periodic_constraints (DofConstraints & constraints,
+                                            DofMap & dof_map,
+                                            const PeriodicBoundaries & boundaries,
+                                            const MeshBase & mesh,
+                                            const PointLocatorBase * point_locator,
                                             const unsigned int variable_number,
-                                            const Elem* elem);
+                                            const Elem * elem);
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
@@ -219,7 +219,7 @@ public:
    * @returns the shape function values at the quadrature points
    * on the element.
    */
-  const std::vector<std::vector<OutputShape> >& get_phi() const
+  const std::vector<std::vector<OutputShape> > & get_phi() const
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
 
@@ -227,7 +227,7 @@ public:
    * @returns the shape function derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputGradient> >& get_dphi() const
+  const std::vector<std::vector<OutputGradient> > & get_dphi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphi; }
 
@@ -235,7 +235,7 @@ public:
    * @returns the curl of the shape function at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_curl_phi() const
+  const std::vector<std::vector<OutputShape> > & get_curl_phi() const
   { libmesh_assert(!calculations_started || calculate_curl_phi);
     calculate_curl_phi = calculate_dphiref = true; return curl_phi; }
 
@@ -243,7 +243,7 @@ public:
    * @returns the divergence of the shape function at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputDivergence> >& get_div_phi() const
+  const std::vector<std::vector<OutputDivergence> > & get_div_phi() const
   { libmesh_assert(!calculations_started || calculate_div_phi);
     calculate_div_phi = calculate_dphiref = true; return div_phi; }
 
@@ -251,7 +251,7 @@ public:
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidx() const
+  const std::vector<std::vector<OutputShape> > & get_dphidx() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphidx; }
 
@@ -259,7 +259,7 @@ public:
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidy() const
+  const std::vector<std::vector<OutputShape> > & get_dphidy() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphidy; }
 
@@ -267,7 +267,7 @@ public:
    * @returns the shape function z-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidz() const
+  const std::vector<std::vector<OutputShape> > & get_dphidz() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphidz; }
 
@@ -275,7 +275,7 @@ public:
    * @returns the shape function xi-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidxi() const
+  const std::vector<std::vector<OutputShape> > & get_dphidxi() const
   { libmesh_assert(!calculations_started || calculate_dphiref);
     calculate_dphiref = true; return dphidxi; }
 
@@ -283,7 +283,7 @@ public:
    * @returns the shape function eta-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphideta() const
+  const std::vector<std::vector<OutputShape> > & get_dphideta() const
   { libmesh_assert(!calculations_started || calculate_dphiref);
     calculate_dphiref = true; return dphideta; }
 
@@ -291,7 +291,7 @@ public:
    * @returns the shape function zeta-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidzeta() const
+  const std::vector<std::vector<OutputShape> > & get_dphidzeta() const
   { libmesh_assert(!calculations_started || calculate_dphiref);
     calculate_dphiref = true; return dphidzeta; }
 
@@ -301,7 +301,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputTensor> >& get_d2phi() const
+  const std::vector<std::vector<OutputTensor> > & get_d2phi() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phi; }
 
@@ -309,7 +309,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidx2() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidx2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidx2; }
 
@@ -317,7 +317,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxdy() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidxdy() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidxdy; }
 
@@ -325,7 +325,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxdz() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidxdz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidxdz; }
 
@@ -333,7 +333,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidy2() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidy2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi =  calculate_dphiref = true; return d2phidy2; }
 
@@ -341,7 +341,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidydz() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidydz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidydz; }
 
@@ -349,7 +349,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidz2() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidz2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidz2; }
 
@@ -357,7 +357,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxi2() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidxi2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidxi2; }
 
@@ -365,7 +365,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxideta() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidxideta() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidxideta; }
 
@@ -373,7 +373,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxidzeta() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidxidzeta() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidxidzeta; }
 
@@ -381,7 +381,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phideta2() const
+  const std::vector<std::vector<OutputShape> > & get_d2phideta2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phideta2; }
 
@@ -389,7 +389,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidetadzeta() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidetadzeta() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidetadzeta; }
 
@@ -397,7 +397,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidzeta2() const
+  const std::vector<std::vector<OutputShape> > & get_d2phidzeta2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phidzeta2; }
 
@@ -415,7 +415,7 @@ public:
    * formulation for an @e infinite element returns correct element
    * matrices for a mesh using both finite and infinite elements.
    */
-  const std::vector<OutputGradient>& get_dphase() const
+  const std::vector<OutputGradient> & get_dphase() const
   { return dphase; }
 
 
@@ -431,7 +431,7 @@ public:
    * formulation for an @e infinite element returns correct element
    * matrices for a mesh using both finite and infinite elements.
    */
-  const std::vector<Real>& get_Sobolev_weight() const
+  const std::vector<Real> & get_Sobolev_weight() const
   { return weight; }
 
   /**
@@ -439,7 +439,7 @@ public:
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */
-  const std::vector<RealGradient>& get_Sobolev_dweight() const
+  const std::vector<RealGradient> & get_Sobolev_dweight() const
   { return dweight; }
 
 #endif
@@ -448,13 +448,13 @@ public:
   /**
    * Prints the value of each shape function at each quadrature point.
    */
-  void print_phi(std::ostream& os) const;
+  void print_phi(std::ostream & os) const;
 
   /**
    * Prints the value of each shape function's derivative
    * at each quadrature point.
    */
-  void print_dphi(std::ostream& os) const;
+  void print_dphi(std::ostream & os) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -462,7 +462,7 @@ public:
    * Prints the value of each shape function's second derivatives
    * at each quadrature point.
    */
-  void print_d2phi(std::ostream& os) const;
+  void print_d2phi(std::ostream & os) const;
 
 #endif
 
@@ -478,8 +478,8 @@ protected:
    * an infinite element.  Implement this in the derived
    * class \p FE<Dim,T>.
    */
-  virtual void init_base_shape_functions(const std::vector<Point>& qp,
-                                         const Elem* e) = 0;
+  virtual void init_base_shape_functions(const std::vector<Point> & qp,
+                                         const Elem * e) = 0;
 
 #endif
 
@@ -493,7 +493,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem* elem, const std::vector<Point>& qp);
+  virtual void compute_shape_functions(const Elem * elem, const std::vector<Point> & qp);
 
   /**
    * Object that handles computing shape function values, gradients, etc
@@ -660,7 +660,7 @@ private:
   /**
    * Make all \p InfFE<Dim,T_radial,T_map> classes friends
    * so that they can safely used \p FE<Dim-1,T_base> through
-   * a \p FEGenericBase* as base approximation.
+   * a \p FEGenericBase * as base approximation.
    */
   template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
   friend class InfFE;
@@ -683,7 +683,7 @@ typedef FEGenericBase<RealGradient> FEVectorBase;
 template <typename OutputType>
 inline
 FEGenericBase<OutputType>::FEGenericBase(const unsigned int d,
-                                         const FEType& fet) :
+                                         const FEType & fet) :
   FEAbstract(d,fet),
   _fe_trans( FETransformationBase<OutputType>::build(fet) ),
   phi(),

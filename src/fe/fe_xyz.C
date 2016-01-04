@@ -33,10 +33,10 @@ namespace libMesh
 // Anonymous namespace for local helper functions
 namespace {
 
-void xyz_nodal_soln(const Elem* elem,
+void xyz_nodal_soln(const Elem * elem,
                     const Order order,
-                    const std::vector<Number>& elem_soln,
-                    std::vector<Number>&       nodal_soln,
+                    const std::vector<Number> & elem_soln,
+                    std::vector<Number> &       nodal_soln,
                     unsigned Dim)
 {
   const unsigned int n_nodes = elem->n_nodes();
@@ -567,8 +567,8 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
 
 
 template <unsigned int Dim>
-void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
-                                      const Elem* libmesh_dbg_var(elem))
+void FEXYZ<Dim>::init_shape_functions(const std::vector<Point> & qp,
+                                      const Elem * libmesh_dbg_var(elem))
 {
   libmesh_assert(elem);
   this->calculations_started = true;
@@ -682,7 +682,8 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 
 
 template <unsigned int Dim>
-void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Point>&)
+void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
+                                          const std::vector<Point> &)
 {
   libmesh_assert(elem);
 
@@ -694,7 +695,7 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Po
   // Start logging the shape function computation
   START_LOG("compute_shape_functions()", "FE");
 
-  const std::vector<Point>& xyz_qp = this->get_xyz();
+  const std::vector<Point> & xyz_qp = this->get_xyz();
 
   // Compute the value of the derivative shape function i at quadrature point p
   switch (this->dim)
@@ -849,31 +850,31 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Po
 // of explicit instantiation at the end of this file.
 // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,XYZ>::nodal_soln(const Elem* elem,
+void FE<0,XYZ>::nodal_soln(const Elem * elem,
                            const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
+                           const std::vector<Number> & elem_soln,
+                           std::vector<Number> & nodal_soln)
 { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
 template <>
-void FE<1,XYZ>::nodal_soln(const Elem* elem,
+void FE<1,XYZ>::nodal_soln(const Elem * elem,
                            const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
+                           const std::vector<Number> & elem_soln,
+                           std::vector<Number> & nodal_soln)
 { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
 template <>
-void FE<2,XYZ>::nodal_soln(const Elem* elem,
+void FE<2,XYZ>::nodal_soln(const Elem * elem,
                            const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
+                           const std::vector<Number> & elem_soln,
+                           std::vector<Number> & nodal_soln)
 { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
 template <>
-void FE<3,XYZ>::nodal_soln(const Elem* elem,
+void FE<3,XYZ>::nodal_soln(const Elem * elem,
                            const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
+                           const std::vector<Number> & elem_soln,
+                           std::vector<Number> & nodal_soln)
 { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 
@@ -915,8 +916,8 @@ template <> bool FE<3,XYZ>::is_hierarchic() const { return true; }
 // Full specialization of compute_constraints() function for 2D and
 // 3D only.  There are no constraints for discontinuous elements, so
 // we do nothing.
-template <> void FE<2,XYZ>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
-template <> void FE<3,XYZ>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
+template <> void FE<2,XYZ>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem *) {}
+template <> void FE<3,XYZ>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem *) {}
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
@@ -939,14 +940,14 @@ template <> bool FE<3,XYZ>::shapes_need_reinit() const { return true; }
 // 2.) There is (IMHO) less chance of the linker calling the
 // wrong version of one of these member functions, since there is
 // only one FEXYZ.
-template void  FEXYZ<0>::init_shape_functions(const std::vector<Point>&, const Elem*);
-template void  FEXYZ<1>::init_shape_functions(const std::vector<Point>&, const Elem*);
-template void  FEXYZ<2>::init_shape_functions(const std::vector<Point>&, const Elem*);
-template void  FEXYZ<3>::init_shape_functions(const std::vector<Point>&, const Elem*);
+template void  FEXYZ<0>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template void  FEXYZ<1>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template void  FEXYZ<2>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template void  FEXYZ<3>::init_shape_functions(const std::vector<Point> &, const Elem *);
 
-template void  FEXYZ<0>::compute_shape_functions(const Elem*,const std::vector<Point>&);
-template void  FEXYZ<1>::compute_shape_functions(const Elem*,const std::vector<Point>&);
-template void  FEXYZ<2>::compute_shape_functions(const Elem*,const std::vector<Point>&);
-template void  FEXYZ<3>::compute_shape_functions(const Elem*,const std::vector<Point>&);
+template void  FEXYZ<0>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template void  FEXYZ<1>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template void  FEXYZ<2>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template void  FEXYZ<3>::compute_shape_functions(const Elem *,const std::vector<Point> &);
 
 } // namespace libMesh

@@ -38,7 +38,7 @@ template <>
 Real FE<1,BERNSTEIN>::shape(const ElemType,
                             const Order order,
                             const unsigned int i,
-                            const Point& p)
+                            const Point & p)
 {
   const Real xi = p(0);
   using Utility::pow;
@@ -189,10 +189,10 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape(const Elem* elem,
+Real FE<1,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
-                            const Point& p)
+                            const Point & p)
 {
   libmesh_assert(elem);
 
@@ -206,7 +206,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int libmesh_dbg_var(j),
-                                  const Point& p)
+                                  const Point & p)
 {
   // only d()/dxi in 1D!
 
@@ -363,11 +363,11 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape_deriv(const Elem* elem,
+Real FE<1,BERNSTEIN>::shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int j,
-                                  const Point& p)
+                                  const Point & p)
 {
   libmesh_assert(elem);
 
@@ -382,7 +382,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
                                          const Order,
                                          const unsigned int,
                                          const unsigned int,
-                                         const Point&)
+                                         const Point &)
 {
   static bool warning_given = false;
 
@@ -399,11 +399,11 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem*,
+Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem *,
                                          const Order,
                                          const unsigned int,
                                          const unsigned int,
-                                         const Point&)
+                                         const Point &)
 {
   static bool warning_given = false;
 

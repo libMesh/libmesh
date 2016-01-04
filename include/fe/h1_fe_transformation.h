@@ -51,23 +51,23 @@ public:
    * conforming elements.  In this case \f$ \phi(x) = \phi(\xi) \f$
    */
   virtual void map_phi(const unsigned int,
-                       const Elem* const,
-                       const std::vector<Point>&,
-                       const FEGenericBase<OutputShape>&,
-                       std::vector<std::vector<OutputShape> >&) const libmesh_override;
+                       const Elem * const,
+                       const std::vector<Point> &,
+                       const FEGenericBase<OutputShape> &,
+                       std::vector<std::vector<OutputShape> > &) const libmesh_override;
 
   /**
    * Evaluates shape function gradients in physical coordinates for H1
    * conforming elements. dphi/dx = dphi/dxi * dxi/dx, etc.
    */
   virtual void map_dphi(const unsigned int dim,
-                        const Elem* const elem,
-                        const std::vector<Point>& qp,
-                        const FEGenericBase<OutputShape>& fe,
-                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& dphi,
-                        std::vector<std::vector<OutputShape> >& dphidx,
-                        std::vector<std::vector<OutputShape> >& dphidy,
-                        std::vector<std::vector<OutputShape> >& dphidz) const libmesh_override;
+                        const Elem * const elem,
+                        const std::vector<Point> & qp,
+                        const FEGenericBase<OutputShape> & fe,
+                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > & dphi,
+                        std::vector<std::vector<OutputShape> > & dphidx,
+                        std::vector<std::vector<OutputShape> > & dphidy,
+                        std::vector<std::vector<OutputShape> > & dphidz) const libmesh_override;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -75,15 +75,15 @@ public:
    * on H1 conforming finite element transformation.
    */
   virtual void map_d2phi(const unsigned int dim,
-                         const std::vector<Point>& qp,
-                         const FEGenericBase<OutputShape>& fe,
-                         std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& d2phi,
-                         std::vector<std::vector<OutputShape> >& d2phidx2,
-                         std::vector<std::vector<OutputShape> >& d2phidxdy,
-                         std::vector<std::vector<OutputShape> >& d2phidxdz,
-                         std::vector<std::vector<OutputShape> >& d2phidy2,
-                         std::vector<std::vector<OutputShape> >& d2phidydz,
-                         std::vector<std::vector<OutputShape> >& d2phidz2) const libmesh_override;
+                         const std::vector<Point> & qp,
+                         const FEGenericBase<OutputShape> & fe,
+                         std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > & d2phi,
+                         std::vector<std::vector<OutputShape> > & d2phidx2,
+                         std::vector<std::vector<OutputShape> > & d2phidxdy,
+                         std::vector<std::vector<OutputShape> > & d2phidxdz,
+                         std::vector<std::vector<OutputShape> > & d2phidy2,
+                         std::vector<std::vector<OutputShape> > & d2phidydz,
+                         std::vector<std::vector<OutputShape> > & d2phidz2) const libmesh_override;
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
@@ -91,20 +91,20 @@ public:
    * on H1 conforming finite element transformation.
    */
   virtual void map_curl(const unsigned int dim,
-                        const Elem* const elem,
-                        const std::vector<Point>& qp,
-                        const FEGenericBase<OutputShape>& fe,
-                        std::vector<std::vector<OutputShape> >& curl_phi) const libmesh_override;
+                        const Elem * const elem,
+                        const std::vector<Point> & qp,
+                        const FEGenericBase<OutputShape> & fe,
+                        std::vector<std::vector<OutputShape> > & curl_phi) const libmesh_override;
 
   /**
    * Evaluates the shape function divergence in physical coordinates
    * based on H1 conforming finite element transformation.
    */
   virtual void map_div(const unsigned int dim,
-                       const Elem* const elem,
-                       const std::vector<Point>& qp,
-                       const FEGenericBase<OutputShape>& fe,
-                       std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >& div_phi) const libmesh_override;
+                       const Elem * const elem,
+                       const std::vector<Point> & qp,
+                       const FEGenericBase<OutputShape> & fe,
+                       std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > & div_phi) const libmesh_override;
 
 }; // class H1FETransformation
 

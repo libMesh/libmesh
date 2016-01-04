@@ -28,7 +28,7 @@ namespace
 using namespace libMesh;
 
 // Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & dxdxi
+void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real> > & dxdxi
 
 #ifdef DEBUG
                            , std::vector<Real> & dydxi, std::vector<Real> & dzdeta, std::vector<Real> & dxdzeta,
@@ -69,7 +69,7 @@ void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & d
 
           // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
           // be 0!
-          const Point &point_i = elem->point(i);
+          const Point & point_i = elem->point(i);
           dxdxi[0][p] += point_i(0) * ddxi;
           dxdxi[1][p] += point_i(1) * ddeta;
           dxdxi[2][p] += point_i(2) * ddzeta;
@@ -101,11 +101,10 @@ void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & d
 
 
 
-Real hermite_bases_3D
-(std::vector<unsigned int> &bases1D,
- const std::vector<std::vector<Real> > &dxdxi,
- const Order &o,
- unsigned int i)
+Real hermite_bases_3D (std::vector<unsigned int> & bases1D,
+                       const std::vector<std::vector<Real> > & dxdxi,
+                       const Order & o,
+                       unsigned int i)
 {
   bases1D.clear();
   bases1D.resize(3,0);
@@ -377,7 +376,7 @@ template <>
 Real FE<3,HERMITE>::shape(const ElemType,
                           const Order,
                           const unsigned int,
-                          const Point&)
+                          const Point &)
 {
   libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
@@ -386,10 +385,10 @@ Real FE<3,HERMITE>::shape(const ElemType,
 
 
 template <>
-Real FE<3,HERMITE>::shape(const Elem* elem,
+Real FE<3,HERMITE>::shape(const Elem * elem,
                           const Order order,
                           const unsigned int i,
-                          const Point& p)
+                          const Point & p)
 {
   libmesh_assert(elem);
 
@@ -452,7 +451,7 @@ Real FE<3,HERMITE>::shape_deriv(const ElemType,
                                 const Order,
                                 const unsigned int,
                                 const unsigned int,
-                                const Point&)
+                                const Point &)
 {
   libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
@@ -461,11 +460,11 @@ Real FE<3,HERMITE>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
+Real FE<3,HERMITE>::shape_deriv(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
-                                const Point& p)
+                                const Point & p)
 {
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
@@ -545,11 +544,11 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
 
 
 template <>
-Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
+Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
                                        const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
-                                       const Point& p)
+                                       const Point & p)
 {
   libmesh_assert(elem);
 

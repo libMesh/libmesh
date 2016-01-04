@@ -383,7 +383,7 @@ FEInterface::FEInterface()
 
 
 unsigned int FEInterface::n_shape_functions(const unsigned int dim,
-                                            const FEType& fe_t,
+                                            const FEType & fe_t,
                                             const ElemType t)
 {
 
@@ -412,7 +412,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 
 unsigned int FEInterface::n_dofs(const unsigned int dim,
-                                 const FEType& fe_t,
+                                 const FEType & fe_t,
                                  const ElemType t)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -434,7 +434,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 
 unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
-                                         const FEType& fe_t,
+                                         const FEType & fe_t,
                                          const ElemType t,
                                          const unsigned int n)
 {
@@ -458,7 +458,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 
 unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
-                                          const FEType& fe_t,
+                                          const FEType & fe_t,
                                           const ElemType t)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -479,11 +479,11 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 
 
-void FEInterface::dofs_on_side(const Elem* const elem,
+void FEInterface::dofs_on_side(const Elem * const elem,
                                const unsigned int dim,
-                               const FEType& fe_t,
+                               const FEType & fe_t,
                                unsigned int s,
-                               std::vector<unsigned int>& di)
+                               std::vector<unsigned int> & di)
 {
   const Order o = fe_t.order;
 
@@ -494,11 +494,11 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 
 
 
-void FEInterface::dofs_on_edge(const Elem* const elem,
+void FEInterface::dofs_on_edge(const Elem * const elem,
                                const unsigned int dim,
-                               const FEType& fe_t,
+                               const FEType & fe_t,
                                unsigned int e,
-                               std::vector<unsigned int>& di)
+                               std::vector<unsigned int> & di)
 {
   const Order o = fe_t.order;
 
@@ -511,10 +511,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 
 
 void FEInterface::nodal_soln(const unsigned int dim,
-                             const FEType& fe_t,
-                             const Elem* elem,
-                             const std::vector<Number>& elem_soln,
-                             std::vector<Number>&       nodal_soln)
+                             const FEType & fe_t,
+                             const Elem * elem,
+                             const std::vector<Number> & elem_soln,
+                             std::vector<Number> &       nodal_soln)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -535,9 +535,9 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 
 Point FEInterface::map(unsigned int dim,
-                       const FEType& fe_t,
-                       const Elem* elem,
-                       const Point& p)
+                       const FEType & fe_t,
+                       const Elem * elem,
+                       const Point & p)
 {
   fe_with_vec_switch(map(elem, p));
 
@@ -550,9 +550,9 @@ Point FEInterface::map(unsigned int dim,
 
 
 Point FEInterface::inverse_map (const unsigned int dim,
-                                const FEType& fe_t,
-                                const Elem* elem,
-                                const Point& p,
+                                const FEType & fe_t,
+                                const Elem * elem,
+                                const Point & p,
                                 const Real tolerance,
                                 const bool secure)
 {
@@ -573,10 +573,10 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 
 void FEInterface::inverse_map (const unsigned int dim,
-                               const FEType& fe_t,
-                               const Elem* elem,
-                               const std::vector<Point>& physical_points,
-                               std::vector<Point>&       reference_points,
+                               const FEType & fe_t,
+                               const Elem * elem,
+                               const std::vector<Point> & physical_points,
+                               std::vector<Point> &       reference_points,
                                const Real tolerance,
                                const bool secure)
 {
@@ -611,7 +611,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 
 
-bool FEInterface::on_reference_element(const Point& p,
+bool FEInterface::on_reference_element(const Point & p,
                                        const ElemType t,
                                        const Real eps)
 {
@@ -622,10 +622,10 @@ bool FEInterface::on_reference_element(const Point& p,
 
 
 Real FEInterface::shape(const unsigned int dim,
-                        const FEType& fe_t,
+                        const FEType & fe_t,
                         const ElemType t,
                         const unsigned int i,
-                        const Point& p)
+                        const Point & p)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -643,10 +643,10 @@ Real FEInterface::shape(const unsigned int dim,
 }
 
 Real FEInterface::shape(const unsigned int dim,
-                        const FEType& fe_t,
-                        const Elem* elem,
+                        const FEType & fe_t,
+                        const Elem * elem,
                         const unsigned int i,
-                        const Point& p)
+                        const Point & p)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -665,11 +665,11 @@ Real FEInterface::shape(const unsigned int dim,
 
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
-                              const FEType& fe_t,
+                              const FEType & fe_t,
                               const ElemType t,
                               const unsigned int i,
-                              const Point& p,
-                              Real& phi)
+                              const Point & p,
+                              Real & phi)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -703,11 +703,11 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
-                              const FEType& fe_t,
-                              const Elem* elem,
+                              const FEType & fe_t,
+                              const Elem * elem,
                               const unsigned int i,
-                              const Point& p,
-                              Real& phi)
+                              const Point & p,
+                              Real & phi)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -741,11 +741,11 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
-                                      const FEType& fe_t,
+                                      const FEType & fe_t,
                                       const ElemType t,
                                       const unsigned int i,
-                                      const Point& p,
-                                      RealGradient& phi)
+                                      const Point & p,
+                                      RealGradient & phi)
 {
   const Order o = fe_t.order;
 
@@ -772,11 +772,11 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
 
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
-                                      const FEType& fe_t,
-                                      const Elem* elem,
+                                      const FEType & fe_t,
+                                      const Elem * elem,
                                       const unsigned int i,
-                                      const Point& p,
-                                      RealGradient& phi)
+                                      const Point & p,
+                                      RealGradient & phi)
 {
   const Order o = fe_t.order;
 
@@ -802,9 +802,9 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
 }
 
 void FEInterface::compute_data(const unsigned int dim,
-                               const FEType& fe_t,
-                               const Elem* elem,
-                               FEComputeData& data)
+                               const FEType & fe_t,
+                               const Elem * elem,
+                               FEComputeData & data)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -821,7 +821,7 @@ void FEInterface::compute_data(const unsigned int dim,
   p_refined.order = static_cast<Order>(p_refined.order + elem->p_level());
 
   const unsigned int n_dof = n_dofs (dim, p_refined, elem->type());
-  const Point&       p     = data.p;
+  const Point &       p     = data.p;
   data.shape.resize(n_dof);
 
   // set default values for all the output fields
@@ -837,14 +837,14 @@ void FEInterface::compute_data(const unsigned int dim,
 
 #ifdef LIBMESH_ENABLE_AMR
 
-void FEInterface::compute_constraints (DofConstraints &constraints,
-                                       DofMap &dof_map,
+void FEInterface::compute_constraints (DofConstraints & constraints,
+                                       DofMap & dof_map,
                                        const unsigned int variable_number,
-                                       const Elem* elem)
+                                       const Elem * elem)
 {
   libmesh_assert(elem);
 
-  const FEType& fe_t = dof_map.variable_type(variable_number);
+  const FEType & fe_t = dof_map.variable_type(variable_number);
 
   switch (elem->dim())
     {
@@ -981,13 +981,13 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
-                                                DofMap &dof_map,
-                                                const PeriodicBoundaries &boundaries,
-                                                const MeshBase &mesh,
-                                                const PointLocatorBase* point_locator,
+void FEInterface::compute_periodic_constraints (DofConstraints & constraints,
+                                                DofMap & dof_map,
+                                                const PeriodicBoundaries & boundaries,
+                                                const MeshBase & mesh,
+                                                const PointLocatorBase * point_locator,
                                                 const unsigned int variable_number,
-                                                const Elem* elem)
+                                                const Elem * elem)
 {
   // No element-specific optimizations currently exist
   FEBase::compute_periodic_constraints (constraints,
@@ -1003,8 +1003,8 @@ void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
 
 
 
-unsigned int FEInterface::max_order(const FEType& fe_t,
-                                    const ElemType& el_t)
+unsigned int FEInterface::max_order(const FEType & fe_t,
+                                    const ElemType & el_t)
 {
   // Yeah, I know, infinity is much larger than 11, but our
   // solvers don't seem to like high degree polynomials, and our
@@ -1348,7 +1348,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 
 
 
-bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
+bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
 {
   switch (fe_t.family)
     {
@@ -1373,12 +1373,12 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
     }
 }
 
-FEFieldType FEInterface::field_type( const FEType& fe_type )
+FEFieldType FEInterface::field_type(const FEType & fe_type)
 {
-  return FEInterface::field_type( fe_type.family );
+  return FEInterface::field_type(fe_type.family);
 }
 
-FEFieldType FEInterface::field_type( const FEFamily& fe_family )
+FEFieldType FEInterface::field_type (const FEFamily & fe_family)
 {
   switch (fe_family)
     {
@@ -1390,7 +1390,8 @@ FEFieldType FEInterface::field_type( const FEFamily& fe_family )
     }
 }
 
-unsigned int FEInterface::n_vec_dim( const MeshBase& mesh, const FEType& fe_type )
+unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
+                                     const FEType & fe_type)
 {
   switch (fe_type.family)
     {

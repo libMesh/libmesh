@@ -102,7 +102,7 @@ protected:
    * cannot be explicitly instantiated.
    */
   FEAbstract (const unsigned int dim,
-              const FEType& fet);
+              const FEType & fet);
 
 public:
 
@@ -117,7 +117,7 @@ public:
    * way the user need not remember to delete the object.
    */
   static UniquePtr<FEAbstract> build (const unsigned int dim,
-                                      const FEType& type);
+                                      const FEType & type);
 
   /**
    * This is at the core of this class. Use this for each
@@ -133,9 +133,9 @@ public:
    * been called, so all such accessors should be called before the first
    * \p reinit().
    */
-  virtual void reinit (const Elem* elem,
-                       const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL) = 0;
+  virtual void reinit (const Elem * elem,
+                       const std::vector<Point> * const pts = NULL,
+                       const std::vector<Real> * const weights = NULL) = 0;
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -145,11 +145,11 @@ public:
    * quadrature rule \p qrule, but any set of points on the reference
    * \em side element may be specified in the optional argument \p pts.
    */
-  virtual void reinit (const Elem* elem,
+  virtual void reinit (const Elem * elem,
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
-                       const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL) = 0;
+                       const std::vector<Point> * const pts = NULL,
+                       const std::vector<Real> * const weights = NULL) = 0;
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -159,21 +159,21 @@ public:
    * quadrature rule \p qrule, but any set of points on the reference
    * \em edge element may be specified in the optional argument \p pts.
    */
-  virtual void edge_reinit (const Elem* elem,
+  virtual void edge_reinit (const Elem * elem,
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
-                            const std::vector<Point>* pts = NULL,
-                            const std::vector<Real>* weights = NULL) = 0;
+                            const std::vector<Point> * pts = NULL,
+                            const std::vector<Real> * weights = NULL) = 0;
 
   /**
    * Computes the reference space quadrature points on the side of
    * an element based on the side quadrature points.
    */
-  virtual void side_map (const Elem* elem,
-                         const Elem* side,
+  virtual void side_map (const Elem * elem,
+                         const Elem * side,
                          const unsigned int s,
-                         const std::vector<Point>& reference_side_points,
-                         std::vector<Point>&       reference_points) = 0;
+                         const std::vector<Point> & reference_side_points,
+                         std::vector<Point> &       reference_points) = 0;
 
   /**
    * @returns true if the point p is located on the reference element
@@ -182,7 +182,7 @@ public:
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
    * \f$ x \le 1 + \epsilon \f$.
    */
-  static bool on_reference_element(const Point& p,
+  static bool on_reference_element(const Point & p,
                                    const ElemType t,
                                    const Real eps = TOLERANCE);
   /**
@@ -190,7 +190,7 @@ public:
    * given the element type
    */
   static void get_refspace_nodes(const ElemType t,
-                                 std::vector<Point>& nodes);
+                                 std::vector<Point> & nodes);
 
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -198,8 +198,8 @@ public:
    * Computes the nodal constraint contributions (for
    * non-conforming adapted meshes), using Lagrange geometry
    */
-  static void compute_node_constraints (NodeConstraints &constraints,
-                                        const Elem* elem);
+  static void compute_node_constraints (NodeConstraints & constraints,
+                                        const Elem * elem);
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -209,11 +209,11 @@ public:
    * Computes the node position constraint equation contributions (for
    * meshes with periodic boundary conditions)
    */
-  static void compute_periodic_node_constraints (NodeConstraints &constraints,
-                                                 const PeriodicBoundaries &boundaries,
-                                                 const MeshBase& mesh,
-                                                 const PointLocatorBase* point_locator,
-                                                 const Elem* elem);
+  static void compute_periodic_node_constraints (NodeConstraints & constraints,
+                                                 const PeriodicBoundaries & boundaries,
+                                                 const MeshBase & mesh,
+                                                 const PointLocatorBase * point_locator,
+                                                 const Elem * elem);
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 #endif // LIBMESH_ENABLE_PERIODIC
@@ -222,47 +222,47 @@ public:
    * @returns the \p xyz spatial locations of the quadrature
    * points on the element.
    */
-  const std::vector<Point>& get_xyz() const
+  const std::vector<Point> & get_xyz() const
   { return this->_fe_map->get_xyz(); }
 
   /**
    * @returns the element Jacobian times the quadrature weight for
    * each quadrature point.
    */
-  const std::vector<Real>& get_JxW() const
+  const std::vector<Real> & get_JxW() const
   { return this->_fe_map->get_JxW(); }
 
   /**
    * @returns the element tangents in xi-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient>& get_dxyzdxi() const
+  const std::vector<RealGradient> & get_dxyzdxi() const
   { return this->_fe_map->get_dxyzdxi(); }
 
   /**
    * @returns the element tangents in eta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient>& get_dxyzdeta() const
+  const std::vector<RealGradient> & get_dxyzdeta() const
   { return this->_fe_map->get_dxyzdeta(); }
 
   /**
    * @returns the element tangents in zeta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient>& get_dxyzdzeta() const
+  const std::vector<RealGradient> & get_dxyzdzeta() const
   { return _fe_map->get_dxyzdzeta(); }
 
   /**
    * @returns the second partial derivatives in xi.
    */
-  const std::vector<RealGradient>& get_d2xyzdxi2() const
+  const std::vector<RealGradient> & get_d2xyzdxi2() const
   { return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
    * @returns the second partial derivatives in eta.
    */
-  const std::vector<RealGradient>& get_d2xyzdeta2() const
+  const std::vector<RealGradient> & get_d2xyzdeta2() const
   { return this->_fe_map->get_d2xyzdeta2(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -270,7 +270,7 @@ public:
   /**
    * @returns the second partial derivatives in zeta.
    */
-  const std::vector<RealGradient>& get_d2xyzdzeta2() const
+  const std::vector<RealGradient> & get_d2xyzdzeta2() const
   { return this->_fe_map->get_d2xyzdzeta2(); }
 
 #endif
@@ -278,7 +278,7 @@ public:
   /**
    * @returns the second partial derivatives in xi-eta.
    */
-  const std::vector<RealGradient>& get_d2xyzdxideta() const
+  const std::vector<RealGradient> & get_d2xyzdxideta() const
   { return this->_fe_map->get_d2xyzdxideta(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -286,13 +286,13 @@ public:
   /**
    * @returns the second partial derivatives in xi-zeta.
    */
-  const std::vector<RealGradient>& get_d2xyzdxidzeta() const
+  const std::vector<RealGradient> & get_d2xyzdxidzeta() const
   { return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
    * @returns the second partial derivatives in eta-zeta.
    */
-  const std::vector<RealGradient>& get_d2xyzdetadzeta() const
+  const std::vector<RealGradient> & get_d2xyzdetadzeta() const
   { return this->_fe_map->get_d2xyzdetadzeta(); }
 
 #endif
@@ -301,88 +301,88 @@ public:
    * @returns the dxi/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_dxidx() const
+  const std::vector<Real> & get_dxidx() const
   { return this->_fe_map->get_dxidx(); }
 
   /**
    * @returns the dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_dxidy() const
+  const std::vector<Real> & get_dxidy() const
   { return this->_fe_map->get_dxidy(); }
 
   /**
    * @returns the dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_dxidz() const
+  const std::vector<Real> & get_dxidz() const
   { return this->_fe_map->get_dxidz(); }
 
   /**
    * @returns the deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_detadx() const
+  const std::vector<Real> & get_detadx() const
   { return this->_fe_map->get_detadx(); }
 
   /**
    * @returns the deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_detady() const
+  const std::vector<Real> & get_detady() const
   { return this->_fe_map->get_detady(); }
 
   /**
    * @returns the deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_detadz() const
+  const std::vector<Real> & get_detadz() const
   { return this->_fe_map->get_detadz(); }
 
   /**
    * @returns the dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_dzetadx() const
+  const std::vector<Real> & get_dzetadx() const
   { return this->_fe_map->get_dzetadx(); }
 
   /**
    * @returns the dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_dzetady() const
+  const std::vector<Real> & get_dzetady() const
   { return this->_fe_map->get_dzetady(); }
 
   /**
    * @returns the dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real>& get_dzetadz() const
+  const std::vector<Real> & get_dzetadz() const
   { return this->_fe_map->get_dzetadz(); }
 
   /**
    * @returns the tangent vectors for face integration.
    */
-  const std::vector<std::vector<Point> >& get_tangents() const
+  const std::vector<std::vector<Point> > & get_tangents() const
   { return this->_fe_map->get_tangents(); }
 
   /**
    * @returns the normal vectors for face integration.
    */
-  const std::vector<Point>& get_normals() const
+  const std::vector<Point> & get_normals() const
   { return this->_fe_map->get_normals(); }
 
   /**
    * @returns the curvatures for use in face integration.
    */
-  const std::vector<Real>& get_curvatures() const
+  const std::vector<Real> & get_curvatures() const
   { return this->_fe_map->get_curvatures();}
 
   /**
    * Provides the class with the quadrature rule.  Implement
    * this in derived classes.
    */
-  virtual void attach_quadrature_rule (QBase* q) = 0;
+  virtual void attach_quadrature_rule (QBase * q) = 0;
 
   /**
    * @returns the total number of approximation shape functions
@@ -439,26 +439,26 @@ public:
   /**
    * @returns the mapping object
    */
-  const FEMap& get_fe_map() const { return *_fe_map.get(); }
+  const FEMap & get_fe_map() const { return *_fe_map.get(); }
 
   /**
    * Prints the Jacobian times the weight for each quadrature point.
    */
-  void print_JxW(std::ostream& os) const;
+  void print_JxW(std::ostream & os) const;
 
   /**
    * Prints the value of each shape function at each quadrature point.
    * Implement in derived class since this depends on whether the element
    * is vector-valued or not.
    */
-  virtual void print_phi(std::ostream& os) const =0;
+  virtual void print_phi(std::ostream & os) const =0;
 
   /**
    * Prints the value of each shape function's derivative
    * at each quadrature point. Implement in derived class since this
    * depends on whether the element is vector-valued or not.
    */
-  virtual void print_dphi(std::ostream& os) const =0;
+  virtual void print_dphi(std::ostream & os) const =0;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -467,7 +467,7 @@ public:
    * at each quadrature point. Implement in derived class since this
    * depends on whether the element is vector-valued or not.
    */
-  virtual void print_d2phi(std::ostream& os) const =0;
+  virtual void print_d2phi(std::ostream & os) const =0;
 
 #endif
 
@@ -475,17 +475,17 @@ public:
    * Prints the spatial location of each quadrature point
    * (on the physical element).
    */
-  void print_xyz(std::ostream& os) const;
+  void print_xyz(std::ostream & os) const;
 
   /**
    * Prints all the relevant information about the current element.
    */
-  void print_info(std::ostream& os) const;
+  void print_info(std::ostream & os) const;
 
   /**
    * Same as above, but allows you to print to a stream.
    */
-  friend std::ostream& operator << (std::ostream& os, const FEAbstract& fe);
+  friend std::ostream & operator << (std::ostream & os, const FEAbstract & fe);
 
 
 protected:
@@ -502,7 +502,7 @@ protected:
    * derived class since this function depends on whether
    * the shape functions are vector-valued or not.
    */
-  virtual void compute_shape_functions(const Elem*, const std::vector<Point>& ) =0;
+  virtual void compute_shape_functions(const Elem *, const std::vector<Point> & ) =0;
 
   UniquePtr<FEMap> _fe_map;
 
@@ -570,7 +570,7 @@ protected:
   /**
    * A pointer to the quadrature rule employed
    */
-  QBase* qrule;
+  QBase * qrule;
 
   /**
    * A flag indicating if current data structures
@@ -595,7 +595,7 @@ protected:
 // FEAbstract class inline members
 inline
 FEAbstract::FEAbstract(const unsigned int d,
-                       const FEType& fet) :
+                       const FEType & fet) :
   _fe_map( FEMap::build(fet) ),
   dim(d),
   calculations_started(false),

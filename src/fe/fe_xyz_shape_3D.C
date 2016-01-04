@@ -46,7 +46,7 @@ template <>
 Real FE<3,XYZ>::shape(const ElemType,
                       const Order,
                       const unsigned int,
-                      const Point&)
+                      const Point &)
 {
   libmesh_error_msg("XYZ polynomials require the element because the centroid is needed.");
   return 0.;
@@ -55,10 +55,10 @@ Real FE<3,XYZ>::shape(const ElemType,
 
 
 template <>
-Real FE<3,XYZ>::shape(const Elem* elem,
+Real FE<3,XYZ>::shape(const Elem * elem,
                       const Order libmesh_dbg_var(order),
                       const unsigned int i,
-                      const Point& point_in)
+                      const Point & point_in)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -250,7 +250,7 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
                             const Order,
                             const unsigned int,
                             const unsigned int,
-                            const Point&)
+                            const Point &)
 {
   libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
   return 0.;
@@ -259,11 +259,11 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<3,XYZ>::shape_deriv(const Elem* elem,
+Real FE<3,XYZ>::shape_deriv(const Elem * elem,
                             const Order libmesh_dbg_var(order),
                             const unsigned int i,
                             const unsigned int j,
-                            const Point& point_in)
+                            const Point & point_in)
 {
 #if LIBMESH_DIM == 3
 
@@ -737,7 +737,7 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
                                    const Order,
                                    const unsigned int,
                                    const unsigned int,
-                                   const Point&)
+                                   const Point &)
 {
   libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
   return 0.;
@@ -746,11 +746,11 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
+Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
                                    const Order libmesh_dbg_var(order),
                                    const unsigned int i,
                                    const unsigned int j,
-                                   const Point& point_in)
+                                   const Point & point_in)
 {
 #if LIBMESH_DIM == 3
 

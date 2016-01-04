@@ -32,7 +32,7 @@ template <>
 Real FE<3,SZABAB>::shape(const ElemType,
                          const Order,
                          const unsigned int,
-                         const Point&)
+                         const Point &)
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
@@ -41,10 +41,10 @@ Real FE<3,SZABAB>::shape(const ElemType,
 
 
 template <>
-Real FE<3,SZABAB>::shape(const Elem*,
+Real FE<3,SZABAB>::shape(const Elem *,
                          const Order,
                          const unsigned int,
-                         const Point&)
+                         const Point &)
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
@@ -56,7 +56,7 @@ Real FE<3,SZABAB>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
-                               const Point& )
+                               const Point & )
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
@@ -65,11 +65,11 @@ Real FE<3,SZABAB>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<3,SZABAB>::shape_deriv(const Elem*,
+Real FE<3,SZABAB>::shape_deriv(const Elem *,
                                const Order,
                                const unsigned int,
                                const unsigned int,
-                               const Point&)
+                               const Point &)
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
@@ -82,7 +82,7 @@ Real FE<3,SZABAB>::shape_second_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
-                                      const Point&)
+                                      const Point &)
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;
@@ -91,11 +91,11 @@ Real FE<3,SZABAB>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,SZABAB>::shape_second_deriv(const Elem*,
+Real FE<3,SZABAB>::shape_second_deriv(const Elem *,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
-                                      const Point&)
+                                      const Point &)
 {
   libmesh_error_msg("Szabo-Babuska polynomials are not defined in 3D");
   return 0.;

@@ -33,7 +33,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfFE::Base class members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-Elem* InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem* inf_elem)
+Elem * InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem * inf_elem)
 {
   UniquePtr<Elem> ape(inf_elem->build_side(0));
   return ape.release();
@@ -145,9 +145,9 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_ra
 
 //--------------------------------------------------------------
 // Explicit instantiations
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Elem*,Base::build_elem(const Elem*));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Elem*,Base::build_elem(const Elem*));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Elem*,Base::build_elem(const Elem*));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Elem *,Base::build_elem(const Elem *));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Elem *,Base::build_elem(const Elem *));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Elem *,Base::build_elem(const Elem *));
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,ElemType,Base::get_elem_type(const ElemType type));

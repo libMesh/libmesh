@@ -34,10 +34,10 @@ namespace libMesh
 
 // Anonymous namespace for local helper functions
 namespace {
-void l2_lagrange_nodal_soln(const Elem* elem,
+void l2_lagrange_nodal_soln(const Elem * elem,
                             const Order order,
-                            const std::vector<Number>& elem_soln,
-                            std::vector<Number>&       nodal_soln)
+                            const std::vector<Number> & elem_soln,
+                            std::vector<Number> &       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -419,31 +419,31 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
   // of explicit instantiation at the end of this file.
   // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,L2_LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<0,L2_LAGRANGE>::nodal_soln(const Elem * elem,
                                    const Order order,
-                                   const std::vector<Number>& elem_soln,
-                                   std::vector<Number>& nodal_soln)
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln)
 { l2_lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<1,L2_LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<1,L2_LAGRANGE>::nodal_soln(const Elem * elem,
                                    const Order order,
-                                   const std::vector<Number>& elem_soln,
-                                   std::vector<Number>& nodal_soln)
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln)
 { l2_lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<2,L2_LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<2,L2_LAGRANGE>::nodal_soln(const Elem * elem,
                                    const Order order,
-                                   const std::vector<Number>& elem_soln,
-                                   std::vector<Number>& nodal_soln)
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln)
 { l2_lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<3,L2_LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<3,L2_LAGRANGE>::nodal_soln(const Elem * elem,
                                    const Order order,
-                                   const std::vector<Number>& elem_soln,
-                                   std::vector<Number>& nodal_soln)
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln)
 { l2_lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 
@@ -493,15 +493,15 @@ template <> bool FE<3,L2_LAGRANGE>::shapes_need_reinit() const { return false; }
 template <>
 void FE<2,L2_LAGRANGE>::compute_constraints (DofConstraints &,
                                              DofMap &,
-                                             const unsigned int ,
-                                             const Elem* )
+                                             const unsigned int,
+                                             const Elem *)
 { }
 
 template <>
 void FE<3,L2_LAGRANGE>::compute_constraints (DofConstraints &,
                                              DofMap &,
-                                             const unsigned int ,
-                                             const Elem* )
+                                             const unsigned int,
+                                             const Elem *)
 { }
 #endif // LIBMESH_ENABLE_AMR
 

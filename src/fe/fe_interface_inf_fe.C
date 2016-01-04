@@ -37,7 +37,7 @@ namespace libMesh
 
 
 unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
-                                                 const FEType& fe_t,
+                                                 const FEType & fe_t,
                                                  const ElemType t)
 {
   switch (dim)
@@ -72,7 +72,7 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
 
 
 unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
-                                      const FEType& fe_t,
+                                      const FEType & fe_t,
                                       const ElemType t)
 {
   switch (dim)
@@ -106,7 +106,7 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
 
 
 unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
-                                              const FEType& fe_t,
+                                              const FEType & fe_t,
                                               const ElemType t,
                                               const unsigned int n)
 {
@@ -142,7 +142,7 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
 
 
 unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
-                                               const FEType& fe_t,
+                                               const FEType & fe_t,
                                                const ElemType t)
 {
   switch (dim)
@@ -176,10 +176,10 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
 
 
 void FEInterface::ifem_nodal_soln(const unsigned int dim,
-                                  const FEType& fe_t,
-                                  const Elem* elem,
-                                  const std::vector<Number>& elem_soln,
-                                  std::vector<Number>& nodal_soln)
+                                  const FEType & fe_t,
+                                  const Elem * elem,
+                                  const std::vector<Number> & elem_soln,
+                                  std::vector<Number> & nodal_soln)
 {
   switch (dim)
     {
@@ -429,9 +429,9 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 
 
 Point FEInterface::ifem_inverse_map (const unsigned int dim,
-                                     const FEType& fe_t,
-                                     const Elem* elem,
-                                     const Point& p,
+                                     const FEType & fe_t,
+                                     const Elem * elem,
+                                     const Point & p,
                                      const Real tolerance,
                                      const bool secure)
 {
@@ -526,10 +526,10 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 
 void FEInterface::ifem_inverse_map (const unsigned int dim,
-                                    const FEType& fe_t,
-                                    const Elem* elem,
-                                    const std::vector<Point>& physical_points,
-                                    std::vector<Point>&       reference_points,
+                                    const FEType & fe_t,
+                                    const Elem * elem,
+                                    const std::vector<Point> & physical_points,
+                                    std::vector<Point> &       reference_points,
                                     const Real tolerance,
                                     const bool secure)
 {
@@ -587,7 +587,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 
 
 
-bool FEInterface::ifem_on_reference_element(const Point& p,
+bool FEInterface::ifem_on_reference_element(const Point & p,
                                             const ElemType t,
                                             const Real eps)
 {
@@ -598,10 +598,10 @@ bool FEInterface::ifem_on_reference_element(const Point& p,
 
 
 Real FEInterface::ifem_shape(const unsigned int dim,
-                             const FEType& fe_t,
+                             const FEType & fe_t,
                              const ElemType t,
                              const unsigned int i,
-                             const Point& p)
+                             const Point & p)
 {
   switch (dim)
     {
@@ -699,10 +699,10 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 
 Real FEInterface::ifem_shape(const unsigned int dim,
-                             const FEType& fe_t,
-                             const Elem* elem,
+                             const FEType & fe_t,
+                             const Elem * elem,
                              const unsigned int i,
-                             const Point& p)
+                             const Point & p)
 {
   switch (dim)
     {
@@ -800,9 +800,9 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 
 void FEInterface::ifem_compute_data(const unsigned int dim,
-                                    const FEType& fe_t,
-                                    const Elem* elem,
-                                    FEComputeData& data)
+                                    const FEType & fe_t,
+                                    const Elem * elem,
+                                    FEComputeData & data)
 {
   switch (dim)
     {

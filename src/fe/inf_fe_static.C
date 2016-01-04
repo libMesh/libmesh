@@ -52,7 +52,7 @@ bool InfFE<Dim,T_radial,T_map>::_warned_for_shape      = false;
 // ------------------------------------------------------------
 // InfFE static class members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
+unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
                                                 const ElemType inf_elem_type)
 {
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
@@ -69,7 +69,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
+unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const ElemType inf_elem_type,
                                                         const unsigned int n)
 {
@@ -98,7 +98,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
+unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
                                                          const ElemType inf_elem_type)
 {
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
@@ -116,10 +116,10 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
-                                           const Elem* /* elem */,
-                                           const std::vector<Number>& /* elem_soln */,
-                                           std::vector<Number>&       nodal_soln)
+void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType & /* fet */,
+                                           const Elem * /* elem */,
+                                           const std::vector<Number> & /* elem_soln */,
+                                           std::vector<Number> &       nodal_soln)
 {
 #ifdef DEBUG
   if (!_warned_for_nodal_soln)
@@ -151,10 +151,10 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
+Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
                                       const ElemType inf_elem_type,
                                       const unsigned int i,
-                                      const Point& p)
+                                      const Point & p)
 {
   libmesh_assert_not_equal_to (Dim, 0);
 
@@ -193,10 +193,10 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
-                                      const Elem* inf_elem,
+Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
+                                      const Elem * inf_elem,
                                       const unsigned int i,
-                                      const Point& p)
+                                      const Point & p)
 {
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (Dim, 0);
@@ -236,16 +236,16 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
-                                             const Elem* inf_elem,
-                                             FEComputeData& data)
+void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
+                                             const Elem * inf_elem,
+                                             FEComputeData & data)
 {
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (Dim, 0);
 
   const Order        o_radial             (fet.radial_order);
   const Order        radial_mapping_order (Radial::mapping_order());
-  const Point&       p                    (data.p);
+  const Point &       p                    (data.p);
   const Real         v                    (p(Dim-1));
   UniquePtr<Elem>      base_el              (inf_elem->build_side(0));
 
@@ -384,8 +384,8 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_type,
                                                       const unsigned int outer_node_index,
-                                                      unsigned int& base_node,
-                                                      unsigned int& radial_node)
+                                                      unsigned int & base_node,
+                                                      unsigned int & radial_node)
 {
   switch (inf_elem_type)
     {
@@ -591,8 +591,8 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_elem_type,
                                                            const unsigned int outer_node_index,
-                                                           unsigned int& base_node,
-                                                           unsigned int& radial_node)
+                                                           unsigned int & base_node,
+                                                           unsigned int & radial_node)
 {
   libmesh_assert_not_equal_to (inf_elem_type, INVALID_ELEM);
 
@@ -698,11 +698,11 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
+void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
                                                        const ElemType inf_elem_type,
                                                        const unsigned int i,
-                                                       unsigned int& base_shape,
-                                                       unsigned int& radial_shape)
+                                                       unsigned int & base_shape,
+                                                       unsigned int & radial_shape)
 {
 
   /*
@@ -937,33 +937,33 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 //#include "libmesh/inf_fe_instantiate_2D.h"
 //#include "libmesh/inf_fe_instantiate_3D.h"
 
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs_per_elem(const FEType&,const ElemType));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs_per_elem(const FEType&,const ElemType));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,n_dofs_per_elem(const FEType&,const ElemType));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs_at_node(const FEType&,const ElemType,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs_at_node(const FEType&,const ElemType,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,n_dofs_at_node(const FEType&,const ElemType,const unsigned int));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,compute_shape_indices(const FEType&,const ElemType,const unsigned int,unsigned int&,unsigned int&));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,compute_shape_indices(const FEType&,const ElemType,const unsigned int,unsigned int&,unsigned int&));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_shape_indices(const FEType&,const ElemType,const unsigned int,unsigned int&,unsigned int&));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,compute_node_indices(const ElemType,const unsigned int,unsigned int&,unsigned int&));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,compute_node_indices(const ElemType,const unsigned int,unsigned int&,unsigned int&));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_node_indices(const ElemType,const unsigned int,unsigned int&,unsigned int&));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Real,shape(const FEType&,const Elem*,const unsigned int,const Point& p));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Real,shape(const FEType&,const Elem*,const unsigned int,const Point& p));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Real,shape(const FEType&,const Elem*,const unsigned int,const Point& p));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Real,shape(const FEType&,const ElemType,const unsigned int,const Point&));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Real,shape(const FEType&,const ElemType,const unsigned int,const Point&));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Real,shape(const FEType&,const ElemType,const unsigned int,const Point&));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,compute_data(const FEType&,const Elem*,FEComputeData&));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,compute_data(const FEType&,const Elem*,FEComputeData&));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_data(const FEType&,const Elem*,FEComputeData&));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_data(const FEType &, const Elem *, FEComputeData &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, nodal_soln(const FEType &, const Elem *, const std::vector<Number> &, std::vector<Number> &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, nodal_soln(const FEType &, const Elem *, const std::vector<Number> &, std::vector<Number> &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, nodal_soln(const FEType &, const Elem *, const std::vector<Number> &, std::vector<Number> &));
 
 } // namespace libMesh
 

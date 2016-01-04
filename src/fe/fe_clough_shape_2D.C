@@ -50,17 +50,17 @@ static Real N21x, N21y, N12x, N12y;
 
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
-                                   const Point& p);
+                                   const Point & p);
 Real clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
-                            const Point& p);
+                            const Point & p);
 Real clough_raw_shape(const unsigned int basis_num,
-                      const Point& p);
-unsigned char subtriangle_lookup(const Point& p);
+                      const Point & p);
+unsigned char subtriangle_lookup(const Point & p);
 
 
 // Compute the static coefficients for an element
-void clough_compute_coefs(const Elem* elem)
+void clough_compute_coefs(const Elem * elem)
 {
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
@@ -514,7 +514,7 @@ void clough_compute_coefs(const Elem* elem)
 }
 
 
-unsigned char subtriangle_lookup(const Point& p)
+unsigned char subtriangle_lookup(const Point & p)
 {
   if ((p(0) >= p(1)) && (p(0) + 2 * p(1) <= 1))
     return 0;
@@ -527,7 +527,7 @@ unsigned char subtriangle_lookup(const Point& p)
 // triangle
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
-                                   const Point& p)
+                                   const Point & p)
 {
   Real xi = p(0), eta = p(1);
 
@@ -1082,7 +1082,7 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
 
 Real clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
-                            const Point& p)
+                            const Point & p)
 {
   Real xi = p(0), eta = p(1);
 
@@ -1519,7 +1519,7 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
 }
 
 Real clough_raw_shape(const unsigned int basis_num,
-                      const Point& p)
+                      const Point & p)
 {
   Real xi = p(0), eta = p(1);
 
@@ -1763,7 +1763,7 @@ template <>
 Real FE<2,CLOUGH>::shape(const ElemType,
                          const Order,
                          const unsigned int,
-                         const Point&)
+                         const Point &)
 {
   libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
@@ -1772,10 +1772,10 @@ Real FE<2,CLOUGH>::shape(const ElemType,
 
 
 template <>
-Real FE<2,CLOUGH>::shape(const Elem* elem,
+Real FE<2,CLOUGH>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
-                         const Point& p)
+                         const Point & p)
 {
   libmesh_assert(elem);
 
@@ -1959,7 +1959,7 @@ Real FE<2,CLOUGH>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
-                               const Point&)
+                               const Point &)
 {
   libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
@@ -1968,11 +1968,11 @@ Real FE<2,CLOUGH>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
+Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
                                const Order order,
                                const unsigned int i,
                                const unsigned int j,
-                               const Point& p)
+                               const Point & p)
 {
   libmesh_assert(elem);
 
@@ -2152,11 +2152,11 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
+Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
                                       const unsigned int j,
-                                      const Point& p)
+                                      const Point & p)
 {
   libmesh_assert(elem);
 

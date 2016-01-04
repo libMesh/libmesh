@@ -82,7 +82,7 @@ public:
    * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_shape_functions(const unsigned int dim,
-                                        const FEType& fe_t,
+                                        const FEType & fe_t,
                                         const ElemType t);
 
   /**
@@ -93,7 +93,7 @@ public:
    * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_dofs(const unsigned int dim,
-                             const FEType& fe_t,
+                             const FEType & fe_t,
                              const ElemType t);
 
   /**
@@ -104,7 +104,7 @@ public:
    * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_dofs_at_node(const unsigned int dim,
-                                     const FEType& fe_t,
+                                     const FEType & fe_t,
                                      const ElemType t,
                                      const unsigned int n);
 
@@ -116,7 +116,7 @@ public:
    * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_dofs_per_elem(const unsigned int dim,
-                                      const FEType& fe_t,
+                                      const FEType & fe_t,
                                       const ElemType t);
 
   /**
@@ -126,11 +126,11 @@ public:
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
-  static void dofs_on_side(const Elem* const elem,
+  static void dofs_on_side(const Elem * const elem,
                            const unsigned int dim,
-                           const FEType& fe_t,
+                           const FEType & fe_t,
                            unsigned int s,
-                           std::vector<unsigned int>& di);
+                           std::vector<unsigned int> & di);
 
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -139,11 +139,11 @@ public:
    *
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
-  static void dofs_on_edge(const Elem* const elem,
+  static void dofs_on_edge(const Elem * const elem,
                            const unsigned int dim,
-                           const FEType& fe_t,
+                           const FEType & fe_t,
                            unsigned int e,
-                           std::vector<unsigned int>& di);
+                           std::vector<unsigned int> & di);
 
   /**
    * Build the nodal soln from the element soln.
@@ -157,19 +157,19 @@ public:
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static void nodal_soln(const unsigned int dim,
-                         const FEType& fe_t,
-                         const Elem* elem,
-                         const std::vector<Number>& elem_soln,
-                         std::vector<Number>& nodal_soln);
+                         const FEType & fe_t,
+                         const Elem * elem,
+                         const std::vector<Number> & elem_soln,
+                         std::vector<Number> & nodal_soln);
 
   /**
    * Returns the point in physical space of the reference point
    * refpoint which is passed in.
    */
   static Point map(unsigned int dim,
-                   const FEType& fe_t,
-                   const Elem* elem,
-                   const Point& p);
+                   const FEType & fe_t,
+                   const Elem * elem,
+                   const Point & p);
 
   /**
    * @returns the location (on the reference element) of the
@@ -181,9 +181,9 @@ public:
    * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static Point inverse_map (const unsigned int dim,
-                            const FEType& fe_t,
-                            const Elem* elem,
-                            const Point& p,
+                            const FEType & fe_t,
+                            const Elem * elem,
+                            const Point & p,
                             const Real tolerance = TOLERANCE,
                             const bool secure = true);
 
@@ -199,10 +199,10 @@ public:
    * p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static void  inverse_map (const unsigned int dim,
-                            const FEType& fe_t,
-                            const Elem* elem,
-                            const std::vector<Point>& physical_points,
-                            std::vector<Point>&       reference_points,
+                            const FEType & fe_t,
+                            const Elem * elem,
+                            const std::vector<Point> & physical_points,
+                            std::vector<Point> &       reference_points,
                             const Real tolerance = TOLERANCE,
                             const bool secure = true);
 
@@ -214,7 +214,7 @@ public:
    * \p eps can be specified to indicate a tolerance.  For example,
    * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$.
    */
-  static bool on_reference_element(const Point& p,
+  static bool on_reference_element(const Point & p,
                                    const ElemType t,
                                    const Real eps=TOLERANCE);
   /**
@@ -226,10 +226,10 @@ public:
    * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static Real shape(const unsigned int dim,
-                    const FEType& fe_t,
+                    const FEType & fe_t,
                     const ElemType t,
                     const unsigned int i,
-                    const Point& p);
+                    const Point & p);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -240,10 +240,10 @@ public:
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static Real shape(const unsigned int dim,
-                    const FEType& fe_t,
-                    const Elem* elem,
+                    const FEType & fe_t,
+                    const Elem * elem,
                     const unsigned int i,
-                    const Point& p);
+                    const Point & p);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -255,11 +255,11 @@ public:
    */
   template< typename OutputType>
   static void shape(const unsigned int dim,
-                    const FEType& fe_t,
+                    const FEType & fe_t,
                     const ElemType t,
                     const unsigned int i,
-                    const Point& p,
-                    OutputType& phi);
+                    const Point & p,
+                    OutputType & phi);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -271,11 +271,11 @@ public:
    */
   template< typename OutputType>
   static void shape(const unsigned int dim,
-                    const FEType& fe_t,
-                    const Elem* elem,
+                    const FEType & fe_t,
+                    const Elem * elem,
                     const unsigned int i,
-                    const Point& p,
-                    OutputType& phi);
+                    const Point & p,
+                    OutputType & phi);
 
   /**
    * Lets the appropriate child of \p FEBase compute the requested
@@ -287,9 +287,9 @@ public:
    * On a p-refined element, \p fe_t.order should be the base order of the element.
    */
   static void compute_data(const unsigned int dim,
-                           const FEType& fe_t,
-                           const Elem* elem,
-                           FEComputeData& data);
+                           const FEType & fe_t,
+                           const Elem * elem,
+                           FEComputeData & data);
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -297,10 +297,10 @@ public:
    * non-conforming adapted meshes) corresponding to
    * variable number \p var_number.
    */
-  static void compute_constraints (DofConstraints &constraints,
-                                   DofMap &dof_map,
+  static void compute_constraints (DofConstraints & constraints,
+                                   DofMap & dof_map,
                                    const unsigned int variable_number,
-                                   const Elem* elem);
+                                   const Elem * elem);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -309,45 +309,46 @@ public:
    * periodic boundary conditions) corresponding to
    * variable number \p var_number.
    */
-  static void compute_periodic_constraints (DofConstraints &constraints,
-                                            DofMap &dof_map,
-                                            const PeriodicBoundaries &boundaries,
-                                            const MeshBase &mesh,
-                                            const PointLocatorBase* point_locator,
+  static void compute_periodic_constraints (DofConstraints & constraints,
+                                            DofMap & dof_map,
+                                            const PeriodicBoundaries & boundaries,
+                                            const MeshBase & mesh,
+                                            const PointLocatorBase * point_locator,
                                             const unsigned int variable_number,
-                                            const Elem* elem);
+                                            const Elem * elem);
 #endif // #ifdef LIBMESH_ENABLE_PERIODIC
 
   /**
    * Returns the maximum polynomial degree that the given finite
    * element family can support on the given geometric element.
    */
-  static unsigned int max_order (const FEType& fe_t,
-                                 const ElemType& el_t);
+  static unsigned int max_order (const FEType & fe_t,
+                                 const ElemType & el_t);
 
   /**
    * Returns true if separate degrees of freedom must be allocated for
    * vertex DoFs and edge/face DoFs at a hanging node.
    */
-  static bool extra_hanging_dofs (const FEType& fe_t);
+  static bool extra_hanging_dofs (const FEType & fe_t);
 
   /**
    * Returns the number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
-  static FEFieldType field_type( const FEType& fe_type );
+  static FEFieldType field_type (const FEType & fe_type);
 
   /**
    * Returns the number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
-  static FEFieldType field_type( const FEFamily& fe_family );
+  static FEFieldType field_type (const FEFamily & fe_family);
 
   /**
    * Returns the number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
-  static unsigned int n_vec_dim( const MeshBase& mesh, const FEType& fe_type );
+  static unsigned int n_vec_dim (const MeshBase & mesh,
+                                 const FEType & fe_type);
 
 private:
 
@@ -371,64 +372,64 @@ private:
    */
 
   static unsigned int ifem_n_shape_functions(const unsigned int dim,
-                                             const FEType& fe_t,
+                                             const FEType & fe_t,
                                              const ElemType t);
 
   static unsigned int ifem_n_dofs(const unsigned int dim,
-                                  const FEType& fe_t,
+                                  const FEType & fe_t,
                                   const ElemType t);
 
   static unsigned int ifem_n_dofs_at_node(const unsigned int dim,
-                                          const FEType& fe_t,
+                                          const FEType & fe_t,
                                           const ElemType t,
                                           const unsigned int n);
 
   static unsigned int ifem_n_dofs_per_elem(const unsigned int dim,
-                                           const FEType& fe_t,
+                                           const FEType & fe_t,
                                            const ElemType t);
 
   static void ifem_nodal_soln(const unsigned int dim,
-                              const FEType& fe_t,
-                              const Elem* elem,
-                              const std::vector<Number>& elem_soln,
-                              std::vector<Number>& nodal_soln);
+                              const FEType & fe_t,
+                              const Elem * elem,
+                              const std::vector<Number> & elem_soln,
+                              std::vector<Number> & nodal_soln);
 
   static Point ifem_inverse_map (const unsigned int dim,
-                                 const FEType& fe_t,
-                                 const Elem* elem,
-                                 const Point& p,
+                                 const FEType & fe_t,
+                                 const Elem * elem,
+                                 const Point & p,
                                  const Real tolerance = TOLERANCE,
                                  const bool secure = true);
 
   static void ifem_inverse_map (const unsigned int dim,
-                                const FEType& fe_t,
-                                const Elem* elem,
-                                const std::vector<Point>& physical_points,
-                                std::vector<Point>&       reference_points,
+                                const FEType & fe_t,
+                                const Elem * elem,
+                                const std::vector<Point> & physical_points,
+                                std::vector<Point> &       reference_points,
                                 const Real tolerance = TOLERANCE,
                                 const bool secure = true);
 
 
-  static bool ifem_on_reference_element(const Point& p,
+  static bool ifem_on_reference_element(const Point & p,
                                         const ElemType t,
                                         const Real eps);
 
   static Real ifem_shape(const unsigned int dim,
-                         const FEType& fe_t,
+                         const FEType & fe_t,
                          const ElemType t,
                          const unsigned int i,
-                         const Point& p);
+                         const Point & p);
 
   static Real ifem_shape(const unsigned int dim,
-                         const FEType& fe_t,
-                         const Elem* elem,
+                         const FEType & fe_t,
+                         const Elem * elem,
                          const unsigned int i,
-                         const Point& p);
+                         const Point & p);
 
   static void ifem_compute_data(const unsigned int dim,
-                                const FEType& fe_t,
-                                const Elem* elem,
-                                FEComputeData& data);
+                                const FEType & fe_t,
+                                const Elem * elem,
+                                FEComputeData & data);
 
 #endif
 
