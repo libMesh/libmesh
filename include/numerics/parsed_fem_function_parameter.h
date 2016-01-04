@@ -74,7 +74,7 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const {
+  virtual const T & get () const {
     _current_val = _func.get_inline_value(_name);
     return _current_val;
   }

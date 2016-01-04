@@ -81,7 +81,7 @@ Real LaspackVector<T>::linfty_norm () const
 
 
 template <typename T>
-NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
+NumericVector<T> & LaspackVector<T>::operator += (const NumericVector<T> & v)
 {
   libmesh_assert (this->closed());
 
@@ -94,7 +94,7 @@ NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
+NumericVector<T> & LaspackVector<T>::operator -= (const NumericVector<T> & v)
 {
   libmesh_assert (this->closed());
 
@@ -169,7 +169,7 @@ void LaspackVector<T>::add (const T v)
 
 
 template <typename T>
-void LaspackVector<T>::add (const NumericVector<T>& v)
+void LaspackVector<T>::add (const NumericVector<T> & v)
 {
   this->add (1., v);
 }
@@ -177,10 +177,10 @@ void LaspackVector<T>::add (const NumericVector<T>& v)
 
 
 template <typename T>
-void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
+void LaspackVector<T>::add (const T a, const NumericVector<T> & v_in)
 {
   // Make sure the vector passed in is really a LaspackVector
-  const LaspackVector* v = cast_ptr<const LaspackVector*>(&v_in);
+  const LaspackVector * v = cast_ptr<const LaspackVector *>(&v_in);
 
 #ifndef NDEBUG
   const bool was_closed = this->_is_closed;
@@ -200,12 +200,12 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 
 
 template <typename T>
-void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
-                                   const SparseMatrix<T> &mat_in)
+void LaspackVector<T>::add_vector (const NumericVector<T> & vec_in,
+                                   const SparseMatrix<T> & mat_in)
 {
   // Make sure the data passed in are really in Laspack types
-  const LaspackVector<T>* vec = cast_ptr<const LaspackVector<T>*>(&vec_in);
-  const LaspackMatrix<T>* mat = cast_ptr<const LaspackMatrix<T>*>(&mat_in);
+  const LaspackVector<T> * vec = cast_ptr<const LaspackVector<T> *>(&vec_in);
+  const LaspackMatrix<T> * mat = cast_ptr<const LaspackMatrix<T> *>(&mat_in);
 
   libmesh_assert(vec);
   libmesh_assert(mat);
@@ -245,12 +245,12 @@ void LaspackVector<T>::abs()
 }
 
 template <typename T>
-T LaspackVector<T>::dot (const NumericVector<T>& V) const
+T LaspackVector<T>::dot (const NumericVector<T> & V) const
 {
   libmesh_assert (this->initialized());
 
   // Make sure the NumericVector passed in is really a LaspackVector
-  const LaspackVector<T>* v = cast_ptr<const LaspackVector<T>*>(&V);
+  const LaspackVector<T> * v = cast_ptr<const LaspackVector<T> *>(&V);
   libmesh_assert(v);
 
   return Mul_VV (const_cast<QVector*>(&(this->_vec)),
@@ -260,7 +260,7 @@ T LaspackVector<T>::dot (const NumericVector<T>& V) const
 
 
 template <typename T>
-NumericVector<T>&
+NumericVector<T> &
 LaspackVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
@@ -274,12 +274,12 @@ LaspackVector<T>::operator = (const T s)
 
 
 template <typename T>
-NumericVector<T>&
-LaspackVector<T>::operator = (const NumericVector<T>& v_in)
+NumericVector<T> &
+LaspackVector<T>::operator = (const NumericVector<T> & v_in)
 {
   // Make sure the NumericVector passed in is really a LaspackVector
-  const LaspackVector<T>* v =
-    cast_ptr<const LaspackVector<T>*>(&v_in);
+  const LaspackVector<T> * v =
+    cast_ptr<const LaspackVector<T> *>(&v_in);
 
   libmesh_assert(v);
 
@@ -291,8 +291,8 @@ LaspackVector<T>::operator = (const NumericVector<T>& v_in)
 
 
 template <typename T>
-LaspackVector<T>&
-LaspackVector<T>::operator = (const LaspackVector<T>& v)
+LaspackVector<T> &
+LaspackVector<T>::operator = (const LaspackVector<T> & v)
 {
   libmesh_assert (this->initialized());
   libmesh_assert (v.closed());
@@ -313,8 +313,8 @@ LaspackVector<T>::operator = (const LaspackVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-LaspackVector<T>::operator = (const std::vector<T>& v)
+NumericVector<T> &
+LaspackVector<T>::operator = (const std::vector<T> & v)
 {
   /**
    * Case 1:  The vector is the same size of
@@ -332,11 +332,11 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
 
 
 template <typename T>
-void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
+void LaspackVector<T>::localize (NumericVector<T> & v_local_in) const
 {
   // Make sure the NumericVector passed in is really a LaspackVector
-  LaspackVector<T>* v_local =
-    cast_ptr<LaspackVector<T>*>(&v_local_in);
+  LaspackVector<T> * v_local =
+    cast_ptr<LaspackVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
 
@@ -346,12 +346,12 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
 
 
 template <typename T>
-void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
-                                 const std::vector<numeric_index_type>& libmesh_dbg_var(send_list)) const
+void LaspackVector<T>::localize (NumericVector<T> & v_local_in,
+                                 const std::vector<numeric_index_type> & libmesh_dbg_var(send_list)) const
 {
   // Make sure the NumericVector passed in is really a LaspackVector
-  LaspackVector<T>* v_local =
-    cast_ptr<LaspackVector<T>*>(&v_local_in);
+  LaspackVector<T> * v_local =
+    cast_ptr<LaspackVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_less_equal (send_list.size(), v_local->size());
@@ -364,7 +364,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
 template <typename T>
 void LaspackVector<T>::localize (const numeric_index_type libmesh_dbg_var(first_local_idx),
                                  const numeric_index_type libmesh_dbg_var(last_local_idx),
-                                 const std::vector<numeric_index_type>& libmesh_dbg_var(send_list))
+                                 const std::vector<numeric_index_type> & libmesh_dbg_var(send_list))
 {
   libmesh_assert_equal_to (first_local_idx, 0);
   libmesh_assert_equal_to (last_local_idx+1, this->size());
@@ -379,7 +379,7 @@ void LaspackVector<T>::localize (const numeric_index_type libmesh_dbg_var(first_
 
 
 template <typename T>
-void LaspackVector<T>::localize (std::vector<T>& v_local) const
+void LaspackVector<T>::localize (std::vector<T> & v_local) const
 
 {
   v_local.resize(this->size());
@@ -391,7 +391,7 @@ void LaspackVector<T>::localize (std::vector<T>& v_local) const
 
 
 template <typename T>
-void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
+void LaspackVector<T>::localize_to_one (std::vector<T> & v_local,
                                         const processor_id_type libmesh_dbg_var(pid)) const
 {
   libmesh_assert_equal_to (pid, 0);
@@ -402,8 +402,8 @@ void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
 
 
 template <typename T>
-void LaspackVector<T>::pointwise_mult (const NumericVector<T>& /*vec1*/,
-                                       const NumericVector<T>& /*vec2*/)
+void LaspackVector<T>::pointwise_mult (const NumericVector<T> & /*vec1*/,
+                                       const NumericVector<T> & /*vec2*/)
 {
   libmesh_not_implemented();
 }

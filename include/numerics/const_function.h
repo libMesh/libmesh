@@ -34,15 +34,15 @@ class ConstFunction : public FunctionBase<Output>
 {
 public:
   explicit
-  ConstFunction (const Output &c) : _c(c) { this->_initialized = true; }
+  ConstFunction (const Output & c) : _c(c) { this->_initialized = true; }
 
-  virtual Output operator() (const Point&,
+  virtual Output operator() (const Point &,
                              const Real = 0) libmesh_override
   { return _c; }
 
-  virtual void operator() (const Point&,
+  virtual void operator() (const Point &,
                            const Real,
-                           DenseVector<Output>& output) libmesh_override
+                           DenseVector<Output> & output) libmesh_override
   {
     unsigned int size = output.size();
     for (unsigned int i=0; i != size; ++i)

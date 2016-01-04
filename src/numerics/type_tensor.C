@@ -36,7 +36,7 @@ namespace libMesh
 
 
 template <typename T>
-void TypeTensor<T>::print(std::ostream& os) const
+void TypeTensor<T>::print(std::ostream & os) const
 {
 #if LIBMESH_DIM == 1
 
@@ -80,7 +80,7 @@ void TypeTensor<T>::print(std::ostream& os) const
 
 
 template <typename T>
-void TypeTensor<T>::write_unformatted (std::ostream &out_stream,
+void TypeTensor<T>::write_unformatted (std::ostream & out_stream,
                                        const bool newline) const
 {
   libmesh_assert (out_stream);
@@ -110,7 +110,7 @@ void TypeTensor<T>::write_unformatted (std::ostream &out_stream,
 
 
 template <>
-bool TypeTensor<Real>::operator < (const TypeTensor<Real>& rhs) const
+bool TypeTensor<Real>::operator < (const TypeTensor<Real> & rhs) const
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     for (unsigned int j=0; j<LIBMESH_DIM; j++)
@@ -126,7 +126,7 @@ bool TypeTensor<Real>::operator < (const TypeTensor<Real>& rhs) const
 
 
 template <>
-bool TypeTensor<Real>::operator > (const TypeTensor<Real>& rhs) const
+bool TypeTensor<Real>::operator > (const TypeTensor<Real> & rhs) const
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     for (unsigned int j=0; j<LIBMESH_DIM; j++)
@@ -143,7 +143,7 @@ bool TypeTensor<Real>::operator > (const TypeTensor<Real>& rhs) const
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <>
-bool TypeTensor<Complex>::operator < (const TypeTensor<Complex>& rhs) const
+bool TypeTensor<Complex>::operator < (const TypeTensor<Complex> & rhs) const
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     for (unsigned int j=0; j<LIBMESH_DIM; j++)
@@ -163,7 +163,7 @@ bool TypeTensor<Complex>::operator < (const TypeTensor<Complex>& rhs) const
 
 
 template <>
-bool TypeTensor<Complex>::operator > (const TypeTensor<Complex>& rhs) const
+bool TypeTensor<Complex>::operator > (const TypeTensor<Complex> & rhs) const
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     for (unsigned int j=0; j<LIBMESH_DIM; j++)

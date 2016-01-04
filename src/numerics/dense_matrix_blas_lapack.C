@@ -41,7 +41,7 @@ namespace libMesh
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
+void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T> & other,
                                     _BLAS_Multiply_Flag flag)
 {
   int result_size = 0;
@@ -79,17 +79,16 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
     }
 
   // For this to work, the passed arg. must actually be a DenseMatrix<T>
-  const DenseMatrix<T>* const_that = cast_ptr< const DenseMatrix<T>* >(&other);
+  const DenseMatrix<T> * const_that = cast_ptr<const DenseMatrix<T> *>(&other);
 
   // Also, although 'that' is logically const in this BLAS routine,
   // the PETSc BLAS interface does not specify that any of the inputs are
   // const.  To use it, I must cast away const-ness.
-  DenseMatrix<T>* that = const_cast< DenseMatrix<T>* > (const_that);
+  DenseMatrix<T> * that = const_cast< DenseMatrix<T> * > (const_that);
 
   // Initialize A, B pointers for LEFT_MULTIPLY* cases
-  DenseMatrix<T>
-    *A = this,
-    *B = that;
+  DenseMatrix<T> * A = this;
+  DenseMatrix<T> * B = that;
 
   // For RIGHT_MULTIPLY* cases, swap the meaning of A and B.
   // Here is a full table of combinations we can pass to BLASgemm, and what the answer is when finished:
@@ -191,8 +190,8 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
 #else
 
 template<typename T>
-void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& ,
-                                    _BLAS_Multiply_Flag )
+void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T> &,
+                                    _BLAS_Multiply_Flag)
 {
   libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
@@ -217,12 +216,12 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   // The calling sequence for dgetrf is:
   // dgetrf(M, N, A, lda, ipiv, info)
 
-  //    M       (input) int*
+  //    M       (input) int *
   //            The number of rows of the matrix A.  M >= 0.
   // In C/C++, pass the number of *cols* of A
   int M = this->n();
 
-  //    N       (input) int*
+  //    N       (input) int *
   //            The number of columns of the matrix A.  N >= 0.
   // In C/C++, pass the number of *rows* of A
   int N = this->m();
@@ -233,7 +232,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   //      A = P*L*U; the unit diagonal elements of L are not stored.
   // Here, we pass &(_val[0]).
 
-  //    LDA     (input) int*
+  //    LDA     (input) int *
   //            The leading dimension of the array A.  LDA >= max(1,M).
   int LDA = M;
 
@@ -243,7 +242,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   // Here, we pass &(_pivots[0]), a private class member used to store pivots
   this->_pivots.resize( std::min(M,N) );
 
-  //    info    (output) int*
+  //    info    (output) int *
   //            = 0:  successful exit
   //            < 0:  if INFO = -i, the i-th argument had an illegal value
   //            > 0:  if INFO = i, U(i,i) is exactly zero. The factorization
@@ -276,7 +275,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 
 
 template<typename T>
-void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
+void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma)
 {
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
@@ -319,7 +318,9 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
 }
 
 template<typename T>
-void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<T>& VT)
+void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma,
+                                  DenseMatrix<T> & U,
+                                  DenseMatrix<T> & VT)
 {
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
@@ -386,17 +387,17 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
 template<typename T>
 void DenseMatrix<T>::_svd_helper (char JOBU,
                                   char JOBVT,
-                                  std::vector<T>& sigma_val,
-                                  std::vector<T>& U_val,
-                                  std::vector<T>& VT_val)
+                                  std::vector<T> & sigma_val,
+                                  std::vector<T> & U_val,
+                                  std::vector<T> & VT_val)
 {
 
-  //    M       (input) int*
+  //    M       (input) int *
   //            The number of rows of the matrix A.  M >= 0.
   // In C/C++, pass the number of *cols* of A
   int M = this->n();
 
-  //    N       (input) int*
+  //    N       (input) int *
   //            The number of columns of the matrix A.  N >= 0.
   // In C/C++, pass the number of *rows* of A
   int N = this->m();
@@ -417,7 +418,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //                          are destroyed.
   // Here, we pass &(_val[0]).
 
-  //    LDA     (input) int*
+  //    LDA     (input) int *
   //            The leading dimension of the array A.  LDA >= max(1,M).
   int LDA = M;
 
@@ -502,9 +503,9 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
 template<typename T>
 void DenseMatrix<T>::_svd_helper (char,
                                   char,
-                                  std::vector<T>&,
-                                  std::vector<T>&,
-                                  std::vector<T>&)
+                                  std::vector<T> &,
+                                  std::vector<T> &,
+                                  std::vector<T> &)
 {
   libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
@@ -517,7 +518,7 @@ void DenseMatrix<T>::_svd_helper (char,
 #if !PETSC_VERSION_LESS_THAN(3,1,0)
 
 template<typename T>
-void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
+void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
                                        DenseVector<T> & x,
                                        Real rcond) const
 {
@@ -629,19 +630,19 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
   //       bidiagonal form did not converge to zero.
   int INFO = 0;
 
-  // LAPACKgelss_(const PetscBLASInt*, // M
-  //              const PetscBLASInt*, // N
-  //              const PetscBLASInt*, // NRHS
-  //              PetscScalar*,        // A
-  //              const PetscBLASInt*, // LDA
-  //              PetscScalar*,        // B
-  //              const PetscBLASInt*, // LDB
-  //              PetscReal*,          // S(out) = singular values of A in increasing order
-  //              const PetscReal*,    // RCOND = tolerance for singular values
-  //              PetscBLASInt*,       // RANK(out) = number of "non-zero" singular values
-  //              PetscScalar*,        // WORK
-  //              const PetscBLASInt*, // LWORK
-  //              PetscBLASInt*);      // INFO
+  // LAPACKgelss_(const PetscBLASInt *, // M
+  //              const PetscBLASInt *, // N
+  //              const PetscBLASInt *, // NRHS
+  //              PetscScalar *,        // A
+  //              const PetscBLASInt *, // LDA
+  //              PetscScalar *,        // B
+  //              const PetscBLASInt *, // LDB
+  //              PetscReal *,          // S(out) = singular values of A in increasing order
+  //              const PetscReal *,    // RCOND = tolerance for singular values
+  //              PetscBLASInt *,       // RANK(out) = number of "non-zero" singular values
+  //              PetscScalar *,        // WORK
+  //              const PetscBLASInt *, // LWORK
+  //              PetscBLASInt *);      // INFO
   LAPACKgelss_(&M, &N, &NRHS, &A_trans_vals[0], &LDA, &B[0], &LDB, &S[0], &RCOND, &RANK, &WORK[0], &LWORK, &INFO);
 
   // Check for errors in the Lapack call
@@ -670,7 +671,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
 #else
 
 template<typename T>
-void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
+void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & /*rhs*/,
                                        DenseVector<T> & /*x*/) const
 {
   libmesh_error_msg("svd_solve() requires PETSc >= 3.1!");
@@ -693,7 +694,8 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
 #if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag)
+void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
+                                  DenseVector<T> & lambda_imag)
 {
   // The calling sequence for dgeev is:
   // DGEEVX( BALANC, JOBVL, JOBVR, SENSE, N, A, LDA, WR, WI, VL, LDVL, VR,
@@ -725,7 +727,7 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
   //          = 'B': Computed for eigenvalues and right eigenvectors.
   char SENSE = 'N';
 
-  //    N       (input) int*
+  //    N       (input) int *
   //            The number of rows/cols of the matrix A.  N >= 0.
   libmesh_assert( this->m() == this->n() );
   int N = this->m();
@@ -735,7 +737,7 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
   //          On exit, A has been overwritten.
   // Here, we pass &(_val[0]).
 
-  //    LDA     (input) int*
+  //    LDA     (input) int *
   //            The leading dimension of the array A.  LDA >= max(1,N).
   int LDA = N;
 
@@ -814,8 +816,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
   int INFO = 0;
 
   // Get references to raw data
-  std::vector<T>& lambda_real_val = lambda_real.get_values();
-  std::vector<T>& lambda_imag_val = lambda_imag.get_values();
+  std::vector<T> & lambda_real_val = lambda_real.get_values();
+  std::vector<T> & lambda_imag_val = lambda_imag.get_values();
 
   // Ready to call the actual factorization routine through SLEPc's interface
   LAPACKgeevx_( &BALANC, &JOBVL, &JOBVR, &SENSE, &N, &(_val[0]), &LDA, &lambda_real_val[0],
@@ -830,7 +832,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
 #else
 
 template<typename T>
-void DenseMatrix<T>::_evd_lapack (DenseVector<T>& , DenseVector<T>& )
+void DenseMatrix<T>::_evd_lapack (DenseVector<T> &,
+                                  DenseVector<T> &)
 {
   libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
@@ -844,22 +847,22 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& , DenseVector<T>& )
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
-                                                 DenseVector<T>& x)
+void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
+                                                 DenseVector<T> & x)
 {
   // The calling sequence for getrs is:
   // dgetrs(TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO)
 
-  //    trans   (input) char*
+  //    trans   (input) char *
   //            'n' for no tranpose, 't' for transpose
   char TRANS[] = "t";
 
-  //    N       (input) int*
+  //    N       (input) int *
   //            The order of the matrix A.  N >= 0.
   int N = this->m();
 
 
-  //    NRHS    (input) int*
+  //    NRHS    (input) int *
   //            The number of right hand sides, i.e., the number of columns
   //            of the matrix B.  NRHS >= 0.
   int NRHS = 1;
@@ -869,7 +872,7 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
   //            as computed by dgetrf.
   // Here, we pass &(_val[0])
 
-  //    LDA     (input) int*
+  //    LDA     (input) int *
   //            The leading dimension of the array A.  LDA >= max(1,N).
   int LDA = N;
 
@@ -885,17 +888,17 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
   // passed right-hand side b is unmodified.  I don't see a way around this
   // copy if we want to maintain an unmodified rhs in LibMesh.
   x = b;
-  std::vector<T>& x_vec = x.get_values();
+  std::vector<T> & x_vec = x.get_values();
 
   // We can avoid the copy if we don't care about overwriting the RHS: just
   // pass b to the Lapack routine and then swap with x before exiting
-  // std::vector<T>& x_vec = b.get_values();
+  // std::vector<T> & x_vec = b.get_values();
 
-  //    LDB     (input) int*
+  //    LDB     (input) int *
   //            The leading dimension of the array B.  LDB >= max(1,N).
   int LDB = N;
 
-  //    INFO    (output) int*
+  //    INFO    (output) int *
   //            = 0:  successful exit
   //            < 0:  if INFO = -i, the i-th argument had an illegal value
   int INFO = 0;
@@ -919,8 +922,8 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
 #else
 
 template<typename T>
-void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
-                                                 DenseVector<T>& )
+void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> &,
+                                                 DenseVector<T> &)
 {
   libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
@@ -934,9 +937,10 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
-                                  DenseVector<T>& dest,
-                                  const DenseVector<T>& arg,
+void DenseMatrix<T>::_matvec_blas(T alpha,
+                                  T beta,
+                                  DenseVector<T> & dest,
+                                  const DenseVector<T> & arg,
                                   bool trans) const
 {
   // Ensure that dest and arg sizes are compatible
@@ -988,8 +992,8 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   // a const function, vector_mult(), and so we have made this function const
   // as well.  Since BLAS knows nothing about const, we have to cast it away
   // now.
-  DenseMatrix<T>& a_ref = const_cast< DenseMatrix<T>& > ( *this );
-  std::vector<T>& a = a_ref.get_values();
+  DenseMatrix<T> & a_ref = const_cast< DenseMatrix<T> &> ( *this );
+  std::vector<T> & a = a_ref.get_values();
 
   //   LDA    - INTEGER.
   //            On entry, LDA specifies the first dimension of A as declared
@@ -1005,8 +1009,8 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   //            vector x.
   // Here, we must cast away the const-ness of "arg" since BLAS knows
   // nothing about const
-  DenseVector<T>& x_ref = const_cast< DenseVector<T>& > ( arg );
-  std::vector<T>& x = x_ref.get_values();
+  DenseVector<T> & x_ref = const_cast< DenseVector<T> &> ( arg );
+  std::vector<T> & x = x_ref.get_values();
 
   //   INCX   - INTEGER.
   //            On entry, INCX specifies the increment for the elements of
@@ -1026,7 +1030,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   //            must contain the vector y. On exit, Y is overwritten by the
   //            updated vector y.
   // The input vector "dest"
-  std::vector<T>& y = dest.get_values();
+  std::vector<T> & y = dest.get_values();
 
   //   INCY   - INTEGER.
   //            On entry, INCY specifies the increment for the elements of
@@ -1042,10 +1046,11 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
 
 
 template<typename T>
-void DenseMatrix<T>::_matvec_blas(T , T,
-                                  DenseVector<T>& ,
-                                  const DenseVector<T>&,
-                                  bool ) const
+void DenseMatrix<T>::_matvec_blas(T,
+                                  T,
+                                  DenseVector<T> &,
+                                  const DenseVector<T> &,
+                                  bool) const
 {
   libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
@@ -1056,42 +1061,48 @@ void DenseMatrix<T>::_matvec_blas(T , T,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template void DenseMatrix<Real>::_multiply_blas(const DenseMatrixBase<Real>&, _BLAS_Multiply_Flag);
+template void DenseMatrix<Real>::_multiply_blas(const DenseMatrixBase<Real> &, _BLAS_Multiply_Flag);
 template void DenseMatrix<Real>::_lu_decompose_lapack();
-template void DenseMatrix<Real>::_lu_back_substitute_lapack(const DenseVector<Real>& ,
-                                                            DenseVector<Real>&);
-template void DenseMatrix<Real>::_matvec_blas(Real, Real,
-                                              DenseVector<Real>& ,
-                                              const DenseVector<Real>&,
-                                              bool ) const;
-template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&);
-template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&, DenseMatrix<Real>&, DenseMatrix<Real>&);
+template void DenseMatrix<Real>::_lu_back_substitute_lapack(const DenseVector<Real> &,
+                                                            DenseVector<Real> &);
+template void DenseMatrix<Real>::_matvec_blas(Real,
+                                              Real,
+                                              DenseVector<Real> &,
+                                              const DenseVector<Real> &,
+                                              bool) const;
+template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &);
+template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &,
+                                             DenseMatrix<Real> &,
+                                             DenseMatrix<Real> &);
 template void DenseMatrix<Real>::_svd_helper (char,
                                               char,
-                                              std::vector<Real>&,
-                                              std::vector<Real>&,
-                                              std::vector<Real>&);
-template void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real>&, DenseVector<Real>&, Real) const;
-template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real>&, DenseVector<Real>&);
+                                              std::vector<Real> &,
+                                              std::vector<Real> &,
+                                              std::vector<Real> &);
+template void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real> &, DenseVector<Real> &, Real) const;
+template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real> &, DenseVector<Real> &);
 
 #if !(LIBMESH_USE_REAL_NUMBERS)
-template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number>&, _BLAS_Multiply_Flag);
+template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number> &, _BLAS_Multiply_Flag);
 template void DenseMatrix<Number>::_lu_decompose_lapack();
-template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number>& ,
-                                                              DenseVector<Number>&);
-template void DenseMatrix<Number>::_matvec_blas(Number, Number,
-                                                DenseVector<Number>& ,
-                                                const DenseVector<Number>&,
-                                                bool ) const;
-template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&);
-template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix<Number>&, DenseMatrix<Number>&);
+template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number> &,
+                                                              DenseVector<Number> &);
+template void DenseMatrix<Number>::_matvec_blas(Number,
+                                                Number,
+                                                DenseVector<Number> &,
+                                                const DenseVector<Number> &,
+                                                bool) const;
+template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number> &);
+template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number> &,
+                                               DenseMatrix<Number> &,
+                                               DenseMatrix<Number> &);
 template void DenseMatrix<Number>::_svd_helper (char,
                                                 char,
-                                                std::vector<Number>&,
-                                                std::vector<Number>&,
-                                                std::vector<Number>&);
-template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number>&, DenseVector<Number>&, Real) const;
-template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number>&, DenseVector<Number>&);
+                                                std::vector<Number> &,
+                                                std::vector<Number> &,
+                                                std::vector<Number> &);
+template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number> &, DenseVector<Number> &, Real) const;
+template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number> &, DenseVector<Number> &);
 
 #endif
 

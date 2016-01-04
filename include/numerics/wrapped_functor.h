@@ -48,7 +48,7 @@ public:
    * Constructor to wrap FunctionBase functors in a FEMFunctionBase
    * compatible shim
    */
-  WrappedFunctor (const FunctionBase<Output>& func)
+  WrappedFunctor (const FunctionBase<Output> & func)
     : _func(func.clone())
   { }
 
@@ -62,8 +62,8 @@ public:
    * @returns the scalar value of variable varnum at coordinate \p p
    * and time \p time.
    */
-  virtual Output operator() (const FEMContext&,
-                             const Point& p,
+  virtual Output operator() (const FEMContext &,
+                             const Point & p,
                              const Real time = 0.) libmesh_override
   { return _func->operator()(p, time); }
 
@@ -72,19 +72,19 @@ public:
    * Returns in \p output the values of all system variables at the
    * coordinate \p p and for time \p time.
    */
-  virtual void operator() (const FEMContext&,
-                           const Point& p,
+  virtual void operator() (const FEMContext &,
+                           const Point & p,
                            const Real time,
-                           DenseVector<Output>& output) libmesh_override
+                           DenseVector<Output> & output) libmesh_override
   { _func->operator() (p, time, output); }
 
   /**
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
-  virtual Output component (const FEMContext&,
+  virtual Output component (const FEMContext &,
                             unsigned int i,
-                            const Point& p,
+                            const Point & p,
                             Real time=0.) libmesh_override
   { return _func->component(i, p, time); }
 

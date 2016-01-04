@@ -129,7 +129,7 @@ class ConstCouplingAccessor
 {
 public:
   ConstCouplingAccessor(std::size_t loc_in,
-                        const CouplingMatrix& mat_in) :
+                        const CouplingMatrix & mat_in) :
     _location(loc_in), _mat(mat_in)
   {
     libmesh_assert_less(_location, _mat.size() * _mat.size());
@@ -174,7 +174,7 @@ public:
 protected:
 
   std::size_t _location;
-  const CouplingMatrix& _mat;
+  const CouplingMatrix & _mat;
 };
 
 
@@ -185,11 +185,11 @@ class CouplingAccessor : public ConstCouplingAccessor
 {
 public:
   CouplingAccessor(std::size_t loc_in,
-                   CouplingMatrix& mat_in) :
+                   CouplingMatrix & mat_in) :
     ConstCouplingAccessor(loc_in, mat_in), _my_mat(mat_in) {}
 
   template <typename T>
-  CouplingAccessor& operator = (T new_value)
+  CouplingAccessor & operator = (T new_value)
   {
     // For backwards compatibility we take integer arguments,
     // but coupling matrix entries are really all zero or one.
@@ -200,7 +200,7 @@ public:
     return *this;
   }
 
-  CouplingAccessor& operator = (bool new_value)
+  CouplingAccessor & operator = (bool new_value)
   {
     const std::size_t max_size = std::numeric_limits<std::size_t>::max();
 
@@ -317,7 +317,7 @@ public:
 
 private:
 
-  CouplingMatrix& _my_mat;
+  CouplingMatrix & _my_mat;
 };
 
 
@@ -330,7 +330,7 @@ class ConstCouplingRow
 {
 public:
   ConstCouplingRow(unsigned int row_in,
-                   const CouplingMatrix& mat_in) :
+                   const CouplingMatrix & mat_in) :
     _row_i(row_in), _mat(mat_in)
   {
     libmesh_assert_less(_row_i, _mat.size());
@@ -407,7 +407,7 @@ public:
    */
   const_iterator end() const;
 
-  bool operator== (const ConstCouplingRow& other) const
+  bool operator== (const ConstCouplingRow & other) const
   {
     // Thinking that rows from different matrix objects are equal is
     // not even wrong
@@ -417,7 +417,7 @@ public:
             (_begin_it == other._begin_it));
   }
 
-  bool operator!= (const ConstCouplingRow& other) const
+  bool operator!= (const ConstCouplingRow & other) const
   {
     return !(*this == other);
   }
@@ -426,7 +426,7 @@ protected:
   friend class ConstCouplingRowConstIterator;
 
   unsigned int _row_i;
-  const CouplingMatrix& _mat;
+  const CouplingMatrix & _mat;
 
   // The location (i*size+j) corresponding to the first entry in this
   // row, or numeric_limits<size_t>::max() for an empty row.
@@ -443,7 +443,7 @@ protected:
 class ConstCouplingRowConstIterator
 {
 public:
-  ConstCouplingRowConstIterator (const ConstCouplingRow& row_in,
+  ConstCouplingRowConstIterator (const ConstCouplingRow & row_in,
                                  std::size_t loc_in,
                                  CouplingMatrix::rc_type::const_iterator it_in) :
     _location(loc_in),
@@ -471,7 +471,7 @@ public:
     return _location % _row._mat.size();
   }
 
-  ConstCouplingRowConstIterator& operator++ ()
+  ConstCouplingRowConstIterator & operator++ ()
   {
     libmesh_assert_not_equal_to
       (_location, std::numeric_limits<std::size_t>::max());
@@ -500,7 +500,7 @@ public:
     return *this;
   }
 
-  bool operator== (const ConstCouplingRowConstIterator& other) const
+  bool operator== (const ConstCouplingRowConstIterator & other) const
   {
     // Thinking that iterators from different row objects are equal
     // is not even wrong
@@ -510,7 +510,7 @@ public:
             (_it == other._it));
   }
 
-  bool operator!= (const ConstCouplingRowConstIterator& other) const
+  bool operator!= (const ConstCouplingRowConstIterator & other) const
   {
     return !(*this == other);
   }
@@ -519,7 +519,7 @@ private:
   // The location (i*size+j) corresponding to this iterator, or
   // numeric_limits<size_t>::max() to signify end()
   std::size_t _location;
-  const ConstCouplingRow &_row;
+  const ConstCouplingRow & _row;
   // The range containing this iterator location, or
   // _row._mat._ranges.end() if no range contains this location
   CouplingMatrix::rc_type::const_iterator _it;

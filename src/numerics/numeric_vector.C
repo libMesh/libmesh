@@ -43,7 +43,7 @@ namespace libMesh
 // Full specialization for Real datatypes
 template <typename T>
 UniquePtr<NumericVector<T> >
-NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage solver_package)
+NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage solver_package)
 {
   // Build the appropriate vector
   switch (solver_package)
@@ -91,8 +91,8 @@ NumericVector<T>::build(const SolverPackage solver_package)
 
 
 template <typename T>
-void NumericVector<T>::insert (const T* v,
-                               const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::insert (const T * v,
+                               const std::vector<numeric_index_type> & dof_indices)
 {
   for (numeric_index_type i=0; i<dof_indices.size(); i++)
     this->set (dof_indices[i], v[i]);
@@ -101,8 +101,8 @@ void NumericVector<T>::insert (const T* v,
 
 
 template <typename T>
-void NumericVector<T>::insert (const NumericVector<T>& V,
-                               const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::insert (const NumericVector<T> & V,
+                               const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
@@ -113,7 +113,7 @@ void NumericVector<T>::insert (const NumericVector<T>& V,
 
 
 template <typename T>
-int NumericVector<T>::compare (const NumericVector<T> &other_vector,
+int NumericVector<T>::compare (const NumericVector<T> & other_vector,
                                const Real threshold) const
 {
   libmesh_assert (this->initialized());
@@ -145,7 +145,7 @@ int NumericVector<T>::compare (const NumericVector<T> &other_vector,
 
 
 template <typename T>
-int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vector,
+int NumericVector<T>::local_relative_compare (const NumericVector<T> & other_vector,
                                               const Real threshold) const
 {
   libmesh_assert (this->initialized());
@@ -178,7 +178,7 @@ int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vect
 
 
 template <typename T>
-int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vector,
+int NumericVector<T>::global_relative_compare (const NumericVector<T> & other_vector,
                                                const Real threshold) const
 {
   libmesh_assert (this->initialized());
@@ -216,7 +216,7 @@ int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vec
 // Full specialization for float datatypes (DistributedVector wants this)
 
 template <>
-int NumericVector<float>::compare (const NumericVector<float> &other_vector,
+int NumericVector<float>::compare (const NumericVector<float> & other_vector,
 const Real threshold) const
 {
 libmesh_assert (this->initialized());
@@ -241,7 +241,7 @@ return rvalue;
 
 // Full specialization for double datatypes
 template <>
-int NumericVector<double>::compare (const NumericVector<double> &other_vector,
+int NumericVector<double>::compare (const NumericVector<double> & other_vector,
 const Real threshold) const
 {
 libmesh_assert (this->initialized());
@@ -267,7 +267,7 @@ return rvalue;
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 // Full specialization for long double datatypes
 template <>
-int NumericVector<long double>::compare (const NumericVector<long double> &other_vector,
+int NumericVector<long double>::compare (const NumericVector<long double> & other_vector,
 const Real threshold) const
 {
 libmesh_assert (this->initialized());
@@ -294,7 +294,7 @@ return rvalue;
 
 // Full specialization for Complex datatypes
 template <>
-int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
+int NumericVector<Complex>::compare (const NumericVector<Complex> & other_vector,
 const Real threshold) const
 {
 libmesh_assert (this->initialized());
@@ -307,8 +307,7 @@ numeric_index_type i = first_local_index();
 
 do
 {
-if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
-( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
+if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) || ( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
 rvalue = i;
 else
 i++;
@@ -381,8 +380,8 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 
 
 template <typename T>
-void NumericVector<T>::add_vector (const T* v,
-                                   const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::add_vector (const T * v,
+                                   const std::vector<numeric_index_type> & dof_indices)
 {
   int n = dof_indices.size();
   for (int i=0; i<n; i++)
@@ -392,8 +391,8 @@ void NumericVector<T>::add_vector (const T* v,
 
 
 template <typename T>
-void NumericVector<T>::add_vector (const NumericVector<T>& v,
-                                   const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::add_vector (const NumericVector<T> & v,
+                                   const std::vector<numeric_index_type> & dof_indices)
 {
   int n = dof_indices.size();
   libmesh_assert_equal_to(v.size(), static_cast<unsigned>(n));
@@ -404,8 +403,8 @@ void NumericVector<T>::add_vector (const NumericVector<T>& v,
 
 
 template <typename T>
-void NumericVector<T>::add_vector (const NumericVector<T>& v,
-                                   const ShellMatrix<T>& a)
+void NumericVector<T>::add_vector (const NumericVector<T> & v,
+                                   const ShellMatrix<T> & a)
 {
   a.vector_mult_add(*this,v);
 }

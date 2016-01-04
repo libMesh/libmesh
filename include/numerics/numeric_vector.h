@@ -67,14 +67,14 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  NumericVector (const Parallel::Communicator &comm_in,
+  NumericVector (const Parallel::Communicator & comm_in,
                  const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  NumericVector (const Parallel::Communicator &comm_in,
+  NumericVector (const Parallel::Communicator & comm_in,
                  const numeric_index_type n,
                  const ParallelType ptype = AUTOMATIC);
 
@@ -82,7 +82,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  NumericVector (const Parallel::Communicator &comm_in,
+  NumericVector (const Parallel::Communicator & comm_in,
                  const numeric_index_type n,
                  const numeric_index_type n_local,
                  const ParallelType ptype = AUTOMATIC);
@@ -92,10 +92,10 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  NumericVector (const Parallel::Communicator &comm_in,
+  NumericVector (const Parallel::Communicator & comm_in,
                  const numeric_index_type N,
                  const numeric_index_type n_local,
-                 const std::vector<numeric_index_type>& ghost,
+                 const std::vector<numeric_index_type> & ghost,
                  const ParallelType ptype = AUTOMATIC);
 
 public:
@@ -112,7 +112,7 @@ public:
    * \p solver_package
    */
   static UniquePtr<NumericVector<T> >
-  build(const Parallel::Communicator &comm,
+  build(const Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -208,7 +208,7 @@ public:
    */
   virtual void init (const numeric_index_type /*N*/,
                      const numeric_index_type /*n_local*/,
-                     const std::vector<numeric_index_type>& /*ghost*/,
+                     const std::vector<numeric_index_type> & /*ghost*/,
                      const bool /*fast*/ = false,
                      const ParallelType = AUTOMATIC) = 0;
 
@@ -216,7 +216,7 @@ public:
    * Creates a vector that has the same dimension and storage type as
    * \p other, including ghost dofs.
    */
-  virtual void init (const NumericVector<T>& other,
+  virtual void init (const NumericVector<T> & other,
                      const bool fast = false) = 0;
 
   /**
@@ -227,12 +227,12 @@ public:
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const NumericVector<T> &V) = 0;
+  virtual NumericVector<T> & operator= (const NumericVector<T> & V) = 0;
 
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const std::vector<T> &v) = 0;
+  virtual NumericVector<T> & operator= (const std::vector<T> & v) = 0;
 
   /**
    * @returns the minimum element in the vector.
@@ -350,7 +350,8 @@ public:
    * implementation calls \p operator() for each index, but some
    * implementations may supply faster methods here.
    */
-  virtual void get(const std::vector<numeric_index_type>& index, T* values) const;
+  virtual void get(const std::vector<numeric_index_type> & index,
+                   T * values) const;
 
   /**
    * Access multiple components at once.  \p values will be resized,
@@ -358,19 +359,20 @@ public:
    * operator() for each index, but some implementations may supply
    * faster methods here.
    */
-  void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
+  void get(const std::vector<numeric_index_type> & index,
+           std::vector<T> & values) const;
 
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  virtual NumericVector<T> & operator += (const NumericVector<T> &V) = 0;
+  virtual NumericVector<T> & operator += (const NumericVector<T> & V) = 0;
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  virtual NumericVector<T> & operator -= (const NumericVector<T> &V) = 0;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> & V) = 0;
 
   /**
    * Multiplication operator.
@@ -422,14 +424,14 @@ public:
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const NumericVector<T>& V) = 0;
+  virtual void add (const NumericVector<T> & V) = 0;
 
   /**
    * \f$U+=a*V\f$.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const T a, const NumericVector<T>& v) = 0;
+  virtual void add (const T a, const NumericVector<T> & v) = 0;
 
   /**
    * \f$ U+=v \f$ where v is a pointer and each \p dof_indices[i]
@@ -437,64 +439,64 @@ public:
    *
    * This should be overridden in subclasses for efficiency
    */
-  virtual void add_vector (const T* v,
-                           const std::vector<numeric_index_type>& dof_indices);
+  virtual void add_vector (const T * v,
+                           const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$ U+=v \f$ where v is a std::vector and each \p dof_indices[i]
    * specifies where to add value \p v[i]
    */
-  void add_vector (const std::vector<T>& v,
-                   const std::vector<numeric_index_type>& dof_indices);
+  void add_vector (const std::vector<T> & v,
+                   const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$ U+=v \f$ where v is a NumericVector and each \p dof_indices[i]
    * specifies where to add value \p v(i)
    */
-  virtual void add_vector (const NumericVector<T>& V,
-                           const std::vector<numeric_index_type>& dof_indices);
+  virtual void add_vector (const NumericVector<T> & V,
+                           const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$ U+=v \f$ where v is a DenseVector and each \p dof_indices[i]
    * specifies where to add value \p v(i)
    */
-  void add_vector (const DenseVector<T>& V,
-                   const std::vector<numeric_index_type>& dof_indices);
+  void add_vector (const DenseVector<T> & V,
+                   const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
-  virtual void add_vector (const NumericVector<T>&,
-                           const SparseMatrix<T>&) = 0;
+  virtual void add_vector (const NumericVector<T> &,
+                           const SparseMatrix<T> &) = 0;
 
   /**
    * \f$U+=A*V\f$, add the product of a \p ShellMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
-  void add_vector (const NumericVector<T>& v,
-                   const ShellMatrix<T>& a);
+  void add_vector (const NumericVector<T> & v,
+                   const ShellMatrix<T> & a);
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
-  virtual void add_vector_transpose (const NumericVector<T>&,
-                                     const SparseMatrix<T>&) = 0;
+  virtual void add_vector_transpose (const NumericVector<T> &,
+                                     const SparseMatrix<T> &) = 0;
 
   /**
-   * \f$ U=v \f$ where v is a \p T[] or T*
+   * \f$ U=v \f$ where v is a \p T[] or T *
    * and you want to specify WHERE to insert it
    */
-  virtual void insert (const T* v,
-                       const std::vector<numeric_index_type>& dof_indices);
+  virtual void insert (const T * v,
+                       const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
-  void insert (const std::vector<T>& v,
-               const std::vector<numeric_index_type>& dof_indices);
+  void insert (const std::vector<T> & v,
+               const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -502,8 +504,8 @@ public:
    * want to specify WHERE to insert
    * the NumericVector<T> V
    */
-  virtual void insert (const NumericVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices);
+  virtual void insert (const NumericVector<T> & V,
+                       const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$ U=V \f$ where U and V are type
@@ -511,16 +513,16 @@ public:
    * want to specify WHERE to insert
    * the DenseVector<T> V
    */
-  void insert (const DenseVector<T>& V,
-               const std::vector<numeric_index_type>& dof_indices);
+  void insert (const DenseVector<T> & V,
+               const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * \f$ U=V \f$ where V is a
    * DenseSubVector<T> and you
    * want to specify WHERE to insert it
    */
-  void insert (const DenseSubVector<T>& V,
-               const std::vector<numeric_index_type>& dof_indices);
+  void insert (const DenseSubVector<T> & V,
+               const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * Scale each element of the
@@ -537,27 +539,27 @@ public:
   /**
    * Computes the dot product, p = U.V
    */
-  virtual T dot(const NumericVector<T>&) const = 0;
+  virtual T dot(const NumericVector<T> &) const = 0;
 
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  virtual void localize (std::vector<T>& v_local) const = 0;
+  virtual void localize (std::vector<T> & v_local) const = 0;
 
   /**
    * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  virtual void localize (NumericVector<T>& v_local) const = 0;
+  virtual void localize (NumericVector<T> & v_local) const = 0;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  virtual void localize (NumericVector<T>& v_local,
-                         const std::vector<numeric_index_type>& send_list) const = 0;
+  virtual void localize (NumericVector<T> & v_local,
+                         const std::vector<numeric_index_type> & send_list) const = 0;
 
   /**
    * Updates a local vector with selected values from neighboring
@@ -565,7 +567,7 @@ public:
    */
   virtual void localize (const numeric_index_type first_local_idx,
                          const numeric_index_type last_local_idx,
-                         const std::vector<numeric_index_type>& send_list) = 0;
+                         const std::vector<numeric_index_type> & send_list) = 0;
 
   /**
    * Creates a local copy of the global vector in
@@ -573,7 +575,7 @@ public:
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  virtual void localize_to_one (std::vector<T>& v_local,
+  virtual void localize_to_one (std::vector<T> & v_local,
                                 const processor_id_type proc_id=0) const = 0;
 
   /**
@@ -584,7 +586,7 @@ public:
    * no threshold is given, the \p libMesh \p TOLERANCE
    * is used.
    */
-  virtual int compare (const NumericVector<T> &other_vector,
+  virtual int compare (const NumericVector<T> & other_vector,
                        const Real threshold = TOLERANCE) const;
 
   /**
@@ -595,7 +597,7 @@ public:
    * threshold.  When no threshold is given, the \p libMesh
    * \p TOLERANCE is used.
    */
-  virtual int local_relative_compare (const NumericVector<T> &other_vector,
+  virtual int local_relative_compare (const NumericVector<T> & other_vector,
                                       const Real threshold = TOLERANCE) const;
 
   /**
@@ -606,32 +608,32 @@ public:
    * threshold.  When no threshold is given, the \p libMesh
    * \p TOLERANCE is used.
    */
-  virtual int global_relative_compare (const NumericVector<T> &other_vector,
+  virtual int global_relative_compare (const NumericVector<T> & other_vector,
                                        const Real threshold = TOLERANCE) const;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
    */
-  virtual void pointwise_mult (const NumericVector<T>& vec1,
-                               const NumericVector<T>& vec2) = 0;
+  virtual void pointwise_mult (const NumericVector<T> & vec1,
+                               const NumericVector<T> & vec2) = 0;
 
   /**
    * Prints the local contents of the vector, by default to
    * libMesh::out
    */
-  virtual void print(std::ostream& os=libMesh::out) const;
+  virtual void print(std::ostream & os=libMesh::out) const;
 
   /**
    * Prints the global contents of the vector, by default to
    * libMesh::out
    */
-  virtual void print_global(std::ostream& os=libMesh::out) const;
+  virtual void print_global(std::ostream & os=libMesh::out) const;
 
   /**
    * Same as above but allows you to use stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const NumericVector<T>& v)
+  friend std::ostream & operator << (std::ostream & os, const NumericVector<T> & v)
   {
     v.print_global(os);
     return os;
@@ -643,7 +645,7 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string& /*name*/ = "") const
+  virtual void print_matlab(const std::string & /*name*/ = "") const
   {
     libmesh_not_implemented();
   }
@@ -654,8 +656,8 @@ public:
    * the SparseMatrix class, it is currently only implemented for
    * PetscVectors.
    */
-  virtual void create_subvector(NumericVector<T>& ,
-                                const std::vector<numeric_index_type>& ) const
+  virtual void create_subvector(NumericVector<T> & ,
+                                const std::vector<numeric_index_type> &) const
   {
     libmesh_not_implemented();
   }
@@ -665,7 +667,7 @@ public:
    * enough indirection in subclasses to make this an O(1) header-swap
    * operation.
    */
-  virtual void swap (NumericVector<T> &v);
+  virtual void swap (NumericVector<T> & v);
 
 protected:
 
@@ -694,7 +696,7 @@ protected:
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
+NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),
@@ -707,7 +709,7 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
+NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
                                  const numeric_index_type /*n*/,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
@@ -723,7 +725,7 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
+NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
                                  const numeric_index_type /*n*/,
                                  const numeric_index_type /*n_local*/,
                                  const ParallelType ptype) :
@@ -740,10 +742,10 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
+NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
                                  const numeric_index_type /*n*/,
                                  const numeric_index_type /*n_local*/,
-                                 const std::vector<numeric_index_type>& /*ghost*/,
+                                 const std::vector<numeric_index_type> & /*ghost*/,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),
@@ -777,7 +779,8 @@ void NumericVector<T>::clear ()
 
 template <typename T>
 inline
-void NumericVector<T>::get(const std::vector<numeric_index_type>& index, T* values) const
+void NumericVector<T>::get(const std::vector<numeric_index_type> & index,
+                           T * values) const
 {
   const std::size_t num = index.size();
   for(std::size_t i=0; i<num; i++)
@@ -790,7 +793,8 @@ void NumericVector<T>::get(const std::vector<numeric_index_type>& index, T* valu
 
 template <typename T>
 inline
-void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
+void NumericVector<T>::get(const std::vector<numeric_index_type> & index,
+                           std::vector<T> & values) const
 {
   const std::size_t num = index.size();
   values.resize(num);
@@ -804,8 +808,8 @@ void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::ve
 
 template <typename T>
 inline
-void NumericVector<T>::add_vector(const std::vector<T>& v,
-                                  const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::add_vector(const std::vector<T> & v,
+                                  const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
@@ -816,8 +820,8 @@ void NumericVector<T>::add_vector(const std::vector<T>& v,
 
 template <typename T>
 inline
-void NumericVector<T>::add_vector(const DenseVector<T>& v,
-                                  const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::add_vector(const DenseVector<T> & v,
+                                  const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
@@ -828,8 +832,8 @@ void NumericVector<T>::add_vector(const DenseVector<T>& v,
 
 template <typename T>
 inline
-void NumericVector<T>::insert(const std::vector<T>& v,
-                              const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::insert(const std::vector<T> & v,
+                              const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
@@ -840,8 +844,8 @@ void NumericVector<T>::insert(const std::vector<T>& v,
 
 template <typename T>
 inline
-void NumericVector<T>::insert(const DenseVector<T>& v,
-                              const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::insert(const DenseVector<T> & v,
+                              const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
@@ -852,8 +856,8 @@ void NumericVector<T>::insert(const DenseVector<T>& v,
 
 template <typename T>
 inline
-void NumericVector<T>::insert(const DenseSubVector<T>& v,
-                              const std::vector<numeric_index_type>& dof_indices)
+void NumericVector<T>::insert(const DenseSubVector<T> & v,
+                              const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert(v.size() == dof_indices.size());
   if (!v.empty())
@@ -867,7 +871,7 @@ void NumericVector<T>::insert(const DenseSubVector<T>& v,
 // version, at least according to icc v7.1
 template <>
 inline
-void NumericVector<Complex>::print(std::ostream& os) const
+void NumericVector<Complex>::print(std::ostream & os) const
 {
   libmesh_assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
@@ -885,7 +889,7 @@ void NumericVector<Complex>::print(std::ostream& os) const
 
 template <typename T>
 inline
-void NumericVector<T>::print(std::ostream& os) const
+void NumericVector<T>::print(std::ostream & os) const
 {
   libmesh_assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
@@ -900,7 +904,7 @@ void NumericVector<T>::print(std::ostream& os) const
 
 template <>
 inline
-void NumericVector<Complex>::print_global(std::ostream& os) const
+void NumericVector<Complex>::print_global(std::ostream & os) const
 {
   libmesh_assert (this->initialized());
 
@@ -922,7 +926,7 @@ void NumericVector<Complex>::print_global(std::ostream& os) const
 
 template <typename T>
 inline
-void NumericVector<T>::print_global(std::ostream& os) const
+void NumericVector<T>::print_global(std::ostream & os) const
 {
   libmesh_assert (this->initialized());
 
@@ -943,7 +947,7 @@ void NumericVector<T>::print_global(std::ostream& os) const
 
 template <typename T>
 inline
-void  NumericVector<T>::swap (NumericVector<T> &v)
+void  NumericVector<T>::swap (NumericVector<T> & v)
 {
   std::swap(_is_closed, v._is_closed);
   std::swap(_is_initialized, v._is_initialized);

@@ -56,7 +56,7 @@ public:
   /**
    * Copy-constructor.
    */
-  //DenseMatrix (const DenseMatrix<T>& other_matrix);
+  //DenseMatrix (const DenseMatrix<T> & other_matrix);
 
   /**
    * Destructor.  Empty.
@@ -98,31 +98,31 @@ public:
   /**
    * Left multipliess by the matrix \p M2.
    */
-  virtual void left_multiply (const DenseMatrixBase<T>& M2) libmesh_override;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
    * Left multipliess by the matrix \p M2 of different type
    */
   template <typename T2>
-  void left_multiply (const DenseMatrixBase<T2>& M2);
+  void left_multiply (const DenseMatrixBase<T2> & M2);
 
   /**
    * Right multiplies by the matrix \p M2.
    */
-  virtual void right_multiply (const DenseMatrixBase<T>& M2) libmesh_override;
+  virtual void right_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
    * Right multiplies by the matrix \p M2 of different type
    */
   template <typename T2>
-  void right_multiply (const DenseMatrixBase<T2>& M2);
+  void right_multiply (const DenseMatrixBase<T2> & M2);
 
   /**
    * Performs the matrix-vector multiplication,
    * \p dest := (*this) * \p arg.
    */
-  void vector_mult (DenseVector<T>& dest,
-                    const DenseVector<T>& arg) const;
+  void vector_mult (DenseVector<T> & dest,
+                    const DenseVector<T> & arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
@@ -130,15 +130,15 @@ public:
    * on mixed types
    */
   template <typename T2>
-  void vector_mult (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-                    const DenseVector<T2>& arg) const;
+  void vector_mult (DenseVector<typename CompareTypes<T,T2>::supertype> & dest,
+                    const DenseVector<T2> & arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
    * \p dest := (*this)^T * \p arg.
    */
-  void vector_mult_transpose (DenseVector<T>& dest,
-                              const DenseVector<T>& arg) const;
+  void vector_mult_transpose (DenseVector<T> & dest,
+                              const DenseVector<T> & arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
@@ -146,16 +146,16 @@ public:
    * on mixed types
    */
   template <typename T2>
-  void vector_mult_transpose (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-                              const DenseVector<T2>& arg) const;
+  void vector_mult_transpose (DenseVector<typename CompareTypes<T,T2>::supertype> & dest,
+                              const DenseVector<T2> & arg) const;
 
   /**
    * Performs the scaled matrix-vector multiplication,
    * \p dest += \p factor * (*this) * \p arg.
    */
-  void vector_mult_add (DenseVector<T>& dest,
+  void vector_mult_add (DenseVector<T> & dest,
                         const T factor,
-                        const DenseVector<T>& arg) const;
+                        const DenseVector<T> & arg) const;
 
   /**
    * Performs the scaled matrix-vector multiplication,
@@ -163,24 +163,24 @@ public:
    * on mixed types
    */
   template <typename T2, typename T3>
-  void vector_mult_add (DenseVector<typename CompareTypes<T, typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
+  void vector_mult_add (DenseVector<typename CompareTypes<T, typename CompareTypes<T2,T3>::supertype>::supertype> & dest,
                         const T2 factor,
-                        const DenseVector<T3>& arg) const;
+                        const DenseVector<T3> & arg) const;
 
   /**
    * Put the \p sub_m x \p sub_n principal submatrix into \p dest.
    */
-  void get_principal_submatrix (unsigned int sub_m, unsigned int sub_n, DenseMatrix<T>& dest) const;
+  void get_principal_submatrix (unsigned int sub_m, unsigned int sub_n, DenseMatrix<T> & dest) const;
 
   /**
    * Put the \p sub_m x \p sub_m principal submatrix into \p dest.
    */
-  void get_principal_submatrix (unsigned int sub_m, DenseMatrix<T>& dest) const;
+  void get_principal_submatrix (unsigned int sub_m, DenseMatrix<T> & dest) const;
 
   /**
    * Assignment operator.
    */
-  DenseMatrix<T>& operator = (const DenseMatrix<T>& other_matrix);
+  DenseMatrix<T> & operator = (const DenseMatrix<T> & other_matrix);
 
   /**
    * Assignment-from-other-matrix-type operator
@@ -190,12 +190,12 @@ public:
    * operations
    */
   template <typename T2>
-  DenseMatrix<T>& operator = (const DenseMatrix<T2>& other_matrix);
+  DenseMatrix<T> & operator = (const DenseMatrix<T2> & other_matrix);
 
   /**
    * STL-like swap method
    */
-  void swap(DenseMatrix<T>& other_matrix);
+  void swap(DenseMatrix<T> & other_matrix);
 
   /**
    * Resize the matrix.  Will never free memory, but may
@@ -218,7 +218,7 @@ public:
   /**
    * Multiplies every element in the matrix by \p factor.
    */
-  DenseMatrix<T>& operator *= (const T factor);
+  DenseMatrix<T> & operator *= (const T factor);
 
   /**
    * Adds \p factor times \p mat to this matrix.
@@ -226,27 +226,27 @@ public:
   template<typename T2, typename T3>
   typename boostcopy::enable_if_c<
     ScalarTraits<T2>::value, void >::type add (const T2 factor,
-                                               const DenseMatrix<T3>& mat);
+                                               const DenseMatrix<T3> & mat);
 
   /**
    * Tests if \p mat is exactly equal to this matrix.
    */
-  bool operator== (const DenseMatrix<T> &mat) const;
+  bool operator== (const DenseMatrix<T> & mat) const;
 
   /**
    * Tests if \p mat is not exactly equal to this matrix.
    */
-  bool operator!= (const DenseMatrix<T> &mat) const;
+  bool operator!= (const DenseMatrix<T> & mat) const;
 
   /**
    * Adds \p mat to this matrix.
    */
-  DenseMatrix<T>& operator+= (const DenseMatrix<T> &mat);
+  DenseMatrix<T> & operator+= (const DenseMatrix<T> & mat);
 
   /**
    * Subtracts \p mat from this matrix.
    */
-  DenseMatrix<T>& operator-= (const DenseMatrix<T> &mat);
+  DenseMatrix<T> & operator-= (const DenseMatrix<T> & mat);
 
   /**
    * @returns the minimum element in the matrix.
@@ -290,27 +290,27 @@ public:
   /**
    * Left multiplies by the transpose of the matrix \p A.
    */
-  void left_multiply_transpose (const DenseMatrix<T>& A);
+  void left_multiply_transpose (const DenseMatrix<T> & A);
 
   /**
    * Left multiplies by the transpose of the matrix \p A of different
    * type
    */
   template <typename T2>
-  void left_multiply_transpose (const DenseMatrix<T2>& A);
+  void left_multiply_transpose (const DenseMatrix<T2> & A);
 
 
   /**
    * Right multiplies by the transpose of the matrix \p A
    */
-  void right_multiply_transpose (const DenseMatrix<T>& A);
+  void right_multiply_transpose (const DenseMatrix<T> & A);
 
   /**
    * Right multiplies by the transpose of the matrix \p A of different
    * type.
    */
   template <typename T2>
-  void right_multiply_transpose (const DenseMatrix<T2>& A);
+  void right_multiply_transpose (const DenseMatrix<T2> & A);
 
   /**
    * @returns the \p (i,j) element of the transposed matrix.
@@ -321,19 +321,19 @@ public:
   /**
    * Put the tranposed matrix into \p dest.
    */
-  void get_transpose(DenseMatrix<T>& dest) const;
+  void get_transpose(DenseMatrix<T> & dest) const;
 
   /**
    * Access to the values array.  This should be used with
    * caution but can  be used to speed up code compilation
    * significantly.
    */
-  std::vector<T>& get_values() { return _val; }
+  std::vector<T> & get_values() { return _val; }
 
   /**
    * Return a constant reference to the matrix values.
    */
-  const std::vector<T>& get_values() const { return _val; }
+  const std::vector<T> & get_values() const { return _val; }
 
   /**
    * Condense-out the \p (i,j) entry of the matrix, forcing
@@ -344,7 +344,7 @@ public:
   void condense(const unsigned int i,
                 const unsigned int j,
                 const T val,
-                DenseVector<T>& rhs)
+                DenseVector<T> & rhs)
   { DenseMatrixBase<T>::condense (i, j, val, rhs); }
 
   /**
@@ -352,8 +352,8 @@ public:
    * is performed by default in order to keep the algorithm stable to
    * the effects of round-off error.
    */
-  void lu_solve (const DenseVector<T>& b,
-                 DenseVector<T>& x);
+  void lu_solve (const DenseVector<T> & b,
+                 DenseVector<T> & x);
 
 
 
@@ -367,8 +367,8 @@ public:
    * A is real-valued and x and b are complex-valued.
    */
   template <typename T2>
-  void cholesky_solve(const DenseVector<T2>& b,
-                      DenseVector<T2>& x);
+  void cholesky_solve(const DenseVector<T2> & b,
+                      DenseVector<T2> & x);
 
 
   /**
@@ -379,7 +379,7 @@ public:
    * The implementation uses PETSc's interface to blas/lapack.
    * If this is not available, this function throws an error.
    */
-  void svd(DenseVector<T>& sigma);
+  void svd(DenseVector<T> & sigma);
 
 
   /**
@@ -393,7 +393,9 @@ public:
    * The implementation uses PETSc's interface to blas/lapack.
    * If this is not available, this function throws an error.
    */
-  void svd(DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<T>& VT);
+  void svd(DenseVector<T> & sigma,
+           DenseMatrix<T> & U,
+           DenseMatrix<T> & VT);
 
   /**
    * Solve the system of equations A*x = rhs for x in the
@@ -422,7 +424,8 @@ public:
    * The implementation requires the LAPACKgeevx_ which is wrapped by
    * SLEPc, and throws an error if called when SLEPc is not available.
    */
-  void evd(DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag);
+  void evd(DenseVector<T> & lambda_real,
+           DenseVector<T> & lambda_imag);
 
 
   /**
@@ -468,8 +471,8 @@ private:
    * is private since it is only called as part of the implementation
    * of the lu_solve(...) function.
    */
-  void _lu_back_substitute (const DenseVector<T>& b,
-                            DenseVector<T>& x) const;
+  void _lu_back_substitute (const DenseVector<T> & b,
+                            DenseVector<T> & x) const;
 
   /**
    * Decomposes a symmetric positive definite matrix into a
@@ -486,8 +489,8 @@ private:
    * are complex-valued.
    */
   template <typename T2>
-  void _cholesky_back_substitute(const DenseVector<T2>& b,
-                                 DenseVector<T2>& x) const;
+  void _cholesky_back_substitute(const DenseVector<T2> & b,
+                                 DenseVector<T2> & x) const;
 
   /**
    * The decomposition schemes above change the entries of the matrix
@@ -522,7 +525,7 @@ private:
    * left_multiply_tranpose() routines.
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _multiply_blas(const DenseMatrixBase<T>& other,
+  void _multiply_blas(const DenseMatrixBase<T> & other,
                       _BLAS_Multiply_Flag flag);
 
   /**
@@ -541,16 +544,16 @@ private:
    * Lapack routine "getsvd".
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _svd_lapack(DenseVector<T>& sigma);
+  void _svd_lapack(DenseVector<T> & sigma);
 
   /**
    * Computes a "reduced" SVD of the matrix using the
    * Lapack routine "getsvd".
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _svd_lapack(DenseVector<T>& sigma,
-                   DenseMatrix<T>& U,
-                   DenseMatrix<T>& VT);
+  void _svd_lapack(DenseVector<T> & sigma,
+                   DenseMatrix<T> & U,
+                   DenseMatrix<T> & VT);
 
   /**
    * Called by svd_solve(rhs).
@@ -565,16 +568,16 @@ private:
    */
   void _svd_helper (char JOBU,
                     char JOBVT,
-                    std::vector<T>& sigma_val,
-                    std::vector<T>& U_val,
-                    std::vector<T>& VT_val);
+                    std::vector<T> & sigma_val,
+                    std::vector<T> & U_val,
+                    std::vector<T> & VT_val);
 
   /**
    * Computes the eigenvalues of the matrix using the
    * Lapack routine "DGEEV".
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _evd_lapack(DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag);
+  void _evd_lapack(DenseVector<T> & lambda_real, DenseVector<T> & lambda_imag);
 
   /**
    * This array is used to store pivot indices.  May be used
@@ -592,8 +595,8 @@ private:
    * non-const.
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _lu_back_substitute_lapack (const DenseVector<T>& b,
-                                   DenseVector<T>& x);
+  void _lu_back_substitute_lapack (const DenseVector<T> & b,
+                                   DenseVector<T> & x);
 
   /**
    * Uses the BLAS GEMV function (through PETSc) to compute
@@ -608,8 +611,8 @@ private:
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _matvec_blas(T alpha, T beta,
-                    DenseVector<T>& dest,
-                    const DenseVector<T>& arg,
+                    DenseVector<T> & dest,
+                    const DenseVector<T> & arg,
                     bool trans=false) const;
 };
 
@@ -677,7 +680,7 @@ DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
 // Can we just use the compiler-generated copy ctor here?
 // template<typename T>
 // inline
-// DenseMatrix<T>::DenseMatrix (const DenseMatrix<T>& other_matrix)
+// DenseMatrix<T>::DenseMatrix (const DenseMatrix<T> & other_matrix)
 //   : DenseMatrixBase<T>(other_matrix._m, other_matrix._n)
 // {
 //   _val = other_matrix._val;
@@ -687,7 +690,7 @@ DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
 
 template<typename T>
 inline
-void DenseMatrix<T>::swap(DenseMatrix<T>& other_matrix)
+void DenseMatrix<T>::swap(DenseMatrix<T> & other_matrix)
 {
   std::swap(this->_m, other_matrix._m);
   std::swap(this->_n, other_matrix._n);
@@ -701,8 +704,8 @@ void DenseMatrix<T>::swap(DenseMatrix<T>& other_matrix)
 template <typename T>
 template <typename T2>
 inline
-DenseMatrix<T>&
-DenseMatrix<T>::operator=(const DenseMatrix<T2>& mat)
+DenseMatrix<T> &
+DenseMatrix<T>::operator=(const DenseMatrix<T2> & mat)
 {
   unsigned int mat_m = mat.m(), mat_n = mat.n();
   this->resize(mat_m, mat_n);
@@ -744,7 +747,7 @@ void DenseMatrix<T>::zero()
 
 template<typename T>
 inline
-DenseMatrix<T>& DenseMatrix<T>::operator = (const DenseMatrix<T>& other_matrix)
+DenseMatrix<T> & DenseMatrix<T>::operator = (const DenseMatrix<T> & other_matrix)
 {
   this->_m = other_matrix._m;
   this->_n = other_matrix._n;
@@ -811,7 +814,7 @@ void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
 
 template<typename T>
 inline
-DenseMatrix<T>& DenseMatrix<T>::operator *= (const T factor)
+DenseMatrix<T> & DenseMatrix<T>::operator *= (const T factor)
 {
   this->scale(factor);
   return *this;
@@ -825,7 +828,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<T2>::value, void >::type
 DenseMatrix<T>::add (const T2 factor,
-                     const DenseMatrix<T3>& mat)
+                     const DenseMatrix<T3> & mat)
 {
   libmesh_assert_equal_to (this->m(), mat.m());
   libmesh_assert_equal_to (this->n(), mat.n());
@@ -839,7 +842,7 @@ DenseMatrix<T>::add (const T2 factor,
 
 template<typename T>
 inline
-bool DenseMatrix<T>::operator == (const DenseMatrix<T> &mat) const
+bool DenseMatrix<T>::operator == (const DenseMatrix<T> & mat) const
 {
   for (unsigned int i=0; i<_val.size(); i++)
     if (_val[i] != mat._val[i])
@@ -852,7 +855,7 @@ bool DenseMatrix<T>::operator == (const DenseMatrix<T> &mat) const
 
 template<typename T>
 inline
-bool DenseMatrix<T>::operator != (const DenseMatrix<T> &mat) const
+bool DenseMatrix<T>::operator != (const DenseMatrix<T> & mat) const
 {
   for (unsigned int i=0; i<_val.size(); i++)
     if (_val[i] != mat._val[i])
@@ -865,7 +868,7 @@ bool DenseMatrix<T>::operator != (const DenseMatrix<T> &mat) const
 
 template<typename T>
 inline
-DenseMatrix<T>& DenseMatrix<T>::operator += (const DenseMatrix<T> &mat)
+DenseMatrix<T> & DenseMatrix<T>::operator += (const DenseMatrix<T> & mat)
 {
   for (unsigned int i=0; i<_val.size(); i++)
     _val[i] += mat._val[i];
@@ -877,7 +880,7 @@ DenseMatrix<T>& DenseMatrix<T>::operator += (const DenseMatrix<T> &mat)
 
 template<typename T>
 inline
-DenseMatrix<T>& DenseMatrix<T>::operator -= (const DenseMatrix<T> &mat)
+DenseMatrix<T> & DenseMatrix<T>::operator -= (const DenseMatrix<T> & mat)
 {
   for (unsigned int i=0; i<_val.size(); i++)
     _val[i] -= mat._val[i];
@@ -1001,7 +1004,7 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 // void DenseMatrix<T>::condense(const unsigned int iv,
 //       const unsigned int jv,
 //       const T val,
-//       DenseVector<T>& rhs)
+//       DenseVector<T> & rhs)
 // {
 //   libmesh_assert_equal_to (this->_m, rhs.size());
 //   libmesh_assert_equal_to (iv, jv);

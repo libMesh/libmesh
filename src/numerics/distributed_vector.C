@@ -131,7 +131,7 @@ Real DistributedVector<T>::linfty_norm () const
 
 
 template <typename T>
-NumericVector<T>& DistributedVector<T>::operator += (const NumericVector<T>& v)
+NumericVector<T> & DistributedVector<T>::operator += (const NumericVector<T> & v)
 {
   libmesh_assert (this->closed());
   libmesh_assert (this->initialized());
@@ -146,7 +146,7 @@ NumericVector<T>& DistributedVector<T>::operator += (const NumericVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>& DistributedVector<T>::operator -= (const NumericVector<T>& v)
+NumericVector<T> & DistributedVector<T>::operator -= (const NumericVector<T> & v)
 {
   libmesh_assert (this->closed());
   libmesh_assert (this->initialized());
@@ -165,7 +165,7 @@ NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());
 
-  DistributedVector<T> & v_vec = cast_ref<DistributedVector<T>&>(v);
+  DistributedVector<T> & v_vec = cast_ref<DistributedVector<T> &>(v);
 
   std::size_t val_size = _values.size();
 
@@ -221,7 +221,7 @@ void DistributedVector<T>::add (const T v)
 
 
 template <typename T>
-void DistributedVector<T>::add (const NumericVector<T>& v)
+void DistributedVector<T>::add (const NumericVector<T> & v)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -233,7 +233,7 @@ void DistributedVector<T>::add (const NumericVector<T>& v)
 
 
 template <typename T>
-void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
+void DistributedVector<T>::add (const T a, const NumericVector<T> & v)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -270,13 +270,13 @@ void DistributedVector<T>::abs()
 
 
 template <typename T>
-T DistributedVector<T>::dot (const NumericVector<T>& V) const
+T DistributedVector<T>::dot (const NumericVector<T> & V) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
   // Make sure the NumericVector passed in is really a DistributedVector
-  const DistributedVector<T>* v = cast_ptr<const DistributedVector<T>*>(&V);
+  const DistributedVector<T> * v = cast_ptr<const DistributedVector<T> *>(&V);
 
   // Make sure that the two vectors are distributed in the same way.
   libmesh_assert_equal_to ( this->first_local_index(), v->first_local_index() );
@@ -297,7 +297,7 @@ T DistributedVector<T>::dot (const NumericVector<T>& V) const
 
 
 template <typename T>
-NumericVector<T>&
+NumericVector<T> &
 DistributedVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
@@ -313,11 +313,11 @@ DistributedVector<T>::operator = (const T s)
 
 
 template <typename T>
-NumericVector<T>&
-DistributedVector<T>::operator = (const NumericVector<T>& v_in)
+NumericVector<T> &
+DistributedVector<T>::operator = (const NumericVector<T> & v_in)
 {
   // Make sure the NumericVector passed in is really a DistributedVector
-  const DistributedVector<T>* v = cast_ptr<const DistributedVector<T>*>(&v_in);
+  const DistributedVector<T> * v = cast_ptr<const DistributedVector<T> *>(&v_in);
 
   *this = *v;
 
@@ -327,8 +327,8 @@ DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 
 
 template <typename T>
-DistributedVector<T>&
-DistributedVector<T>::operator = (const DistributedVector<T>& v)
+DistributedVector<T> &
+DistributedVector<T>::operator = (const DistributedVector<T> & v)
 {
   this->_is_initialized    = v._is_initialized;
   this->_is_closed         = v._is_closed;
@@ -350,8 +350,8 @@ DistributedVector<T>::operator = (const DistributedVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-DistributedVector<T>::operator = (const std::vector<T>& v)
+NumericVector<T> &
+DistributedVector<T>::operator = (const std::vector<T> & v)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -373,14 +373,14 @@ DistributedVector<T>::operator = (const std::vector<T>& v)
 
 
 template <typename T>
-void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
+void DistributedVector<T>::localize (NumericVector<T> & v_local_in) const
 
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  DistributedVector<T>* v_local = cast_ptr<DistributedVector<T>*>(&v_local_in);
+  DistributedVector<T> * v_local = cast_ptr<DistributedVector<T> *>(&v_local_in);
 
   v_local->_first_local_index = 0;
 
@@ -405,8 +405,8 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
 
 
 template <typename T>
-void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
-                                     const std::vector<numeric_index_type>&) const
+void DistributedVector<T>::localize (NumericVector<T> & v_local_in,
+                                     const std::vector<numeric_index_type> &) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -421,7 +421,7 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
 template <typename T>
 void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
                                      const numeric_index_type last_local_idx,
-                                     const std::vector<numeric_index_type>& send_list)
+                                     const std::vector<numeric_index_type> & send_list)
 {
   // Only good for serial vectors
   libmesh_assert_equal_to (this->size(), this->local_size());
@@ -455,7 +455,7 @@ void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
 
 
 template <typename T>
-void DistributedVector<T>::localize (std::vector<T>& v_local) const
+void DistributedVector<T>::localize (std::vector<T> & v_local) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -476,7 +476,7 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
 
 template <typename T>
-void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
+void DistributedVector<T>::localize_to_one (std::vector<T> & v_local,
                                             const processor_id_type pid) const
 {
   // This function must be run on all processors at once
@@ -498,10 +498,10 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 
 
 template <typename T>
-void DistributedVector<T>::pointwise_mult (const NumericVector<T>&,
-                                           const NumericVector<T>&)
-//void DistributedVector<T>::pointwise_mult (const NumericVector<T>& vec1,
-//   const NumericVector<T>& vec2)
+void DistributedVector<T>::pointwise_mult (const NumericVector<T> &,
+                                           const NumericVector<T> &)
+//void DistributedVector<T>::pointwise_mult (const NumericVector<T> & vec1,
+//   const NumericVector<T> & vec2)
 {
   libmesh_not_implemented();
 }

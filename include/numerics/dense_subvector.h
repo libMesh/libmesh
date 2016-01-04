@@ -47,7 +47,7 @@ public:
    * and the \f$(0,0)\f$ entry of the subvector is located
    * at the \f$(ioff,joff)\f$ location in the parent vector.
    */
-  DenseSubVector(DenseVector<T>& new_parent,
+  DenseSubVector(DenseVector<T> & new_parent,
                  const unsigned int ioff=0,
                  const unsigned int n=0);
 
@@ -60,7 +60,7 @@ public:
   /**
    * @returns a reference to the parent vector.
    */
-  DenseVector<T>& parent () { return _parent_vector; }
+  DenseVector<T> & parent () { return _parent_vector; }
 
   /**
    * Set every element in the subvector to 0.
@@ -153,7 +153,7 @@ private:
   /**
    * The parent vector that contains this subvector.
    */
-  DenseVector<T>& _parent_vector;
+  DenseVector<T> & _parent_vector;
 
   /**
    * The length of this subvector.
@@ -172,7 +172,7 @@ private:
 // Dense Vector member functions
 template<typename T>
 inline
-DenseSubVector<T>::DenseSubVector(DenseVector<T>& new_parent,
+DenseSubVector<T>::DenseSubVector(DenseVector<T> & new_parent,
                                   const unsigned int ioff,
                                   const unsigned int n) :
   _parent_vector(new_parent)

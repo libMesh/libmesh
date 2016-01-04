@@ -81,13 +81,13 @@ public:
   /**
    * Pretty-print the vector to \p stdout.
    */
-  void print(std::ostream& os) const;
+  void print(std::ostream & os) const;
 
   /**
    * Same as above, but allows you to print using the
    * usual stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const DenseVectorBase<T>& v)
+  friend std::ostream & operator << (std::ostream & os, const DenseVectorBase<T> & v)
   {
     v.print(os);
     return os;
@@ -97,7 +97,7 @@ public:
    * Prints the entries of the vector with additional
    * decimal places in scientific notation.
    */
-  void print_scientific(std::ostream& os, unsigned precision=8) const;
+  void print_scientific(std::ostream & os, unsigned precision=8) const;
 
 };
 

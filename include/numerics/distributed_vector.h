@@ -55,14 +55,14 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  DistributedVector (const Parallel::Communicator &comm,
+  DistributedVector (const Parallel::Communicator & comm,
                      const ParallelType = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  DistributedVector (const Parallel::Communicator &comm,
+  DistributedVector (const Parallel::Communicator & comm,
                      const numeric_index_type n,
                      const ParallelType ptype = AUTOMATIC);
 
@@ -70,7 +70,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  DistributedVector (const Parallel::Communicator &comm,
+  DistributedVector (const Parallel::Communicator & comm,
                      const numeric_index_type n,
                      const numeric_index_type n_local,
                      const ParallelType ptype = AUTOMATIC);
@@ -80,10 +80,10 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  DistributedVector (const Parallel::Communicator &comm,
+  DistributedVector (const Parallel::Communicator & comm,
                      const numeric_index_type N,
                      const numeric_index_type n_local,
-                     const std::vector<numeric_index_type>& ghost,
+                     const std::vector<numeric_index_type> & ghost,
                      const ParallelType ptype = AUTOMATIC);
 
   /**
@@ -150,7 +150,7 @@ public:
    */
   virtual void init (const numeric_index_type /*N*/,
                      const numeric_index_type /*n_local*/,
-                     const std::vector<numeric_index_type>& /*ghost*/,
+                     const std::vector<numeric_index_type> & /*ghost*/,
                      const bool /*fast*/ = false,
                      const ParallelType = AUTOMATIC) libmesh_override;
 
@@ -158,7 +158,7 @@ public:
    * Creates a vector that has the same dimension and storage type as
    * \p other, including ghost dofs.
    */
-  virtual void init (const NumericVector<T>& other,
+  virtual void init (const NumericVector<T> & other,
                      const bool fast = false) libmesh_override;
 
   /**
@@ -169,17 +169,17 @@ public:
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const NumericVector<T> &V) libmesh_override;
+  virtual NumericVector<T> & operator= (const NumericVector<T> & v) libmesh_override;
 
   /**
    *  \f$U = V\f$: copy all components.
    */
-  DistributedVector<T> & operator= (const DistributedVector<T> &V);
+  DistributedVector<T> & operator= (const DistributedVector<T> & v);
 
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const std::vector<T> &v) libmesh_override;
+  virtual NumericVector<T> & operator= (const std::vector<T> & v) libmesh_override;
 
   /**
    * @returns the minimum element in the vector.
@@ -256,13 +256,13 @@ public:
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  virtual NumericVector<T> & operator += (const NumericVector<T> &V) libmesh_override;
+  virtual NumericVector<T> & operator += (const NumericVector<T> & v) libmesh_override;
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  virtual NumericVector<T> & operator -= (const NumericVector<T> &V) libmesh_override;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> & v) libmesh_override;
 
   /**
    * Pointwise Division operator. ie divide every entry in this vector by the entry in v
@@ -302,14 +302,14 @@ public:
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const NumericVector<T>& V) libmesh_override;
+  virtual void add (const NumericVector<T> & V) libmesh_override;
 
   /**
    * \f$U+=a*V\f$.
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const T a, const NumericVector<T>& v) libmesh_override;
+  virtual void add (const T a, const NumericVector<T> & v) libmesh_override;
 
   /**
    * We override one NumericVector<T>::add_vector() method but don't
@@ -323,8 +323,8 @@ public:
    * and a Numeric vector \p V to this Numeric vector.
    * @e Not @e implemented.
    */
-  virtual void add_vector (const NumericVector<T>&,
-                           const SparseMatrix<T>&) libmesh_override
+  virtual void add_vector (const NumericVector<T> &,
+                           const SparseMatrix<T> &) libmesh_override
   { libmesh_not_implemented(); }
 
   /**
@@ -333,8 +333,8 @@ public:
    * and a Numeric vector \p V to this Numeric vector.
    * @e Not @e implemented.
    */
-  virtual void add_vector_transpose (const NumericVector<T>&,
-                                     const SparseMatrix<T>&) libmesh_override
+  virtual void add_vector_transpose (const NumericVector<T> &,
+                                     const SparseMatrix<T> &) libmesh_override
   { libmesh_not_implemented(); }
 
   /**
@@ -352,27 +352,27 @@ public:
   /**
    * Computes the dot product, p = U.V
    */
-  virtual T dot(const NumericVector<T>& V) const libmesh_override;
+  virtual T dot(const NumericVector<T> & V) const libmesh_override;
 
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  virtual void localize (std::vector<T>& v_local) const libmesh_override;
+  virtual void localize (std::vector<T> & v_local) const libmesh_override;
 
   /**
    * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  virtual void localize (NumericVector<T>& v_local) const libmesh_override;
+  virtual void localize (NumericVector<T> & v_local) const libmesh_override;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  virtual void localize (NumericVector<T>& v_local,
-                         const std::vector<numeric_index_type>& send_list) const libmesh_override;
+  virtual void localize (NumericVector<T> & v_local,
+                         const std::vector<numeric_index_type> & send_list) const libmesh_override;
 
   /**
    * Updates a local vector with selected values from neighboring
@@ -380,7 +380,7 @@ public:
    */
   virtual void localize (const numeric_index_type first_local_idx,
                          const numeric_index_type last_local_idx,
-                         const std::vector<numeric_index_type>& send_list) libmesh_override;
+                         const std::vector<numeric_index_type> & send_list) libmesh_override;
 
   /**
    * Creates a local copy of the global vector in
@@ -388,20 +388,20 @@ public:
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  virtual void localize_to_one (std::vector<T>& v_local,
+  virtual void localize_to_one (std::vector<T> & v_local,
                                 const processor_id_type proc_id=0) const libmesh_override;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
    */
-  virtual void pointwise_mult (const NumericVector<T>& vec1,
-                               const NumericVector<T>& vec2) libmesh_override;
+  virtual void pointwise_mult (const NumericVector<T> & vec1,
+                               const NumericVector<T> & vec2) libmesh_override;
 
   /**
    * Swaps the vector data and metadata
    */
-  virtual void swap (NumericVector<T> &v) libmesh_override;
+  virtual void swap (NumericVector<T> & v) libmesh_override;
 
 private:
 
@@ -437,7 +437,7 @@ private:
 // DistributedVector inline methods
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator & comm_in,
                                          const ParallelType ptype) :
   NumericVector<T>(comm_in, ptype),
   _global_size      (0),
@@ -452,7 +452,7 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator & comm_in,
                                          const numeric_index_type n,
                                          const ParallelType ptype)
   : NumericVector<T>(comm_in, ptype)
@@ -464,7 +464,7 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator & comm_in,
                                          const numeric_index_type n,
                                          const numeric_index_type n_local,
                                          const ParallelType ptype)
@@ -477,10 +477,10 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator & comm_in,
                                          const numeric_index_type n,
                                          const numeric_index_type n_local,
-                                         const std::vector<numeric_index_type>& ghost,
+                                         const std::vector<numeric_index_type> & ghost,
                                          const ParallelType ptype)
   : NumericVector<T>(comm_in, ptype)
 {
@@ -583,7 +583,7 @@ template <typename T>
 inline
 void DistributedVector<T>::init (const numeric_index_type n,
                                  const numeric_index_type n_local,
-                                 const std::vector<numeric_index_type>& /*ghost*/,
+                                 const std::vector<numeric_index_type> & /*ghost*/,
                                  const bool fast,
                                  const ParallelType ptype)
 {
@@ -596,7 +596,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 /* Default implementation for solver packages for which ghosted
    vectors are not yet implemented.  */
 template <class T>
-void DistributedVector<T>::init (const NumericVector<T>& other,
+void DistributedVector<T>::init (const NumericVector<T> & other,
                                  const bool fast)
 {
   this->init(other.size(),other.local_size(),fast,other.type());
@@ -662,7 +662,7 @@ template <typename T>
 inline
 UniquePtr<NumericVector<T> > DistributedVector<T>::zero_clone () const
 {
-  NumericVector<T>* cloned_vector = new DistributedVector<T>(this->comm());
+  NumericVector<T> * cloned_vector = new DistributedVector<T>(this->comm());
   cloned_vector->init(*this);
   return UniquePtr<NumericVector<T> >(cloned_vector);
 }
@@ -673,7 +673,7 @@ template <typename T>
 inline
 UniquePtr<NumericVector<T> > DistributedVector<T>::clone () const
 {
-  NumericVector<T>* cloned_vector = new DistributedVector<T>(this->comm());
+  NumericVector<T> * cloned_vector = new DistributedVector<T>(this->comm());
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
   return UniquePtr<NumericVector<T> >(cloned_vector);
@@ -825,9 +825,9 @@ Real DistributedVector<T>::max() const
 
 template <typename T>
 inline
-void DistributedVector<T>::swap (NumericVector<T> &other)
+void DistributedVector<T>::swap (NumericVector<T> & other)
 {
-  DistributedVector<T>& v = cast_ref<DistributedVector<T>&>(other);
+  DistributedVector<T> & v = cast_ref<DistributedVector<T> &>(other);
 
   std::swap(_global_size, v._global_size);
   std::swap(_local_size, v._local_size);

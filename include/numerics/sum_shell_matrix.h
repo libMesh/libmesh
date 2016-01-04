@@ -49,15 +49,15 @@ public:
    * in an error.  However, an empty sum is allowed to be multiplied
    * with a vector and will give the expected result.
    */
-  SumShellMatrix (const Parallel::Communicator &comm_in
+  SumShellMatrix (const Parallel::Communicator & comm_in
                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor that passes a vector of shell matrices.
    */
   explicit
-  SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-                  const Parallel::Communicator &comm_in
+  SumShellMatrix (const std::vector<ShellMatrix<T> *> & mat,
+                  const Parallel::Communicator & comm_in
                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -81,24 +81,24 @@ public:
    * Multiplies the matrix with \p arg and stores the result in \p
    * dest.
    */
-  virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const libmesh_override;
+  virtual void vector_mult (NumericVector<T> & dest,
+                            const NumericVector<T> & arg) const libmesh_override;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
-  virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const libmesh_override;
+  virtual void vector_mult_add (NumericVector<T> & dest,
+                                const NumericVector<T> & arg) const libmesh_override;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
   /**
    * A vector of the summands.
    */
-  std::vector<ShellMatrix<T>*> matrices;
+  std::vector<ShellMatrix<T> *> matrices;
 };
 
 
@@ -107,7 +107,7 @@ public:
 // SumShellMatrix inline members
 template <typename T>
 inline
-SumShellMatrix<T>::SumShellMatrix (const Parallel::Communicator &comm_in):
+SumShellMatrix<T>::SumShellMatrix (const Parallel::Communicator & comm_in):
   ShellMatrix<T>(comm_in),
   matrices()
 {}
@@ -116,8 +116,8 @@ SumShellMatrix<T>::SumShellMatrix (const Parallel::Communicator &comm_in):
 
 template <typename T>
 inline
-SumShellMatrix<T>::SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-                                   const Parallel::Communicator &comm_in):
+SumShellMatrix<T>::SumShellMatrix (const std::vector<ShellMatrix<T> *> & mat,
+                                   const Parallel::Communicator & comm_in):
   ShellMatrix<T>(comm_in),
   matrices(mat)
 {}

@@ -28,9 +28,9 @@ namespace libMesh
 
 
 template<typename T>
-void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
-                                   const DenseMatrixBase<T>& M2,
-                                   const DenseMatrixBase<T>& M3)
+void DenseMatrixBase<T>::multiply (DenseMatrixBase<T> & M1,
+                                   const DenseMatrixBase<T> & M2,
+                                   const DenseMatrixBase<T> & M3)
 {
   // Assertions to make sure we have been
   // passed matrices of the correct dimension.
@@ -58,7 +58,7 @@ template<typename T>
 void DenseMatrixBase<T>::condense(const unsigned int iv,
                                   const unsigned int jv,
                                   const T val,
-                                  DenseVectorBase<T>& rhs)
+                                  DenseVectorBase<T> & rhs)
 {
   libmesh_assert_equal_to (this->_m, rhs.size());
   libmesh_assert_equal_to (iv, jv);
@@ -83,7 +83,7 @@ void DenseMatrixBase<T>::condense(const unsigned int iv,
 
 
 template<typename T>
-void DenseMatrixBase<T>::print_scientific (std::ostream& os, unsigned precision) const
+void DenseMatrixBase<T>::print_scientific (std::ostream & os, unsigned precision) const
 {
 #ifndef LIBMESH_BROKEN_IOSTREAM
 
@@ -125,7 +125,7 @@ void DenseMatrixBase<T>::print_scientific (std::ostream& os, unsigned precision)
 
 
 template<typename T>
-void DenseMatrixBase<T>::print (std::ostream& os) const
+void DenseMatrixBase<T>::print (std::ostream & os) const
 {
   for (unsigned int i=0; i<this->m(); i++)
     {

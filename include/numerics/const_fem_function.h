@@ -40,13 +40,15 @@ public:
   virtual UniquePtr<FEMFunctionBase<Output> > clone () const
   {return UniquePtr<FEMFunctionBase<Output> >( new ConstFEMFunction(*this) ); }
 
-  virtual Output operator() (const FEMContext&, const Point&,
+  virtual Output operator() (const FEMContext &,
+                             const Point &,
                              const Real /* time */ = 0.)
   { return _c; }
 
-  virtual void operator() (const FEMContext&, const Point&,
+  virtual void operator() (const FEMContext &,
+                           const Point &,
                            const Real,
-                           DenseVector<Output>& output)
+                           DenseVector<Output> & output)
   {for(unsigned int i = 0; i < output.size(); i++ )
       output(i) = _c;}
 

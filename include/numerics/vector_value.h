@@ -82,20 +82,20 @@ public:
   VectorValue (const Scalar x,
                typename
                boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-               const Scalar>::type* sfinae = NULL);
+               const Scalar>::type * sfinae = NULL);
 
 
   /**
    * Copy-constructor.
    */
   template <typename T2>
-  VectorValue (const VectorValue<T2>& p);
+  VectorValue (const VectorValue<T2> & p);
 
   /**
    * Copy-constructor.
    */
   template <typename T2>
-  VectorValue (const TypeVector<T2>& p);
+  VectorValue (const TypeVector<T2> & p);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   /**
@@ -103,8 +103,8 @@ public:
    * representing the real and imaginary part as
    * arguments.
    */
-  VectorValue (const TypeVector<Real>& p_re,
-               const TypeVector<Real>& p_im);
+  VectorValue (const TypeVector<Real> & p_re,
+               const TypeVector<Real> & p_im);
 #endif
 
   /**
@@ -113,8 +113,8 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    VectorValue&>::type
-  operator = (const Scalar& libmesh_dbg_var(p))
+    VectorValue &>::type
+  operator = (const Scalar & libmesh_dbg_var(p))
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 };
 
@@ -176,7 +176,7 @@ inline
 VectorValue<T>::VectorValue (const Scalar x,
                              typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                             const Scalar>::type* /*sfinae*/) :
+                             const Scalar>::type * /*sfinae*/) :
   TypeVector<T> (x)
 {
 }
@@ -184,7 +184,7 @@ VectorValue<T>::VectorValue (const Scalar x,
 template <typename T>
 template <typename T2>
 inline
-VectorValue<T>::VectorValue (const VectorValue<T2>& p) :
+VectorValue<T>::VectorValue (const VectorValue<T2> & p) :
   TypeVector<T> (p)
 {
 }
@@ -194,7 +194,7 @@ VectorValue<T>::VectorValue (const VectorValue<T2>& p) :
 template <typename T>
 template <typename T2>
 inline
-VectorValue<T>::VectorValue (const TypeVector<T2>& p) :
+VectorValue<T>::VectorValue (const TypeVector<T2> & p) :
   TypeVector<T> (p)
 {
 }
@@ -202,8 +202,8 @@ VectorValue<T>::VectorValue (const TypeVector<T2>& p) :
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <typename T>
 inline
-VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
-                             const TypeVector<Real>& p_im) :
+VectorValue<T>::VectorValue (const TypeVector<Real> & p_re,
+                             const TypeVector<Real> & p_im) :
   TypeVector<T> (Complex (p_re(0), p_im(0)),
                  Complex (p_re(1), p_im(1)),
                  Complex (p_re(2), p_im(2)))

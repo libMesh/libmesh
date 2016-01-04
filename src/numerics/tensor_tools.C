@@ -25,12 +25,12 @@ namespace libMesh
 namespace TensorTools
 {
 // Needed for ExactSolution to compile
-Number curl_from_grad( const VectorValue<Number>& )
+Number curl_from_grad(const VectorValue<Number> &)
 {
   libmesh_error_msg("Operation not defined for scalar quantities.");
 }
 
-VectorValue<Number> curl_from_grad( const TensorValue<Number>& grad )
+VectorValue<Number> curl_from_grad(const TensorValue<Number> & grad)
 {
   const Number duz_dy = grad(2,1);
   const Number duy_dz = grad(1,2);
@@ -39,22 +39,24 @@ VectorValue<Number> curl_from_grad( const TensorValue<Number>& grad )
   const Number duy_dx = grad(1,0);
   const Number dux_dy = grad(0,1);
 
-  return VectorValue<Number>( duz_dy - duy_dz, dux_dz - duz_dx, duy_dx - dux_dy);
+  return VectorValue<Number>(duz_dy - duy_dz,
+                             dux_dz - duz_dx,
+                             duy_dx - dux_dy);
 }
 
 // Needed for ExactSolution to compile. Will implement when needed.
-TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number>& /* grad */ )
+TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number> & /* grad */ )
 {
   libmesh_not_implemented();
 }
 
 // Needed for ExactSolution to compile
-Number div_from_grad( const VectorValue<Number>& /* grad */ )
+Number div_from_grad( const VectorValue<Number> & /* grad */ )
 {
   libmesh_error_msg("Operation not defined for scalar quantities.");
 }
 
-Number div_from_grad( const TensorValue<Number>& grad )
+Number div_from_grad( const TensorValue<Number> & grad )
 {
   const Number dux_dx = grad(0,0);
   const Number duy_dy = grad(1,1);
@@ -64,7 +66,7 @@ Number div_from_grad( const TensorValue<Number>& grad )
 }
 
 // Needed for ExactSolution to compile. Will implement when needed.
-VectorValue<Number> div_from_grad( const TypeNTensor<3,Number>& /* grad */ )
+VectorValue<Number> div_from_grad( const TypeNTensor<3,Number> & /* grad */ )
 {
   libmesh_not_implemented();
 }

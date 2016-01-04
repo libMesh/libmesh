@@ -76,7 +76,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  EpetraMatrix (const Parallel::Communicator &comm
+  EpetraMatrix (const Parallel::Communicator & comm
                 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -87,7 +87,7 @@ public:
    * and to simply provide additional functionality with the EpetraMatrix.
    */
   EpetraMatrix (Epetra_FECrsMatrix * m,
-                const Parallel::Communicator &comm
+                const Parallel::Communicator & comm
                 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -206,16 +206,16 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-  virtual void add_matrix (const DenseMatrix<T> &dm,
-                           const std::vector<numeric_index_type> &rows,
-                           const std::vector<numeric_index_type> &cols) libmesh_override;
+  virtual void add_matrix (const DenseMatrix<T> & dm,
+                           const std::vector<numeric_index_type> & rows,
+                           const std::vector<numeric_index_type> & cols) libmesh_override;
 
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_matrix (const DenseMatrix<T> &dm,
-                           const std::vector<numeric_index_type> &dof_indices) libmesh_override;
+  virtual void add_matrix (const DenseMatrix<T> & dm,
+                           const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
@@ -226,7 +226,7 @@ public:
    * whenever you add a non-zero value to \p X.  Note: \p X will
    * be closed, if not already done, before performing any work.
    */
-  virtual void add (const T a, SparseMatrix<T> &X) libmesh_override;
+  virtual void add (const T a, SparseMatrix<T> & X) libmesh_override;
 
   /**
    * Return the value of the entry
@@ -274,18 +274,18 @@ public:
   /**
    * Print the contents of the matrix, by default to libMesh::out.
    */
-  virtual void print_personal(std::ostream& os=libMesh::out) const libmesh_override;
+  virtual void print_personal(std::ostream & os=libMesh::out) const libmesh_override;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
   /**
    * Copies the transpose of the matrix into \p dest, which may be
    * *this.
    */
-  virtual void get_transpose (SparseMatrix<T>& dest) const libmesh_override;
+  virtual void get_transpose (SparseMatrix<T> & dest) const libmesh_override;
 
   /**
    * Swaps the raw PETSc matrix context pointers.

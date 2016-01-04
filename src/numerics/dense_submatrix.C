@@ -28,7 +28,7 @@ namespace libMesh
 // // ------------------------------------------------------------
 // // Dense Matrix member functions
 template<typename T>
-void DenseSubMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
+void DenseSubMatrix<T>::left_multiply (const DenseMatrixBase<T> & M2)
 {
   // (*this) <- M2 * M3
   // Where:
@@ -46,7 +46,7 @@ void DenseSubMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 
 
 template<typename T>
-void DenseSubMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
+void DenseSubMatrix<T>::right_multiply (const DenseMatrixBase<T> & M3)
 {
   // (*this) <- M2 * M3
   // Where:

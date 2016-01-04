@@ -62,7 +62,7 @@ void TrilinosPreconditioner<T>::init ()
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
     {
-      EpetraMatrix<T> * matrix = cast_ptr<EpetraMatrix<T>*, SparseMatrix<T> >(this->_matrix);
+      EpetraMatrix<T> * matrix = cast_ptr<EpetraMatrix<T> *, SparseMatrix<T> >(this->_matrix);
       _mat = matrix->mat();
     }
 
@@ -194,14 +194,14 @@ TrilinosPreconditioner<T>::SetUseTranspose(bool UseTranspose)
 
 template <typename T>
 int
-TrilinosPreconditioner<T>::Apply(const Epetra_MultiVector &X, Epetra_MultiVector &Y) const
+TrilinosPreconditioner<T>::Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const
 {
   return _prec->Apply(X, Y);
 }
 
 template <typename T>
 int
-TrilinosPreconditioner<T>::ApplyInverse(const Epetra_MultiVector &r, Epetra_MultiVector &z) const
+TrilinosPreconditioner<T>::ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const
 {
   return _prec->ApplyInverse(r, z);
 }

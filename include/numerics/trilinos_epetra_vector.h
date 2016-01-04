@@ -65,14 +65,14 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  EpetraVector (const Parallel::Communicator &comm,
+  EpetraVector (const Parallel::Communicator & comm,
                 const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  EpetraVector (const Parallel::Communicator &comm,
+  EpetraVector (const Parallel::Communicator & comm,
                 const numeric_index_type n,
                 const ParallelType type = AUTOMATIC);
 
@@ -80,7 +80,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  EpetraVector (const Parallel::Communicator &comm,
+  EpetraVector (const Parallel::Communicator & comm,
                 const numeric_index_type n,
                 const numeric_index_type n_local,
                 const ParallelType type = AUTOMATIC);
@@ -90,10 +90,10 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  EpetraVector (const Parallel::Communicator &comm,
+  EpetraVector (const Parallel::Communicator & comm,
                 const numeric_index_type N,
                 const numeric_index_type n_local,
-                const std::vector<numeric_index_type>& ghost,
+                const std::vector<numeric_index_type> & ghost,
                 const ParallelType type = AUTOMATIC);
 
   /**
@@ -104,7 +104,7 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v,
-               const Parallel::Communicator &comm
+               const Parallel::Communicator & comm
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -171,7 +171,7 @@ public:
    */
   virtual void init (const numeric_index_type /*N*/,
                      const numeric_index_type /*n_local*/,
-                     const std::vector<numeric_index_type>& /*ghost*/,
+                     const std::vector<numeric_index_type> & /*ghost*/,
                      const bool /*fast*/ = false,
                      const ParallelType = AUTOMATIC) libmesh_override;
 
@@ -179,7 +179,7 @@ public:
    * Creates a vector that has the same dimension and storage type as
    * \p other, including ghost dofs.
    */
-  virtual void init (const NumericVector<T>& other,
+  virtual void init (const NumericVector<T> & other,
                      const bool fast = false) libmesh_override;
 
   /**
@@ -190,17 +190,17 @@ public:
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const NumericVector<T> &V) libmesh_override;
+  virtual NumericVector<T> & operator= (const NumericVector<T> & v) libmesh_override;
 
   /**
    *  \f$U = V\f$: copy all components.
    */
-  EpetraVector<T> & operator= (const EpetraVector<T> &V);
+  EpetraVector<T> & operator= (const EpetraVector<T> & v);
 
   /**
    *  \f$U = V\f$: copy all components.
    */
-  virtual NumericVector<T> & operator= (const std::vector<T> &v) libmesh_override;
+  virtual NumericVector<T> & operator= (const std::vector<T> & v) libmesh_override;
 
   /**
    * @returns the minimum element in the vector.
@@ -277,13 +277,13 @@ public:
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
-  virtual NumericVector<T> & operator += (const NumericVector<T> &V) libmesh_override;
+  virtual NumericVector<T> & operator += (const NumericVector<T> & v) libmesh_override;
 
   /**
    * Subtraction operator.
    * Fast equivalent to \p U.add(-1, V).
    */
-  virtual NumericVector<T> & operator -= (const NumericVector<T> &V) libmesh_override;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> & v) libmesh_override;
 
   /**
    * Pointwise Division operator. ie divide every entry in this vector by the entry in v
@@ -324,14 +324,14 @@ public:
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const NumericVector<T>& V) libmesh_override;
+  virtual void add (const NumericVector<T> & V) libmesh_override;
 
   /**
    * \f$ U+=a*V \f$ .
    * Simple vector addition, equal to the
    * \p operator +=.
    */
-  virtual void add (const T a, const NumericVector<T>& v) libmesh_override;
+  virtual void add (const T a, const NumericVector<T> & v) libmesh_override;
 
   /**
    * We override two NumericVector<T>::add_vector() methods but don't
@@ -343,22 +343,22 @@ public:
    * \f$ U+=v \f$ where v is a pointer and each \p dof_indices[i]
    * specifies where to add value \p v[i]
    */
-  virtual void add_vector (const T* v,
-                           const std::vector<numeric_index_type>& dof_indices) libmesh_override;
+  virtual void add_vector (const T * v,
+                           const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
-  virtual void add_vector (const NumericVector<T> &V,
-                           const SparseMatrix<T> &A) libmesh_override;
+  virtual void add_vector (const NumericVector<T> & v,
+                           const SparseMatrix<T> & A) libmesh_override;
 
   /**
    * \f$U+=A*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
-  virtual void add_vector_transpose (const NumericVector<T> &V,
-                                     const SparseMatrix<T> &A_trans) libmesh_override;
+  virtual void add_vector_transpose (const NumericVector<T> & v,
+                                     const SparseMatrix<T> & A_trans) libmesh_override;
 
   /**
    * We override one NumericVector<T>::insert() method but don't want
@@ -367,11 +367,11 @@ public:
   using NumericVector<T>::insert;
 
   /**
-   * \f$ U=v \f$ where v is a \p T[] or T*
+   * \f$ U=v \f$ where v is a \p T[] or T *
    * and you want to specify WHERE to insert it
    */
-  virtual void insert (const T* v,
-                       const std::vector<numeric_index_type>& dof_indices) libmesh_override;
+  virtual void insert (const T * v,
+                       const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
   /**
    * Scale each element of the
@@ -389,27 +389,27 @@ public:
   /**
    * Computes the dot product, p = U.V
    */
-  virtual T dot(const NumericVector<T>& V) const libmesh_override;
+  virtual T dot(const NumericVector<T> & V) const libmesh_override;
 
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
    */
-  virtual void localize (std::vector<T>& v_local) const libmesh_override;
+  virtual void localize (std::vector<T> & v_local) const libmesh_override;
 
   /**
    * Same, but fills a \p NumericVector<T> instead of
    * a \p std::vector.
    */
-  virtual void localize (NumericVector<T>& v_local) const libmesh_override;
+  virtual void localize (NumericVector<T> & v_local) const libmesh_override;
 
   /**
    * Creates a local vector \p v_local containing
    * only information relevant to this processor, as
    * defined by the \p send_list.
    */
-  virtual void localize (NumericVector<T>& v_local,
-                         const std::vector<numeric_index_type>& send_list) const libmesh_override;
+  virtual void localize (NumericVector<T> & v_local,
+                         const std::vector<numeric_index_type> & send_list) const libmesh_override;
 
   /**
    * Updates a local vector with selected values from neighboring
@@ -417,7 +417,7 @@ public:
    */
   virtual void localize (const numeric_index_type first_local_idx,
                          const numeric_index_type last_local_idx,
-                         const std::vector<numeric_index_type>& send_list) libmesh_override;
+                         const std::vector<numeric_index_type> & send_list) libmesh_override;
 
   /**
    * Creates a local copy of the global vector in
@@ -425,27 +425,27 @@ public:
    * default the data is sent to processor 0.  This method
    * is useful for outputting data from one processor.
    */
-  virtual void localize_to_one (std::vector<T>& v_local,
+  virtual void localize_to_one (std::vector<T> & v_local,
                                 const processor_id_type proc_id=0) const libmesh_override;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
    */
-  virtual void pointwise_mult (const NumericVector<T>& vec1,
-                               const NumericVector<T>& vec2) libmesh_override;
+  virtual void pointwise_mult (const NumericVector<T> & vec1,
+                               const NumericVector<T> & vec2) libmesh_override;
 
   /**
    * Creates a "subvector" from this vector using the rows indices
    * of the "rows" array.
    */
-  virtual void create_subvector (NumericVector<T>& subvector,
-                                 const std::vector<numeric_index_type>& rows) const libmesh_override;
+  virtual void create_subvector (NumericVector<T> & subvector,
+                                 const std::vector<numeric_index_type> & rows) const libmesh_override;
 
   /**
    * Swaps the raw Epetra vector context pointers.
    */
-  virtual void swap (NumericVector<T> &v) libmesh_override;
+  virtual void swap (NumericVector<T> & v) libmesh_override;
 
   /**
    * Returns the raw PETSc vector context pointer.  Note this is generally
@@ -485,7 +485,9 @@ private:
   /** Accumulate values into the vector, adding them to any values that
       already exist for the specified indices.
   */
-  int SumIntoGlobalValues(int numIDs, const int* GIDs, const double* values);
+  int SumIntoGlobalValues(int numIDs,
+                          const int * GIDs,
+                          const double * values);
 
   /** Accumulate values into the vector, adding them to any values that
       already exist for the specified GIDs.
@@ -496,13 +498,15 @@ private:
       @param values List of coefficient values. Must be the same length as
       the accompanying list of GIDs.
   */
-  int SumIntoGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
-                          const Epetra_SerialDenseVector& values);
+  int SumIntoGlobalValues(const Epetra_IntSerialDenseVector & GIDs,
+                          const Epetra_SerialDenseVector & values);
 
   /** Copy values into the vector overwriting any values that already exist
       for the specified indices.
   */
-  int ReplaceGlobalValues(int numIDs, const int* GIDs, const double* values);
+  int ReplaceGlobalValues(int numIDs,
+                          const int * GIDs,
+                          const double * values);
 
   /** Copy values into the vector, replacing any values that
       already exist for the specified GIDs.
@@ -513,16 +517,18 @@ private:
       @param values List of coefficient values. Must be the same length as
       the accompanying list of GIDs.
   */
-  int ReplaceGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
-                          const Epetra_SerialDenseVector& values);
+  int ReplaceGlobalValues(const Epetra_IntSerialDenseVector & GIDs,
+                          const Epetra_SerialDenseVector & values);
 
-  int SumIntoGlobalValues(int numIDs, const int* GIDs,
-                          const int* numValuesPerID,
-                          const double* values);
+  int SumIntoGlobalValues(int numIDs,
+                          const int * GIDs,
+                          const int * numValuesPerID,
+                          const double * values);
 
-  int ReplaceGlobalValues(int numIDs, const int* GIDs,
-                          const int* numValuesPerID,
-                          const double* values);
+  int ReplaceGlobalValues(int numIDs,
+                          const int * GIDs,
+                          const int * numValuesPerID,
+                          const double * values);
 
   /** Gather any overlapping/shared data into the non-overlapping partitioning
       defined by the Map that was passed to this vector at construction time.
@@ -539,33 +545,39 @@ private:
     ignoreNonLocalEntries_ = flag;
   }
 
-  void FEoperatorequals(const EpetraVector& source);
+  void FEoperatorequals(const EpetraVector & source);
 
   int inputValues(int numIDs,
-                  const int* GIDs, const double* values,
+                  const int * GIDs,
+                  const double * values,
                   bool accumulate);
 
   int inputValues(int numIDs,
-                  const int* GIDs, const int* numValuesPerID,
-                  const double* values,
+                  const int * GIDs,
+                  const int * numValuesPerID,
+                  const double * values,
                   bool accumulate);
 
-  int inputNonlocalValue(int GID, double value, bool accumulate);
+  int inputNonlocalValue(int GID,
+                         double value,
+                         bool accumulate);
 
-  int inputNonlocalValues(int GID, int numValues, const double* values,
+  int inputNonlocalValues(int GID,
+                          int numValues,
+                          const double * values,
                           bool accumulate);
 
   void destroyNonlocalData();
 
   int myFirstID_;
   int myNumIDs_;
-  double* myCoefs_;
+  double * myCoefs_;
 
-  int* nonlocalIDs_;
-  int* nonlocalElementSize_;
+  int * nonlocalIDs_;
+  int * nonlocalElementSize_;
   int numNonlocalIDs_;
   int allocatedNonlocalLength_;
-  double** nonlocalCoefs_;
+  double ** nonlocalCoefs_;
 
   /**
    * Keep track of whether the last write operation on this vector was
@@ -584,7 +596,7 @@ private:
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
                                const ParallelType type) :
   NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
@@ -606,7 +618,7 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
                                const numeric_index_type n,
                                const ParallelType type) :
   NumericVector<T>(comm, type),
@@ -630,7 +642,7 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
                                const numeric_index_type n,
                                const numeric_index_type n_local,
                                const ParallelType type) :
@@ -656,7 +668,7 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector(Epetra_Vector & v,
-                              const Parallel::Communicator &comm) :
+                              const Parallel::Communicator & comm) :
   NumericVector<T>(comm, AUTOMATIC),
   _destroy_vec_on_exit(false),
   myFirstID_(0),
@@ -695,10 +707,10 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
                                const numeric_index_type n,
                                const numeric_index_type n_local,
-                               const std::vector<numeric_index_type>& ghost,
+                               const std::vector<numeric_index_type> & ghost,
                                const ParallelType type) :
   NumericVector<T>(comm, AUTOMATIC),
   _destroy_vec_on_exit(true),
@@ -721,7 +733,7 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 /* Default implementation for solver packages for which ghosted
    vectors are not yet implemented.  */
 template <class T>
-void EpetraVector<T>::init (const NumericVector<T>& other,
+void EpetraVector<T>::init (const NumericVector<T> & other,
                             const bool fast)
 {
   this->init(other.size(),other.local_size(),fast,other.type());
@@ -797,7 +809,7 @@ template <typename T>
 inline
 void EpetraVector<T>::init (const numeric_index_type n,
                             const numeric_index_type n_local,
-                            const std::vector<numeric_index_type>& /*ghost*/,
+                            const std::vector<numeric_index_type> & /*ghost*/,
                             const bool fast,
                             const ParallelType type)
 {
@@ -881,7 +893,7 @@ template <typename T>
 inline
 UniquePtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
 {
-  NumericVector<T>* cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
+  NumericVector<T> * cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
   cloned_vector->init(*this);
   return UniquePtr<NumericVector<T> >(cloned_vector);
 }
@@ -892,7 +904,7 @@ template <typename T>
 inline
 UniquePtr<NumericVector<T> > EpetraVector<T>::clone () const
 {
-  NumericVector<T>* cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
+  NumericVector<T> * cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
   return UniquePtr<NumericVector<T> >(cloned_vector);
@@ -986,11 +998,11 @@ Real EpetraVector<T>::max() const
 
 template <typename T>
 inline
-void EpetraVector<T>::swap (NumericVector<T> &other)
+void EpetraVector<T>::swap (NumericVector<T> & other)
 {
   NumericVector<T>::swap(other);
 
-  EpetraVector<T>& v = cast_ref<EpetraVector<T>&>(other);
+  EpetraVector<T> & v = cast_ref<EpetraVector<T> &>(other);
 
   std::swap(_vec, v._vec);
   std::swap(_map, v._map);

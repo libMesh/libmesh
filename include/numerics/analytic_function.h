@@ -50,15 +50,15 @@ public:
    * Constructor.  Takes a function pointer for scalar
    * return values.
    */
-  AnalyticFunction (Output fptr(const Point& p,
+  AnalyticFunction (Output fptr(const Point & p,
                                 const Real time));
 
   /**
    * Constructor.  Takes a function pointer for
    * vector valued functions.
    */
-  AnalyticFunction (void fptr(DenseVector<Output>& output,
-                              const Point& p,
+  AnalyticFunction (void fptr(DenseVector<Output> & output,
+                              const Point & p,
                               const Real time));
   /**
    * Destructor.
@@ -71,14 +71,14 @@ public:
    * the boundary values when an analytical expression
    * is available.
    */
-  Output (* _number_fptr) (const Point& p,
+  Output (* _number_fptr) (const Point & p,
                            const Real time);
 
   /**
    * Pointer to user-provided vector valued function.
    */
-  void (* _vector_fptr) (DenseVector<Output>& output,
-                         const Point& p,
+  void (* _vector_fptr) (DenseVector<Output> & output,
+                         const Point & p,
                          const Real time);
 
   /**
@@ -100,16 +100,16 @@ public:
    * @returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
-  virtual Output operator() (const Point& p,
+  virtual Output operator() (const Point & p,
                              const Real time=0.) libmesh_override;
 
   /**
    * Like before, but returns the values in a
    * writable reference.
    */
-  virtual void operator() (const Point& p,
+  virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output>& output) libmesh_override;
+                           DenseVector<Output> & output) libmesh_override;
 };
 
 
@@ -118,7 +118,7 @@ public:
 // AnalyticFunction inline methods
 template <typename Output>
 inline
-Output AnalyticFunction<Output>::operator() (const Point& p,
+Output AnalyticFunction<Output>::operator() (const Point & p,
                                              const Real time)
 {
   libmesh_assert (this->initialized());
@@ -129,9 +129,9 @@ Output AnalyticFunction<Output>::operator() (const Point& p,
 
 template <typename Output>
 inline
-void AnalyticFunction<Output>::operator() (const Point& p,
+void AnalyticFunction<Output>::operator() (const Point & p,
                                            const Real time,
-                                           DenseVector<Output>& output)
+                                           DenseVector<Output> & output)
 {
   libmesh_assert (this->initialized());
   this->_vector_fptr(output, p, time);
@@ -141,7 +141,7 @@ void AnalyticFunction<Output>::operator() (const Point& p,
 
 
 template <typename Output>
-AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point& p,
+AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point & p,
                                                         const Real time)) :
   FunctionBase<Output> (),
   _number_fptr (fptr),
@@ -155,8 +155,8 @@ AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point& p,
 
 template <typename Output>
 inline
-AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output>& output,
-                                                      const Point& p,
+AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output> & output,
+                                                      const Point & p,
                                                       const Real time)) :
   FunctionBase<Output> (),
   _number_fptr (NULL),

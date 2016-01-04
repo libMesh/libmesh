@@ -44,25 +44,25 @@ template <typename T, typename T2>
 inline
 typename boostcopy::enable_if_c<ScalarTraits<T>::value && ScalarTraits<T2>::value,
                                 typename CompareTypes<T, T2>::supertype>::type
-  inner_product(const T& a, const T2& b)
+  inner_product(const T & a, const T2& b)
 { return a * b; }
 
 template <typename T, typename T2>
 inline
 typename CompareTypes<T, T2>::supertype
-inner_product(const TypeVector<T>& a, const TypeVector<T2>& b)
+inner_product(const TypeVector<T> & a, const TypeVector<T2> & b)
 { return a * b; }
 
 template <typename T, typename T2>
 inline
 typename CompareTypes<T, T2>::supertype
-inner_product(const TypeTensor<T>& a, const TypeTensor<T2>& b)
+inner_product(const TypeTensor<T> & a, const TypeTensor<T2> & b)
 { return a.contract(b); }
 
 template <unsigned int N, typename T, typename T2>
 inline
 typename CompareTypes<T, T2>::supertype
-inner_product(const TypeNTensor<N,T>& a, const TypeNTensor<N,T2>& b)
+inner_product(const TypeNTensor<N,T> & a, const TypeNTensor<N,T2> & b)
 { return a.contract(b); }
 
 template<typename T>
@@ -75,12 +75,12 @@ T norm_sq(std::complex<T> a) { return std::norm(a); }
 
 template <typename T>
 inline
-Real norm_sq(const TypeVector<T>& a)
+Real norm_sq(const TypeVector<T> & a)
 {return a.size_sq();}
 
 template <typename T>
 inline
-Real norm_sq(const VectorValue<T>& a)
+Real norm_sq(const VectorValue<T> & a)
 {return a.size_sq();}
 
 // Any tensor-rank-independent code will need to include
@@ -267,24 +267,24 @@ struct MakeReal<TypeNTensor<N,T> >
 };
 
 // Needed for ExactSolution to compile
-Number curl_from_grad( const VectorValue<Number>& );
+Number curl_from_grad( const VectorValue<Number> & );
 
 //! Computes the curl of a vector given the gradient of that vector
-VectorValue<Number> curl_from_grad( const TensorValue<Number>& grad );
+VectorValue<Number> curl_from_grad( const TensorValue<Number> & grad );
 
 /*! Place holder needed for ExactSolution to compile. Will compute the
   curl of a tensor given the gradient of that tensor. */
-TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number>& grad );
+TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number> & grad );
 
 //! Dummy. Divgerence of a scalar not defined, but is needed for ExactSolution to compile
-Number div_from_grad( const VectorValue<Number>& grad );
+Number div_from_grad( const VectorValue<Number> & grad );
 
 //! Computes the divergence of a vector given the gradient of that vector
-Number div_from_grad( const TensorValue<Number>& grad );
+Number div_from_grad( const TensorValue<Number> & grad );
 
 /*! Place holder needed for ExactSolution to compile. Will compute the
   divergence of a tensor given the gradient of that tensor. */
-VectorValue<Number> div_from_grad( const TypeNTensor<3,Number>& grad );
+VectorValue<Number> div_from_grad( const TypeNTensor<3,Number> & grad );
 
 }//namespace TensorTools
 

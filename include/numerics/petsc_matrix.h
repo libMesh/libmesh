@@ -40,7 +40,7 @@
 #ifndef NDEBUG
 #include <cstring>
 
-#define semiparallel_only() do { if (this->initialized()) { const char *mytype; \
+#define semiparallel_only() do { if (this->initialized()) { const char * mytype; \
       MatGetType(_mat,&mytype);                                         \
       if (!strcmp(mytype, MATSEQAIJ))                                   \
         parallel_object_only(); } } while (0)
@@ -93,7 +93,7 @@ public:
    * \p init(...).
    */
   explicit
-  PetscMatrix (const Parallel::Communicator &comm_in
+  PetscMatrix (const Parallel::Communicator & comm_in
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -105,7 +105,7 @@ public:
    */
   explicit
   PetscMatrix (Mat m,
-               const Parallel::Communicator &comm_in
+               const Parallel::Communicator & comm_in
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -147,8 +147,8 @@ public:
              const numeric_index_type n,
              const numeric_index_type m_l,
              const numeric_index_type n_l,
-             const std::vector<numeric_index_type>& n_nz,
-             const std::vector<numeric_index_type>& n_oz,
+             const std::vector<numeric_index_type> & n_nz,
+             const std::vector<numeric_index_type> & n_oz,
              const numeric_index_type blocksize=1);
 
   /**
@@ -241,16 +241,16 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-  virtual void add_matrix (const DenseMatrix<T> &dm,
-                           const std::vector<numeric_index_type> &rows,
-                           const std::vector<numeric_index_type> &cols) libmesh_override;
+  virtual void add_matrix (const DenseMatrix<T> & dm,
+                           const std::vector<numeric_index_type> & rows,
+                           const std::vector<numeric_index_type> & cols) libmesh_override;
 
   /**
    * Same as \p add_matrix, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_matrix (const DenseMatrix<T> &dm,
-                           const std::vector<numeric_index_type> &dof_indices) libmesh_override;
+  virtual void add_matrix (const DenseMatrix<T> & dm,
+                           const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
   /**
    * Add the full matrix \p dm to the
@@ -259,16 +259,16 @@ public:
    * at assembly time.  The matrix is assumed blocked, and \p brow, \p bcol
    * correspond to the *block* row, columm indices.
    */
-  virtual void add_block_matrix (const DenseMatrix<T> &dm,
-                                 const std::vector<numeric_index_type> &brows,
-                                 const std::vector<numeric_index_type> &bcols) libmesh_override;
+  virtual void add_block_matrix (const DenseMatrix<T> & dm,
+                                 const std::vector<numeric_index_type> & brows,
+                                 const std::vector<numeric_index_type> & bcols) libmesh_override;
 
   /**
    * Same as \p add_block_matrix , but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_block_matrix (const DenseMatrix<T> &dm,
-                                 const std::vector<numeric_index_type> &dof_indices) libmesh_override
+  virtual void add_block_matrix (const DenseMatrix<T> & dm,
+                                 const std::vector<numeric_index_type> & dof_indices) libmesh_override
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
@@ -282,7 +282,7 @@ public:
    * whenever you add a non-zero value to \p X.  Note: \p X will
    * be closed, if not already done, before performing any work.
    */
-  virtual void add (const T a, SparseMatrix<T> &X) libmesh_override;
+  virtual void add (const T a, SparseMatrix<T> & X) libmesh_override;
 
   /**
    * Return the value of the entry
@@ -334,7 +334,7 @@ public:
    * limited ourselves to one PETSc implementation for
    * writing.
    */
-  virtual void print_personal(std::ostream& os=libMesh::out) const libmesh_override;
+  virtual void print_personal(std::ostream & os=libMesh::out) const libmesh_override;
 
   /**
    * Print the contents of the matrix in Matlab's
@@ -342,18 +342,18 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string& name = "") const libmesh_override;
+  virtual void print_matlab(const std::string & name = "") const libmesh_override;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
   /**
    * Copies the transpose of the matrix into \p dest, which may be
    * *this.
    */
-  virtual void get_transpose (SparseMatrix<T>& dest) const libmesh_override;
+  virtual void get_transpose (SparseMatrix<T> & dest) const libmesh_override;
 
   /**
    * Swaps the raw PETSc matrix context pointers.
@@ -378,9 +378,9 @@ protected:
    * whether or not PETSc will treat "submatrix" as one which has already
    * been used (had memory allocated) or as a new matrix.
    */
-  virtual void _get_submatrix(SparseMatrix<T>& submatrix,
-                              const std::vector<numeric_index_type>& rows,
-                              const std::vector<numeric_index_type>& cols,
+  virtual void _get_submatrix(SparseMatrix<T> & submatrix,
+                              const std::vector<numeric_index_type> & rows,
+                              const std::vector<numeric_index_type> & cols,
                               const bool reuse_submatrix) const libmesh_override;
 
 private:

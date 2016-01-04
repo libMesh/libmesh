@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 template<typename T>
-void DenseVectorBase<T>::print_scientific (std::ostream& os, unsigned precision) const
+void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision) const
 {
 #ifndef LIBMESH_BROKEN_IOSTREAM
 
@@ -59,7 +59,7 @@ void DenseVectorBase<T>::print_scientific (std::ostream& os, unsigned precision)
 
 
 template<typename T>
-void DenseVectorBase<T>::print (std::ostream& os) const
+void DenseVectorBase<T>::print (std::ostream & os) const
 {
   for (unsigned int i=0; i<this->size(); i++)
     os << std::setw(8)

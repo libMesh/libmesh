@@ -84,12 +84,12 @@ public:
   /**
    * Performs the operation: (*this) <- M2 * (*this)
    */
-  virtual void left_multiply (const DenseMatrixBase<T>& M2) = 0;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) = 0;
 
   /**
    * Performs the operation: (*this) <- (*this) * M3
    */
-  virtual void right_multiply (const DenseMatrixBase<T>& M3) = 0;
+  virtual void right_multiply (const DenseMatrixBase<T> & M3) = 0;
 
   /**
    * @returns the row-dimension of the matrix.
@@ -104,14 +104,14 @@ public:
   /**
    * Pretty-print the matrix, by default to \p libMesh::out.
    */
-  void print(std::ostream& os = libMesh::out) const;
+  void print(std::ostream & os = libMesh::out) const;
 
   /**
    * Formatted print as above but allows you to do
    * DenseMatrix K;
    * libMesh::out << K << std::endl;
    */
-  friend std::ostream& operator << (std::ostream& os, const DenseMatrixBase<T>& m)
+  friend std::ostream & operator << (std::ostream & os, const DenseMatrixBase<T> & m)
   {
     m.print(os);
     return os;
@@ -121,7 +121,7 @@ public:
    * Prints the matrix entries with more decimal places in
    * scientific notation.
    */
-  void print_scientific(std::ostream& os, unsigned precision=8) const;
+  void print_scientific(std::ostream & os, unsigned precision=8) const;
 
   /**
    * Adds \p factor to every element in the matrix.
@@ -132,7 +132,7 @@ public:
   typename boostcopy::enable_if_c<
     ScalarTraits<T2>::value, void >::type
   add (const T2 factor,
-       const DenseMatrixBase<T3>& mat);
+       const DenseMatrixBase<T3> & mat);
 
 protected:
 
@@ -143,9 +143,9 @@ protected:
    * M2 = (m x p)
    * M3 = (p x n)
    */
-  static void multiply (DenseMatrixBase<T>& M1,
-                        const DenseMatrixBase<T>& M2,
-                        const DenseMatrixBase<T>& M3);
+  static void multiply (DenseMatrixBase<T> & M1,
+                        const DenseMatrixBase<T> & M2,
+                        const DenseMatrixBase<T> & M3);
 
   /**
    * Condense-out the \p (i,j) entry of the matrix, forcing
@@ -156,7 +156,7 @@ protected:
   void condense(const unsigned int i,
                 const unsigned int j,
                 const T val,
-                DenseVectorBase<T>& rhs);
+                DenseVectorBase<T> & rhs);
 
   /**
    * The row dimension.
@@ -181,7 +181,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<T2>::value, void >::type
 DenseMatrixBase<T>::add (const T2 factor,
-                         const DenseMatrixBase<T3>& mat)
+                         const DenseMatrixBase<T3> & mat)
 {
   libmesh_assert_equal_to (this->m(), mat.m());
   libmesh_assert_equal_to (this->n(), mat.n());

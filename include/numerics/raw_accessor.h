@@ -94,27 +94,27 @@ class RawAccessor
 {
 public:
 
-  RawAccessor( FieldType& data, const unsigned int dim )
+  RawAccessor(FieldType & data, const unsigned int dim)
     : _data(data),
       _dim(dim)
   {}
 
   ~RawAccessor(){}
 
-  typename RawFieldType<FieldType>::type& operator()( unsigned int i );
-  const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const;
+  typename RawFieldType<FieldType>::type & operator()( unsigned int i );
+  const typename RawFieldType<FieldType>::type & operator()( unsigned int i ) const;
 
 private:
   RawAccessor();
 
-  FieldType& _data;
+  FieldType & _data;
   const unsigned int _dim;
 };
 
 // Specialize for specific cases
 template<>
 inline
-Number& RawAccessor<Number>::operator()( unsigned int libmesh_dbg_var(i) )
+Number & RawAccessor<Number>::operator()( unsigned int libmesh_dbg_var(i) )
 {
   libmesh_assert_equal_to (i, 0);
   return this->_data;
@@ -122,7 +122,7 @@ Number& RawAccessor<Number>::operator()( unsigned int libmesh_dbg_var(i) )
 
 template<>
 inline
-Number& RawAccessor<Gradient>::operator()( unsigned int i )
+Number & RawAccessor<Gradient>::operator()( unsigned int i )
 {
   libmesh_assert_less (i, this->_dim);
   return this->_data(i);
@@ -130,7 +130,7 @@ Number& RawAccessor<Gradient>::operator()( unsigned int i )
 
 template<>
 inline
-Number& RawAccessor<Tensor>::operator()( unsigned int k )
+Number & RawAccessor<Tensor>::operator()( unsigned int k )
 {
   libmesh_assert_less (k, this->_dim*this->_dim);
 
@@ -153,17 +153,17 @@ public:
 
   typedef TypeNTensor<N, ScalarType> FieldType;
 
-  RawAccessor( FieldType& data, const unsigned int dim )
+  RawAccessor(FieldType & data, const unsigned int dim)
     : _data(data),
       _dim(dim)
   {}
 
   ~RawAccessor(){}
 
-  typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ )
+  typename RawFieldType<FieldType>::type & operator()( unsigned int /*i*/ )
   { return dummy; }
 
-  const typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ ) const
+  const typename RawFieldType<FieldType>::type & operator()( unsigned int /*i*/ ) const
   { return dummy; }
 
 private:
@@ -171,14 +171,14 @@ private:
 
   ScalarType dummy;
 
-  FieldType& _data;
+  FieldType & _data;
   const unsigned int _dim;
 };
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template<>
 inline
-Real& RawAccessor<Real>::operator()( unsigned int i )
+Real & RawAccessor<Real>::operator()( unsigned int i )
 {
   libmesh_assert_equal_to (i, 0);
   return this->_data;
@@ -186,7 +186,7 @@ Real& RawAccessor<Real>::operator()( unsigned int i )
 
 template<>
 inline
-Real& RawAccessor<RealGradient>::operator()( unsigned int i )
+Real & RawAccessor<RealGradient>::operator()( unsigned int i )
 {
   libmesh_assert_less (i, this->_dim);
   return this->_data(i);
@@ -194,7 +194,7 @@ Real& RawAccessor<RealGradient>::operator()( unsigned int i )
 
 template<>
 inline
-Real& RawAccessor<RealTensor>::operator()( unsigned int k )
+Real & RawAccessor<RealTensor>::operator()( unsigned int k )
 {
   libmesh_assert_less (k, this->_dim*this->_dim);
 
