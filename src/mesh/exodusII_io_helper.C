@@ -235,7 +235,7 @@ const int ExodusII_IO_Helper::Conversion::invalid_id = std::numeric_limits<int>:
 // ------------------------------------------------------------
 // ExodusII_IO_Helper class members
 
-ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject &parent,
+ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
                                        bool v,
                                        bool run_only_on_proc0,
                                        bool single_precision) :
@@ -279,28 +279,28 @@ ExodusII_IO_Helper::~ExodusII_IO_Helper()
 
 
 
-const char* ExodusII_IO_Helper::get_elem_type() const
+const char * ExodusII_IO_Helper::get_elem_type() const
 {
   return &elem_type[0];
 }
 
 
 
-void ExodusII_IO_Helper::message(const std::string& msg)
+void ExodusII_IO_Helper::message(const std::string & msg)
 {
   if (verbose) libMesh::out << msg << std::endl;
 }
 
 
 
-void ExodusII_IO_Helper::message(const std::string& msg, int i)
+void ExodusII_IO_Helper::message(const std::string & msg, int i)
 {
   if (verbose) libMesh::out << msg << i << "." << std::endl;
 }
 
 
 
-void ExodusII_IO_Helper::open(const char* filename, bool read_only)
+void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 {
   // Version of Exodus you are using
   float ex_version = 0.;
@@ -379,7 +379,7 @@ void ExodusII_IO_Helper::read_qa_records()
 
   if (num_qa_rec > 0)
     {
-      // How to dynamically allocate an array of fixed-size char* arrays in C++.
+      // How to dynamically allocate an array of fixed-size char * arrays in C++.
       // http://stackoverflow.com/questions/8529359/creating-a-dynamic-sized-array-of-fixed-sized-int-arrays-in-c
       typedef char * inner_array_t[4];
       inner_array_t * qa_record = new inner_array_t[num_qa_rec];
@@ -409,7 +409,7 @@ void ExodusII_IO_Helper::read_qa_records()
           if (std::string(qa_record[i][0]).find("CUBIT") != std::string::npos)
             {
               // Try to convert field [1] of this QA record to a number.
-              char* endptr;
+              char * endptr;
               long cubit_version = std::strtol(qa_record[i][1], &endptr, /*base=*/10);
 
               // If there were no digits at all, strtol stores the
@@ -460,9 +460,9 @@ void ExodusII_IO_Helper::read_nodes()
   z.resize(num_nodes);
 
   ex_err = exII::ex_get_coord(ex_id,
-                              static_cast<void*>(&x[0]),
-                              static_cast<void*>(&y[0]),
-                              static_cast<void*>(&z[0]));
+                              static_cast<void *>(&x[0]),
+                              static_cast<void *>(&y[0]),
+                              static_cast<void *>(&z[0]));
 
   EX_CHECK_ERR(ex_err, "Error retrieving nodal data.");
   message("Nodal data retrieved successfully.");
@@ -490,7 +490,7 @@ void ExodusII_IO_Helper::read_node_num_map ()
 }
 
 
-void ExodusII_IO_Helper::print_nodes(std::ostream &out_stream)
+void ExodusII_IO_Helper::print_nodes(std::ostream & out_stream)
 {
   for (int i=0; i<num_nodes; i++)
     out_stream << "(" << x[i] << ", " << y[i] << ", " << z[i] << ")" << std::endl;
@@ -897,9 +897,9 @@ void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
 
 
 
-void ExodusII_IO_Helper::read_var_names_impl(const char* var_type,
-                                             int& count,
-                                             std::vector<std::string>& result)
+void ExodusII_IO_Helper::read_var_names_impl(const char * var_type,
+                                             int & count,
+                                             std::vector<std::string> & result)
 {
   // First read and store the number of names we have
   ex_err = exII::ex_get_var_param(ex_id, var_type, &count);
@@ -931,13 +931,13 @@ void ExodusII_IO_Helper::read_var_names_impl(const char* var_type,
 
   // Copy the char buffers into strings.
   for (int i=0; i<count; i++)
-    result[i] = names_table.get_char_star(i); // calls string::op=(const char*)
+    result[i] = names_table.get_char_star(i); // calls string::op=(const char *)
 }
 
 
 
 
-void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::string>& names)
+void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::string> & names)
 {
   switch (type)
     {
@@ -957,7 +957,7 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
 
 
 
-void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names)
+void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count, std::vector<std::string> & names)
 {
   // Update the count variable so that it's available to other parts of the class.
   count = cast_int<int>(names.size());
@@ -1332,7 +1332,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // Note: It appears that there is a bug in exodusII::ex_put_name where
   // the index returned from the ex_id_lkup is erronously used.  For now
   // the work around is to use the alternative function ex_put_names, but
-  // this function requires a char** datastructure.
+  // this function requires a char ** datastructure.
   NamesData names_table(num_elem_blk, MAX_STR_LENGTH);
 
   // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
@@ -1350,7 +1350,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       names_table.push_back_entry(mesh.subdomain_name((*it).first));
 
       // Get a reference to a vector of element IDs for this subdomain.
-      subdomain_map_type::mapped_type& tmp_vec = (*it).second;
+      subdomain_map_type::mapped_type & tmp_vec = (*it).second;
 
       ExodusII_IO_Helper::ElementMaps em(*this);
 
@@ -1376,7 +1376,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           unsigned int elem_id = tmp_vec[i];
           libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
 
-          const Elem* elem = mesh.elem(elem_id);
+          const Elem * elem = mesh.elem(elem_id);
 
           // We *might* be able to get away with writing mixed element
           // types which happen to have the same number of nodes, but
@@ -1695,8 +1695,8 @@ void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> na
 
 
 void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
-                                             std::vector<std::string>& names,
-                                             std::vector<std::string>& names_from_file)
+                                             std::vector<std::string> & names,
+                                             std::vector<std::string> & names_from_file)
 {
   // There may already be global variables in the file (for example,
   // if we're appending) and in that case, we
@@ -1834,7 +1834,7 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Real> 
 
 
 
-void ExodusII_IO_Helper::write_information_records(const std::vector<std::string>& records)
+void ExodusII_IO_Helper::write_information_records(const std::vector<std::string> & records)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1906,7 +1906,7 @@ void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 }
 
 
-std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector<std::string>& names) const
+std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector<std::string> & names) const
 {
   std::vector<std::string>::const_iterator names_it = names.begin();
   std::vector<std::string>::const_iterator names_end = names.end();
@@ -2326,17 +2326,17 @@ void ExodusII_IO_Helper::NamesData::push_back_entry(const std::string & name)
 
 
 
-char** ExodusII_IO_Helper::NamesData::get_char_star_star()
+char ** ExodusII_IO_Helper::NamesData::get_char_star_star()
 {
   return &data_table_pointers[0];
 }
 
 
 
-char* ExodusII_IO_Helper::NamesData::get_char_star(int i)
+char * ExodusII_IO_Helper::NamesData::get_char_star(int i)
 {
   if (static_cast<unsigned>(i) >= table_size)
-    libmesh_error_msg("Requested char* " << i << " but only have " << table_size << "!");
+    libmesh_error_msg("Requested char * " << i << " but only have " << table_size << "!");
 
   else
     return &(data_table[i][0]);

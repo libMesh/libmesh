@@ -59,13 +59,13 @@ public:
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  UNVIO (MeshBase& mesh, MeshData* mesh_data = NULL);
+  UNVIO (MeshBase & mesh, MeshData * mesh_data = NULL);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  UNVIO (const MeshBase& mesh, MeshData* mesh_data = NULL);
+  UNVIO (const MeshBase & mesh, MeshData * mesh_data = NULL);
 
   /**
    * Destructor.
@@ -75,12 +75,12 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string&) libmesh_override;
+  virtual void read (const std::string &) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
   /**
    * Set the flag indicationg if we should be verbose.
@@ -96,14 +96,14 @@ private:
    * The public read interface simply decides which
    * type of stream to pass the implementation.
    */
-  void read_implementation (std::istream& in_stream);
+  void read_implementation (std::istream & in_stream);
 
   /**
    * The actual implementation of the write function.
    * The public write interface simply decides which
    * type of stream to pass the implementation.
    */
-  void write_implementation (std::ostream& out_stream);
+  void write_implementation (std::ostream & out_stream);
 
   //-------------------------------------------------------------
   // read support methods
@@ -111,22 +111,22 @@ private:
   /**
    * Read nodes from file.
    */
-  void nodes_in (std::istream& in_file);
+  void nodes_in (std::istream & in_file);
 
   /**
    * Method reads elements and stores them in
-   * \p std::vector<Elem*> \p _elements in the same order as they
+   * \p std::vector<Elem *> \p _elements in the same order as they
    * come in. Within \p UNVIO, element labels are
    * ignored, but \p MeshData takes care of such things
    * (if active).
    */
-  void elements_in (std::istream& in_file);
+  void elements_in (std::istream & in_file);
 
   /**
    * Reads the "groups" section of the file. The format of the groups section is described here:
    * http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm
    */
-  void groups_in(std::istream& in_file);
+  void groups_in(std::istream & in_file);
 
   //-------------------------------------------------------------
   // write support methods
@@ -137,7 +137,7 @@ private:
    * \p MeshBase has to be active.  Do not use this directly,
    * but through the proper write method.
    */
-  void nodes_out (std::ostream& out_file);
+  void nodes_out (std::ostream & out_file);
 
   /**
    * Outputs the element data to the file \p out_file.
@@ -145,7 +145,7 @@ private:
    * \p Mesh has to be active. Do not use this directly,
    * but through the proper write method.
    */
-  void elements_out (std::ostream& out_file);
+  void elements_out (std::ostream & out_file);
 
   /**
    * Returns the maximum geometric element dimension encountered while
@@ -186,7 +186,7 @@ private:
    * A pointer to the MeshData object you would like to use.
    * with this UNVIO object.  Can be NULL.
    */
-  MeshData* _mesh_data;
+  MeshData * _mesh_data;
 
   /**
    * Map libmesh element IDs to UNV element IDs.

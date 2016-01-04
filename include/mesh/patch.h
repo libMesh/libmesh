@@ -111,7 +111,7 @@ public:
    * number of elements meets or exceeds \p target_patch_size, or
    * until the patch has no more local neighbors.
    */
-  void build_around_element(const Elem* elem,
+  void build_around_element(const Elem * elem,
                             const unsigned int target_patch_size = 10,
                             PMF patchtype = &Patch::add_local_face_neighbors);
 
@@ -121,13 +121,13 @@ protected:
    * This function finds all elements which
    * touch the current patch at a face
    */
-  void find_face_neighbors(std::set<const Elem *> &neighbor_set);
+  void find_face_neighbors(std::set<const Elem *> & neighbor_set);
 
   /**
    * This function finds all elements which
    * touch the current patch at any point
    */
-  void find_point_neighbors(std::set<const Elem *> &neighbor_set);
+  void find_point_neighbors(std::set<const Elem *> & neighbor_set);
 
   const processor_id_type _my_procid;
 };

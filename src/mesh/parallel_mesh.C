@@ -31,7 +31,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ParallelMesh class member functions
-ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
+ParallelMesh::ParallelMesh (const Parallel::Communicator & comm_in,
                             unsigned char d) :
   UnstructuredMesh (comm_in,d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
@@ -79,7 +79,7 @@ ParallelMesh::~ParallelMesh ()
 // This might be specialized later, but right now it's just here to
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
-ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
+ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -111,7 +111,7 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
 
 
 
-ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
+ParallelMesh::ParallelMesh (const UnstructuredMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -214,7 +214,7 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
 
 
 
-const Point& ParallelMesh::point (const dof_id_type i) const
+const Point & ParallelMesh::point (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -226,7 +226,7 @@ const Point& ParallelMesh::point (const dof_id_type i) const
 
 
 
-const Node& ParallelMesh::node (const dof_id_type i) const
+const Node & ParallelMesh::node (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -238,7 +238,7 @@ const Node& ParallelMesh::node (const dof_id_type i) const
 
 
 
-Node& ParallelMesh::node (const dof_id_type i)
+Node & ParallelMesh::node (const dof_id_type i)
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -248,7 +248,7 @@ Node& ParallelMesh::node (const dof_id_type i)
 
 
 
-const Node* ParallelMesh::node_ptr (const dof_id_type i) const
+const Node * ParallelMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -259,7 +259,7 @@ const Node* ParallelMesh::node_ptr (const dof_id_type i) const
 
 
 
-Node* ParallelMesh::node_ptr (const dof_id_type i)
+Node * ParallelMesh::node_ptr (const dof_id_type i)
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -270,12 +270,12 @@ Node* ParallelMesh::node_ptr (const dof_id_type i)
 
 
 
-const Node* ParallelMesh::query_node_ptr (const dof_id_type i) const
+const Node * ParallelMesh::query_node_ptr (const dof_id_type i) const
 {
-  std::map<dof_id_type, Node*>::const_iterator it = _nodes.find(i);
+  std::map<dof_id_type, Node *>::const_iterator it = _nodes.find(i);
   if (it != _nodes.end().it)
     {
-      const Node* n = it->second;
+      const Node * n = it->second;
       libmesh_assert (!n || n->id() == i);
       return n;
     }
@@ -286,12 +286,12 @@ const Node* ParallelMesh::query_node_ptr (const dof_id_type i) const
 
 
 
-Node* ParallelMesh::query_node_ptr (const dof_id_type i)
+Node * ParallelMesh::query_node_ptr (const dof_id_type i)
 {
-  std::map<dof_id_type, Node*>::const_iterator it = _nodes.find(i);
+  std::map<dof_id_type, Node *>::const_iterator it = _nodes.find(i);
   if (it != _nodes.end().it)
     {
-      Node* n = it->second;
+      Node * n = it->second;
       libmesh_assert (!n || n->id() == i);
       return n;
     }
@@ -302,7 +302,7 @@ Node* ParallelMesh::query_node_ptr (const dof_id_type i)
 
 
 
-const Elem* ParallelMesh::elem (const dof_id_type i) const
+const Elem * ParallelMesh::elem (const dof_id_type i) const
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -313,7 +313,7 @@ const Elem* ParallelMesh::elem (const dof_id_type i) const
 
 
 
-Elem* ParallelMesh::elem (const dof_id_type i)
+Elem * ParallelMesh::elem (const dof_id_type i)
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -324,12 +324,12 @@ Elem* ParallelMesh::elem (const dof_id_type i)
 
 
 
-const Elem* ParallelMesh::query_elem (const dof_id_type i) const
+const Elem * ParallelMesh::query_elem (const dof_id_type i) const
 {
-  std::map<dof_id_type, Elem*>::const_iterator it = _elements.find(i);
+  std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
     {
-      const Elem* e = it->second;
+      const Elem * e = it->second;
       libmesh_assert (!e || e->id() == i);
       return e;
     }
@@ -340,12 +340,12 @@ const Elem* ParallelMesh::query_elem (const dof_id_type i) const
 
 
 
-Elem* ParallelMesh::query_elem (const dof_id_type i)
+Elem * ParallelMesh::query_elem (const dof_id_type i)
 {
-  std::map<dof_id_type, Elem*>::const_iterator it = _elements.find(i);
+  std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
     {
-      Elem* e = _elements[i];
+      Elem * e = _elements[i];
       libmesh_assert (!e || e->id() == i);
       return e;
     }
@@ -356,7 +356,7 @@ Elem* ParallelMesh::query_elem (const dof_id_type i)
 
 
 
-Elem* ParallelMesh::add_elem (Elem *e)
+Elem * ParallelMesh::add_elem (Elem * e)
 {
   // Don't try to add NULLs!
   libmesh_assert(e);
@@ -377,7 +377,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
       // Use the unpartitioned ids for unpartitioned elems,
       // in serial, and temporarily for ghost elems
-      dof_id_type *next_id = &_next_free_unpartitioned_elem_id;
+      dof_id_type * next_id = &_next_free_unpartitioned_elem_id;
       if (elem_procid == this->processor_id() &&
           !this->is_serial())
         next_id = &_next_free_local_elem_id;
@@ -403,7 +403,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
 #ifndef NDEBUG
     // We need a const mapvector so we don't inadvertently create
     // NULL entries when testing for non-NULL ones
-    const mapvector<Elem*,dof_id_type>& const_elements = _elements;
+    const mapvector<Elem *, dof_id_type> & const_elements = _elements;
 #endif
     libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
     libmesh_assert(!const_elements[_next_free_local_elem_id]);
@@ -445,7 +445,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
 
 
-Elem* ParallelMesh::insert_elem (Elem* e)
+Elem * ParallelMesh::insert_elem (Elem * e)
 {
   if (_elements[e->id()])
     this->delete_elem(_elements[e->id()]);
@@ -463,7 +463,7 @@ Elem* ParallelMesh::insert_elem (Elem* e)
 
 
 
-void ParallelMesh::delete_elem(Elem* e)
+void ParallelMesh::delete_elem(Elem * e)
 {
   libmesh_assert (e);
 
@@ -494,7 +494,7 @@ void ParallelMesh::delete_elem(Elem* e)
 void ParallelMesh::renumber_elem(const dof_id_type old_id,
                                  const dof_id_type new_id)
 {
-  Elem *el = _elements[old_id];
+  Elem * el = _elements[old_id];
   libmesh_assert (el);
   libmesh_assert_equal_to (el->id(), old_id);
 
@@ -506,13 +506,13 @@ void ParallelMesh::renumber_elem(const dof_id_type old_id,
 
 
 
-Node* ParallelMesh::add_point (const Point& p,
-                               const dof_id_type id,
-                               const processor_id_type proc_id)
+Node * ParallelMesh::add_point (const Point & p,
+                                const dof_id_type id,
+                                const processor_id_type proc_id)
 {
   if (_nodes.count(id))
     {
-      Node *n = _nodes[id];
+      Node * n = _nodes[id];
       libmesh_assert (n);
       libmesh_assert_equal_to (n->id(), id);
 
@@ -522,7 +522,7 @@ Node* ParallelMesh::add_point (const Point& p,
       return n;
     }
 
-  Node* n = Node::build(p, id).release();
+  Node * n = Node::build(p, id).release();
   n->processor_id() = proc_id;
 
   return ParallelMesh::add_node(n);
@@ -530,7 +530,7 @@ Node* ParallelMesh::add_point (const Point& p,
 
 
 
-Node* ParallelMesh::add_node (Node *n)
+Node * ParallelMesh::add_node (Node * n)
 {
   // Don't try to add NULLs!
   libmesh_assert(n);
@@ -551,7 +551,7 @@ Node* ParallelMesh::add_node (Node *n)
 
       // Use the unpartitioned ids for unpartitioned nodes,
       // in serial, and temporarily for ghost nodes
-      dof_id_type *next_id = &_next_free_unpartitioned_node_id;
+      dof_id_type * next_id = &_next_free_unpartitioned_node_id;
       if (node_procid == this->processor_id() &&
           !this->is_serial())
         next_id = &_next_free_local_node_id;
@@ -577,7 +577,7 @@ Node* ParallelMesh::add_node (Node *n)
 #ifndef NDEBUG
     // We need a const mapvector so we don't inadvertently create
     // NULL entries when testing for non-NULL ones
-    const mapvector<Node*,dof_id_type>& const_nodes = _nodes;
+    const mapvector<Node *,dof_id_type> & const_nodes = _nodes;
 #endif
     libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
     libmesh_assert(!const_nodes[_next_free_local_node_id]);
@@ -620,14 +620,14 @@ Node* ParallelMesh::add_node (Node *n)
 
 
 
-Node* ParallelMesh::insert_node(Node* n)
+Node * ParallelMesh::insert_node(Node * n)
 {
   return ParallelMesh::add_node(n);
 }
 
 
 
-void ParallelMesh::delete_node(Node* n)
+void ParallelMesh::delete_node(Node * n)
 {
   libmesh_assert(n);
   libmesh_assert(_nodes[n->id()]);
@@ -659,7 +659,7 @@ void ParallelMesh::delete_node(Node* n)
 void ParallelMesh::renumber_node(const dof_id_type old_id,
                                  const dof_id_type new_id)
 {
-  Node *nd = _nodes[old_id];
+  Node * nd = _nodes[old_id];
   libmesh_assert (nd);
   libmesh_assert_equal_to (nd->id(), old_id);
 
@@ -676,8 +676,8 @@ void ParallelMesh::renumber_node(const dof_id_type old_id,
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   if (_nodes[new_id])
     {
-      libmesh_assert_equal_to (*(Point*)_nodes[new_id],
-                               *(Point*)_nodes[old_id]);
+      libmesh_assert_equal_to (*(Point *)_nodes[new_id],
+                               *(Point *)_nodes[old_id]);
       _nodes.erase(new_id);
     }
 #else
@@ -782,8 +782,7 @@ void ParallelMesh::update_post_partitioning ()
 
 
 template <typename T>
-void ParallelMesh::libmesh_assert_valid_parallel_object_ids
-(const mapvector<T*,dof_id_type> &objects) const
+void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *, dof_id_type> & objects) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -794,7 +793,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
 
   for (dof_id_type i=0; i != pmax_id; ++i)
     {
-      T* obj = objects[i]; // Returns NULL if there's no map entry
+      T * obj = objects[i]; // Returns NULL if there's no map entry
 
       dof_id_type dofid = obj && obj->valid_id() ?
         obj->id() : DofObject::invalid_id;
@@ -852,7 +851,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      Elem* el = _elements[i]; // Returns NULL if there's no map entry
+      Elem * el = _elements[i]; // Returns NULL if there's no map entry
 
       unsigned int refinement_flag   = el ?
         static_cast<unsigned int> (el->refinement_flag()) : libMesh::invalid_uint;
@@ -878,13 +877,13 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
 
 template <typename T>
-dof_id_type ParallelMesh::renumber_dof_objects
-(mapvector<T*,dof_id_type> &objects)
+dof_id_type
+ParallelMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  typedef typename mapvector<T*,dof_id_type>::veclike_iterator object_iterator;
+  typedef typename mapvector<T *,dof_id_type>::veclike_iterator object_iterator;
 
   // In parallel we may not know what objects other processors have.
   // Start by figuring out how many
@@ -898,7 +897,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
   for (; it != end;)
     {
-      T *obj = *it;
+      T * obj = *it;
 
       // Remove any NULL container entries while we're here,
       // being careful not to invalidate our iterator
@@ -962,7 +961,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
   end = objects.end();
   for (it = objects.begin(); it != end; ++it)
     {
-      T *obj = *it;
+      T * obj = *it;
       if (obj->processor_id() == this->processor_id())
         obj->set_id(next_id++);
       else if (obj->processor_id() != DofObject::invalid_processor_id)
@@ -1002,7 +1001,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
           std::vector<dof_id_type> new_ids(request_to_fill.size());
           for (std::size_t i=0; i != request_to_fill.size(); ++i)
             {
-              T *obj = objects[request_to_fill[i]];
+              T * obj = objects[request_to_fill[i]];
               libmesh_assert(obj);
               libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
               new_ids[i] = obj->id();
@@ -1031,7 +1030,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
           // And copy the id changes we've now been informed of
           for (std::size_t i=0; i != filled_request.size(); ++i)
             {
-              T *obj = objects[requested_ids[procup][i]];
+              T * obj = objects[requested_ids[procup][i]];
               libmesh_assert (obj);
               libmesh_assert_equal_to (obj->processor_id(), procup);
               libmesh_assert_greater_equal (filled_request[i],
@@ -1055,7 +1054,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
     next_id += objects_on_proc[i];
   for (it = objects.begin(); it != end; ++it)
     {
-      T *obj = *it;
+      T * obj = *it;
       if (obj->processor_id() == DofObject::invalid_processor_id)
         obj->set_id(next_id++);
     }
@@ -1065,10 +1064,10 @@ dof_id_type ParallelMesh::renumber_dof_objects
   end = objects.end();
   for (it = objects.begin(); it != end;)
     {
-      T *obj = *it;
+      T * obj = *it;
       if (obj) // don't try shuffling already-NULL entries
         {
-          T *next = objects[obj->id()];
+          T * next = objects[obj->id()];
           // If we have to move this object
           if (next != obj)
             {
@@ -1129,7 +1128,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
     for (; it != end; ++it)
       {
-        Elem *el = *it;
+        Elem * el = *it;
 
         for (unsigned int n=0; n != el->n_nodes(); ++n)
           used_nodes.insert(el->node(n));
@@ -1144,7 +1143,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
     for (; it != end;)
       {
-        Node *nd = *it;
+        Node * nd = *it;
         if (!nd)
           _nodes.erase(it++);
         else if (!used_nodes.count(nd->id()))
@@ -1202,12 +1201,12 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 {
   // We need access to iterators for the underlying containers,
   // not the mapvector<> reimplementations.
-  mapvector<Node*,dof_id_type>::maptype &nodes = this->_nodes;
-  mapvector<Elem*,dof_id_type>::maptype &elems = this->_elements;
+  mapvector<Node *,dof_id_type>::maptype & nodes = this->_nodes;
+  mapvector<Elem *,dof_id_type>::maptype & elems = this->_elements;
 
   // Nodes first
   {
-    mapvector<Node*,dof_id_type>::maptype::iterator
+    mapvector<Node *,dof_id_type>::maptype::iterator
       it  = nodes.begin(),
       end = nodes.end();
 
@@ -1218,7 +1217,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
   // Elements next
   {
-    mapvector<Elem*,dof_id_type>::maptype::iterator
+    mapvector<Elem *,dof_id_type>::maptype::iterator
       it  = elems.begin(),
       end = elems.end();
 
@@ -1279,16 +1278,16 @@ void ParallelMesh::delete_remote_elements()
 
   // Now make sure the containers actually shrink - strip
   // any newly-created NULL voids out of the element array
-  mapvector<Elem*,dof_id_type>::veclike_iterator e_it        = _elements.begin();
-  const mapvector<Elem*,dof_id_type>::veclike_iterator e_end = _elements.end();
+  mapvector<Elem *,dof_id_type>::veclike_iterator e_it        = _elements.begin();
+  const mapvector<Elem *,dof_id_type>::veclike_iterator e_end = _elements.end();
   for (; e_it != e_end;)
     if (!*e_it)
       _elements.erase(e_it++);
     else
       ++e_it;
 
-  mapvector<Node*,dof_id_type>::veclike_iterator n_it        = _nodes.begin();
-  const mapvector<Node*,dof_id_type>::veclike_iterator n_end = _nodes.end();
+  mapvector<Node *,dof_id_type>::veclike_iterator n_it        = _nodes.begin();
+  const mapvector<Node *,dof_id_type>::veclike_iterator n_end = _nodes.end();
   for (; n_it != n_end;)
     if (!*n_it)
       _nodes.erase(n_it++);
@@ -1318,7 +1317,7 @@ void ParallelMesh::delete_remote_elements()
 }
 
 
-void ParallelMesh::add_extra_ghost_elem(Elem* e)
+void ParallelMesh::add_extra_ghost_elem(Elem * e)
 {
   // First add the elem like normal
   add_elem(e);

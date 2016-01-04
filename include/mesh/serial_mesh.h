@@ -46,7 +46,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  SerialMesh (const Parallel::Communicator &comm_in,
+  SerialMesh (const Parallel::Communicator & comm_in,
               unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -64,13 +64,13 @@ public:
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  SerialMesh (const UnstructuredMesh& other_mesh);
+  SerialMesh (const UnstructuredMesh & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
    * serial mesh.
    */
-  SerialMesh (const SerialMesh& other_mesh);
+  SerialMesh (const SerialMesh & other_mesh);
 
   /**
    * Virtual copy-constructor, creates a copy of this mesh
@@ -122,30 +122,30 @@ public:
   // SerialMesh has no caches to update
   virtual void update_parallel_id_counts () libmesh_override {}
 
-  virtual const Point& point (const dof_id_type i) const libmesh_override;
+  virtual const Point & point (const dof_id_type i) const libmesh_override;
 
-  virtual const Node&  node  (const dof_id_type i) const libmesh_override;
-  virtual Node& node (const dof_id_type i) libmesh_override;
+  virtual const Node &  node  (const dof_id_type i) const libmesh_override;
+  virtual Node & node (const dof_id_type i) libmesh_override;
 
-  virtual const Node* node_ptr (const dof_id_type i) const libmesh_override;
-  virtual Node* node_ptr (const dof_id_type i) libmesh_override;
+  virtual const Node * node_ptr (const dof_id_type i) const libmesh_override;
+  virtual Node * node_ptr (const dof_id_type i) libmesh_override;
 
-  virtual const Node* query_node_ptr (const dof_id_type i) const libmesh_override;
-  virtual Node* query_node_ptr (const dof_id_type i) libmesh_override;
+  virtual const Node * query_node_ptr (const dof_id_type i) const libmesh_override;
+  virtual Node * query_node_ptr (const dof_id_type i) libmesh_override;
 
-  virtual const Elem* elem (const dof_id_type i) const libmesh_override;
-  virtual Elem* elem (const dof_id_type i) libmesh_override;
+  virtual const Elem * elem (const dof_id_type i) const libmesh_override;
+  virtual Elem * elem (const dof_id_type i) libmesh_override;
 
-  virtual const Elem* query_elem (const dof_id_type i) const libmesh_override;
-  virtual Elem* query_elem (const dof_id_type i) libmesh_override;
+  virtual const Elem * query_elem (const dof_id_type i) const libmesh_override;
+  virtual Elem * query_elem (const dof_id_type i) libmesh_override;
 
   /**
    * functions for adding /deleting nodes elements.
    */
-  virtual Node* add_point (const Point& p,
-                           const dof_id_type id = DofObject::invalid_id,
-                           const processor_id_type proc_id = DofObject::invalid_processor_id) libmesh_override;
-  virtual Node* add_node (Node* n) libmesh_override;
+  virtual Node * add_point (const Point & p,
+                            const dof_id_type id = DofObject::invalid_id,
+                            const processor_id_type proc_id = DofObject::invalid_processor_id) libmesh_override;
+  virtual Node * add_node (Node * n) libmesh_override;
 
   /**
    * Insert \p Node \p n into the Mesh at a location consistent with
@@ -158,13 +158,13 @@ public:
    * which is only capable of appending nodes at the end of the nodes
    * storage.
    */
-  virtual Node* insert_node(Node* n) libmesh_override;
+  virtual Node * insert_node(Node * n) libmesh_override;
 
-  virtual void delete_node (Node* n) libmesh_override;
+  virtual void delete_node (Node * n) libmesh_override;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) libmesh_override;
-  virtual Elem* add_elem (Elem* e) libmesh_override;
-  virtual Elem* insert_elem (Elem* e) libmesh_override;
-  virtual void delete_elem (Elem* e) libmesh_override;
+  virtual Elem * add_elem (Elem * e) libmesh_override;
+  virtual Elem * insert_elem (Elem * e) libmesh_override;
+  virtual void delete_elem (Elem * e) libmesh_override;
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) libmesh_override;
 
   /**
@@ -193,7 +193,7 @@ public:
    * neighbors for each elements are copied as well and patched, without calling the time-consuming
    * find_neighbors() function.
    */
-  void stitch_meshes (SerialMesh& other_mesh,
+  void stitch_meshes (SerialMesh & other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
@@ -388,12 +388,12 @@ protected:
   /**
    * The verices (spatial coordinates) of the mesh.
    */
-  std::vector<Node*> _nodes;
+  std::vector<Node *> _nodes;
 
   /**
    * The elements in the mesh.
    */
-  std::vector<Elem*> _elements;
+  std::vector<Elem *> _elements;
 
 private:
 
@@ -401,7 +401,7 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  void stitching_helper (SerialMesh* other_mesh,
+  void stitching_helper (SerialMesh * other_mesh,
                          boundary_id_type boundary_id_1,
                          boundary_id_type boundary_id_2,
                          Real tol,
@@ -413,17 +413,17 @@ private:
 
   /**
    * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Elem*>.
+   * it's just a std::vector<Elem *>.
    */
-  typedef std::vector<Elem*>::iterator             elem_iterator_imp;
-  typedef std::vector<Elem*>::const_iterator const_elem_iterator_imp;
+  typedef std::vector<Elem *>::iterator             elem_iterator_imp;
+  typedef std::vector<Elem *>::const_iterator const_elem_iterator_imp;
 
   /**
    * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Node*>.
+   * it's just a std::vector<Node *>.
    */
-  typedef std::vector<Node*>::iterator             node_iterator_imp;
-  typedef std::vector<Node*>::const_iterator const_node_iterator_imp;
+  typedef std::vector<Node *>::iterator             node_iterator_imp;
+  typedef std::vector<Node *>::const_iterator const_node_iterator_imp;
 };
 
 

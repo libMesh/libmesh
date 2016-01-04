@@ -48,12 +48,12 @@ public:
    * This constructor will only allow us to write the mesh.
    */
   explicit
-  FroIO (const MeshBase&);
+  FroIO (const MeshBase &);
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 };
 
 
@@ -61,7 +61,7 @@ public:
 // ------------------------------------------------------------
 // FroIO inline members
 inline
-FroIO::FroIO (const MeshBase& mesh_in) :
+FroIO::FroIO (const MeshBase & mesh_in) :
   MeshOutput<MeshBase> (mesh_in)
 {
 }

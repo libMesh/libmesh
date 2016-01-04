@@ -31,7 +31,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // TetgenIO class members
-void TetGenIO::read (const std::string& name)
+void TetGenIO::read (const std::string & name)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -92,8 +92,8 @@ void TetGenIO::read (const std::string& name)
 
 
 
-void TetGenIO::read_nodes_and_elem (std::istream& node_stream,
-                                    std::istream& ele_stream)
+void TetGenIO::read_nodes_and_elem (std::istream & node_stream,
+                                    std::istream & ele_stream)
 {
   _num_nodes    = 0;
   _num_elements = 0;
@@ -115,13 +115,13 @@ void TetGenIO::read_nodes_and_elem (std::istream& node_stream,
 
 //----------------------------------------------------------------------
 // Function to read in the node table.
-void TetGenIO::node_in (std::istream& node_stream)
+void TetGenIO::node_in (std::istream & node_stream)
 {
   // Check input buffer
   libmesh_assert (node_stream.good());
 
   // Get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   unsigned int dimension=0, nAttributes=0, BoundaryMarkers=0;
 
@@ -165,7 +165,7 @@ void TetGenIO::node_in (std::istream& node_stream)
       _assign_nodes[node_lab] = i;
 
       // do this irrespective whether MeshData exists
-      Node* newnode = mesh.add_point(xyz, i);
+      Node * newnode = mesh.add_point(xyz, i);
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
@@ -178,13 +178,13 @@ void TetGenIO::node_in (std::istream& node_stream)
 
 //----------------------------------------------------------------------
 // Function to read in the element table.
-void TetGenIO::element_in (std::istream& ele_stream)
+void TetGenIO::element_in (std::istream & ele_stream)
 {
   // Check input buffer
   libmesh_assert (ele_stream.good());
 
   // Get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Read the elements from the ele_stream (*.ele file).
   unsigned int element_lab=0, n_nodes=0, nAttri=0;
@@ -209,7 +209,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
       libmesh_assert (ele_stream.good());
 
       // TetGen only supports Tet4 and Tet10 elements.
-      Elem* elem;
+      Elem * elem;
 
       if (n_nodes==4)
         elem = new Tet4;
@@ -257,7 +257,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
  * This method implements writing a mesh to a specified ".poly" file.
  * ".poly" files defines so called Piecewise Linear Complex (PLC).
  */
-void TetGenIO::write (const std::string& fname)
+void TetGenIO::write (const std::string & fname)
 {
   // libmesh_assert three dimensions (should be extended later)
   libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().mesh_dimension(), 3);
@@ -273,7 +273,7 @@ void TetGenIO::write (const std::string& fname)
     libmesh_file_error(fname.c_str());
 
   // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // Begin interfacing with the .poly file
   {

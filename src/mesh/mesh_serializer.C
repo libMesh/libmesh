@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-MeshSerializer::MeshSerializer(MeshBase& mesh, bool need_serial) :
+MeshSerializer::MeshSerializer(MeshBase & mesh, bool need_serial) :
   _mesh(mesh),
   reparallelize(false)
 {

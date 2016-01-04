@@ -61,7 +61,7 @@ enum IO_Type {
  * memory when working with C, which has no constructors or
  * destructors.
  */
-void init(triangulateio& t);
+void init(triangulateio & t);
 
 /**
  * Frees any memory which has been dynamically allocated by
@@ -74,7 +74,7 @@ void init(triangulateio& t);
  * performing a deep copy of the holelist itself.  Therefore, double-free
  * will occur without additional care!
  */
-void destroy(triangulateio& t, IO_Type);
+void destroy(triangulateio & t, IO_Type);
 
 /**
  * Copies triangulation data computed by triange from a triangulateio object
@@ -82,8 +82,8 @@ void destroy(triangulateio& t, IO_Type);
  * MeshTools::Generation::build_delaunay_square(...) and
  * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
  */
-void copy_tri_to_mesh(const triangulateio& triangle_data_input,
-                      UnstructuredMesh& mesh_output,
+void copy_tri_to_mesh(const triangulateio & triangle_data_input,
+                      UnstructuredMesh & mesh_output,
                       const ElemType type);
 } // namespace TriangleWrapper
 } // namespace libMesh

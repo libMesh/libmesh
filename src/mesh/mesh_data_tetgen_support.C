@@ -31,7 +31,7 @@ namespace libMesh
 
 //---------------------------------------------------------------------
 // MeshDate TetGen support function
-void MeshData::read_tetgen (const std::string& name)
+void MeshData::read_tetgen (const std::string & name)
 {
   std::string name_node, name_ele, dummy;
   std::string desc = name;
@@ -109,8 +109,8 @@ void MeshData::read_tetgen (const std::string& name)
         if (BoundMark == 1)
           node_stream >> dummy_val;
 
-        // For the foreign node id locate the Node*.
-        const Node* node = foreign_id_to_node(f_n_id);
+        // For the foreign node id locate the Node *.
+        const Node * node = foreign_id_to_node(f_n_id);
 
         // Insert this node and the values in our _node_data.
         _node_data.insert (std::make_pair(node, AttriValue));
@@ -146,8 +146,8 @@ void MeshData::read_tetgen (const std::string& name)
         for (unsigned int j=0; j<nAttri; j++)
           ele_stream >> AttriValue[j];
 
-        // For the foreign elem id locate the Elem*.
-        const Elem* elem = foreign_id_to_elem(f_e_id);
+        // For the foreign elem id locate the Elem *.
+        const Elem * elem = foreign_id_to_elem(f_e_id);
 
         // Insert this elem and the values in our _elem_data.
         _elem_data.insert (std::make_pair(elem, AttriValue));

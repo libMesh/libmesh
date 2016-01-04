@@ -59,7 +59,7 @@ public:
    * Constructor. Takes a reference to the mesh.
    */
   explicit
-  TetGenMeshInterface (UnstructuredMesh& mesh);
+  TetGenMeshInterface (UnstructuredMesh & mesh);
 
   /**
    * Empty destructor.
@@ -91,7 +91,7 @@ public:
    * from the nodes point set. Boundary constraints are taken from
    * elements array. Include carve-out functionality.
    */
-  void triangulate_conformingDelaunayMesh_carvehole (const std::vector<Point>& holes,
+  void triangulate_conformingDelaunayMesh_carvehole (const std::vector<Point> & holes,
                                                      double quality_constraint=0.,
                                                      double volume_constraint=0.);
 
@@ -104,13 +104,13 @@ protected:
    * node numberings (which can happen with e.g. ParallelMesh)
    * are handled.
    */
-  void fill_pointlist(TetGenWrapper& wrapper);
+  void fill_pointlist(TetGenWrapper & wrapper);
 
   /**
    * Assigns the node IDs contained in the 'node_labels'
    * array to 'elem'.
    */
-  void assign_nodes_to_elem(unsigned* node_labels, Elem* elem);
+  void assign_nodes_to_elem(unsigned * node_labels, Elem * elem);
 
   /**
    * This function checks the integrity of the current set of
@@ -143,7 +143,7 @@ protected:
   /**
    * Local reference to the mesh we are working with.
    */
-  UnstructuredMesh& _mesh;
+  UnstructuredMesh & _mesh;
 
   /**
    * We should not assume libmesh nodes are numbered sequentially...

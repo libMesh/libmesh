@@ -30,24 +30,24 @@
 namespace libMesh
 {
 
-void TriangleWrapper::init(TriangleWrapper::triangulateio& t)
+void TriangleWrapper::init(TriangleWrapper::triangulateio & t)
 {
   t.pointlist                    = static_cast<REAL*>(NULL);
   t.pointattributelist           = static_cast<REAL*>(NULL);
-  t.pointmarkerlist              = static_cast<int* >(NULL);
+  t.pointmarkerlist              = static_cast<int * >(NULL);
   t.numberofpoints               = 0 ;
   t.numberofpointattributes      = 0 ;
 
-  t.trianglelist                 = static_cast<int* >(NULL);
+  t.trianglelist                 = static_cast<int * >(NULL);
   t.triangleattributelist        = static_cast<REAL*>(NULL);
   t.trianglearealist             = static_cast<REAL*>(NULL);
-  t.neighborlist                 = static_cast<int* >(NULL);
+  t.neighborlist                 = static_cast<int * >(NULL);
   t.numberoftriangles            = 0;
   t.numberofcorners              = 0;
   t.numberoftriangleattributes   = 0;
 
-  t.segmentlist                  = static_cast<int* >(NULL);
-  t.segmentmarkerlist            = static_cast<int* >(NULL);
+  t.segmentlist                  = static_cast<int * >(NULL);
+  t.segmentmarkerlist            = static_cast<int * >(NULL);
   t.numberofsegments             = 0;
 
   t.holelist                     = static_cast<REAL*>(NULL);
@@ -56,8 +56,8 @@ void TriangleWrapper::init(TriangleWrapper::triangulateio& t)
   t.regionlist                   = static_cast<REAL*>(NULL);
   t.numberofregions              = 0;
 
-  t.edgelist                     = static_cast<int* >(NULL);
-  t.edgemarkerlist               = static_cast<int* >(NULL);
+  t.edgelist                     = static_cast<int * >(NULL);
+  t.edgemarkerlist               = static_cast<int * >(NULL);
   t.normlist                     = static_cast<REAL*>(NULL);
   t.numberofedges                = 0;
 }
@@ -67,7 +67,7 @@ void TriangleWrapper::init(TriangleWrapper::triangulateio& t)
 
 
 
-void TriangleWrapper::destroy(TriangleWrapper::triangulateio& t, TriangleWrapper::IO_Type io_type)
+void TriangleWrapper::destroy(TriangleWrapper::triangulateio & t, TriangleWrapper::IO_Type io_type)
 {
   std::free (t.pointlist            );
   std::free (t.pointattributelist   );
@@ -99,8 +99,8 @@ void TriangleWrapper::destroy(TriangleWrapper::triangulateio& t, TriangleWrapper
 
 
 
-void TriangleWrapper::copy_tri_to_mesh(const triangulateio& triangle_data_input,
-                                       UnstructuredMesh& mesh_output,
+void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input,
+                                       UnstructuredMesh & mesh_output,
                                        const ElemType type)
 {
   // Transfer the information into the LibMesh mesh.
@@ -126,7 +126,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio& triangle_data_input,
         {
         case TRI3:
           {
-            Elem* elem = mesh_output.add_elem (new Tri3);
+            Elem * elem = mesh_output.add_elem (new Tri3);
 
             for (unsigned int n=0; n<3; ++n)
               elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
@@ -136,7 +136,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio& triangle_data_input,
 
         case TRI6:
           {
-            Elem* elem = mesh_output.add_elem (new Tri6);
+            Elem * elem = mesh_output.add_elem (new Tri6);
 
             // Triangle number TRI6 nodes in a different way to libMesh
             elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);

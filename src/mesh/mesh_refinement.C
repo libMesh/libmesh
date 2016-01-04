@@ -52,7 +52,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // Mesh refinement methods
-MeshRefinement::MeshRefinement (MeshBase& m) :
+MeshRefinement::MeshRefinement (MeshBase & m) :
   ParallelObject(m),
   _mesh(m),
   _use_member_parameters(false),
@@ -100,10 +100,10 @@ void MeshRefinement::clear ()
 
 
 
-Node* MeshRefinement::add_node(const Elem& parent,
-                               unsigned int child,
-                               unsigned int node,
-                               processor_id_type proc_id)
+Node * MeshRefinement::add_node(const Elem & parent,
+                                unsigned int child,
+                                unsigned int node,
+                                processor_id_type proc_id)
 {
   START_LOG("add_node()", "MeshRefinement");
 
@@ -151,7 +151,7 @@ Node* MeshRefinement::add_node(const Elem& parent,
         }
     }
 
-  Node* new_node = _mesh.add_point (p, DofObject::invalid_id, proc_id);
+  Node * new_node = _mesh.add_point (p, DofObject::invalid_id, proc_id);
 
   libmesh_assert(new_node);
 
@@ -166,7 +166,7 @@ Node* MeshRefinement::add_node(const Elem& parent,
 
 
 
-Elem* MeshRefinement::add_elem (Elem* elem)
+Elem * MeshRefinement::add_elem (Elem * elem)
 {
   libmesh_assert(elem);
 
@@ -175,7 +175,7 @@ Elem* MeshRefinement::add_elem (Elem* elem)
   //   // old elements, take the first one
   //   if (!_unused_elements.empty())
   //     {
-  //       std::vector<Elem*>::iterator it = _unused_elements.front();
+  //       std::vector<Elem *>::iterator it = _unused_elements.front();
 
   //       *it = elem;
 
@@ -196,11 +196,10 @@ Elem* MeshRefinement::add_elem (Elem* elem)
 
 
 
-void MeshRefinement::create_parent_error_vector
-(const ErrorVector& error_per_cell,
- ErrorVector& error_per_parent,
- Real& parent_error_min,
- Real& parent_error_max)
+void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_cell,
+                                                ErrorVector & error_per_parent,
+                                                Real & parent_error_min,
+                                                Real & parent_error_max)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -218,7 +217,7 @@ void MeshRefinement::create_parent_error_vector
 
   // Use a reference to std::vector to avoid confusing
   // this->comm().verify
-  std::vector<ErrorVectorReal> &epc = error_per_parent;
+  std::vector<ErrorVectorReal> & epc = error_per_parent;
   libmesh_assert(this->comm().verify(epc));
 #endif // #ifdef DEBUG
 
@@ -232,8 +231,8 @@ void MeshRefinement::create_parent_error_vector
     const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
     for (; elem_it != elem_end; ++elem_it)
       {
-        Elem* elem   = *elem_it;
-        Elem* parent = elem->parent();
+        Elem * elem   = *elem_it;
+        Elem * parent = elem->parent();
 
         // Active elements are uncoarsenable
         error_per_parent[elem->id()] = -1.0;
@@ -254,7 +253,7 @@ void MeshRefinement::create_parent_error_vector
     // Sync between processors.
     // Use a reference to std::vector to avoid confusing
     // this->comm().min
-    std::vector<ErrorVectorReal> &epp = error_per_parent;
+    std::vector<ErrorVectorReal> & epp = error_per_parent;
     this->comm().min(epp);
   }
 
@@ -272,8 +271,8 @@ void MeshRefinement::create_parent_error_vector
 
     for (; elem_it != elem_end; ++elem_it)
       {
-        Elem* elem   = *elem_it;
-        Elem* parent = elem->parent();
+        Elem * elem   = *elem_it;
+        Elem * parent = elem->parent();
 
         // Calculate each contribution to parent cells
         if (parent)
@@ -292,7 +291,7 @@ void MeshRefinement::create_parent_error_vector
   }
 
   // Sum the vector across all processors
-  this->comm().sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
+  this->comm().sum(static_cast<std::vector<ErrorVectorReal> &>(error_per_parent));
 
   // Calculate the min and max as we loop
   parent_error_min = std::numeric_limits<double>::max();
@@ -364,18 +363,18 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   bool failure = false;
 
 #ifndef NDEBUG
-  Elem *failed_elem = NULL;
-  Elem *failed_neighbor = NULL;
+  Elem * failed_elem = NULL;
+  Elem * failed_neighbor = NULL;
 #endif // !NDEBUG
 
   for ( ; elem_it != elem_end && !failure; ++elem_it)
     {
       // Pointer to the element
-      Elem *elem = *elem_it;
+      Elem * elem = *elem_it;
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
-          Elem *neighbor =
+          Elem * neighbor =
             topological_neighbor(elem, point_locator.get(), n);
 
           if (!neighbor || !neighbor->active() ||
@@ -406,12 +405,12 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 #ifndef NDEBUG
       if (libmesh_assert_pass)
         {
-          libMesh::out <<
-            "MeshRefinement Level one failure, element: " <<
-            *failed_elem << std::endl;
-          libMesh::out <<
-            "MeshRefinement Level one failure, neighbor: " <<
-            *failed_neighbor << std::endl;
+          libMesh::out << "MeshRefinement Level one failure, element: "
+                       << *failed_elem
+                       << std::endl;
+          libMesh::out << "MeshRefinement Level one failure, neighbor: "
+                       << *failed_neighbor
+                       << std::endl;
         }
 #endif // !NDEBUG
       libmesh_assert(!libmesh_assert_pass);
@@ -434,13 +433,13 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
 #ifndef NDEBUG
-  Elem *failed_elem = NULL;
+  Elem * failed_elem = NULL;
 #endif
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Pointer to the element
-      Elem *elem = *elem_it;
+      Elem * elem = *elem_it;
 
       if (elem->refinement_flag() == Elem::REFINE ||
           elem->refinement_flag() == Elem::COARSEN ||
@@ -495,7 +494,7 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Pointer to the element
-      Elem *elem = *elem_it;
+      Elem * elem = *elem_it;
 
       // Set refinement flag to INACTIVE if the
       // element isn't active
@@ -616,7 +615,7 @@ bool MeshRefinement::coarsen_elements ()
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Pointer to the element
-      Elem* elem = *elem_it;
+      Elem * elem = *elem_it;
 
       // Set refinement flag to INACTIVE if the
       // element isn't active
@@ -696,7 +695,7 @@ bool MeshRefinement::refine_elements ()
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Pointer to the element
-      Elem *elem = *elem_it;
+      Elem * elem = *elem_it;
 
       // Set refinement flag to INACTIVE if the
       // element isn't active
@@ -763,23 +762,23 @@ struct SyncRefinementFlags
   typedef Elem::RefinementState (Elem::*get_a_flag)() const;
   typedef void (Elem::*set_a_flag)(const Elem::RefinementState);
 
-  SyncRefinementFlags(MeshBase &_mesh,
+  SyncRefinementFlags(MeshBase & _mesh,
                       get_a_flag _getter,
                       set_a_flag _setter) :
     mesh(_mesh), parallel_consistent(true),
     get_flag(_getter), set_flag(_setter) {}
 
-  MeshBase &mesh;
+  MeshBase & mesh;
   bool parallel_consistent;
   get_a_flag get_flag;
   set_a_flag set_flag;
   // References to pointers to member functions segfault?
-  // get_a_flag& get_flag;
-  // set_a_flag& set_flag;
+  // get_a_flag & get_flag;
+  // set_a_flag & set_flag;
 
   // Find the refinement flag on each requested element
-  void gather_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& flags)
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & flags)
   {
     flags.resize(ids.size());
 
@@ -787,22 +786,22 @@ struct SyncRefinementFlags
       {
         // Look for this element in the mesh
         // We'd better find every element we're asked for
-        Elem *elem = mesh.elem(ids[i]);
+        Elem * elem = mesh.elem(ids[i]);
 
         // Return the element's refinement flag
         flags[i] = (elem->*get_flag)();
       }
   }
 
-  void act_on_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& flags)
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & flags)
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
-        Elem *elem = mesh.elem(ids[i]);
+        Elem * elem = mesh.elem(ids[i]);
 
         datum old_flag = (elem->*get_flag)();
-        datum &new_flag = flags[i];
+        datum & new_flag = flags[i];
 
         if (old_flag != new_flag)
           {
@@ -912,7 +911,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
     for (; el != end_el; ++el)
       {
-        Elem *elem = *el;
+        Elem * elem = *el;
         max_level = std::max(max_level, elem->level());
         max_p_level =
           std::max(max_p_level,
@@ -963,7 +962,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
           for (; el != end_el; ++el)
             {
-              Elem* elem = *el;
+              Elem * elem = *el;
               bool my_flag_changed = false;
 
               if (elem->refinement_flag() == Elem::COARSEN) // If the element is active and
@@ -973,7 +972,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
                   for (unsigned int n=0; n<elem->n_neighbors(); n++)
                     {
-                      const Elem* neighbor =
+                      const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
 
                       if (neighbor != NULL &&      // I have a
@@ -1009,7 +1008,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
                   for (unsigned int n=0; n<elem->n_neighbors(); n++)
                     {
-                      const Elem* neighbor =
+                      const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
 
                       if (neighbor != NULL &&      // I have a
@@ -1038,7 +1037,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                               libmesh_assert(neighbor->has_children());
                               for (unsigned int c=0; c!=neighbor->n_children(); c++)
                                 {
-                                  Elem *subneighbor = neighbor->child(c);
+                                  Elem * subneighbor = neighbor->child(c);
                                   if (subneighbor != remote_elem &&
                                       subneighbor->active() &&
                                       has_topological_neighbor(subneighbor, point_locator.get(), elem))
@@ -1072,7 +1071,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
               if (my_flag_changed && !_mesh.is_serial())
                 for (unsigned int n=0; n != elem->n_neighbors(); ++n)
                   {
-                    Elem* neigh =
+                    Elem * neigh =
                       topological_neighbor(elem, point_locator.get(), n);
 
                     if (!neigh)
@@ -1115,7 +1114,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
       const MeshBase::element_iterator end_el = _mesh.level_elements_end(level);
       for (; el != end_el; ++el)
         {
-          Elem *elem = *el;
+          Elem * elem = *el;
           if (elem->ancestor())
             {
 
@@ -1126,7 +1125,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
               for (unsigned int c=0; c<elem->n_children(); c++)
                 {
-                  Elem *child = elem->child(c);
+                  Elem * child = elem->child(c);
                   if (child == remote_elem)
                     found_remote_child = true;
                   else if ((child->refinement_flag() != Elem::COARSEN) ||
@@ -1140,7 +1139,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
                   for (unsigned int c=0; c<elem->n_children(); c++)
                     {
-                      Elem *child = elem->child(c);
+                      Elem * child = elem->child(c);
                       if (child == remote_elem)
                         continue;
                       if (child->refinement_flag() == Elem::COARSEN)
@@ -1163,7 +1162,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   const MeshBase::element_iterator all_el_end = _mesh.elements_end();
   for (; all_el != all_el_end; ++all_el)
     {
-      Elem *elem = *all_el;
+      Elem * elem = *all_el;
       if (elem->ancestor())
         {
 
@@ -1174,7 +1173,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
           for (unsigned int c=0; c<elem->n_children(); c++)
             {
-              Elem *child = elem->child(c);
+              Elem * child = elem->child(c);
               if (child == remote_elem)
                 found_remote_child = true;
               else if (child->refinement_flag() != Elem::COARSEN)
@@ -1258,7 +1257,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
           for (; el != end_el; ++el)
             {
-              Elem *elem = *el;
+              Elem * elem = *el;
               if (elem->refinement_flag() == Elem::REFINE)  // If the element is active and the
                 // h refinement flag is set
                 {
@@ -1266,7 +1265,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
                   for (unsigned int side=0; side != elem->n_sides(); side++)
                     {
-                      Elem* neighbor =
+                      Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), side);
 
                       if (neighbor != NULL        && // I have a
@@ -1324,7 +1323,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
                   for (unsigned int side=0; side != elem->n_sides(); side++)
                     {
-                      Elem* neighbor =
+                      Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), side);
 
                       if (neighbor != NULL &&      // I have a
@@ -1352,7 +1351,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                               libmesh_assert(neighbor->has_children());
                               for (unsigned int c=0; c!=neighbor->n_children(); c++)
                                 {
-                                  Elem *subneighbor = neighbor->child(c);
+                                  Elem * subneighbor = neighbor->child(c);
                                   if (subneighbor == remote_elem)
                                     continue;
                                   if (subneighbor->active() &&
@@ -1422,7 +1421,7 @@ bool MeshRefinement::_coarsen_elements ()
   // Loop over the elements.
   for ( ; it != end; ++it)
     {
-      Elem* elem = *it;
+      Elem * elem = *it;
 
       // Not necessary when using elem_iterator
       // libmesh_assert(elem);
@@ -1532,22 +1531,22 @@ bool MeshRefinement::_refine_elements ()
 
   for (; it != end; ++it)
     {
-      Elem* elem = *it;
+      Elem * elem = *it;
       if (elem->refinement_flag() == Elem::REFINE)
         n_elems_flagged++;
     }
 
-  // Construct a local vector of Elem* which have been
+  // Construct a local vector of Elem * which have been
   // previously marked for refinement.  We reserve enough
   // space to allow for every element to be refined.
-  std::vector<Elem*> local_copy_of_elements;
+  std::vector<Elem *> local_copy_of_elements;
   local_copy_of_elements.reserve(n_elems_flagged);
 
   // Iterate over the elements, looking for elements
   // flagged for refinement.
   for (it = _mesh.elements_begin(); it != end; ++it)
     {
-      Elem* elem = *it;
+      Elem * elem = *it;
       if (elem->refinement_flag() == Elem::REFINE)
         local_copy_of_elements.push_back(elem);
       if (elem->p_refinement_flag() == Elem::REFINE &&
@@ -1754,9 +1753,9 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
 
 
 
-Elem* MeshRefinement::topological_neighbor(Elem* elem,
-                                           const PointLocatorBase* point_locator,
-                                           const unsigned int side)
+Elem * MeshRefinement::topological_neighbor(Elem * elem,
+                                            const PointLocatorBase * point_locator,
+                                            const unsigned int side)
 {
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())
@@ -1770,9 +1769,9 @@ Elem* MeshRefinement::topological_neighbor(Elem* elem,
 
 
 
-bool MeshRefinement::has_topological_neighbor(Elem* elem,
-                                              const PointLocatorBase* point_locator,
-                                              Elem* neighbor)
+bool MeshRefinement::has_topological_neighbor(Elem * elem,
+                                              const PointLocatorBase * point_locator,
+                                              Elem * neighbor)
 {
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())

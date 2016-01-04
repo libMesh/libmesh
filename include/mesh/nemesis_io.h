@@ -59,7 +59,7 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  Nemesis_IO (MeshBase& mesh, bool single_precision=false);
+  Nemesis_IO (MeshBase & mesh, bool single_precision=false);
 
   /**
    * Destructor.
@@ -71,24 +71,27 @@ public:
    * You provide the basename, then LibMesh appends the ".size.rank"
    * depending on this->n_processors() and this->processor_id().
    */
-  virtual void read (const std::string& base_filename) libmesh_override;
+  virtual void read (const std::string & base_filename) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& base_filename) libmesh_override;
+  virtual void write (const std::string & base_filename) libmesh_override;
 
   /**
    * Write one timestep's worth of the solution.
    */
-  void write_timestep (const std::string& fname, const EquationSystems& es, const int timestep, const Real time);
+  void write_timestep (const std::string & fname,
+                       const EquationSystems & es,
+                       const int timestep,
+                       const Real time);
 
   /**
    * Output a nodal solution.
    */
-  virtual void write_nodal_data (const std::string& fname,
-                                 const std::vector<Number>& soln,
-                                 const std::vector<std::string>& names) libmesh_override;
+  virtual void write_nodal_data (const std::string & fname,
+                                 const std::vector<Number> & soln,
+                                 const std::vector<std::string> & names) libmesh_override;
 
   /**
    * Set the flag indicationg if we should be verbose.
@@ -98,13 +101,13 @@ public:
   /**
    * Write out global variables.
    */
-  void write_global_data (const std::vector<Number>&,
-                          const std::vector<std::string>&);
+  void write_global_data (const std::vector<Number> &,
+                          const std::vector<std::string> &);
 
   /**
    * Write out information records.
    */
-  void write_information_records (const std::vector<std::string>&);
+  void write_information_records (const std::vector<std::string> &);
 
   /**
    * If true, this flag will cause the Nemesis_IO object to attempt to
@@ -115,7 +118,7 @@ public:
 
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  Nemesis_IO_Helper *nemhelper;
+  Nemesis_IO_Helper * nemhelper;
   int _timestep;
 #endif
 

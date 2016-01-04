@@ -61,9 +61,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // NameBasedIO members
-void NameBasedIO::read (const std::string& name)
+void NameBasedIO::read (const std::string & name)
 {
-  MeshBase& mymesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
@@ -286,9 +286,9 @@ void NameBasedIO::read (const std::string& name)
 }
 
 
-void NameBasedIO::write (const std::string& name)
+void NameBasedIO::write (const std::string & name)
 {
-  MeshBase& mymesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
   // parallel formats are special -- they may choose to write
   // separate files, let's not try to handle the zipping here.
@@ -438,11 +438,11 @@ void NameBasedIO::write (const std::string& name)
 }
 
 
-void NameBasedIO::write_nodal_data (const std::string& name,
-                                    const std::vector<Number>& v,
-                                    const std::vector<std::string>& vn)
+void NameBasedIO::write_nodal_data (const std::string & name,
+                                    const std::vector<Number> & v,
+                                    const std::vector<std::string> & vn)
 {
-  MeshBase& mymesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
   // Write the file based on extension
   if (name.rfind(".dat") < name.size())
@@ -503,9 +503,9 @@ void NameBasedIO::write_nodal_data (const std::string& name,
 }
 
 
-void NameBasedIO::write_equation_systems (const std::string& filename,
-                                          const EquationSystems& es,
-                                          const std::set<std::string>* system_names)
+void NameBasedIO::write_equation_systems (const std::string & filename,
+                                          const EquationSystems & es,
+                                          const std::set<std::string> * system_names)
 {
   // XDA/XDR require a separate code path, and currently only support
   // writing complete restarts

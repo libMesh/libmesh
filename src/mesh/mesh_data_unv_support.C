@@ -36,7 +36,7 @@ namespace libMesh
 
 //------------------------------------------------------
 // MeshData UNV support functions
-void MeshData::read_unv (const std::string& file_name)
+void MeshData::read_unv (const std::string & file_name)
 {
   /*
    * we should better be active or in compatibility mode
@@ -82,7 +82,7 @@ void MeshData::read_unv (const std::string& file_name)
 
 
 
-void MeshData::read_unv_implementation (std::istream& in_file)
+void MeshData::read_unv_implementation (std::istream & in_file)
 {
   /*
    * This is the actual implementation of
@@ -346,7 +346,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
                 /*
                  * Add the values vector to the MeshData data structure.
                  */
-                const Node* node = foreign_id_to_node(f_n_id);
+                const Node * node = foreign_id_to_node(f_n_id);
                 _node_data.insert (std::make_pair(node, values));
 
               } // while(true)
@@ -379,7 +379,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 
 
 
-void MeshData::write_unv (const std::string& file_name)
+void MeshData::write_unv (const std::string & file_name)
 {
   /*
    * we should better be active or in compatibility mode
@@ -421,7 +421,7 @@ void MeshData::write_unv (const std::string& file_name)
 
 
 
-void MeshData::write_unv_implementation (std::ostream& out_file)
+void MeshData::write_unv_implementation (std::ostream & out_file)
 {
   /*
    * This is the actual implementation of writing
@@ -538,13 +538,13 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
   /*
    * Write the foreign node number and the respective data.
    */
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator nit = _node_data.begin();
 
   char buf[27];
   for (; nit != _node_data.end(); ++nit)
     {
-      const Node* node = (*nit).first;
+      const Node * node = (*nit).first;
 
       unsigned int f_n_id = node_to_foreign_id (node);
       std::sprintf(buf, "%10u\n", f_n_id);
@@ -556,7 +556,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
       libmesh_assert (this->has_data(node));
 
       // const reference to the nodal values
-      const std::vector<Number>& values = this->get_data(node);
+      const std::vector<Number> & values = this->get_data(node);
 
       for (unsigned int v_cnt=0; v_cnt<values.size(); v_cnt++)
         {
@@ -627,7 +627,7 @@ MeshDataUnvHeader::~MeshDataUnvHeader()
 
 
 
-bool MeshDataUnvHeader::read (std::istream& in_file)
+bool MeshDataUnvHeader::read (std::istream & in_file)
 {
   in_file >> this->dataset_label;
 
@@ -726,7 +726,7 @@ bool MeshDataUnvHeader::read (std::istream& in_file)
 
 
 
-void MeshDataUnvHeader::write (std::ostream& out_file)
+void MeshDataUnvHeader::write (std::ostream & out_file)
 {
 
 
@@ -785,7 +785,7 @@ void MeshDataUnvHeader::write (std::ostream& out_file)
 
 
 
-bool MeshDataUnvHeader::need_D_to_e (std::string& number)
+bool MeshDataUnvHeader::need_D_to_e (std::string & number)
 {
   // find "D" in string, start looking at 6th element, to improve speed.
   // We dont expect a "D" earlier
@@ -811,7 +811,7 @@ void MeshDataUnvHeader::which_dataset (const unsigned int ds_label)
 
 
 
-void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
+void MeshDataUnvHeader::operator = (const MeshDataUnvHeader & omduh)
 {
   this->dataset_label          = omduh.dataset_label;
   this->dataset_name           = omduh.dataset_name;
@@ -876,7 +876,7 @@ void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
 
 
 
-bool MeshDataUnvHeader::operator == (const MeshDataUnvHeader& omduh) const
+bool MeshDataUnvHeader::operator == (const MeshDataUnvHeader & omduh) const
 {
   return (this->dataset_label          == omduh.dataset_label       &&
           this->dataset_name           == omduh.dataset_name        &&

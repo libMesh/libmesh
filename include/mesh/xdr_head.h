@@ -49,22 +49,22 @@ public:
   /**
    * Set the mesh/solution file id.
    */
-  void setId(const char* id)           { delete [] mp_id; mp_id = cpyString(id); }
+  void setId(const char * id)           { delete [] mp_id; mp_id = cpyString(id); }
 
   /**
    * Get the mesh/solution file id.
    */
-  const char* getId() const            { return mp_id; }
+  const char * getId() const            { return mp_id; }
 
   /**
    * Set the mesh/solution file title.
    */
-  void setTitle(const char* title)     { delete [] mp_title; mp_title = cpyString(title); }
+  void setTitle(const char * title)     { delete [] mp_title; mp_title = cpyString(title); }
 
   /**
    * Get the mesh/solution file title.
    */
-  const char* getTitle() const         { return mp_title; }
+  const char * getTitle() const         { return mp_title; }
 
   /**
    * Set the total number of
@@ -165,22 +165,22 @@ protected:
   /**
    * An ID string for the file.
    */
-  char* mp_id;
+  char * mp_id;
 
   /**
    * A title string for the file.
    */
-  char* mp_title;
+  char * mp_title;
 
   /**
    * User's simulation title
    */
-  char* mp_userTitle;
+  char * mp_userTitle;
 
   /**
    * List of null-separated variable names.
    */
-  char* mp_varTitle;
+  char * mp_varTitle;
 
   /**
    * Current solution time.
@@ -196,11 +196,11 @@ protected:
    *
    * @return Copy of \p src
    */
-  char* cpyString(const char* src, int len = -1);
+  char * cpyString(const char * src, int len = -1);
 
 private:
-  XdrHEAD(const XdrHEAD&);
-  const XdrHEAD& operator=(const XdrHEAD&);
+  XdrHEAD(const XdrHEAD &);
+  const XdrHEAD & operator=(const XdrHEAD &);
 };
 
 

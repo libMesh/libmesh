@@ -51,7 +51,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // UnstructuredMesh class member functions
-UnstructuredMesh::UnstructuredMesh (const Parallel::Communicator &comm_in,
+UnstructuredMesh::UnstructuredMesh (const Parallel::Communicator & comm_in,
                                     unsigned char d) :
   MeshBase (comm_in,d)
 {
@@ -70,8 +70,8 @@ UnstructuredMesh::UnstructuredMesh (unsigned char d) :
 
 
 
-void UnstructuredMesh::copy_nodes_and_elements
-(const UnstructuredMesh& other_mesh, const bool skip_find_neighbors)
+void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_mesh,
+                                               const bool skip_find_neighbors)
 {
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
@@ -94,7 +94,7 @@ void UnstructuredMesh::copy_nodes_and_elements
 
     for (; it != end; ++it)
       {
-        const Node *oldn = *it;
+        const Node * oldn = *it;
 
         // Add new nodes in old node Point locations
         /*Node *newn =*/ this->add_point(*oldn, oldn->id(), oldn->processor_id());
@@ -110,7 +110,7 @@ void UnstructuredMesh::copy_nodes_and_elements
     this->reserve_elem(other_mesh.n_elem());
 
     // Declare a map linking old and new elements, needed to copy the neighbor lists
-    std::map<const Elem*, Elem*> old_elems_to_new_elems;
+    std::map<const Elem *, Elem *> old_elems_to_new_elems;
 
     // Loop over the elements
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
@@ -120,9 +120,9 @@ void UnstructuredMesh::copy_nodes_and_elements
     for (; it != end; ++it)
       {
         //Look at the old element
-        const Elem *old = *it;
+        const Elem * old = *it;
         //Build a new element
-        Elem *newparent = old->parent() ?
+        Elem * newparent = old->parent() ?
           this->elem(old->parent()->id()) : NULL;
         UniquePtr<Elem> ap = Elem::build(old->type(), newparent);
         Elem * el = ap.release();
@@ -131,13 +131,13 @@ void UnstructuredMesh::copy_nodes_and_elements
 
         for (unsigned int s=0; s != old->n_sides(); ++s)
           if (old->neighbor(s) == remote_elem)
-            el->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+            el->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
 #ifdef LIBMESH_ENABLE_AMR
         if (old->has_children())
           for (unsigned int c=0; c != old->n_children(); ++c)
             if (old->child(c) == remote_elem)
-              el->add_child(const_cast<RemoteElem*>(remote_elem), c);
+              el->add_child(const_cast<RemoteElem *>(remote_elem), c);
 
         //Create the parent's child pointers if necessary
         if (newparent)
@@ -168,7 +168,7 @@ void UnstructuredMesh::copy_nodes_and_elements
           }
         else
           {
-            Elem* new_el = this->add_elem(el);
+            Elem * new_el = this->add_elem(el);
             old_elems_to_new_elems[old] = new_el;
           }
 
@@ -183,12 +183,12 @@ void UnstructuredMesh::copy_nodes_and_elements
         it = other_mesh.elements_begin();
         for (; it != end; ++it)
           {
-            Elem* old_elem = *it;
-            Elem* new_elem = old_elems_to_new_elems[old_elem];
+            Elem * old_elem = *it;
+            Elem * new_elem = old_elems_to_new_elems[old_elem];
             for (unsigned int s=0; s != old_elem->n_neighbors(); ++s)
               {
-                const Elem* old_neighbor = old_elem->neighbor(s);
-                Elem* new_neighbor = old_elems_to_new_elems[old_neighbor];
+                const Elem * old_neighbor = old_elem->neighbor(s);
+                Elem * new_neighbor = old_elems_to_new_elems[old_neighbor];
                 new_elem->set_neighbor(s, new_neighbor);
               }
           }
@@ -237,7 +237,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   if (reset_current_list)
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
       {
-        Elem* e = *el;
+        Elem * e = *el;
         for (unsigned int s=0; s<e->n_neighbors(); s++)
           if (e->neighbor(s) != remote_elem ||
               reset_remote_elements)
@@ -250,7 +250,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   {
     // data structures -- Use the hash_multimap if available
     typedef unsigned int                    key_type;
-    typedef std::pair<Elem*, unsigned char> val_type;
+    typedef std::pair<Elem *, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
 
     typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;
@@ -262,7 +262,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
       {
-        Elem* element = *el;
+        Elem * element = *el;
 
         for (unsigned char ms=0; ms<element->n_neighbors(); ms++)
           {
@@ -291,7 +291,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                     while (bounds.first != bounds.second)
                       {
                         // Get the potential element
-                        Elem* neighbor = bounds.first->second.first;
+                        Elem * neighbor = bounds.first->second.first;
 
                         // Get the side for the neighboring element
                         const unsigned int ns = bounds.first->second.second;
@@ -399,9 +399,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       for (element_iterator el = this->level_elements_begin(level);
            el != end; ++el)
         {
-          Elem* current_elem = *el;
+          Elem * current_elem = *el;
           libmesh_assert(current_elem);
-          Elem* parent = current_elem->parent();
+          Elem * parent = current_elem->parent();
           libmesh_assert(parent);
           const unsigned int my_child_num = parent->which_child_am_i(current_elem);
 
@@ -411,7 +411,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   (current_elem->neighbor(s) == remote_elem &&
                    parent->is_child_on_side(my_child_num, s)))
                 {
-                  Elem *neigh = parent->neighbor(s);
+                  Elem * neigh = parent->neighbor(s);
 
                   // If neigh was refined and had non-subactive children
                   // made remote earlier, then a non-subactive elem should
@@ -436,7 +436,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       libmesh_assert_not_equal_to (current_elem->processor_id(),
                                                    this->processor_id());
 #endif // DEBUG
-                      neigh = const_cast<RemoteElem*>(remote_elem);
+                      neigh = const_cast<RemoteElem *>(remote_elem);
                     }
 
                   if (!current_elem->subactive())
@@ -483,7 +483,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
           // We have no interior parents unless we can find one later
           current_elem->set_interior_parent(NULL);
 
-          Elem *pip = parent->interior_parent();
+          Elem * pip = parent->interior_parent();
 
           if (!pip)
             continue;
@@ -504,7 +504,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
           // parent's interior_parent.
           for (unsigned int c=0; c != pip->n_children(); ++c)
             {
-              Elem *child = pip->child(c);
+              Elem * child = pip->child(c);
 
               // If we have a remote_elem, that might be our
               // interior_parent.  We'll set it provisionally now and
@@ -512,7 +512,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
               if (child == remote_elem)
                 {
                   current_elem->set_interior_parent
-                    (const_cast<RemoteElem*>(remote_elem));
+                    (const_cast<RemoteElem *>(remote_elem));
                   continue;
                 }
 
@@ -561,8 +561,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 
 
-void UnstructuredMesh::read (const std::string& name,
-                             MeshData* mesh_data,
+void UnstructuredMesh::read (const std::string & name,
+                             MeshData * mesh_data,
                              bool skip_renumber_nodes_and_elements)
 {
   // Set the skip_renumber_nodes_and_elements flag on all processors
@@ -601,8 +601,8 @@ void UnstructuredMesh::read (const std::string& name,
 
 
 
-void UnstructuredMesh::write (const std::string& name,
-                              MeshData* mesh_data)
+void UnstructuredMesh::write (const std::string & name,
+                              MeshData * mesh_data)
 {
   START_LOG("write()", "Mesh");
 
@@ -622,9 +622,9 @@ void UnstructuredMesh::write (const std::string& name,
 
 
 
-void UnstructuredMesh::write (const std::string& name,
-                              const std::vector<Number>& v,
-                              const std::vector<std::string>& vn)
+void UnstructuredMesh::write (const std::string & name,
+                              const std::vector<Number> & v,
+                              const std::vector<std::string> & vn)
 {
   START_LOG("write()", "Mesh");
 
@@ -637,7 +637,7 @@ void UnstructuredMesh::write (const std::string& name,
 
 
 
-void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
+void UnstructuredMesh::create_pid_mesh(UnstructuredMesh & pid_mesh,
                                        const processor_id_type pid) const
 {
 
@@ -677,9 +677,9 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
 
 
 
-void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
-                                       const_element_iterator& it,
-                                       const const_element_iterator& it_end) const
+void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
+                                       const_element_iterator & it,
+                                       const const_element_iterator & it_end) const
 {
   // Just in case the subdomain_mesh already has some information
   // in it, get rid of it.
@@ -703,11 +703,11 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
   for (; it != it_end; ++it)
     {
-      const Elem* old_elem = *it;
+      const Elem * old_elem = *it;
 
       // Add an equivalent element type to the new_mesh.
       // Copy ids for this element.
-      Elem* new_elem = Elem::build(old_elem->type()).release();
+      Elem * new_elem = Elem::build(old_elem->type()).release();
       new_elem->set_id() = old_elem->id();
       new_elem->subdomain_id() = old_elem->subdomain_id();
       new_elem->processor_id() = old_elem->processor_id();
@@ -762,7 +762,7 @@ bool UnstructuredMesh::contract ()
   for ( ; in != end; ++in)
     if (*in != NULL)
       {
-        Elem* el = *in;
+        Elem * el = *in;
         libmesh_assert(el->active() || el->subactive() || el->ancestor());
       }
   in = elements_begin();
@@ -772,7 +772,7 @@ bool UnstructuredMesh::contract ()
   for ( ; in != end; ++in)
     if (*in != NULL)
       {
-        Elem* el = *in;
+        Elem * el = *in;
 
         // Delete all the subactive ones
         if (el->subactive())

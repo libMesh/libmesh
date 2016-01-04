@@ -67,7 +67,7 @@ public:
   /**
    * Simple constructor to use for smoothing purposes
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh,
+  VariationalMeshSmoother(UnstructuredMesh & mesh,
                           double theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
@@ -76,8 +76,8 @@ public:
   /**
    * Slightly more complicated constructor for mesh redistribution based on adapt_data
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh,
-                          std::vector<float>* adapt_data,
+  VariationalMeshSmoother(UnstructuredMesh & mesh,
+                          std::vector<float> * adapt_data,
                           double theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
@@ -88,9 +88,9 @@ public:
    * Even more complicated constructor for mesh redistribution based on adapt_data with an
    * area of interest
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh,
-                          const UnstructuredMesh* area_of_interest,
-                          std::vector<float>* adapt_data,
+  VariationalMeshSmoother(UnstructuredMesh & mesh,
+                          const UnstructuredMesh * area_of_interest,
+                          std::vector<float> * adapt_data,
                           double theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
@@ -229,8 +229,8 @@ private:
       _data(nx, std::vector<T>(ny)) {}
 
     // Accessors
-    std::vector<T>& operator[](unsigned i) {return _data[i];}
-    const std::vector<T>& operator[](unsigned i) const {return _data[i];}
+    std::vector<T> & operator[](unsigned i) {return _data[i];}
+    const std::vector<T> & operator[](unsigned i) const {return _data[i];}
 
   private:
     std::vector<std::vector<T> > _data;
@@ -250,27 +250,27 @@ private:
     }
 
     // Accessors
-    Array2D<T>& operator[](unsigned i) {return _data[i];}
-    const Array2D<T>& operator[](unsigned i) const {return _data[i];}
+    Array2D<T> & operator[](unsigned i) {return _data[i];}
+    const Array2D<T> & operator[](unsigned i) const {return _data[i];}
 
   private:
     std::vector<Array2D<T> > _data;
   };
 
 
-  int writegr(const Array2D<double>& R);
+  int writegr(const Array2D<double> & R);
 
-  int readgr(Array2D<double>& R,
-             std::vector<int>& mask,
-             Array2D<int>& cells,
-             std::vector<int>& mcells,
-             std::vector<int>& edges,
-             std::vector<int>& hnodes);
+  int readgr(Array2D<double> & R,
+             std::vector<int> & mask,
+             Array2D<int> & cells,
+             std::vector<int> & mcells,
+             std::vector<int> & edges,
+             std::vector<int> & hnodes);
 
   int readmetr(std::string name,
-               Array3D<double>& H);
+               Array3D<double> & H);
 
-  int read_adp(std::vector<double>& afun);
+  int read_adp(std::vector<double> & afun);
 
   double jac3(double x1, double y1, double z1,
               double x2, double y2, double z2,
@@ -279,124 +279,124 @@ private:
   double jac2(double x1, double y1,
               double x2, double y2);
 
-  int basisA(Array2D<double>& Q,
+  int basisA(Array2D<double> & Q,
              int nvert,
-             const std::vector<double>& K,
-             const Array2D<double>& H,
+             const std::vector<double> & K,
+             const Array2D<double> & H,
              int me);
 
-  void adp_renew(const Array2D<double>& R,
-                 const Array2D<int>& cells,
-                 std::vector<double>& afun,
+  void adp_renew(const Array2D<double> & R,
+                 const Array2D<int> & cells,
+                 std::vector<double> & afun,
                  int adp);
 
-  void full_smooth(Array2D<double>& R,
-                   const std::vector<int>& mask,
-                   const Array2D<int>& cells,
-                   const std::vector<int>& mcells,
-                   const std::vector<int>& edges,
-                   const std::vector<int>& hnodes,
+  void full_smooth(Array2D<double> & R,
+                   const std::vector<int> & mask,
+                   const Array2D<int> & cells,
+                   const std::vector<int> & mcells,
+                   const std::vector<int> & edges,
+                   const std::vector<int> & hnodes,
                    double w,
-                   const std::vector<int>& iter,
+                   const std::vector<int> & iter,
                    int me,
-                   const Array3D<double>& H,
+                   const Array3D<double> & H,
                    int adp,
                    int gr);
 
-  double maxE(Array2D<double>& R,
-              const Array2D<int>& cells,
-              const std::vector<int>& mcells,
+  double maxE(Array2D<double> & R,
+              const Array2D<int> & cells,
+              const std::vector<int> & mcells,
               int me,
-              const Array3D<double>& H,
+              const Array3D<double> & H,
               double v,
               double epsilon,
               double w,
-              std::vector<double>& Gamma,
-              double& qmin);
+              std::vector<double> & Gamma,
+              double & qmin);
 
-  double minq(const Array2D<double>& R,
-              const Array2D<int>& cells,
-              const std::vector<int>& mcells,
+  double minq(const Array2D<double> & R,
+              const Array2D<int> & cells,
+              const std::vector<int> & mcells,
               int me,
-              const Array3D<double>& H,
-              double& vol,
-              double& Vmin);
+              const Array3D<double> & H,
+              double & vol,
+              double & Vmin);
 
-  double minJ(Array2D<double>& R,
-              const std::vector<int>& mask,
-              const Array2D<int>& cells,
-              const std::vector<int>& mcells,
+  double minJ(Array2D<double> & R,
+              const std::vector<int> & mask,
+              const Array2D<int> & cells,
+              const std::vector<int> & mcells,
               double epsilon,
               double w,
               int me,
-              const Array3D<double>& H,
+              const Array3D<double> & H,
               double vol,
-              const std::vector<int>& edges,
-              const std::vector<int>& hnodes,
+              const std::vector<int> & edges,
+              const std::vector<int> & hnodes,
               int msglev,
-              double& Vmin,
-              double& emax,
-              double& qmin,
+              double & Vmin,
+              double & emax,
+              double & qmin,
               int adp,
-              const std::vector<double>& afun);
+              const std::vector<double> & afun);
 
-  double minJ_BC(Array2D<double>& R,
-                 const std::vector<int>& mask,
-                 const Array2D<int>& cells,
-                 const std::vector<int>& mcells,
+  double minJ_BC(Array2D<double> & R,
+                 const std::vector<int> & mask,
+                 const Array2D<int> & cells,
+                 const std::vector<int> & mcells,
                  double epsilon,
                  double w,
                  int me,
-                 const Array3D<double>& H,
+                 const Array3D<double> & H,
                  double vol,
                  int msglev,
-                 double& Vmin,
-                 double& emax,
-                 double& qmin,
+                 double & Vmin,
+                 double & emax,
+                 double & qmin,
                  int adp,
-                 const std::vector<double>& afun,
+                 const std::vector<double> & afun,
                  int NCN);
 
-  double localP(Array3D<double>& W,
-                Array2D<double>& F,
-                Array2D<double>& R,
-                const std::vector<int>& cell_in,
-                const std::vector<int>& mask,
+  double localP(Array3D<double> & W,
+                Array2D<double> & F,
+                Array2D<double> & R,
+                const std::vector<int> & cell_in,
+                const std::vector<int> & mask,
                 double epsilon,
                 double w,
                 int nvert,
-                const Array2D<double>& H,
+                const Array2D<double> & H,
                 int me,
                 double vol,
                 int f,
-                double& Vmin,
-                double& qmin,
+                double & Vmin,
+                double & qmin,
                 int adp,
-                const std::vector<double>& afun,
-                std::vector<double>& Gloc);
+                const std::vector<double> & afun,
+                std::vector<double> & Gloc);
 
-  double avertex(const std::vector<double>& afun,
-                 std::vector<double>& G,
-                 const Array2D<double>& R,
-                 const std::vector<int>& cell_in,
+  double avertex(const std::vector<double> & afun,
+                 std::vector<double> & G,
+                 const Array2D<double> & R,
+                 const std::vector<int> & cell_in,
                  int nvert,
                  int adp);
 
-  double vertex(Array3D<double>& W,
-                Array2D<double>& F,
-                const Array2D<double>& R,
-                const std::vector<int>& cell_in,
+  double vertex(Array3D<double> & W,
+                Array2D<double> & F,
+                const Array2D<double> & R,
+                const std::vector<int> & cell_in,
                 double epsilon,
                 double w,
                 int nvert,
-                const std::vector<double>& K,
-                const Array2D<double>& H,
+                const std::vector<double> & K,
+                const Array2D<double> & H,
                 int me,
                 double vol,
                 int f,
-                double& Vmin,
+                double & Vmin,
                 int adp,
-                const std::vector<double>& g,
+                const std::vector<double> & g,
                 double sigma);
 
   void metr_data_gen(std::string grid,
@@ -404,33 +404,33 @@ private:
                      int me);
 
   int solver(int n,
-             const std::vector<int>& ia,
-             const std::vector<int>& ja,
-             const std::vector<double>& a,
-             std::vector<double>& x,
-             const std::vector<double>& b,
+             const std::vector<int> & ia,
+             const std::vector<int> & ja,
+             const std::vector<double> & a,
+             std::vector<double> & x,
+             const std::vector<double> & b,
              double eps,
              int maxite,
              int msglev);
 
   int pcg_ic0(int n,
-              const std::vector<int>& ia,
-              const std::vector<int>& ja,
-              const std::vector<double>& a,
-              const std::vector<double>& u,
-              std::vector<double>& x,
-              const std::vector<double>& b,
-              std::vector<double>& r,
-              std::vector<double>& p,
-              std::vector<double>& z,
+              const std::vector<int> & ia,
+              const std::vector<int> & ja,
+              const std::vector<double> & a,
+              const std::vector<double> & u,
+              std::vector<double> & x,
+              const std::vector<double> & b,
+              std::vector<double> & r,
+              std::vector<double> & p,
+              std::vector<double> & z,
               double eps,
               int maxite,
               int msglev);
 
   int pcg_par_check(int n,
-                    const std::vector<int>& ia,
-                    const std::vector<int>& ja,
-                    const std::vector<double>& a,
+                    const std::vector<int> & ia,
+                    const std::vector<int> & ja,
+                    const std::vector<double> & a,
                     double eps,
                     int maxite,
                     int msglev);

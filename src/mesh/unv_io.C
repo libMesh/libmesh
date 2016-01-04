@@ -62,7 +62,7 @@ const std::string UNVIO::_groups_dataset_label   = "2467";
 // ------------------------------------------------------------
 // UNVIO class members
 
-UNVIO::UNVIO (MeshBase& mesh, MeshData* mesh_data) :
+UNVIO::UNVIO (MeshBase & mesh, MeshData * mesh_data) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _verbose (false),
@@ -72,7 +72,7 @@ UNVIO::UNVIO (MeshBase& mesh, MeshData* mesh_data) :
 
 
 
-UNVIO::UNVIO (const MeshBase& mesh, MeshData* mesh_data) :
+UNVIO::UNVIO (const MeshBase & mesh, MeshData * mesh_data) :
   MeshOutput<MeshBase> (mesh),
   _verbose (false),
   _mesh_data (mesh_data)
@@ -94,7 +94,7 @@ bool & UNVIO::verbose ()
 
 
 
-void UNVIO::read (const std::string& file_name)
+void UNVIO::read (const std::string & file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
@@ -120,7 +120,7 @@ void UNVIO::read (const std::string& file_name)
 }
 
 
-void UNVIO::read_implementation (std::istream& in_stream)
+void UNVIO::read_implementation (std::istream & in_stream)
 {
   // Keep track of what kinds of elements this file contains
   elems_of_dimension.clear();
@@ -245,7 +245,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
     // added to the mesh stricly for setting BCs.
     {
       // Grab reference to the Mesh
-      MeshBase& mesh = MeshInput<MeshBase>::mesh();
+      MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
       unsigned char max_dim = this->max_elem_dimension_seen();
 
@@ -254,7 +254,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
       for (; el != end_el; ++el)
         {
-          Elem* elem = *el;
+          Elem * elem = *el;
 
           if (elem->dim() < max_dim)
             mesh.delete_elem(elem);
@@ -270,7 +270,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
 
 
-void UNVIO::write (const std::string& file_name)
+void UNVIO::write (const std::string & file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
@@ -299,7 +299,7 @@ void UNVIO::write (const std::string& file_name)
 
 
 
-void UNVIO::write_implementation (std::ostream& out_file)
+void UNVIO::write_implementation (std::ostream & out_file)
 {
   if ( !out_file.good() )
     libmesh_error_msg("ERROR: Output file not good.");
@@ -325,14 +325,14 @@ void UNVIO::write_implementation (std::ostream& out_file)
 
 
 
-void UNVIO::nodes_in (std::istream& in_file)
+void UNVIO::nodes_in (std::istream & in_file)
 {
   START_LOG("nodes_in()","UNVIO");
 
   if (this->verbose())
     libMesh::out << "  Reading nodes" << std::endl;
 
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // node label, we use an int here so we can read in a -1
   int node_label;
@@ -391,7 +391,7 @@ void UNVIO::nodes_in (std::istream& in_file)
       _unv_node_id_to_libmesh_node_id[node_label] = ctr;
 
       // add node to the Mesh
-      Node* added_node = mesh.add_point(xyz, ctr++);
+      Node * added_node = mesh.add_point(xyz, ctr++);
 
       // tell the MeshData object the foreign node id
       if (_mesh_data)
@@ -419,10 +419,10 @@ unsigned char UNVIO::max_elem_dimension_seen ()
 
 
 
-void UNVIO::groups_in (std::istream& in_file)
+void UNVIO::groups_in (std::istream & in_file)
 {
   // Grab reference to the Mesh, so we can add boundary info data to it
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Record the max and min element dimension seen while reading the file.
   unsigned char max_dim = this->max_elem_dimension_seen();
@@ -508,7 +508,7 @@ void UNVIO::groups_in (std::istream& in_file)
                 unsigned libmesh_elem_id = it->second;
 
                 // Attempt to get a pointer to the elem listed in the group
-                Elem* group_elem = mesh.elem(libmesh_elem_id);
+                Elem * group_elem = mesh.elem(libmesh_elem_id);
                 if (!group_elem)
                   libmesh_error_msg("Group referred to non-existent element with ID " << libmesh_elem_id);
 
@@ -568,7 +568,7 @@ void UNVIO::groups_in (std::istream& in_file)
     const MeshBase::element_iterator end = mesh.active_elements_end();
     for ( ; it != end; ++it)
       {
-        Elem* elem = *it;
+        Elem * elem = *it;
 
         if (elem->dim() == max_dim)
           {
@@ -593,7 +593,7 @@ void UNVIO::groups_in (std::istream& in_file)
                     UniquePtr<Elem> side (elem->build_side(sn));
 
                     // Get a pointer to the lower-dimensional element
-                    Elem* lower_dim_elem = iter->second;
+                    Elem * lower_dim_elem = iter->second;
 
                     // This was a hash, so it might not be perfect.  Let's verify...
                     if (*lower_dim_elem == *side)
@@ -607,14 +607,14 @@ void UNVIO::groups_in (std::istream& in_file)
 
 
 
-void UNVIO::elements_in (std::istream& in_file)
+void UNVIO::elements_in (std::istream & in_file)
 {
   START_LOG("elements_in()","UNVIO");
 
   if (this->verbose())
     libMesh::out << "  Reading elements" << std::endl;
 
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // node label, we use an int here so we can read in a -1
   int element_label;
@@ -682,7 +682,7 @@ void UNVIO::elements_in (std::istream& in_file)
         in_file >> node_labels[j];
 
       // element pointer, to be allocated
-      Elem* elem = NULL;
+      Elem * elem = NULL;
 
       switch (fe_descriptor_id)
         {
@@ -888,7 +888,7 @@ void UNVIO::elements_in (std::istream& in_file)
       _unv_elem_id_to_libmesh_elem_id[element_label] = ctr;
 
       // Add the element to the Mesh
-      Elem* added_elem = mesh.add_elem(elem);
+      Elem * added_elem = mesh.add_elem(elem);
 
       // Tell the MeshData object the foreign elem id
       if (_mesh_data)
@@ -906,7 +906,7 @@ void UNVIO::elements_in (std::istream& in_file)
 
 
 
-void UNVIO::nodes_out (std::ostream& out_file)
+void UNVIO::nodes_out (std::ostream & out_file)
 {
   if (_mesh_data)
     libmesh_assert (_mesh_data->active() ||
@@ -927,7 +927,7 @@ void UNVIO::nodes_out (std::ostream& out_file)
     color_dummy          = 0; // color(not supported yet)
 
   // A reference to the parent class's mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // Use scientific notation with captial E and 16 digits for printing out the coordinates
   out_file << std::scientific << std::setprecision(16) << std::uppercase;
@@ -937,7 +937,7 @@ void UNVIO::nodes_out (std::ostream& out_file)
 
   for (; nd != end; ++nd)
     {
-      const Node* current_node = *nd;
+      const Node * current_node = *nd;
 
       dof_id_type node_id = current_node->id();
 
@@ -971,7 +971,7 @@ void UNVIO::nodes_out (std::ostream& out_file)
 
 
 
-void UNVIO::elements_out(std::ostream& out_file)
+void UNVIO::elements_out(std::ostream & out_file)
 {
   if (_mesh_data)
     libmesh_assert (_mesh_data->active() ||
@@ -1010,14 +1010,14 @@ void UNVIO::elements_out(std::ostream& out_file)
   unsigned int n_elem_written=0;
 
   // A reference to the parent class's mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   MeshBase::const_element_iterator it  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
 
   for (; it != end; ++it)
     {
-      const Elem* elem = *it;
+      const Elem * elem = *it;
 
       elem->n_nodes();
 
@@ -1189,7 +1189,7 @@ void UNVIO::elements_out(std::ostream& out_file)
           // assign_elem_nodes[j]-th node: i.e., j loops over the
           // libMesh numbering, and assign_elem_nodes[j] over the
           // UNV numbering.
-          const Node* node_in_unv_order = elem->get_node(assign_elem_nodes[j]);
+          const Node * node_in_unv_order = elem->get_node(assign_elem_nodes[j]);
 
           // new record after 8 id entries
           if (j==8 || j==16)

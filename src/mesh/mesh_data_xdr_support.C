@@ -32,7 +32,7 @@ namespace libMesh
 
 //------------------------------------------------------
 // MeshData functions
-void MeshData::read_xdr (const std::string& name,
+void MeshData::read_xdr (const std::string & name,
                          const XdrMODE mode)
 {
   /**
@@ -168,12 +168,12 @@ void MeshData::read_xdr (const std::string& name,
        * 5.)
        *
        * Read the foreign node id, locate the
-       * Node* associated with this foreign id
+       * Node * associated with this foreign id
        */
       unsigned int f_id = 0;
       io.data (f_id);
 
-      const Node* node = foreign_id_to_node(f_id);
+      const Node * node = foreign_id_to_node(f_id);
 
 
       /**
@@ -220,12 +220,12 @@ void MeshData::read_xdr (const std::string& name,
       /**
        * 7.)
        *
-       * Read the foreign elem id, locate the Elem*
+       * Read the foreign elem id, locate the Elem *
        */
       unsigned int f_id = 0;
       io.data (f_id);
 
-      const Elem* elem = foreign_id_to_elem(f_id);
+      const Elem * elem = foreign_id_to_elem(f_id);
 
 
       /**
@@ -279,7 +279,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
 
-void MeshData::write_xdr (const std::string& name,
+void MeshData::write_xdr (const std::string & name,
                           const XdrMODE mode)
 {
   /**
@@ -393,12 +393,12 @@ void MeshData::write_xdr (const std::string& name,
 
 
 
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator nit = _node_data.begin ();
 
   for (; nit != _node_data.end(); ++nit)
     {
-      const Node* node = (*nit).first;
+      const Node * node = (*nit).first;
 
       /**
        * 5.)
@@ -423,7 +423,7 @@ void MeshData::write_xdr (const std::string& name,
          */
         libmesh_assert (this->has_data(node));
 
-        const std::vector<Number>& values = this->get_data(node);
+        const std::vector<Number> & values = this->get_data(node);
 
         /*
          * copy the data to a local buf, since
@@ -441,12 +441,12 @@ void MeshData::write_xdr (const std::string& name,
 
 
 
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> >::const_iterator eit = _elem_data.begin ();
 
   for (; eit != _elem_data.end(); ++eit)
     {
-      const Elem* elem = (*eit).first;
+      const Elem * elem = (*eit).first;
 
       /**
        * 7.)
@@ -471,7 +471,7 @@ void MeshData::write_xdr (const std::string& name,
          */
         libmesh_assert (this->has_data(elem));
 
-        const std::vector<Number>& values = this->get_data(elem);
+        const std::vector<Number> & values = this->get_data(elem);
 
         /*
          * copy the data to a local buf, since

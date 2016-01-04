@@ -53,7 +53,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  Mesh (const Parallel::Communicator &comm_in,
+  Mesh (const Parallel::Communicator & comm_in,
         unsigned char dim=1)
     : DefaultMesh(comm_in,dim) {}
 
@@ -72,7 +72,7 @@ public:
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  Mesh (const UnstructuredMesh& other_mesh) : DefaultMesh(other_mesh) {}
+  Mesh (const UnstructuredMesh & other_mesh) : DefaultMesh(other_mesh) {}
 
   /**
    * Destructor.

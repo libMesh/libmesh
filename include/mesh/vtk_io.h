@@ -65,38 +65,38 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  VTKIO (MeshBase& mesh, MeshData* mesh_data=NULL);
+  VTKIO (MeshBase & mesh, MeshData * mesh_data=NULL);
 
   /**
    * Constructor.  Takes a read-only reference to a mesh object.
    * This is the constructor required to write a mesh.
    */
   explicit
-  VTKIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
+  VTKIO (const MeshBase & mesh, MeshData * mesh_data=NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&) libmesh_override;
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &) libmesh_override;
 
   /**
    * This method implements reading a mesh from a specified file
    * in VTK format.
    */
-  virtual void read (const std::string&) libmesh_override;
+  virtual void read (const std::string &) libmesh_override;
 
   /**
    * Output the mesh without solutions to a .pvtu file
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
   /**
    * Get a pointer to the VTK datastructure
    */
-  vtkUnstructuredGrid* get_vtk_grid();
+  vtkUnstructuredGrid * get_vtk_grid();
 
   /**
    * Setter for compression flag
@@ -124,18 +124,19 @@ private:
   /**
    * write the system vectors to vtk
    */
-  void system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid);
+  void system_vectors_to_vtk(const EquationSystems & es,
+                             vtkUnstructuredGrid * & grid);
 
   /**
    * pointer to the VTK grid
    */
-  vtkUnstructuredGrid* _vtk_grid;
+  vtkUnstructuredGrid * _vtk_grid;
 
   /**
    * A pointer to the MeshData object you would like to use.
    * with this VTKIO object.  Can be NULL.
    */
-  MeshData* _mesh_data;
+  MeshData * _mesh_data;
 
   /**
    * Flag to indicate whether the output should be compressed

@@ -57,27 +57,27 @@ public:
    * e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
    */
   explicit
-  GnuPlotIO (const MeshBase&,
-             const std::string& = std::string("FE 1D Solution"),
+  GnuPlotIO (const MeshBase &,
+             const std::string & = std::string("FE 1D Solution"),
              int properties=0);
 
   /**
    * Write the mesh to the specified file.
    */
-  virtual void write(const std::string&) libmesh_override;
+  virtual void write(const std::string &) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&) libmesh_override;
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &) libmesh_override;
 
   /**
    * Set title of plot
    */
-  void set_title(const std::string& title) { _title = title; }
+  void set_title(const std::string & title) { _title = title; }
 
   /**
    * Turn grid on or off.
@@ -106,9 +106,9 @@ private:
    * specified file where the nodal data and variable names are optionally
    * provided.  This will write an ASCII file.
    */
-  void write_solution (const std::string&,
-                       const std::vector<Number>* = NULL,
-                       const std::vector<std::string>* = NULL);
+  void write_solution (const std::string &,
+                       const std::vector<Number> * = NULL,
+                       const std::vector<std::string> * = NULL);
 
   std::string _title;
 

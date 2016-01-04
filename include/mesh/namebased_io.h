@@ -51,24 +51,24 @@ public:
    * This constructor will only allow us to write the mesh.
    */
   explicit
-  NameBasedIO (const MeshBase&);
+  NameBasedIO (const MeshBase &);
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
    * This constructor is required to let us read in a mesh.
    */
   explicit
-  NameBasedIO (MeshBase&);
+  NameBasedIO (MeshBase &);
 
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string& mesh_file) libmesh_override;
+  virtual void read (const std::string & mesh_file) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& mesh_file) libmesh_override;
+  virtual void write (const std::string & mesh_file) libmesh_override;
 
   /**
    * This method implements writing a mesh with data to a specified file
@@ -79,21 +79,21 @@ public:
    * output a proper restart file if the requested filename is an XDA
    * or XDR type.
    */
-  virtual void write_equation_systems (const std::string& filename,
-                                       const EquationSystems& es,
-                                       const std::set<std::string>* system_names=NULL) libmesh_override;
+  virtual void write_equation_systems (const std::string & filename,
+                                       const EquationSystems & es,
+                                       const std::set<std::string> * system_names=NULL) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&) libmesh_override;
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &) libmesh_override;
 
   // Certain mesh formats can support parallel I/O, including the
   // "new" Xdr format and the Nemesis format.
-  bool is_parallel_file_format (const std::string &filename);
+  bool is_parallel_file_format (const std::string & filename);
 };
 
 
@@ -101,13 +101,13 @@ public:
 // ------------------------------------------------------------
 // NameBasedIO inline members
 inline
-NameBasedIO::NameBasedIO (const MeshBase& mesh) :
+NameBasedIO::NameBasedIO (const MeshBase & mesh) :
   MeshOutput<MeshBase>    (mesh)
 {
 }
 
 inline
-NameBasedIO::NameBasedIO (MeshBase& mesh) :
+NameBasedIO::NameBasedIO (MeshBase & mesh) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh)
 {
@@ -115,7 +115,7 @@ NameBasedIO::NameBasedIO (MeshBase& mesh) :
 
 inline
 bool
-NameBasedIO::is_parallel_file_format (const std::string &name)
+NameBasedIO::is_parallel_file_format (const std::string & name)
 {
   return ((name.rfind(".xda") < name.size()) ||
           (name.rfind(".xdr") < name.size()) ||

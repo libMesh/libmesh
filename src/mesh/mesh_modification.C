@@ -44,7 +44,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // MeshTools::Modification functions for mesh modification
-void MeshTools::Modification::distort (MeshBase& mesh,
+void MeshTools::Modification::distort (MeshBase & mesh,
                                        const Real factor,
                                        const bool perturb_boundary)
 {
@@ -115,7 +115,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 
           dir = dir.unit();
 
-          Node *node = mesh.node_ptr(n);
+          Node * node = mesh.node_ptr(n);
           if (!node)
             continue;
 
@@ -134,8 +134,8 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 
 
 
-void MeshTools::Modification::redistribute (MeshBase& mesh,
-                                            const FunctionBase<Real> &mapfunc)
+void MeshTools::Modification::redistribute (MeshBase & mesh,
+                                            const FunctionBase<Real> & mapfunc)
 {
   libmesh_assert (mesh.n_nodes());
   libmesh_assert (mesh.n_elem());
@@ -152,7 +152,7 @@ void MeshTools::Modification::redistribute (MeshBase& mesh,
 
   for (; it != end; ++it)
     {
-      Node *node = *it;
+      Node * node = *it;
 
       (*myfunc)(*node, output_vec);
 
@@ -171,7 +171,7 @@ void MeshTools::Modification::redistribute (MeshBase& mesh,
 
 
 
-void MeshTools::Modification::translate (MeshBase& mesh,
+void MeshTools::Modification::translate (MeshBase & mesh,
                                          const Real xt,
                                          const Real yt,
                                          const Real zt)
@@ -186,7 +186,7 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 }
 
 
-// void MeshTools::Modification::rotate2D (MeshBase& mesh,
+// void MeshTools::Modification::rotate2D (MeshBase & mesh,
 //                                         const Real alpha)
 // {
 //   libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
@@ -208,7 +208,7 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 
 
 
-void MeshTools::Modification::rotate (MeshBase& mesh,
+void MeshTools::Modification::rotate (MeshBase & mesh,
                                       const Real phi,
                                       const Real theta,
                                       const Real psi)
@@ -244,7 +244,7 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
 }
 
 
-void MeshTools::Modification::scale (MeshBase& mesh,
+void MeshTools::Modification::scale (MeshBase & mesh,
                                      const Real xs,
                                      const Real ys,
                                      const Real zs)
@@ -317,7 +317,7 @@ void UnstructuredMesh::all_first_order ()
   for (element_iterator it = elements_begin();
        it != endit; ++it)
     {
-      Elem* so_elem = *it;
+      Elem * so_elem = *it;
 
       libmesh_assert(so_elem);
 
@@ -325,13 +325,13 @@ void UnstructuredMesh::all_first_order ()
        * build the first-order equivalent, add to
        * the new_elements list.
        */
-      Elem* lo_elem = Elem::build
+      Elem * lo_elem = Elem::build
         (Elem::first_order_equivalent_type
          (so_elem->type()), so_elem->parent()).release();
 
       for (unsigned int s=0; s != so_elem->n_sides(); ++s)
         if (so_elem->neighbor(s) == remote_elem)
-          lo_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+          lo_elem->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
 #ifdef LIBMESH_ENABLE_AMR
       /*
@@ -405,7 +405,7 @@ void UnstructuredMesh::all_first_order ()
   MeshBase::node_iterator nd = this->nodes_begin();
   while (nd != nd_end)
     {
-      Node *the_node = *nd;
+      Node * the_node = *nd;
       ++nd;
       if (!node_touched_by_me[the_node->id()])
         this->delete_node(the_node);
@@ -473,7 +473,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * nodes.  We are safe to use node id's since we
    * make sure that these are correctly numbered.
    */
-  std::map<std::vector<dof_id_type>, Node*> adj_vertices_to_so_nodes;
+  std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_so_nodes;
 
   /*
    * for speed-up of the \p add_point() method, we
@@ -540,7 +540,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        it != endit; ++it)
     {
       // the linear-order element
-      const Elem* lo_elem = *it;
+      const Elem * lo_elem = *it;
 
       libmesh_assert(lo_elem);
 
@@ -559,7 +559,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * for either type of seconrd-order equivalent, e.g.
        * Hex20 or Hex27, as equivalents for Hex8
        */
-      Elem* so_elem =
+      Elem * so_elem =
         Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
                                                         full_ordered) ).release();
 
@@ -608,8 +608,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 
           // does this set of vertices already has a mid-node added?
-          std::pair<std::map<std::vector<dof_id_type>, Node*>::iterator,
-                    std::map<std::vector<dof_id_type>, Node*>::iterator>
+          std::pair<std::map<std::vector<dof_id_type>, Node *>::iterator,
+                    std::map<std::vector<dof_id_type>, Node *>::iterator>
             pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
           // no, not added yet
@@ -631,7 +631,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
               /* Add the new point to the mesh, giving it a globally
                * well-defined processor id.
                */
-              Node* so_node = this->add_point
+              Node * so_node = this->add_point
                 (new_location, DofObject::invalid_id,
                  this->node(adjacent_vertices_ids[0]).processor_id());
 
@@ -677,7 +677,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
           this->get_boundary_info().add_side (so_elem, s, bndry_ids);
 
           if (lo_elem->neighbor(s) == remote_elem)
-            so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+            so_elem->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
         }
 
       /*
@@ -712,7 +712,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 
 
-void MeshTools::Modification::all_tri (MeshBase& mesh)
+void MeshTools::Modification::all_tri (MeshBase & mesh)
 {
   // The number of elements in the original mesh before any additions
   // or deletions.
@@ -722,7 +722,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   // until they are ready to be added to the mesh.  This is because
   // adding new elements on the fly can cause reallocation and invalidation
   // of existing iterators.
-  std::vector<Elem*> new_elements;
+  std::vector<Elem *> new_elements;
   new_elements.reserve (2*n_orig_elem);
 
   // If the original mesh has boundary data, we carry that over
@@ -730,7 +730,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   const bool mesh_has_boundary_data = (mesh.get_boundary_info().n_boundary_ids() > 0);
 
   // Temporary vectors to store the new boundary element pointers, side numbers, and boundary ids
-  std::vector<Elem*> new_bndry_elements;
+  std::vector<Elem *> new_bndry_elements;
   std::vector<unsigned short int> new_bndry_sides;
   std::vector<boundary_id_type> new_bndry_ids;
 
@@ -743,7 +743,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
     for (; el!=end; ++el)
       {
-        Elem* elem = *el;
+        Elem * elem = *el;
 
         const ElemType etype = elem->type();
 
@@ -758,8 +758,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
         bool split_elem = false;
 
         // The two new triangular elements we will split the quad into.
-        Elem* tri0 = NULL;
-        Elem* tri1 = NULL;
+        Elem * tri0 = NULL;
+        Elem * tri1 = NULL;
 
 
         switch (etype)
@@ -808,11 +808,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
               tri0 = new Tri6;
               tri1 = new Tri6;
 
-              Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
+              Node * new_node = mesh.add_point((mesh.node(elem->node(0)) +
                                                 mesh.node(elem->node(1)) +
                                                 mesh.node(elem->node(2)) +
-                                                mesh.node(elem->node(3)) / 4)
-                                               );
+                                                mesh.node(elem->node(3)) / 4));
 
               // Check for possible edge swap
               if ((elem->point(0) - elem->point(2)).size() <
@@ -1050,25 +1049,25 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                           case 0:
                             {
                               // New remote side is Tri 0, side 0
-                              tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                              tri0->set_neighbor(0, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
                           case 1:
                             {
                               // New remote side is Tri 0, side 1
-                              tri0->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                              tri0->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
                           case 2:
                             {
                               // New remote side is Tri 1, side 1
-                              tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                              tri1->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
                           case 3:
                             {
                               // New remote side is Tri 1, side 2
-                              tri1->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
+                              tri1->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
 
@@ -1084,25 +1083,25 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                           case 0:
                             {
                               // New remote side is Tri 0, side 0
-                              tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                              tri0->set_neighbor(0, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
                           case 1:
                             {
                               // New remote side is Tri 1, side 0
-                              tri1->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                              tri1->set_neighbor(0, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
                           case 2:
                             {
                               // New remote side is Tri 1, side 1
-                              tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                              tri1->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
                           case 3:
                             {
                               // New remote side is Tri 0, side 2
-                              tri0->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
+                              tri0->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
                               break;
                             }
 
@@ -1135,8 +1134,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   // Now, iterate over the new elements vector, and add them each to
   // the Mesh.
   {
-    std::vector<Elem*>::iterator el        = new_elements.begin();
-    const std::vector<Elem*>::iterator end = new_elements.end();
+    std::vector<Elem *>::iterator el        = new_elements.begin();
+    const std::vector<Elem *>::iterator end = new_elements.end();
     for (; el != end; ++el)
       mesh.add_elem(*el);
   }
@@ -1173,7 +1172,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 }
 
 
-void MeshTools::Modification::smooth (MeshBase& mesh,
+void MeshTools::Modification::smooth (MeshBase & mesh,
                                       const unsigned int n_iterations,
                                       const Real power)
 {
@@ -1216,7 +1215,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                 /*
                  * Constant handle for the element
                  */
-                const Elem* elem = *el;
+                const Elem * elem = *el;
 
                 /*
                  * We relax all nodes on level 0 first
@@ -1238,8 +1237,8 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                           {
                             UniquePtr<Elem> side(elem->build_side(s));
 
-                            Node* node0 = side->get_node(0);
-                            Node* node1 = side->get_node(1);
+                            Node * node0 = side->get_node(0);
+                            Node * node1 = side->get_node(1);
 
                             Real node_weight = 1.;
                             // calculate the weight of the nodes
@@ -1266,7 +1265,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                      * (one level less refined) element, and the embedding matrix
                      */
 
-                    const Elem* parent = elem->parent();
+                    const Elem * parent = elem->parent();
 
                     /*
                      * find out which child I am
@@ -1329,7 +1328,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                 /*
                  * Constant handle for the element
                  */
-                const Elem* elem = *el;
+                const Elem * elem = *el;
                 const unsigned int son_begin = elem->n_vertices();
                 const unsigned int son_end   = elem->n_nodes();
                 for (unsigned int n=son_begin; n<son_end; n++)
@@ -1355,7 +1354,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::Modification::flatten(MeshBase& mesh)
+void MeshTools::Modification::flatten(MeshBase & mesh)
 {
   // Algorithm:
   // .) For each active element in the mesh: construct a
@@ -1367,10 +1366,10 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   // .) Add the level-0 copies back to the mesh
 
   // Temporary storage for new element pointers
-  std::vector<Elem*> new_elements;
+  std::vector<Elem *> new_elements;
 
   // BoundaryInfo Storage for element ids, sides, and BC ids
-  std::vector<Elem*>              saved_boundary_elements;
+  std::vector<Elem *>              saved_boundary_elements;
   std::vector<boundary_id_type>   saved_bc_ids;
   std::vector<unsigned short int> saved_bc_sides;
 
@@ -1388,10 +1387,10 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
     for (; it != end; ++it)
       {
-        Elem* elem = *it;
+        Elem * elem = *it;
 
         // Make a new element of the same type
-        Elem* copy = Elem::build(elem->type()).release();
+        Elem * copy = Elem::build(elem->type()).release();
 
         // Set node pointers (they still point to nodes in the original mesh)
         for(unsigned int n=0; n<elem->n_nodes(); n++)
@@ -1411,7 +1410,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
         for (unsigned short s=0; s<elem->n_sides(); s++)
           {
             if (elem->neighbor(s) == remote_elem)
-              copy->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+              copy->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
             mesh.get_boundary_info().boundary_ids(elem, s, bc_ids);
             for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -1454,7 +1453,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
   // Add the copied (now level-0) elements back to the mesh
   {
-    for (std::vector<Elem*>::iterator it = new_elements.begin();
+    for (std::vector<Elem *>::iterator it = new_elements.begin();
          it != new_elements.end();
          ++it)
       {
@@ -1462,7 +1461,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
         dof_id_type orig_id = (*it)->id();
 
         // ugly mid-statement endif to avoid unused variable warnings
-        Elem* added_elem =
+        Elem * added_elem =
 #endif
           mesh.add_elem(*it);
 
@@ -1490,15 +1489,15 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
 
 
-void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
+void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
                                                   const boundary_id_type old_id,
                                                   const boundary_id_type new_id)
 {
   if(old_id == new_id)
-  {
-    // If the IDs are the same, this is a no-op.
-    return;
-  }
+    {
+      // If the IDs are the same, this is a no-op.
+      return;
+    }
 
   // A reference to the Mesh's BoundaryInfo object, for convenience.
   BoundaryInfo & bi = mesh.get_boundary_info();
@@ -1608,22 +1607,22 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
 
 
 
-void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
+void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
                                                    const subdomain_id_type old_id,
                                                    const subdomain_id_type new_id)
 {
   if(old_id == new_id)
-  {
-    // If the IDs are the same, this is a no-op.
-    return;
-  }
+    {
+      // If the IDs are the same, this is a no-op.
+      return;
+    }
 
   MeshBase::element_iterator           el = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
 
   for (; el != end_el; ++el)
     {
-      Elem *elem = *el;
+      Elem * elem = *el;
 
       if (elem->subdomain_id() == old_id)
         elem->subdomain_id() = new_id;

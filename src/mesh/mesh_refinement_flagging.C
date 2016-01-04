@@ -42,7 +42,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // Mesh refinement methods
-void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
+void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector & error_per_cell,
                                                       const Real refine_frac,
                                                       const Real coarsen_frac,
                                                       const unsigned int max_l)
@@ -140,7 +140,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     _mesh.active_elements_end();
   for (; e_it != e_end; ++e_it)
     {
-      Elem* elem           = *e_it;
+      Elem * elem           = *e_it;
       const dof_id_type id = elem->id();
 
       libmesh_assert_less (id, error_per_cell.size());
@@ -149,7 +149,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
       if (_coarsen_by_parents)
         {
-          Elem* parent           = elem->parent();
+          Elem * parent           = elem->parent();
           if (parent)
             {
               const dof_id_type parentid  = parent->id();
@@ -175,7 +175,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
 
 
-void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_per_cell_in)
+void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector & error_per_cell_in)
 {
   parallel_object_only();
 
@@ -211,8 +211,8 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem* elem = *elem_it;
-      Elem* parent = elem->parent();
+      Elem * elem = *elem_it;
+      Elem * parent = elem->parent();
       const dof_id_type elem_number    = elem->id();
       const ErrorVectorReal elem_error = error_per_cell_in[elem_number];
 
@@ -242,7 +242,7 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
 
 
-bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per_cell)
+bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_per_cell)
 {
   parallel_object_only();
 
@@ -377,7 +377,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     for (dof_id_type i=0; i != sorted_error.size(); ++i)
       {
         dof_id_type eid = sorted_error[i].second;
-        Elem *elem = _mesh.query_elem(eid);
+        Elem * elem = _mesh.query_elem(eid);
         if (elem && elem->level() < _max_h_level)
           is_refinable[eid] = true;
       }
@@ -391,7 +391,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
           break;
 
         dof_id_type eid = sorted_error[i].second;
-        Elem *elem = _mesh.query_elem(eid);
+        Elem * elem = _mesh.query_elem(eid);
         if (is_refinable[eid])
           {
             if (elem)
@@ -420,7 +420,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
             break;
 
           dof_id_type parent_id = sorted_parent_error[i].second;
-          Elem *parent = _mesh.query_elem(parent_id);
+          Elem * parent = _mesh.query_elem(parent_id);
 
           // On a ParallelMesh we skip remote elements
           if (!parent)
@@ -429,7 +429,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
           libmesh_assert(parent->has_children());
           for (unsigned int c=0; c != parent->n_children(); ++c)
             {
-              Elem *elem = parent->child(c);
+              Elem * elem = parent->child(c);
               if (elem && elem != remote_elem)
                 {
                   libmesh_assert(elem->active());
@@ -450,7 +450,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
 
 
-void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
+void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector & error_per_cell,
                                                      const Real refine_frac,
                                                      const Real coarsen_frac,
                                                      const unsigned int max_l)
@@ -569,8 +569,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   elem_it  = _mesh.active_elements_begin();
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem* elem = *elem_it;
-      Elem* parent = elem->parent();
+      Elem * elem = *elem_it;
+      Elem * parent = elem->parent();
 
       if (_coarsen_by_parents && parent && n_elem_coarsen &&
           error_per_parent[parent->id()] <= bottom_error)
@@ -589,7 +589,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
 
 
-void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
+void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector & error_per_cell,
                                                    const Real refine_frac,
                                                    const Real coarsen_frac,
                                                    const unsigned int max_l)
@@ -634,7 +634,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem* elem             = *elem_it;
+      Elem * elem             = *elem_it;
       const dof_id_type id  = elem->id();
 
       libmesh_assert_less (id, error_per_cell.size());
@@ -653,7 +653,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
 
 
-void MeshRefinement::flag_elements_by (ElementFlagging &element_flagging)
+void MeshRefinement::flag_elements_by (ElementFlagging & element_flagging)
 {
   element_flagging.flag_elements();
 }

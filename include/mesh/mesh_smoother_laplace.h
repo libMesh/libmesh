@@ -53,7 +53,7 @@ public:
    * in the protected data section of the class.
    */
   explicit
-  LaplaceMeshSmoother(UnstructuredMesh& mesh);
+  LaplaceMeshSmoother(UnstructuredMesh & mesh);
 
   /**
    * Destructor.
@@ -88,7 +88,7 @@ public:
    * Mainly for debugging, this function will print
    * out the connectivity graph which has been created.
    */
-  void print_graph(std::ostream& out = libMesh::out) const;
+  void print_graph(std::ostream & out = libMesh::out) const;
 
 private:
   /**

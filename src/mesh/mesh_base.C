@@ -44,7 +44,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // MeshBase class member functions
-MeshBase::MeshBase (const Parallel::Communicator &comm_in,
+MeshBase::MeshBase (const Parallel::Communicator & comm_in,
                     unsigned char d) :
   ParallelObject (comm_in),
   boundary_info  (new BoundaryInfo(*this)),
@@ -88,7 +88,7 @@ MeshBase::MeshBase (unsigned char d) :
 
 
 
-MeshBase::MeshBase (const MeshBase& other_mesh) :
+MeshBase::MeshBase (const MeshBase & other_mesh) :
   ParallelObject (other_mesh),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
@@ -220,7 +220,7 @@ void MeshBase::clear ()
 
 
 
-void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
+void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids) const
 {
   // This requires an inspection on every processor
   parallel_object_only();
@@ -353,14 +353,14 @@ std::string MeshBase::get_info() const
 }
 
 
-void MeshBase::print_info(std::ostream& os) const
+void MeshBase::print_info(std::ostream & os) const
 {
   os << this->get_info()
      << std::endl;
 }
 
 
-std::ostream& operator << (std::ostream& os, const MeshBase& m)
+std::ostream & operator << (std::ostream & os, const MeshBase & m)
 {
   m.print_info(os);
   return os;
@@ -422,7 +422,7 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 
 
-const PointLocatorBase& MeshBase::point_locator () const
+const PointLocatorBase & MeshBase::point_locator () const
 {
   libmesh_deprecated();
 
@@ -466,12 +466,12 @@ void MeshBase::clear_point_locator ()
 
 
 
-std::string& MeshBase::subdomain_name(subdomain_id_type id)
+std::string & MeshBase::subdomain_name(subdomain_id_type id)
 {
   return _block_id_to_name[id];
 }
 
-const std::string& MeshBase::subdomain_name(subdomain_id_type id) const
+const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
 {
   // An empty string to return when no matching subdomain name is found
   static const std::string empty;
@@ -486,7 +486,7 @@ const std::string& MeshBase::subdomain_name(subdomain_id_type id) const
 
 
 
-subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
+subdomain_id_type MeshBase::get_id_by_name(const std::string & name) const
 {
   // Linear search over the map values.
   std::map<subdomain_id_type, std::string>::const_iterator
@@ -569,7 +569,7 @@ void MeshBase::detect_interior_parents()
 
       for (dof_id_type n=0; n < element->n_vertices(); n++)
         {
-          std::vector<dof_id_type> &element_ids = node_to_elem[element->node(n)];
+          std::vector<dof_id_type> & element_ids = node_to_elem[element->node(n)];
           for (std::vector<dof_id_type>::iterator e_it = element_ids.begin();
                e_it != element_ids.end(); e_it++)
             {
@@ -597,9 +597,9 @@ void MeshBase::detect_interior_parents()
       // will be the lowest element id if there is potential for multiple interior parents.
       if (found_interior_parents)
         {
-          std::set<dof_id_type> &neighbors_0 = neighbors[0];
+          std::set<dof_id_type> & neighbors_0 = neighbors[0];
           for (std::set<dof_id_type>::iterator e_it = neighbors_0.begin();
-              e_it != neighbors_0.end(); e_it++)
+               e_it != neighbors_0.end(); e_it++)
             {
               found_interior_parents=false;
               dof_id_type interior_parent_id = *e_it;

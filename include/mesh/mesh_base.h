@@ -73,7 +73,7 @@ public:
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (const Parallel::Communicator &comm_in,
+  MeshBase (const Parallel::Communicator & comm_in,
             unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -88,7 +88,7 @@ public:
   /**
    * Copy-constructor.
    */
-  MeshBase (const MeshBase& other_mesh);
+  MeshBase (const MeshBase & other_mesh);
 
   /**
    * Virtual "copy constructor"
@@ -103,17 +103,17 @@ public:
   /**
    * A partitioner to use at each prepare_for_use()
    */
-  virtual UniquePtr<Partitioner> &partitioner() { return _partitioner; }
+  virtual UniquePtr<Partitioner> & partitioner() { return _partitioner; }
 
   /**
    * The information about boundary ids on the mesh
    */
-  const BoundaryInfo& get_boundary_info() const { return *boundary_info; }
+  const BoundaryInfo & get_boundary_info() const { return *boundary_info; }
 
   /**
    * Writeable information about boundary ids on the mesh
    */
-  BoundaryInfo& get_boundary_info() { return *boundary_info; }
+  BoundaryInfo & get_boundary_info() { return *boundary_info; }
 
   /**
    * Deletes all the data that are currently stored.
@@ -168,7 +168,7 @@ public:
   /**
    * @returns set of dimensions of elements present in the mesh.
    */
-  const std::set<unsigned char>& elem_dimensions() const
+  const std::set<unsigned char> & elem_dimensions() const
   { return _elem_dims; }
 
   /**
@@ -329,70 +329,70 @@ public:
    * \f$ i^{th} \f$ point, which should be present in this processor's
    * subset of the mesh data structure.
    */
-  virtual const Point& point (const dof_id_type i) const = 0;
+  virtual const Point & point (const dof_id_type i) const = 0;
 
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ node, which should be present in this processor's
    * subset of the mesh data structure.
    */
-  virtual const Node& node (const dof_id_type i) const = 0;
+  virtual const Node & node (const dof_id_type i) const = 0;
 
   /**
    * Return a reference to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual Node& node (const dof_id_type i) = 0;
+  virtual Node & node (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual const Node* node_ptr (const dof_id_type i) const = 0;
+  virtual const Node * node_ptr (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ node, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
-  virtual Node* node_ptr (const dof_id_type i) = 0;
+  virtual Node * node_ptr (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node, or NULL if no such
    * node exists in this processor's mesh data structure.
    */
-  virtual const Node* query_node_ptr (const dof_id_type i) const = 0;
+  virtual const Node * query_node_ptr (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ node, or NULL if
    * no such node exists in this processor's mesh data structure.
    */
-  virtual Node* query_node_ptr (const dof_id_type i) = 0;
+  virtual Node * query_node_ptr (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual const Elem* elem (const dof_id_type i) const = 0;
+  virtual const Elem * elem (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
-  virtual Elem* elem (const dof_id_type i) = 0;
+  virtual Elem * elem (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element, or NULL if no
    * such element exists in this processor's mesh data structure.
    */
-  virtual const Elem* query_elem (const dof_id_type i) const = 0;
+  virtual const Elem * query_elem (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    */
-  virtual Elem* query_elem (const dof_id_type i) = 0;
+  virtual Elem * query_elem (const dof_id_type i) = 0;
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
@@ -404,15 +404,15 @@ public:
    * DofObject::invalid_id will set that specific node id.  Only
    * do this in parallel if you are manually keeping ids consistent.
    */
-  virtual Node* add_point (const Point& p,
-                           const dof_id_type id = DofObject::invalid_id,
-                           const processor_id_type proc_id =
-                           DofObject::invalid_processor_id) = 0;
+  virtual Node * add_point (const Point & p,
+                            const dof_id_type id = DofObject::invalid_id,
+                            const processor_id_type proc_id =
+                            DofObject::invalid_processor_id) = 0;
 
   /**
    * Add \p Node \p n to the end of the vertex array.
    */
-  virtual Node* add_node (Node* n) = 0;
+  virtual Node * add_node (Node * n) = 0;
 
   /**
    * Insert \p Node \p n into the Mesh at a location consistent with
@@ -421,12 +421,12 @@ public:
    * use with the mesh_inserter_iterator, only use if you know what
    * you are doing...
    */
-  virtual Node* insert_node(Node* n) = 0;
+  virtual Node * insert_node(Node * n) = 0;
 
   /**
    * Removes the Node n from the mesh.
    */
-  virtual void delete_node (Node* n) = 0;
+  virtual void delete_node (Node * n) = 0;
 
   /**
    * Changes the id of node \p old_id, both by changing node(old_id)->id() and
@@ -444,7 +444,7 @@ public:
    * Users should call MeshBase::prepare_for_use() after elements are
    * added to and/or deleted from the mesh.
    */
-  virtual Elem* add_elem (Elem* e) = 0;
+  virtual Elem * add_elem (Elem * e) = 0;
 
   /**
    * Insert elem \p e to the element array, preserving its id
@@ -453,7 +453,7 @@ public:
    * Users should call MeshBase::prepare_for_use() after elements are
    * added to and/or deleted from the mesh.
    */
-  virtual Elem* insert_elem (Elem* e) = 0;
+  virtual Elem * insert_elem (Elem * e) = 0;
 
   /**
    * Removes element \p e from the mesh. Note that calling this
@@ -464,7 +464,7 @@ public:
    * Users should call MeshBase::prepare_for_use() after elements are
    * added to and/or deleted from the mesh.
    */
-  virtual void delete_elem (Elem* e) = 0;
+  virtual void delete_elem (Elem * e) = 0;
 
   /**
    * Changes the id of element \p old_id, both by changing elem(old_id)->id()
@@ -578,7 +578,7 @@ public:
    * or regions where different physical processes are important.  The subdomain
    * mapping is independent from the parallel decomposition.
    */
-  void subdomain_ids (std::set<subdomain_id_type> &ids) const;
+  void subdomain_ids (std::set<subdomain_id_type> & ids) const;
 
   /**
    * Returns the number of subdomains in the global mesh. Subdomains correspond
@@ -607,23 +607,23 @@ public:
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out) const;
 
   /**
    * Equivalent to calling print_info() above, but now you can write:
    * Mesh mesh;
    * libMesh::out << mesh << std::endl;
    */
-  friend std::ostream& operator << (std::ostream& os, const MeshBase& m);
+  friend std::ostream & operator << (std::ostream & os, const MeshBase & m);
 
   /**
    * Interfaces for reading/writing a mesh to/from a file.  Must be
    * implemented in derived classes.
    */
-  virtual void read  (const std::string& name,
-                      MeshData* mesh_data=NULL,
+  virtual void read  (const std::string & name,
+                      MeshData * mesh_data=NULL,
                       bool skip_renumber_nodes_and_elements=false) = 0;
-  virtual void write (const std::string& name, MeshData* mesh_data=NULL) = 0;
+  virtual void write (const std::string & name, MeshData * mesh_data=NULL) = 0;
 
   /**
    * Converts a mesh with higher-order
@@ -687,7 +687,7 @@ public:
    * This should never be used in threaded or non-parallel_only code,
    * and so is deprecated.
    */
-  const PointLocatorBase& point_locator () const;
+  const PointLocatorBase & point_locator () const;
 
   /**
    * \p returns a pointer to a subordinate \p PointLocatorBase object
@@ -716,14 +716,14 @@ public:
    * Returns a writable reference for getting/setting an optional
    * name for a subdomain.
    */
-  std::string& subdomain_name(subdomain_id_type id);
-  const std::string& subdomain_name(subdomain_id_type id) const;
+  std::string & subdomain_name(subdomain_id_type id);
+  const std::string & subdomain_name(subdomain_id_type id) const;
 
   /**
    * Returns the id of the named subdomain if it exists,
    * Elem::invalid_subdomain_id otherwise.
    */
-  subdomain_id_type get_id_by_name(const std::string& name) const;
+  subdomain_id_type get_id_by_name(const std::string & name) const;
 
   //
   // element_iterator accessors
@@ -945,9 +945,9 @@ public:
   /**
    * Return a writeable reference to the whole subdomain name map
    */
-  std::map<subdomain_id_type, std::string>& set_subdomain_name_map ()
+  std::map<subdomain_id_type, std::string> & set_subdomain_name_map ()
   { return _block_id_to_name; }
-  const std::map<subdomain_id_type, std::string>& get_subdomain_name_map () const
+  const std::map<subdomain_id_type, std::string> & get_subdomain_name_map () const
   { return _block_id_to_name; }
 
 
@@ -989,7 +989,7 @@ protected:
   /**
    * Returns a writeable reference to the number of partitions.
    */
-  unsigned int& set_n_partitions ()
+  unsigned int & set_n_partitions ()
   { return _n_parts; }
 
   /**
@@ -1083,7 +1083,7 @@ private:
    *  classes and a link-time error to try and do it from this class.
    *  Use clone() if necessary.
    */
-  MeshBase& operator= (const MeshBase& other);
+  MeshBase & operator= (const MeshBase & other);
 };
 
 
@@ -1100,15 +1100,15 @@ private:
  * The definition of the element_iterator struct.
  */
 struct
-MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem*>
+MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
-  element_iterator (const IterType& d,
-                    const IterType& e,
-                    const PredType& p ) :
+  element_iterator (const IterType & d,
+                    const IterType & e,
+                    const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Elem*>(d,e,p) {}
+    Elem *>(d,e,p) {}
 };
 
 
@@ -1120,28 +1120,28 @@ MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem*>
  */
 struct
 MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                           Elem* const,
-                                                           Elem* const&,
-                                                           Elem* const*>
+                                                           Elem * const,
+                                                           Elem * const &,
+                                                           Elem * const *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
-  const_element_iterator (const IterType& d,
-                          const IterType& e,
-                          const PredType& p ) :
+  const_element_iterator (const IterType & d,
+                          const IterType & e,
+                          const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Elem* const,
-    Elem* const&,
-    Elem* const*>(d,e,p)  {}
+                            Elem * const,
+                            Elem * const &,
+                            Elem * const *>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
-  const_element_iterator (const MeshBase::element_iterator& rhs) :
+  const_element_iterator (const MeshBase::element_iterator & rhs) :
     variant_filter_iterator<Predicate,
-    Elem* const,
-    Elem* const&,
-    Elem* const*>(rhs)
+                            Elem * const,
+                            Elem * const &,
+                            Elem * const *>(rhs)
   {
     // libMesh::out << "Called element_iterator conversion-to-const ctor." << std::endl;
   }
@@ -1157,15 +1157,15 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
  * The definition of the node_iterator struct.
  */
 struct
-MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node*>
+MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
-  node_iterator (const IterType& d,
-                 const IterType& e,
-                 const PredType& p ) :
+  node_iterator (const IterType & d,
+                 const IterType & e,
+                 const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Node*>(d,e,p) {}
+    Node *>(d,e,p) {}
 };
 
 
@@ -1177,28 +1177,28 @@ MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node*>
  */
 struct
 MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                        Node* const,
-                                                        Node* const &,
-                                                        Node* const *>
+                                                        Node * const,
+                                                        Node * const &,
+                                                        Node * const *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
-  const_node_iterator (const IterType& d,
-                       const IterType& e,
-                       const PredType& p ) :
+  const_node_iterator (const IterType & d,
+                       const IterType & e,
+                       const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Node* const,
-    Node* const &,
-    Node* const *>(d,e,p)  {}
+    Node * const,
+    Node * const &,
+    Node * const *>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
-  const_node_iterator (const MeshBase::node_iterator& rhs) :
+  const_node_iterator (const MeshBase::node_iterator & rhs) :
     variant_filter_iterator<Predicate,
-    Node* const,
-    Node* const &,
-    Node* const *>(rhs)
+    Node * const,
+    Node * const &,
+    Node * const *>(rhs)
   {
     // libMesh::out << "Called node_iterator conversion-to-const ctor." << std::endl;
   }

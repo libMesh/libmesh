@@ -40,7 +40,7 @@ namespace libMesh
 //
 
 // Constructor
-TriangleInterface::TriangleInterface(UnstructuredMesh& mesh)
+TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
   : _mesh(mesh),
     _holes(NULL),
     _elem_type(TRI3),
@@ -146,7 +146,7 @@ void TriangleInterface::triangulate()
   // Allocate space for the segments (2 int per segment)
   if (initial.numberofsegments > 0)
     {
-      initial.segmentlist = static_cast<int*> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
+      initial.segmentlist = static_cast<int *> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
     }
 
 
@@ -190,7 +190,7 @@ void TriangleInterface::triangulate()
         dof_id_type index = 2*hole_offset + ctr;
 
         // Get pointer to the current node
-        Node* node = *it;
+        Node * node = *it;
 
         // Set x,y values in pointlist
         initial.pointlist[index] = (*node)(0);
@@ -320,7 +320,7 @@ void TriangleInterface::triangulate()
     flags << _extra_flags;
 
   // Refine the initial output to conform to the area constraint
-  TriangleWrapper::triangulate(const_cast<char*>(flags.str().c_str()),
+  TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
                                &initial,
                                &final,
                                NULL); // voronoi ouput -- not used

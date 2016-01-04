@@ -86,7 +86,7 @@ public:
    * -v Prints the version information.
    * -h Help: A brief instruction for using TetGen.
    */
-  void set_switches(const std::string& s);
+  void set_switches(const std::string & s);
 
   /**
    * Method starts triangulization.
@@ -151,7 +151,7 @@ public:
   /**
    * Method returns coordinates of point i in TetGen output.
    */
-  void get_output_node(unsigned i, REAL& x, REAL& y, REAL& z);
+  void get_output_node(unsigned i, REAL & x, REAL & y, REAL & z);
 
   /**
    * Method returns index of jth node from element i in TetGen output.
@@ -223,7 +223,7 @@ public:
   /**
    * TetGen output structure.
    */
-  tetgenio*  tetgen_output;
+  tetgenio *  tetgen_output;
 
   /**
    * TetGen mesh structure (from the TetGen library).

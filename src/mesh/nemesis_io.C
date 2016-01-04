@@ -43,13 +43,13 @@ struct CompareGlobalIdxMappings
 {
   // strict weak ordering for a.first -> a.second mapping.  since we can only map to one
   // value only order the first entry
-  bool operator()(const std::pair<unsigned int, unsigned int> &a,
-                  const std::pair<unsigned int, unsigned int> &b) const
+  bool operator()(const std::pair<unsigned int, unsigned int> & a,
+                  const std::pair<unsigned int, unsigned int> & b) const
   { return a.first < b.first; }
 
   // strict weak ordering for a.first -> a.second mapping.  lookups will
   // be in terms of a single integer, which is why we need this method.
-  bool operator()(const std::pair<unsigned int, unsigned int> &a,
+  bool operator()(const std::pair<unsigned int, unsigned int> & a,
                   const unsigned int b) const
   { return a.first < b; }
 };
@@ -59,7 +59,7 @@ struct CompareGlobalIdxMappings
 // this trivial little method saves some typing & also makes sure something
 // is not horribly wrong.
 template <typename T>
-inline unsigned int to_uint ( const T &t )
+inline unsigned int to_uint ( const T & t )
 {
   libmesh_assert_equal_to (t, static_cast<T>(static_cast<unsigned int>(t)));
 
@@ -69,8 +69,8 @@ inline unsigned int to_uint ( const T &t )
 // test equality for a.first -> a.second mapping.  since we can only map to one
 // value only test the first entry
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned int> &a,
-                                         const std::pair<unsigned int, unsigned int> &b)
+inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned int> & a,
+                                         const std::pair<unsigned int, unsigned int> & b)
 {
   return a.first == b.first;
 }
@@ -82,7 +82,7 @@ inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned 
 
 // ------------------------------------------------------------
 // Nemesis_IO class members
-Nemesis_IO::Nemesis_IO (MeshBase& mesh,
+Nemesis_IO::Nemesis_IO (MeshBase & mesh,
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
                         bool single_precision
 #else
@@ -133,7 +133,7 @@ void Nemesis_IO::append(bool val)
 
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-void Nemesis_IO::read (const std::string& base_filename)
+void Nemesis_IO::read (const std::string & base_filename)
 {
   // On one processor, Nemesis and ExodusII should be equivalent, so
   // let's cowardly defer to that implementation...
@@ -143,7 +143,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // object, it will no longer be set... thus no extra print-outs for serial runs.
       // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
 
-      MeshBase& mesh = MeshInput<MeshBase>::mesh();
+      MeshBase & mesh = MeshInput<MeshBase>::mesh();
       ExodusII_IO(mesh).read (base_filename);
       return;
     }
@@ -171,8 +171,8 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // Get a reference to the mesh.  We need to be specific
   // since Nemesis_IO is multiply-inherited
-  // MeshBase& mesh = this->mesh();
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  // MeshBase & mesh = this->mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // We're reading a file on each processor, so our mesh is
   // partitioned into that many parts as it's created
@@ -443,7 +443,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       // "Catch" the node pointer after addition, make sure the
       // ID matches the requested value.
-      Node* added_node =
+      Node * added_node =
         mesh.add_point (Point(nemhelper->x[local_node_idx],
                               nemhelper->y[local_node_idx],
                               nemhelper->z[local_node_idx]),
@@ -493,7 +493,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
           // "Catch" the node pointer after addition, make sure the
           // ID matches the requested value.
-          Node* added_node =
+          Node * added_node =
             mesh.add_point (Point(nemhelper->x[local_node_idx],
                                   nemhelper->y[local_node_idx],
                                   nemhelper->z[local_node_idx]),
@@ -566,7 +566,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
           // get a reference to the request buffer for this processor to
           // avoid repeated map lookups
-          std::vector<int> &xfer_buf (requested_node_idxs[requesting_pid_idx]);
+          std::vector<int> & xfer_buf (requested_node_idxs[requesting_pid_idx]);
 
           // actually receive the message.
           this->comm().receive (requesting_pid_idx, xfer_buf, nodes_tag);
@@ -641,7 +641,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
                   // "Catch" the node pointer after addition, make sure the
                   // ID matches the requested value.
-                  Node* added_node =
+                  Node * added_node =
                     mesh.add_point (Point(nemhelper->x[local_node_idx],
                                           nemhelper->y[local_node_idx],
                                           nemhelper->z[local_node_idx]),
@@ -826,7 +826,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Loop over all the elements in this block
       for (unsigned int j=0; j<to_uint(nemhelper->num_elem_this_blk); j++)
         {
-          Elem* elem = Elem::build (conv.get_canonical_type()).release();
+          Elem * elem = Elem::build (conv.get_canonical_type()).release();
           libmesh_assert (elem);
 
           // Assign subdomain and processor ID to the newly-created Elem.
@@ -1016,7 +1016,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // not necessarily in order, so if we did instead loop over the
       // mesh, we would have to search the (unsorted) elem_list vector
       // for each entry!  We'll settle for doing some error checking instead.
-      Elem* elem = mesh.elem(my_elem_offset + (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
+      Elem * elem = mesh.elem(my_elem_offset + (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
 
       if (elem == NULL)
         libmesh_error_msg("Mesh returned a NULL pointer when asked for element " \
@@ -1143,12 +1143,12 @@ void Nemesis_IO::read (const std::string& base_filename)
     return;
 
   // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
-  MeshCommunication().gather_neighboring_elements(cast_ref<ParallelMesh&>(mesh));
+  MeshCommunication().gather_neighboring_elements(cast_ref<ParallelMesh &>(mesh));
 }
 
 #else
 
-void Nemesis_IO::read (const std::string& )
+void Nemesis_IO::read (const std::string &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined!");
 }
@@ -1161,7 +1161,7 @@ void Nemesis_IO::read (const std::string& )
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
-void Nemesis_IO::write (const std::string& base_filename)
+void Nemesis_IO::write (const std::string & base_filename)
 {
   // Get a constant reference to the mesh for writing
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -1214,7 +1214,7 @@ void Nemesis_IO::write (const std::string& base_filename)
 
 #else
 
-void Nemesis_IO::write (const std::string& )
+void Nemesis_IO::write (const std::string & )
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined!");
 }
@@ -1224,8 +1224,8 @@ void Nemesis_IO::write (const std::string& )
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
-void Nemesis_IO::write_timestep (const std::string& fname,
-                                 const EquationSystems& es,
+void Nemesis_IO::write_timestep (const std::string & fname,
+                                 const EquationSystems & es,
                                  const int timestep,
                                  const Real time)
 {
@@ -1237,8 +1237,8 @@ void Nemesis_IO::write_timestep (const std::string& fname,
 
 #else
 
-void Nemesis_IO::write_timestep (const std::string&,
-                                 const EquationSystems&,
+void Nemesis_IO::write_timestep (const std::string &,
+                                 const EquationSystems &,
                                  const int,
                                  const Real)
 {
@@ -1249,9 +1249,9 @@ void Nemesis_IO::write_timestep (const std::string&,
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
-void Nemesis_IO::write_nodal_data (const std::string& base_filename,
-                                   const std::vector<Number>& soln,
-                                   const std::vector<std::string>& names)
+void Nemesis_IO::write_nodal_data (const std::string & base_filename,
+                                   const std::vector<Number> & soln,
+                                   const std::vector<std::string> & names)
 {
   START_LOG("write_nodal_data()", "Nemesis_IO");
 
@@ -1311,9 +1311,9 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
 
 #else
 
-void Nemesis_IO::write_nodal_data (const std::string& ,
-                                   const std::vector<Number>& ,
-                                   const std::vector<std::string>& )
+void Nemesis_IO::write_nodal_data (const std::string & ,
+                                   const std::vector<Number> & ,
+                                   const std::vector<std::string> & )
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
@@ -1327,8 +1327,8 @@ void Nemesis_IO::write_nodal_data (const std::string& ,
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
-void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
-                                    const std::vector<std::string>& names)
+void Nemesis_IO::write_global_data (const std::vector<Number> & soln,
+                                    const std::vector<std::string> & names)
 {
   if (!nemhelper->opened_for_writing)
     libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting global variables.");
@@ -1380,8 +1380,8 @@ void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
 
 #else
 
-void Nemesis_IO::write_global_data (const std::vector<Number>&,
-                                    const std::vector<std::string>&)
+void Nemesis_IO::write_global_data (const std::vector<Number> &,
+                                    const std::vector<std::string> &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
@@ -1392,7 +1392,7 @@ void Nemesis_IO::write_global_data (const std::vector<Number>&,
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
-void Nemesis_IO::write_information_records (const std::vector<std::string>& records)
+void Nemesis_IO::write_information_records (const std::vector<std::string> & records)
 {
   if (!nemhelper->opened_for_writing)
     libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting information records.");
@@ -1404,7 +1404,7 @@ void Nemesis_IO::write_information_records (const std::vector<std::string>& reco
 
 #else
 
-void Nemesis_IO::write_information_records ( const std::vector<std::string>& )
+void Nemesis_IO::write_information_records ( const std::vector<std::string> & )
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }

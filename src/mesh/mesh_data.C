@@ -32,7 +32,7 @@ namespace libMesh
 
 //------------------------------------------------------
 // MeshData functions
-MeshData::MeshData(const MeshBase& m) :
+MeshData::MeshData(const MeshBase & m) :
   _mesh               (m),
   _data_descriptor    (""),
   _node_id_map_closed (false),
@@ -61,7 +61,7 @@ MeshData::~MeshData()
 
 
 
-void MeshData::activate (const std::string& descriptor)
+void MeshData::activate (const std::string & descriptor)
 {
 #ifdef DEBUG
   if (_compatibility_mode)
@@ -78,7 +78,7 @@ void MeshData::activate (const std::string& descriptor)
 
 
 
-void MeshData::enable_compatibility_mode (const std::string& descriptor)
+void MeshData::enable_compatibility_mode (const std::string & descriptor)
 {
   if (!_active)
     {
@@ -157,9 +157,9 @@ void  MeshData::slim (const bool node_id_map,
 
 
 
-void MeshData::translate (const MeshBase& out_mesh,
-                          std::vector<Number>& values,
-                          std::vector<std::string>& names) const
+void MeshData::translate (const MeshBase & out_mesh,
+                          std::vector<Number> & values,
+                          std::vector<std::string> & names) const
 {
   libmesh_assert (_active || _compatibility_mode);
 
@@ -183,7 +183,7 @@ void MeshData::translate (const MeshBase& out_mesh,
     // when there is no nodal data.
     for (; nodes_it != nodes_end; ++nodes_it)
       {
-        const Node* node = *nodes_it;
+        const Node * node = *nodes_it;
 
         for (unsigned int c= 0; c<n_comp; c++)
           values.push_back(this->operator()(node, c));
@@ -234,7 +234,7 @@ void MeshData::close_foreign_id_maps ()
 
 
 
-void MeshData::read (const std::string& name)
+void MeshData::read (const std::string & name)
 {
   START_LOG("read()", "MeshData");
 
@@ -283,7 +283,7 @@ void MeshData::read (const std::string& name)
 
 
 
-void MeshData::write (const std::string& name)
+void MeshData::write (const std::string & name)
 {
   START_LOG("write()", "MeshData");
 
@@ -355,14 +355,14 @@ std::string MeshData::get_info() const
 
 
 
-void MeshData::print_info(std::ostream& os) const
+void MeshData::print_info(std::ostream & os) const
 {
   os << this->get_info()
      << std::endl;
 }
 
 
-std::ostream& operator << (std::ostream& os, const MeshData& m)
+std::ostream & operator << (std::ostream & os, const MeshData & m)
 {
   m.print_info(os);
   return os;
@@ -371,7 +371,7 @@ std::ostream& operator << (std::ostream& os, const MeshData& m)
 
 
 
-const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
+const Node * MeshData::foreign_id_to_node (const unsigned int fid) const
 {
   if (_active)
     {
@@ -379,10 +379,10 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
       libmesh_assert (_node_id_map_closed);
 
       std::map<unsigned int,
-               const Node*>::const_iterator pos = _id_node.find(fid);
+               const Node *>::const_iterator pos = _id_node.find(fid);
 
       if (pos == _id_node.end())
-        libmesh_error_msg("ERROR: Have no Node* associated with the foreign id = " << fid);
+        libmesh_error_msg("ERROR: Have no Node * associated with the foreign id = " << fid);
 
       else
         return pos->second;
@@ -401,7 +401,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 
 
 
-unsigned int MeshData::node_to_foreign_id (const Node* n) const
+unsigned int MeshData::node_to_foreign_id (const Node * n) const
 {
   libmesh_assert(n);
 
@@ -411,7 +411,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
       libmesh_assert (_node_id_map_closed);
 
       // look it up in the map
-      std::map<const Node*,
+      std::map<const Node *,
                unsigned int>::const_iterator pos = _node_id.find(n);
 
       if (pos == _node_id.end())
@@ -436,7 +436,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 
 
 
-const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
+const Elem * MeshData::foreign_id_to_elem (const unsigned int fid) const
 {
   if (_active)
     {
@@ -444,10 +444,10 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
       libmesh_assert (_elem_id_map_closed);
 
       std::map<unsigned int,
-               const Elem*>::const_iterator pos = _id_elem.find(fid);
+               const Elem *>::const_iterator pos = _id_elem.find(fid);
 
       if (pos == _id_elem.end())
-        libmesh_error_msg("ERROR: Have no Elem* associated with the foreign id = " << fid);
+        libmesh_error_msg("ERROR: Have no Elem * associated with the foreign id = " << fid);
 
       else
         return pos->second;
@@ -465,7 +465,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 
 
 
-unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
+unsigned int MeshData::elem_to_foreign_id (const Elem * e) const
 {
   libmesh_assert(e);
 
@@ -475,7 +475,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
       libmesh_assert (_elem_id_map_closed);
 
       // look it up in the map
-      std::map<const Elem*,
+      std::map<const Elem *,
                unsigned int>::const_iterator pos = _elem_id.find(e);
 
       if (pos == _elem_id.end())
@@ -499,8 +499,8 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 
 
 
-void MeshData::insert_node_data (std::map<const Node*,
-                                 std::vector<Number> >& nd,
+void MeshData::insert_node_data (std::map<const Node *,
+                                 std::vector<Number> > & nd,
                                  const bool close_elem_data)
 {
   libmesh_assert (this->_active || this->_compatibility_mode);
@@ -513,9 +513,9 @@ void MeshData::insert_node_data (std::map<const Node*,
   libmesh_assert (this->_node_data.empty());
 
 #ifdef DEBUG
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator nd_pos = nd.begin();
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator nd_end = nd.end();
 
   // Compare entity-by-entity that the
@@ -555,8 +555,8 @@ void MeshData::insert_node_data (std::map<const Node*,
 
 
 
-void MeshData::insert_elem_data (std::map<const Elem*,
-                                 std::vector<Number> >& ed,
+void MeshData::insert_elem_data (std::map<const Elem *,
+                                 std::vector<Number> > & ed,
                                  const bool close_node_data)
 {
   libmesh_assert (this->_active || this->_compatibility_mode);
@@ -569,9 +569,9 @@ void MeshData::insert_elem_data (std::map<const Elem*,
   libmesh_assert (this->_elem_data.empty());
 
 #ifdef DEBUG
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> >::const_iterator ed_pos = ed.begin();
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> >::const_iterator ed_end = ed.end();
 
   // Compare entity-by-entity that the
@@ -612,7 +612,7 @@ unsigned int MeshData::n_val_per_node () const
 
   if (!this->_node_data.empty())
     {
-      std::map<const Node*,
+      std::map<const Node *,
                std::vector<Number> >::const_iterator pos = _node_data.begin();
       libmesh_assert (pos != _node_data.end());
       return cast_int<unsigned int>(pos->second.size());
@@ -642,7 +642,7 @@ unsigned int MeshData::n_val_per_elem () const
 
   if (!_elem_data.empty())
     {
-      std::map<const Elem*,
+      std::map<const Elem *,
                std::vector<Number> >::const_iterator pos = _elem_data.begin();
       libmesh_assert (pos != _elem_data.end());
       return cast_int<unsigned int>(pos->second.size());
@@ -665,7 +665,7 @@ dof_id_type MeshData::n_elem_data () const
 
 
 
-void MeshData::assign (const MeshData& omd)
+void MeshData::assign (const MeshData & omd)
 {
   this->_data_descriptor    = omd._data_descriptor;
   this->_node_id_map_closed = omd._node_id_map_closed;
@@ -701,7 +701,7 @@ void MeshData::assign (const MeshData& omd)
 
       for (; elem_it != elem_end; ++elem_it)
         {
-          const Elem* elem = *elem_it;
+          const Elem * elem = *elem_it;
           this->add_foreign_elem_id(elem, elem->id());
         }
     }

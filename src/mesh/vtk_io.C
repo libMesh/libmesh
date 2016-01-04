@@ -169,7 +169,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
 
 void VTKIO::nodes_to_vtk()
 {
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // containers for points and coordinates of points
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
@@ -183,7 +183,7 @@ void VTKIO::nodes_to_vtk()
   MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
   for (; nd != nd_end; nd++, ++local_node_counter)
     {
-      Node* node = (*nd);
+      Node * node = (*nd);
 
       double pnt[LIBMESH_DIM];
       for (unsigned int i=0; i<LIBMESH_DIM; ++i)
@@ -207,7 +207,7 @@ void VTKIO::nodes_to_vtk()
 
 void VTKIO::cells_to_vtk()
 {
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
@@ -227,7 +227,7 @@ void VTKIO::cells_to_vtk()
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
   for (; it != end; ++it, ++active_element_counter)
     {
-      Elem *elem = *it;
+      Elem * elem = *it;
 
       pts->SetNumberOfIds(elem->n_nodes());
 
@@ -244,7 +244,7 @@ void VTKIO::cells_to_vtk()
             {
               dof_id_type global_node_id = elem->node(i);
 
-              const Node* the_node = mesh.node_ptr(global_node_id);
+              const Node * the_node = mesh.node_ptr(global_node_id);
 
               // Error checking...
               if (the_node == NULL)
@@ -286,14 +286,15 @@ void VTKIO::cells_to_vtk()
  * FIXME: This is known to write nonsense on AMR meshes
  * and it strips the imaginary parts of complex Numbers
  */
-void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid)
+void VTKIO::system_vectors_to_vtk(const EquationSystems & es,
+                                  vtkUnstructuredGrid *& grid)
 {
   if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
     {
       std::map<std::string, std::vector<Number> > vecs;
       for (unsigned int i=0; i<es.n_systems(); ++i)
         {
-          const System& sys = es.get_system(i);
+          const System & sys = es.get_system(i);
           System::const_vectors_iterator v_end = sys.vectors_end();
           System::const_vectors_iterator it = sys.vectors_begin();
           for (; it!= v_end; ++it)
@@ -338,8 +339,8 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid
 
 // write out mesh data to the VTK file, this might come in handy to display
 // boundary conditions and material data
-// void VTKIO::meshdata_to_vtk(const MeshData& meshdata,
-//                             vtkUnstructuredGrid* grid)
+// void VTKIO::meshdata_to_vtk(const MeshData & meshdata,
+//                             vtkUnstructuredGrid * grid)
 // {
 //   vtkPointData* pointdata = vtkPointData::New();
 //
@@ -355,7 +356,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid
 
 
 // Constructor for reading
-VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
+VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _mesh_data(mesh_data),
@@ -369,7 +370,7 @@ VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
 
 
 // Constructor for writing
-VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
+VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
   MeshOutput<MeshBase>(mesh),
   _mesh_data(mesh_data),
   _compress(false),
@@ -381,7 +382,7 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
 
 
 
-vtkUnstructuredGrid* VTKIO::get_vtk_grid()
+vtkUnstructuredGrid * VTKIO::get_vtk_grid()
 {
   return _vtk_grid;
 }
@@ -395,7 +396,7 @@ void VTKIO::set_compression(bool b)
 
 
 
-void VTKIO::read (const std::string& name)
+void VTKIO::read (const std::string & name)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -426,7 +427,7 @@ void VTKIO::read (const std::string& name)
   // _vtk_grid->Update(); // FIXME: Necessary?
 
   // Get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Clear out any pre-existing data from the Mesh
   mesh.clear();
@@ -442,7 +443,7 @@ void VTKIO::read (const std::string& name)
       // and add the actual point
       double * pnt = _vtk_grid->GetPoint(static_cast<vtkIdType>(i));
       Point xyz(pnt[0], pnt[1], pnt[2]);
-      Node* newnode = mesh.add_point(xyz, i);
+      Node * newnode = mesh.add_point(xyz, i);
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
@@ -455,8 +456,8 @@ void VTKIO::read (const std::string& name)
 
   for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
-      vtkCell* cell = _vtk_grid->GetCell(i);
-      Elem* elem = NULL;
+      vtkCell * cell = _vtk_grid->GetCell(i);
+      Elem * elem = NULL;
       switch (cell->GetCellType())
         {
         case VTK_LINE:
@@ -553,13 +554,13 @@ void VTKIO::read (const std::string& name)
 
 
 
-void VTKIO::write_nodal_data (const std::string& fname,
+void VTKIO::write_nodal_data (const std::string & fname,
 #ifdef LIBMESH_HAVE_VTK
-                              const std::vector<Number>& soln,
-                              const std::vector<std::string>& names
+                              const std::vector<Number> & soln,
+                              const std::vector<std::string> & names
 #else
-                              const std::vector<Number>&,
-                              const std::vector<std::string>&
+                              const std::vector<Number> &,
+                              const std::vector<std::string> &
 #endif
                               )
 {
@@ -669,7 +670,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
 
 // Output the mesh without solutions to a .pvtu file
-void VTKIO::write (const std::string& name)
+void VTKIO::write (const std::string & name)
 {
   std::vector<Number> soln;
   std::vector<std::string> names;

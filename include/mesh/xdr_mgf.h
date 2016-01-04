@@ -127,7 +127,7 @@ public:
    * - Opens the appropriate \p xdr file handle.
    * - Reads/Writes a signature to the file.
    */
-  void init(XdrIO_TYPE t, const char* fn, const char* type, int icnt);
+  void init(XdrIO_TYPE t, const char * fn, const char * type, int icnt);
 
   /**
    * Destructor. Frees the memory
@@ -153,14 +153,14 @@ public:
    * \param numvar The total number of variables (size of the array)
    * \param size The size of each individual variable in the array
    */
-  int dataBlk(int*  array, int numvar, int size);
+  int dataBlk(int *  array, int numvar, int size);
 
   /**
    * Read/Writes a block of \p Reals
    * to/from the current \p xdr
    * file/file handle.
    */
-  int dataBlk(Real* array, int numvar, int size);
+  int dataBlk(Real * array, int numvar, int size);
 
   /**
    * Get the originator flag.
@@ -207,7 +207,7 @@ protected:
    * header file \p rpc/rpc.h
    * for more information.
    */
-  XDR*  mp_xdr_handle;
+  XDR * mp_xdr_handle;
 
 #endif
 
@@ -233,13 +233,13 @@ protected:
   std::ofstream mp_out;
 
 private:
-  std::FILE* mp_fp;
+  std::FILE * mp_fp;
 
   /**
    * This function allows us to set the number of levels in
    * the mesh when reading.
    */
-  void tokenize_first_line(const char* p)
+  void tokenize_first_line(const char * p)
   {
     std::string buf_str(p);
     std::stringstream ss(buf_str);

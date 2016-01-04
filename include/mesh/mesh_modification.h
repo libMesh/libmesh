@@ -55,7 +55,7 @@ namespace Modification
  * by default, however they may be by setting the flag
  * \p perturb_boundary true.
  */
-void distort (MeshBase& mesh,
+void distort (MeshBase & mesh,
               const Real factor, const bool perturb_boundary=false);
 
 /**
@@ -71,8 +71,8 @@ void distort (MeshBase& mesh,
  * behavior is often suboptimal for higher order geometries and may be
  * subject to change in future libMesh versions.
  */
-void redistribute (MeshBase& mesh,
-                   const FunctionBase<Real> &mapfunc);
+void redistribute (MeshBase & mesh,
+                   const FunctionBase<Real> & mapfunc);
 
 
 /**
@@ -80,7 +80,7 @@ void redistribute (MeshBase& mesh,
  * \p x direction by \p xt, in the \p y direction by \p yt,
  * etc...
  */
-void translate (MeshBase& mesh,
+void translate (MeshBase & mesh,
                 const Real xt=0., const Real yt=0., const Real zt=0.);
 
 //     /**
@@ -88,7 +88,7 @@ void translate (MeshBase& mesh,
 //      * counter-clock-wise (mathematical definition).
 //      * The angle is in degrees (360 make a full circle)
 //      */
-//     void rotate2D (MeshBase& mesh,
+//     void rotate2D (MeshBase & mesh,
 //                    const Real alpha=0.);
 
 /**
@@ -97,7 +97,7 @@ void translate (MeshBase& mesh,
  * (http://mathworld.wolfram.com/EulerAngles.html)
  * The angles are in degrees (360 make a full circle)
  */
-void rotate (MeshBase& mesh,
+void rotate (MeshBase & mesh,
              const Real phi, const Real theta=0., const Real psi=0.);
 
 /**
@@ -106,7 +106,7 @@ void rotate (MeshBase& mesh,
  * etc...  If only \p xs is specified then the scaling is
  * assumed uniform in all directions.
  */
-void scale (MeshBase& mesh,
+void scale (MeshBase & mesh,
             const Real xs, const Real ys=0., const Real zs=0.);
 
 /**
@@ -116,7 +116,7 @@ void scale (MeshBase& mesh,
  * Note: Probably won't do the right thing for meshes which
  * have been refined previously.
  */
-void all_tri (MeshBase& mesh);
+void all_tri (MeshBase & mesh);
 
 /**
  * Smooth the mesh with a simple Laplace smoothing algorithm.  The mesh is
@@ -130,7 +130,7 @@ void all_tri (MeshBase& mesh);
  * \author Martin Luthi (luthi@gi.alaska.edu)
  * \date 2005
  */
-void smooth(MeshBase&, unsigned int, Real);
+void smooth(MeshBase &, unsigned int, Real);
 
 #ifdef LIBMESH_ENABLE_AMR
 /**
@@ -142,14 +142,14 @@ void smooth(MeshBase&, unsigned int, Real);
  * you probably only want to do this on meshes which have been uniformly
  * refined.
  */
-void flatten(MeshBase& mesh);
+void flatten(MeshBase & mesh);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 /**
  * Finds any boundary ids that are currently old_id,
  * changes them to new_id
  */
-void change_boundary_id (MeshBase &mesh,
+void change_boundary_id (MeshBase & mesh,
                          const boundary_id_type old_id,
                          const boundary_id_type new_id);
 
@@ -157,7 +157,7 @@ void change_boundary_id (MeshBase &mesh,
  * Finds any subdomain ids that are currently old_id,
  * changes them to new_id
  */
-void change_subdomain_id (MeshBase &mesh,
+void change_subdomain_id (MeshBase & mesh,
                           const subdomain_id_type old_id,
                           const subdomain_id_type new_id);
 

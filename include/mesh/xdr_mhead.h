@@ -101,12 +101,12 @@ public:
    *
    * @return A writeable reference to the vector of element block types.
    */
-  void get_block_elt_types(std::vector<ElemType>& bet) const { bet = block_elt_types; }
+  void get_block_elt_types(std::vector<ElemType> & bet) const { bet = block_elt_types; }
 
   /**
    * Set the vector of element block types
    */
-  void set_block_elt_types(const std::vector<ElemType>& bet) { block_elt_types = bet; }
+  void set_block_elt_types(const std::vector<ElemType> & bet) { block_elt_types = bet; }
 
   /**
    * The size of each element block is
@@ -115,12 +115,12 @@ public:
    *
    * @return The vector of block sizes
    */
-  void get_num_elem_each_block(std::vector<unsigned int>& neeb) const { neeb = num_elem_each_block; }
+  void get_num_elem_each_block(std::vector<unsigned int> & neeb) const { neeb = num_elem_each_block; }
 
   /**
    * Set the vector of block sizes
    */
-  void set_num_elem_each_block(const std::vector<unsigned int>& neeb) { num_elem_each_block = neeb; }
+  void set_num_elem_each_block(const std::vector<unsigned int> & neeb) { num_elem_each_block = neeb; }
 
 
 private:
