@@ -33,8 +33,8 @@ namespace libMesh
 
 //------------------------------------------------------------------
 // PointLocatorBase methods
-PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
-                                    const PointLocatorBase* master) :
+PointLocatorBase::PointLocatorBase (const MeshBase & mesh,
+                                    const PointLocatorBase * master) :
   _verbose                 (false),
   _master                  (master),
   _mesh                    (mesh),
@@ -62,8 +62,8 @@ bool PointLocatorBase::initialized () const
 
 
 UniquePtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
-                                                     const MeshBase& mesh,
-                                                     const PointLocatorBase* master)
+                                                     const MeshBase & mesh,
+                                                     const PointLocatorBase * master)
 {
   switch (t)
     {

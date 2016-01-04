@@ -43,10 +43,10 @@ namespace libMesh
  * Helper functions for printing scalar and vector types.  Called from Parameters::Parameter<T>::print(...).
  */
 template<typename P>
-void print_helper(std::ostream& os, const P* param);
+void print_helper(std::ostream & os, const P * param);
 
 template<typename P>
-void print_helper(std::ostream& os, const std::vector<P>* param);
+void print_helper(std::ostream & os, const std::vector<P> * param);
 
 /**
  * This class provides the ability to map between
@@ -69,7 +69,7 @@ public:
   /**
    * Copy constructor.
    */
-  Parameters (const Parameters&);
+  Parameters (const Parameters &);
 
   /**
    * Destructor.  Clears any allocated memory.
@@ -80,14 +80,14 @@ public:
    * Assignment operator.  Removes all parameters in \p this
    * and inserts copies of all parameters from \p source
    */
-  virtual Parameters& operator= (const Parameters& source);
+  virtual Parameters & operator= (const Parameters & source);
 
   /**
    * Addition/Assignment operator.  Inserts copies of all parameters
    * from \p source.  Any parameters of the same name already in \p
    * this are replaced.
    */
-  virtual Parameters& operator+= (const Parameters& source);
+  virtual Parameters & operator+= (const Parameters & source);
 
   /**
    * @returns \p true if a parameter of type \p T
@@ -97,14 +97,14 @@ public:
    * if a parameter of specified name exists regardless of its type.
    */
   template <typename T>
-  bool have_parameter (const std::string&) const;
+  bool have_parameter (const std::string &) const;
 
   /**
    * @returns a constant reference to the specified parameter
    * value.  Requires, of course, that the parameter exists.
    */
   template <typename T>
-  const T& get (const std::string&) const;
+  const T & get (const std::string &) const;
 
   /**
    * Inserts a new Parameter into the object but does not return
@@ -112,7 +112,7 @@ public:
    * parameter may not be valid.
    */
   template <typename T>
-  void insert (const std::string&);
+  void insert (const std::string &);
 
   /**
    * @returns a writeable reference to the specified parameter.
@@ -121,18 +121,18 @@ public:
    * accessed with the \p get() member.
    */
   template <typename T>
-  T& set (const std::string&);
+  T & set (const std::string &);
 
   /**
    * Overridable function to set any extended attributes for
    * classes inheriting from this class.
    */
-  virtual void set_attributes(const std::string&, bool /*inserted_only*/) {}
+  virtual void set_attributes(const std::string &, bool /*inserted_only*/) {}
 
   /**
    * Removes the specified parameter from the list, if it exists.
    */
-  void remove (const std::string&);
+  void remove (const std::string &);
 
   /**
    * @returns the total number of parameters.
@@ -155,7 +155,7 @@ public:
   /**
    * Prints the contents, by default to libMesh::out.
    */
-  void print (std::ostream& os=libMesh::out) const;
+  void print (std::ostream & os=libMesh::out) const;
 
 private:
 
@@ -183,13 +183,13 @@ private:
      * Prints the parameter value to the specified stream.
      * Must be reimplemented in derived classes.
      */
-    virtual void print(std::ostream&) const = 0;
+    virtual void print(std::ostream &) const = 0;
 
     /**
      * Clone this value.  Useful in copy-construction.
      * Must be reimplemented in derived classes.
      */
-    virtual Value* clone () const = 0;
+    virtual Value * clone () const = 0;
   };
 
 public:
@@ -206,12 +206,12 @@ public:
     /**
      * @returns a read-only reference to the parameter value.
      */
-    const T& get () const { return _value; }
+    const T & get () const { return _value; }
 
     /**
      * @returns a writeable reference to the parameter value.
      */
-    T& set () { return _value; }
+    T & set () { return _value; }
 
 #ifdef LIBMESH_HAVE_RTTI
     /**
@@ -223,12 +223,12 @@ public:
     /**
      * Prints the parameter value to the specified stream.
      */
-    virtual void print(std::ostream&) const;
+    virtual void print(std::ostream &) const;
 
     /**
      * Clone this value.  Useful in copy-construction.
      */
-    virtual Value* clone () const;
+    virtual Value * clone () const;
 
   private:
     /**
@@ -240,12 +240,12 @@ public:
   /**
    * Parameter map iterator.
    */
-  typedef std::map<std::string, Value*>::iterator iterator;
+  typedef std::map<std::string, Value *>::iterator iterator;
 
   /**
    * Constant parameter map iterator.
    */
-  typedef std::map<std::string, Value*>::const_iterator const_iterator;
+  typedef std::map<std::string, Value *>::const_iterator const_iterator;
 
   /**
    * Iterator pointing to the beginning of the set of parameters.
@@ -272,7 +272,7 @@ protected:
   /**
    * Data structure to map names with values.
    */
-  std::map<std::string, Value*> _values;
+  std::map<std::string, Value *> _values;
 
 };
 
@@ -292,21 +292,17 @@ std::string Parameters::Parameter<T>::type () const
 
 template <typename T>
 inline
-void Parameters::Parameter<T>::print (std::ostream& os) const
+void Parameters::Parameter<T>::print (std::ostream & os) const
 {
   // Call helper function overloaded for basic scalar and vector types
-  print_helper(os, static_cast<const T*>(&_value));
+  print_helper(os, static_cast<const T *>(&_value));
 }
 
 template <typename T>
 inline
-Parameters::Value* Parameters::Parameter<T>::clone () const
+Parameters::Value * Parameters::Parameter<T>::clone () const
 {
-  // No good for Solaris C++! - BSK
-  //  Parameters::Parameter<T>
-  //    *copy = new Parameters::Parameter<T>;
-  Parameter<T>
-    *copy = new Parameter<T>;
+  Parameter<T> * copy = new Parameter<T>;
 
   libmesh_assert(copy);
 
@@ -335,7 +331,7 @@ void Parameters::clear () // since this is inline we must define it
 
 
 inline
-Parameters& Parameters::operator= (const Parameters& source)
+Parameters & Parameters::operator= (const Parameters & source)
 {
   this->clear();
   *this += source;
@@ -344,7 +340,7 @@ Parameters& Parameters::operator= (const Parameters& source)
 }
 
 inline
-Parameters& Parameters::operator+= (const Parameters& source)
+Parameters & Parameters::operator+= (const Parameters & source)
 {
   for (Parameters::const_iterator it = source._values.begin();
        it != source._values.end(); ++it)
@@ -358,7 +354,7 @@ Parameters& Parameters::operator+= (const Parameters& source)
 }
 
 inline
-Parameters::Parameters (const Parameters& p)
+Parameters::Parameters (const Parameters & p)
 {
   *this = p;
 }
@@ -374,7 +370,7 @@ Parameters::~Parameters ()
 
 
 inline
-void Parameters::print (std::ostream& os) const
+void Parameters::print (std::ostream & os) const
 {
   Parameters::const_iterator it = _values.begin();
 
@@ -399,7 +395,7 @@ void Parameters::print (std::ostream& os) const
 // By declaring this early we can use it in subsequent
 // methods.  Required for gcc-4.0.2 -- 11/30/2005, BSK
 inline
-std::ostream& operator << (std::ostream& os, const Parameters& p)
+std::ostream & operator << (std::ostream & os, const Parameters & p)
 {
   p.print(os);
   return os;
@@ -409,15 +405,15 @@ std::ostream& operator << (std::ostream& os, const Parameters& p)
 
 template <typename T>
 inline
-bool Parameters::have_parameter (const std::string& name) const
+bool Parameters::have_parameter (const std::string & name) const
 {
   Parameters::const_iterator it = _values.find(name);
 
   if (it != _values.end())
 #ifdef LIBMESH_HAVE_RTTI
-    if (dynamic_cast<const Parameter<T>*>(it->second) != NULL)
+    if (dynamic_cast<const Parameter<T> *>(it->second) != NULL)
 #else // LIBMESH_HAVE_RTTI
-      if (cast_ptr<const Parameter<T>*>(it->second) != NULL)
+      if (cast_ptr<const Parameter<T> *>(it->second) != NULL)
 #endif // LIBMESH_HAVE_RTTI
         return true;
 
@@ -428,7 +424,7 @@ bool Parameters::have_parameter (const std::string& name) const
 
 template <typename T>
 inline
-const T& Parameters::get (const std::string& name) const
+const T & Parameters::get (const std::string & name) const
 {
   if (!this->have_parameter<T>(name))
     {
@@ -451,12 +447,12 @@ const T& Parameters::get (const std::string& name) const
   libmesh_assert(it != _values.end());
   libmesh_assert(it->second);
 
-  return cast_ptr<Parameter<T>*>(it->second)->get();
+  return cast_ptr<Parameter<T> *>(it->second)->get();
 }
 
 template <typename T>
 inline
-void Parameters::insert (const std::string &name)
+void Parameters::insert (const std::string & name)
 {
   if (!this->have_parameter<T>(name))
     _values[name] = new Parameter<T>;
@@ -467,18 +463,18 @@ void Parameters::insert (const std::string &name)
 
 template <typename T>
 inline
-T& Parameters::set (const std::string& name)
+T & Parameters::set (const std::string & name)
 {
   if (!this->have_parameter<T>(name))
     _values[name] = new Parameter<T>;
 
   set_attributes(name, false);
 
-  return cast_ptr<Parameter<T>*>(_values[name])->set();
+  return cast_ptr<Parameter<T> *>(_values[name])->set();
 }
 
 inline
-void Parameters::remove (const std::string& name)
+void Parameters::remove (const std::string & name)
 {
   Parameters::iterator it = _values.find(name);
 
@@ -504,7 +500,7 @@ unsigned int Parameters::n_parameters () const
   const Parameters::const_iterator vals_end = _values.end();
 
   for (; it != vals_end; ++it)
-    if (dynamic_cast<Parameter<T>*>(it->second) != NULL)
+    if (dynamic_cast<Parameter<T> *>(it->second) != NULL)
       cnt++;
 
   return cnt;
@@ -537,14 +533,14 @@ Parameters::const_iterator Parameters::end() const
 
 //non-member scalar print function
 template<typename P>
-void print_helper(std::ostream& os, const P* param)
+void print_helper(std::ostream & os, const P * param)
 {
   os << *param;
 }
 
 //non-member vector print function
 template<typename P>
-void print_helper(std::ostream& os, const std::vector<P>* param)
+void print_helper(std::ostream & os, const std::vector<P> * param)
 {
   for (unsigned int i=0; i<param->size(); ++i)
     os << (*param)[i] << " ";

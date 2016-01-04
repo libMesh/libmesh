@@ -49,8 +49,8 @@ public:
 protected:
 
   safe_bool_base() {}
-  safe_bool_base(const safe_bool_base&) {}
-  safe_bool_base& operator=(const safe_bool_base&) {return *this;}
+  safe_bool_base(const safe_bool_base &) {}
+  safe_bool_base & operator=(const safe_bool_base &) {return *this;}
   ~safe_bool_base() {}
 };
 
@@ -64,7 +64,7 @@ class safe_bool : private safe_bool_base
 public:
   operator bool_type() const
   {
-    return (static_cast<const T*>(this))->boolean_test()
+    return (static_cast<const T *>(this))->boolean_test()
       ? &safe_bool_base::this_type_does_not_support_comparisons : 0;
   }
 protected:
@@ -75,13 +75,13 @@ protected:
 
 // Equality comparison operators between safe_bool<T> and regular bool
 template <typename T>
-bool operator==(const safe_bool<T>& lhs, bool b)
+bool operator==(const safe_bool<T> & lhs, bool b)
 {
   return b == static_cast<bool>(lhs);
 }
 
 template <typename T>
-bool operator==(bool b, const safe_bool<T>& rhs)
+bool operator==(bool b, const safe_bool<T> & rhs)
 {
   return b == static_cast<bool>(rhs);
 }
@@ -90,14 +90,16 @@ bool operator==(bool b, const safe_bool<T>& rhs)
 
 // Disallow equality comparison operators between safe_bool<T> and safe_bool<U>
 template <typename T, typename U>
-bool operator==(const safe_bool<T>& lhs, const safe_bool<U>& /*rhs*/)
+bool operator==(const safe_bool<T> & lhs,
+                const safe_bool<U> & /*rhs*/)
 {
   lhs.this_type_does_not_support_comparisons();
   return false;
 }
 
 template <typename T,typename U>
-bool operator!=(const safe_bool<T>& lhs,const safe_bool<U>& /*rhs*/)
+bool operator!=(const safe_bool<T> & lhs,
+                const safe_bool<U> & /*rhs*/)
 {
   lhs.this_type_does_not_support_comparisons();
   return false;

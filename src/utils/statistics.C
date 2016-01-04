@@ -187,7 +187,7 @@ void StatisticsVector<T>::normalize()
 
 
 template <typename T>
-void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
+void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
                                     unsigned int n_bins)
 {
   // Must have at least 1 bin
@@ -283,7 +283,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
 
 template <typename T>
 void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
-                                         const std::string& filename,
+                                         const std::string & filename,
                                          unsigned int n_bins)
 {
   // First generate the histogram with the desired number of bins
@@ -325,7 +325,7 @@ void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
 
 
 template <typename T>
-void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
+void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
                                     unsigned int n_bins) const
 {
   StatisticsVector<T> sv = (*this);

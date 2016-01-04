@@ -32,7 +32,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // TreeNode class methods
 template <unsigned int N>
-bool TreeNode<N>::insert (const Node* nd)
+bool TreeNode<N>::insert (const Node * nd)
 {
   libmesh_assert(nd);
   libmesh_assert_less (nd->id(), mesh.n_nodes());
@@ -67,7 +67,7 @@ bool TreeNode<N>::insert (const Node* nd)
 
 
 template <unsigned int N>
-bool TreeNode<N>::insert (const Elem* elem)
+bool TreeNode<N>::insert (const Elem * elem)
 {
   libmesh_assert(elem);
 
@@ -166,8 +166,8 @@ void TreeNode<N>::refine ()
   // We don't need to store nodes or elements any more, they have been
   // added to the children.  Use the "swap trick" to actually reduce
   // the capacity of these vectors.
-  std::vector<const Node*>().swap(nodes);
-  std::vector<const Elem*>().swap(elements);
+  std::vector<const Node *>().swap(nodes);
+  std::vector<const Elem *>().swap(elements);
 
   libmesh_assert_equal_to (nodes.capacity(), 0);
   libmesh_assert_equal_to (elements.capacity(), 0);
@@ -176,7 +176,7 @@ void TreeNode<N>::refine ()
 
 
 template <unsigned int N>
-void TreeNode<N>::set_bounding_box (const std::pair<Point, Point>& bbox)
+void TreeNode<N>::set_bounding_box (const std::pair<Point, Point> & bbox)
 {
   bounding_box = bbox;
 }
@@ -184,7 +184,7 @@ void TreeNode<N>::set_bounding_box (const std::pair<Point, Point>& bbox)
 
 
 template <unsigned int N>
-bool TreeNode<N>::bounds_node (const Node* nd,
+bool TreeNode<N>::bounds_node (const Node * nd,
                                Real relative_tol) const
 {
   libmesh_assert(nd);
@@ -194,11 +194,11 @@ bool TreeNode<N>::bounds_node (const Node* nd,
 
 
 template <unsigned int N>
-bool TreeNode<N>::bounds_point (const Point& p,
+bool TreeNode<N>::bounds_point (const Point & p,
                                 Real relative_tol) const
 {
-  const Point& min = bounding_box.first;
-  const Point& max = bounding_box.second;
+  const Point & min = bounding_box.first;
+  const Point & max = bounding_box.second;
 
   const Real tol = (max - min).size() * relative_tol;
 
@@ -343,7 +343,7 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
 
 
 template <unsigned int N>
-void TreeNode<N>::print_nodes(std::ostream& out_stream) const
+void TreeNode<N>::print_nodes(std::ostream & out_stream) const
 {
   if (this->active())
     {
@@ -364,13 +364,13 @@ void TreeNode<N>::print_nodes(std::ostream& out_stream) const
 
 
 template <unsigned int N>
-void TreeNode<N>::print_elements(std::ostream& out_stream) const
+void TreeNode<N>::print_elements(std::ostream & out_stream) const
 {
   if (this->active())
     {
       out_stream << "TreeNode Level: " << this->level() << std::endl;
 
-      for (std::vector<const Elem*>::const_iterator pos=elements.begin();
+      for (std::vector<const Elem *>::const_iterator pos=elements.begin();
            pos != elements.end(); ++pos)
         out_stream << " " << *pos;
 
@@ -386,7 +386,7 @@ void TreeNode<N>::print_elements(std::ostream& out_stream) const
 
 
 template <unsigned int N>
-void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem)
+void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem *> > & nodes_to_elem)
 {
   if (this->active())
     {
@@ -395,7 +395,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
       // Temporarily use a set. Since multiple nodes
       // will likely map to the same element we use a
       // set to eliminate the duplication.
-      std::set<const Elem*> elements_set;
+      std::set<const Elem *> elements_set;
 
       for (unsigned int n=0; n<nodes.size(); n++)
         {
@@ -411,7 +411,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
         }
 
       // Done with the nodes.
-      std::vector<const Node*>().swap(nodes);
+      std::vector<const Node *>().swap(nodes);
 
       // Now the set is built.  We can copy this to the
       // vector.  Note that the resulting vector will
@@ -419,7 +419,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
       // than the set.
       elements.reserve(elements_set.size());
 
-      for (std::set<const Elem*>::iterator pos=elements_set.begin();
+      for (std::set<const Elem *>::iterator pos=elements_set.begin();
            pos != elements_set.end(); ++pos)
         {
           elements.push_back(*pos);
@@ -464,11 +464,10 @@ unsigned int TreeNode<N>::n_active_bins() const
 
 
 template <unsigned int N>
-const Elem*
-TreeNode<N>::find_element
-(const Point& p,
- const std::set<subdomain_id_type> *allowed_subdomains,
- Real relative_tol) const
+const Elem *
+TreeNode<N>::find_element (const Point & p,
+                           const std::set<subdomain_id_type> * allowed_subdomains,
+                           Real relative_tol) const
 {
   if (this->active())
     {
@@ -476,7 +475,7 @@ TreeNode<N>::find_element
       // or if the node contains infinite elements
       if (this->bounds_point(p, relative_tol) || this->contains_ifems)
         // Search the active elements in the active TreeNode.
-        for (std::vector<const Elem*>::const_iterator pos=elements.begin();
+        for (std::vector<const Elem *>::const_iterator pos=elements.begin();
              pos != elements.end(); ++pos)
           if (!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id()))
             if ((*pos)->active() && (*pos)->contains_point(p, relative_tol))
@@ -497,10 +496,9 @@ TreeNode<N>::find_element
 
 
 template <unsigned int N>
-const Elem* TreeNode<N>::find_element_in_children
-(const Point& p,
- const std::set<subdomain_id_type> *allowed_subdomains,
- Real relative_tol) const
+const Elem * TreeNode<N>::find_element_in_children (const Point & p,
+                                                    const std::set<subdomain_id_type> * allowed_subdomains,
+                                                    Real relative_tol) const
 {
   libmesh_assert (!this->active());
 
@@ -511,7 +509,7 @@ const Elem* TreeNode<N>::find_element_in_children
   for (unsigned int c=0; c<children.size(); c++)
     if (children[c]->bounds_point(p, relative_tol))
       {
-        const Elem* e =
+        const Elem * e =
           children[c]->find_element(p,allowed_subdomains,
                                     relative_tol);
 
@@ -534,7 +532,7 @@ const Elem* TreeNode<N>::find_element_in_children
   for (unsigned int c=0; c<children.size(); c++)
     if (!searched_child[c])
       {
-        const Elem* e =
+        const Elem * e =
           children[c]->find_element(p,allowed_subdomains,
                                     relative_tol);
 

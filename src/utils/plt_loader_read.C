@@ -31,7 +31,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------------------
 // PltLoader reading members
-void PltLoader::read (const std::string& name)
+void PltLoader::read (const std::string & name)
 {
   std::ifstream in (name.c_str(), std::ios::in|std::ios::binary);
 
@@ -58,7 +58,7 @@ void PltLoader::read (const std::string& name)
 
 
 
-void PltLoader::read_header (std::istream& in)
+void PltLoader::read_header (std::istream & in)
 {
   libmesh_assert (in.good());
 
@@ -599,7 +599,7 @@ void PltLoader::read_header (std::istream& in)
 
 
 
-void PltLoader::read_data (std::istream& in)
+void PltLoader::read_data (std::istream & in)
 {
   libmesh_assert (in.good());
 
@@ -830,7 +830,7 @@ void PltLoader::read_data (std::istream& in)
 
 
 
-void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
+void PltLoader::read_block_data (std::istream & in, const unsigned int zone)
 {
   libmesh_assert (in.good());
 
@@ -855,7 +855,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
                          this->jmax(zone)*
                          this->kmax(zone));
 
-            in.read ((char*) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
+            in.read ((char *) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
 
             for (unsigned int i=0; i<data.size(); i++)
               rb(data[i]);
@@ -878,7 +878,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
                           this->jmax(zone)*
                           this->kmax(zone));
 
-            in.read ((char*) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
+            in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
             for (unsigned int i=0; i<data.size(); i++)
               data[i] = rb(ddata[i]);
@@ -894,7 +894,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
 
 
 
-void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
+void PltLoader::read_point_data (std::istream & in, const unsigned int zone)
 {
   libmesh_assert (in.good());
 
@@ -947,7 +947,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
 
 
 
-void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
+void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
 {
   libmesh_assert (in.good());
 
@@ -968,7 +968,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
             data.clear();
             data.resize (this->imax(zone));
 
-            in.read ((char*) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
+            in.read ((char *) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
 
             for (unsigned int i=0; i<data.size(); i++)
               rb(data[i]);
@@ -986,7 +986,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
             data.resize (this->imax(zone));
             ddata.resize (this->imax(zone));
 
-            in.read ((char*) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
+            in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
             for (unsigned int i=0; i<data.size(); i++)
               data[i] = rb(ddata[i]);
@@ -1003,7 +1003,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
   {
     // Get the connectivity repetition flag
     int rep=0;
-    in.read ((char*) &rep, LIBMESH_SIZEOF_INT);
+    in.read ((char *) &rep, LIBMESH_SIZEOF_INT);
     rb(rep);
 
     if (rep == 1 && this->n_zones() > 1)
@@ -1017,7 +1017,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 
         _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
-        in.read ((char*) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
+        in.read ((char *) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
 
         for (unsigned int i=0; i<_conn[zone].size(); i++)
           rb(_conn[zone][i]);
@@ -1027,7 +1027,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
 
 
 
-void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
+void PltLoader::read_fepoint_data (std::istream & in, const unsigned int zone)
 {
   libmesh_assert (in.good());
 
@@ -1078,7 +1078,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
     // Get the connectivity repetition flag
     int rep=0;
 
-    in.read ((char*) &rep, LIBMESH_SIZEOF_INT);
+    in.read ((char *) &rep, LIBMESH_SIZEOF_INT);
     rb(rep);
 
     if (rep == 1)
@@ -1092,7 +1092,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
 
         _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
-        in.read ((char*) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
+        in.read ((char *) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
 
         for (unsigned int i=0; i<_conn[zone].size(); i++)
           rb(_conn[zone][i]);

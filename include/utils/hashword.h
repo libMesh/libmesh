@@ -54,7 +54,7 @@ uint32_t rot(uint32_t x, uint32_t k)
 // \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
-void mix(uint32_t& a, uint32_t& b, uint32_t& c)
+void mix(uint32_t & a, uint32_t & b, uint32_t & c)
 {
   a -= c;  a ^= rot(c, 4);  c += b;
   b -= a;  b ^= rot(a, 6);  a += c;
@@ -71,7 +71,7 @@ void mix(uint32_t& a, uint32_t& b, uint32_t& c)
 // \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
-void final(uint32_t& a, uint32_t& b, uint32_t& c)
+void final(uint32_t & a, uint32_t & b, uint32_t & c)
 {
   c ^= b; c -= rot(b,14);
   a ^= c; a -= rot(c,11);
@@ -97,16 +97,16 @@ void final(uint32_t& a, uint32_t& b, uint32_t& c)
 // len - length of buffer in octets
 //
 // returns: 64 bit hash as a static hash type
-uint64_t fnv_64_buf(const void *buf, size_t len)
+uint64_t fnv_64_buf(const void * buf, size_t len)
 {
   // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
   uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
 
   // start of buffer
-  const unsigned char *bp = static_cast<const unsigned char *>(buf);
+  const unsigned char * bp = static_cast<const unsigned char *>(buf);
 
   // beyond end of buffer
-  const unsigned char *be = bp + len;
+  const unsigned char * be = bp + len;
 
   // FNV-1 hash each octet of the buffer
   while (bp < be)
@@ -138,7 +138,7 @@ namespace Utility
 // \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
-uint32_t hashword(const uint32_t *k, size_t length, uint32_t initval=0)
+uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
 {
   uint32_t a,b,c;
 
@@ -186,7 +186,7 @@ uint32_t hashword(const std::vector<uint32_t> & keys, uint32_t initval=0)
 // \copyright Public Domain
 // http://burtleburtle.net/bob/hash/index.html
 inline
-uint32_t hashword2(const uint32_t& first, const uint32_t& second, uint32_t initval=0)
+uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t initval=0)
 {
   uint32_t a,b,c;
 
@@ -221,7 +221,7 @@ uint16_t hashword2(const uint16_t first, const uint16_t second)
 
 // Call the 64-bit FNV hash function.
 inline
-uint64_t hashword(const uint64_t *k, size_t length)
+uint64_t hashword(const uint64_t * k, size_t length)
 {
   return fnv_64_buf(k, 8*length);
 }
@@ -240,7 +240,7 @@ uint64_t hashword(const std::vector<uint64_t> & keys)
 // integers that way.  The output is c, or the top or bottom 16 bits
 // of c if you only need 16 bit hash values." [JWP]
 inline
-uint16_t hashword(const uint16_t *k, size_t length)
+uint16_t hashword(const uint16_t * k, size_t length)
 {
   // Three values that will be passed to final() after they are initialized.
   uint32_t a = 0;

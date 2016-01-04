@@ -54,7 +54,7 @@ namespace {
 // Reverse a map
 template <typename MapIter, class MapType>
 inline
-void build_reverse_map (MapIter it, MapIter end, MapType& reverse)
+void build_reverse_map (MapIter it, MapIter end, MapType & reverse)
 {
   reverse.clear();
 
@@ -604,7 +604,7 @@ namespace Utility {
 
 #define INSTANTIATE_STRING_TO_ENUM(ENUM_NAME,VAR_NAME)                  \
   template <>                                                           \
-  ENUM_NAME string_to_enum<ENUM_NAME> (const std::string& s)            \
+  ENUM_NAME string_to_enum<ENUM_NAME> (const std::string & s)           \
   {                                                                     \
     init_##VAR_NAME##_to_enum();                                        \
                                                                         \

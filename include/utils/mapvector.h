@@ -40,11 +40,11 @@ class mapvector : public std::map<index_t, Val>
 public:
   typedef std::map<index_t, Val> maptype;
 
-  Val& operator[] (const index_t &k)
+  Val & operator[] (const index_t & k)
   {
     return maptype::operator[](k);
   }
-  Val operator[] (const index_t &k) const
+  Val operator[] (const index_t & k) const
   {
     typename maptype::const_iterator it = this->find(k);
     return it == this->end().it? Val() : it->second;
@@ -53,15 +53,15 @@ public:
   class veclike_iterator
   {
   public:
-    veclike_iterator(const typename maptype::iterator &i)
+    veclike_iterator(const typename maptype::iterator & i)
       : it(i) {}
 
-    veclike_iterator(const veclike_iterator &i)
+    veclike_iterator(const veclike_iterator & i)
       : it(i.it) {}
 
-    Val& operator*() const { return it->second; }
+    Val & operator*() const { return it->second; }
 
-    veclike_iterator& operator++() { ++it; return *this; }
+    veclike_iterator & operator++() { ++it; return *this; }
 
     veclike_iterator operator++(int) {
       veclike_iterator i = *this;
@@ -69,11 +69,11 @@ public:
       return i;
     }
 
-    bool operator==(const veclike_iterator &other) const {
+    bool operator==(const veclike_iterator & other) const {
       return it == other.it;
     }
 
-    bool operator!=(const veclike_iterator &other) const {
+    bool operator!=(const veclike_iterator & other) const {
       return it != other.it;
     }
 
@@ -83,18 +83,18 @@ public:
   class const_veclike_iterator
   {
   public:
-    const_veclike_iterator(const typename maptype::const_iterator &i)
+    const_veclike_iterator(const typename maptype::const_iterator & i)
       : it(i) {}
 
-    const_veclike_iterator(const const_veclike_iterator &i)
+    const_veclike_iterator(const const_veclike_iterator & i)
       : it(i.it) {}
 
-    const_veclike_iterator(const veclike_iterator &i)
+    const_veclike_iterator(const veclike_iterator & i)
       : it(i.it) {}
 
-    const Val& operator*() const { return it->second; }
+    const Val & operator*() const { return it->second; }
 
-    const_veclike_iterator& operator++() { ++it; return *this; }
+    const_veclike_iterator & operator++() { ++it; return *this; }
 
     const_veclike_iterator operator++(int) {
       veclike_iterator i = *this;
@@ -102,11 +102,11 @@ public:
       return i;
     }
 
-    bool operator==(const const_veclike_iterator &other) const {
+    bool operator==(const const_veclike_iterator & other) const {
       return it == other.it;
     }
 
-    bool operator!=(const const_veclike_iterator &other) const {
+    bool operator!=(const const_veclike_iterator & other) const {
       return it != other.it;
     }
 
@@ -117,7 +117,7 @@ public:
     maptype::erase(i);
   }
 
-  void erase(const veclike_iterator &pos) {
+  void erase(const veclike_iterator & pos) {
     maptype::erase(pos.it);
   }
 

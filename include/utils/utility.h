@@ -127,7 +127,7 @@ bool is_sorted(InputIterator first, InputIterator last)
  * element, or "last" if the element is not found.
  */
 template<class ForwardIterator, class T>
-ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T& value)
+ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T & value)
 {
   ForwardIterator it = std::lower_bound(first, last, value);
   return (it == last || value < *it) ? last : it;
@@ -137,7 +137,7 @@ ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T
  * As above, but takes a custom comparison object.
  */
 template<class ForwardIterator, class T, class Compare>
-ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T& value, Compare comp)
+ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T & value, Compare comp)
 {
   ForwardIterator it = std::lower_bound(first, last, value, comp);
   return (it == last || comp(value,*it)) ? last : it;
@@ -151,7 +151,7 @@ ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T
  */
 template <int N, typename T>
 struct do_pow {
-  static inline T apply (const T& x)
+  static inline T apply (const T & x)
   {
     libmesh_assert(N>1);
 
@@ -169,7 +169,7 @@ struct do_pow {
 // T::operator*) might do worse, so we'll specialize here.
 template <typename T>
 struct do_pow<6,T> {
-  static inline T apply (const T& x)
+  static inline T apply (const T & x)
   {
     const T x2 = x*x,
       x4 = x2*x2;
@@ -180,18 +180,18 @@ struct do_pow<6,T> {
 
 template <typename T>
 struct do_pow<1,T> {
-  static inline T apply (const T& x) { return x; }
+  static inline T apply (const T & x) { return x; }
 };
 
 template <typename T>
 struct do_pow<0,T> {
-  static inline T apply (const T&) { return 1; }
+  static inline T apply (const T &) { return 1; }
 };
 
 
 template <int N, typename T>
 inline
-T pow(const T& x)
+T pow(const T & x)
 {
   return do_pow<N,T>::apply(x);
 }
@@ -221,7 +221,7 @@ unsigned int factorial(unsigned int n)
  * A convenient method to truly empty a vector using the "swap trick"
  */
 template <typename T>
-void deallocate (std::vector<T> &vec)
+void deallocate (std::vector<T> & vec)
 {
   std::vector<T>().swap(vec);
 }
@@ -237,15 +237,15 @@ void deallocate (std::vector<T> &vec)
  * of complex data, and for  \p r_o_c = 1 the filename for the imaginary
  * part.
  */
-std::string complex_filename (const std::string& basename,
+std::string complex_filename (const std::string & basename,
                               unsigned int r_o_c=0);
 
 /**
  * Prepare complex data for writing.
  */
-void prepare_complex_data (const std::vector<Complex>& source,
-                           std::vector<Real>& real_part,
-                           std::vector<Real>& imag_part);
+void prepare_complex_data (const std::vector<Complex> & source,
+                           std::vector<Real> & real_part,
+                           std::vector<Real> & imag_part);
 
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
@@ -276,7 +276,7 @@ public:
    * byte-ordering reversal.
    */
   template <typename T>
-  T operator () (T& data) const;
+  T operator () (T & data) const;
 
 private:
 
@@ -303,12 +303,12 @@ ReverseBytes::ReverseBytes (const bool rb) :
 
 template <typename T>
 inline
-T ReverseBytes::operator() (T& data) const
+T ReverseBytes::operator() (T & data) const
 {
   // Possibly reverse the byte ordering
   if (this->reverse())
     {
-      unsigned char* b = (unsigned char*) &data;
+      unsigned char * b = (unsigned char *) &data;
 
       int i=0;
       int j=(sizeof(T) - 1);

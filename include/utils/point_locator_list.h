@@ -73,8 +73,8 @@ public:
    * locator holds a list, the others simply  use the
    * master's list.
    */
-  PointLocatorList (const MeshBase& mesh,
-                    const PointLocatorBase* master = NULL);
+  PointLocatorList (const MeshBase & mesh,
+                    const PointLocatorBase * master = NULL);
 
   /**
    * Destructor.
@@ -99,7 +99,7 @@ public:
    * \p p is located, optionally restricted to a set of allowed subdomains.
    * Overloaded from base class.
    */
-  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const libmesh_override;
+  virtual const Elem * operator() (const Point & p, const std::set<subdomain_id_type> * allowed_subdomains = NULL) const libmesh_override;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
@@ -135,7 +135,7 @@ protected:
    * pointer points to the list of the master.   Note that
    * it's not a std::list as the name might suggest, but a std::vector.
    */
-  std::vector<std::pair<Point, const Elem *> >* _list;
+  std::vector<std::pair<Point, const Elem *> > * _list;
 };
 
 } // namespace libMesh

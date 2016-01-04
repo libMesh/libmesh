@@ -35,8 +35,8 @@ typedef std::vector<Point>::const_iterator   const_list_iterator;
 
 //------------------------------------------------------------------
 // PointLocator methods
-PointLocatorList::PointLocatorList (const MeshBase& mesh,
-                                    const PointLocatorBase* master) :
+PointLocatorList::PointLocatorList (const MeshBase & mesh,
+                                    const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
   _list            (NULL)
 {
@@ -94,7 +94,7 @@ void PointLocatorList::init ()
           // First create it, then get a handy reference, and
           // then try to speed up by reserving space...
           this->_list = new std::vector<std::pair<Point, const Elem *> >;
-          std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
+          std::vector<std::pair<Point, const Elem *> > & my_list = *(this->_list);
 
           my_list.clear();
           my_list.reserve(this->_mesh.n_active_elem());
@@ -118,8 +118,8 @@ void PointLocatorList::init ()
           // the master in a state for which we are friends
           // (this should also beware of a bad master pointer?).
           // And make sure the master @e has a list!
-          const PointLocatorList* my_master =
-            cast_ptr<const PointLocatorList*>(this->_master);
+          const PointLocatorList * my_master =
+            cast_ptr<const PointLocatorList *>(this->_master);
 
           if (my_master->initialized())
             this->_list = my_master->_list;
@@ -134,7 +134,8 @@ void PointLocatorList::init ()
 
 
 
-const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem * PointLocatorList::operator() (const Point & p,
+                                           const std::set<subdomain_id_type> * allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
 
@@ -159,7 +160,7 @@ const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdoma
   // here to avoid repeated calls to std::sqrt(), which is
   // pretty expensive.
   {
-    std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
+    std::vector<std::pair<Point, const Elem *> > & my_list = *(this->_list);
 
     Real              last_distance_sq = std::numeric_limits<Real>::max();
     const Elem *      last_elem        = NULL;

@@ -59,7 +59,7 @@ public:
    * ErrorVector will assume that all 0.0 error values correspond to inactive
    * elements and all non-zero error values correspond to active elements.
    */
-  ErrorVector(dof_id_type i=0, MeshBase *mesh = NULL) : StatisticsVector<ErrorVectorReal> (i), _mesh(mesh) {}
+  ErrorVector(dof_id_type i=0, MeshBase * mesh = NULL) : StatisticsVector<ErrorVectorReal> (i), _mesh(mesh) {}
 
   /**
    * ErrorVector constructor; sets initial length to \p i and initial values to \p val.
@@ -145,8 +145,8 @@ public:
    * the file extension in \p filename, of the error values on
    * the active elements of \p mesh.
    */
-  void plot_error(const std::string &filename,
-                  const MeshBase& mesh) const;
+  void plot_error(const std::string & filename,
+                  const MeshBase & mesh) const;
 
 protected:
   /**
@@ -158,7 +158,7 @@ protected:
    * Pointer to the mesh, which may be used to decide which
    * elements are active
    */
-  MeshBase *_mesh;
+  MeshBase * _mesh;
 };
 
 } // namespace libMesh

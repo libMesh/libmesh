@@ -56,8 +56,8 @@ public:
    * master locator holds a  tree, the others simply
    * use the master's tree.
    */
-  PointLocatorTree (const MeshBase& mesh,
-                    const PointLocatorBase* master = NULL);
+  PointLocatorTree (const MeshBase & mesh,
+                    const PointLocatorBase * master = NULL);
 
 
   /**
@@ -71,9 +71,9 @@ public:
    * use the master's tree. Allows the user to specify
    * the build type.
    */
-  PointLocatorTree (const MeshBase& mesh,
+  PointLocatorTree (const MeshBase & mesh,
                     const Trees::BuildType build_type,
-                    const PointLocatorBase* master = NULL);
+                    const PointLocatorBase * master = NULL);
 
   /**
    * Destructor.
@@ -104,7 +104,8 @@ public:
    * the result and allow it to be used during the next call to
    * operator().
    */
-  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const libmesh_override;
+  virtual const Elem * operator() (const Point & p,
+                                   const std::set<subdomain_id_type> * allowed_subdomains = NULL) const libmesh_override;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear
@@ -114,10 +115,10 @@ public:
    * the linear search.
    * Return NULL if no element is found.
    */
-  const Elem* perform_linear_search(const Point& p,
-                                    const std::set<subdomain_id_type> *allowed_subdomains,
-                                    bool use_close_to_point,
-                                    Real close_to_point_tolerance=TOLERANCE) const;
+  const Elem * perform_linear_search(const Point & p,
+                                     const std::set<subdomain_id_type> * allowed_subdomains,
+                                     bool use_close_to_point,
+                                     Real close_to_point_tolerance=TOLERANCE) const;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
@@ -150,14 +151,14 @@ protected:
    * through \p init().  For servant PointLocators (not master),
    * this simply points to the tree of the master.
    */
-  TreeBase* _tree;
+  TreeBase * _tree;
 
   /**
    * Pointer to the last element that was found by the tree.
    * Chances are that this may be close to the next call to
    * \p operator()...
    */
-  mutable const Elem* _element;
+  mutable const Elem * _element;
 
   /**
    * \p true if out-of-mesh mode is enabled.  See \p

@@ -59,7 +59,7 @@ public:
    * to which we pass output.  The user is responsible for ensuring
    * that this target exists for as long as the proxy does.
    */
-  BasicOStreamProxy (streamT& target) : _target(&target) {}
+  BasicOStreamProxy (streamT & target) : _target(&target) {}
 
   /**
    * Shallow copy constructor.  Output in the new object is passed to
@@ -67,12 +67,12 @@ public:
    * responsible for ensuring that this target exists for as long as
    * the proxies do.
    */
-  BasicOStreamProxy (BasicOStreamProxy& old) : _target(old._target) {}
+  BasicOStreamProxy (BasicOStreamProxy & old) : _target(old._target) {}
 
   /**
    * Reset the internal target to a new \p target output stream.
    */
-  BasicOStreamProxy& operator= (streamT& target)
+  BasicOStreamProxy & operator= (streamT & target)
   {
     _target = &target;
     return *this;
@@ -81,7 +81,7 @@ public:
   /**
    * Reset the target to the same output stream as in \p old
    */
-  BasicOStreamProxy& operator= (const BasicOStreamProxy& old)
+  BasicOStreamProxy & operator= (const BasicOStreamProxy & old)
   {
     _target = old._target;
     return *this;
@@ -97,60 +97,60 @@ public:
   //
 
   /**
-   * Conversion to ostream&, for when we get passed to a function
+   * Conversion to ostream &, for when we get passed to a function
    * requesting one.
    */
-  operator streamT&() { return *_target; }
+  operator streamT & () { return *_target; }
 
   /**
-   * Conversion to const ostream&, for when we get passed to a
+   * Conversion to const ostream &, for when we get passed to a
    * function requesting one.
    */
-  operator const streamT&() const { return *_target; }
+  operator const streamT &() const { return *_target; }
 
   /**
    * Redirect any output to the target.
    */
   template<typename T>
-  BasicOStreamProxy& operator<< (const T& in) {
+  BasicOStreamProxy & operator<< (const T & in) {
     (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ostream manipulators to the target.
    */
-  BasicOStreamProxy& operator<< (streamT& (*in)(streamT&)) {
+  BasicOStreamProxy & operator<< (streamT & (*in)(streamT &)) {
     (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ios manipulators to the target.
    */
-  BasicOStreamProxy& operator<< (std::basic_ios<charT,traits>& (*in)(std::basic_ios<charT,traits>&)) {
+  BasicOStreamProxy & operator<< (std::basic_ios<charT,traits> & (*in)(std::basic_ios<charT,traits> &)) {
     (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ios_base manipulators to the target.
    */
-  BasicOStreamProxy& operator<< (std::ios_base& (*in)(std::ios_base&)) {
+  BasicOStreamProxy & operator<< (std::ios_base & (*in)(std::ios_base &)) {
     (*_target) << in; return *this;
   }
 
   /**
    * Get the associated stream buffer
    */
-  streambufT* rdbuf () const { return _target->rdbuf(); }
+  streambufT * rdbuf () const { return _target->rdbuf(); }
 
   /**
    * Set the associated stream buffer
    */
-  streambufT* rdbuf ( streambufT* sb ) { return _target->rdbuf(sb); }
+  streambufT * rdbuf ( streambufT * sb ) { return _target->rdbuf(sb); }
 
   /**
    * Flush the associated stream buffer
    */
-  BasicOStreamProxy& flush () { _target->flush(); return *this; }
+  BasicOStreamProxy & flush () { _target->flush(); return *this; }
 
   /**
    * Get the associated format flags
@@ -203,13 +203,13 @@ public:
    * Reset the proxy to point to a different \p target.  Note that this
    * does not delete the previous target.
    */
-  void reset (streamT& target) { _target = &target; }
+  void reset (streamT & target) { _target = &target; }
 
   /**
    * Rather than implement every ostream/ios/ios_base function, we'll
    * be lazy and make esoteric uses go through a \p get() function.
    */
-  streamT* get() {
+  streamT * get() {
     return _target;
   }
 
@@ -217,7 +217,7 @@ public:
    * Rather than implement every ostream/ios/ios_base function, we'll
    * be lazy and make esoteric uses go through a \p get() function.
    */
-  const streamT* get() const {
+  const streamT * get() const {
     return _target;
   }
 
@@ -225,7 +225,7 @@ private:
   /**
    * The pointer to the "real" ostream we send everything to.
    */
-  streamT* _target;
+  streamT * _target;
 };
 
 typedef BasicOStreamProxy<> OStreamProxy;

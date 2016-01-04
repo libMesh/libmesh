@@ -214,23 +214,23 @@ bool ErrorVector::is_active_elem (dof_id_type i) const
 }
 
 
-void ErrorVector::plot_error(const std::string& filename,
-                             const MeshBase& oldmesh) const
+void ErrorVector::plot_error(const std::string & filename,
+                             const MeshBase & oldmesh) const
 {
   UniquePtr<MeshBase> meshptr = oldmesh.clone();
-  MeshBase &mesh = *meshptr;
+  MeshBase & mesh = *meshptr;
 
   // The all_first_order routine requires that renumbering be allowed
   mesh.allow_renumbering(true);
 
   mesh.all_first_order();
   EquationSystems temp_es (mesh);
-  ExplicitSystem& error_system
+  ExplicitSystem & error_system
     = temp_es.add_system<ExplicitSystem> ("Error");
   error_system.add_variable("error", CONSTANT, MONOMIAL);
   temp_es.init();
 
-  const DofMap& error_dof_map = error_system.get_dof_map();
+  const DofMap & error_dof_map = error_system.get_dof_map();
 
   MeshBase::const_element_iterator       el     =
     mesh.active_local_elements_begin();
@@ -240,7 +240,7 @@ void ErrorVector::plot_error(const std::string& filename,
 
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       error_dof_map.dof_indices(elem, dof_indices);
 

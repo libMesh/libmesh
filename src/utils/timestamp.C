@@ -39,11 +39,11 @@ std::string get_timestamp()
 #ifdef LIBMESH_HAVE_LOCALE
   // Create time_put "facet"
   std::locale loc;
-  const std::time_put<char>& tp = std::use_facet <std::time_put<char> > (loc);
+  const std::time_put<char> & tp = std::use_facet <std::time_put<char> > (loc);
 
   // Call C-style time getting functions
-  time_t now    = time(NULL);
-  tm* tm_struct = localtime(&now);
+  time_t now = time(NULL);
+  tm * tm_struct = localtime(&now);
 
   // Date will eventually be stored in this ostringstream's string
   std::ostringstream date_stream;
@@ -74,7 +74,7 @@ std::string get_timestamp()
   char time_buffer[time_size];
 
   time_t now = time ( NULL );
-  tm* tm_struct = localtime ( &now );
+  tm * tm_struct = localtime ( &now );
 
   // No more than time_size characters will be placed into the array.  If the
   // total number of resulting characters, including the terminating
@@ -119,8 +119,8 @@ std::string get_timestamp()
 // tm_struct, /*tm*/
 // 'c'/*format*/);
 
-// We can also pass to char* to the beginning and end of the desired format:
-// const charT* pattern, const charT* pat_end.  This allows us to have the full
+// We can also pass to char * to the beginning and end of the desired format:
+// const charT * pattern, const charT * pat_end.  This allows us to have the full
 // flexibility of strftime.
 // Example: "%d %B %Y %I:%M:%S %p"
 // 04 February 2010 01:44:10 PM

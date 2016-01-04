@@ -130,7 +130,7 @@ public:
    * disable logging.  You can use this flag to turn off
    * logging without touching any other code.
    */
-  PerfLog(const std::string& label_name="",
+  PerfLog(const std::string & label_name="",
           const bool log_events=true);
 
   /**
@@ -165,50 +165,50 @@ public:
   /**
    * Push the event \p label onto the stack, pausing any active event.
    */
-  void push (const char *label,
-             const char *header="");
+  void push (const char * label,
+             const char * header="");
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
    */
-  void push (const std::string &label,
-             const std::string &header="");
+  void push (const std::string & label,
+             const std::string & header="");
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
    */
-  void pop (const char *label,
-            const char *header="");
+  void pop (const char * label,
+            const char * header="");
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
    */
-  void pop (const std::string &label,
-            const std::string &header="");
+  void pop (const std::string & label,
+            const std::string & header="");
 
   /**
    * Start monitoring the event named \p label.
    */
-  void start_event(const std::string &label,
-                   const std::string &header="");
+  void start_event(const std::string & label,
+                   const std::string & header="");
 
   /**
    * Stop monitoring the event named \p label.
    */
-  void stop_event(const std::string &label,
-                  const std::string &header="");
+  void stop_event(const std::string & label,
+                  const std::string & header="");
 
   /**
    * Suspend monitoring of the event.
    */
-  void pause_event(const std::string &label,
-                   const std::string &header="");
+  void pause_event(const std::string & label,
+                   const std::string & header="");
 
   /**
    * Restart monitoring the event.
    */
-  void restart_event(const std::string &label,
-                     const std::string &header="");
+  void restart_event(const std::string & label,
+                     const std::string & header="");
 
   /**
    * @returns a string containing:
@@ -245,7 +245,7 @@ public:
   /**
    * Return the PerfData object associated with a label and header.
    */
-  PerfData get_perf_data(const std::string &label, const std::string &header="");
+  PerfData get_perf_data(const std::string & label, const std::string & header="");
 
 private:
 
@@ -293,8 +293,8 @@ private:
    * Splits a string on whitespace into a vector of separate strings.  This is used to make the
    * LIBMESH_CONFIGURE_INFO a little more manageable.
    */
-  void split_on_whitespace(const std::string& input,
-                           std::vector<std::string>& output) const;
+  void split_on_whitespace(const std::string & input,
+                           std::vector<std::string> & output) const;
 };
 
 
@@ -371,14 +371,14 @@ double PerfData::stopit ()
 // ------------------------------------------------------------
 // PerfLog class inline member funcions
 inline
-void PerfLog::push (const std::string &label,
-                    const std::string &header)
+void PerfLog::push (const std::string & label,
+                    const std::string & header)
 {
   if (this->log_events)
     {
       // Get a reference to the event data to avoid
       // repeated map lookups
-      PerfData *perf_data = &(log[std::make_pair(header,label)]);
+      PerfData * perf_data = &(log[std::make_pair(header,label)]);
 
       if (!log_stack.empty())
         total_time +=
@@ -392,8 +392,8 @@ void PerfLog::push (const std::string &label,
 
 
 inline
-void PerfLog::push (const char *label,
-                    const char *header)
+void PerfLog::push (const char * label,
+                    const char * header)
 {
   if (this->log_events)
     this->push(std::string(label), std::string(header));
@@ -402,15 +402,15 @@ void PerfLog::push (const char *label,
 
 
 inline
-void PerfLog::pop (const std::string &libmesh_dbg_var(label),
-                   const std::string &libmesh_dbg_var(header))
+void PerfLog::pop (const std::string & libmesh_dbg_var(label),
+                   const std::string & libmesh_dbg_var(header))
 {
   if (this->log_events)
     {
       libmesh_assert (!log_stack.empty());
 
 #ifndef NDEBUG
-      PerfData *perf_data = &(log[std::make_pair(header,label)]);
+      PerfData * perf_data = &(log[std::make_pair(header,label)]);
       if (perf_data != log_stack.top())
         {
           libMesh::err << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
@@ -437,8 +437,8 @@ void PerfLog::pop (const std::string &libmesh_dbg_var(label),
 
 
 inline
-void PerfLog::pop(const char *label,
-                  const char *header)
+void PerfLog::pop(const char * label,
+                  const char * header)
 {
   if (this->log_events)
     this->pop(std::string(label), std::string(header));

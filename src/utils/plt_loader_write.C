@@ -29,18 +29,18 @@ namespace libMesh
 
 // extern "C" {
 
-//   void open_   (const int*, const char*, int*);
-//   void idata_  (const int*, int*, int*);
-//   void fdata_  (const int*, float*, int*);
-//   void ddata_  (const int*, double*, int*);
-//   void close_  (const int*);
+//   void open_   (const int *, const char *, int *);
+//   void idata_  (const int *, int *, int *);
+//   void fdata_  (const int *, float*, int *);
+//   void ddata_  (const int *, double *, int *);
+//   void close_  (const int *);
 // }
 
 
 
 //-----------------------------------------------------------------------------
 // PltLoader write members
-// void PltLoader::write_plot3d (const std::string& basename,
+// void PltLoader::write_plot3d (const std::string & basename,
 //       const bool reverse,
 //       const bool gridonly) const
 // {
@@ -287,7 +287,7 @@ namespace libMesh
 
 
 
-// void PltLoader::write_tri (const std::string& name,
+// void PltLoader::write_tri (const std::string & name,
 //    const bool reverse,
 //    const bool gridonly) const
 //   {
@@ -447,7 +447,7 @@ namespace libMesh
 
 
 
-void PltLoader::write_dat (const std::string& name,
+void PltLoader::write_dat (const std::string & name,
                            const unsigned int version_in) const
 {
   std::ofstream out_stream (name.c_str());
