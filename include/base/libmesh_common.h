@@ -88,9 +88,9 @@ namespace libMesh
 // libmesh_common.C.
 namespace MacroFunctions
 {
-void here(const char* file, int line, const char* date, const char* time);
-void stop(const char* file, int line, const char* date, const char* time);
-void report_error(const char* file, int line, const char* date, const char* time);
+void here(const char * file, int line, const char * date, const char * time);
+void stop(const char * file, int line, const char * date, const char * time);
+void report_error(const char * file, int line, const char * date, const char * time);
 }
 
 // Undefine any existing macros
@@ -351,7 +351,7 @@ extern bool warned_about_auto_ptr;
 // The libmesh_not_implemented() macro prints a message and throws a
 // NotImplemented exception
 //
-// The libmesh_file_error(const std::string& filename) macro prints a message
+// The libmesh_file_error(const std::string & filename) macro prints a message
 // and throws a FileError exception
 //
 // The libmesh_convergence_failure() macro
@@ -453,7 +453,7 @@ extern bool warned_about_auto_ptr;
 // A function template for ignoring unused variables.  This is a way
 // to shut up unused variable compiler warnings on a case by case
 // basis.
-template<class T> inline void libmesh_ignore( const T& ) { }
+template<class T> inline void libmesh_ignore( const T & ) { }
 
 
 // cast_ref and cast_ptr do a dynamic cast and assert
@@ -464,7 +464,7 @@ template<class T> inline void libmesh_ignore( const T& ) { }
 // Use these casts when you're certain that a cast will succeed in
 // correct code but you want to be able to double-check.
 template <typename Tnew, typename Told>
-inline Tnew cast_ref(Told& oldvar)
+inline Tnew cast_ref(Told & oldvar)
 {
 #if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   try
@@ -488,7 +488,7 @@ inline Tnew cast_ref(Told& oldvar)
 }
 
 template <typename Tnew, typename Told>
-inline Tnew libmesh_cast_ref(Told& oldvar)
+inline Tnew libmesh_cast_ref(Told & oldvar)
 {
   // we use the less redundantly named libMesh::cast_ref now
   libmesh_deprecated();
@@ -498,7 +498,7 @@ inline Tnew libmesh_cast_ref(Told& oldvar)
 // We use two different function names to avoid an odd overloading
 // ambiguity bug with icc 10.1.008
 template <typename Tnew, typename Told>
-inline Tnew cast_ptr (Told* oldvar)
+inline Tnew cast_ptr (Told * oldvar)
 {
 #if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI)
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
@@ -520,7 +520,7 @@ inline Tnew cast_ptr (Told* oldvar)
 
 
 template <typename Tnew, typename Told>
-inline Tnew libmesh_cast_ptr (Told* oldvar)
+inline Tnew libmesh_cast_ptr (Told * oldvar)
 {
   // we use the less redundantly named libMesh::cast_ptr now
   return cast_ptr<Tnew>(oldvar);

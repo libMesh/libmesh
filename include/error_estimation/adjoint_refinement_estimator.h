@@ -71,13 +71,13 @@ public:
    * Access to the QoISet (default: weight all QoIs equally) to use
    * when computing errors
    */
-  QoISet &qoi_set() { return _qoi_set; }
+  QoISet & qoi_set() { return _qoi_set; }
 
   /**
    * Access to the QoISet (default: weight all QoIs equally) to use
    * when computing errors
    */
-  const QoISet &qoi_set() const { return _qoi_set; }
+  const QoISet & qoi_set() const { return _qoi_set; }
 
   /**
    * This function does uniform refinements and an adjoint
@@ -95,16 +95,16 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
+  virtual void estimate_error (const System & system,
+                               ErrorVector & error_per_cell,
+                               const NumericVector<Number> * solution_vector = NULL,
                                bool estimate_parent_error = false);
 
   /**
    * This is an accessor function to access the computed global
    * QoI error estimates
    */
-  Number &get_global_QoI_error_estimate(unsigned int qoi_index)
+  Number & get_global_QoI_error_estimate(unsigned int qoi_index)
   {
     return computed_global_QoI_errors[qoi_index];
   }

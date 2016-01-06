@@ -41,8 +41,9 @@ public:
   /**
    * Special implementation for XYZ finite elements
    */
-  virtual void compute_face_map(int dim, const std::vector<Real>& qw,
-                                const Elem* side) libmesh_override;
+  virtual void compute_face_map(int dim,
+                                const std::vector<Real> & qw,
+                                const Elem * side) libmesh_override;
 
 }; // class FEXYZMap
 } // namespace libMesh

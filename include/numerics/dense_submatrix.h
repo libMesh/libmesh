@@ -49,7 +49,7 @@ public:
    * and the \f$(0,0)\f$ entry of the submatrix is located
    * at the \f$(ioff,joff)\f$ location in the parent matrix.
    */
-  DenseSubMatrix(DenseMatrix<T>& new_parent,
+  DenseSubMatrix(DenseMatrix<T> & new_parent,
                  const unsigned int ioff=0,
                  const unsigned int joff=0,
                  const unsigned int m=0,
@@ -58,7 +58,7 @@ public:
   /**
    * Copy Constructor.
    */
-  DenseSubMatrix (const DenseSubMatrix<T>& other_matrix);
+  DenseSubMatrix (const DenseSubMatrix<T> & other_matrix);
 
   /**
    * Destructor.  Empty.
@@ -69,7 +69,7 @@ public:
   /**
    * @returns a reference to the parent matrix.
    */
-  DenseMatrix<T>& parent () { return _parent_matrix; }
+  DenseMatrix<T> & parent () { return _parent_matrix; }
 
   /**
    * Set every element in the submatrix to 0.
@@ -105,12 +105,12 @@ public:
   /**
    * Performs the operation: (*this) <- M2 * (*this)
    */
-  virtual void left_multiply (const DenseMatrixBase<T>& M2) libmesh_override;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
    * Performs the operation: (*this) <- (*this) * M3
    */
-  virtual void right_multiply (const DenseMatrixBase<T>& M3) libmesh_override;
+  virtual void right_multiply (const DenseMatrixBase<T> & M3) libmesh_override;
 
   /**
    * Changes the location of the submatrix in the parent matrix.
@@ -139,7 +139,7 @@ public:
   void condense(const unsigned int i,
                 const unsigned int j,
                 const T val,
-                DenseSubVector<T>& rhs)
+                DenseSubVector<T> & rhs)
   {
     this->parent().condense(this->i_off()+i,
                             this->j_off()+j,
@@ -151,7 +151,7 @@ private:
   /**
    * The parent matrix that contains this submatrix.
    */
-  DenseMatrix<T>& _parent_matrix;
+  DenseMatrix<T> & _parent_matrix;
 
   /**
    * The row offset into the parent matrix.
@@ -169,7 +169,7 @@ private:
 // Constructor
 template<typename T>
 inline
-DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& new_parent,
+DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T> & new_parent,
                                   const unsigned int ioff,
                                   const unsigned int joff,
                                   const unsigned int new_m,
@@ -184,7 +184,7 @@ DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& new_parent,
 // Copy Constructor
 template<typename T>
 inline
-DenseSubMatrix<T>::DenseSubMatrix(const DenseSubMatrix<T>& other_matrix) :
+DenseSubMatrix<T>::DenseSubMatrix(const DenseSubMatrix<T> & other_matrix) :
   DenseMatrixBase<T>(other_matrix._m, other_matrix._n),
   _parent_matrix(other_matrix._parent_matrix)
 {

@@ -49,7 +49,7 @@ public:
    * Constructor-from-vector-of-Number*: each points to a parameter
    */
   explicit
-  ParameterVector(const std::vector<Number *> &params);
+  ParameterVector(const std::vector<Number *> & params);
 
   /**
    * Destructor - deletes ParameterAccessor objects
@@ -60,20 +60,20 @@ public:
    * Deep copy constructor: the \p target will now own new copies of
    * all the parameter values I'm pointing to
    */
-  void deep_copy(ParameterVector &target) const;
+  void deep_copy(ParameterVector & target) const;
 
   /**
    * Shallow copy constructor: the \p target will now point to all the
    * parameter values I'm pointing to
    */
-  void shallow_copy(ParameterVector &target) const;
+  void shallow_copy(ParameterVector & target) const;
 
   /**
    * Value copy method: the \p target, which should already have as
    * many parameters as I do, will now have those parameters set to my
    * values.
    */
-  void value_copy(ParameterVector &target) const;
+  void value_copy(ParameterVector & target) const;
 
   /**
    * Resets to "no parameters"
@@ -110,7 +110,7 @@ public:
   /**
    * Returns a smart-pointer to a parameter value
    */
-  const ParameterAccessor<Number>& operator[](unsigned int i) const;
+  const ParameterAccessor<Number> & operator[](unsigned int i) const;
 
   /**
    * Returns a reference to a smart-pointer to a parameter value,
@@ -118,18 +118,18 @@ public:
    * This method is deprecated and may not work with more
    * sophisticated ParameterAccessor subclasses.
    */
-  ParameterAccessor<Number>& operator[](unsigned int i);
+  ParameterAccessor<Number> & operator[](unsigned int i);
 
   /**
    * Multiplication operator; acts individually on each parameter.
    */
-  ParameterVector& operator *= (const Number a);
+  ParameterVector & operator *= (const Number a);
 
   /**
    * Addition operator.  The parameter vector to be added in must
    * have the same number of values.
    */
-  ParameterVector& operator += (const ParameterVector& a);
+  ParameterVector & operator += (const ParameterVector & a);
 
 private:
   /**
@@ -185,7 +185,7 @@ void ParameterVector::push_back(UniquePtr<ParameterAccessor<Number> > new_access
 
 
 inline
-const ParameterAccessor<Number>& ParameterVector::operator[] (unsigned int i) const
+const ParameterAccessor<Number> & ParameterVector::operator[] (unsigned int i) const
 {
   libmesh_assert_greater (_params.size(), i);
 
@@ -195,7 +195,7 @@ const ParameterAccessor<Number>& ParameterVector::operator[] (unsigned int i) co
 
 
 inline
-ParameterAccessor<Number>& ParameterVector::operator[] (unsigned int i)
+ParameterAccessor<Number> & ParameterVector::operator[] (unsigned int i)
 {
   libmesh_assert_greater (_params.size(), i);
 

@@ -77,7 +77,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid14 (Elem* p=NULL) :
+  Pyramid14 (Elem * p=NULL) :
     Pyramid(Pyramid14::n_nodes(), p, _nodelinks_data)
   {}
 
@@ -168,7 +168,7 @@ public:
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
    * @returns 2 for all edge nodes and 4 for face nodes
@@ -199,7 +199,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[14];
+  Node * _nodelinks_data[14];
 
 
 

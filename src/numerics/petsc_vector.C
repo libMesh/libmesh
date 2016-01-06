@@ -109,8 +109,8 @@ Real PetscVector<T>::linfty_norm () const
 
 
 template <typename T>
-NumericVector<T>&
-PetscVector<T>::operator += (const NumericVector<T>& v)
+NumericVector<T> &
+PetscVector<T>::operator += (const NumericVector<T> & v)
 {
   this->_restore_array();
   libmesh_assert(this->closed());
@@ -123,8 +123,8 @@ PetscVector<T>::operator += (const NumericVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-PetscVector<T>::operator -= (const NumericVector<T>& v)
+NumericVector<T> &
+PetscVector<T>::operator -= (const NumericVector<T> & v)
 {
   this->_restore_array();
   libmesh_assert(this->closed());
@@ -197,8 +197,8 @@ void PetscVector<T>::add (const numeric_index_type i, const T value)
 
 
 template <typename T>
-void PetscVector<T>::add_vector (const T* v,
-                                 const std::vector<numeric_index_type>& dof_indices)
+void PetscVector<T>::add_vector (const T * v,
+                                 const std::vector<numeric_index_type> & dof_indices)
 {
   // If we aren't adding anything just return
   if(dof_indices.empty())
@@ -207,8 +207,8 @@ void PetscVector<T>::add_vector (const T* v,
   this->_restore_array();
 
   PetscErrorCode ierr=0;
-  const PetscInt * i_val = reinterpret_cast<const PetscInt*>(&dof_indices[0]);
-  const PetscScalar * petsc_value = static_cast<const PetscScalar*>(v);
+  const PetscInt * i_val = reinterpret_cast<const PetscInt *>(&dof_indices[0]);
+  const PetscScalar * petsc_value = static_cast<const PetscScalar *>(v);
 
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        i_val, petsc_value, ADD_VALUES);
@@ -220,13 +220,13 @@ void PetscVector<T>::add_vector (const T* v,
 
 
 template <typename T>
-void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
-                                 const SparseMatrix<T>& A_in)
+void PetscVector<T>::add_vector (const NumericVector<T> & V_in,
+                                 const SparseMatrix<T> & A_in)
 {
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
-  const PetscVector<T>* V = cast_ptr<const PetscVector<T>*>(&V_in);
-  const PetscMatrix<T>* A = cast_ptr<const PetscMatrix<T>*>(&A_in);
+  const PetscVector<T> * V = cast_ptr<const PetscVector<T> *>(&V_in);
+  const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
 
   PetscErrorCode ierr=0;
 
@@ -234,20 +234,20 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // is not const-correct.
-  ierr = MatMultAdd(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
+  ierr = MatMultAdd(const_cast<PetscMatrix<T> *>(A)->mat(), V->_vec, _vec, _vec);
   LIBMESH_CHKERR(ierr);
 }
 
 
 
 template <typename T>
-void PetscVector<T>::add_vector_transpose (const NumericVector<T>& V_in,
-                                           const SparseMatrix<T>& A_in)
+void PetscVector<T>::add_vector_transpose (const NumericVector<T> & V_in,
+                                           const SparseMatrix<T> & A_in)
 {
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
-  const PetscVector<T>* V = cast_ptr<const PetscVector<T>*>(&V_in);
-  const PetscMatrix<T>* A = cast_ptr<const PetscMatrix<T>*>(&A_in);
+  const PetscVector<T> * V = cast_ptr<const PetscVector<T> *>(&V_in);
+  const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
 
   PetscErrorCode ierr=0;
 
@@ -255,15 +255,15 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T>& V_in,
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // is not const-correct.
-  ierr = MatMultTransposeAdd(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
+  ierr = MatMultTransposeAdd(const_cast<PetscMatrix<T> *>(A)->mat(), V->_vec, _vec, _vec);
   LIBMESH_CHKERR(ierr);
 }
 
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
 template <typename T>
-void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>&,
-                                                     const SparseMatrix<T>&)
+void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> &,
+                                                     const SparseMatrix<T> &)
 {
   libmesh_error_msg("MatMultHermitianTranspose was introduced in PETSc 3.1.0," \
                     << "No one has made it backwards compatible with older " \
@@ -273,13 +273,13 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>&,
 #else
 
 template <typename T>
-void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>& V_in,
-                                                     const SparseMatrix<T>& A_in)
+void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & V_in,
+                                                     const SparseMatrix<T> & A_in)
 {
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
-  const PetscVector<T>* V = cast_ptr<const PetscVector<T>*>(&V_in);
-  const PetscMatrix<T>* A = cast_ptr<const PetscMatrix<T>*>(&A_in);
+  const PetscVector<T> * V = cast_ptr<const PetscVector<T> *>(&V_in);
+  const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
 
   A->close();
 
@@ -289,7 +289,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>& V_i
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // is not const-correct.
-  PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec);
+  PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T> *>(A)->mat(), V->_vec, _vec);
   LIBMESH_CHKERR(ierr);
 
   // Add the temporary copy to the matvec result
@@ -304,7 +304,7 @@ void PetscVector<T>::add (const T v_in)
   this->_restore_array();
 
   PetscErrorCode ierr=0;
-  PetscScalar* values;
+  PetscScalar * values;
   const PetscScalar v = static_cast<PetscScalar>(v_in);
 
   if(this->type() != GHOSTED)
@@ -364,7 +364,7 @@ void PetscVector<T>::add (const T v_in)
 
 
 template <typename T>
-void PetscVector<T>::add (const NumericVector<T>& v)
+void PetscVector<T>::add (const NumericVector<T> & v)
 {
   this->add (1., v);
 }
@@ -372,7 +372,7 @@ void PetscVector<T>::add (const NumericVector<T>& v)
 
 
 template <typename T>
-void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
+void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 {
   this->_restore_array();
 
@@ -380,7 +380,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   PetscScalar a = static_cast<PetscScalar>(a_in);
 
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&v_in);
+  const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
   v->_restore_array();
 
   libmesh_assert_equal_to (this->size(), v->size());
@@ -426,8 +426,8 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 
 
 template <typename T>
-void PetscVector<T>::insert (const T* v,
-                             const std::vector<numeric_index_type>& dof_indices)
+void PetscVector<T>::insert (const T * v,
+                             const std::vector<numeric_index_type> & dof_indices)
 {
   if (dof_indices.empty())
     return;
@@ -435,7 +435,7 @@ void PetscVector<T>::insert (const T* v,
   this->_restore_array();
 
   PetscErrorCode ierr=0;
-  PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
+  PetscInt * idx_values = numeric_petsc_cast(&dof_indices[0]);
   ierr = VecSetValues (_vec, dof_indices.size(), idx_values, v, INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
 
@@ -490,7 +490,7 @@ NumericVector<T> & PetscVector<T>::operator /= (NumericVector<T> & v)
 {
   PetscErrorCode ierr = 0;
 
-  const PetscVector<T>* v_vec = cast_ptr<const PetscVector<T>*>(&v);
+  const PetscVector<T> * v_vec = cast_ptr<const PetscVector<T> *>(&v);
 
   ierr = VecPointwiseDivide(_vec, _vec, v_vec->_vec);
   LIBMESH_CHKERR(ierr);
@@ -525,7 +525,7 @@ void PetscVector<T>::abs()
 }
 
 template <typename T>
-T PetscVector<T>::dot (const NumericVector<T>& V) const
+T PetscVector<T>::dot (const NumericVector<T> & V) const
 {
   this->_restore_array();
 
@@ -536,7 +536,7 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
   PetscScalar value=0.;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&V);
+  const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&V);
 
   // 2.3.x (at least) style.  Untested for previous versions.
   ierr = VecDot(this->_vec, v->_vec, &value);
@@ -546,7 +546,7 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
 }
 
 template <typename T>
-T PetscVector<T>::indefinite_dot (const NumericVector<T>& V) const
+T PetscVector<T>::indefinite_dot (const NumericVector<T> & V) const
 {
   this->_restore_array();
 
@@ -557,7 +557,7 @@ T PetscVector<T>::indefinite_dot (const NumericVector<T>& V) const
   PetscScalar value=0.;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&V);
+  const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&V);
 
   // 2.3.x (at least) style.  Untested for previous versions.
   ierr = VecTDot(this->_vec, v->_vec, &value);
@@ -568,7 +568,7 @@ T PetscVector<T>::indefinite_dot (const NumericVector<T>& V) const
 
 
 template <typename T>
-NumericVector<T>&
+NumericVector<T> &
 PetscVector<T>::operator = (const T s_in)
 {
   this->_restore_array();
@@ -618,11 +618,11 @@ PetscVector<T>::operator = (const T s_in)
 
 
 template <typename T>
-NumericVector<T>&
-PetscVector<T>::operator = (const NumericVector<T>& v_in)
+NumericVector<T> &
+PetscVector<T>::operator = (const NumericVector<T> & v_in)
 {
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&v_in);
+  const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
 
   *this = *v;
 
@@ -632,8 +632,8 @@ PetscVector<T>::operator = (const NumericVector<T>& v_in)
 
 
 template <typename T>
-PetscVector<T>&
-PetscVector<T>::operator = (const PetscVector<T>& v)
+PetscVector<T> &
+PetscVector<T>::operator = (const PetscVector<T> & v)
 {
   this->_restore_array();
   v._restore_array();
@@ -696,15 +696,15 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-PetscVector<T>::operator = (const std::vector<T>& v)
+NumericVector<T> &
+PetscVector<T>::operator = (const std::vector<T> & v)
 {
   this->_restore_array();
 
   const numeric_index_type nl   = this->local_size();
   const numeric_index_type ioff = this->first_local_index();
   PetscErrorCode ierr=0;
-  PetscScalar* values;
+  PetscScalar * values;
 
   /**
    * Case 1:  The vector is the same size of
@@ -750,12 +750,12 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 
 
 template <typename T>
-void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
+void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
 {
   this->_restore_array();
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* v_local = cast_ptr<PetscVector<T>*>(&v_local_in);
+  PetscVector<T> * v_local = cast_ptr<PetscVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_equal_to (v_local->size(), this->size());
@@ -814,8 +814,8 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 
 
 template <typename T>
-void PetscVector<T>::localize (NumericVector<T>& v_local_in,
-                               const std::vector<numeric_index_type>& send_list) const
+void PetscVector<T>::localize (NumericVector<T> & v_local_in,
+                               const std::vector<numeric_index_type> & send_list) const
 {
   // FIXME: Workaround for a strange bug at large-scale.
   // If we have ghosting, PETSc lets us just copy the solution, and
@@ -832,7 +832,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   this->_restore_array();
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* v_local = cast_ptr<PetscVector<T>*>(&v_local_in);
+  PetscVector<T> * v_local = cast_ptr<PetscVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_equal_to (v_local->size(), this->size());
@@ -908,7 +908,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 template <typename T>
 void PetscVector<T>::localize (const numeric_index_type first_local_idx,
                                const numeric_index_type last_local_idx,
-                               const std::vector<numeric_index_type>& send_list)
+                               const std::vector<numeric_index_type> & send_list)
 {
   this->_restore_array();
 
@@ -994,7 +994,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 
 
 template <typename T>
-void PetscVector<T>::localize (std::vector<T>& v_local) const
+void PetscVector<T>::localize (std::vector<T> & v_local) const
 {
   this->_restore_array();
 
@@ -1004,7 +1004,7 @@ void PetscVector<T>::localize (std::vector<T>& v_local) const
   PetscErrorCode ierr=0;
   const PetscInt n = this->size();
   const PetscInt nl = this->local_size();
-  PetscScalar *values;
+  PetscScalar * values;
 
   v_local.clear();
   v_local.resize(n, 0.);
@@ -1029,7 +1029,7 @@ void PetscVector<T>::localize (std::vector<T>& v_local) const
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
 template <>
-void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
+void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
                                          const processor_id_type pid) const
 {
   this->_restore_array();
@@ -1037,7 +1037,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   PetscErrorCode ierr=0;
   const PetscInt n  = size();
   const PetscInt nl = local_size();
-  PetscScalar *values;
+  PetscScalar * values;
 
 
   // only one processor
@@ -1123,7 +1123,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 template <>
-void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
+void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
                                             const processor_id_type pid) const
 {
   this->_restore_array();
@@ -1131,7 +1131,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
   PetscErrorCode ierr=0;
   const PetscInt n  = size();
   const PetscInt nl = local_size();
-  PetscScalar *values;
+  PetscScalar * values;
 
 
   v_local.resize(n);
@@ -1207,16 +1207,16 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 
 
 template <typename T>
-void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
-                                     const NumericVector<T>& vec2)
+void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
+                                     const NumericVector<T> & vec2)
 {
   this->_restore_array();
 
   PetscErrorCode ierr = 0;
 
   // Convert arguments to PetscVector*.
-  const PetscVector<T>* vec1_petsc = cast_ptr<const PetscVector<T>*>(&vec1);
-  const PetscVector<T>* vec2_petsc = cast_ptr<const PetscVector<T>*>(&vec2);
+  const PetscVector<T> * vec1_petsc = cast_ptr<const PetscVector<T> *>(&vec1);
+  const PetscVector<T> * vec2_petsc = cast_ptr<const PetscVector<T> *>(&vec2);
 
   // Call PETSc function.
 
@@ -1232,8 +1232,8 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
   if(this->type() != GHOSTED)
     {
       ierr = VecPointwiseMult(this->vec(),
-                              const_cast<PetscVector<T>*>(vec1_petsc)->vec(),
-                              const_cast<PetscVector<T>*>(vec2_petsc)->vec());
+                              const_cast<PetscVector<T> *>(vec1_petsc)->vec(),
+                              const_cast<PetscVector<T> *>(vec2_petsc)->vec());
       LIBMESH_CHKERR(ierr);
     }
   else
@@ -1243,17 +1243,17 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
       Vec v2_loc_vec;
       ierr = VecGhostGetLocalForm (_vec,&loc_vec);
       LIBMESH_CHKERR(ierr);
-      ierr = VecGhostGetLocalForm (const_cast<PetscVector<T>*>(vec1_petsc)->vec(),&v1_loc_vec);
+      ierr = VecGhostGetLocalForm (const_cast<PetscVector<T> *>(vec1_petsc)->vec(),&v1_loc_vec);
       LIBMESH_CHKERR(ierr);
-      ierr = VecGhostGetLocalForm (const_cast<PetscVector<T>*>(vec2_petsc)->vec(),&v2_loc_vec);
+      ierr = VecGhostGetLocalForm (const_cast<PetscVector<T> *>(vec2_petsc)->vec(),&v2_loc_vec);
       LIBMESH_CHKERR(ierr);
 
       ierr = VecPointwiseMult(loc_vec,v1_loc_vec,v2_loc_vec);
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecGhostRestoreLocalForm (const_cast<PetscVector<T>*>(vec1_petsc)->vec(),&v1_loc_vec);
+      ierr = VecGhostRestoreLocalForm (const_cast<PetscVector<T> *>(vec1_petsc)->vec(),&v1_loc_vec);
       LIBMESH_CHKERR(ierr);
-      ierr = VecGhostRestoreLocalForm (const_cast<PetscVector<T>*>(vec2_petsc)->vec(),&v2_loc_vec);
+      ierr = VecGhostRestoreLocalForm (const_cast<PetscVector<T> *>(vec2_petsc)->vec(),&v2_loc_vec);
       LIBMESH_CHKERR(ierr);
       ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
       LIBMESH_CHKERR(ierr);
@@ -1266,7 +1266,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 
 
 template <typename T>
-void PetscVector<T>::print_matlab (const std::string& name) const
+void PetscVector<T>::print_matlab (const std::string & name) const
 {
   this->_restore_array();
   libmesh_assert (this->closed());
@@ -1324,8 +1324,8 @@ void PetscVector<T>::print_matlab (const std::string& name) const
 
 
 template <typename T>
-void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
-                                      const std::vector<numeric_index_type>& rows) const
+void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
+                                      const std::vector<numeric_index_type> & rows) const
 {
   this->_restore_array();
 
@@ -1335,7 +1335,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   PetscErrorCode ierr = 0;
 
   // Make sure the passed in subvector is really a PetscVector
-  PetscVector<T>* petsc_subvector = cast_ptr<PetscVector<T>*>(&subvector);
+  PetscVector<T> * petsc_subvector = cast_ptr<PetscVector<T> *>(&subvector);
 
   // If the petsc_subvector is already initialized, we assume that the
   // user has already allocated the *correct* amount of space for it.
@@ -1441,7 +1441,7 @@ void PetscVector<T>::_get_array() const
           // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
           // have an older PETSc than that, we'll do an ugly
           // const_cast and call VecGetArray() instead.
-          ierr = VecGetArray(_vec, const_cast<PetscScalar**>(&_values));
+          ierr = VecGetArray(_vec, const_cast<PetscScalar **>(&_values));
 #else
           ierr = VecGetArrayRead(_vec, &_values);
 #endif
@@ -1456,7 +1456,7 @@ void PetscVector<T>::_get_array() const
           // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
           // have an older PETSc than that, we'll do an ugly
           // const_cast and call VecGetArray() instead.
-          ierr = VecGetArray(_local_form, const_cast<PetscScalar**>(&_values));
+          ierr = VecGetArray(_local_form, const_cast<PetscScalar **>(&_values));
 #else
           ierr = VecGetArrayRead(_local_form, &_values);
 #endif
@@ -1496,7 +1496,7 @@ void PetscVector<T>::_restore_array() const
           // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
           // have an older PETSc than that, we'll do an ugly
           // const_cast and call VecRestoreArray() instead.
-          ierr = VecRestoreArray (_vec, const_cast<PetscScalar**>(&_values));
+          ierr = VecRestoreArray (_vec, const_cast<PetscScalar **>(&_values));
 #else
           ierr = VecRestoreArrayRead (_vec, &_values);
 #endif
@@ -1510,7 +1510,7 @@ void PetscVector<T>::_restore_array() const
           // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
           // have an older PETSc than that, we'll do an ugly
           // const_cast and call VecRestoreArray() instead.
-          ierr = VecRestoreArray (_local_form, const_cast<PetscScalar**>(&_values));
+          ierr = VecRestoreArray (_local_form, const_cast<PetscScalar **>(&_values));
 #else
           ierr = VecRestoreArrayRead (_local_form, &_values);
 #endif

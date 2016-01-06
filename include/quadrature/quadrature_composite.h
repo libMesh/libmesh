@@ -82,8 +82,8 @@ public:
    * cut the element into subelements, for example, and constuct a
    * composite quadrature rule for the cut element.
    */
-  virtual void init (const Elem &elem,
-                     const std::vector<Real> &vertex_distance_func,
+  virtual void init (const Elem & elem,
+                     const std::vector<Real> & vertex_distance_func,
                      unsigned int p_level=0);
 
 private:
@@ -91,7 +91,7 @@ private:
   /**
    *
    */
-  void add_subelem_values (const std::vector<Elem const*> &subelem);
+  void add_subelem_values (const std::vector<Elem const *> & subelem);
 
   /**
    * Subcell quadrature object.

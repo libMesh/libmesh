@@ -34,8 +34,8 @@ namespace libMesh
 
 namespace Parallel {
 template <typename KeyType, typename IdxType>
-Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator &comm_in,
-                                       const std::vector<KeyType>& d) :
+Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator & comm_in,
+                                       const std::vector<KeyType> & d) :
   ParallelObject(comm_in),
   data(d)
 {

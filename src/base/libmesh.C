@@ -84,8 +84,8 @@ libMesh::UniquePtr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
 // replacing them in the destructor before program termination.
-std::streambuf* out_buf (NULL);
-std::streambuf* err_buf (NULL);
+std::streambuf * out_buf (NULL);
+std::streambuf * err_buf (NULL);
 
 libMesh::UniquePtr<libMesh::Threads::task_scheduler_init> task_scheduler;
 #if defined(LIBMESH_HAVE_MPI)
@@ -103,7 +103,7 @@ bool libmesh_initialized_slepc = false;
 /**
  * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
  */
-void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
+void libmesh_handleFPE(int /*signo*/, siginfo_t * info, void * /*context*/)
 {
   libMesh::err << std::endl;
   libMesh::err << "Floating point exception signaled (";
@@ -128,7 +128,7 @@ void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
 }
 
 
-void libmesh_handleSEGV(int /*signo*/, siginfo_t *info, void * /*context*/)
+void libmesh_handleSEGV(int /*signo*/, siginfo_t * info, void * /*context*/)
 {
   libMesh::err << std::endl;
   libMesh::err << "Segmentation fault exception signaled (";
@@ -197,10 +197,10 @@ int                GLOBAL_COMM_WORLD = 0;
 
 #ifdef LIBMESH_DISABLE_COMMWORLD
 Parallel::FakeCommunicator CommWorld;
-Parallel::FakeCommunicator& Parallel::Communicator_World = CommWorld;
+Parallel::FakeCommunicator & Parallel::Communicator_World = CommWorld;
 #else
 Parallel::Communicator CommWorld;
-Parallel::Communicator& Parallel::Communicator_World = CommWorld;
+Parallel::Communicator & Parallel::Communicator_World = CommWorld;
 #endif
 
 
@@ -333,9 +333,9 @@ void libmesh_terminate_handler()
 
 
 #ifndef LIBMESH_HAVE_MPI
-LibMeshInit::LibMeshInit (int argc, const char* const* argv)
+LibMeshInit::LibMeshInit (int argc, const char * const * argv)
 #else
-LibMeshInit::LibMeshInit (int argc, const char* const* argv,
+LibMeshInit::LibMeshInit (int argc, const char * const * argv,
                           MPI_Comm COMM_WORLD_IN)
 #endif
 {
@@ -396,7 +396,7 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
             MPI_THREAD_FUNNELED :
             MPI_THREAD_SINGLE;
 
-          MPI_Init_thread (&argc, const_cast<char***>(&argv),
+          MPI_Init_thread (&argc, const_cast<char ***>(&argv),
                            mpi_thread_requested, &mpi_thread_provided);
 
           if ((libMesh::n_threads() > 1) &&
@@ -428,7 +428,7 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
                               std::endl);
             }
 
-          MPI_Init (&argc, const_cast<char***>(&argv));
+          MPI_Init (&argc, const_cast<char ***>(&argv));
 #endif
           libmesh_initialized_mpi = true;
         }
@@ -515,14 +515,14 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       if (!SlepcInitializeCalled)
 #  endif
         {
-          ierr = SlepcInitialize  (&argc, const_cast<char***>(&argv), NULL, NULL);
+          ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), NULL, NULL);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
         {
-          ierr = PetscInitialize (&argc, const_cast<char***>(&argv), NULL, NULL);
+          ierr = PetscInitialize (&argc, const_cast<char ***>(&argv), NULL, NULL);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
         }
 # endif
@@ -561,9 +561,9 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       // Redirect.  We'll share streambufs with cout/cerr for now, but
       // presumably anyone using this option will want to replace the
       // bufs later.
-      std::ostream* newout = new std::ostream(std::cout.rdbuf());
+      std::ostream * newout = new std::ostream(std::cout.rdbuf());
       libMesh::out = *newout;
-      std::ostream* newerr = new std::ostream(std::cerr.rdbuf());
+      std::ostream * newerr = new std::ostream(std::cerr.rdbuf());
       libMesh::err = *newerr;
     }
 
@@ -813,7 +813,7 @@ void enableSEGV(bool on)
 
 
 
-bool on_command_line (const std::string& arg)
+bool on_command_line (const std::string & arg)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
@@ -824,7 +824,7 @@ bool on_command_line (const std::string& arg)
 
 
 template <typename T>
-T command_line_value (const std::string &name, T value)
+T command_line_value (const std::string & name, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
@@ -837,7 +837,7 @@ T command_line_value (const std::string &name, T value)
 }
 
 template <typename T>
-T command_line_value (const std::vector<std::string> &name, T value)
+T command_line_value (const std::vector<std::string> & name, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
@@ -856,7 +856,7 @@ T command_line_value (const std::vector<std::string> &name, T value)
 
 
 template <typename T>
-T command_line_next (const std::string &name, T value)
+T command_line_next (const std::string & name, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
@@ -870,7 +870,7 @@ T command_line_next (const std::string &name, T value)
 
 
 template <typename T>
-void command_line_vector (const std::string &name, std::vector<T>& vec)
+void command_line_vector (const std::string & name, std::vector<T> & vec)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
@@ -951,21 +951,21 @@ SolverPackage default_solver_package ()
 
 
 //-------------------------------------------------------------------------------
-template int          command_line_value<int>         (const std::string&, int);
-template float        command_line_value<float>       (const std::string&, float);
-template double       command_line_value<double>      (const std::string&, double);
-template long double  command_line_value<long double> (const std::string&, long double);
-template std::string  command_line_value<std::string> (const std::string&, std::string);
+template int          command_line_value<int>         (const std::string &, int);
+template float        command_line_value<float>       (const std::string &, float);
+template double       command_line_value<double>      (const std::string &, double);
+template long double  command_line_value<long double> (const std::string &, long double);
+template std::string  command_line_value<std::string> (const std::string &, std::string);
 
-template int          command_line_next<int>         (const std::string&, int);
-template float        command_line_next<float>       (const std::string&, float);
-template double       command_line_next<double>      (const std::string&, double);
-template long double  command_line_next<long double> (const std::string&, long double);
-template std::string  command_line_next<std::string> (const std::string&, std::string);
+template int          command_line_next<int>         (const std::string &, int);
+template float        command_line_next<float>       (const std::string &, float);
+template double       command_line_next<double>      (const std::string &, double);
+template long double  command_line_next<long double> (const std::string &, long double);
+template std::string  command_line_next<std::string> (const std::string &, std::string);
 
-template void         command_line_vector<int>         (const std::string&, std::vector<int>&);
-template void         command_line_vector<float>       (const std::string&, std::vector<float>&);
-template void         command_line_vector<double>      (const std::string&, std::vector<double>&);
-template void         command_line_vector<long double> (const std::string&, std::vector<long double>&);
+template void         command_line_vector<int>         (const std::string &, std::vector<int> &);
+template void         command_line_vector<float>       (const std::string &, std::vector<float> &);
+template void         command_line_vector<double>      (const std::string &, std::vector<double> &);
+template void         command_line_vector<long double> (const std::string &, std::vector<long double> &);
 
 } // namespace libMesh

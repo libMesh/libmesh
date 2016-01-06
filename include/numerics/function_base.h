@@ -45,7 +45,7 @@ class Point;
  * required input of each derived class thwarts the effective
  * use of the commonly used \p build() member.  But afterwards
  * the virtual members allow the convenient and libMesh-common
- * usage through a \p FunctionBase*. Note that for functor objects
+ * usage through a \p FunctionBase *. Note that for functor objects
  * for vector-valued variables, it is assumed each component is indexed
  * contiguously; i.e. if u_var is index 3, then libMesh expects
  * the x-component of u_var is index 3, the y-component is index 4,
@@ -65,7 +65,7 @@ protected:
    * Constructor.  Optionally takes a master.
    */
   explicit
-  FunctionBase (const FunctionBase* master = NULL);
+  FunctionBase (const FunctionBase * master = NULL);
 
 public:
 
@@ -100,7 +100,7 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual Output operator() (const Point& p,
+  virtual Output operator() (const Point & p,
                              const Real time = 0.) = 0;
 
   /**
@@ -108,8 +108,8 @@ public:
    * Returns in \p output the values of the data at the
    * coordinate \p p.
    */
-  void operator() (const Point& p,
-                   DenseVector<Output>& output);
+  void operator() (const Point & p,
+                   DenseVector<Output> & output);
 
   /**
    * Return function for vectors.
@@ -122,9 +122,9 @@ public:
    * in the set. This is useful in cases where there are multiple
    * dimensioned elements, for example.
    */
-  virtual void operator() (const Point& p,
+  virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output>& output) = 0;
+                           DenseVector<Output> & output) = 0;
 
   /**
    * @returns the vector component \p i at coordinate
@@ -137,7 +137,7 @@ public:
    * unnecessarily inefficient.
    */
   virtual Output component(unsigned int i,
-                           const Point& p,
+                           const Point & p,
                            Real time=0.);
 
 
@@ -156,7 +156,7 @@ protected:
    * but to save memory, one master handles some centralized
    * data.
    */
-  const FunctionBase* _master;
+  const FunctionBase * _master;
 
   /**
    * When \p init() was called so that everything is ready
@@ -172,7 +172,7 @@ protected:
 
 template<typename Output>
 inline
-FunctionBase<Output>::FunctionBase (const FunctionBase* master) :
+FunctionBase<Output>::FunctionBase (const FunctionBase * master) :
   _master             (master),
   _initialized        (false)
 {
@@ -200,7 +200,7 @@ bool FunctionBase<Output>::initialized() const
 template <typename Output>
 inline
 Output FunctionBase<Output>::component (unsigned int i,
-                                        const Point& p,
+                                        const Point & p,
                                         Real time)
 {
   DenseVector<Output> outvec(i+1);
@@ -212,8 +212,8 @@ Output FunctionBase<Output>::component (unsigned int i,
 
 template <typename Output>
 inline
-void FunctionBase<Output>::operator() (const Point& p,
-                                       DenseVector<Output>& output)
+void FunctionBase<Output>::operator() (const Point & p,
+                                       DenseVector<Output> & output)
 {
   // Call the time-dependent function with t=0.
   this->operator()(p, 0., output);

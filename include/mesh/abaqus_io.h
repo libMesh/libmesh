@@ -44,7 +44,7 @@ public:
    * Constructor.  Takes a writeable reference to a mesh object.
    */
   explicit
-  AbaqusIO (MeshBase& mesh);
+  AbaqusIO (MeshBase & mesh);
 
   /**
    * Destructor.
@@ -54,7 +54,7 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string& name) libmesh_override;
+  virtual void read (const std::string & name) libmesh_override;
 
   /**
    * Default false.  Abaqus files have only nodesets in them by
@@ -106,7 +106,7 @@ private:
    * set of the given name, storing them in the passed map using the
    * name as key.
    */
-  void read_ids(std::string set_name, container_t& container);
+  void read_ids(std::string set_name, container_t & container);
 
   /**
    * This function is called after all the elements have been
@@ -136,7 +136,7 @@ private:
    * by a "*Surface" section in the file, and then a list of element ID
    * and side IDs for the set.
    */
-  void read_sideset(std::string sideset_name, sideset_container_t& container);
+  void read_sideset(std::string sideset_name, sideset_container_t & container);
 
   /**
    * This function assigns boundary IDs to node sets based on the

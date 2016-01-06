@@ -43,8 +43,8 @@ using namespace libMesh;
 
 // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
 // [0,max_inttype]^3 for computing Hilbert keys
-void get_hilbert_coords (const Point &p,
-                         const MeshTools::BoundingBox &bbox,
+void get_hilbert_coords (const Point & p,
+                         const MeshTools::BoundingBox & bbox,
                          CFixBitVec icoords[3])
 {
   static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
@@ -78,8 +78,8 @@ void get_hilbert_coords (const Point &p,
 // Compute the hilbert index
 template <typename T>
 Hilbert::HilbertIndices
-get_hilbert_index (const T *p,
-                   const MeshTools::BoundingBox &bbox)
+get_hilbert_index (const T * p,
+                   const MeshTools::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
@@ -95,8 +95,8 @@ get_hilbert_index (const T *p,
 
 template <>
 Hilbert::HilbertIndices
-get_hilbert_index (const Elem *e,
-                   const MeshTools::BoundingBox &bbox)
+get_hilbert_index (const Elem * e,
+                   const MeshTools::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
@@ -114,8 +114,8 @@ get_hilbert_index (const Elem *e,
 
 // Compute the hilbert index
 Hilbert::HilbertIndices
-get_hilbert_index (const Point &p,
-                   const MeshTools::BoundingBox &bbox)
+get_hilbert_index (const Point & p,
+                   const MeshTools::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
@@ -133,19 +133,19 @@ get_hilbert_index (const Point &p,
 class ComputeHilbertKeys
 {
 public:
-  ComputeHilbertKeys (const MeshTools::BoundingBox &bbox,
-                      std::vector<Hilbert::HilbertIndices> &keys) :
+  ComputeHilbertKeys (const MeshTools::BoundingBox & bbox,
+                      std::vector<Hilbert::HilbertIndices> & keys) :
     _bbox(bbox),
     _keys(keys)
   {}
 
   // computes the hilbert index for a node
-  void operator() (const ConstNodeRange &range) const
+  void operator() (const ConstNodeRange & range) const
   {
     std::size_t pos = range.first_idx();
     for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
       {
-        const Node* node = (*it);
+        const Node * node = (*it);
         libmesh_assert(node);
         libmesh_assert_less (pos, _keys.size());
         _keys[pos++] = get_hilbert_index (*node, _bbox);
@@ -153,12 +153,12 @@ public:
   }
 
   // computes the hilbert index for an element
-  void operator() (const ConstElemRange &range) const
+  void operator() (const ConstElemRange & range) const
   {
     std::size_t pos = range.first_idx();
     for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
       {
-        const Elem* elem = (*it);
+        const Elem * elem = (*it);
         libmesh_assert(elem);
         libmesh_assert_less (pos, _keys.size());
         _keys[pos++] = get_hilbert_index (elem->centroid(), _bbox);
@@ -166,8 +166,8 @@ public:
   }
 
 private:
-  const MeshTools::BoundingBox &_bbox;
-  std::vector<Hilbert::HilbertIndices> &_keys;
+  const MeshTools::BoundingBox & _bbox;
+  std::vector<Hilbert::HilbertIndices> & _keys;
 };
 }
 #endif
@@ -180,7 +180,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // MeshCommunication class members
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
-void MeshCommunication::assign_global_indices (MeshBase& mesh) const
+void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 {
   START_LOG ("assign_global_indices()", "MeshCommunication");
 
@@ -194,7 +194,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
   // (4) determine the position in the global ranking for
   //     each local object
 
-  const Parallel::Communicator &communicator (mesh.comm());
+  const Parallel::Communicator & communicator (mesh.comm());
 
   // Global bounding box
   MeshTools::BoundingBox bbox =
@@ -228,12 +228,12 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
                   get_hilbert_coords(**nodej, bbox, jcoords);
                   libMesh::err <<
                     "node " << (*nodej)->id() << ", " <<
-                    *(Point*)(*nodej) << " has HilbertIndices " <<
+                    *(Point *)(*nodej) << " has HilbertIndices " <<
                     node_keys[j] << std::endl;
                   get_hilbert_coords(**nodei, bbox, icoords);
                   libMesh::err <<
                     "node " << (*nodei)->id() << ", " <<
-                    *(Point*)(*nodei) << " has HilbertIndices " <<
+                    *(Point *)(*nodei) << " has HilbertIndices " <<
                     node_keys[i] << std::endl;
                   libmesh_error_msg("Error: nodes with duplicate Hilbert keys!");
                 }
@@ -292,14 +292,14 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
                                                        node_keys);
   node_sorter.sort(); /* done with node_keys */ //node_keys.clear();
 
-  const std::vector<Hilbert::HilbertIndices> &my_node_bin =
+  const std::vector<Hilbert::HilbertIndices> & my_node_bin =
     node_sorter.bin();
 
   Parallel::Sort<Hilbert::HilbertIndices> elem_sorter (communicator,
                                                        elem_keys);
   elem_sorter.sort(); /* done with elem_keys */ //elem_keys.clear();
 
-  const std::vector<Hilbert::HilbertIndices> &my_elem_bin =
+  const std::vector<Hilbert::HilbertIndices> & my_elem_bin =
     elem_sorter.bin();
 
 
@@ -364,7 +364,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
         // build up list of requests
         for (; it != end; ++it)
           {
-            const Node* node = (*it);
+            const Node * node = (*it);
             libmesh_assert(node);
             const Hilbert::HilbertIndices hi =
               get_hilbert_index (*node, bbox);
@@ -408,7 +408,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
           std::vector<dof_id_type> global_ids; /**/ global_ids.reserve(request_to_fill.size());
           for (std::size_t idx=0; idx<request_to_fill.size(); idx++)
             {
-              const Hilbert::HilbertIndices &hi = request_to_fill[idx];
+              const Hilbert::HilbertIndices & hi = request_to_fill[idx];
               libmesh_assert_less_equal (hi, node_upper_bounds[communicator.rank()]);
 
               // find the requested index in my node bin
@@ -441,7 +441,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
           for (; it != end; ++it)
             {
-              Node* node = (*it);
+              Node * node = (*it);
               libmesh_assert(node);
               const Hilbert::HilbertIndices hi =
                 get_hilbert_index (*node, bbox);
@@ -481,7 +481,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
         for (; it != end; ++it)
           {
-            const Elem* elem = (*it);
+            const Elem * elem = (*it);
             libmesh_assert(elem);
             const Hilbert::HilbertIndices hi =
               get_hilbert_index (elem->centroid(), bbox);
@@ -525,7 +525,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
           std::vector<dof_id_type> global_ids; /**/ global_ids.reserve(request_to_fill.size());
           for (std::size_t idx=0; idx<request_to_fill.size(); idx++)
             {
-              const Hilbert::HilbertIndices &hi = request_to_fill[idx];
+              const Hilbert::HilbertIndices & hi = request_to_fill[idx];
               libmesh_assert_less_equal (hi, elem_upper_bounds[communicator.rank()]);
 
               // find the requested index in my elem bin
@@ -558,7 +558,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
           for (; it != end; ++it)
             {
-              Elem* elem = (*it);
+              Elem * elem = (*it);
               libmesh_assert(elem);
               const Hilbert::HilbertIndices hi =
                 get_hilbert_index (elem->centroid(), bbox);
@@ -586,14 +586,14 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
   STOP_LOG ("assign_global_indices()", "MeshCommunication");
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
-void MeshCommunication::assign_global_indices (MeshBase&) const
+void MeshCommunication::assign_global_indices (MeshBase &) const
 {
 }
 #endif // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
-void MeshCommunication::check_for_duplicate_global_indices (MeshBase& mesh) const
+void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) const
 {
   START_LOG ("check_for_duplicate_global_indices()", "MeshCommunication");
 
@@ -626,12 +626,12 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase& mesh) cons
                   get_hilbert_coords(**nodej, bbox, jcoords);
                   libMesh::err <<
                     "node " << (*nodej)->id() << ", " <<
-                    *(Point*)(*nodej) << " has HilbertIndices " <<
+                    *(Point *)(*nodej) << " has HilbertIndices " <<
                     node_keys[j] << std::endl;
                   get_hilbert_coords(**nodei, bbox, icoords);
                   libMesh::err <<
                     "node " << (*nodei)->id() << ", " <<
-                    *(Point*)(*nodei) << " has HilbertIndices " <<
+                    *(Point *)(*nodei) << " has HilbertIndices " <<
                     node_keys[i] << std::endl;
                   libmesh_error_msg("Error: nodes with duplicate Hilbert keys!");
                 }
@@ -682,18 +682,18 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase& mesh) cons
   STOP_LOG ("check_for_duplicate_global_indices()", "MeshCommunication");
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
-void MeshCommunication::check_for_duplicate_global_indices (MeshBase&) const
+void MeshCommunication::check_for_duplicate_global_indices (MeshBase &) const
 {
 }
 #endif // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template <typename ForwardIterator>
-void MeshCommunication::find_global_indices (const Parallel::Communicator &communicator,
-                                             const MeshTools::BoundingBox &bbox,
-                                             const ForwardIterator &begin,
-                                             const ForwardIterator &end,
-                                             std::vector<dof_id_type> &index_map) const
+void MeshCommunication::find_global_indices (const Parallel::Communicator & communicator,
+                                             const MeshTools::BoundingBox & bbox,
+                                             const ForwardIterator & begin,
+                                             const ForwardIterator & end,
+                                             std::vector<dof_id_type> & index_map) const
 {
   START_LOG ("find_global_indices()", "MeshCommunication");
 
@@ -745,7 +745,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
                                                   sorted_hilbert_keys);
   sorter.sort();
   STOP_LOG ("parallel_sort()", "MeshCommunication");
-  const std::vector<Hilbert::HilbertIndices> &my_bin = sorter.bin();
+  const std::vector<Hilbert::HilbertIndices> & my_bin = sorter.bin();
 
   // The number of objects in my_bin on each processor
   std::vector<unsigned int> bin_sizes(communicator.size());
@@ -830,7 +830,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
         global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
         for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
           {
-            const Hilbert::HilbertIndices &hilbert_indices = request_to_fill[idx];
+            const Hilbert::HilbertIndices & hilbert_indices = request_to_fill[idx];
             libmesh_assert_less_equal (hilbert_indices, upper_bounds[communicator.rank()]);
 
             // find the requested index in my node bin
@@ -932,9 +932,9 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
 template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const Parallel::Communicator &,
                                              const MeshTools::BoundingBox &,
-                                             const ForwardIterator &begin,
-                                             const ForwardIterator &end,
-                                             std::vector<dof_id_type> &index_map) const
+                                             const ForwardIterator & begin,
+                                             const ForwardIterator & end,
+                                             std::vector<dof_id_type> & index_map) const
 {
   index_map.clear();
   index_map.reserve(std::distance (begin, end));

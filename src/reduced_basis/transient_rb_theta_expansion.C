@@ -31,7 +31,7 @@ TransientRBThetaExpansion::TransientRBThetaExpansion()
 }
 
 Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
-                                               const RBParameters& mu)
+                                               const RBParameters & mu)
 {
   if(q >= get_n_M_terms())
     libmesh_error_msg("Error: We must have q < get_n_M_terms in eval_M_theta.");
@@ -41,7 +41,7 @@ Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
   return _M_theta_vector[q]->evaluate( mu );
 }
 
-void TransientRBThetaExpansion::attach_M_theta(RBTheta* theta_q_m)
+void TransientRBThetaExpansion::attach_M_theta(RBTheta * theta_q_m)
 {
   libmesh_assert(theta_q_m);
 

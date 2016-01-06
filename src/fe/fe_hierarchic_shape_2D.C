@@ -32,7 +32,7 @@ template <>
 Real FE<2,HIERARCHIC>::shape(const ElemType,
                              const Order,
                              const unsigned int,
-                             const Point&)
+                             const Point &)
 {
   libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
@@ -41,10 +41,10 @@ Real FE<2,HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape(const Elem* elem,
+Real FE<2,HIERARCHIC>::shape(const Elem * elem,
                              const Order order,
                              const unsigned int i,
-                             const Point& p)
+                             const Point & p)
 {
   libmesh_assert(elem);
 
@@ -228,7 +228,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
                                    const Order,
                                    const unsigned int,
                                    const unsigned int,
-                                   const Point&)
+                                   const Point &)
 {
   libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
@@ -237,11 +237,11 @@ Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
+Real FE<2,HIERARCHIC>::shape_deriv(const Elem * elem,
                                    const Order order,
                                    const unsigned int i,
                                    const unsigned int j,
-                                   const Point& p)
+                                   const Point & p)
 {
   libmesh_assert(elem);
 
@@ -376,7 +376,7 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
                                           const Order,
                                           const unsigned int,
                                           const unsigned int,
-                                          const Point&)
+                                          const Point &)
 {
   libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
@@ -385,11 +385,11 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
+Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                           const Order order,
                                           const unsigned int i,
                                           const unsigned int j,
-                                          const Point& p)
+                                          const Point & p)
 {
   libmesh_assert(elem);
 

@@ -30,12 +30,12 @@ namespace libMesh
 /**
  * Print a stack trace (for code compiled with gcc)
  */
-void print_trace(std::ostream &out_stream = std::cerr);
+void print_trace(std::ostream & out_stream = std::cerr);
 
 /**
  * Mostly system independent demangler
  */
-std::string demangle(const char *name);
+std::string demangle(const char * name);
 
 /**
  * Writes a stack trace to a uniquely named file if

@@ -88,7 +88,7 @@ UniquePtr<Elem> InfHex::side (const unsigned int i) const
   libmesh_assert_less (i, this->n_sides());
 
   // To be returned wrapped in an UniquePtr
-  Elem* face = NULL;
+  Elem * face = NULL;
 
   // Think of a unit cube: (-1,1) x (-1,1) x (-1,1),
   // with (in general) the normals pointing outwards

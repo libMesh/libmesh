@@ -163,7 +163,7 @@ UniquePtr<Elem> Tet10::build_side (const unsigned int i,
 
   else
     {
-      Elem* face = new Tri6;
+      Elem * face = new Tri6;
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
@@ -189,7 +189,7 @@ UniquePtr<Elem> Tet10::build_edge (const unsigned int i) const
 
 void Tet10::connectivity(const unsigned int sc,
                          const IOPackage iop,
-                         std::vector<dof_id_type>& conn) const
+                         std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

@@ -50,8 +50,8 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  TransientSystem (EquationSystems& es,
-                   const std::string& name,
+  TransientSystem (EquationSystems & es,
+                   const std::string & name,
                    const unsigned int number);
 
   /**

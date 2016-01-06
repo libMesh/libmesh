@@ -40,7 +40,7 @@ public:
    * Default brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Hex(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -150,7 +150,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[7+(LIBMESH_DIM>3)];
+  Elem * _elemlinks_data[7+(LIBMESH_DIM>3)];
 
   /**
    * Matrix that tells which vertices define the location

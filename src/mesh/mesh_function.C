@@ -40,11 +40,11 @@ namespace libMesh
 
 //------------------------------------------------------------------
 // MeshFunction methods
-MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
-                            const NumericVector<Number>& vec,
-                            const DofMap& dof_map,
-                            const std::vector<unsigned int>& vars,
-                            const FunctionBase<Number>* master) :
+MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
+                            const NumericVector<Number> & vec,
+                            const DofMap & dof_map,
+                            const std::vector<unsigned int> & vars,
+                            const FunctionBase<Number> * master) :
   FunctionBase<Number> (master),
   ParallelObject       (eqn_systems),
   _eqn_systems         (eqn_systems),
@@ -59,11 +59,11 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 
 
 
-MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
-                            const NumericVector<Number>& vec,
-                            const DofMap& dof_map,
+MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
+                            const NumericVector<Number> & vec,
+                            const DofMap & dof_map,
                             const unsigned int var,
-                            const FunctionBase<Number>* master) :
+                            const FunctionBase<Number> * master) :
   FunctionBase<Number> (master),
   ParallelObject       (eqn_systems),
   _eqn_systems         (eqn_systems),
@@ -116,8 +116,8 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
   if (this->_master != NULL)
     {
       // we aren't the master
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
+      const MeshFunction * master =
+        cast_ptr<const MeshFunction *>(this->_master);
 
       if (master->_point_locator == NULL)
         libmesh_error_msg("ERROR: When the master-servant concept is used, the master has to be initialized first!");
@@ -132,7 +132,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       // we are the master: build the point locator
 
       // constant reference to the other mesh
-      const MeshBase& mesh = this->_eqn_systems.get_mesh();
+      const MeshBase & mesh = this->_eqn_systems.get_mesh();
 
       // build the point locator.  Only \p TREE version available
       //UniquePtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
@@ -173,7 +173,7 @@ UniquePtr<FunctionBase<Number> > MeshFunction::clone () const
 
 
 
-Number MeshFunction::operator() (const Point& p,
+Number MeshFunction::operator() (const Point & p,
                                  const Real time)
 {
   libmesh_assert (this->initialized());
@@ -185,7 +185,7 @@ Number MeshFunction::operator() (const Point& p,
 
 
 
-Gradient MeshFunction::gradient (const Point& p,
+Gradient MeshFunction::gradient (const Point & p,
                                  const Real time)
 {
   libmesh_assert (this->initialized());
@@ -198,7 +198,7 @@ Gradient MeshFunction::gradient (const Point& p,
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor MeshFunction::hessian (const Point& p,
+Tensor MeshFunction::hessian (const Point & p,
                               const Real time)
 {
   libmesh_assert (this->initialized());
@@ -209,21 +209,21 @@ Tensor MeshFunction::hessian (const Point& p,
 }
 #endif
 
-void MeshFunction::operator() (const Point& p,
+void MeshFunction::operator() (const Point & p,
                                const Real time,
-                               DenseVector<Number>& output)
+                               DenseVector<Number> & output)
 {
   this->operator() (p,time,output,NULL);
 }
 
-void MeshFunction::operator() (const Point& p,
+void MeshFunction::operator() (const Point & p,
                                const Real,
-                               DenseVector<Number>& output,
-                               const std::set<subdomain_id_type>* subdomain_ids)
+                               DenseVector<Number> & output,
+                               const std::set<subdomain_id_type> * subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p,subdomain_ids);
+  const Elem * element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
@@ -259,7 +259,7 @@ void MeshFunction::operator() (const Point& p,
              * the data for this variable
              */
             const unsigned int var = _system_vars[index];
-            const FEType& fe_type = this->_dof_map.variable_type(var);
+            const FEType & fe_type = this->_dof_map.variable_type(var);
 
             /**
              * Build an FEComputeData that contains both input and output data
@@ -297,14 +297,14 @@ void MeshFunction::operator() (const Point& p,
 
 
 
-void MeshFunction::gradient (const Point& p,
+void MeshFunction::gradient (const Point & p,
                              const Real,
-                             std::vector<Gradient>& output,
-                             const std::set<subdomain_id_type>* subdomain_ids)
+                             std::vector<Gradient> & output,
+                             const std::set<subdomain_id_type> * subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p,subdomain_ids);
+  const Elem * element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
@@ -340,10 +340,10 @@ void MeshFunction::gradient (const Point& p,
              * the data for this variable
              */
             const unsigned int var = _system_vars[index];
-            const FEType& fe_type = this->_dof_map.variable_type(var);
+            const FEType & fe_type = this->_dof_map.variable_type(var);
 
             UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealGradient> >& dphi = point_fe->get_dphi();
+            const std::vector<std::vector<RealGradient> > & dphi = point_fe->get_dphi();
             point_fe->reinit(element, &point_list);
 
             // where the solution values for the var-th variable are stored
@@ -368,14 +368,14 @@ void MeshFunction::gradient (const Point& p,
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-void MeshFunction::hessian (const Point& p,
+void MeshFunction::hessian (const Point & p,
                             const Real,
-                            std::vector<Tensor>& output,
-                            const std::set<subdomain_id_type>* subdomain_ids)
+                            std::vector<Tensor> & output,
+                            const std::set<subdomain_id_type> * subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p,subdomain_ids);
+  const Elem * element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
@@ -411,10 +411,10 @@ void MeshFunction::hessian (const Point& p,
              * the data for this variable
              */
             const unsigned int var = _system_vars[index];
-            const FEType& fe_type = this->_dof_map.variable_type(var);
+            const FEType & fe_type = this->_dof_map.variable_type(var);
 
             UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealTensor> >& d2phi =
+            const std::vector<std::vector<RealTensor> > & d2phi =
               point_fe->get_d2phi();
             point_fe->reinit(element, &point_list);
 
@@ -438,8 +438,8 @@ void MeshFunction::hessian (const Point& p,
 }
 #endif
 
-const Elem* MeshFunction::find_element( const Point& p,
-                                        const std::set<subdomain_id_type>* subdomain_ids ) const
+const Elem * MeshFunction::find_element(const Point & p,
+                                        const std::set<subdomain_id_type> * subdomain_ids) const
 {
   /* Ensure that in the case of a master mesh function, the
      out-of-mesh mode is enabled either for both or for none.  This is
@@ -449,8 +449,8 @@ const Elem* MeshFunction::find_element( const Point& p,
 #ifdef DEBUG
   if (this->_master != NULL)
     {
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
+      const MeshFunction * master =
+        cast_ptr<const MeshFunction *>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
         libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
                           << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
@@ -458,7 +458,7 @@ const Elem* MeshFunction::find_element( const Point& p,
 #endif
 
   // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p,subdomain_ids);
+  const Elem * element = this->_point_locator->operator()(p,subdomain_ids);
 
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a
@@ -468,14 +468,14 @@ const Elem* MeshFunction::find_element( const Point& p,
       _vector.type() != SERIAL)
     {
       // look for a local element containing the point
-      std::set<const Elem*> point_neighbors;
+      std::set<const Elem *> point_neighbors;
       element->find_point_neighbors(p, point_neighbors);
       element = NULL;
-      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
-      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+      std::set<const Elem *>::const_iterator       it  = point_neighbors.begin();
+      const std::set<const Elem *>::const_iterator end = point_neighbors.end();
       for (; it != end; ++it)
         {
-          const Elem* elem = *it;
+          const Elem * elem = *it;
           if (elem->processor_id() == this->processor_id())
             {
               element = elem;
@@ -487,13 +487,13 @@ const Elem* MeshFunction::find_element( const Point& p,
   return element;
 }
 
-const PointLocatorBase& MeshFunction::get_point_locator (void) const
+const PointLocatorBase & MeshFunction::get_point_locator (void) const
 {
   libmesh_assert (this->initialized());
   return *_point_locator;
 }
 
-void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number>& value)
+void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number> & value)
 {
   libmesh_assert (this->initialized());
   _point_locator->enable_out_of_mesh_mode();
@@ -501,7 +501,7 @@ void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number>& value)
   _out_of_mesh_value = value;
 }
 
-void MeshFunction::enable_out_of_mesh_mode(const Number& value)
+void MeshFunction::enable_out_of_mesh_mode(const Number & value)
 {
   DenseVector<Number> v(1);
   v(0) = value;

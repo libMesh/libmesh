@@ -42,7 +42,7 @@ namespace libMesh
 {
 
 UniquePtr<FEAbstract> FEAbstract::build(const unsigned int dim,
-                                        const FEType& fet)
+                                        const FEType & fet)
 {
   switch (dim)
     {
@@ -256,7 +256,7 @@ UniquePtr<FEAbstract> FEAbstract::build(const unsigned int dim,
   return UniquePtr<FEAbstract>();
 }
 
-void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nodes)
+void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
   switch(itemType)
     {
@@ -551,7 +551,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>&
     }
 }
 
-bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Real eps)
+bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const Real eps)
 {
   libmesh_assert_greater_equal (eps, 0.);
 
@@ -745,20 +745,20 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
 
 
 
-void FEAbstract::print_JxW(std::ostream& os) const
+void FEAbstract::print_JxW(std::ostream & os) const
 {
   this->_fe_map->print_JxW(os);
 }
 
 
 
-void FEAbstract::print_xyz(std::ostream& os) const
+void FEAbstract::print_xyz(std::ostream & os) const
 {
   this->_fe_map->print_xyz(os);
 }
 
 
-void FEAbstract::print_info(std::ostream& os) const
+void FEAbstract::print_info(std::ostream & os) const
 {
   os << "phi[i][j]: Shape function i at quadrature pt. j" << std::endl;
   this->print_phi(os);
@@ -774,7 +774,7 @@ void FEAbstract::print_info(std::ostream& os) const
 }
 
 
-std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
+std::ostream & operator << (std::ostream & os, const FEAbstract & fe)
 {
   fe.print_info(os);
   return os;
@@ -785,8 +785,8 @@ std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
 #ifdef LIBMESH_ENABLE_AMR
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
-                                           const Elem* elem)
+void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
+                                           const Elem * elem)
 {
   libmesh_assert(elem);
 
@@ -803,7 +803,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
   // We currently always use LAGRANGE mappings for geometry
   const FEType fe_type(elem->default_order(), LAGRANGE);
 
-  std::vector<const Node*> my_nodes, parent_nodes;
+  std::vector<const Node *> my_nodes, parent_nodes;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -814,7 +814,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
         {                                                     // this element and ones coarser
           // than this element.
           // Get pointers to the elements of interest and its parent.
-          const Elem* parent = elem->parent();
+          const Elem * parent = elem->parent();
 
           // This can't happen...  Only level-0 elements have NULL
           // parents, and no level-0 elements can be at a higher
@@ -843,10 +843,10 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
             {
               libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
-              const Node* my_node = my_nodes[my_side_n];
+              const Node * my_node = my_nodes[my_side_n];
 
               // The support point of the DOF
-              const Point& support_point = *my_node;
+              const Point & support_point = *my_node;
 
               // Figure out where my node lies on their reference element.
               const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
@@ -860,7 +860,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
                 {
                   libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
 
-                  const Node* their_node = parent_nodes[their_side_n];
+                  const Node * their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
 
                   const Real their_value = FEInterface::shape(Dim-1,
@@ -893,7 +893,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
                         Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                         // A reference to the constraint row.
-                        NodeConstraintRow& constraint_row = constraints[my_node].first;
+                        NodeConstraintRow & constraint_row = constraints[my_node].first;
 
                         constraint_row.insert(std::make_pair (their_node,
                                                               0.));
@@ -909,7 +909,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
                         Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                         // A reference to the constraint row.
-                        NodeConstraintRow& constraint_row = constraints[my_node].first;
+                        NodeConstraintRow & constraint_row = constraints[my_node].first;
 
                         constraint_row.insert(std::make_pair (their_node,
                                                               their_value));
@@ -928,11 +928,11 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints,
-                                                    const PeriodicBoundaries &boundaries,
-                                                    const MeshBase &mesh,
-                                                    const PointLocatorBase *point_locator,
-                                                    const Elem* elem)
+void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraints,
+                                                    const PeriodicBoundaries & boundaries,
+                                                    const MeshBase & mesh,
+                                                    const PointLocatorBase * point_locator,
+                                                    const Elem * elem)
 {
   // Only bother if we truly have periodic boundaries
   if (boundaries.empty())
@@ -949,7 +949,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
   // We currently always use LAGRANGE mappings for geometry
   const FEType fe_type(elem->default_order(), LAGRANGE);
 
-  std::vector<const Node*> my_nodes, neigh_nodes;
+  std::vector<const Node *> my_nodes, neigh_nodes;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -963,13 +963,13 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
-          const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
+          const PeriodicBoundaryBase * periodic = boundaries.boundary(boundary_id);
           if (periodic)
             {
               libmesh_assert(point_locator);
 
               // Get pointers to the element's neighbor.
-              const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+              const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
 
               // h refinement constraints:
               // constrain dofs shared between
@@ -1013,7 +1013,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                     {
                       libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
-                      const Node* my_node = my_nodes[my_side_n];
+                      const Node * my_node = my_nodes[my_side_n];
 
                       // Figure out where my node lies on their reference element.
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
@@ -1042,7 +1042,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                         {
                           libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
-                          const Node* their_node = neigh_nodes[their_side_n];
+                          const Node * their_node = neigh_nodes[their_side_n];
 
                           // If there's a constraint on an opposing node,
                           // we need to see if it's constrained by
@@ -1054,7 +1054,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                             if (!constraints.count(their_node))
                               continue;
 
-                            const NodeConstraintRow& their_constraint_row =
+                            const NodeConstraintRow & their_constraint_row =
                               constraints[their_node].first;
 
                             for (unsigned int orig_side_n=0;
@@ -1063,7 +1063,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                               {
                                 libmesh_assert_less (orig_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
-                                const Node* orig_node = my_nodes[orig_side_n];
+                                const Node * orig_node = my_nodes[orig_side_n];
 
                                 if (their_constraint_row.count(orig_node))
                                   skip_constraint[orig_side_n] = true;
@@ -1080,7 +1080,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                       if (skip_constraint[my_side_n])
                         continue;
 
-                      const Node* my_node = my_nodes[my_side_n];
+                      const Node * my_node = my_nodes[my_side_n];
 
                       // Figure out where my node lies on their reference element.
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
@@ -1096,7 +1096,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                         {
                           libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
-                          const Node* their_node = neigh_nodes[their_side_n];
+                          const Node * their_node = neigh_nodes[their_side_n];
                           libmesh_assert(their_node);
 
                           const Real their_value = FEInterface::shape(Dim-1,
@@ -1111,7 +1111,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                           {
                             Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-                            NodeConstraintRow& constraint_row =
+                            NodeConstraintRow & constraint_row =
                               constraints[my_node].first;
 
                             constraint_row.insert(std::make_pair(their_node,

@@ -130,7 +130,7 @@ UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      Elem * face = NULL;
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
@@ -179,7 +179,7 @@ UniquePtr<Elem> InfHex8::build_edge (const unsigned int i) const
   return UniquePtr<Elem>(new SideEdge<InfEdge2,InfHex8>(this,i));
 }
 
-bool InfHex8::contains_point (const Point& p, Real tol) const
+bool InfHex8::contains_point (const Point & p, Real tol) const
 {
   /*
    * For infinite elements with linear base interpolation:
@@ -243,7 +243,7 @@ bool InfHex8::contains_point (const Point& p, Real tol) const
 
 void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
                            const IOPackage iop,
-                           std::vector<dof_id_type>& conn) const
+                           std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

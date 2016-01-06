@@ -25,7 +25,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // XdrMESH members
-int XdrMESH::header(XdrMHEAD *hd)
+int XdrMESH::header(XdrMHEAD * hd)
 {
   // Temporary variables to facilitate stream reading
   const int comm_len= 256;
@@ -303,7 +303,7 @@ int XdrMESH::header(XdrMHEAD *hd)
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):
       {
-        char* temp = hd->cpyString(hd->getId());
+        char * temp = hd->cpyString(hd->getId());
         xdr_string(mp_xdr_handle, &temp,
                    ((m_type == XdrMGF::ENCODE) ?
                     cast_int<unsigned int>(std::strlen(temp)) :

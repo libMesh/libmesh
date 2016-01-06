@@ -59,39 +59,39 @@ public:
    * Perform the specified A interior assembly.
    */
   void perform_A_interior_assembly(unsigned int q,
-                                   FEMContext& context);
+                                   FEMContext & context);
 
   /**
    * Perform the specified A boundary assembly.
    */
   void perform_A_boundary_assembly(unsigned int q,
-                                   FEMContext& context);
+                                   FEMContext & context);
 
   /**
    * Perform the specified F interior assembly.
    */
   void perform_F_interior_assembly(unsigned int q,
-                                   FEMContext& context);
+                                   FEMContext & context);
 
   /**
    * Perform the specified F boundary assembly.
    */
   void perform_F_boundary_assembly(unsigned int q,
-                                   FEMContext& context);
+                                   FEMContext & context);
 
   /**
    * Perform the specified output assembly.
    */
   void perform_output_interior_assembly(unsigned int output_index,
                                         unsigned int q_l,
-                                        FEMContext& context);
+                                        FEMContext & context);
 
   /**
    * Perform the specified output assembly.
    */
   void perform_output_boundary_assembly(unsigned int output_index,
                                         unsigned int q_l,
-                                        FEMContext& context);
+                                        FEMContext & context);
 
   /**
    * Get Q_a, the number of terms in the affine
@@ -119,32 +119,32 @@ public:
    * Attach ElemAssembly object for the left-hand side
    * (both interior and boundary assembly).
    */
-  void attach_A_assembly(ElemAssembly* Aq_assembly);
+  void attach_A_assembly(ElemAssembly * Aq_assembly);
 
   /**
    * Attach multiple ElemAssembly objects for the left-hand side
    * (both interior and boundary assembly).
    */
-  void attach_multiple_A_assembly(std::vector<ElemAssembly*> Aq_assembly);
+  void attach_multiple_A_assembly(std::vector<ElemAssembly *> Aq_assembly);
 
   /**
    * Attach ElemAssembly object for the right-hand side
    * (both interior and boundary assembly).
    */
-  void attach_F_assembly(ElemAssembly* Fq_assembly);
+  void attach_F_assembly(ElemAssembly * Fq_assembly);
 
   /**
    * Attach multiple ElemAssembly objects for the right-hand side
    * (both interior and boundary assembly).
    */
-  void attach_multiple_F_assembly(std::vector<ElemAssembly*> Fq_assembly);
+  void attach_multiple_F_assembly(std::vector<ElemAssembly *> Fq_assembly);
 
   /**
    * Attach ElemAssembly object for an output
    * (both interior and boundary assembly).
    * In this case we pass in vector arguments to allow for Q_l > 1.
    */
-  virtual void attach_output_assembly(std::vector<ElemAssembly*> output_assembly);
+  virtual void attach_output_assembly(std::vector<ElemAssembly *> output_assembly);
 
   /**
    * Attach ElemAssembly object for an output
@@ -152,22 +152,22 @@ public:
    * This function provides simpler syntax in the case that Q_l = 1; we
    * do not need to use a vector in this case.
    */
-  virtual void attach_output_assembly(ElemAssembly* output_assembly);
+  virtual void attach_output_assembly(ElemAssembly * output_assembly);
 
   /**
    * Return a reference to the specified A_assembly object.
    */
-  ElemAssembly& get_A_assembly(unsigned int q);
+  ElemAssembly & get_A_assembly(unsigned int q);
 
   /**
    * Return a reference to the specified F_assembly object.
    */
-  ElemAssembly& get_F_assembly(unsigned int q);
+  ElemAssembly & get_F_assembly(unsigned int q);
 
   /**
    * Return a reference to the specified output assembly object.
    */
-  ElemAssembly& get_output_assembly(unsigned int output_index, unsigned int q_l);
+  ElemAssembly & get_output_assembly(unsigned int output_index, unsigned int q_l);
 
 private:
 
@@ -176,19 +176,19 @@ private:
    * routines for the affine operators, both interior and boundary
    * assembly.
    */
-  std::vector<ElemAssembly*> _A_assembly_vector;
+  std::vector<ElemAssembly *> _A_assembly_vector;
 
   /**
    * Vector storing the function pointers to the assembly
    * routines for the rhs affine vectors.
    */
-  std::vector<ElemAssembly*> _F_assembly_vector;
+  std::vector<ElemAssembly *> _F_assembly_vector;
 
   /**
    * Vector storing the function pointers to the assembly
    * routines for the outputs. Element interior part.
    */
-  std::vector< std::vector<ElemAssembly*> > _output_assembly_vector;
+  std::vector< std::vector<ElemAssembly *> > _output_assembly_vector;
 };
 
 }

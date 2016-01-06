@@ -24,7 +24,7 @@ namespace libMesh
 
 
 
-AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
+AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type & s)
   : FirstOrderUnsteadySolver(s),
     core_time_solver(),
     target_tolerance(1.e-3),
@@ -86,9 +86,9 @@ void AdaptiveTimeSolver::reinit()
 
 void AdaptiveTimeSolver::advance_timestep ()
 {
-  NumericVector<Number> &old_nonlinear_soln =
+  NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
-  NumericVector<Number> &nonlinear_solution =
+  NumericVector<Number> & nonlinear_solution =
     *(_system.solution);
   //    _system.get_vector("_nonlinear_solution");
 
@@ -110,7 +110,7 @@ Real AdaptiveTimeSolver::error_order () const
 
 
 bool AdaptiveTimeSolver::element_residual (bool request_jacobian,
-                                           DiffContext &context)
+                                           DiffContext & context)
 {
   libmesh_assert(core_time_solver.get());
 
@@ -120,7 +120,7 @@ bool AdaptiveTimeSolver::element_residual (bool request_jacobian,
 
 
 bool AdaptiveTimeSolver::side_residual (bool request_jacobian,
-                                        DiffContext &context)
+                                        DiffContext & context)
 {
   libmesh_assert(core_time_solver.get());
 
@@ -130,7 +130,7 @@ bool AdaptiveTimeSolver::side_residual (bool request_jacobian,
 
 
 bool AdaptiveTimeSolver::nonlocal_residual (bool request_jacobian,
-                                            DiffContext &context)
+                                            DiffContext & context)
 {
   libmesh_assert(core_time_solver.get());
 
@@ -153,8 +153,8 @@ UniquePtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
 
 
 
-Real AdaptiveTimeSolver::calculate_norm(System &s,
-                                        NumericVector<Number> &v)
+Real AdaptiveTimeSolver::calculate_norm(System & s,
+                                        NumericVector<Number> & v)
 {
   return s.calculate_norm(v, component_norm);
 }

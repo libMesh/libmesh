@@ -36,7 +36,7 @@
 namespace libMesh
 {
 
-TransientRBEvaluation::TransientRBEvaluation(const Parallel::Communicator &comm_in) :
+TransientRBEvaluation::TransientRBEvaluation(const Parallel::Communicator & comm_in) :
   RBEvaluation(comm_in),
   _rb_solve_data_cached(false)
 {
@@ -88,8 +88,8 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
   RB_RHS_matrix.resize(Nmax,Nmax);
   RB_RHS_save.resize(Nmax);
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
@@ -171,10 +171,10 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   if(N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
@@ -444,8 +444,8 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
 
   const RBParameters mu = get_parameters();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
@@ -619,10 +619,10 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   // Use the stored representor inner product values
   // to evaluate the residual norm
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
@@ -765,15 +765,15 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
-void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string& directory_name,
+void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                                const bool write_binary_data)
 {
   START_LOG("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
 
   Parent::legacy_write_offline_data_to_files(directory_name);
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
@@ -919,7 +919,7 @@ void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string
   STOP_LOG("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
 }
 
-void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::string& directory_name,
+void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
                                                                 bool read_error_bound_data,
                                                                 const bool read_binary_data)
 {
@@ -927,8 +927,8 @@ void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::strin
 
   Parent::legacy_read_offline_data_from_files(directory_name);
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();

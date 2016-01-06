@@ -65,7 +65,7 @@ public:
    *  Constructor. Initializes Nox data structures
    */
   explicit
-  NoxNonlinearSolver (sys_type& system);
+  NoxNonlinearSolver (sys_type & system);
 
   /**
    * Destructor.
@@ -80,7 +80,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char* name = NULL) libmesh_override;
+  virtual void init (const char * name = NULL) libmesh_override;
 
   /**
    * Call the Nox solver.  It calls the method below, using the
@@ -127,7 +127,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-NoxNonlinearSolver<T>::NoxNonlinearSolver (sys_type& system) :
+NoxNonlinearSolver<T>::NoxNonlinearSolver (sys_type & system) :
   NonlinearSolver<T>(system),
   _solver(NULL),
   _interface(NULL),

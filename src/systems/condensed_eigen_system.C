@@ -31,8 +31,8 @@
 namespace libMesh
 {
 
-CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
-                                            const std::string& name_in,
+CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
+                                            const std::string & name_in,
                                             const unsigned int number_in)
   : Parent(es, name_in, number_in),
     condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
@@ -41,7 +41,7 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
 {
 }
 
-void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& global_dirichlet_dofs_set)
+void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int> & global_dirichlet_dofs_set)
 {
   // First, put all local dofs into non_dirichlet_dofs_set and
   std::set<unsigned int> local_non_condensed_dofs_set;
@@ -108,7 +108,7 @@ void CondensedEigenSystem::solve()
     }
 
   // A reference to the EquationSystems
-  EquationSystems& es = this->get_equation_systems();
+  EquationSystems & es = this->get_equation_systems();
 
   // check that necessary parameters have been set
   libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));

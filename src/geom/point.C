@@ -38,7 +38,7 @@
 
 //   tempx = static_cast<unsigned int>(((*this)(0)*deg));
 //   tempy = static_cast<unsigned int>(((*this)(1)*deg));
-//   tempz = static_cast<unsigned int>(((*this)(2)*deg));
+//   tempz = static_cast<unsigned int>(((*t!his)(2)*deg));
 
 //   index[0]=0;
 //   index[1]=0;

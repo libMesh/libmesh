@@ -39,7 +39,7 @@ const float PostscriptIO::_bezier_transform[3][3] =
   };
 
 
-PostscriptIO::PostscriptIO (const MeshBase& mesh_in) :
+PostscriptIO::PostscriptIO (const MeshBase & mesh_in) :
   MeshOutput<MeshBase> (mesh_in),
   shade_value(0.0),
   line_width(0.5),
@@ -68,16 +68,16 @@ PostscriptIO::~PostscriptIO ()
 
 
 
-void PostscriptIO::write (const std::string& fname)
+void PostscriptIO::write (const std::string & fname)
 {
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
+  MeshSerializer serialize(const_cast<MeshBase &>(this->mesh()), !_is_parallel_format);
 
   if (this->mesh().processor_id() == 0)
     {
       // Get a constant reference to the mesh.
-      const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+      const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
       // Only works in 2D
       libmesh_assert_equal_to (the_mesh.mesh_dimension(), 2);
@@ -115,7 +115,7 @@ void PostscriptIO::write (const std::string& fname)
 
       // Header writing stuff stolen from Deal.II
       std::time_t  time1= std::time (0);
-      std::tm     *time = std::localtime(&time1);
+      std::tm     * time = std::localtime(&time1);
       _out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
         //<< "%!PS-Adobe-1.0" << '\n' // Lars' PS version
            << "%%Filename: " << fname << '\n'
@@ -177,8 +177,6 @@ void PostscriptIO::write (const std::string& fname)
       const MeshBase::const_element_iterator end_el = the_mesh.active_elements_end();
       for ( ; el != end_el; ++el)
         {
-          //const Elem* elem = *el;
-
           this->plot_linear_elem(*el);
           //this->plot_quadratic_elem(*el); // Experimental
         }
@@ -194,7 +192,7 @@ void PostscriptIO::write (const std::string& fname)
 
 
 
-void PostscriptIO::plot_linear_elem(const Elem* elem)
+void PostscriptIO::plot_linear_elem(const Elem * elem)
 {
   // Clear the string contents.  Yes, this really is how you do that...
   _cell_string.str("");
@@ -236,7 +234,7 @@ void PostscriptIO::plot_linear_elem(const Elem* elem)
 
 
 
-void PostscriptIO::plot_quadratic_elem(const Elem* elem)
+void PostscriptIO::plot_quadratic_elem(const Elem * elem)
 {
   for (unsigned int ns=0; ns<elem->n_sides(); ++ns)
     {
@@ -268,7 +266,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem* elem)
 
 
 
-void PostscriptIO::_compute_edge_bezier_coeffs(const Elem* elem)
+void PostscriptIO::_compute_edge_bezier_coeffs(const Elem * elem)
 {
   // I only know how to do this for an Edge3!
   libmesh_assert_equal_to (elem->type(), EDGE3);

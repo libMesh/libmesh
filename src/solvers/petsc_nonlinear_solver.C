@@ -79,7 +79,7 @@ extern "C"
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the residual at X
   PetscErrorCode
-  __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx)
+  __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
     START_LOG("residual()", "PetscNonlinearSolver");
 
@@ -89,9 +89,9 @@ extern "C"
     libmesh_assert(r);
     libmesh_assert(ctx);
 
-    // No way to safety-check this cast, since we got a void*...
-    PetscNonlinearSolver<Number>* solver =
-      static_cast<PetscNonlinearSolver<Number>*> (ctx);
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
     // Get the current iteration number from the snes object,
     // store it in the PetscNonlinearSolver object for possible use
@@ -103,9 +103,9 @@ extern "C"
       solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
     }
 
-    NonlinearImplicitSystem &sys = solver->system();
+    NonlinearImplicitSystem & sys = solver->system();
 
-    PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
 
     // Use the system's update() to get a good local version of the
@@ -163,9 +163,9 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_jacobian(
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx
+                                SNES snes, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx
 #else
-                                SNES snes, Vec x, Mat jac, Mat pc, void *ctx
+                                SNES snes, Vec x, Mat jac, Mat pc, void * ctx
 #endif
                                 )
   {
@@ -175,9 +175,9 @@ extern "C"
 
     libmesh_assert(ctx);
 
-    // No way to safety-check this cast, since we got a void*...
-    PetscNonlinearSolver<Number>* solver =
-      static_cast<PetscNonlinearSolver<Number>*> (ctx);
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
     // Get the current iteration number from the snes object,
     // store it in the PetscNonlinearSolver object for possible use
@@ -189,7 +189,7 @@ extern "C"
       solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
     }
 
-    NonlinearImplicitSystem &sys = solver->system();
+    NonlinearImplicitSystem & sys = solver->system();
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
     PetscMatrix<Number> PC(*pc, sys.comm());
     PetscMatrix<Number> Jac(*jac, sys.comm());
@@ -197,7 +197,7 @@ extern "C"
     PetscMatrix<Number> PC(pc, sys.comm());
     PetscMatrix<Number> Jac(jac, sys.comm());
 #endif
-    PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
     // Set the dof maps
@@ -264,9 +264,9 @@ extern "C"
   // direction or solution vector was changed, respectively.
   PetscErrorCode __libmesh_petsc_snes_postcheck(
 #if PETSC_VERSION_LESS_THAN(3,3,0)
-                                                SNES, Vec x, Vec y, Vec w, void *context, PetscBool *changed_y, PetscBool *changed_w
+                                                SNES, Vec x, Vec y, Vec w, void * context, PetscBool * changed_y, PetscBool * changed_w
 #else
-                                                SNESLineSearch, Vec x, Vec y, Vec w, PetscBool *changed_y, PetscBool *changed_w, void *context
+                                                SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context
 #endif
                                                 )
   {
@@ -282,8 +282,8 @@ extern "C"
     libmesh_assert(context);
 
     // Cast the context to a NonlinearSolver object.
-    PetscNonlinearSolver<Number>* solver =
-      static_cast<PetscNonlinearSolver<Number>*> (context);
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (context);
 
     // If the user has provided both postcheck function pointer and
     // object, this is ambiguous, so throw an error.
@@ -338,7 +338,7 @@ extern "C"
 
     if (dof_map.n_constrained_dofs())
       {
-        PetscVector<Number> & system_soln = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+        PetscVector<Number> & system_soln = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
 
         // ... and swap it in before enforcing the constraints.
         petsc_w.swap(system_soln);
@@ -367,7 +367,7 @@ extern "C"
 //---------------------------------------------------------------------
 // PetscNonlinearSolver<> methods
 template <typename T>
-PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system_in) :
+PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
@@ -410,7 +410,7 @@ void PetscNonlinearSolver<T>::clear ()
 
 
 template <typename T>
-void PetscNonlinearSolver<T>::init (const char* name)
+void PetscNonlinearSolver<T>::init (const char * name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -496,7 +496,7 @@ void PetscNonlinearSolver<T>::init (const char* name)
           this->_preconditioner->init();
 
           PCSetType(pc, PCSHELL);
-          PCShellSetContext(pc,(void*)this->_preconditioner);
+          PCShellSetContext(pc,(void *)this->_preconditioner);
 
           //Re-Use the shell functions from petsc_linear_solver
           PCShellSetSetUp(pc,__libmesh_petsc_preconditioner_setup);
@@ -536,12 +536,12 @@ void PetscNonlinearSolver<T>::init (const char* name)
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 template <typename T>
 void
-PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
-                                              void (*computeSubspace)(std::vector<NumericVector<Number>*>&, sys_type&),
-                                              MatNullSpace *msp)
+PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
+                                              void (*computeSubspace)(std::vector<NumericVector<Number> *> &, sys_type &),
+                                              MatNullSpace * msp)
 {
   PetscErrorCode ierr;
-  std::vector<NumericVector<Number>* > sp;
+  std::vector<NumericVector<Number> * > sp;
   if (computeSubspaceObject)
     (*computeSubspaceObject)(sp, this->system());
   else
@@ -550,8 +550,8 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
   *msp = PETSC_NULL;
   if (sp.size())
     {
-      Vec *modes;
-      PetscScalar *dots;
+      Vec * modes;
+      PetscScalar * dots;
       PetscInt nmodes = cast_int<PetscInt>(sp.size());
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -563,7 +563,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
-          PetscVector<T>* pv = cast_ptr<PetscVector<T>*>(sp[i]);
+          PetscVector<T> * pv = cast_ptr<PetscVector<T> *>(sp[i]);
           Vec v = pv->vec();
 
           ierr = VecDuplicate(v, modes+i);
@@ -610,9 +610,9 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
-                                NumericVector<T>& x_in,    // Solution vector
-                                NumericVector<T>& r_in,    // Residual vector
+PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian Matrix
+                                NumericVector<T> & x_in,    // Solution vector
+                                NumericVector<T> & r_in,    // Residual vector
                                 const double,              // Stopping tolerance
                                 const unsigned int)
 {
@@ -620,9 +620,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* jac = cast_ptr<PetscMatrix<T>*>(&jac_in);
-  PetscVector<T>* x   = cast_ptr<PetscVector<T>*>(&x_in);
-  PetscVector<T>* r   = cast_ptr<PetscVector<T>*>(&r_in);
+  PetscMatrix<T> * jac = cast_ptr<PetscMatrix<T> *>(&jac_in);
+  PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
+  PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
   PetscErrorCode ierr=0;
   PetscInt n_iterations =0;

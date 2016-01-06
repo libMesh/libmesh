@@ -32,7 +32,7 @@ template <>
 Real FE<2,LAGRANGE>::shape(const ElemType type,
                            const Order order,
                            const unsigned int i,
-                           const Point& p)
+                           const Point & p)
 {
 #if LIBMESH_DIM > 1
 
@@ -204,10 +204,10 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape(const Elem* elem,
+Real FE<2,LAGRANGE>::shape(const Elem * elem,
                            const Order order,
                            const unsigned int i,
-                           const Point& p)
+                           const Point & p)
 {
   libmesh_assert(elem);
 
@@ -222,7 +222,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point& p)
+                                 const Point & p)
 {
 #if LIBMESH_DIM > 1
 
@@ -544,11 +544,11 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_deriv(const Elem* elem,
+Real FE<2,LAGRANGE>::shape_deriv(const Elem * elem,
                                  const Order order,
                                  const unsigned int i,
                                  const unsigned int j,
-                                 const Point& p)
+                                 const Point & p)
 {
   libmesh_assert(elem);
 
@@ -565,7 +565,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point& p)
+                                        const Point & p)
 {
 #if LIBMESH_DIM > 1
 
@@ -896,11 +896,11 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 
 template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const Elem* elem,
+Real FE<2,LAGRANGE>::shape_second_deriv(const Elem * elem,
                                         const Order order,
                                         const unsigned int i,
                                         const unsigned int j,
-                                        const Point& p)
+                                        const Point & p)
 {
   libmesh_assert(elem);
 

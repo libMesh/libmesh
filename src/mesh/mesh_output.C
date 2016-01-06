@@ -27,15 +27,15 @@ namespace libMesh
 {
 
 template <class MT>
-void MeshOutput<MT>::write_equation_systems (const std::string& fname,
-                                             const EquationSystems& es,
-                                             const std::set<std::string>* system_names)
+void MeshOutput<MT>::write_equation_systems (const std::string & fname,
+                                             const EquationSystems & es,
+                                             const std::set<std::string> * system_names)
 {
   START_LOG("write_equation_systems()", "MeshOutput");
 
   // We may need to gather and/or renumber a ParallelMesh to output
   // it, making that const qualifier in our constructor a dirty lie
-  MT& my_mesh = const_cast<MT&>(*_obj);
+  MT & my_mesh = const_cast<MT &>(*_obj);
 
   // If we're asked to write data that's associated with a different
   // mesh, output files full of garbage are the result.
@@ -63,7 +63,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
       my_mesh.allow_renumbering(false);
     }
 
-  MeshSerializer serialize(const_cast<MT&>(*_obj), !_is_parallel_format);
+  MeshSerializer serialize(const_cast<MT &>(*_obj), !_is_parallel_format);
 
   // Build the nodal solution values & get the variable
   // names from the EquationSystems object
@@ -83,15 +83,15 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 
 template <class MT>
 void MeshOutput<MT>::
-_build_variable_names_and_solution_vector (const EquationSystems& es,
-                                           std::vector<Number>& soln,
-                                           std::vector<std::string>& names,
-                                           const std::set<std::string>* system_names)
+_build_variable_names_and_solution_vector (const EquationSystems & es,
+                                           std::vector<Number> & soln,
+                                           std::vector<std::string> & names,
+                                           const std::set<std::string> * system_names)
 {
   if(!_is_parallel_format)
     {
       // We need a serial mesh for MeshOutput for now
-      const_cast<EquationSystems&>(es).allgather();
+      const_cast<EquationSystems &>(es).allgather();
     }
 
   es.build_variable_names  (names, NULL, system_names);

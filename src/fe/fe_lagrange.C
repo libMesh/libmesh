@@ -34,10 +34,10 @@ namespace libMesh
 
 // Anonymous namespace for local helper functions
 namespace {
-void lagrange_nodal_soln(const Elem* elem,
+void lagrange_nodal_soln(const Elem * elem,
                          const Order order,
-                         const std::vector<Number>& elem_soln,
-                         std::vector<Number>&       nodal_soln)
+                         const std::vector<Number> & elem_soln,
+                         std::vector<Number> &       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -666,10 +666,10 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void lagrange_compute_constraints (DofConstraints &constraints,
-                                   DofMap &dof_map,
+void lagrange_compute_constraints (DofConstraints & constraints,
+                                   DofMap & dof_map,
                                    const unsigned int variable_number,
-                                   const Elem* elem,
+                                   const Elem * elem,
                                    const unsigned Dim)
 {
   // Only constrain elements in 2,3D.
@@ -695,7 +695,7 @@ void lagrange_compute_constraints (DofConstraints &constraints,
         {                                                     // this element and ones coarser
           // than this element.
           // Get pointers to the elements of interest and its parent.
-          const Elem* parent = elem->parent();
+          const Elem * parent = elem->parent();
 
           // This can't happen...  Only level-0 elements have NULL
           // parents, and no level-0 elements can be at a higher
@@ -749,7 +749,7 @@ void lagrange_compute_constraints (DofConstraints &constraints,
               if (self_constraint)
                 continue;
 
-              DofConstraintRow* constraint_row;
+              DofConstraintRow * constraint_row;
 
               // we may be running constraint methods concurrently
               // on multiple threads, so we need a lock to
@@ -765,7 +765,7 @@ void lagrange_compute_constraints (DofConstraints &constraints,
               }
 
               // The support point of the DOF
-              const Point& support_point = my_side->point(my_dof);
+              const Point & support_point = my_side->point(my_dof);
 
               // Figure out where my node lies on their reference element.
               const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
@@ -816,31 +816,31 @@ void lagrange_compute_constraints (DofConstraints &constraints,
   // of explicit instantiation at the end of this file.
   // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<0,LAGRANGE>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<1,LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<1,LAGRANGE>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<2,LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<2,LAGRANGE>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<3,LAGRANGE>::nodal_soln(const Elem* elem,
+void FE<3,LAGRANGE>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 
@@ -892,17 +892,17 @@ template <> bool FE<3,LAGRANGE>::shapes_need_reinit() const { return false; }
 // Dim==2 and 3.
 #ifdef LIBMESH_ENABLE_AMR
 template <>
-void FE<2,LAGRANGE>::compute_constraints (DofConstraints &constraints,
-                                          DofMap &dof_map,
+void FE<2,LAGRANGE>::compute_constraints (DofConstraints & constraints,
+                                          DofMap & dof_map,
                                           const unsigned int variable_number,
-                                          const Elem* elem)
+                                          const Elem * elem)
 { lagrange_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/2); }
 
 template <>
-void FE<3,LAGRANGE>::compute_constraints (DofConstraints &constraints,
-                                          DofMap &dof_map,
+void FE<3,LAGRANGE>::compute_constraints (DofConstraints & constraints,
+                                          DofMap & dof_map,
                                           const unsigned int variable_number,
-                                          const Elem* elem)
+                                          const Elem * elem)
 { lagrange_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/3); }
 #endif // LIBMESH_ENABLE_AMR
 

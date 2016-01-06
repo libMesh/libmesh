@@ -66,7 +66,7 @@ public:
   /**
    *  Constructor. Initializes PetscPreconditioner data structures
    */
-  TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm
+  TrilinosPreconditioner (const libMesh::Parallel::Communicator & comm
                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -125,15 +125,15 @@ protected:
 
   // Epetra_Operator interface
   virtual int SetUseTranspose(bool UseTranspose);
-  virtual int Apply(const Epetra_MultiVector &X, Epetra_MultiVector &Y) const;
-  virtual int ApplyInverse(const Epetra_MultiVector &r, Epetra_MultiVector &z) const;
+  virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const;
+  virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const;
   virtual double NormInf() const;
-  virtual const char *Label() const;
+  virtual const char * Label() const;
   virtual bool UseTranspose() const;
   virtual bool HasNormInf() const;
-  virtual const Epetra_Comm &Comm() const;
-  virtual const Epetra_Map &OperatorDomainMap() const;
-  virtual const Epetra_Map &OperatorRangeMap() const;
+  virtual const Epetra_Comm & Comm() const;
+  virtual const Epetra_Map & OperatorDomainMap() const;
+  virtual const Epetra_Map & OperatorRangeMap() const;
 };
 
 
@@ -142,7 +142,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-TrilinosPreconditioner<T>::TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm) :
+TrilinosPreconditioner<T>::TrilinosPreconditioner (const libMesh::Parallel::Communicator & comm) :
   Preconditioner<T>(comm),
   _prec(NULL),
   _mat(NULL)

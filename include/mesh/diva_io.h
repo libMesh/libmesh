@@ -49,12 +49,12 @@ public:
    */
   //TODO:[JWP] figure out how to implement a const write method!
   explicit
-  DivaIO (const MeshBase&);
+  DivaIO (const MeshBase &);
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
 private:
 
@@ -63,7 +63,7 @@ private:
    * file is called by the public interface file after it
    * constructs an ofstream.
    */
-  void write_stream(std::ostream& out);
+  void write_stream(std::ostream & out);
 };
 
 
@@ -72,7 +72,7 @@ private:
 // ------------------------------------------------------------
 // DivaIO inline members
 inline
-DivaIO::DivaIO (const MeshBase& mesh_in) :
+DivaIO::DivaIO (const MeshBase & mesh_in) :
   MeshOutput<MeshBase>  (mesh_in)
 {}
 

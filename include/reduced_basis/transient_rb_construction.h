@@ -53,8 +53,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  TransientRBConstruction (EquationSystems& es,
-                           const std::string& name,
+  TransientRBConstruction (EquationSystems & es,
+                           const std::string & name,
                            const unsigned int number);
 
   /**
@@ -107,7 +107,7 @@ public:
    * Read in the parameters from file and set up the system
    * accordingly.
    */
-  virtual void process_parameters_file (const std::string& parameters_filename) libmesh_override;
+  virtual void process_parameters_file (const std::string & parameters_filename) libmesh_override;
 
   /**
    * Print out info that describes the current setup of this RBConstruction.
@@ -134,58 +134,61 @@ public:
   /**
    * Assemble the L2 matrix.
    */
-  void assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+  void assemble_L2_matrix(SparseMatrix<Number> * input_matrix,
+                          bool apply_dirichlet_bc=true);
 
   /**
    * Assemble the mass matrix at the current parameter
    * and store it in input_matrix.
    */
-  void assemble_mass_matrix(SparseMatrix<Number>* input_matrix);
+  void assemble_mass_matrix(SparseMatrix<Number> * input_matrix);
 
   /**
    * Add the scaled mass matrix (assembled for the current parameter)
    * to input_matrix.
    */
   void add_scaled_mass_matrix(Number scalar,
-                              SparseMatrix<Number>* input_matrix);
+                              SparseMatrix<Number> * input_matrix);
 
   /**
    * Perform a matrix-vector multiplication with the current mass matrix
    * and store the result in dest.
    */
   void mass_matrix_scaled_matvec(Number scalar,
-                                 NumericVector<Number>& dest,
-                                 NumericVector<Number>& arg);
+                                 NumericVector<Number> & dest,
+                                 NumericVector<Number> & arg);
 
   /**
    * Set the L2 object.
    */
-  void set_L2_assembly(ElemAssembly& L2_assembly_in);
+  void set_L2_assembly(ElemAssembly & L2_assembly_in);
 
   /**
    * @return a reference to the L2 assembly object
    */
-  ElemAssembly& get_L2_assembly();
+  ElemAssembly & get_L2_assembly();
 
   /**
    * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
    */
-  void assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+  void assemble_Mq_matrix(unsigned int q,
+                          SparseMatrix<Number> * input_matrix,
+                          bool apply_dirichlet_bc=true);
 
   /**
    * Get a pointer to M_q.
    */
-  SparseMatrix<Number>* get_M_q(unsigned int q);
+  SparseMatrix<Number> * get_M_q(unsigned int q);
 
   /**
    * Get a pointer to non_dirichlet_M_q.
    */
-  SparseMatrix<Number>* get_non_dirichlet_M_q(unsigned int q);
+  SparseMatrix<Number> * get_non_dirichlet_M_q(unsigned int q);
 
   /**
    * Get a map that stores pointers to all of the matrices.
    */
-  virtual void get_all_matrices(std::map<std::string, SparseMatrix<Number>*>& all_matrices) libmesh_override;
+  virtual void get_all_matrices(std::map<std::string, SparseMatrix<Number> *> & all_matrices) libmesh_override;
 
   /**
    * Assemble the truth system in the transient linear case.
@@ -225,7 +228,7 @@ public:
    * the RB basis is empty, then this corresponds to the truth
    * solution data itself.
    */
-  const NumericVector<Number>& get_error_temporal_data();
+  const NumericVector<Number> & get_error_temporal_data();
 
   /**
    * Compute the L2 projection of the initial condition
@@ -238,14 +241,14 @@ public:
    * Write out all the Riesz representor data to files. Override
    * to write out transient data too.
    */
-  virtual void write_riesz_representors_to_files(const std::string& riesz_representors_dir,
+  virtual void write_riesz_representors_to_files(const std::string & riesz_representors_dir,
                                                  const bool write_binary_residual_representors) libmesh_override;
 
   /**
    * Write out all the Riesz representor data to files. Override
    * to read in transient data too.
    */
-  virtual void read_riesz_representors_from_files(const std::string& riesz_representors_dir,
+  virtual void read_riesz_representors_from_files(const std::string & riesz_representors_dir,
                                                   const bool write_binary_residual_representors) libmesh_override;
 
 
@@ -265,20 +268,20 @@ public:
   /**
    * Vector storing the Q_m matrices from the mass operator
    */
-  std::vector< SparseMatrix<Number>* > M_q_vector;
+  std::vector<SparseMatrix<Number> *> M_q_vector;
 
   /**
    * We sometimes also need a second set of M_q matrices
    * that do not have the Dirichlet boundary conditions
    * enforced.
    */
-  std::vector< SparseMatrix<Number>* > non_dirichlet_M_q_vector;
+  std::vector<SparseMatrix<Number> *> non_dirichlet_M_q_vector;
 
   /**
    * The truth outputs for all time-levels from the
    * most recent truth_solve.
    */
-  std::vector< std::vector<Number> > truth_outputs_all_k;
+  std::vector<std::vector<Number> > truth_outputs_all_k;
 
   /**
    * Boolean flag to indicate whether we are using a non-zero initialization.
@@ -325,7 +328,7 @@ protected:
    * Override to return the L2 product matrix for output
    * dual norm solves for transient state problems.
    */
-  virtual SparseMatrix<Number>& get_matrix_for_output_dual_solves() libmesh_override;
+  virtual SparseMatrix<Number> & get_matrix_for_output_dual_solves() libmesh_override;
 
   /**
    * Initialize RB space by adding the truth initial condition
@@ -383,7 +386,7 @@ protected:
   /**
    * Function pointer for assembling the L2 matrix.
    */
-  ElemAssembly* L2_assembly;
+  ElemAssembly * L2_assembly;
 
   /**
    * The vector that stores the right-hand side for the initial
@@ -398,7 +401,7 @@ private:
   /**
    * Dense matrix to store the data that we use for the temporal POD.
    */
-  std::vector< NumericVector<Number>* > temporal_data;
+  std::vector< NumericVector<Number> * > temporal_data;
 };
 
 } // namespace libMesh

@@ -73,9 +73,9 @@ public:
    * The estimated error is output in the vector
    * \p error_per_cell
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
+  virtual void estimate_error (const System & system,
+                               ErrorVector & error_per_cell,
+                               const NumericVector<Number> * solution_vector = NULL,
                                bool estimate_parent_error = false) libmesh_override;
 
   /**
@@ -119,15 +119,15 @@ private:
   class EstimateError
   {
   public:
-    EstimateError (const System& sys,
-                   const PatchRecoveryErrorEstimator &ee,
-                   ErrorVector& epc) :
+    EstimateError (const System & sys,
+                   const PatchRecoveryErrorEstimator & ee,
+                   ErrorVector & epc) :
       system(sys),
       error_estimator(ee),
       error_per_cell(epc)
     {}
 
-    void operator()(const ConstElemRange &range) const;
+    void operator()(const ConstElemRange & range) const;
 
     /**
      * Function to set the boolean patch_reuse in case the user
@@ -136,9 +136,9 @@ private:
 
   private:
 
-    const System &system;
-    const PatchRecoveryErrorEstimator &error_estimator;
-    ErrorVector &error_per_cell;
+    const System & system;
+    const PatchRecoveryErrorEstimator & error_estimator;
+    ErrorVector & error_per_cell;
   };
 
   friend class EstimateError;

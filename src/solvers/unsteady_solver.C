@@ -27,7 +27,7 @@ namespace libMesh
 
 
 
-UnsteadySolver::UnsteadySolver (sys_type& s)
+UnsteadySolver::UnsteadySolver (sys_type & s)
   : TimeSolver(s),
     old_local_nonlinear_solution (NumericVector<Number>::build(s.comm())),
     first_solve                  (true),
@@ -80,7 +80,7 @@ void UnsteadySolver::reinit ()
 #endif
 
   // localize the old solution
-  NumericVector<Number> &old_nonlinear_soln =
+  NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
 
   old_nonlinear_soln.localize
@@ -161,9 +161,9 @@ void UnsteadySolver::advance_timestep ()
       _system.time += _system.deltat;
     }
 
-  NumericVector<Number> &old_nonlinear_soln =
+  NumericVector<Number> & old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
-  NumericVector<Number> &nonlinear_solution =
+  NumericVector<Number> & nonlinear_solution =
     *(_system.solution);
 
   old_nonlinear_soln = nonlinear_solution;
@@ -224,7 +224,7 @@ Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_numbe
 
 
 
-Real UnsteadySolver::du(const SystemNorm &norm) const
+Real UnsteadySolver::du(const SystemNorm & norm) const
 {
 
   UniquePtr<NumericVector<Number> > solution_copy =

@@ -137,7 +137,7 @@ unsigned int idx(const ElemType type,
 
 // ------------------------------------------------------------
 // MeshTools::Generation function for mesh generation
-void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
+void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                                        const unsigned int nx,
                                        const unsigned int ny,
                                        const unsigned int nz,
@@ -161,7 +161,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
   // Clear the mesh and start from scratch
   mesh.clear();
 
-  BoundaryInfo& boundary_info = mesh.get_boundary_info();
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   if (nz != 0)
     mesh.set_mesh_dimension(3);
@@ -186,7 +186,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
         // Build one nodal element for the mesh
         mesh.add_point (Point(0, 0, 0), 0);
-        Elem* elem = mesh.add_elem (new NodeElem);
+        Elem * elem = mesh.add_elem (new NodeElem);
         elem->set_node(0) = mesh.node_ptr(0);
 
         break;
@@ -374,7 +374,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             {
               for (unsigned int i=0; i<nx; i++)
                 {
-                  Elem* elem = mesh.add_elem (new Edge2);
+                  Elem * elem = mesh.add_elem (new Edge2);
                   elem->set_node(0) = mesh.node_ptr(i);
                   elem->set_node(1) = mesh.node_ptr(i+1);
 
@@ -391,7 +391,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             {
               for (unsigned int i=0; i<nx; i++)
                 {
-                  Elem* elem = mesh.add_elem (new Edge3);
+                  Elem * elem = mesh.add_elem (new Edge3);
                   elem->set_node(0) = mesh.node_ptr(2*i);
                   elem->set_node(2) = mesh.node_ptr(2*i+1);
                   elem->set_node(1) = mesh.node_ptr(2*i+2);
@@ -409,7 +409,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             {
               for (unsigned int i=0; i<nx; i++)
                 {
-                  Elem* elem = mesh.add_elem (new Edge4);
+                  Elem * elem = mesh.add_elem (new Edge4);
                   elem->set_node(0) = mesh.node_ptr(3*i);
                   elem->set_node(2) = mesh.node_ptr(3*i+1);
                   elem->set_node(3) = mesh.node_ptr(3*i+2);
@@ -614,7 +614,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
-                    Elem* elem = mesh.add_elem(new Quad4);
+                    Elem * elem = mesh.add_elem(new Quad4);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
@@ -642,7 +642,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
-                    Elem* elem = NULL;
+                    Elem * elem = NULL;
 
                     // Add first Tri3
                     elem = mesh.add_elem(new Tri3);
@@ -681,7 +681,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               for (unsigned int j=0; j<(2*ny); j += 2)
                 for (unsigned int i=0; i<(2*nx); i += 2)
                   {
-                    Elem* elem = (type == QUAD8) ?
+                    Elem * elem = (type == QUAD8) ?
                       mesh.add_elem(new Quad8) :
                       mesh.add_elem(new Quad9);
 
@@ -719,7 +719,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               for (unsigned int j=0; j<(2*ny); j += 2)
                 for (unsigned int i=0; i<(2*nx); i += 2)
                   {
-                    Elem* elem = NULL;
+                    Elem * elem = NULL;
 
                     // Add first Tri6
                     elem = mesh.add_elem(new Tri6);
@@ -991,7 +991,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                 for (unsigned int j=0; j<ny; j++)
                   for (unsigned int i=0; i<nx; i++)
                     {
-                      Elem* elem = mesh.add_elem(new Hex8);
+                      Elem * elem = mesh.add_elem(new Hex8);
 
                       elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
                       elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
@@ -1033,7 +1033,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   for (unsigned int i=0; i<nx; i++)
                     {
                       // First Prism
-                      Elem* elem = NULL;
+                      Elem * elem = NULL;
                       elem = mesh.add_elem(new Prism6);
 
                       elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
@@ -1099,7 +1099,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                 for (unsigned int j=0; j<(2*ny); j += 2)
                   for (unsigned int i=0; i<(2*nx); i += 2)
                     {
-                      Elem* elem = (type == HEX20) ?
+                      Elem * elem = (type == HEX20) ?
                         mesh.add_elem(new Hex20) :
                         mesh.add_elem(new Hex27);
 
@@ -1168,7 +1168,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   for (unsigned int i=0; i<(2*nx); i += 2)
                     {
                       // First Prism
-                      Elem* elem = NULL;
+                      Elem * elem = NULL;
                       elem = ((type == PRISM15) ?
                               mesh.add_elem(new Prism15) :
                               mesh.add_elem(new Prism18));
@@ -1290,7 +1290,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             (type == PYRAMID14))
           {
             // Temporary storage for new elements. (24 tets per hex, 6 pyramids)
-            std::vector<Elem*> new_elements;
+            std::vector<Elem *> new_elements;
 
             if ((type == TET4) || (type == TET10))
               new_elements.reserve(24*mesh.n_elem());
@@ -1305,10 +1305,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               for ( ; el != end_el;  ++el)
                 {
                   // Get a pointer to the HEX27 element.
-                  Elem* base_hex = *el;
+                  Elem * base_hex = *el;
 
                   // Get a pointer to the node located at the HEX27 centroid
-                  Node* apex_node = base_hex->get_node(26);
+                  Node * apex_node = base_hex->get_node(26);
 
                   for (unsigned short s=0; s<base_hex->n_sides(); ++s)
                     {
@@ -1324,7 +1324,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                           for (unsigned int sub_tet=0; sub_tet<4; ++sub_tet)
                             {
                               new_elements.push_back( new Tet4 );
-                              Elem* sub_elem = new_elements.back();
+                              Elem * sub_elem = new_elements.back();
                               sub_elem->set_node(0) = side->get_node(sub_tet);
                               sub_elem->set_node(1) = side->get_node(8);                           // centroid of the face
                               sub_elem->set_node(2) = side->get_node(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
@@ -1342,7 +1342,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                         {
                           // Build 1 sub-pyramid per side.
                           new_elements.push_back(new Pyramid5);
-                          Elem* sub_elem = new_elements.back();
+                          Elem * sub_elem = new_elements.back();
 
                           // Set the base.  Note that since the apex is *inside* the base_hex,
                           // and the pyramid uses a counter-clockwise base numbering, we need to
@@ -1425,7 +1425,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-void MeshTools::Generation::build_point (UnstructuredMesh& mesh,
+void MeshTools::Generation::build_point (UnstructuredMesh & mesh,
                                          const ElemType type,
                                          const bool gauss_lobatto_grid)
 {
@@ -1443,7 +1443,7 @@ void MeshTools::Generation::build_point (UnstructuredMesh& mesh,
 }
 
 
-void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
+void MeshTools::Generation::build_line (UnstructuredMesh & mesh,
                                         const unsigned int nx,
                                         const Real xmin, const Real xmax,
                                         const ElemType type,
@@ -1464,7 +1464,7 @@ void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
 
 
 
-void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
+void MeshTools::Generation::build_square (UnstructuredMesh & mesh,
                                           const unsigned int nx,
                                           const unsigned int ny,
                                           const Real xmin, const Real xmax,
@@ -1495,7 +1495,7 @@ void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 
 
 #ifndef LIBMESH_ENABLE_AMR
-void MeshTools::Generation::build_sphere (UnstructuredMesh&,
+void MeshTools::Generation::build_sphere (UnstructuredMesh &,
                                           const Real,
                                           const unsigned int,
                                           const ElemType,
@@ -1507,7 +1507,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 
 #else
 
-void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
+void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
                                           const Real rad,
                                           const unsigned int nr,
                                           const ElemType type,
@@ -1522,7 +1522,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
   // Clear the mesh and start from scratch
   mesh.clear();
 
-  BoundaryInfo& boundary_info = mesh.get_boundary_info();
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   // Sphere is centered at origin by default
   const Point cent;
@@ -1558,7 +1558,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
             const Real rad_sqrt_2 = rad/sqrt_2;
 
             // (Temporary) convenient storage for node pointers
-            std::vector<Node*> nodes(8);
+            std::vector<Node *> nodes(8);
 
             // Point 0
             nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.), node_id++);
@@ -1588,7 +1588,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
             // Element 0
             {
-              Elem* elem0 = mesh.add_elem (new Quad4);
+              Elem * elem0 = mesh.add_elem (new Quad4);
               elem0->set_node(0) = nodes[0];
               elem0->set_node(1) = nodes[1];
               elem0->set_node(2) = nodes[2];
@@ -1597,7 +1597,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
             // Element 1
             {
-              Elem* elem1 = mesh.add_elem (new Quad4);
+              Elem * elem1 = mesh.add_elem (new Quad4);
               elem1->set_node(0) = nodes[4];
               elem1->set_node(1) = nodes[0];
               elem1->set_node(2) = nodes[3];
@@ -1606,7 +1606,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
             // Element 2
             {
-              Elem* elem2 = mesh.add_elem (new Quad4);
+              Elem * elem2 = mesh.add_elem (new Quad4);
               elem2->set_node(0) = nodes[4];
               elem2->set_node(1) = nodes[5];
               elem2->set_node(2) = nodes[1];
@@ -1615,7 +1615,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
             // Element 3
             {
-              Elem* elem3 = mesh.add_elem (new Quad4);
+              Elem * elem3 = mesh.add_elem (new Quad4);
               elem3->set_node(0) = nodes[1];
               elem3->set_node(1) = nodes[5];
               elem3->set_node(2) = nodes[6];
@@ -1624,7 +1624,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
             // Element 4
             {
-              Elem* elem4 = mesh.add_elem (new Quad4);
+              Elem * elem4 = mesh.add_elem (new Quad4);
               elem4->set_node(0) = nodes[3];
               elem4->set_node(1) = nodes[2];
               elem4->set_node(2) = nodes[6];
@@ -1662,7 +1662,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
             for (unsigned int i = 0; i < 5; ++i)
               {
                 // 5 elems around point 0
-                Elem* new_elem = mesh.add_elem (new Tri3);
+                Elem * new_elem = mesh.add_elem (new Tri3);
                 new_elem->set_node(0) = mesh.node_ptr(0);
                 new_elem->set_node(1) = mesh.node_ptr(idx1[i]);
                 new_elem->set_node(2) = mesh.node_ptr(idx1[i+1]);
@@ -1713,7 +1713,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
           r_med   = (0.125*std::sqrt(2.)+0.5)*rad; // .67677*radius
 
         // (Temporary) convenient storage for node pointers
-        std::vector<Node*> nodes(16);
+        std::vector<Node *> nodes(16);
 
         // For ParallelMesh, if we don't specify node IDs the Mesh
         // will try to pick an appropriate (unique) one for us.  But
@@ -1744,7 +1744,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
         // Now create the elements and add them to the mesh
         // Element 0 - center element
         {
-          Elem* elem0 = mesh.add_elem (new Hex8);
+          Elem * elem0 = mesh.add_elem (new Hex8);
           elem0->set_node(0) = nodes[0];
           elem0->set_node(1) = nodes[1];
           elem0->set_node(2) = nodes[2];
@@ -1757,7 +1757,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
         // Element 1 - "bottom"
         {
-          Elem* elem1 = mesh.add_elem (new Hex8);
+          Elem * elem1 = mesh.add_elem (new Hex8);
           elem1->set_node(0) = nodes[8];
           elem1->set_node(1) = nodes[9];
           elem1->set_node(2) = nodes[10];
@@ -1770,7 +1770,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
         // Element 2 - "front"
         {
-          Elem* elem2 = mesh.add_elem (new Hex8);
+          Elem * elem2 = mesh.add_elem (new Hex8);
           elem2->set_node(0) = nodes[8];
           elem2->set_node(1) = nodes[9];
           elem2->set_node(2) = nodes[1];
@@ -1783,7 +1783,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
         // Element 3 - "right"
         {
-          Elem* elem3 = mesh.add_elem (new Hex8);
+          Elem * elem3 = mesh.add_elem (new Hex8);
           elem3->set_node(0) = nodes[1];
           elem3->set_node(1) = nodes[9];
           elem3->set_node(2) = nodes[10];
@@ -1796,7 +1796,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
         // Element 4 - "back"
         {
-          Elem* elem4 = mesh.add_elem (new Hex8);
+          Elem * elem4 = mesh.add_elem (new Hex8);
           elem4->set_node(0) = nodes[3];
           elem4->set_node(1) = nodes[2];
           elem4->set_node(2) = nodes[10];
@@ -1809,7 +1809,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
         // Element 5 - "left"
         {
-          Elem* elem5 = mesh.add_elem (new Hex8);
+          Elem * elem5 = mesh.add_elem (new Hex8);
           elem5->set_node(0) = nodes[8];
           elem5->set_node(1) = nodes[0];
           elem5->set_node(2) = nodes[3];
@@ -1822,7 +1822,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
         // Element 6 - "top"
         {
-          Elem* elem6 = mesh.add_elem (new Hex8);
+          Elem * elem6 = mesh.add_elem (new Hex8);
           elem6->set_node(0) = nodes[4];
           elem6->set_node(1) = nodes[5];
           elem6->set_node(2) = nodes[6];
@@ -1858,7 +1858,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
       for (; it != end; ++it)
         {
-          Elem* elem = *it;
+          Elem * elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
             if (elem->neighbor(s) == NULL || (mesh.mesh_dimension() == 2 && !flat))
@@ -1905,7 +1905,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
       for (; it != end; ++it)
         {
-          Elem* elem = *it;
+          Elem * elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
             if (elem->neighbor(s) == NULL)
@@ -1932,7 +1932,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
     for (; it != end; ++it)
       {
-        Elem* elem = *it;
+        Elem * elem = *it;
         for (unsigned short s=0; s != elem->n_sides(); ++s)
           if (!elem->neighbor(s))
             boundary_info.add_side(elem, s, 0);
@@ -1950,8 +1950,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
 
 // Meshes the tensor product of a 1D and a 1D-or-2D domain.
-void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
-                                             const MeshBase& cross_section,
+void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
+                                             const MeshBase & cross_section,
                                              const unsigned int nz,
                                              RealVectorValue extrusion_vector,
                                              QueryElemSubdomainIDBase * elem_subdomain)
@@ -1966,8 +1966,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
   unsigned int order = 1;
 
-  BoundaryInfo& boundary_info = mesh.get_boundary_info();
-  const BoundaryInfo& cross_section_boundary_info = cross_section.get_boundary_info();
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
+  const BoundaryInfo & cross_section_boundary_info = cross_section.get_boundary_info();
 
   // If cross_section is distributed, so is its extrusion
   if (!cross_section.is_serial())
@@ -1990,11 +1990,11 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   const MeshBase::const_node_iterator nend = cross_section.nodes_end();
   for (; nd!=nend; ++nd)
     {
-      const Node* node = *nd;
+      const Node * node = *nd;
 
       for (unsigned int k=0; k != order*nz+1; ++k)
         {
-          Node *new_node =
+          Node * new_node =
             mesh.add_point(*node +
                            (extrusion_vector * k / nz / order),
                            node->id() + (k * orig_nodes),
@@ -2005,7 +2005,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
         }
     }
 
-  const std::set<boundary_id_type> &side_ids =
+  const std::set<boundary_id_type> & side_ids =
     cross_section_boundary_info.get_side_boundary_ids();
   const boundary_id_type next_side_id = side_ids.empty() ?
     0 : cast_int<boundary_id_type>(*side_ids.rbegin() + 1);
@@ -2014,7 +2014,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   const MeshBase::const_element_iterator end = cross_section.elements_end();
   for (; el!=end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       const ElemType etype = elem->type();
 
       // build_extrusion currently only works on coarse meshes
@@ -2022,7 +2022,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
       for (unsigned int k=0; k != nz; ++k)
         {
-          Elem *new_elem;
+          Elem * new_elem;
           switch (etype)
             {
             case EDGE2:
@@ -2202,13 +2202,13 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Triangulates a 2D rectangular region with or without holes
-void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
+void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
                                                   const unsigned int nx, // num. of elements in x-dir
                                                   const unsigned int ny, // num. of elements in y-dir
                                                   const Real xmin, const Real xmax,
                                                   const Real ymin, const Real ymax,
                                                   const ElemType type,
-                                                  const std::vector<TriangleInterface::Hole*>* holes)
+                                                  const std::vector<TriangleInterface::Hole*> * holes)
 {
   // Check for reasonable size
   libmesh_assert_greater_equal (nx, 1); // need at least 1 element in x-direction
@@ -2219,7 +2219,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
   // Clear out any data which may have been in the Mesh
   mesh.clear();
 
-  BoundaryInfo& boundary_info = mesh.get_boundary_info();
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   // Make sure the new Mesh will be 2D
   mesh.set_mesh_dimension(2);
@@ -2268,7 +2268,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
   const MeshBase::element_iterator end_el = mesh.elements_end();
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       for (unsigned int s=0; s<elem->n_sides(); s++)
         if (elem->neighbor(s) == NULL)

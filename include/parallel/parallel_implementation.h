@@ -40,7 +40,7 @@ namespace Parallel {
   {                                                                     \
   public:                                                               \
     explicit                                                            \
-      StandardType(const cxxtype* = NULL) : DataType(mpitype) {}        \
+      StandardType(const cxxtype * = NULL) : DataType(mpitype) {}       \
   }
 
 #else
@@ -51,7 +51,7 @@ namespace Parallel {
   {                                                             \
   public:                                                       \
     explicit                                                    \
-      StandardType(const cxxtype* = NULL) : DataType() {}       \
+      StandardType(const cxxtype * = NULL) : DataType() {}      \
   }
 
 #endif
@@ -63,8 +63,8 @@ namespace Parallel {
   struct Attributes<cxxtype>                                            \
   {                                                                     \
     static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype& x) { x = std::numeric_limits<cxxtype>::min(); } \
-    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+    static void set_lowest(cxxtype & x) { x = std::numeric_limits<cxxtype>::min(); } \
+    static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::max(); } \
   }
 
 #define FLOAT_TYPE(cxxtype,mpitype)                                     \
@@ -74,8 +74,8 @@ namespace Parallel {
   struct Attributes<cxxtype>                                            \
   {                                                                     \
     static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::infinity(); } \
-    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::infinity(); } \
+    static void set_lowest(cxxtype & x) { x = -std::numeric_limits<cxxtype>::infinity(); } \
+    static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::infinity(); } \
   }
 
 #define CONTAINER_TYPE(cxxtype)                                         \
@@ -83,10 +83,10 @@ namespace Parallel {
   struct Attributes<cxxtype<T> >                                        \
   {                                                                     \
     static const bool has_min_max = Attributes<T>::has_min_max;         \
-    static void set_lowest(cxxtype<T>& x) {                             \
+    static void set_lowest(cxxtype<T> & x) {                            \
       for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
         Attributes<T>::set_lowest(*i); }                                \
-    static void set_highest(cxxtype<T>& x) {                            \
+    static void set_highest(cxxtype<T> & x) {                           \
       for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
         Attributes<T>::set_highest(*i); }                               \
   }
@@ -116,7 +116,7 @@ class StandardType<std::pair<T1, T2> > : public DataType
 {
 public:
   explicit
-  StandardType(const std::pair<T1, T2> *example = NULL) {
+  StandardType(const std::pair<T1, T2> * example = NULL) {
     // We need an example for MPI_Address to use
     libmesh_assert(example);
 
@@ -143,7 +143,7 @@ public:
         MPI_Aint displs[4];
 
         libmesh_call_mpi
-          (MPI_Address (const_cast<std::pair<T1,T2>*>(example),
+          (MPI_Address (const_cast<std::pair<T1,T2> *>(example),
                         &displs[0]));
         libmesh_call_mpi
           (MPI_Address (const_cast<T1*>(&example->first),
@@ -152,7 +152,7 @@ public:
           (MPI_Address (const_cast<T2*>(&example->second),
                         &displs[2]));
         libmesh_call_mpi
-          (MPI_Address (const_cast<std::pair<T1,T2>*>(example+1),
+          (MPI_Address (const_cast<std::pair<T1,T2> *>(example+1),
                         &displs[3]));
 
         displs[1] -= displs[0];
@@ -169,7 +169,7 @@ public:
         MPI_Aint displs[2], start;
 
         libmesh_call_mpi
-          (MPI_Get_address (const_cast<std::pair<T1,T2>*>(example),
+          (MPI_Get_address (const_cast<std::pair<T1,T2> *>(example),
                             &start));
         libmesh_call_mpi
           (MPI_Get_address (const_cast<T1*>(&example->first),
@@ -231,8 +231,8 @@ namespace {
 // Internal helper function to create vector<something_useable> from
 // vector<bool> for compatibility with MPI bitwise operations
 template <typename T>
-inline void pack_vector_bool(const std::vector<bool> &in,
-                             std::vector<T> &out)
+inline void pack_vector_bool(const std::vector<bool> & in,
+                             std::vector<T> & out)
 {
   unsigned int data_bits = 8*sizeof(T);
   std::size_t in_size = in.size();
@@ -251,8 +251,8 @@ inline void pack_vector_bool(const std::vector<bool> &in,
 // vector<something usable> for compatibility with MPI byte
 // operations
 template <typename T>
-inline void unpack_vector_bool(const std::vector<T> &in,
-                               std::vector<bool> &out)
+inline void unpack_vector_bool(const std::vector<T> & in,
+                               std::vector<bool> & out)
 {
   unsigned int data_bits = 8*sizeof(T);
   // We need the output vector to already be properly sized
@@ -272,14 +272,13 @@ inline void unpack_vector_bool(const std::vector<T> &in,
 // We use a helper function here to avoid ambiguity when calling
 // send_receive of (vector<vector<T>>,vector<vector<T>>)
 template <typename T1, typename T2>
-inline void send_receive_vec_of_vec
-(const unsigned int dest_processor_id,
- std::vector<std::vector<T1> > &send,
- const unsigned int source_processor_id,
- std::vector<std::vector<T2> > &recv,
- const libMesh::Parallel::MessageTag &send_tag,
- const libMesh::Parallel::MessageTag &recv_tag,
- const libMesh::Parallel::Communicator &comm)
+inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
+                                    std::vector<std::vector<T1> > & send,
+                                    const unsigned int source_processor_id,
+                                    std::vector<std::vector<T2> > & recv,
+                                    const libMesh::Parallel::MessageTag & send_tag,
+                                    const libMesh::Parallel::MessageTag & recv_tag,
+                                    const libMesh::Parallel::Communicator & comm)
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -430,9 +429,9 @@ namespace Parallel
  * libMesh::CommWorld
  */
 #ifdef LIBMESH_DISABLE_COMMWORLD
-extern FakeCommunicator& Communicator_World;
+extern FakeCommunicator & Communicator_World;
 #else
-extern Communicator& Communicator_World;
+extern Communicator & Communicator_World;
 #endif
 
 
@@ -440,7 +439,7 @@ extern Communicator& Communicator_World;
  * Helper function for range packing
  */
 template <typename Context, typename Iter>
-inline std::size_t packed_range_size (const Context *context,
+inline std::size_t packed_range_size (const Context * context,
                                       Iter range_begin,
                                       const Iter range_end)
 {
@@ -459,10 +458,10 @@ inline std::size_t packed_range_size (const Context *context,
  * Helper function for range packing
  */
 template <typename Context, typename buffertype, typename Iter>
-inline Iter pack_range (const Context *context,
+inline Iter pack_range (const Context * context,
                         Iter range_begin,
                         const Iter range_end,
-                        std::vector<buffertype>& buffer)
+                        std::vector<buffertype> & buffer)
 {
   // When we serialize into buffers, we need to use large buffers to optimize MPI
   // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
@@ -516,8 +515,8 @@ inline Iter pack_range (const Context *context,
  * Helper function for range unpacking
  */
 template <typename Context, typename buffertype, typename OutputIter>
-inline void unpack_range (const std::vector<buffertype>& buffer,
-                          Context *context,
+inline void unpack_range (const std::vector<buffertype> & buffer,
+                          Context * context,
                           OutputIter out)
 {
   // Our objects should be of the correct type to be assigned to the
@@ -531,7 +530,7 @@ inline void unpack_range (const std::vector<buffertype>& buffer,
 
   while (next_object_start < buffer.end())
     {
-      T* obj;
+      T * obj;
       Parallel::unpack(next_object_start, &obj, context);
       libmesh_assert(obj);
       next_object_start += Parallel::packed_size(obj, next_object_start);
@@ -553,7 +552,7 @@ inline Communicator::Communicator () :
   used_tag_values(),
   _I_duped_it(false) {}
 
-inline Communicator::Communicator (const communicator &comm) :
+inline Communicator::Communicator (const communicator & comm) :
 #ifdef LIBMESH_HAVE_MPI
   _communicator(MPI_COMM_SELF),
 #endif
@@ -566,12 +565,14 @@ inline Communicator::Communicator (const communicator &comm) :
   this->assign(comm);
 }
 
-inline Communicator::~Communicator () {
+inline Communicator::~Communicator ()
+{
   this->clear();
 }
 
 #ifdef LIBMESH_HAVE_MPI
-inline void Communicator::split(int color, int key, Communicator &target) const {
+inline void Communicator::split(int color, int key, Communicator & target) const
+{
   target.clear();
   MPI_Comm newcomm;
   libmesh_call_mpi
@@ -581,18 +582,21 @@ inline void Communicator::split(int color, int key, Communicator &target) const 
   target.send_mode(this->send_mode());
 }
 #else
-inline void Communicator::split(int, int, Communicator &target) const {
+inline void Communicator::split(int, int, Communicator & target) const
+{
   target.assign(this->get());
 }
 #endif
 
-inline void Communicator::duplicate(const Communicator &comm) {
+inline void Communicator::duplicate(const Communicator & comm)
+{
   this->duplicate(comm._communicator);
   this->send_mode(comm.send_mode());
 }
 
 #ifdef LIBMESH_HAVE_MPI
-inline void Communicator::duplicate(const communicator &comm) {
+inline void Communicator::duplicate(const communicator & comm)
+{
   if (_communicator != MPI_COMM_NULL)
     {
       libmesh_call_mpi
@@ -620,7 +624,8 @@ inline void Communicator::clear() {
 #endif
 }
 
-inline Communicator& Communicator::operator= (const communicator &comm) {
+inline Communicator & Communicator::operator= (const communicator & comm)
+{
   this->clear();
   this->assign(comm);
   return *this;
@@ -640,7 +645,7 @@ inline Communicator::Communicator (const Communicator &) :
   libmesh_not_implemented();
 }
 
-inline void Communicator::assign(const communicator &comm)
+inline void Communicator::assign(const communicator & comm)
 {
   _communicator = comm;
 #ifdef LIBMESH_HAVE_MPI
@@ -675,29 +680,29 @@ inline Status::Status () :
   _datatype()
 {}
 
-inline Status::Status (const data_type &type) :
+inline Status::Status (const data_type & type) :
   _status(),
   _datatype(type)
 {}
 
-inline Status::Status (const status &stat) :
+inline Status::Status (const status & stat) :
   _status(stat),
   _datatype()
 {}
 
-inline Status::Status (const status &stat,
-                       const data_type &type) :
+inline Status::Status (const status & stat,
+                       const data_type & type) :
   _status(stat),
   _datatype(type)
 {}
 
-inline Status::Status (const Status &stat) :
+inline Status::Status (const Status & stat) :
   _status(stat._status),
   _datatype(stat._datatype)
 {}
 
-inline Status::Status (const Status    &stat,
-                       const data_type &type) :
+inline Status::Status (const Status    & stat,
+                       const data_type & type) :
   _status(stat._status),
   _datatype(type)
 {}
@@ -722,7 +727,7 @@ inline int Status::tag () const
 }
 
 #ifdef LIBMESH_HAVE_MPI
-inline unsigned int Status::size (const data_type &type) const
+inline unsigned int Status::size (const data_type & type) const
 {
   int msg_size;
   libmesh_call_mpi
@@ -754,12 +759,12 @@ inline Request::Request () :
   post_wait_work(NULL)
 {}
 
-inline Request::Request (const request &r) :
+inline Request::Request (const request & r) :
   _request(r),
   post_wait_work(NULL)
 {}
 
-inline Request::Request (const Request &other) :
+inline Request::Request (const Request & other) :
   _request(other._request),
   post_wait_work(other.post_wait_work)
 {
@@ -784,7 +789,7 @@ inline void Request::cleanup()
 #ifdef DEBUG
           // If we're done using this request, then we'd better have
           // done the work we waited for
-          for (std::vector<PostWaitWork*>::iterator i =
+          for (std::vector<PostWaitWork *>::iterator i =
                  post_wait_work->first.begin();
                i != post_wait_work->first.end(); ++i)
             libmesh_assert(!(*i));
@@ -795,7 +800,7 @@ inline void Request::cleanup()
     }
 }
 
-inline Request& Request::operator = (const Request &other)
+inline Request & Request::operator = (const Request & other)
 {
   this->cleanup();
   _request = other._request;
@@ -812,7 +817,7 @@ inline Request& Request::operator = (const Request &other)
   return *this;
 }
 
-inline Request& Request::operator = (const request &r)
+inline Request & Request::operator = (const request & r)
 {
   this->cleanup();
   _request = r;
@@ -837,7 +842,7 @@ inline Status Request::wait ()
     (MPI_Wait (&_request, stat.get()));
 #endif
   if (post_wait_work)
-    for (std::vector<PostWaitWork*>::iterator i =
+    for (std::vector<PostWaitWork *>::iterator i =
            post_wait_work->first.begin();
          i != post_wait_work->first.end(); ++i)
       {
@@ -883,7 +888,7 @@ inline bool Request::test ()
 }
 
 #ifdef LIBMESH_HAVE_MPI
-inline bool Request::test (status &stat)
+inline bool Request::test (status & stat)
 {
   int val=0;
 
@@ -899,12 +904,12 @@ inline bool Request::test (status &)
 }
 #endif
 
-inline void Request::add_prior_request(const Request& req)
+inline void Request::add_prior_request(const Request & req)
 {
   // We're making a chain of prior requests, not a tree
   libmesh_assert(!req._prior_request.get());
 
-  Request *new_prior_req = new Request(req);
+  Request * new_prior_req = new Request(req);
 
   // new_prior_req takes ownership of our existing _prior_request
   new_prior_req->_prior_request.reset(this->_prior_request.release());
@@ -913,12 +918,12 @@ inline void Request::add_prior_request(const Request& req)
   this->_prior_request.reset(new_prior_req);
 }
 
-inline void Request::add_post_wait_work(PostWaitWork* work)
+inline void Request::add_post_wait_work(PostWaitWork * work)
 {
   if (!post_wait_work)
     post_wait_work = new
-      std::pair<std::vector <PostWaitWork* >, unsigned int>
-      (std::vector <PostWaitWork* >(), 1);
+      std::pair<std::vector <PostWaitWork * >, unsigned int>
+      (std::vector <PostWaitWork * >(), 1);
   post_wait_work->first.push_back(work);
 }
 
@@ -948,293 +953,294 @@ inline void Communicator::barrier () const {}
 // legacy e.g. Paralell::send() methods, requires
 // Communicator_World
 #ifndef LIBMESH_DISABLE_COMMWORLD
-inline void barrier (const Communicator &comm = Communicator_World)
+inline void barrier (const Communicator & comm = Communicator_World)
 {
   comm.barrier();
 }
 
 template <typename T>
-inline bool verify(const T &r,
-                   const Communicator &comm = Communicator_World)
+inline bool verify(const T & r,
+                   const Communicator & comm = Communicator_World)
 { return comm.verify(r); }
 
 template <typename T>
-inline void min(T &r,
-                const Communicator &comm = Communicator_World)
+inline void min(T & r,
+                const Communicator & comm = Communicator_World)
 { comm.min(r); }
 
 template <typename T, typename U>
-inline void minloc(T &r,
-                   U &min_id,
-                   const Communicator &comm = Communicator_World)
+inline void minloc(T & r,
+                   U & min_id,
+                   const Communicator & comm = Communicator_World)
 { comm.minloc(r, min_id); }
 
 template <typename T>
-inline void max(T &r,
-                const Communicator &comm = Communicator_World)
+inline void max(T & r,
+                const Communicator & comm = Communicator_World)
 { comm.max(r); }
 
 template <typename T, typename U>
-inline void maxloc(T &r,
-                   U &max_id,
-                   const Communicator &comm = Communicator_World)
+inline void maxloc(T & r,
+                   U & max_id,
+                   const Communicator & comm = Communicator_World)
 { comm.maxloc(r, max_id); }
 
 template <typename T>
-inline void sum(T &r,
-                const Communicator &comm = Communicator_World)
+inline void sum(T & r,
+                const Communicator & comm = Communicator_World)
 { comm.sum(r); }
 
 template <typename T>
-inline void set_union(T &data, const unsigned int root_id,
-                      const Communicator &comm = Communicator_World)
+inline void set_union(T & data, const unsigned int root_id,
+                      const Communicator & comm = Communicator_World)
 { comm.set_union(data, root_id); }
 
 template <typename T>
-inline void set_union(T &data,
-                      const Communicator &comm = Communicator_World)
+inline void set_union(T & data,
+                      const Communicator & comm = Communicator_World)
 { comm.set_union(data); }
 
 inline status probe (const unsigned int src_processor_id,
-                     const MessageTag &tag=any_tag,
-                     const Communicator &comm = Communicator_World)
+                     const MessageTag & tag=any_tag,
+                     const Communicator & comm = Communicator_World)
 { return comm.probe(src_processor_id, tag); }
 
 template <typename T>
 inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
+                  T & data,
+                  const MessageTag & tag=no_tag,
+                  const Communicator & comm = Communicator_World)
 { comm.send(dest_processor_id, data, tag); }
 
 template <typename T>
 inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  Request &req,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
+                  T & data,
+                  Request & req,
+                  const MessageTag & tag=no_tag,
+                  const Communicator & comm = Communicator_World)
 { comm.send(dest_processor_id, data, req, tag); }
 
 template <typename T>
 inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  const DataType &type,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
+                  T & data,
+                  const DataType & type,
+                  const MessageTag & tag=no_tag,
+                  const Communicator & comm = Communicator_World)
 { comm.send(dest_processor_id, data, type, tag); }
 
 template <typename T>
 inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  const DataType &type,
-                  Request &req,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
+                  T & data,
+                  const DataType & type,
+                  Request & req,
+                  const MessageTag & tag=no_tag,
+                  const Communicator & comm = Communicator_World)
 { comm.send(dest_processor_id, data, type, req, tag); }
 
 
 template <typename Context, typename Iter>
 inline void send_packed_range (const unsigned int dest_processor_id,
-                               const Context *context,
+                               const Context * context,
                                Iter range_begin,
                                const Iter range_end,
-                               const MessageTag &tag=no_tag,
-                               const Communicator &comm = Communicator_World)
+                               const MessageTag & tag=no_tag,
+                               const Communicator & comm = Communicator_World)
 { comm.send_packed_range(dest_processor_id, context, range_begin, range_end, tag); }
 
 
 template <typename Context, typename Iter>
 inline void send_packed_range (const unsigned int dest_processor_id,
-                               const Context *context,
+                               const Context * context,
                                Iter range_begin,
                                const Iter range_end,
-                               Request &req,
-                               const MessageTag &tag=no_tag,
-                               const Communicator &comm = Communicator_World)
+                               Request & req,
+                               const MessageTag & tag=no_tag,
+                               const Communicator & comm = Communicator_World)
 { comm.send_packed_range(dest_processor_id, context, range_begin, range_end, req, tag); }
 
 
 template <typename T>
 inline void nonblocking_send (const unsigned int dest_processor_id,
-                              T &buf,
-                              const DataType &type,
-                              Request &r,
-                              const MessageTag &tag=no_tag,
-                              const Communicator &comm = Communicator_World)
+                              T & buf,
+                              const DataType & type,
+                              Request & r,
+                              const MessageTag & tag=no_tag,
+                              const Communicator & comm = Communicator_World)
 { comm.send (dest_processor_id, buf, type, r, tag); }
 
 template <typename T>
 inline void nonblocking_send (const unsigned int dest_processor_id,
-                              T &buf,
-                              Request &r,
-                              const MessageTag &tag=no_tag,
-                              const Communicator &comm = Communicator_World)
+                              T & buf,
+                              Request & r,
+                              const MessageTag & tag=no_tag,
+                              const Communicator & comm = Communicator_World)
 { comm.send (dest_processor_id, buf, r, tag); }
 
 template <typename T>
 inline Status receive (const unsigned int src_processor_id,
-                       T &buf,
-                       const MessageTag &tag=any_tag,
-                       const Communicator &comm = Communicator_World)
+                       T & buf,
+                       const MessageTag & tag=any_tag,
+                       const Communicator & comm = Communicator_World)
 { return comm.receive (src_processor_id, buf, tag); }
 
 template <typename T>
 inline void receive (const unsigned int src_processor_id,
-                     T &buf,
-                     Request &req,
-                     const MessageTag &tag=any_tag,
-                     const Communicator &comm = Communicator_World)
+                     T & buf,
+                     Request & req,
+                     const MessageTag & tag=any_tag,
+                     const Communicator & comm = Communicator_World)
 { comm.receive (src_processor_id, buf, req, tag); }
 
 template <typename T>
 inline Status receive (const unsigned int src_processor_id,
-                       T &buf,
-                       const DataType &type,
-                       const MessageTag &tag=any_tag,
-                       const Communicator &comm = Communicator_World)
+                       T & buf,
+                       const DataType & type,
+                       const MessageTag & tag=any_tag,
+                       const Communicator & comm = Communicator_World)
 { return comm.receive (src_processor_id, buf, type, tag); }
 
 template <typename T>
 inline void receive (const unsigned int src_processor_id,
-                     T &buf,
-                     const DataType &type,
-                     Request &req,
-                     const MessageTag &tag=any_tag,
-                     const Communicator &comm = Communicator_World)
+                     T & buf,
+                     const DataType & type,
+                     Request & req,
+                     const MessageTag & tag=any_tag,
+                     const Communicator & comm = Communicator_World)
 { comm.receive (src_processor_id, buf, type, req, tag); }
 
 template <typename Context, typename OutputIter>
 inline void receive_packed_range (const unsigned int src_processor_id,
-                                  Context *context,
+                                  Context * context,
                                   OutputIter out,
-                                  const MessageTag &tag=any_tag,
-                                  const Communicator &comm = Communicator_World)
+                                  const MessageTag & tag=any_tag,
+                                  const Communicator & comm = Communicator_World)
 { comm.receive_packed_range (src_processor_id, context, out, tag); }
 
 // template <typename Context, typename OutputIter>
 // inline void receive_packed_range (const unsigned int src_processor_id,
-//                                   Context *context,
+//                                   Context * context,
 //                                   OutputIter out,
-//                                   Request &req,
-//                                   const MessageTag &tag=any_tag,
-//                                   const Communicator &comm = Communicator_World)
+//                                   Request & req,
+//                                   const MessageTag & tag=any_tag,
+//                                   const Communicator & comm = Communicator_World)
 // { comm.receive_packed_range (src_processor_id, context, out, req, tag); }
 
 template <typename T>
 inline void nonblocking_receive (const unsigned int src_processor_id,
-                                 T &buf,
-                                 const DataType &type,
-                                 Request &r,
-                                 const MessageTag &tag=any_tag,
-                                 const Communicator &comm = Communicator_World)
+                                 T & buf,
+                                 const DataType & type,
+                                 Request & r,
+                                 const MessageTag & tag=any_tag,
+                                 const Communicator & comm = Communicator_World)
 { comm.receive (src_processor_id, buf, type, r, tag); }
 
 template <typename T>
 inline void nonblocking_receive (const unsigned int src_processor_id,
-                                 T &buf,
-                                 Request &r,
-                                 const MessageTag &tag=any_tag,
-                                 const Communicator &comm = Communicator_World)
+                                 T & buf,
+                                 Request & r,
+                                 const MessageTag & tag=any_tag,
+                                 const Communicator & comm = Communicator_World)
 { comm.receive (src_processor_id, buf, r, tag); }
 
 template <typename T1, typename T2>
 inline void send_receive(const unsigned int dest_processor_id,
-                         T1 &send,
+                         T1 & send,
                          const unsigned int source_processor_id,
-                         T2 &recv,
-                         const MessageTag &send_tag = no_tag,
-                         const MessageTag &recv_tag = any_tag,
-                         const Communicator &comm = Communicator_World)
+                         T2 & recv,
+                         const MessageTag & send_tag = no_tag,
+                         const MessageTag & recv_tag = any_tag,
+                         const Communicator & comm = Communicator_World)
 { comm.send_receive(dest_processor_id, send, source_processor_id, recv,
                     send_tag, recv_tag); }
 
 template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
 inline void send_receive_packed_range(const unsigned int dest_processor_id,
-                                      const Context1* context1,
+                                      const Context1 * context1,
                                       RangeIter send_begin,
                                       const RangeIter send_end,
                                       const unsigned int source_processor_id,
-                                      Context2* context2,
+                                      Context2 * context2,
                                       OutputIter out,
-                                      const MessageTag &send_tag = no_tag,
-                                      const MessageTag &recv_tag = any_tag,
-                                      const Communicator &comm = Communicator_World)
+                                      const MessageTag & send_tag = no_tag,
+                                      const MessageTag & recv_tag = any_tag,
+                                      const Communicator & comm = Communicator_World)
 { comm.send_receive_packed_range(dest_processor_id, context1, send_begin, send_end,
                                  source_processor_id, context2, out, send_tag, recv_tag); }
 
 template <typename T1, typename T2>
 inline void send_receive(const unsigned int dest_processor_id,
-                         T1 &send,
-                         const DataType &type1,
+                         T1 & send,
+                         const DataType & type1,
                          const unsigned int source_processor_id,
-                         T2 &recv,
-                         const DataType &type2,
-                         const MessageTag &send_tag = no_tag,
-                         const MessageTag &recv_tag = any_tag,
-                         const Communicator &comm = Communicator_World)
+                         T2 & recv,
+                         const DataType & type2,
+                         const MessageTag & send_tag = no_tag,
+                         const MessageTag & recv_tag = any_tag,
+                         const Communicator & comm = Communicator_World)
 { comm.send_receive(dest_processor_id, send, type1, source_processor_id,
                     recv, type2, send_tag, recv_tag); }
 
 template <typename T>
 inline void gather(const unsigned int root_id,
                    T send,
-                   std::vector<T> &recv,
-                   const Communicator &comm = Communicator_World)
+                   std::vector<T> & recv,
+                   const Communicator & comm = Communicator_World)
 { comm.gather(root_id, send, recv); }
 
 template <typename T>
 inline void gather(const unsigned int root_id,
-                   std::vector<T> &r,
-                   const Communicator &comm = Communicator_World)
+                   std::vector<T> & r,
+                   const Communicator & comm = Communicator_World)
 { comm.gather(root_id, r); }
 
 template <typename T>
 inline void allgather(T send,
-                      std::vector<T> &recv,
-                      const Communicator &comm = Communicator_World)
+                      std::vector<T> & recv,
+                      const Communicator & comm = Communicator_World)
 { comm.allgather(send, recv); }
 
 template <typename T>
-inline void allgather(std::vector<T> &r,
+inline void allgather(std::vector<T> & r,
                       const bool identical_buffer_sizes = false,
-                      const Communicator &comm = Communicator_World)
+                      const Communicator & comm = Communicator_World)
 { comm.allgather(r, identical_buffer_sizes); }
 
 template <typename Context, typename Iter, typename OutputIter>
 inline void gather_packed_range (const unsigned int root_id,
-                                 Context *context,
+                                 Context * context,
                                  Iter range_begin,
                                  const Iter range_end,
                                  OutputIter out,
-                                 const Communicator &comm = Communicator_World)
+                                 const Communicator & comm = Communicator_World)
 { comm.gather_packed_range(root_id, context, range_begin, range_end, out); }
 
 template <typename Context, typename Iter, typename OutputIter>
-inline void allgather_packed_range (Context *context,
+inline void allgather_packed_range (Context * context,
                                     Iter range_begin,
                                     const Iter range_end,
                                     OutputIter out,
-                                    const Communicator &comm = Communicator_World)
+                                    const Communicator & comm = Communicator_World)
 { comm.allgather_packed_range(context, range_begin, range_end, out); }
 
 template <typename T>
-inline void alltoall(std::vector<T> &r,
-                     const Communicator &comm = Communicator_World)
+inline void alltoall(std::vector<T> & r,
+                     const Communicator & comm = Communicator_World)
 { comm.alltoall(r); }
 
 template <typename T>
-inline void broadcast(T &data, const unsigned int root_id=0,
-                      const Communicator &comm = Communicator_World)
+inline void broadcast(T & data,
+                      const unsigned int root_id=0,
+                      const Communicator & comm = Communicator_World)
 { comm.broadcast(data, root_id); }
 
 template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
-inline void broadcast_packed_range (const Context *context1,
+inline void broadcast_packed_range (const Context * context1,
                                     Iter range_begin,
                                     const Iter range_end,
-                                    OutputContext *context2,
+                                    OutputContext * context2,
                                     OutputIter out,
                                     const unsigned int root_id = 0,
-                                    const Communicator &comm = Communicator_World)
+                                    const Communicator & comm = Communicator_World)
 { comm.broadcast_packed_range(context1, range_begin, range_end, context2, out, root_id); }
 
 #endif // #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -1251,7 +1257,7 @@ MessageTag::~MessageTag()
 
 
 inline
-MessageTag::MessageTag(const MessageTag &other)
+MessageTag::MessageTag(const MessageTag & other)
   : _tagvalue(other._tagvalue), _comm(other._comm)
 {
   if (_comm)
@@ -1327,7 +1333,7 @@ template<>
 inline data_type dataplusint_type<long double>() { return MPI_LONG_DOUBLE_INT; }
 
 template <typename T>
-inline bool Communicator::verify(const T &r) const
+inline bool Communicator::verify(const T & r) const
 {
   if (this->size() > 1 && Attributes<T>::has_min_max == true)
     {
@@ -1351,7 +1357,7 @@ inline bool Communicator::verify(const T &r) const
 
 
 template <>
-inline bool Communicator::verify(const bool &r) const
+inline bool Communicator::verify(const bool & r) const
 {
   const unsigned char rnew = r;
   return this->verify(rnew);
@@ -1360,7 +1366,7 @@ inline bool Communicator::verify(const bool &r) const
 
 
 template <typename T>
-inline bool Communicator::semiverify(const T *r) const
+inline bool Communicator::semiverify(const T * r) const
 {
   if (this->size() > 1 && Attributes<T>::has_min_max == true)
     {
@@ -1391,7 +1397,7 @@ inline bool Communicator::semiverify(const T *r) const
 
 
 template <>
-inline bool Communicator::semiverify(const bool *r) const
+inline bool Communicator::semiverify(const bool * r) const
 {
   if (r)
     {
@@ -1399,19 +1405,19 @@ inline bool Communicator::semiverify(const bool *r) const
       return this->semiverify(&rnew);
     }
 
-  const unsigned char *rptr = NULL;
+  const unsigned char * rptr = NULL;
   return this->semiverify(rptr);
 }
 
 
 
 template <typename T>
-inline bool Communicator::semiverify(const std::vector<T> *r) const
+inline bool Communicator::semiverify(const std::vector<T> * r) const
 {
   if (this->size() > 1 && Attributes<T>::has_min_max == true)
     {
       std::size_t rsize = r ? r->size() : 0;
-      std::size_t *psize = r ? &rsize : NULL;
+      std::size_t * psize = r ? &rsize : NULL;
 
       if (!this->semiverify(psize))
         return false;
@@ -1469,7 +1475,7 @@ inline bool Communicator::semiverify(const std::string * r) const
   if (this->size() > 1)
     {
       std::size_t rsize = r ? r->size() : 0;
-      std::size_t *psize = r ? &rsize : NULL;
+      std::size_t * psize = r ? &rsize : NULL;
 
       if (!this->semiverify(psize))
         return false;
@@ -1486,7 +1492,7 @@ inline bool Communicator::semiverify(const std::string * r) const
             temp.push_back((*r)[i]);
         }
 
-      std::vector<short int> *ptemp = r ? &temp: NULL;
+      std::vector<short int> * ptemp = r ? &temp: NULL;
 
       return this->semiverify(ptemp);
     }
@@ -1496,7 +1502,7 @@ inline bool Communicator::semiverify(const std::string * r) const
 
 
 template <typename T>
-inline void Communicator::min(T &r) const
+inline void Communicator::min(T & r) const
 {
   if (this->size() > 1)
     {
@@ -1512,7 +1518,7 @@ inline void Communicator::min(T &r) const
 }
 
 
-inline void Communicator::min(bool &r) const
+inline void Communicator::min(bool & r) const
 {
   if (this->size() > 1)
     {
@@ -1534,7 +1540,7 @@ inline void Communicator::min(bool &r) const
 
 
 template <typename T>
-inline void Communicator::min(std::vector<T> &r) const
+inline void Communicator::min(std::vector<T> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1553,7 +1559,7 @@ inline void Communicator::min(std::vector<T> &r) const
 }
 
 
-inline void Communicator::min(std::vector<bool> &r) const
+inline void Communicator::min(std::vector<bool> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1577,8 +1583,8 @@ inline void Communicator::min(std::vector<bool> &r) const
 
 
 template <typename T>
-inline void Communicator::minloc(T &r,
-                                 unsigned int &min_id) const
+inline void Communicator::minloc(T & r,
+                                 unsigned int & min_id) const
 {
   if (this->size() > 1)
     {
@@ -1601,8 +1607,8 @@ inline void Communicator::minloc(T &r,
 }
 
 
-inline void Communicator::minloc(bool &r,
-                                 unsigned int &min_id) const
+inline void Communicator::minloc(bool & r,
+                                 unsigned int & min_id) const
 {
   if (this->size() > 1)
     {
@@ -1626,8 +1632,8 @@ inline void Communicator::minloc(bool &r,
 
 
 template <typename T>
-inline void Communicator::minloc(std::vector<T> &r,
-                                 std::vector<unsigned int> &min_id) const
+inline void Communicator::minloc(std::vector<T> & r,
+                                 std::vector<unsigned int> & min_id) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1662,8 +1668,8 @@ inline void Communicator::minloc(std::vector<T> &r,
 }
 
 
-inline void Communicator::minloc(std::vector<bool> &r,
-                                 std::vector<unsigned int> &min_id) const
+inline void Communicator::minloc(std::vector<bool> & r,
+                                 std::vector<unsigned int> & min_id) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1699,7 +1705,7 @@ inline void Communicator::minloc(std::vector<bool> &r,
 
 
 template <typename T>
-inline void Communicator::max(T &r) const
+inline void Communicator::max(T & r) const
 {
   if (this->size() > 1)
     {
@@ -1716,7 +1722,7 @@ inline void Communicator::max(T &r) const
 }
 
 
-inline void Communicator::max(bool &r) const
+inline void Communicator::max(bool & r) const
 {
   if (this->size() > 1)
     {
@@ -1736,7 +1742,7 @@ inline void Communicator::max(bool &r) const
 
 
 template <typename T>
-inline void Communicator::max(std::vector<T> &r) const
+inline void Communicator::max(std::vector<T> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1755,7 +1761,7 @@ inline void Communicator::max(std::vector<T> &r) const
 }
 
 
-inline void Communicator::max(std::vector<bool> &r) const
+inline void Communicator::max(std::vector<bool> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1779,8 +1785,8 @@ inline void Communicator::max(std::vector<bool> &r) const
 
 
 template <typename T>
-inline void Communicator::maxloc(T &r,
-                                 unsigned int &max_id) const
+inline void Communicator::maxloc(T & r,
+                                 unsigned int & max_id) const
 {
   if (this->size() > 1)
     {
@@ -1803,8 +1809,8 @@ inline void Communicator::maxloc(T &r,
 }
 
 
-inline void Communicator::maxloc(bool &r,
-                                 unsigned int &max_id) const
+inline void Communicator::maxloc(bool & r,
+                                 unsigned int & max_id) const
 {
   if (this->size() > 1)
     {
@@ -1828,8 +1834,8 @@ inline void Communicator::maxloc(bool &r,
 
 
 template <typename T>
-inline void Communicator::maxloc(std::vector<T> &r,
-                                 std::vector<unsigned int> &max_id) const
+inline void Communicator::maxloc(std::vector<T> & r,
+                                 std::vector<unsigned int> & max_id) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1864,8 +1870,8 @@ inline void Communicator::maxloc(std::vector<T> &r,
 }
 
 
-inline void Communicator::maxloc(std::vector<bool> &r,
-                                 std::vector<unsigned int> &max_id) const
+inline void Communicator::maxloc(std::vector<bool> & r,
+                                 std::vector<unsigned int> & max_id) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1901,7 +1907,7 @@ inline void Communicator::maxloc(std::vector<bool> &r,
 
 
 template <typename T>
-inline void Communicator::sum(T &r) const
+inline void Communicator::sum(T & r) const
 {
   if (this->size() > 1)
     {
@@ -1918,7 +1924,7 @@ inline void Communicator::sum(T &r) const
 
 
 template <typename T>
-inline void Communicator::sum(std::vector<T> &r) const
+inline void Communicator::sum(std::vector<T> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1940,7 +1946,7 @@ inline void Communicator::sum(std::vector<T> &r) const
 // We still do function overloading for complex sums - in a perfect
 // world we'd have a StandardSumOp to go along with StandardType...
 template <typename T>
-inline void Communicator::sum(std::complex<T> &r) const
+inline void Communicator::sum(std::complex<T> & r) const
 {
   if (this->size() > 1)
     {
@@ -1957,7 +1963,7 @@ inline void Communicator::sum(std::complex<T> &r) const
 
 
 template <typename T>
-inline void Communicator::sum(std::vector<std::complex<T> > &r) const
+inline void Communicator::sum(std::vector<std::complex<T> > & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
@@ -1976,7 +1982,7 @@ inline void Communicator::sum(std::vector<std::complex<T> > &r) const
 
 
 template <typename T>
-inline void Communicator::set_union(std::set<T> &data,
+inline void Communicator::set_union(std::set<T> & data,
                                     const unsigned int root_id) const
 {
   std::vector<T> vecdata(data.begin(), data.end());
@@ -1988,7 +1994,7 @@ inline void Communicator::set_union(std::set<T> &data,
 
 
 template <typename T>
-inline void Communicator::set_union(std::set<T> &data) const
+inline void Communicator::set_union(std::set<T> & data) const
 {
   std::vector<T> vecdata(data.begin(), data.end());
   this->allgather(vecdata, false);
@@ -1998,7 +2004,7 @@ inline void Communicator::set_union(std::set<T> &data) const
 
 
 template <typename T1, typename T2>
-inline void Communicator::set_union(std::map<T1,T2> &data,
+inline void Communicator::set_union(std::map<T1,T2> & data,
                                     const unsigned int root_id) const
 {
   std::vector<std::pair<T1,T2> > vecdata(data.begin(), data.end());
@@ -2010,7 +2016,7 @@ inline void Communicator::set_union(std::map<T1,T2> &data,
 
 
 template <typename T1, typename T2>
-inline void Communicator::set_union(std::map<T1,T2> &data) const
+inline void Communicator::set_union(std::map<T1,T2> & data) const
 {
   std::vector<std::pair<T1,T2> > vecdata(data.begin(), data.end());
   this->allgather(vecdata, false);
@@ -2020,7 +2026,7 @@ inline void Communicator::set_union(std::map<T1,T2> &data) const
 
 
 inline status Communicator::probe (const unsigned int src_processor_id,
-                                   const MessageTag &tag) const
+                                   const MessageTag & tag) const
 {
   START_LOG("probe()", "Parallel");
 
@@ -2038,12 +2044,12 @@ inline status Communicator::probe (const unsigned int src_processor_id,
 
 template<typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::basic_string<T> &buf,
-                                const MessageTag &tag) const
+                                std::basic_string<T> & buf,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
-  T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
+  T * dataptr = buf.empty() ? NULL : const_cast<T *>(buf.data());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2061,13 +2067,13 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::basic_string<T> &buf,
-                                Request &req,
-                                const MessageTag &tag) const
+                                std::basic_string<T> & buf,
+                                Request & req,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
-  T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
+  T * dataptr = buf.empty() ? NULL : const_cast<T *>(buf.data());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2086,12 +2092,12 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                T &buf,
-                                const MessageTag &tag) const
+                                T & buf,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
-  T* dataptr = &buf;
+  T * dataptr = &buf;
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2109,13 +2115,13 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                T &buf,
-                                Request &req,
-                                const MessageTag &tag) const
+                                T & buf,
+                                Request & req,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
-  T* dataptr = &buf;
+  T * dataptr = &buf;
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2134,8 +2140,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                const MessageTag &tag) const
+                                std::set<T> & buf,
+                                const MessageTag & tag) const
 {
   this->send(dest_processor_id,
              StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
@@ -2145,9 +2151,9 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                Request &req,
-                                const MessageTag &tag) const
+                                std::set<T> & buf,
+                                Request & req,
+                                const MessageTag & tag) const
 {
   this->send(dest_processor_id,
              StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
@@ -2157,9 +2163,9 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                const DataType &type,
-                                const MessageTag &tag) const
+                                std::set<T> & buf,
+                                const DataType & type,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
@@ -2173,16 +2179,16 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                const DataType &type,
-                                Request &req,
-                                const MessageTag &tag) const
+                                std::set<T> & buf,
+                                const DataType & type,
+                                Request & req,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
   // Allocate temporary buffer on the heap so it lives until after
   // the non-blocking send completes
-  std::vector<T> *vecbuf =
+  std::vector<T> * vecbuf =
     new std::vector<T>(buf.begin(), buf.end());
 
   // Make the Request::wait() handle deleting the buffer
@@ -2198,8 +2204,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                const MessageTag &tag) const
+                                std::vector<T> & buf,
+                                const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
              StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
@@ -2209,9 +2215,9 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                Request &req,
-                                const MessageTag &tag) const
+                                std::vector<T> & buf,
+                                Request & req,
+                                const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
              StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
@@ -2221,9 +2227,9 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                const DataType &type,
-                                const MessageTag &tag) const
+                                std::vector<T> & buf,
+                                const DataType & type,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
@@ -2243,10 +2249,10 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                const DataType &type,
-                                Request &req,
-                                const MessageTag &tag) const
+                                std::vector<T> & buf,
+                                const DataType & type,
+                                Request & req,
+                                const MessageTag & tag) const
 {
   START_LOG("send()", "Parallel");
 
@@ -2266,10 +2272,10 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range (const unsigned int dest_processor_id,
-                                             const Context *context,
+                                             const Context * context,
                                              Iter range_begin,
                                              const Iter range_end,
-                                             const MessageTag &tag) const
+                                             const MessageTag & tag) const
 {
   // We will serialize variable size objects from *range_begin to
   // *range_end as a sequence of plain data (e.g. ints) in this buffer
@@ -2306,11 +2312,11 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range (const unsigned int dest_processor_id,
-                                             const Context *context,
+                                             const Context * context,
                                              Iter range_begin,
                                              const Iter range_end,
-                                             Request &req,
-                                             const MessageTag &tag) const
+                                             Request & req,
+                                             const MessageTag & tag) const
 {
   // Allocate a buffer on the heap so we don't have to free it until
   // after the Request::wait()
@@ -2323,7 +2329,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   // That local variable will be gone soon; we need a send buffer that
   // will stick around.  I heard you like buffering so I put a buffer
   // for your buffer size so you can buffer the size of your buffer.
-  std::size_t *total_buffer_size_buffer = new std::size_t;
+  std::size_t * total_buffer_size_buffer = new std::size_t;
   *total_buffer_size_buffer = total_buffer_size;
 
   // Delete the buffer size's buffer when we're done
@@ -2342,7 +2348,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
   while (range_begin != range_end)
     {
-      std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
+      std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
 
       range_begin = Parallel::pack_range(context, range_begin, range_end, *buffer);
 
@@ -2352,7 +2358,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
       Request next_intermediate_req;
 
-      Request *my_req = (range_begin == range_end) ? &req : &next_intermediate_req;
+      Request * my_req = (range_begin == range_end) ? &req : &next_intermediate_req;
 
       // Make the Request::wait() handle deleting the buffer
       my_req->add_post_wait_work
@@ -2371,8 +2377,8 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::basic_string<T> &buf,
-                                     const MessageTag &tag) const
+                                     std::basic_string<T> & buf,
+                                     const MessageTag & tag) const
 {
   std::vector<T> tempbuf;  // Officially C++ won't let us get a
                            // modifiable array from a string
@@ -2386,14 +2392,14 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::basic_string<T> &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
+                                   std::basic_string<T> & buf,
+                                   Request & req,
+                                   const MessageTag & tag) const
 {
   // Officially C++ won't let us get a modifiable array from a
   // string, and we can't even put one on the stack for the
   // non-blocking case.
-  std::vector<T> *tempbuf = new std::vector<T>();
+  std::vector<T> * tempbuf = new std::vector<T>();
 
   // We can clear the string, but the Request::wait() will need to
   // handle copying our temporary buffer to it
@@ -2415,8 +2421,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     T &buf,
-                                     const MessageTag &tag) const
+                                     T & buf,
+                                     const MessageTag & tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2437,9 +2443,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                   T &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
+                                   T & buf,
+                                   Request & req,
+                                   const MessageTag & tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2454,8 +2460,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::set<T> &buf,
-                                     const MessageTag &tag) const
+                                     std::set<T> & buf,
+                                     const MessageTag & tag) const
 {
   return this->receive
     (src_processor_id, buf,
@@ -2466,9 +2472,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::set<T> &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
+                                   std::set<T> & buf,
+                                   Request & req,
+                                   const MessageTag & tag) const
 {
   this->receive (src_processor_id, buf,
                  StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
@@ -2478,9 +2484,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::set<T> &buf,
-                                     const DataType &type,
-                                     const MessageTag &tag) const
+                                     std::set<T> & buf,
+                                     const DataType & type,
+                                     const MessageTag & tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2498,16 +2504,16 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::set<T> &buf,
-                                   const DataType &type,
-                                   Request &req,
-                                   const MessageTag &tag) const
+                                   std::set<T> & buf,
+                                   const DataType & type,
+                                   Request & req,
+                                   const MessageTag & tag) const
 {
   START_LOG("receive()", "Parallel");
 
   // Allocate temporary buffer on the heap so it lives until after
   // the non-blocking send completes
-  std::vector<T> *vecbuf = new std::vector<T>();
+  std::vector<T> * vecbuf = new std::vector<T>();
 
   // We can clear the set, but the Request::wait() will need to
   // handle copying our temporary buffer to it
@@ -2531,8 +2537,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::vector<T> &buf,
-                                     const MessageTag &tag) const
+                                     std::vector<T> & buf,
+                                     const MessageTag & tag) const
 {
   return this->receive
     (src_processor_id, buf,
@@ -2543,9 +2549,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::vector<T> &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
+                                   std::vector<T> & buf,
+                                   Request & req,
+                                   const MessageTag & tag) const
 {
   this->receive (src_processor_id, buf,
                  StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
@@ -2555,9 +2561,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::vector<T> &buf,
-                                     const DataType &type,
-                                     const MessageTag &tag) const
+                                     std::vector<T> & buf,
+                                     const DataType & type,
+                                     const MessageTag & tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2586,10 +2592,10 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::vector<T> &buf,
-                                   const DataType &type,
-                                   Request &req,
-                                   const MessageTag &tag) const
+                                   std::vector<T> & buf,
+                                   const DataType & type,
+                                   Request & req,
+                                   const MessageTag & tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2604,9 +2610,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename Context, typename OutputIter>
 inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
-                                                Context *context,
+                                                Context * context,
                                                 OutputIter out,
-                                                const MessageTag &tag) const
+                                                const MessageTag & tag) const
 {
   typedef typename std::iterator_traits<OutputIter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -2633,10 +2639,10 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 
 // template <typename Context, typename OutputIter>
 // inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
-//                                                 Context *context,
+//                                                 Context * context,
 //                                                 OutputIter out,
-//                                                 Request &req,
-//                                                 const MessageTag &tag) const
+//                                                 Request & req,
+//                                                 const MessageTag & tag) const
 // {
 //   typedef typename std::iterator_traits<OutputIter>::value_type T;
 //   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -2645,7 +2651,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 //   // buffer_t.
 //   // Allocate a buffer on the heap so we don't have to free it until
 //   // after the Request::wait()
-//   std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
+//   std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
 //   this->receive(src_processor_id, *buffer, req, tag);
 //
 //   // Make the Request::wait() handle unpacking the buffer
@@ -2662,13 +2668,13 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 
 template <typename T1, typename T2>
 inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<T1> &sendvec,
-                                       const DataType &type1,
+                                       std::vector<T1> & sendvec,
+                                       const DataType & type1,
                                        const unsigned int source_processor_id,
-                                       std::vector<T2> &recv,
-                                       const DataType &type2,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+                                       std::vector<T2> & recv,
+                                       const DataType & type2,
+                                       const MessageTag & send_tag,
+                                       const MessageTag & recv_tag) const
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -2695,11 +2701,11 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 
 template <typename T1, typename T2>
 inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       T1 &sendvec,
+                                       T1 & sendvec,
                                        const unsigned int source_processor_id,
-                                       T2 &recv,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+                                       T2 & recv,
+                                       const MessageTag & send_tag,
+                                       const MessageTag & recv_tag) const
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -2743,11 +2749,11 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 // MPI.
 template <typename T>
 inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<T> &sendvec,
+                                       std::vector<T> & sendvec,
                                        const unsigned int source_processor_id,
-                                       std::vector<T> &recv,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+                                       std::vector<T> & recv,
+                                       const MessageTag & send_tag,
+                                       const MessageTag & recv_tag) const
 {
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
@@ -2772,11 +2778,11 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 // function template, so we have to re-specify the default arguments
 template <typename T1, typename T2>
 inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<T1> &sendvec,
+                                       std::vector<T1> & sendvec,
                                        const unsigned int source_processor_id,
-                                       std::vector<T2> &recv,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+                                       std::vector<T2> & recv,
+                                       const MessageTag & send_tag,
+                                       const MessageTag & recv_tag) const
 {
   // Call the user-defined type version with automatic
   // type conversion based on template argument:
@@ -2792,9 +2798,9 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 
 template <typename T1, typename T2>
 inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<std::vector<T1> > &sendvec,
+                                       std::vector<std::vector<T1> > & sendvec,
                                        const unsigned int source_processor_id,
-                                       std::vector<std::vector<T2> > &recv,
+                                       std::vector<std::vector<T2> > & recv,
                                        const MessageTag & /* send_tag */,
                                        const MessageTag & /* recv_tag */) const
 {
@@ -2810,9 +2816,9 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 // function template, so we have to re-specify the default arguments
 template <typename T>
 inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<std::vector<T> > &sendvec,
+                                       std::vector<std::vector<T> > & sendvec,
                                        const unsigned int source_processor_id,
-                                       std::vector<std::vector<T> > &recv,
+                                       std::vector<std::vector<T> > & recv,
                                        const MessageTag & /* send_tag */,
                                        const MessageTag & /* recv_tag */) const
 {
@@ -2826,16 +2832,15 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 
 
 template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
-inline void Communicator::send_receive_packed_range
-(const unsigned int dest_processor_id,
- const Context1* context1,
- RangeIter send_begin,
- const RangeIter send_end,
- const unsigned int source_processor_id,
- Context2* context2,
- OutputIter out,
- const MessageTag &send_tag,
- const MessageTag &recv_tag) const
+inline void Communicator::send_receive_packed_range(const unsigned int dest_processor_id,
+                                                    const Context1 * context1,
+                                                    RangeIter send_begin,
+                                                    const RangeIter send_end,
+                                                    const unsigned int source_processor_id,
+                                                    Context2 * context2,
+                                                    OutputIter out,
+                                                    const MessageTag & send_tag,
+                                                    const MessageTag & recv_tag) const
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -2857,7 +2862,7 @@ inline void Communicator::send_receive_packed_range
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
                                  T sendval,
-                                 std::vector<T> &recv) const
+                                 std::vector<T> & recv) const
 {
   libmesh_assert_less (root_id, this->size());
 
@@ -2885,7 +2890,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
-                                 std::vector<T> &r) const
+                                 std::vector<T> & r) const
 {
   if (this->size() == 1)
     {
@@ -2942,7 +2947,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
 template <typename T>
 inline void Communicator::allgather(T sendval,
-                                    std::vector<T> &recv) const
+                                    std::vector<T> & recv) const
 {
   START_LOG ("allgather()","Parallel");
 
@@ -2967,9 +2972,8 @@ inline void Communicator::allgather(T sendval,
 
 
 template <typename T>
-inline void Communicator::allgather
-(std::vector<T> &r,
- const bool identical_buffer_sizes) const
+inline void Communicator::allgather(std::vector<T> & r,
+                                    const bool identical_buffer_sizes) const
 {
   if (this->size() < 2)
     return;
@@ -3037,12 +3041,11 @@ inline void Communicator::allgather
 
 
 template <typename Context, typename Iter, typename OutputIter>
-inline void Communicator::gather_packed_range
-(const unsigned int root_id,
- Context *context,
- Iter range_begin,
- const Iter range_end,
- OutputIter out) const
+inline void Communicator::gather_packed_range(const unsigned int root_id,
+                                              Context * context,
+                                              Iter range_begin,
+                                              const Iter range_end,
+                                              OutputIter out) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -3069,11 +3072,10 @@ inline void Communicator::gather_packed_range
 
 
 template <typename Context, typename Iter, typename OutputIter>
-inline void Communicator::allgather_packed_range
-(Context *context,
- Iter range_begin,
- const Iter range_end,
- OutputIter out) const
+inline void Communicator::allgather_packed_range(Context * context,
+                                                 Iter range_begin,
+                                                 const Iter range_end,
+                                                 OutputIter out) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -3102,7 +3104,7 @@ inline void Communicator::allgather_packed_range
 
 
 template <typename T>
-inline void Communicator::alltoall(std::vector<T> &buf) const
+inline void Communicator::alltoall(std::vector<T> & buf) const
 {
   if (this->size() < 2 || buf.empty())
     return;
@@ -3133,7 +3135,7 @@ inline void Communicator::alltoall(std::vector<T> &buf) const
 
 
 template <typename T>
-inline void Communicator::broadcast (T &data, const unsigned int root_id) const
+inline void Communicator::broadcast (T & data, const unsigned int root_id) const
 {
   if (this->size() == 1)
     {
@@ -3156,7 +3158,7 @@ inline void Communicator::broadcast (T &data, const unsigned int root_id) const
 
 
 template <>
-inline void Communicator::broadcast (bool &data, const unsigned int root_id) const
+inline void Communicator::broadcast (bool & data, const unsigned int root_id) const
 {
   if (this->size() == 1)
     {
@@ -3185,7 +3187,7 @@ inline void Communicator::broadcast (bool &data, const unsigned int root_id) con
 
 
 template <typename T>
-inline void Communicator::broadcast (std::basic_string<T> &data,
+inline void Communicator::broadcast (std::basic_string<T> & data,
                                      const unsigned int root_id) const
 {
   if (this->size() == 1)
@@ -3226,7 +3228,7 @@ inline void Communicator::broadcast (std::basic_string<T> &data,
 
 
 template <typename T>
-inline void Communicator::broadcast (std::vector<T> &data,
+inline void Communicator::broadcast (std::vector<T> & data,
                                      const unsigned int root_id) const
 {
   if (this->size() == 1)
@@ -3242,7 +3244,7 @@ inline void Communicator::broadcast (std::vector<T> &data,
 
   // and get the data from the remote processors.
   // Pass NULL if our vector is empty.
-  T *data_ptr = data.empty() ? NULL : &data[0];
+  T * data_ptr = data.empty() ? NULL : &data[0];
 
   libmesh_call_mpi
     (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
@@ -3253,7 +3255,7 @@ inline void Communicator::broadcast (std::vector<T> &data,
 
 
 template <typename T>
-inline void Communicator::broadcast (std::vector<std::basic_string<T> > &data,
+inline void Communicator::broadcast (std::vector<std::basic_string<T> > & data,
                                      const unsigned int root_id) const
 {
   if (this->size() == 1)
@@ -3317,7 +3319,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T> > &data,
 
 
 template <typename T>
-inline void Communicator::broadcast (std::set<T> &data,
+inline void Communicator::broadcast (std::set<T> & data,
                                      const unsigned int root_id) const
 {
   if (this->size() == 1)
@@ -3353,7 +3355,7 @@ inline void Communicator::broadcast (std::set<T> &data,
 
 
 template <typename T1, typename T2>
-inline void Communicator::broadcast(std::map<T1, T2> &data,
+inline void Communicator::broadcast(std::map<T1, T2> & data,
                                     const unsigned int root_id) const
 {
   if (this->size() == 1)
@@ -3406,13 +3408,12 @@ inline void Communicator::broadcast(std::map<T1, T2> &data,
 
 template <typename Context, typename OutputContext,
           typename Iter, typename OutputIter>
-inline void Communicator::broadcast_packed_range
-(const Context *context1,
- Iter range_begin,
- const Iter range_end,
- OutputContext *context2,
- OutputIter out,
- const unsigned int root_id) const
+inline void Communicator::broadcast_packed_range(const Context * context1,
+                                                 Iter range_begin,
+                                                 const Iter range_end,
+                                                 OutputContext * context2,
+                                                 OutputIter out,
+                                                 const unsigned int root_id) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -3458,104 +3459,127 @@ template <typename T>
 inline void Communicator::min(T &) const {}
 
 template <typename T>
-inline void Communicator::minloc(T &, unsigned int &min_id) const { min_id = 0; }
+inline void Communicator::minloc(T &, unsigned int & min_id) const { min_id = 0; }
 
 template <typename T>
-inline void Communicator::minloc
-(std::vector<T> &r, std::vector<unsigned int> &min_id) const
+inline void Communicator::minloc(std::vector<T> & r, std::vector<unsigned int> & min_id) const
 { for (std::size_t i=0; i!= r.size(); ++i) min_id[i] = 0; }
 
 template <typename T>
 inline void Communicator::max(T &) const {}
 
 template <typename T>
-inline void Communicator::maxloc(T &, unsigned int &max_id) const { max_id = 0; }
+inline void Communicator::maxloc(T &, unsigned int & max_id) const { max_id = 0; }
 
 template <typename T>
-inline void Communicator::maxloc
-(std::vector<T> &r, std::vector<unsigned int> &max_id) const
+inline void Communicator::maxloc(std::vector<T> & r, std::vector<unsigned int> & max_id) const
 { for (std::size_t i=0; i!= r.size(); ++i) max_id[i] = 0; }
 
 template <typename T>
 inline void Communicator::sum(T &) const {}
 
 template <typename T>
-inline void Communicator::set_union(T&) const {}
+inline void Communicator::set_union(T &) const {}
 
 template <typename T>
-inline void Communicator::set_union(T&, const unsigned int root_id) const
+inline void Communicator::set_union(T &, const unsigned int root_id) const
 { libmesh_assert_equal_to(root_id, 0); }
 
 /**
  * We do not currently support probes on one processor without MPI.
  */
 inline status Communicator::probe (const unsigned int,
-                                   const MessageTag&) const
+                                   const MessageTag &) const
 { libmesh_not_implemented(); status s; return s; }
 
 /**
  * We do not currently support sends on one processor without MPI.
  */
 template <typename T>
-inline void Communicator::send (const unsigned int, T&, const MessageTag &) const
-{ libmesh_not_implemented(); }
-
-template <typename T>
-inline void Communicator::send (const unsigned int, T&, Request&,
-                                const MessageTag&) const
-{ libmesh_not_implemented(); }
-
-template <typename T>
-inline void Communicator::send (const unsigned int, T&, const DataType&,
+inline void Communicator::send (const unsigned int,
+                                T &,
                                 const MessageTag &) const
 { libmesh_not_implemented(); }
 
 template <typename T>
-inline void Communicator::send (const unsigned int, T&, const DataType&, Request&,
+inline void Communicator::send (const unsigned int,
+                                T &,
+                                Request &,
+                                const MessageTag &) const
+{ libmesh_not_implemented(); }
+
+template <typename T>
+inline void Communicator::send (const unsigned int,
+                                T &,
+                                const DataType &,
+                                const MessageTag &) const
+{ libmesh_not_implemented(); }
+
+template <typename T>
+inline void Communicator::send (const unsigned int,
+                                T &,
+                                const DataType &,
+                                Request &,
                                 const MessageTag &) const
 { libmesh_not_implemented(); }
 
 template <typename Context, typename Iter>
-inline void Communicator::send_packed_range
-(const unsigned int, const Context*, Iter, const Iter, const MessageTag&) const
+inline void Communicator::send_packed_range(const unsigned int,
+                                            const Context *,
+                                            Iter,
+                                            const Iter,
+                                            const MessageTag &) const
 { libmesh_not_implemented(); }
 
 template <typename Context, typename Iter>
-inline void Communicator::send_packed_range
-(const unsigned int, const Context*, Iter, const Iter, Request&,
- const MessageTag&) const
+inline void Communicator::send_packed_range (const unsigned int,
+                                             const Context *,
+                                             Iter,
+                                             const Iter,
+                                             Request &,
+                                             const MessageTag &) const
 { libmesh_not_implemented(); }
 
 /**
  * We do not currently support receives on one processor without MPI.
  */
 template <typename T>
-inline Status Communicator::receive (const unsigned int, T&, const MessageTag&) const
+inline Status Communicator::receive (const unsigned int,
+                                     T &,
+                                     const MessageTag &) const
 { libmesh_not_implemented(); return Status(); }
 
 template <typename T>
-inline void Communicator::receive
-(const unsigned int, T&, Request&, const MessageTag&) const
+inline void Communicator::receive(const unsigned int,
+                                  T &,
+                                  Request &,
+                                  const MessageTag &) const
 { libmesh_not_implemented(); }
 
 template <typename T>
-inline Status Communicator::receive
-(const unsigned int, T&, const DataType&, const MessageTag&) const
+inline Status Communicator::receive(const unsigned int,
+                                    T &,
+                                    const DataType &,
+                                    const MessageTag &) const
 { libmesh_not_implemented(); return Status(); }
 
 template <typename T>
-inline void Communicator::receive
-(const unsigned int, T&, const DataType&, Request&, const MessageTag&) const
+inline void Communicator::receive(const unsigned int,
+                                  T &,
+                                  const DataType &,
+                                  Request &,
+                                  const MessageTag &) const
 { libmesh_not_implemented(); }
 
 template <typename Context, typename OutputIter>
-inline void Communicator::receive_packed_range
-(const unsigned int, Context*, OutputIter, const MessageTag&) const
+inline void Communicator::receive_packed_range(const unsigned int,
+                                               Context *,
+                                               OutputIter,
+                                               const MessageTag &) const
 { libmesh_not_implemented(); }
 
 // template <typename Context, typename OutputIter>
-// inline void Communicator::receive_packed_range
-// (const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
+// inline void Communicator::receive_packed_range(const unsigned int, Context *, OutputIter, Request &, const MessageTag &) const
 // { libmesh_not_implemented(); }
 
 /**
@@ -3563,9 +3587,9 @@ inline void Communicator::receive_packed_range
  */
 template <typename T1, typename T2>
 inline void Communicator::send_receive (const unsigned int send_tgt,
-                                        T1 &send_val,
+                                        T1 & send_val,
                                         const unsigned int recv_source,
-                                        T2 &recv_val,
+                                        T2 & recv_val,
                                         const MessageTag &,
                                         const MessageTag &) const
 {
@@ -3581,11 +3605,15 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
  */
 template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter>
-inline void Communicator::send_receive_packed_range
-(const unsigned int /* dest_processor_id */, const Context1*,
- RangeIter /* send_begin */, const RangeIter /* send_end */,
- const unsigned int /* source_processor_id */, Context2*,
- OutputIter /* out */, const MessageTag &, const MessageTag &) const
+inline void Communicator::send_receive_packed_range(const unsigned int /* dest_processor_id */,
+                                                    const Context1 *,
+                                                    RangeIter /* send_begin */,
+                                                    const RangeIter /* send_end */,
+                                                    const unsigned int /* source_processor_id */,
+                                                    Context2 *,
+                                                    OutputIter /* out */,
+                                                    const MessageTag &,
+                                                    const MessageTag &) const
 { libmesh_not_implemented(); }
 
 /**
@@ -3594,7 +3622,7 @@ inline void Communicator::send_receive_packed_range
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
                                  T send_val,
-                                 std::vector<T> &recv_val) const
+                                 std::vector<T> & recv_val) const
 {
   libmesh_assert_equal_to (root_id, 0);
   recv_val.resize(1);
@@ -3602,24 +3630,28 @@ inline void Communicator::gather(const unsigned int root_id,
 }
 
 template <typename T>
-inline void Communicator::gather(const unsigned int root_id, std::vector<T>&) const
+inline void Communicator::gather(const unsigned int root_id,
+                                 std::vector<T> &) const
 { libmesh_assert_equal_to(root_id, 0); }
 
 template <typename T>
-inline void Communicator::allgather(T send_val, std::vector<T> &recv_val) const
+inline void Communicator::allgather(T send_val,
+                                    std::vector<T> & recv_val) const
 {
   recv_val.resize(1);
   recv_val[0] = send_val;
 }
 
 template <typename T>
-inline void Communicator::allgather(std::vector<T> &, const bool) const {}
+inline void Communicator::allgather(std::vector<T> &,
+                                    const bool) const {}
 
 template <typename T>
 inline void Communicator::alltoall(std::vector<T> &) const {}
 
 template <typename T>
-inline void Communicator::broadcast (T &, const unsigned int root_id) const
+inline void Communicator::broadcast (T &,
+                                     const unsigned int root_id) const
 { libmesh_assert_equal_to(root_id, 0); }
 
 #endif // LIBMESH_HAVE_MPI

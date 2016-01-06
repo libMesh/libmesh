@@ -54,7 +54,7 @@ public:
   /**
    *  Constructor. Initializes Aztec data structures
    */
-  AztecLinearSolver (const libMesh::Parallel::Communicator &comm
+  AztecLinearSolver (const libMesh::Parallel::Communicator & comm
                      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -70,16 +70,16 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char *name=NULL) libmesh_override;
+  virtual void init (const char * name=NULL) libmesh_override;
 
   /**
    * Call the Aztec solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
   virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix_in,
-         NumericVector<T> &solution_in,
-         NumericVector<T> &rhs_in,
+  solve (SparseMatrix<T> & matrix_in,
+         NumericVector<T> & solution_in,
+         NumericVector<T> & rhs_in,
          const double tol,
          const unsigned int m_its) libmesh_override
   {
@@ -93,10 +93,10 @@ public:
    * case, and will instead premultiply by the matrix you provide.
    */
   virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix,
-         SparseMatrix<T>  &preconditioner,
-         NumericVector<T> &solution,
-         NumericVector<T> &rhs,
+  solve (SparseMatrix<T> & matrix,
+         SparseMatrix<T> & preconditioner,
+         NumericVector<T> & solution,
+         NumericVector<T> & rhs,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -104,9 +104,9 @@ public:
    * This function solves a system whose matrix is a shell matrix.
    */
   virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
+  solve (const ShellMatrix<T> & shell_matrix,
+         NumericVector<T> & solution_in,
+         NumericVector<T> & rhs_in,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -116,10 +116,10 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         const SparseMatrix<T>& precond_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
+  solve (const ShellMatrix<T> & shell_matrix,
+         const SparseMatrix<T> & precond_matrix,
+         NumericVector<T> & solution_in,
+         NumericVector<T> & rhs_in,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -127,7 +127,7 @@ public:
    * Fills the input vector with the sequence of residual norms
    * from the latest iterative solve.
    */
-  void get_residual_history(std::vector<double>& hist);
+  void get_residual_history(std::vector<double> & hist);
 
   /**
    * Returns just the initial residual for the solve just
@@ -165,7 +165,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-AztecLinearSolver<T>::AztecLinearSolver (const libMesh::Parallel::Communicator &comm) :
+AztecLinearSolver<T>::AztecLinearSolver (const libMesh::Parallel::Communicator & comm) :
   LinearSolver<T>(comm)
 {
   if (this->n_processors() == 1)

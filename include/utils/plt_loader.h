@@ -51,7 +51,7 @@ public:
   /**
    * Constructor.  Reads the file specified by \p name.
    */
-  PltLoader  (const std::string& name, const bool v=false);
+  PltLoader  (const std::string & name, const bool v=false);
 
   /**
    * Destructor.
@@ -71,13 +71,13 @@ public:
   /**
    * Reads the .plt file specified by \p name.
    */
-  void read (const std::string& name);
+  void read (const std::string & name);
 
   /**
    * Writes an ASCII Tecplot file.  The optional parameter \p version
    * specifies the version format to write.
    */
-  void write_dat (const std::string& name,
+  void write_dat (const std::string & name,
                   const unsigned int version=10) const;
 
   // BSK - this functionality requires FORTRAN subrouitine calls,
@@ -90,7 +90,7 @@ public:
   //    * locations of the grid points.  The optional parameter \p reverse
   //    * specifies if the output file will have reversed byte ordering.
   //    */
-  //   void write_plot3d (const std::string& basename,
+  //   void write_plot3d (const std::string & basename,
   //      const bool reverse=false,
   //      const bool gridonly=false) const;
 
@@ -98,7 +98,7 @@ public:
   //    * Writes a Cart3D .tri component file.  The number of components
   //    * will be the number of zones in the .plt file.
   //    */
-  //   void write_tri (const std::string& name,
+  //   void write_tri (const std::string & name,
   //   const bool reverse=false,
   //   const bool gridonly=false) const;
 
@@ -255,32 +255,32 @@ private:
   /**
    * Read the header of the binary file.
    */
-  void read_header (std::istream& in);
+  void read_header (std::istream & in);
 
   /**
    * Read data from the binary file.
    */
-  void read_data (std::istream& in);
+  void read_data (std::istream & in);
 
   /**
    * Read data for the zth zone in BLOCK structured format.
    */
-  void read_block_data (std::istream& in, const unsigned int zn);
+  void read_block_data (std::istream & in, const unsigned int zn);
 
   /**
    * Read data for the zth zone in POINT structured format.
    */
-  void read_point_data (std::istream& in, const unsigned int zn);
+  void read_point_data (std::istream & in, const unsigned int zn);
 
   /**
    * Read data for the zth zone in FEBLOCK unstructured format.
    */
-  void read_feblock_data (std::istream& in, const unsigned int zn);
+  void read_feblock_data (std::istream & in, const unsigned int zn);
 
   /**
    * Read data for the zth zone in FEPOINT unstructured format.
    */
-  void read_fepoint_data (std::istream& in, const unsigned int zn);
+  void read_fepoint_data (std::istream & in, const unsigned int zn);
 
 
   //--------------------------------------------------------------
@@ -456,7 +456,7 @@ PltLoader::PltLoader (const bool v) :
 
 
 inline
-PltLoader::PltLoader (const std::string& name, const bool v) :
+PltLoader::PltLoader (const std::string & name, const bool v) :
   _verbose      (v),
   _is_foreign   (false),
   _n_vars       (0),

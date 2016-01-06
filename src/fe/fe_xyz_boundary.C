@@ -38,11 +38,11 @@ namespace libMesh
 //-------------------------------------------------------
 // Full specialization for 0D when this is a useless method
 template <>
-void FEXYZ<0>::reinit(const Elem*,
+void FEXYZ<0>::reinit(const Elem *,
                       const unsigned int,
                       const Real,
-                      const std::vector<Point>* const,
-                      const std::vector<Real>* const)
+                      const std::vector<Point> * const,
+                      const std::vector<Real> * const)
 {
   libmesh_error_msg("ERROR: This method only makes sense for 2D/3D elements!");
 }
@@ -51,11 +51,11 @@ void FEXYZ<0>::reinit(const Elem*,
 //-------------------------------------------------------
 // Full specialization for 1D when this is a useless method
 template <>
-void FEXYZ<1>::reinit(const Elem*,
+void FEXYZ<1>::reinit(const Elem *,
                       const unsigned int,
                       const Real,
-                      const std::vector<Point>* const,
-                      const std::vector<Real>* const)
+                      const std::vector<Point> * const,
+                      const std::vector<Real> * const)
 {
   libmesh_error_msg("ERROR: This method only makes sense for 2D/3D elements!");
 }
@@ -64,11 +64,11 @@ void FEXYZ<1>::reinit(const Elem*,
 //-------------------------------------------------------
 // Method for 2D, 3D
 template <unsigned int Dim>
-void FEXYZ<Dim>::reinit(const Elem* elem,
+void FEXYZ<Dim>::reinit(const Elem * elem,
                         const unsigned int s,
                         const Real,
-                        const std::vector<Point>* const pts,
-                        const std::vector<Real>* const weights)
+                        const std::vector<Point> * const pts,
+                        const std::vector<Real> * const weights)
 {
   libmesh_assert(elem);
   libmesh_assert (this->qrule != NULL || pts != NULL);
@@ -125,9 +125,9 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
 
 
 template <unsigned int Dim>
-void FEXYZ<Dim>::compute_face_values(const Elem* elem,
-                                     const Elem* side,
-                                     const std::vector<Real>& qw)
+void FEXYZ<Dim>::compute_face_values(const Elem * elem,
+                                     const Elem * side,
+                                     const std::vector<Real> & qw)
 {
   libmesh_assert(elem);
   libmesh_assert(side);
@@ -161,7 +161,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 
   this->_fe_map->compute_face_map(this->dim, qw, side);
 
-  const std::vector<libMesh::Point>& xyz = this->_fe_map->get_xyz();
+  const std::vector<libMesh::Point> & xyz = this->_fe_map->get_xyz();
 
   switch (this->dim)
     {

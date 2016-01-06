@@ -35,15 +35,15 @@
 using namespace libMesh;
 
 
-void assemble(EquationSystems& es,
-              const std::string& system_name);
+void assemble(EquationSystems & es,
+              const std::string & system_name);
 
 
 
 
 
 #ifdef LIBMESH_ENABLE_AMR
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
@@ -76,7 +76,7 @@ int main (int argc, char** argv)
   // Set up the equation system(s)
   EquationSystems es (mesh);
 
-  LinearImplicitSystem& primary =
+  LinearImplicitSystem & primary =
     es.add_system<LinearImplicitSystem>("primary");
 
   primary.add_variable ("U", FIRST);
@@ -117,7 +117,7 @@ int main (int argc, char** argv)
   return 0;
 }
 #else
-int main (int, char**)
+int main (int, char **)
 {
   return 1;
 }
@@ -128,12 +128,12 @@ int main (int, char**)
 
 
 
-void assemble(EquationSystems& es,
-              const std::string& libmesh_dbg_var(system_name))
+void assemble(EquationSystems & es,
+              const std::string & libmesh_dbg_var(system_name))
 {
   libmesh_assert_equal_to (system_name, "primary");
 
-  const MeshBase& mesh   = es.get_mesh();
+  const MeshBase & mesh   = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
 
   // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
@@ -150,20 +150,20 @@ void assemble(EquationSystems& es,
 
   fe_face->attach_quadrature_rule(&qface);
 
-  LinearImplicitSystem& system =
+  LinearImplicitSystem & system =
     es.get_system<LinearImplicitSystem>("primary");
 
 
   // These are references to cell-specific data
-  const std::vector<Real>& JxW_face                   = fe_face->get_JxW();
-  const std::vector<Real>& JxW                        = fe->get_JxW();
-  const std::vector<Point>& q_point                   = fe->get_xyz();
-  const std::vector<std::vector<Real> >& phi          = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<Real> & JxW_face                   = fe_face->get_JxW();
+  const std::vector<Real> & JxW                        = fe->get_JxW();
+  const std::vector<Point> & q_point                   = fe->get_xyz();
+  const std::vector<std::vector<Real> > & phi          = fe->get_phi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   std::vector<unsigned int> dof_indices_U;
   std::vector<unsigned int> dof_indices_V;
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   DenseMatrix<Number> Kuu;
   DenseMatrix<Number> Kvv;
@@ -177,7 +177,7 @@ void assemble(EquationSystems& es,
 
   for (; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // recompute the element-specific data for the current element
       fe->reinit (elem);

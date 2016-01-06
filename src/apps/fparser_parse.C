@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   using namespace libMesh;
 

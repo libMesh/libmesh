@@ -38,7 +38,8 @@ class EquationSystems;
 
 /**
  * This class implements writing meshes and solutions in Ensight's Gold format.
- * \p author Camata
+ * \author Camata
+ * \date 2009
  */
 class EnsightIO : public MeshOutput<MeshBase>
 {
@@ -47,7 +48,8 @@ public:
   /**
    * Constructor.
    */
-  EnsightIO (const std::string &filename, const EquationSystems &eq);
+  EnsightIO (const std::string & filename,
+             const EquationSystems & eq);
 
   ~EnsightIO ();
 
@@ -55,32 +57,38 @@ public:
    * add 2D vector: Tell the EnsightIO interface that the variables u and v are a vector.
    * Note that u and v should be the same variables defined in the system.
    */
-  void add_vector (const std::string &system, const std::string &vec_description,
-                   const std::string &u, const std::string &v);
+  void add_vector (const std::string & system,
+                   const std::string & vec_description,
+                   const std::string & u,
+                   const std::string & v);
 
   /**
    * add 3D vector: tell the EnsightIO interface that the variables u, v and w are vector components
    */
-  void add_vector (const std::string &system, const std::string &vec_description,
-                   const std::string &u, const std::string &v, const std::string &w);
+  void add_vector (const std::string & system,
+                   const std::string & vec_description,
+                   const std::string & u,
+                   const std::string & v,
+                   const std::string & w);
 
   /**
    * add scalar: tell the EnsightIO interface that the variable s is a scalar
    */
-  void add_scalar (const std::string &system, const std::string &scalar_description,
-                   const std::string &s);
+  void add_scalar (const std::string & system,
+                   const std::string & scalar_description,
+                   const std::string & s);
 
   /**
    * write solution
    */
-  virtual void write (const std::string &name) libmesh_override;
+  virtual void write (const std::string & name) libmesh_override;
 
   /**
    * write solution
    */
   void write (const double time = 0);
 
-  bool& has_mesh_refinement();
+  bool & has_mesh_refinement();
 
 private:
 
@@ -115,20 +123,20 @@ private:
   // private methods
   // write solution in ascii format file
   void write_ascii (const double time = 0);
-  void write_scalar_ascii (const std::string &sys, const std::string &var);
-  void write_vector_ascii (const std::string &sys, const std::vector<std::string> &vec, const std::string &var_name);
+  void write_scalar_ascii (const std::string & sys, const std::string & var);
+  void write_vector_ascii (const std::string & sys, const std::vector<std::string> & vec, const std::string & var_name);
   void write_solution_ascii ();
   void write_geometry_ascii ();
 
 
   void write_case();
-  void elem_type_to_string (ElemType, char*);
+  void elem_type_to_string (ElemType, char *);
 
   // private Attributes
   std::string     _ensight_file_name;
   std::vector<double>   _time_steps;
   SystemsVarsMap   _systems_vars_map;
-  const EquationSystems &_equation_systems;
+  const EquationSystems & _equation_systems;
 };
 
 

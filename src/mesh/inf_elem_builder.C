@@ -82,14 +82,14 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
 
 
 
-const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
-                                            const InfElemOriginValue& origin_y,
-                                            const InfElemOriginValue& origin_z,
+const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
+                                            const InfElemOriginValue & origin_y,
+                                            const InfElemOriginValue & origin_z,
                                             const bool x_sym,
                                             const bool y_sym,
                                             const bool z_sym,
                                             const bool be_verbose,
-                                            std::vector<const Node*>* inner_boundary_nodes)
+                                            std::vector<const Node *> * inner_boundary_nodes)
 {
   START_LOG("build_inf_elem()", "InfElemBuilder");
 
@@ -147,7 +147,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
   // Now that we have the origin, check if the user provided an \p
   // inner_boundary_nodes.  If so, we pass a std::set to the actual
   // implementation of the build_inf_elem(), so that we can convert
-  // this to the Node* vector
+  // this to the Node * vector
   if (inner_boundary_nodes != NULL)
     {
       // note that the std::set that we will get
@@ -164,7 +164,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
 
       // Form the list of faces of elements which finally
       // will tell us which nodes should receive boundary
-      // conditions (to form the std::vector<const Node*>)
+      // conditions (to form the std::vector<const Node *>)
       std::set< std::pair<dof_id_type,
                           unsigned int> > inner_faces;
 
@@ -179,14 +179,14 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
         {
           this->_mesh.print_info();
           libMesh::out << "Data pre-processing:" << std::endl
-                       << " convert the <int,int> list to a Node* list..."
+                       << " convert the <int,int> list to a Node * list..."
                        << std::endl;
         }
 
       // First use a std::vector<dof_id_type> that holds
       // the global node numbers.  Then sort this vector,
       // so that it can be made unique (no multiple occurence
-      // of a node), and then finally insert the Node* in
+      // of a node), and then finally insert the Node * in
       // the vector inner_boundary_nodes.
       //
       // Reserve memory for the vector<> with
@@ -231,7 +231,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       std::size_t unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
       libmesh_assert_less_equal (unique_size, ibn_size_before);
 
-      // Finally, create const Node* in the inner_boundary_nodes
+      // Finally, create const Node * in the inner_boundary_nodes
       // vector.  Reserve, not resize (otherwise, the push_back
       // would append the interesting nodes, while NULL-nodes
       // live in the resize'd area...
@@ -242,7 +242,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       std::vector<dof_id_type>::iterator pos_it = inner_boundary_node_numbers.begin();
       for (; pos_it != unique_end; ++pos_it)
         {
-          const Node& node = this->_mesh.node(*pos_it);
+          const Node & node = this->_mesh.node(*pos_it);
           inner_boundary_nodes->push_back(&node);
         }
 
@@ -278,13 +278,13 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
 
 
 // The actual implementation of building elements.
-void InfElemBuilder::build_inf_elem(const Point& origin,
+void InfElemBuilder::build_inf_elem(const Point & origin,
                                     const bool x_sym,
                                     const bool y_sym,
                                     const bool z_sym,
                                     const bool be_verbose,
                                     std::set< std::pair<dof_id_type,
-                                    unsigned int> >* inner_faces)
+                                    unsigned int> > * inner_faces)
 {
   if (be_verbose)
     {
@@ -336,7 +336,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
     for(; it != end; ++it)
       {
-        Elem* elem = *it;
+        Elem * elem = *it;
 
         for (unsigned int s=0; s<elem->n_neighbors(); s++)
           {
@@ -513,7 +513,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
       else
         {
           // Pick a unique id in parallel
-          Node &bnode = _mesh.node(*on_it);
+          Node & bnode = _mesh.node(*on_it);
           dof_id_type new_id = bnode.id() + old_max_node_id;
           outer_nodes[*on_it] =
             this->_mesh.add_point(p, new_id,
@@ -542,7 +542,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
       // use braces to force scope.
       bool is_higher_order_elem = false;
 
-      Elem* el;
+      Elem * el;
       switch(side->type())
         {
           // 3D infinite elements
@@ -598,7 +598,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
       // In parallel, assign unique ids to the new element
       if (!_mesh.is_serial())
         {
-          Elem *belem = _mesh.elem(p.first);
+          Elem * belem = _mesh.elem(p.first);
           el->processor_id() = belem->processor_id();
           // We'd better not have elements with more than 6 sides
           el->set_id (belem->id() * 6 + p.second + old_max_elem_id);

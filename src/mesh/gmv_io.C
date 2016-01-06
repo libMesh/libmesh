@@ -80,12 +80,12 @@ std::map<ElemType, ElementDefinition> eletypes;
 
 // Helper function to fill up eletypes map
 void add_eletype_entry(ElemType libmesh_elem_type,
-                       const unsigned* node_map,
-                       const std::string& gmv_label,
+                       const unsigned * node_map,
+                       const std::string & gmv_label,
                        unsigned nodes_size )
 {
   // If map entry does not exist, this will create it
-  ElementDefinition& map_entry = eletypes[libmesh_elem_type];
+  ElementDefinition & map_entry = eletypes[libmesh_elem_type];
 
   // Set the label
   map_entry.label = gmv_label;
@@ -205,7 +205,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // GMVIO  members
-void GMVIO::write (const std::string& fname)
+void GMVIO::write (const std::string & fname)
 {
   if (this->binary())
     this->write_binary (fname);
@@ -215,9 +215,9 @@ void GMVIO::write (const std::string& fname)
 
 
 
-void GMVIO::write_nodal_data (const std::string& fname,
-                              const std::vector<Number>& soln,
-                              const std::vector<std::string>& names)
+void GMVIO::write_nodal_data (const std::string & fname,
+                              const std::vector<Number> & soln,
+                              const std::vector<std::string> & names)
 {
   START_LOG("write_nodal_data()", "GMVIO");
 
@@ -231,9 +231,9 @@ void GMVIO::write_nodal_data (const std::string& fname,
 
 
 
-void GMVIO::write_ascii_new_impl (const std::string& fname,
-                                  const std::vector<Number>* v,
-                                  const std::vector<std::string>* solution_names)
+void GMVIO::write_ascii_new_impl (const std::string & fname,
+                                  const std::vector<Number> * v,
+                                  const std::vector<std::string> * solution_names)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -247,7 +247,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 #else
 
   // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // This is a parallel_only function
   const unsigned int n_active_elem = mesh.n_active_elem();
@@ -305,7 +305,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
     for ( ; it != end; ++it)
       {
-        const Elem* elem = *it;
+        const Elem * elem = *it;
 
         mesh_max_p_level = std::max(mesh_max_p_level,
                                     elem->p_level());
@@ -314,7 +314,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
         // the current element type.
         libmesh_assert (eletypes.count(elem->type()));
 
-        const ElementDefinition& ele = eletypes[elem->type()];
+        const ElementDefinition & ele = eletypes[elem->type()];
 
         // The element mapper better not require any more nodes
         // than are present in the current element!
@@ -398,9 +398,9 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
       for ( ; it != end; ++it)
         {
-          const Elem* elem = *it;
+          const Elem * elem = *it;
 
-          const ElementDefinition& ele = eletypes[elem->type()];
+          const ElementDefinition & ele = eletypes[elem->type()];
 
           // The element mapper better not require any more nodes
           // than are present in the current element!
@@ -416,15 +416,15 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   // optionally write cell-centered data
   if ( !(this->_cell_centered_data.empty()) )
     {
-      std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
-      const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();
+      std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
+      const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
 
       for (; it != end; ++it)
         {
           // write out the variable name, followed by a zero.
           out_stream << (*it).first << " 0\n";
 
-          const std::vector<Real>* the_array = (*it).second;
+          const std::vector<Real> * the_array = (*it).second;
 
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
@@ -434,7 +434,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
           for (; elem_it != elem_end; ++elem_it)
             {
-              const Elem* e = *elem_it;
+              const Elem * e = *elem_it;
 
               // Use the element's ID to find the value.
               libmesh_assert_less (e->id(), the_array->size());
@@ -527,18 +527,18 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
 
 
-void GMVIO::write_ascii_old_impl (const std::string& fname,
-                                  const std::vector<Number>* v,
-                                  const std::vector<std::string>* solution_names)
+void GMVIO::write_ascii_old_impl (const std::string & fname,
+                                  const std::vector<Number> * v,
+                                  const std::vector<std::string> * solution_names)
 {
   // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // Use a MeshSerializer object to gather a parallel mesh before outputting it.
   // Note that we cast away constness here (which is bad), but the destructor of
   // the MeshSerializer object reparallelizes the Mesh, hopefully keeping it
   // "logically const" outside the context of this function...
-  MeshSerializer serialize(const_cast<MeshBase&>(mesh),
+  MeshSerializer serialize(const_cast<MeshBase &>(mesh),
                            !MeshOutput<MeshBase>::_is_parallel_format);
 
   // These are parallel_only functions
@@ -626,7 +626,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
     for ( ; it != end; ++it)
       {
-        const Elem* elem = *it;
+        const Elem * elem = *it;
 
         mesh_max_p_level = std::max(mesh_max_p_level,
                                     elem->p_level());
@@ -1052,15 +1052,15 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // optionally write cell-centered data
   if ( !(this->_cell_centered_data.empty()) )
     {
-      std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
-      const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();
+      std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
+      const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
 
       for (; it != end; ++it)
         {
           // write out the variable name, followed by a zero.
           out_stream << (*it).first << " 0\n";
 
-          const std::vector<Real>* the_array = (*it).second;
+          const std::vector<Real> * the_array = (*it).second;
 
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
@@ -1070,7 +1070,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
           for (; elem_it != elem_end; ++elem_it)
             {
-              const Elem* e = *elem_it;
+              const Elem * e = *elem_it;
 
               // Use the element's ID to find the value...
               libmesh_assert_less (e->id(), the_array->size());
@@ -1167,12 +1167,12 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
 
 
-void GMVIO::write_binary (const std::string& fname,
-                          const std::vector<Number>* vec,
-                          const std::vector<std::string>* solution_names)
+void GMVIO::write_binary (const std::string & fname,
+                          const std::vector<Number> * vec,
+                          const std::vector<std::string> * solution_names)
 {
   // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // This is a parallel_only function
   const dof_id_type n_active_elem = mesh.n_active_elem();
@@ -1212,7 +1212,7 @@ void GMVIO::write_binary (const std::string& fname,
     out_stream.write(buf, sizeof(unsigned int));
 
     // write the x coordinate
-    float *temp = new float[mesh.n_nodes()];
+    float * temp = new float[mesh.n_nodes()];
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       temp[v] = static_cast<float>(mesh.point(v)(0));
     out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
@@ -1255,7 +1255,7 @@ void GMVIO::write_binary (const std::string& fname,
 
     for ( ; it != end; ++it)
       {
-        const Elem* elem = *it;
+        const Elem * elem = *it;
 
         mesh_max_p_level = std::max(mesh_max_p_level,
                                     (*it)->p_level());
@@ -1276,8 +1276,7 @@ void GMVIO::write_binary (const std::string& fname,
 
                   std::vector<dof_id_type> conn;
                   (*it)->connectivity(se,TECPLOT,conn);
-
-                  out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+                  out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
                 }
 
               break;
@@ -1294,7 +1293,7 @@ void GMVIO::write_binary (const std::string& fname,
                   out_stream.write(buf, sizeof(unsigned int));
                   std::vector<dof_id_type> conn;
                   (*it)->connectivity(se,TECPLOT,conn);
-                  out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+                  out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
                 }
 
               break;
@@ -1310,7 +1309,7 @@ void GMVIO::write_binary (const std::string& fname,
                   out_stream.write(buf, sizeof(unsigned int));
                   std::vector<dof_id_type> conn;
                   (*it)->connectivity(se,TECPLOT,conn);
-                  out_stream.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
+                  out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
                 }
 
               break;
@@ -1398,7 +1397,7 @@ void GMVIO::write_binary (const std::string& fname,
       for (unsigned int i=0; i != mesh.mesh_dimension(); ++i)
         n_floats *= 2;
 
-      float *temp = new float[n_floats];
+      float * temp = new float[n_floats];
 
       std::strcpy(buf, "p_level");
       out_stream.write(buf, std::strlen(buf));
@@ -1428,8 +1427,8 @@ void GMVIO::write_binary (const std::string& fname,
     {
       libMesh::err << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
 
-      //        std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
-      //        const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();
+      //        std::map<std::string, const std::vector<Real> * >::iterator       it  = this->_cell_centered_data.begin();
+      //        const std::map<std::string, const std::vector<Real> * >::iterator end = this->_cell_centered_data.end();
 
       //        for (; it != end; ++it)
       //  {
@@ -1443,12 +1442,12 @@ void GMVIO::write_binary (const std::string& fname,
       //    out_stream.write(buf, sizeof(unsigned int));
 
       //    // Get a pointer to the array of cell-centered data values
-      //    const std::vector<Real>* the_array = (*it).second;
+      //    const std::vector<Real> * the_array = (*it).second;
 
       //   // Since the_array might contain zeros (for inactive elements) we need to
       //   // make a copy of it containing just values for active elements.
       //   const unsigned int n_floats = n_active_elem * (1<<mesh.mesh_dimension());
-      //   float *temp = new float[n_floats];
+      //   float * temp = new float[n_floats];
 
       //   MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
       //   const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
@@ -1479,7 +1478,7 @@ void GMVIO::write_binary (const std::string& fname,
   if ((solution_names != NULL) &&
       (vec != NULL))
     {
-      float *temp = new float[mesh.n_nodes()];
+      float * temp = new float[mesh.n_nodes()];
 
       const unsigned int n_vars =
         cast_int<unsigned int>(solution_names->size());
@@ -1580,16 +1579,16 @@ void GMVIO::write_binary (const std::string& fname,
 
 
 
-void GMVIO::write_discontinuous_gmv (const std::string& name,
-                                     const EquationSystems& es,
+void GMVIO::write_discontinuous_gmv (const std::string & name,
+                                     const EquationSystems & es,
                                      const bool write_partitioning,
-                                     const std::set<std::string>* system_names) const
+                                     const std::set<std::string> * system_names) const
 {
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
 
   // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   es.build_variable_names  (solution_names, NULL, system_names);
   es.build_discontinuous_solution_vector (v, system_names);
@@ -1929,8 +1928,8 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 
 
 
-void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_name,
-                                    const std::vector<Real>* cell_centered_data_vals)
+void GMVIO::add_cell_centered_data (const std::string &       cell_centered_data_name,
+                                    const std::vector<Real> * cell_centered_data_vals)
 {
   libmesh_assert(cell_centered_data_vals);
 
@@ -1946,7 +1945,7 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 
 
 
-void GMVIO::read (const std::string& name)
+void GMVIO::read (const std::string & name)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -1967,7 +1966,7 @@ void GMVIO::read (const std::string& name)
   init_eletypes();
 
   // Clear the mesh so we are sure to start from a pristeen state.
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
 
   // Keep track of what kinds of elements this file contains
@@ -1978,7 +1977,7 @@ void GMVIO::read (const std::string& name)
   // a "fromfile" directive (?) But we currently don't make
   // any use of this feature in LibMesh.  Nonzero return val
   // from any function usually means an error has occurred.
-  int ierr = GMVLib::gmvread_open_fromfileskip(const_cast<char*>(name.c_str()));
+  int ierr = GMVLib::gmvread_open_fromfileskip(const_cast<char *>(name.c_str()));
   if (ierr != 0)
     libmesh_error_msg("GMVLib::gmvread_open_fromfileskip failed!");
 
@@ -2205,7 +2204,7 @@ void GMVIO::_read_one_cell()
 #endif
   libmesh_assert (recognized);
 
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   if (GMVLib::gmv_data.datatype == REGULAR)
     {
@@ -2227,11 +2226,11 @@ void GMVIO::_read_one_cell()
       // to be careful to read back in exactly what we wrote out...
       ElemType type = this->_gmv_elem_to_libmesh_elem(GMVLib::gmv_data.name1);
 
-      Elem* elem = Elem::build(type).release();
+      Elem * elem = Elem::build(type).release();
       elem->set_id(_next_elem_id++);
 
       // Get the ElementDefinition object for this element type
-      const ElementDefinition& eledef = eletypes[type];
+      const ElementDefinition & eledef = eletypes[type];
 
       // Print out the connectivity information for
       // this cell.
@@ -2267,7 +2266,7 @@ void GMVIO::_read_one_cell()
 }
 
 
-ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
+ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char * elemname)
 {
   //
   // Linear Elements
@@ -2334,7 +2333,7 @@ ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
 
 
 
-void GMVIO::copy_nodal_solution(EquationSystems& es)
+void GMVIO::copy_nodal_solution(EquationSystems & es)
 {
   // Check for easy return if there isn't any nodal data
   if (_nodal_data.empty())
@@ -2360,7 +2359,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
   for (unsigned int sys=0; sys<es.n_systems(); ++sys)
     {
       // Get a generic refernence to the current System
-      System& system = es.get_system(sys);
+      System & system = es.get_system(sys);
 
       // And a reference to that system's dof_map
       // const DofMap & dof_map = system.get_dof_map();
@@ -2390,7 +2389,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 
               // The only type of nodal data we can read in from GMV is for
               // linear LAGRANGE type elements.
-              const FEType& fe_type = system.variable_type(var_num);
+              const FEType & fe_type = system.variable_type(var_num);
               if ((fe_type.order != FIRST) || (fe_type.family != LAGRANGE))
                 {
                   libMesh::err << "Only FIRST-order LAGRANGE variables can be read from GMV files. "

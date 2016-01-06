@@ -57,14 +57,14 @@ public:
    * will fill up with elements via the read() command.
    */
   explicit
-  GmshIO (MeshBase& mesh);
+  GmshIO (MeshBase & mesh);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
   explicit
-  GmshIO (const MeshBase& mesh);
+  GmshIO (const MeshBase & mesh);
 
   /**
    * Reads in a mesh in the Gmsh *.msh format from the ASCII file
@@ -73,21 +73,21 @@ public:
    * The user is responsible for calling Mesh::prepare_for_use()
    * after reading the mesh and before using it.
    */
-  virtual void read (const std::string& name) libmesh_override;
+  virtual void read (const std::string & name) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file
    * in the Gmsh *.msh format.
    */
-  virtual void write (const std::string& name) libmesh_override;
+  virtual void write (const std::string & name) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&) libmesh_override;
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &) libmesh_override;
 
   /**
    * Flag indicating whether or not to write a binary file.  While binary
@@ -113,22 +113,22 @@ private:
    * is called by the public interface function and implements
    * reading the file.
    */
-  void read_mesh (std::istream& in);
+  void read_mesh (std::istream & in);
 
   /**
    * This method implements writing a mesh to a
    * specified file.  This will write an ASCII *.msh file.
    */
-  void write_mesh (std::ostream& out);
+  void write_mesh (std::ostream & out);
 
   /**
    * This method implements writing a mesh with nodal data to a specified file
    * where the nodal data and variable names are optionally provided.  This
    * will write an ASCII or binary *.pos file, depending on the binary flag.
    */
-  void write_post (const std::string&,
-                   const std::vector<Number>* = NULL,
-                   const std::vector<std::string>* = NULL);
+  void write_post (const std::string &,
+                   const std::vector<Number> * = NULL,
+                   const std::vector<std::string> * = NULL);
 
   /**
    * Flag to write binary data.

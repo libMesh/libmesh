@@ -65,7 +65,7 @@ void XdrMGF::fini()
 
 
 
-void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
+void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char * fn, const char *, int)
 {
   m_type=t;
 
@@ -140,7 +140,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
     case (XdrMGF::ENCODE):
       {
-        char* p = &buf[0];
+        char * p = &buf[0];
         const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
 
         std::ostringstream name;
@@ -166,7 +166,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
     case (XdrMGF::DECODE):
       {
-        char* p = &buf[0];
+        char * p = &buf[0];
         xdr_string(mp_xdr_handle, &p, bufLen); // Reads binary signature
 
         // Set the number of levels used in the mesh
@@ -261,7 +261,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
 
 
-int XdrMGF::dataBlk(int* array, int numvar, int size)
+int XdrMGF::dataBlk(int * array, int numvar, int size)
 {
   int totalSize = numvar*size;
 
@@ -324,7 +324,7 @@ int XdrMGF::dataBlk(int* array, int numvar, int size)
 
 
 
-int XdrMGF::dataBlk(Real* array, int numvar, int size)
+int XdrMGF::dataBlk(Real * array, int numvar, int size)
 {
   int totalSize = numvar*size;
 

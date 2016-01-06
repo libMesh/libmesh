@@ -35,7 +35,7 @@ namespace libMesh
 
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
-TetGenMeshInterface::TetGenMeshInterface (UnstructuredMesh& mesh) :
+TetGenMeshInterface::TetGenMeshInterface (UnstructuredMesh & mesh) :
   _mesh(mesh),
   _serializer(_mesh)
 {
@@ -81,7 +81,7 @@ void TetGenMeshInterface::triangulate_pointset ()
 
   for (unsigned int i=0; i<num_elements; ++i)
     {
-      Elem* elem = new Tet4;
+      Elem * elem = new Tet4;
 
       // Get the nodes associated with this element
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
@@ -133,7 +133,7 @@ void TetGenMeshInterface::pointset_convexhull ()
 
   for (unsigned int i=0; i<num_elements; ++i)
     {
-      Elem* elem = new Tri3;
+      Elem * elem = new Tri3;
 
       // Get node labels associated with this element
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
@@ -160,7 +160,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_con
 
 
 
-void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const std::vector<Point>& holes,
+void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const std::vector<Point> & holes,
                                                                          double quality_constraint,
                                                                          double volume_constraint)
 {
@@ -196,7 +196,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
         tetgen_wrapper.allocate_facet_polygonlist(insertnum, 1);
         tetgen_wrapper.allocate_polygon_vertexlist(insertnum, 0, 3);
 
-        Elem* elem = *it;
+        Elem * elem = *it;
 
         for (unsigned int j=0; j<elem->n_nodes(); ++j)
           {
@@ -293,7 +293,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 
       // Catch the node returned by add_point()... this will tell us the ID
       // assigned by the Mesh.
-      Node* new_node = this->_mesh.add_point ( Point(x,y,z) );
+      Node * new_node = this->_mesh.add_point ( Point(x,y,z) );
 
       // Store this new ID in our sequential-to-libmesh node mapping array
       _sequential_to_libmesh_node_map.push_back( new_node->id() );
@@ -315,7 +315,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   for (unsigned int i=0; i<num_elements; i++)
     {
       // TetGen only supports Tet4 elements.
-      Elem* elem = new Tet4;
+      Elem * elem = new Tet4;
 
       // Fill up the the node_labels vector
       for (unsigned int j=0; j<elem->n_nodes(); j++)
@@ -337,7 +337,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 
 
 
-void TetGenMeshInterface::fill_pointlist(TetGenWrapper& wrapper)
+void TetGenMeshInterface::fill_pointlist(TetGenWrapper & wrapper)
 {
   // fill input structure with point set data:
   wrapper.allocate_pointlist( this->_mesh.n_nodes() );
@@ -364,7 +364,7 @@ void TetGenMeshInterface::fill_pointlist(TetGenWrapper& wrapper)
 
 
 
-void TetGenMeshInterface::assign_nodes_to_elem(unsigned* node_labels, Elem* elem)
+void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * elem)
 {
   for (unsigned int j=0; j<elem->n_nodes(); ++j)
     {
@@ -372,7 +372,7 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned* node_labels, Elem* elem
       unsigned mapped_node_id = _sequential_to_libmesh_node_map[ node_labels[j] ];
 
       // Parallel mesh can return NULL pointers, this is bad...
-      Node* current_node = this->_mesh.node_ptr( mapped_node_id );
+      Node * current_node = this->_mesh.node_ptr( mapped_node_id );
 
       if (current_node == NULL)
         libmesh_error_msg("Error! Mesh returned NULL node pointer!");
@@ -399,7 +399,7 @@ unsigned TetGenMeshInterface::check_hull_integrity()
 
   for (; it != end ; ++it)
     {
-      Elem* elem = *it;
+      Elem * elem = *it;
 
       // Check for proper element type
       if (elem->type() != TRI3)
@@ -452,7 +452,7 @@ void TetGenMeshInterface::delete_2D_hull_elements()
 
   for (; it != end ; ++it)
     {
-      Elem* elem = *it;
+      Elem * elem = *it;
 
       // Check for proper element type. Yes, we legally delete elements while
       // iterating over them because no entries from the underlying container

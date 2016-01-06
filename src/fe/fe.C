@@ -41,7 +41,7 @@ unsigned int FE<Dim,T>::n_shape_functions () const
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::attach_quadrature_rule (QBase* q)
+void FE<Dim,T>::attach_quadrature_rule (QBase * q)
 {
   libmesh_assert(q);
   this->qrule = q;
@@ -60,10 +60,10 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::dofs_on_side(const Elem* const elem,
+void FE<Dim,T>::dofs_on_side(const Elem * const elem,
                              const Order o,
                              unsigned int s,
-                             std::vector<unsigned int>& di)
+                             std::vector<unsigned int> & di)
 {
   libmesh_assert(elem);
   libmesh_assert_less (s, elem->n_sides());
@@ -86,10 +86,10 @@ void FE<Dim,T>::dofs_on_side(const Elem* const elem,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
+void FE<Dim,T>::dofs_on_edge(const Elem * const elem,
                              const Order o,
                              unsigned int e,
-                             std::vector<unsigned int>& di)
+                             std::vector<unsigned int> & di)
 {
   libmesh_assert(elem);
   libmesh_assert_less (e, elem->n_edges());
@@ -112,9 +112,9 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::reinit(const Elem* elem,
-                       const std::vector<Point>* const pts,
-                       const std::vector<Real>* const weights)
+void FE<Dim,T>::reinit(const Elem * elem,
+                       const std::vector<Point> * const pts,
+                       const std::vector<Real> * const weights)
 {
   // We can be called with no element.  If we're evaluating SCALAR
   // dofs we'll still have work to do.
@@ -274,8 +274,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
-                                     const Elem* elem)
+void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
+                                     const Elem * elem)
 {
   // We can be called with no element.  If we're evaluating SCALAR
   // dofs we'll still have work to do.
@@ -566,8 +566,8 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
-                                          const Elem* e)
+void FE<Dim,T>::init_base_shape_functions(const std::vector<Point> & qp,
+                                          const Elem * e)
 {
   // I don't understand infinite elements well enough to risk
   // calculating too little.  :-(  RHS

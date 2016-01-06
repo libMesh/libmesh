@@ -50,7 +50,7 @@ public:
    * Default infinite prism element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  InfPrism(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata)
   {}
 
@@ -132,7 +132,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+  Elem * _elemlinks_data[5+(LIBMESH_DIM>3)];
 
   /**
    * Master element node locations

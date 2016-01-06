@@ -50,11 +50,11 @@ public:
    * constructor creates a variable which is active on
    * all subdomains.
    */
-  Variable (System *sys,
-            const std::string &var_name,
+  Variable (System * sys,
+            const std::string & var_name,
             const unsigned int var_number,
             const unsigned int first_scalar_num,
-            const FEType &var_type) :
+            const FEType & var_type) :
     _sys(sys),
     _name(var_name),
     _active_subdomains(),
@@ -67,12 +67,12 @@ public:
    * Constructor.  Takes a set which contains the subdomain
    * indices for which this variable is active.
    */
-  Variable (System *sys,
-            const std::string &var_name,
+  Variable (System * sys,
+            const std::string & var_name,
             const unsigned int var_number,
             const unsigned int first_scalar_num,
-            const FEType &var_type,
-            const std::set<subdomain_id_type> &var_active_subdomains) :
+            const FEType & var_type,
+            const std::set<subdomain_id_type> & var_active_subdomains) :
     _sys(sys),
     _name(var_name),
     _active_subdomains(var_active_subdomains),
@@ -170,11 +170,11 @@ public:
    * constructor creates a variable which is active on
    * all subdomains.
    */
-  VariableGroup (System *sys,
-                 const std::vector<std::string> &var_names,
+  VariableGroup (System * sys,
+                 const std::vector<std::string> & var_names,
                  const unsigned int var_number,
                  const unsigned int first_scalar_num,
-                 const FEType &var_type) :
+                 const FEType & var_type) :
     Variable (sys,
               "var_group",
               var_number,
@@ -188,12 +188,12 @@ public:
    * Constructor.  Takes a set which contains the subdomain
    * indices for which this variable is active.
    */
-  VariableGroup (System *sys,
-                 const std::vector<std::string> &var_names,
+  VariableGroup (System * sys,
+                 const std::vector<std::string> & var_names,
                  const unsigned int var_number,
                  const unsigned int first_scalar_num,
-                 const FEType &var_type,
-                 const std::set<subdomain_id_type> &var_active_subdomains) :
+                 const FEType & var_type,
+                 const std::set<subdomain_id_type> & var_active_subdomains) :
 
     Variable (sys,
               "var_group",
@@ -264,7 +264,7 @@ public:
    * a very limited window of opportunity - after the user specifies variables
    * but before the system is initialized.
    */
-  void append (const std::string &var_name)
+  void append (const std::string & var_name)
   { _names.push_back (var_name); }
 
 protected:

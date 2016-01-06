@@ -51,12 +51,12 @@ public:
   /**
    * Copy-constructor.
    */
-  Point (const Point& p);
+  Point (const Point & p);
 
   /**
    * Copy-constructor.
    */
-  Point (const TypeVector<Real>& p);
+  Point (const TypeVector<Real> & p);
 
   /**
    * Empty.
@@ -93,7 +93,7 @@ Point::Point (const Real x,
 
 
 inline
-Point::Point (const Point& p) :
+Point::Point (const Point & p) :
   TypeVector<Real> (p)
 {
 }
@@ -101,7 +101,7 @@ Point::Point (const Point& p) :
 
 
 inline
-Point::Point (const TypeVector<Real>& p) :
+Point::Point (const TypeVector<Real> & p) :
   TypeVector<Real> (p)
 {
 }

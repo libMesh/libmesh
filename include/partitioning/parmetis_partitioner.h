@@ -71,13 +71,13 @@ protected:
    * takes a previously partitioned domain (which may have
    * then been adaptively refined) and repartitions it.
    */
-  virtual void _do_repartition (MeshBase& mesh,
+  virtual void _do_repartition (MeshBase & mesh,
                                 const unsigned int n) libmesh_override;
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void _do_partition (MeshBase& mesh,
+  virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) libmesh_override;
 
 private:
@@ -89,17 +89,17 @@ private:
   /**
    * Initialize data structures.
    */
-  void initialize (const MeshBase& mesh, const unsigned int n_sbdmns);
+  void initialize (const MeshBase & mesh, const unsigned int n_sbdmns);
 
   /**
    * Build the graph.
    */
-  void build_graph (const MeshBase& mesh);
+  void build_graph (const MeshBase & mesh);
 
   /**
    * Assign the computed partitioning to the mesh.
    */
-  void assign_partitioning (MeshBase& mesh);
+  void assign_partitioning (MeshBase & mesh);
 
   /**
    * The number of active elements on each processor.  Note that
@@ -117,7 +117,7 @@ private:
    * Pointer to the Parmetis-specific data structures.  Lets us avoid
    * including parmetis.h here.
    */
-  ParmetisHelper* _pmetis;
+  ParmetisHelper * _pmetis;
 
 #endif
 };

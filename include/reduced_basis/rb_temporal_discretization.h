@@ -71,17 +71,17 @@ public:
    * Get/set the RHS control.
    */
   Real get_control(const unsigned int k) const;
-  void set_control(const std::vector<Real>& control);
+  void set_control(const std::vector<Real> & control);
 
   /**
    * Read in and initialize parameters from \p parameters_filename.
    */
-  void process_temporal_parameters_file (const std::string& parameters_filename);
+  void process_temporal_parameters_file (const std::string & parameters_filename);
 
   /**
    * Pull the temporal discretization data from \p other.
    */
-  void pull_temporal_discretization_data(RBTemporalDiscretization& other);
+  void pull_temporal_discretization_data(RBTemporalDiscretization & other);
 
 private:
 

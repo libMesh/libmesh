@@ -33,10 +33,10 @@ namespace libMesh
 // Anonymous namespace for local helper functions
 namespace {
 
-void monomial_nodal_soln(const Elem* elem,
+void monomial_nodal_soln(const Elem * elem,
                          const Order order,
-                         const std::vector<Number>& elem_soln,
-                         std::vector<Number>&       nodal_soln,
+                         const std::vector<Number> & elem_soln,
+                         std::vector<Number> &       nodal_soln,
                          const unsigned Dim)
 {
   const unsigned int n_nodes = elem->n_nodes();
@@ -338,31 +338,31 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
   // of explicit instantiation at the end of this file.
   // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,MONOMIAL>::nodal_soln(const Elem* elem,
+void FE<0,MONOMIAL>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
 template <>
-void FE<1,MONOMIAL>::nodal_soln(const Elem* elem,
+void FE<1,MONOMIAL>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
 template <>
-void FE<2,MONOMIAL>::nodal_soln(const Elem* elem,
+void FE<2,MONOMIAL>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
 template <>
-void FE<3,MONOMIAL>::nodal_soln(const Elem* elem,
+void FE<3,MONOMIAL>::nodal_soln(const Elem * elem,
                                 const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
+                                const std::vector<Number> & elem_soln,
+                                std::vector<Number> & nodal_soln)
 { monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 
@@ -404,8 +404,8 @@ template <> bool FE<3,MONOMIAL>::is_hierarchic() const { return true; }
 // Full specialization of compute_constraints() function for 2D and
 // 3D only.  There are no constraints for discontinuous elements, so
 // we do nothing.
-template <> void FE<2,MONOMIAL>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
-template <> void FE<3,MONOMIAL>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
+template <> void FE<2,MONOMIAL>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem *) {}
+template <> void FE<3,MONOMIAL>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem *) {}
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

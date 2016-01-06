@@ -65,7 +65,7 @@ protected:
    * This constructor will only allow us to write the object.
    */
   explicit
-  MeshOutput (const MT&, const bool is_parallel_format = false);
+  MeshOutput (const MT &, const bool is_parallel_format = false);
 
 
 public:
@@ -78,23 +78,23 @@ public:
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) = 0;
+  virtual void write (const std::string &) = 0;
 
   /**
    * This method implements writing a mesh with data to a specified file
    * where the data is taken from the \p EquationSystems object.
    */
-  virtual void write_equation_systems (const std::string&,
-                                       const EquationSystems&,
-                                       const std::set<std::string>* system_names=NULL);
+  virtual void write_equation_systems (const std::string &,
+                                       const EquationSystems &,
+                                       const std::set<std::string> * system_names=NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&)
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &)
   { libmesh_not_implemented(); }
 
   /**
@@ -112,7 +112,7 @@ protected:
   /**
    * Returns the object as a read-only reference.
    */
-  const MT& mesh() const;
+  const MT & mesh() const;
 
 
   /**
@@ -130,7 +130,7 @@ private:
    *  A pointer to a constant object.
    * This allows us to write the object to file.
    */
-  const MT* const _obj;
+  const MT * const _obj;
 
   /**
    * Precision to use when writing ASCII files.
@@ -143,10 +143,10 @@ private:
    * Only generate names and solution data corresponding to
    * systems specified in system_names.
    */
-  void _build_variable_names_and_solution_vector(const EquationSystems& es,
-                                                 std::vector<Number>& soln,
-                                                 std::vector<std::string>& names,
-                                                 const std::set<std::string>* system_names=NULL);
+  void _build_variable_names_and_solution_vector(const EquationSystems & es,
+                                                 std::vector<Number> & soln,
+                                                 std::vector<std::string> & names,
+                                                 const std::set<std::string> * system_names=NULL);
 };
 
 
@@ -168,7 +168,7 @@ MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
 
 template <class MT>
 inline
-MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
+MeshOutput<MT>::MeshOutput (const MT & obj, const bool is_parallel_format) :
   _is_parallel_format(is_parallel_format),
   _obj (&obj),
   _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
@@ -196,7 +196,7 @@ MeshOutput<MT>::~MeshOutput ()
 
 template <class MT>
 inline
-const MT& MeshOutput<MT>::mesh () const
+const MT & MeshOutput<MT>::mesh () const
 {
   libmesh_assert(_obj);
   return *_obj;

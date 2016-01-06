@@ -44,15 +44,15 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // JumpErrorEstimator implementations
-void JumpErrorEstimator::init_context (FEMContext&)
+void JumpErrorEstimator::init_context (FEMContext &)
 {
 }
 
 
 
-void JumpErrorEstimator::estimate_error (const System& system,
-                                         ErrorVector& error_per_cell,
-                                         const NumericVector<Number>* solution_vector,
+void JumpErrorEstimator::estimate_error (const System & system,
+                                         ErrorVector & error_per_cell,
+                                         const NumericVector<Number> * solution_vector,
                                          bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "JumpErrorEstimator");
@@ -94,13 +94,13 @@ void JumpErrorEstimator::estimate_error (const System& system,
   */
 
   // The current mesh
-  const MeshBase& mesh = system.get_mesh();
+  const MeshBase & mesh = system.get_mesh();
 
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();
 
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
@@ -127,9 +127,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
     {
-      NumericVector<Number>* newsol =
-        const_cast<NumericVector<Number>*>(solution_vector);
-      System &sys = const_cast<System&>(system);
+      NumericVector<Number> * newsol =
+        const_cast<NumericVector<Number> *>(solution_vector);
+      System & sys = const_cast<System &>(system);
       newsol->swap(*sys.solution);
       sys.update();
     }
@@ -145,9 +145,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
       if (error_norm.weight(var) == 0.0) continue;
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase* side_fe = NULL;
+      FEBase * side_fe = NULL;
 
-      const std::set<unsigned char>& elem_dims =
+      const std::set<unsigned char> & elem_dims =
         fine_context->elem_dimensions();
 
       for (std::set<unsigned char>::const_iterator dim_it =
@@ -174,13 +174,13 @@ void JumpErrorEstimator::estimate_error (const System& system,
   for (; elem_it != elem_end; ++elem_it)
     {
       // e is necessarily an active element on the local processor
-      const Elem* e = *elem_it;
+      const Elem * e = *elem_it;
       const dof_id_type e_id = e->id();
 
 #ifdef LIBMESH_ENABLE_AMR
       // See if the parent of element e has been examined yet;
       // if not, we may want to compute the estimator on it
-      const Elem* parent = e->parent();
+      const Elem * parent = e->parent();
 
       // We only can compute and only need to compute on
       // parents with all active children
@@ -206,7 +206,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
               if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
                 {
                   // Find the active neighbors in this direction
-                  std::vector<const Elem*> active_neighbors;
+                  std::vector<const Elem *> active_neighbors;
                   parent->neighbor(n_p)->
                     active_family_tree_by_neighbor(active_neighbors,
                                                    parent);
@@ -214,7 +214,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
                   for (unsigned int a=0;
                        a != active_neighbors.size(); ++a)
                     {
-                      const Elem *f = active_neighbors[a];
+                      const Elem * f = active_neighbors[a];
                       // FIXME - what about when f->level <
                       // parent->level()??
                       if (f->level() >= parent->level())
@@ -301,7 +301,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
           if (e->neighbor(n_e) != NULL) // e is not on the boundary
             {
-              const Elem* f           = e->neighbor(n_e);
+              const Elem * f           = e->neighbor(n_e);
               const dof_id_type f_id = f->id();
 
               // Compute flux jumps if we are in case 1 or case 2.
@@ -408,9 +408,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // the current_local_solution
   if (solution_vector && solution_vector != system.solution.get())
     {
-      NumericVector<Number>* newsol =
-        const_cast<NumericVector<Number>*>(solution_vector);
-      System &sys = const_cast<System&>(system);
+      NumericVector<Number> * newsol =
+        const_cast<NumericVector<Number> *>(solution_vector);
+      System & sys = const_cast<System &>(system);
       newsol->swap(*sys.solution);
       sys.update();
     }
@@ -428,14 +428,14 @@ JumpErrorEstimator::reinit_sides ()
   unsigned int dim = fine_context->get_elem().dim();
   libmesh_assert_equal_to(dim, coarse_context->get_elem().dim());
 
-  FEBase* fe_fine = NULL;
+  FEBase * fe_fine = NULL;
   fine_context->get_side_fe( 0, fe_fine, dim );
 
   // Get the physical locations of the fine element quadrature points
   std::vector<Point> qface_point = fe_fine->get_xyz();
 
   // Find the master quadrature point locations on the coarse element
-  FEBase* fe_coarse = NULL;
+  FEBase * fe_coarse = NULL;
   coarse_context->get_side_fe( 0, fe_coarse, dim );
 
   std::vector<Point> qp_coarse;

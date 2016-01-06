@@ -61,7 +61,7 @@ protected:
    * This is the constructor required to read an object.
    */
   explicit
-  MeshInput (MT&, const bool is_parallel_format = false);
+  MeshInput (MT &, const bool is_parallel_format = false);
 
 public:
 
@@ -73,7 +73,7 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string&) = 0;
+  virtual void read (const std::string &) = 0;
 
 
 protected:
@@ -81,7 +81,7 @@ protected:
   /**
    * Returns the object as a writeable reference.
    */
-  MT& mesh ();
+  MT & mesh ();
 
   /**
    * Sets the number of partitions in the mesh.  Typically this gets
@@ -100,7 +100,7 @@ protected:
    * Reads input from \p in, skipping all the lines
    * that start with the character \p comment_start.
    */
-  void skip_comment_lines (std::istream& in,
+  void skip_comment_lines (std::istream & in,
                            const char comment_start);
 
 
@@ -111,7 +111,7 @@ private:
    * A pointer to a non-const object object.
    * This allows us to read the object from file.
    */
-  MT* _obj;
+  MT * _obj;
 
   /**
    * Flag specifying whether this format is parallel-capable.
@@ -138,7 +138,7 @@ MeshInput<MT>::MeshInput (const bool is_parallel_format) :
 
 template <class MT>
 inline
-MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
+MeshInput<MT>::MeshInput (MT & obj, const bool is_parallel_format) :
   elems_of_dimension(),
   _obj (&obj),
   _is_parallel_format(is_parallel_format)
@@ -166,7 +166,7 @@ MeshInput<MT>::~MeshInput ()
 
 template <class MT>
 inline
-MT& MeshInput<MT>::mesh ()
+MT & MeshInput<MT>::mesh ()
 {
   if (_obj == NULL)
     libmesh_error_msg("ERROR: _obj should not be NULL!");
@@ -176,7 +176,7 @@ MT& MeshInput<MT>::mesh ()
 
 
 template <class MT>
-void MeshInput<MT>::skip_comment_lines (std::istream &in,
+void MeshInput<MT>::skip_comment_lines (std::istream & in,
                                         const char comment_start)
 {
   char c, line[256];

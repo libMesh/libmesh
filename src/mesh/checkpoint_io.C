@@ -47,7 +47,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // CheckpointIO members
-CheckpointIO::CheckpointIO (MeshBase& mesh, const bool binary_in) :
+CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
   MeshInput<MeshBase> (mesh,/* is_parallel_format = */ true),
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   ParallelObject      (mesh),
@@ -58,7 +58,7 @@ CheckpointIO::CheckpointIO (MeshBase& mesh, const bool binary_in) :
 
 
 
-CheckpointIO::CheckpointIO (const MeshBase& mesh, const bool binary_in) :
+CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   ParallelObject      (mesh),
   _binary (binary_in)
@@ -74,17 +74,17 @@ CheckpointIO::~CheckpointIO ()
 
 
 
-void CheckpointIO::write (const std::string& name)
+void CheckpointIO::write (const std::string & name)
 {
   START_LOG("write()","CheckpointIO");
 
   // convenient reference to our mesh
-  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // Try to dynamic cast the mesh to see if it's a ParallelMesh object
   // Note: Just using is_serial() is not good enough because the Mesh won't
   // have been prepared yet when is when that flag gets set to false... sigh.
-  bool parallel_mesh = dynamic_cast<const ParallelMesh*>(&mesh);
+  bool parallel_mesh = dynamic_cast<const ParallelMesh *>(&mesh);
 
   // If this is a serial mesh then we're only going to write it on processor 0
   if(parallel_mesh || this->processor_id() == 0)
@@ -144,10 +144,10 @@ void CheckpointIO::write (const std::string& name)
 
 
 
-void CheckpointIO::write_subdomain_names(Xdr &io) const
+void CheckpointIO::write_subdomain_names(Xdr & io) const
 {
   {
-    const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+    const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
     const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
 
@@ -181,10 +181,10 @@ void CheckpointIO::write_subdomain_names(Xdr &io) const
 
 
 
-void CheckpointIO::write_nodes (Xdr &io) const
+void CheckpointIO::write_nodes (Xdr & io) const
 {
   // convenient reference to our mesh
-  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   MeshBase::const_node_iterator
     it  = mesh.nodes_begin(),
@@ -233,12 +233,12 @@ void CheckpointIO::write_nodes (Xdr &io) const
 
 
 
-void CheckpointIO::write_connectivity (Xdr &io) const
+void CheckpointIO::write_connectivity (Xdr & io) const
 {
   libmesh_assert (io.writing());
 
   // convenient reference to our mesh
-  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // We will only write active elements and their parents.
   unsigned int n_active_levels = n_active_levels_on_processor(mesh);
@@ -314,15 +314,15 @@ void CheckpointIO::write_connectivity (Xdr &io) const
 
 
 
-void CheckpointIO::write_bcs (Xdr &io) const
+void CheckpointIO::write_bcs (Xdr & io) const
 {
   libmesh_assert (io.writing());
 
   // convenient reference to our mesh
-  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // and our boundary info object
-  const BoundaryInfo &boundary_info = mesh.get_boundary_info();
+  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces entity names
   write_bc_names(io, boundary_info, true);  // sideset names
@@ -341,15 +341,15 @@ void CheckpointIO::write_bcs (Xdr &io) const
 
 
 
-void CheckpointIO::write_nodesets (Xdr &io) const
+void CheckpointIO::write_nodesets (Xdr & io) const
 {
   libmesh_assert (io.writing());
 
   // convenient reference to our mesh
-  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // and our boundary info object
-  const BoundaryInfo &boundary_info = mesh.get_boundary_info();
+  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   std::vector<dof_id_type> node_id_list;
   std::vector<boundary_id_type> bc_id_list;
@@ -362,7 +362,7 @@ void CheckpointIO::write_nodesets (Xdr &io) const
 
 
 
-void CheckpointIO::write_bc_names (Xdr &io, const BoundaryInfo & info, bool is_sideset) const
+void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_sideset) const
 {
   const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
     info.get_sideset_name_map() : info.get_nodeset_name_map();
@@ -399,16 +399,16 @@ void CheckpointIO::write_bc_names (Xdr &io, const BoundaryInfo & info, bool is_s
 
 
 
-void CheckpointIO::read (const std::string& name)
+void CheckpointIO::read (const std::string & name)
 {
   START_LOG("read()","CheckpointIO");
 
-  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Try to dynamic cast the mesh to see if it's a ParallelMesh object
   // Note: Just using is_serial() is not good enough because the Mesh won't
   // have been prepared yet when is when that flag gets set to false... sigh.
-  bool parallel_mesh = dynamic_cast<ParallelMesh*>(&mesh);
+  bool parallel_mesh = dynamic_cast<ParallelMesh *>(&mesh);
 
   // If this is a serial mesh then we're going to only read it on processor 0 and broadcast it
   if(parallel_mesh || this->processor_id() == 0)
@@ -478,9 +478,9 @@ void CheckpointIO::read (const std::string& name)
 
 
 
-void CheckpointIO::read_subdomain_names(Xdr &io)
+void CheckpointIO::read_subdomain_names(Xdr & io)
 {
-  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   std::map<subdomain_id_type, std::string> & subdomain_map =
     mesh.set_subdomain_name_map();
@@ -507,10 +507,10 @@ void CheckpointIO::read_subdomain_names(Xdr &io)
 
 
 
-void CheckpointIO::read_nodes (Xdr &io)
+void CheckpointIO::read_nodes (Xdr & io)
 {
   // convenient reference to our mesh
-  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   unsigned int n_nodes_here;
   io.data(n_nodes_here, "# n_nodes on proc");
@@ -557,10 +557,10 @@ void CheckpointIO::read_nodes (Xdr &io)
 
 
 
-void CheckpointIO::read_connectivity (Xdr &io)
+void CheckpointIO::read_connectivity (Xdr & io)
 {
   // convenient reference to our mesh
-  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   unsigned int n_active_levels;
   io.data(n_active_levels, "# n_active_levels");
@@ -655,13 +655,13 @@ void CheckpointIO::read_connectivity (Xdr &io)
 
 
 
-void CheckpointIO::read_bcs (Xdr &io)
+void CheckpointIO::read_bcs (Xdr & io)
 {
   // convenient reference to our mesh
-  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // and our boundary info object
-  BoundaryInfo &boundary_info = mesh.get_boundary_info();
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces entity names
   read_bc_names(io, boundary_info, true);  // sideset names
@@ -681,13 +681,13 @@ void CheckpointIO::read_bcs (Xdr &io)
 
 
 
-void CheckpointIO::read_nodesets (Xdr &io)
+void CheckpointIO::read_nodesets (Xdr & io)
 {
   // convenient reference to our mesh
-  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // and our boundary info object
-  BoundaryInfo &boundary_info = mesh.get_boundary_info();
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   std::vector<dof_id_type> node_id_list;
   std::vector<boundary_id_type> bc_id_list;
@@ -701,7 +701,7 @@ void CheckpointIO::read_nodesets (Xdr &io)
 
 
 
-void CheckpointIO::read_bc_names(Xdr &io, BoundaryInfo & info, bool is_sideset)
+void CheckpointIO::read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
 {
   std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
     info.set_sideset_name_map() : info.set_nodeset_name_map();
@@ -728,7 +728,7 @@ void CheckpointIO::read_bc_names(Xdr &io, BoundaryInfo & info, bool is_sideset)
 }
 
 
-unsigned int CheckpointIO::n_active_levels_on_processor(const MeshBase &mesh) const
+unsigned int CheckpointIO::n_active_levels_on_processor(const MeshBase & mesh) const
 {
   unsigned int max_level = 0;
 

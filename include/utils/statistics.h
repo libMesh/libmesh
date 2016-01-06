@@ -187,7 +187,7 @@ public:
    * order.
    * Source: GNU Scientific Library
    */
-  virtual void histogram (std::vector<dof_id_type>& bin_members,
+  virtual void histogram (std::vector<dof_id_type> & bin_members,
                           unsigned int n_bins=10);
 
   /**
@@ -198,13 +198,13 @@ public:
    * the order of the vector.
    */
   void plot_histogram(const processor_id_type my_procid,
-                      const std::string& filename,
+                      const std::string & filename,
                       unsigned int n_bins);
 
   /**
    * A const version of the histogram function.
    */
-  virtual void histogram (std::vector<dof_id_type>& bin_members,
+  virtual void histogram (std::vector<dof_id_type> & bin_members,
                           unsigned int n_bins=10) const;
 
   /**

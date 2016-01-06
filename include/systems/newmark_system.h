@@ -52,8 +52,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  NewmarkSystem (EquationSystems& es,
-                 const std::string& name,
+  NewmarkSystem (EquationSystems & es,
+                 const std::string & name,
                  const unsigned int number);
 
   /**

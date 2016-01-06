@@ -48,11 +48,13 @@ extern "C"
   // Function to hand to PETSc's SNES,
   // which monitors convergence at X
   PetscErrorCode
-  __libmesh_petsc_diff_solver_monitor (SNES snes, PetscInt its,
-                                       PetscReal fnorm, void *ctx)
+  __libmesh_petsc_diff_solver_monitor (SNES snes,
+                                       PetscInt its,
+                                       PetscReal fnorm,
+                                       void * ctx)
   {
-    PetscDiffSolver& solver =
-      *(static_cast<PetscDiffSolver*> (ctx));
+    PetscDiffSolver & solver =
+      *(static_cast<PetscDiffSolver *> (ctx));
 
     if (solver.verbose)
       libMesh::out << "  PetscDiffSolver step " << its
@@ -89,23 +91,23 @@ extern "C"
   // Functions to hand to PETSc's SNES,
   // which compute the residual or jacobian at X
   PetscErrorCode
-  __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
+  __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void * ctx)
   {
     libmesh_assert(x);
     libmesh_assert(r);
     libmesh_assert(ctx);
 
-    PetscDiffSolver& solver =
+    PetscDiffSolver & solver =
       *(static_cast<PetscDiffSolver*> (ctx));
-    ImplicitSystem &sys = solver.system();
+    ImplicitSystem & sys = solver.system();
 
     if (solver.verbose)
       libMesh::out << "Assembling the residual" << std::endl;
 
-    PetscVector<Number>& X_system =
-      *cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscVector<Number>& R_system =
-      *cast_ptr<PetscVector<Number>*>(sys.rhs);
+    PetscVector<Number> & X_system =
+      *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+    PetscVector<Number> & R_system =
+      *cast_ptr<PetscVector<Number> *>(sys.rhs);
     PetscVector<Number> X_input(x, sys.comm()), R_input(r, sys.comm());
 
     // DiffSystem assembles from the solution and into the rhs, so swap
@@ -136,12 +138,19 @@ extern "C"
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
   PetscErrorCode
-  __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat *pc,
-                                        MatStructure *msflag, void *ctx)
+  __libmesh_petsc_diff_solver_jacobian (SNES,
+                                        Vec x,
+                                        Mat * libmesh_dbg_var(j),
+                                        Mat * pc,
+                                        MatStructure * msflag,
+                                        void * ctx)
 #else
     PetscErrorCode
-    __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat pc,
-                                          void *ctx)
+    __libmesh_petsc_diff_solver_jacobian (SNES,
+                                          Vec x,
+                                          Mat libmesh_dbg_var(j),
+                                          Mat pc,
+                                          void * ctx)
 #endif
   {
     libmesh_assert(x);
@@ -149,15 +158,15 @@ extern "C"
     //  libmesh_assert_equal_to (pc, j);  // We don't use separate preconditioners yet
     libmesh_assert(ctx);
 
-    PetscDiffSolver& solver =
+    PetscDiffSolver & solver =
       *(static_cast<PetscDiffSolver*> (ctx));
-    ImplicitSystem &sys = solver.system();
+    ImplicitSystem & sys = solver.system();
 
     if (solver.verbose)
       libMesh::out << "Assembling the Jacobian" << std::endl;
 
-    PetscVector<Number>& X_system =
-      *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscVector<Number> & X_system =
+      *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_input(x, sys.comm());
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -165,8 +174,8 @@ extern "C"
 #else
     PetscMatrix<Number> J_input(pc, sys.comm());
 #endif
-    PetscMatrix<Number>& J_system =
-      *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
+    PetscMatrix<Number> & J_system =
+      *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
 
     // DiffSystem assembles from the solution and into the jacobian, so
     // swap those with our input vectors before assembling.  They'll
@@ -199,7 +208,7 @@ extern "C"
 } // extern "C"
 
 
-PetscDiffSolver::PetscDiffSolver (sys_type& s)
+PetscDiffSolver::PetscDiffSolver (sys_type & s)
   : Parent(s)
 {
 }
@@ -353,12 +362,12 @@ unsigned int PetscDiffSolver::solve()
 
   START_LOG("solve()", "PetscDiffSolver");
 
-  PetscVector<Number> &x =
-    *(cast_ptr<PetscVector<Number>*>(_system.solution.get()));
-  PetscMatrix<Number> &jac =
-    *(cast_ptr<PetscMatrix<Number>*>(_system.matrix));
-  PetscVector<Number> &r =
-    *(cast_ptr<PetscVector<Number>*>(_system.rhs));
+  PetscVector<Number> & x =
+    *(cast_ptr<PetscVector<Number> *>(_system.solution.get()));
+  PetscMatrix<Number> & jac =
+    *(cast_ptr<PetscMatrix<Number> *>(_system.matrix));
+  PetscVector<Number> & r =
+    *(cast_ptr<PetscVector<Number> *>(_system.rhs));
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   _system.get_dof_map().enforce_constraints_exactly(_system);

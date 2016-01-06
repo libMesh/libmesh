@@ -29,7 +29,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // XdrSOLN members
-int XdrSOLN::header(XdrSHEAD *hd)
+int XdrSOLN::header(XdrSHEAD * hd)
 {
 
   switch (m_type)
@@ -51,7 +51,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 
         m_wrtVar=hd->m_wrtVar;
 
-        char* temp = const_cast<char *>(hd->getId());
+        char * temp = const_cast<char *>(hd->getId());
         xdr_string(mp_xdr_handle,&(temp),
                    ((m_type == XdrMGF::ENCODE) ? std::strlen(temp)    : hd->m_strSize));
         hd->setId(temp);
@@ -74,10 +74,10 @@ int XdrSOLN::header(XdrSHEAD *hd)
           {
             xdr_string(mp_xdr_handle, &tempTitle, hd->m_strSize*m_wrtVar);
             std::size_t olen= std::strlen(tempTitle);
-            char *top = tempTitle;
+            char * top = tempTitle;
             for (int ivar = 0; ivar < m_wrtVar; ++ivar)
               {
-                char *p = strchr(tempTitle,' ');
+                char * p = strchr(tempTitle,' ');
                 *p = '\0';
                 std::size_t tempSize = std::strlen(tempTitle) ;
                 tempTitle+=tempSize+1;
@@ -88,8 +88,8 @@ int XdrSOLN::header(XdrSHEAD *hd)
           }
         else if (m_type == XdrMGF::ENCODE)
           {
-            char *p = hd->mp_varTitle;
-            char *top = tempTitle;
+            char * p = hd->mp_varTitle;
+            char * top = tempTitle;
             for (int ivar = 0; ivar < m_wrtVar; ++ivar)
               {
                 std::size_t tempSize = std::strlen(p) + 1;
@@ -136,7 +136,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
         // Read the variable names
         {
           std::string var_name;
-          char* titles = new char[hd->m_wrtVar*hd->m_strSize];
+          char * titles = new char[hd->m_wrtVar*hd->m_strSize];
           unsigned int c=0;
 
           for (int var=0; var < hd->m_wrtVar; var++)
@@ -173,7 +173,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 
         // write the variable names
         {
-          const char* p = hd->getVarTitle();
+          const char * p = hd->getVarTitle();
 
           for (int var=0; var<hd->m_wrtVar ; var++)
             {

@@ -51,7 +51,7 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  UCDIO (MeshBase& mesh) :
+  UCDIO (MeshBase & mesh) :
     MeshInput<MeshBase> (mesh),
     MeshOutput<MeshBase>(mesh)
   {}
@@ -61,7 +61,7 @@ public:
    * This constructor will only allow us to write the mesh.
    */
   explicit
-  UCDIO (const MeshBase& mesh) :
+  UCDIO (const MeshBase & mesh) :
     MeshOutput<MeshBase> (mesh)
   {}
 
@@ -69,21 +69,21 @@ public:
    * This method implements reading a mesh from a specified file
    * in UCD format.
    */
-  virtual void read (const std::string&) libmesh_override;
+  virtual void read (const std::string &) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file
    * in UCD format.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
   /**
    * This method implements writing a mesh and solution to a specified file
    * in UCD format. This is internally called by MeshOutput::write_equation_systems
    */
-  virtual void write_nodal_data(const std::string& fname,
-                                const std::vector<Number>&soln,
-                                const std::vector<std::string>& names) libmesh_override;
+  virtual void write_nodal_data(const std::string & fname,
+                                const std::vector<Number> & soln,
+                                const std::vector<std::string> & names) libmesh_override;
 
 
 private:
@@ -93,42 +93,42 @@ private:
    * The public read interface simply decides which
    * type of stream to pass the implementation.
    */
-  void read_implementation (std::istream& in_stream);
+  void read_implementation (std::istream & in_stream);
 
   /**
    * The actual implementation of the write function.
    * The public write interface simply decides which
    * type of stream to pass the implementation.
    */
-  void write_implementation (std::ostream& out_stream);
+  void write_implementation (std::ostream & out_stream);
 
   /**
    * Write UCD format header
    */
-  void write_header(std::ostream& out,
-                    const MeshBase& mesh,
+  void write_header(std::ostream & out,
+                    const MeshBase & mesh,
                     dof_id_type n_elems,
                     unsigned int n_vars);
 
   /**
    * Write node information
    */
-  void write_nodes(std::ostream& out,
-                   const MeshBase& mesh);
+  void write_nodes(std::ostream & out,
+                   const MeshBase & mesh);
 
   /**
    * Write element information
    */
-  void write_interior_elems(std::ostream& out,
-                            const MeshBase& mesh);
+  void write_interior_elems(std::ostream & out,
+                            const MeshBase & mesh);
 
   /**
    * Writes all nodal solution variables
    */
-  void write_soln(std::ostream& out,
-                  const MeshBase& mesh,
-                  const std::vector<std::string>& names,
-                  const std::vector<Number>& soln);
+  void write_soln(std::ostream & out,
+                  const MeshBase & mesh,
+                  const std::vector<std::string> & names,
+                  const std::vector<Number> & soln);
 
   // Static map from libmesh ElementType -> UCD description string for
   // use during writing.

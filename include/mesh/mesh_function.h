@@ -63,11 +63,11 @@ public:
    * \p eqn_systems and the coefficient vector \p vec
    * should be serialized.
    */
-  MeshFunction (const EquationSystems& eqn_systems,
-                const NumericVector<Number>& vec,
-                const DofMap& dof_map,
-                const std::vector<unsigned int>& vars,
-                const FunctionBase<Number>* master=NULL);
+  MeshFunction (const EquationSystems & eqn_systems,
+                const NumericVector<Number> & vec,
+                const DofMap & dof_map,
+                const std::vector<unsigned int> & vars,
+                const FunctionBase<Number> * master=NULL);
 
   /**
    * Constructor for mesh based functions with a number
@@ -77,11 +77,11 @@ public:
    * \p eqn_systems and the coefficient vector \p vec
    * should be serialized.
    */
-  MeshFunction (const EquationSystems& eqn_systems,
-                const NumericVector<Number>& vec,
-                const DofMap& dof_map,
+  MeshFunction (const EquationSystems & eqn_systems,
+                const NumericVector<Number> & vec,
+                const DofMap & dof_map,
                 const unsigned int var,
-                const FunctionBase<Number>* master=NULL);
+                const FunctionBase<Number> * master=NULL);
 
   /**
    * Destructor.
@@ -119,14 +119,14 @@ public:
    * @returns the value of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Number operator() (const Point& p,
+  Number operator() (const Point & p,
                      const Real time=0.) libmesh_override;
 
   /**
    * @returns the first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Gradient gradient (const Point& p,
+  Gradient gradient (const Point & p,
                      const Real time=0.);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -134,7 +134,7 @@ public:
    * @returns the second derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Tensor hessian (const Point& p,
+  Tensor hessian (const Point & p,
                   const Real time=0.);
 #endif
 
@@ -144,19 +144,19 @@ public:
    * subdomain_ids. This is useful in cases where there are multiple
    * dimensioned elements, for example.
    */
-  void operator() (const Point& p,
+  void operator() (const Point & p,
                    const Real time,
-                   DenseVector<Number>& output) libmesh_override;
+                   DenseVector<Number> & output) libmesh_override;
 
   /**
    * Computes values at coordinate \p p and for time \p time,
    * restricting the point to the passed subdomain_ids. This is useful in
    * cases where there are multiple dimensioned elements, for example.
    */
-  void operator() (const Point& p,
+  void operator() (const Point & p,
                    const Real time,
-                   DenseVector<Number>& output,
-                   const std::set<subdomain_id_type>* subdomain_ids);
+                   DenseVector<Number> & output,
+                   const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -164,10 +164,10 @@ public:
    * subdomain_ids. This is useful in cases where there are multiple
    * dimensioned elements, for example.
    */
-  void gradient (const Point& p,
+  void gradient (const Point & p,
                  const Real time,
-                 std::vector<Gradient>& output,
-                 const std::set<subdomain_id_type>* subdomain_ids = NULL);
+                 std::vector<Gradient> & output,
+                 const std::set<subdomain_id_type> * subdomain_ids = NULL);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -175,17 +175,17 @@ public:
    * subdomain_ids. This is useful in cases where there are multiple
    * dimensioned elements, for example.
    */
-  void hessian (const Point& p,
+  void hessian (const Point & p,
                 const Real time,
-                std::vector<Tensor>& output,
-                const std::set<subdomain_id_type>* subdomain_ids = NULL);
+                std::vector<Tensor> & output,
+                const std::set<subdomain_id_type> * subdomain_ids = NULL);
 
   /**
    * Returns the current \p PointLocator object, for you might want to
    * use it elsewhere.  The \p MeshFunction object must be initialized
    * before.
    */
-  const PointLocatorBase& get_point_locator (void) const;
+  const PointLocatorBase & get_point_locator (void) const;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked for a point
@@ -197,7 +197,7 @@ public:
    * master mesh function.  You may, however, specify different
    * values.
    */
-  void enable_out_of_mesh_mode(const DenseVector<Number>& value);
+  void enable_out_of_mesh_mode(const DenseVector<Number> & value);
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked for a point
@@ -209,7 +209,7 @@ public:
    * master mesh function.  You may, however, specify different
    * values.
    */
-  void enable_out_of_mesh_mode(const Number& value);
+  void enable_out_of_mesh_mode(const Number & value);
 
   /**
    * Disables out-of-mesh mode.  This is also the default.
@@ -234,25 +234,25 @@ protected:
   /**
    * Helper function to reduce code duplication
    */
-  const Elem* find_element( const Point& p,
-                            const std::set<subdomain_id_type>* subdomain_ids = NULL ) const;
+  const Elem * find_element(const Point & p,
+                            const std::set<subdomain_id_type> * subdomain_ids = NULL) const;
 
   /**
    * The equation systems handler, from which
    * the data are gathered.
    */
-  const EquationSystems& _eqn_systems;
+  const EquationSystems & _eqn_systems;
 
   /**
    * A reference to the vector that holds the data
    * that is to be interpolated.
    */
-  const NumericVector<Number>& _vector;
+  const NumericVector<Number> & _vector;
 
   /**
    * Need access to the \p DofMap of the other system.
    */
-  const DofMap& _dof_map;
+  const DofMap & _dof_map;
 
   /**
    * The indices of the variables within the other system
@@ -264,7 +264,7 @@ protected:
    * A point locator is needed to locate the
    * points in the mesh.
    */
-  PointLocatorBase* _point_locator;
+  PointLocatorBase * _point_locator;
 
   /**
    * \p true if out-of-mesh mode is enabled.  See \p

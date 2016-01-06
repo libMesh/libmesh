@@ -46,14 +46,14 @@ public:
   /**
    * Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
    */
-  Tree (const MeshBase& m,
+  Tree (const MeshBase & m,
         unsigned int target_bin_size,
         Trees::BuildType bt=Trees::NODES);
 
   /**
    * Copy-constructor.  Not currently implemented.
    */
-  Tree (const Tree<N>& other_tree);
+  Tree (const Tree<N> & other_tree);
 
   /**
    * Destructor.
@@ -63,12 +63,12 @@ public:
   /**
    * Prints the nodes.
    */
-  virtual void print_nodes(std::ostream& my_out=libMesh::out) const libmesh_override;
+  virtual void print_nodes(std::ostream & my_out=libMesh::out) const libmesh_override;
 
   /**
    * Prints the nodes.
    */
-  virtual void print_elements(std::ostream& my_out=libMesh::out) const libmesh_override;
+  virtual void print_elements(std::ostream & my_out=libMesh::out) const libmesh_override;
 
   /**
    * @returns the number of active bins.
@@ -81,19 +81,18 @@ public:
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */
-  virtual const Elem* find_element(const Point& p,
-                                   const std::set<subdomain_id_type> *allowed_subdomains = NULL,
-                                   Real relative_tol = TOLERANCE) const libmesh_override;
+  virtual const Elem * find_element(const Point & p,
+                                    const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                                    Real relative_tol = TOLERANCE) const libmesh_override;
 
   /**
    * @returns a pointer to the element containing point p,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */
-  const Elem* operator() (const Point& p,
-                          const std::set<subdomain_id_type>
-                          *allowed_subdomains = NULL,
-                          Real relative_tol = TOLERANCE) const;
+  const Elem * operator() (const Point & p,
+                           const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                           Real relative_tol = TOLERANCE) const;
 
 private:
   /**

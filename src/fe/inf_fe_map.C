@@ -37,8 +37,8 @@ namespace libMesh
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
-                                      const Point& reference_point)
+Point InfFE<Dim,T_radial,T_map>::map (const Elem * inf_elem,
+                                      const Point & reference_point)
 {
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (Dim, 0);
@@ -86,8 +86,8 @@ Point InfFE<Dim,T_radial,T_map>::map (const Elem* inf_elem,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
-                                              const Point& physical_point,
+Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
+                                              const Point & physical_point,
                                               const Real tolerance,
                                               const bool secure,
                                               const bool interpolated)
@@ -162,12 +162,12 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
     case 3:
       {
         // references to the nodal points of the base element
-        const Point& p0 = base_elem->point(0);
-        const Point& p1 = base_elem->point(1);
-        const Point& p2 = base_elem->point(2);
+        const Point & p0 = base_elem->point(0);
+        const Point & p1 = base_elem->point(1);
+        const Point & p2 = base_elem->point(2);
 
         // a reference to the physical point
-        const Point& fp = physical_point;
+        const Point & fp = physical_point;
 
         // The intersection of the plane and the line is given by
         // can be computed solving a linear 3x3 system
@@ -618,9 +618,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 }
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* elem,
-                                             const std::vector<Point>& physical_points,
-                                             std::vector<Point>&       reference_points,
+void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * elem,
+                                             const std::vector<Point> & physical_points,
+                                             std::vector<Point> &       reference_points,
                                              const Real tolerance,
                                              const bool secure)
 {
@@ -650,13 +650,13 @@ void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* elem,
 
 //INSTANTIATE_INF_FE(3,CARTESIAN);
 
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool,const bool));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool,const bool));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,Point,inverse_map(const Elem*,const Point&,const Real,const bool,const bool));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
 
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, inverse_map(const Elem *, const std::vector<Point> &, std::vector<Point> &, const Real,  const bool));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, inverse_map(const Elem *, const std::vector<Point> &, std::vector<Point> &, const Real,  const bool));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, inverse_map(const Elem *, const std::vector<Point> &, std::vector<Point> &, const Real,  const bool));
 
 
 } // namespace libMesh

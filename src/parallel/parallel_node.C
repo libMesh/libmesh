@@ -57,7 +57,7 @@ namespace Parallel
 {
 
 template <>
-unsigned int packable_size (const Node* node, const MeshBase* mesh)
+unsigned int packable_size (const Node * node, const MeshBase * mesh)
 {
   return
 #ifndef NDEBUG
@@ -71,7 +71,7 @@ unsigned int packable_size (const Node* node, const MeshBase* mesh)
 
 
 template <>
-unsigned int packed_size (const Node*,
+unsigned int packed_size (const Node *,
                           const std::vector<largest_id_type>::const_iterator in)
 {
   const unsigned int pre_indexing_size =
@@ -93,7 +93,7 @@ unsigned int packed_size (const Node*,
 
 
 template <>
-unsigned int packed_size (const Node* n,
+unsigned int packed_size (const Node * n,
                           const std::vector<largest_id_type>::iterator in)
 {
   return packed_size(n, std::vector<largest_id_type>::const_iterator(in));
@@ -102,17 +102,17 @@ unsigned int packed_size (const Node* n,
 
 
 template <>
-unsigned int packable_size (const Node* node, const ParallelMesh* mesh)
+unsigned int packable_size (const Node * node, const ParallelMesh * mesh)
 {
-  return packable_size(node, static_cast<const MeshBase*>(mesh));
+  return packable_size(node, static_cast<const MeshBase *>(mesh));
 }
 
 
 
 template <>
-void pack (const Node* node,
-           std::vector<largest_id_type>& data,
-           const MeshBase* mesh)
+void pack (const Node * node,
+           std::vector<largest_id_type> & data,
+           const MeshBase * mesh)
 {
   libmesh_assert(node);
 
@@ -140,8 +140,8 @@ void pack (const Node* node,
 
   for (unsigned int i=0; i != LIBMESH_DIM; ++i)
     {
-      const largest_id_type* Real_as_idtypes =
-        reinterpret_cast<const largest_id_type*>(&((*node)(i)));
+      const largest_id_type * Real_as_idtypes =
+        reinterpret_cast<const largest_id_type *>(&((*node)(i)));
       for (unsigned int j=0; j != idtypes_per_Real; ++j)
         {
           data.push_back(Real_as_idtypes[j]);
@@ -177,19 +177,19 @@ void pack (const Node* node,
 
 
 template <>
-void pack (const Node* node,
-           std::vector<largest_id_type>& data,
-           const ParallelMesh* mesh)
+void pack (const Node * node,
+           std::vector<largest_id_type> & data,
+           const ParallelMesh * mesh)
 {
-  pack(node, data, static_cast<const MeshBase*>(mesh));
+  pack(node, data, static_cast<const MeshBase *>(mesh));
 }
 
 
 
 template <>
 void unpack (std::vector<largest_id_type>::const_iterator in,
-             Node** out,
-             MeshBase* mesh)
+             Node ** out,
+             MeshBase * mesh)
 {
 #ifndef NDEBUG
   const std::vector<largest_id_type>::const_iterator original_in = in;
@@ -207,7 +207,7 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
   const unique_id_type unique_id = cast_int<unique_id_type>(*in++);
 #endif
 
-  Node *node = mesh->query_node_ptr(id);
+  Node * node = mesh->query_node_ptr(id);
 
   if (node)
     {
@@ -223,7 +223,7 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
       // own the node.
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
-          const Real& idtypes_as_Real = *(reinterpret_cast<const Real*>(&(*in)));
+          const Real & idtypes_as_Real = *(reinterpret_cast<const Real *>(&(*in)));
           libmesh_assert_less_equal ((*node)(i), idtypes_as_Real + (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
           libmesh_assert_greater_equal ((*node)(i), idtypes_as_Real - (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
 
@@ -255,7 +255,7 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
-          const Real* idtypes_as_Real = reinterpret_cast<const Real*>(&(*in));
+          const Real * idtypes_as_Real = reinterpret_cast<const Real *>(&(*in));
           (*node)(i) = *idtypes_as_Real;
           in += idtypes_per_Real;
         }
@@ -296,10 +296,10 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 
 template <>
 void unpack (std::vector<largest_id_type>::const_iterator in,
-             Node** out,
-             ParallelMesh* mesh)
+             Node ** out,
+             ParallelMesh * mesh)
 {
-  unpack(in, out, static_cast<MeshBase*>(mesh));
+  unpack(in, out, static_cast<MeshBase *>(mesh));
 }
 
 } // namespace Parallel

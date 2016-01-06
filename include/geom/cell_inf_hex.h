@@ -47,7 +47,7 @@ public:
    * Default infinite brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  InfHex(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     InfCell(nn, InfHex::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -145,7 +145,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[6+(LIBMESH_DIM>3)];
+  Elem * _elemlinks_data[6+(LIBMESH_DIM>3)];
 
 
 

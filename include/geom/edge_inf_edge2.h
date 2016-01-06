@@ -58,7 +58,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfEdge2 (Elem* p=NULL) :
+  InfEdge2 (Elem * p=NULL) :
     Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 
   /**
@@ -117,7 +117,7 @@ public:
 
   virtual void connectivity(const unsigned int se,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -139,7 +139,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[2];
+  Node * _nodelinks_data[2];
 
 
 

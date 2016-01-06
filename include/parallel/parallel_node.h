@@ -31,7 +31,7 @@ namespace Parallel {
 // BufferType<> specialization to return a buffer datatype
 // to handle communication of Nodes
 template <>
-struct BufferType<const Node*> {
+struct BufferType<const Node *> {
   typedef largest_id_type type;
 };
 

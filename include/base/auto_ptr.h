@@ -167,7 +167,7 @@ private:
   /**
    * The actual dumb pointer this class wraps.
    */
-  Tp* _ptr;
+  Tp * _ptr;
 
 public:
   /**
@@ -182,7 +182,7 @@ public:
    *  This object now @e owns the object pointed to by @a p.
    */
   explicit
-  AutoPtr(element_type* p = 0)
+  AutoPtr(element_type * p = 0)
     : _ptr(p)
   {
     // Note: we can't call libmesh_deprecated() here, since global
@@ -197,7 +197,7 @@ public:
    *  This object now @e owns the object previously owned by @a a, which has
    *  given up ownsership.
    */
-  AutoPtr(AutoPtr& a)
+  AutoPtr(AutoPtr & a)
     : _ptr(a.release())
   {
   }
@@ -212,7 +212,7 @@ public:
    *  given up ownsership.
    */
   template<typename Tp1>
-  AutoPtr(AutoPtr<Tp1>& a)
+  AutoPtr(AutoPtr<Tp1> & a)
     : _ptr(a.release())
   {
   }
@@ -225,8 +225,8 @@ public:
    *  given up ownsership.  The object that this one @e used to own and
    *  track has been deleted.
    */
-  AutoPtr&
-  operator=(AutoPtr& a)
+  AutoPtr &
+  operator=(AutoPtr & a)
   {
     reset(a.release());
     return *this;
@@ -243,8 +243,8 @@ public:
    *  track has been deleted.
    */
   template <typename Tp1>
-  AutoPtr&
-  operator=(AutoPtr<Tp1>& a)
+  AutoPtr &
+  operator=(AutoPtr<Tp1> & a)
   {
     reset(a.release());
     return *this;
@@ -281,7 +281,7 @@ public:
    *  being a null pointer, and you know what happens when you dereference
    *  one of those...)
    */
-  element_type&
+  element_type &
   operator*() const  { return *_ptr; }
 
   /**
@@ -290,7 +290,7 @@ public:
    *  This returns the pointer itself, which the language then will
    *  automatically cause to be dereferenced.
    */
-  element_type*
+  element_type *
   operator->() const  { return _ptr; }
 
   /**
@@ -303,7 +303,7 @@ public:
    *
    *  @note  This %AutoPtr still owns the memory.
    */
-  element_type*
+  element_type *
   get() const  { return _ptr; }
 
   /**
@@ -317,10 +317,10 @@ public:
    *  @note  This %AutoPtr no longer owns the memory.  When this object
    *  goes out of scope, nothing will happen.
    */
-  element_type*
+  element_type *
   release()
   {
-    element_type* tmp = _ptr;
+    element_type * tmp = _ptr;
     _ptr = 0;
     return tmp;
   }
@@ -333,7 +333,7 @@ public:
    *  object has been deleted.
    */
   void
-  reset(element_type* p = 0)
+  reset(element_type * p = 0)
   {
     if (p != _ptr)
       {
@@ -362,7 +362,7 @@ public:
    * AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
    * @endcode
    */
-  AutoPtr&
+  AutoPtr &
   operator=(AutoPtrRef<element_type> ref)
   {
     if (ref._ptr != this->get())

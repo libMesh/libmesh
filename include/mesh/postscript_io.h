@@ -57,7 +57,7 @@ public:
    * Constructor.
    */
   explicit
-  PostscriptIO (const MeshBase& mesh);
+  PostscriptIO (const MeshBase & mesh);
 
   /**
    * Destructor.
@@ -67,7 +67,7 @@ public:
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
   /**
    * Controls greyscale shading of cells.  By default this value
@@ -90,12 +90,12 @@ public:
   /**
    * Draws an element with Bezier curves
    */
-  void plot_quadratic_elem(const Elem* elem);
+  void plot_quadratic_elem(const Elem * elem);
 
   /**
    * Draws an element with straight lines
    */
-  void plot_linear_elem(const Elem* elem);
+  void plot_linear_elem(const Elem * elem);
 
 private:
   /**
@@ -103,7 +103,7 @@ private:
    * computes the Bezier coefficients.  These may be passed to
    * the Postscript routine "curveto".
    */
-  void _compute_edge_bezier_coeffs(const Elem* elem);
+  void _compute_edge_bezier_coeffs(const Elem * elem);
 
   /**
    * Coefficients of the transformation from physical-space

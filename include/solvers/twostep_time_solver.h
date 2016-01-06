@@ -60,7 +60,7 @@ public:
    * to be solved.
    */
   explicit
-  TwostepTimeSolver (sys_type& s);
+  TwostepTimeSolver (sys_type & s);
 
   /**
    * Destructor.

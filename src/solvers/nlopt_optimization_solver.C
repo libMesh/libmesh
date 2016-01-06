@@ -36,15 +36,15 @@ namespace libMesh
 double __libmesh_nlopt_objective(unsigned n,
                                  const double * x,
                                  double * gradient,
-                                 void *data)
+                                 void * data)
 {
   START_LOG("objective()", "NloptOptimizationSolver");
 
-  // ctx should be a pointer to the solver (it was passed in as void*)
-  NloptOptimizationSolver<Number>* solver =
-    static_cast<NloptOptimizationSolver<Number>*> (data);
+  // ctx should be a pointer to the solver (it was passed in as void *)
+  NloptOptimizationSolver<Number> * solver =
+    static_cast<NloptOptimizationSolver<Number> *> (data);
 
-  OptimizationSystem &sys = solver->system();
+  OptimizationSystem & sys = solver->system();
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
@@ -119,11 +119,11 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
 
   libmesh_assert(data);
 
-  // data should be a pointer to the solver (it was passed in as void*)
-  NloptOptimizationSolver<Number>* solver =
-    static_cast<NloptOptimizationSolver<Number>*> (data);
+  // data should be a pointer to the solver (it was passed in as void *)
+  NloptOptimizationSolver<Number> * solver =
+    static_cast<NloptOptimizationSolver<Number> *> (data);
 
-  OptimizationSystem &sys = solver->system();
+  OptimizationSystem & sys = solver->system();
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
@@ -210,11 +210,11 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
 
   libmesh_assert(data);
 
-  // data should be a pointer to the solver (it was passed in as void*)
-  NloptOptimizationSolver<Number>* solver =
-    static_cast<NloptOptimizationSolver<Number>*> (data);
+  // data should be a pointer to the solver (it was passed in as void *)
+  NloptOptimizationSolver<Number> * solver =
+    static_cast<NloptOptimizationSolver<Number> *> (data);
 
-  OptimizationSystem &sys = solver->system();
+  OptimizationSystem & sys = solver->system();
 
   // We'll use current_local_solution below, so let's ensure that it's consistent
   // with the vector x that was passed in.
@@ -294,7 +294,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
 //---------------------------------------------------------------------
 // NloptOptimizationSolver<> methods
 template <typename T>
-NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem& system_in)
+NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem & system_in)
   :
   OptimizationSolver<T>(system_in),
   _opt(NULL),

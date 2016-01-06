@@ -30,7 +30,7 @@ namespace libMesh
 namespace
 {
 
-Point get_min_point(const Elem *elem,
+Point get_min_point(const Elem * elem,
                     unsigned int a,
                     unsigned int b,
                     unsigned int c,
@@ -40,13 +40,13 @@ Point get_min_point(const Elem *elem,
                   std::min(elem->point(c),elem->point(d)));
 }
 
-void cube_indices(const Elem *elem,
+void cube_indices(const Elem * elem,
                   const unsigned int totalorder,
                   const unsigned int i,
-                  Real &xi, Real &eta, Real &zeta,
-                  unsigned int &i0,
-                  unsigned int &i1,
-                  unsigned int &i2)
+                  Real & xi, Real & eta, Real & zeta,
+                  unsigned int & i0,
+                  unsigned int & i1,
+                  unsigned int & i2)
 {
   // The only way to make any sense of this
   // is to look at the mgflo/mg2/mgf documentation
@@ -645,7 +645,7 @@ template <>
 Real FE<3,L2_HIERARCHIC>::shape(const ElemType,
                                 const Order,
                                 const unsigned int,
-                                const Point&)
+                                const Point &)
 {
   libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge and face orientation is needed.");
   return 0.;
@@ -654,10 +654,10 @@ Real FE<3,L2_HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-Real FE<3,L2_HIERARCHIC>::shape(const Elem* elem,
+Real FE<3,L2_HIERARCHIC>::shape(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
-                                const Point& p)
+                                const Point & p)
 {
 #if LIBMESH_DIM == 3
 
@@ -707,7 +707,7 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
-                                      const Point& )
+                                      const Point & )
 {
   libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge and face orientation is needed.");
   return 0.;
@@ -716,11 +716,11 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<3,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
+Real FE<3,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
                                       const unsigned int j,
-                                      const Point& p)
+                                      const Point & p)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -776,7 +776,7 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
                                              const Order,
                                              const unsigned int,
                                              const unsigned int,
-                                             const Point& )
+                                             const Point & )
 {
   libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge and face orientation is needed.");
   return 0.;
@@ -785,11 +785,11 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
+Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                              const Order order,
                                              const unsigned int i,
                                              const unsigned int j,
-                                             const Point& p)
+                                             const Point & p)
 {
   libmesh_assert(elem);
 

@@ -95,7 +95,7 @@ protected:
    * Partitions the mesh into n subdomains.  This is
    * a required interface for the class.
    */
-  virtual void _do_partition (MeshBase& mesh,
+  virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) libmesh_override;
 
 private:
@@ -105,7 +105,7 @@ private:
    * This list will be kept around in case a repartition
    * is desired.
    */
-  void compute_centroids (MeshBase& mesh);
+  void compute_centroids (MeshBase & mesh);
 
   /**
    * Partition the list of centroids based on the
@@ -113,8 +113,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_x (const std::pair<Point, Elem*>& lhs,
-                      const std::pair<Point, Elem*>& rhs);
+  static bool sort_x (const std::pair<Point, Elem *> & lhs,
+                      const std::pair<Point, Elem *> & rhs);
 
   /**
    * Partition the list of centroids based on the
@@ -122,8 +122,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_y (const std::pair<Point, Elem*>& lhs,
-                      const std::pair<Point, Elem*>& rhs);
+  static bool sort_y (const std::pair<Point, Elem *> & lhs,
+                      const std::pair<Point, Elem *> & rhs);
 
   /**
    * Partition the list of centroids based on the
@@ -131,8 +131,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_z (const std::pair<Point, Elem*>& lhs,
-                      const std::pair<Point, Elem*>& rhs);
+  static bool sort_z (const std::pair<Point, Elem *> & lhs,
+                      const std::pair<Point, Elem *> & rhs);
 
 
   /**
@@ -141,8 +141,8 @@ private:
    * a function which may be passed to the std::sort
    * routine for sorting the elements by centroid.
    */
-  static bool sort_radial (const std::pair<Point, Elem*>& lhs,
-                           const std::pair<Point, Elem*>& rhs);
+  static bool sort_radial (const std::pair<Point, Elem *> & lhs,
+                           const std::pair<Point, Elem *> & rhs);
 
   /**
    * Store a flag which tells which type of
@@ -154,7 +154,7 @@ private:
    * Vector which holds pairs of centroids and
    * their respective element pointers.
    */
-  std::vector<std::pair<Point, Elem*> > _elem_centroids;
+  std::vector<std::pair<Point, Elem *> > _elem_centroids;
 };
 
 } // namespace libMesh

@@ -62,7 +62,7 @@ public:
 class FileError : public std::runtime_error
 {
 public:
-  FileError(const std::string& filename) : std::runtime_error( "Error accessing file: " + filename ) {}
+  FileError(const std::string & filename) : std::runtime_error( "Error accessing file: " + filename ) {}
 };
 
 

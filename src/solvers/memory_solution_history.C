@@ -108,13 +108,13 @@ void MemorySolutionHistory::store()
   libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
 
   // Map of stored vectors for this solution step
-  std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
+  std::map<std::string, NumericVector<Number> *> & saved_vectors = stored_sols->second;
 
   // Loop over all the system vectors
   for (System::vectors_iterator vec = _system.vectors_begin(); vec != _system.vectors_end(); ++vec)
     {
       // The name of this vector
-      const std::string& vec_name = vec->first;
+      const std::string & vec_name = vec->first;
 
       // If we haven't seen this vector before or if we have and
       // want to overwrite it
@@ -159,7 +159,7 @@ void MemorySolutionHistory::retrieve()
     }
 
   // Get the saved vectors at this timestep
-  std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
+  std::map<std::string, NumericVector<Number> *> & saved_vectors = stored_sols->second;
 
   std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
   std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
@@ -168,7 +168,7 @@ void MemorySolutionHistory::retrieve()
   for (; vec != vec_end; ++vec)
     {
       // The name of this vector
-      const std::string& vec_name = vec->first;
+      const std::string & vec_name = vec->first;
 
       // Get the vec_name entry in the saved vectors map and set the
       // current system vec[vec_name] entry to it

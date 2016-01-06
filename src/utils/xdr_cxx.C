@@ -37,7 +37,7 @@
 namespace {
 
 // Nasty hacks for reading/writing zipped files
-void bzip_file (const std::string &unzipped_name)
+void bzip_file (const std::string & unzipped_name)
 {
 #ifdef LIBMESH_HAVE_BZIP
   START_LOG("system(bzip2)", "XdrIO");
@@ -53,7 +53,7 @@ void bzip_file (const std::string &unzipped_name)
 #endif
 }
 
-std::string unzip_file (const std::string &name)
+std::string unzip_file (const std::string & name)
 {
   std::ostringstream pid_suffix;
   pid_suffix << '_' << getpid();
@@ -92,7 +92,7 @@ std::string unzip_file (const std::string &name)
   return new_name;
 }
 
-void xzip_file (const std::string &unzipped_name)
+void xzip_file (const std::string & unzipped_name)
 {
 #ifdef LIBMESH_HAVE_XZ
   START_LOG("system(xz)", "XdrIO");
@@ -110,7 +110,7 @@ void xzip_file (const std::string &unzipped_name)
 
 
 // remove an unzipped file
-void remove_unzipped_file (const std::string &name)
+void remove_unzipped_file (const std::string & name)
 {
   std::ostringstream pid_suffix;
   pid_suffix << '_' << getpid();
@@ -137,7 +137,8 @@ namespace libMesh
 
 //-------------------------------------------------------------
 // Xdr class implementation
-Xdr::Xdr (const std::string& name, const XdrMODE m) :
+Xdr::Xdr (const std::string & name,
+          const XdrMODE m) :
   mode(m),
   file_name(name),
 #ifdef LIBMESH_HAVE_XDR
@@ -163,7 +164,7 @@ Xdr::~Xdr()
 
 
 
-void Xdr::open (const std::string& name)
+void Xdr::open (const std::string & name)
 {
   file_name = name;
 
@@ -202,7 +203,7 @@ void Xdr::open (const std::string& name)
         if (gzipped_file)
           {
 #ifdef LIBMESH_HAVE_GZSTREAM
-            igzstream *inf = new igzstream;
+            igzstream * inf = new igzstream;
             libmesh_assert(inf);
             in.reset(inf);
             inf->open(name.c_str(), std::ios::in);
@@ -212,7 +213,7 @@ void Xdr::open (const std::string& name)
           }
         else
           {
-            std::ifstream *inf = new std::ifstream;
+            std::ifstream * inf = new std::ifstream;
             libmesh_assert(inf);
             in.reset(inf);
 
@@ -237,7 +238,7 @@ void Xdr::open (const std::string& name)
         if (gzipped_file)
           {
 #ifdef LIBMESH_HAVE_GZSTREAM
-            ogzstream *outf = new ogzstream;
+            ogzstream * outf = new ogzstream;
             libmesh_assert(outf);
             out.reset(outf);
             outf->open(name.c_str(), std::ios::out);
@@ -247,7 +248,7 @@ void Xdr::open (const std::string& name)
           }
         else
           {
-            std::ofstream *outf = new std::ofstream;
+            std::ofstream * outf = new std::ofstream;
             libmesh_assert(outf);
             out.reset(outf);
 
@@ -481,11 +482,16 @@ template <typename T>
 xdrproc_t xdr_translator();
 
 template <typename T>
-bool xdr_translate(XDR* x, T& a) {return (xdr_translator<T>())(x, &a, 0); }
+bool xdr_translate(XDR * x, T & a)
+{
+  return (xdr_translator<T>())(x, &a, 0);
+}
 
 template <>
-bool xdr_translate(XDR* x, std::string& s) {
-  char* sptr = new char[xdr_MAX_STRING_LENGTH+1];
+bool xdr_translate(XDR * x,
+                   std::string & s)
+{
+  char * sptr = new char[xdr_MAX_STRING_LENGTH+1];
   std::copy(s.begin(), s.end(), sptr);
   sptr[s.size()] = 0;
   unsigned int length = xdr_MAX_STRING_LENGTH;
@@ -501,7 +507,8 @@ bool xdr_translate(XDR* x, std::string& s) {
 }
 
 template <typename T>
-bool xdr_translate(XDR* x, std::complex<T>& a) {
+bool xdr_translate(XDR * x, std::complex<T> & a)
+{
   T r = a.real(), i = a.imag();
   bool b1 = xdr_translate(x, r);
   bool b2 = xdr_translate(x, i);
@@ -510,13 +517,14 @@ bool xdr_translate(XDR* x, std::complex<T>& a) {
 }
 
 template <typename T>
-bool xdr_translate(XDR* x, std::vector<T>& a) {
+bool xdr_translate(XDR * x, std::vector<T> & a)
+{
   unsigned int length = cast_int<unsigned int>(a.size());
   xdr_u_int(x, &length);
   if (length > 0)
     {
       a.resize(length);
-      return xdr_vector(x, (char*) &a[0], length, sizeof(T),
+      return xdr_vector(x, (char *) &a[0], length, sizeof(T),
                         xdr_translator<T>());
     }
   else
@@ -524,7 +532,8 @@ bool xdr_translate(XDR* x, std::vector<T>& a) {
 }
 
 template <typename T>
-bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
+bool xdr_translate(XDR * x, std::vector<std::complex<T> > & a)
+{
   unsigned int length = cast_int<unsigned int>(a.size());
   bool b = xdr_u_int(x, &length);
   a.resize(length);
@@ -536,7 +545,8 @@ bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
 }
 
 template <>
-bool xdr_translate(XDR* x, std::vector<std::string>& s) {
+bool xdr_translate(XDR * x, std::vector<std::string> & s)
+{
   unsigned int length = cast_int<unsigned int>(s.size());
   bool b = xdr_u_int(x, &length);
   s.resize(length);
@@ -592,13 +602,15 @@ xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(xdr_double); }
 #endif
 
 template <typename T>
-void Xdr::do_read(T& a) {
+void Xdr::do_read(T & a)
+{
   *in >> a;
   in->getline(comm, comm_len);
 }
 
 template <typename T>
-void Xdr::do_read(std::complex<T>& a) {
+void Xdr::do_read(std::complex<T> & a)
+{
   T r, i;
   *in >> r >> i;
   a = std::complex<T>(r,i);
@@ -606,7 +618,8 @@ void Xdr::do_read(std::complex<T>& a) {
 }
 
 template <>
-void Xdr::do_read(std::string& a) {
+void Xdr::do_read(std::string & a)
+{
   in->getline(comm, comm_len);
 
   a = "";
@@ -620,7 +633,8 @@ void Xdr::do_read(std::string& a) {
 }
 
 template <typename T>
-void Xdr::do_read(std::vector<T>& a) {
+void Xdr::do_read(std::vector<T> & a)
+{
   unsigned int length=0;
   data(length, "# vector length");
   a.resize(length);
@@ -635,7 +649,8 @@ void Xdr::do_read(std::vector<T>& a) {
 }
 
 template <typename T>
-void Xdr::do_read(std::vector<std::complex<T> >& a) {
+void Xdr::do_read(std::vector<std::complex<T> > & a)
+{
   unsigned int length=0;
   data(length, "# vector length x 2 (complex)");
   a.resize(length);
@@ -652,15 +667,17 @@ void Xdr::do_read(std::vector<std::complex<T> >& a) {
 }
 
 template <typename T>
-void Xdr::do_write(T& a) { *out << a; }
+void Xdr::do_write(T & a) { *out << a; }
 
 template <typename T>
-void Xdr::do_write(std::complex<T>& a) {
+void Xdr::do_write(std::complex<T> & a)
+{
   *out << a.real() << "\t " << a.imag();
 }
 
 template <typename T>
-void Xdr::do_write(std::vector<T>& a) {
+void Xdr::do_write(std::vector<T> & a)
+{
   std::size_t length = a.size();
   data(length, "# vector length");
 
@@ -674,7 +691,8 @@ void Xdr::do_write(std::vector<T>& a) {
 }
 
 template <typename T>
-void Xdr::do_write(std::vector<std::complex<T> >& a) {
+void Xdr::do_write(std::vector<std::complex<T> > & a)
+{
   std::size_t length=a.size();
   data(length, "# vector length x 2 (complex)");
 
@@ -690,7 +708,7 @@ void Xdr::do_write(std::vector<std::complex<T> >& a) {
 
 
 template <typename T>
-void Xdr::data (T& a, const char* comment_in)
+void Xdr::data (T & a, const char * comment_in)
 {
   switch (mode)
     {
@@ -747,7 +765,7 @@ void Xdr::data (T& a, const char* comment_in)
 
 
 template <typename T>
-void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_break)
+void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -762,7 +780,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
         if (size_of_type <= 4) // 32-bit types
           {
             xdr_vector(xdrs,
-                       (char*) val,
+                       (char *) val,
                        len,
                        size_of_type,
                        (xdrproc_t) xdr_u_int);
@@ -770,7 +788,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
         else // 64-bit types
           {
             xdr_vector(xdrs,
-                       (char*) val,
+                       (char *) val,
                        len,
                        size_of_type,
                        (xdrproc_t) xdr_u_hyper);
@@ -798,7 +816,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
           {
             if (len > 0)
               xdr_vector(xdrs,
-                         (char*) val,
+                         (char *) val,
                          len,
                          size_of_type,
                          (xdrproc_t) xdr_u_int);
@@ -807,7 +825,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
           {
             if (len > 0)
               xdr_vector(xdrs,
-                         (char*) val,
+                         (char *) val,
                          len,
                          size_of_type,
                          (xdrproc_t) xdr_u_hyper);
@@ -885,7 +903,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
 
 template <>
-void Xdr::data_stream (double *val, const unsigned int len, const unsigned int line_break)
+void Xdr::data_stream (double * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -898,7 +916,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 
         if (len > 0)
           xdr_vector(xdrs,
-                     (char*) val,
+                     (char *) val,
                      len,
                      sizeof(double),
                      (xdrproc_t) xdr_double);
@@ -979,7 +997,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 
 
 template <>
-void Xdr::data_stream (float *val, const unsigned int len, const unsigned int line_break)
+void Xdr::data_stream (float * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -992,7 +1010,7 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 
         if (len > 0)
           xdr_vector(xdrs,
-                     (char*) val,
+                     (char *) val,
                      len,
                      sizeof(float),
                      (xdrproc_t) xdr_float);
@@ -1071,7 +1089,7 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
     }
 }
 template <>
-void Xdr::data_stream (long double *val, const unsigned int len, const unsigned int line_break)
+void Xdr::data_stream (long double * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1089,7 +1107,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
         // write long double ASCII files of course.
         // if (len > 0)
         //   xdr_vector(xdrs,
-        //      (char*) val,
+        //      (char *) val,
         //      len,
         //      sizeof(double),
         //      (xdrproc_t) xdr_quadruple);
@@ -1104,7 +1122,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
                 io_buffer[cnt++] = val[i];
 
             xdr_vector(xdrs,
-                       (char*) &io_buffer[0],
+                       (char *) &io_buffer[0],
                        len,
                        sizeof(double),
                        (xdrproc_t) xdr_double);
@@ -1194,7 +1212,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <>
-void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const unsigned int line_break)
+void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1219,7 +1237,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
                 }
 
             xdr_vector(xdrs,
-                       (char*) &io_buffer[0],
+                       (char *) &io_buffer[0],
                        2*len,
                        sizeof(double),
                        (xdrproc_t) xdr_double);
@@ -1313,7 +1331,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 }
 
 template <>
-void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, const unsigned int line_break)
+void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1343,7 +1361,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
                 }
 
             xdr_vector(xdrs,
-                       (char*) &io_buffer[0],
+                       (char *) &io_buffer[0],
                        2*len,
                        sizeof(double),
                        (xdrproc_t) xdr_double);
@@ -1439,7 +1457,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 }
 #endif // # LIBMESH_USE_COMPLEX_NUMBERS
 
-void Xdr::comment (std::string &comment_in)
+void Xdr::comment (std::string & comment_in)
 {
   switch (mode)
     {
@@ -1475,44 +1493,44 @@ void Xdr::comment (std::string &comment_in)
 
 
 //
-template void Xdr::data<int>                              (int&,                             const char*);
-template void Xdr::data<unsigned int>                     (unsigned int&,                    const char*);
-template void Xdr::data<unsigned short int>               (unsigned short int&,              const char*);
-template void Xdr::data<short int>                        (short int&,                       const char*);
-template void Xdr::data<unsigned long int>                (unsigned long int&,               const char*);
-template void Xdr::data<unsigned long long>               (unsigned long long&,              const char*);
-template void Xdr::data<long int>                         (long int&,                        const char*);
-template void Xdr::data<char>                             (char&,                            const char*);
-template void Xdr::data<signed char>                      (signed char&,                     const char*);
-template void Xdr::data<unsigned char>                    (unsigned char&,                   const char*);
-template void Xdr::data<float>                            (float&,                           const char*);
-template void Xdr::data<double>                           (double&,                          const char*);
-template void Xdr::data<long double>                      (long double&,                     const char*);
-template void Xdr::data<std::complex<float> >             (std::complex<float>&,             const char*);
-template void Xdr::data<std::complex<double> >            (std::complex<double>&,            const char*);
-template void Xdr::data<std::complex<long double> >       (std::complex<long double>&,       const char*);
-template void Xdr::data<std::string>                      (std::string&,                     const char*);
-template void Xdr::data<std::vector<int> >                (std::vector<int>&,                const char*);
-template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int>&,       const char*);
-template void Xdr::data<std::vector<short int> >          (std::vector<short int>&,          const char*);
-template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
-template void Xdr::data<std::vector<long int> >           (std::vector<long int>&,           const char*);
-template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int>&,  const char*);
-template void Xdr::data<std::vector<unsigned long long> > (std::vector<unsigned long long>&, const char*);
-template void Xdr::data<std::vector<char> >               (std::vector<char>&,               const char*);
-template void Xdr::data<std::vector<signed char> >        (std::vector<signed char>&,        const char*);
-template void Xdr::data<std::vector<unsigned char> >      (std::vector<unsigned char>&,      const char*);
-template void Xdr::data<std::vector<float> >              (std::vector<float>&,              const char*);
-template void Xdr::data<std::vector<double> >             (std::vector<double>&,             const char*);
-template void Xdr::data<std::vector<long double> >        (std::vector<long double>&,        const char*);
-template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::complex<float> >&,  const char*);
-template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> >&, const char*);
-template void Xdr::data<std::vector<std::complex<long double> > > (std::vector<std::complex<long double> >&, const char*);
-template void Xdr::data<std::vector<std::string> >        (std::vector<std::string>&,        const char*);
-template void Xdr::data_stream<int>                (int *val,                const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned short int> (unsigned short int *val, const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned int>       (unsigned int *val,       const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned long int>  (unsigned long int *val,  const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned long long> (unsigned long long *val, const unsigned int len, const unsigned int line_break);
+template void Xdr::data<int>                              (int &,                             const char *);
+template void Xdr::data<unsigned int>                     (unsigned int &,                    const char *);
+template void Xdr::data<unsigned short int>               (unsigned short int &,              const char *);
+template void Xdr::data<short int>                        (short int &,                       const char *);
+template void Xdr::data<unsigned long int>                (unsigned long int &,               const char *);
+template void Xdr::data<unsigned long long>               (unsigned long long &,              const char *);
+template void Xdr::data<long int>                         (long int &,                        const char *);
+template void Xdr::data<char>                             (char &,                            const char *);
+template void Xdr::data<signed char>                      (signed char &,                     const char *);
+template void Xdr::data<unsigned char>                    (unsigned char &,                   const char *);
+template void Xdr::data<float>                            (float &,                           const char *);
+template void Xdr::data<double>                           (double &,                          const char *);
+template void Xdr::data<long double>                      (long double &,                     const char *);
+template void Xdr::data<std::complex<float> >             (std::complex<float> &,             const char *);
+template void Xdr::data<std::complex<double> >            (std::complex<double> &,            const char *);
+template void Xdr::data<std::complex<long double> >       (std::complex<long double> &,       const char *);
+template void Xdr::data<std::string>                      (std::string &,                      const char *);
+template void Xdr::data<std::vector<int> >                (std::vector<int> &,                const char *);
+template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int> &,       const char *);
+template void Xdr::data<std::vector<short int> >          (std::vector<short int> &,          const char *);
+template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int> &, const char *);
+template void Xdr::data<std::vector<long int> >           (std::vector<long int> &,           const char *);
+template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int> &,  const char *);
+template void Xdr::data<std::vector<unsigned long long> > (std::vector<unsigned long long> &, const char *);
+template void Xdr::data<std::vector<char> >               (std::vector<char> &,               const char *);
+template void Xdr::data<std::vector<signed char> >        (std::vector<signed char> &,        const char *);
+template void Xdr::data<std::vector<unsigned char> >      (std::vector<unsigned char> &,      const char *);
+template void Xdr::data<std::vector<float> >              (std::vector<float> &,              const char *);
+template void Xdr::data<std::vector<double> >             (std::vector<double> &,             const char *);
+template void Xdr::data<std::vector<long double> >        (std::vector<long double> &,        const char *);
+template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::complex<float> > &,  const char *);
+template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> > &, const char *);
+template void Xdr::data<std::vector<std::complex<long double> > > (std::vector<std::complex<long double> > &, const char *);
+template void Xdr::data<std::vector<std::string> >        (std::vector<std::string> &,        const char *);
+template void Xdr::data_stream<int>                (int * val,                const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned short int> (unsigned short int * val, const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned int>       (unsigned int * val,       const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned long int>  (unsigned long int * val,  const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned long long> (unsigned long long * val, const unsigned int len, const unsigned int line_break);
 
 } // namespace libMesh

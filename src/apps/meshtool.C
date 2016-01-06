@@ -64,7 +64,7 @@ using namespace libMesh;
 enum BoundaryMeshWriteMode {BM_DISABLED=0, BM_MESH_ONLY, BM_WITH_MESHDATA};
 
 
-void usage(char *progName)
+void usage(char * progName)
 {
   std::string baseName;
   static std::string helpList =
@@ -187,29 +187,30 @@ void usage(char *progName)
 
 
 
-void process_cmd_line(int argc, char **argv,
-                      std::vector<std::string>& names,
-                      unsigned int& n_subdomains,
-                      unsigned int& n_rsteps,
-                      unsigned char& dim,
-                      double& dist_fact,
-                      bool& verbose,
-                      BoundaryMeshWriteMode& write_bndry,
-                      unsigned int& convert_second_order,
-                      bool& triangulate,
-                      bool& do_quality,
-                      ElemQuality& quality_type,
-                      bool& addinfelems,
+void process_cmd_line(int argc,
+                      char ** argv,
+                      std::vector<std::string> & names,
+                      unsigned int & n_subdomains,
+                      unsigned int & n_rsteps,
+                      unsigned char & dim,
+                      double & dist_fact,
+                      bool & verbose,
+                      BoundaryMeshWriteMode & write_bndry,
+                      unsigned int & convert_second_order,
+                      bool & triangulate,
+                      bool & do_quality,
+                      ElemQuality & quality_type,
+                      bool & addinfelems,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                      InfElemBuilder::InfElemOriginValue& origin_x,
-                      InfElemBuilder::InfElemOriginValue& origin_y,
-                      InfElemBuilder::InfElemOriginValue& origin_z,
+                      InfElemBuilder::InfElemOriginValue & origin_x,
+                      InfElemBuilder::InfElemOriginValue & origin_y,
+                      InfElemBuilder::InfElemOriginValue & origin_z,
 #endif
 
-                      bool& x_sym,
-                      bool& y_sym,
-                      bool& z_sym
+                      bool & x_sym,
+                      bool & y_sym,
+                      bool & z_sym
                       )
 {
 
@@ -494,7 +495,7 @@ void process_cmd_line(int argc, char **argv,
 // A helper function for creating a submesh of active elements.  Why do we need this?
 // Well, the create submesh function is expecting const_element_iterators,
 // and this is just one way to get them...
-void construct_mesh_of_active_elements(Mesh& new_mesh, const Mesh& mesh)
+void construct_mesh_of_active_elements(Mesh & new_mesh, const Mesh & mesh)
 {
   MeshBase::const_element_iterator       it     = mesh.active_elements_begin();
   const MeshBase::const_element_iterator it_end = mesh.active_elements_end();
@@ -506,7 +507,7 @@ void construct_mesh_of_active_elements(Mesh& new_mesh, const Mesh& mesh)
 
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
@@ -567,7 +568,7 @@ int main (int argc, char** argv)
       mesh_ptr.reset(new Mesh(init.comm(),dim));
     }
 
-  Mesh& mesh = *mesh_ptr;
+  Mesh & mesh = *mesh_ptr;
   MeshData mesh_data(mesh);
 
   /**
@@ -708,7 +709,7 @@ int main (int argc, char** argv)
         end = mesh.active_elements_end();
       for (; it != end; ++it)
         {
-          Elem *e = *it;
+          Elem * e = *it;
           sv.push_back(e->quality(quality_type));
         }
 

@@ -60,7 +60,7 @@ public:
    * \param icnt Number to be appended to file e.g. \p name.mesh.0000
    * \param dim Problem dimension (always three in MGF)
    */
-  void init(XdrIO_TYPE type, const char* fn, int icnt, int dim=3)
+  void init(XdrIO_TYPE type, const char * fn, int icnt, int dim=3)
   { XdrMGF::init(type, fn, "mesh", icnt); m_dim = dim;}
 
   /**
@@ -76,7 +76,7 @@ public:
    * \param hd Pointer to an \p xdr mesh_base.header object
    * @return 1 on success
    */
-  int header(XdrMHEAD *hd);
+  int header(XdrMHEAD * hd);
 
   /**
    * Read/Write an integer connectivity array
@@ -86,7 +86,7 @@ public:
    * \param num Basically a dummy parameter
    * @return numvar*num
    */
-  int Icon(int* array, int numvar, int num)   { return dataBlk(array, numvar, num);}
+  int Icon(int * array, int numvar, int num)   { return dataBlk(array, numvar, num);}
 
   /**
    * Read/Write a coord of appropriate size.
@@ -95,7 +95,7 @@ public:
    * \param size Size of \p array (number of elements)
    * @return dim*size
    */
-  int coord(Real* array, int dim, int size)  { return dataBlk(array, dim, size);}
+  int coord(Real * array, int dim, int size)  { return dataBlk(array, dim, size);}
 
   /**
    * Read/Write a BC of appropriate size
@@ -104,7 +104,7 @@ public:
    * \param size Size of \p array (number of elements)
    * @return 3*size
    */
-  int BC(int* array, int size)                { return dataBlk(array, 3, size);}
+  int BC(int * array, int size)                { return dataBlk(array, 3, size);}
 
 
 private:

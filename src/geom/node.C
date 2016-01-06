@@ -34,7 +34,7 @@ namespace libMesh
 //const unsigned int Node::invalid_id = libMesh::invalid_uint;
 
 
-bool Node::operator==(const Node& rhs) const
+bool Node::operator==(const Node & rhs) const
 {
   // Explicitly calling the operator== defined in Point
   return this->Point::operator==(rhs);
@@ -42,7 +42,7 @@ bool Node::operator==(const Node& rhs) const
 
 
 
-void Node::print_info (std::ostream& os) const
+void Node::print_info (std::ostream & os) const
 {
   os << this->get_info()
      << std::endl;
@@ -62,7 +62,7 @@ std::string Node::get_info () const
     oss << "invalid";
 
   oss << ", processor_id()=" << this->processor_id() <<
-    ", Point=" << *static_cast<const Point*>(this) << '\n';
+    ", Point=" << *static_cast<const Point *>(this) << '\n';
 
   oss << "    DoFs=";
   for (unsigned int s=0; s != this->n_systems(); ++s)

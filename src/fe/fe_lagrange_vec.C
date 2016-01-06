@@ -34,11 +34,11 @@ namespace libMesh
 
 // Anonymous namespace for local helper functions
 namespace {
-void lagrange_vec_nodal_soln(const Elem* elem,
+void lagrange_vec_nodal_soln(const Elem * elem,
                              const Order order,
-                             const std::vector<Number>& elem_soln,
+                             const std::vector<Number> & elem_soln,
                              const int dim,
-                             std::vector<Number>&       nodal_soln)
+                             std::vector<Number> &       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -504,31 +504,31 @@ void lagrange_vec_nodal_soln(const Elem* elem,
   // of explicit instantiation at the end of this file.
   // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,LAGRANGE_VEC>::nodal_soln(const Elem* elem,
+void FE<0,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
-                                    const std::vector<Number>& elem_soln,
-                                    std::vector<Number>& nodal_soln)
+                                    const std::vector<Number> & elem_soln,
+                                    std::vector<Number> & nodal_soln)
 { FE<0,LAGRANGE>::nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<1,LAGRANGE_VEC>::nodal_soln(const Elem* elem,
+void FE<1,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
-                                    const std::vector<Number>& elem_soln,
-                                    std::vector<Number>& nodal_soln)
+                                    const std::vector<Number> & elem_soln,
+                                    std::vector<Number> & nodal_soln)
 { FE<1,LAGRANGE>::nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
-void FE<2,LAGRANGE_VEC>::nodal_soln(const Elem* elem,
+void FE<2,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
-                                    const std::vector<Number>& elem_soln,
-                                    std::vector<Number>& nodal_soln)
+                                    const std::vector<Number> & elem_soln,
+                                    std::vector<Number> & nodal_soln)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln); }
 
 template <>
-void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem* elem,
+void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
-                                    const std::vector<Number>& elem_soln,
-                                    std::vector<Number>& nodal_soln)
+                                    const std::vector<Number> & elem_soln,
+                                    std::vector<Number> & nodal_soln)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln); }
 
 
@@ -536,21 +536,21 @@ void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem* elem,
 
 // 0-D
 template <> RealGradient FE<0,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
-                                                   const unsigned int i, const Point& p)
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<0,LAGRANGE>::shape( type, order, i, p );
   return libMesh::RealGradient( value );
 }
 template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<0,LAGRANGE>::shape_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
 }
 template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<0,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
@@ -558,21 +558,21 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 
 // 1-D
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
-                                                   const unsigned int i, const Point& p)
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<1,LAGRANGE>::shape( type, order, i, p );
   return libMesh::RealGradient( value );
 }
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<1,LAGRANGE>::shape_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
 }
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<1,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
   return libMesh::RealGradient( value );
@@ -580,7 +580,7 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 
 // 2-D
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
-                                                   const unsigned int i, const Point& p)
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<2,LAGRANGE>::shape( type, order, i/2, p );
 
@@ -601,7 +601,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const ElemType type, const Or
 }
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<2,LAGRANGE>::shape_deriv( type, order, i/2, j, p );
 
@@ -622,7 +622,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
 }
 template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<2,LAGRANGE>::shape_second_deriv( type, order, i/2, j, p );
 
@@ -645,7 +645,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 
 // 3-D
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
-                                                   const unsigned int i, const Point& p)
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<3,LAGRANGE>::shape( type, order, i/3, p );
 
@@ -669,7 +669,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const ElemType type, const Or
 }
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<3,LAGRANGE>::shape_deriv( type, order, i/3, j, p );
 
@@ -693,7 +693,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
 }
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<3,LAGRANGE>::shape_second_deriv( type, order, i/3, j, p );
 
@@ -719,52 +719,52 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 
 
 // 0-D
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape(const Elem* elem, const Order order,
-                                                   const unsigned int i, const Point& p)
+template <> RealGradient FE<0,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<0,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
   return libMesh::RealGradient( value );
 }
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<0,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<0,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
 
 // 1-D
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const Elem* elem, const Order order,
-                                                   const unsigned int i, const Point& p)
+template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<1,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
   return libMesh::RealGradient( value );
 }
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<1,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<1,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
 }
 
 // 2-D
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const Elem* elem, const Order order,
-                                                   const unsigned int i, const Point& p)
+template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<2,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + elem->p_level()), i/2, p );
 
@@ -783,9 +783,9 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const Elem* elem, const Order
   //dummy
   return libMesh::RealGradient();
 }
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<2,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i/2, j, p );
 
@@ -804,9 +804,9 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const
   //dummy
   return libMesh::RealGradient();
 }
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<2,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i/2, j, p );
 
@@ -827,8 +827,8 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem
 }
 
 // 3-D
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const Elem* elem, const Order order,
-                                                   const unsigned int i, const Point& p)
+template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                   const unsigned int i, const Point & p)
 {
   Real value = FE<3,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + elem->p_level()), i/3, p );
 
@@ -850,9 +850,9 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const Elem* elem, const Order
   //dummy
   return libMesh::RealGradient();
 }
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
-                                                         const Point& p)
+                                                         const Point & p)
 {
   Real value = FE<3,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i/3, j, p );
 
@@ -874,9 +874,9 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const
   //dummy
   return libMesh::RealGradient();
 }
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem, const Order order,
+template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
-                                                                const Point& p)
+                                                                const Point & p)
 {
   Real value = FE<3,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + elem->p_level()), i/3, j, p );
 
@@ -947,19 +947,19 @@ template <> bool FE<3,LAGRANGE_VEC>::shapes_need_reinit() const { return false; 
 // Dim==2 and 3.
 #ifdef LIBMESH_ENABLE_AMR
 template <>
-void FE<2,LAGRANGE_VEC>::compute_constraints (DofConstraints &constraints,
-                                              DofMap &dof_map,
+void FE<2,LAGRANGE_VEC>::compute_constraints (DofConstraints & constraints,
+                                              DofMap & dof_map,
                                               const unsigned int variable_number,
-                                              const Elem* elem)
+                                              const Elem * elem)
 { //libmesh_not_implemented();
   FEVectorBase::compute_proj_constraints(constraints, dof_map, variable_number, elem);
 }
 
 template <>
-void FE<3,LAGRANGE_VEC>::compute_constraints (DofConstraints &constraints,
-                                              DofMap &dof_map,
+void FE<3,LAGRANGE_VEC>::compute_constraints (DofConstraints & constraints,
+                                              DofMap & dof_map,
                                               const unsigned int variable_number,
-                                              const Elem* elem)
+                                              const Elem * elem)
 { //libmesh_not_implemented();
   FEVectorBase::compute_proj_constraints(constraints, dof_map, variable_number, elem);
 }

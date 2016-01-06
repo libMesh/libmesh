@@ -38,12 +38,12 @@ class MeshBase;
 class MeshSerializer
 {
 public:
-  MeshSerializer(MeshBase& mesh, bool need_serial = true);
+  MeshSerializer(MeshBase & mesh, bool need_serial = true);
 
   ~MeshSerializer();
 
 private:
-  MeshBase& _mesh;
+  MeshBase & _mesh;
   bool reparallelize;
 };
 

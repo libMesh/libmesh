@@ -100,20 +100,20 @@ void AztecLinearSolver<T>::init (const char * /*name*/)
 
 template <typename T>
 std::pair<unsigned int, Real>
-AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
-                             SparseMatrix<T>& precond_in,
-                             NumericVector<T>& solution_in,
-                             NumericVector<T>& rhs_in,
+AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
+                             SparseMatrix<T> & precond_in,
+                             NumericVector<T> & solution_in,
+                             NumericVector<T> & rhs_in,
                              const double tol,
                              const unsigned int m_its)
 {
   START_LOG("solve()", "AztecLinearSolver");
 
   // Make sure the data passed in are really of Epetra types
-  EpetraMatrix<T>* matrix   = cast_ptr<EpetraMatrix<T>*>(&matrix_in);
-  EpetraMatrix<T>* precond  = cast_ptr<EpetraMatrix<T>*>(&precond_in);
-  EpetraVector<T>* solution = cast_ptr<EpetraVector<T>*>(&solution_in);
-  EpetraVector<T>* rhs      = cast_ptr<EpetraVector<T>*>(&rhs_in);
+  EpetraMatrix<T> * matrix   = cast_ptr<EpetraMatrix<T> *>(&matrix_in);
+  EpetraMatrix<T> * precond  = cast_ptr<EpetraMatrix<T> *>(&precond_in);
+  EpetraVector<T> * solution = cast_ptr<EpetraVector<T> *>(&solution_in);
+  EpetraVector<T> * rhs      = cast_ptr<EpetraVector<T> *>(&rhs_in);
 
   this->init();
 
@@ -142,14 +142,14 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real>
-AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
-                             NumericVector<T>&,
-                             NumericVector<T>&,
+AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
+                             NumericVector<T> &,
+                             NumericVector<T> &,
                              const double,
                              const unsigned int)
-//AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-//     NumericVector<T>& solution_in,
-//     NumericVector<T>& rhs_in,
+//AztecLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
+//     NumericVector<T> & solution_in,
+//     NumericVector<T> & rhs_in,
 //     const double tol,
 //     const unsigned int m_its)
 {
@@ -160,16 +160,16 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
 
 template <typename T>
 std::pair<unsigned int, Real>
-AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
-                             const SparseMatrix<T>&,
+AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
+                             const SparseMatrix<T> &,
                              NumericVector<T> &,
                              NumericVector<T> &,
                              const double,
                              const unsigned int)
-//AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-//     const SparseMatrix<T>& precond_matrix,
-//     NumericVector<T> &solution_in,
-//     NumericVector<T> &rhs_in,
+//AztecLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
+//     const SparseMatrix<T> & precond_matrix,
+//     NumericVector<T> & solution_in,
+//     NumericVector<T> & rhs_in,
 //     const double tol,
 //     const unsigned int m_its)
 {
@@ -179,7 +179,7 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
 
 
 template <typename T>
-void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
+void AztecLinearSolver<T>::get_residual_history(std::vector<double> & /* hist */)
 {
   libmesh_not_implemented();
 }

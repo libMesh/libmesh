@@ -32,10 +32,10 @@ namespace libMesh
 // Anonymous namespace for local helper functions
 namespace {
 
-void l2_hierarchic_nodal_soln(const Elem* elem,
+void l2_hierarchic_nodal_soln(const Elem * elem,
                               const Order order,
-                              const std::vector<Number>& elem_soln,
-                              std::vector<Number>&       nodal_soln,
+                              const std::vector<Number> & elem_soln,
+                              std::vector<Number> &       nodal_soln,
                               unsigned Dim)
 {
   const unsigned int n_nodes = elem->n_nodes();
@@ -141,31 +141,31 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
   // file.
   // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
+void FE<0,L2_HIERARCHIC>::nodal_soln(const Elem * elem,
                                      const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
+                                     const std::vector<Number> & elem_soln,
+                                     std::vector<Number> & nodal_soln)
 { l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
 template <>
-void FE<1,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
+void FE<1,L2_HIERARCHIC>::nodal_soln(const Elem * elem,
                                      const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
+                                     const std::vector<Number> & elem_soln,
+                                     std::vector<Number> & nodal_soln)
 { l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
 template <>
-void FE<2,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
+void FE<2,L2_HIERARCHIC>::nodal_soln(const Elem * elem,
                                      const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
+                                     const std::vector<Number> & elem_soln,
+                                     std::vector<Number> & nodal_soln)
 { l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
 template <>
-void FE<3,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
+void FE<3,L2_HIERARCHIC>::nodal_soln(const Elem * elem,
                                      const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
+                                     const std::vector<Number> & elem_soln,
+                                     std::vector<Number> & nodal_soln)
 { l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 // Full specialization of n_dofs() function for every dimension
@@ -205,14 +205,14 @@ template <>
 void FE<2,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
                                                DofMap &,
                                                const unsigned int,
-                                               const Elem*)
+                                               const Elem *)
 { }
 
 template <>
 void FE<3,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
                                                DofMap &,
                                                const unsigned int,
-                                               const Elem*)
+                                               const Elem *)
 { }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

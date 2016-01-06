@@ -37,8 +37,8 @@ namespace libMesh
 namespace Parallel {
 
 template <typename KeyType, typename IdxType>
-BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm_in,
-                                       const std::vector<KeyType>& d) :
+BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator & comm_in,
+                                       const std::vector<KeyType> & d) :
   ParallelObject(comm_in),
   data(d)
 {
@@ -66,7 +66,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
   phist.make_histogram (nbins*50, max, min);
   phist.build_histogram ();
 
-  const std::vector<IdxType>& histogram =
+  const std::vector<IdxType> & histogram =
     phist.get_histogram();
 
 

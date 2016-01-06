@@ -29,11 +29,12 @@ namespace libMesh
 //
 // PolygonHole member functions
 //
-TriangleInterface::PolygonHole::PolygonHole
-(const Point& center, Real radius, unsigned int n_points_in)
-  : _center(center),
-    _radius(radius),
-    _n_points(n_points_in)
+TriangleInterface::PolygonHole::PolygonHole(const Point & center,
+                                            Real radius,
+                                            unsigned int n_points_in) :
+  _center(center),
+  _radius(radius),
+  _n_points(n_points_in)
 {}
 
 
@@ -65,8 +66,8 @@ Point TriangleInterface::PolygonHole::inside() const
 //
 // ArbitraryHole member functions
 //
-TriangleInterface::ArbitraryHole::ArbitraryHole(const Point& center,
-                                                const std::vector<Point>& points)
+TriangleInterface::ArbitraryHole::ArbitraryHole(const Point & center,
+                                                const std::vector<Point> & points)
   : _center(center),
     _points(points)
 {}

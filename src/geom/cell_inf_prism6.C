@@ -127,7 +127,7 @@ UniquePtr<Elem> InfPrism6::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      Elem * face = NULL;
 
       switch (i)
         {
@@ -173,7 +173,7 @@ UniquePtr<Elem> InfPrism6::build_edge (const unsigned int i) const
 }
 
 
-bool InfPrism6::contains_point (const Point& p, Real tol) const
+bool InfPrism6::contains_point (const Point & p, Real tol) const
 {
   /*
    * For infinite elements with linear base interpolation:
@@ -238,7 +238,7 @@ bool InfPrism6::contains_point (const Point& p, Real tol) const
 
 void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),
                              const IOPackage iop,
-                             std::vector<dof_id_type>& conn) const
+                             std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

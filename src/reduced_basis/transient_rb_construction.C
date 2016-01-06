@@ -54,8 +54,8 @@
 namespace libMesh
 {
 
-TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
-                                                  const std::string& name_in,
+TransientRBConstruction::TransientRBConstruction (EquationSystems & es,
+                                                  const std::string & name_in,
                                                   const unsigned int number_in)
   : Parent(es, name_in, number_in),
     L2_matrix(SparseMatrix<Number>::build(es.comm())),
@@ -124,11 +124,11 @@ void TransientRBConstruction::initialize_rb_construction(bool skip_matrix_assemb
 {
   // Check that the theta and assembly objects are consistently sized
 #ifndef NDEBUG
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
-  TransientRBAssemblyExpansion& trans_assembly_expansion =
-    cast_ref<TransientRBAssemblyExpansion&>(get_rb_assembly_expansion());
+  TransientRBAssemblyExpansion & trans_assembly_expansion =
+    cast_ref<TransientRBAssemblyExpansion &>(get_rb_assembly_expansion());
 #endif
   // This assert only gets called if DEBUG is on
   libmesh_assert_equal_to (trans_theta_expansion.get_n_M_terms(), trans_assembly_expansion.get_n_M_terms());
@@ -136,7 +136,7 @@ void TransientRBConstruction::initialize_rb_construction(bool skip_matrix_assemb
   Parent::initialize_rb_construction(skip_matrix_assembly, skip_vector_assembly);
 }
 
-void TransientRBConstruction::process_parameters_file (const std::string& parameters_filename)
+void TransientRBConstruction::process_parameters_file (const std::string & parameters_filename)
 {
   Parent::process_parameters_file(parameters_filename);
 
@@ -159,7 +159,7 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
   set_delta_N(delta_N_in);
 
   // Pass the temporal discretization data to the RBEvaluation
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
   trans_rb_eval.pull_temporal_discretization_data( *this );
 }
 
@@ -172,8 +172,8 @@ void TransientRBConstruction::print_info()
   if( is_rb_eval_initialized() )
     {
       // Print out info that describes the current setup
-      TransientRBThetaExpansion& trans_theta_expansion =
-        cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+      TransientRBThetaExpansion & trans_theta_expansion =
+        cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
       libMesh::out << "Q_m: " << trans_theta_expansion.get_n_M_terms() << std::endl;
     }
   else
@@ -203,8 +203,8 @@ void TransientRBConstruction::allocate_data_structures()
 {
   Parent::allocate_data_structures();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m       = trans_theta_expansion.get_n_M_terms();
   const unsigned int n_outputs = trans_theta_expansion.get_n_outputs();
 
@@ -219,7 +219,7 @@ void TransientRBConstruction::allocate_data_structures()
   // Only initialize the mass matrices if we
   // are not in single-matrix mode
   {
-    DofMap& dof_map = this->get_dof_map();
+    DofMap & dof_map = this->get_dof_map();
 
     dof_map.attach_matrix(*L2_matrix);
     L2_matrix->init();
@@ -310,10 +310,10 @@ Real TransientRBConstruction::train_reduced_basis(const bool resize_rb_eval_data
   return value;
 }
 
-SparseMatrix<Number>* TransientRBConstruction::get_M_q(unsigned int q)
+SparseMatrix<Number> * TransientRBConstruction::get_M_q(unsigned int q)
 {
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   if(q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
@@ -321,13 +321,13 @@ SparseMatrix<Number>* TransientRBConstruction::get_M_q(unsigned int q)
   return M_q_vector[q];
 }
 
-SparseMatrix<Number>* TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
+SparseMatrix<Number> * TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
     libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q.");
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   if(q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
@@ -335,7 +335,7 @@ SparseMatrix<Number>* TransientRBConstruction::get_non_dirichlet_M_q(unsigned in
   return non_dirichlet_M_q_vector[q];
 }
 
-void TransientRBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number>*>& all_matrices)
+void TransientRBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number> *> & all_matrices)
 {
   Parent::get_all_matrices(all_matrices);
 
@@ -344,8 +344,8 @@ void TransientRBConstruction::get_all_matrices(std::map<std::string, SparseMatri
   if (store_non_dirichlet_operators)
     all_matrices["L2_matrix_non_dirichlet"] = non_dirichlet_L2_matrix.get();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
   for(unsigned int q_m=0; q_m<Q_m; q_m++)
@@ -362,7 +362,7 @@ void TransientRBConstruction::get_all_matrices(std::map<std::string, SparseMatri
     }
 }
 
-void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
+void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number> * input_matrix, bool apply_dirichlet_bc)
 {
   input_matrix->zero();
   add_scaled_matrix_and_vector(1.,
@@ -373,18 +373,18 @@ void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number>* input_mat
                                apply_dirichlet_bc);
 }
 
-void TransientRBConstruction::assemble_mass_matrix(SparseMatrix<Number>* input_matrix)
+void TransientRBConstruction::assemble_mass_matrix(SparseMatrix<Number> * input_matrix)
 {
   input_matrix->zero();
   add_scaled_mass_matrix(1., input_matrix);
 }
 
-void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix<Number>* input_matrix)
+void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix<Number> * input_matrix)
 {
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
@@ -393,17 +393,17 @@ void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix
 }
 
 void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
-                                                        NumericVector<Number>& dest,
-                                                        NumericVector<Number>& arg)
+                                                        NumericVector<Number> & dest,
+                                                        NumericVector<Number> & arg)
 {
   START_LOG("mass_matrix_scaled_matvec()", "TransientRBConstruction");
 
   dest.zero();
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
@@ -428,10 +428,10 @@ void TransientRBConstruction::truth_assembly()
   this->matrix->zero();
   this->rhs->zero();
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
@@ -474,12 +474,12 @@ void TransientRBConstruction::truth_assembly()
   STOP_LOG("truth_assembly()", "TransientRBConstruction");
 }
 
-void TransientRBConstruction::set_L2_assembly(ElemAssembly& L2_assembly_in)
+void TransientRBConstruction::set_L2_assembly(ElemAssembly & L2_assembly_in)
 {
   L2_assembly = &L2_assembly_in;
 }
 
-ElemAssembly& TransientRBConstruction::get_L2_assembly()
+ElemAssembly & TransientRBConstruction::get_L2_assembly()
 {
   if(!L2_assembly)
     libmesh_error_msg("Error: L2_assembly hasn't been initialized yet");
@@ -487,13 +487,13 @@ ElemAssembly& TransientRBConstruction::get_L2_assembly()
   return *L2_assembly;
 }
 
-void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
+void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number> * input_matrix, bool apply_dirichlet_bc)
 {
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
-  TransientRBAssemblyExpansion& trans_assembly_expansion =
-    cast_ref<TransientRBAssemblyExpansion&>(get_rb_assembly_expansion());
+  TransientRBAssemblyExpansion & trans_assembly_expansion =
+    cast_ref<TransientRBAssemblyExpansion &>(get_rb_assembly_expansion());
 
   if(q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in assemble_Mq_matrix.");
@@ -511,8 +511,8 @@ void TransientRBConstruction::assemble_all_affine_operators()
 {
   Parent::assemble_all_affine_operators();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   for(unsigned int q=0; q<trans_theta_expansion.get_n_M_terms(); q++)
     assemble_Mq_matrix(q, get_M_q(q));
@@ -542,7 +542,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 {
   START_LOG("truth_solve()", "TransientRBConstruction");
 
-  const RBParameters& mu = get_parameters();
+  const RBParameters & mu = get_parameters();
   const unsigned int n_time_steps = get_n_time_steps();
 
   //   // NumericVector for computing true L2 error
@@ -721,7 +721,7 @@ Number TransientRBConstruction::set_error_temporal_data()
   return solution->dot(*inner_product_storage_vector);
 }
 
-const NumericVector<Number>& TransientRBConstruction::get_error_temporal_data()
+const NumericVector<Number> & TransientRBConstruction::get_error_temporal_data()
 {
   START_LOG("get_error_temporal_data()", "TransientRBConstruction");
 
@@ -766,7 +766,7 @@ void TransientRBConstruction::add_IC_to_RB_space()
 
   // load the new basis function into the basis_functions vector.
   get_rb_evaluation().basis_functions.push_back( NumericVector<Number>::build(this->comm()).release() );
-  NumericVector<Number>& current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
+  NumericVector<Number> & current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
   current_bf.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   current_bf = *solution;
 
@@ -887,7 +887,7 @@ void TransientRBConstruction::enrich_RB_space()
     {
       // load the new basis function into the basis_functions vector.
       get_rb_evaluation().basis_functions.push_back( NumericVector<Number>::build(this->comm()).release() );
-      NumericVector<Number>& current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
+      NumericVector<Number> & current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
       current_bf.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       current_bf.zero();
 
@@ -963,7 +963,7 @@ void TransientRBConstruction::update_system()
   update_RB_initial_condition_all_N();
 }
 
-SparseMatrix<Number>& TransientRBConstruction::get_matrix_for_output_dual_solves()
+SparseMatrix<Number> & TransientRBConstruction::get_matrix_for_output_dual_solves()
 {
   return *L2_matrix;
 }
@@ -976,7 +976,7 @@ void TransientRBConstruction::load_rb_solution()
 
   const unsigned int time_step = get_time_step();
 
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
   DenseVector<Number> RB_solution_vector_k = trans_rb_eval.RB_temporal_solution_data[time_step];
 
   if(RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions())
@@ -1002,10 +1002,10 @@ void TransientRBConstruction::update_RB_system_matrices()
 
   Parent::update_RB_system_matrices();
 
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
@@ -1062,10 +1062,10 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
   Parent::update_residual_terms(compute_inner_products);
 
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  TransientRBThetaExpansion & trans_theta_expansion =
+    cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
@@ -1197,7 +1197,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 {
   START_LOG("update_RB_initial_condition_all_N()", "TransientRBConstruction");
 
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
 
   // Load the initial condition into the solution vector
   initialize_truth();
@@ -1294,7 +1294,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //   }
 //
 //   // Load parallel_temp into current_local_solution in order to do assembly
-//   const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list();
+//   const std::vector<unsigned int> & send_list = this->get_dof_map().get_send_list();
 //   parallel_temp->localize (*current_local_solution, send_list);
 //
 //   // Load the system_matrix
@@ -1341,7 +1341,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //  return libmesh_real(std::sqrt( slow_residual_norm_sq ));
 //}
 
-void TransientRBConstruction::write_riesz_representors_to_files(const std::string& riesz_representors_dir,
+void TransientRBConstruction::write_riesz_representors_to_files(const std::string & riesz_representors_dir,
                                                                 const bool write_binary_residual_representors)
 {
   START_LOG("write_riesz_representors_to_files()", "TransientRBConstruction");
@@ -1354,7 +1354,7 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
   std::ostringstream file_name;
   const std::string riesz_representor_suffix = (write_binary_residual_representors ? ".xdr" : ".dat");
 
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
 
   const unsigned int istop  = trans_rb_eval.get_n_basis_functions();
   const unsigned int istart = istop-get_delta_N();
@@ -1392,7 +1392,7 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
   STOP_LOG("write_riesz_representors_to_files()", "TransientRBConstruction");
 }
 
-void TransientRBConstruction::read_riesz_representors_from_files(const std::string& riesz_representors_dir,
+void TransientRBConstruction::read_riesz_representors_from_files(const std::string & riesz_representors_dir,
                                                                  const bool read_binary_residual_representors)
 {
   START_LOG("read_riesz_representors_from_files()", "TransientRBConstruction");
@@ -1403,7 +1403,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
   std::ostringstream file_name;
   struct stat stat_info;
 
-  TransientRBEvaluation& trans_rb_eval = cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
 
   libMesh::out << "Reading in the M_q_representors..." << std::endl;
 

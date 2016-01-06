@@ -55,7 +55,7 @@ public:
   /**
    *  Constructor. Initializes EigenPreconditioner data structures
    */
-  EigenPreconditioner (const libMesh::Parallel::Communicator &comm_in
+  EigenPreconditioner (const libMesh::Parallel::Communicator & comm_in
                        LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -86,7 +86,7 @@ public:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-EigenPreconditioner<T>::EigenPreconditioner(const libMesh::Parallel::Communicator &comm_in) :
+EigenPreconditioner<T>::EigenPreconditioner(const libMesh::Parallel::Communicator & comm_in) :
   Preconditioner<T>(comm_in)
 {
 }

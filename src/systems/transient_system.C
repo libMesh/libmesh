@@ -35,8 +35,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // TransientSystem implementation
 template <class Base>
-TransientSystem<Base>::TransientSystem (EquationSystems& es,
-                                        const std::string& name_in,
+TransientSystem<Base>::TransientSystem (EquationSystems & es,
+                                        const std::string & name_in,
                                         const unsigned int number_in) :
 
   Base                 (es, name_in, number_in)
@@ -144,7 +144,7 @@ void TransientSystem<Base>::re_update ()
   // re_update the parent system
   Base::re_update ();
 
-  const std::vector<dof_id_type>& send_list = this->get_dof_map().get_send_list ();
+  const std::vector<dof_id_type> & send_list = this->get_dof_map().get_send_list ();
 
   const dof_id_type first_local_dof = Base::get_dof_map().first_dof();
   const dof_id_type end_local_dof  = Base::get_dof_map().end_dof();

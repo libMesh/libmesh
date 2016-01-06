@@ -29,7 +29,7 @@ namespace libMesh
 
 //---------------------------------------------------------
 // CentroidPartitioner methods
-void CentroidPartitioner::_do_partition (MeshBase& mesh,
+void CentroidPartitioner::_do_partition (MeshBase & mesh,
                                          const unsigned int n)
 {
   // Check for an easy return
@@ -107,7 +107,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
 
   for (dof_id_type i=0; i<n_elem; i++)
     {
-      Elem* elem = _elem_centroids[i].second;
+      Elem * elem = _elem_centroids[i].second;
 
       elem->processor_id() =
         std::min (cast_int<processor_id_type>(i / target_size),
@@ -122,7 +122,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
 
 
 
-void CentroidPartitioner::compute_centroids (MeshBase& mesh)
+void CentroidPartitioner::compute_centroids (MeshBase & mesh)
 {
   _elem_centroids.clear();
   _elem_centroids.reserve(mesh.n_elem());
@@ -135,7 +135,7 @@ void CentroidPartitioner::compute_centroids (MeshBase& mesh)
 
   for (; it != it_end; ++it)
     {
-      Elem* elem = *it;
+      Elem * elem = *it;
 
       _elem_centroids.push_back(std::make_pair(elem->centroid(), elem));
     }
@@ -144,8 +144,8 @@ void CentroidPartitioner::compute_centroids (MeshBase& mesh)
 
 
 
-bool CentroidPartitioner::sort_x (const std::pair<Point, Elem*>& lhs,
-                                  const std::pair<Point, Elem*>& rhs)
+bool CentroidPartitioner::sort_x (const std::pair<Point, Elem *> & lhs,
+                                  const std::pair<Point, Elem *> & rhs)
 {
   return (lhs.first(0) < rhs.first(0));
 }
@@ -153,8 +153,8 @@ bool CentroidPartitioner::sort_x (const std::pair<Point, Elem*>& lhs,
 
 
 
-bool CentroidPartitioner::sort_y (const std::pair<Point, Elem*>& lhs,
-                                  const std::pair<Point, Elem*>& rhs)
+bool CentroidPartitioner::sort_y (const std::pair<Point, Elem *> & lhs,
+                                  const std::pair<Point, Elem *> & rhs)
 {
   return (lhs.first(1) < rhs.first(1));
 }
@@ -163,16 +163,16 @@ bool CentroidPartitioner::sort_y (const std::pair<Point, Elem*>& lhs,
 
 
 
-bool CentroidPartitioner::sort_z (const std::pair<Point, Elem*>& lhs,
-                                  const std::pair<Point, Elem*>& rhs)
+bool CentroidPartitioner::sort_z (const std::pair<Point, Elem *> & lhs,
+                                  const std::pair<Point, Elem *> & rhs)
 {
   return (lhs.first(2) < rhs.first(2));
 }
 
 
 
-bool CentroidPartitioner::sort_radial (const std::pair<Point, Elem*>& lhs,
-                                       const std::pair<Point, Elem*>& rhs)
+bool CentroidPartitioner::sort_radial (const std::pair<Point, Elem *> & lhs,
+                                       const std::pair<Point, Elem *> & rhs)
 {
   return (lhs.first.size() < rhs.first.size());
 }

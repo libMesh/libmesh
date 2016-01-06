@@ -57,7 +57,7 @@ public:
    * to be solved.
    */
   explicit
-  PetscDiffSolver (sys_type& system);
+  PetscDiffSolver (sys_type & system);
 
   /**
    * Destructor.

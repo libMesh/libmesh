@@ -55,7 +55,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  UnstructuredMesh (const Parallel::Communicator &comm_in,
+  UnstructuredMesh (const Parallel::Communicator & comm_in,
                     unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -85,8 +85,8 @@ public:
    * The skip_renumber_nodes_and_elements argument is now deprecated -
    * to disallow renumbering, set \p MeshBase::allow_renumbering(false)
    */
-  virtual void read (const std::string& name,
-                     MeshData* mesh_data=NULL,
+  virtual void read (const std::string & name,
+                     MeshData * mesh_data=NULL,
                      bool skip_renumber_nodes_and_elements=false) libmesh_override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
@@ -96,16 +96,16 @@ public:
    * also pass a separate pointer to the MeshData object you have been
    * using with this mesh, since these write methods expect it.
    */
-  virtual void write (const std::string& name,
-                      MeshData* mesh_data=NULL) libmesh_override;
+  virtual void write (const std::string & name,
+                      MeshData * mesh_data=NULL) libmesh_override;
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension. Also writes data.
    */
-  void write (const std::string& name,
-              const std::vector<Number>& values,
-              const std::vector<std::string>& variable_names);
+  void write (const std::string & name,
+              const std::vector<Number> & values,
+              const std::vector<std::string> & variable_names);
 
   /**
    * Converts a mesh with higher-order
@@ -134,7 +134,7 @@ public:
    * to the pid_mesh reference which you must create and pass
    * to the function.
    */
-  void create_pid_mesh (UnstructuredMesh& pid_mesh,
+  void create_pid_mesh (UnstructuredMesh & pid_mesh,
                         const processor_id_type pid) const;
 
   /**
@@ -142,16 +142,16 @@ public:
    * iterating over the elements between it and it_end and adding
    * them to the new mesh.
    */
-  void create_submesh (UnstructuredMesh& new_mesh,
-                       const_element_iterator& it,
-                       const const_element_iterator& it_end) const;
+  void create_submesh (UnstructuredMesh & new_mesh,
+                       const_element_iterator & it,
+                       const const_element_iterator & it_end) const;
 
 
   /**
    * Deep copy of another unstructured mesh class (used by subclass
    * copy constructors)
    */
-  virtual void copy_nodes_and_elements(const UnstructuredMesh& other_mesh, const bool skip_find_neighbors=false);
+  virtual void copy_nodes_and_elements(const UnstructuredMesh & other_mesh, const bool skip_find_neighbors=false);
 
 
   /**

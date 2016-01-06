@@ -63,7 +63,7 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const = 0;
+  virtual const T & get () const = 0;
 
   /**
    * Reseater: change the location of the parameter we access.
@@ -76,7 +76,7 @@ public:
   /**
    * Proxy: for backward compatibility, we allow codes to treat a
    * ParameterAccessor as if it were a simple pointer-to-value.  We
-   * can't safely allow "Number *n = parameter_vector[p]" to compile,
+   * can't safely allow "Number * n = parameter_vector[p]" to compile,
    * but we can allow "*parameter_vector[p] += deltap" to work.
    */
   ParameterProxy<T> operator* () { return ParameterProxy<T>(*this); }
@@ -98,43 +98,43 @@ public:
   /**
    * Constructor: which parameter are we a proxy for?
    */
-  ParameterProxy (ParameterAccessor<T>& accessor)
+  ParameterProxy (ParameterAccessor<T> & accessor)
     : _accessor(accessor) {}
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator = (const T & new_value) { _accessor.set(new_value); return *this; }
+  ParameterProxy & operator = (const T & new_value) { _accessor.set(new_value); return *this; }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator = (const ParameterProxy<T> & new_value) { _accessor.set(new_value.get()); }
+  ParameterProxy & operator = (const ParameterProxy<T> & new_value) { _accessor.set(new_value.get()); }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator = (const ConstParameterProxy<T> & new_value) { _accessor.set(new_value.get()); return *this; }
+  ParameterProxy & operator = (const ConstParameterProxy<T> & new_value) { _accessor.set(new_value.get()); return *this; }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator += (const T & value_increment) { _accessor.set(_accessor.get() + value_increment); return *this; }
+  ParameterProxy & operator += (const T & value_increment) { _accessor.set(_accessor.get() + value_increment); return *this; }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator -= (const T & value_decrement) { _accessor.set(_accessor.get() - value_decrement); return *this; }
+  ParameterProxy & operator -= (const T & value_decrement) { _accessor.set(_accessor.get() - value_decrement); return *this; }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator *= (const T & value_multiplier) { _accessor.set(_accessor.get() * value_multiplier); return *this; }
+  ParameterProxy & operator *= (const T & value_multiplier) { _accessor.set(_accessor.get() * value_multiplier); return *this; }
 
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy& operator /= (const T & value_divisor) { _accessor.set(_accessor.get() / value_divisor); return *this; }
+  ParameterProxy & operator /= (const T & value_divisor) { _accessor.set(_accessor.get() / value_divisor); return *this; }
 
   /**
    * Getter: get the value of the parameter we access.
@@ -142,7 +142,7 @@ public:
   operator T () const { return _accessor.get(); }
 
 private:
-  ParameterAccessor<T>& _accessor;
+  ParameterAccessor<T> & _accessor;
 };
 
 
@@ -153,7 +153,7 @@ public:
   /**
    * Constructor: which parameter are we a proxy for?
    */
-  ConstParameterProxy (const ParameterAccessor<T>& accessor)
+  ConstParameterProxy (const ParameterAccessor<T> & accessor)
     : _accessor(accessor) {}
 
   /**
@@ -167,7 +167,7 @@ public:
   T get() const { return _accessor.get(); }
 
 private:
-  const ParameterAccessor<T>& _accessor;
+  const ParameterAccessor<T> & _accessor;
 };
 
 

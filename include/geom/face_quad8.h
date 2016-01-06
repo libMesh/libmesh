@@ -61,7 +61,7 @@ public:
    * Constructor. By default this element has no parent.
    */
   explicit
-  Quad8 (Elem* p=NULL) :
+  Quad8 (Elem * p=NULL) :
     Quad(Quad8::n_nodes(), p, _nodelinks_data) {}
 
   /**
@@ -141,7 +141,7 @@ public:
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
    * @returns 2 for all \p n
@@ -181,7 +181,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[8];
+  Node * _nodelinks_data[8];
 
 
 

@@ -53,7 +53,7 @@ public:
    * to be solved.
    */
   explicit
-  UnsteadySolver (sys_type& s);
+  UnsteadySolver (sys_type & s);
 
   /**
    * Destructor.
@@ -143,7 +143,7 @@ public:
    * then you'll get a result of zero since old_nonlinear_solution
    * is set equal to nonlinear_solution in this function.
    */
-  virtual Real du(const SystemNorm& norm) const libmesh_override;
+  virtual Real du(const SystemNorm & norm) const libmesh_override;
 
   /**
    * This is not a steady-state solver.

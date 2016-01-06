@@ -32,7 +32,7 @@ SteadySolver::~SteadySolver ()
 
 
 bool SteadySolver::element_residual(bool request_jacobian,
-                                    DiffContext& context)
+                                    DiffContext & context)
 {
   return this->_general_residual(request_jacobian,
                                  context,
@@ -43,7 +43,7 @@ bool SteadySolver::element_residual(bool request_jacobian,
 
 
 bool SteadySolver::side_residual(bool request_jacobian,
-                                 DiffContext& context)
+                                 DiffContext & context)
 {
   return this->_general_residual(request_jacobian,
                                  context,
@@ -54,7 +54,7 @@ bool SteadySolver::side_residual(bool request_jacobian,
 
 
 bool SteadySolver::nonlocal_residual(bool request_jacobian,
-                                     DiffContext& context)
+                                     DiffContext & context)
 {
   return this->_general_residual(request_jacobian,
                                  context,
@@ -65,7 +65,7 @@ bool SteadySolver::nonlocal_residual(bool request_jacobian,
 
 
 bool SteadySolver::_general_residual(bool request_jacobian,
-                                     DiffContext& context,
+                                     DiffContext & context,
                                      ResFuncType time_deriv,
                                      ResFuncType constraint)
 {

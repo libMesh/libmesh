@@ -40,7 +40,7 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm_in) :
+SparseMatrix<T>::SparseMatrix (const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
   _dof_map(NULL),
   _is_initialized(false)
@@ -58,9 +58,9 @@ SparseMatrix<T>::~SparseMatrix ()
 
 // default implementation is to fall back to non-blocked method
 template <typename T>
-void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
-                                        const std::vector<numeric_index_type> &brows,
-                                        const std::vector<numeric_index_type> &bcols)
+void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> & dm,
+                                        const std::vector<numeric_index_type> & brows,
+                                        const std::vector<numeric_index_type> & bcols)
 {
   libmesh_assert_equal_to (dm.m() / brows.size(), dm.n() / bcols.size());
 
@@ -98,7 +98,7 @@ void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
 
 // Full specialization of print method for Complex datatypes
 template <>
-void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
+void SparseMatrix<Complex>::print(std::ostream & os, const bool sparse) const
 {
   // std::complex<>::operator<<() is defined, but use this form
 
@@ -132,7 +132,7 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 // Full specialization for Real datatypes
 template <typename T>
 UniquePtr<SparseMatrix<T> >
-SparseMatrix<T>::build(const Parallel::Communicator &comm,
+SparseMatrix<T>::build(const Parallel::Communicator & comm,
                        const SolverPackage solver_package)
 {
   // Build the appropriate vector
@@ -172,8 +172,8 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
 
 
 template <typename T>
-void SparseMatrix<T>::vector_mult (NumericVector<T>& dest,
-                                   const NumericVector<T>& arg) const
+void SparseMatrix<T>::vector_mult (NumericVector<T> & dest,
+                                   const NumericVector<T> & arg) const
 {
   dest.zero();
   this->vector_mult_add(dest,arg);
@@ -182,8 +182,8 @@ void SparseMatrix<T>::vector_mult (NumericVector<T>& dest,
 
 
 template <typename T>
-void SparseMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-                                       const NumericVector<T>& arg) const
+void SparseMatrix<T>::vector_mult_add (NumericVector<T> & dest,
+                                       const NumericVector<T> & arg) const
 {
   /* This functionality is actually implemented in the \p
      NumericVector class.  */
@@ -202,7 +202,7 @@ void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
 
 
 template <typename T>
-void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
+void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 {
   parallel_object_only();
 

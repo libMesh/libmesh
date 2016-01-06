@@ -29,8 +29,8 @@
 namespace libMesh
 {
 
-GnuPlotIO::GnuPlotIO(const MeshBase& mesh_in,
-                     const std::string& title,
+GnuPlotIO::GnuPlotIO(const MeshBase & mesh_in,
+                     const std::string & title,
                      int mesh_properties)
   :
   MeshOutput<MeshBase> (mesh_in),
@@ -40,14 +40,14 @@ GnuPlotIO::GnuPlotIO(const MeshBase& mesh_in,
   _png_output = (mesh_properties & PNG_OUTPUT);
 }
 
-void GnuPlotIO::write(const std::string& fname)
+void GnuPlotIO::write(const std::string & fname)
 {
   this->write_solution(fname);
 }
 
-void GnuPlotIO::write_nodal_data (const std::string& fname,
-                                  const std::vector<Number>& soln,
-                                  const std::vector<std::string>& names)
+void GnuPlotIO::write_nodal_data (const std::string & fname,
+                                  const std::vector<Number> & soln,
+                                  const std::vector<std::string> & names)
 {
   START_LOG("write_nodal_data()", "GnuPlotIO");
 
@@ -59,15 +59,15 @@ void GnuPlotIO::write_nodal_data (const std::string& fname,
 
 
 
-void GnuPlotIO::write_solution(const std::string& fname,
-                               const std::vector<Number>* soln,
-                               const std::vector<std::string>* names)
+void GnuPlotIO::write_solution(const std::string & fname,
+                               const std::vector<Number> * soln,
+                               const std::vector<std::string> * names)
 {
   // Even when writing on a serialized ParallelMesh, we expect
   // non-proc-0 help with calls like n_active_elem
   // libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   dof_id_type n_active_elem = the_mesh.n_active_elem();
 
@@ -120,7 +120,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
       for( ; it != end_it; ++it)
         {
-          const Elem* el = *it;
+          const Elem * el = *it;
 
           // if el is the left edge of the mesh, print its left node position
           if(el->neighbor(0) == NULL)
@@ -186,7 +186,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
       for ( ; it != end_it; ++it)
         {
-          const Elem* elem = *it;
+          const Elem * elem = *it;
 
           for(unsigned int i=0; i<elem->n_nodes(); i++)
             {

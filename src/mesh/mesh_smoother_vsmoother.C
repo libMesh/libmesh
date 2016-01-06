@@ -41,7 +41,7 @@ namespace libMesh
 #endif
 
 // Member functions for the Variational Smoother
-VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
+VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  double theta,
                                                  unsigned miniter,
                                                  unsigned maxiter,
@@ -67,8 +67,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
 
 
 
-VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
-                                                 std::vector<float>* adapt_data,
+VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
+                                                 std::vector<float> * adapt_data,
                                                  double theta,
                                                  unsigned miniter,
                                                  unsigned maxiter,
@@ -94,9 +94,9 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
 
 
 
-VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
-                                                 const UnstructuredMesh* area_of_interest,
-                                                 std::vector<float>* adapt_data,
+VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
+                                                 const UnstructuredMesh * area_of_interest,
+                                                 std::vector<float> * adapt_data,
                                                  double theta,
                                                  unsigned miniter,
                                                  unsigned maxiter,
@@ -219,7 +219,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
 
 // save grid
-int VariationalMeshSmoother::writegr(const Array2D<double>& R)
+int VariationalMeshSmoother::writegr(const Array2D<double> & R)
 {
   libMesh::out << "Starting writegr" << std::endl;
 
@@ -238,7 +238,7 @@ int VariationalMeshSmoother::writegr(const Array2D<double>& R)
         for (unsigned int j=0; j<_dim; j++)
           {
             // Get a reference to the node
-            Node& node = *(*it);
+            Node & node = *(*it);
 
             double distance = R[i][j] - node(j);
 
@@ -267,12 +267,12 @@ int VariationalMeshSmoother::writegr(const Array2D<double>& R)
 
 
 // reading grid from input file
-int VariationalMeshSmoother::readgr(Array2D<double>& R,
-                                    std::vector<int>& mask,
-                                    Array2D<int>& cells,
-                                    std::vector<int>& mcells,
-                                    std::vector<int>& edges,
-                                    std::vector<int>& hnodes)
+int VariationalMeshSmoother::readgr(Array2D<double> & R,
+                                    std::vector<int> & mask,
+                                    Array2D<int> & cells,
+                                    std::vector<int> & mcells,
+                                    std::vector<int> & edges,
+                                    std::vector<int> & hnodes)
 {
   libMesh::out << "Sarting readgr" << std::endl;
   // add error messages where format can be inconsistent
@@ -287,13 +287,13 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
     const MeshBase::const_node_iterator end = _mesh.nodes_end();
 
     // Only compute the node to elem map once
-    std::vector<std::vector<const Elem*> > nodes_to_elem_map;
+    std::vector<std::vector<const Elem *> > nodes_to_elem_map;
     MeshTools::build_nodes_to_elem_map(_mesh, nodes_to_elem_map);
 
     for (int i=0; it != end; ++it)
       {
         // Get a reference to the node
-        Node& node = *(*it);
+        Node & node = *(*it);
 
         // For each node grab its X Y [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
@@ -310,11 +310,11 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
               {
                 // Find all the nodal neighbors... that is the nodes directly connected
                 // to this node through one edge
-                std::vector<const Node*> neighbors;
+                std::vector<const Node *> neighbors;
                 MeshTools::find_nodal_neighbors(_mesh, node, nodes_to_elem_map, neighbors);
 
-                std::vector<const Node*>::const_iterator ne = neighbors.begin();
-                std::vector<const Node*>::const_iterator ne_end = neighbors.end();
+                std::vector<const Node *>::const_iterator ne = neighbors.begin();
+                std::vector<const Node *>::const_iterator ne_end = neighbors.end();
 
                 // Grab the x,y coordinates
                 Real x = node(0);
@@ -328,7 +328,7 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
                 // Calculate the thetas
                 for (; ne != ne_end; ne++)
                   {
-                    const Node& neighbor = *(*ne);
+                    const Node & neighbor = *(*ne);
 
                     // Note that the x and y values of this node are subtracted off
                     // this centers the system around this node
@@ -384,7 +384,7 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
 
     for (int i=0; it != end; ++it)
       {
-        const Elem* elem = *it;
+        const Elem * elem = *it;
 
         // Keep track of the number of nodes
         // there must be 6 for 2D
@@ -500,7 +500,7 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
 
 // Read Metrics
 int VariationalMeshSmoother::readmetr(std::string name,
-                                      Array3D<double>& H)
+                                      Array3D<double> & H)
 {
   std::ifstream infile(name.c_str());
   std::string dummy;
@@ -544,7 +544,7 @@ void VariationalMeshSmoother::adjust_adapt_data()
 {
   // For convenience
   const UnstructuredMesh & aoe_mesh = *_area_of_interest;
-  std::vector<float>& adapt_data = *_adapt_data;
+  std::vector<float> & adapt_data = *_adapt_data;
 
   float min = adapt_minimum();
 
@@ -582,9 +582,9 @@ void VariationalMeshSmoother::adjust_adapt_data()
 
 
 // Read Adaptivity
-int VariationalMeshSmoother::read_adp(std::vector<double>& afun)
+int VariationalMeshSmoother::read_adp(std::vector<double> & afun)
 {
-  std::vector<float>& adapt_data = *_adapt_data;
+  std::vector<float> & adapt_data = *_adapt_data;
 
   if (_area_of_interest)
     adjust_adapt_data();
@@ -630,10 +630,10 @@ double VariationalMeshSmoother::jac2(double x1,
 
 
 // BasisA determines matrix H^(-T)Q on one Jacobian matrix
-int VariationalMeshSmoother::basisA(Array2D<double>& Q,
+int VariationalMeshSmoother::basisA(Array2D<double> & Q,
                                     int nvert,
-                                    const std::vector<double>& K,
-                                    const Array2D<double>& H,
+                                    const std::vector<double> & K,
+                                    const Array2D<double> & H,
                                     int me)
 {
   Array2D<double> U(_dim, nvert);
@@ -838,9 +838,9 @@ int VariationalMeshSmoother::basisA(Array2D<double>& Q,
 
 
 // Specify adaptive function
-void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
-                                        const Array2D<int>& cells,
-                                        std::vector<double>& afun,
+void VariationalMeshSmoother::adp_renew(const Array2D<double> & R,
+                                        const Array2D<int> & cells,
+                                        std::vector<double> & afun,
                                         int adp)
 {
   // evaluates given adaptive function on the provided mesh
@@ -885,16 +885,16 @@ void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
 
 
 // Preprocess mesh data and control smoothing/untangling iterations
-void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
-                                          const std::vector<int>& mask,
-                                          const Array2D<int>& cells,
-                                          const std::vector<int>& mcells,
-                                          const std::vector<int>& edges,
-                                          const std::vector<int>& hnodes,
+void VariationalMeshSmoother::full_smooth(Array2D<double> & R,
+                                          const std::vector<int> & mask,
+                                          const Array2D<int> & cells,
+                                          const std::vector<int> & mcells,
+                                          const std::vector<int> & edges,
+                                          const std::vector<int> & hnodes,
                                           double w,
-                                          const std::vector<int>& iter,
+                                          const std::vector<int> & iter,
                                           int me,
-                                          const Array3D<double>& H,
+                                          const Array3D<double> & H,
                                           int adp,
                                           int gr)
 {
@@ -1086,16 +1086,16 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
 
 
 // Determines the values of maxE_theta
-double VariationalMeshSmoother::maxE(Array2D<double>& R,
-                                     const Array2D<int>& cells,
-                                     const std::vector<int>& mcells,
+double VariationalMeshSmoother::maxE(Array2D<double> & R,
+                                     const Array2D<int> & cells,
+                                     const std::vector<int> & mcells,
                                      int me,
-                                     const Array3D<double>& H,
+                                     const Array3D<double> & H,
                                      double v,
                                      double epsilon,
                                      double w,
-                                     std::vector<double>& Gamma,
-                                     double& qmin)
+                                     std::vector<double> & Gamma,
+                                     double & qmin)
 {
   Array2D<double> Q(3, 3*_dim + _dim%2);
   std::vector<double> K(9);
@@ -1487,13 +1487,13 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
 
 
 // Compute min Jacobian determinant (minq), min cell volume (Vmin), and average cell volume (vol).
-double VariationalMeshSmoother::minq(const Array2D<double>& R,
-                                     const Array2D<int>& cells,
-                                     const std::vector<int>& mcells,
+double VariationalMeshSmoother::minq(const Array2D<double> & R,
+                                     const Array2D<int> & cells,
+                                     const std::vector<int> & mcells,
                                      int me,
-                                     const Array3D<double>& H,
-                                     double& vol,
-                                     double& Vmin)
+                                     const Array3D<double> & H,
+                                     double & vol,
+                                     double & Vmin)
 {
   std::vector<double> K(9);
   Array2D<double> Q(3, 3*_dim + _dim%2);
@@ -1883,23 +1883,23 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
 // Executes one step of minimization algorithm:
 // finds minimization direction (P=H^{-1} \grad J) and solves approximately
 // local minimization problem for optimal step in this minimization direction (tau=min J(R+tau P))
-double VariationalMeshSmoother::minJ(Array2D<double>& R,
-                                     const std::vector<int>& mask,
-                                     const Array2D<int>& cells,
-                                     const std::vector<int>& mcells,
+double VariationalMeshSmoother::minJ(Array2D<double> & R,
+                                     const std::vector<int> & mask,
+                                     const Array2D<int> & cells,
+                                     const std::vector<int> & mcells,
                                      double epsilon,
                                      double w,
                                      int me,
-                                     const Array3D<double>& H,
+                                     const Array3D<double> & H,
                                      double vol,
-                                     const std::vector<int>& edges,
-                                     const std::vector<int>& hnodes,
+                                     const std::vector<int> & edges,
+                                     const std::vector<int> & hnodes,
                                      int msglev,
-                                     double& Vmin,
-                                     double& emax,
-                                     double& qmin,
+                                     double & Vmin,
+                                     double & emax,
+                                     double & qmin,
                                      int adp,
-                                     const std::vector<double>& afun)
+                                     const std::vector<double> & afun)
 {
   // columns - max number of nonzero entries in every row of global matrix
   int columns = _dim*_dim*10;
@@ -2355,21 +2355,21 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 // minJ() with sliding Boundary Nodes constraints and no account for HN,
 // using Lagrange multiplier formulation: minimize L=J+\sum lam*g;
 // only works in 2D
-double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
-                                        const std::vector<int>& mask,
-                                        const Array2D<int>& cells,
-                                        const std::vector<int>& mcells,
+double VariationalMeshSmoother::minJ_BC(Array2D<double> & R,
+                                        const std::vector<int> & mask,
+                                        const Array2D<int> & cells,
+                                        const std::vector<int> & mcells,
                                         double epsilon,
                                         double w,
                                         int me,
-                                        const Array3D<double>& H,
+                                        const Array3D<double> & H,
                                         double vol,
                                         int msglev,
-                                        double& Vmin,
-                                        double& emax,
-                                        double& qmin,
+                                        double & Vmin,
+                                        double & emax,
+                                        double & qmin,
                                         int adp,
-                                        const std::vector<double>& afun,
+                                        const std::vector<double> & afun,
                                         int NCN)
 {
   // new form of matrices, 5 iterations for minL
@@ -2975,23 +2975,23 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
 
 
 // composes local matrix W and right side F from all quadrature nodes of one cell
-double VariationalMeshSmoother::localP(Array3D<double>& W,
-                                       Array2D<double>& F,
-                                       Array2D<double>& R,
-                                       const std::vector<int>& cell_in,
-                                       const std::vector<int>& mask,
+double VariationalMeshSmoother::localP(Array3D<double> & W,
+                                       Array2D<double> & F,
+                                       Array2D<double> & R,
+                                       const std::vector<int> & cell_in,
+                                       const std::vector<int> & mask,
                                        double epsilon,
                                        double w,
                                        int nvert,
-                                       const Array2D<double>& H,
+                                       const Array2D<double> & H,
                                        int me,
                                        double vol,
                                        int f,
-                                       double& Vmin,
-                                       double& qmin,
+                                       double & Vmin,
+                                       double & qmin,
                                        int adp,
-                                       const std::vector<double>& afun,
-                                       std::vector<double>& Gloc)
+                                       const std::vector<double> & afun,
+                                       std::vector<double> & Gloc)
 {
   // K - determines approximation rule for local integral over the cell
   std::vector<double> K(9);
@@ -3306,10 +3306,10 @@ double VariationalMeshSmoother::localP(Array3D<double>& W,
 
 
 // avertex - assembly of adaptivity metric on a cell
-double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
-                                        std::vector<double>& G,
-                                        const Array2D<double>& R,
-                                        const std::vector<int>& cell_in,
+double VariationalMeshSmoother::avertex(const std::vector<double> & afun,
+                                        std::vector<double> & G,
+                                        const Array2D<double> & R,
+                                        const std::vector<int> & cell_in,
                                         int nvert,
                                         int adp)
 {
@@ -3398,21 +3398,21 @@ double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
 
 
 // Computes local matrics W and local rhs F on one basis
-double VariationalMeshSmoother::vertex(Array3D<double>& W,
-                                       Array2D<double>& F,
-                                       const Array2D<double>& R,
-                                       const std::vector<int>& cell_in,
+double VariationalMeshSmoother::vertex(Array3D<double> & W,
+                                       Array2D<double> & F,
+                                       const Array2D<double> & R,
+                                       const std::vector<int> & cell_in,
                                        double epsilon,
                                        double w,
                                        int nvert,
-                                       const std::vector<double>& K,
-                                       const Array2D<double>& H,
+                                       const std::vector<double> & K,
+                                       const Array2D<double> & H,
                                        int me,
                                        double vol,
                                        int f,
-                                       double& qmin,
+                                       double & qmin,
                                        int adp,
-                                       const std::vector<double>& g,
+                                       const std::vector<double> & g,
                                        double sigma)
 {
   // hessian, function, gradient
@@ -3617,11 +3617,11 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
 // by Conjugate Gradient (CG) method preconditioned by
 // Point Jacobi (diagonal scaling)
 int VariationalMeshSmoother::solver(int n,
-                                    const std::vector<int>& ia,
-                                    const std::vector<int>& ja,
-                                    const std::vector<double>& a,
-                                    std::vector<double>& x,
-                                    const std::vector<double>& b,
+                                    const std::vector<int> & ia,
+                                    const std::vector<int> & ja,
+                                    const std::vector<double> & a,
+                                    std::vector<double> & x,
+                                    const std::vector<double> & b,
                                     double eps,
                                     int maxite,
                                     int msglev)
@@ -3654,9 +3654,9 @@ int VariationalMeshSmoother::solver(int n,
 
 // Input parameter check
 int VariationalMeshSmoother::pcg_par_check(int n,
-                                           const std::vector<int>& ia,
-                                           const std::vector<int>& ja,
-                                           const std::vector<double>& a,
+                                           const std::vector<int> & ia,
+                                           const std::vector<int> & ja,
+                                           const std::vector<double> & a,
                                            double eps,
                                            int maxite,
                                            int msglev)
@@ -3796,15 +3796,15 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 
 // Solve the SPD linear system by PCG method
 int VariationalMeshSmoother::pcg_ic0(int n,
-                                     const std::vector<int>& ia,
-                                     const std::vector<int>& ja,
-                                     const std::vector<double>& a,
-                                     const std::vector<double>& u,
-                                     std::vector<double>& x,
-                                     const std::vector<double>& b,
-                                     std::vector<double>& r,
-                                     std::vector<double>& p,
-                                     std::vector<double>& z,
+                                     const std::vector<int> & ia,
+                                     const std::vector<int> & ja,
+                                     const std::vector<double> & a,
+                                     const std::vector<double> & u,
+                                     std::vector<double> & x,
+                                     const std::vector<double> & b,
+                                     std::vector<double> & r,
+                                     std::vector<double> & p,
+                                     std::vector<double> & z,
                                      double eps,
                                      int maxite,
                                      int msglev)

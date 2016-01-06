@@ -63,8 +63,8 @@ public:
 
   DTKEvaluator(System & in_sys, std::string var_name);
 
-  virtual FieldContainerType evaluate(const Teuchos::ArrayRCP<int>& elements,
-                                      const Teuchos::ArrayRCP<double>& coords) libmesh_override;
+  virtual FieldContainerType evaluate(const Teuchos::ArrayRCP<int> & elements,
+                                      const Teuchos::ArrayRCP<double> & coords) libmesh_override;
 
 protected:
   System & sys;
@@ -74,7 +74,7 @@ protected:
   unsigned int dim;
   DofMap & dof_map;
   unsigned int var_num;
-  const FEType& fe_type;
+  const FEType & fe_type;
 };
 
 } // namespace libMesh

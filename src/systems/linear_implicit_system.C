@@ -34,8 +34,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // LinearImplicitSystem implementation
-LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
-                                            const std::string& name_in,
+LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
+                                            const std::string & name_in,
                                             const unsigned int number_in) :
 
   Parent                 (es, name_in, number_in),
@@ -93,7 +93,7 @@ void LinearImplicitSystem::reinit ()
 
 
 
-void LinearImplicitSystem::restrict_solve_to (const SystemSubset* subset,
+void LinearImplicitSystem::restrict_solve_to (const SystemSubset * subset,
                                               const SubsetSolveMode subset_solve_mode)
 {
   _subset = subset;
@@ -117,7 +117,7 @@ void LinearImplicitSystem::solve ()
   // START_LOG("solve()", "System");
 
   // Get a reference to the EquationSystems
-  const EquationSystems& es =
+  const EquationSystems & es =
     this->get_equation_systems();
 
   // If the linear solver hasn't been initialized, we do so here.
@@ -168,14 +168,14 @@ void LinearImplicitSystem::solve ()
 
 
 
-void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matrix)
+void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matrix)
 {
   _shell_matrix = shell_matrix;
 }
 
 
 /*
-  void LinearImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
+  void LinearImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
   {
   if (this->assemble_before_solve)
   {
@@ -188,7 +188,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
   }
 
   // Get a reference to the EquationSystems
-  const EquationSystems& es =
+  const EquationSystems & es =
   this->get_equation_systems();
 
   // Get the user-specifiied linear solver tolerance
@@ -206,7 +206,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
 
   // Solve the linear system.
-  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+  SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
   for (unsigned int p=0; p != parameters.size(); ++p)
   {
   rval = linear_solver->solve (*matrix, pc,
@@ -226,7 +226,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
 
 
 
-  void LinearImplicitSystem::adjoint_solve (const QoISet &qoi_indices)
+  void LinearImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
   {
   const unsigned int Nq = this->qoi.size();
 
@@ -245,7 +245,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
   matrix->get_transpose(*matrix);
 
   // Including of any separate preconditioner
-  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+  SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
   if(pc)
   pc->get_transpose(*pc);
 
@@ -255,7 +255,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
   }
 
   // Get a reference to the EquationSystems
-  const EquationSystems& es =
+  const EquationSystems & es =
   this->get_equation_systems();
 
   // Get the user-specifiied linear solver tolerance
@@ -273,7 +273,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
 
   // Solve the linear system.
-  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
+  SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
   for (unsigned int i=0; i != Nq; ++i)
   if (qoi_indices.has_index(i))
   {
@@ -288,9 +288,9 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
 
 
   void LinearImplicitSystem::forward_qoi_parameter_sensitivity
-  (const QoISet&          qoi_indices,
-  const ParameterVector& parameters,
-  SensitivityData&       sensitivities)
+  (const QoISet &          qoi_indices,
+  const ParameterVector & parameters,
+  SensitivityData &       sensitivities)
   {
   const unsigned int Np = parameters.size();
   const unsigned int Nq = this->qoi.size();
@@ -339,7 +339,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
 
   *parameters[j] = old_parameter + delta_p;
   this->assemble_qoi(qoi_indices);
-  std::vector<Number> &qoi_plus = this->qoi;
+  std::vector<Number> & qoi_plus = this->qoi;
   std::vector<Number> partialq_partialp(Nq, 0);
   for (unsigned int i=0; i != Nq; ++i)
   if (qoi_indices.has_index(i))
@@ -363,14 +363,14 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number>* shell_matri
 
 
 
-LinearSolver<Number>* LinearImplicitSystem::get_linear_solver() const
+LinearSolver<Number> * LinearImplicitSystem::get_linear_solver() const
 {
   return linear_solver.get();
 }
 
 
 
-void LinearImplicitSystem::release_linear_solver(LinearSolver<Number>*) const
+void LinearImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
 {
 }
 

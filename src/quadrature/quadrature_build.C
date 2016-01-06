@@ -39,7 +39,7 @@ namespace libMesh
 
 
 //---------------------------------------------------------------
-UniquePtr<QBase> QBase::build (const std::string &type,
+UniquePtr<QBase> QBase::build (const std::string & type,
                                const unsigned int _dim,
                                const Order _order)
 {

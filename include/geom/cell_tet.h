@@ -40,7 +40,7 @@ public:
    * Default tetrahedral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
-  Tet (const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Tet (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
     Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata),
     _diagonal_selection(INVALID_DIAG)
   {
@@ -174,7 +174,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+  Elem * _elemlinks_data[5+(LIBMESH_DIM>3)];
 
   /**
    * Master element node locations

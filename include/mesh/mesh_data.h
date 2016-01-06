@@ -58,23 +58,23 @@ public:
   // convenient typedefs
   /**
    * A const iterator over the nodal data entries of
-   * \p MeshData.  Use this when a loop over all \p Node*
+   * \p MeshData.  Use this when a loop over all \p Node *
    * in the \p MeshData is wanted.  Note that only const versions
    * are provided.  Also these iterators should @e not be
    * confused with the \p node_iterators provided
    * for the \p Mesh classes!
    */
-  typedef std::map<const Node*, std::vector<Number> >::const_iterator const_node_data_iterator;
+  typedef std::map<const Node *, std::vector<Number> >::const_iterator const_node_data_iterator;
 
   /**
    * A const iterator over the element-associated data entries of
-   * \p MeshData.  Use this when a loop over all \p Node*
+   * \p MeshData.  Use this when a loop over all \p Node *
    * in the \p MeshData is wanted.  Note that only const versions
    * are provided.  Also these iterators should @e not be
    * confused with the \p node_iterators provided
    * for the \p Mesh classes!
    */
-  typedef std::map<const Elem*, std::vector<Number> >::const_iterator const_elem_data_iterator;
+  typedef std::map<const Elem *, std::vector<Number> >::const_iterator const_elem_data_iterator;
 
 
   //----------------------------------------------------------
@@ -82,7 +82,7 @@ public:
    * Default Constructor.  Takes const reference
    * to the mesh it belongs to.
    */
-  MeshData (const MeshBase& m);
+  MeshData (const MeshBase & m);
 
   /**
    * Destructor.
@@ -98,7 +98,7 @@ public:
    * Optionally takes a string that should help the user
    * in identifying the data later on.
    */
-  void activate (const std::string& descriptor="");
+  void activate (const std::string & descriptor="");
 
   /**
    * When the \p MeshData should be used, but was @e not activated
@@ -112,7 +112,7 @@ public:
    * it does @e not create an image of ids when compatibility
    * mode was activated.
    */
-  void enable_compatibility_mode (const std::string& descriptor="");
+  void enable_compatibility_mode (const std::string & descriptor="");
 
   /**
    * Clears the data fields, but leaves the id maps
@@ -146,9 +146,9 @@ public:
    * the \p MeshBase itself (that this \p MeshData belongs
    * to), or its \p BoundaryMesh, cf. \p Mesh.
    */
-  void translate (const MeshBase& out_mesh,
-                  std::vector<Number>& data_values,
-                  std::vector<std::string>& data_names) const;
+  void translate (const MeshBase & out_mesh,
+                  std::vector<Number> & data_values,
+                  std::vector<std::string> & data_names) const;
 
   /**
    * Read mesh data from file named \p name.
@@ -156,13 +156,13 @@ public:
    * prior to this you have to at least either
    * \p close_node_map() or \p close_elem_map().
    */
-  void read (const std::string& name);
+  void read (const std::string & name);
 
   /**
    * Write mesh data to file named \p name.
    * Guess format from the file extension.
    */
-  void write (const std::string& name);
+  void write (const std::string & name);
 
   /**
    * @returns a string containing relevant information
@@ -173,12 +173,12 @@ public:
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out) const;
 
   /**
    * Same as above, but allows you to use the stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const MeshData& m);
+  friend std::ostream & operator << (std::ostream & os, const MeshData & m);
 
 
   //----------------------------------------------------------
@@ -188,14 +188,14 @@ public:
    * with node \p node.  Returns \p libMesh::zero when there
    * is no such \p node in the map.
    */
-  Number operator() (const Node* node,
+  Number operator() (const Node * node,
                      const unsigned int i=0) const;
 
   /**
    * @returns \p true when the node \p node has data,
    * \p false otherwise.
    */
-  bool has_data (const Node* node) const;
+  bool has_data (const Node * node) const;
 
   /**
    * @returns a const reference to the values associated with
@@ -203,13 +203,13 @@ public:
    * when there is no data associated with the node \p node!
    * Check existence through \p has_data() first.
    */
-  const std::vector<Number>& get_data (const Node* node) const;
+  const std::vector<Number> & get_data (const Node * node) const;
 
   /**
    * Sets all the data values associated with
    * the node \p node, overwriting any existing vector
    */
-  void set_data (const Node* node, const std::vector<Number>& val);
+  void set_data (const Node * node, const std::vector<Number> & val);
 
   /**
    * @returns the number of \p Number -type data
@@ -228,14 +228,14 @@ public:
 
   /**
    * Returns the \p MeshData::const_node_data_iterator which points
-   * to the beginning of the \p Node* data containers
+   * to the beginning of the \p Node * data containers
    * used here.
    */
   const_node_data_iterator node_data_begin () const;
 
   /**
    * Returns the \p MeshData::const_node_data_iterator which points
-   * to the end of the \p Node* data containers used here.
+   * to the end of the \p Node * data containers used here.
    */
   const_node_data_iterator node_data_end () const;
 
@@ -245,7 +245,7 @@ public:
    * It is mandatory that there does not yet exist any
    * other node data in this object, that the id maps
    * are closed, that the size of the std::vector's of
-   * each map have identical length and that the Node*
+   * each map have identical length and that the Node *
    * point to nodes of the associated mesh.
    * Note that this method takes a non-const reference
    * and essentially clears the passed-in data.
@@ -254,8 +254,8 @@ public:
    * use the operator() methods etc. If \p false, the
    * user @e has to add element-associated data, too.
    */
-  void insert_node_data (std::map<const Node*,
-                         std::vector<Number> >& nd,
+  void insert_node_data (std::map<const Node *,
+                         std::vector<Number> > & nd,
                          const bool close_elem_data = true);
 
 
@@ -266,14 +266,14 @@ public:
    * with element \p elem.  Returns \p libMesh::zero when there
    * is no data for \p elem in the map.
    */
-  Number operator() (const Elem* elem,
+  Number operator() (const Elem * elem,
                      const unsigned int i=0) const;
 
   /**
    * @returns \p true when the element \p elem has data,
    * \p false otherwise.
    */
-  bool has_data (const Elem* elem) const;
+  bool has_data (const Elem * elem) const;
 
   /**
    * @returns a const reference to the values associated with
@@ -281,13 +281,13 @@ public:
    * when there is no data associated with the element \p elem!
    * Check existence through \p has_data() first.
    */
-  const std::vector<Number>& get_data (const Elem* elem) const;
+  const std::vector<Number> & get_data (const Elem * elem) const;
 
   /**
    * Sets all the data values associated with
    * the element \p elem, overwriting any existing vector
    */
-  void set_data (const Elem* elem, const std::vector<Number> &val);
+  void set_data (const Elem * elem, const std::vector<Number> & val);
 
   /**
    * @returns the number of \p Number -type data
@@ -306,14 +306,14 @@ public:
 
   /**
    * Returns a \p MeshData::const_elem_data_iterators which points
-   * to the beginning of the \p Elem* data containers
+   * to the beginning of the \p Elem * data containers
    * used here.
    */
   const_elem_data_iterator elem_data_begin () const;
 
   /**
    * Returns a \p MeshData::const_elem_data_iterators which points
-   * to the end of the \p Elem* data containers used here.
+   * to the end of the \p Elem * data containers used here.
    */
   const_elem_data_iterator elem_data_end () const;
 
@@ -324,7 +324,7 @@ public:
    * it is imperative that the local \p _elem_data is empty,
    * that the id maps are closed, that the size of the
    * \p std::vector's of each map have identical length
-   * and that the \p Elem* point to elements of the
+   * and that the \p Elem points to elements of the
    * associated mesh.
    * Note that this method takes a non-const reference
    * and essentially clears the passed-in data.
@@ -333,8 +333,7 @@ public:
    * use the operator() methods etc. If \p false, the
    * user @e has to add nodal data, too.
    */
-  void insert_elem_data (std::map<const Elem*,
-                         std::vector<Number> >& ed,
+  void insert_elem_data (std::map<const Elem *, std::vector<Number> > & ed,
                          const bool close_node_data = true);
 
 
@@ -368,24 +367,24 @@ public:
   // Methods for accessing the node and element maps.
   // Heavily used by the \p read() and \p write() methods.
   /**
-   * @returns the \p Node* that this foreign id maps to.
+   * @returns the \p Node * that this foreign id maps to.
    */
-  const Node* foreign_id_to_node (const unsigned int fid) const;
+  const Node * foreign_id_to_node (const unsigned int fid) const;
 
   /**
-   * @returns the \p Elem* that this foreign id maps to.
+   * @returns the \p Elem * that this foreign id maps to.
    */
-  const Elem* foreign_id_to_elem (const unsigned int fid) const;
+  const Elem * foreign_id_to_elem (const unsigned int fid) const;
 
   /**
-   * @returns the foreign id this \p Node* maps to.
+   * @returns the foreign id this \p Node * maps to.
    */
-  unsigned int node_to_foreign_id (const Node* n) const;
+  unsigned int node_to_foreign_id (const Node * n) const;
 
   /**
-   * @returns the foreign id this \p Elem* maps to.
+   * @returns the foreign id this \p Elem * maps to.
    */
-  unsigned int elem_to_foreign_id (const Elem* n) const;
+  unsigned int elem_to_foreign_id (const Elem * n) const;
 
   //----------------------------------------------------------
   // Methods for the header information in universal formated
@@ -400,7 +399,7 @@ public:
    * Set the \p MeshDataUnvHeader data structure that will be
    * used for output.
    */
-  void set_unv_header(MeshDataUnvHeader* unv_header);
+  void set_unv_header(MeshDataUnvHeader * unv_header);
 
 
   /**
@@ -409,7 +408,7 @@ public:
    * from the \p d dimensional mesh to the \p d-1 dimensional mesh
    * (the boundary mesh).
    */
-  void assign (const MeshData& omd);
+  void assign (const MeshData & omd);
 
 
   //----------------------------------------------------------
@@ -419,21 +418,21 @@ public:
   /**
    * In general, \p MeshData gathers nodal data
    * from a file, but it needs to relate this data
-   * with the \p Node* of the current mesh.  Mesh
+   * with the \p Node * of the current mesh.  Mesh
    * importers simply use this method to add such
    * a map.
    */
-  void add_foreign_node_id (const Node* node,
+  void add_foreign_node_id (const Node * node,
                             const unsigned int foreign_node_id);
 
   /**
    * In general, \p MeshData gathers element-associated
    * data from file, but it needs to relate this data
-   * with the \p Elem* of the current mesh.  Mesh
+   * with the \p Elem * of the current mesh.  Mesh
    * importers simply use this method to add such
    * a map.
    */
-  void add_foreign_elem_id (const Elem* elem,
+  void add_foreign_elem_id (const Elem * elem,
                             const unsigned int foreign_elem_id);
 
   /**
@@ -451,14 +450,14 @@ protected:
   /**
    * Read nodal/element oriented data in TetGen format.
    */
-  void read_tetgen (const std::string& name);
+  void read_tetgen (const std::string & name);
 
   /**
    * Read nodal/element oriented data in UNV format,
    * either from an ASCII file or from a gzip'ed ASCII
    * file, using the C++ wrapper \p gzstream to \p zlib.h.
    */
-  void read_unv (const std::string& file_name);
+  void read_unv (const std::string & file_name);
 
   /**
    * Actual implementation of reading nodal/element
@@ -466,14 +465,14 @@ protected:
    * decoupled from \p read_unv() in order to allow
    * reading both \p .unv and \p .unv.gz files.
    */
-  void read_unv_implementation (std::istream& in_file);
+  void read_unv_implementation (std::istream & in_file);
 
   /**
    * Write nodal/element oriented data in UNV format,
    * either to an ASCII file or to a gzip'ed ASCII
    * file, using the C++ wrapper \p gzstream to \p zlib.h.
    */
-  void write_unv (const std::string& file_name);
+  void write_unv (const std::string & file_name);
 
   /**
    * Actual implementation of writing nodal/element
@@ -481,7 +480,7 @@ protected:
    * decoupled from \p write_unv() in order to allow
    * writing both \p .unv and \p .unv.gz files.
    */
-  void write_unv_implementation (std::ostream& out_file);
+  void write_unv_implementation (std::ostream & out_file);
 
 
   /**
@@ -491,7 +490,7 @@ protected:
    * By default uses ASCII format, but may easily
    * be changed setting \p mode to \p DECODE.
    */
-  void read_xdr (const std::string& name,
+  void read_xdr (const std::string & name,
                  const XdrMODE mode = READ);
 
   /**
@@ -500,14 +499,14 @@ protected:
    * By default uses ASCII format, but may easily
    * be changed setting \p mode to \p ENCODE.
    */
-  void write_xdr (const std::string& name,
+  void write_xdr (const std::string & name,
                   const XdrMODE mode = WRITE);
 
 
   /**
    * The mesh this object belongs to
    */
-  const MeshBase& _mesh;
+  const MeshBase & _mesh;
 
   /**
    * Some name the user gave to the data when this
@@ -522,14 +521,14 @@ protected:
    * The map containing pointers to nodes in the mesh
    * and the corresponding data.
    */
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> > _node_data;
 
   /**
    * Maps node pointers to node numbers in the @e foreign
    * format.
    */
-  std::map<const Node*,
+  std::map<const Node *,
            unsigned int> _node_id;
 
   /**
@@ -537,7 +536,7 @@ protected:
    * current mesh.
    */
   std::map<unsigned int,
-           const Node*> _id_node;
+           const Node *> _id_node;
 
 
 
@@ -546,21 +545,21 @@ protected:
   /**
    * Maps element pointers to the element-associated data
    */
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> > _elem_data;
 
   /**
    * Maps element pointers to element labels in the @e foreign
    * format.
    */
-  std::map<const Elem*,
+  std::map<const Elem *,
            unsigned int> _elem_id;
   /**
    * Maps @e foreign element labels to element pointers of the
    * current mesh.
    */
   std::map<unsigned int,
-           const Elem*> _id_elem;
+           const Elem *> _id_elem;
 
 
 
@@ -570,7 +569,7 @@ protected:
    * node-foreign-id maps, and the node-foreign-id maps
    * exist.  Note that these maps may be deleted through
    * \p slim() to save memory.  Then the data is
-   * still accessible through the \p Node* or \p Elem*,
+   * still accessible through the \p Node * or \p Elem *,
    * but the foreign id's are lost.
    */
   bool _node_id_map_closed;
@@ -588,7 +587,7 @@ protected:
    * element-id maps, and the element-id maps exist.
    * Note that these maps may be deleted through
    * \p slim() to save memory.  Then the data is
-   * still accessible through the \p Elem*,
+   * still accessible through the \p Elem *,
    * but the foreign element id's are lost.
    */
   bool _elem_id_map_closed;
@@ -617,7 +616,7 @@ protected:
   /**
    * The header information of universal files.
    */
-  MeshDataUnvHeader* _unv_header;
+  MeshDataUnvHeader * _unv_header;
 
   /**
    * Make the \p MeshDataUnvHeader class a friend.
@@ -706,13 +705,13 @@ public:
    * Assignment operator.  Simply assigns all values from
    \p omduh to \p this.
   */
-  void operator = (const MeshDataUnvHeader& omduh);
+  void operator = (const MeshDataUnvHeader & omduh);
 
   /**
    * @returns \p true when \p this and \p omduh are equal,
    * \p false otherwise.
    */
-  bool operator == (const MeshDataUnvHeader& omduh) const;
+  bool operator == (const MeshDataUnvHeader & omduh) const;
 
   /**
    * Record 1.  User specified analysis dataset label.
@@ -787,12 +786,12 @@ protected:
    * also reads the header information from the
    * stream \p in_file.
    */
-  bool read (std::istream& in_file);
+  bool read (std::istream & in_file);
 
   /**
    * Write the header information to the stream \p out_file.
    */
-  void write (std::ostream& out_file);
+  void write (std::ostream & out_file);
 
 
 private:
@@ -809,7 +808,7 @@ private:
    * \p false otherwise.  Also actually replaces
    * the 'D' by an 'e'.
    */
-  static bool need_D_to_e (std::string& number);
+  static bool need_D_to_e (std::string & number);
 
   /**
    * Make the \p MeshData class a friend.
@@ -826,13 +825,13 @@ private:
 //-------------------------------------------------------------
 // element data inline methods
 inline
-Number MeshData::operator() (const Node* node,
+Number MeshData::operator() (const Node * node,
                              const unsigned int i) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_node_data_closed);
 
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   if (pos == _node_data.end())
@@ -846,12 +845,12 @@ Number MeshData::operator() (const Node* node,
 
 
 inline
-bool MeshData::has_data (const Node* node) const
+bool MeshData::has_data (const Node * node) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_node_data_closed);
 
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   return (pos != _node_data.end());
@@ -860,12 +859,12 @@ bool MeshData::has_data (const Node* node) const
 
 
 inline
-const std::vector<Number>& MeshData::get_data (const Node* node) const
+const std::vector<Number> & MeshData::get_data (const Node * node) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_node_data_closed);
 
-  std::map<const Node*,
+  std::map<const Node *,
            std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
 #ifdef DEBUG
@@ -879,8 +878,8 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
 
 
 inline
-void MeshData::set_data (const Node* node,
-                         const std::vector<Number> &val)
+void MeshData::set_data (const Node * node,
+                         const std::vector<Number> & val)
 {
   this->_node_data[node] = val;
 }
@@ -906,13 +905,13 @@ MeshData::const_node_data_iterator MeshData::node_data_end () const
 //-------------------------------------------------------------
 // element data inline methods
 inline
-Number MeshData::operator() (const Elem* elem,
+Number MeshData::operator() (const Elem * elem,
                              const unsigned int i) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_elem_data_closed);
 
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   if (pos == _elem_data.end())
@@ -926,12 +925,12 @@ Number MeshData::operator() (const Elem* elem,
 
 
 inline
-bool MeshData::has_data (const Elem* elem) const
+bool MeshData::has_data (const Elem * elem) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_elem_data_closed);
 
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   return (pos != _elem_data.end());
@@ -940,12 +939,12 @@ bool MeshData::has_data (const Elem* elem) const
 
 
 inline
-const std::vector<Number>& MeshData::get_data (const Elem* elem) const
+const std::vector<Number> & MeshData::get_data (const Elem * elem) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_elem_data_closed);
 
-  std::map<const Elem*,
+  std::map<const Elem *,
            std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
 #ifdef DEBUG
@@ -959,8 +958,8 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 
 
 inline
-void MeshData::set_data (const Elem* elem,
-                         const std::vector<Number> &val)
+void MeshData::set_data (const Elem * elem,
+                         const std::vector<Number> & val)
 {
   this->_elem_data[elem] = val;
 }
@@ -1018,7 +1017,7 @@ bool MeshData::node_initialized() const
 
 
 inline
-void MeshData::add_foreign_node_id (const Node* node,
+void MeshData::add_foreign_node_id (const Node * node,
                                     const unsigned int foreign_node_id)
 {
   if (_active)
@@ -1031,7 +1030,7 @@ void MeshData::add_foreign_node_id (const Node* node,
       /*
        * _always_ insert in _id_node and _node_id.  If we would
        * use the mesh.node(unsigned int) method or the node.id()
-       * to get Node* and unsigned int, respectively, we would not
+       * to get Node * and unsigned int, respectively, we would not
        * be safe any more when the mesh gets refined or re-numbered
        * within libMesh. And we could get in big trouble that would
        * be hard to find when importing data _after_ having refined...
@@ -1044,7 +1043,7 @@ void MeshData::add_foreign_node_id (const Node* node,
 
 
 inline
-void MeshData::add_foreign_elem_id (const Elem* elem,
+void MeshData::add_foreign_elem_id (const Elem * elem,
                                     const unsigned int foreign_elem_id)
 {
   if (_active)
@@ -1069,7 +1068,7 @@ const MeshDataUnvHeader & MeshData::get_unv_header () const
 
 
 inline
-void MeshData::set_unv_header (MeshDataUnvHeader* unv_header)
+void MeshData::set_unv_header (MeshDataUnvHeader * unv_header)
 {
   libmesh_assert(unv_header);
   this->_unv_header = unv_header;

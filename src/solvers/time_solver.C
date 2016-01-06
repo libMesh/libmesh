@@ -26,7 +26,7 @@ namespace libMesh
 
 
 
-TimeSolver::TimeSolver (sys_type& s)
+TimeSolver::TimeSolver (sys_type & s)
   : quiet (true),
     reduce_deltat_on_diffsolver_failure (0),
     _diff_solver (),

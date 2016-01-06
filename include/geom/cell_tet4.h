@@ -58,7 +58,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet4 (Elem* p=NULL) :
+  Tet4 (Elem * p=NULL) :
     Tet(Tet4::n_nodes(), p, _nodelinks_data)
   {}
 
@@ -145,7 +145,7 @@ public:
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -192,7 +192,7 @@ protected:
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[4];
+  Node * _nodelinks_data[4];
 
 
 

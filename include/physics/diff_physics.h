@@ -106,7 +106,7 @@ public:
   /**
    * Initialize any data structures associated with the physics.
    */
-  virtual void init_physics (const System& sys);
+  virtual void init_physics (const System & sys);
 
   /**
    * Adds the time derivative contribution on \p elem to elem_residual.
@@ -329,7 +329,7 @@ public:
    * themselves.
    */
   virtual bool nonlocal_mass_residual (bool request_jacobian,
-                                       DiffContext &c);
+                                       DiffContext & c);
 
   /**
    * Subtracts a damping vector contribution on \p elem from
@@ -414,20 +414,20 @@ public:
    * This code is experimental.  "Trust but verify, and not in that
    * order"
    */
-  virtual void set_mesh_system(System* sys);
+  virtual void set_mesh_system(System * sys);
 
   /**
    * Returns a const reference to the system with variables corresponding to
    * mesh nodal coordinates, or NULL if the mesh is fixed.
    * Useful for ALE calculations.
    */
-  const System* get_mesh_system() const;
+  const System * get_mesh_system() const;
 
   /**
    * Returns a reference to the system with variables corresponding to
    * mesh nodal coordinates, or NULL if the mesh is fixed.
    */
-  System* get_mesh_system();
+  System * get_mesh_system();
 
   /**
    * Tells the DifferentiablePhysics that variable \p var from the mesh system
@@ -481,7 +481,7 @@ public:
    * pointer-to-member-function when refactoring.
    */
   bool _eulerian_time_deriv (bool request_jacobian,
-                             DiffContext&);
+                             DiffContext &);
 
 
 protected:
@@ -489,7 +489,7 @@ protected:
   /**
    * System from which to acquire moving mesh information
    */
-  System *_mesh_sys;
+  System * _mesh_sys;
 
   /**
    * Variables from which to acquire moving mesh information
@@ -510,7 +510,7 @@ protected:
 
 
 inline
-void DifferentiablePhysics::set_mesh_system(System* sys)
+void DifferentiablePhysics::set_mesh_system(System * sys)
 {
   // For now we assume that we're doing fully coupled mesh motion
   //  if (sys && sys != this)
@@ -554,13 +554,13 @@ void DifferentiablePhysics::set_mesh_z_var (unsigned int var)
 
 
 inline
-const System* DifferentiablePhysics::get_mesh_system() const
+const System * DifferentiablePhysics::get_mesh_system() const
 {
   return _mesh_sys;
 }
 
 inline
-System* DifferentiablePhysics::get_mesh_system()
+System * DifferentiablePhysics::get_mesh_system()
 {
   return _mesh_sys;
 }

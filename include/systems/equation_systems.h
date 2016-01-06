@@ -90,7 +90,7 @@ public:
   /**
    * Constructor.
    */
-  EquationSystems (MeshBase& mesh, MeshData* mesh_data=NULL);
+  EquationSystems (MeshBase & mesh, MeshData * mesh_data=NULL);
 
   /**
    * Destructor.  Should be virtual, since the user may want to derive
@@ -127,30 +127,30 @@ public:
    * @returns true if the system named \p name exists within
    * this EquationSystems object.
    */
-  bool has_system (const std::string& name) const;
+  bool has_system (const std::string & name) const;
 
   /**
    * @returns a constant reference to the system named \p name.
    * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * const SteadySystem & sys = eq.get_system<SteadySystem> ("sys");
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  const T_sys & get_system (const std::string& name) const;
+  const T_sys & get_system (const std::string & name) const;
 
   /**
    * @returns a writeable referene to the system named \p name.
    * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
+   * const SteadySystem & sys = eq.get_system<SteadySystem> ("sys");
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  T_sys & get_system (const std::string& name);
+  T_sys & get_system (const std::string & name);
 
   /**
    * @returns a constant reference to system number \p num.
    * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
+   * const SteadySystem & sys = eq.get_system<SteadySystem> (0);
    * is an example of how the method might be used
    */
   template <typename T_sys>
@@ -159,7 +159,7 @@ public:
   /**
    * @returns a writeable referene to the system number \p num.
    * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
+   * const SteadySystem & sys = eq.get_system<SteadySystem> (0);
    * is an example of how the method might be used
    */
   template <typename T_sys>
@@ -168,12 +168,12 @@ public:
   /**
    * @returns a constant reference to the system named \p name.
    */
-  const System & get_system (const std::string& name) const;
+  const System & get_system (const std::string & name) const;
 
   /**
    * @returns a writeable referene to the system named \p name.
    */
-  System & get_system (const std::string& name);
+  System & get_system (const std::string & name);
 
   /**
    * @returns a constant reference to system number \p num.
@@ -189,21 +189,21 @@ public:
    * Add the system of type \p system_type named \p name to the
    * systems array.
    */
-  virtual System & add_system (const std::string& system_type,
-                               const std::string& name);
+  virtual System & add_system (const std::string & system_type,
+                               const std::string & name);
 
   /**
    * Add the system named \p name to the systems array.
    */
   template <typename T_sys>
-  T_sys & add_system (const std::string& name);
+  T_sys & add_system (const std::string & name);
 
   /**
    * Remove the system named \p name from the systems array.
    * This function is now deprecated - write the
    * libmesh-devel mailing list if you need it reimplemented.
    */
-  void delete_system (const std::string& name);
+  void delete_system (const std::string & name);
 
   /**
    * @returns the total number of variables in all
@@ -241,7 +241,7 @@ public:
    * more sophisticated decoupled problems the user may with to
    * override this behavior in a derived class.
    */
-  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
+  virtual void adjoint_solve (const QoISet & qoi_indices = QoISet());
 
   /**
    * Call \p sensitivity_solve on all the individual equation systems.
@@ -251,7 +251,7 @@ public:
    * more sophisticated decoupled problems the user may with to
    * override this behavior in a derived class.
    */
-  virtual void sensitivity_solve (const ParameterVector& parameters);
+  virtual void sensitivity_solve (const ParameterVector & parameters);
 
   /**
    * Fill the input vector \p var_names with the names
@@ -260,9 +260,9 @@ public:
    * If systems_names!=NULL, only include names from the
    * specified systems.
    */
-  void build_variable_names (std::vector<std::string>& var_names,
-                             const FEType *type=NULL,
-                             const std::set<std::string>* system_names=NULL) const;
+  void build_variable_names (std::vector<std::string> & var_names,
+                             const FEType * type=NULL,
+                             const std::set<std::string> * system_names=NULL) const;
 
   /**
    * Fill the input vector \p soln with the solution values for the
@@ -270,9 +270,9 @@ public:
    * vector \p soln will only be assembled on processor 0, so this
    * method is only applicable to outputting plot files from processor 0.
    */
-  void build_solution_vector (std::vector<Number>& soln,
-                              const std::string& system_name,
-                              const std::string& variable_name = "all_vars") const;
+  void build_solution_vector (std::vector<Number> & soln,
+                              const std::string & system_name,
+                              const std::string & variable_name = "all_vars") const;
 
   /**
    * Fill the input vector \p soln with solution values.  The
@@ -281,8 +281,8 @@ public:
    * If systems_names!=NULL, only include data from the
    * specified systems.
    */
-  void build_solution_vector (std::vector<Number>& soln,
-                              const std::set<std::string>* system_names=NULL) const;
+  void build_solution_vector (std::vector<Number> & soln,
+                              const std::set<std::string> * system_names=NULL) const;
 
   /**
    * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
@@ -299,8 +299,8 @@ public:
    * If systems_names!=NULL, only include data from the
    * specified systems.
    */
-  void build_discontinuous_solution_vector (std::vector<Number>& soln,
-                                            const std::set<std::string>* system_names=NULL) const;
+  void build_discontinuous_solution_vector (std::vector<Number> & soln,
+                                            const std::set<std::string> * system_names=NULL) const;
 
   /**
    * Read & initialize the systems from disk using the XDR data format.
@@ -325,23 +325,23 @@ public:
    * that have two nodes in exactly the same position!
    */
   template <typename InValType>
-  void read (const std::string& name,
+  void read (const std::string & name,
              const XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
-  void read (const std::string& name,
+  void read (const std::string & name,
              const XdrMODE mode,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true)
   { read<Number>(name, mode, read_flags, partition_agnostic); }
 
   template <typename InValType>
-  void read (const std::string& name,
+  void read (const std::string & name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
-  void read (const std::string& name,
+  void read (const std::string & name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true)
   { read<Number>(name, read_flags, partition_agnostic); }
@@ -368,12 +368,12 @@ public:
    * processes.  Note that this renumbering is not compatible with meshes
    * that have two nodes in exactly the same position!
    */
-  void write (const std::string& name,
+  void write (const std::string & name,
               const XdrMODE,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
-  void write (const std::string& name,
+  void write (const std::string & name,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
@@ -383,7 +383,7 @@ public:
    * most of the comparisons to perform to the responsible
    * systems
    */
-  virtual bool compare (const EquationSystems& other_es,
+  virtual bool compare (const EquationSystems & other_es,
                         const Real threshold,
                         const bool verbose) const;
 
@@ -397,12 +397,13 @@ public:
    * Prints information about the equation systems, by default to
    * libMesh::out.
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out) const;
 
   /**
    * Same as above, but allows you to also use stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const EquationSystems& es);
+  friend std::ostream & operator << (std::ostream & os,
+                                     const EquationSystems & es);
 
   /**
    * @returns a constant reference to the mesh
@@ -449,28 +450,28 @@ protected:
   /**
    * The mesh data structure
    */
-  MeshBase& _mesh;
+  MeshBase & _mesh;
 
   /**
    * A pointer to the MeshData object you would like to use.
    * Can be NULL.
    */
-  MeshData* _mesh_data;
+  MeshData * _mesh_data;
 
   /**
    * Data structure holding the systems.
    */
-  std::map<std::string, System*> _systems;
+  std::map<std::string, System *> _systems;
 
   /**
    * Typedef for system iterators
    */
-  typedef std::map<std::string, System*>::iterator       system_iterator;
+  typedef std::map<std::string, System *>::iterator       system_iterator;
 
   /**
    * Typedef for constatnt system iterators
    */
-  typedef std::map<std::string, System*>::const_iterator const_system_iterator;
+  typedef std::map<std::string, System *>::const_iterator const_system_iterator;
 
 private:
 
@@ -485,7 +486,7 @@ private:
    * that have two nodes in exactly the same position!
    */
   template <typename InValType>
-  void _read_impl (const std::string& name,
+  void _read_impl (const std::string & name,
                    const XdrMODE,
                    const unsigned int read_flags,
                    bool partition_agnostic = true);
@@ -551,9 +552,9 @@ unsigned int EquationSystems::n_systems () const
 
 template <typename T_sys>
 inline
-T_sys & EquationSystems::add_system (const std::string& name)
+T_sys & EquationSystems::add_system (const std::string & name)
 {
-  T_sys* ptr = NULL;
+  T_sys * ptr = NULL;
 
   if (!_systems.count(name))
     {
@@ -579,7 +580,7 @@ T_sys & EquationSystems::add_system (const std::string& name)
 
 
 inline
-bool EquationSystems::has_system (const std::string& name) const
+bool EquationSystems::has_system (const std::string & name) const
 {
   if (_systems.find(name) == _systems.end())
     return false;
@@ -608,7 +609,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
     libmesh_error_msg("ERROR: no system number " << num << " found!");
 
   // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  return *cast_ptr<T_sys *>(pos->second);
 }
 
 
@@ -632,7 +633,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
     libmesh_error_msg("ERROR: no system number " << num << " found!");
 
   // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  return *cast_ptr<T_sys *>(pos->second);
 }
 
 
@@ -642,7 +643,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
 
 template <typename T_sys>
 inline
-const T_sys & EquationSystems::get_system (const std::string& name) const
+const T_sys & EquationSystems::get_system (const std::string & name) const
 {
   const_system_iterator pos = _systems.find(name);
 
@@ -651,7 +652,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
     libmesh_error_msg("ERROR: no system named \"" << name << "\" found!");
 
   // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  return *cast_ptr<T_sys *>(pos->second);
 }
 
 
@@ -661,7 +662,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
 
 template <typename T_sys>
 inline
-T_sys & EquationSystems::get_system (const std::string& name)
+T_sys & EquationSystems::get_system (const std::string & name)
 {
   system_iterator pos = _systems.find(name);
 
@@ -670,7 +671,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
     libmesh_error_msg("ERROR: no system named " << name << " found!");
 
   // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  return *cast_ptr<T_sys *>(pos->second);
 }
 
 
@@ -680,7 +681,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
 
 
 inline
-const System & EquationSystems::get_system (const std::string& name) const
+const System & EquationSystems::get_system (const std::string & name) const
 {
   return this->get_system<System>(name);
 }
@@ -688,7 +689,7 @@ const System & EquationSystems::get_system (const std::string& name) const
 
 
 inline
-System & EquationSystems::get_system (const std::string& name)
+System & EquationSystems::get_system (const std::string & name)
 {
   return this->get_system<System>(name);
 }

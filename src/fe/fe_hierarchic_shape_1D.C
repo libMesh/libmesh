@@ -33,7 +33,7 @@ template <>
 Real FE<1,HIERARCHIC>::shape(const ElemType,
                              const Order libmesh_dbg_var(order),
                              const unsigned int i,
-                             const Point& p)
+                             const Point & p)
 {
   libmesh_assert_less (i, order+1u);
 
@@ -98,10 +98,10 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-Real FE<1,HIERARCHIC>::shape(const Elem* elem,
+Real FE<1,HIERARCHIC>::shape(const Elem * elem,
                              const Order order,
                              const unsigned int i,
-                             const Point& p)
+                             const Point & p)
 {
   libmesh_assert(elem);
 
@@ -115,7 +115,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
                                    const Order libmesh_dbg_var(order),
                                    const unsigned int i,
                                    const unsigned int libmesh_dbg_var(j),
-                                   const Point& p)
+                                   const Point & p)
 {
   // only d()/dxi in 1D!
 
@@ -182,11 +182,11 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,HIERARCHIC>::shape_deriv(const Elem* elem,
+Real FE<1,HIERARCHIC>::shape_deriv(const Elem * elem,
                                    const Order order,
                                    const unsigned int i,
                                    const unsigned int j,
-                                   const Point& p)
+                                   const Point & p)
 {
   libmesh_assert(elem);
 
@@ -201,7 +201,7 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
                                           const Order libmesh_dbg_var(order),
                                           const unsigned int i,
                                           const unsigned int libmesh_dbg_var(j),
-                                          const Point& p)
+                                          const Point & p)
 {
   // only d2()/d2xi in 1D!
 
@@ -265,11 +265,11 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem* elem,
+Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                           const Order order,
                                           const unsigned int i,
                                           const unsigned int j,
-                                          const Point& p)
+                                          const Point & p)
 {
   libmesh_assert(elem);
 

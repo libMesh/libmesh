@@ -26,7 +26,7 @@ namespace libMesh
 
 
 
-TwostepTimeSolver::TwostepTimeSolver (sys_type& s)
+TwostepTimeSolver::TwostepTimeSolver (sys_type & s)
   : AdaptiveTimeSolver(s)
 
 {

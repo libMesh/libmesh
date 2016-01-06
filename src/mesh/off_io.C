@@ -32,7 +32,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // OFFIO class members
 
-void OFFIO::read(const std::string& name)
+void OFFIO::read(const std::string & name)
 {
   std::ifstream in (name.c_str());
 
@@ -41,7 +41,7 @@ void OFFIO::read(const std::string& name)
 
 
 
-void OFFIO::read_stream(std::istream& in)
+void OFFIO::read_stream(std::istream & in)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -49,7 +49,7 @@ void OFFIO::read_stream(std::istream& in)
   libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 
   // Get a reference to the mesh
-  MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & the_mesh = MeshInput<MeshBase>::mesh();
 
   // Clear any existing mesh data
   the_mesh.clear();
@@ -106,7 +106,7 @@ void OFFIO::read_stream(std::istream& in)
             }
         }
 
-      Elem* elem;
+      Elem * elem;
       switch (nv)
         {
         case 2:

@@ -35,8 +35,7 @@ namespace libMesh
 class MeshFunctionSolutionTransfer : public SolutionTransfer
 {
 public:
-  MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator
-                               &comm LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator & comm LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
   virtual ~MeshFunctionSolutionTransfer();
 
   /**

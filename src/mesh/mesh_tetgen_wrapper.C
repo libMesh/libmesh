@@ -77,7 +77,7 @@ void TetGenWrapper::set_numberofpoints(int i)
 
 
 
-void TetGenWrapper::get_output_node(unsigned i, REAL& x, REAL& y, REAL& z)
+void TetGenWrapper::get_output_node(unsigned i, REAL & x, REAL & y, REAL & z)
 {
   // Bounds checking...
   if (i >= static_cast<unsigned>(tetgen_output->numberofpoints))
@@ -156,10 +156,10 @@ void TetGenWrapper::allocate_pointlist(int numofpoints)
 
 
 
-void TetGenWrapper::set_switches(const std::string& s)
+void TetGenWrapper::set_switches(const std::string & s)
 {
   // A temporary buffer for passing to the C API, it requires
-  // a char*, not a const char*...
+  // a char *, not a const char *...
   char buffer[256];
 
   // Make sure char buffer has enough room

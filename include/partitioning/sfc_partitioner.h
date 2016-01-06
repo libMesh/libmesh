@@ -58,7 +58,7 @@ public:
    * Sets the type of space-filling curve to use.  Valid types are
    * "Hilbert" (the default) and "Morton"
    */
-  void set_sfc_type (const std::string& sfc_type);
+  void set_sfc_type (const std::string & sfc_type);
 
 
 protected:
@@ -66,7 +66,7 @@ protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void _do_partition (MeshBase& mesh,
+  virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) libmesh_override;
 
 
@@ -83,7 +83,7 @@ private:
 // ------------------------------------------------------------
 // LinearPartitioner inline members
 inline
-void SFCPartitioner::set_sfc_type (const std::string& sfc_type)
+void SFCPartitioner::set_sfc_type (const std::string & sfc_type)
 {
   libmesh_assert ((sfc_type == "Hilbert") ||
                   (sfc_type == "Morton"));

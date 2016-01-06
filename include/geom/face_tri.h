@@ -61,8 +61,8 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Tri (const unsigned int nn,
-       Elem* p,
-       Node** nodelinkdata) :
+       Elem * p,
+       Node ** nodelinkdata) :
     Face(nn, Tri::n_sides(), p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
@@ -159,7 +159,7 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[4+(LIBMESH_DIM>2)];
+  Elem * _elemlinks_data[4+(LIBMESH_DIM>2)];
 
   /**
    * Master element node locations

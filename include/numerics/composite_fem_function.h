@@ -48,8 +48,8 @@ public:
   // Attach a new subfunction, along with a map from the indices of
   // that subfunction to the indices of the global function.
   // (*this)(index_map[i]) will return f(i).
-  void attach_subfunction (const FEMFunctionBase<Output>& f,
-                           const std::vector<unsigned int>& index_map)
+  void attach_subfunction (const FEMFunctionBase<Output> & f,
+                           const std::vector<unsigned int> & index_map)
   {
     const unsigned int subfunction_index = subfunctions.size();
     libmesh_assert_equal_to(subfunctions.size(), index_maps.size());
@@ -77,17 +77,17 @@ public:
       }
   }
 
-  virtual Output operator() (const FEMContext& c,
-                             const Point& p,
+  virtual Output operator() (const FEMContext & c,
+                             const Point & p,
                              const Real time = 0) libmesh_override
   {
     return this->component(c,0,p,time);
   }
 
-  virtual void operator() (const FEMContext& c,
-                           const Point& p,
+  virtual void operator() (const FEMContext & c,
+                           const Point & p,
                            const Real time,
-                           DenseVector<Output>& output) libmesh_override
+                           DenseVector<Output> & output) libmesh_override
   {
     libmesh_assert_greater_equal (output.size(),
                                   reverse_index_map.size());
@@ -110,9 +110,9 @@ public:
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
-  virtual Output component (const FEMContext& c,
+  virtual Output component (const FEMContext & c,
                             unsigned int i,
-                            const Point& p,
+                            const Point & p,
                             Real time) libmesh_override
   {
     if (i >= reverse_index_map.size() ||
@@ -129,7 +129,7 @@ public:
 
   virtual UniquePtr<FEMFunctionBase<Output> > clone() const libmesh_override
   {
-    CompositeFEMFunction* returnval = new CompositeFEMFunction();
+    CompositeFEMFunction * returnval = new CompositeFEMFunction();
     for (unsigned int i=0; i != subfunctions.size(); ++i)
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
     return UniquePtr<FEMFunctionBase<Output> > (returnval);

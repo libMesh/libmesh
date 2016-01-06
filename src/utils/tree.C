@@ -34,7 +34,7 @@ namespace libMesh
 
 // constructor
 template <unsigned int N>
-Tree<N>::Tree (const MeshBase& m,
+Tree<N>::Tree (const MeshBase & m,
                unsigned int target_bin_size,
                const Trees::BuildType bt) :
   TreeBase(m),
@@ -64,7 +64,7 @@ Tree<N>::Tree (const MeshBase& m,
       // Now the tree contains the nodes.
       // However, we want element pointers, so here we
       // convert between the two.
-      std::vector<std::vector<const Elem*> > nodes_to_elem;
+      std::vector<std::vector<const Elem *> > nodes_to_elem;
 
       MeshTools::build_nodes_to_elem_map (mesh, nodes_to_elem);
       root.transform_nodes_to_elements (nodes_to_elem);
@@ -112,7 +112,7 @@ Tree<N>::Tree (const MeshBase& m,
 
 // copy-constructor is not implemented
 template <unsigned int N>
-Tree<N>::Tree (const Tree<N>& other_tree) :
+Tree<N>::Tree (const Tree<N> & other_tree) :
   TreeBase   (other_tree),
   root       (other_tree.root),
   build_type (other_tree.build_type)
@@ -126,7 +126,7 @@ Tree<N>::Tree (const Tree<N>& other_tree) :
 
 
 template <unsigned int N>
-void Tree<N>::print_nodes(std::ostream& my_out) const
+void Tree<N>::print_nodes(std::ostream & my_out) const
 {
   my_out << "Printing nodes...\n";
   root.print_nodes(my_out);
@@ -135,7 +135,7 @@ void Tree<N>::print_nodes(std::ostream& my_out) const
 
 
 template <unsigned int N>
-void Tree<N>::print_elements(std::ostream& my_out) const
+void Tree<N>::print_elements(std::ostream & my_out) const
 {
   my_out << "Printing elements...\n";
   root.print_elements(my_out);
@@ -144,11 +144,10 @@ void Tree<N>::print_elements(std::ostream& my_out) const
 
 
 template <unsigned int N>
-const Elem*
-Tree<N>::find_element
-(const Point& p,
- const std::set<subdomain_id_type> *allowed_subdomains,
- Real relative_tol) const
+const Elem *
+Tree<N>::find_element (const Point & p,
+                       const std::set<subdomain_id_type> * allowed_subdomains,
+                       Real relative_tol) const
 {
   return root.find_element(p, allowed_subdomains, relative_tol);
 }
@@ -156,9 +155,9 @@ Tree<N>::find_element
 
 
 template <unsigned int N>
-const Elem*
-Tree<N>::operator() (const Point& p,
-                     const std::set<subdomain_id_type> *allowed_subdomains,
+const Elem *
+Tree<N>::operator() (const Point & p,
+                     const std::set<subdomain_id_type> * allowed_subdomains,
                      Real relative_tol) const
 {
   return this->find_element(p, allowed_subdomains, relative_tol);

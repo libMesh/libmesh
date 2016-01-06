@@ -47,7 +47,7 @@ template <typename T> class NumericVector;
 // This template helper function must be declared before it
 // can be defined below.
 template <typename T>
-std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
+std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m);
 
 
 /**
@@ -82,7 +82,7 @@ public:
    * \p init(...).
    */
   explicit
-  SparseMatrix (const Parallel::Communicator &comm
+  SparseMatrix (const Parallel::Communicator & comm
                 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -97,7 +97,7 @@ public:
    * \p solver_package
    */
   static UniquePtr<SparseMatrix<T> >
-  build(const Parallel::Communicator &comm,
+  build(const Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
@@ -109,7 +109,7 @@ public:
   /**
    * Get a pointer to the \p DofMap to use.
    */
-  void attach_dof_map (const DofMap& dof_map)
+  void attach_dof_map (const DofMap & dof_map)
   { _dof_map = &dof_map; }
 
   /**
@@ -229,16 +229,16 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-  virtual void add_matrix (const DenseMatrix<T> &dm,
-                           const std::vector<numeric_index_type> &rows,
-                           const std::vector<numeric_index_type> &cols) = 0;
+  virtual void add_matrix (const DenseMatrix<T> & dm,
+                           const std::vector<numeric_index_type> & rows,
+                           const std::vector<numeric_index_type> & cols) = 0;
 
   /**
    * Same as \p add_matrix, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_matrix (const DenseMatrix<T> &dm,
-                           const std::vector<numeric_index_type> &dof_indices) = 0;
+  virtual void add_matrix (const DenseMatrix<T> & dm,
+                           const std::vector<numeric_index_type> & dof_indices) = 0;
 
   /**
    * Add the full matrix \p dm to the
@@ -247,16 +247,16 @@ public:
    * at assembly time.  The matrix is assumed blocked, and \p brow, \p bcol
    * correspond to the *block* row, columm indices.
    */
-  virtual void add_block_matrix (const DenseMatrix<T> &dm,
-                                 const std::vector<numeric_index_type> &brows,
-                                 const std::vector<numeric_index_type> &bcols);
+  virtual void add_block_matrix (const DenseMatrix<T> & dm,
+                                 const std::vector<numeric_index_type> & brows,
+                                 const std::vector<numeric_index_type> & bcols);
 
   /**
    * Same as \p add_block_matrix , but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
-  virtual void add_block_matrix (const DenseMatrix<T> &dm,
-                                 const std::vector<numeric_index_type> &dof_indices)
+  virtual void add_block_matrix (const DenseMatrix<T> & dm,
+                                 const std::vector<numeric_index_type> & dof_indices)
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
@@ -312,40 +312,40 @@ public:
    * in a uniform style, regardless of matrix/solver
    * package being used.
    */
-  void print(std::ostream& os=libMesh::out, const bool sparse=false) const;
+  void print(std::ostream & os=libMesh::out, const bool sparse=false) const;
 
   /**
    * Same as the print method above, but allows you
    * to print to a stream in the standard syntax.
    *
    * template <typename U>
-   * friend std::ostream& operator << (std::ostream& os, const SparseMatrix<U>& m);
+   * friend std::ostream & operator << (std::ostream & os, const SparseMatrix<U> & m);
    *
    * Obscure C++ note 1: the above syntax, which does not require any
    * prior declaration of operator<<, declares *any* instantiation of
    * SparseMatrix<X> is friend to *any* instantiation of
-   * operator<<(ostream&, SparseMatrix<Y>&).  It would not happen in
+   * operator<<(ostream &, SparseMatrix<Y> &).  It would not happen in
    * practice, but in principle it means that SparseMatrix<Complex>
-   * would be friend to operator<<(ostream&, SparseMatrix<Real>).
+   * would be friend to operator<<(ostream &, SparseMatrix<Real>).
    *
    * Obscure C++ note 2: The form below, which requires a previous
-   * declaration of the operator<<(stream&, SparseMatrix<T>&) function
+   * declaration of the operator<<(stream &, SparseMatrix<T> &) function
    * (see top of this file), means that any instantiation of
    * SparseMatrix<T> is friend to the specialization
-   * operator<<(ostream&, SparseMatrix<T>&), but e.g. SparseMatrix<U>
+   * operator<<(ostream &, SparseMatrix<T> &), but e.g. SparseMatrix<U>
    * is *not* friend to the same function.  So this is slightly
    * different to the form above...
    *
    * This method seems to be the "preferred" technique, see
    * http://www.parashift.com/c++-faq-lite/template-friends.html
    */
-  friend std::ostream& operator << <>(std::ostream& os, const SparseMatrix<T>& m);
+  friend std::ostream & operator << <>(std::ostream & os, const SparseMatrix<T> & m);
 
   /**
    * Print the contents of the matrix to the screen
    * in a package-personalized style, if available.
    */
-  virtual void print_personal(std::ostream& os=libMesh::out) const = 0;
+  virtual void print_personal(std::ostream & os=libMesh::out) const = 0;
 
   /**
    * Print the contents of the matrix in Matlab's
@@ -353,7 +353,7 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string& /*name*/ = "") const
+  virtual void print_matlab(const std::string & /*name*/ = "") const
   {
     libmesh_not_implemented();
   }
@@ -363,9 +363,9 @@ public:
    * by the row and column indices given in the "rows" and "cols" entries.
    * Currently this operation is only defined for the PetscMatrix type.
    */
-  virtual void create_submatrix(SparseMatrix<T>& submatrix,
-                                const std::vector<numeric_index_type>& rows,
-                                const std::vector<numeric_index_type>& cols) const
+  virtual void create_submatrix(SparseMatrix<T> & submatrix,
+                                const std::vector<numeric_index_type> & rows,
+                                const std::vector<numeric_index_type> & cols) const
   {
     this->_get_submatrix(submatrix,
                          rows,
@@ -379,9 +379,9 @@ public:
    * it again.  This should hopefully be more efficient if you are frequently
    * extracting submatrices of the same size.
    */
-  virtual void reinit_submatrix(SparseMatrix<T>& submatrix,
-                                const std::vector<numeric_index_type>& rows,
-                                const std::vector<numeric_index_type>& cols) const
+  virtual void reinit_submatrix(SparseMatrix<T> & submatrix,
+                                const std::vector<numeric_index_type> & rows,
+                                const std::vector<numeric_index_type> & cols) const
   {
     this->_get_submatrix(submatrix,
                          rows,
@@ -393,25 +393,25 @@ public:
    * Multiplies the matrix with \p arg and stores the result in \p
    * dest.
    */
-  void vector_mult (NumericVector<T>& dest,
-                    const NumericVector<T>& arg) const;
+  void vector_mult (NumericVector<T> & dest,
+                    const NumericVector<T> & arg) const;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
-  void vector_mult_add (NumericVector<T>& dest,
-                        const NumericVector<T>& arg) const;
+  void vector_mult_add (NumericVector<T> & dest,
+                        const NumericVector<T> & arg) const;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const = 0;
+  virtual void get_diagonal (NumericVector<T> & dest) const = 0;
 
   /**
    * Copies the transpose of the matrix into \p dest, which may be
    * *this.
    */
-  virtual void get_transpose (SparseMatrix<T>& dest) const = 0;
+  virtual void get_transpose (SparseMatrix<T> & dest) const = 0;
 
 protected:
 
@@ -420,9 +420,9 @@ protected:
    * routines.  Note that this function must be redefined in derived classes
    * for it to work properly!
    */
-  virtual void _get_submatrix(SparseMatrix<T>& ,
-                              const std::vector<numeric_index_type>& ,
-                              const std::vector<numeric_index_type>& ,
+  virtual void _get_submatrix(SparseMatrix<T> & ,
+                              const std::vector<numeric_index_type> & ,
+                              const std::vector<numeric_index_type> & ,
                               const bool) const
   {
     libmesh_not_implemented();
@@ -431,7 +431,7 @@ protected:
   /**
    * The \p DofMap object associated with this object.
    */
-  DofMap const *_dof_map;
+  DofMap const * _dof_map;
 
   /**
    * Flag indicating whether or not the matrix
@@ -451,7 +451,7 @@ protected:
 // It's generally easier to define these friend functions in the header
 // file.
 template <typename T>
-std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
+std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m)
 {
   m.print(os);
   return os;

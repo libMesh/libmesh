@@ -27,7 +27,7 @@
 namespace libMesh
 {
 
-MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator &comm_in) :
+MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator & comm_in) :
   SolutionTransfer(comm_in)
 {}
 
@@ -35,7 +35,8 @@ MeshFunctionSolutionTransfer::~MeshFunctionSolutionTransfer()
 {}
 
 void
-MeshFunctionSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
+MeshFunctionSolutionTransfer::transfer(const Variable & from_var,
+                                       const Variable & to_var)
 {
   // This only works when transferring to a Lagrange variable
   libmesh_assert(to_var.type().family == LAGRANGE);

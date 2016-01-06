@@ -212,7 +212,7 @@ UniquePtr<Elem> Hex27::build_side (const unsigned int i,
 
   else
     {
-      Elem* face = new Quad9;
+      Elem * face = new Quad9;
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
@@ -238,7 +238,7 @@ UniquePtr<Elem> Hex27::build_edge (const unsigned int i) const
 
 void Hex27::connectivity(const unsigned int sc,
                          const IOPackage iop,
-                         std::vector<dof_id_type>& conn) const
+                         std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

@@ -38,7 +38,7 @@ namespace libMesh
 //EpetraMatrix members
 
 template <typename T>
-void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
+void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sparsity_pattern)
 {
   // clear data, start over
   this->clear ();
@@ -80,8 +80,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
 
-  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
+  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
   libmesh_assert_equal_to (n_nz.size(), n_l);
@@ -239,9 +239,9 @@ Real EpetraMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                 const std::vector<numeric_index_type>& rows,
-                                 const std::vector<numeric_index_type>& cols)
+void EpetraMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
+                                 const std::vector<numeric_index_type> & rows,
+                                 const std::vector<numeric_index_type> & cols)
 {
   libmesh_assert (this->initialized());
 
@@ -260,10 +260,10 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 template <typename T>
-void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
+void EpetraMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 {
   // Convert vector to EpetraVector.
-  EpetraVector<T>* epetra_dest = cast_ptr<EpetraVector<T>*>(&dest);
+  EpetraVector<T> * epetra_dest = cast_ptr<EpetraVector<T> *>(&dest);
 
   // Call Epetra function.
   _mat->ExtractDiagonalCopy(*(epetra_dest->vec()));
@@ -272,10 +272,10 @@ void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 
 
 template <typename T>
-void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
+void EpetraMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
 {
   // Make sure the SparseMatrix passed in is really a EpetraMatrix
-  EpetraMatrix<T>& epetra_dest = cast_ref<EpetraMatrix<T>&>(dest);
+  EpetraMatrix<T> & epetra_dest = cast_ref<EpetraMatrix<T> &>(dest);
 
   if(&epetra_dest != this)
     epetra_dest = *this;
@@ -287,7 +287,7 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 
 
 template <typename T>
-EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm) :
+EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator & comm) :
   SparseMatrix<T>(comm),
   _destroy_mat_on_exit(true),
   _use_transpose(false)
@@ -298,7 +298,7 @@ EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm) :
 
 template <typename T>
 EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m,
-                              const Parallel::Communicator &comm) :
+                              const Parallel::Communicator & comm) :
   SparseMatrix<T>(comm),
   _destroy_mat_on_exit(false),
   _use_transpose(false) // dumb guess is the best we can do...
@@ -410,8 +410,8 @@ void EpetraMatrix<T>::add (const numeric_index_type i,
 
 
 template <typename T>
-void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                 const std::vector<numeric_index_type>& dof_indices)
+void EpetraMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
+                                 const std::vector<numeric_index_type> & dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -419,7 +419,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 template <typename T>
-void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
 {
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRAEXT
   libmesh_assert (this->initialized());
@@ -429,7 +429,7 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  EpetraMatrix<T>* X = cast_ptr<EpetraMatrix<T>*> (&X_in);
+  EpetraMatrix<T> * X = cast_ptr<EpetraMatrix<T> *> (&X_in);
 
   EpetraExt::MatrixMatrix::Add (*X->_mat, false, a_in, *_mat, 1.);
 #else
@@ -451,8 +451,9 @@ T EpetraMatrix<T>::operator () (const numeric_index_type i,
   libmesh_assert_less (i, this->row_stop());
 
 
-  int row_length, *row_indices;
-  double *values;
+  int row_length;
+  int * row_indices;
+  double * values;
 
   _mat->ExtractMyRowView (i-this->row_start(),
                           row_length,
@@ -461,7 +462,7 @@ T EpetraMatrix<T>::operator () (const numeric_index_type i,
 
   //libMesh::out << "row_length=" << row_length << std::endl;
 
-  int *index = std::lower_bound (row_indices, row_indices+row_length, j);
+  int * index = std::lower_bound (row_indices, row_indices+row_length, j);
 
   libmesh_assert_less (*index, row_length);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(row_indices[*index]), j);
@@ -496,7 +497,7 @@ void EpetraMatrix<T>::swap(EpetraMatrix<T> & m)
 
 
 template <typename T>
-void EpetraMatrix<T>::print_personal(std::ostream& os) const
+void EpetraMatrix<T>::print_personal(std::ostream & os) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert(_mat);

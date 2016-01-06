@@ -75,7 +75,7 @@ std::map<std::string, ElemType> UCDIO::build_reading_element_map()
 }
 
 
-void UCDIO::read (const std::string& file_name)
+void UCDIO::read (const std::string & file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
@@ -96,7 +96,7 @@ void UCDIO::read (const std::string& file_name)
 
 
 
-void UCDIO::write (const std::string& file_name)
+void UCDIO::write (const std::string & file_name)
 {
   if (file_name.rfind(".gz") < file_name.size())
     {
@@ -117,7 +117,7 @@ void UCDIO::write (const std::string& file_name)
 
 
 
-void UCDIO::read_implementation (std::istream& in)
+void UCDIO::read_implementation (std::istream & in)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -127,7 +127,7 @@ void UCDIO::read_implementation (std::istream& in)
   // Check input buffer
   libmesh_assert (in.good());
 
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Keep track of what kinds of elements this file contains
   elems_of_dimension.clear();
@@ -232,11 +232,11 @@ void UCDIO::read_implementation (std::istream& in)
 
 
 
-void UCDIO::write_implementation (std::ostream& out_stream)
+void UCDIO::write_implementation (std::ostream & out_stream)
 {
   libmesh_assert (out_stream.good());
 
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // UCD doesn't work any dimension except 3?
   if (mesh.mesh_dimension() != 3)
@@ -255,8 +255,8 @@ void UCDIO::write_implementation (std::ostream& out_stream)
 
 
 
-void UCDIO::write_header(std::ostream& out_stream,
-                         const MeshBase& mesh,
+void UCDIO::write_header(std::ostream & out_stream,
+                         const MeshBase & mesh,
                          dof_id_type n_elems,
                          unsigned int n_vars)
 {
@@ -274,8 +274,8 @@ void UCDIO::write_header(std::ostream& out_stream,
 
 
 
-void UCDIO::write_nodes(std::ostream& out_stream,
-                        const MeshBase& mesh)
+void UCDIO::write_nodes(std::ostream & out_stream,
+                        const MeshBase & mesh)
 {
   MeshBase::const_node_iterator       it  = mesh.nodes_begin();
   const MeshBase::const_node_iterator end = mesh.nodes_end();
@@ -295,8 +295,8 @@ void UCDIO::write_nodes(std::ostream& out_stream,
 
 
 
-void UCDIO::write_interior_elems(std::ostream& out_stream,
-                                 const MeshBase& mesh)
+void UCDIO::write_interior_elems(std::ostream & out_stream,
+                                 const MeshBase & mesh)
 {
   MeshBase::const_element_iterator it  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
@@ -326,11 +326,11 @@ void UCDIO::write_interior_elems(std::ostream& out_stream,
 
 
 
-void UCDIO::write_nodal_data(const std::string& fname,
-                             const std::vector<Number>&soln,
-                             const std::vector<std::string>& names)
+void UCDIO::write_nodal_data(const std::string & fname,
+                             const std::vector<Number> & soln,
+                             const std::vector<std::string> & names)
 {
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   const dof_id_type n_elem = mesh.n_elem();
 
@@ -359,10 +359,10 @@ void UCDIO::write_nodal_data(const std::string& fname,
 
 
 
-void UCDIO::write_soln(std::ostream& out_stream,
-                       const MeshBase& mesh,
-                       const std::vector<std::string>& names,
-                       const std::vector<Number>&soln)
+void UCDIO::write_soln(std::ostream & out_stream,
+                       const MeshBase & mesh,
+                       const std::vector<std::string> & names,
+                       const std::vector<Number> & soln)
 {
   libmesh_assert (out_stream.good());
 

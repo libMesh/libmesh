@@ -65,11 +65,12 @@ class BoundingBox : public std::pair<Point, Point>
 {
 public:
 
-  BoundingBox (const Point &new_min, const Point &new_max) :
+  BoundingBox (const Point & new_min,
+               const Point & new_max) :
     std::pair<Point, Point>(new_min, new_max)
   {}
 
-  BoundingBox (const std::pair<Point, Point> &bbox) :
+  BoundingBox (const std::pair<Point, Point> & bbox) :
     std::pair<Point, Point> (bbox)
   {}
 
@@ -118,7 +119,7 @@ private:
  * A feasible load balancing scheme is to keep the weight per processor as
  * uniform as possible.
  */
-dof_id_type total_weight (const MeshBase &mesh);
+dof_id_type total_weight (const MeshBase & mesh);
 
 /**
  * This function returns the sum over all the elemenents on processor \p pid
@@ -126,10 +127,11 @@ dof_id_type total_weight (const MeshBase &mesh);
  * A feasible load balancing scheme is to keep the weight per processor as
  * uniform as possible.
  */
-dof_id_type weight (const MeshBase &mesh, const processor_id_type pid);
+dof_id_type weight (const MeshBase & mesh,
+                    const processor_id_type pid);
 
 inline
-dof_id_type weight (const MeshBase &mesh)
+dof_id_type weight (const MeshBase & mesh)
 { return MeshTools::weight (mesh, mesh.processor_id()); }
 
 /**
@@ -138,14 +140,14 @@ dof_id_type weight (const MeshBase &mesh)
  * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
  * element connected to node \p i.
  */
-void build_nodes_to_elem_map (const MeshBase &mesh,
-                              std::vector<std::vector<dof_id_type> > &nodes_to_elem_map);
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::vector<std::vector<dof_id_type> > & nodes_to_elem_map);
 
 /**
  * The same, except element pointers are returned instead of indices.
  */
-void build_nodes_to_elem_map (const MeshBase &mesh,
-                              std::vector<std::vector<const Elem*> >&nodes_to_elem_map);
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::vector<std::vector<const Elem *> > & nodes_to_elem_map);
 
 
 //   /**
@@ -153,14 +155,14 @@ void build_nodes_to_elem_map (const MeshBase &mesh,
 //    * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
 //    * and \p QUAD9s will be converted to \p TRI6s.
 //    */
-//   void all_tri (MeshBase &mesh);
+//   void all_tri (MeshBase & mesh);
 
 /**
  * Fills the vector "on_boundary" with flags that tell whether each node
  * is on the domain boundary (true)) or not (false).
  */
-void find_boundary_nodes (const MeshBase &mesh,
-                          std::vector<bool> &on_boundary);
+void find_boundary_nodes (const MeshBase & mesh,
+                          std::vector<bool> & on_boundary);
 
 /**
  * @returns two points defining a cartesian box that bounds the
@@ -168,27 +170,27 @@ void find_boundary_nodes (const MeshBase &mesh,
  * is the maximim.
  */
 BoundingBox
-bounding_box (const MeshBase &mesh);
+bounding_box (const MeshBase & mesh);
 
 /**
  * Same, but returns a sphere instead of a box.
  */
 Sphere
-bounding_sphere (const MeshBase &mesh);
+bounding_sphere (const MeshBase & mesh);
 
 /**
  * @returns two points defining a cartesian box that bounds the
  * elements belonging to processor pid.
  */
 BoundingBox
-processor_bounding_box (const MeshBase &mesh,
+processor_bounding_box (const MeshBase & mesh,
                         const processor_id_type pid);
 
 /**
  * Same, but returns a sphere instead of a box.
  */
 Sphere
-processor_bounding_sphere (const MeshBase &mesh,
+processor_bounding_sphere (const MeshBase & mesh,
                            const processor_id_type pid);
 
 /**
@@ -196,14 +198,14 @@ processor_bounding_sphere (const MeshBase &mesh,
  * elements belonging to subdomain sid.
  */
 BoundingBox
-subdomain_bounding_box (const MeshBase &mesh,
+subdomain_bounding_box (const MeshBase & mesh,
                         const subdomain_id_type sid);
 
 /**
  * Same, but returns a sphere instead of a box.
  */
 Sphere
-subdomain_bounding_sphere (const MeshBase &mesh,
+subdomain_bounding_sphere (const MeshBase & mesh,
                            const subdomain_id_type sid);
 
 
@@ -211,21 +213,21 @@ subdomain_bounding_sphere (const MeshBase &mesh,
  * Return a vector of all element types for the mesh.  Implemented
  * in terms of element_iterators.
  */
-void elem_types (const MeshBase &mesh,
-                 std::vector<ElemType> &et);
+void elem_types (const MeshBase & mesh,
+                 std::vector<ElemType> & et);
 
 /**
  * Return the number of elements of type \p type.  Implemented
  * in terms of type_element_iterators.
  */
-dof_id_type n_elem_of_type (const MeshBase &mesh,
+dof_id_type n_elem_of_type (const MeshBase & mesh,
                             const ElemType type);
 
 /**
  * Return the number of active elements of type \p type.
  * Implemented in terms of active_type_element_iterators.
  */
-dof_id_type n_active_elem_of_type (const MeshBase &mesh,
+dof_id_type n_active_elem_of_type (const MeshBase & mesh,
                                    const ElemType type);
 
 /**
@@ -236,7 +238,7 @@ dof_id_type n_active_elem_of_type (const MeshBase &mesh,
  * a single function which takes a range of iterators and returns the
  * std::distance between them.
  */
-dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase &mesh,
+dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
                                                   const ElemType type,
                                                   const unsigned int level);
 
@@ -245,35 +247,35 @@ dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase &mesh,
  * Implemented by looping over all the local elements and finding the
  * maximum level, then summing in parallel.
  */
-unsigned int n_levels(const MeshBase &mesh);
+unsigned int n_levels(const MeshBase & mesh);
 
 /**
  * Return the number of levels of refinement in the local mesh.
  * Implemented by looping over all the local elements and finding the
  * maximum level.
  */
-unsigned int n_local_levels(const MeshBase &mesh);
+unsigned int n_local_levels(const MeshBase & mesh);
 
 /**
  * Return the number of levels of refinement in the active mesh.
  * Implemented by looping over all the active local elements and finding
  * the maximum level, then maxxing in parallel.
  */
-unsigned int n_active_levels(const MeshBase &mesh);
+unsigned int n_active_levels(const MeshBase & mesh);
 
 /**
  * Return the number of levels of refinement in the active local mesh.
  * Implemented by looping over all the active local elements and finding
  * the maximum level.
  */
-unsigned int n_active_local_levels(const MeshBase &mesh);
+unsigned int n_active_local_levels(const MeshBase & mesh);
 
 /**
  * Return the number of p-levels of refinement in the mesh.
  * Implemented by looping over all the local elements and finding the
  * maximum p-level, then summing in parallel.
  */
-unsigned int n_p_levels (const MeshBase &mesh);
+unsigned int n_p_levels (const MeshBase & mesh);
 
 /**
  * Builds a set of node IDs for nodes which belong to non-subactive
@@ -281,38 +283,39 @@ unsigned int n_p_levels (const MeshBase &mesh);
  * or inactive.  This is useful for determining which nodes should be
  * written to a data file, and is used by the XDA mesh writing methods.
  */
-void get_not_subactive_node_ids(const MeshBase &mesh,
-                                std::set<dof_id_type> &not_subactive_node_ids);
+void get_not_subactive_node_ids(const MeshBase & mesh,
+                                std::set<dof_id_type> & not_subactive_node_ids);
 
 /**
  * Count up the number of elements of a specific type
  * (as defined by an iterator range).
  */
-dof_id_type n_elem (const MeshBase::const_element_iterator &begin,
-                    const MeshBase::const_element_iterator &end);
+dof_id_type n_elem (const MeshBase::const_element_iterator & begin,
+                    const MeshBase::const_element_iterator & end);
 
 
 /**
  * Count up the number of nodes of a specific type
  * (as defined by an iterator range).
  */
-dof_id_type n_nodes (const MeshBase::const_node_iterator &begin,
-                     const MeshBase::const_node_iterator &end);
+dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
+                     const MeshBase::const_node_iterator & end);
 
 
 /**
  * Find the maxium h-refinement level in a mesh.
  */
-unsigned int max_level (const MeshBase &mesh);
+unsigned int max_level (const MeshBase & mesh);
 
 
 /**
  * Given a mesh and a node in the mesh, the vector will be filled with
  * every node directly attached to the given one.
  */
-void find_nodal_neighbors(const MeshBase &mesh, const Node &n,
-                          const std::vector<std::vector<const Elem*> > &nodes_to_elem_map,
-                          std::vector<const Node*> &neighbors);
+void find_nodal_neighbors(const MeshBase & mesh,
+                          const Node & n,
+                          const std::vector<std::vector<const Elem *> > & nodes_to_elem_map,
+                          std::vector<const Node *> & neighbors);
 
 /**
  * Given a mesh hanging_nodes will be filled with an associative array keyed off the
@@ -320,7 +323,8 @@ void find_nodal_neighbors(const MeshBase &mesh, const Node &n,
  * parents of the node (meaning the two nodes to either side of it that make up
  * the side the hanging node is on.
  */
-void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<dof_id_type, std::vector<dof_id_type> > &hanging_nodes);
+void find_hanging_nodes_and_parents(const MeshBase & mesh,
+                                    std::map<dof_id_type, std::vector<dof_id_type> > & hanging_nodes);
 
 /**
  * Changes the processor ids on each node so be the same as the id of the
@@ -340,52 +344,52 @@ void correct_node_proc_ids(MeshBase &);
  * A function for verifying that an element has been cut off
  * from the rest of the mesh
  */
-void libmesh_assert_no_links_to_elem(const MeshBase &mesh,
-                                     const Elem *bad_elem);
+void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
+                                     const Elem * bad_elem);
 
 /**
  * A function for testing that all DofObjects within a mesh
  * have the same n_systems count
  */
-void libmesh_assert_equal_n_systems (const MeshBase &mesh);
+void libmesh_assert_equal_n_systems (const MeshBase & mesh);
 
 /**
  * A function for testing that all non-recently-created DofObjects
  * within a mesh have old_dof_object data.  This is not expected to
  * be true at all points within a simulation code.
  */
-void libmesh_assert_old_dof_objects (const MeshBase &mesh);
+void libmesh_assert_old_dof_objects (const MeshBase & mesh);
 
 /**
  * A function for walking across the mesh to try and ferret out
  * invalidated or misassigned pointers
  */
-void libmesh_assert_valid_node_pointers (const MeshBase &mesh);
+void libmesh_assert_valid_node_pointers (const MeshBase & mesh);
 
 /**
  * A function for verifying that active local elements' neighbors
  * are never remote elements
  */
-void libmesh_assert_valid_remote_elems (const MeshBase &mesh);
+void libmesh_assert_valid_remote_elems (const MeshBase & mesh);
 
 /**
  * A function for verifying that ids and processor assignment of elements
  * are correctly sorted (monotone increasing)
  */
-void libmesh_assert_valid_elem_ids (const MeshBase &mesh);
+void libmesh_assert_valid_elem_ids (const MeshBase & mesh);
 
 /**
  * A function for verifying that ids of elements are correctly
  * sorted for AMR (parents have lower ids than children)
  */
-void libmesh_assert_valid_amr_elem_ids (const MeshBase &mesh);
+void libmesh_assert_valid_amr_elem_ids (const MeshBase & mesh);
 
 /**
  * A function for verifying that any interior_parent pointers on
  * elements are consistent with AMR (parents' interior_parents are
  * interior_parents' parents)
  */
-void libmesh_assert_valid_amr_interior_parents (const MeshBase &mesh);
+void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
 
 /**
  * A function for verifying that all nodes are connected to at least
@@ -397,13 +401,13 @@ void libmesh_assert_valid_amr_interior_parents (const MeshBase &mesh);
  * without also being given the remote elements connected to those
  * nodes.
  */
-void libmesh_assert_connected_nodes (const MeshBase &mesh);
+void libmesh_assert_connected_nodes (const MeshBase & mesh);
 
 /**
  * A function for verifying that degree of freedom indexing matches
  * across processors.
  */
-void libmesh_assert_valid_dof_ids (const MeshBase &mesh);
+void libmesh_assert_valid_dof_ids (const MeshBase & mesh);
 
 /**
  * A function for verifying that processor assignment is
@@ -414,19 +418,19 @@ void libmesh_assert_valid_dof_ids (const MeshBase &mesh);
  * can see)
  */
 template <typename DofObjectSubclass>
-void libmesh_assert_valid_procids (const MeshBase &mesh);
+void libmesh_assert_valid_procids (const MeshBase & mesh);
 
 /**
  * A function for verifying that refinement flags on elements
  * are consistent between processors
  */
-void libmesh_assert_valid_refinement_flags (const MeshBase &mesh);
+void libmesh_assert_valid_refinement_flags (const MeshBase & mesh);
 
 /**
  * A function for verifying that elements on this processor have
  * valid descendants and consistent active flags.
  */
-void libmesh_assert_valid_refinement_tree (const MeshBase &mesh);
+void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
 
 /**
  * A function for verifying that neighbor connectivity is correct (each
@@ -434,7 +438,7 @@ void libmesh_assert_valid_refinement_tree (const MeshBase &mesh);
  * and consistent (each neighbor link goes to either the same neighbor
  * or to a RemoteElem on each processor)
  */
-void libmesh_assert_valid_neighbors (const MeshBase &mesh);
+void libmesh_assert_valid_neighbors (const MeshBase & mesh);
 #endif
 
 // There is no reason for users to call functions in the MeshTools::Private namespace.

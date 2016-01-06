@@ -24,7 +24,7 @@ namespace libMesh
 {
 
 template< typename OutputShape >
-UniquePtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType& fe_type )
+UniquePtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType & fe_type )
 {
   switch (fe_type.family)
     {

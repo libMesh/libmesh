@@ -59,7 +59,7 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  ExodusII_IO (MeshBase& mesh,
+  ExodusII_IO (MeshBase & mesh,
                bool single_precision=false);
 
   /**
@@ -74,12 +74,12 @@ public:
    * by cubit.  Works in 2D for \p TRIs, \p TRI6s, \p QUAD s, and \p QUAD9s.
    * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.
    */
-  virtual void read (const std::string& name) libmesh_override;
+  virtual void read (const std::string & name) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string& fname) libmesh_override;
+  virtual void write (const std::string & fname) libmesh_override;
 
   /**
    * Set the flag indicating if we should be verbose.
@@ -89,7 +89,7 @@ public:
   /**
    * Returns an array containing the timesteps in the file
    */
-  const std::vector<Real>& get_time_steps();
+  const std::vector<Real> & get_time_steps();
 
   /**
    * Returns the number of timesteps currently stored in the Exodus
@@ -103,7 +103,7 @@ public:
   /**
    * Backward compatibility version of function that takes a single variable name
    */
-  void copy_nodal_solution(System& system,
+  void copy_nodal_solution(System & system,
                            std::string var_name,
                            unsigned int timestep=1);
 
@@ -111,7 +111,7 @@ public:
    * If we read in a nodal solution while reading in a mesh, we can attempt
    * to copy that nodal solution into an EquationSystems object.
    */
-  void copy_nodal_solution(System& system,
+  void copy_nodal_solution(System & system,
                            std::string system_var_name,
                            std::string exodus_var_name,
                            unsigned int timestep=1);
@@ -120,7 +120,7 @@ public:
    * If we read in a elemental solution while reading in a mesh, we can attempt
    * to copy that elemental solution into an EquationSystems object.
    */
-  void copy_elemental_solution(System& system,
+  void copy_elemental_solution(System & system,
                                std::string system_var_name,
                                std::string exodus_var_name,
                                unsigned int timestep=1);
@@ -128,46 +128,46 @@ public:
   /**
    * Writes a exodusII file with discontinuous data
    */
-  void write_discontinuous_exodusII (const std::string& name,
-                                     const EquationSystems& es,
-                                     const std::set<std::string>* system_names=NULL);
+  void write_discontinuous_exodusII (const std::string & name,
+                                     const EquationSystems & es,
+                                     const std::set<std::string> * system_names=NULL);
 
   /**
    * Write out element solution.
    */
-  void write_element_data (const EquationSystems& es);
+  void write_element_data (const EquationSystems & es);
 
   /**
    * Write out a nodal solution.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&) libmesh_override;
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &) libmesh_override;
 
   /**
    * Write out a discontinuous nodal solution.
    */
-  void write_nodal_data_discontinuous (const std::string&,
-                                       const std::vector<Number>&,
-                                       const std::vector<std::string>&);
+  void write_nodal_data_discontinuous (const std::string &,
+                                       const std::vector<Number> &,
+                                       const std::vector<std::string> &);
 
   /**
    * Write out global variables.
    */
-  void write_global_data (const std::vector<Number>&,
-                          const std::vector<std::string>&);
+  void write_global_data (const std::vector<Number> &,
+                          const std::vector<std::string> &);
 
   /**
    * Write out information records.
    */
-  void write_information_records (const std::vector<std::string>&);
+  void write_information_records (const std::vector<std::string> &);
 
   /**
    * Writes out the solution at a specific timestep.
    * @param timestep The timestep to write out, should be _1_ indexed.
    */
-  void write_timestep (const std::string& fname,
-                       const EquationSystems& es,
+  void write_timestep (const std::string & fname,
+                       const EquationSystems & es,
                        const int timestep,
                        const Real time);
 
@@ -179,7 +179,7 @@ public:
    * result in empty vectors supplied here to also be populated with all
    * variables.
    */
-  void set_output_variables(const std::vector<std::string>& output_variables,
+  void set_output_variables(const std::vector<std::string> & output_variables,
                             bool allow_empty = true);
 
   /**
@@ -225,7 +225,7 @@ private:
    * functionality when LIBMESH_HAVE_EXODUS_API is not defined.
    */
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO_Helper *exio_helper;
+  ExodusII_IO_Helper * exio_helper;
 #endif
 
   /**
@@ -256,7 +256,7 @@ private:
    * write_nodal_data() and write_nodal_data_discontinuous() functions
    */
   void write_nodal_data_common(std::string fname,
-                               const std::vector<std::string>& names,
+                               const std::vector<std::string> & names,
                                bool continuous=true);
 
   /**

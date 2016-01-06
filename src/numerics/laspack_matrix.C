@@ -36,7 +36,7 @@ namespace libMesh
 //-----------------------------------------------------------------------
 // LaspackMatrix members
 template <typename T>
-void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
+void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sparsity_pattern)
 {
   // clear data, start over
   this->clear ();
@@ -176,8 +176,8 @@ void LaspackMatrix<T>::init ()
 #ifndef NDEBUG
   // The following variables are only used for assertions,
   // so avoid declaring them when asserts are inactive.
-  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
+  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
 #endif
 
   // Make sure the sparsity pattern isn't empty
@@ -187,7 +187,7 @@ void LaspackMatrix<T>::init ()
   if (n_rows==0)
     return;
 
-  Q_Constr(&_QMat, const_cast<char*>("Mat"), n_rows, _LPFalse, Rowws, Normal, _LPTrue);
+  Q_Constr(&_QMat, const_cast<char *>("Mat"), n_rows, _LPFalse, Rowws, Normal, _LPTrue);
 
   this->_is_initialized = true;
 
@@ -197,9 +197,9 @@ void LaspackMatrix<T>::init ()
 
 
 template <typename T>
-void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                  const std::vector<numeric_index_type>& rows,
-                                  const std::vector<numeric_index_type>& cols)
+void LaspackMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
+                                  const std::vector<numeric_index_type> & rows,
+                                  const std::vector<numeric_index_type> & cols)
 
 {
   libmesh_assert (this->initialized());
@@ -217,7 +217,7 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 template <typename T>
-void LaspackMatrix<T>::get_diagonal (NumericVector<T>& /*dest*/) const
+void LaspackMatrix<T>::get_diagonal (NumericVector<T> & /*dest*/) const
 {
   libmesh_not_implemented();
 }
@@ -225,7 +225,7 @@ void LaspackMatrix<T>::get_diagonal (NumericVector<T>& /*dest*/) const
 
 
 template <typename T>
-void LaspackMatrix<T>::get_transpose (SparseMatrix<T>& /*dest*/) const
+void LaspackMatrix<T>::get_transpose (SparseMatrix<T> & /*dest*/) const
 {
   libmesh_not_implemented();
 }
@@ -233,7 +233,7 @@ void LaspackMatrix<T>::get_transpose (SparseMatrix<T>& /*dest*/) const
 
 
 template <typename T>
-LaspackMatrix<T>::LaspackMatrix (const Parallel::Communicator &comm) :
+LaspackMatrix<T>::LaspackMatrix (const Parallel::Communicator & comm) :
   SparseMatrix<T>(comm),
   _closed (false)
 {
@@ -370,8 +370,8 @@ void LaspackMatrix<T>::add (const numeric_index_type i,
 
 
 template <typename T>
-void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                  const std::vector<numeric_index_type>& dof_indices)
+void LaspackMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
+                                  const std::vector<numeric_index_type> & dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -379,13 +379,13 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 template <typename T>
-void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  LaspackMatrix<T>* X = cast_ptr<LaspackMatrix<T>*> (&X_in);
+  LaspackMatrix<T> * X = cast_ptr<LaspackMatrix<T> *> (&X_in);
   _LPNumber         a = static_cast<_LPNumber>          (a_in);
 
   libmesh_assert(X);

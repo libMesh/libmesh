@@ -34,7 +34,7 @@ namespace Utility
 // 04 February 2010 01:56:43 PM
 std::string get_timestamp();
 
-inline void print_timestamp (std::ostream& target = std::cout)
+inline void print_timestamp (std::ostream & target = std::cout)
 {
   target << get_timestamp() << std::endl;
 }

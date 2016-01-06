@@ -66,7 +66,7 @@ public:
    * files.
    */
   explicit
-  CheckpointIO (MeshBase&,       const bool=false);
+  CheckpointIO (MeshBase &, const bool=false);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -76,7 +76,7 @@ public:
    * files.
    */
   explicit
-  CheckpointIO (const MeshBase&, const bool=false);
+  CheckpointIO (const MeshBase &, const bool=false);
 
   /**
    * Destructor.
@@ -86,12 +86,12 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string&) libmesh_override;
+  virtual void read (const std::string &) libmesh_override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
   /**
    * Get/Set the flag indicating if we should read/write binary.
@@ -112,32 +112,32 @@ private:
   /**
    * Write subdomain name information - NEW in 0.9.2 format
    */
-  void write_subdomain_names(Xdr &io) const;
+  void write_subdomain_names(Xdr & io) const;
 
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
-  void write_connectivity (Xdr &io) const;
+  void write_connectivity (Xdr & io) const;
 
   /**
    * Write the nodal locations for a parallel, distributed mesh
    */
-  void write_nodes (Xdr &io) const;
+  void write_nodes (Xdr & io) const;
 
   /**
    * Write the boundary conditions for a parallel, distributed mesh
    */
-  void write_bcs (Xdr &io) const;
+  void write_bcs (Xdr & io) const;
 
   /**
    * Write the boundary conditions for a parallel, distributed mesh
    */
-  void write_nodesets (Xdr &io) const;
+  void write_nodesets (Xdr & io) const;
 
   /**
    * Write boundary names information (sideset and nodeset) - NEW in 0.9.2 format
    */
-  void write_bc_names (Xdr &io, const BoundaryInfo & info, bool is_sideset) const;
+  void write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_sideset) const;
 
 
   //---------------------------------------------------------------------------
@@ -145,32 +145,32 @@ private:
   /**
    * Read subdomain name information - NEW in 0.9.2 format
    */
-  void read_subdomain_names(Xdr &io);
+  void read_subdomain_names(Xdr & io);
 
   /**
    * Read the connectivity for a parallel, distributed mesh
    */
-  void read_connectivity (Xdr &io);
+  void read_connectivity (Xdr & io);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
    */
-  void read_nodes (Xdr &io);
+  void read_nodes (Xdr & io);
 
   /**
    * Read the boundary conditions for a parallel, distributed mesh
    */
-  void read_bcs (Xdr &io);
+  void read_bcs (Xdr & io);
 
   /**
    * Read the nodeset conditions for a parallel, distributed mesh
    */
-  void read_nodesets (Xdr &io);
+  void read_nodesets (Xdr & io);
 
   /**
    * Read boundary names information (sideset and nodeset) - NEW in 0.9.2 format
    */
-  void read_bc_names(Xdr &io, BoundaryInfo & info, bool is_sideset);
+  void read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset);
 
   /**
    * Return the number of levels of refinement in the active mesh on this processor.
@@ -178,7 +178,7 @@ private:
    * Implemented by looping over all the active elements and finding
    * the maximum level.
    */
-  unsigned int n_active_levels_on_processor(const MeshBase &mesh) const;
+  unsigned int n_active_levels_on_processor(const MeshBase & mesh) const;
 
   bool _binary;
   std::string _version;

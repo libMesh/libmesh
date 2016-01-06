@@ -37,16 +37,16 @@ using namespace libMesh;
 
 struct DM_libMesh
 {
-  NonlinearImplicitSystem* sys;
-  std::map<std::string, unsigned int>  *varids;
-  std::map<unsigned int, std::string>  *varnames;
-  std::map<std::string, unsigned int>  *blockids;
-  std::map<unsigned int, std::string>  *blocknames;
-  unsigned int                          decomposition_type;
-  std::vector<std::set<unsigned int> > *decomposition;
-  unsigned int                          embedding_type;
-  IS                                    embedding;
-  unsigned int                          vec_count;
+  NonlinearImplicitSystem * sys;
+  std::map<std::string, unsigned int> * varids;
+  std::map<unsigned int, std::string> * varnames;
+  std::map<std::string, unsigned int> * blockids;
+  std::map<unsigned int, std::string> * blocknames;
+  unsigned int decomposition_type;
+  std::vector<std::set<unsigned int> > * decomposition;
+  unsigned int embedding_type;
+  IS embedding;
+  unsigned int vec_count;
 };
 
 struct DMVec_libMesh {
@@ -55,7 +55,7 @@ struct DMVec_libMesh {
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshGetVec_Private"
-PetscErrorCode DMlibMeshGetVec_Private(DM /*dm*/, const char* /*name*/, Vec*)
+PetscErrorCode DMlibMeshGetVec_Private(DM /*dm*/, const char * /*name*/, Vec *)
 {
   PetscFunctionBegin;
 
@@ -68,9 +68,9 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm);
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshSetSystem_libMesh"
-PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem& sys)
+PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem & sys)
 {
-  const Parallel::Communicator &comm(sys.comm());
+  const Parallel::Communicator & comm = sys.comm();
 
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -80,11 +80,11 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem& sys)
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
 
   if(dm->setupcalled) SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONGSTATE, "Cannot reset the libMesh system after DM has been set up.");
-  DM_libMesh *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   dlm->sys =&sys;
   /* Initially populate the sets of active blockids and varids using all of the
      existing blocks/variables (only variables are supported at the moment). */
-  DofMap& dofmap = dlm->sys->get_dof_map();
+  DofMap & dofmap = dlm->sys->get_dof_map();
   dlm->varids->clear();
   dlm->varnames->clear();
   for(unsigned int v = 0; v < dofmap.n_variables(); ++v) {
@@ -92,7 +92,7 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem& sys)
     dlm->varids->insert(std::pair<std::string,unsigned int>(vname,v));
     dlm->varnames->insert(std::pair<unsigned int,std::string>(v,vname));
   }
-  const MeshBase& mesh = dlm->sys->get_mesh();
+  const MeshBase & mesh = dlm->sys->get_mesh();
   dlm->blockids->clear();
   dlm->blocknames->clear();
   std::set<subdomain_id_type> blocks;
@@ -131,7 +131,7 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem& sys)
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshGetSystem_libMesh"
-PetscErrorCode DMlibMeshGetSystem_libMesh(DM dm, NonlinearImplicitSystem*& sys)
+PetscErrorCode DMlibMeshGetSystem_libMesh(DM dm, NonlinearImplicitSystem *& sys)
 {
   PetscErrorCode ierr;
 
@@ -140,7 +140,7 @@ PetscErrorCode DMlibMeshGetSystem_libMesh(DM dm, NonlinearImplicitSystem*& sys)
   PetscBool islibmesh;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);CHKERRQ(ierr);
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
-  DM_libMesh *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   sys = dlm->sys;
   PetscFunctionReturn(0);
 }
@@ -148,7 +148,7 @@ PetscErrorCode DMlibMeshGetSystem_libMesh(DM dm, NonlinearImplicitSystem*& sys)
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshGetBlocks"
-PetscErrorCode DMlibMeshGetBlocks(DM dm, PetscInt *n, char*** blocknames)
+PetscErrorCode DMlibMeshGetBlocks(DM dm, PetscInt * n, char *** blocknames)
 {
   PetscErrorCode ierr;
   PetscInt i;
@@ -157,11 +157,11 @@ PetscErrorCode DMlibMeshGetBlocks(DM dm, PetscInt *n, char*** blocknames)
   PetscBool islibmesh;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
-  DM_libMesh *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   PetscValidPointer(n,2);
   *n = dlm->blockids->size();
   if(!blocknames) PetscFunctionReturn(0);
-  ierr = PetscMalloc(*n*sizeof(char*), blocknames); CHKERRQ(ierr);
+  ierr = PetscMalloc(*n*sizeof(char *), blocknames); CHKERRQ(ierr);
   i = 0;
   for(std::map<std::string, unsigned int>::const_iterator it = dlm->blockids->begin(); it != dlm->blockids->end(); ++it){
     ierr = PetscStrallocpy(it->first.c_str(), *blocknames+i); CHKERRQ(ierr);
@@ -172,7 +172,7 @@ PetscErrorCode DMlibMeshGetBlocks(DM dm, PetscInt *n, char*** blocknames)
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshGetVariables"
-PetscErrorCode DMlibMeshGetVariables(DM dm, PetscInt *n, char*** varnames)
+PetscErrorCode DMlibMeshGetVariables(DM dm, PetscInt * n, char *** varnames)
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -181,11 +181,11 @@ PetscErrorCode DMlibMeshGetVariables(DM dm, PetscInt *n, char*** varnames)
   PetscInt i;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
-  DM_libMesh *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   PetscValidPointer(n,2);
   *n = dlm->varids->size();
   if(!varnames) PetscFunctionReturn(0);
-  ierr = PetscMalloc(*n*sizeof(char*), varnames); CHKERRQ(ierr);
+  ierr = PetscMalloc(*n*sizeof(char *), varnames); CHKERRQ(ierr);
   i = 0;
   for(std::map<std::string, unsigned int>::const_iterator it = dlm->varids->begin(); it != dlm->varids->end(); ++it){
     ierr = PetscStrallocpy(it->first.c_str(), *varnames+i); CHKERRQ(ierr);
@@ -198,11 +198,11 @@ PetscErrorCode DMlibMeshGetVariables(DM dm, PetscInt *n, char*** varnames)
 #define __FUNCT__ "DMlibMeshSetUpName_Private"
 PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
 {
-  DM_libMesh* dlm = (DM_libMesh*)dm->data;
+  DM_libMesh * dlm = (DM_libMesh *)dm->data;
   PetscErrorCode ierr;
   PetscFunctionBegin;
   std::string name = dlm->sys->name();
-  std::map<unsigned int, std::string> *dnames = PETSC_NULL, *enames = PETSC_NULL;
+  std::map<unsigned int, std::string> * dnames = PETSC_NULL, * enames = PETSC_NULL;
   if(dlm->decomposition_type == DMLIBMESH_FIELD_DECOMPOSITION) {
     name += ":dec:var:";
     dnames = dlm->varnames;
@@ -246,20 +246,20 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateFieldDecomposition_libMesh"
-static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, char ***namelist, IS **islist, DM **dmlist)
+static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len, char *** namelist, IS ** islist, DM ** dmlist)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  DM_libMesh     *dlm = (DM_libMesh *)(dm->data);
-  NonlinearImplicitSystem *sys = dlm->sys;
+  DM_libMesh     * dlm = (DM_libMesh *)(dm->data);
+  NonlinearImplicitSystem * sys = dlm->sys;
   IS emb;
   if(dlm->decomposition_type != DMLIBMESH_FIELD_DECOMPOSITION) PetscFunctionReturn(0);
 
   *len = dlm->decomposition->size();
-  if(namelist) {ierr = PetscMalloc(*len*sizeof(char*), namelist);  CHKERRQ(ierr);}
+  if(namelist) {ierr = PetscMalloc(*len*sizeof(char *), namelist);  CHKERRQ(ierr);}
   if(islist)   {ierr = PetscMalloc(*len*sizeof(IS),    islist);    CHKERRQ(ierr);}
   if(dmlist)   {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
-  DofMap& dofmap = dlm->sys->get_dof_map();
+  DofMap & dofmap = dlm->sys->get_dof_map();
   for(unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
     std::set<numeric_index_type>         dindices;
     std::string                          dname;
@@ -281,7 +281,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
         MeshBase::const_element_iterator el     = sys->get_mesh().active_local_subdomain_elements_begin(b);
         MeshBase::const_element_iterator end_el = sys->get_mesh().active_local_subdomain_elements_end(b);
         for ( ; el != end_el; ++el) {
-          const Elem* elem = *el;
+          const Elem * elem = *el;
           //unsigned int e_subdomain = elem->subdomain_id();
           std::vector<numeric_index_type> evindices;
           // Get the degree of freedom indices for the given variable off the current element.
@@ -299,7 +299,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
     }
     if(islist) {
       IS dis;
-      PetscInt *darray;
+      PetscInt * darray;
       ierr = PetscMalloc(sizeof(PetscInt)*dindices.size(), &darray); CHKERRQ(ierr);
       numeric_index_type i = 0;
       for(std::set<numeric_index_type>::const_iterator it = dindices.begin(); it != dindices.end(); ++it) {
@@ -330,7 +330,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
       DM ddm;
       ierr = DMCreate(((PetscObject)dm)->comm, &ddm); CHKERRQ(ierr);
       ierr = DMSetType(ddm, DMLIBMESH);               CHKERRQ(ierr);
-      DM_libMesh *ddlm = (DM_libMesh*)(ddm->data);
+      DM_libMesh * ddlm = (DM_libMesh *)(ddm->data);
       ddlm->sys = dlm->sys;
       /* copy over the block ids and names */
       *ddlm->blockids = *dlm->blockids;
@@ -352,16 +352,16 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateDomainDecomposition_libMesh"
-static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len, char ***namelist, IS **innerislist, IS **outerislist, DM **dmlist)
+static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt * len, char *** namelist, IS ** innerislist, IS ** outerislist, DM ** dmlist)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  DM_libMesh     *dlm = (DM_libMesh *)(dm->data);
-  NonlinearImplicitSystem *sys = dlm->sys;
+  DM_libMesh     * dlm = (DM_libMesh *)(dm->data);
+  NonlinearImplicitSystem * sys = dlm->sys;
   IS emb;
   if(dlm->decomposition_type != DMLIBMESH_DOMAIN_DECOMPOSITION) PetscFunctionReturn(0);
   *len = dlm->decomposition->size();
-  if(namelist)      {ierr = PetscMalloc(*len*sizeof(char*), namelist);  CHKERRQ(ierr);}
+  if(namelist)      {ierr = PetscMalloc(*len*sizeof(char *), namelist);  CHKERRQ(ierr);}
   if(innerislist)   {ierr = PetscMalloc(*len*sizeof(IS),    innerislist);    CHKERRQ(ierr);}
   if(outerislist)   *outerislist = PETSC_NULL; /* FIX: allow mesh-based overlap. */
   if(dmlist)        {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
@@ -383,7 +383,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       MeshBase::const_element_iterator       el     = sys->get_mesh().active_local_subdomain_elements_begin(b);
       const MeshBase::const_element_iterator end_el = sys->get_mesh().active_local_subdomain_elements_end(b);
       for ( ; el != end_el; ++el) {
-        const Elem* elem = *el;
+        const Elem * elem = *el;
         std::vector<numeric_index_type> evindices;
         /* Iterate only over this DM's variables. */
         for(std::map<std::string, unsigned int>::const_iterator vit = dlm->varids->begin(); vit != dlm->varids->end(); ++vit) {
@@ -402,7 +402,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       ierr = PetscStrallocpy(dname.c_str(),(*namelist)+d);            CHKERRQ(ierr);
     }
     if(innerislist) {
-      PetscInt *darray;
+      PetscInt * darray;
       IS dis;
       ierr = PetscMalloc(sizeof(PetscInt)*dindices.size(), &darray); CHKERRQ(ierr);
       numeric_index_type i = 0;
@@ -438,7 +438,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       DM ddm;
       ierr = DMCreate(((PetscObject)dm)->comm, &ddm); CHKERRQ(ierr);
       ierr = DMSetType(ddm, DMLIBMESH);               CHKERRQ(ierr);
-      DM_libMesh *ddlm = (DM_libMesh*)(ddm->data);
+      DM_libMesh * ddlm = (DM_libMesh *)(ddm->data);
       ddlm->sys = dlm->sys;
       /* copy over the varids and varnames */
       *ddlm->varids    = *dlm->varids;
@@ -461,7 +461,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshCreateFieldDecompositionDM"
-PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, PetscInt* dsizes, char*** dvarlists, DM* ddm)
+PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, PetscInt * dsizes, char *** dvarlists, DM * ddm)
 {
   PetscErrorCode ierr;
   PetscBool islibmesh;
@@ -471,10 +471,10 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   if(dnumber < 0) SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Negative number %D of decomposition parts", dnumber);
   PetscValidPointer(ddm,5);
-  DM_libMesh *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   ierr = DMCreate(((PetscObject)dm)->comm, ddm); CHKERRQ(ierr);
   ierr = DMSetType(*ddm, DMLIBMESH);             CHKERRQ(ierr);
-  DM_libMesh *ddlm = (DM_libMesh *)((*ddm)->data);
+  DM_libMesh * ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
   ddlm->varids = dlm->varids;
   ddlm->varnames = dlm->varnames;
@@ -514,7 +514,7 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshCreateDomainDecompositionDM"
-PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, PetscInt* dsizes, char*** dblocklists, DM* ddm)
+PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, PetscInt * dsizes, char *** dblocklists, DM * ddm)
 {
   PetscErrorCode ierr;
   PetscBool islibmesh;
@@ -524,10 +524,10 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   if(dnumber < 0) SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Negative number %D of decomposition parts", dnumber);
   PetscValidPointer(ddm,5);
-  DM_libMesh *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   ierr = DMCreate(((PetscObject)dm)->comm, ddm); CHKERRQ(ierr);
   ierr = DMSetType(*ddm, DMLIBMESH);             CHKERRQ(ierr);
-  DM_libMesh *ddlm = (DM_libMesh *)((*ddm)->data);
+  DM_libMesh * ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
   ddlm->varids   = dlm->varids;
   ddlm->varnames = dlm->varnames;
@@ -566,8 +566,8 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
 }
 
 struct token {
-  const  char* s;
-  struct token *next;
+  const  char * s;
+  struct token * next;
 };
 
 
@@ -576,13 +576,17 @@ struct token {
 
 #undef __FUNCT__
 #define __FUNCT__ "DMlibMeshParseDecompositionDescriptor_Private"
-static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, const char* ddesc, PetscInt* dtype, PetscInt* dcount, PetscInt** dsizes, char ****dlists)
+static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, const char * ddesc, PetscInt * dtype, PetscInt * dcount, PetscInt ** dsizes, char **** dlists)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
   PetscBool eq;
-  char *s0, *s, *ss;
-  struct token *llfirst = PETSC_NULL, *lllast = PETSC_NULL, *tok;
+  char * s0;
+  char * s;
+  char * ss;
+  struct token * llfirst = PETSC_NULL;
+  struct token * lllast = PETSC_NULL;
+  struct token * tok;
   PetscInt stcount = 0, brcount = 0, d, i;
   size_t len0, count;
 
@@ -617,7 +621,8 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
   }
   ierr = PetscStrlen(s0,&count);       CHKERRQ(ierr);
   while(count < len0) {
-    struct token *st, *br;
+    struct token * st;
+    struct token * br;
     ++ss; ++count;
     s=ss;
     while(*ss && *ss != ',' && *ss != ';') {
@@ -680,7 +685,7 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
   /* Allocate the space for the output. */
   *dcount = brcount;
   ierr = PetscMalloc(*dcount*sizeof(PetscInt), dsizes); CHKERRQ(ierr);
-  ierr = PetscMalloc(*dcount*sizeof(char**),   dlists); CHKERRQ(ierr);
+  ierr = PetscMalloc(*dcount*sizeof(char **),   dlists); CHKERRQ(ierr);
   for(d = 0; d < *dcount; ++d) (*dsizes)[d] = 0;
   tok = llfirst; d = 0;
   while(tok) {
@@ -691,7 +696,7 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
     tok = tok->next;
   }
   for(d = 0; d < *dcount; ++d) {
-    ierr = PetscMalloc(sizeof(char**)*(*dsizes)[d], (*dlists)+d); CHKERRQ(ierr);
+    ierr = PetscMalloc(sizeof(char **)*(*dsizes)[d], (* dlists)+d); CHKERRQ(ierr);
   }
   /* Now copy strings and destroy tokens. */
   tok = llfirst; d = 0; i = 0;
@@ -715,12 +720,13 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateFieldDecompositionDM_libMesh"
-static PetscErrorCode  DMCreateFieldDecompositionDM_libMesh(DM dm, const char* ddesc, DM *ddm)
+static PetscErrorCode  DMCreateFieldDecompositionDM_libMesh(DM dm, const char * ddesc, DM * ddm)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  PetscInt dtype, dcount, *dsizes;
-  char ***dlists;
+  PetscInt dtype, dcount;
+  PetscInt * dsizes;
+  char *** dlists;
   PetscFunctionBegin;
   *ddm = PETSC_NULL;
   ierr = DMlibMeshParseDecompositionDescriptor_Private(dm,ddesc,&dtype,&dcount,&dsizes,&dlists); CHKERRQ(ierr);
@@ -733,12 +739,13 @@ static PetscErrorCode  DMCreateFieldDecompositionDM_libMesh(DM dm, const char* d
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateDomainDecompositionDM_libMesh"
-static PetscErrorCode  DMCreateDomainDecompositionDM_libMesh(DM dm, const char* ddesc, DM *ddm)
+static PetscErrorCode  DMCreateDomainDecompositionDM_libMesh(DM dm, const char * ddesc, DM * ddm)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  PetscInt dtype, dcount, *dsizes;
-  char ***dlists;
+  PetscInt dtype, dcount;
+  PetscInt * dsizes;
+  char *** dlists;
   PetscFunctionBegin;
   *ddm = PETSC_NULL;
   ierr = DMlibMeshParseDecompositionDescriptor_Private(dm,ddesc,&dtype,&dcount,&dsizes,&dlists); CHKERRQ(ierr);
@@ -761,11 +768,11 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   libmesh_assert(x);
   libmesh_assert(r);
 
-  NonlinearImplicitSystem* _sys;
+  NonlinearImplicitSystem * _sys;
   ierr = DMlibMeshGetSystem(dm, _sys);CHKERRQ(ierr);
-  NonlinearImplicitSystem& sys = *_sys;
-  PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>* >(sys.solution.get());
-  PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>* >(sys.rhs);
+  NonlinearImplicitSystem & sys = *_sys;
+  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> * >(sys.solution.get());
+  PetscVector<Number> & R_sys = *libmesh_cast_ptr<PetscVector<Number> * >(sys.rhs);
   PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
 
   // Use the systems update() to get a good local version of the parallel solution
@@ -811,7 +818,7 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
 #if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef __FUNCT__
 #define __FUNCT__ "SNESFunction_DMlibMesh"
-static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void *ctx)
+static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void * ctx)
 {
   DM dm = (DM)ctx;
   PetscErrorCode ierr;
@@ -826,7 +833,7 @@ static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void *ctx)
 #define __FUNCT__ "DMlibMeshJacobian"
 static PetscErrorCode DMlibMeshJacobian(
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                        DM dm, Vec x, Mat jac, Mat pc, MatStructure *msflag
+                                        DM dm, Vec x, Mat jac, Mat pc, MatStructure * msflag
 #else
                                         DM dm, Vec x, Mat jac, Mat pc
 #endif
@@ -834,15 +841,15 @@ static PetscErrorCode DMlibMeshJacobian(
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
-  NonlinearImplicitSystem* _sys;
+  NonlinearImplicitSystem * _sys;
   ierr = DMlibMeshGetSystem(dm, _sys); CHKERRQ(ierr);
-  NonlinearImplicitSystem& sys = *_sys;
+  NonlinearImplicitSystem & sys = *_sys;
 
-  PetscMatrix<Number>  the_pc(pc,sys.comm());
-  PetscMatrix<Number>  Jac(jac,sys.comm());
-  PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
-  PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-  PetscVector<Number>  X_global(x, sys.comm());
+  PetscMatrix<Number> the_pc(pc,sys.comm());
+  PetscMatrix<Number> Jac(jac,sys.comm());
+  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.solution.get());
+  PetscMatrix<Number> & Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number> *>(sys.matrix);
+  PetscVector<Number> X_global(x, sys.comm());
 
   // Set the dof maps
   the_pc.attach_dof_map(sys.get_dof_map());
@@ -897,9 +904,9 @@ static PetscErrorCode DMlibMeshJacobian(
 #define __FUNCT__ "SNESJacobian_DMlibMesh"
 static PetscErrorCode SNESJacobian_DMlibMesh(
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                             SNES, Vec x, Mat *jac, Mat *pc, MatStructure* flag, void* ctx
+                                             SNES, Vec x, Mat * jac, Mat * pc, MatStructure * flag, void * ctx
 #else
-                                             SNES, Vec x, Mat jac, Mat pc, void* ctx
+                                             SNES, Vec x, Mat jac, Mat pc, void * ctx
 #endif
                                              )
 {
@@ -920,9 +927,9 @@ static PetscErrorCode SNESJacobian_DMlibMesh(
 static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
 {
   PetscErrorCode ierr;
-  NonlinearImplicitSystem* _sys;
+  NonlinearImplicitSystem * _sys;
   ierr = DMlibMeshGetSystem(dm, _sys); CHKERRQ(ierr);
-  NonlinearImplicitSystem& sys = *_sys;
+  NonlinearImplicitSystem & sys = *_sys;
   PetscVector<Number> XL(xl, sys.comm());
   PetscVector<Number> XU(xu, sys.comm());
   PetscFunctionBegin;
@@ -950,7 +957,7 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  DM_libMesh     *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh     * dlm = (DM_libMesh *)(dm->data);
   PetscBool eq;
 
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH, &eq); CHKERRQ(ierr);
@@ -961,8 +968,8 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
   if (!dlm->sys)
     SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, "No libMesh system set for DM_libMesh");
 
-  NumericVector<Number>* nv = (dlm->sys->solution).get();
-  PetscVector<Number>*   pv = dynamic_cast<PetscVector<Number>*>(nv);
+  NumericVector<Number> * nv = (dlm->sys->solution).get();
+  PetscVector<Number> *   pv = dynamic_cast<PetscVector<Number> *>(nv);
   Vec                    v  = pv->vec();
   /* Unfortunately, currently this does not produce a ghosted vector, so nonlinear subproblem solves aren't going to be easily available.
      Should work fine for getting vectors out for linear subproblem solvers. */
@@ -988,14 +995,14 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateMatrix_libMesh"
 #if PETSC_VERSION_LT(3,5,0)
-static PetscErrorCode DMCreateMatrix_libMesh(DM dm, const MatType, Mat *A)
+static PetscErrorCode DMCreateMatrix_libMesh(DM dm, const MatType, Mat * A)
 #else
-  static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat *A)
+  static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat * A)
 #endif
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  DM_libMesh     *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh     * dlm = (DM_libMesh *)(dm->data);
   PetscBool eq;
 
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH, &eq); CHKERRQ(ierr);
@@ -1006,7 +1013,7 @@ static PetscErrorCode DMCreateMatrix_libMesh(DM dm, const MatType, Mat *A)
   if (!dlm->sys)
     SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, "No libMesh system set for DM_libMesh");
 
-  *A = (dynamic_cast<PetscMatrix<Number>*>(dlm->sys->matrix))->mat();
+  *A = (dynamic_cast<PetscMatrix<Number> *>(dlm->sys->matrix))->mat();
   ierr = PetscObjectReference((PetscObject)(*A)); CHKERRQ(ierr);
   PetscFunctionReturn(0);
 }
@@ -1018,8 +1025,8 @@ static PetscErrorCode  DMView_libMesh(DM dm, PetscViewer viewer)
 {
   PetscErrorCode ierr;
   PetscBool isascii;
-  const char *name, *prefix;
-  DM_libMesh *dlm = (DM_libMesh*)dm->data;
+  const char * name, * prefix;
+  DM_libMesh * dlm = (DM_libMesh *)dm->data;
   PetscFunctionBegin;
   ierr = PetscObjectTypeCompare((PetscObject)viewer,PETSCVIEWERASCII,&isascii); CHKERRQ(ierr);
   if(isascii) {
@@ -1077,7 +1084,7 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
-  DM_libMesh     *dlm = (DM_libMesh *)(dm->data);
+  DM_libMesh     * dlm = (DM_libMesh *)(dm->data);
   PetscBool eq;
 
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH, &eq); CHKERRQ(ierr);
@@ -1095,8 +1102,8 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
     ierr = DMSetFunction(dm, DMlibMeshFunction); CHKERRQ(ierr);
     ierr = DMSetJacobian(dm, DMlibMeshJacobian); CHKERRQ(ierr);
 #else
-    ierr = DMSNESSetFunction(dm, SNESFunction_DMlibMesh, (void*)dm); CHKERRQ(ierr);
-    ierr = DMSNESSetJacobian(dm, SNESJacobian_DMlibMesh, (void*)dm); CHKERRQ(ierr);
+    ierr = DMSNESSetFunction(dm, SNESFunction_DMlibMesh, (void *)dm); CHKERRQ(ierr);
+    ierr = DMSNESSetJacobian(dm, SNESJacobian_DMlibMesh, (void *)dm); CHKERRQ(ierr);
 #endif
     if (dlm->sys->nonlinear_solver->bounds || dlm->sys->nonlinear_solver->bounds_object)
       ierr = DMSetVariableBounds(dm, DMVariableBounds_libMesh); CHKERRQ(ierr);
@@ -1119,7 +1126,7 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
 #define __FUNCT__ "DMDestroy_libMesh"
 static PetscErrorCode  DMDestroy_libMesh(DM dm)
 {
-  DM_libMesh *dlm = (DM_libMesh*)(dm->data);
+  DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   PetscErrorCode ierr;
   PetscFunctionBegin;
   delete dlm->varids;
@@ -1139,7 +1146,7 @@ EXTERN_C_BEGIN
 PetscErrorCode  DMCreate_libMesh(DM dm)
 {
   PetscErrorCode ierr;
-  DM_libMesh     *dlm;
+  DM_libMesh     * dlm;
 
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);

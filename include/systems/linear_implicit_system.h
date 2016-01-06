@@ -53,8 +53,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  LinearImplicitSystem (EquationSystems& es,
-                        const std::string& name,
+  LinearImplicitSystem (EquationSystems & es,
+                        const std::string & name,
                         const unsigned int number);
 
   /**
@@ -107,7 +107,7 @@ public:
    * subset.  To disable this mode, call this method with \p subset
    * being a \p NULL pointer.
    */
-  virtual void restrict_solve_to (const SystemSubset* subset,
+  virtual void restrict_solve_to (const SystemSubset * subset,
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) libmesh_override;
 
   /**
@@ -119,7 +119,7 @@ public:
    * Returns a pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    */
-  virtual LinearSolver<Number> *get_linear_solver() const libmesh_override;
+  virtual LinearSolver<Number> * get_linear_solver() const libmesh_override;
 
   /**
    * Releases a pointer to a linear solver acquired by
@@ -169,7 +169,7 @@ public:
    * its original state by supplying a \p NULL pointer to this
    * function.
    */
-  void attach_shell_matrix (ShellMatrix<Number>* shell_matrix);
+  void attach_shell_matrix (ShellMatrix<Number> * shell_matrix);
 
   /**
    * Detaches a shell matrix.  Same as \p attach_shell_matrix(NULL).
@@ -180,7 +180,7 @@ public:
    * Returns a pointer to the currently attached shell matrix, if any,
    * or \p NULL else.
    */
-  ShellMatrix<Number>* get_shell_matrix() { return _shell_matrix; }
+  ShellMatrix<Number> * get_shell_matrix() { return _shell_matrix; }
 
 protected:
 
@@ -198,12 +198,12 @@ protected:
   /**
    * User supplies shell matrix or \p NULL if no shell matrix is used.
    */
-  ShellMatrix<Number>* _shell_matrix;
+  ShellMatrix<Number> * _shell_matrix;
 
   /**
    * The current subset on which to solve (or \p NULL if none).
    */
-  const SystemSubset* _subset;
+  const SystemSubset * _subset;
 
   /**
    * If restrict-solve-to-subset mode is active, this member decides

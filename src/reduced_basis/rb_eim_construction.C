@@ -47,8 +47,8 @@
 namespace libMesh
 {
 
-RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
-                                      const std::string& name_in,
+RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
+                                      const std::string & name_in,
                                       const unsigned int number_in)
   : Parent(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
@@ -113,7 +113,7 @@ void RBEIMConstruction::clear()
   _parametrized_functions_in_training_set_initialized = false;
 }
 
-void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
+void RBEIMConstruction::process_parameters_file (const std::string & parameters_filename)
 {
   Parent::process_parameters_file(parameters_filename);
 
@@ -123,7 +123,7 @@ void RBEIMConstruction::process_parameters_file (const std::string& parameters_f
   set_best_fit_type_flag(best_fit_type_string);
 }
 
-void RBEIMConstruction::set_best_fit_type_flag (const std::string& best_fit_type_string)
+void RBEIMConstruction::set_best_fit_type_flag (const std::string & best_fit_type_string)
 {
   if(best_fit_type_string == "projection")
     {
@@ -242,7 +242,7 @@ void RBEIMConstruction::initialize_eim_assembly_objects()
     }
 }
 
-std::vector<ElemAssembly*> RBEIMConstruction::get_eim_assembly_objects()
+std::vector<ElemAssembly *> RBEIMConstruction::get_eim_assembly_objects()
 {
   return _rb_eim_assembly_objects;
 }
@@ -255,7 +255,7 @@ void RBEIMConstruction::enrich_RB_space()
   // this allows us to compute EIM_rhs appropriately
   solution->localize(*_ghosted_meshfunction_vector, this->get_dof_map().get_send_list());
 
-  RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  RBEIMEvaluation & eim_eval = cast_ref<RBEIMEvaluation &>(get_rb_evaluation());
 
   // If we have at least one basis function we need to use
   // rb_solve to find the EIM interpolation error, otherwise just use solution as is
@@ -298,10 +298,10 @@ void RBEIMConstruction::enrich_RB_space()
   Real largest_abs_value = -1.;
 
   // Compute truth representation via projection
-  MeshBase& mesh = this->get_mesh();
+  MeshBase & mesh = this->get_mesh();
 
   UniquePtr<DGFEMContext> c = this->build_context();
-  DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
+  DGFEMContext & context  = cast_ref<DGFEMContext &>(*c);
 
   this->init_context(context);
 
@@ -329,7 +329,7 @@ void RBEIMConstruction::enrich_RB_space()
                   optimal_var = var;
                   optimal_elem_id = (*el)->id();
 
-                  FEBase* elem_fe = NULL;
+                  FEBase * elem_fe = NULL;
                   context.get_element_fe( var, elem_fe );
                   optimal_point = elem_fe->get_xyz()[qp];
                 }
@@ -361,10 +361,10 @@ void RBEIMConstruction::enrich_RB_space()
     {
       eim_eval.interpolation_points.push_back(optimal_point);
       eim_eval.interpolation_points_var.push_back(optimal_var);
-      Elem* elem_ptr = mesh.elem(optimal_elem_id);
+      Elem * elem_ptr = mesh.elem(optimal_elem_id);
       eim_eval.interpolation_points_elem.push_back( elem_ptr );
 
-      NumericVector<Number>* new_bf = NumericVector<Number>::build(this->comm()).release();
+      NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
       new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       *new_bf = *solution;
       get_rb_evaluation().basis_functions.push_back( new_bf );
@@ -494,14 +494,14 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   // Otherwise, we have to compute the projection
   else
     {
-      RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+      RBEIMEvaluation & eim_eval = cast_ref<RBEIMEvaluation &>(get_rb_evaluation());
       eim_eval.set_parameters( get_parameters() );
 
       // Compute truth representation via projection
-      const MeshBase& mesh = this->get_mesh();
+      const MeshBase & mesh = this->get_mesh();
 
       UniquePtr<DGFEMContext> c = this->build_context();
-      DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
+      DGFEMContext & context  = cast_ref<DGFEMContext &>(*c);
 
       this->init_context(context);
 
@@ -517,11 +517,11 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
           // All variables should have the same quadrature rule, hence
           // we can get JxW and xyz based on first_elem_fe.
-          FEBase* first_elem_fe = NULL;
+          FEBase * first_elem_fe = NULL;
           context.get_element_fe( 0, first_elem_fe );
           unsigned int n_qpoints = context.get_element_qrule().n_points();
-          const std::vector<Real> &JxW = first_elem_fe->get_JxW();
-          const std::vector<Point> &xyz = first_elem_fe->get_xyz();
+          const std::vector<Real> & JxW = first_elem_fe->get_JxW();
+          const std::vector<Point> & xyz = first_elem_fe->get_xyz();
 
           // Loop over qp before var because parametrized functions often use
           // some caching based on qp.
@@ -529,11 +529,11 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
             {
               for (unsigned int var=0; var<n_vars(); var++)
                 {
-                  FEBase* elem_fe = NULL;
+                  FEBase * elem_fe = NULL;
                   context.get_element_fe( var, elem_fe );
-                  const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+                  const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
-                  DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
+                  DenseSubVector<Number> & subresidual_var = context.get_elem_residual( var );
 
                   unsigned int n_var_dofs = cast_int<unsigned int>(context.get_dof_indices( var ).size());
 
@@ -571,13 +571,13 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   return 0.;
 }
 
-void RBEIMConstruction::init_context(FEMContext &c)
+void RBEIMConstruction::init_context(FEMContext & c)
 {
   // default implementation of init_context
   // for compute_best_fit
   for(unsigned int var=0; var<n_vars(); var++)
     {
-      FEBase* elem_fe = NULL;
+      FEBase * elem_fe = NULL;
       c.get_element_fe( var, elem_fe );
       elem_fe->get_JxW();
       elem_fe->get_phi();
@@ -593,7 +593,7 @@ void RBEIMConstruction::update_RB_system_matrices()
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  RBEIMEvaluation & eim_eval = cast_ref<RBEIMEvaluation &>(get_rb_evaluation());
 
   // update the EIM interpolation matrix
   for(unsigned int j=0; j<RB_size; j++)

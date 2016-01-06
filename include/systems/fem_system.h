@@ -58,8 +58,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  FEMSystem (EquationSystems& es,
-             const std::string& name,
+  FEMSystem (EquationSystems & es,
+             const std::string & name,
              const unsigned int number);
 
   /**
@@ -140,7 +140,7 @@ public:
    * quantities of interest that are not expressible as a sum of
    * element qois.
    */
-  virtual void assemble_qoi (const QoISet& indices = QoISet()) libmesh_override;
+  virtual void assemble_qoi (const QoISet & indices = QoISet()) libmesh_override;
 
   /**
    * Runs a qoi derivative assembly loop over all elements, and if
@@ -149,7 +149,7 @@ public:
    * Users may have to override this function for quantities of
    * interest that are not expressible as a sum of element qois.
    */
-  virtual void assemble_qoi_derivative (const QoISet &qoi_indices = QoISet(),
+  virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
                                         bool include_liftfunc = true,
                                         bool apply_constraints = true) libmesh_override;
 
@@ -203,35 +203,35 @@ public:
   /**
    * Syntax sugar to make numerical_jacobian() declaration easier.
    */
-  typedef bool (TimeSolver::*TimeSolverResPtr)(bool, DiffContext&);
+  typedef bool (TimeSolver::*TimeSolverResPtr)(bool, DiffContext &);
 
   /**
    * Uses the results of multiple \p res calls
    * to numerically differentiate the corresponding jacobian.
    */
   void numerical_jacobian (TimeSolverResPtr res,
-                           FEMContext &context) const;
+                           FEMContext & context) const;
 
   /**
    * Uses the results of multiple element_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on an element.
    */
-  void numerical_elem_jacobian (FEMContext &context) const;
+  void numerical_elem_jacobian (FEMContext & context) const;
 
   /**
    * Uses the results of multiple side_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on an element's side.
    */
-  void numerical_side_jacobian (FEMContext &context) const;
+  void numerical_side_jacobian (FEMContext & context) const;
 
   /**
    * Uses the results of multiple side_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on nonlocal DoFs.
    */
-  void numerical_nonlocal_jacobian (FEMContext &context) const;
+  void numerical_nonlocal_jacobian (FEMContext & context) const;
 
 protected:
   /**

@@ -23,7 +23,7 @@
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 // This header defines some typedefs that are useful for working with
-// "unordered" containers of Elem* that use Elem::key() as a hash
+// "unordered" containers of Elem * that use Elem::key() as a hash
 // function.
 namespace libMesh
 {
@@ -43,7 +43,7 @@ public:
   // used with the "unordered" container types.  Simply returns
   // elem->key() as the hash.
   inline
-  std::size_t operator()(const Elem* elem) const
+  std::size_t operator()(const Elem * elem) const
   {
     return cast_int<std::size_t>(elem->key());
   }
@@ -59,8 +59,8 @@ public:
   }
 };
 
-// A convenient type for working with unordered_multiset<Elem*>
-typedef LIBMESH_BEST_UNORDERED_MULTISET<Elem*, ElemHashUtils, ElemHashUtils> unordered_multiset_elem;
+// A convenient type for working with unordered_multiset<Elem *>
+typedef LIBMESH_BEST_UNORDERED_MULTISET<Elem *, ElemHashUtils, ElemHashUtils> unordered_multiset_elem;
 
 }
 

@@ -144,7 +144,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
 // why it works, but it does.
 void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositioned
                                     unsigned int p, // # of partitions
-                                    std::vector<std::vector<unsigned int> >& result)
+                                    std::vector<std::vector<unsigned int> > & result)
 {
   // Clear out results remaining from previous calls
   result.clear();

@@ -16,7 +16,7 @@ L2System::~L2System ()
          it = input_contexts.begin();
        it != input_contexts.end(); ++it)
     {
-      FEMContext *c = it->second;
+      FEMContext * c = it->second;
       delete c;
     }
 }
@@ -32,9 +32,9 @@ void L2System::init_data ()
 
 
 
-void L2System::init_context(DiffContext &context)
+void L2System::init_context(DiffContext & context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext & c = libmesh_cast_ref<FEMContext &>(context);
 
   // Now make sure we have requested all the data
   // we need to build the L2 system.
@@ -59,32 +59,32 @@ void L2System::init_context(DiffContext &context)
 
 
 bool L2System::element_time_derivative (bool request_jacobian,
-                                        DiffContext &context)
+                                        DiffContext & context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext & c = libmesh_cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.get_element_fe(0)->get_JxW();
+  const std::vector<Real> & JxW = c.get_element_fe(0)->get_JxW();
 
-  const std::vector<std::vector<Real> > &phi = c.get_element_fe(0)->get_phi();
+  const std::vector<std::vector<Real> > & phi = c.get_element_fe(0)->get_phi();
 
-  const std::vector<Point> &xyz = c.get_element_fe(0)->get_xyz();
+  const std::vector<Point> & xyz = c.get_element_fe(0)->get_xyz();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.get_dof_indices(0).size();
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &K = c.get_elem_jacobian(0, 0);
-  DenseSubVector<Number> &F = c.get_elem_residual(0);
+  DenseSubMatrix<Number> & K = c.get_elem_jacobian(0, 0);
+  DenseSubVector<Number> & F = c.get_elem_residual(0);
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   libmesh_assert (input_contexts.find(&c) != input_contexts.end());
 
-  FEMContext &input_c = *input_contexts[&c];
+  FEMContext & input_c = *input_contexts[&c];
   input_c.pre_fe_reinit(*input_system, &c.get_elem());
   input_c.elem_fe_reinit();
 

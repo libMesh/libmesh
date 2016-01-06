@@ -62,7 +62,7 @@ protected:
    * by the Mesh class.  A user should never instantiate
    * this class.  Therefore the constructor is protected.
    */
-  BoundaryInfo (const MeshBase& m);
+  BoundaryInfo (const MeshBase & m);
 
 public:
   /**
@@ -70,7 +70,7 @@ public:
    *
    * Note that it does not copy the mesh over (for obvious reasons).
    */
-  BoundaryInfo& operator=(const BoundaryInfo& other_boundary_info);
+  BoundaryInfo & operator=(const BoundaryInfo & other_boundary_info);
 
 
   /**
@@ -96,9 +96,9 @@ public:
    * pass a pointer to both the boundary_mesh's MeshData object,
    * and the MeshData object used for this mesh.
    */
-  void sync (UnstructuredMesh& boundary_mesh,
-             MeshData* boundary_mesh_data=NULL,
-             MeshData* this_mesh_data=NULL);
+  void sync (UnstructuredMesh & boundary_mesh,
+             MeshData * boundary_mesh_data=NULL,
+             MeshData * this_mesh_data=NULL);
 
   /**
    * Generates \p boundary_mesh data structures corresponding to the
@@ -115,10 +115,10 @@ public:
    * pass a pointer to both the boundary_mesh's MeshData object,
    * and the MeshData object used for this mesh.
    */
-  void sync (const std::set<boundary_id_type>& requested_boundary_ids,
-             UnstructuredMesh& boundary_mesh,
-             MeshData* boundary_mesh_data=NULL,
-             MeshData* this_mesh_data=NULL);
+  void sync (const std::set<boundary_id_type> & requested_boundary_ids,
+             UnstructuredMesh & boundary_mesh,
+             MeshData * boundary_mesh_data=NULL,
+             MeshData * this_mesh_data=NULL);
 
   /**
    * Suppose we have used sync to create \p boundary_mesh. Then each
@@ -131,9 +131,9 @@ public:
    *    corresponds to.
    * \p tolerance is used to identify when we have matching elements.
    */
-  void get_side_and_node_maps (UnstructuredMesh& boundary_mesh,
-                               std::map<dof_id_type, dof_id_type>& node_id_map,
-                               std::map<dof_id_type, unsigned char>& side_id_map,
+  void get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
+                               std::map<dof_id_type, dof_id_type> & node_id_map,
+                               std::map<dof_id_type, unsigned char> & side_id_map,
                                Real tolerance=1.e-6);
 
   /**
@@ -146,14 +146,14 @@ public:
    *
    * Only boundary elements with the specified ids are created.
    */
-  void add_elements (const std::set<boundary_id_type>& requested_boundary_ids,
-                     UnstructuredMesh& boundary_mesh);
+  void add_elements (const std::set<boundary_id_type> & requested_boundary_ids,
+                     UnstructuredMesh & boundary_mesh);
 
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
    * information data structures.
    */
-  void add_node (const Node* node,
+  void add_node (const Node * node,
                  const boundary_id_type id);
 
   /**
@@ -167,8 +167,8 @@ public:
    * Add \p Node \p node with boundary ids \p ids to the boundary
    * information data structure.
    */
-  void add_node (const Node* node,
-                 const std::vector<boundary_id_type>& ids);
+  void add_node (const Node * node,
+                 const std::vector<boundary_id_type> & ids);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh
@@ -189,7 +189,7 @@ public:
    * to the boundary information data structure.
    * Edge-based boundary IDs should only be used in 3D.
    */
-  void add_edge (const Elem* elem,
+  void add_edge (const Elem * elem,
                  const unsigned short int edge,
                  const boundary_id_type id);
 
@@ -198,9 +198,9 @@ public:
    * to the boundary information data structure.
    * Edge-based boundary IDs should only be used in 3D.
    */
-  void add_edge (const Elem* elem,
+  void add_edge (const Elem * elem,
                  const unsigned short int edge,
-                 const std::vector<boundary_id_type>& ids);
+                 const std::vector<boundary_id_type> & ids);
 
   /**
    * Add side \p side of element number \p elem with boundary id \p id
@@ -214,7 +214,7 @@ public:
    * Add side \p side of element \p elem with boundary id \p id
    * to the boundary information data structure.
    */
-  void add_side (const Elem* elem,
+  void add_side (const Elem * elem,
                  const unsigned short int side,
                  const boundary_id_type id);
 
@@ -222,34 +222,34 @@ public:
    * Add side \p side of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
    */
-  void add_side (const Elem* elem,
+  void add_side (const Elem * elem,
                  const unsigned short int side,
-                 const std::vector<boundary_id_type>& ids);
+                 const std::vector<boundary_id_type> & ids);
 
   /**
    * Removes the boundary conditions associated with node \p node,
    * if any exist.
    */
-  void remove (const Node* node);
+  void remove (const Node * node);
 
   /**
    * Removes the boundary conditions associated with element \p elem,
    * if any exist.
    */
-  void remove (const Elem* elem);
+  void remove (const Elem * elem);
 
   /**
    * Removes all boundary conditions associated with edge \p edge of
    * element \p elem, if any exist.
    */
-  void remove_edge (const Elem* elem,
+  void remove_edge (const Elem * elem,
                     const unsigned short int edge);
 
   /**
    * Removes the boundary id \p id from edge \p edge of element \p
    * elem, if it exists.
    */
-  void remove_edge (const Elem* elem,
+  void remove_edge (const Elem * elem,
                     const unsigned short int edge,
                     const boundary_id_type id);
 
@@ -257,14 +257,14 @@ public:
    * Removes all boundary conditions associated with side \p side of
    * element \p elem, if any exist.
    */
-  void remove_side (const Elem* elem,
+  void remove_side (const Elem * elem,
                     const unsigned short int side);
 
   /**
    * Removes the boundary id \p id from side \p side of element \p
    * elem, if it exists.
    */
-  void remove_side (const Elem* elem,
+  void remove_side (const Elem * elem,
                     const unsigned short int side,
                     const boundary_id_type id);
 
@@ -286,7 +286,7 @@ public:
   /**
    * Returns true iff the given node is associated with the given id.
    */
-  bool has_boundary_id (const Node* const node,
+  bool has_boundary_id (const Node * const node,
                         const boundary_id_type id) const;
 
   /**
@@ -295,7 +295,7 @@ public:
    * This function has been deprecated.  Instead, use the version of
    * this function that fills a std::vector.
    */
-  std::vector<boundary_id_type> boundary_ids (const Node* node) const;
+  std::vector<boundary_id_type> boundary_ids (const Node * node) const;
 
   /**
    * Fills a user-provided std::vector with the boundary ids associated
@@ -303,20 +303,20 @@ public:
    *
    * This is the non-deprecated version of the function.
    */
-  void boundary_ids (const Node* node,
+  void boundary_ids (const Node * node,
                      std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
    * Returns the number of boundary ids associated with \p Node \p node.
    */
-  unsigned int n_boundary_ids (const Node* node) const;
+  unsigned int n_boundary_ids (const Node * node) const;
 
   /**
    * Returns the number of boundary ids associated with the \p edge
    * edge of element \p elem.
    * Edge-based boundary IDs should only be used in 3D.
    */
-  unsigned int n_edge_boundary_ids (const Elem* const elem,
+  unsigned int n_edge_boundary_ids (const Elem * const elem,
                                     const unsigned short int edge) const;
 
   /**
@@ -327,7 +327,7 @@ public:
    * This function has been deprecated.  Instead, use the version of
    * this function that fills a std::vector.
    */
-  std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
+  std::vector<boundary_id_type> edge_boundary_ids (const Elem * const elem,
                                                    const unsigned short int edge) const;
 
   /**
@@ -337,7 +337,7 @@ public:
    *
    * This is the non-deprecated version of the function.
    */
-  void edge_boundary_ids (const Elem* const elem,
+  void edge_boundary_ids (const Elem * const elem,
                           const unsigned short int edge,
                           std::vector<boundary_id_type> & vec_to_fill) const;
 
@@ -351,7 +351,7 @@ public:
    * This function has been deprecated.  Instead, use the version of
    * this function that fills a std::vector.
    */
-  std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem* const elem,
+  std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem * const elem,
                                                        const unsigned short int edge) const;
 
   /**
@@ -363,7 +363,7 @@ public:
    *
    * This is the non-deprecated version of the function.
    */
-  void raw_edge_boundary_ids (const Elem* const elem,
+  void raw_edge_boundary_ids (const Elem * const elem,
                               const unsigned short int edge,
                               std::vector<boundary_id_type> & vec_to_fill) const;
 
@@ -371,7 +371,7 @@ public:
    * Returns true iff the given side of the given element is
    * associated with the given id.
    */
-  bool has_boundary_id (const Elem* const elem,
+  bool has_boundary_id (const Elem * const elem,
                         const unsigned short int side,
                         const boundary_id_type id) const;
 
@@ -382,14 +382,14 @@ public:
    * if the \p side does not have an associated boundary id, hence
    * \p invalid_id can be used as the default boundary id.
    */
-  boundary_id_type boundary_id (const Elem* const elem,
+  boundary_id_type boundary_id (const Elem * const elem,
                                 const unsigned short int side) const;
 
   /**
    * Returns the number of boundary ids associated with the \p side
    * side of element \p elem.
    */
-  unsigned int n_boundary_ids (const Elem* const elem,
+  unsigned int n_boundary_ids (const Elem * const elem,
                                const unsigned short int side) const;
 
   /**
@@ -399,7 +399,7 @@ public:
    * This function has been deprecated.  Instead, use the version of
    * this function that fills a std::vector.
    */
-  std::vector<boundary_id_type> boundary_ids (const Elem* const elem,
+  std::vector<boundary_id_type> boundary_ids (const Elem * const elem,
                                               const unsigned short int side) const;
 
   /**
@@ -408,7 +408,7 @@ public:
    *
    * This is the non-deprecated version of the function.
    */
-  void boundary_ids (const Elem* const elem,
+  void boundary_ids (const Elem * const elem,
                      const unsigned short int side,
                      std::vector<boundary_id_type> & vec_to_fill) const;
 
@@ -421,7 +421,7 @@ public:
    * This function has been deprecated.  Instead, use the version of
    * this function that fills a std::vector.
    */
-  std::vector<boundary_id_type> raw_boundary_ids (const Elem* const elem,
+  std::vector<boundary_id_type> raw_boundary_ids (const Elem * const elem,
                                                   const unsigned short int side) const;
 
   /**
@@ -432,7 +432,7 @@ public:
    *
    * This is the non-deprecated version of the function.
    */
-  void raw_boundary_ids (const Elem* const elem,
+  void raw_boundary_ids (const Elem * const elem,
                          const unsigned short int side,
                          std::vector<boundary_id_type> & vec_to_fill) const;
 
@@ -444,18 +444,18 @@ public:
    *
    * Returns \p invalid_uint if no side has the requested boundary id.
    */
-  unsigned int side_with_boundary_id(const Elem* const elem,
+  unsigned int side_with_boundary_id(const Elem * const elem,
                                      const boundary_id_type boundary_id) const;
 
   /**
    * Builds the list of unique node boundary ids.
    */
-  void build_node_boundary_ids(std::vector<boundary_id_type>& b_ids) const;
+  void build_node_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
    * Builds the list of unique side boundary ids.
    */
-  void build_side_boundary_ids(std::vector<boundary_id_type>& b_ids) const;
+  void build_side_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
    * @returns the number of element-side-based boundary conditions.
@@ -476,8 +476,8 @@ public:
   /**
    * Creates a list of nodes and ids for those nodes.
    */
-  void build_node_list (std::vector<dof_id_type>&      node_id_list,
-                        std::vector<boundary_id_type>& bc_id_list) const;
+  void build_node_list (std::vector<dof_id_type> &      node_id_list,
+                        std::vector<boundary_id_type> & bc_id_list) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -494,34 +494,34 @@ public:
   /**
    * Creates a list of element numbers, sides, and ids for those sides.
    */
-  void build_side_list (std::vector<dof_id_type>&        element_id_list,
-                        std::vector<unsigned short int>& side_list,
-                        std::vector<boundary_id_type>&   bc_id_list) const;
+  void build_side_list (std::vector<dof_id_type> &        element_id_list,
+                        std::vector<unsigned short int> & side_list,
+                        std::vector<boundary_id_type> &   bc_id_list) const;
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.
    */
-  void build_active_side_list (std::vector<dof_id_type>&        element_id_list,
-                               std::vector<unsigned short int>& side_list,
-                               std::vector<boundary_id_type>&   bc_id_list) const;
+  void build_active_side_list (std::vector<dof_id_type> &        element_id_list,
+                               std::vector<unsigned short int> & side_list,
+                               std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
    * Creates a list of element numbers, edges, and boundary ids for those edges.
    */
-  void build_edge_list (std::vector<dof_id_type>&        element_id_list,
-                        std::vector<unsigned short int>& edge_list,
-                        std::vector<boundary_id_type>&   bc_id_list) const;
+  void build_edge_list (std::vector<dof_id_type> &        element_id_list,
+                        std::vector<unsigned short int> & edge_list,
+                        std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
    * @returns the user-specified boundary ids.
    */
-  const std::set<boundary_id_type>& get_boundary_ids () const
+  const std::set<boundary_id_type> & get_boundary_ids () const
   { return _boundary_ids; }
 
   /**
    * Returns a reference to the set of all boundary IDs
    * specified on sides.
    */
-  const std::set<boundary_id_type>& get_side_boundary_ids () const
+  const std::set<boundary_id_type> & get_side_boundary_ids () const
   { return _side_boundary_ids; }
 
   /**
@@ -529,69 +529,69 @@ public:
    * specified on edges.
    * Edge-based boundary IDs should only be used in 3D.
    */
-  const std::set<boundary_id_type>& get_edge_boundary_ids () const
+  const std::set<boundary_id_type> & get_edge_boundary_ids () const
   { return _edge_boundary_ids; }
 
   /**
    * Returns a reference to the set of all boundary IDs
    * specified on nodes.
    */
-  const std::set<boundary_id_type>& get_node_boundary_ids () const
+  const std::set<boundary_id_type> & get_node_boundary_ids () const
   { return _node_boundary_ids; }
 
 
   /**
    * Print the boundary information data structure.
    */
-  void print_info (std::ostream& out=libMesh::out) const;
+  void print_info (std::ostream & out=libMesh::out) const;
 
   /**
    * Print a summary of the boundary information.
    */
-  void print_summary (std::ostream& out=libMesh::out) const;
+  void print_summary (std::ostream & out=libMesh::out) const;
 
   /**
    * Returns a reference for getting an optional name for a sideset.
    */
-  const std::string& get_sideset_name(boundary_id_type id) const;
+  const std::string & get_sideset_name(boundary_id_type id) const;
 
   /**
    * Returns a writable reference for setting an optional
    * name for a sideset.
    */
-  std::string& sideset_name(boundary_id_type id);
+  std::string & sideset_name(boundary_id_type id);
 
   /**
    * Returns a reference for getting an optional name for a nodeset.
    */
-  const std::string& get_nodeset_name(boundary_id_type id) const;
+  const std::string & get_nodeset_name(boundary_id_type id) const;
 
   /**
    * Returns a writable reference for setting an optional
    * name for a nodeset.
    */
-  std::string& nodeset_name(boundary_id_type id);
+  std::string & nodeset_name(boundary_id_type id);
 
   /**
    * Returns the id of the named boundary if it exists, invalid_id
    * otherwise.
    */
-  boundary_id_type get_id_by_name(const std::string& name) const;
+  boundary_id_type get_id_by_name(const std::string & name) const;
 
   /**
    * Return a writeable reference to the whole sideset name map
    */
-  std::map<boundary_id_type, std::string>& set_sideset_name_map ()
+  std::map<boundary_id_type, std::string> & set_sideset_name_map ()
   { return _ss_id_to_name; }
-  const std::map<boundary_id_type, std::string>& get_sideset_name_map () const
+  const std::map<boundary_id_type, std::string> & get_sideset_name_map () const
   { return _ss_id_to_name; }
 
   /**
    * Return a writeable reference to the whole nodeset name map
    */
-  std::map<boundary_id_type, std::string>& set_nodeset_name_map ()
+  std::map<boundary_id_type, std::string> & set_nodeset_name_map ()
   { return _ns_id_to_name; }
-  const std::map<boundary_id_type, std::string>& get_nodeset_name_map () const
+  const std::map<boundary_id_type, std::string> & get_nodeset_name_map () const
   { return _ns_id_to_name; }
 
   /**
@@ -608,7 +608,7 @@ private:
    * dof_object ids.  Either node_id_map or side_id_map can be NULL,
    * in which case it will not be filled.
    */
-  void _find_id_maps (const std::set<boundary_id_type>& requested_boundary_ids,
+  void _find_id_maps (const std::set<boundary_id_type> & requested_boundary_ids,
                       dof_id_type first_free_node_id,
                       std::map<dof_id_type, dof_id_type> * node_id_map,
                       dof_id_type first_free_elem_id,
@@ -617,53 +617,53 @@ private:
   /**
    * The Mesh this boundary info pertains to.
    */
-  const MeshBase& _mesh;
+  const MeshBase & _mesh;
 
   /**
    * Data structure that maps nodes in the mesh
    * to boundary ids.
    */
-  std::multimap<const Node*,
+  std::multimap<const Node *,
                 boundary_id_type> _boundary_node_id;
 
   /**
    * Typdef for iterators into the _boundary_node_id container.
    */
-  typedef std::multimap<const Node*, boundary_id_type>::const_iterator boundary_node_iter;
+  typedef std::multimap<const Node *, boundary_id_type>::const_iterator boundary_node_iter;
 
   /**
    * Some older compilers don't support erasing from a map with
    * const_iterators, so we need to use a non-const iterator in those
    * situations.
    */
-  typedef std::multimap<const Node*, boundary_id_type>::iterator boundary_node_erase_iter;
+  typedef std::multimap<const Node *, boundary_id_type>::iterator boundary_node_erase_iter;
 
   /**
    * Data structure that maps edges of elements
    * to boundary ids. This is only relevant in 3D.
    */
-  std::multimap<const Elem*,
+  std::multimap<const Elem *,
                 std::pair<unsigned short int, boundary_id_type> >
   _boundary_edge_id;
 
   /**
    * Typdef for iterators into the _boundary_edge_id container.
    */
-  typedef std::multimap<const Elem*,
+  typedef std::multimap<const Elem *,
                         std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_edge_iter;
 
   /**
    * Data structure that maps sides of elements
    * to boundary ids.
    */
-  std::multimap<const Elem*,
+  std::multimap<const Elem *,
                 std::pair<unsigned short int, boundary_id_type> >
   _boundary_side_id;
 
   /**
    * Typdef for iterators into the _boundary_side_id container.
    */
-  typedef std::multimap<const Elem*,
+  typedef std::multimap<const Elem *,
                         std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_side_iter;
 
   /**
@@ -671,7 +671,7 @@ private:
    * const_iterators, so we need to use a non-const iterator in those
    * situations.
    */
-  typedef std::multimap<const Elem*,
+  typedef std::multimap<const Elem *,
                         std::pair<unsigned short int, boundary_id_type> >::iterator erase_iter;
   /**
    * A collection of user-specified boundary ids for sides, edges and nodes.

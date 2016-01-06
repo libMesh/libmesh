@@ -54,7 +54,7 @@ template <typename FFunctor, typename GFunctor,
 class GenericProjector
 {
 private:
-  const System &system;
+  const System & system;
 
   // For TBB compatibility and thread safety we'll copy these in
   // operator()
@@ -62,14 +62,14 @@ private:
   const GFunctor * master_g;  // Needed for C1 type elements only
   bool g_was_copied;
   const ProjectionAction & master_action;
-  const std::vector<unsigned int>& variables;
+  const std::vector<unsigned int> & variables;
 
 public:
-  GenericProjector (const System &system_in,
+  GenericProjector (const System & system_in,
                     const FFunctor & f_in,
                     const GFunctor * g_in,
                     const ProjectionAction & act_in,
-                    const std::vector<unsigned int>& variables_in) :
+                    const std::vector<unsigned int> & variables_in) :
     system(system_in),
     master_f(f_in),
     master_g(g_in),
@@ -78,7 +78,7 @@ public:
     variables(variables_in)
   {}
 
-  GenericProjector (const GenericProjector& in) :
+  GenericProjector (const GenericProjector & in) :
     system(in.system),
     master_f(in.master_f),
     master_g(in.master_g ? new GFunctor(*in.master_g) : NULL),
@@ -93,7 +93,7 @@ public:
       delete master_g;
   }
 
-  void operator() (const ConstElemRange &range) const;
+  void operator() (const ConstElemRange & range) const;
 };
 
 
@@ -107,15 +107,15 @@ template <typename Val>
 class VectorSetAction
 {
 private:
-  NumericVector<Val> &target_vector;
+  NumericVector<Val> & target_vector;
 
 public:
-  VectorSetAction(NumericVector<Val> &target_vec) :
+  VectorSetAction(NumericVector<Val> & target_vec) :
     target_vector(target_vec) {}
 
-  void insert(const FEMContext &c,
+  void insert(const FEMContext & c,
               unsigned int var_num,
-              const DenseVector<Val> &Ue)
+              const DenseVector<Val> & Ue)
   {
     const numeric_index_type
       first = target_vector.first_local_index(),
@@ -144,22 +144,22 @@ template <typename Output>
 class FEMFunctionWrapper
 {
 public:
-  FEMFunctionWrapper(const FEMFunctionBase<Output> &f) : _f(f.clone()) {}
+  FEMFunctionWrapper(const FEMFunctionBase<Output> & f) : _f(f.clone()) {}
 
-  FEMFunctionWrapper(const FEMFunctionWrapper<Output> &fw) :
+  FEMFunctionWrapper(const FEMFunctionWrapper<Output> & fw) :
     _f(fw._f->clone()) {}
 
-  void init_context (FEMContext &c) { _f->init_context(c); }
+  void init_context (FEMContext & c) { _f->init_context(c); }
 
-  Output eval_at_node (const FEMContext& c,
+  Output eval_at_node (const FEMContext & c,
                        unsigned int i,
-                       const Node& n,
+                       const Node & n,
                        const Real time)
   { return _f->component(c, i, n, time); }
 
-  Output eval_at_point (const FEMContext& c,
+  Output eval_at_point (const FEMContext & c,
                         unsigned int i,
-                        const Point& n,
+                        const Point & n,
                         const Real time)
   { return _f->component(c, i, n, time); }
 
@@ -169,27 +169,29 @@ private:
 
 
 template <typename Output,
-          void (FEMContext::*point_output)
-            (unsigned int, const Point &, Output&, const Real) const>
+          void (FEMContext::*point_output) (unsigned int,
+                                            const Point &,
+                                            Output &,
+                                            const Real) const>
 class OldSolutionValue
 {
 public:
-  OldSolutionValue(const libMesh::System &sys_in,
+  OldSolutionValue(const libMesh::System & sys_in,
                    const NumericVector<Number> & old_sol) :
-  last_elem(NULL),
-  sys(sys_in),
-  old_context(sys_in),
-  old_solution(old_sol)
+    last_elem(NULL),
+    sys(sys_in),
+    old_context(sys_in),
+    old_solution(old_sol)
   {
     old_context.set_algebraic_type(FEMContext::OLD);
     old_context.set_custom_solution(&old_solution);
   }
 
-  OldSolutionValue(const OldSolutionValue &in) :
-  last_elem(NULL),
-  sys(in.sys),
-  old_context(sys),
-  old_solution(in.old_solution)
+  OldSolutionValue(const OldSolutionValue & in) :
+    last_elem(NULL),
+    sys(in.sys),
+    old_context(sys),
+    old_solution(in.old_solution)
   {
     old_context.set_algebraic_type(FEMContext::OLD);
     old_context.set_custom_solution(&old_solution);
@@ -197,19 +199,19 @@ public:
 
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
-  void init_context (FEMContext &c)
+  void init_context (FEMContext & c)
   {
     c.set_algebraic_type(FEMContext::DOFS_ONLY);
   }
 
-  Output eval_at_node (const FEMContext& c,
+  Output eval_at_node (const FEMContext & c,
                        unsigned int i,
-                       const Node& n,
+                       const Node & n,
                        Real /* time */ =0.);
 
-  Output eval_at_point(const FEMContext& c,
+  Output eval_at_point(const FEMContext & c,
                        unsigned int i,
-                       const Point& p,
+                       const Point & p,
                        Real /* time */ =0.)
   {
     START_LOG ("component(c,i,p,t)", "OldSolutionValue");
@@ -226,7 +228,7 @@ public:
   }
 
 protected:
-  bool check_old_context (const FEMContext& c, const Point& p)
+  bool check_old_context (const FEMContext & c, const Point & p)
   {
     START_LOG ("check_old_context", "OldSolutionValue");
     const Elem & elem = c.get_elem();
@@ -298,8 +300,8 @@ protected:
   }
 
 private:
-  const Elem *last_elem;
-  const System &sys;
+  const Elem * last_elem;
+  const System & sys;
   FEMContext old_context;
   const NumericVector<Number> & old_solution;
 
@@ -310,91 +312,83 @@ private:
 template<>
 inline
 Number
-OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node
-  (const FEMContext& c,
-   unsigned int i,
-   const Node& n,
-   Real)
-  {
-    START_LOG ("Number eval_at_node()", "OldSolutionValue");
+OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node (const FEMContext & c,
+                                                                  unsigned int i,
+                                                                  const Node & n,
+                                                                  Real)
+{
+  START_LOG ("Number eval_at_node()", "OldSolutionValue");
 
-    // Optimize for the common case, where this node was part of the
-    // old solution.
-    //
-    // Be sure to handle cases where the variable wasn't defined on
-    // this node (due to changing subdomain support) or where the
-    // variable has no components on this node (due to Elem order
-    // exceeding FE order)
-    if (n.old_dof_object &&
-        n.old_dof_object->n_vars(sys.number()) &&
-        n.old_dof_object->n_comp(sys.number(), i))
-      {
-        const dof_id_type old_id =
-          n.old_dof_object->dof_number(sys.number(), i, 0);
-        STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
-        return old_solution(old_id);
-      }
+  // Optimize for the common case, where this node was part of the
+  // old solution.
+  //
+  // Be sure to handle cases where the variable wasn't defined on
+  // this node (due to changing subdomain support) or where the
+  // variable has no components on this node (due to Elem order
+  // exceeding FE order)
+  if (n.old_dof_object &&
+      n.old_dof_object->n_vars(sys.number()) &&
+      n.old_dof_object->n_comp(sys.number(), i))
+    {
+      const dof_id_type old_id =
+        n.old_dof_object->dof_number(sys.number(), i, 0);
+      STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
+      return old_solution(old_id);
+    }
 
-    STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
+  STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
 
-    return this->eval_at_point(c, i, n, 0);
-  }
+  return this->eval_at_point(c, i, n, 0);
+}
 
 
 
 template<>
 inline
 Gradient
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node
-  (const FEMContext& c,
-   unsigned int i,
-   const Node& n,
-   Real)
-  {
-    START_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node (const FEMContext & c,
+                                                                       unsigned int i,
+                                                                       const Node & n,
+                                                                       Real)
+{
+  START_LOG ("Gradient eval_at_node()", "OldSolutionValue");
 
-    // Optimize for the common case, where this node was part of the
-    // old solution.
-    //
-    // Be sure to handle cases where the variable wasn't defined on
-    // this node (due to changing subdomain support) or where the
-    // variable has no components on this node (due to Elem order
-    // exceeding FE order)
-    if (n.old_dof_object &&
-        n.old_dof_object->n_vars(sys.number()) &&
-        n.old_dof_object->n_comp(sys.number(), i))
-      {
-        Gradient g;
-        for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
-          {
-            const dof_id_type old_id =
-              n.old_dof_object->dof_number(sys.number(), i, d+1);
-            g(d) = old_solution(old_id);
-          }
-        STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
-        return g;
-      }
+  // Optimize for the common case, where this node was part of the
+  // old solution.
+  //
+  // Be sure to handle cases where the variable wasn't defined on
+  // this node (due to changing subdomain support) or where the
+  // variable has no components on this node (due to Elem order
+  // exceeding FE order)
+  if (n.old_dof_object &&
+      n.old_dof_object->n_vars(sys.number()) &&
+      n.old_dof_object->n_comp(sys.number(), i))
+    {
+      Gradient g;
+      for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+        {
+          const dof_id_type old_id =
+            n.old_dof_object->dof_number(sys.number(), i, d+1);
+          g(d) = old_solution(old_id);
+        }
+      STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+      return g;
+    }
 
-    STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+  STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
 
-    return this->eval_at_point(c, i, n, 0);
-  }
-
+  return this->eval_at_point(c, i, n, 0);
+}
 
 
 
 
-template <>
-const Real
-OldSolutionValue
-  <Number, &FEMContext::point_value>::out_of_elem_tol =
-  10*TOLERANCE;
 
 template <>
-const Real
-OldSolutionValue
-  <Gradient, &FEMContext::point_gradient>::out_of_elem_tol =
-  10*TOLERANCE;
+const Real OldSolutionValue<Number, &FEMContext::point_value>::out_of_elem_tol = 10*TOLERANCE;
+
+template <>
+const Real OldSolutionValue <Gradient, &FEMContext::point_gradient>::out_of_elem_tol = 10*TOLERANCE;
 
 
 /**
@@ -409,22 +403,22 @@ OldSolutionValue
 class BuildProjectionList
 {
 private:
-  const System              &system;
+  const System & system;
 
 public:
-  BuildProjectionList (const System &system_in) :
+  BuildProjectionList (const System & system_in) :
     system(system_in),
     send_list()
   {}
 
-  BuildProjectionList (BuildProjectionList &other, Threads::split) :
+  BuildProjectionList (BuildProjectionList & other, Threads::split) :
     system(other.system),
     send_list()
   {}
 
   void unique();
-  void operator()(const ConstElemRange &range);
-  void join (const BuildProjectionList &other);
+  void operator()(const ConstElemRange & range);
+  void join (const BuildProjectionList & other);
   std::vector<dof_id_type> send_list;
 };
 
@@ -438,22 +432,22 @@ public:
 class BoundaryProjectSolution
 {
 private:
-  const std::set<boundary_id_type> &b;
-  const std::vector<unsigned int>  &variables;
-  const System                     &system;
-  UniquePtr<FunctionBase<Number> >    f;
-  UniquePtr<FunctionBase<Gradient> >  g;
-  const Parameters                 &parameters;
-  NumericVector<Number>            &new_vector;
+  const std::set<boundary_id_type> & b;
+  const std::vector<unsigned int>  & variables;
+  const System                     & system;
+  UniquePtr<FunctionBase<Number> >   f;
+  UniquePtr<FunctionBase<Gradient> > g;
+  const Parameters                 & parameters;
+  NumericVector<Number>            & new_vector;
 
 public:
-  BoundaryProjectSolution (const std::set<boundary_id_type> &b_in,
-                           const std::vector<unsigned int> &variables_in,
-                           const System &system_in,
-                           FunctionBase<Number>* f_in,
-                           FunctionBase<Gradient>* g_in,
-                           const Parameters &parameters_in,
-                           NumericVector<Number> &new_v_in) :
+  BoundaryProjectSolution (const std::set<boundary_id_type> & b_in,
+                           const std::vector<unsigned int> & variables_in,
+                           const System & system_in,
+                           FunctionBase<Number> * f_in,
+                           FunctionBase<Gradient> * g_in,
+                           const Parameters & parameters_in,
+                           NumericVector<Number> & new_v_in) :
     b(b_in),
     variables(variables_in),
     system(system_in),
@@ -468,7 +462,7 @@ public:
       g->init();
   }
 
-  BoundaryProjectSolution (const BoundaryProjectSolution &in) :
+  BoundaryProjectSolution (const BoundaryProjectSolution & in) :
     b(in.b),
     variables(in.variables),
     system(in.system),
@@ -483,14 +477,14 @@ public:
       g->init();
   }
 
-  void operator()(const ConstElemRange &range) const;
+  void operator()(const ConstElemRange & range) const;
 };
 
 
 
 // ------------------------------------------------------------
 // System implementation
-void System::project_vector (NumericVector<Number>& vector,
+void System::project_vector (NumericVector<Number> & vector,
                              int is_adjoint) const
 {
   // Create a copy of the vector, which currently
@@ -508,8 +502,8 @@ void System::project_vector (NumericVector<Number>& vector,
  * via L2 projections or nodal
  * interpolations on each element.
  */
-void System::project_vector (const NumericVector<Number>& old_v,
-                             NumericVector<Number>& new_v,
+void System::project_vector (const NumericVector<Number> & old_v,
+                             NumericVector<Number> & new_v,
                              int is_adjoint) const
 {
   START_LOG ("project_vector(old,new)", "System");
@@ -525,11 +519,11 @@ void System::project_vector (const NumericVector<Number>& old_v,
 #ifdef LIBMESH_ENABLE_AMR
 
   // Resize the new vector and get a serial version.
-  NumericVector<Number> *new_vector_ptr = NULL;
+  NumericVector<Number> * new_vector_ptr = NULL;
   UniquePtr<NumericVector<Number> > new_vector_built;
-  NumericVector<Number> *local_old_vector;
+  NumericVector<Number> * local_old_vector;
   UniquePtr<NumericVector<Number> > local_old_vector_built;
-  const NumericVector<Number> *old_vector_ptr = NULL;
+  const NumericVector<Number> * old_vector_ptr = NULL;
 
   ConstElemRange active_local_elem_range
     (this->get_mesh().active_local_elements_begin(),
@@ -598,8 +592,8 @@ void System::project_vector (const NumericVector<Number>& old_v,
   libmesh_assert(new_vector_ptr);
   libmesh_assert(old_vector_ptr);
 
-  NumericVector<Number> &new_vector = *new_vector_ptr;
-  const NumericVector<Number> &old_vector = *old_vector_ptr;
+  NumericVector<Number> & new_vector = *new_vector_ptr;
+  const NumericVector<Number> & old_vector = *old_vector_ptr;
 
   const unsigned int n_variables = this->n_vars();
 
@@ -611,10 +605,9 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
       typedef
-        GenericProjector
-          <OldSolutionValue<Number,   &FEMContext::point_value>,
-           OldSolutionValue<Gradient, &FEMContext::point_gradient>,
-           Number, VectorSetAction<Number> > FEMProjector;
+        GenericProjector<OldSolutionValue<Number,   &FEMContext::point_value>,
+                         OldSolutionValue<Gradient, &FEMContext::point_gradient>,
+                         Number, VectorSetAction<Number> > FEMProjector;
 
       OldSolutionValue<Number,   &FEMContext::point_value>    f(*this, old_vector);
       OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
@@ -628,7 +621,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       // processor with highest ID
       if(this->processor_id() == (this->n_processors()-1))
         {
-          const DofMap& dof_map = this->get_dof_map();
+          const DofMap & dof_map = this->get_dof_map();
           for (unsigned int var=0; var<this->n_vars(); var++)
             if(this->variable(var).type().family == SCALAR)
               {
@@ -704,15 +697,15 @@ void System::project_vector (const NumericVector<Number>& old_v,
  * This method projects an arbitrary function onto the solution via L2
  * projections and nodal interpolations on each element.
  */
-void System::project_solution (Number fptr(const Point& p,
-                                           const Parameters& parameters,
-                                           const std::string& sys_name,
-                                           const std::string& unknown_name),
-                               Gradient gptr(const Point& p,
-                                             const Parameters& parameters,
-                                             const std::string& sys_name,
-                                             const std::string& unknown_name),
-                               const Parameters& parameters) const
+void System::project_solution (Number fptr(const Point & p,
+                                           const Parameters & parameters,
+                                           const std::string & sys_name,
+                                           const std::string & unknown_name),
+                               Gradient gptr(const Point & p,
+                                             const Parameters & parameters,
+                                             const std::string & sys_name,
+                                             const std::string & unknown_name),
+                               const Parameters & parameters) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -724,8 +717,8 @@ void System::project_solution (Number fptr(const Point& p,
  * This method projects an arbitrary function onto the solution via L2
  * projections and nodal interpolations on each element.
  */
-void System::project_solution (FunctionBase<Number> *f,
-                               FunctionBase<Gradient> *g) const
+void System::project_solution (FunctionBase<Number> * f,
+                               FunctionBase<Gradient> * g) const
 {
   this->project_vector(*solution, f, g);
 
@@ -737,8 +730,8 @@ void System::project_solution (FunctionBase<Number> *f,
  * This method projects an arbitrary function onto the solution via L2
  * projections and nodal interpolations on each element.
  */
-void System::project_solution (FEMFunctionBase<Number> *f,
-                               FEMFunctionBase<Gradient> *g) const
+void System::project_solution (FEMFunctionBase<Number> * f,
+                               FEMFunctionBase<Gradient> * g) const
 {
   this->project_vector(*solution, f, g);
 
@@ -750,16 +743,16 @@ void System::project_solution (FEMFunctionBase<Number> *f,
  * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
-void System::project_vector (Number fptr(const Point& p,
-                                         const Parameters& parameters,
-                                         const std::string& sys_name,
-                                         const std::string& unknown_name),
-                             Gradient gptr(const Point& p,
-                                           const Parameters& parameters,
-                                           const std::string& sys_name,
-                                           const std::string& unknown_name),
-                             const Parameters& parameters,
-                             NumericVector<Number>& new_vector,
+void System::project_vector (Number fptr(const Point & p,
+                                         const Parameters & parameters,
+                                         const std::string & sys_name,
+                                         const std::string & unknown_name),
+                             Gradient gptr(const Point & p,
+                                           const Parameters & parameters,
+                                           const std::string & sys_name,
+                                           const std::string & unknown_name),
+                             const Parameters & parameters,
+                             NumericVector<Number> & new_vector,
                              int is_adjoint) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
@@ -771,9 +764,9 @@ void System::project_vector (Number fptr(const Point& p,
  * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
-void System::project_vector (NumericVector<Number>& new_vector,
-                             FunctionBase<Number> *f,
-                             FunctionBase<Gradient> *g,
+void System::project_vector (NumericVector<Number> & new_vector,
+                             FunctionBase<Number> * f,
+                             FunctionBase<Gradient> * g,
                              int is_adjoint) const
 {
   START_LOG ("project_vector(FunctionBase)", "System");
@@ -799,9 +792,9 @@ void System::project_vector (NumericVector<Number>& new_vector,
  * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
-void System::project_vector (NumericVector<Number>& new_vector,
-                             FEMFunctionBase<Number> *f,
-                             FEMFunctionBase<Gradient> *g,
+void System::project_vector (NumericVector<Number> & new_vector,
+                             FEMFunctionBase<Number> * f,
+                             FEMFunctionBase<Gradient> * g,
                              int is_adjoint) const
 {
   START_LOG ("project_fem_vector()", "System");
@@ -822,9 +815,8 @@ void System::project_vector (NumericVector<Number>& new_vector,
 
   // Use a typedef to make the calling sequence for parallel_for() a bit more readable
   typedef
-    GenericProjector
-      <FEMFunctionWrapper<Number>, FEMFunctionWrapper<Gradient>,
-       Number, VectorSetAction<Number> > FEMProjector;
+    GenericProjector<FEMFunctionWrapper<Number>, FEMFunctionWrapper<Gradient>,
+                     Number, VectorSetAction<Number> > FEMProjector;
 
   FEMFunctionWrapper<Number> fw(*f);
 
@@ -849,15 +841,15 @@ void System::project_vector (NumericVector<Number>& new_vector,
       // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
       FEMContext context( *this );
 
-      const DofMap& dof_map = this->get_dof_map();
+      const DofMap & dof_map = this->get_dof_map();
       for (unsigned int var=0; var<this->n_vars(); var++)
         if(this->variable(var).type().family == SCALAR)
           {
             // FIXME: We reinit with an arbitrary element in case the user
             //        doesn't override FEMFunctionBase::component. Is there
             //        any use case we're missing? [PB]
-            Elem *el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
-            context.pre_fe_reinit( *this, el );
+            Elem * el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
+            context.pre_fe_reinit(*this, el);
 
             std::vector<dof_id_type> SCALAR_indices;
             dof_map.SCALAR_dof_indices (SCALAR_indices, var);
@@ -894,18 +886,17 @@ void System::project_vector (NumericVector<Number>& new_vector,
  * onto the solution via L2 projections and nodal interpolations on
  * each element.
  */
-void System::boundary_project_solution
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- Number fptr(const Point& p,
-             const Parameters& parameters,
-             const std::string& sys_name,
-             const std::string& unknown_name),
- Gradient gptr(const Point& p,
-               const Parameters& parameters,
-               const std::string& sys_name,
-               const std::string& unknown_name),
- const Parameters& parameters)
+void System::boundary_project_solution (const std::set<boundary_id_type> & b,
+                                        const std::vector<unsigned int> & variables,
+                                        Number fptr(const Point & p,
+                                                    const Parameters & parameters,
+                                                    const std::string & sys_name,
+                                                    const std::string & unknown_name),
+                                        Gradient gptr(const Point & p,
+                                                      const Parameters & parameters,
+                                                      const std::string & sys_name,
+                                                      const std::string & unknown_name),
+                                        const Parameters & parameters)
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -918,11 +909,10 @@ void System::boundary_project_solution
  * solution via L2 projections and nodal interpolations on each
  * element.
  */
-void System::boundary_project_solution
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- FunctionBase<Number> *f,
- FunctionBase<Gradient> *g)
+void System::boundary_project_solution (const std::set<boundary_id_type> & b,
+                                        const std::vector<unsigned int> & variables,
+                                        FunctionBase<Number> * f,
+                                        FunctionBase<Gradient> * g)
 {
   this->boundary_project_vector(b, variables, *solution, f, g);
 
@@ -937,20 +927,19 @@ void System::boundary_project_solution
  * This method projects an arbitrary boundary function via L2
  * projections and nodal interpolations on each element.
  */
-void System::boundary_project_vector
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- Number fptr(const Point& p,
-             const Parameters& parameters,
-             const std::string& sys_name,
-             const std::string& unknown_name),
- Gradient gptr(const Point& p,
-               const Parameters& parameters,
-               const std::string& sys_name,
-               const std::string& unknown_name),
- const Parameters& parameters,
- NumericVector<Number>& new_vector,
- int is_adjoint) const
+void System::boundary_project_vector (const std::set<boundary_id_type> & b,
+                                      const std::vector<unsigned int> & variables,
+                                      Number fptr(const Point & p,
+                                                  const Parameters & parameters,
+                                                  const std::string & sys_name,
+                                                  const std::string & unknown_name),
+                                      Gradient gptr(const Point & p,
+                                                    const Parameters & parameters,
+                                                    const std::string & sys_name,
+                                                    const std::string & unknown_name),
+                                      const Parameters & parameters,
+                                      NumericVector<Number> & new_vector,
+                                      int is_adjoint) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -962,13 +951,12 @@ void System::boundary_project_vector
  * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
-void System::boundary_project_vector
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- NumericVector<Number>& new_vector,
- FunctionBase<Number> *f,
- FunctionBase<Gradient> *g,
- int is_adjoint) const
+void System::boundary_project_vector (const std::set<boundary_id_type> & b,
+                                      const std::vector<unsigned int> & variables,
+                                      NumericVector<Number> & new_vector,
+                                      FunctionBase<Number> * f,
+                                      FunctionBase<Gradient> * g,
+                                      int is_adjoint) const
 {
   START_LOG ("boundary_project_vector()", "System");
 
@@ -1001,7 +989,7 @@ void System::boundary_project_vector
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
-  (const ConstElemRange &range) const
+  (const ConstElemRange & range) const
 {
   START_LOG ("operator()","GenericProjector");
 
@@ -1012,7 +1000,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
     g.reset(new GFunctor(*master_g));
 
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // The element matrix and RHS for projections.
   // Note that Ke is always real-valued, whereas
@@ -1035,11 +1023,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       const unsigned int var = variables[v];
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase* fe = NULL;
-      FEBase* side_fe = NULL;
-      FEBase* edge_fe = NULL;
+      FEBase * fe = NULL;
+      FEBase * side_fe = NULL;
+      FEBase * edge_fe = NULL;
 
-      const std::set<unsigned char>& elem_dims =
+      const std::set<unsigned char> & elem_dims =
         context.elem_dimensions();
 
       for (std::set<unsigned char>::const_iterator dim_it =
@@ -1089,7 +1077,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end();
        ++elem_it)
     {
-      const Elem* elem = *elem_it;
+      const Elem * elem = *elem_it;
 
       unsigned int dim = elem->dim();
 
@@ -1101,21 +1089,21 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
         {
           const unsigned int var = variables[v];
 
-          const Variable& variable = dof_map.variable(var);
+          const Variable & variable = dof_map.variable(var);
 
           // Per-subdomain variables don't need to be projected on
           // elements where they're not active
           if (!variable.active_on_subdomain(elem->subdomain_id()))
             continue;
 
-          const FEType& fe_type = variable.type();
+          const FEType & fe_type = variable.type();
 
           if (fe_type.family == SCALAR)
             continue;
 
-          FEBase* fe = NULL;
-          FEBase* side_fe = NULL;
-          FEBase* edge_fe = NULL;
+          FEBase * fe = NULL;
+          FEBase * side_fe = NULL;
+          FEBase * edge_fe = NULL;
 
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
@@ -1130,7 +1118,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           const unsigned int var_component =
             system.variable_scalar_number(var, 0);
 
-          const std::vector<dof_id_type>& dof_indices =
+          const std::vector<dof_id_type> & dof_indices =
             context.get_dof_indices(var);
 
           // The number of DOFs on the element
@@ -1168,8 +1156,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               // FIXME: this should go through the DofMap,
               // not duplicate dof_indices code badly!
               const unsigned int nc =
-                FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                             n);
+                FEInterface::n_dofs_at_node (dim, fe_type, elem_type, n);
 
               if (!elem->is_vertex(n))
                 {
@@ -1388,7 +1375,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                         if (dof_indices[i] == new_edge_dof)
                           {
                             dof_is_fixed[i] = true;
-                            FValue &ui = Ue(i);
+                            FValue & ui = Ue(i);
                             ui = f.eval_at_node(context,
                                                 var_component,
                                                 *node,
@@ -1403,17 +1390,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
-              const std::vector<Point>& xyz_values =
+              const std::vector<Point> & xyz_values =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 edge_fe->get_xyz() : fe->get_xyz();
-              const std::vector<Real>& JxW =
+              const std::vector<Real> & JxW =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 edge_fe->get_JxW() : fe->get_JxW();
 
-              const std::vector<std::vector<Real> >& phi =
+              const std::vector<std::vector<Real> > & phi =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 edge_fe->get_phi() : fe->get_phi();
-              const std::vector<std::vector<RealGradient> >* dphi = NULL;
+              const std::vector<std::vector<RealGradient> > * dphi = NULL;
               if (cont == C_ONE)
                 dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                   &(edge_fe->get_dphi()) : &(fe->get_dphi());
@@ -1539,7 +1526,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   // Transfer new edge solutions to element
                   for (unsigned int i=0; i != free_dofs; ++i)
                     {
-                      FValue &ui = Ue(side_dofs[free_dof[i]]);
+                      FValue & ui = Ue(side_dofs[free_dof[i]]);
                       libmesh_assert(std::abs(ui) < TOLERANCE ||
                                      std::abs(ui - Uedge(i)) < TOLERANCE);
                       ui = Uedge(i);
@@ -1557,17 +1544,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard side FE
-              const std::vector<Point>& xyz_values =
+              const std::vector<Point> & xyz_values =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 side_fe->get_xyz() : fe->get_xyz();
-              const std::vector<Real>& JxW =
+              const std::vector<Real> & JxW =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 side_fe->get_JxW() : fe->get_JxW();
 
-              const std::vector<std::vector<Real> >& phi =
+              const std::vector<std::vector<Real> > & phi =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 side_fe->get_phi() : fe->get_phi();
-              const std::vector<std::vector<RealGradient> >* dphi = NULL;
+              const std::vector<std::vector<RealGradient> > * dphi = NULL;
               if (cont == C_ONE)
                 dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                   &(side_fe->get_dphi()) : &(fe->get_dphi());
@@ -1693,7 +1680,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   // Transfer new side solutions to element
                   for (unsigned int i=0; i != free_dofs; ++i)
                     {
-                      FValue &ui = Ue(side_dofs[free_dof[i]]);
+                      FValue & ui = Ue(side_dofs[free_dof[i]]);
                       libmesh_assert(std::abs(ui) < TOLERANCE ||
                                      std::abs(ui - Uside(i)) < TOLERANCE);
                       ui = Uside(i);
@@ -1718,11 +1705,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // There may be nothing to project
           if (free_dofs)
             {
-              const std::vector<Point>& xyz_values = fe->get_xyz();
-              const std::vector<Real>& JxW = fe->get_JxW();
+              const std::vector<Point> & xyz_values = fe->get_xyz();
+              const std::vector<Real> & JxW = fe->get_JxW();
 
-              const std::vector<std::vector<Real> >& phi = fe->get_phi();
-              const std::vector<std::vector<RealGradient> >* dphi = NULL;
+              const std::vector<std::vector<Real> > & phi = fe->get_phi();
+              const std::vector<std::vector<RealGradient> > * dphi = NULL;
               if (cont == C_ONE)
                 dphi = &(fe->get_dphi());
 
@@ -1820,7 +1807,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               // Transfer new interior solutions to element
               for (unsigned int i=0; i != free_dofs; ++i)
                 {
-                  FValue &ui = Ue(free_dof[i]);
+                  FValue & ui = Ue(free_dof[i]);
                   libmesh_assert(std::abs(ui) < TOLERANCE ||
                                  std::abs(ui - Uint(i)) < TOLERANCE);
                   ui = Uint(i);
@@ -1870,10 +1857,10 @@ void BuildProjectionList::operator()(const ConstElemRange &)
   libmesh_not_implemented();
 }
 #else
-void BuildProjectionList::operator()(const ConstElemRange &range)
+void BuildProjectionList::operator()(const ConstElemRange & range)
 {
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   const dof_id_type first_old_dof = dof_map.first_old_dof();
   const dof_id_type end_old_dof   = dof_map.end_old_dof();
@@ -1885,7 +1872,7 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
   // Iterate over the elements in the range
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
     {
-      const Elem* elem = *elem_it;
+      const Elem * elem = *elem_it;
       // If this element doesn't have an old_dof_object with dofs for the
       // current system, then it must be newly added, so the user
       // is responsible for setting the new dofs.
@@ -1904,7 +1891,7 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
           elem->refinement_flag() != Elem::JUST_COARSENED)
         continue;
 
-      const Elem* parent = elem->parent();
+      const Elem * parent = elem->parent();
 
       if (elem->refinement_flag() == Elem::JUST_REFINED)
         {
@@ -1928,8 +1915,8 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
 
           for (unsigned int n=0; n != elem->n_nodes(); ++n)
             {
-              const Node* node = elem->get_node(n);
-              const DofObject* old_dofs = node->old_dof_object;
+              const Node * node = elem->get_node(n);
+              const DofObject * old_dofs = node->old_dof_object;
 
               if (old_dofs)
                 {
@@ -1976,7 +1963,7 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
 
 
 
-void BuildProjectionList::join(const BuildProjectionList &other)
+void BuildProjectionList::join(const BuildProjectionList & other)
 {
   // Joining simply requires I add the dof indices from the other object
   this->send_list.insert(this->send_list.end(),
@@ -1986,7 +1973,7 @@ void BuildProjectionList::join(const BuildProjectionList &other)
 
 
 
-void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
+void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 {
   // We need data to project
   libmesh_assert(f.get());
@@ -2002,10 +1989,10 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
   const unsigned int dim = system.get_mesh().mesh_dimension();
 
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Boundary info for the current mesh
-  const BoundaryInfo& boundary_info =
+  const BoundaryInfo & boundary_info =
     system.get_mesh().get_boundary_info();
 
   // The element matrix and RHS for projections.
@@ -2023,9 +2010,9 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
     {
       const unsigned int var = variables[v];
 
-      const Variable& variable = dof_map.variable(var);
+      const Variable & variable = dof_map.variable(var);
 
-      const FEType& fe_type = variable.type();
+      const FEType & fe_type = variable.type();
 
       if (fe_type.family == SCALAR)
         continue;
@@ -2042,11 +2029,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
 
       // The values of the shape functions at the quadrature
       // points
-      const std::vector<std::vector<Real> >& phi = fe->get_phi();
+      const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
       // The gradients of the shape functions at the quadrature
       // points on the child element.
-      const std::vector<std::vector<RealGradient> > *dphi = NULL;
+      const std::vector<std::vector<RealGradient> > * dphi = NULL;
 
       const FEContinuity cont = fe->get_continuity();
 
@@ -2055,17 +2042,17 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
           // We'll need gradient data for a C1 projection
           libmesh_assert(g.get());
 
-          const std::vector<std::vector<RealGradient> >&
+          const std::vector<std::vector<RealGradient> > &
             ref_dphi = fe->get_dphi();
           dphi = &ref_dphi;
         }
 
       // The Jacobian * quadrature weight at the quadrature points
-      const std::vector<Real>& JxW =
+      const std::vector<Real> & JxW =
         fe->get_JxW();
 
       // The XYZ locations of the quadrature points
-      const std::vector<Point>& xyz_values =
+      const std::vector<Point> & xyz_values =
         fe->get_xyz();
 
       // The global DOF indices
@@ -2079,7 +2066,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
       // Iterate over all the elements in the range
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
         {
-          const Elem* elem = *elem_it;
+          const Elem * elem = *elem_it;
 
           // Per-subdomain variables don't need to be projected on
           // elements where they're not active
@@ -2390,7 +2377,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                 // Transfer new edge solutions to element
                 for (unsigned int i=0; i != free_dofs; ++i)
                   {
-                    Number &ui = Ue(side_dofs[free_dof[i]]);
+                    Number & ui = Ue(side_dofs[free_dof[i]]);
                     libmesh_assert(std::abs(ui) < TOLERANCE ||
                                    std::abs(ui - Uedge(i)) < TOLERANCE);
                     ui = Uedge(i);
@@ -2488,7 +2475,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                 // Transfer new side solutions to element
                 for (unsigned int i=0; i != free_dofs; ++i)
                   {
-                    Number &ui = Ue(side_dofs[free_dof[i]]);
+                    Number & ui = Ue(side_dofs[free_dof[i]]);
                     libmesh_assert(std::abs(ui) < TOLERANCE ||
                                    std::abs(ui - Uside(i)) < TOLERANCE);
                     ui = Uside(i);

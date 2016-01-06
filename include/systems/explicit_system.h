@@ -47,8 +47,8 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  ExplicitSystem (EquationSystems& es,
-                  const std::string& name,
+  ExplicitSystem (EquationSystems & es,
+                  const std::string & name,
                   const unsigned int number);
 
   /**
@@ -88,14 +88,14 @@ public:
    * user qoi function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi (const QoISet& qoi_indices = QoISet()) libmesh_override;
+  virtual void assemble_qoi (const QoISet & qoi_indices = QoISet()) libmesh_override;
 
   /**
    * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
    * then calls user qoi derivative function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi_derivative (const QoISet &qoi_indices = QoISet(),
+  virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
                                         bool include_liftfunc = true,
                                         bool apply_constraints = true) libmesh_override;
 

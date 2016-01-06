@@ -70,12 +70,12 @@ public:
   /**
    * Copy-constructor.
    */
-  Node (const Node& n);
+  Node (const Node & n);
 
   /**
    * Copy-constructor from a \p Point.  Optionally assigned the \p id.
    */
-  explicit Node (const Point& p,
+  explicit Node (const Point & p,
                  const dof_id_type id = invalid_id);
 
   /**
@@ -86,19 +86,19 @@ public:
   /**
    * Assign to a node from a point
    */
-  Node& operator= (const Point& p);
+  Node & operator= (const Point & p);
 
   /**
    * Builds a \p Node and returns an \p UniquePtr<Node> to the
    * newly-created object.  The \p id is copied from \p n.id()
    */
-  static UniquePtr<Node> build (const Node& n);
+  static UniquePtr<Node> build (const Node & n);
 
   /**
    * Builds a \p Node from \p Point p and returns an \p UniquePtr<Node>
    * to the newly-created object.  Optionally assignes the \p id.
    */
-  static UniquePtr<Node> build (const Point& p,
+  static UniquePtr<Node> build (const Point & p,
                                 const dof_id_type id);
 
   /**
@@ -122,12 +122,12 @@ public:
   /**
    * @returns \p true if this node equals rhs, false otherwise.
    */
-  bool operator ==(const Node& rhs) const;
+  bool operator ==(const Node & rhs) const;
 
   /**
    * Prints relevant information about the node
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out) const;
 
   /**
    * Prints relevant information about the node to a string.
@@ -199,7 +199,7 @@ private:
 // global Node functions
 
 inline
-std::ostream& operator << (std::ostream& os, const Node& n)
+std::ostream & operator << (std::ostream & os, const Node & n)
 {
   n.print_info(os);
   return os;
@@ -226,7 +226,7 @@ Node::Node (const Real x,
 
 
 inline
-Node::Node (const Node& n) :
+Node::Node (const Node & n) :
   Point(n),
   DofObject(n),
   ReferenceCountedObject<Node>()
@@ -240,7 +240,7 @@ Node::Node (const Node& n) :
 
 
 inline
-Node::Node (const Point& p,
+Node::Node (const Point & p,
             const dof_id_type dofid) :
   Point(p)
 #ifdef LIBMESH_ENABLE_NODE_VALENCE
@@ -266,7 +266,7 @@ Node::~Node ()
 
 
 inline
-Node & Node::operator= (const Point& p)
+Node & Node::operator= (const Point & p)
 {
   (*this)(0) = p(0);
 #if LIBMESH_DIM > 1
@@ -282,7 +282,7 @@ Node & Node::operator= (const Point& p)
 
 
 inline
-UniquePtr<Node> Node::build(const Node& n)
+UniquePtr<Node> Node::build(const Node & n)
 {
   return UniquePtr<Node>(new Node(n));
 }
@@ -290,7 +290,7 @@ UniquePtr<Node> Node::build(const Node& n)
 
 
 inline
-UniquePtr<Node> Node::build(const Point& p,
+UniquePtr<Node> Node::build(const Point & p,
                             const dof_id_type id)
 {
   return UniquePtr<Node>(new Node(p,id));

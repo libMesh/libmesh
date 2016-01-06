@@ -136,7 +136,7 @@ UniquePtr<Elem> Tet4::build_side (const unsigned int i,
 
   else
     {
-      Elem* face = new Tri3;
+      Elem * face = new Tri3;
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
@@ -160,7 +160,7 @@ UniquePtr<Elem> Tet4::build_edge (const unsigned int i) const
 
 void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
                         const IOPackage iop,
-                        std::vector<dof_id_type>& conn) const
+                        std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -406,7 +406,7 @@ dof_id_type Tet4::key () const
 //  available.  */
 //       for (unsigned int c=4; c<this->n_children(); c++)
 // {
-//   Elem *child = this->child(c);
+//   Elem * child = this->child(c);
 //   for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 //     {
 //       /* Unassign the current node.  */

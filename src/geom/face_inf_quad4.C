@@ -104,7 +104,7 @@ bool InfQuad4::is_node_on_side(const unsigned int n,
   return false;
 }
 
-bool InfQuad4::contains_point (const Point& p, Real tol) const
+bool InfQuad4::contains_point (const Point & p, Real tol) const
 {
   /*
    * make use of the fact that infinite elements do not
@@ -189,7 +189,7 @@ UniquePtr<Elem> InfQuad4::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem* edge = NULL;
+      Elem * edge = NULL;
 
       switch (i)
         {
@@ -227,7 +227,7 @@ UniquePtr<Elem> InfQuad4::build_side (const unsigned int i,
 
 void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const
+                            std::vector<dof_id_type> & conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);

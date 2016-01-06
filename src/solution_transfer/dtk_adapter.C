@@ -151,10 +151,15 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     }
 
   */
-  Teuchos::RCP<MeshContainerType> mesh_container = Teuchos::rcp(
-                                                                new MeshContainerType(dim, vertices, coordinates,
-                                                                                      element_topology, n_nodes_per_elem,
-                                                                                      elements, connectivity, permutation_list) );
+  Teuchos::RCP<MeshContainerType>
+    mesh_container = Teuchos::rcp(new MeshContainerType(dim,
+                                                        vertices,
+                                                        coordinates,
+                                                        element_topology,
+                                                        n_nodes_per_elem,
+                                                        elements,
+                                                        connectivity,
+                                                        permutation_list));
 
   // We only have 1 element topology in this grid so we make just one mesh block
   Teuchos::ArrayRCP<Teuchos::RCP<MeshContainerType> > mesh_blocks(1);

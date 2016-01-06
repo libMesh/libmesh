@@ -46,8 +46,8 @@ public:
    * Constructor; takes references to the two vectors as arguments.
    * The vectors themselves have to be stored elsewhere.
    */
-  TensorShellMatrix (const NumericVector<T>& v,
-                     const NumericVector<T>& w);
+  TensorShellMatrix (const NumericVector<T> & v,
+                     const NumericVector<T> & w);
 
   /**
    * Destructor.
@@ -70,30 +70,30 @@ public:
    * Multiplies the matrix with \p arg and stores the result in \p
    * dest.
    */
-  virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const libmesh_override;
+  virtual void vector_mult (NumericVector<T> & dest,
+                            const NumericVector<T> & arg) const libmesh_override;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
-  virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const libmesh_override;
+  virtual void vector_mult_add (NumericVector<T> & dest,
+                                const NumericVector<T> & arg) const libmesh_override;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
 protected:
   /**
    * The column vector.
    */
-  const NumericVector<T>& _v;
+  const NumericVector<T> & _v;
 
   /**
    * The row vector.
    */
-  const NumericVector<T>& _w;
+  const NumericVector<T> & _w;
 };
 
 
@@ -102,8 +102,8 @@ protected:
 // TensorShellMatrix inline members
 template <typename T>
 inline
-TensorShellMatrix<T>::TensorShellMatrix (const NumericVector<T>& v,
-                                         const NumericVector<T>& w):
+TensorShellMatrix<T>::TensorShellMatrix (const NumericVector<T> & v,
+                                         const NumericVector<T> & w):
   ShellMatrix<T>(v.comm()),
   _v(v),
   _w(w)

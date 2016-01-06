@@ -45,7 +45,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  NodeElem (Elem* p=NULL) :
+  NodeElem (Elem * p=NULL) :
     Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data,
          _nodelinks_data)
   {
@@ -185,7 +185,7 @@ public:
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const libmesh_override;
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -203,12 +203,12 @@ protected:
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[1+(LIBMESH_DIM>0)];
+  Elem * _elemlinks_data[1+(LIBMESH_DIM>0)];
 
   /**
    * Data for links to nodes
    */
-  Node* _nodelinks_data[1];
+  Node * _nodelinks_data[1];
 
 
 #ifdef LIBMESH_ENABLE_AMR

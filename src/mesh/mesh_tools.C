@@ -66,7 +66,7 @@ public:
     _weight(0)
   {}
 
-  void operator()(const ConstElemRange &range)
+  void operator()(const ConstElemRange & range)
   {
     for (ConstElemRange::const_iterator it = range.begin(); it !=range.end(); ++it)
       _weight += (*it)->n_nodes();
@@ -78,7 +78,7 @@ public:
   // If we don't have threads we never need a join, and icpc yells a
   // warning if it sees an anonymous function that's never used
 #if LIBMESH_USING_THREADS
-  void join (const SumElemWeight &other)
+  void join (const SumElemWeight & other)
   { _weight += other.weight(); }
 #endif
 
@@ -101,7 +101,7 @@ public:
     _vmax(LIBMESH_DIM, -std::numeric_limits<Real>::max())
   {}
 
-  FindBBox (FindBBox &other, Threads::split) :
+  FindBBox (FindBBox & other, Threads::split) :
     _vmin(other._vmin),
     _vmax(other._vmax)
   {}
@@ -109,11 +109,11 @@ public:
   std::vector<Real> & min() { return _vmin; }
   std::vector<Real> & max() { return _vmax; }
 
-  void operator()(const ConstNodeRange &range)
+  void operator()(const ConstNodeRange & range)
   {
     for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
       {
-        const Node *node = *it;
+        const Node * node = *it;
         libmesh_assert(node);
 
         for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -124,16 +124,16 @@ public:
       }
   }
 
-  void operator()(const ConstElemRange &range)
+  void operator()(const ConstElemRange & range)
   {
     for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
       {
-        const Elem *elem = *it;
+        const Elem * elem = *it;
         libmesh_assert(elem);
 
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
-            const Point &point = elem->point(n);
+            const Point & point = elem->point(n);
 
             for (unsigned int i=0; i<LIBMESH_DIM; i++)
               {
@@ -147,7 +147,7 @@ public:
   // If we don't have threads we never need a join, and icpc yells a
   // warning if it sees an anonymous function that's never used
 #if LIBMESH_USING_THREADS
-  void join (const FindBBox &other)
+  void join (const FindBBox & other)
   {
     for (unsigned int i=0; i<LIBMESH_DIM; i++)
       {
@@ -187,8 +187,8 @@ private:
 };
 
 #ifdef DEBUG
-void assert_semiverify_dofobj(const Parallel::Communicator &communicator,
-                              const DofObject *d)
+void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
+                              const DofObject * d)
 {
   if (d)
     {
@@ -218,9 +218,9 @@ void assert_semiverify_dofobj(const Parallel::Communicator &communicator,
     }
   else
     {
-      const unsigned int* p_ui = NULL;
-      const std::vector<unsigned int>* p_vui = NULL;
-      const std::vector<dof_id_type>* p_vdid = NULL;
+      const unsigned int * p_ui = NULL;
+      const std::vector<unsigned int> * p_vui = NULL;
+      const std::vector<dof_id_type> * p_vdid = NULL;
 
       libmesh_assert(communicator.semiverify(p_ui));
       libmesh_assert(communicator.semiverify(p_vui));
@@ -244,10 +244,10 @@ bool is_between(Real min, Real check, Real max)
 bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
 {
   // Make local variables first to make thiings more clear in a moment
-  const Real& my_min_x = this->first(0);
-  const Real& my_max_x = this->second(0);
-  const Real& other_min_x = other_box.first(0);
-  const Real& other_max_x = other_box.second(0);
+  const Real & my_min_x = this->first(0);
+  const Real & my_max_x = this->second(0);
+  const Real & other_min_x = other_box.first(0);
+  const Real & other_max_x = other_box.second(0);
 
   const bool x_int = is_between(my_min_x, other_min_x, my_max_x) || is_between(my_min_x, other_max_x, my_max_x) ||
     is_between(other_min_x, my_min_x, other_max_x) || is_between(other_min_x, my_max_x, other_max_x);
@@ -255,10 +255,10 @@ bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
   bool intersection_true = x_int;
 
 #if LIBMESH_DIM > 1
-  const Real& my_min_y = this->first(1);
-  const Real& my_max_y = this->second(1);
-  const Real& other_min_y = other_box.first(1);
-  const Real& other_max_y = other_box.second(1);
+  const Real & my_min_y = this->first(1);
+  const Real & my_max_y = this->second(1);
+  const Real & other_min_y = other_box.first(1);
+  const Real & other_max_y = other_box.second(1);
 
   const bool y_int = is_between(my_min_y, other_min_y, my_max_y) || is_between(my_min_y, other_max_y, my_max_y) ||
     is_between(other_min_y, my_min_y, other_max_y) || is_between(other_min_y, my_max_y, other_max_y);
@@ -267,10 +267,10 @@ bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
 #endif
 
 #if LIBMESH_DIM > 2
-  const Real& my_min_z = this->first(2);
-  const Real& my_max_z = this->second(2);
-  const Real& other_min_z = other_box.first(2);
-  const Real& other_max_z = other_box.second(2);
+  const Real & my_min_z = this->first(2);
+  const Real & my_max_z = this->second(2);
+  const Real & other_min_z = other_box.first(2);
+  const Real & other_max_z = other_box.second(2);
 
   const bool z_int = is_between(my_min_z, other_min_z, my_max_z) || is_between(my_min_z, other_max_z, my_max_z) ||
     is_between(other_min_z, my_min_z, other_max_z) || is_between(other_min_z, my_max_z, other_max_z);
@@ -312,7 +312,7 @@ bool MeshTools::BoundingBox::contains_point (const Point & p) const
 
 // ------------------------------------------------------------
 // MeshTools functions
-dof_id_type MeshTools::total_weight(const MeshBase& mesh)
+dof_id_type MeshTools::total_weight(const MeshBase & mesh)
 {
   if (!mesh.is_serial())
     {
@@ -335,7 +335,7 @@ dof_id_type MeshTools::total_weight(const MeshBase& mesh)
 
 
 
-dof_id_type MeshTools::weight(const MeshBase& mesh, const processor_id_type pid)
+dof_id_type MeshTools::weight(const MeshBase & mesh, const processor_id_type pid)
 {
   SumElemWeight sew;
 
@@ -347,8 +347,8 @@ dof_id_type MeshTools::weight(const MeshBase& mesh, const processor_id_type pid)
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-                                         std::vector<std::vector<dof_id_type> >& nodes_to_elem_map)
+void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
+                                         std::vector<std::vector<dof_id_type> > & nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -367,8 +367,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-                                         std::vector<std::vector<const Elem*> >& nodes_to_elem_map)
+void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
+                                         std::vector<std::vector<const Elem *> > & nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -386,8 +386,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
 
 
 
-void MeshTools::find_boundary_nodes (const MeshBase& mesh,
-                                     std::vector<bool>& on_boundary)
+void MeshTools::find_boundary_nodes (const MeshBase & mesh,
+                                     std::vector<bool> & on_boundary)
 {
   // Resize the vector which holds boundary nodes and fill with false.
   on_boundary.resize(mesh.n_nodes());
@@ -414,7 +414,7 @@ void MeshTools::find_boundary_nodes (const MeshBase& mesh,
 
 
 MeshTools::BoundingBox
-MeshTools::bounding_box(const MeshBase& mesh)
+MeshTools::bounding_box(const MeshBase & mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -440,7 +440,7 @@ MeshTools::bounding_box(const MeshBase& mesh)
 
 
 Sphere
-MeshTools::bounding_sphere(const MeshBase& mesh)
+MeshTools::bounding_sphere(const MeshBase & mesh)
 {
   BoundingBox bbox = bounding_box(mesh);
 
@@ -453,7 +453,7 @@ MeshTools::bounding_sphere(const MeshBase& mesh)
 
 
 MeshTools::BoundingBox
-MeshTools::processor_bounding_box (const MeshBase& mesh,
+MeshTools::processor_bounding_box (const MeshBase & mesh,
                                    const processor_id_type pid)
 {
   libmesh_assert_less (pid, mesh.n_processors());
@@ -470,7 +470,7 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
 
 
 Sphere
-MeshTools::processor_bounding_sphere (const MeshBase& mesh,
+MeshTools::processor_bounding_sphere (const MeshBase & mesh,
                                       const processor_id_type pid)
 {
   BoundingBox bbox = processor_bounding_box(mesh,pid);
@@ -484,7 +484,7 @@ MeshTools::processor_bounding_sphere (const MeshBase& mesh,
 
 
 MeshTools::BoundingBox
-MeshTools::subdomain_bounding_box (const MeshBase& mesh,
+MeshTools::subdomain_bounding_box (const MeshBase & mesh,
                                    const subdomain_id_type sid)
 {
   libmesh_assert_not_equal_to (mesh.n_nodes(), 0);
@@ -507,7 +507,7 @@ MeshTools::subdomain_bounding_box (const MeshBase& mesh,
 
 
 Sphere
-MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
+MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
                                       const subdomain_id_type sid)
 {
   BoundingBox bbox = subdomain_bounding_box(mesh,sid);
@@ -520,8 +520,8 @@ MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
 
 
 
-void MeshTools::elem_types (const MeshBase& mesh,
-                            std::vector<ElemType>& et)
+void MeshTools::elem_types (const MeshBase & mesh,
+                            std::vector<ElemType> & et)
 {
   MeshBase::const_element_iterator       el  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
@@ -539,7 +539,7 @@ void MeshTools::elem_types (const MeshBase& mesh,
 
 
 
-dof_id_type MeshTools::n_elem_of_type (const MeshBase& mesh,
+dof_id_type MeshTools::n_elem_of_type (const MeshBase & mesh,
                                        const ElemType type)
 {
   return static_cast<dof_id_type>(std::distance(mesh.type_elements_begin(type),
@@ -548,14 +548,14 @@ dof_id_type MeshTools::n_elem_of_type (const MeshBase& mesh,
 
 
 
-dof_id_type MeshTools::n_active_elem_of_type (const MeshBase& mesh,
+dof_id_type MeshTools::n_active_elem_of_type (const MeshBase & mesh,
                                               const ElemType type)
 {
   return static_cast<dof_id_type>(std::distance(mesh.active_type_elements_begin(type),
                                                 mesh.active_type_elements_end  (type)));
 }
 
-dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
+dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
                                                              const ElemType type,
                                                              const unsigned int level)
 {
@@ -572,7 +572,7 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mes
 }
 
 
-unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
+unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
 {
   unsigned int max_level = 0;
 
@@ -587,7 +587,7 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
 
 
 
-unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
+unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
@@ -608,7 +608,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
 
 
 
-unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
+unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
 {
   unsigned int max_level = 0;
 
@@ -623,7 +623,7 @@ unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
 
 
 
-unsigned int MeshTools::n_levels(const MeshBase& mesh)
+unsigned int MeshTools::n_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
@@ -643,14 +643,14 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
 
 
 
-void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
-                                           std::set<dof_id_type>& not_subactive_node_ids)
+void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
+                                           std::set<dof_id_type> & not_subactive_node_ids)
 {
   MeshBase::const_element_iterator el           = mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
   for( ; el != end_el; ++el)
     {
-      const Elem* elem = (*el);
+      const Elem * elem = (*el);
       if(!elem->subactive())
         for (unsigned int n=0; n<elem->n_nodes(); ++n)
           not_subactive_node_ids.insert(elem->node(n));
@@ -659,23 +659,23 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
 
 
 
-dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
-                               const MeshBase::const_element_iterator &end)
+dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator & begin,
+                               const MeshBase::const_element_iterator & end)
 {
   return cast_int<dof_id_type>(std::distance(begin, end));
 }
 
 
 
-dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
-                                const MeshBase::const_node_iterator &end)
+dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator & begin,
+                                const MeshBase::const_node_iterator & end)
 {
   return cast_int<dof_id_type>(std::distance(begin, end));
 }
 
 
 
-unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
+unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
@@ -702,21 +702,21 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
 
 
 
-void MeshTools::find_nodal_neighbors(const MeshBase&,
-                                     const Node& node,
-                                     const std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
-                                     std::vector<const Node*>& neighbors)
+void MeshTools::find_nodal_neighbors(const MeshBase &,
+                                     const Node & node,
+                                     const std::vector<std::vector<const Elem *> > & nodes_to_elem_map,
+                                     std::vector<const Node *> & neighbors)
 {
   // We'll refer back to the Node ID several times
   dof_id_type global_id = node.id();
 
-  // We'll construct a std::set<const Node*> for more efficient
+  // We'll construct a std::set<const Node *> for more efficient
   // searching while finding the nodal neighbors, and return it to the
   // user in a std::vector.
-  std::set<const Node*> neighbor_set;
+  std::set<const Node *> neighbor_set;
 
   // Iterators to iterate through the elements that include this node
-  std::vector<const Elem*>::const_iterator
+  std::vector<const Elem *>::const_iterator
     el = nodes_to_elem_map[global_id].begin(),
     end_el = nodes_to_elem_map[global_id].end();
 
@@ -728,7 +728,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
   for (; el != end_el; ++el)
     {
       // Grab an Elem pointer to use in the subsequent loop
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // We only care about active elements...
       if (elem->active())
@@ -840,7 +840,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
               // Did we find one?
               if (found_edge)
                 {
-                  Node* node_to_save = NULL;
+                  Node * node_to_save = NULL;
 
                   // Find another node in this element on this edge
                   for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
@@ -872,7 +872,8 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
 
 
 
-void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<dof_id_type, std::vector<dof_id_type> >& hanging_nodes)
+void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
+                                               std::map<dof_id_type, std::vector<dof_id_type> > & hanging_nodes)
 {
   MeshBase::const_element_iterator it  = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
@@ -881,7 +882,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<do
   for (; it != end; ++it)
     {
       //Save it off for easier access
-      const Elem* elem = (*it);
+      const Elem * elem = (*it);
 
       //Right now this only works for quad4's
       //libmesh_assert_equal_to (elem->type(), QUAD4);
@@ -895,12 +896,12 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<do
               if (elem->neighbor(s) != NULL)
                 {
                   // Get pointers to the element's neighbor.
-                  const Elem* neigh = elem->neighbor(s);
+                  const Elem * neigh = elem->neighbor(s);
 
                   //Is there a coarser element next to this one?
                   if (neigh->level() < elem->level())
                     {
-                      const Elem *ancestor = elem;
+                      const Elem * ancestor = elem;
                       while (neigh->level() < ancestor->level())
                         ancestor = ancestor->parent();
                       unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
@@ -975,7 +976,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<do
 
 
 
-void MeshTools::correct_node_proc_ids (MeshBase &mesh)
+void MeshTools::correct_node_proc_ids (MeshBase & mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -990,10 +991,10 @@ void MeshTools::correct_node_proc_ids (MeshBase &mesh)
   const MeshBase::element_iterator e_end = mesh.active_elements_end();
   for (; e_it != e_end; ++e_it)
     {
-      Elem *elem = *e_it;
+      Elem * elem = *e_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          Node *node = elem->get_node(n);
+          Node * node = elem->get_node(n);
           node->invalidate_processor_id();
         }
     }
@@ -1002,11 +1003,11 @@ void MeshTools::correct_node_proc_ids (MeshBase &mesh)
   // elements touching each node, and set the node processor id.
   for (e_it = mesh.active_elements_begin(); e_it != e_end; ++e_it)
     {
-      Elem *elem = *e_it;
+      Elem * elem = *e_it;
       processor_id_type proc_id = elem->processor_id();
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          Node *node = elem->get_node(n);
+          Node * node = elem->get_node(n);
           if (node->processor_id() == DofObject::invalid_processor_id ||
               node->processor_id() > proc_id)
             node->processor_id() = proc_id;
@@ -1022,7 +1023,7 @@ void MeshTools::correct_node_proc_ids (MeshBase &mesh)
 
 
 #ifdef DEBUG
-void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
+void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
@@ -1035,7 +1036,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
 
   for (; el != el_end; ++el)
     {
-      const Elem *elem = *el;
+      const Elem * elem = *el;
       libmesh_assert_equal_to (elem->n_systems(), n_sys);
     }
 
@@ -1049,7 +1050,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
 
   for (; node_it != node_end; ++node_it)
     {
-      const Node *node = *node_it;
+      const Node * node = *node_it;
       libmesh_assert_equal_to (node->n_systems(), n_sys);
     }
 }
@@ -1057,7 +1058,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
+void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 {
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
@@ -1066,7 +1067,7 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
 
   for (; el != el_end; ++el)
     {
-      const Elem *elem = *el;
+      const Elem * elem = *el;
 
       if (elem->refinement_flag() == Elem::JUST_REFINED ||
           elem->refinement_flag() == Elem::INACTIVE)
@@ -1077,7 +1078,7 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node *node = elem->get_node(n);
+          const Node * node = elem->get_node(n);
           if (node->has_dofs())
             libmesh_assert(elem->get_node(n)->old_dof_object);
         }
@@ -1089,14 +1090,14 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &) {}
 
 
 
-void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 {
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
       while (elem)
         {
@@ -1113,19 +1114,19 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
 }
 
 
-void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 {
   const MeshBase::const_element_iterator el_end =
     mesh.local_elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.local_elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
         libmesh_assert_not_equal_to (elem->neighbor(n), remote_elem);
 #ifdef LIBMESH_ENABLE_AMR
-      const Elem* parent = elem->parent();
+      const Elem * parent = elem->parent();
       if (parent)
         {
           libmesh_assert_not_equal_to (parent, remote_elem);
@@ -1137,15 +1138,15 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
 }
 
 
-void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
-                                                const Elem *bad_elem)
+void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
+                                                const Elem * bad_elem)
 {
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
       libmesh_assert_not_equal_to (elem->parent(), bad_elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
@@ -1160,7 +1161,7 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
 
 
 
-void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 {
   processor_id_type lastprocid = 0;
   dof_id_type lastelemid = 0;
@@ -1170,7 +1171,7 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
   for (MeshBase::const_element_iterator el =
          mesh.active_elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
       processor_id_type elemprocid = elem->processor_id();
       dof_id_type elemid = elem->id();
@@ -1185,17 +1186,17 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 {
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
 
-      const Elem* parent = elem->parent();
+      const Elem * parent = elem->parent();
 
       if (parent)
         {
@@ -1207,14 +1208,14 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 {
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
 
       // We can skip to the next element if we're full-dimension
@@ -1222,9 +1223,9 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase &mesh)
       if (elem->dim() >= LIBMESH_DIM)
         continue;
 
-      const Elem* ip = elem->interior_parent();
+      const Elem * ip = elem->interior_parent();
 
-      const Elem* parent = elem->parent();
+      const Elem * parent = elem->parent();
 
       if (ip && (ip != remote_elem) && parent)
         {
@@ -1245,16 +1246,16 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
+void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 {
-  std::set<const Node*> used_nodes;
+  std::set<const Node *> used_nodes;
 
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
 
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
@@ -1266,7 +1267,7 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
   for (MeshBase::const_node_iterator node_it = mesh.nodes_begin();
        node_it != node_end; ++node_it)
     {
-      Node *node = *node_it;
+      Node * node = *node_it;
       libmesh_assert(node);
       libmesh_assert(used_nodes.count(node));
     }
@@ -1276,7 +1277,7 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
 
 namespace MeshTools {
 
-void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
+void libmesh_assert_valid_dof_ids(const MeshBase & mesh)
 {
   if (mesh.n_processors() == 1)
     return;
@@ -1299,7 +1300,7 @@ void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
 }
 
 template <>
-void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
+void libmesh_assert_valid_procids<Elem>(const MeshBase & mesh)
 {
   if (mesh.n_processors() == 1)
     return;
@@ -1315,7 +1316,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 
   for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
     {
-      const Elem *elem = mesh.query_elem(i);
+      const Elem * elem = mesh.query_elem(i);
 
       processor_id_type min_id =
         elem ? elem->processor_id() :
@@ -1349,13 +1350,13 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem *elem = *el;
+      const Elem * elem = *el;
       libmesh_assert(elem);
 
       if (!elem->active() && !elem->subactive())
         continue;
 
-      const Elem *parent = elem->parent();
+      const Elem * parent = elem->parent();
 
       if (parent)
         {
@@ -1364,7 +1365,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
           bool matching_child_id = false;
           for (unsigned int c = 0; c != parent->n_children(); ++c)
             {
-              const Elem* child = parent->child(c);
+              const Elem * child = parent->child(c);
               libmesh_assert(child);
 
               // If we've got a remote_elem then we don't know whether
@@ -1384,7 +1385,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 
 
 template <>
-void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
+void libmesh_assert_valid_procids<Node>(const MeshBase & mesh)
 {
   if (mesh.n_processors() == 1)
     return;
@@ -1400,7 +1401,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 
   for (dof_id_type i=0; i != parallel_max_node_id; ++i)
     {
-      const Node *node = mesh.query_node_ptr(i);
+      const Node * node = mesh.query_node_ptr(i);
 
       processor_id_type min_id =
         node ? node->processor_id() :
@@ -1429,12 +1430,12 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
   for (MeshBase::const_element_iterator el =
          mesh.active_local_elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
 
       for (unsigned int i=0; i != elem->n_nodes(); ++i)
         {
-          const Node *node = elem->get_node(i);
+          const Node * node = elem->get_node(i);
           dof_id_type nodeid = node->id();
           node_touched_by_me[nodeid] = true;
         }
@@ -1446,7 +1447,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
   for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
        nd != nd_end; ++nd)
     {
-      const Node *node = *nd;
+      const Node * node = *nd;
       libmesh_assert(node);
 
       dof_id_type nodeid = node->id();
@@ -1460,7 +1461,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
   if (mesh.n_processors() == 1)
@@ -1474,7 +1475,7 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
       dof_id_type elemid = elem->id();
 
@@ -1507,14 +1508,14 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
 {
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
          mesh.elements_begin(); el != el_end; ++el)
     {
-      const Elem *elem = *el;
+      const Elem * elem = *el;
       libmesh_assert(elem);
       if (elem->has_children())
         for (unsigned int n=0; n != elem->n_children(); ++n)
@@ -1544,13 +1545,13 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 
 
 
-void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh)
 {
   const MeshBase::const_element_iterator el_end = mesh.elements_end();
   for (MeshBase::const_element_iterator el = mesh.elements_begin();
        el != el_end; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       libmesh_assert (elem);
       elem->libmesh_assert_valid_neighbors();
     }
@@ -1562,7 +1563,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
 
   for (dof_id_type i=0; i != mesh.max_elem_id(); ++i)
     {
-      const Elem *elem = mesh.query_elem(i);
+      const Elem * elem = mesh.query_elem(i);
 
       const unsigned int my_n_neigh = elem ? elem->n_neighbors() : 0;
       unsigned int n_neigh = my_n_neigh;
@@ -1573,7 +1574,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
       for (unsigned int n = 0; n != n_neigh; ++n)
         {
           dof_id_type my_neighbor = DofObject::invalid_id; // NULL
-          dof_id_type* p_my_neighbor = NULL;
+          dof_id_type * p_my_neighbor = NULL;
           if (elem && elem->neighbor(n) != remote_elem)
             {
               p_my_neighbor = &my_neighbor;
@@ -1591,7 +1592,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
 
 
 
-void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase& mesh)
+void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase & mesh)
 {
   MeshCommunication().assign_global_indices(mesh);
 }

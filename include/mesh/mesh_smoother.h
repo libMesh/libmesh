@@ -43,7 +43,7 @@ public:
    * in the protected data section of the class.
    */
   explicit
-  MeshSmoother(UnstructuredMesh& mesh) : _mesh(mesh) {}
+  MeshSmoother(UnstructuredMesh & mesh) : _mesh(mesh) {}
 
   /**
    * Destructor.
@@ -58,7 +58,7 @@ public:
 
 protected:
 
-  UnstructuredMesh& _mesh;
+  UnstructuredMesh & _mesh;
 };
 
 } // namespace libMesh

@@ -46,7 +46,7 @@
  * \author John W. Peterson
  * \date 2004
  */
-template<class Predicate, class Type, class ReferenceType = Type&, class PointerType = Type*>
+template<class Predicate, class Type, class ReferenceType = Type &, class PointerType = Type *>
 class variant_filter_iterator :
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
   public std::forward_iterator<std::forward_iterator_tag, Type>
@@ -72,7 +72,7 @@ public:
   struct IterBase
   {
     virtual ~IterBase() {}
-    virtual  IterBase* clone() const = 0;
+    virtual  IterBase * clone() const = 0;
 
     /**
      * Custom interface method.
@@ -82,14 +82,14 @@ public:
     /**
      * Custom interface method.
      */
-    virtual IterBase& operator++() = 0;
+    virtual IterBase & operator++() = 0;
 
-    virtual bool equal(const IterBase *other) const = 0;
+    virtual bool equal(const IterBase * other) const = 0;
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
-    // typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::IterBase const_IterBase;
-    typedef typename variant_filter_iterator<Predicate, Type const, Type const & , Type const*>::IterBase const_IterBase;
-    virtual const_IterBase* const_clone() const = 0;
+    // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::IterBase const_IterBase;
+    typedef typename variant_filter_iterator<Predicate, Type const, Type const & , Type const *>::IterBase const_IterBase;
+    virtual const_IterBase * const_clone() const = 0;
   };
 
 
@@ -104,13 +104,13 @@ public:
   struct PredBase
   {
     virtual ~PredBase() {}
-    virtual PredBase* clone() const = 0;
-    virtual bool operator()(const IterBase* in) const = 0;
+    virtual PredBase * clone() const = 0;
+    virtual bool operator()(const IterBase * in) const = 0;
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
-    // typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::PredBase const_PredBase;
-    typedef typename variant_filter_iterator<Predicate, Type const,  Type const &,  Type const *>::PredBase const_PredBase;
-    virtual const_PredBase* const_clone() const = 0;
+    // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
+    typedef typename variant_filter_iterator<Predicate, Type const, Type const &, Type const *>::PredBase const_PredBase;
+    virtual const_PredBase * const_clone() const = 0;
   };
 
 
@@ -129,17 +129,17 @@ public:
     /**
      * Constructor
      */
-    Iter (const IterType& v) :
+    Iter (const IterType & v) :
       iter_data (v)
     {
-      // libMesh::out << "In Iter<IterType>::Iter(const IterType& v)" << std::endl;
+      // libMesh::out << "In Iter<IterType>::Iter(const IterType & v)" << std::endl;
     }
 
 
     /**
      * Copy Constructor.
      */
-    Iter (const Iter& other) :
+    Iter (const Iter & other) :
       iter_data(other.iter_data)
     {}
 
@@ -153,13 +153,13 @@ public:
      * @returns a copy of this object as a pointer to
      * the base (non-templated) class.
      */
-    virtual IterBase* clone() const libmesh_override
+    virtual IterBase * clone() const libmesh_override
     {
 #ifdef __SUNPRO_CC
-      variant_filter_iterator::Iter<IterType> *copy =
+      variant_filter_iterator::Iter<IterType> * copy =
         new variant_filter_iterator::Iter<IterType>(iter_data);
 #else
-      Iter<IterType> *copy =
+      Iter<IterType> * copy =
         new Iter<IterType>(iter_data);
 #endif
 
@@ -170,15 +170,15 @@ public:
      * Returns a copy of this object as a pointer to a
      * different type of object.
      */
-    virtual typename IterBase::const_IterBase* const_clone() const libmesh_override
+    virtual typename IterBase::const_IterBase * const_clone() const libmesh_override
     {
       /**
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
        */
-      // typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::template Iter<IterType> const_Iter;
+      // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Iter<IterType> const_Iter;
       typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Iter<IterType> const_Iter;
 
-      typename IterBase::const_IterBase* copy =
+      typename IterBase::const_IterBase * copy =
         new const_Iter(iter_data);
 
       return copy;
@@ -189,13 +189,13 @@ public:
      */
     virtual ReferenceType operator*() const libmesh_override
     {
-      return *iter_data;
+      return * iter_data;
     }
 
     /**
      * Custom interface method.
      */
-    virtual Iter& operator++() libmesh_override
+    virtual Iter & operator++() libmesh_override
     {
       ++iter_data;
       return *this;
@@ -207,14 +207,14 @@ public:
      * fails it means you compared two different derived
      * classes.
      */
-    virtual bool equal(const IterBase *other) const libmesh_override
+    virtual bool equal(const IterBase * other) const libmesh_override
     {
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
-      const variant_filter_iterator::Iter<IterType>* p =
-        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
+      const variant_filter_iterator::Iter<IterType> * p =
+        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType> *>(other);
 #else
-      const Iter<IterType>* p =
-        libMesh::cast_ptr<const Iter<IterType>*>(other);
+      const Iter<IterType> * p =
+        libMesh::cast_ptr<const Iter<IterType> *>(other);
 #endif
 
       return (iter_data == p->iter_data);
@@ -240,7 +240,7 @@ public:
     /**
      * Constructor
      */
-    Pred (const PredType& v) :
+    Pred (const PredType & v) :
       pred_data (v) {}
 
     /**
@@ -251,13 +251,13 @@ public:
     /**
      * Returns a copy of this object as a pointer to the base class.
      */
-    virtual PredBase* clone() const libmesh_override
+    virtual PredBase * clone() const libmesh_override
     {
 #ifdef __SUNPRO_CC
-      variant_filter_iterator::Pred<IterType,PredType> *copy =
+      variant_filter_iterator::Pred<IterType,PredType> * copy =
         new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
 #else
-      Pred<IterType,PredType> *copy =
+      Pred<IterType,PredType> * copy =
         new Pred<IterType,PredType>(pred_data);
 #endif
 
@@ -269,16 +269,16 @@ public:
      * The redefinition of the const_clone function for the Pred class.
      * Notice the strange typename syntax required.  Will it compile everywhere?
      */
-    virtual typename PredBase::const_PredBase* const_clone() const libmesh_override
+    virtual typename PredBase::const_PredBase * const_clone() const libmesh_override
     {
       /**
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
        */
-      //      typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::template Pred<IterType, PredType> const_Pred;
+      //      typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Pred<IterType, PredType> const_Pred;
       typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Pred<IterType, PredType> const_Pred;
 
 
-      typename PredBase::const_PredBase* copy =
+      typename PredBase::const_PredBase * copy =
         new const_Pred(pred_data);
 
       return copy;
@@ -290,17 +290,17 @@ public:
     /**
      * Re-implementation of op()
      */
-    virtual bool operator() (const IterBase* in) const libmesh_override
+    virtual bool operator() (const IterBase * in) const libmesh_override
     {
       libmesh_assert(in);
 
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
-      const variant_filter_iterator::Iter<IterType>* p =
-        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType>* >(in);
+      const variant_filter_iterator::Iter<IterType> * p =
+        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType> * >(in);
 #else
-      const Iter<IterType>* p =
-        libMesh::cast_ptr<const Iter<IterType>* >(in);
+      const Iter<IterType> * p =
+        libMesh::cast_ptr<const Iter<IterType> *>(in);
 #endif
 
       // Return result of op() for the user's predicate.
@@ -325,20 +325,20 @@ public:
    * Polymorphic pointer to the object.  Don't confuse
    * with the data pointer located in the \p Iter!
    */
-  IterBase* data;
+  IterBase * data;
 
   /**
    * Also have a polymorphic pointer to the end object,
    * this prevents iterating past the end.
    */
-  IterBase* end;
+  IterBase * end;
 
   /**
    * The predicate object.  Must have op() capable of
-   * operating on IterBase* pointers.  Therefore it has
+   * operating on IterBase * pointers.  Therefore it has
    * to follow the same paradigm as \p IterBase.
    */
-  PredBase* pred;
+  PredBase * pred;
 
 
 
@@ -349,9 +349,9 @@ public:
    * to the first entry which satisfies the predicate.
    */
   template<typename PredType, typename IterType>
-  variant_filter_iterator (const IterType& d,
-                           const IterType& e,
-                           const PredType& p ):
+  variant_filter_iterator (const IterType & d,
+                           const IterType & e,
+                           const PredType & p ):
     data ( new Iter<IterType>(d) ), // note: uses default IterBase copy constructor
     end  ( new Iter<IterType>(e) ),
     pred ( new Pred<IterType,PredType>(p) )
@@ -371,7 +371,7 @@ public:
    * Copy Constructor.
    * Copy the internal data instead of sharing it.
    */
-  variant_filter_iterator (const Iterator& rhs) :
+  variant_filter_iterator (const Iterator & rhs) :
     data (rhs.data != NULL ? rhs.data->clone() : NULL),
     end  (rhs.end  != NULL ? rhs.end->clone()  : NULL),
     pred (rhs.pred != NULL ? rhs.pred->clone() : NULL) {}
@@ -382,15 +382,15 @@ public:
    * Copy construct from another (similar) variant_filter_iterator.
    * The Predicate is the same, but the Type, ReferenceType and
    * PointerType are different.  Example:
-   * You are iterating over a std::vector<int*> with std::vector<int*>::iterator
+   * You are iterating over a std::vector<int *> with std::vector<int *>::iterator
    * Then, you have:
-   * Type=int* ,  ReferenceType=int*& , PointerType=int**
-   * On the other hand, when you iterate using std::vector<int*>::const_iterator
+   * Type=int * ,  ReferenceType=int *& , PointerType=int **
+   * On the other hand, when you iterate using std::vector<int *>::const_iterator
    * you have:
    * Type=int * const, ReferenceType=int * const & , PointerType=int * const *
    */
   template <class OtherType, class OtherReferenceType, class OtherPointerType>
-  variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType>& rhs)
+  variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType> & rhs)
     : data (rhs.data != NULL ? rhs.data->const_clone() : NULL),
       end  (rhs.end  != NULL ? rhs.end->const_clone()  : NULL),
       pred (rhs.pred != NULL ? rhs.pred->const_clone() : NULL)
@@ -433,7 +433,7 @@ public:
   /**
    * op++() forwards on to \p Iter::op++()
    */
-  Iterator& operator++()
+  Iterator & operator++()
   {
     ++*data;
     this->satisfy_predicate();
@@ -457,7 +457,7 @@ public:
    * but this is usually not important and would require an
    * additional dynamic cast.
    */
-  bool equal(const variant_filter_iterator& other) const
+  bool equal(const variant_filter_iterator & other) const
   {
     return data->equal(other.data);
   }
@@ -465,7 +465,7 @@ public:
   /**
    * swap, used to implement op=
    */
-  void swap(Iterator& lhs, Iterator& rhs)
+  void swap(Iterator & lhs, Iterator & rhs)
   {
     // Swap the data pointers
     std::swap (lhs.data, rhs.data);
@@ -480,7 +480,7 @@ public:
   /**
    * Assignment operator.
    */
-  Iterator& operator=(const Iterator& rhs)
+  Iterator & operator=(const Iterator & rhs)
   {
     Iterator temp(rhs);
     swap(temp, *this);
@@ -511,8 +511,8 @@ private:
 // op==
 template<class Predicate, class Type, class ReferenceType, class PointerType>
 inline
-bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& x,
-                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& y)
+bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & x,
+                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & y)
 {
   return x.equal(y);
 }
@@ -522,8 +522,8 @@ bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, Po
 // op!=
 template<class Predicate, class Type, class ReferenceType, class PointerType>
 inline
-bool operator!=(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& x,
-                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& y)
+bool operator!=(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & x,
+                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & y)
 {
   return !(x == y);
 }

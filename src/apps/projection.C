@@ -39,7 +39,7 @@ using namespace libMesh;
 
 
 // If there's a missing input argument, then print a help message
-void usage_error(const char *progname)
+void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
                << " --dim d               mesh dimension           [default: autodetect]\n"
@@ -54,10 +54,10 @@ void usage_error(const char *progname)
 
 // Get an input argument, or print a help message if it's missing
 template <typename T>
-T assert_argument (GetPot &cl,
-                   const std::string &argname,
-                   const char        *progname,
-                   const T&          defaultarg)
+T assert_argument (GetPot & cl,
+                   const std::string & argname,
+                   const char * progname,
+                   const T & defaultarg)
 {
   if(!cl.search(argname))
     {
@@ -75,37 +75,37 @@ std::string current_sys_name;
 std::map<std::string, MeshFunction *> mesh_functions;
 
 // Return the function value on the old mesh and solution
-Number fptr(const Point& p,
-            const Parameters&,
-            const std::string& libmesh_dbg_var(sys_name),
-            const std::string& unknown_name)
+Number fptr(const Point & p,
+            const Parameters &,
+            const std::string & libmesh_dbg_var(sys_name),
+            const std::string & unknown_name)
 {
   libmesh_assert_equal_to (sys_name, current_sys_name);
   libmesh_assert(mesh_functions.count(unknown_name));
   libmesh_assert(mesh_functions[unknown_name]);
 
-  MeshFunction &meshfunc = *mesh_functions[unknown_name];
+  MeshFunction & meshfunc = *mesh_functions[unknown_name];
 
   return meshfunc(p);
 }
 
 // Return the function gradient on the old mesh and solution
-Gradient gptr(const Point& p,
-              const Parameters&,
-              const std::string& libmesh_dbg_var(sys_name),
-              const std::string& unknown_name)
+Gradient gptr(const Point & p,
+              const Parameters &,
+              const std::string & libmesh_dbg_var(sys_name),
+              const std::string & unknown_name)
 {
   libmesh_assert_equal_to (sys_name, current_sys_name);
   libmesh_assert(mesh_functions.count(unknown_name));
   libmesh_assert(mesh_functions[unknown_name]);
 
-  MeshFunction &meshfunc = *mesh_functions[unknown_name];
+  MeshFunction & meshfunc = *mesh_functions[unknown_name];
 
   return meshfunc.gradient(p);
 }
 
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
@@ -175,14 +175,14 @@ int main(int argc, char** argv)
   // a potentially-very-different partitioning
   for (unsigned int i = 0; i != n_systems; ++i)
     {
-      System &old_sys = old_es.get_system(i);
+      System & old_sys = old_es.get_system(i);
       current_sys_name = old_sys.name();
 
       libMesh::out << "Projecting system " << current_sys_name << std::endl;
 
       libmesh_assert (new_es.has_system(current_sys_name));
 
-      System &new_sys = new_es.get_system(current_sys_name);
+      System & new_sys = new_es.get_system(current_sys_name);
       unsigned int n_vars = old_sys.n_vars();
       libmesh_assert_equal_to (new_sys.n_vars(), n_vars);
 
@@ -199,7 +199,7 @@ int main(int argc, char** argv)
         {
           libMesh::out << " with variable " << old_sys.variable_name(j) << std::endl;
 
-          MeshFunction *mesh_func =
+          MeshFunction * mesh_func =
             new MeshFunction(old_es, *comparison_soln,
                              old_sys.get_dof_map(), j);
           mesh_func->init();

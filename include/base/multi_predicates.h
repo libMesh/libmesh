@@ -59,7 +59,7 @@ struct abstract_multi_predicate : multi_predicate
   }
 
   // operator= (perform deep copy of entries in _predicates vector
-  abstract_multi_predicate& operator=(const abstract_multi_predicate& rhs)
+  abstract_multi_predicate & operator=(const abstract_multi_predicate & rhs)
   {
     // First clear out the predicates vector
     for (unsigned int i=0; i<_predicates.size(); ++i)
@@ -72,11 +72,11 @@ struct abstract_multi_predicate : multi_predicate
   }
 
   // operator() checks all the predicates in the vector.
-  virtual bool operator()(const T& it) const
+  virtual bool operator()(const T & it) const
   {
     for (unsigned int i=0; i<_predicates.size(); ++i)
       {
-        const predicate<T>* pred = _predicates[i];
+        const predicate<T> * pred = _predicates[i];
 
         libmesh_assert (pred);
 
@@ -92,7 +92,7 @@ protected:
   abstract_multi_predicate() {}
 
   // Copy constructor.
-  abstract_multi_predicate(const abstract_multi_predicate& rhs)
+  abstract_multi_predicate(const abstract_multi_predicate & rhs)
   {
     this->deep_copy(rhs);
   }
@@ -100,14 +100,14 @@ protected:
   // The deep_copy function is used by both the op= and
   // copy constructors.  This function uses the default (empty)
   // copy constructor for the predicate class.
-  void deep_copy(const abstract_multi_predicate& rhs)
+  void deep_copy(const abstract_multi_predicate & rhs)
   {
     for (unsigned int i=0; i<rhs._predicates.size(); ++i)
       _predicates.push_back(rhs._predicates[i]->clone());
   }
 
   // Predicates to be evaluated.
-  std::vector<predicate<T>*> _predicates;
+  std::vector<predicate<T> *> _predicates;
 };
 
 
@@ -423,7 +423,7 @@ struct PID : abstract_multi_predicate<T>
 template <typename T>
 struct BID : abstract_multi_predicate<T>
 {
-  BID(boundary_id_type bndry_id, const BoundaryInfo& bndry_info)
+  BID(boundary_id_type bndry_id, const BoundaryInfo & bndry_info)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new bid<T>(bndry_id, bndry_info));
@@ -438,7 +438,7 @@ struct BID : abstract_multi_predicate<T>
 template <typename T>
 struct BND : abstract_multi_predicate<T>
 {
-  BND(const BoundaryInfo& bndry_info)
+  BND(const BoundaryInfo & bndry_info)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new bnd<T>(bndry_info));

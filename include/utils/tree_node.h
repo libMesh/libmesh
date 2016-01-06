@@ -52,9 +52,9 @@ public:
    * parent.  The pointer should only be NULL
    * for the top-level (root) node.
    */
-  TreeNode (const MeshBase& m,
+  TreeNode (const MeshBase & m,
             unsigned int tbs,
-            const TreeNode<N> *p = NULL);
+            const TreeNode<N> * p = NULL);
 
   /**
    * Destructor.  Deletes all children, if any.  Thus
@@ -80,14 +80,14 @@ public:
    * Returns \p true iff \p nd is inserted into the TreeNode or one of
    * its children.
    */
-  bool insert (const Node* nd);
+  bool insert (const Node * nd);
 
   /**
    * Inserts \p Elem \p el into the TreeNode.
    * Returns \p true iff \p el is inserted into the TreeNode or one of
    * its children.
    */
-  bool insert (const Elem* nd);
+  bool insert (const Elem * nd);
 
   /**
    * Refine the tree node into N children if it contains
@@ -98,20 +98,20 @@ public:
   /**
    * Sets the bounding box;
    */
-  void set_bounding_box (const std::pair<Point, Point>& bbox);
+  void set_bounding_box (const std::pair<Point, Point> & bbox);
 
   /**
    * @returns true if this TreeNode (or its children) contain node n
    * (within relative tolerance), false otherwise.
    */
-  bool bounds_node (const Node* nd,
+  bool bounds_node (const Node * nd,
                     Real relative_tol = 0) const;
 
   /**
    * @returns true if this TreeNode (or its children) contain point p
    * (within relative tolerance), false otherwise.
    */
-  bool bounds_point (const Point &p,
+  bool bounds_point (const Point & p,
                      Real relative_tol = 0) const;
 
   /**
@@ -123,18 +123,18 @@ public:
    * Prints the contents of the node_numbers vector if we
    * are active.
    */
-  void print_nodes(std::ostream& out=libMesh::out) const;
+  void print_nodes(std::ostream & out=libMesh::out) const;
 
   /**
    * Prints the contents of the elements set if we
    * are active.
    */
-  void print_elements(std::ostream& out=libMesh::out) const;
+  void print_elements(std::ostream & out=libMesh::out) const;
 
   /**
    * Transforms node numbers to element pointers.
    */
-  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem);
+  void transform_nodes_to_elements (std::vector<std::vector<const Elem *> > & nodes_to_elem);
 
   /**
    * @returns the number of active bins below
@@ -146,9 +146,9 @@ public:
    * @returns an element containing point p,
    * optionally restricted to a set of allowed subdomains.
    */
-  const Elem* find_element (const Point& p,
-                            const std::set<subdomain_id_type>* allowed_subdomains = NULL,
-                            Real relative_tol = TOLERANCE) const;
+  const Elem * find_element (const Point & p,
+                             const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                             Real relative_tol = TOLERANCE) const;
 
 
 private:
@@ -156,9 +156,9 @@ private:
    * Look for point \p p in our children,
    * optionally restricted to a set of allowed subdomains.
    */
-  const Elem* find_element_in_children (const Point& p,
-                                        const std::set<subdomain_id_type>* allowed_subdomains,
-                                        Real relative_tol) const;
+  const Elem * find_element_in_children (const Point & p,
+                                         const std::set<subdomain_id_type> * allowed_subdomains,
+                                         Real relative_tol) const;
 
   /**
    * Constructs the bounding box for child \p c.
@@ -168,18 +168,18 @@ private:
   /**
    * Reference to the mesh.
    */
-  const MeshBase& mesh;
+  const MeshBase & mesh;
 
   /**
    * Pointer to this node's parent.
    */
-  const TreeNode<N> *parent;
+  const TreeNode<N> * parent;
 
   /**
    * Pointers to our children.  This vector
    * is empty if the node is active.
    */
-  std::vector<TreeNode<N>* > children;
+  std::vector<TreeNode<N> * > children;
 
   /**
    * The Cartesian bounding box for the node.
@@ -191,12 +191,12 @@ private:
   /**
    * Pointers to the elements in this tree node.
    */
-  std::vector<const Elem*> elements;
+  std::vector<const Elem *> elements;
 
   /**
    * The node numbers contained in this portion of the tree.
    */
-  std::vector<const Node*> nodes;
+  std::vector<const Node *> nodes;
 
   /**
    * The maximum number of things we should store before
@@ -218,9 +218,9 @@ private:
 // TreeNode class inline methods
 template <unsigned int N>
 inline
-TreeNode<N>::TreeNode (const MeshBase& m,
+TreeNode<N>::TreeNode (const MeshBase & m,
                        unsigned int tbs,
-                       const TreeNode<N>* p) :
+                       const TreeNode<N> * p) :
   mesh           (m),
   parent         (p),
   tgt_bin_size   (tbs),

@@ -34,7 +34,7 @@ namespace libMesh
 
 template <typename T>
 EigenSparseLinearSolver<T>::
-EigenSparseLinearSolver(const Parallel::Communicator &comm_in) :
+EigenSparseLinearSolver(const Parallel::Communicator & comm_in) :
   LinearSolver<T>(comm_in),
   _comp_info(Eigen::Success)
 {
@@ -59,7 +59,7 @@ void EigenSparseLinearSolver<T>::clear ()
 
 
 template <typename T>
-void EigenSparseLinearSolver<T>::init (const char* /*name*/)
+void EigenSparseLinearSolver<T>::init (const char * /*name*/)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -72,9 +72,9 @@ void EigenSparseLinearSolver<T>::init (const char* /*name*/)
 
 template <typename T>
 std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
-                                   NumericVector<T> &solution_in,
-                                   NumericVector<T> &rhs_in,
+EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
+                                   NumericVector<T> & solution_in,
+                                   NumericVector<T> & rhs_in,
                                    const double tol,
                                    const unsigned int m_its)
 {
@@ -82,9 +82,9 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   this->init ();
 
   // Make sure the data passed in are really Eigen types
-  EigenSparseMatrix<T>& matrix   = cast_ref<EigenSparseMatrix<T>&>(matrix_in);
-  EigenSparseVector<T>& solution = cast_ref<EigenSparseVector<T>&>(solution_in);
-  EigenSparseVector<T>& rhs      = cast_ref<EigenSparseVector<T>&>(rhs_in);
+  EigenSparseMatrix<T> & matrix   = cast_ref<EigenSparseMatrix<T> &>(matrix_in);
+  EigenSparseVector<T> & solution = cast_ref<EigenSparseVector<T> &>(solution_in);
+  EigenSparseVector<T> & rhs      = cast_ref<EigenSparseVector<T> &>(rhs_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix.close();
@@ -158,9 +158,9 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
-                                           NumericVector<T> &solution_in,
-                                           NumericVector<T> &rhs_in,
+EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
+                                           NumericVector<T> & solution_in,
+                                           NumericVector<T> & rhs_in,
                                            const double tol,
                                            const unsigned int m_its)
 {
@@ -187,9 +187,9 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-                                   NumericVector<T>& /*solution_in*/,
-                                   NumericVector<T>& /*rhs_in*/,
+EigenSparseLinearSolver<T>::solve (const ShellMatrix<T> & /*shell_matrix*/,
+                                   NumericVector<T> & /*solution_in*/,
+                                   NumericVector<T> & /*rhs_in*/,
                                    const double /*tol*/,
                                    const unsigned int /*m_its*/)
 {
@@ -201,10 +201,10 @@ EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 
 template <typename T>
 std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-                                   const SparseMatrix<T>& /*precond_matrix*/,
-                                   NumericVector<T>& /*solution_in*/,
-                                   NumericVector<T>& /*rhs_in*/,
+EigenSparseLinearSolver<T>::solve (const ShellMatrix<T> & /*shell_matrix*/,
+                                   const SparseMatrix<T> & /*precond_matrix*/,
+                                   NumericVector<T> & /*solution_in*/,
+                                   NumericVector<T> & /*rhs_in*/,
                                    const double /*tol*/,
                                    const unsigned int /*m_its*/)
 {

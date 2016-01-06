@@ -62,7 +62,7 @@ public:
   /**
    *  Constructor. Initializes Preconditioner data structures
    */
-  Preconditioner (const libMesh::Parallel::Communicator &comm);
+  Preconditioner (const libMesh::Parallel::Communicator & comm);
 
   /**
    * Destructor.
@@ -73,7 +73,7 @@ public:
    * Builds a \p Preconditioner using the linear solver package specified by
    * \p solver_package
    */
-  static Preconditioner<T> * build(const libMesh::Parallel::Communicator &comm
+  static Preconditioner<T> * build(const libMesh::Parallel::Communicator & comm
                                    LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
                                    const SolverPackage solver_package = libMesh::default_solver_package());
 
@@ -149,7 +149,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator &comm_in) :
+Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
   _matrix(NULL),
   _preconditioner_type (ILU_PRECOND),

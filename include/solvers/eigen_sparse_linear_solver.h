@@ -51,7 +51,7 @@ public:
   /**
    *  Constructor. Initializes Eigen data structures
    */
-  EigenSparseLinearSolver (const libMesh::Parallel::Communicator &comm_in
+  EigenSparseLinearSolver (const libMesh::Parallel::Communicator & comm_in
                            LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -67,15 +67,15 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char* name=NULL) libmesh_override;
+  virtual void init (const char * name=NULL) libmesh_override;
 
   /**
    * Call the Eigen solver
    */
   virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix,
-         NumericVector<T> &solution,
-         NumericVector<T> &rhs,
+  solve (SparseMatrix<T> & matrix,
+         NumericVector<T> & solution,
+         NumericVector<T> & rhs,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -83,9 +83,9 @@ public:
    * Call the Eigen solver to solve A^T x = b
    */
   virtual std::pair<unsigned int, Real>
-  adjoint_solve (SparseMatrix<T>  &matrix,
-                 NumericVector<T> &solution,
-                 NumericVector<T> &rhs,
+  adjoint_solve (SparseMatrix<T> & matrix,
+                 NumericVector<T> & solution,
+                 NumericVector<T> & rhs,
                  const double tol,
                  const unsigned int m_its) libmesh_override;
 
@@ -93,10 +93,10 @@ public:
    * Call the Eigen solver
    */
   virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix,
-         SparseMatrix<T>  &pc,
-         NumericVector<T> &solution,
-         NumericVector<T> &rhs,
+  solve (SparseMatrix<T> & matrix,
+         SparseMatrix<T> & pc,
+         NumericVector<T> & solution,
+         NumericVector<T> & rhs,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -104,9 +104,9 @@ public:
    * This function solves a system whose matrix is a shell matrix.
    */
   virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
+  solve (const ShellMatrix<T> & shell_matrix,
+         NumericVector<T> & solution_in,
+         NumericVector<T> & rhs_in,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -116,10 +116,10 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         const SparseMatrix<T>& precond_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
+  solve (const ShellMatrix<T> & shell_matrix,
+         const SparseMatrix<T> & precond_matrix,
+         NumericVector<T> & solution_in,
+         NumericVector<T> & rhs_in,
          const double tol,
          const unsigned int m_its) libmesh_override;
 
@@ -184,10 +184,10 @@ EigenSparseLinearSolver<T>::~EigenSparseLinearSolver ()
 template <typename T>
 inline
 std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (SparseMatrix<T>&,
-                                   SparseMatrix<T>&,
-                                   NumericVector<T>&,
-                                   NumericVector<T>&,
+EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &,
+                                   SparseMatrix<T> &,
+                                   NumericVector<T> &,
+                                   NumericVector<T> &,
                                    const double,
                                    const unsigned int)
 {

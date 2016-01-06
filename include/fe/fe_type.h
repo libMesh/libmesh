@@ -129,7 +129,7 @@ public:
   /**
    * Tests equality
    */
-  bool operator== (const FEType &f2) const
+  bool operator== (const FEType & f2) const
   {
     return (order == f2.order
             && family == f2.family
@@ -144,7 +144,7 @@ public:
   /**
    * Tests inequality
    */
-  bool operator!= (const FEType &f2) const
+  bool operator!= (const FEType & f2) const
   {
     return !(*this == f2);
   }
@@ -152,7 +152,7 @@ public:
   /**
    * An ordering to make FEType useful as a std::map key
    */
-  bool operator< (const FEType &f2) const
+  bool operator< (const FEType & f2) const
   {
     if (order != f2.order)
       return (order < f2.order);

@@ -65,7 +65,7 @@ protected:
    * Constructor.  Protected.
    */
   explicit
-  TreeBase (const MeshBase& m);
+  TreeBase (const MeshBase & m);
 
 public:
   /**
@@ -76,12 +76,12 @@ public:
   /**
    * Prints the nodes.
    */
-  virtual void print_nodes(std::ostream& out=libMesh::out) const = 0;
+  virtual void print_nodes(std::ostream & out=libMesh::out) const = 0;
 
   /**
    * Prints the nodes.
    */
-  virtual void print_elements(std::ostream& out=libMesh::out) const = 0;
+  virtual void print_elements(std::ostream & out=libMesh::out) const = 0;
 
   /**
    * @returns the number of active bins.
@@ -93,9 +93,9 @@ public:
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */
-  virtual const Elem* find_element(const Point& p,
-                                   const std::set<subdomain_id_type> *allowed_subdomains = NULL,
-                                   Real relative_tol = TOLERANCE) const = 0;
+  virtual const Elem * find_element(const Point & p,
+                                    const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                                    Real relative_tol = TOLERANCE) const = 0;
 
 protected:
 
@@ -103,7 +103,7 @@ protected:
    * Constant reference to a mesh.  Declared
    * at construction.
    */
-  const MeshBase& mesh;
+  const MeshBase & mesh;
 };
 
 // ------------------------------------------------------------
@@ -111,7 +111,7 @@ protected:
 
 // constructor
 inline
-TreeBase::TreeBase (const MeshBase& m) :
+TreeBase::TreeBase (const MeshBase & m) :
   mesh(m)
 {
 }

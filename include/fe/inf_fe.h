@@ -194,7 +194,7 @@ protected:
      * this method allocates memory!  So be sure to delete the
      * new element afterwards.
      */
-    static Elem* build_elem (const Elem* inf_elem);
+    static Elem * build_elem (const Elem * inf_elem);
 
     /**
      * @returns the base element associated to
@@ -233,12 +233,12 @@ public:
    *
    * The same remarks concerning compile-time optimization for
    * \p FE also hold for \p InfFE.  Use the
-   * \p FEBase::build_InfFE(const unsigned int, const FEType&)
+   * \p FEBase::build_InfFE(const unsigned int, const FEType &)
    * method to build specific instantiations of \p InfFE at
    * run time.
    */
   explicit
-  InfFE(const FEType& fet);
+  InfFE(const FEType & fet);
 
   /**
    * Desctructor.  Clean up.
@@ -262,10 +262,10 @@ public:
    * correct shapes, instead use \p compute_data().  The \p shape()
    * methods should only be used for mapping.
    */
-  static Real shape(const FEType& fet,
+  static Real shape(const FEType & fet,
                     const ElemType t,
                     const unsigned int i,
-                    const Point& p);
+                    const Point & p);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -278,13 +278,13 @@ public:
    * correct shapes, instead use \p compute_data().  The \p shape()
    * methods should only be used for mapping.
    */
-  static Real shape(const FEType& fet,
-                    const Elem* elem,
+  static Real shape(const FEType & fet,
+                    const Elem * elem,
                     const unsigned int i,
-                    const Point& p);
+                    const Point & p);
 
   /**
-   * Generalized version of \p shape(), takes an \p Elem*.  The \p data
+   * Generalized version of \p shape(), takes an \p Elem *.  The \p data
    * contains both input and output parameters.  For frequency domain
    * simulations, the complex-valued shape is returned.  In time domain
    * both the computed shape, @e and the phase is returned.  Note that
@@ -292,15 +292,15 @@ public:
    * from the envelope) is actually a measure how @e far into the @e future
    * the results are.  Pretty weird, hm!?
    */
-  static void compute_data(const FEType& fe_t,
-                           const Elem* inf_elem,
-                           FEComputeData& data);
+  static void compute_data(const FEType & fe_t,
+                           const Elem * inf_elem,
+                           FEComputeData & data);
 
   /**
    * @returns the number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
    */
-  static unsigned int n_shape_functions (const FEType& fet,
+  static unsigned int n_shape_functions (const FEType & fet,
                                          const ElemType t)
   { return n_dofs(fet, t); }
 
@@ -309,14 +309,14 @@ public:
    * infinite element.  Currently, we have \p o_radial+1 modes in
    * radial direction, and FE<Dim-1,T>::n_dofs(...) in the base.
    */
-  static unsigned int n_dofs(const FEType& fet,
+  static unsigned int n_dofs(const FEType & fet,
                              const ElemType inf_elem_type);
 
   /**
    * @returns the number of dofs at infinite element @e node \p n
    * (not dof!) for an element of type \p t and order \p o.
    */
-  static unsigned int n_dofs_at_node(const FEType& fet,
+  static unsigned int n_dofs_at_node(const FEType & fet,
                                      const ElemType inf_elem_type,
                                      const unsigned int n);
 
@@ -324,7 +324,7 @@ public:
    * @returns the number of dofs interior to the element,
    * not associated with any interior nodes.
    */
-  static unsigned int n_dofs_per_elem(const FEType& fet,
+  static unsigned int n_dofs_per_elem(const FEType & fet,
                                       const ElemType inf_elem_type);
 
   /**
@@ -347,10 +347,10 @@ public:
    * results.  Use \p compute_data() to compute results.  For
    * compatibility an empty vector is returned.
    */
-  static void nodal_soln(const FEType& fet,
-                         const Elem* elem,
-                         const std::vector<Number>& elem_soln,
-                         std::vector<Number>& nodal_soln);
+  static void nodal_soln(const FEType & fet,
+                         const Elem * elem,
+                         const std::vector<Number> & elem_soln,
+                         std::vector<Number> & nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the
@@ -367,8 +367,8 @@ public:
    * base element to the infinite element origin is used for the map
    * in radial direction.
    */
-  static Point inverse_map (const Elem* elem,
-                            const Point& p,
+  static Point inverse_map (const Elem * elem,
+                            const Point & p,
                             const Real tolerance = TOLERANCE,
                             const bool secure = true,
                             const bool interpolated = true);
@@ -380,9 +380,9 @@ public:
    * input element \p elem.  The values on the reference element are
    * returned in the vector \p reference_points
    */
-  static void inverse_map (const Elem* elem,
-                           const std::vector<Point>& physical_points,
-                           std::vector<Point>&       reference_points,
+  static void inverse_map (const Elem * elem,
+                           const std::vector<Point> & physical_points,
+                           std::vector<Point> &       reference_points,
                            const Real tolerance = TOLERANCE,
                            const bool secure = true);
 
@@ -395,41 +395,41 @@ public:
    * element-dependent data based on the current element
    * \p elem.
    */
-  virtual void reinit (const Elem* elem,
-                       const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL) libmesh_override;
+  virtual void reinit (const Elem * elem,
+                       const std::vector<Point> * const pts = NULL,
+                       const std::vector<Real> * const weights = NULL) libmesh_override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
    * element-dependent data based on the \p side of an infinite
    * element.
    */
-  virtual void reinit (const Elem* elem,
+  virtual void reinit (const Elem * elem,
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
-                       const std::vector<Point>* const pts = NULL,
-                       const std::vector<Real>* const weights = NULL) libmesh_override;
+                       const std::vector<Point> * const pts = NULL,
+                       const std::vector<Real> * const weights = NULL) libmesh_override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
    * element-dependent data based on the \p edge of an infinite
    * element.
    */
-  virtual void edge_reinit (const Elem* elem,
+  virtual void edge_reinit (const Elem * elem,
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
-                            const std::vector<Point>* const pts = NULL,
-                            const std::vector<Real>* const weights = NULL) libmesh_override;
+                            const std::vector<Point> * const pts = NULL,
+                            const std::vector<Real> * const weights = NULL) libmesh_override;
 
   /**
    * Computes the reference space quadrature points on the side of
    * an element based on the side quadrature points.
    */
-  virtual void side_map (const Elem* /* elem */,
-                         const Elem* /* side */,
+  virtual void side_map (const Elem * /* elem */,
+                         const Elem * /* side */,
                          const unsigned int /* s */,
-                         const std::vector<Point>& /* reference_side_points */,
-                         std::vector<Point>& /* reference_points */) libmesh_override
+                         const std::vector<Point> & /* reference_side_points */,
+                         std::vector<Point> & /* reference_points */) libmesh_override
   {
     libmesh_not_implemented();
   }
@@ -440,12 +440,12 @@ public:
    * \p FE class requires an appropriately initialized quadrature
    * rule object, and simply uses it, the \p InfFE class requires only
    * the quadrature rule object of the current \p FE class.
-   * From this \p QBase*, it determines the necessary data,
+   * From this \p QBase *, it determines the necessary data,
    * and @e builds two appropriate quadrature classes, one for radial,
    * and another for base integration, using the convenient
    * \p QBase::build() method.
    */
-  virtual void attach_quadrature_rule (QBase* q) libmesh_override;
+  virtual void attach_quadrature_rule (QBase * q) libmesh_override;
 
   /**
    * @returns the number of shape functions associated with
@@ -505,13 +505,13 @@ protected:
    * Updates the protected member \p base_elem to the appropriate base element
    * for the given \p inf_elem.
    */
-  void update_base_elem (const Elem* inf_elem);
+  void update_base_elem (const Elem * inf_elem);
 
   /**
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
-  virtual void init_base_shape_functions(const std::vector<Point>&,
-                                         const Elem*) libmesh_override
+  virtual void init_base_shape_functions(const std::vector<Point> &,
+                                         const Elem *) libmesh_override
   { libmesh_not_implemented(); }
 
   /**
@@ -519,7 +519,7 @@ protected:
    * infinite element.  The parts that only change when the radial
    * order changes, are initialized here.
    */
-  void init_radial_shape_functions(const Elem* inf_elem);
+  void init_radial_shape_functions(const Elem * inf_elem);
 
   /**
    * Initialize all the data fields like \p weight, \p mode,
@@ -527,24 +527,24 @@ protected:
    * for the current element.  This method prepares the data
    * related to the base part, and some of the combined fields.
    */
-  void init_shape_functions(const Elem* inf_elem);
+  void init_shape_functions(const Elem * inf_elem);
 
   /**
    * Not implemented yet.  Initialize all the data fields like \p weight,
    * \p phi, etc for the side \p s.
    */
-  void init_face_shape_functions (const std::vector<Point>& qp,
-                                  const Elem* side);
+  void init_face_shape_functions (const std::vector<Point> & qp,
+                                  const Elem * side);
 
   /**
    * Combines the shape functions, which were formed in
-   * \p init_shape_functions(Elem*), with geometric data.
+   * \p init_shape_functions(Elem *), with geometric data.
    * Has to be called every time the geometric configuration
    * changes.  Afterwards, the fields are ready to be used
    * to compute global derivatives, the jacobian etc, see
    * \p FEAbstract::compute_map().
    */
-  void combine_base_radial(const Elem* inf_elem);
+  void combine_base_radial(const Elem * inf_elem);
 
   /**
    * After having updated the jacobian and the transformation
@@ -557,7 +557,7 @@ protected:
    * it protected.
    * Overloaded method from the \p FEBase version.
    */
-  virtual void compute_shape_functions(const Elem*, const std::vector<Point>&) libmesh_override;
+  virtual void compute_shape_functions(const Elem *, const std::vector<Point> &) libmesh_override;
 
 
 
@@ -568,8 +568,8 @@ protected:
    * @returns the location (in physical space) of the point
    * \p p located on the reference element.
    */
-  static Point map (const Elem* inf_elem,
-                    const Point& reference_point);
+  static Point map (const Elem * inf_elem,
+                    const Point & reference_point);
 
   /**
    * Computes the indices in the base \p base_node and in radial
@@ -579,8 +579,8 @@ protected:
    */
   static void compute_node_indices (const ElemType inf_elem_type,
                                     const unsigned int outer_node_index,
-                                    unsigned int& base_node,
-                                    unsigned int& radial_node);
+                                    unsigned int & base_node,
+                                    unsigned int & radial_node);
 
   /**
    * Does the same as \p compute_node_indices(), but stores
@@ -592,8 +592,8 @@ protected:
    */
   static void compute_node_indices_fast (const ElemType inf_elem_type,
                                          const unsigned int outer_node_index,
-                                         unsigned int& base_node,
-                                         unsigned int& radial_node);
+                                         unsigned int & base_node,
+                                         unsigned int & radial_node);
 
   /**
    * Computes the indices of shape functions in the base \p base_shape and
@@ -601,11 +601,11 @@ protected:
    * out) associated to the shape with global index \p i of an infinite element
    * of type \p inf_elem_type.
    */
-  static void compute_shape_indices (const FEType& fet,
+  static void compute_shape_indices (const FEType & fet,
                                      const ElemType inf_elem_type,
                                      const unsigned int i,
-                                     unsigned int& base_shape,
-                                     unsigned int& radial_shape);
+                                     unsigned int & base_shape,
+                                     unsigned int & radial_shape);
 
   //--------------------------------------------------------------
   // protected members, which are not to be accessed from outside
@@ -753,19 +753,19 @@ protected:
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  QBase* base_qrule;
+  QBase * base_qrule;
 
   /**
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  QBase* radial_qrule;
+  QBase * radial_qrule;
 
   /**
    * The base element associated with the
    * current infinite element
    */
-  Elem* base_elem;
+  Elem * base_elem;
 
   /**
    * Have a \p FE<Dim-1,T_base> handy for base approximation.
@@ -773,7 +773,7 @@ protected:
    * the \p InfFE class is not required to be templated w.r.t.
    * to the base approximation shape.
    */
-  FEBase* base_fe;
+  FEBase * base_fe;
 
   /**
    * This \p FEType stores the characteristics for which

@@ -41,15 +41,15 @@
 
 namespace libMesh
 {
-void WeightedPatchRecoveryErrorEstimator::estimate_error (const System& system,
-                                                          ErrorVector& error_per_cell,
-                                                          const NumericVector<Number>* solution_vector,
+void WeightedPatchRecoveryErrorEstimator::estimate_error (const System & system,
+                                                          ErrorVector & error_per_cell,
+                                                          const NumericVector<Number> * solution_vector,
                                                           bool)
 {
   START_LOG("estimate_error()", "WeightedPatchRecoveryErrorEstimator");
 
   // The current mesh
-  const MeshBase& mesh = system.get_mesh();
+  const MeshBase & mesh = system.get_mesh();
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
@@ -60,9 +60,9 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System& system,
   // solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
     {
-      NumericVector<Number>* newsol =
-        const_cast<NumericVector<Number>*>(solution_vector);
-      System &sys = const_cast<System&>(system);
+      NumericVector<Number> * newsol =
+        const_cast<NumericVector<Number> *>(solution_vector);
+      System & sys = const_cast<System &>(system);
       newsol->swap(*sys.solution);
       sys.update();
     }
@@ -88,9 +88,9 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System& system,
   // the current_local_solution
   if (solution_vector && solution_vector != system.solution.get())
     {
-      NumericVector<Number>* newsol =
-        const_cast<NumericVector<Number>*>(solution_vector);
-      System &sys = const_cast<System&>(system);
+      NumericVector<Number> * newsol =
+        const_cast<NumericVector<Number> *>(solution_vector);
+      System & sys = const_cast<System &>(system);
       newsol->swap(*sys.solution);
       sys.update();
     }
@@ -100,10 +100,10 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System& system,
 
 
 
-void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange &range) const
+void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange & range) const
 {
   // The current mesh
-  const MeshBase& mesh = system.get_mesh();
+  const MeshBase & mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
@@ -112,14 +112,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
   const unsigned int n_vars = system.n_vars();
 
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   //------------------------------------------------------------
   // Iterate over all the elements in the range.
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it!=range.end(); ++elem_it)
     {
       // elem is necessarily an active element on the local processor
-      const Elem* elem = *elem_it;
+      const Elem * elem = *elem_it;
 
       // We'll need an index into the error vector
       const dof_id_type e_id=elem->id();
@@ -196,7 +196,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           if (error_estimator.error_norm.weight(var) == 0.0) continue;
 
           // The type of finite element to use for this variable
-          const FEType& fe_type = dof_map.variable_type (var);
+          const FEType & fe_type = dof_map.variable_type (var);
 
           const Order element_order  = static_cast<Order>
             (fe_type.order + elem->p_level());
@@ -211,14 +211,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           fe->attach_quadrature_rule (qrule.get());
 
           // Get Jacobian values, etc..
-          const std::vector<Real>&                       JxW     = fe->get_JxW();
-          const std::vector<Point>&                      q_point = fe->get_xyz();
+          const std::vector<Real> & JxW = fe->get_JxW();
+          const std::vector<Point> & q_point = fe->get_xyz();
 
           // Get whatever phi/dphi/d2phi values we need.  Avoid
           // getting them unless the requested norm is actually going
           // to use them.
 
-          const std::vector<std::vector<Real> >         *phi = NULL;
+          const std::vector<std::vector<Real> > * phi = NULL;
           // If we're using phi to assert the correct dof_indices
           // vector size later, then we'll need to get_phi whether we
           // plan to use it or not.
@@ -228,7 +228,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 #endif
             phi = &(fe->get_phi());
 
-          const std::vector<std::vector<RealGradient> > *dphi = NULL;
+          const std::vector<std::vector<RealGradient> > * dphi = NULL;
           if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
               error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
               error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
@@ -237,7 +237,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
             dphi = &(fe->get_dphi());
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor> >  *d2phi = NULL;
+          const std::vector<std::vector<RealTensor> > * d2phi = NULL;
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             d2phi = &(fe->get_d2phi());
@@ -318,7 +318,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           for (; patch_it != patch_end; ++patch_it)
             {
               // The pth element in the patch
-              const Elem* e_p = *patch_it;
+              const Elem * e_p = *patch_it;
 
               // Reinitialize the finite element data for this element
               fe->reinit (e_p);
@@ -569,14 +569,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
               // Build the Finite Element for the current element
 
               // The pth element in the patch
-              const Elem* e_p = *patch_re_it;
+              const Elem * e_p = *patch_re_it;
 
               // We'll need an index into the error vector for this element
               const dof_id_type e_p_id = e_p->id();
 
               // Get a pointer to the element, we need it to initialize
               // the FEMContext
-              Elem *e_p_cast = const_cast<Elem *>(*patch_re_it);
+              Elem * e_p_cast = const_cast<Elem *>(*patch_re_it);
 
               // Initialize the FEMContext
               femcontext.pre_fe_reinit(system, e_p_cast);
@@ -858,7 +858,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       for (unsigned int i = 0 ; patch_re_it != patch_re_end; ++patch_re_it, ++i)
         {
           // The pth element in the patch
-          const Elem* e_p = *patch_re_it;
+          const Elem * e_p = *patch_re_it;
 
           // We'll need an index into the error vector
           const dof_id_type e_p_id = e_p->id();

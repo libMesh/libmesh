@@ -61,8 +61,8 @@ QComposite<QSubCell>::~QComposite()
 
 
 template <class QSubCell>
-void QComposite<QSubCell>::init (const Elem &elem,
-                                 const std::vector<Real> &vertex_distance_func,
+void QComposite<QSubCell>::init (const Elem & elem,
+                                 const std::vector<Real> & vertex_distance_func,
                                  unsigned int p_level)
 {
   libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
@@ -84,7 +84,7 @@ void QComposite<QSubCell>::init (const Elem &elem,
   // point locations of the subelements live in the reference
   // coordinate system, thereby eliminating the need for inverse
   // mapping.
-  const Elem *reference_elem = elem.reference_elem();
+  const Elem * reference_elem = elem.reference_elem();
 
   libmesh_assert (reference_elem != NULL);
 
@@ -97,7 +97,7 @@ void QComposite<QSubCell>::init (const Elem &elem,
 
   // inside subelem
   {
-    const std::vector<Elem const*> &inside_elem (_elem_cutter.inside_elements());
+    const std::vector<Elem const *> & inside_elem (_elem_cutter.inside_elements());
     std::cout << inside_elem.size() << " elements inside\n";
 
     this->add_subelem_values(inside_elem);
@@ -105,7 +105,7 @@ void QComposite<QSubCell>::init (const Elem &elem,
 
   // outside subelem
   {
-    const std::vector<Elem const*> &outside_elem (_elem_cutter.outside_elements());
+    const std::vector<Elem const *> & outside_elem (_elem_cutter.outside_elements());
     std::cout << outside_elem.size() << " elements outside\n";
 
     this->add_subelem_values(outside_elem);
@@ -117,13 +117,13 @@ void QComposite<QSubCell>::init (const Elem &elem,
 
 
 template <class QSubCell>
-void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const*> &subelem)
+void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const *> & subelem)
 
 {
-  const std::vector<Real>  &subelem_weights = _lagrange_fe->get_JxW();
-  const std::vector<Point> &subelem_points  = _lagrange_fe->get_xyz();
+  const std::vector<Real>  & subelem_weights = _lagrange_fe->get_JxW();
+  const std::vector<Point> & subelem_points  = _lagrange_fe->get_xyz();
 
-  for (std::vector<Elem const*>::const_iterator it = subelem.begin();
+  for (std::vector<Elem const *>::const_iterator it = subelem.begin();
        it!=subelem.end(); ++it)
     {
       // tetgen seems to create 0-volume cells on occasion, but we *should*

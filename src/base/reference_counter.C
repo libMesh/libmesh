@@ -85,7 +85,7 @@ std::string ReferenceCounter::get_info ()
 // avoid unused variable warnings
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-void ReferenceCounter::print_info (std::ostream &out_stream)
+void ReferenceCounter::print_info (std::ostream & out_stream)
 {
   if( _enable_print_counter ) out_stream << ReferenceCounter::get_info();
 }

@@ -35,10 +35,10 @@ namespace libMesh
 // Anonymous namespace for local helper functions
 namespace {
 
-void bernstein_nodal_soln(const Elem* elem,
+void bernstein_nodal_soln(const Elem * elem,
                           const Order order,
-                          const std::vector<Number>& elem_soln,
-                          std::vector<Number>&       nodal_soln,
+                          const std::vector<Number> & elem_soln,
+                          std::vector<Number> &       nodal_soln,
                           unsigned Dim)
 {
   const unsigned int n_nodes = elem->n_nodes();
@@ -370,31 +370,31 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
   // file.
   // This could be macro-ified so that it fits on one line...
 template <>
-void FE<0,BERNSTEIN>::nodal_soln(const Elem* elem,
+void FE<0,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
-                                 const std::vector<Number>& elem_soln,
-                                 std::vector<Number>& nodal_soln)
+                                 const std::vector<Number> & elem_soln,
+                                 std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
 template <>
-void FE<1,BERNSTEIN>::nodal_soln(const Elem* elem,
+void FE<1,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
-                                 const std::vector<Number>& elem_soln,
-                                 std::vector<Number>& nodal_soln)
+                                 const std::vector<Number> & elem_soln,
+                                 std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
 template <>
-void FE<2,BERNSTEIN>::nodal_soln(const Elem* elem,
+void FE<2,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
-                                 const std::vector<Number>& elem_soln,
-                                 std::vector<Number>& nodal_soln)
+                                 const std::vector<Number> & elem_soln,
+                                 std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
 template <>
-void FE<3,BERNSTEIN>::nodal_soln(const Elem* elem,
+void FE<3,BERNSTEIN>::nodal_soln(const Elem * elem,
                                  const Order order,
-                                 const std::vector<Number>& elem_soln,
-                                 std::vector<Number>& nodal_soln)
+                                 const std::vector<Number> & elem_soln,
+                                 std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 
@@ -431,17 +431,17 @@ template <> bool FE<3,BERNSTEIN>::is_hierarchic() const { return false; }
 #ifdef LIBMESH_ENABLE_AMR
 // compute_constraints() specializations are only needed for 2 and 3D
 template <>
-void FE<2,BERNSTEIN>::compute_constraints (DofConstraints &constraints,
-                                           DofMap &dof_map,
+void FE<2,BERNSTEIN>::compute_constraints (DofConstraints & constraints,
+                                           DofMap & dof_map,
                                            const unsigned int variable_number,
-                                           const Elem* elem)
+                                           const Elem * elem)
 { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 
 template <>
-void FE<3,BERNSTEIN>::compute_constraints (DofConstraints &constraints,
-                                           DofMap &dof_map,
+void FE<3,BERNSTEIN>::compute_constraints (DofConstraints & constraints,
+                                           DofMap & dof_map,
                                            const unsigned int variable_number,
-                                           const Elem* elem)
+                                           const Elem * elem)
 { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

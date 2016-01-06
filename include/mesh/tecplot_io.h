@@ -52,21 +52,21 @@ public:
    * output files.
    */
   explicit
-  TecplotIO (const MeshBase&, const bool binary=false,
+  TecplotIO (const MeshBase &, const bool binary=false,
              const double time=0., const int strand_offset=0);
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string&) libmesh_override;
+  virtual void write (const std::string &) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&) libmesh_override;
+  virtual void write_nodal_data (const std::string &,
+                                 const std::vector<Number> &,
+                                 const std::vector<std::string> &) libmesh_override;
 
   /**
    * Flag indicating whether or not to write a binary file
@@ -107,9 +107,9 @@ private:
    * specified file where the nodal data and variable names are optionally
    * provided.  This will write an ASCII file.
    */
-  void write_ascii (const std::string&,
-                    const std::vector<Number>* = NULL,
-                    const std::vector<std::string>* = NULL);
+  void write_ascii (const std::string &,
+                    const std::vector<Number> * = NULL,
+                    const std::vector<std::string> * = NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -118,9 +118,9 @@ private:
    * found at compile time, otherwise a warning message will be printed and
    * an ASCII file will be created.
    */
-  void write_binary (const std::string&,
-                     const std::vector<Number>* = NULL,
-                     const std::vector<std::string>* = NULL);
+  void write_binary (const std::string &,
+                     const std::vector<Number> * = NULL,
+                     const std::vector<std::string> * = NULL);
 
   /**
    * Determines the logical spatial dimension of the elements in the

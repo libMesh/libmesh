@@ -78,11 +78,11 @@ Real EigenSparseVector<T>::linfty_norm () const
 
 
 template <typename T>
-NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v_in)
+NumericVector<T> & EigenSparseVector<T>::operator += (const NumericVector<T> & v_in)
 {
   libmesh_assert (this->closed());
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  const EigenSparseVector<T> & v = cast_ref<const EigenSparseVector<T> &>(v_in);
 
   _vec += v._vec;
 
@@ -93,11 +93,11 @@ NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v_i
 
 
 template <typename T>
-NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v_in)
+NumericVector<T> & EigenSparseVector<T>::operator -= (const NumericVector<T> & v_in)
 {
   libmesh_assert (this->closed());
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  const EigenSparseVector<T> & v = cast_ref<const EigenSparseVector<T> &>(v_in);
 
   _vec -= v._vec;
 
@@ -112,7 +112,7 @@ NumericVector<T> & EigenSparseVector<T>::operator /= (NumericVector<T> & v_in)
   libmesh_assert (this->closed());
   libmesh_assert_equal_to(size(), v_in.size());
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  const EigenSparseVector<T> & v = cast_ref<const EigenSparseVector<T> &>(v_in);
 
   _vec = _vec.cwiseQuotient(v._vec);
 
@@ -160,11 +160,11 @@ void EigenSparseVector<T>::add (const T v)
 
 
 template <typename T>
-void EigenSparseVector<T>::add (const NumericVector<T>& v_in)
+void EigenSparseVector<T>::add (const NumericVector<T> & v_in)
 {
   libmesh_assert (this->initialized());
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  const EigenSparseVector<T> & v = cast_ref<const EigenSparseVector<T> &>(v_in);
 
   _vec += v._vec;
 }
@@ -172,11 +172,11 @@ void EigenSparseVector<T>::add (const NumericVector<T>& v_in)
 
 
 template <typename T>
-void EigenSparseVector<T>::add (const T a, const NumericVector<T>& v_in)
+void EigenSparseVector<T>::add (const T a, const NumericVector<T> & v_in)
 {
   libmesh_assert (this->initialized());
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  const EigenSparseVector<T> & v = cast_ref<const EigenSparseVector<T> &>(v_in);
 
   _vec += v._vec*a;
 }
@@ -184,12 +184,12 @@ void EigenSparseVector<T>::add (const T a, const NumericVector<T>& v_in)
 
 
 template <typename T>
-void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
-                                       const SparseMatrix<T>  &mat_in)
+void EigenSparseVector<T>::add_vector (const NumericVector<T> & vec_in,
+                                       const SparseMatrix<T>  & mat_in)
 {
   // Make sure the data passed in are really in Eigen types
-  const EigenSparseVector<T>* e_vec = cast_ptr<const EigenSparseVector<T>*>(&vec_in);
-  const EigenSparseMatrix<T>* mat = cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
+  const EigenSparseVector<T> * e_vec = cast_ptr<const EigenSparseVector<T> *>(&vec_in);
+  const EigenSparseMatrix<T> * mat = cast_ptr<const EigenSparseMatrix<T> *>(&mat_in);
 
   libmesh_assert(e_vec);
   libmesh_assert(mat);
@@ -200,12 +200,12 @@ void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
 
 
 template <typename T>
-void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> &vec_in,
-                                                 const SparseMatrix<T>  &mat_in)
+void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> & vec_in,
+                                                 const SparseMatrix<T>  & mat_in)
 {
   // Make sure the data passed in are really in Eigen types
-  const EigenSparseVector<T>* e_vec = cast_ptr<const EigenSparseVector<T>*>(&vec_in);
-  const EigenSparseMatrix<T>* mat = cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
+  const EigenSparseVector<T> * e_vec = cast_ptr<const EigenSparseVector<T> *>(&vec_in);
+  const EigenSparseMatrix<T> * mat = cast_ptr<const EigenSparseMatrix<T> *>(&mat_in);
 
   libmesh_assert(e_vec);
   libmesh_assert(mat);
@@ -239,12 +239,12 @@ void EigenSparseVector<T>::abs()
 
 
 template <typename T>
-T EigenSparseVector<T>::dot (const NumericVector<T>& V) const
+T EigenSparseVector<T>::dot (const NumericVector<T> & V) const
 {
   libmesh_assert (this->initialized());
 
   // Make sure the NumericVector passed in is really a EigenSparseVector
-  const EigenSparseVector<T>* v = cast_ptr<const EigenSparseVector<T>*>(&V);
+  const EigenSparseVector<T> * v = cast_ptr<const EigenSparseVector<T> *>(&V);
   libmesh_assert(v);
 
   return _vec.dot(v->_vec);
@@ -253,7 +253,7 @@ T EigenSparseVector<T>::dot (const NumericVector<T>& V) const
 
 
 template <typename T>
-NumericVector<T>&
+NumericVector<T> &
 EigenSparseVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
@@ -267,12 +267,12 @@ EigenSparseVector<T>::operator = (const T s)
 
 
 template <typename T>
-NumericVector<T>&
-EigenSparseVector<T>::operator = (const NumericVector<T>& v_in)
+NumericVector<T> &
+EigenSparseVector<T>::operator = (const NumericVector<T> & v_in)
 {
   // Make sure the NumericVector passed in is really a EigenSparseVector
-  const EigenSparseVector<T>* v =
-    cast_ptr<const EigenSparseVector<T>*>(&v_in);
+  const EigenSparseVector<T> * v =
+    cast_ptr<const EigenSparseVector<T> *>(&v_in);
 
   libmesh_assert(v);
 
@@ -284,8 +284,8 @@ EigenSparseVector<T>::operator = (const NumericVector<T>& v_in)
 
 
 template <typename T>
-EigenSparseVector<T>&
-EigenSparseVector<T>::operator = (const EigenSparseVector<T>& v)
+EigenSparseVector<T> &
+EigenSparseVector<T>::operator = (const EigenSparseVector<T> & v)
 {
   libmesh_assert (this->initialized());
   libmesh_assert (v.closed());
@@ -303,8 +303,8 @@ EigenSparseVector<T>::operator = (const EigenSparseVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-EigenSparseVector<T>::operator = (const std::vector<T>& v)
+NumericVector<T> &
+EigenSparseVector<T>::operator = (const std::vector<T> & v)
 {
   /**
    * Case 1:  The vector is the same size of
@@ -322,11 +322,11 @@ EigenSparseVector<T>::operator = (const std::vector<T>& v)
 
 
 template <typename T>
-void EigenSparseVector<T>::localize (NumericVector<T>& v_local_in) const
+void EigenSparseVector<T>::localize (NumericVector<T> & v_local_in) const
 {
   // Make sure the NumericVector passed in is really a EigenSparseVector
-  EigenSparseVector<T>* v_local =
-    cast_ptr<EigenSparseVector<T>*>(&v_local_in);
+  EigenSparseVector<T> * v_local =
+    cast_ptr<EigenSparseVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
 
@@ -336,12 +336,12 @@ void EigenSparseVector<T>::localize (NumericVector<T>& v_local_in) const
 
 
 template <typename T>
-void EigenSparseVector<T>::localize (NumericVector<T>& v_local_in,
-                                     const std::vector<numeric_index_type>& libmesh_dbg_var(send_list)) const
+void EigenSparseVector<T>::localize (NumericVector<T> & v_local_in,
+                                     const std::vector<numeric_index_type> & libmesh_dbg_var(send_list)) const
 {
   // Make sure the NumericVector passed in is really a EigenSparseVector
-  EigenSparseVector<T>* v_local =
-    cast_ptr<EigenSparseVector<T>*>(&v_local_in);
+  EigenSparseVector<T> * v_local =
+    cast_ptr<EigenSparseVector<T> *>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_less_equal (send_list.size(), v_local->size());
@@ -354,7 +354,7 @@ void EigenSparseVector<T>::localize (NumericVector<T>& v_local_in,
 template <typename T>
 void EigenSparseVector<T>::localize (const numeric_index_type libmesh_dbg_var(first_local_idx),
                                      const numeric_index_type libmesh_dbg_var(last_local_idx),
-                                     const std::vector<numeric_index_type>& libmesh_dbg_var(send_list))
+                                     const std::vector<numeric_index_type> & libmesh_dbg_var(send_list))
 {
   libmesh_assert_equal_to (first_local_idx, 0);
   libmesh_assert_equal_to (last_local_idx+1, this->size());
@@ -369,7 +369,7 @@ void EigenSparseVector<T>::localize (const numeric_index_type libmesh_dbg_var(fi
 
 
 template <typename T>
-void EigenSparseVector<T>::localize (std::vector<T>& v_local) const
+void EigenSparseVector<T>::localize (std::vector<T> & v_local) const
 
 {
   v_local.resize(this->size());
@@ -381,7 +381,7 @@ void EigenSparseVector<T>::localize (std::vector<T>& v_local) const
 
 
 template <typename T>
-void EigenSparseVector<T>::localize_to_one (std::vector<T>& v_local,
+void EigenSparseVector<T>::localize_to_one (std::vector<T> & v_local,
                                             const processor_id_type libmesh_dbg_var(pid)) const
 {
   libmesh_assert_equal_to (pid, 0);
@@ -392,8 +392,8 @@ void EigenSparseVector<T>::localize_to_one (std::vector<T>& v_local,
 
 
 template <typename T>
-void EigenSparseVector<T>::pointwise_mult (const NumericVector<T>& /*vec1*/,
-                                           const NumericVector<T>& /*vec2*/)
+void EigenSparseVector<T>::pointwise_mult (const NumericVector<T> & /*vec1*/,
+                                           const NumericVector<T> & /*vec2*/)
 {
   libmesh_not_implemented();
 }

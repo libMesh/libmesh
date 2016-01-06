@@ -42,7 +42,7 @@ namespace Utility {
  * enumeration of type \p T.
  */
 template <typename T>
-T string_to_enum (const std::string& s);
+T string_to_enum (const std::string & s);
 
 
 

@@ -34,7 +34,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // MEDITIO  members
-void MEDITIO::write (const std::string& fname)
+void MEDITIO::write (const std::string & fname)
 {
   if (this->mesh().processor_id() == 0)
     if (!this->binary())
@@ -43,9 +43,9 @@ void MEDITIO::write (const std::string& fname)
 
 
 
-void MEDITIO::write_nodal_data (const std::string& fname,
-                                const std::vector<Number>& soln,
-                                const std::vector<std::string>& names)
+void MEDITIO::write_nodal_data (const std::string & fname,
+                                const std::vector<Number> & soln,
+                                const std::vector<std::string> & names)
 {
   START_LOG("write_nodal_data()", "MEDITIO");
 
@@ -58,9 +58,9 @@ void MEDITIO::write_nodal_data (const std::string& fname,
 
 
 
-void MEDITIO::write_ascii (const std::string& fname,
-                           const std::vector<Number>* vec,
-                           const std::vector<std::string>* solution_names)
+void MEDITIO::write_ascii (const std::string & fname,
+                           const std::vector<Number> * vec,
+                           const std::vector<std::string> * solution_names)
 {
   // Current lacks in implementation:
   //  (i)   only 3D meshes.
@@ -79,7 +79,7 @@ void MEDITIO::write_ascii (const std::string& fname,
     libmesh_file_error(fname.c_str());
 
   // Get a reference to the mesh
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Begin interfacing with the MEdit data file
   {

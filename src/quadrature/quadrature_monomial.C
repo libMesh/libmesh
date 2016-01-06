@@ -62,7 +62,7 @@ void QMonomial::wissmann_rule(const Real rule_data[][3],
 
 
 void QMonomial::stroud_rule(const Real rule_data[][3],
-                            const unsigned int* rule_symmetry,
+                            const unsigned int * rule_symmetry,
                             const unsigned int n_pts)
 {
   for (unsigned int i=0, c=0; i<n_pts; ++i)
@@ -210,7 +210,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 
 
 void QMonomial::kim_rule(const Real rule_data[][4],
-                         const unsigned int* rule_id,
+                         const unsigned int * rule_id,
                          const unsigned int n_pts)
 {
   for (unsigned int i=0, c=0; i<n_pts; ++i)

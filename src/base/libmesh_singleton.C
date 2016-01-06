@@ -37,16 +37,16 @@ SingletonMutex singleton_mtx, setup_mtx;
 
 // global list of runtime Singleton objects - created dynamically,
 // cleaned up in reverse order.
-typedef std::vector<Singleton*> SingletonList;
+typedef std::vector<Singleton *> SingletonList;
 
-SingletonList& get_singleton_cache()
+SingletonList & get_singleton_cache()
 {
   static SingletonList singleton_cache;
   return singleton_cache;
 }
 
-typedef std::vector<Singleton::Setup*> SetupList;
-SetupList& get_setup_cache()
+typedef std::vector<Singleton::Setup *> SetupList;
+SetupList & get_setup_cache()
 {
   static SetupList setup_cache;
   return setup_cache;
@@ -81,7 +81,7 @@ void Singleton::setup ()
 {
   SingletonMutex::scoped_lock lock(setup_mtx);
 
-  SetupList& setup_cache = get_setup_cache();
+  SetupList & setup_cache = get_setup_cache();
 
   for (SetupList::iterator it = setup_cache.begin();
        it!=setup_cache.end(); ++it)
@@ -97,7 +97,7 @@ void Singleton::cleanup ()
 {
   SingletonMutex::scoped_lock lock(singleton_mtx);
 
-  SingletonList& singleton_cache = get_singleton_cache();
+  SingletonList & singleton_cache = get_singleton_cache();
 
   for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
        it!=singleton_cache.rend(); ++it)

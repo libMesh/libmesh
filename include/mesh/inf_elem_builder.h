@@ -57,7 +57,7 @@ public:
    * Constructor.
    */
   explicit
-  InfElemBuilder(MeshBase& mesh) : _mesh(mesh) {}
+  InfElemBuilder(MeshBase & mesh) : _mesh(mesh) {}
 
   /**
    * Useful typedef
@@ -97,14 +97,14 @@ public:
    * respectively.
    * The flag \p be_verbose enables some diagnostic output.
    */
-  const Point build_inf_elem (const InfElemOriginValue& origin_x,
-                              const InfElemOriginValue& origin_y,
-                              const InfElemOriginValue& origin_z,
+  const Point build_inf_elem (const InfElemOriginValue & origin_x,
+                              const InfElemOriginValue & origin_y,
+                              const InfElemOriginValue & origin_z,
                               const bool x_sym = false,
                               const bool y_sym = false,
                               const bool z_sym = false,
                               const bool be_verbose = false,
-                              std::vector<const Node*>* inner_boundary_nodes = NULL);
+                              std::vector<const Node *> * inner_boundary_nodes = NULL);
 
 
 
@@ -113,18 +113,18 @@ private:
    * Build infinite elements atop a volume-based mesh.
    * Actual implementation.
    */
-  void build_inf_elem (const Point& origin,
+  void build_inf_elem (const Point & origin,
                        const bool x_sym = false,
                        const bool y_sym = false,
                        const bool z_sym = false,
                        const bool be_verbose = false,
                        std::set<std::pair<dof_id_type,
-                       unsigned int> >* inner_faces = NULL);
+                       unsigned int> > * inner_faces = NULL);
   /**
    * Reference to the mesh we're building infinite
    * elements for.
    */
-  MeshBase& _mesh;
+  MeshBase & _mesh;
 };
 
 

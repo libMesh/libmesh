@@ -25,7 +25,7 @@
 namespace libMesh
 {
 
-BoundaryMesh::BoundaryMesh(const Parallel::Communicator &comm_in,
+BoundaryMesh::BoundaryMesh(const Parallel::Communicator & comm_in,
                            unsigned char d) :
   Mesh(comm_in,d)
 {

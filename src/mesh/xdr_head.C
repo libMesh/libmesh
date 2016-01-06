@@ -56,9 +56,9 @@ XdrHEAD::~XdrHEAD()
 
 
 
-char* XdrHEAD::cpyString(const char* src, int len)
+char * XdrHEAD::cpyString(const char * src, int len)
 {
-  char* temp = NULL;
+  char * temp = NULL;
   int myLen = len;
   if(src)
     {

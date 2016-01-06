@@ -34,8 +34,8 @@ namespace libMesh
 
 //------------------------------------------------------------------
 // PointLocator methods
-PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
-                                    const PointLocatorBase* master) :
+PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
+                                    const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
   _tree            (NULL),
   _element         (NULL),
@@ -48,9 +48,9 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
 
 
 
-PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
+PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
                                     const Trees::BuildType build_type,
-                                    const PointLocatorBase* master) :
+                                    const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
   _tree            (NULL),
   _element         (NULL),
@@ -165,8 +165,8 @@ void PointLocatorTree::init (Trees::BuildType build_type)
           // the master's tree.  But for this we first transform
           // the master in a state for which we are friends.
           // And make sure the master @e has a tree!
-          const PointLocatorTree* my_master =
-            cast_ptr<const PointLocatorTree*>(this->_master);
+          const PointLocatorTree * my_master =
+            cast_ptr<const PointLocatorTree *>(this->_master);
 
           if (my_master->initialized())
             this->_tree = my_master->_tree;
@@ -189,7 +189,8 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 
 
 
-const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem * PointLocatorTree::operator() (const Point & p,
+                                           const std::set<subdomain_id_type> * allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
 
@@ -213,7 +214,7 @@ const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdoma
           //     search over all active (possibly local) elements.
           //     The idea here is that, in the case of curved elements,
           //     the bounding box computed in \p TreeNode::insert(const
-          //     Elem*) might be slightly inaccurate and therefore we may
+          //     Elem *) might be slightly inaccurate and therefore we may
           //     have generated a false negative.
           if (_out_of_mesh_mode == false)
             {
@@ -262,10 +263,10 @@ const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdoma
 
 
 
-const Elem* PointLocatorTree::perform_linear_search(const Point& p,
-                                                    const std::set<subdomain_id_type> *allowed_subdomains,
-                                                    bool use_close_to_point,
-                                                    Real close_to_point_tolerance) const
+const Elem * PointLocatorTree::perform_linear_search(const Point & p,
+                                                     const std::set<subdomain_id_type> * allowed_subdomains,
+                                                     bool use_close_to_point,
+                                                     Real close_to_point_tolerance) const
 {
   START_LOG("perform_linear_search", "PointLocatorTree");
 

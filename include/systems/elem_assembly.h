@@ -52,21 +52,21 @@ public:
   /**
    * Perform the element interior assembly.
    */
-  virtual void interior_assembly(FEMContext& ) { }
+  virtual void interior_assembly(FEMContext &) { }
 
   /**
    * Perform the element boundary assembly.
    */
-  virtual void boundary_assembly(FEMContext& ) { }
+  virtual void boundary_assembly(FEMContext &) { }
 
   /**
    * Get values to add to the RHS vector based on \p node.
    * This allows one to impose point loads, for example.
    */
   virtual void
-  get_nodal_rhs_values(std::map<numeric_index_type, Number>& values,
-                       const System& ,
-                       const Node& )
+  get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
+                       const System &,
+                       const Node &)
   {
     // By default, just clear the values map
     values.clear();

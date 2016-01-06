@@ -29,7 +29,7 @@ namespace libMesh
 
 template <typename T>
 inline
-OptimizationSolver<T>::OptimizationSolver (sys_type& s) :
+OptimizationSolver<T>::OptimizationSolver (sys_type & s) :
   ParallelObject(s),
   objective_object(NULL),
   gradient_object(NULL),
@@ -59,7 +59,7 @@ OptimizationSolver<T>::~OptimizationSolver ()
 
 template <typename T>
 UniquePtr<OptimizationSolver<T> >
-OptimizationSolver<T>::build(sys_type& s, const SolverPackage solver_package)
+OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 {
   // Prevent unused variables warnings when Tao is not available
   libmesh_ignore(s);

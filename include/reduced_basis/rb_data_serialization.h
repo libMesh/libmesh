@@ -59,7 +59,7 @@ public:
    * Initialize a new buffer using the structure from the Cap'n'Proto schema
    * described in rb_data.capnp.
    */
-  RBEvaluationSerialization(RBEvaluation& rb_eval);
+  RBEvaluationSerialization(RBEvaluation & rb_eval);
 
   /**
    * Destructor.
@@ -69,14 +69,14 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void write_to_file(const std::string& path);
+  void write_to_file(const std::string & path);
 
 private:
 
   /**
    * The RBEvaluation object that will be written to disk.
    */
-  RBEvaluation& _rb_eval;
+  RBEvaluation & _rb_eval;
 
 };
 
@@ -92,7 +92,7 @@ public:
    * Initialize a new buffer using the structure from the Cap'n'Proto schema
    * described in rb_data.capnp.
    */
-  TransientRBEvaluationSerialization(TransientRBEvaluation& rb_eval);
+  TransientRBEvaluationSerialization(TransientRBEvaluation & rb_eval);
 
   /**
    * Destructor.
@@ -102,14 +102,14 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void write_to_file(const std::string& path);
+  void write_to_file(const std::string & path);
 
 private:
 
   /**
    * The RBEvaluation object that will be written to disk.
    */
-  TransientRBEvaluation& _trans_rb_eval;
+  TransientRBEvaluation & _trans_rb_eval;
 
 };
 
@@ -125,7 +125,7 @@ public:
    * Initialize a new buffer using the structure from the Cap'n'Proto schema
    * described in rb_data.capnp.
    */
-  RBEIMEvaluationSerialization(RBEIMEvaluation& rb_eval);
+  RBEIMEvaluationSerialization(RBEIMEvaluation & rb_eval);
 
   /**
    * Destructor.
@@ -135,14 +135,14 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void write_to_file(const std::string& path);
+  void write_to_file(const std::string & path);
 
 private:
 
   /**
    * The RBEvaluation object that will be written to disk.
    */
-  RBEIMEvaluation& _rb_eim_eval;
+  RBEIMEvaluation & _rb_eim_eval;
 
 };
 
@@ -162,7 +162,7 @@ public:
    * Initialize a new buffer using the structure from the Cap'n'Proto schema
    * described in rb_data.capnp.
    */
-  RBSCMEvaluationSerialization(RBSCMEvaluation& rb_eval);
+  RBSCMEvaluationSerialization(RBSCMEvaluation & rb_eval);
 
   /**
    * Destructor.
@@ -172,14 +172,14 @@ public:
   /**
    * Write the Cap'n'Proto buffer to disk.
    */
-  void write_to_file(const std::string& path);
+  void write_to_file(const std::string & path);
 
 private:
 
   /**
    * The RBEvaluation object that will be written to disk.
    */
-  RBSCMEvaluation& _rb_scm_eval;
+  RBSCMEvaluation & _rb_scm_eval;
 
 };
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
@@ -187,34 +187,34 @@ private:
 /**
  * Add parameter ranges for continuous and discrete parameters.
  */
-void add_parameter_ranges_to_builder(const RBParametrized& rb_evaluation,
-                                     RBData::ParameterRanges::Builder& parameter_ranges,
-                                     RBData::DiscreteParameterList::Builder& discrete_parameters_list);
+void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
+                                     RBData::ParameterRanges::Builder & parameter_ranges,
+                                     RBData::DiscreteParameterList::Builder & discrete_parameters_list);
 
 /**
  * Add data for an RBEvaluation to the builder.
  */
 template <typename RBEvaluationBuilderNumber>
-void add_rb_evaluation_data_to_builder(RBEvaluation& rb_eval,
-                                       RBEvaluationBuilderNumber& rb_eval_builder);
+void add_rb_evaluation_data_to_builder(RBEvaluation & rb_eval,
+                                       RBEvaluationBuilderNumber & rb_eval_builder);
 
 /**
  * Add data for a TransientRBEvaluation to the builder.
  * Templated to deal with both Real and Complex numbers.
  */
 template <typename RBEvaluationBuilderNumber, typename TransRBEvaluationBuilderNumber>
-void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation& trans_rb_eval,
-                                                 RBEvaluationBuilderNumber& rb_eval_builder,
-                                                 TransRBEvaluationBuilderNumber& trans_rb_eval_builder);
+void add_transient_rb_evaluation_data_to_builder(TransientRBEvaluation & trans_rb_eval,
+                                                 RBEvaluationBuilderNumber & rb_eval_builder,
+                                                 TransRBEvaluationBuilderNumber & trans_rb_eval_builder);
 
 /**
  * Add data for an RBEIMEvaluation to the builder.
  * Templated to deal with both Real and Complex numbers.
  */
 template <typename RBEvaluationBuilderNumber, typename RBEIMEvaluationBuilderNumber>
-void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation& rb_eim_eval,
-                                           RBEvaluationBuilderNumber& rb_eval_builder,
-                                           RBEIMEvaluationBuilderNumber& rb_eim_eval_builder);
+void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_eval,
+                                           RBEvaluationBuilderNumber & rb_eval_builder,
+                                           RBEIMEvaluationBuilderNumber & rb_eim_eval_builder);
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 /**
@@ -224,20 +224,20 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation& rb_eim_eval,
  * Real values, and hence doesn't depend on whether we're
  * using complex numbers or not.
  */
-void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation& rb_scm_eval,
-                                           RBData::RBSCMEvaluation::Builder& rb_scm_eval_builder);
+void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
+                                           RBData::RBSCMEvaluation::Builder & rb_scm_eval_builder);
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 /**
  * Helper function that adds point data.
  */
-void add_point_to_builder(const Point& point,
+void add_point_to_builder(const Point & point,
                           RBData::Point3D::Builder point_builder);
 
 /**
  * Helper function that adds element data.
  */
-void add_elem_to_builder(const Elem& elem,
+void add_elem_to_builder(const Elem & elem,
                          RBData::MeshElem::Builder mesh_elem_builder);
 
 } // namespace RBDataSerialization

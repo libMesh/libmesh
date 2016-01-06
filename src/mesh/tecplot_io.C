@@ -60,7 +60,7 @@ public:
   std::vector<float> nodalData;
   std::vector<int>   connData;
   //float* nodalData;
-  //int*   connData;
+  //int *   connData;
 
   void set_n_cells (const dof_id_type nc);
 
@@ -117,7 +117,7 @@ void TecplotMacros::set_n_cells (const dof_id_type nc)
 
 // ------------------------------------------------------------
 // TecplotIO  members
-TecplotIO::TecplotIO (const MeshBase& mesh_in,
+TecplotIO::TecplotIO (const MeshBase & mesh_in,
                       const bool binary_in,
                       const double time_in,
                       const int strand_offset_in) :
@@ -170,7 +170,7 @@ bool & TecplotIO::ascii_append ()
 }
 
 
-void TecplotIO::write (const std::string& fname)
+void TecplotIO::write (const std::string & fname)
 {
   if (this->mesh().processor_id() == 0)
     {
@@ -183,9 +183,9 @@ void TecplotIO::write (const std::string& fname)
 
 
 
-void TecplotIO::write_nodal_data (const std::string& fname,
-                                  const std::vector<Number>& soln,
-                                  const std::vector<std::string>& names)
+void TecplotIO::write_nodal_data (const std::string & fname,
+                                  const std::vector<Number> & soln,
+                                  const std::vector<std::string> & names)
 {
   START_LOG("write_nodal_data()", "TecplotIO");
 
@@ -205,7 +205,7 @@ void TecplotIO::write_nodal_data (const std::string& fname,
 unsigned TecplotIO::elem_dimension()
 {
   // Get a constant reference to the mesh.
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   std::vector<unsigned> elem_dims(3);
 
@@ -232,9 +232,9 @@ unsigned TecplotIO::elem_dimension()
 
 
 
-void TecplotIO::write_ascii (const std::string& fname,
-                             const std::vector<Number>* v,
-                             const std::vector<std::string>* solution_names)
+void TecplotIO::write_ascii (const std::string & fname,
+                             const std::vector<Number> * v,
+                             const std::vector<std::string> * solution_names)
 {
   // Should only do this on processor 0!
   libmesh_assert_equal_to (this->mesh().processor_id(), 0);
@@ -247,7 +247,7 @@ void TecplotIO::write_ascii (const std::string& fname,
     libmesh_file_error(fname.c_str());
 
   // Get a constant reference to the mesh.
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Write header to stream
   {
@@ -354,9 +354,9 @@ void TecplotIO::write_ascii (const std::string& fname,
 
 
 
-void TecplotIO::write_binary (const std::string& fname,
-                              const std::vector<Number>* vec,
-                              const std::vector<std::string>* solution_names)
+void TecplotIO::write_binary (const std::string & fname,
+                              const std::vector<Number> * vec,
+                              const std::vector<std::string> * solution_names)
 {
   //-----------------------------------------------------------
   // Call the ASCII output function if configure did not detect
@@ -378,7 +378,7 @@ void TecplotIO::write_binary (const std::string& fname,
 #elif defined(LIBMESH_HAVE_TECPLOT_API_112)
 
   // Get a constant reference to the mesh.
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Required variables
   std::string tecplot_variable_names;
@@ -493,9 +493,9 @@ void TecplotIO::write_binary (const std::string& fname,
 
   // Initialize the file
   ierr = TECINI112 (NULL,
-                    const_cast<char*>(tecplot_variable_names.c_str()),
-                    const_cast<char*>(fname.c_str()),
-                    const_cast<char*>("."),
+                    const_cast<char *>(tecplot_variable_names.c_str()),
+                    const_cast<char *>(fname.c_str()),
+                    const_cast<char *>("."),
                     &file_type,
                     &tec_debug,
                     &is_double);
@@ -584,7 +584,7 @@ void TecplotIO::write_binary (const std::string& fname,
             zone_name << *sbd_it;
           }
 
-        ierr = TECZNE112 (const_cast<char*>(zone_name.str().c_str()),
+        ierr = TECZNE112 (const_cast<char *>(zone_name.str().c_str()),
                           &cell_type,
                           &num_nodes,
                           &num_cells,
@@ -652,7 +652,7 @@ void TecplotIO::write_binary (const std::string& fname,
 #else
 
   // Get a constant reference to the mesh.
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Tecplot binary output only good for dim=2,3
   if (the_mesh.mesh_dimension() == 1)
@@ -775,9 +775,9 @@ void TecplotIO::write_binary (const std::string& fname,
 
 
     ierr = TECINI (NULL,
-                   (char*) tecplot_variable_names.c_str(),
-                   (char*) fname.c_str(),
-                   (char*) ".",
+                   (char *) tecplot_variable_names.c_str(),
+                   (char *) fname.c_str(),
+                   (char *) ".",
                    &tec_debug,
                    &is_double);
 
@@ -789,7 +789,7 @@ void TecplotIO::write_binary (const std::string& fname,
                    &num_nodes,
                    &num_cells,
                    &cell_type,
-                   (char*) "FEBLOCK",
+                   (char *) "FEBLOCK",
                    NULL);
 
     if (ierr)

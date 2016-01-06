@@ -36,7 +36,8 @@ namespace libMesh
 {
 
 
-EnsightIO::EnsightIO (const std::string &filename, const EquationSystems &eq) :
+EnsightIO::EnsightIO (const std::string & filename,
+                      const EquationSystems & eq) :
   MeshOutput<MeshBase> (eq.get_mesh()),
   _equation_systems(eq)
 {
@@ -58,8 +59,10 @@ EnsightIO::~EnsightIO ()
 
 
 
-void EnsightIO::add_vector (const std::string &system_name, const std::string &vec_description,
-                            const std::string &u, const std::string &v)
+void EnsightIO::add_vector (const std::string & system_name,
+                            const std::string & vec_description,
+                            const std::string & u,
+                            const std::string & v)
 {
   libmesh_assert (_equation_systems.has_system(system_name));
   libmesh_assert (_equation_systems.get_system(system_name).has_variable(u));
@@ -75,8 +78,11 @@ void EnsightIO::add_vector (const std::string &system_name, const std::string &v
 
 
 
-void EnsightIO::add_vector (const std::string &system_name, const std::string &vec_name,
-                            const std::string &u, const std::string &v, const std::string &w)
+void EnsightIO::add_vector (const std::string & system_name,
+                            const std::string & vec_name,
+                            const std::string & u,
+                            const std::string & v,
+                            const std::string & w)
 {
   libmesh_assert(_equation_systems.has_system(system_name));
   libmesh_assert(_equation_systems.get_system(system_name).has_variable(u));
@@ -93,8 +99,9 @@ void EnsightIO::add_vector (const std::string &system_name, const std::string &v
 
 
 
-void EnsightIO::add_scalar(const std::string &system_name, const std::string &scl_description,
-                           const std::string &s)
+void EnsightIO::add_scalar(const std::string & system_name,
+                           const std::string & scl_description,
+                           const std::string & s)
 {
   libmesh_assert(_equation_systems.has_system(system_name));
   libmesh_assert(_equation_systems.get_system(system_name).has_variable(s));
@@ -110,11 +117,11 @@ void EnsightIO::add_scalar(const std::string &system_name, const std::string &sc
 
 // This method must be implemented as it is pure virtual in
 // the MeshOutput base class.
-void EnsightIO::write (const std::string &name)
+void EnsightIO::write (const std::string & name)
 {
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
+  MeshSerializer serialize(const_cast<MeshBase &>(this->mesh()), !_is_parallel_format);
 
   _ensight_file_name = name;
   this->write();
@@ -151,7 +158,7 @@ void EnsightIO::write_geometry_ascii()
        << std::right
        << _time_steps.size()-1;
 
-  FILE* fout = fopen(file.str().c_str(),"w");
+  FILE * fout = fopen(file.str().c_str(),"w");
 
   char buffer[80];
 
@@ -173,18 +180,18 @@ void EnsightIO::write_geometry_ascii()
   std::map <int, int>       ensight_node_index;
 
   // Grouping elements of the same type
-  std::map<ElemType, std::vector<const Elem*> >                    ensight_parts_map;
-  typedef std::map<ElemType, std::vector<const Elem*> >::iterator  ensight_parts_iterator;
-  typedef std::pair<ElemType, std::vector<const Elem*> >           ensight_parts_value;
+  std::map<ElemType, std::vector<const Elem *> >                    ensight_parts_map;
+  typedef std::map<ElemType, std::vector<const Elem *> >::iterator  ensight_parts_iterator;
+  typedef std::pair<ElemType, std::vector<const Elem *> >           ensight_parts_value;
 
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
 
   for ( ; el != end_el ; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       ensight_parts_map[elem->type()].push_back(elem);
 
       for (unsigned int i = 0; i < elem->n_nodes(); i++)
@@ -233,7 +240,7 @@ void EnsightIO::write_geometry_ascii()
       elem_type_to_string(kvp.first,buffer);
       fprintf(fout,"\n%s\n", buffer);
 
-      std::vector<const Elem*> elem_ref  = kvp.second;
+      std::vector<const Elem *> elem_ref  = kvp.second;
 
       // Write number of element
       fprintf(fout,"%10d\n",static_cast<int>(elem_ref.size()));
@@ -271,7 +278,7 @@ void EnsightIO::write_case()
   std::stringstream case_file, geo_file;
   case_file << _ensight_file_name << ".case";
 
-  FILE* fout = fopen(case_file.str().c_str(),"w");
+  FILE * fout = fopen(case_file.str().c_str(),"w");
   fprintf(fout,"FORMAT\n");
   fprintf(fout,"type:  ensight gold\n\n");
   fprintf(fout,"GEOMETRY\n");
@@ -352,7 +359,8 @@ void EnsightIO::write_solution_ascii()
 }
 
 
-void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &var_name)
+void EnsightIO::write_scalar_ascii(const std::string & sys,
+                                   const std::string & var_name)
 {
   std::ostringstream scl_file;
   scl_file << _ensight_file_name << "_" << var_name << ".scl";
@@ -370,13 +378,13 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
   fprintf(fout,"%10d\n",1);
   fprintf(fout,"coordinates\n");
 
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   const unsigned int dim = the_mesh.mesh_dimension();
 
-  const System &system = _equation_systems.get_system(sys);
+  const System & system = _equation_systems.get_system(sys);
 
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
 
   int var = system.variable_number(var_name);
@@ -398,33 +406,32 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
   std::vector<Number>       elem_soln;
   std::vector<Number>       nodal_soln;
 
-  for ( ; el != end_el ; ++el){
+  for ( ; el != end_el ; ++el)
+    {
+      const Elem * elem = *el;
 
-    const Elem* elem = *el;
+      const FEType & fe_type    = system.variable_type(var);
 
-    const FEType& fe_type    = system.variable_type(var);
+      dof_map.dof_indices (elem, dof_indices);
+      dof_map.dof_indices (elem, dof_indices_scl, var);
 
-    dof_map.dof_indices (elem, dof_indices);
-    dof_map.dof_indices (elem, dof_indices_scl, var);
+      elem_soln.resize(dof_indices_scl.size());
 
-    elem_soln.resize(dof_indices_scl.size());
+      for (unsigned int i = 0; i < dof_indices_scl.size(); i++)
+        elem_soln[i] = system.current_solution(dof_indices_scl[i]);
 
-    for (unsigned int i = 0; i < dof_indices_scl.size(); i++)
-      elem_soln[i] = system.current_solution(dof_indices_scl[i]);
+      FEInterface::nodal_soln (dim,fe_type, elem, elem_soln, nodal_soln);
 
-    FEInterface::nodal_soln (dim,fe_type, elem, elem_soln, nodal_soln);
-
-    libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+      libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-    libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
-    libmesh_not_implemented();
+      libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
+      libmesh_not_implemented();
 #endif
 
-    for (unsigned int n=0; n<elem->n_nodes(); n++)
-      local_soln[elem->node(n)] = libmesh_real(nodal_soln[n]);
-
-  }
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        local_soln[elem->node(n)] = libmesh_real(nodal_soln[n]);
+    }
 
   local_soln_iterator sol = local_soln.begin();
   const local_soln_iterator sol_end = local_soln.end();
@@ -436,7 +443,9 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
 }
 
 
-void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std::string> &vec, const std::string &var_name)
+void EnsightIO::write_vector_ascii(const std::string & sys,
+                                   const std::vector<std::string> & vec,
+                                   const std::string & var_name)
 {
   std::ostringstream vec_file;
   vec_file<<_ensight_file_name<<"_"<<var_name<<".vec";
@@ -454,14 +463,14 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
   fprintf(fout,"coordinates\n");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   // The dimension that we are running
   const unsigned int dim = the_mesh.mesh_dimension();
 
-  const System &system = _equation_systems.get_system(sys);
+  const System & system = _equation_systems.get_system(sys);
 
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   const unsigned int u_var = system.variable_number(vec[0]);
   const unsigned int v_var = system.variable_number(vec[1]);
@@ -481,61 +490,60 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
 
   map_local_soln local_soln;
 
-  for ( ; el != end_el ; ++el){
+  for ( ; el != end_el ; ++el)
+    {
+      const Elem * elem = *el;
 
-    const Elem* elem = *el;
+      const FEType & fe_type    = system.variable_type(u_var);
 
-    const FEType& fe_type    = system.variable_type(u_var);
-
-    dof_map.dof_indices (elem, dof_indices);
-    dof_map.dof_indices (elem, dof_indices_u,u_var);
-    dof_map.dof_indices (elem, dof_indices_v,v_var);
-    if(dim==3)  dof_map.dof_indices (elem, dof_indices,w_var);
-
-
-    std::vector<Number>       elem_soln_u;
-    std::vector<Number>       elem_soln_v;
-    std::vector<Number>       elem_soln_w;
-
-    std::vector<Number>       nodal_soln_u;
-    std::vector<Number>       nodal_soln_v;
-    std::vector<Number>       nodal_soln_w;
-
-    elem_soln_u.resize(dof_indices_u.size());
-    elem_soln_v.resize(dof_indices_v.size());
-    if(dim == 3) elem_soln_w.resize(dof_indices_w.size());
-
-    for (unsigned int i = 0; i < dof_indices_u.size(); i++)
-      {
-        elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
-        elem_soln_v[i] = system.current_solution(dof_indices_v[i]);
-        if(dim==3) elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
-      }
-
-    FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_u,nodal_soln_u);
-    FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_v,nodal_soln_v);
-    if(dim == 3) FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_w,nodal_soln_w);
+      dof_map.dof_indices (elem, dof_indices);
+      dof_map.dof_indices (elem, dof_indices_u,u_var);
+      dof_map.dof_indices (elem, dof_indices_v,v_var);
+      if(dim==3)  dof_map.dof_indices (elem, dof_indices,w_var);
 
 
-    libmesh_assert_equal_to (nodal_soln_u.size(), elem->n_nodes());
-    libmesh_assert_equal_to (nodal_soln_v.size(), elem->n_nodes());
+      std::vector<Number>       elem_soln_u;
+      std::vector<Number>       elem_soln_v;
+      std::vector<Number>       elem_soln_w;
 
-#ifdef LIBMESH_ENABLE_COMPLEX
-    libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
-    libmesh_not_implemented()
-#endif
+      std::vector<Number>       nodal_soln_u;
+      std::vector<Number>       nodal_soln_v;
+      std::vector<Number>       nodal_soln_w;
 
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      elem_soln_u.resize(dof_indices_u.size());
+      elem_soln_v.resize(dof_indices_v.size());
+      if(dim == 3) elem_soln_w.resize(dof_indices_w.size());
+
+      for (unsigned int i = 0; i < dof_indices_u.size(); i++)
         {
-          std::vector<Real> node_vec(3);
-          node_vec[0]= libmesh_real(nodal_soln_u[n]);
-          node_vec[1]= libmesh_real(nodal_soln_v[n]);
-          node_vec[2]=0.0;
-          if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
-          local_soln[elem->node(n)] = node_vec;
+          elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
+          elem_soln_v[i] = system.current_solution(dof_indices_v[i]);
+          if(dim==3) elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
         }
 
-  }
+      FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_u,nodal_soln_u);
+      FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_v,nodal_soln_v);
+      if(dim == 3) FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_w,nodal_soln_w);
+
+
+      libmesh_assert_equal_to (nodal_soln_u.size(), elem->n_nodes());
+      libmesh_assert_equal_to (nodal_soln_v.size(), elem->n_nodes());
+
+#ifdef LIBMESH_ENABLE_COMPLEX
+      libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
+      libmesh_not_implemented()
+#endif
+
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          {
+            std::vector<Real> node_vec(3);
+            node_vec[0]= libmesh_real(nodal_soln_u[n]);
+            node_vec[1]= libmesh_real(nodal_soln_v[n]);
+            node_vec[2]=0.0;
+            if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
+            local_soln[elem->node(n)] = node_vec;
+          }
+    }
 
   local_soln_iterator sol = local_soln.begin();
   const local_soln_iterator sol_end = local_soln.end();
@@ -553,7 +561,7 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
 
 }
 
-void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
+void EnsightIO::elem_type_to_string(ElemType type, char * buffer)
 {
   switch(type){
   case EDGE2:

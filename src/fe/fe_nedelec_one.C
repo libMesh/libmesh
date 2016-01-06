@@ -35,11 +35,11 @@ namespace libMesh
 
 // Anonymous namespace for local helper functions
 namespace {
-void nedelec_one_nodal_soln(const Elem* elem,
+void nedelec_one_nodal_soln(const Elem * elem,
                             const Order order,
-                            const std::vector<Number>& elem_soln,
+                            const std::vector<Number> & elem_soln,
                             const int dim,
-                            std::vector<Number>&       nodal_soln)
+                            std::vector<Number> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType elem_type   = elem->type();
@@ -114,7 +114,7 @@ void nedelec_one_nodal_soln(const Elem* elem,
         // applied to it.
         UniquePtr<FEVectorBase> vis_fe = FEVectorBase::build(dim,fe_type);
 
-        const std::vector<std::vector<RealGradient> >& vis_phi = vis_fe->get_phi();
+        const std::vector<std::vector<RealGradient> > & vis_phi = vis_fe->get_phi();
 
         vis_fe->reinit(elem,&refspace_nodes);
 
@@ -368,10 +368,10 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
-                                      DofMap &/*dof_map*/,
+void nedelec_one_compute_constraints (DofConstraints & /*constraints*/,
+                                      DofMap & /*dof_map*/,
                                       const unsigned int /*variable_number*/,
-                                      const Elem* libmesh_dbg_var(elem),
+                                      const Elem * libmesh_dbg_var(elem),
                                       const unsigned Dim)
 {
   // Only constrain elements in 2,3D.
@@ -400,7 +400,7 @@ void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
   {                                                     // this element and ones coarser
   // than this element.
   // Get pointers to the elements of interest and its parent.
-  const Elem* parent = elem->parent();
+  const Elem * parent = elem->parent();
 
   // This can't happen...  Only level-0 elements have NULL
   // parents, and no level-0 elements can be at a higher
@@ -432,7 +432,7 @@ void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
   const unsigned int my_dof_g = my_dof_indices[my_dof];
 
   // The support point of the DOF
-  const Point& support_point = my_side->point(my_dof);
+  const Point & support_point = my_side->point(my_dof);
 
   // Figure out where my node lies on their reference element.
   const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
@@ -467,7 +467,7 @@ void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
   Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
   // A reference to the constraint row.
-  DofConstraintRow& constraint_row = constraints[my_dof_g].first;
+  DofConstraintRow & constraint_row = constraints[my_dof_g].first;
 
   constraint_row.insert(std::make_pair (their_dof_g,
   their_dof_value));
@@ -494,31 +494,31 @@ void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this file.
 template <>
-void FE<0,NEDELEC_ONE>::nodal_soln(const Elem*,
+void FE<0,NEDELEC_ONE>::nodal_soln(const Elem *,
                                    const Order,
-                                   const std::vector<Number>&,
-                                   std::vector<Number>&)
+                                   const std::vector<Number> &,
+                                   std::vector<Number> &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
-void FE<1,NEDELEC_ONE>::nodal_soln(const Elem*,
+void FE<1,NEDELEC_ONE>::nodal_soln(const Elem *,
                                    const Order,
-                                   const std::vector<Number>&,
-                                   std::vector<Number>&)
+                                   const std::vector<Number> &,
+                                   std::vector<Number> &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
-void FE<2,NEDELEC_ONE>::nodal_soln(const Elem* elem,
+void FE<2,NEDELEC_ONE>::nodal_soln(const Elem * elem,
                                    const Order order,
-                                   const std::vector<Number>& elem_soln,
-                                   std::vector<Number>& nodal_soln)
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln)
 { nedelec_one_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln); }
 
 template <>
-void FE<3,NEDELEC_ONE>::nodal_soln(const Elem* elem,
+void FE<3,NEDELEC_ONE>::nodal_soln(const Elem * elem,
                                    const Order order,
-                                   const std::vector<Number>& elem_soln,
-                                   std::vector<Number>& nodal_soln)
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln)
 { nedelec_one_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln); }
 
 
@@ -569,76 +569,76 @@ template <>
 void FE<0,NEDELEC_ONE>::compute_constraints (DofConstraints &,
                                              DofMap &,
                                              const unsigned int,
-                                             const Elem*)
+                                             const Elem *)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
 void FE<1,NEDELEC_ONE>::compute_constraints (DofConstraints &,
                                              DofMap &,
                                              const unsigned int,
-                                             const Elem*)
+                                             const Elem *)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
-void FE<2,NEDELEC_ONE>::compute_constraints (DofConstraints &constraints,
-                                             DofMap &dof_map,
+void FE<2,NEDELEC_ONE>::compute_constraints (DofConstraints & constraints,
+                                             DofMap & dof_map,
                                              const unsigned int variable_number,
-                                             const Elem* elem)
+                                             const Elem * elem)
 { nedelec_one_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/2); }
 
 template <>
-void FE<3,NEDELEC_ONE>::compute_constraints (DofConstraints &constraints,
-                                             DofMap &dof_map,
+void FE<3,NEDELEC_ONE>::compute_constraints (DofConstraints & constraints,
+                                             DofMap & dof_map,
                                              const unsigned int variable_number,
-                                             const Elem* elem)
+                                             const Elem * elem)
 { nedelec_one_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/3); }
 #endif // LIBMESH_ENABLE_AMR
 
 // Specialize useless shape function methods
 template <>
-RealGradient FE<0,NEDELEC_ONE>::shape(const ElemType, const Order,const unsigned int,const Point&)
+RealGradient FE<0,NEDELEC_ONE>::shape(const ElemType, const Order,const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<0,NEDELEC_ONE>::shape(const Elem*,const Order,const unsigned int,const Point&)
+RealGradient FE<0,NEDELEC_ONE>::shape(const Elem *,const Order,const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<0,NEDELEC_ONE>::shape_deriv(const ElemType, const Order,const unsigned int,
-                                            const unsigned int,const Point&)
+                                            const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<0,NEDELEC_ONE>::shape_deriv(const Elem*,const Order,const unsigned int,
-                                            const unsigned int,const Point&)
+RealGradient FE<0,NEDELEC_ONE>::shape_deriv(const Elem *,const Order,const unsigned int,
+                                            const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<0,NEDELEC_ONE>::shape_second_deriv(const ElemType, const Order,const unsigned int,
-                                                   const unsigned int,const Point&)
+                                                   const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<0,NEDELEC_ONE>::shape_second_deriv(const Elem*,const Order,const unsigned int,
-                                                   const unsigned int,const Point&)
+RealGradient FE<0,NEDELEC_ONE>::shape_second_deriv(const Elem *,const Order,const unsigned int,
+                                                   const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
-RealGradient FE<1,NEDELEC_ONE>::shape(const ElemType, const Order,const unsigned int,const Point&)
+RealGradient FE<1,NEDELEC_ONE>::shape(const ElemType, const Order,const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<1,NEDELEC_ONE>::shape(const Elem*,const Order,const unsigned int,const Point&)
+RealGradient FE<1,NEDELEC_ONE>::shape(const Elem *,const Order,const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<1,NEDELEC_ONE>::shape_deriv(const ElemType, const Order,const unsigned int,
-                                            const unsigned int,const Point&)
+                                            const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<1,NEDELEC_ONE>::shape_deriv(const Elem*,const Order,const unsigned int,
-                                            const unsigned int,const Point&)
+RealGradient FE<1,NEDELEC_ONE>::shape_deriv(const Elem *,const Order,const unsigned int,
+                                            const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<1,NEDELEC_ONE>::shape_second_deriv(const ElemType, const Order,const unsigned int,
-                                                   const unsigned int,const Point&)
+                                                   const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <>
-RealGradient FE<1,NEDELEC_ONE>::shape_second_deriv(const Elem*,const Order,const unsigned int,
-                                                   const unsigned int,const Point&)
+RealGradient FE<1,NEDELEC_ONE>::shape_second_deriv(const Elem *,const Order,const unsigned int,
+                                                   const unsigned int,const Point &)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 } // namespace libMesh

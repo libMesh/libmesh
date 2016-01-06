@@ -118,7 +118,7 @@ public:
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (ParallelMesh &mesh) const
+  void allgather (ParallelMesh & mesh) const
   { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**
@@ -160,7 +160,7 @@ public:
    * index for each object in the input range.
    */
   template <typename ForwardIterator>
-  void find_global_indices (const Parallel::Communicator &communicator,
+  void find_global_indices (const Parallel::Communicator & communicator,
                             const MeshTools::BoundingBox &,
                             const ForwardIterator &,
                             const ForwardIterator &,

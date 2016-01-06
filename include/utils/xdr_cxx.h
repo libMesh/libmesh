@@ -73,7 +73,7 @@ public:
    * Constructor.  Takes the filename and the mode.
    * Valid modes are ENCODE, DECODE, READ, and WRITE.
    */
-  Xdr (const std::string& name="", const XdrMODE m=UNKNOWN);
+  Xdr (const std::string & name="", const XdrMODE m=UNKNOWN);
 
   /**
    * Destructor.  Closes the file if it is open.
@@ -83,7 +83,7 @@ public:
   /**
    * Opens the file.
    */
-  void open (const std::string& name);
+  void open (const std::string & name);
 
   /**
    * Closes the file if it is open.
@@ -128,25 +128,25 @@ public:
    * Inputs or outputs a single value.
    */
   template <typename T>
-  void data(T& a, const char* comment="");
+  void data(T & a, const char * comment="");
 
   /**
    * Same, but provides an \p ostream like interface.
    */
   template <typename T>
-  Xdr& operator << (T& a) { libmesh_assert (writing()); data(a); return *this; }
+  Xdr & operator << (T & a) { libmesh_assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
   template <typename T>
-  Xdr& operator >> (T& a) { libmesh_assert (reading()); data(a); return *this; }
+  Xdr & operator >> (T & a) { libmesh_assert (reading()); data(a); return *this; }
 
   /**
    * Inputs or outputs a raw data stream.
    */
   template <typename T>
-  void data_stream (T *val, const unsigned int len, const unsigned int line_break=libMesh::invalid_uint);
+  void data_stream (T * val, const unsigned int len, const unsigned int line_break=libMesh::invalid_uint);
 
   /**
    * Writes or reads (ignores) a comment line.
@@ -169,31 +169,31 @@ private:
    * Helper method for reading different data types
    */
   template <typename T>
-  void do_read(T& a);
+  void do_read(T & a);
 
   template <typename T>
-  void do_read(std::complex<T>& a);
+  void do_read(std::complex<T> & a);
 
   template <typename T>
-  void do_read(std::vector<T>& a);
+  void do_read(std::vector<T> & a);
 
   template <typename T>
-  void do_read(std::vector<std::complex<T> >& a);
+  void do_read(std::vector<std::complex<T> > & a);
 
   /**
    * Helper method for writing different data types
    */
   template <typename T>
-  void do_write(T& a);
+  void do_write(T & a);
 
   template <typename T>
-  void do_write(std::complex<T>& a);
+  void do_write(std::complex<T> & a);
 
   template <typename T>
-  void do_write(std::vector<T>& a);
+  void do_write(std::vector<T> & a);
 
   template <typename T>
-  void do_write(std::vector<std::complex<T> >& a);
+  void do_write(std::vector<std::complex<T> > & a);
 
   /**
    * The mode used for accessing the file.
@@ -213,12 +213,12 @@ private:
    * header file rpc/rpc.h
    * for more information.
    */
-  XDR* xdrs;
+  XDR * xdrs;
 
   /**
    * File pointer.
    */
-  FILE* fp;
+  FILE * fp;
 
 #endif
 

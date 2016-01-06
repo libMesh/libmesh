@@ -21,7 +21,7 @@
 namespace libMesh
 {
 
-void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem* side)
+void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Elem * side)
 {
   libmesh_assert(side);
 
@@ -60,7 +60,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
           {
-            const Point& side_point = side->point(i);
+            const Point & side_point = side->point(i);
 
             for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
               {
@@ -141,7 +141,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
           {
-            const Point& side_point = side->point(i);
+            const Point & side_point = side->point(i);
 
             for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
               {

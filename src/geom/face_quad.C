@@ -74,7 +74,7 @@ UniquePtr<Elem> Quad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  Elem* edge = new Edge2;
+  Elem * edge = new Edge2;
 
   for (unsigned n=0; n<edge->n_nodes(); ++n)
     edge->set_node(n) = this->get_node(Quad4::side_nodes_map[i][n]);

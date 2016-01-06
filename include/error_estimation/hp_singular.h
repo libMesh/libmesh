@@ -70,7 +70,7 @@ public:
    * refinement and potentially change the desired
    * refinement type.
    */
-  virtual void select_refinement (System& system);
+  virtual void select_refinement (System & system);
 
   /**
    * This list, to be filled by the user, should include

@@ -43,7 +43,7 @@ namespace libMesh
 // Anonymous namespace for implementation details.
 namespace {
 std::string local_file_name (const unsigned int processor_id,
-                             const std::string &name)
+                             const std::string & name)
 {
   std::string basename(name);
   char buf[256];
@@ -71,7 +71,7 @@ std::string local_file_name (const unsigned int processor_id,
 // ------------------------------------------------------------
 // EquationSystem class implementation
 template <typename InValType>
-void EquationSystems::read (const std::string& name,
+void EquationSystems::read (const std::string & name,
                             const unsigned int read_flags,
                             bool partition_agnostic)
 {
@@ -89,7 +89,7 @@ void EquationSystems::read (const std::string& name,
 
 
 template <typename InValType>
-void EquationSystems::read (const std::string& name,
+void EquationSystems::read (const std::string & name,
                             const XdrMODE mode,
                             const unsigned int read_flags,
                             bool partition_agnostic)
@@ -151,7 +151,7 @@ void EquationSystems::read (const std::string& name,
 
 
 template <typename InValType>
-void EquationSystems::_read_impl (const std::string& name,
+void EquationSystems::_read_impl (const std::string & name,
                                   const XdrMODE mode,
                                   const unsigned int read_flags,
                                   bool partition_agnostic)
@@ -228,7 +228,7 @@ void EquationSystems::_read_impl (const std::string& name,
   const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
   bool read_parallel_files  = false;
 
-  std::map<std::string, System*> xda_systems;
+  std::map<std::string, System *> xda_systems;
 
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
@@ -306,7 +306,7 @@ void EquationSystems::_read_impl (const std::string& name,
 
         // 5.) - 9.)
         // Let System::read_header() do the job
-        System& new_system = this->get_system(sys_name);
+        System & new_system = this->get_system(sys_name);
         new_system.read_header (io,
                                 version,
                                 read_header,
@@ -339,13 +339,13 @@ void EquationSystems::_read_impl (const std::string& name,
       // and elements in the mesh, which requires that we abuse const_cast
       if (!read_legacy_format && partition_agnostic)
         {
-          MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
+          MeshBase & mesh = const_cast<MeshBase &>(this->get_mesh());
           MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
         }
 
       Xdr local_io (read_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-      std::map<std::string, System*>::iterator
+      std::map<std::string, System *>::iterator
         pos = xda_systems.begin();
 
       for (; pos != xda_systems.end(); ++pos)
@@ -374,7 +374,7 @@ void EquationSystems::_read_impl (const std::string& name,
 
 
 
-void EquationSystems::write(const std::string& name,
+void EquationSystems::write(const std::string & name,
                             const unsigned int write_flags,
                             bool partition_agnostic) const
 {
@@ -386,7 +386,7 @@ void EquationSystems::write(const std::string& name,
 
 
 
-void EquationSystems::write(const std::string& name,
+void EquationSystems::write(const std::string & name,
                             const XdrMODE mode,
                             const unsigned int write_flags,
                             bool partition_agnostic) const
@@ -459,7 +459,7 @@ void EquationSystems::write(const std::string& name,
   // and elements in the mesh, which requires that we abuse const_cast
   if(partition_agnostic)
     {
-      MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
+      MeshBase & mesh = const_cast<MeshBase &>(this->get_mesh());
       MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
     }
 
@@ -486,7 +486,7 @@ void EquationSystems::write(const std::string& name,
     const unsigned int proc_id = this->processor_id();
 
     unsigned int n_sys = 0;
-    for (std::map<std::string, System*>::const_iterator pos = _systems.begin();
+    for (std::map<std::string, System *>::const_iterator pos = _systems.begin();
          pos != _systems.end(); ++pos)
       {
         if (! pos->second->hide_output()) n_sys++;
@@ -518,7 +518,7 @@ void EquationSystems::write(const std::string& name,
         // Write the number of equation systems
         io.data (n_sys, "# No. of Equation Systems");
 
-        for (std::map<std::string, System*>::const_iterator pos = _systems.begin();
+        for (std::map<std::string, System *>::const_iterator pos = _systems.begin();
              pos != _systems.end(); ++pos)
           {
             // Ignore this system if it has been marked as hidden
@@ -563,7 +563,7 @@ void EquationSystems::write(const std::string& name,
         // open a parallel buffer if warranted.
         Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-        for (std::map<std::string, System*>::const_iterator pos = _systems.begin();
+        for (std::map<std::string, System *>::const_iterator pos = _systems.begin();
              pos != _systems.end(); ++pos)
           {
             // Ignore this system if it has been marked as hidden
@@ -584,20 +584,20 @@ void EquationSystems::write(const std::string& name,
   // but we need to undo the temporary numbering of the nodes
   // and elements in the mesh, which requires that we abuse const_cast
   if(partition_agnostic)
-    const_cast<MeshBase&>(_mesh).fix_broken_node_and_element_numbering();
+    const_cast<MeshBase &>(_mesh).fix_broken_node_and_element_numbering();
 }
 
 
 
 // template specialization
 
-template void EquationSystems::read<Number> (const std::string& name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Number> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Number> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::read<Number> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::read<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::_read_impl<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void EquationSystems::read<Real> (const std::string& name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Real> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Real> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::read<Real> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::read<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::_read_impl<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #endif
 
 } // namespace libMesh

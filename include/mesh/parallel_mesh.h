@@ -53,7 +53,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  ParallelMesh (const Parallel::Communicator &comm_in,
+  ParallelMesh (const Parallel::Communicator & comm_in,
                 unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -71,13 +71,13 @@ public:
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  ParallelMesh (const UnstructuredMesh& other_mesh);
+  ParallelMesh (const UnstructuredMesh & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
    * parallel mesh.
    */
-  ParallelMesh (const ParallelMesh& other_mesh);
+  ParallelMesh (const ParallelMesh & other_mesh);
 
   /**
    * Virtual copy-constructor, creates a copy of this mesh
@@ -121,7 +121,7 @@ public:
    * Calls libmesh_assert() on each possible failure in that container.
    */
   template <typename T>
-  void libmesh_assert_valid_parallel_object_ids(const mapvector<T*,dof_id_type>&) const;
+  void libmesh_assert_valid_parallel_object_ids(const mapvector<T *,dof_id_type> &) const;
 
   /**
    * Verify id and processor_id consistency of our elements and
@@ -143,7 +143,7 @@ public:
    * container.
    */
   template <typename T>
-  dof_id_type renumber_dof_objects (mapvector<T*,dof_id_type>&);
+  dof_id_type renumber_dof_objects (mapvector<T *,dof_id_type> &);
 
   /**
    * Remove NULL elements from arrays
@@ -168,7 +168,7 @@ public:
    * get deleted by delete_remote_elements.  This is handy for inserting
    * off-processor elements that you want to keep track of on this processor.
    */
-  virtual void add_extra_ghost_elem(Elem* e);
+  virtual void add_extra_ghost_elem(Elem * e);
 
   /**
    * Clears extra ghost elements.
@@ -193,41 +193,41 @@ public:
   virtual dof_id_type parallel_n_elem () const libmesh_override;
   dof_id_type parallel_max_elem_id () const;
 
-  virtual const Point& point (const dof_id_type i) const libmesh_override;
+  virtual const Point & point (const dof_id_type i) const libmesh_override;
 
-  virtual const Node&  node  (const dof_id_type i) const libmesh_override;
-  virtual Node& node (const dof_id_type i) libmesh_override;
+  virtual const Node &  node  (const dof_id_type i) const libmesh_override;
+  virtual Node & node (const dof_id_type i) libmesh_override;
 
-  virtual const Node* node_ptr (const dof_id_type i) const libmesh_override;
-  virtual Node* node_ptr (const dof_id_type i) libmesh_override;
+  virtual const Node * node_ptr (const dof_id_type i) const libmesh_override;
+  virtual Node * node_ptr (const dof_id_type i) libmesh_override;
 
-  virtual const Node* query_node_ptr (const dof_id_type i) const libmesh_override;
-  virtual Node* query_node_ptr (const dof_id_type i) libmesh_override;
+  virtual const Node * query_node_ptr (const dof_id_type i) const libmesh_override;
+  virtual Node * query_node_ptr (const dof_id_type i) libmesh_override;
 
-  virtual const Elem* elem (const dof_id_type i) const libmesh_override;
-  virtual Elem* elem (const dof_id_type i) libmesh_override;
+  virtual const Elem * elem (const dof_id_type i) const libmesh_override;
+  virtual Elem * elem (const dof_id_type i) libmesh_override;
 
-  virtual const Elem* query_elem (const dof_id_type i) const libmesh_override;
-  virtual Elem* query_elem (const dof_id_type i) libmesh_override;
+  virtual const Elem * query_elem (const dof_id_type i) const libmesh_override;
+  virtual Elem * query_elem (const dof_id_type i) libmesh_override;
 
   /**
    * functions for adding /deleting nodes elements.
    */
-  virtual Node* add_point (const Point& p,
-                           const dof_id_type id = DofObject::invalid_id,
-                           const processor_id_type proc_id = DofObject::invalid_processor_id) libmesh_override;
-  virtual Node* add_node (Node* n) libmesh_override;
+  virtual Node * add_point (const Point & p,
+                            const dof_id_type id = DofObject::invalid_id,
+                            const processor_id_type proc_id = DofObject::invalid_processor_id) libmesh_override;
+  virtual Node * add_node (Node * n) libmesh_override;
 
   /**
    * Calls add_node().
    */
-  virtual Node* insert_node(Node* n) libmesh_override;
+  virtual Node * insert_node(Node * n) libmesh_override;
 
-  virtual void delete_node (Node* n) libmesh_override;
+  virtual void delete_node (Node * n) libmesh_override;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) libmesh_override;
-  virtual Elem* add_elem (Elem* e) libmesh_override;
-  virtual Elem* insert_elem (Elem* e) libmesh_override;
-  virtual void delete_elem (Elem* e) libmesh_override;
+  virtual Elem * add_elem (Elem * e) libmesh_override;
+  virtual Elem * insert_elem (Elem * e) libmesh_override;
+  virtual void delete_elem (Elem * e) libmesh_override;
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) libmesh_override;
 
   /**
@@ -413,12 +413,12 @@ protected:
   /**
    * The verices (spatial coordinates) of the mesh.
    */
-  mapvector<Node*,dof_id_type> _nodes;
+  mapvector<Node *, dof_id_type> _nodes;
 
   /**
    * The elements in the mesh.
    */
-  mapvector<Elem*,dof_id_type> _elements;
+  mapvector<Elem *, dof_id_type> _elements;
 
   /**
    * A boolean remembering whether we're serialized or not
@@ -449,17 +449,17 @@ private:
 
   /**
    * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Elem*>.
+   * it's just a std::vector<Elem *>.
    */
-  typedef mapvector<Elem*,dof_id_type>::veclike_iterator             elem_iterator_imp;
-  typedef mapvector<Elem*,dof_id_type>::const_veclike_iterator const_elem_iterator_imp;
+  typedef mapvector<Elem *, dof_id_type>::veclike_iterator             elem_iterator_imp;
+  typedef mapvector<Elem *, dof_id_type>::const_veclike_iterator const_elem_iterator_imp;
 
   /**
    * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Node*>.
+   * it's just a std::vector<Node *>.
    */
-  typedef mapvector<Node*,dof_id_type>::veclike_iterator             node_iterator_imp;
-  typedef mapvector<Node*,dof_id_type>::const_veclike_iterator const_node_iterator_imp;
+  typedef mapvector<Node *, dof_id_type>::veclike_iterator             node_iterator_imp;
+  typedef mapvector<Node *, dof_id_type>::const_veclike_iterator const_node_iterator_imp;
 };
 
 

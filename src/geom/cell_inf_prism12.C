@@ -128,7 +128,7 @@ UniquePtr<Elem> InfPrism12::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      Elem * face = NULL;
 
       switch (i)
         {
@@ -177,7 +177,7 @@ UniquePtr<Elem> InfPrism12::build_edge (const unsigned int i) const
 
 void InfPrism12::connectivity(const unsigned int sc,
                               const IOPackage iop,
-                              std::vector<dof_id_type>& conn) const
+                              std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

@@ -38,7 +38,7 @@
 namespace libMesh
 {
 
-ExactSolution::ExactSolution(const EquationSystems& es) :
+ExactSolution::ExactSolution(const EquationSystems & es) :
   _equation_systems(es),
   _equation_systems_fine(NULL),
   _extra_order(0)
@@ -48,10 +48,10 @@ ExactSolution::ExactSolution(const EquationSystems& es) :
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
       // Reference to the system
-      const System& system = _equation_systems.get_system(sys);
+      const System & system = _equation_systems.get_system(sys);
 
       // The name of the system
-      const std::string& sys_name = system.name();
+      const std::string & sys_name = system.name();
 
       // The SystemErrorMap to be inserted
       ExactSolution::SystemErrorMap sem;
@@ -59,7 +59,7 @@ ExactSolution::ExactSolution(const EquationSystems& es) :
       for (unsigned int var=0; var<system.n_vars(); ++var)
         {
           // The name of this variable
-          const std::string& var_name = system.variable_name(var);
+          const std::string & var_name = system.variable_name(var);
           sem[var_name] = std::vector<Real>(5, 0.);
         }
 
@@ -84,7 +84,7 @@ ExactSolution::~ExactSolution()
 }
 
 
-void ExactSolution::attach_reference_solution (const EquationSystems* es_fine)
+void ExactSolution::attach_reference_solution (const EquationSystems * es_fine)
 {
   libmesh_assert(es_fine);
   _equation_systems_fine = es_fine;
@@ -96,10 +96,10 @@ void ExactSolution::attach_reference_solution (const EquationSystems* es_fine)
 }
 
 
-void ExactSolution::attach_exact_value (Number fptr(const Point& p,
-                                                    const Parameters& parameters,
-                                                    const std::string& sys_name,
-                                                    const std::string& unknown_name))
+void ExactSolution::attach_exact_value (Number fptr(const Point & p,
+                                                    const Parameters & parameters,
+                                                    const std::string & sys_name,
+                                                    const std::string & unknown_name))
 {
   libmesh_assert(fptr);
 
@@ -109,7 +109,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
-      const System& system = _equation_systems.get_system(sys);
+      const System & system = _equation_systems.get_system(sys);
       _exact_values.push_back
         (new WrappedFunction<Number>
          (system, fptr, &_equation_systems.parameters));
@@ -150,10 +150,10 @@ void ExactSolution::attach_exact_value (unsigned int sys_num,
 }
 
 
-void ExactSolution::attach_exact_deriv (Gradient gptr(const Point& p,
-                                                      const Parameters& parameters,
-                                                      const std::string& sys_name,
-                                                      const std::string& unknown_name))
+void ExactSolution::attach_exact_deriv (Gradient gptr(const Point & p,
+                                                      const Parameters & parameters,
+                                                      const std::string & sys_name,
+                                                      const std::string & unknown_name))
 {
   libmesh_assert(gptr);
 
@@ -163,7 +163,7 @@ void ExactSolution::attach_exact_deriv (Gradient gptr(const Point& p,
 
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
-      const System& system = _equation_systems.get_system(sys);
+      const System & system = _equation_systems.get_system(sys);
       _exact_derivs.push_back
         (new WrappedFunction<Gradient>
          (system, gptr, &_equation_systems.parameters));
@@ -194,7 +194,7 @@ void ExactSolution::attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g
 
 
 void ExactSolution::attach_exact_deriv (unsigned int sys_num,
-                                        FunctionBase<Gradient>* g)
+                                        FunctionBase<Gradient> * g)
 {
   if (_exact_derivs.size() <= sys_num)
     _exact_derivs.resize(sys_num+1, NULL);
@@ -204,10 +204,10 @@ void ExactSolution::attach_exact_deriv (unsigned int sys_num,
 }
 
 
-void ExactSolution::attach_exact_hessian (Tensor hptr(const Point& p,
-                                                      const Parameters& parameters,
-                                                      const std::string& sys_name,
-                                                      const std::string& unknown_name))
+void ExactSolution::attach_exact_hessian (Tensor hptr(const Point & p,
+                                                      const Parameters & parameters,
+                                                      const std::string & sys_name,
+                                                      const std::string & unknown_name))
 {
   libmesh_assert(hptr);
 
@@ -217,7 +217,7 @@ void ExactSolution::attach_exact_hessian (Tensor hptr(const Point& p,
 
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
-      const System& system = _equation_systems.get_system(sys);
+      const System & system = _equation_systems.get_system(sys);
       _exact_hessians.push_back
         (new WrappedFunction<Tensor>
          (system, hptr, &_equation_systems.parameters));
@@ -248,7 +248,7 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
 
 
 void ExactSolution::attach_exact_hessian (unsigned int sys_num,
-                                          FunctionBase<Tensor>* h)
+                                          FunctionBase<Tensor> * h)
 {
   if (_exact_hessians.size() <= sys_num)
     _exact_hessians.resize(sys_num+1, NULL);
@@ -258,8 +258,8 @@ void ExactSolution::attach_exact_hessian (unsigned int sys_num,
 }
 
 
-std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
-                                                const std::string& unknown_name)
+std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
+                                                 const std::string & unknown_name)
 {
   // If no exact solution function or fine grid solution has been
   // attached, we now just compute the solution norm (i.e. the
@@ -284,16 +284,16 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
 
 
 
-void ExactSolution::compute_error(const std::string& sys_name,
-                                  const std::string& unknown_name)
+void ExactSolution::compute_error(const std::string & sys_name,
+                                  const std::string & unknown_name)
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   libmesh_assert( _equation_systems.has_system(sys_name) );
-  const System& sys = _equation_systems.get_system<System>( sys_name );
+  const System & sys = _equation_systems.get_system<System>( sys_name );
 
   libmesh_assert( sys.has_variable( unknown_name ) );
   switch( FEInterface::field_type(sys.variable_type( unknown_name )) )
@@ -321,18 +321,18 @@ void ExactSolution::compute_error(const std::string& sys_name,
 
 
 
-Real ExactSolution::error_norm(const std::string& sys_name,
-                               const std::string& unknown_name,
-                               const FEMNormType& norm)
+Real ExactSolution::error_norm(const std::string & sys_name,
+                               const std::string & unknown_name,
+                               const FEMNormType & norm)
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   libmesh_assert(_equation_systems.has_system(sys_name));
   libmesh_assert(_equation_systems.get_system(sys_name).has_variable( unknown_name ));
-  const FEType& fe_type = _equation_systems.get_system(sys_name).variable_type(unknown_name);
+  const FEType & fe_type = _equation_systems.get_system(sys_name).variable_type(unknown_name);
 
   switch (norm)
     {
@@ -390,14 +390,14 @@ Real ExactSolution::error_norm(const std::string& sys_name,
 
 
 
-Real ExactSolution::l2_error(const std::string& sys_name,
-                             const std::string& unknown_name)
+Real ExactSolution::l2_error(const std::string & sys_name,
+                             const std::string & unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   // Return the square root of the first component of the
   // computed error.
@@ -410,14 +410,14 @@ Real ExactSolution::l2_error(const std::string& sys_name,
 
 
 
-Real ExactSolution::l1_error(const std::string& sys_name,
-                             const std::string& unknown_name)
+Real ExactSolution::l1_error(const std::string & sys_name,
+                             const std::string & unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   // Return the square root of the first component of the
   // computed error.
@@ -430,14 +430,14 @@ Real ExactSolution::l1_error(const std::string& sys_name,
 
 
 
-Real ExactSolution::l_inf_error(const std::string& sys_name,
-                                const std::string& unknown_name)
+Real ExactSolution::l_inf_error(const std::string & sys_name,
+                                const std::string & unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   // Return the square root of the first component of the
   // computed error.
@@ -450,8 +450,8 @@ Real ExactSolution::l_inf_error(const std::string& sys_name,
 
 
 
-Real ExactSolution::h1_error(const std::string& sys_name,
-                             const std::string& unknown_name)
+Real ExactSolution::h1_error(const std::string & sys_name,
+                             const std::string & unknown_name)
 {
   // If the user has supplied no exact derivative function, we
   // just integrate the H1 norm of the solution; i.e. its
@@ -459,31 +459,31 @@ Real ExactSolution::h1_error(const std::string& sys_name,
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   // Return the square root of the sum of the computed errors.
   return std::sqrt(error_vals[0] + error_vals[1]);
 }
 
 
-Real ExactSolution::hcurl_error(const std::string& sys_name,
-                                const std::string& unknown_name)
+Real ExactSolution::hcurl_error(const std::string & sys_name,
+                                const std::string & unknown_name)
 {
   return this->error_norm(sys_name,unknown_name,HCURL);
 }
 
 
-Real ExactSolution::hdiv_error(const std::string& sys_name,
-                               const std::string& unknown_name)
+Real ExactSolution::hdiv_error(const std::string & sys_name,
+                               const std::string & unknown_name)
 {
   return this->error_norm(sys_name,unknown_name,HDIV);
 }
 
 
 
-Real ExactSolution::h2_error(const std::string& sys_name,
-                             const std::string& unknown_name)
+Real ExactSolution::h2_error(const std::string & sys_name,
+                             const std::string & unknown_name)
 {
   // If the user has supplied no exact derivative functions, we
   // just integrate the H2 norm of the solution; i.e. its
@@ -491,8 +491,8 @@ Real ExactSolution::h2_error(const std::string& sys_name,
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
-  std::vector<Real>& error_vals = this->_check_inputs(sys_name,
-                                                      unknown_name);
+  std::vector<Real> & error_vals = this->_check_inputs(sys_name,
+                                                       unknown_name);
 
   // Return the square root of the sum of the computed errors.
   return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
@@ -505,15 +505,15 @@ Real ExactSolution::h2_error(const std::string& sys_name,
 
 
 template< typename OutputShape>
-void ExactSolution::_compute_error(const std::string& sys_name,
-                                   const std::string& unknown_name,
-                                   std::vector<Real>& error_vals)
+void ExactSolution::_compute_error(const std::string & sys_name,
+                                   const std::string & unknown_name,
+                                   std::vector<Real> & error_vals)
 {
   // Make sure we aren't "overconfigured"
   libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
 
   // We need a commmunicator.
-  const Parallel::Communicator &communicator(_equation_systems.comm());
+  const Parallel::Communicator & communicator(_equation_systems.comm());
 
   // This function must be run on all processors at once
   libmesh_parallel_only(communicator);
@@ -521,7 +521,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead
   // for more accuracy.
-  const System& computed_system = _equation_systems_fine ?
+  const System & computed_system = _equation_systems_fine ?
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
 
@@ -537,7 +537,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   UniquePtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
   if (_equation_systems_fine)
     {
-      const System& comparison_system
+      const System & comparison_system
         = _equation_systems.get_system(sys_name);
 
       std::vector<Number> global_soln;
@@ -567,12 +567,12 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       _exact_hessians[i]->init();
 
   // Get a reference to the dofmap and mesh for that system
-  const DofMap& computed_dof_map = computed_system.get_dof_map();
+  const DofMap & computed_dof_map = computed_system.get_dof_map();
 
-  const MeshBase& _mesh = computed_system.get_mesh();
+  const MeshBase & _mesh = computed_system.get_mesh();
 
   // Grab which element dimensions are present in the mesh
-  const std::set<unsigned char>& elem_dims = _mesh.elem_dimensions();
+  const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
 
   // Zero the error before summation
   // 0 - sum of square of function error (L2)
@@ -585,7 +585,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   error_vals = std::vector<Real>(7, 0.);
 
   // Construct Quadrature rule based on default quadrature order
-  const FEType& fe_type  = computed_dof_map.variable_type(var);
+  const FEType & fe_type  = computed_dof_map.variable_type(var);
 
   unsigned int n_vec_dim = FEInterface::n_vec_dim( _mesh, fe_type );
 
@@ -601,8 +601,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 
   // Allow space for dims 0-3, even if we don't use them all
-  std::vector<FEGenericBase<OutputShape>*> fe_ptrs(4,NULL);
-  std::vector<QBase*> q_rules(4,NULL);
+  std::vector<FEGenericBase<OutputShape> *> fe_ptrs(4,NULL);
+  std::vector<QBase *> q_rules(4,NULL);
 
   // Prepare finite elements for each dimension present in the mesh
   for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
@@ -637,7 +637,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
       const unsigned int dim = elem->dim();
 
       const subdomain_id_type elem_subid = elem->subdomain_id();
@@ -653,29 +653,29 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       std::set<subdomain_id_type> subdomain_id;
       subdomain_id.insert(elem_subid);
 
-      FEGenericBase<OutputShape>* fe = fe_ptrs[dim];
-      QBase* qrule = q_rules[dim];
+      FEGenericBase<OutputShape> * fe = fe_ptrs[dim];
+      QBase * qrule = q_rules[dim];
       libmesh_assert(fe);
       libmesh_assert(qrule);
 
       // The Jacobian*weight at the quadrature points.
-      const std::vector<Real>& JxW = fe->get_JxW();
+      const std::vector<Real> & JxW = fe->get_JxW();
 
       // The value of the shape functions at the quadrature points
       // i.e. phi(i) = phi_values[i][qp]
-      const std::vector<std::vector<OutputShape> >&  phi_values = fe->get_phi();
+      const std::vector<std::vector<OutputShape> > &  phi_values = fe->get_phi();
 
       // The value of the shape function gradients at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &
         dphi_values = fe->get_dphi();
 
       // The value of the shape function curls at the quadrature points
       // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >* curl_values = NULL;
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> > * curl_values = NULL;
 
       // The value of the shape function divergences at the quadrature points
       // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >* div_values = NULL;
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > * div_values = NULL;
 
       if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
         {
@@ -685,12 +685,12 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The value of the shape function second derivatives at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &
         d2phi_values = fe->get_d2phi();
 #endif
 
       // The XYZ locations (in physical space) of the quadrature points
-      const std::vector<Point>& q_point = fe->get_xyz();
+      const std::vector<Point> & q_point = fe->get_xyz();
 
       // reinitialize the element-specific data
       // for the current element
@@ -886,7 +886,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 }
 
 // Explicit instantiations of templated member functions
-template void ExactSolution::_compute_error<Real>(const std::string&, const std::string&, std::vector<Real>&);
-template void ExactSolution::_compute_error<RealGradient>(const std::string&, const std::string&, std::vector<Real>&);
+template void ExactSolution::_compute_error<Real>(const std::string &, const std::string &, std::vector<Real> &);
+template void ExactSolution::_compute_error<RealGradient>(const std::string &, const std::string &, std::vector<Real> &);
 
 } // namespace libMesh

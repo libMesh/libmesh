@@ -38,8 +38,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // EigenSystem implementation
-EigenSystem::EigenSystem (EquationSystems& es,
-                          const std::string& name_in,
+EigenSystem::EigenSystem (EquationSystems & es,
+                          const std::string & name_in,
                           const unsigned int number_in
                           ) :
   Parent           (es, name_in, number_in),
@@ -142,7 +142,7 @@ void EigenSystem::init_data ()
 
 void EigenSystem::init_matrices ()
 {
-  DofMap& dof_map = this->get_dof_map();
+  DofMap & dof_map = this->get_dof_map();
 
   dof_map.attach_matrix(*matrix_A);
 
@@ -181,7 +181,7 @@ void EigenSystem::reinit ()
   if (_is_generalized_eigenproblem)
     matrix_B->clear();
 
-  DofMap& dof_map = this->get_dof_map();
+  DofMap & dof_map = this->get_dof_map();
 
   // Clear the sparsity pattern
   dof_map.clear_sparsity();
@@ -207,7 +207,7 @@ void EigenSystem::solve ()
 {
 
   // A reference to the EquationSystems
-  EquationSystems& es = this->get_equation_systems();
+  EquationSystems & es = this->get_equation_systems();
 
   // check that necessary parameters have been set
   libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));

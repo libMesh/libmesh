@@ -51,7 +51,7 @@ public:
    * to be solved.
    */
   explicit
-  NewtonSolver (sys_type& system);
+  NewtonSolver (sys_type & system);
 
   /**
    * Destructor.
@@ -148,9 +148,11 @@ protected:
    * newton_iterate is moved to the end of the quasiNewton step, and
    * the return value is the substep size.
    */
-  Real line_search(Real tol, Real last_residual, Real& current_residual,
-                   NumericVector<Number> &newton_iterate,
-                   const NumericVector<Number> &linear_solution);
+  Real line_search(Real tol,
+                   Real last_residual,
+                   Real & current_residual,
+                   NumericVector<Number> & newton_iterate,
+                   const NumericVector<Number> & linear_solution);
 
   /**
    * This prints output for the convergence criteria based on

@@ -50,12 +50,12 @@ public:
   /**
    * Constructor to wrap scalar-valued function pointers.
    */
-  WrappedFunction (const System &sys,
-                   Output fptr(const Point& p,
-                               const Parameters& parameters,
-                               const std::string& sys_name,
-                               const std::string& unknown_name) = NULL,
-                   const Parameters* parameters = NULL,
+  WrappedFunction (const System & sys,
+                   Output fptr(const Point & p,
+                               const Parameters & parameters,
+                               const std::string & sys_name,
+                               const std::string & unknown_name) = NULL,
+                   const Parameters * parameters = NULL,
                    unsigned int varnum=0)
     : _sys(sys),
       _fptr(fptr),
@@ -73,7 +73,7 @@ public:
    * @returns the scalar value of variable varnum at coordinate \p p
    * and time \p time.
    */
-  virtual Output operator() (const Point& p,
+  virtual Output operator() (const Point & p,
                              const Real time = 0.) libmesh_override;
 
   /**
@@ -81,28 +81,28 @@ public:
    * Returns in \p output the values of all system variables at the
    * coordinate \p p and for time \p time.
    */
-  virtual void operator() (const Point& p,
+  virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output>& output) libmesh_override;
+                           DenseVector<Output> & output) libmesh_override;
 
   /**
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component (unsigned int i,
-                            const Point& p,
+                            const Point & p,
                             Real time=0.) libmesh_override;
 
 protected:
 
-  const System& _sys;
+  const System & _sys;
 
-  Output (*_fptr)(const Point& p,
-                  const Parameters& parameters,
-                  const std::string& sys_name,
-                  const std::string& unknown_name);
+  Output (*_fptr)(const Point & p,
+                  const Parameters & parameters,
+                  const std::string & sys_name,
+                  const std::string & unknown_name);
 
-  const Parameters* _parameters;
+  const Parameters * _parameters;
 
   unsigned int _varnum;
 };
@@ -114,7 +114,7 @@ protected:
 
 template <typename Output>
 inline
-Output WrappedFunction<Output>::operator() (const Point& p,
+Output WrappedFunction<Output>::operator() (const Point & p,
                                             const Real /*time*/)
 {
   libmesh_assert(_fptr);
@@ -144,9 +144,9 @@ WrappedFunction<Output>::clone () const
  */
 template <typename Output>
 inline
-void WrappedFunction<Output>::operator() (const Point& p,
+void WrappedFunction<Output>::operator() (const Point & p,
                                           const Real /*time*/,
-                                          DenseVector<Output>& output)
+                                          DenseVector<Output> & output)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);
@@ -190,7 +190,7 @@ void WrappedFunction<Output>::operator() (const Point& p,
 template <typename Output>
 inline
 Output WrappedFunction<Output>::component (unsigned int i,
-                                           const Point& p,
+                                           const Point & p,
                                            Real /*time*/)
 {
   libmesh_assert(_fptr);

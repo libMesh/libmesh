@@ -43,8 +43,8 @@ namespace libMesh
 //-----------------------------------------------------------------
 // HPCoarsenTest implementations
 
-void HPCoarsenTest::add_projection(const System &system,
-                                   const Elem *elem,
+void HPCoarsenTest::add_projection(const System & system,
+                                   const Elem * elem,
                                    unsigned int var)
 {
   // If we have children, we need to add their projections instead
@@ -57,10 +57,10 @@ void HPCoarsenTest::add_projection(const System &system,
     }
 
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // The type of finite element to use for this variable
-  const FEType& fe_type = dof_map.variable_type (var);
+  const FEType & fe_type = dof_map.variable_type (var);
 
   const FEContinuity cont = fe->get_continuity();
 
@@ -142,12 +142,12 @@ void HPCoarsenTest::add_projection(const System &system,
     }
 }
 
-void HPCoarsenTest::select_refinement (System &system)
+void HPCoarsenTest::select_refinement (System & system)
 {
   START_LOG("select_refinement()", "HPCoarsenTest");
 
   // The current mesh
-  MeshBase& mesh = system.get_mesh();
+  MeshBase & mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
@@ -156,7 +156,7 @@ void HPCoarsenTest::select_refinement (System &system)
   const unsigned int n_vars = system.n_vars();
 
   // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // The system number (for doing bad hackery)
   const unsigned int sys_num = system.number();
@@ -190,7 +190,7 @@ void HPCoarsenTest::select_refinement (System &system)
         if (component_scale[var] == 0.0) continue;
 
       // The type of finite element to use for this variable
-      const FEType& fe_type = dof_map.variable_type (var);
+      const FEType & fe_type = dof_map.variable_type (var);
 
       // Finite element objects for a fine (and probably a coarse)
       // element will be needed
@@ -247,7 +247,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
       for (; elem_it != elem_end; ++elem_it)
         {
-          const Elem* elem = *elem_it;
+          const Elem * elem = *elem_it;
 
           // We're only checking elements that are already flagged for h
           // refinement
@@ -524,7 +524,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem* elem = *elem_it;
+      Elem * elem = *elem_it;
 
       // We're only checking elements that are already flagged for h
       // refinement
@@ -539,7 +539,7 @@ void HPCoarsenTest::select_refinement (System &system)
       for (unsigned int var=0; var<n_vars; var++)
         {
           // The type of finite element to use for this variable
-          const FEType& fe_type = dof_map.variable_type (var);
+          const FEType & fe_type = dof_map.variable_type (var);
 
           // FIXME: we're overestimating the number of DOFs added by h
           // refinement

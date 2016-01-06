@@ -81,17 +81,17 @@ public:
   /**
    * Constructs a sphere of radius r centered at c.
    */
-  Sphere (const Point& c, const Real r);
+  Sphere (const Point & c, const Real r);
 
   /**
    * Constructs a sphere connecting four points
    */
-  Sphere (const Point&, const Point&, const Point&, const Point&);
+  Sphere (const Point &, const Point &, const Point &, const Point &);
 
   /**
    * Copy-constructor.
    */
-  Sphere (const Sphere& other_sphere);
+  Sphere (const Sphere & other_sphere);
 
   /**
    * Destructor.  Does nothing at the moment.
@@ -101,31 +101,31 @@ public:
   /**
    * Defines a sphere of radius r centered at c.
    */
-  void create_from_center_radius (const Point& c, const Real r);
+  void create_from_center_radius (const Point & c, const Real r);
 
   /**
    * @returns true if other_sphere intersects this sphere,
    * false otherwise.
    */
-  bool intersects (const Sphere& other_sphere) const;
+  bool intersects (const Sphere & other_sphere) const;
 
   /**
    * @returns the distance between the surface of this sphere and
    * another sphere.
    */
-  Real distance (const Sphere& other_sphere) const;
+  Real distance (const Sphere & other_sphere) const;
 
   /**
    * @returns true if the point p is above the surface,
    * false otherwise.
    */
-  virtual bool above_surface (const Point& p) const libmesh_override;
+  virtual bool above_surface (const Point & p) const libmesh_override;
 
   /**
    * @returns true if the point p is below the surface,
    * false otherwise.
    */
-  virtual bool below_surface (const Point& p) const libmesh_override;
+  virtual bool below_surface (const Point & p) const libmesh_override;
 
   /**
    * @returns true if the point p is on the surface,
@@ -133,18 +133,18 @@ public:
    * the surface really means "very close" to account
    * for roundoff error.
    */
-  virtual bool on_surface (const Point& p) const libmesh_override;
+  virtual bool on_surface (const Point & p) const libmesh_override;
 
   /**
    * @returns the closest point on the surface to point p.
    */
-  virtual Point closest_point (const Point& p) const libmesh_override;
+  virtual Point closest_point (const Point & p) const libmesh_override;
 
   /**
    * @returns a unit vector normal to the surface at
    * point p.
    */
-  virtual Point unit_normal (const Point& p) const libmesh_override;
+  virtual Point unit_normal (const Point & p) const libmesh_override;
 
   /**
    * Returns the radius of the sphere.
@@ -154,29 +154,29 @@ public:
   /**
    * Returns the radius of the sphere as a writeable reference.
    */
-  Real& radius() { return _rad; }
+  Real & radius() { return _rad; }
 
   /**
    * @returns the center of the sphere.
    */
-  const Point& center() const { return _cent; }
+  const Point & center() const { return _cent; }
 
   /**
    * @returns the center of the sphere.
    */
-  Point& center() { return _cent; }
+  Point & center() { return _cent; }
 
   /**
    * @returns the spherical coordinates for the
    * cartesian coordinates \p cart.
    */
-  virtual Point surface_coords (const Point& cart) const libmesh_override;
+  virtual Point surface_coords (const Point & cart) const libmesh_override;
 
   /**
    * @returns the cartesian coordinates for the
    * spherical coordinates \p sph.
    */
-  virtual Point world_coords (const Point& sph) const libmesh_override;
+  virtual Point world_coords (const Point & sph) const libmesh_override;
 
 
 private:
@@ -197,7 +197,7 @@ private:
 // ------------------------------------------------------------
 // Sphere inline functions
 inline
-Point Sphere::surface_coords (const Point& cart) const
+Point Sphere::surface_coords (const Point & cart) const
 {
   // constant translation in the origin
   const Point c (cart-this->center());
@@ -213,7 +213,7 @@ Point Sphere::surface_coords (const Point& cart) const
 
 
 inline
-Point Sphere::world_coords (const Point& sph) const
+Point Sphere::world_coords (const Point & sph) const
 {
   const Real r     = sph(0);
   const Real theta = sph(1);

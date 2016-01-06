@@ -56,7 +56,7 @@ protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
-  virtual void _do_partition (MeshBase& mesh,
+  virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) libmesh_override;
 };
 

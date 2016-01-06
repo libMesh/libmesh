@@ -39,7 +39,7 @@ namespace libMesh
 // LinearSolver members
 template <typename T>
 UniquePtr<LinearSolver<T> >
-LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
+LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,
                        const SolverPackage solver_package)
 {
   // Build the appropriate solver
@@ -117,7 +117,7 @@ LinearSolver<T>::reuse_preconditioner(bool reuse_flag)
 
 template <typename T>
 void
-LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
+LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int> * const dofs,
                                    const SubsetSolveMode /*subset_solve_mode*/)
 {
   if(dofs!=NULL)
@@ -129,8 +129,8 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
 
 template <typename T>
 std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
-                                                              NumericVector<T>& sol,
-                                                              NumericVector<T>& rhs,
+                                                              NumericVector<T> & sol,
+                                                              NumericVector<T> & rhs,
                                                               const double tol,
                                                               const unsigned int n_iter)
 {
@@ -164,7 +164,7 @@ void LinearSolver<T>::print_converged_reason() const
 }
 
 template <typename T>
-void LinearSolver<T>::set_solver_configuration(SolverConfiguration& solver_configuration)
+void LinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_configuration)
 {
   _solver_configuration = &solver_configuration;
 }

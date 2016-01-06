@@ -24,14 +24,14 @@
 namespace libMesh
 {
 
-RBEIMTheta::RBEIMTheta(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in)
+RBEIMTheta::RBEIMTheta(RBEIMEvaluation & rb_eim_eval_in, unsigned int index_in)
   :
   rb_eim_eval(rb_eim_eval_in),
   index(index_in)
 {
 }
 
-Number RBEIMTheta::evaluate(const RBParameters& mu)
+Number RBEIMTheta::evaluate(const RBParameters & mu)
 {
   if(mu.n_parameters() > rb_eim_eval.get_n_params())
     {

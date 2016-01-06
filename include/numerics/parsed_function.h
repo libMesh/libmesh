@@ -49,34 +49,34 @@ class ParsedFunction : public FunctionBase<Output>
 {
 public:
   explicit
-  ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
-                  const std::vector<Output>* initial_vals=NULL);
+  ParsedFunction (const std::string & expression, const std::vector<std::string> * additional_vars=NULL,
+                  const std::vector<Output> * initial_vals=NULL);
 
   // Re-parse with new expression
-  void reparse (const std::string& expression);
+  void reparse (const std::string & expression);
 
-  virtual Output operator() (const Point& p,
+  virtual Output operator() (const Point & p,
                              const Real time = 0);
 
   // Query if the automatic derivative generation was successful
   virtual bool has_derivatives() { return _valid_derivatives; }
 
-  virtual Output dot(const Point& p,
+  virtual Output dot(const Point & p,
                      const Real time = 0);
 
-  virtual OutputGradient gradient(const Point& p,
+  virtual OutputGradient gradient(const Point & p,
                                   const Real time = 0);
 
-  virtual void operator() (const Point& p,
+  virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output>& output);
+                           DenseVector<Output> & output);
 
   /**
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component (unsigned int i,
-                            const Point& p,
+                            const Point & p,
                             Real time);
 
   const std::string & expression() { return _expression; }
@@ -95,7 +95,7 @@ public:
    * and if the inline variable takes the same value within any
    * subexpressions where it appears.
    */
-  Output get_inline_value(const std::string& inline_var_name) const;
+  Output get_inline_value(const std::string & inline_var_name) const;
 
   /**
    * Changes the value of an inline variable.  Forever after the
@@ -104,12 +104,12 @@ public:
    * Currently only works if the inline variable is not redefined
    * within any one subexpression.
    */
-  void set_inline_value(const std::string& inline_var_name,
+  void set_inline_value(const std::string & inline_var_name,
                         Output newval);
 
 protected:
   // Re-parse with minor changes to expression
-  void partial_reparse (const std::string& expression);
+  void partial_reparse (const std::string & expression);
 
   // Helper function for parsing out variable names
   std::size_t find_name (const std::string & varname,
@@ -117,7 +117,7 @@ protected:
 
 private:
   // Set the _spacetime argument vector
-  void set_spacetime(const Point& p,
+  void set_spacetime(const Point & p,
                      const Real time = 0);
 
   // Evaluate the ith FunctionParser and check the result
@@ -152,9 +152,9 @@ private:
 
 template <typename Output, typename OutputGradient>
 inline
-ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string& expression,
-                                                       const std::vector<std::string>* additional_vars,
-                                                       const std::vector<Output>* initial_vals) :
+ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expression,
+                                                       const std::vector<std::string> * additional_vars,
+                                                       const std::vector<Output> * initial_vals) :
   _expression (), // overridden by parse()
   // Size the spacetime vector to account for space, time, and any additional
   // variables passed
@@ -171,7 +171,7 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string& expres
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::reparse (const std::string& expression)
+ParsedFunction<Output,OutputGradient>::reparse (const std::string & expression)
 {
   variables = "x";
 #if LIBMESH_DIM > 1
@@ -200,7 +200,7 @@ ParsedFunction<Output,OutputGradient>::reparse (const std::string& expression)
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::operator() (const Point& p, const Real time)
+ParsedFunction<Output,OutputGradient>::operator() (const Point & p, const Real time)
 {
   set_spacetime(p, time);
   return eval(parsers[0], "f", 0);
@@ -209,7 +209,7 @@ ParsedFunction<Output,OutputGradient>::operator() (const Point& p, const Real ti
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::dot (const Point& p, const Real time)
+ParsedFunction<Output,OutputGradient>::dot (const Point & p, const Real time)
 {
   set_spacetime(p, time);
   return eval(dt_parsers[0], "df/dt", 0);
@@ -218,7 +218,7 @@ ParsedFunction<Output,OutputGradient>::dot (const Point& p, const Real time)
 template <typename Output, typename OutputGradient>
 inline
 OutputGradient
-ParsedFunction<Output,OutputGradient>::gradient (const Point& p, const Real time)
+ParsedFunction<Output,OutputGradient>::gradient (const Point & p, const Real time)
 {
   OutputGradient grad;
   set_spacetime(p, time);
@@ -238,9 +238,9 @@ template <typename Output, typename OutputGradient>
 inline
 void
 ParsedFunction<Output,OutputGradient>::operator()
-  (const Point& p,
+  (const Point & p,
    const Real time,
-   DenseVector<Output>& output)
+   DenseVector<Output> & output)
 {
   set_spacetime(p, time);
 
@@ -262,7 +262,7 @@ template <typename Output, typename OutputGradient>
 inline
 Output
 ParsedFunction<Output,OutputGradient>::component (unsigned int i,
-                                                  const Point& p,
+                                                  const Point & p,
                                                   Real time)
 {
   set_spacetime(p, time);
@@ -305,7 +305,7 @@ ParsedFunction<Output,OutputGradient>::clone() const
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string& inline_var_name) const
+ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inline_var_name) const
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
 
@@ -380,7 +380,7 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string& inli
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string& inline_var_name,
+ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string & inline_var_name,
                                                          Output newval)
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
@@ -445,7 +445,7 @@ ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string& inli
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string& expression)
+ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expression)
 {
   _expression = expression;
   _subexpressions.clear();
@@ -560,7 +560,7 @@ ParsedFunction<Output,OutputGradient>::find_name (const std::string & varname,
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::set_spacetime (const Point& p,
+ParsedFunction<Output,OutputGradient>::set_spacetime (const Point & p,
                                                       const Real time)
 {
   _spacetime[0] = p(0);
@@ -649,13 +649,13 @@ public:
     libmesh_not_implemented();
   }
 
-  virtual Output operator() (const Point&,
+  virtual Output operator() (const Point &,
                              const Real /* time */ = 0)
   { return 0.; }
 
-  virtual void operator() (const Point&,
+  virtual void operator() (const Point &,
                            const Real /* time */,
-                           DenseVector<Output>& /* output */) {}
+                           DenseVector<Output> & /* output */) {}
 
   virtual void init() {}
   virtual void clear() {}

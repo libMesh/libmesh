@@ -36,10 +36,10 @@ namespace libMesh
 //-------------------------------------------------
 // Full specialization for the Factory<Partitioner>
 template<>
-std::map<std::string, Factory<Partitioner>*>&
+std::map<std::string, Factory<Partitioner> *> &
 Factory<Partitioner>::factory_map()
 {
-  static std::map<std::string, Factory<Partitioner>*> _map;
+  static std::map<std::string, Factory<Partitioner> *> _map;
   return _map;
 }
 

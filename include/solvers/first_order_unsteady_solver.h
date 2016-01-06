@@ -43,7 +43,7 @@ public:
    * to be solved.
    */
   explicit
-  FirstOrderUnsteadySolver (sys_type& s)
+  FirstOrderUnsteadySolver (sys_type & s)
     : UnsteadySolver(s) {}
 
   /**

@@ -32,8 +32,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // NonlinearImplicitSystem implementation
-NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
-                                                  const std::string& name_in,
+NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
+                                                  const std::string & name_in,
                                                   const unsigned int number_in) :
 
   Parent                    (es, name_in, number_in),
@@ -95,7 +95,7 @@ void NonlinearImplicitSystem::reinit ()
 void NonlinearImplicitSystem::set_solver_parameters ()
 {
   // Get a reference to the EquationSystems
-  const EquationSystems& es =
+  const EquationSystems & es =
     this->get_equation_systems();
 
   // Get the user-specifiied nonlinear solver tolerances

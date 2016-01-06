@@ -32,7 +32,7 @@ RBParameters::RBParameters()
 {
 }
 
-RBParameters::RBParameters(const std::map<std::string, Real>& parameter_map)
+RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
 {
   _parameters = parameter_map;
 }
@@ -42,7 +42,7 @@ void RBParameters::clear()
   _parameters.clear();
 }
 
-Real RBParameters::get_value(const std::string& param_name) const
+Real RBParameters::get_value(const std::string & param_name) const
 {
   // find the parameter value
   const_iterator it = _parameters.find(param_name);
@@ -54,7 +54,7 @@ Real RBParameters::get_value(const std::string& param_name) const
   return it->second;
 }
 
-void RBParameters::set_value(const std::string& param_name, Real value)
+void RBParameters::set_value(const std::string & param_name, Real value)
 {
   _parameters[param_name] = value;
 }
@@ -65,7 +65,7 @@ unsigned int RBParameters::n_parameters() const
     (_parameters.size());
 }
 
-void RBParameters::get_parameter_names(std::set<std::string>& param_names) const
+void RBParameters::get_parameter_names(std::set<std::string> & param_names) const
 {
   param_names.clear();
 
@@ -87,12 +87,12 @@ RBParameters::const_iterator RBParameters::end() const
   return _parameters.end();
 }
 
-bool RBParameters::operator==(const RBParameters& rhs) const
+bool RBParameters::operator==(const RBParameters & rhs) const
 {
   return this->_parameters == rhs._parameters;
 }
 
-bool RBParameters::operator!=(const RBParameters& rhs) const
+bool RBParameters::operator!=(const RBParameters & rhs) const
 {
   return !(*this == rhs);
 }

@@ -76,8 +76,8 @@ public:
    * smallest chunk the range may be broken into for parallel
    * execution.
    */
-  StoredRange (const iterator_type &first,
-               const iterator_type &last,
+  StoredRange (const iterator_type & first,
+               const iterator_type & last,
                const unsigned int new_grainsize = 1000) :
     _end(),
     _begin(),
@@ -102,7 +102,7 @@ public:
    * the copy constructor to specifically omit the \p _objs
    * vector.
    */
-  StoredRange (const StoredRange<iterator_type,object_type> &er):
+  StoredRange (const StoredRange<iterator_type,object_type> & er):
     _end(er._end),
     _begin(er._begin),
     _last(er._last),
@@ -130,9 +130,9 @@ public:
    * ending of this new range to be different from that of the
    * one we're copying.
    */
-  StoredRange (const StoredRange<iterator_type,object_type> &er,
-               const const_iterator &begin_range,
-               const const_iterator &end_range):
+  StoredRange (const StoredRange<iterator_type,object_type> & er,
+               const const_iterator & begin_range,
+               const const_iterator & end_range):
     _end(end_range),
     _begin(begin_range),
     _last(0), // Initialize these in a moment
@@ -151,7 +151,7 @@ public:
    * of the range is left in place, the second
    * half of the range is placed in *this.
    */
-  StoredRange (StoredRange<iterator_type,object_type> &r, Threads::split ) :
+  StoredRange (StoredRange<iterator_type,object_type> & r, Threads::split ) :
     _end(r._end),
     _begin(r._begin),
     _last(r._last),
@@ -180,8 +180,8 @@ public:
    * expecting a StoredRange<> can be passed e.g. foo.reset(begin,end).
    */
   StoredRange<iterator_type, object_type> &
-  reset (const iterator_type &first,
-         const iterator_type &last)
+  reset (const iterator_type & first,
+         const iterator_type & last)
   {
     _objs.clear();
 
@@ -244,7 +244,7 @@ public:
   /**
    * Set the grain size.
    */
-  void grainsize (const unsigned int &gs) {_grainsize = gs;}
+  void grainsize (const unsigned int & gs) {_grainsize = gs;}
 
   /**
    * \return the size of the range.

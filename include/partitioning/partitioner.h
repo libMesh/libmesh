@@ -82,7 +82,7 @@ public:
    * specific partitioning algorithm.  See, e.g.  MetisPartitioner for
    * an example.
    */
-  virtual void partition (MeshBase& mesh,
+  virtual void partition (MeshBase & mesh,
                           const unsigned int n);
 
   /**
@@ -102,7 +102,7 @@ public:
    * specific partitioning algorithm.  See, e.g.  MetisPartitioner for
    * an example.
    */
-  virtual void partition (MeshBase& mesh);
+  virtual void partition (MeshBase & mesh);
 
   /**
    * Repartitions the \p MeshBase into \p n parts.  This
@@ -110,7 +110,7 @@ public:
    * more efficiently than computing a new partitioning from scratch.
    * The default behavior is to simply call this->partition(mesh,n)
    */
-  void repartition (MeshBase& mesh,
+  void repartition (MeshBase & mesh,
                     const unsigned int n);
 
   /**
@@ -118,14 +118,14 @@ public:
    * is required since some partitoning algorithms can repartition
    * more efficiently than computing a new partitioning from scratch.
    */
-  void repartition (MeshBase& mesh);
+  void repartition (MeshBase & mesh);
 
   /**
    * This function
    */
-  static void partition_unpartitioned_elements (MeshBase &mesh);
+  static void partition_unpartitioned_elements (MeshBase & mesh);
 
-  static void partition_unpartitioned_elements (MeshBase &mesh,
+  static void partition_unpartitioned_elements (MeshBase & mesh,
                                                 const unsigned int n);
 
   /**
@@ -133,14 +133,14 @@ public:
    * for the inactive parent elements.  A Parent's processor ID is the same
    * as its first child.
    */
-  static void set_parent_processor_ids(MeshBase& mesh);
+  static void set_parent_processor_ids(MeshBase & mesh);
 
   /**
    * This function is called after partitioning to set the processor IDs
    * for the nodes.  By definition, a Node's processor ID is the minimum
    * processor ID for all of the elements which share the node.
    */
-  static void set_node_processor_ids(MeshBase& mesh);
+  static void set_node_processor_ids(MeshBase & mesh);
 
   /**
    * Attach weights that can be used for partitioning.  This ErrorVector should be
@@ -157,14 +157,14 @@ protected:
    * to processor 0.  Is is provided as a separate function
    * so that derived classes may use it without reimplementing it.
    */
-  void single_partition (MeshBase& mesh);
+  void single_partition (MeshBase & mesh);
 
   /**
    * This is the actual partitioning method which must be overloaded
    * in derived classes.  It is called via the public partition()
    * method above by the user.
    */
-  virtual void _do_partition(MeshBase& mesh,
+  virtual void _do_partition(MeshBase & mesh,
                              const unsigned int n) = 0;
 
   /**
@@ -172,7 +172,7 @@ protected:
    * in derived classes.  Note that the default behavior is to simply
    * call the partition function.
    */
-  virtual void _do_repartition (MeshBase& mesh,
+  virtual void _do_repartition (MeshBase & mesh,
                                 const unsigned int n) { this->_do_partition (mesh, n); }
 
   /**

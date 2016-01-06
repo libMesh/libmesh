@@ -137,7 +137,7 @@ private:
    * quadrature rules and later authors certainly built upon his work.
    */
   void stroud_rule(const Real rule_data[][3],
-                   const unsigned int* rule_symmetry,
+                   const unsigned int * rule_symmetry,
                    const unsigned int n_pts);
 
   /**
@@ -178,7 +178,7 @@ private:
    * the unique permutations of G^{rot} were computed by me [JWP] using Maple.
    */
   void kim_rule(const Real rule_data[][4],
-                const unsigned int* rule_id,
+                const unsigned int * rule_id,
                 const unsigned int n_pts);
 };
 

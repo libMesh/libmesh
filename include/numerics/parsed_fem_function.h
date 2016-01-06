@@ -58,10 +58,10 @@ public:
    * Constructor.
    */
   explicit
-  ParsedFEMFunction (const System& sys,
-                     const std::string& expression,
-                     const std::vector<std::string>* additional_vars=NULL,
-                     const std::vector<Output>* initial_vals=NULL);
+  ParsedFEMFunction (const System & sys,
+                     const std::string & expression,
+                     const std::vector<std::string> * additional_vars=NULL,
+                     const std::vector<Output> * initial_vals=NULL);
 
   /**
    * Destructor.
@@ -69,12 +69,12 @@ public:
   virtual ~ParsedFEMFunction () {}
 
   // Re-parse with new expression
-  void reparse (const std::string& expression);
+  void reparse (const std::string & expression);
 
   /**
    * Prepares a context object for use.
    */
-  virtual void init_context (const FEMContext &c) libmesh_override;
+  virtual void init_context (const FEMContext & c) libmesh_override;
 
   /**
    * Returns a new copy of the function.  The new copy should be as
@@ -91,8 +91,8 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual Output operator() (const FEMContext& c,
-                             const Point& p,
+  virtual Output operator() (const FEMContext & c,
+                             const Point & p,
                              const Real time = 0.) libmesh_override;
 
   /**
@@ -100,18 +100,18 @@ public:
    * Returns in \p output the values of the data at the
    * coordinate \p p and for time \p time.
    */
-  void operator() (const FEMContext& c,
-                   const Point& p,
+  void operator() (const FEMContext & c,
+                   const Point & p,
                    const Real time,
-                   DenseVector<Output>& output) libmesh_override;
+                   DenseVector<Output> & output) libmesh_override;
 
   /**
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
-  virtual Output component(const FEMContext& c,
+  virtual Output component(const FEMContext & c,
                            unsigned int i,
-                           const Point& p,
+                           const Point & p,
                            Real time=0.) libmesh_override;
 
   const std::string & expression() { return _expression; }
@@ -123,7 +123,7 @@ public:
    * and if the inline variable takes the same value within any
    * subexpressions where it appears.
    */
-  Output get_inline_value(const std::string& inline_var_name) const;
+  Output get_inline_value(const std::string & inline_var_name) const;
 
   /**
    * Changes the value of an inline variable.  Forever after the
@@ -132,20 +132,20 @@ public:
    * Currently only works if the inline variable is not redefined
    * within any one subexpression.
    */
-  void set_inline_value(const std::string& inline_var_name,
+  void set_inline_value(const std::string & inline_var_name,
                         Output newval);
 
 protected:
   // Helper function for reparsing minor changes to expression
-  void partial_reparse (const std::string& expression);
+  void partial_reparse (const std::string & expression);
 
   // Helper function for parsing out variable names
   std::size_t find_name (const std::string & varname,
                          const std::string & expr) const;
 
   // Helper function for evaluating function arguments
-  void eval_args(const FEMContext& c,
-                 const Point& p,
+  void eval_args(const FEMContext & c,
+                 const Point & p,
                  const Real time);
 
   // Evaluate the ith FunctionParser and check the result
@@ -160,7 +160,7 @@ protected:
 #endif
 
 private:
-  const System& _sys;
+  const System & _sys;
   std::string _expression;
   std::vector<std::string> _subexpressions;
   unsigned int _n_vars,
@@ -200,10 +200,10 @@ private:
 
 template <typename Output>
 inline
-ParsedFEMFunction<Output>::ParsedFEMFunction (const System& sys,
-                                              const std::string& expression,
-                                              const std::vector<std::string>* additional_vars,
-                                              const std::vector<Output>* initial_vals) :
+ParsedFEMFunction<Output>::ParsedFEMFunction (const System & sys,
+                                              const std::string & expression,
+                                              const std::vector<std::string> * additional_vars,
+                                              const std::vector<Output> * initial_vals) :
   _sys(sys),
   _expression (), // overridden by parse()
   _n_vars(sys.n_vars()),
@@ -226,7 +226,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction (const System& sys,
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::reparse (const std::string& expression)
+ParsedFEMFunction<Output>::reparse (const std::string & expression)
 {
   variables = "x";
 #if LIBMESH_DIM > 1
@@ -355,11 +355,11 @@ ParsedFEMFunction<Output>::reparse (const std::string& expression)
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::init_context (const FEMContext &c)
+ParsedFEMFunction<Output>::init_context (const FEMContext & c)
 {
   for (unsigned int v=0; v != _n_vars; ++v)
     {
-      FEBase* elem_fe;
+      FEBase * elem_fe;
       c.get_element_fe(v, elem_fe);
       if (_n_requested_vars)
         elem_fe->get_phi();
@@ -373,7 +373,7 @@ ParsedFEMFunction<Output>::init_context (const FEMContext &c)
 
   if (_requested_normals)
     {
-      FEBase* side_fe;
+      FEBase * side_fe;
       c.get_side_fe(0, side_fe);
 
       side_fe->get_normals();
@@ -396,9 +396,9 @@ ParsedFEMFunction<Output>::clone () const
 template <typename Output>
 inline
 Output
-ParsedFEMFunction<Output>::operator()
-  (const FEMContext& c, const Point& p,
-   const Real time)
+ParsedFEMFunction<Output>::operator() (const FEMContext & c,
+                                       const Point & p,
+                                       const Real time)
 {
   eval_args(c, p, time);
 
@@ -410,10 +410,10 @@ ParsedFEMFunction<Output>::operator()
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::operator()
-  (const FEMContext& c, const Point& p,
-   const Real time,
-   DenseVector<Output>& output)
+ParsedFEMFunction<Output>::operator() (const FEMContext & c,
+                                       const Point & p,
+                                       const Real time,
+                                       DenseVector<Output> & output)
 {
   eval_args(c, p, time);
 
@@ -429,9 +429,9 @@ ParsedFEMFunction<Output>::operator()
 template <typename Output>
 inline
 Output
-ParsedFEMFunction<Output>::component (const FEMContext& c,
+ParsedFEMFunction<Output>::component (const FEMContext & c,
                                       unsigned int i,
-                                      const Point& p,
+                                      const Point & p,
                                       Real time)
 {
   eval_args(c, p, time);
@@ -443,8 +443,7 @@ ParsedFEMFunction<Output>::component (const FEMContext& c,
 template <typename Output>
 inline
 Output
-ParsedFEMFunction<Output>::get_inline_value
-(const std::string& inline_var_name) const
+ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name) const
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
 
@@ -518,7 +517,7 @@ ParsedFEMFunction<Output>::get_inline_value
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::set_inline_value (const std::string& inline_var_name,
+ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name,
                                              Output newval)
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
@@ -584,7 +583,7 @@ ParsedFEMFunction<Output>::set_inline_value (const std::string& inline_var_name,
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::partial_reparse (const std::string& expression)
+ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
 {
   _expression = expression;
   _subexpressions.clear();
@@ -674,8 +673,8 @@ ParsedFEMFunction<Output>::find_name (const std::string & varname,
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::eval_args (const FEMContext& c,
-                                      const Point& p,
+ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
+                                      const Point & p,
                                       const Real time)
 {
   _spacetime[0] = p(0);
@@ -760,12 +759,12 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext& c,
 
   if (_requested_normals)
     {
-      FEBase* side_fe;
+      FEBase * side_fe;
       c.get_side_fe(0, side_fe);
 
-      const std::vector<Point>& normals = side_fe->get_normals();
+      const std::vector<Point> & normals = side_fe->get_normals();
 
-      const std::vector<Point>& xyz = side_fe->get_xyz();
+      const std::vector<Point> & xyz = side_fe->get_xyz();
 
       libmesh_assert_equal_to(normals.size(), xyz.size());
 
@@ -777,7 +776,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext& c,
         {
           if (p == xyz[qp])
             {
-              const Point& n = normals[qp];
+              const Point & n = normals[qp];
               for (unsigned int d=0; d != LIBMESH_DIM; ++d)
                 {
                   _spacetime[LIBMESH_DIM+1+request_index] = n(d);

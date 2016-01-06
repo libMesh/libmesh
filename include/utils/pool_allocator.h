@@ -61,7 +61,7 @@ public:
     boost::pool_allocator<T>()
   {}
 
-  explicit PoolAllocator(const PoolAllocator &o) :
+  explicit PoolAllocator(const PoolAllocator & o) :
     boost::pool_allocator<T>(o)
   {}
 
@@ -111,7 +111,7 @@ public:
     boost::fast_pool_allocator<T>()
   {}
 
-  explicit FastPoolAllocator(const FastPoolAllocator &o) :
+  explicit FastPoolAllocator(const FastPoolAllocator & o) :
     boost::fast_pool_allocator<T>(o)
   {}
 
@@ -159,7 +159,7 @@ public:
     std::allocator<T>()
   {}
 
-  explicit PoolAllocator(const PoolAllocator &o) :
+  explicit PoolAllocator(const PoolAllocator & o) :
     std::allocator<T>(o)
   {}
 
@@ -199,7 +199,7 @@ public:
     std::allocator<T>()
   {}
 
-  explicit FastPoolAllocator(const FastPoolAllocator &o) :
+  explicit FastPoolAllocator(const FastPoolAllocator & o) :
     std::allocator<T>(o)
   {}
 

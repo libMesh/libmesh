@@ -131,7 +131,7 @@ UniquePtr<Elem> Pyramid5::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      Elem * face = NULL;
 
       switch (i)
         {
@@ -178,7 +178,7 @@ UniquePtr<Elem> Pyramid5::build_edge (const unsigned int i) const
 
 void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
                             const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const
+                            std::vector<dof_id_type> & conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -222,11 +222,11 @@ Real Pyramid5::volume () const
   // The pyramid with a bilinear base has volume given by the
   // formula in: "Calculation of the Volume of a General Hexahedron
   // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
-  Node* node0 = this->get_node(0);
-  Node* node1 = this->get_node(1);
-  Node* node2 = this->get_node(2);
-  Node* node3 = this->get_node(3);
-  Node* node4 = this->get_node(4);
+  Node * node0 = this->get_node(0);
+  Node * node1 = this->get_node(1);
+  Node * node2 = this->get_node(2);
+  Node * node3 = this->get_node(3);
+  Node * node4 = this->get_node(4);
 
   // Construct Various edge and diagonal vectors
   Point v40 ( *node0 - *node4 );

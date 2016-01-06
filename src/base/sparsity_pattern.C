@@ -32,9 +32,9 @@ namespace SparsityPattern
 //-------------------------------------------------------
 // we need to implement these constructors here so that
 // a full DofMap definition is available.
-Build::Build (const MeshBase &mesh_in,
-              const DofMap &dof_map_in,
-              const CouplingMatrix *dof_coupling_in,
+Build::Build (const MeshBase & mesh_in,
+              const DofMap & dof_map_in,
+              const CouplingMatrix * dof_coupling_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in) :
   ParallelObject(dof_map_in),
@@ -51,7 +51,7 @@ Build::Build (const MeshBase &mesh_in,
 
 
 
-Build::Build (Build &other, Threads::split) :
+Build::Build (Build & other, Threads::split) :
   ParallelObject(other),
   mesh(other.mesh),
   dof_map(other.dof_map),

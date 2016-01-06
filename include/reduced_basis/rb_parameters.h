@@ -51,7 +51,7 @@ public:
   /**
    * Constructor. Set parameters based on the std::map \p parameter_map.
    */
-  RBParameters(const std::map<std::string, Real>& parameter_map);
+  RBParameters(const std::map<std::string, Real> & parameter_map);
 
   // Define a constant iterator for this class
   typedef std::map<std::string, Real>::const_iterator const_iterator;
@@ -64,13 +64,13 @@ public:
   /**
    * Get the value of the specific parameter.
    */
-  Real get_value(const std::string& param_name) const;
+  Real get_value(const std::string & param_name) const;
 
   /**
    * Set the value of the specified parameter. If param_name
    * doesn't already exist, it is added to the RBParameters object.
    */
-  void set_value(const std::string& param_name, Real value);
+  void set_value(const std::string & param_name, Real value);
 
   /**
    * Get the number of parameters that have been added.
@@ -80,7 +80,7 @@ public:
   /**
    * Fill \p param_names with the names of the parameters.
    */
-  void get_parameter_names(std::set<std::string>& param_names) const;
+  void get_parameter_names(std::set<std::string> & param_names) const;
 
   /**
    * Get a constant iterator to beginning of this RBParameters object.
@@ -95,12 +95,12 @@ public:
   /**
    * Two RBParameters are equal if they have the same _parameters map.
    */
-  bool operator== (const RBParameters& rhs) const;
+  bool operator== (const RBParameters & rhs) const;
 
   /**
    * @return !(*this == rhs).
    */
-  bool operator!= (const RBParameters& node) const;
+  bool operator!= (const RBParameters & node) const;
 
   /**
    * Get a string that specifies the contents of this RBParameters object.

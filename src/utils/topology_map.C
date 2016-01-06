@@ -34,7 +34,7 @@ namespace libMesh
 {
 
 //--------------------------------------------------------------------------
-void TopologyMap::init(MeshBase& mesh)
+void TopologyMap::init(MeshBase & mesh)
 {
   // This function must be run on all processors at once
   // for non-serial meshes
@@ -53,8 +53,8 @@ void TopologyMap::init(MeshBase& mesh)
 
 
 
-void TopologyMap::add_node(const Node& mid_node,
-                           const std::vector<std::pair<dof_id_type, dof_id_type> >& bracketing_nodes)
+void TopologyMap::add_node(const Node & mid_node,
+                           const std::vector<std::pair<dof_id_type, dof_id_type> > & bracketing_nodes)
 {
   const dof_id_type mid_node_id = mid_node.id();
 
@@ -83,7 +83,7 @@ void TopologyMap::add_node(const Node& mid_node,
 }
 
 
-dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type> >& bracketing_nodes) const
+dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type> > & bracketing_nodes) const
 {
   dof_id_type new_node_id = DofObject::invalid_id;
 
@@ -140,7 +140,7 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
 
 #ifdef LIBMESH_ENABLE_AMR
 
-void TopologyMap::fill(const MeshBase& mesh)
+void TopologyMap::fill(const MeshBase & mesh)
 {
   // Populate the nodes map
   MeshBase::const_element_iterator
@@ -148,7 +148,7 @@ void TopologyMap::fill(const MeshBase& mesh)
     end = mesh.elements_end();
   for (; it != end; ++it)
     {
-      const Elem* elem = *it;
+      const Elem * elem = *it;
 
       // We only need to add nodes which might be added during mesh
       // refinement; this means they need to be child nodes.
@@ -175,7 +175,7 @@ void TopologyMap::fill(const MeshBase& mesh)
 #else
 
 // no-op without AMR
-void TopologyMap::fill(const MeshBase&) {}
+void TopologyMap::fill(const MeshBase &) {}
 
 #endif
 

@@ -100,8 +100,8 @@ Real EpetraVector<T>::linfty_norm () const
 }
 
 template <typename T>
-NumericVector<T>&
-EpetraVector<T>::operator += (const NumericVector<T>& v)
+NumericVector<T> &
+EpetraVector<T>::operator += (const NumericVector<T> & v)
 {
   libmesh_assert(this->closed());
 
@@ -113,8 +113,8 @@ EpetraVector<T>::operator += (const NumericVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-EpetraVector<T>::operator -= (const NumericVector<T>& v)
+NumericVector<T> &
+EpetraVector<T>::operator -= (const NumericVector<T> & v)
 {
   libmesh_assert(this->closed());
 
@@ -131,7 +131,7 @@ EpetraVector<T>::operator /= (NumericVector<T> & v)
   libmesh_assert(this->closed());
   libmesh_assert_equal_to(size(), v.size());
 
-  EpetraVector<T> & v_vec = cast_ref<EpetraVector<T>&>(v);
+  EpetraVector<T> & v_vec = cast_ref<EpetraVector<T> &>(v);
 
   _vec->ReciprocalMultiply(1.0, *v_vec._vec, *_vec, 0.0);
 
@@ -167,7 +167,7 @@ void EpetraVector<T>::reciprocal()
   // Alternatively, compute the reciprocal by hand... see also the add(T) member that does this...
   const unsigned int nl = _vec->MyLength();
 
-  T* values = _vec->Values();
+  T * values = _vec->Values();
 
   for (unsigned int i=0; i<nl; i++)
     {
@@ -208,29 +208,29 @@ void EpetraVector<T>::add (const numeric_index_type i_in, const T value_in)
 
 
 template <typename T>
-void EpetraVector<T>::add_vector (const T* v,
-                                  const std::vector<numeric_index_type>& dof_indices)
+void EpetraVector<T>::add_vector (const T * v,
+                                  const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
   SumIntoGlobalValues (dof_indices.size(),
-                       (int*) &dof_indices[0],
-                       const_cast<T*>(v));
+                       (int *) &dof_indices[0],
+                       const_cast<T *>(v));
 }
 
 
 
 // TODO: fill this in after creating an EpetraMatrix
 template <typename T>
-void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
-                                  const SparseMatrix<T>& A_in)
+void EpetraVector<T>::add_vector (const NumericVector<T> & V_in,
+                                  const SparseMatrix<T> & A_in)
 {
-  const EpetraVector<T>* V = cast_ptr<const EpetraVector<T>*>(&V_in);
-  const EpetraMatrix<T>* A = cast_ptr<const EpetraMatrix<T>*>(&A_in);
+  const EpetraVector<T> * V = cast_ptr<const EpetraVector<T> *>(&V_in);
+  const EpetraMatrix<T> * A = cast_ptr<const EpetraMatrix<T> *>(&A_in);
 
   // FIXME - does Trilinos let us do this *without* memory allocation?
   UniquePtr<NumericVector<T> > temp = V->zero_clone();
-  EpetraVector<T>* tempV = cast_ptr<EpetraVector<T>*>(temp.get());
+  EpetraVector<T> * tempV = cast_ptr<EpetraVector<T> *>(temp.get());
   A->mat()->Multiply(false, *V->_vec, *tempV->_vec);
   *this += *temp;
 }
@@ -239,8 +239,8 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
 
 // TODO: fill this in after creating an EpetraMatrix
 template <typename T>
-void EpetraVector<T>::add_vector_transpose (const NumericVector<T>& /* V_in */,
-                                            const SparseMatrix<T>& /* A_in */)
+void EpetraVector<T>::add_vector_transpose (const NumericVector<T> & /* V_in */,
+                                            const SparseMatrix<T> & /* A_in */)
 {
   libmesh_not_implemented();
 }
@@ -262,16 +262,16 @@ void EpetraVector<T>::add (const T v_in)
 
 
 template <typename T>
-void EpetraVector<T>::add (const NumericVector<T>& v)
+void EpetraVector<T>::add (const NumericVector<T> & v)
 {
   this->add (1., v);
 }
 
 
 template <typename T>
-void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
+void EpetraVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 {
-  const EpetraVector<T>* v = cast_ptr<const EpetraVector<T>*>(&v_in);
+  const EpetraVector<T> * v = cast_ptr<const EpetraVector<T> *>(&v_in);
 
   libmesh_assert_equal_to (this->size(), v->size());
 
@@ -281,14 +281,14 @@ void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 
 
 template <typename T>
-void EpetraVector<T>::insert (const T* v,
-                              const std::vector<numeric_index_type>& dof_indices)
+void EpetraVector<T>::insert (const T * v,
+                              const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
   ReplaceGlobalValues (dof_indices.size(),
-                       (int*) &dof_indices[0],
-                       const_cast<T*>(v));
+                       (int *) &dof_indices[0],
+                       const_cast<T *>(v));
 }
 
 
@@ -307,9 +307,9 @@ void EpetraVector<T>::abs()
 
 
 template <typename T>
-T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
+T EpetraVector<T>::dot (const NumericVector<T> & V_in) const
 {
-  const EpetraVector<T>* V = cast_ptr<const EpetraVector<T>*>(&V_in);
+  const EpetraVector<T> * V = cast_ptr<const EpetraVector<T> *>(&V_in);
 
   T result=0.0;
 
@@ -320,18 +320,18 @@ T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
 
 
 template <typename T>
-void EpetraVector<T>::pointwise_mult (const NumericVector<T>& vec1,
-                                      const NumericVector<T>& vec2)
+void EpetraVector<T>::pointwise_mult (const NumericVector<T> & vec1,
+                                      const NumericVector<T> & vec2)
 {
-  const EpetraVector<T>* V1 = cast_ptr<const EpetraVector<T>*>(&vec1);
-  const EpetraVector<T>* V2 = cast_ptr<const EpetraVector<T>*>(&vec2);
+  const EpetraVector<T> * V1 = cast_ptr<const EpetraVector<T> *>(&vec1);
+  const EpetraVector<T> * V2 = cast_ptr<const EpetraVector<T> *>(&vec2);
 
   _vec->Multiply(1.0, *V1->_vec, *V2->_vec, 0.0);
 }
 
 
 template <typename T>
-NumericVector<T>&
+NumericVector<T> &
 EpetraVector<T>::operator = (const T s_in)
 {
   _vec->PutScalar(s_in);
@@ -342,10 +342,10 @@ EpetraVector<T>::operator = (const T s_in)
 
 
 template <typename T>
-NumericVector<T>&
-EpetraVector<T>::operator = (const NumericVector<T>& v_in)
+NumericVector<T> &
+EpetraVector<T>::operator = (const NumericVector<T> & v_in)
 {
-  const EpetraVector<T>* v = cast_ptr<const EpetraVector<T>*>(&v_in);
+  const EpetraVector<T> * v = cast_ptr<const EpetraVector<T> *>(&v_in);
 
   *this = *v;
 
@@ -355,8 +355,8 @@ EpetraVector<T>::operator = (const NumericVector<T>& v_in)
 
 
 template <typename T>
-EpetraVector<T>&
-EpetraVector<T>::operator = (const EpetraVector<T>& v)
+EpetraVector<T> &
+EpetraVector<T>::operator = (const EpetraVector<T> & v)
 {
   (*_vec) = *v._vec;
 
@@ -368,8 +368,8 @@ EpetraVector<T>::operator = (const EpetraVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>&
-EpetraVector<T>::operator = (const std::vector<T>& v)
+NumericVector<T> &
+EpetraVector<T>::operator = (const std::vector<T> & v)
 {
   T * values = _vec->Values();
 
@@ -406,9 +406,9 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
 
 
 template <typename T>
-void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
+void EpetraVector<T>::localize (NumericVector<T> & v_local_in) const
 {
-  EpetraVector<T>* v_local = cast_ptr<EpetraVector<T>*>(&v_local_in);
+  EpetraVector<T> * v_local = cast_ptr<EpetraVector<T> *>(&v_local_in);
 
   Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, -1);
   v_local->_vec->ReplaceMap(rootMap);
@@ -420,14 +420,14 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 
 
 template <typename T>
-void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
-                                const std::vector<numeric_index_type>& /* send_list */) const
+void EpetraVector<T>::localize (NumericVector<T> & v_local_in,
+                                const std::vector<numeric_index_type> & /* send_list */) const
 {
   // TODO: optimize to sync only the send list values
   this->localize(v_local_in);
 
-  //   EpetraVector<T>* v_local =
-  //   cast_ptr<EpetraVector<T>*>(&v_local_in);
+  //   EpetraVector<T> * v_local =
+  //   cast_ptr<EpetraVector<T> *>(&v_local_in);
 
   //   libmesh_assert(this->_map.get());
   //   libmesh_assert(v_local->_map.get());
@@ -443,7 +443,7 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 template <typename T>
 void EpetraVector<T>::localize (const numeric_index_type first_local_idx,
                                 const numeric_index_type last_local_idx,
-                                const std::vector<numeric_index_type>& send_list)
+                                const std::vector<numeric_index_type> & send_list)
 {
   // Only good for serial vectors.
   libmesh_assert_equal_to (this->size(), this->local_size());
@@ -478,7 +478,7 @@ void EpetraVector<T>::localize (const numeric_index_type first_local_idx,
 
 
 template <typename T>
-void EpetraVector<T>::localize (std::vector<T>& v_local) const
+void EpetraVector<T>::localize (std::vector<T> & v_local) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -501,7 +501,7 @@ void EpetraVector<T>::localize (std::vector<T>& v_local) const
 
 
 template <typename T>
-void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
+void EpetraVector<T>::localize_to_one (std::vector<T> &  v_local,
                                        const processor_id_type pid) const
 {
   // This function must be run on all processors at once
@@ -527,8 +527,8 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
 
 
 template <typename T>
-void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
-                                       const std::vector<numeric_index_type>& /* rows */) const
+void EpetraVector<T>::create_subvector(NumericVector<T> & /* subvector */,
+                                       const std::vector<numeric_index_type> & /* rows */) const
 {
   libmesh_not_implemented();
 }
@@ -543,16 +543,17 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::SumIntoGlobalValues(int numIDs, const int* GIDs,
-                                         const double* values)
+int EpetraVector<T>::SumIntoGlobalValues(int numIDs,
+                                         const int * GIDs,
+                                         const double * values)
 {
   return( inputValues( numIDs, GIDs, values, true) );
 }
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::SumIntoGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
-                                         const Epetra_SerialDenseVector& values)
+int EpetraVector<T>::SumIntoGlobalValues(const Epetra_IntSerialDenseVector & GIDs,
+                                         const Epetra_SerialDenseVector & values)
 {
   if (GIDs.Length() != values.Length()) {
     return(-1);
@@ -563,25 +564,27 @@ int EpetraVector<T>::SumIntoGlobalValues(const Epetra_IntSerialDenseVector& GIDs
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::SumIntoGlobalValues(int numIDs, const int* GIDs,
-                                         const int* numValuesPerID,
-                                         const double* values)
+int EpetraVector<T>::SumIntoGlobalValues(int numIDs,
+                                         const int * GIDs,
+                                         const int * numValuesPerID,
+                                         const double * values)
 {
   return( inputValues( numIDs, GIDs, numValuesPerID, values, true) );
 }
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::ReplaceGlobalValues(int numIDs, const int* GIDs,
-                                         const double* values)
+int EpetraVector<T>::ReplaceGlobalValues(int numIDs,
+                                         const int * GIDs,
+                                         const double * values)
 {
   return( inputValues( numIDs, GIDs, values, false) );
 }
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::ReplaceGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
-                                         const Epetra_SerialDenseVector& values)
+int EpetraVector<T>::ReplaceGlobalValues(const Epetra_IntSerialDenseVector & GIDs,
+                                         const Epetra_SerialDenseVector & values)
 {
   if (GIDs.Length() != values.Length()) {
     return(-1);
@@ -592,9 +595,10 @@ int EpetraVector<T>::ReplaceGlobalValues(const Epetra_IntSerialDenseVector& GIDs
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::ReplaceGlobalValues(int numIDs, const int* GIDs,
-                                         const int* numValuesPerID,
-                                         const double* values)
+int EpetraVector<T>::ReplaceGlobalValues(int numIDs,
+                                         const int * GIDs,
+                                         const int * numValuesPerID,
+                                         const double * values)
 {
   return( inputValues( numIDs, GIDs, numValuesPerID, values, false) );
 }
@@ -602,8 +606,8 @@ int EpetraVector<T>::ReplaceGlobalValues(int numIDs, const int* GIDs,
 //----------------------------------------------------------------------------
 template <typename T>
 int EpetraVector<T>::inputValues(int numIDs,
-                                 const int* GIDs,
-                                 const double* values,
+                                 const int * GIDs,
+                                 const double * values,
                                  bool accumulate)
 {
   if (accumulate) {
@@ -639,9 +643,9 @@ int EpetraVector<T>::inputValues(int numIDs,
 //----------------------------------------------------------------------------
 template <typename T>
 int EpetraVector<T>::inputValues(int numIDs,
-                                 const int* GIDs,
-                                 const int* numValuesPerID,
-                                 const double* values,
+                                 const int * GIDs,
+                                 const int * numValuesPerID,
+                                 const double * values,
                                  bool accumulate)
 {
   if (accumulate) {
@@ -713,7 +717,7 @@ int EpetraVector<T>::inputNonlocalValue(int GID, double value, bool accumulate)
     --tmp1;
     EPETRA_CHK_ERR( Epetra_Util_insert(1, insertPoint, nonlocalElementSize_,
                                        tmp1, tmp3) );
-    double* values = new double[1];
+    double * values = new double[1];
     values[0] = value;
     EPETRA_CHK_ERR( Epetra_Util_insert(values, insertPoint, nonlocalCoefs_,
                                        numNonlocalIDs_, allocatedNonlocalLength_) );
@@ -724,8 +728,10 @@ int EpetraVector<T>::inputNonlocalValue(int GID, double value, bool accumulate)
 
 //----------------------------------------------------------------------------
 template <typename T>
-int EpetraVector<T>::inputNonlocalValues(int GID, int numValues,
-                                         const double* values, bool accumulate)
+int EpetraVector<T>::inputNonlocalValues(int GID,
+                                         int numValues,
+                                         const double * values,
+                                         bool accumulate)
 {
   int insertPoint = -1;
 
@@ -768,7 +774,7 @@ int EpetraVector<T>::inputNonlocalValues(int GID, int numValues,
     --tmp1;
     EPETRA_CHK_ERR( Epetra_Util_insert(numValues, insertPoint, nonlocalElementSize_,
                                        tmp1, tmp3) );
-    double* newvalues = new double[numValues];
+    double * newvalues = new double[numValues];
     for(int j=0; j<numValues; ++j) {
       newvalues[j] = values[j];
     }
@@ -826,7 +832,7 @@ int EpetraVector<T>::GlobalAssemble(Epetra_CombineMode mode)
 
 //----------------------------------------------------------------------------
 template <typename T>
-void EpetraVector<T>::FEoperatorequals(const EpetraVector& source)
+void EpetraVector<T>::FEoperatorequals(const EpetraVector & source)
 {
   (*_vec) = *(source._vec);
 
@@ -837,7 +843,7 @@ void EpetraVector<T>::FEoperatorequals(const EpetraVector& source)
     numNonlocalIDs_ = source.numNonlocalIDs_;
     nonlocalIDs_ = new int[allocatedNonlocalLength_];
     nonlocalElementSize_ = new int[allocatedNonlocalLength_];
-    nonlocalCoefs_ = new double*[allocatedNonlocalLength_];
+    nonlocalCoefs_ = new double *[allocatedNonlocalLength_];
     for(int i=0; i<numNonlocalIDs_; ++i) {
       int elemSize = source.nonlocalElementSize_[i];
       nonlocalCoefs_[i] = new double[elemSize];
