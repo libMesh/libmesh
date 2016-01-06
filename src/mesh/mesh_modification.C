@@ -396,6 +396,9 @@ void UnstructuredMesh::all_first_order ()
        * the second-order element.
        */
       lo_elem->set_id(so_elem->id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      lo_elem->set_unique_id() = so_elem->unique_id();
+#endif
       lo_elem->processor_id() = so_elem->processor_id();
       lo_elem->subdomain_id() = so_elem->subdomain_id();
       this->insert_elem(lo_elem);
@@ -686,6 +689,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * the first-order element.
        */
       so_elem->set_id(lo_elem->id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      so_elem->set_unique_id() = lo_elem->unique_id();
+#endif
       so_elem->processor_id() = lo_elem->processor_id();
       so_elem->subdomain_id() = lo_elem->subdomain_id();
       this->insert_elem(so_elem);
@@ -697,9 +703,10 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   STOP_LOG("all_second_order()", "Mesh");
 
-  // In a ParallelMesh our ghost node processor ids may be bad and
-  // the ids of nodes touching remote elements may be inconsistent.
-  // Fix them.
+  // In a ParallelMesh our ghost node processor ids may be bad,
+  // the ids of nodes touching remote elements may be inconsistent,
+  // and unique_ids of newly added non-local nodes remain unset.
+  // make_nodes_parallel_consistent() will fix all this.
   if (!this->is_serial())
     MeshCommunication().make_nodes_parallel_consistent (*this);
 
@@ -733,6 +740,11 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   std::vector<Elem*> new_bndry_elements;
   std::vector<unsigned short int> new_bndry_sides;
   std::vector<boundary_id_type> new_bndry_ids;
+
+  // We may need to add new points if we run into a 1.5th order
+  // element; if we do that on a ParallelMesh in a ghost element then
+  // we will need to fix their ids / unique_ids
+  bool added_new_ghost_point = false;
 
   // Iterate over the elements, splitting QUADS into
   // pairs of conforming triangles.
@@ -804,6 +816,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
           case QUAD8:
             {
               split_elem =  true;
+              if (elem->processor_id() != mesh.processor_id())
+                added_new_ghost_point = true;
 
               tri0 = new Tri6;
               tri1 = new Tri6;
@@ -811,8 +825,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
               Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
                                                 mesh.node(elem->node(1)) +
                                                 mesh.node(elem->node(2)) +
-                                                mesh.node(elem->node(3)) / 4)
-                                               );
+                                                mesh.node(elem->node(3))
+                                                / 4),
+                                               DofObject::invalid_id,
+                                               elem->processor_id());
 
               // Check for possible edge swap
               if ((elem->point(0) - elem->point(2)).size() <
@@ -1113,13 +1129,25 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                   } // end if (elem->neighbor(sn) == remote_elem)
               } // end for loop over sides
 
+            // The number of elements in the original mesh before any additions
+            // or deletions.
+            const dof_id_type max_elem_id = mesh.max_elem_id();
+
             // Determine new IDs for the split elements which will be
             // the same on all processors, therefore keeping the Mesh
-            // in sync.  Note: we offset the new IDs by n_orig_elem to
-            // avoid overwriting any of the original IDs, this assumes
-            // they were contiguously-numbered to begin with...
-            tri0->set_id( n_orig_elem + 2*elem->id() + 0 );
-            tri1->set_id( n_orig_elem + 2*elem->id() + 1 );
+            // in sync.  Note: we offset the new IDs by the max of the
+            // pre-existing ids to avoid conflicting with originals.
+            tri0->set_id( max_elem_id + 2*elem->id());
+            tri1->set_id( max_elem_id + 2*elem->id() + 1 );
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+            unique_id_type max_unique_id =
+              mesh.parallel_max_unique_id();
+            tri0->set_unique_id() =
+              max_unique_id + 2*elem->unique_id();
+            tri1->set_unique_id() =
+              max_unique_id + 2*elem->unique_id() + 1;
+#endif
 
             // Add the newly-created triangles to the temporary vector of new elements.
             new_elements.push_back(tri0);
@@ -1164,6 +1192,19 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                                           new_bndry_sides[s],
                                           new_bndry_ids[s]);
     }
+
+  // In a ParallelMesh any newly added ghost node ids may be
+  // inconsistent, and unique_ids of newly added ghost nodes remain
+  // unset.
+  // make_nodes_parallel_consistent() will fix all this.
+  if (!mesh.is_serial())
+    {
+      mesh.comm().max(added_new_ghost_point);
+
+      if (added_new_ghost_point)
+        MeshCommunication().make_nodes_parallel_consistent (mesh);
+    }
+
 
 
   // Prepare the newly created mesh for use.
@@ -1401,9 +1442,12 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
         copy->processor_id() = elem->processor_id();
         copy->subdomain_id() = elem->subdomain_id();
 
-        // Retain the original element's ID as well, otherwise ParallelMesh will
-        // try to create one for you...
+        // Retain the original element's ID(s) as well, otherwise
+        // the Mesh may try to create them for you...
         copy->set_id( elem->id() );
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+        copy->set_unique_id() = elem->unique_id();
+#endif
 
         // This element could have boundary info or ParallelMesh
         // remote_elem links as well.  We need to save the (elem,

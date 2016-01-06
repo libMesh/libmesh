@@ -160,6 +160,9 @@ SerialMesh::SerialMesh (const SerialMesh &other_mesh) :
 {
   this->copy_nodes_and_elements(other_mesh);
   this->get_boundary_info() = other_mesh.get_boundary_info();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  this->_next_unique_id = other_mesh._next_unique_id;
+#endif
 }
 
 
@@ -349,6 +352,11 @@ Elem* SerialMesh::add_elem (Elem* e)
 
 Elem* SerialMesh::insert_elem (Elem* e)
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!e->valid_unique_id())
+    e->set_unique_id() = _next_unique_id++;
+#endif
+
   dof_id_type eid = e->id();
   libmesh_assert_less (eid, _elements.size());
   Elem *oldelem = _elements[eid];
@@ -457,6 +465,11 @@ Node* SerialMesh::add_point (const Point& p,
                       cast_int<dof_id_type>(_nodes.size()-1) : id).release();
       n->processor_id() = proc_id;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      if (!n->valid_unique_id())
+        n->set_unique_id() = _next_unique_id++;
+#endif
+
       if (id == DofObject::invalid_id)
         _nodes.back() = n;
       else
@@ -518,6 +531,10 @@ Node* SerialMesh::insert_node(Node* n)
       _nodes.resize(n->id() + 1);
     }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!n->valid_unique_id())
+    n->set_unique_id() = _next_unique_id++;
+#endif
 
   // We have enough space and this spot isn't already occupied by
   // another node, so go ahead and add it.
@@ -618,6 +635,29 @@ void SerialMesh::clear ()
     _nodes.clear();
   }
 }
+
+
+
+void SerialMesh::update_parallel_id_counts()
+{
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = this->parallel_max_unique_id();
+#endif
+}
+
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+unique_id_type SerialMesh::parallel_max_unique_id() const
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  unique_id_type max_local = _next_unique_id;
+  this->comm().max(max_local);
+  return max_local;
+}
+#endif
 
 
 
@@ -774,6 +814,8 @@ void SerialMesh::renumber_nodes_and_elements ()
 
   libmesh_assert_equal_to (next_free_elem, _elements.size());
   libmesh_assert_equal_to (next_free_node, _nodes.size());
+
+  this->update_parallel_id_counts();
 
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
@@ -1455,20 +1497,6 @@ dof_id_type SerialMesh::n_active_elem () const
   return static_cast<dof_id_type>(std::distance (this->active_elements_begin(),
                                                  this->active_elements_end()));
 }
-
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-void SerialMesh::assign_unique_ids()
-{
-  for (dof_id_type i=0; i<_elements.size(); ++i)
-    if (_elements[i] && ! _elements[i]->valid_unique_id())
-      _elements[i]->set_unique_id() = _next_unique_id++;
-
-  for (dof_id_type i=0; i<_nodes.size(); ++i)
-    if (_nodes[i] && ! _nodes[i]->valid_unique_id())
-      _nodes[i]->set_unique_id() = _next_unique_id++;
-}
-#endif
 
 
 } // namespace libMesh

@@ -58,8 +58,65 @@ public:
     _datatype = _static_type;
   }
 };
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  typedef
+  std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
+#else
+  typedef
+  Hilbert::HilbertIndices DofObjectKey;
+#endif
+
+
 } // namespace Parallel
+
+
+
+// This has to be in libMesh namespace for Koenig lookup to work
+// g++ doesn't find it if it's in the global namespace.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+inline
+std::ostream&
+operator <<
+  (std::ostream& os,
+   const libMesh::Parallel::DofObjectKey & hilbert_pair)
+{
+  os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;
+  return os;
+}
+#endif
+
+
 } // namespace libMesh
+
+
+// Appropriate operator< definitions for std::pair let the same code handle
+// both DofObjectKey types
+
+inline
+void dofobjectkey_max_op (libMesh::Parallel::DofObjectKey *in,
+                          libMesh::Parallel::DofObjectKey *inout,
+                          int *len, void *)
+{
+  // When (*in <= *inout), then inout already contains max(*in,*inout)
+  // Otherwise we need to copy from in.
+  for (int i=0; i<*len; i++, in++, inout++)
+    if (*inout < *in)
+      *inout = *in;
+}
+
+inline
+void dofobjectkey_min_op (libMesh::Parallel::DofObjectKey *in,
+                          libMesh::Parallel::DofObjectKey *inout,
+                          int *len, void *)
+{
+  // When (*in >= *inout), then inout already contains min(*in,*inout)
+  // Otherwise we need to copy from in.
+  for (int i=0; i<*len; i++, in++, inout++)
+    if (*in < *inout)
+      *inout = *in;
+}
 
 #endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
 

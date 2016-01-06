@@ -262,6 +262,14 @@ public:
   virtual dof_id_type max_elem_id () const = 0;
 
   /**
+   * Returns a number greater than or equal to the maximum unique_id in the
+   * mesh.
+   */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  virtual unique_id_type parallel_max_unique_id () const = 0;
+#endif
+
+  /**
    * Reserves space for a known number of elements.
    * Note that this method may or may not do anything, depending
    * on the actual \p Mesh implementation.  If you know the number
@@ -977,14 +985,6 @@ public:
 
 
 protected:
-
-  /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
-   */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  virtual void assign_unique_ids() = 0;
-#endif
 
   /**
    * Returns a writeable reference to the number of partitions.

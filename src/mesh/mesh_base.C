@@ -30,6 +30,8 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
@@ -176,16 +178,21 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // of dim+1 and set that element as the interior parent
   this->detect_interior_parents();
 
+  // Fix up node unique ids in case mesh generation code didn't take
+  // exceptional care to do so.
+//  MeshCommunication().make_node_unique_ids_parallel_consistent(*this);
+
+  // We're going to still require that mesh generation code gets
+  // element unique ids consistent.
+#if defined(DEBUG) && defined(LIBMESH_ENABLE_UNIQUE_ID)
+  MeshTools::libmesh_assert_valid_unique_ids(*this);
+#endif
+
   // Partition the mesh.
   this->partition();
 
   // If we're using ParallelMesh, we'll want it parallelized.
   this->delete_remote_elements();
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  // Assign DOF object unique ids
-  this->assign_unique_ids();
-#endif
 
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
@@ -196,6 +203,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   // The mesh is now prepared for use.
   _is_prepared = true;
+
+#if defined(DEBUG) && defined(LIBMESH_ENABLE_UNIQUE_ID)
+  MeshTools::libmesh_assert_valid_unique_ids(*this);
+#endif
 }
 
 

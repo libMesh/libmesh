@@ -97,10 +97,14 @@ void UnstructuredMesh::copy_nodes_and_elements
         const Node *oldn = *it;
 
         // Add new nodes in old node Point locations
-        /*Node *newn =*/ this->add_point(*oldn, oldn->id(), oldn->processor_id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+        Node *newn =
+#endif
+          this->add_point(*oldn, oldn->id(), oldn->processor_id());
 
-        // And start them off in the same subdomain
-        //        newn->processor_id() = oldn->processor_id();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+        newn->set_unique_id() = oldn->unique_id();
+#endif
       }
   }
 
@@ -158,8 +162,12 @@ void UnstructuredMesh::copy_nodes_and_elements
         // And start it off in the same subdomain
         el->processor_id() = old->processor_id();
 
-        // Give it the same id
+        // Give it the same ids
         el->set_id(old->id());
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+        el->set_unique_id() = old->unique_id();
+#endif
 
         //Hold onto it
         if(!skip_find_neighbors)
@@ -552,7 +560,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 
 #ifdef DEBUG
-  MeshTools::libmesh_assert_valid_neighbors(*this);
+  MeshTools::libmesh_assert_valid_neighbors(*this,
+                                            !reset_remote_elements);
   MeshTools::libmesh_assert_valid_amr_interior_parents(*this);
 #endif
 
@@ -709,6 +718,9 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       // Copy ids for this element.
       Elem* new_elem = Elem::build(old_elem->type()).release();
       new_elem->set_id() = old_elem->id();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      new_elem->set_unique_id() = old_elem->unique_id();
+#endif
       new_elem->subdomain_id() = old_elem->subdomain_id();
       new_elem->processor_id() = old_elem->processor_id();
 
@@ -724,9 +736,16 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
           // Add this node to the new mesh if it's not there already
           if (!new_mesh.query_node_ptr(node_id))
             {
-              new_mesh.add_point (old_elem->point(n),
-                                  node_id,
-                                  old_elem->get_node(n)->processor_id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+              Node *newn =
+#endif
+                new_mesh.add_point (old_elem->point(n),
+                                    node_id,
+                                    old_elem->get_node(n)->processor_id());
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+              newn->set_unique_id() = old_elem->get_node(n)->unique_id();
+#endif
             }
 
           // Define this element's connectivity on the new mesh

@@ -116,11 +116,14 @@ public:
   virtual dof_id_type max_elem_id () const libmesh_override
   { return cast_int<dof_id_type>(_elements.size()); }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  virtual unique_id_type parallel_max_unique_id () const libmesh_override;
+#endif
+
   virtual void reserve_elem (const dof_id_type ne) libmesh_override
   { _elements.reserve (ne); }
 
-  // SerialMesh has no caches to update
-  virtual void update_parallel_id_counts () libmesh_override {}
+  virtual void update_parallel_id_counts () libmesh_override;
 
   virtual const Point& point (const dof_id_type i) const libmesh_override;
 
@@ -376,14 +379,6 @@ public:
   virtual const_node_iterator bnd_nodes_end () const libmesh_override;
 
 protected:
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
-   */
-  virtual void assign_unique_ids() libmesh_override;
-#endif
 
   /**
    * The verices (spatial coordinates) of the mesh.
