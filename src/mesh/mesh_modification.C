@@ -758,9 +758,12 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
   new_elements.reserve (max_subelems*n_orig_elem);
 
-  // If the original mesh has boundary data, we carry that over
-  // to the new mesh with triangular elements.
-  const bool mesh_has_boundary_data = (mesh.get_boundary_info().n_boundary_ids() > 0);
+  // If the original mesh has *side* boundary data, we carry that over
+  // to the new mesh with triangular elements.  We currently only
+  // support bringing over side-based BCs to the all-tri mesh, but
+  // that could probably be extended to node and edge-based BCs as
+  // well.
+  const bool mesh_has_boundary_data = (mesh.get_boundary_info().n_boundary_conds() > 0);
 
   // Temporary vectors to store the new boundary element pointers, side numbers, and boundary ids
   std::vector<Elem *> new_bndry_elements;
@@ -841,7 +844,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             {
               if (elem->processor_id() != mesh.processor_id())
                 added_new_ghost_point = true;
-              
+
               subelem[0] = new Tri6;
               subelem[1] = new Tri6;
 
@@ -1398,8 +1401,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
 
 
-        // Be sure the correct ID's are also set for subelem[0] and
-        // subelem[1].
+        // Be sure the correct IDs are also set for all subelems.
         for (unsigned int i=0; i != max_subelems; ++i)
           if (subelem[i]) {
             subelem[i]->processor_id() = elem->processor_id();
@@ -1415,9 +1417,11 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
         if (mesh_has_boundary_data || mesh_is_serial)
           {
+            // Container to key boundary IDs handed back by the BoundaryInfo object.
+            std::vector<boundary_id_type> bc_ids;
+
             for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
               {
-                std::vector<boundary_id_type> bc_ids;
                 mesh.get_boundary_info().boundary_ids(*el, sn, bc_ids);
                 for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                   {
@@ -1426,41 +1430,50 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                     if (mesh_is_serial && b_id == BoundaryInfo::invalid_id)
                       continue;
 
+                    // Make a sorted list of node ids for elem->side(sn)
+                    UniquePtr<Elem> elem_side = elem->build_side(sn);
+                    std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
+                    for (unsigned int esn=0; esn<elem_side_nodes.size(); ++esn)
+                      elem_side_nodes[esn] = elem_side->node(esn);
+                    std::sort(elem_side_nodes.begin(), elem_side_nodes.end());
+
                     for (unsigned int i=0; i != max_subelems; ++i)
                       if (subelem[i])
                         {
-                          for (unsigned int subside=0;
-                               subside < subelem[i]->n_sides();
-                               ++subside)
+                          for (unsigned int subside=0; subside < subelem[i]->n_sides(); ++subside)
                             {
-                              bool subside_is_on_sn = true;
-                              for (unsigned int v=0;
-                                   v != subelem[i]->n_vertices();
-                                   ++v)
-                                {
-                                  if (!elem->is_node_on_side
-                                      (elem->get_node_index
-                                       (subelem[i]->get_node(v)), sn))
-                                    subside_is_on_sn = false;
-                                }
+                              UniquePtr<Elem> subside_elem = subelem[i]->build_side(subside);
 
-                              if (subside_is_on_sn)
+                              // Make a list of *vertex* node ids for this subside, see if they are all present
+                              // in elem->side(sn).  Note 1: we can't just compare elem->key(sn) to
+                              // subelem[i]->key(subside) in the Prism cases, since the new side is
+                              // a different type.  Note 2: we only use vertex nodes since, in the future,
+                              // a Hex20 or Prism15's QUAD8 face may be split into two Tri6 faces, and the
+                              // original face will not contain the mid-edge node.
+                              std::vector<dof_id_type> subside_nodes(subside_elem->n_vertices());
+                              for (unsigned int ssn=0; ssn<subside_nodes.size(); ++ssn)
+                                subside_nodes[ssn] = subside_elem->node(ssn);
+                              std::sort(subside_nodes.begin(), subside_nodes.end());
+
+                              // std::includes returns true if every element of the second sorted range is
+                              // contained in the first sorted range.
+                              if (std::includes(elem_side_nodes.begin(), elem_side_nodes.end(),
+                                                subside_nodes.begin(), subside_nodes.end()))
                                 {
                                   if (b_id != BoundaryInfo::invalid_id)
                                     {
-                                      // Add the boundary ID to the list of new boundary ids
                                       new_bndry_ids.push_back(b_id);
                                       new_bndry_elements.push_back(subelem[i]);
                                       new_bndry_sides.push_back(subside);
                                     }
 
+                                  // If the original element had a RemoteElem neighbor on side 'sn',
+                                  // then the subelem has one on side 'subside'.
                                   if (elem->neighbor(sn) == remote_elem)
-                                    subelem[i]->set_neighbor
-                                      (0, const_cast<RemoteElem*>(remote_elem));
+                                    subelem[i]->set_neighbor(subside, const_cast<RemoteElem*>(remote_elem));
                                 }
                             }
                         }
-
                   } // end for loop over boundary IDs
               } // end for loop over sides
 
@@ -1469,14 +1482,10 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
           } // end if (mesh_has_boundary_data)
 
-        // The number of elements in the original mesh before any additions
-        // or deletions.
-        const dof_id_type max_elem_id = mesh.max_elem_id();
-
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         unique_id_type max_unique_id = mesh.parallel_max_unique_id();
 #endif
-        
+
         // Determine new IDs for the split elements which will be
         // the same on all processors, therefore keeping the Mesh
         // in sync.  Note: we offset the new IDs by max_orig_id to
@@ -1488,8 +1497,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               // the same on all processors, therefore keeping the Mesh
               // in sync.  Note: we offset the new IDs by the max of the
               // pre-existing ids to avoid conflicting with originals.
-              subelem[i]->set_id( max_elem_id + 6*elem->id() + i );
-              
+              subelem[i]->set_id( max_orig_id + 6*elem->id() + i );
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
               subelem[i]->set_unique_id() = max_unique_id + 2*elem->unique_id() + i;
 #endif
@@ -1515,15 +1524,17 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
   if (mesh_has_boundary_data)
     {
-      // By this time, we should have removed all of the original boundary sides
-      // - except on a hybrid mesh, where we can't "start from a blank slate"! - RHS
-      // libmesh_assert_equal_to (mesh.get_boundary_info().n_boundary_conds(), 0);
-
-      // Clear the boundary info, to be sure and start from a blank slate.
-      // mesh.get_boundary_info().clear();
-
-      // If the old mesh had boundary data, the new mesh better have some.
-      libmesh_assert_greater (new_bndry_elements.size(), 0);
+      // If the old mesh had boundary data, the new mesh better have
+      // some.  However, we can't assert that the size of
+      // new_bndry_elements vector is > 0, since we may not have split
+      // any elements actually on the boundary.  We also can't assert
+      // that the original number of boundary sides is equal to the
+      // sum of the boundary sides currently in the mesh and the
+      // newly-added boundary sides, since in 3D, we may have split a
+      // boundary QUAD into two boundary TRIs.  Therefore, we won't be
+      // too picky about the actual number of BCs, and just assert that
+      // there are some, somewhere.
+      libmesh_assert(new_bndry_elements.size()>0 || mesh.get_boundary_info().n_boundary_conds()>0);
 
       // We should also be sure that the lengths of the new boundary data vectors
       // are all the same.
