@@ -21,12 +21,10 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/parallel_bin_sorter.h"
-#include "libmesh/parallel_histogram.h"
-#ifdef LIBMESH_HAVE_LIBHILBERT
-#  include "hilbert.h"
-#endif
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_bin_sorter.h"
+#include "libmesh/parallel_hilbert.h"
+#include "libmesh/parallel_histogram.h"
 #include "libmesh/parallel_conversion_utils.h"
 
 namespace libMesh
@@ -126,8 +124,10 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
           // Set the upper bound of the bin
           bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
-          bin_iters[b+1]  = std::lower_bound(bin_iters[b], data.end(),
-                                             Parallel::Utils::to_key_type<KeyType>(bin_bounds[b+1]));
+          bin_iters[b+1] =
+            std::lower_bound(bin_iters[b], data.end(),
+                             Parallel::Utils::Convert<KeyType>::to_key_type
+                               (bin_bounds[b+1]));
         }
 
       // Just be sure the last boundary points to the right place
@@ -145,7 +145,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 template class Parallel::BinSorter<int, unsigned int>;
 template class Parallel::BinSorter<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::BinSorter<Hilbert::HilbertIndices, unsigned int>;
+template class Parallel::BinSorter<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh

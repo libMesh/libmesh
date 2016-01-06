@@ -1299,6 +1299,36 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh)
                              mesh.query_node_ptr(i));
 }
 
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
+{
+  libmesh_parallel_only(mesh.comm());
+
+  dof_id_type pmax_elem_id = mesh.max_elem_id();
+  mesh.comm().max(pmax_elem_id);
+
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
+    {
+      const Elem *elem = mesh.query_elem(i);
+      const unique_id_type unique_id = elem ? elem->unique_id() : 0;
+      const unique_id_type * uid_ptr = elem ? &unique_id : NULL;
+      libmesh_assert(mesh.comm().semiverify(uid_ptr));
+    }
+
+  dof_id_type pmax_node_id = mesh.max_node_id();
+  mesh.comm().max(pmax_node_id);
+
+  for (dof_id_type i=0; i != pmax_node_id; ++i)
+    {
+      const Node *node = mesh.query_node_ptr(i);
+      const unique_id_type unique_id = node ? node->unique_id() : 0;
+      const unique_id_type * uid_ptr = node ? &unique_id : NULL;
+      libmesh_assert(mesh.comm().semiverify(uid_ptr));
+    }
+}
+#endif
+
 template <>
 void libmesh_assert_valid_procids<Elem>(const MeshBase & mesh)
 {
@@ -1545,7 +1575,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 
 
 
-void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh)
+void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
+                                               bool assert_valid_remote_elems)
 {
   const MeshBase::const_element_iterator el_end = mesh.elements_end();
   for (MeshBase::const_element_iterator el = mesh.elements_begin();
@@ -1575,13 +1606,24 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh)
         {
           dof_id_type my_neighbor = DofObject::invalid_id; // NULL
           dof_id_type * p_my_neighbor = NULL;
+
+          // If we have a non-remote_elem neighbor link, then we can
+          // verify it.
           if (elem && elem->neighbor(n) != remote_elem)
             {
               p_my_neighbor = &my_neighbor;
               if (elem->neighbor(n))
                 my_neighbor = elem->neighbor(n)->id();
+
+              // But wait - if we haven't set remote_elem links yet then
+              // some NULL links on ghost elements might be
+              // future-remote_elem links, so we can't verify those.
+              if (!assert_valid_remote_elems &&
+                  !elem->neighbor(n) &&
+                  elem->processor_id() != mesh.processor_id())
+                p_my_neighbor = NULL;
             }
-          mesh.comm().semiverify(p_my_neighbor);
+          libmesh_assert(mesh.comm().semiverify(p_my_neighbor));
         }
     }
 }

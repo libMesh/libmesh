@@ -193,6 +193,10 @@ public:
   virtual dof_id_type parallel_n_elem () const libmesh_override;
   dof_id_type parallel_max_elem_id () const;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  virtual unique_id_type parallel_max_unique_id () const libmesh_override;
+#endif
+
   virtual const Point & point (const dof_id_type i) const libmesh_override;
 
   virtual const Node &  node  (const dof_id_type i) const libmesh_override;
@@ -403,14 +407,6 @@ public:
 protected:
 
   /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
-   */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  virtual void assign_unique_ids() libmesh_override;
-#endif
-
-  /**
    * The verices (spatial coordinates) of the mesh.
    */
   mapvector<Node *, dof_id_type> _nodes;
@@ -438,6 +434,13 @@ protected:
     _next_free_local_elem_id;
   dof_id_type _next_free_unpartitioned_node_id,
     _next_free_unpartitioned_elem_id;
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * The next available unique id for assigning ids to unpartitioned DOF objects
+   */
+  unique_id_type _next_unpartitioned_unique_id;
+#endif
 
   /**
    * These are extra ghost elements that we want to make sure

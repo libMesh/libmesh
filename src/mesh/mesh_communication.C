@@ -937,6 +937,50 @@ struct SyncIds
         (mesh.*renumber)(old_ids[i], new_ids[i]);
   }
 };
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+template <typename DofObjSubclass>
+struct SyncUniqueIds
+{
+  typedef unique_id_type datum;
+  typedef DofObjSubclass* (MeshBase::*query_obj)(const dof_id_type);
+
+  SyncUniqueIds(MeshBase &_mesh, query_obj _querier) :
+    mesh(_mesh),
+    query(_querier) {}
+
+  MeshBase &mesh;
+  query_obj query;
+
+  // Find the id of each requested DofObject -
+  // Parallel::sync_* already did the work for us
+  void gather_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& ids_out)
+  {
+    ids_out.reserve(ids.size());
+
+    for (unsigned int i=0; i != ids.size(); ++i)
+      {
+        DofObjSubclass *d = (mesh.*query)(ids[i]);
+        libmesh_assert(d);
+
+        ids_out.push_back(d->unique_id());
+      }
+  }
+
+  void act_on_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& unique_ids)
+  {
+    for (unsigned int i=0; i != ids.size(); ++i)
+      {
+        DofObjSubclass *d = (mesh.*query)(ids[i]);
+        libmesh_assert(d);
+
+        d->set_unique_id() = unique_ids[i];
+      }
+  }
+};
+#endif // LIBMESH_ENABLE_UNIQUE_ID
 }
 
 
@@ -958,6 +1002,27 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
 
 
 
+void MeshCommunication::make_node_unique_ids_parallel_consistent
+(MeshBase &mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  START_LOG ("make_node_unique_ids_parallel_consistent()", "MeshCommunication");
+
+  SyncUniqueIds<Node> syncuniqueids(mesh, &MeshBase::query_node_ptr);
+  Parallel::sync_dofobject_data_by_id
+    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(),
+     syncuniqueids);
+
+  STOP_LOG ("make_node_unique_ids_parallel_consistent()", "MeshCommunication");
+#endif
+}
+
+
+
+
 // ------------------------------------------------------------
 void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
 {
@@ -970,6 +1035,13 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
   Parallel::sync_element_data_by_parent_id
     (mesh, mesh.active_elements_begin(),
      mesh.active_elements_end(), syncids);
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  SyncUniqueIds<Elem> syncuniqueids(mesh, &MeshBase::query_elem);
+  Parallel::sync_dofobject_data_by_id
+    (mesh.comm(), mesh.active_elements_begin(),
+     mesh.active_elements_end(), syncuniqueids);
+#endif
 
   STOP_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
 }
@@ -1083,6 +1155,9 @@ void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
 
   // Second, sync up dofobject ids.
   this->make_node_ids_parallel_consistent(mesh);
+
+  // Third, sync up dofobject unique_ids if applicable.
+  this->make_node_unique_ids_parallel_consistent(mesh);
 
   // Finally, correct the processor ids to make DofMap happy
   MeshTools::correct_node_proc_ids(mesh);

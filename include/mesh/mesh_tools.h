@@ -409,6 +409,15 @@ void libmesh_assert_connected_nodes (const MeshBase & mesh);
  */
 void libmesh_assert_valid_dof_ids (const MeshBase & mesh);
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+/**
+ * A function for verifying that unique ids match across processors.
+ *
+ * FIXME: we ought to check for uniqueness too.
+ */
+void libmesh_assert_valid_unique_ids (const MeshBase &mesh);
+#endif
+
 /**
  * A function for verifying that processor assignment is
  * self-consistent on nodes (each node part of an active element on
@@ -437,8 +446,13 @@ void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
  * element is a neighbor of or descendant of a neighbor of its neighbors)
  * and consistent (each neighbor link goes to either the same neighbor
  * or to a RemoteElem on each processor)
+ *
+ * If assert_valid_remote_elems is set to false, then no error will be
+ * thrown for neighbor links where a remote_elem should exist but NULL
+ * exists instead.
  */
-void libmesh_assert_valid_neighbors (const MeshBase & mesh);
+void libmesh_assert_valid_neighbors (const MeshBase & mesh,
+                                     bool assert_valid_remote_elems=true);
 #endif
 
 // There is no reason for users to call functions in the MeshTools::Private namespace.

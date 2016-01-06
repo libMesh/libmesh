@@ -118,7 +118,9 @@ public:
   explicit
   StandardType(const std::pair<T1, T2> * example = NULL) {
     // We need an example for MPI_Address to use
-    libmesh_assert(example);
+    static const std::pair<T1, T2> p;
+    if (!example)
+      example = &p;
 
     // _static_type never gets freed, but it only gets committed once
     // per T, so it's not a *huge* memory leak...
@@ -2764,12 +2766,15 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
       return;
     }
 
+  const T* example = sendvec.empty() ?
+                     (recv.empty() ? NULL : &recv[0]) : &sendvec[0];
+
   // Call the user-defined type version with automatic
   // type conversion based on template argument:
   this->send_receive (dest_processor_id, sendvec,
-                      StandardType<T>(sendvec.empty() ? NULL : &sendvec[0]),
+                      StandardType<T>(example),
                       source_processor_id, recv,
-                      StandardType<T>(recv.empty() ? NULL : &recv[0]),
+                      StandardType<T>(example),
                       send_tag, recv_tag);
 }
 

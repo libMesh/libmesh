@@ -71,17 +71,47 @@ double to_double (const KeyType & k)
 }
 
 /**
- * A utility to convert a \p double to some
- * sort of \p KeyType, for interpreting how
- * histogram bounds relate to \p KeyType
- * positions.
+ * A utility to convert a \p double to some sort of \p KeyType, for
+ * interpreting how histogram bounds relate to \p KeyType positions.
+ *
+ * This is a class to allow partial template specialization for the
+ * std::pair case without adding a "dummy" variable.
  */
 template <typename KeyType>
+struct Convert {
+  inline static
+  KeyType to_key_type (const double f)
+  {
+    return static_cast<KeyType>(f);
+  }
+};
+
+/**
+ * A pseudoinverse for converting bounds back to pairs of key types.
+ */
+template <typename FirstKeyType, typename SecondKeyType>
+struct Convert<std::pair<FirstKeyType, SecondKeyType> > {
+  inline static
+  std::pair<FirstKeyType,SecondKeyType> to_key_type (const double f)
+  {
+    return std::make_pair
+      (Convert<FirstKeyType>::to_key_type(f),SecondKeyType());
+  }
+};
+
+
+
+/**
+ * A utility function for pairs of key types.  When finding bounds,
+ * the second entry of the pair is effectively "rounded away".
+ */
+template <typename FirstKeyType, typename SecondKeyType>
 inline
-KeyType to_key_type (const double f)
+double to_double (const std::pair<FirstKeyType,SecondKeyType> &k)
 {
-  return static_cast<KeyType>(f);
+  return to_double(k.first);
 }
+
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
 
@@ -93,18 +123,20 @@ double to_double (const Hilbert::HilbertIndices & bvt)
 }
 
 template <>
-inline
-Hilbert::HilbertIndices
-to_key_type (const double f)
-{
-  Hilbert::HilbertIndices bvt;
+struct Convert<Hilbert::HilbertIndices> {
+  inline static
+  Hilbert::HilbertIndices
+  to_key_type (const double f)
+  {
+    Hilbert::HilbertIndices bvt;
 
-  bvt.rack0 = 0;
-  bvt.rack1 = 0;
-  bvt.rack2 = static_cast<Hilbert::inttype>(f);
+    bvt.rack0 = 0;
+    bvt.rack1 = 0;
+    bvt.rack2 = static_cast<Hilbert::inttype>(f);
 
-  return bvt;
-}
+    return bvt;
+  }
+};
 #endif // LIBMESH_HAVE_LIBHILBERT
 }
 }
