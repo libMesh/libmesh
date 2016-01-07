@@ -89,6 +89,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+
+#EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = \
 @LIBMESH_ENABLE_FPARSER_TRUE@	fparser/autodiff.C
 
@@ -891,7 +893,6 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	parallel/parallel_test.C parallel/parallel_point_test.C \
 	quadrature/quadrature_test.C systems/equation_systems_test.C \
 	systems/systems_test.C utils/vectormap_test.C $(am__append_1)
-EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)

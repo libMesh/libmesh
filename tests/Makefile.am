@@ -43,7 +43,7 @@ unit_tests_sources = \
         systems/systems_test.C \
 	utils/vectormap_test.C
 
-EXTRA_DIST = base/getpot_test_input.in
+#EXTRA_DIST = base/getpot_test_input.in
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
