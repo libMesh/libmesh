@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/fem_system/ex4
 data          = fem_system_ex4.C fem_system_ex4.in heatsystem.C heatsystem.h run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = out_*.e out.gmv
+CLEANFILES = out*.e out.gmv
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
