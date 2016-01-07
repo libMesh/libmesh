@@ -681,7 +681,7 @@ std::pair<Real,Real> LinearElasticityWithContact::update_lambdas()
   {
     dof_id_type upper_node_id = it->first;
 
-    auto new_lambda_it = _lambda_plus_penalty_values.find(upper_node_id);
+    std::map<dof_id_type, Real>::iterator new_lambda_it = _lambda_plus_penalty_values.find(upper_node_id);
     if(new_lambda_it == _lambda_plus_penalty_values.end())
     {
       libmesh_error_msg("New lambda value not found");
@@ -712,7 +712,7 @@ std::pair<Real,Real> LinearElasticityWithContact::get_least_and_max_gap_function
   move_mesh(*mesh_clone, *_sys.solution);
 
   Real least_value = std::numeric_limits<Real>::max();
-  Real max_value = std::numeric_limits<Real>::lowest();
+  Real max_value = std::numeric_limits<Real>::min();
 
   LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it =
     _augment_sparsity._contact_node_map.begin();
