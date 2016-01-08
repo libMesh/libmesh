@@ -672,7 +672,8 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
 
 template<typename T>
 void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & /*rhs*/,
-                                       DenseVector<T> & /*x*/) const
+                                       DenseVector<T> & /*x*/,
+                                       Real /*rcond*/) const
 {
   libmesh_error_msg("svd_solve() requires PETSc >= 3.1!");
 }
@@ -681,9 +682,9 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & /*rhs*/,
 
 #else
 template<typename T>
-void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& rhs,
-                                       DenseVector<T> & x,
-                                       Real rcond) const
+void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
+                                       DenseVector<T> & /*x*/,
+                                       Real /*rcond*/) const
 {
   libmesh_not_implemented();
 }
