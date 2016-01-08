@@ -896,6 +896,13 @@ public:
    */
   unsigned int p_level () const;
 
+  /**
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+                                const unsigned int s) const = 0;
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -931,13 +938,6 @@ public:
    * a->child(c) will be e;
    */
   unsigned int which_child_am_i(const Elem * e) const;
-
-  /**
-   * @returns true iff the specified child is on the
-   * specified side
-   */
-  virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const = 0;
 
   /**
    * @returns true iff the specified child is on the
