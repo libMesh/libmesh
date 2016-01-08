@@ -75,9 +75,14 @@ public:
 } // namespace Parallel
 
 
+} // namespace libMesh
 
-// This has to be in libMesh namespace for Koenig lookup to work
+
+namespace Hilbert {
+
+// This has to be in the Hilbert namespace for Koenig lookup to work?
 // g++ doesn't find it if it's in the global namespace.
+// XCode didn't find it in the libMesh namespace.
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 inline
 std::ostream&
@@ -90,8 +95,7 @@ operator <<
 }
 #endif
 
-
-} // namespace libMesh
+}
 
 
 // Appropriate operator< definitions for std::pair let the same code handle
