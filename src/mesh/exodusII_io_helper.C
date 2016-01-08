@@ -1357,7 +1357,15 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       //Use the first element in this block to get representative information.
       //Note that Exodus assumes all elements in a block are of the same type!
       //We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
+      ElemType elem_type = mesh.elem(tmp_vec[0])->type();
+      if(elem_type == NODEELEM)
+      {
+        // We may include NODEELEMs in the mesh, e.g. to represent isolated
+        // nodes (useful for imposing rotation boundary conditions, for example).
+        // But do not attempt to write out NODEELEMs to the exodus file.
+        continue;
+      }
+      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem_type);
       num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();
 
       ex_err = exII::ex_put_elem_block(ex_id,
