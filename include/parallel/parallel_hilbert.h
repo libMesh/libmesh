@@ -25,7 +25,7 @@
 
 #include "libmesh/libmesh_config.h"
 
-#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
+#if defined(LIBMESH_HAVE_LIBHILBERT)
 
 // Local includes
 #include "hilbert.h"
@@ -36,6 +36,8 @@
 
 namespace libMesh {
 namespace Parallel {
+
+#ifdef LIBMESH_HAVE_MPI
 // A StandardType<> specialization to return a derived MPI datatype
 // to handle communication of HilbertIndices.  We use a singleton
 // pattern here because a global variable would have tried to call
@@ -59,6 +61,7 @@ public:
   }
 };
 
+#endif // LIBMESH_HAVE_MPI
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   typedef
