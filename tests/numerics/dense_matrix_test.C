@@ -8,6 +8,12 @@
 #include <libmesh/dense_matrix.h>
 #include <libmesh/dense_vector.h>
 
+#ifdef LIBMESH_HAVE_PETSC
+#include "libmesh/petsc_macro.h"
+#endif
+
+#ifdef LIBMESH_USE_REAL_NUMBERS
+
 using namespace libMesh;
 
 class DenseMatrixTest : public CppUnit::TestCase
@@ -65,4 +71,11 @@ private:
 
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(DenseMatrixTest);
+// Only run the test if we expect it can actually work!
+#ifdef LIBMESH_HAVE_PETSC
+#if !PETSC_VERSION_LESS_THAN(3,1,0)
+  CPPUNIT_TEST_SUITE_REGISTRATION(DenseMatrixTest);
+#endif
+#endif
+
+#endif // LIBMESH_USE_REAL_NUMBERS
