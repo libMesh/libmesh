@@ -171,7 +171,7 @@ PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
 	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
@@ -194,6 +194,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
+	mesh/unit_tests_dbg-all_tri.$(OBJEXT) \
 	mesh/unit_tests_dbg-boundary_mesh.$(OBJEXT) \
 	mesh/unit_tests_dbg-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_dbg-mixed_dim_mesh_test.$(OBJEXT) \
@@ -232,7 +233,7 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
 	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
@@ -254,6 +255,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
+	mesh/unit_tests_devel-all_tri.$(OBJEXT) \
 	mesh/unit_tests_devel-boundary_mesh.$(OBJEXT) \
 	mesh/unit_tests_devel-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_devel-mixed_dim_mesh_test.$(OBJEXT) \
@@ -290,7 +292,7 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
 	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
@@ -312,6 +314,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
+	mesh/unit_tests_oprof-all_tri.$(OBJEXT) \
 	mesh/unit_tests_oprof-boundary_mesh.$(OBJEXT) \
 	mesh/unit_tests_oprof-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_oprof-mixed_dim_mesh_test.$(OBJEXT) \
@@ -348,7 +351,7 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
 	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
@@ -370,6 +373,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
+	mesh/unit_tests_opt-all_tri.$(OBJEXT) \
 	mesh/unit_tests_opt-boundary_mesh.$(OBJEXT) \
 	mesh/unit_tests_opt-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_opt-mixed_dim_mesh_test.$(OBJEXT) \
@@ -404,7 +408,7 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C base/auto_ptr_test.C \
 	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
@@ -426,6 +430,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-auto_ptr_test.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
+	mesh/unit_tests_prof-all_tri.$(OBJEXT) \
 	mesh/unit_tests_prof-boundary_mesh.$(OBJEXT) \
 	mesh/unit_tests_prof-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_prof-mixed_dim_mesh_test.$(OBJEXT) \
@@ -877,10 +882,10 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	numerics/composite_function_test.C \
+	geom/point_test.C geom/point_test.h mesh/all_tri.C \
+	mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -998,6 +1003,8 @@ mesh/$(am__dirstamp):
 mesh/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) mesh/$(DEPDIR)
 	@: > mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-all_tri.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-boundary_mesh.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1095,6 +1102,8 @@ geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-all_tri.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-boundary_mesh.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1156,6 +1165,8 @@ geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-all_tri.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-boundary_mesh.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1217,6 +1228,8 @@ geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-all_tri.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-boundary_mesh.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1278,6 +1291,8 @@ geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-all_tri.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-boundary_mesh.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1377,26 +1392,31 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po@am__quote@
@@ -1586,6 +1606,20 @@ geom/unit_tests_dbg-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_dbg-point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+mesh/unit_tests_dbg-all_tri.o: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-all_tri.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Tpo -c -o mesh/unit_tests_dbg-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_dbg-all_tri.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+
+mesh/unit_tests_dbg-all_tri.obj: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-all_tri.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Tpo -c -o mesh/unit_tests_dbg-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_dbg-all_tri.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
 
 mesh/unit_tests_dbg-boundary_mesh.o: mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-boundary_mesh.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Tpo -c -o mesh/unit_tests_dbg-boundary_mesh.o `test -f 'mesh/boundary_mesh.C' || echo '$(srcdir)/'`mesh/boundary_mesh.C
@@ -1993,6 +2027,20 @@ geom/unit_tests_devel-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
 
+mesh/unit_tests_devel-all_tri.o: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-all_tri.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-all_tri.Tpo -c -o mesh/unit_tests_devel-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_devel-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_devel-all_tri.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+
+mesh/unit_tests_devel-all_tri.obj: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-all_tri.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-all_tri.Tpo -c -o mesh/unit_tests_devel-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_devel-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_devel-all_tri.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+
 mesh/unit_tests_devel-boundary_mesh.o: mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-boundary_mesh.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Tpo -c -o mesh/unit_tests_devel-boundary_mesh.o `test -f 'mesh/boundary_mesh.C' || echo '$(srcdir)/'`mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Tpo mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po
@@ -2398,6 +2446,20 @@ geom/unit_tests_oprof-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_oprof-point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+mesh/unit_tests_oprof-all_tri.o: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-all_tri.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Tpo -c -o mesh/unit_tests_oprof-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_oprof-all_tri.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+
+mesh/unit_tests_oprof-all_tri.obj: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-all_tri.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Tpo -c -o mesh/unit_tests_oprof-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_oprof-all_tri.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
 
 mesh/unit_tests_oprof-boundary_mesh.o: mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-boundary_mesh.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Tpo -c -o mesh/unit_tests_oprof-boundary_mesh.o `test -f 'mesh/boundary_mesh.C' || echo '$(srcdir)/'`mesh/boundary_mesh.C
@@ -2805,6 +2867,20 @@ geom/unit_tests_opt-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
 
+mesh/unit_tests_opt-all_tri.o: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-all_tri.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-all_tri.Tpo -c -o mesh/unit_tests_opt-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_opt-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_opt-all_tri.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+
+mesh/unit_tests_opt-all_tri.obj: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-all_tri.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-all_tri.Tpo -c -o mesh/unit_tests_opt-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_opt-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_opt-all_tri.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+
 mesh/unit_tests_opt-boundary_mesh.o: mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-boundary_mesh.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Tpo -c -o mesh/unit_tests_opt-boundary_mesh.o `test -f 'mesh/boundary_mesh.C' || echo '$(srcdir)/'`mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Tpo mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po
@@ -3210,6 +3286,20 @@ geom/unit_tests_prof-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_prof-point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+mesh/unit_tests_prof-all_tri.o: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-all_tri.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-all_tri.Tpo -c -o mesh/unit_tests_prof-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_prof-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_prof-all_tri.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-all_tri.o `test -f 'mesh/all_tri.C' || echo '$(srcdir)/'`mesh/all_tri.C
+
+mesh/unit_tests_prof-all_tri.obj: mesh/all_tri.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-all_tri.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-all_tri.Tpo -c -o mesh/unit_tests_prof-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-all_tri.Tpo mesh/$(DEPDIR)/unit_tests_prof-all_tri.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/all_tri.C' object='mesh/unit_tests_prof-all_tri.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-all_tri.obj `if test -f 'mesh/all_tri.C'; then $(CYGPATH_W) 'mesh/all_tri.C'; else $(CYGPATH_W) '$(srcdir)/mesh/all_tri.C'; fi`
 
 mesh/unit_tests_prof-boundary_mesh.o: mesh/boundary_mesh.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-boundary_mesh.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Tpo -c -o mesh/unit_tests_prof-boundary_mesh.o `test -f 'mesh/boundary_mesh.C' || echo '$(srcdir)/'`mesh/boundary_mesh.C
