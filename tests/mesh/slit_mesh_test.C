@@ -18,6 +18,52 @@
 
 using namespace libMesh;
 
+class SlitFunc : public FEMFunctionBase<Number>
+{
+public:
+
+  SlitFunc() {}
+
+  ~SlitFunc () {}
+
+  virtual void init_context (const FEMContext &) {}
+
+  virtual UniquePtr<FEMFunctionBase<Number> >
+  clone () const libmesh_override
+  {
+    return UniquePtr<FEMFunctionBase<Number> > (new SlitFunc());
+  }
+
+  virtual Number operator() (const FEMContext & c,
+                             const Point & p,
+                             const Real /*time*/ = 0.)
+  libmesh_override
+  {
+    const Real & x = p(0);
+    const Real & y = p(1);
+    const Point centroid = c.get_elem().centroid();
+    const Real sign = centroid(1)/std::abs(centroid(1));
+
+    return (1 - std::abs(1-x)) * (1-std::abs(y)) * sign;
+  }
+
+  virtual void operator() (const FEMContext & c,
+                           const Point & p,
+                           const Real time,
+                           DenseVector<Number> & output)
+  libmesh_override
+  {
+    for (unsigned int i=0; i != output.size(); ++i)
+      output(i) = (*this)(c, p, time);
+  }
+};
+
+
+
+
+
+
+
 class SlitMeshTest : public CppUnit::TestCase {
   /**
    * The goal of this test is to ensure that a 2D mesh with nodes overlapping
@@ -64,40 +110,50 @@ protected:
     _mesh->add_point( Point(0.0, 1.0), 3 );
     _mesh->add_point( Point(0.0,-1.0), 4 );
     _mesh->add_point( Point(1.0,-1.0), 5 );
-    _mesh->add_point( Point(0.0, 0.0), 6 );
+    _mesh->add_point( Point(1.0, 0.0), 6 );
     _mesh->add_point( Point(2.0, 0.0), 7 );
     _mesh->add_point( Point(2.0, 1.0), 8 );
     _mesh->add_point( Point(2.0,-1.0), 9 );
 
     {
-      Elem* elem_top_left = _mesh->add_elem( new Quad4 );
+      Elem* elem_top_left = new Quad4;
       elem_top_left->set_node(0) = _mesh->node_ptr(0);
       elem_top_left->set_node(1) = _mesh->node_ptr(1);
       elem_top_left->set_node(2) = _mesh->node_ptr(2);
       elem_top_left->set_node(3) = _mesh->node_ptr(3);
+      elem_top_left->set_id() = 0;
+      _mesh->add_elem(elem_top_left);
 
-      Elem* elem_bottom_left = _mesh->add_elem( new Quad4 );
+      Elem* elem_bottom_left = new Quad4;
       elem_bottom_left->set_node(0) = _mesh->node_ptr(4);
       elem_bottom_left->set_node(1) = _mesh->node_ptr(5);
       elem_bottom_left->set_node(2) = _mesh->node_ptr(6);
       elem_bottom_left->set_node(3) = _mesh->node_ptr(0);
+      elem_bottom_left->set_id() = 1;
+      _mesh->add_elem(elem_bottom_left);
 
-      Elem* elem_top_right = _mesh->add_elem( new Quad4 );
+      Elem* elem_top_right = new Quad4;
       elem_top_right->set_node(0) = _mesh->node_ptr(1);
       elem_top_right->set_node(1) = _mesh->node_ptr(7);
       elem_top_right->set_node(2) = _mesh->node_ptr(8);
       elem_top_right->set_node(3) = _mesh->node_ptr(2);
+      elem_top_right->set_id() = 2;
+      _mesh->add_elem(elem_top_right);
 
-      Elem* elem_bottom_right = _mesh->add_elem( new Quad4 );
+      Elem* elem_bottom_right = new Quad4;
       elem_bottom_right->set_node(0) = _mesh->node_ptr(5);
       elem_bottom_right->set_node(1) = _mesh->node_ptr(9);
       elem_bottom_right->set_node(2) = _mesh->node_ptr(7);
       elem_bottom_right->set_node(3) = _mesh->node_ptr(6);
+      elem_bottom_right->set_id() = 3;
+      _mesh->add_elem(elem_bottom_right);
     }
 
     // libMesh shouldn't renumber, or our based-on-initial-id
     // assertions later may fail.
-    _mesh->prepare_for_use(true /*skip_renumber*/);
+    _mesh->allow_renumbering(false);
+
+    _mesh->prepare_for_use();
   }
 
 public:
@@ -109,7 +165,7 @@ public:
   void tearDown()
   {
     delete _mesh;
-   }
+  }
 
   void testMesh()
   {
@@ -175,5 +231,108 @@ public:
   }
 };
 
+class SlitMeshRefinedSystemTest : public SlitMeshTest {
+  /**
+   * The goal of this test is the same as the previous, but now we
+   * create a system and set dof values to make sure they are properly
+   * interpolated after refinement.
+   */
+public:
+  CPPUNIT_TEST_SUITE( SlitMeshRefinedSystemTest );
+
+  CPPUNIT_TEST( testMesh );
+
+  CPPUNIT_TEST( testSystem );
+
+  CPPUNIT_TEST_SUITE_END();
+
+protected:
+
+  System* _sys;
+  EquationSystems* _es;
+
+public:
+
+  void setUp()
+  {
+    this->build_mesh();
+
+    _es = new EquationSystems(*_mesh);
+    _sys = &_es->add_system<System> ("SimpleSystem");
+    _sys->add_variable("u", FIRST);
+
+    _es->init();
+    SlitFunc slitfunc;
+    _sys->project_solution(&slitfunc);
+
+#ifdef LIBMESH_ENABLE_AMR
+    MeshRefinement(*_mesh).uniformly_refine(1);
+    _es->reinit();
+    MeshRefinement(*_mesh).uniformly_refine(1);
+    _es->reinit();
+#endif
+  }
+
+  void tearDown()
+  {
+    delete _es;
+    // _sys is owned by _es
+    delete _mesh;
+  }
+
+  void testMesh()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    // We should have 84 total and 64 active elements.
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)(4+16+64), _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)64, _mesh->n_active_elem() );
+
+    // We should have 88 nodes
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)88, _mesh->n_nodes() );
+#endif
+  }
+
+  void testSystem()
+  {
+    SlitFunc slitfunc;
+
+    unsigned int dim = 2;
+
+    CPPUNIT_ASSERT_EQUAL( _sys->n_vars(), 1u );
+
+    FEMContext context(*_sys);
+    FEBase * fe = NULL;
+    context.get_element_fe( 0, fe, dim );
+    const std::vector<Point> & xyz = fe->get_xyz();
+    fe->get_phi();
+
+    MeshBase::const_element_iterator       el     =
+      _mesh->active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el =
+      _mesh->active_local_elements_end();
+
+    for (; el != end_el; ++el)
+      {
+        const Elem * elem = *el;
+        context.pre_fe_reinit(*_sys, elem);
+        context.elem_fe_reinit();
+
+        const unsigned int n_qp = xyz.size();
+
+        for (unsigned int qp=0; qp != n_qp; ++qp)
+          {
+            const Number exact_val = slitfunc(context, xyz[qp]);
+
+            const Number discrete_val = context.interior_value(0, qp);
+
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(exact_val),
+                                         libmesh_real(discrete_val),
+                                         TOLERANCE*TOLERANCE);
+          }
+      }
+  }
+};
+
 CPPUNIT_TEST_SUITE_REGISTRATION( SlitMeshTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( SlitMeshRefinedMeshTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( SlitMeshRefinedSystemTest );
