@@ -57,6 +57,9 @@ void init_element_equivalence_map()
 {
   if (element_equivalence_map.empty())
     {
+      // We use an ExodusII SPHERE element to represent a NodeElem
+      element_equivalence_map["SPHERE"] = NODEELEM;
+
       // EDGE2 equivalences
       element_equivalence_map["EDGE2"]  = EDGE2;
       element_equivalence_map["TRUSS"]  = EDGE2;
@@ -143,6 +146,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::ElementMaps static data
+
+// 0D node map definitions
+const int ExodusII_IO_Helper::ElementMaps::nodeelem_node_map[1] = {0};
 
 // 1D node map definitions
 const int ExodusII_IO_Helper::ElementMaps::edge2_node_map[2] = {0, 1};
@@ -1959,6 +1965,20 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 {
   switch (type)
     {
+    case NODEELEM:
+      {
+        const Conversion conv(nodeelem_node_map,
+                              ARRAY_LENGTH(nodeelem_node_map),
+                              nodeelem_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(nodeelem_node_map),
+                              NULL, // NODELEM doesn't have any edges
+                              0,
+                              NULL,
+                              0,
+                              NODEELEM, "SPHERE");
+        return conv;
+      }
+
     case EDGE2:
       {
         const Conversion conv(edge2_node_map,

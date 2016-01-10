@@ -788,6 +788,16 @@ private:
 public:
 
   /**
+   * 0D node maps.  These define mappings from ExodusII-formatted
+   * element numberings.
+   */
+
+  /**
+   * The NodeElem node map.
+   */
+  static const int nodeelem_node_map[1];
+
+  /**
    * 1D node maps.  These define mappings from ExodusII-formatted
    * element numberings.
    */
