@@ -244,6 +244,8 @@ public:
 
   CPPUNIT_TEST( testSystem );
 
+  CPPUNIT_TEST( testRestart );
+
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -256,6 +258,10 @@ public:
   void setUp()
   {
     this->build_mesh();
+
+    // libMesh *should* renumber now, or a ParallelMesh might not have
+    // contiguous ids, which is a requirement to write xda files.
+    _mesh->allow_renumbering(true);
 
     _es = new EquationSystems(*_mesh);
     _sys = &_es->add_system<System> ("SimpleSystem");
@@ -315,6 +321,56 @@ public:
       {
         const Elem * elem = *el;
         context.pre_fe_reinit(*_sys, elem);
+        context.elem_fe_reinit();
+
+        const unsigned int n_qp = xyz.size();
+
+        for (unsigned int qp=0; qp != n_qp; ++qp)
+          {
+            const Number exact_val = slitfunc(context, xyz[qp]);
+
+            const Number discrete_val = context.interior_value(0, qp);
+
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(exact_val),
+                                         libmesh_real(discrete_val),
+                                         TOLERANCE*TOLERANCE);
+          }
+      }
+  }
+
+  void testRestart()
+  {
+    SlitFunc slitfunc;
+
+    _mesh->write("slit_mesh.xda");
+    _es->write("slit_solution.xda");
+
+    Mesh mesh2(*TestCommWorld);
+    mesh2.read("slit_mesh.xda");
+    EquationSystems es2(mesh2);
+    es2.read("slit_solution.xda");
+
+    System & sys2 = es2.get_system<System> ("SimpleSystem");
+
+    unsigned int dim = 2;
+
+    CPPUNIT_ASSERT_EQUAL( sys2.n_vars(), 1u );
+
+    FEMContext context(sys2);
+    FEBase * fe = NULL;
+    context.get_element_fe( 0, fe, dim );
+    const std::vector<Point> & xyz = fe->get_xyz();
+    fe->get_phi();
+
+    MeshBase::const_element_iterator       el     =
+      mesh2.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el =
+      mesh2.active_local_elements_end();
+
+    for (; el != end_el; ++el)
+      {
+        const Elem * elem = *el;
+        context.pre_fe_reinit(sys2, elem);
         context.elem_fe_reinit();
 
         const unsigned int n_qp = xyz.size();
