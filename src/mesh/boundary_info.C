@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_data.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/parallel.h"
@@ -524,6 +525,11 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
             }
         }
     }
+
+  // We haven't been bothering to keep unique ids consistent on ghost
+  // elements
+  if (!boundary_mesh.is_serial())
+    MeshCommunication().make_node_unique_ids_parallel_consistent(boundary_mesh);
 
   // Make sure we didn't add ids inconsistently
 #ifdef DEBUG
