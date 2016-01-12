@@ -1403,7 +1403,8 @@ Real System::discrete_var_norm(const NumericVector<Number> & v,
 
 Real System::calculate_norm(const NumericVector<Number> & v,
                             unsigned int var,
-                            FEMNormType norm_type) const
+                            FEMNormType norm_type,
+                            std::set<unsigned int> * skip_dimensions) const
 {
   //short circuit to save time
   if(norm_type == DISCRETE_L1 ||
@@ -1416,14 +1417,15 @@ Real System::calculate_norm(const NumericVector<Number> & v,
   std::vector<Real> weights(this->n_vars(), 0.0);
   norms[var] = norm_type;
   weights[var] = 1.0;
-  Real val = this->calculate_norm(v, SystemNorm(norms, weights));
+  Real val = this->calculate_norm(v, SystemNorm(norms, weights), skip_dimensions);
   return val;
 }
 
 
 
 Real System::calculate_norm(const NumericVector<Number> & v,
-                            const SystemNorm & norm) const
+                            const SystemNorm & norm,
+                            std::set<unsigned int> * skip_dimensions) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1516,34 +1518,36 @@ Real System::calculate_norm(const NumericVector<Number> & v,
         libmesh_not_implemented();
 
       const FEType & fe_type = this->get_dof_map().variable_type(var);
-      UniquePtr<QBase> qrule =
-        fe_type.default_quadrature_rule (dim);
-      UniquePtr<FEBase> fe
-        (FEBase::build(dim, fe_type));
-      fe->attach_quadrature_rule (qrule.get());
 
-      const std::vector<Real> &               JxW = fe->get_JxW();
-      const std::vector<std::vector<Real> > * phi = NULL;
-      if (norm_type == H1 ||
-          norm_type == H2 ||
-          norm_type == L2 ||
-          norm_type == L1 ||
-          norm_type == L_INF)
-        phi = &(fe->get_phi());
+      // Allow space for dims 0-3, even if we don't use them all
+      std::vector<FEBase *> fe_ptrs(4,NULL);
+      std::vector<QBase *> q_rules(4,NULL);
 
-      const std::vector<std::vector<RealGradient> > * dphi = NULL;
-      if (norm_type == H1 ||
-          norm_type == H2 ||
-          norm_type == H1_SEMINORM ||
-          norm_type == W1_INF_SEMINORM)
-        dphi = &(fe->get_dphi());
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      const std::vector<std::vector<RealTensor> > *   d2phi = NULL;
-      if (norm_type == H2 ||
-          norm_type == H2_SEMINORM ||
-          norm_type == W2_INF_SEMINORM)
-        d2phi = &(fe->get_d2phi());
-#endif
+      const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
+
+      // Prepare finite elements for each dimension present in the mesh
+      for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
+           d_it != elem_dims.end(); ++d_it )
+        {
+          if(skip_dimensions)
+          {
+            if(skip_dimensions->find(*d_it) != skip_dimensions->end())
+            {
+              continue;
+            }
+          }
+
+          q_rules[*d_it] =
+
+            fe_type.default_quadrature_rule (*d_it).release();
+
+          // Construct finite element object
+
+          fe_ptrs[*d_it] = FEBase::build(*d_it, fe_type).release();
+
+          // Attach quadrature rule to FE object
+          fe_ptrs[*d_it]->attach_quadrature_rule (q_rules[*d_it]);
+        }
 
       std::vector<dof_id_type> dof_indices;
 
@@ -1556,6 +1560,43 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       for ( ; el != end_el; ++el)
         {
           const Elem * elem = *el;
+          const unsigned int dim = elem->dim();
+
+          if(skip_dimensions)
+          {
+            if(skip_dimensions->find(dim) != skip_dimensions->end())
+            {
+              continue;
+            }
+          }
+
+          FEBase * fe = fe_ptrs[dim];
+          QBase * qrule = q_rules[dim];
+          libmesh_assert(fe);
+          libmesh_assert(qrule);
+
+          const std::vector<Real> &               JxW = fe->get_JxW();
+          const std::vector<std::vector<Real> > * phi = NULL;
+          if (norm_type == H1 ||
+              norm_type == H2 ||
+              norm_type == L2 ||
+              norm_type == L1 ||
+              norm_type == L_INF)
+            phi = &(fe->get_phi());
+
+          const std::vector<std::vector<RealGradient> > * dphi = NULL;
+          if (norm_type == H1 ||
+              norm_type == H2 ||
+              norm_type == H1_SEMINORM ||
+              norm_type == W1_INF_SEMINORM)
+            dphi = &(fe->get_dphi());
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+          const std::vector<std::vector<RealTensor> > *   d2phi = NULL;
+          if (norm_type == H2 ||
+              norm_type == H2_SEMINORM ||
+              norm_type == W2_INF_SEMINORM)
+            d2phi = &(fe->get_d2phi());
+#endif
 
           fe->reinit (elem);
 

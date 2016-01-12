@@ -1204,14 +1204,16 @@ public:
    */
   Real calculate_norm(const NumericVector<Number> & v,
                       unsigned int var,
-                      FEMNormType norm_type) const;
+                      FEMNormType norm_type,
+                      std::set<unsigned int> * skip_dimensions=NULL) const;
 
   /**
    * @returns a norm of the vector \p v, using \p component_norm and \p
    * component_scale to choose and weight the norms of each variable.
    */
   Real calculate_norm(const NumericVector<Number> & v,
-                      const SystemNorm & norm) const;
+                      const SystemNorm & norm,
+                      std::set<unsigned int> * skip_dimensions=NULL) const;
 
   /**
    * Reads the basic data header for this System.
