@@ -1656,7 +1656,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
           libmesh_here();
           libMesh::err << "WARNING:  inverse_map of physical point "
                        << physical_point
-                       << " is not on element." << '\n';
+                       << "is not on element." << '\n';
           elem->print_info(libMesh::err);
         }
     }
