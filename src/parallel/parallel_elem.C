@@ -167,7 +167,7 @@ unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const ParallelMesh * mesh)
 {
-  return packable_size(elem, static_cast<const MeshBase *>(mesh));
+  return packable_size(elem, static_cast<const MeshBase*>(mesh));
 }
 
 
@@ -248,7 +248,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
-      const Elem * neigh = elem->neighbor(n);
+      const Elem *neigh = elem->neighbor(n);
       if (neigh)
         *data_out++ = (neigh->id());
       else
@@ -410,7 +410,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   // plus the real data header
   libmesh_assert_equal_to (in - original_in, header_size + 1);
 
-  Elem * elem = mesh->query_elem(id);
+  Elem *elem = mesh->query_elem(id);
 
   // if we already have this element, make sure its
   // properties match, and update any missing neighbor
@@ -467,7 +467,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           }
         else
           {
-            Elem * ip = mesh->query_elem(interior_parent_id);
+            Elem *ip = mesh->query_elem(interior_parent_id);
 
             // The sending processor sees an interior parent here, so
             // if we don't have that interior element, then we'd
@@ -494,64 +494,58 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       }
 
       // Our neighbor links should be "close to" correct - we may have
-      // to update a remote_elem link, and we can check for possible
-      // inconsistencies along the way.
-      //
-      // For subactive elements, we don't bother keeping neighbor
-      // links in good shape, so there's nothing we need to set or can
-      // safely assert here.
-      if (!elem->subactive())
-        for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-          {
-            const dof_id_type neighbor_id =
-              cast_int<dof_id_type>(*in++);
+      // to update them, but we can check for some inconsistencies.
+      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+        {
+          const dof_id_type neighbor_id =
+            cast_int<dof_id_type>(*in++);
 
-            // If the sending processor sees a domain boundary here,
-            // we'd better agree.
-            if (neighbor_id == DofObject::invalid_id)
-              {
-                libmesh_assert (!(elem->neighbor(n)));
-                continue;
-              }
+          // If the sending processor sees a domain boundary here,
+          // we'd better agree.
+          if (neighbor_id == DofObject::invalid_id)
+            {
+              libmesh_assert (!(elem->neighbor(n)));
+              continue;
+            }
 
-            // If the sending processor has a remote_elem neighbor here,
-            // then all we know is that we'd better *not* have a domain
-            // boundary.
-            if (neighbor_id == remote_elem->id())
-              {
-                libmesh_assert(elem->neighbor(n));
-                continue;
-              }
+          // If the sending processor has a remote_elem neighbor here,
+          // then all we know is that we'd better *not* have a domain
+          // boundary.
+          if (neighbor_id == remote_elem->id())
+            {
+              libmesh_assert(elem->neighbor(n));
+              continue;
+            }
 
-            Elem * neigh = mesh->query_elem(neighbor_id);
+          Elem *neigh = mesh->query_elem(neighbor_id);
 
-            // The sending processor sees a neighbor here, so if we
-            // don't have that neighboring element, then we'd better
-            // have a remote_elem signifying that fact.
-            if (!neigh)
-              {
-                libmesh_assert_equal_to (elem->neighbor(n), remote_elem);
-                continue;
-              }
+          // The sending processor sees a neighbor here, so if we
+          // don't have that neighboring element, then we'd better
+          // have a remote_elem signifying that fact.
+          if (!neigh)
+            {
+              libmesh_assert_equal_to (elem->neighbor(n), remote_elem);
+              continue;
+            }
 
-            // The sending processor has a neighbor here, and we have
-            // that element, but that does *NOT* mean we're already
-            // linking to it.  Perhaps we initially received both elem
-            // and neigh from processors on which their mutual link was
-            // remote?
-            libmesh_assert(elem->neighbor(n) == neigh ||
-                           elem->neighbor(n) == remote_elem);
+          // The sending processor has a neighbor here, and we have
+          // that element, but that does *NOT* mean we're already
+          // linking to it.  Perhaps we initially received both elem
+          // and neigh from processors on which their mutual link was
+          // remote?
+          libmesh_assert(elem->neighbor(n) == neigh ||
+                         elem->neighbor(n) == remote_elem);
 
-            // If the link was originally remote, we should update it,
-            // and make sure the appropriate parts of its family link
-            // back to us.
-            if (elem->neighbor(n) == remote_elem)
-              {
-                elem->set_neighbor(n, neigh);
+          // If the link was originally remote, we should update it,
+          // and make sure the appropriate parts of its family link
+          // back to us.
+          if (elem->neighbor(n) == remote_elem)
+            {
+              elem->set_neighbor(n, neigh);
 
-                elem->make_links_to_me_local(n);
-              }
-          }
+              elem->make_links_to_me_local(n);
+            }
+        }
 
       // FIXME: We should add some debug mode tests to ensure that the
       // encoded indexing and boundary conditions are consistent.
@@ -604,7 +598,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // elements may overwrite that.
       if (has_children)
         for (unsigned int c=0; c != elem->n_children(); ++c)
-          elem->add_child(const_cast<RemoteElem *>(remote_elem), c);
+          elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
 
 #endif // LIBMESH_ENABLE_AMR
 
@@ -634,16 +628,16 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
         if (interior_parent_id == remote_elem->id())
           {
             elem->set_interior_parent
-              (const_cast<RemoteElem *>(remote_elem));
+              (const_cast<RemoteElem*>(remote_elem));
           }
         else if (interior_parent_id != DofObject::invalid_id)
           {
             // If we don't have the interior parent element, then it's
             // a remote_elem until we get it.
-            Elem * ip = mesh->query_elem(interior_parent_id);
+            Elem *ip = mesh->query_elem(interior_parent_id);
             if (!ip )
               elem->set_interior_parent
-                (const_cast<RemoteElem *>(remote_elem));
+                (const_cast<RemoteElem*>(remote_elem));
             else
               elem->set_interior_parent(ip);
           }
@@ -664,16 +658,16 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           // packed element to give us better information.
           if (neighbor_id == remote_elem->id())
             {
-              elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
+              elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
               continue;
             }
 
           // If we don't have the neighbor element, then it's a
           // remote_elem until we get it.
-          Elem * neigh = mesh->query_elem(neighbor_id);
+          Elem *neigh = mesh->query_elem(neighbor_id);
           if (!neigh)
             {
-              elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
+              elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
               continue;
             }
 

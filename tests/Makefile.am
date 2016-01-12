@@ -44,7 +44,6 @@ unit_tests_sources = \
 	parallel/parallel_point_test.C \
 	quadrature/quadrature_test.C \
         systems/equation_systems_test.C \
-        systems/systems_test.C \
 	utils/vectormap_test.C
 
 #EXTRA_DIST = base/getpot_test_input.in

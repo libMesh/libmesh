@@ -47,7 +47,7 @@ extern "C" {
 
 
 // Hash maps for interior->boundary element lookups
-#include LIBMESH_INCLUDE_UNORDERED_MULTIMAP
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 #include LIBMESH_INCLUDE_HASH
 LIBMESH_DEFINE_HASH_POINTERS
 
@@ -80,7 +80,7 @@ ParmetisPartitioner::~ParmetisPartitioner()
 
 
 
-void ParmetisPartitioner::_do_partition (MeshBase & mesh,
+void ParmetisPartitioner::_do_partition (MeshBase& mesh,
                                          const unsigned int n_sbdmns)
 {
   this->_do_repartition (mesh, n_sbdmns);
@@ -88,7 +88,7 @@ void ParmetisPartitioner::_do_partition (MeshBase & mesh,
 
 
 
-void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
+void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
                                            const unsigned int n_sbdmns)
 {
   libmesh_assert_greater (n_sbdmns, 0);
@@ -202,7 +202,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 // Only need to compile these methods if ParMETIS is present
 #ifdef LIBMESH_HAVE_PARMETIS
 
-void ParmetisPartitioner::initialize (const MeshBase & mesh,
+void ParmetisPartitioner::initialize (const MeshBase& mesh,
                                       const unsigned int n_sbdmns)
 {
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
@@ -294,7 +294,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
         for (dof_id_type cnt=0; it != end; ++it)
           {
-            const Elem * elem = *it;
+            const Elem *elem = *it;
             libmesh_assert (!_global_index_by_pid_map.count(elem->id()));
             libmesh_assert_less (cnt, global_index.size());
             libmesh_assert_less (global_index[cnt], _n_active_elem_on_proc[pid]);
@@ -318,7 +318,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
       for (dof_id_type cnt=0; it != end; ++it)
         {
-          const Elem * elem = *it;
+          const Elem *elem = *it;
           libmesh_assert (!global_index_map.count(elem->id()));
           libmesh_assert_less (cnt, global_index.size());
           libmesh_assert_less (global_index[cnt], n_active_elem);
@@ -372,7 +372,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
     for (; elem_it != elem_end; ++elem_it)
       {
-        const Elem * elem = *elem_it;
+        const Elem *elem = *elem_it;
 
         libmesh_assert (_global_index_by_pid_map.count(elem->id()));
         const dof_id_type global_index_by_pid =
@@ -410,7 +410,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
 
 
-void ParmetisPartitioner::build_graph (const MeshBase & mesh)
+void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 {
   // build the graph in distributed CSR format.  Note that
   // the edges in the graph will correspond to
@@ -422,7 +422,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   // interior elements from boundary elements, but we need to build up
   // a lookup map to do the reverse.
 
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<const Elem *, const Elem *>
+  typedef LIBMESH_BEST_UNORDERED_MAP<const Elem *, const Elem *>
     map_type;
   map_type interior_to_boundary_map;
 
@@ -432,7 +432,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
     for (; elem_it != elem_end; ++elem_it)
       {
-        const Elem * elem = *elem_it;
+        const Elem* elem = *elem_it;
 
         // If we don't have an interior_parent then there's nothing to look us
         // up.
@@ -441,20 +441,17 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
           continue;
 
         // get all relevant interior elements
-        std::set<const Elem *> neighbor_set;
+        std::set<const Elem*> neighbor_set;
         elem->find_interior_neighbors(neighbor_set);
 
-        std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+        std::set<const Elem*>::iterator n_it = neighbor_set.begin();
         for (; n_it != neighbor_set.end(); ++n_it)
           {
             // FIXME - non-const versions of the Elem set methods
             // would be nice
-            Elem * neighbor = const_cast<Elem *>(*n_it);
+            Elem* neighbor = const_cast<Elem*>(*n_it);
 
-#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) || \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) ||    \
-  defined(LIBMESH_HAVE_HASH_MAP) ||             \
-  defined(LIBMESH_HAVE_EXT_HASH_MAP)
+#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
             interior_to_boundary_map.insert
               (std::make_pair(neighbor, elem));
 #else
@@ -467,7 +464,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   }
 
 #ifdef LIBMESH_ENABLE_AMR
-  std::vector<const Elem *> neighbors_offspring;
+  std::vector<const Elem*> neighbors_offspring;
 #endif
 
   std::vector<std::vector<dof_id_type> > graph(n_active_local_elem);
@@ -480,7 +477,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      const Elem * elem = *elem_it;
+      const Elem* elem = *elem_it;
 
       libmesh_assert (_global_index_by_pid_map.count(elem->id()));
       const dof_id_type global_index_by_pid =
@@ -490,13 +487,13 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
         global_index_by_pid - first_local_elem;
       libmesh_assert_less (local_index, n_active_local_elem);
 
-      std::vector<dof_id_type> & graph_row = graph[local_index];
+      std::vector<dof_id_type> &graph_row = graph[local_index];
 
       // Loop over the element's neighbors.  An element
       // adjacency corresponds to a face neighbor
       for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
         {
-          const Elem * neighbor = elem->neighbor(ms);
+          const Elem* neighbor = elem->neighbor(ms);
 
           if (neighbor != libmesh_nullptr)
             {
@@ -543,7 +540,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
                   // to us
                   for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
                     {
-                      const Elem * child =
+                      const Elem* child =
                         neighbors_offspring[nc];
 
                       // This does not assume a level-1 mesh.
@@ -572,15 +569,15 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
           elem->interior_parent())
         {
           // get all relevant interior elements
-          std::set<const Elem *> neighbor_set;
+          std::set<const Elem*> neighbor_set;
           elem->find_interior_neighbors(neighbor_set);
 
-          std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+          std::set<const Elem*>::iterator n_it = neighbor_set.begin();
           for (; n_it != neighbor_set.end(); ++n_it)
             {
               // FIXME - non-const versions of the Elem set methods
               // would be nice
-              Elem * neighbor = const_cast<Elem *>(*n_it);
+              Elem* neighbor = const_cast<Elem*>(*n_it);
 
               const dof_id_type neighbor_global_index_by_pid =
                 _global_index_by_pid_map[neighbor->id()];
@@ -597,7 +594,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
       for (map_it_type it = bounds.first; it != bounds.second; ++it)
         {
-          const Elem * neighbor = it->second;
+          const Elem* neighbor = it->second;
 
           const dof_id_type neighbor_global_index_by_pid =
             _global_index_by_pid_map[neighbor->id()];
@@ -632,7 +629,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
 
 
-void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
+void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -649,7 +646,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem * elem = *elem_it;
+      Elem *elem = *elem_it;
 
       // we need to get the index from the owning processor
       // (note we cannot assign it now -- we are iterating
@@ -709,7 +706,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
   for (std::vector<unsigned int> counters(mesh.n_processors(), 0);
        elem_it != elem_end; ++elem_it)
     {
-      Elem * elem = *elem_it;
+      Elem *elem = *elem_it;
 
       const processor_id_type current_pid = elem->processor_id();
 
