@@ -1557,6 +1557,13 @@ Real System::calculate_norm(const NumericVector<Number> & v,
         {
           const Elem * elem = *el;
 
+          if(elem->dim() < dim)
+          {
+            // Skip lower-dimensional elements since they do
+            // not contribute to the norm
+            continue;
+          }
+
           fe->reinit (elem);
 
           this->get_dof_map().dof_indices (elem, dof_indices, var);
