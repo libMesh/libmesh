@@ -96,6 +96,7 @@ extern "C" {
 #else // !USE_LIBMESH
 
 // Currently threaded GetPot use is only supported via libMesh Threads
+#define GETPOT_DISABLE_MUTEX
 #define SCOPED_MUTEX
 #define GETPOT_MUTEX_DECLARE
 
