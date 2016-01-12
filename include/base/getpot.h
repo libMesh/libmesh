@@ -880,7 +880,7 @@ GetPot::parse_input_file(const std::string& FileName,
   std::ifstream input(FileName.c_str());
 
   if (!input)
-    libmesh_file_error(FileName);
+    getpot_file_error(FileName);
 
   this->parse_input_stream(input,FileName,CommentStart,CommentEnd,FieldSeparator);
 }
