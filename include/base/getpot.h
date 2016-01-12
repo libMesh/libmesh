@@ -68,8 +68,10 @@ extern "C" {
 #if !defined(GETPOT_DISABLE_MUTEX)
 #include "libmesh/threads.h"
 #define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
+#define GETPOT_MUTEX_DECLARE mutable libMesh::Threads::spin_mutex _getpot_mtx
 #else
 #define SCOPED_MUTEX
+#define GETPOT_MUTEX_DECLARE
 #endif
 
 #define getpot_cerr libMesh::err
@@ -80,7 +82,9 @@ extern "C" {
 #else // USE_LIBMESH
 
 // Currently threaded GetPot use is only supported via libMesh Threads
+#define GETPOT_DISABLE_MUTEX
 #define SCOPED_MUTEX
+#define GETPOT_MUTEX_DECLARE
 
 #define getpot_cerr std::cerr
 #define getpot_error() throw std::runtime_error(std::string("GetPot Error"))
@@ -499,9 +503,7 @@ private:
    * multiple threads at once, so we'll wrap access to
    * mutable objects in a mutex.
    */
-#if !defined(GETPOT_DISABLE_MUTEX)
-  mutable libMesh::Threads::spin_mutex _getpot_mtx;
-#endif
+  GETPOT_MUTEX_DECLARE;
 
   /**
    * some functions return a char pointer to a string created on the fly.
