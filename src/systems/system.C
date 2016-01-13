@@ -1475,8 +1475,6 @@ Real System::calculate_norm(const NumericVector<Number> & v,
   local_v->init(v.size(), true, SERIAL);
   v.localize (*local_v, _dof_map->get_send_list());
 
-  unsigned int dim = this->get_mesh().mesh_dimension();
-
   // I'm not sure how best to mix Hilbert norms on some variables (for
   // which we'll want to square then sum then square root) with norms
   // like L_inf (for which we'll just want to take an absolute value
