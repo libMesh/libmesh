@@ -172,11 +172,36 @@ public:
   { return _elem_dims; }
 
   /**
-   * Returns the spatial dimension of the mesh.  Note that this is
-   * defined at compile time in the header \p libmesh_common.h.
+   * Returns the "spatial dimension" of the mesh.  The spatial
+   * dimension is defined as:
+   *
+   *   1 - for an exactly x-aligned mesh of 1D elements
+   *   2 - for an exactly x-y planar mesh of 2D elements
+   *   3 - otherwise
+   *
+   * No tolerance checks are performed to determine whether the Mesh
+   * is x-aligned or x-y planar, only strict equality with zero in the
+   * higher dimensions is checked.  Also, x-z and y-z planar meshes are
+   * considered to have spatial dimension == 3.
+   *
+   * The spatial dimension is updated during prepare_for_use() based
+   * on the dimensions of the various elements present in the Mesh,
+   * but is *never automatically decreased* by this function.
+   *
+   * For example, if the user calls set_spatial_dimension(2) and then
+   * later inserts 3D elements into the mesh,
+   * Mesh::spatial_dimension() will return 3 after the next call to
+   * prepare_for_use().  On the other hand, if the user calls
+   * set_spatial_dimension(3) and then inserts only x-aligned 1D
+   * elements into the Mesh, mesh.spatial_dimension() will remain 3.
    */
-  unsigned int spatial_dimension () const
-  { return cast_int<unsigned int>(LIBMESH_DIM); }
+  unsigned int spatial_dimension () const;
+
+  /**
+   * Sets the "spatial dimension" of the Mesh.  See the documentation
+   * for Mesh::spatial_dimension() for more information.
+   */
+  void set_spatial_dimension(unsigned char d);
 
   /**
    * Returns the number of nodes in the mesh. This function and others must
@@ -1057,6 +1082,12 @@ protected:
    * will contain 1 and 2.
    */
   std::set<unsigned char> _elem_dims;
+
+  /**
+   * The "spatial dimension" of the Mesh.  See the documentation for
+   * Mesh::spatial_dimension() for more information.
+   */
+  unsigned char _spatial_dimension;
 
   /**
    * The partitioner class is a friend so that it can set
