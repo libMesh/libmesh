@@ -232,10 +232,7 @@ void EquationSystems::reinit ()
 
   // FIXME: Where should the user set maintain_level_one now??
   // Don't override previous settings, for now
-
   MeshRefinement mesh_refine(_mesh);
-
-  mesh_refine.face_level_mismatch_limit() = false;
 
   // Try to coarsen the mesh, then restrict each system's vectors
   // if necessary
