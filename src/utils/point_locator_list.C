@@ -40,11 +40,11 @@ PointLocatorList::PointLocatorList (const MeshBase & mesh,
   PointLocatorBase (mesh,master),
   _list            (NULL)
 {
-  // This code will only work if your mesh is the Voroni mesh of it's
+  // This code will only work if your mesh is the Voronoi mesh of its
   // own elements' centroids.  If your mesh is that regular you might
   // as well hand-code an O(1) algorithm for locating points within
   // it. - RHS
-  libmesh_experimental();
+  libmesh_deprecated();
 
   this->init();
 }
