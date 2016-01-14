@@ -521,34 +521,33 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	cell_prism6.h cell_pyramid.h cell_pyramid13.h cell_pyramid14.h \
 	cell_pyramid5.h cell_tet.h cell_tet10.h cell_tet4.h edge.h \
 	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
-	elem_cutter.h elem_hash.h elem_quality.h elem_range.h \
-	elem_type.h face.h face_inf_quad.h face_inf_quad4.h \
-	face_inf_quad6.h face_quad.h face_quad4.h face_quad8.h \
-	face_quad9.h face_tri.h face_tri3.h face_tri3_subdivision.h \
-	face_tri6.h node.h node_elem.h node_range.h plane.h point.h \
-	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
-	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
-	checkpoint_io.h diva_io.h ensight_io.h exodusII_io.h \
-	exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h \
-	inf_elem_builder.h legacy_xdr_io.h matlab_io.h medit_io.h \
-	mesh.h mesh_base.h mesh_communication.h mesh_data.h \
-	mesh_function.h mesh_generation.h mesh_input.h \
-	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
-	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
-	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
-	mesh_subdivision_support.h mesh_tetgen_interface.h \
-	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
-	mesh_triangle_interface.h mesh_triangle_wrapper.h \
-	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
-	parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
-	tecplot_io.h tetgen_io.h ucd_io.h unstructured_mesh.h unv_io.h \
-	vtk_io.h xdr_head.h xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h \
-	xdr_shead.h xdr_soln.h analytic_function.h \
-	composite_fem_function.h composite_function.h \
-	const_fem_function.h const_function.h coupling_matrix.h \
-	dense_matrix.h dense_matrix_base.h dense_submatrix.h \
-	dense_subvector.h dense_vector.h dense_vector_base.h \
-	distributed_vector.h eigen_core_support.h \
+	elem_cutter.h elem_hash.h elem_quality.h elem_range.h face.h \
+	face_inf_quad.h face_inf_quad4.h face_inf_quad6.h face_quad.h \
+	face_quad4.h face_quad8.h face_quad9.h face_tri.h face_tri3.h \
+	face_tri3_subdivision.h face_tri6.h node.h node_elem.h \
+	node_range.h plane.h point.h reference_elem.h remote_elem.h \
+	side.h sphere.h stored_range.h surface.h abaqus_io.h \
+	boundary_info.h boundary_mesh.h checkpoint_io.h diva_io.h \
+	ensight_io.h exodusII_io.h exodusII_io_helper.h fro_io.h \
+	gmsh_io.h gmv_io.h gnuplot_io.h inf_elem_builder.h \
+	legacy_xdr_io.h matlab_io.h medit_io.h mesh.h mesh_base.h \
+	mesh_communication.h mesh_data.h mesh_function.h \
+	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
+	mesh_modification.h mesh_output.h mesh_refinement.h \
+	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
+	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
+	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
+	mesh_triangle_holes.h mesh_triangle_interface.h \
+	mesh_triangle_wrapper.h namebased_io.h nemesis_io.h \
+	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
+	postscript_io.h serial_mesh.h tecplot_io.h tetgen_io.h \
+	ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h xdr_head.h \
+	xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h xdr_shead.h \
+	xdr_soln.h analytic_function.h composite_fem_function.h \
+	composite_function.h const_fem_function.h const_function.h \
+	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
+	dense_submatrix.h dense_subvector.h dense_vector.h \
+	dense_vector_base.h distributed_vector.h eigen_core_support.h \
 	eigen_preconditioner.h eigen_sparse_matrix.h \
 	eigen_sparse_vector.h fem_function_base.h function_base.h \
 	laspack_matrix.h laspack_vector.h numeric_vector.h \
@@ -575,28 +574,28 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	quadrature_clough.h quadrature_composite.h \
 	quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
-	quadrature_jacobi.h quadrature_monomial.h quadrature_rules.h \
-	quadrature_simpson.h quadrature_trap.h rb_assembly_expansion.h \
-	rb_construction.h rb_construction_base.h \
-	rb_data_deserialization.h rb_data_serialization.h \
-	rb_eim_assembly.h rb_eim_construction.h rb_eim_evaluation.h \
-	rb_eim_theta.h rb_evaluation.h rb_parameters.h \
-	rb_parametrized.h rb_parametrized_function.h \
-	rb_scm_construction.h rb_scm_evaluation.h \
-	rb_temporal_discretization.h rb_theta.h rb_theta_expansion.h \
-	transient_rb_assembly_expansion.h transient_rb_construction.h \
-	transient_rb_evaluation.h transient_rb_theta_expansion.h \
-	direct_solution_transfer.h dtk_adapter.h dtk_evaluator.h \
-	dtk_solution_transfer.h meshfree_interpolation.h \
-	meshfree_solution_transfer.h meshfunction_solution_transfer.h \
-	radial_basis_functions.h radial_basis_interpolation.h \
-	solution_transfer.h adaptive_time_solver.h diff_solver.h \
-	eigen_solver.h eigen_sparse_linear_solver.h \
-	eigen_time_solver.h euler2_solver.h euler_solver.h \
-	first_order_unsteady_solver.h laspack_linear_solver.h \
-	linear_solver.h memory_solution_history.h newmark_solver.h \
-	newton_solver.h nlopt_optimization_solver.h \
-	no_solution_history.h nonlinear_solver.h optimization_solver.h \
+	quadrature_jacobi.h quadrature_monomial.h quadrature_simpson.h \
+	quadrature_trap.h rb_assembly_expansion.h rb_construction.h \
+	rb_construction_base.h rb_data_deserialization.h \
+	rb_data_serialization.h rb_eim_assembly.h \
+	rb_eim_construction.h rb_eim_evaluation.h rb_eim_theta.h \
+	rb_evaluation.h rb_parameters.h rb_parametrized.h \
+	rb_parametrized_function.h rb_scm_construction.h \
+	rb_scm_evaluation.h rb_temporal_discretization.h rb_theta.h \
+	rb_theta_expansion.h transient_rb_assembly_expansion.h \
+	transient_rb_construction.h transient_rb_evaluation.h \
+	transient_rb_theta_expansion.h direct_solution_transfer.h \
+	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
+	meshfree_interpolation.h meshfree_solution_transfer.h \
+	meshfunction_solution_transfer.h radial_basis_functions.h \
+	radial_basis_interpolation.h solution_transfer.h \
+	adaptive_time_solver.h diff_solver.h eigen_solver.h \
+	eigen_sparse_linear_solver.h eigen_time_solver.h \
+	euler2_solver.h euler_solver.h first_order_unsteady_solver.h \
+	laspack_linear_solver.h linear_solver.h \
+	memory_solution_history.h newmark_solver.h newton_solver.h \
+	nlopt_optimization_solver.h no_solution_history.h \
+	nonlinear_solver.h optimization_solver.h \
 	petsc_auto_fieldsplit.h petsc_diff_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h second_order_unsteady_solver.h \
@@ -1206,9 +1205,6 @@ elem_quality.h: $(top_srcdir)/include/geom/elem_quality.h
 elem_range.h: $(top_srcdir)/include/geom/elem_range.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-elem_type.h: $(top_srcdir)/include/geom/elem_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 face.h: $(top_srcdir)/include/geom/face.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1717,9 +1713,6 @@ quadrature_jacobi.h: $(top_srcdir)/include/quadrature/quadrature_jacobi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_monomial.h: $(top_srcdir)/include/quadrature/quadrature_monomial.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-quadrature_rules.h: $(top_srcdir)/include/quadrature/quadrature_rules.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_simpson.h: $(top_srcdir)/include/quadrature/quadrature_simpson.h

@@ -696,7 +696,6 @@ include_HEADERS = \
         geom/elem_hash.h \
         geom/elem_quality.h \
         geom/elem_range.h \
-        geom/elem_type.h \
         geom/face.h \
         geom/face_inf_quad.h \
         geom/face_inf_quad4.h \
@@ -861,7 +860,6 @@ include_HEADERS = \
         quadrature/quadrature_grid.h \
         quadrature/quadrature_jacobi.h \
         quadrature/quadrature_monomial.h \
-        quadrature/quadrature_rules.h \
         quadrature/quadrature_simpson.h \
         quadrature/quadrature_trap.h \
         reduced_basis/rb_assembly_expansion.h \
