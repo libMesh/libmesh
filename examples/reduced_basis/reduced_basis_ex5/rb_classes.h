@@ -1,5 +1,5 @@
-#ifndef __rb_classes_h__
-#define __rb_classes_h__
+#ifndef RB_CLASSES_H
+#define RB_CLASSES_H
 
 // local includes
 #include "assembly.h"
