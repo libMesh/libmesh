@@ -1,6 +1,6 @@
 
 #ifndef FEMPARAMETERS_H
-#Define FEMPARAMETERS_H
+#define FEMPARAMETERS_H
 
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dof_map.h"
