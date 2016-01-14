@@ -586,6 +586,13 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Flag indicating whether or not PETSc was configured with MUMPS support */
+#undef PETSC_HAVE_MUMPS
+
+/* Flag indicating whether or not PETSc was configured with SuperLU_dist
+   support */
+#undef PETSC_HAVE_SUPERLU_DIST
+
 /* Flag indicating whether or not PETSc was configured with debugging enabled
    */
 #undef PETSC_USE_DEBUG

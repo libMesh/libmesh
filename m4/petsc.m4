@@ -76,6 +76,12 @@ AC_DEFUN([CONFIGURE_PETSC],
       # We look for petscconf.h in both $PETSC_DIR/include and
       # $PETSC_DIR/$PETSC_ARCH/include, since it can appear in either.
       petsc_use_debug=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_DEBUG`
+      petsc_have_superlu_dist=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_SUPERLU_DIST`
+      petsc_have_mumps=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_MUMPS`
+
+      # We have had a slightly different way of checking for Hypre for
+      # quite some time, see below.
+      # petsc_have_hypre=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_HYPRE`
 
     else # petscversion.h was not readable
         enablepetsc=no
@@ -328,6 +334,23 @@ AC_DEFUN([CONFIGURE_PETSC],
     if (test $petsc_use_debug -gt 0) ; then
       AC_DEFINE(PETSC_USE_DEBUG, 1, [Flag indicating whether or not PETSc was configured with debugging enabled])
     fi
+
+    # Set a #define if PETSc was built with SuperLU_dist support
+    if (test $petsc_have_superlu_dist -gt 0) ; then
+      AC_DEFINE(PETSC_HAVE_SUPERLU_DIST, 1, [Flag indicating whether or not PETSc was configured with SuperLU_dist support])
+    fi
+
+    # Set a #define if PETSc was built with MUMPS support
+    if (test $petsc_have_mumps -gt 0) ; then
+      AC_DEFINE(PETSC_HAVE_MUMPS, 1, [Flag indicating whether or not PETSc was configured with MUMPS support])
+    fi
+
+    # Set a #define if PETSc was built with Hypre support.  We have
+    # been using the slightly different "LIBMESH_HAVE_PETSC_HYPRE" for
+    # quite a while, I may update this in a future branch.
+    # if (test $petsc_have_hypre -gt 0) ; then
+    #   AC_DEFINE(PETSC_HAVE_HYPRE, 1, [Flag indicating whether or not PETSc was configured with Hypre support])
+    # fi
 
     AC_SUBST(PETSC_ARCH) # Note: may be empty...
     AC_SUBST(PETSC_DIR)
