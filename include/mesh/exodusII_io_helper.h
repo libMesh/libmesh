@@ -25,7 +25,7 @@
 // Local includes
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
-#include "libmesh/elem_type.h"
+#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <iostream>

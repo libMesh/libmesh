@@ -96,7 +96,7 @@ public:
   void set_n_blocks(const unsigned int nb) { this->_n_blocks = nb; }
 
   /**
-   * Element block types are defined in elem_type.h.
+   * Element block types are defined in enum_elem_type.h.
    * They may be for example TRI3, TRI6, QUAD4, etc.
    *
    * @return A writeable reference to the vector of element block types.
@@ -144,7 +144,7 @@ private:
    * Note: The element type uniquely
    * defines the number of nodes for
    * that element.
-   * @see elem_type.h for more
+   * @see enum_elem_type.h for more
    */
   std::vector<ElemType> block_elt_types;
 
