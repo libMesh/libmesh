@@ -267,8 +267,7 @@ public:
     if (!libMesh::warned_about_auto_ptr)
       {
         libMesh::warned_about_auto_ptr = true;
-        libMesh::out << "*** Warning, AutoPtr is deprecated and will be removed in a future library version! "
-                     << __FILE__ << ", line " << __LINE__ << ", compiled " << LIBMESH_DATE << " at " << LIBMESH_TIME << " ***" << std::endl;
+        libmesh_deprecated();
       }
     delete _ptr;
   }
