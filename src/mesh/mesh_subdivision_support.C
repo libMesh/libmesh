@@ -106,6 +106,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
 
       Elem * tri = new Tri3Subdivision;
       tri->set_id(elem->id());
+      tri->subdomain_id() = elem->subdomain_id();
       tri->set_node(0) = (*el)->get_node(0);
       tri->set_node(1) = (*el)->get_node(1);
       tri->set_node(2) = (*el)->get_node(2);
