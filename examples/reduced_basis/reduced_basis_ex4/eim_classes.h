@@ -1,5 +1,5 @@
-#ifndef __eim_classes_h__
-#define __eim_classes_h__
+#ifndef EIM_CLASSES_H
+#define EIM_CLASSES_H
 
 // local includes
 #include "libmesh/rb_eim_construction.h"

@@ -20,8 +20,8 @@
 
 using namespace libMesh;
 
-#ifndef __solution_function_h__
-#define __solution_function_h__
+#ifndef SOLUTION_FUNCTION_H
+#define SOLUTION_FUNCTION_H
 
 class SolutionFunction : public FunctionBase<Number>
 {
@@ -100,4 +100,4 @@ private:
   CurlCurlExactSolution soln;
 };
 
-#endif // __solution_function_h__
+#endif // SOLUTION_FUNCTION_H

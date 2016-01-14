@@ -1,5 +1,5 @@
-#ifndef __assembly_h__
-#define __assembly_h__
+#ifndef ASSEMBLY_H
+#define ASSEMBLY_H
 
 #if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_GLPK)
 

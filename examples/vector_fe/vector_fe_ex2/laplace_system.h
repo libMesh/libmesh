@@ -25,8 +25,8 @@
 
 using namespace libMesh;
 
-#ifndef __laplace_system_h__
-#define __laplace_system_h__
+#ifndef LAPLACE_SYSTEM_H
+#define LAPLACE_SYSTEM_H
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
@@ -69,4 +69,4 @@ protected:
   LaplaceExactSolution exact_solution;
 };
 
-#endif //__laplace_system_h__
+#endif // LAPLACE_SYSTEM_H

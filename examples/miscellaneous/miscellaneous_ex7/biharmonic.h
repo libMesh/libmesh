@@ -1,5 +1,5 @@
-#ifndef __biharmonic_h__
-#define __biharmonic_h__
+#ifndef BIHARMONIC_H
+#define BIHARMONIC_H
 
 #include "libmesh/equation_systems.h"
 #include "libmesh/serial_mesh.h"
@@ -125,4 +125,4 @@ private:
 
 
 
-#endif // __biharmonic_h__
+#endif // BIHARMONIC_H

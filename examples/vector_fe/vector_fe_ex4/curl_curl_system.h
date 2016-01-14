@@ -25,8 +25,8 @@
 
 using namespace libMesh;
 
-#ifndef __curl_curl_system_h__
-#define __curl_curl_system_h__
+#ifndef CURL_CURL_SYSTEM_H
+#define CURL_CURL_SYSTEM_H
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
@@ -70,4 +70,4 @@ protected:
 
 };
 
-#endif //__curl_curl_system_h__
+#endif // CURL_CURL_SYSTEM_H

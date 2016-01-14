@@ -1,5 +1,5 @@
-#ifndef __biharmonic_jr_h__
-#define __biharmonic_jr_h__
+#ifndef BIHARMONIC_JR_H
+#define BIHARMONIC_JR_H
 
 // LibMesh includes
 #include "libmesh/transient_system.h"
@@ -68,4 +68,4 @@ private:
 };
 
 
-#endif // __biharmonic_jr_h__
+#endif // BIHARMONIC_JR_H

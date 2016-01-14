@@ -19,8 +19,8 @@
 
 using namespace libMesh;
 
-#ifndef __laplace_exact_solution_h__
-#define __laplace_exact_solution_h__
+#ifndef LAPLACE_EXACT_SOLUTION_H
+#define LAPLACE_EXACT_SOLUTION_H
 
 class LaplaceExactSolution
 {
@@ -87,4 +87,4 @@ public:
   }
 };
 
-#endif // __laplace_exact_solution_h__
+#endif // LAPLACE_EXACT_SOLUTION_H

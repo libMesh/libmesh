@@ -20,8 +20,8 @@
 
 using namespace libMesh;
 
-#ifndef __curl_curl_exact_solution_h__
-#define __curl_curl_exact_solution_h__
+#ifndef CURL_CURL_EXACT_SOLUTION_H
+#define CURL_CURL_EXACT_SOLUTION_H
 
 class CurlCurlExactSolution
 {
@@ -66,4 +66,4 @@ public:
 
 };
 
-#endif // __curl_curl_exact_solution_h__
+#endif // CURL_CURL_EXACT_SOLUTION_H

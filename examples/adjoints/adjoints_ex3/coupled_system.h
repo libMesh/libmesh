@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __coupled_system_h__
-#define __coupled_system_h__
+#ifndef COUPLED_SYSTEM_H
+#define COUPLED_SYSTEM_H
 
 // DiffSystem framework files
 #include "libmesh/fem_function_base.h"
@@ -157,4 +157,4 @@ private:
 
 };
 
-#endif //__coupled_system_h__
+#endif //COUPLED_SYSTEM_H

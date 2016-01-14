@@ -1,6 +1,6 @@
 
-#ifndef __fem_parameters_h__
-#define __fem_parameters_h__
+#ifndef FEMPARAMETERS_H
+#define FEMPARAMETERS_H
 
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dof_map.h"
@@ -146,4 +146,4 @@ public:
     std::string system_config_file;
 };
 
-#endif // __fem_parameters_h__
+#endif // FEMPARAMETERS_H

@@ -1,5 +1,5 @@
-#ifndef __assembly_h__
-#define __assembly_h__
+#ifndef ASSEMBLY_H
+#define ASSEMBLY_H
 
 // rbOOmit includes
 #include "libmesh/rb_parameters.h"

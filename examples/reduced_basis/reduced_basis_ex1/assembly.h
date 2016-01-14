@@ -1,5 +1,5 @@
-#ifndef __assembly_h__
-#define __assembly_h__
+#ifndef ASSEMBLY_H
+#define ASSEMBLY_H
 
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
