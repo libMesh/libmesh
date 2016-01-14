@@ -30,7 +30,6 @@ public:
 
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
-  CPPUNIT_TEST( testPointLocatorList );
   CPPUNIT_TEST( testPointLocatorTree );
 
   CPPUNIT_TEST_SUITE_END();
