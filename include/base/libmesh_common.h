@@ -25,11 +25,11 @@
 
 // Use actual timestamps or constant dummies (to aid ccache)
 #ifdef LIBMESH_ENABLE_TIMESTAMPS
-#  define  __LIBMESH_TIME__ __TIME__
-#  define  __LIBMESH_DATE__ __DATE__
+#  define  LIBMESH_TIME __TIME__
+#  define  LIBMESH_DATE __DATE__
 #else
-#  define  __LIBMESH_TIME__ "notime"
-#  define  __LIBMESH_DATE__ "nodate"
+#  define  LIBMESH_TIME "notime"
+#  define  LIBMESH_DATE "nodate"
 #endif
 
 // C/C++ includes everyone should know about
@@ -241,7 +241,7 @@ extern bool warned_about_auto_ptr;
 // stick a libmesh_here(); in it, for example
 #define libmesh_here()                                                  \
   do {                                                                  \
-    libMesh::MacroFunctions::here(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
+    libMesh::MacroFunctions::here(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
   } while(0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
@@ -252,7 +252,7 @@ extern bool warned_about_auto_ptr;
 // serial cases.
 #define libmesh_stop()                                                  \
   do {                                                                  \
-    libMesh::MacroFunctions::stop(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
+    libMesh::MacroFunctions::stop(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
   } while(0)
 
 // The libmesh_dbg_var() macro indicates that an argument to a function
@@ -359,7 +359,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     libMesh::err << msg << std::endl;                                   \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
     LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
@@ -368,7 +368,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_exceptionless_error_msg(msg)                            \
   do {                                                                  \
     libMesh::err << msg << std::endl;                                   \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
     std::terminate();                                                   \
   } while(0)
 
@@ -377,7 +377,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_not_implemented_msg(msg)                                \
   do {                                                                  \
     libMesh::err << msg << std::endl;                                   \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
     LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
@@ -385,7 +385,7 @@ extern bool warned_about_auto_ptr;
 
 #define libmesh_file_error_msg(filename, msg)                           \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
     libMesh::err << msg << std::endl;                                   \
     LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
@@ -433,7 +433,7 @@ extern bool warned_about_auto_ptr;
 #ifdef LIBMESH_ENABLE_WARNINGS
 #define libmesh_warning(message)                                        \
   libmesh_do_once(libMesh::out << message                               \
-                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __LIBMESH_DATE__ << " at " << __LIBMESH_TIME__ << " ***" << std::endl;)
+                  << __FILE__ << ", line " << __LINE__ << ", compiled " << LIBMESH_DATE << " at " << LIBMESH_TIME << " ***" << std::endl;)
 #else
 #define libmesh_warning(message)  ((void) 0)
 #endif
