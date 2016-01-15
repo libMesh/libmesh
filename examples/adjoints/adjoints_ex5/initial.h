@@ -27,12 +27,12 @@ using namespace libMesh;
 void read_initial_parameters();
 void finish_initialization();
 
-Number initial_value(const Point& p,
-                     const Parameters&,
-                     const std::string&,
-                     const std::string&);
+Number initial_value(const Point & p,
+                     const Parameters &,
+                     const std::string &,
+                     const std::string &);
 
-Gradient initial_grad(const Point& p,
-                      const Parameters&,
-                      const std::string&,
-                      const std::string&);
+Gradient initial_grad(const Point & p,
+                      const Parameters &,
+                      const std::string &,
+                      const std::string &);

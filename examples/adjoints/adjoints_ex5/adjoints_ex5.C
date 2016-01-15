@@ -107,12 +107,12 @@
 #include <sys/time.h>
 #include <iomanip>
 
-void write_output(EquationSystems &es,
+void write_output(EquationSystems & es,
                   unsigned int a_step,       // The adaptive step count
                   std::string solution_type) // primal or adjoint solve
 {
 #ifdef LIBMESH_HAVE_GMV
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   std::ostringstream file_name_gmv;
   file_name_gmv << solution_type
@@ -127,7 +127,8 @@ void write_output(EquationSystems &es,
 #endif
 }
 
-void set_system_parameters(HeatSystem &system, FEMParameters &param)
+void set_system_parameters(HeatSystem & system,
+                           FEMParameters & param)
 {
   // Use the prescribed FE type
   system.fe_family() = param.fe_family[0];
@@ -191,14 +192,15 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
       boundary_id_type b = i->first;
       FunctionBase<Number> *f = i->second;
       std::set<boundary_id_type> bdys; bdys.insert(b);
-      system.get_dof_map().add_dirichlet_boundary
-        (DirichletBoundary
-         (bdys, param.dirichlet_condition_variables[b], f));
-      std::cout << "Added Dirichlet boundary " << b << " for variables ";
-      for (unsigned int vi=0; vi !=
-             param.dirichlet_condition_variables[b].size(); ++vi)
-        std::cout << param.dirichlet_condition_variables[b][vi];
-      std::cout << std::endl;
+
+      system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(bdys,
+                                                                    param.dirichlet_condition_variables[b],
+                                                                    f));
+
+      libMesh::out << "Added Dirichlet boundary " << b << " for variables ";
+      for (unsigned int vi=0; vi != param.dirichlet_condition_variables[b].size(); ++vi)
+        libMesh::out << param.dirichlet_condition_variables[b][vi];
+      libMesh::out << std::endl;
     }
 
   // Set the time stepping options
@@ -256,7 +258,7 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-  std::cout << "Started " << argv[0] << std::endl;
+  libMesh::out << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
   {
@@ -280,7 +282,7 @@ int main (int argc, char** argv)
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);
 
-  std::cout << "Building mesh" << std::endl;
+  libMesh::out << "Building mesh" << std::endl;
 
   // Build a unit square
   ElemType elemtype;
@@ -291,19 +293,18 @@ int main (int argc, char** argv)
   else
     elemtype = QUAD4;
 
-  MeshTools::Generation::build_square
-    (mesh, param.coarsegridx, param.coarsegridy,
-     param.domain_xmin, param.domain_xmin + param.domain_edge_width,
-     param.domain_ymin, param.domain_ymin + param.domain_edge_length,
-     elemtype);
+  MeshTools::Generation::build_square (mesh, param.coarsegridx, param.coarsegridy,
+                                       param.domain_xmin, param.domain_xmin + param.domain_edge_width,
+                                       param.domain_ymin, param.domain_ymin + param.domain_edge_length,
+                                       elemtype);
 
-  std::cout << "Building system" << std::endl;
+  libMesh::out << "Building system" << std::endl;
 
-  HeatSystem &system = equation_systems.add_system<HeatSystem> ("HeatSystem");
+  HeatSystem & system = equation_systems.add_system<HeatSystem> ("HeatSystem");
 
   set_system_parameters(system, param);
 
-  std::cout << "Initializing systems" << std::endl;
+  libMesh::out << "Initializing systems" << std::endl;
 
   // Initialize the system
   equation_systems.init ();
@@ -315,7 +316,7 @@ int main (int argc, char** argv)
       equation_systems.reinit();
     }
 
-  std::cout<<"Setting primal initial conditions"<<std::endl;
+  libMesh::out << "Setting primal initial conditions" << std::endl;
 
   read_initial_parameters();
 
@@ -323,7 +324,12 @@ int main (int argc, char** argv)
                           equation_systems.parameters);
 
   // Output the H1 norm of the initial conditions
-  libMesh::out << "|U(" <<system.time<< ")|= " << system.calculate_norm(*system.solution, 0, H1) << std::endl<<std::endl;
+  libMesh::out << "|U("
+               << system.time
+               << ")|= "
+               << system.calculate_norm(*system.solution, 0, H1)
+               << std::endl
+               << std::endl;
 
   // Add an adjoint vector, this will be computed after the forward
   // time stepping is complete
@@ -362,17 +368,24 @@ int main (int argc, char** argv)
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
           // A pretty update message
-          std::cout << " Solving time step " << t_step << ", time = "
-                    << system.time << std::endl;
+          libMesh::out << " Solving time step "
+                       << t_step
+                       << ", time = "
+                       << system.time
+                       << std::endl;
 
           // Solve the forward problem at time t, to obtain the solution at time t + dt
           system.solve();
 
           // Output the H1 norm of the computed solution
-          libMesh::out << "|U(" <<system.time + system.deltat<< ")|= " << system.calculate_norm(*system.solution, 0, H1) << std::endl;
+          libMesh::out << "|U("
+                       << system.time + system.deltat
+                       << ")|= "
+                       << system.calculate_norm(*system.solution, 0, H1)
+                       << std::endl;
 
           // Advance to the next timestep in a transient problem
-          std::cout<<"Advancing timestep"<<std::endl<<std::endl;
+          libMesh::out << "Advancing timestep" << std::endl << std::endl;
           system.time_solver->advance_timestep();
 
           // Write out this timestep
@@ -383,7 +396,7 @@ int main (int argc, char** argv)
       ///////////////// Now for the Adjoint Solution //////////////////////////////////////
 
       // Now we will solve the backwards in time adjoint problem
-      std::cout << std::endl << "Solving the adjoint problem" << std::endl;
+      libMesh::out << std::endl << "Solving the adjoint problem" << std::endl;
 
       // We need to tell the library that it needs to project the adjoint, so
       // MemorySolutionHistory knows it has to save it
@@ -392,26 +405,47 @@ int main (int argc, char** argv)
       // save it
       system.set_vector_preservation(adjoint_solution_name, true);
 
-      std::cout << "Setting adjoint initial conditions Z("<<system.time<<")"<<std::endl;
+      libMesh::out << "Setting adjoint initial conditions Z("
+                   << system.time
+                   << ")"
+                   <<std::endl;
 
       // Need to call adjoint_advance_timestep once for the initial condition setup
-      std::cout<<"Retrieving solutions at time t="<<system.time<<std::endl;
+      libMesh::out<<"Retrieving solutions at time t="<<system.time<<std::endl;
       system.time_solver->adjoint_advance_timestep();
 
       // Output the H1 norm of the retrieved solutions (u^i and u^i+1)
-      libMesh::out << "|U(" <<system.time + system.deltat<< ")|= " << system.calculate_norm(*system.solution, 0, H1) << std::endl;
+      libMesh::out << "|U("
+                   << system.time + system.deltat
+                   << ")|= "
+                   << system.calculate_norm(*system.solution, 0, H1)
+                   << std::endl;
 
-      libMesh::out << "|U(" <<system.time<< ")|= " << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1) << std::endl;
+      libMesh::out << "|U("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                   << std::endl;
 
       // The first thing we have to do is to apply the adjoint initial
       // condition. The user should supply these. Here they are specified
       // in the functions adjoint_initial_value and adjoint_initial_gradient
-      system.project_vector(adjoint_initial_value, adjoint_initial_grad, equation_systems.parameters, system.get_adjoint_solution(0));
+      system.project_vector(adjoint_initial_value,
+                            adjoint_initial_grad,
+                            equation_systems.parameters,
+                            system.get_adjoint_solution(0));
 
-      // Since we have specified an adjoint solution for the current time (T), set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the adjoint sensitivity method
+      // Since we have specified an adjoint solution for the current
+      // time (T), set the adjoint_already_solved boolean to true, so
+      // we dont solve unneccesarily in the adjoint sensitivity method
       system.set_adjoint_already_solved(true);
 
-      libMesh::out << "|Z(" <<system.time<< ")|= " << system.calculate_norm(system.get_adjoint_solution(), 0, H1) << std::endl<<std::endl;
+      libMesh::out << "|Z("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_adjoint_solution(), 0, H1)
+                   << std::endl
+                   << std::endl;
 
       write_output(equation_systems, param.n_timesteps, "dual");
 
@@ -423,36 +457,54 @@ int main (int argc, char** argv)
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
           //A pretty update message
-          std::cout << " Solving adjoint time step " << t_step << ", time = "
-                    << system.time << std::endl;
+          libMesh::out << " Solving adjoint time step "
+                       << t_step
+                       << ", time = "
+                       << system.time
+                       << std::endl;
 
-          // The adjoint_advance_timestep
-          // function calls the retrieve function of the memory_solution_history
-          // class via the memory_solution_history object we declared earlier.
-          // The retrieve function sets the system primal vectors to their values
-          // at the current timestep
-          std::cout<<"Retrieving solutions at time t="<<system.time<<std::endl;
+          // The adjoint_advance_timestep function calls the retrieve
+          // function of the memory_solution_history class via the
+          // memory_solution_history object we declared earlier.  The
+          // retrieve function sets the system primal vectors to their
+          // values at the current timestep.
+          libMesh::out << "Retrieving solutions at time t=" << system.time << std::endl;
           system.time_solver->adjoint_advance_timestep();
 
           // Output the H1 norm of the retrieved solution
-          libMesh::out << "|U(" <<system.time + system.deltat << ")|= " << system.calculate_norm(*system.solution, 0, H1) << std::endl;
+          libMesh::out << "|U("
+                       << system.time + system.deltat
+                       << ")|= "
+                       << system.calculate_norm(*system.solution, 0, H1)
+                       << std::endl;
 
-          libMesh::out << "|U(" <<system.time<< ")|= " << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1) << std::endl;
+          libMesh::out << "|U("
+                       << system.time
+                       << ")|= "
+                       << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                       << std::endl;
 
           system.set_adjoint_already_solved(false);
 
           system.adjoint_solve();
 
-          // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+          // Now that we have solved the adjoint, set the
+          // adjoint_already_solved boolean to true, so we dont solve
+          // unneccesarily in the error estimator
           system.set_adjoint_already_solved(true);
 
-          libMesh::out << "|Z(" <<system.time<< ")|= "<< system.calculate_norm(system.get_adjoint_solution(), 0, H1) << std::endl << std::endl;
+          libMesh::out << "|Z("
+                       << system.time
+                       << ")|= "
+                       << system.calculate_norm(system.get_adjoint_solution(), 0, H1)
+                       << std::endl
+                       << std::endl;
 
           // Get a pointer to the primal solution vector
-          NumericVector<Number> &primal_solution = *system.solution;
+          NumericVector<Number> & primal_solution = *system.solution;
 
           // Get a pointer to the solution vector of the adjoint problem for QoI 0
-          NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+          NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
           // Swap the primal and dual solutions so we can write out the adjoint solution
           primal_solution.swap(dual_solution_0);
@@ -478,49 +530,81 @@ int main (int argc, char** argv)
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
           // A pretty update message
-          std::cout << "Retrieving " << t_step << ", time = "
-                    << system.time << std::endl;
+          libMesh::out << "Retrieving "
+                       << t_step
+                       << ", time = "
+                       << system.time
+                       << std::endl;
 
           // Retrieve the primal and adjoint solutions at the current timestep
           system.time_solver->retrieve_timestep();
 
-          libMesh::out << "|U(" <<system.time + system.deltat << ")|= " << system.calculate_norm(*system.solution, 0, H1) << std::endl;
+          libMesh::out << "|U("
+                       << system.time + system.deltat
+                       << ")|= "
+                       << system.calculate_norm(*system.solution, 0, H1)
+                       << std::endl;
 
-          libMesh::out << "|U(" <<system.time<< ")|= " << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1) << std::endl;
+          libMesh::out << "|U("
+                       << system.time
+                       << ")|= "
+                       << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                       << std::endl;
 
-          libMesh::out << "|Z(" <<system.time<< ")|= "<< system.calculate_norm(system.get_adjoint_solution(0), 0, H1) << std::endl << std::endl;
+          libMesh::out << "|Z("
+                       << system.time
+                       << ")|= "
+                       << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                       << std::endl
+                       << std::endl;
 
           // Call the postprocess function which we have overloaded to compute
           // accumulate the perturbed residuals
-          (dynamic_cast<HeatSystem&>(system)).perturb_accumulate_residuals(dynamic_cast<HeatSystem&>(system).get_parameter_vector());
+          dynamic_cast<HeatSystem &>(system).perturb_accumulate_residuals(dynamic_cast<HeatSystem &>(system).get_parameter_vector());
 
           // Move the system time forward (retrieve_timestep does not do this)
           system.time += system.deltat;
         }
 
       // A pretty update message
-      std::cout << "Retrieving " << " final time = "
-                << system.time << std::endl;
+      libMesh::out << "Retrieving final time = "
+                   << system.time
+                   << std::endl;
 
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
 
-      libMesh::out << "|U(" <<system.time + system.deltat << ")|= " << system.calculate_norm(*system.solution, 0, H1) << std::endl;
+      libMesh::out << "|U("
+                   << system.time + system.deltat
+                   << ")|= "
+                   << system.calculate_norm(*system.solution, 0, H1)
+                   << std::endl;
 
-      libMesh::out << "|U(" <<system.time<< ")|= " << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1) << std::endl;
+      libMesh::out << "|U("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
+                   << std::endl;
 
-      libMesh::out << "|Z(" <<system.time<< ")|= "<< system.calculate_norm(system.get_adjoint_solution(0), 0, H1) << std::endl<<std::endl;
+      libMesh::out << "|Z("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                   << std::endl
+                   << std::endl;
 
       // Call the postprocess function which we have overloaded to compute
       // accumulate the perturbed residuals
-      (dynamic_cast<HeatSystem&>(system)).perturb_accumulate_residuals(dynamic_cast<HeatSystem&>(system).get_parameter_vector());
+      dynamic_cast<HeatSystem &>(system).perturb_accumulate_residuals(dynamic_cast<HeatSystem &>(system).get_parameter_vector());
 
       // Now that we computed the accumulated, perturbed residuals, we can compute the
       // approximate sensitivity
-      Number sensitivity_0_0 = (dynamic_cast<HeatSystem&>(system)).compute_final_sensitivity();
+      Number sensitivity_0_0 = (dynamic_cast<HeatSystem &>(system)).compute_final_sensitivity();
 
       // Print it out
-      std::cout<<"Sensitivity of QoI 0 w.r.t parameter 0 is: " << sensitivity_0_0 << std::endl;
+      libMesh::out << "Sensitivity of QoI 0 w.r.t parameter 0 is: "
+                   << sensitivity_0_0
+                   << std::endl;
 
       // Hard coded assert to ensure that the actual numbers we are
       // getting are what they should be
@@ -532,13 +616,14 @@ int main (int argc, char** argv)
     }
   catch (...)
     {
-      std::cerr << '[' << mesh.processor_id()
-                << "] Caught exception; exiting early." << std::endl;
+      libMesh::err << '[' << mesh.processor_id()
+                   << "] Caught exception; exiting early." << std::endl;
     }
 #endif
 
-  std::cerr << '[' << mesh.processor_id()
-            << "] Completing output." << std::endl;
+  libMesh::err << '[' << mesh.processor_id()
+               << "] Completing output."
+               << std::endl;
 
   // All done.
   return 0;

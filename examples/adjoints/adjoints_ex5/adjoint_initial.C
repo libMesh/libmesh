@@ -32,10 +32,10 @@ void adjoint_finish_initialization()
 
 
 // Initial conditions
-Number adjoint_initial_value(const Point& p,
-                             const Parameters&,
-                             const std::string&,
-                             const std::string&)
+Number adjoint_initial_value(const Point & p,
+                             const Parameters &,
+                             const std::string &,
+                             const std::string &)
 {
   Real x = p(0), y = p(1);
 
@@ -44,10 +44,10 @@ Number adjoint_initial_value(const Point& p,
 
 
 
-Gradient adjoint_initial_grad(const Point& p,
-                              const Parameters&,
-                              const std::string&,
-                              const std::string&)
+Gradient adjoint_initial_grad(const Point & p,
+                              const Parameters &,
+                              const std::string &,
+                              const std::string &)
 {
   Real x = p(0), y = p(1);
 

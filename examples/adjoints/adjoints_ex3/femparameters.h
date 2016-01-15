@@ -22,12 +22,12 @@
 class FEMParameters : public libMesh::ParallelObject
 {
 public:
-    FEMParameters(const libMesh::Parallel::Communicator &comm_in);
+    FEMParameters(const libMesh::Parallel::Communicator & comm_in);
 
     ~FEMParameters();
 
-    void read(GetPot &input,
-              const std::vector<std::string>* other_variable_names = NULL);
+    void read(GetPot & input,
+              const std::vector<std::string> * other_variable_names = NULL);
 
     // Parameters applicable to entire EquationSystems:
 

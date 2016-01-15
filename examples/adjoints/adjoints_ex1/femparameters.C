@@ -21,7 +21,7 @@ using namespace libMesh;
   std::string stringval = input(#A, std::string());\
   variable_names.push_back(std::string(#A "=") + stringval); }
 
-FEMParameters::FEMParameters(const Parallel::Communicator &comm_in) :
+FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
       ParallelObject(comm_in),
       initial_timestep(0), n_timesteps(100),
       transient(true),
@@ -32,7 +32,7 @@ FEMParameters::FEMParameters(const Parallel::Communicator &comm_in) :
       timesolver_maxgrowth(0.), timesolver_tolerance(0.),
       timesolver_upper_tolerance(0.),
       steadystate_tolerance(0.),
-      timesolver_norm(0,L2),
+      timesolver_norm(0, L2),
 
       dimension(2),
       domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),
@@ -131,30 +131,28 @@ FEMParameters::~FEMParameters()
 }
 
 
-AutoPtr<FunctionBase<Number> > new_function_base(const std::string& func_type,
-                                        const std::string& func_value)
+UniquePtr<FunctionBase<Number> > new_function_base(const std::string & func_type,
+                                                   const std::string & func_value)
 {
   if (func_type == "parsed")
-    return AutoPtr<FunctionBase<Number> >
-      (new ParsedFunction<Number>(func_value));
+    return UniquePtr<FunctionBase<Number> >(new ParsedFunction<Number>(func_value));
   else if (func_type == "zero")
-    return AutoPtr<FunctionBase<Number> >
-      (new ZeroFunction<Number>);
+    return UniquePtr<FunctionBase<Number> >(new ZeroFunction<Number>);
   else
     libmesh_not_implemented();
 
-  return AutoPtr<FunctionBase<Number> >();
+  return UniquePtr<FunctionBase<Number> >();
 }
 
 
-void FEMParameters::read(GetPot &input,
-                         const std::vector<std::string>* other_variable_names)
+void FEMParameters::read(GetPot & input,
+                         const std::vector<std::string> * other_variable_names)
 {
     std::vector<std::string> variable_names;
     if (other_variable_names)
       for (unsigned int i=0; i != other_variable_names->size(); ++i)
         {
-          const std::string& name = (*other_variable_names)[i];
+          const std::string & name = (*other_variable_names)[i];
           const std::string stringval = input(name, std::string());
           variable_names.push_back(name + "=" + stringval);
         }
@@ -705,12 +703,12 @@ void FEMParameters::read(GetPot &input,
 
   if (this->comm().rank() == 0 && !bad_variables.empty())
     {
-      std::cerr << "ERROR: Unrecognized variables:" << std::endl;
+      libMesh::err << "ERROR: Unrecognized variables:" << std::endl;
       for (unsigned int i = 0; i != bad_variables.size(); ++i)
-        std::cerr << bad_variables[i] << std::endl;
-      std::cerr << "Not found among recognized variables:" << std::endl;
+        libMesh::err << bad_variables[i] << std::endl;
+      libMesh::err << "Not found among recognized variables:" << std::endl;
       for (unsigned int i = 0; i != variable_names.size(); ++i)
-        std::cerr << variable_names[i] << std::endl;
+        libMesh::err << variable_names[i] << std::endl;
       libmesh_error();
     }
 }

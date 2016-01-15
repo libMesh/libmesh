@@ -70,12 +70,12 @@ void HeatSystem::init_data ()
 
 
 
-void HeatSystem::init_context(DiffContext &context)
+void HeatSystem::init_context(DiffContext & context)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
-  FEBase* elem_fe = NULL;
-  c.get_element_fe( 0, elem_fe );
+  FEBase * elem_fe = NULL;
+  c.get_element_fe(0, elem_fe);
 
   // Now make sure we have requested all the data
   // we need to build the linear system.
@@ -90,7 +90,7 @@ void HeatSystem::init_context(DiffContext &context)
       const System & sys = c.get_system();
 
       // Get a pointer to the adjoint solution vector
-      NumericVector<Number> &adjoint_solution =
+      NumericVector<Number> & adjoint_solution =
         const_cast<System &>(sys).get_adjoint_solution(0);
 
       // Add this adjoint solution to the vectors that diff context should localize
@@ -104,22 +104,22 @@ void HeatSystem::init_context(DiffContext &context)
 //#define optassert(X) libmesh_assert(X);
 
 bool HeatSystem::element_time_derivative (bool request_jacobian,
-                                          DiffContext &context)
+                                          DiffContext & context)
 {
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
 
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase* elem_fe = NULL;
-  c.get_element_fe( 0, elem_fe );
+  FEBase * elem_fe = NULL;
+  c.get_element_fe(0, elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = elem_fe->get_JxW();
+  const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // Element basis functions
-  const std::vector<std::vector<RealGradient> > &dphi = elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
 
   // Workaround for weird FC6 bug
   optassert(c.get_dof_indices().size() > 0);
@@ -128,8 +128,8 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   const unsigned int n_u_dofs = c.get_dof_indices(0).size();
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &K = c.get_elem_jacobian(0,0);
-  DenseSubVector<Number> &F = c.get_elem_residual(0);
+  DenseSubMatrix<Number> & K = c.get_elem_jacobian(0, 0);
+  DenseSubVector<Number> & F = c.get_elem_residual(0);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -156,7 +156,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 }
 
 // Perturb and accumulate dual weighted residuals
-void HeatSystem::perturb_accumulate_residuals(ParameterVector& parameters_in)
+void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 {
   const unsigned int Np = parameters_in.size();
 
@@ -187,6 +187,5 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector& parameters_in)
       R_plus_dp += -R_plus->dot(this->get_adjoint_solution(0));
 
       *parameters_in[j] = old_parameter;
-
     }
 }
