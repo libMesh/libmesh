@@ -83,22 +83,22 @@ using namespace libMesh;
 // name of the system we are assembling as input.  From the
 // \p EquationSystems object we have acess to the \p Mesh and
 // other objects we might need.
-void assemble_laplace(EquationSystems& es,
-                      const std::string& system_name);
+void assemble_laplace(EquationSystems & es,
+                      const std::string & system_name);
 
 
 // Prototype for calculation of the exact solution.  Useful
 // for setting boundary conditions.
-Number exact_solution(const Point& p,
-                      const Parameters&,   // EquationSystem parameters, not needed
-                      const std::string&,  // sys_name, not needed
-                      const std::string&); // unk_name, not needed);
+Number exact_solution(const Point & p,
+                      const Parameters &,   // EquationSystem parameters, not needed
+                      const std::string &,  // sys_name, not needed
+                      const std::string &); // unk_name, not needed);
 
 // Prototype for calculation of the gradient of the exact solution.
-Gradient exact_derivative(const Point& p,
-                          const Parameters&,   // EquationSystems parameters, not needed
-                          const std::string&,  // sys_name, not needed
-                          const std::string&); // unk_name, not needed);
+Gradient exact_derivative(const Point & p,
+                          const Parameters &,   // EquationSystems parameters, not needed
+                          const std::string &,  // sys_name, not needed
+                          const std::string &); // unk_name, not needed);
 
 
 // These are non-const because the input file may change it,
@@ -111,7 +111,7 @@ unsigned int dim = 2;
 bool singularity = true;
 
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
 
   // Read in the mesh
   if (dim == 1)
-    MeshTools::Generation::build_line(mesh,1,-1.,0.);
+    MeshTools::Generation::build_line(mesh, 1, -1., 0.);
   else if (dim == 2)
     mesh.read("lshaped.xda");
   else
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 
   // Declare the system and its variables.
   // Creates a system named "Laplace"
-  LinearImplicitSystem& system =
+  LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Laplace");
 
   // Adds the variable "u" to "Laplace", using
@@ -245,20 +245,21 @@ int main(int argc, char** argv)
   // A refinement loop.
   for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
     {
-      std::cout << "Beginning Solve " << r_step << std::endl;
+      libMesh::out << "Beginning Solve " << r_step << std::endl;
 
       // Solve the system "Laplace", just like example 2.
       system.solve();
 
-      std::cout << "System has: " << equation_systems.n_active_dofs()
-                << " degrees of freedom."
-                << std::endl;
+      libMesh::out << "System has: "
+                   << equation_systems.n_active_dofs()
+                   << " degrees of freedom."
+                   << std::endl;
 
-      std::cout << "Linear solver converged at step: "
-                << system.n_linear_iterations()
-                << ", final residual: "
-                << system.final_linear_residual()
-                << std::endl;
+      libMesh::out << "Linear solver converged at step: "
+                   << system.n_linear_iterations()
+                   << ", final residual: "
+                   << system.final_linear_residual()
+                   << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // After solving the system write the solution
@@ -276,12 +277,12 @@ int main(int argc, char** argv)
       exact_sol.compute_error("Laplace", "u");
 
       // Print out the error values
-      std::cout << "L2-Error is: "
-                << exact_sol.l2_error("Laplace", "u")
-                << std::endl;
-      std::cout << "H1-Error is: "
-                << exact_sol.h1_error("Laplace", "u")
-                << std::endl;
+      libMesh::out << "L2-Error is: "
+                   << exact_sol.l2_error("Laplace", "u")
+                   << std::endl;
+      libMesh::out << "H1-Error is: "
+                   << exact_sol.h1_error("Laplace", "u")
+                   << std::endl;
 
       // Print to output file
       out << equation_systems.n_active_dofs() << " "
@@ -291,7 +292,7 @@ int main(int argc, char** argv)
       // Possibly refine the mesh
       if (r_step+1 != max_r_steps)
         {
-          std::cout << "  Refining the mesh..." << std::endl;
+          libMesh::out << "  Refining the mesh..." << std::endl;
 
           if (uniform_refine == 0)
             {
@@ -361,11 +362,11 @@ int main(int argc, char** argv)
               std::ostringstream ss;
               ss << r_step;
 #ifdef LIBMESH_HAVE_EXODUS_API
-              std::string error_output = "error_"+ss.str()+".e";
+              std::string error_output = "error_" + ss.str() + ".e";
 #else
-              std::string error_output = "error_"+ss.str()+".gmv";
+              std::string error_output = "error_" + ss.str() + ".gmv";
 #endif
-              error.plot_error( error_output, mesh );
+              error.plot_error(error_output, mesh);
 
               // This takes the error in \p error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
@@ -462,10 +463,10 @@ int main(int argc, char** argv)
 // We now define the exact solution, being careful
 // to obtain an angle from atan2 in the correct
 // quadrant.
-Number exact_solution(const Point& p,
-                      const Parameters&,  // parameters, not needed
-                      const std::string&, // sys_name, not needed
-                      const std::string&) // unk_name, not needed
+Number exact_solution(const Point & p,
+                      const Parameters &,  // parameters, not needed
+                      const std::string &, // sys_name, not needed
+                      const std::string &) // unk_name, not needed
 {
   const Real x = p(0);
   const Real y = (dim > 1) ? p(1) : 0.;
@@ -474,7 +475,7 @@ Number exact_solution(const Point& p,
     {
       // The exact solution to the singular problem,
       // u_exact = r^(2/3)*sin(2*theta/3).
-      Real theta = atan2(y,x);
+      Real theta = atan2(y, x);
 
       // Make sure 0 <= theta <= 2*pi
       if (theta < 0)
@@ -502,10 +503,10 @@ Number exact_solution(const Point& p,
 // We now define the gradient of the exact solution, again being careful
 // to obtain an angle from atan2 in the correct
 // quadrant.
-Gradient exact_derivative(const Point& p,
-                          const Parameters&,  // parameters, not needed
-                          const std::string&, // sys_name, not needed
-                          const std::string&) // unk_name, not needed
+Gradient exact_derivative(const Point & p,
+                          const Parameters &,  // parameters, not needed
+                          const std::string &, // sys_name, not needed
+                          const std::string &) // unk_name, not needed
 {
   // Gradient value to be returned.
   Gradient gradu;
@@ -528,7 +529,7 @@ Gradient exact_derivative(const Point& p,
 
       // The boundary value, given by the exact solution,
       // u_exact = r^(2/3)*sin(2*theta/3).
-      Real theta = atan2(y,x);
+      Real theta = atan2(y, x);
 
       // Make sure 0 <= theta <= 2*pi
       if (theta < 0)
@@ -568,8 +569,8 @@ Gradient exact_derivative(const Point& p,
 // matrices and right-hand sides, and then take into
 // account the boundary conditions, which will be handled
 // via a penalty method.
-void assemble_laplace(EquationSystems& es,
-                      const std::string& system_name)
+void assemble_laplace(EquationSystems & es,
+                      const std::string & system_name)
 {
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
@@ -581,22 +582,22 @@ void assemble_laplace(EquationSystems& es,
   // string to identify what part of the code we are
   // logging, since there may be many PerfLogs in an
   // application.
-  PerfLog perf_log ("Matrix Assembly",false);
+  PerfLog perf_log ("Matrix Assembly", false);
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int mesh_dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Laplace");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Laplace");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -621,26 +622,26 @@ void assemble_laplace(EquationSystems& es,
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.
-  const std::vector<Real>& JxW      = fe->get_JxW();
-  const std::vector<Real>& JxW_face = fe_face->get_JxW();
+  const std::vector<Real> & JxW      = fe->get_JxW();
+  const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
   // properties or forcing functions at the quadrature points.
-  const std::vector<Point>& q_point = fe->get_xyz();
+  const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
   // For this simple problem we usually only need them on element
   // boundaries.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // The XY locations of the quadrature points used for face integration
-  const std::vector<Point>& qface_points = fe_face->get_xyz();
+  const std::vector<Point> & qface_points = fe_face->get_xyz();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -675,7 +676,7 @@ void assemble_laplace(EquationSystems& es,
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -756,7 +757,7 @@ void assemble_laplace(EquationSystems& es,
         for (unsigned int s=0; s<elem->n_sides(); s++)
           if (elem->neighbor(s) == NULL)
             {
-              fe_face->reinit(elem,s);
+              fe_face->reinit(elem, s);
 
               for (unsigned int qp=0; qp<qface->n_points(); qp++)
                 {
