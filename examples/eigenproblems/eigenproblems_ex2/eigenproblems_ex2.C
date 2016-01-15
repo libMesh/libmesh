@@ -54,12 +54,12 @@ using namespace libMesh;
 
 // Function prototype.  This is the function that will assemble
 // the eigen system. Here, we will simply assemble a mass matrix.
-void assemble_mass(EquationSystems& es,
-                   const std::string& system_name);
+void assemble_mass(EquationSystems & es,
+                   const std::string & system_name);
 
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and the dependent libraries.
   LibMeshInit init (argc, argv);
@@ -67,9 +67,9 @@ int main (int argc, char** argv)
   // This example is designed for the SLEPc eigen solver interface.
 #ifndef LIBMESH_HAVE_SLEPC
   if (init.comm().rank() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with SLEPc eigen solvers support!"
-              << std::endl;
+    libMesh::err << "ERROR: This example requires libMesh to be\n"
+                 << "compiled with SLEPc eigen solvers support!"
+                 << std::endl;
 
   return 0;
 #else
@@ -86,12 +86,12 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
     }
 
   // Get the number of eigen values to be computed from argv[2]
@@ -149,8 +149,7 @@ int main (int argc, char** argv)
 
   // Set the solver tolerance and the maximum number of iterations.
   equation_systems.parameters.set<Real>("linear solver tolerance") = pow(TOLERANCE, 5./3.);
-  equation_systems.parameters.set<unsigned int>
-    ("linear solver maximum iterations") = 1000;
+  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 1000;
 
   // Set the type of the problem, here we deal with
   // a generalized Hermitian problem.
@@ -172,8 +171,10 @@ int main (int argc, char** argv)
   // Get the number of converged eigen pairs.
   unsigned int nconv = eigen_system.get_n_converged();
 
-  std::cout << "Number of converged eigenpairs: " << nconv
-            << "\n" << std::endl;
+  libMesh::out << "Number of converged eigenpairs: "
+               << nconv
+               << "\n"
+               << std::endl;
 
   // Get the last converged eigenpair
   if (nconv != 0)
@@ -187,7 +188,7 @@ int main (int argc, char** argv)
     }
   else
     {
-      std::cout << "WARNING: Solver did not converge!\n" << nconv << std::endl;
+      libMesh::out << "WARNING: Solver did not converge!\n" << nconv << std::endl;
     }
 
 #endif // LIBMESH_HAVE_SLEPC
@@ -198,8 +199,8 @@ int main (int argc, char** argv)
 
 
 
-void assemble_mass(EquationSystems& es,
-                   const std::string& system_name)
+void assemble_mass(EquationSystems & es,
+                   const std::string & system_name)
 {
 
   // It is a good idea to make sure we are assembling
@@ -209,7 +210,7 @@ void assemble_mass(EquationSystems& es,
 #ifdef LIBMESH_HAVE_SLEPC
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -222,8 +223,8 @@ void assemble_mass(EquationSystems& es,
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the two system matrices
-  SparseMatrix<Number>&  matrix_A = *eigen_system.matrix_A;
-  SparseMatrix<Number>&  matrix_B = *eigen_system.matrix_B;
+  SparseMatrix<Number> & matrix_A = *eigen_system.matrix_A;
+  SparseMatrix<Number> & matrix_B = *eigen_system.matrix_B;
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
@@ -239,29 +240,28 @@ void assemble_mass(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
 
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = eigen_system.get_dof_map();
+  const DofMap & dof_map = eigen_system.get_dof_map();
 
   // The element mass and stiffness matrices.
-  DenseMatrix<Number>   Me;
-  DenseMatrix<Number>   Ke;
+  DenseMatrix<Number> Me;
+  DenseMatrix<Number> Ke;
 
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
-
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -276,7 +276,7 @@ void assemble_mass(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -329,7 +329,6 @@ void assemble_mass(EquationSystems& es,
       // overall matrices A and B.
       matrix_A.add_matrix (Ke, dof_indices);
       matrix_B.add_matrix (Me, dof_indices);
-
     } // end of element loop
 
 
@@ -337,10 +336,4 @@ void assemble_mass(EquationSystems& es,
   // Avoid compiler warnings
   libmesh_ignore(es);
 #endif // LIBMESH_HAVE_SLEPC
-
-  /**
-   * All done!
-   */
-  return;
-
 }

@@ -72,16 +72,16 @@ using namespace libMesh;
 
 // Function prototype.  This is the function that will assemble
 // the eigen system. Here, we will simply assemble a mass matrix.
-void assemble_matrices(EquationSystems& es,
-                       const std::string& system_name);
+void assemble_matrices(EquationSystems & es,
+                       const std::string & system_name);
 
 // We store the Dirichlet dofs in a set in order to impose the boundary conditions
-void get_dirichlet_dofs(EquationSystems& es,
-                        const std::string& system_name,
-                        std::set<unsigned int>& global_dirichlet_dofs_set);
+void get_dirichlet_dofs(EquationSystems & es,
+                        const std::string & system_name,
+                        std::set<unsigned int> & global_dirichlet_dofs_set);
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and the dependent libraries.
   LibMeshInit init (argc, argv);
@@ -94,9 +94,9 @@ int main (int argc, char** argv)
   // This example is designed for the SLEPc eigen solver interface.
 #ifndef LIBMESH_HAVE_SLEPC
   if (init.comm().rank() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with SLEPc eigen solvers support!"
-              << std::endl;
+    libMesh::err << "ERROR: This example requires libMesh to be\n"
+                 << "compiled with SLEPc eigen solvers support!"
+                 << std::endl;
 
   return 0;
 #else
@@ -114,12 +114,12 @@ int main (int argc, char** argv)
 
   // Tell the user what we are doing.
   {
-    std::cout << "Running " << argv[0];
+    libMesh::out << "Running " << argv[0];
 
     for (int i=1; i<argc; i++)
-      std::cout << " " << argv[i];
+      libMesh::out << " " << argv[i];
 
-    std::cout << std::endl << std::endl;
+    libMesh::out << std::endl << std::endl;
   }
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
@@ -130,18 +130,18 @@ int main (int argc, char** argv)
 
   // Read the mesh name from the command line
   std::string mesh_name = "";
-  if ( command_line.search(1, "-mesh_name") )
+  if (command_line.search(1, "-mesh_name"))
     mesh_name = command_line.next(mesh_name);
 
   // Also, read in the index of the eigenvector that we should plot
   // (zero-based indexing, as usual!)
   unsigned int plotting_index = 0;
-  if ( command_line.search(1, "-plotting_index") )
+  if (command_line.search(1, "-plotting_index"))
     plotting_index = command_line.next(plotting_index);
 
   // Finally, read in the number of eigenpairs we want to compute!
   unsigned int n_evals = 0;
-  if ( command_line.search(1, "-n_evals") )
+  if (command_line.search(1, "-n_evals"))
     n_evals = command_line.next(n_evals);
 
   // Append the .e to mesh_name
@@ -208,12 +208,14 @@ int main (int argc, char** argv)
   // Get the number of converged eigen pairs.
   unsigned int nconv = eigen_system.get_n_converged();
 
-  std::cout << "Number of converged eigenpairs: " << nconv
-            << "\n" << std::endl;
+  libMesh::out << "Number of converged eigenpairs: "
+               << nconv
+               << "\n"
+               << std::endl;
 
   if (plotting_index > n_evals)
     {
-      std::cout << "WARNING: Solver did not converge for the requested eigenvector!" << std::endl;
+      libMesh::out << "WARNING: Solver did not converge for the requested eigenvector!" << std::endl;
     }
 
   // write out all of the computed eigenvalues and plot the specified eigenvector
@@ -221,7 +223,7 @@ int main (int argc, char** argv)
   eigenvalue_output_name << mesh_name << "_evals.txt";
   std::ofstream evals_file(eigenvalue_output_name.str().c_str());
 
-  for(unsigned int i=0; i<nconv; i++)
+  for (unsigned int i=0; i<nconv; i++)
     {
       std::pair<Real,Real> eval = eigen_system.get_eigenpair(i);
 
@@ -230,7 +232,7 @@ int main (int argc, char** argv)
       evals_file << eval.first << std::endl;
 
       // plot the specified eigenvector
-      if(i == plotting_index)
+      if (i == plotting_index)
         {
 #ifdef LIBMESH_HAVE_EXODUS_API
           // Write the eigen vector to file.
@@ -251,8 +253,8 @@ int main (int argc, char** argv)
 
 
 
-void assemble_matrices(EquationSystems& es,
-                       const std::string& system_name)
+void assemble_matrices(EquationSystems & es,
+                       const std::string & system_name)
 {
 
   // It is a good idea to make sure we are assembling
@@ -262,7 +264,7 @@ void assemble_matrices(EquationSystems& es,
 #ifdef LIBMESH_HAVE_SLEPC
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -275,8 +277,8 @@ void assemble_matrices(EquationSystems& es,
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the two system matrices
-  SparseMatrix<Number>&  matrix_A = *eigen_system.matrix_A;
-  SparseMatrix<Number>&  matrix_B = *eigen_system.matrix_B;
+  SparseMatrix<Number> & matrix_A = *eigen_system.matrix_A;
+  SparseMatrix<Number> & matrix_B = *eigen_system.matrix_B;
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
@@ -292,23 +294,23 @@ void assemble_matrices(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
 
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = eigen_system.get_dof_map();
+  const DofMap & dof_map = eigen_system.get_dof_map();
 
   // The element mass and stiffness matrices.
-  DenseMatrix<Number>   Me;
-  DenseMatrix<Number>   Ke;
+  DenseMatrix<Number> Me;
+  DenseMatrix<Number> Ke;
 
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
@@ -329,7 +331,7 @@ void assemble_matrices(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -382,7 +384,6 @@ void assemble_matrices(EquationSystems& es,
       // overall matrices A and B.
       matrix_A.add_matrix (Ke, dof_indices);
       matrix_B.add_matrix (Me, dof_indices);
-
     } // end of element loop
 
 
@@ -390,17 +391,11 @@ void assemble_matrices(EquationSystems& es,
   // Avoid compiler warnings
   libmesh_ignore(es);
 #endif // LIBMESH_HAVE_SLEPC
-
-  /**
-   * All done!
-   */
-  return;
-
 }
 
-void get_dirichlet_dofs(EquationSystems& es,
-                        const std::string& system_name,
-                        std::set<unsigned int>& dirichlet_dof_ids)
+void get_dirichlet_dofs(EquationSystems & es,
+                        const std::string & system_name,
+                        std::set<unsigned int> & dirichlet_dof_ids)
 {
 #ifdef LIBMESH_HAVE_SLEPC
 
@@ -411,7 +406,7 @@ void get_dirichlet_dofs(EquationSystems& es,
   libmesh_assert_equal_to (system_name, "Eigensystem");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -423,7 +418,7 @@ void get_dirichlet_dofs(EquationSystems& es,
   // for the first (and only) variable in the system.
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
-  const DofMap& dof_map = eigen_system.get_dof_map();
+  const DofMap & dof_map = eigen_system.get_dof_map();
 
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
@@ -444,7 +439,7 @@ void get_dirichlet_dofs(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -461,7 +456,7 @@ void get_dirichlet_dofs(EquationSystems& es,
               FEInterface::dofs_on_side(elem, dim, fe_type,
                                         s, side_dofs);
 
-              for(unsigned int ii=0; ii<side_dofs.size(); ii++)
+              for (unsigned int ii=0; ii<side_dofs.size(); ii++)
                 dirichlet_dof_ids.insert(dof_indices[side_dofs[ii]]);
             }
       }
@@ -474,10 +469,4 @@ void get_dirichlet_dofs(EquationSystems& es,
   libmesh_ignore(system_name);
   libmesh_ignore(dirichlet_dof_ids);
 #endif // LIBMESH_HAVE_SLEPC
-
-  /**
-   * All done!
-   */
-  return;
-
 }
