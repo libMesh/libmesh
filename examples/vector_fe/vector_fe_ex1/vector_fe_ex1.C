@@ -66,8 +66,8 @@ using namespace libMesh;
 // name of the system we are assembling as input.  From the
 //  EquationSystems object we have access to the  Mesh and
 // other objects we might need.
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name);
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name);
 
 // Function prototype for the exact solution.
 Real exact_solution (const int component,
@@ -75,19 +75,19 @@ Real exact_solution (const int component,
                      const Real y,
                      const Real z = 0.);
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libraries.
   LibMeshInit init (argc, argv);
 
   // Brief message to the user regarding the program name
   // and command line arguments.
-  std::cout << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
 
   for (int i=1; i<argc; i++)
-    std::cout << " " << argv[i];
+    libMesh::out << " " << argv[i];
 
-  std::cout << std::endl << std::endl;
+  libMesh::out << std::endl << std::endl;
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -150,11 +150,11 @@ int main (int argc, char** argv)
   equation_systems.get_system("Poisson").solve();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO(mesh).write_equation_systems( "out.e", equation_systems);
+  ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 #endif
 
 #ifdef LIBMESH_HAVE_GMV
-  GMVIO(mesh).write_equation_systems( "out.gmv", equation_systems);
+  GMVIO(mesh).write_equation_systems("out.gmv", equation_systems);
 #endif
 
   // All done.
@@ -168,8 +168,8 @@ int main (int argc, char** argv)
 // matrices and right-hand sides, and then take into
 // account the boundary conditions, which will be handled
 // via a penalty method.
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name)
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name)
 {
 
   // It is a good idea to make sure we are assembling
@@ -178,19 +178,19 @@ void assemble_poisson(EquationSystems& es,
 
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem> ("Poisson");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("Poisson");
 
   // A reference to the  DofMap object for this system.  The  DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the  DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -224,20 +224,20 @@ void assemble_poisson(EquationSystems& es,
   // will be used to assemble the linear system.
   //
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
   // properties at the quadrature points.
-  const std::vector<Point>& q_point = fe->get_xyz();
+  const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
   // Notice the shape functions are a vector rather than a scalar.
-  const std::vector<std::vector<RealGradient> >& phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points. Notice that the shape function gradients are a tensor.
-  const std::vector<std::vector<RealTensor> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealTensor> > & dphi = fe->get_dphi();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -247,7 +247,6 @@ void assemble_poisson(EquationSystems& es,
   // or complex numbers.
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
-
 
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
@@ -276,7 +275,7 @@ void assemble_poisson(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -289,7 +288,6 @@ void assemble_poisson(EquationSystems& es,
       // quadrature points (q_point) and the shape functions
       // (phi, dphi) for the current element.
       fe->reinit (elem);
-
 
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
@@ -309,15 +307,12 @@ void assemble_poisson(EquationSystems& es,
       // the numeric integration.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-
           // Now we will build the element matrix.  This involves
           // a double loop to integrate the test funcions (i) against
           // the trial functions (j).
           for (unsigned int i=0; i<phi.size(); i++)
             for (unsigned int j=0; j<phi.size(); j++)
-              {
-                Ke(i,j) += JxW[qp]*( dphi[i][qp].contract(dphi[j][qp]) );
-              }
+              Ke(i,j) += JxW[qp] * dphi[i][qp].contract(dphi[j][qp]);
 
           // This is the end of the matrix summation loop
           // Now we build the element right-hand-side contribution.
@@ -327,7 +322,6 @@ void assemble_poisson(EquationSystems& es,
             const Real x = q_point[qp](0);
             const Real y = q_point[qp](1);
             const Real eps = 1.e-3;
-
 
             // "f" is the forcing function for the Poisson equation.
             // In this case we set f to be a finite difference
@@ -343,19 +337,19 @@ void assemble_poisson(EquationSystems& es,
             // Since the value of the forcing function depends only
             // on the location of the quadrature point (q_point[qp])
             // we will compute it here, outside of the i-loop
-            const Real fx = -(exact_solution(0,x,y-eps) +
-                              exact_solution(0,x,y+eps) +
-                              exact_solution(0,x-eps,y) +
-                              exact_solution(0,x+eps,y) -
-                              4.*exact_solution(0,x,y))/eps/eps;
+            const Real fx = -(exact_solution(0, x, y-eps) +
+                              exact_solution(0, x, y+eps) +
+                              exact_solution(0, x-eps, y) +
+                              exact_solution(0, x+eps, y) -
+                              4.*exact_solution(0, x, y))/eps/eps;
 
-            const Real fy = -(exact_solution(1,x,y-eps) +
-                              exact_solution(1,x,y+eps) +
-                              exact_solution(1,x-eps,y) +
-                              exact_solution(1,x+eps,y) -
-                              4.*exact_solution(1,x,y))/eps/eps;
+            const Real fy = -(exact_solution(1, x, y-eps) +
+                              exact_solution(1, x, y+eps) +
+                              exact_solution(1, x-eps, y) +
+                              exact_solution(1, x+eps, y) -
+                              4.*exact_solution(1, x, y))/eps/eps;
 
-            const RealGradient f( fx, fy );
+            const RealGradient f(fx, fy);
 
             for (unsigned int i=0; i<phi.size(); i++)
               Fe(i) += JxW[qp]*f*phi[i][qp];
@@ -393,7 +387,6 @@ void assemble_poisson(EquationSystems& es,
       //
       // \frac{1}{\epsilon} is the penalty parameter, defined such that \epsilon << 1
       {
-
         // The following loop is over the sides of the element.
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
@@ -402,16 +395,16 @@ void assemble_poisson(EquationSystems& es,
             {
               // The value of the shape functions at the quadrature
               // points.
-              const std::vector<std::vector<RealGradient> >&  phi_face = fe_face->get_phi();
+              const std::vector<std::vector<RealGradient> > & phi_face = fe_face->get_phi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
-              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+              const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
               // The XYZ locations (in physical space) of the
               // quadrature points on the face.  This is where
               // we will interpolate the boundary value function.
-              const std::vector<Point>& qface_point = fe_face->get_xyz();
+              const std::vector<Point> & qface_point = fe_face->get_xyz();
 
               // Compute the shape function values on the element
               // face.
@@ -420,7 +413,6 @@ void assemble_poisson(EquationSystems& es,
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-
                   // The location on the boundary of the current
                   // face quadrature point.
                   const Real xf = qface_point[qp](0);
@@ -431,8 +423,8 @@ void assemble_poisson(EquationSystems& es,
                   const Real penalty = 1.e10;
 
                   // The boundary values.
-                  const RealGradient f( exact_solution(0, xf, yf),
-                                        exact_solution(1, xf, yf) );
+                  const RealGradient f(exact_solution(0, xf, yf),
+                                       exact_solution(1, xf, yf));
 
                   // Matrix contribution of the L2 projection.
                   for (unsigned int i=0; i<phi_face.size(); i++)
