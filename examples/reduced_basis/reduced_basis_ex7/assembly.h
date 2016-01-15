@@ -37,32 +37,68 @@ using libMesh::MeshBase;
 using libMesh::FEBase;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
-struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(1., mu.get_value("frequency")*damping_epsilon); return val; } };
-struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(-mu.get_value("frequency")*mu.get_value("frequency"), 0.); return val; } };
-struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(0., mu.get_value("frequency")); return val; } };
-struct ThetaA3 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(0.5/R_rad, mu.get_value("frequency")); return val; } };
+struct ThetaA0 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return Number(1., mu.get_value("frequency")*damping_epsilon);
+  }
+};
 
-struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(0., 2.*mu.get_value("frequency")); return val; } };
+struct ThetaA1 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return Number(-mu.get_value("frequency")*mu.get_value("frequency"), 0.);
+  }
+};
 
-struct ThetaOutput0 : RBTheta { virtual Number evaluate(const RBParameters& ) { Number val(1., 0.); return val; } };
+struct ThetaA2 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return Number(0., mu.get_value("frequency"));
+  }
+};
+
+struct ThetaA3 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return Number(0.5/R_rad, mu.get_value("frequency"));
+  }
+};
+
+struct ThetaF0 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return Number(0., 2.*mu.get_value("frequency"));
+  }
+};
+
+struct ThetaOutput0 : RBTheta
+{
+  virtual Number evaluate(const RBParameters &)
+  {
+    return Number(1., 0.);
+  }
+};
 
 struct AcousticsInnerProduct : ElemAssembly
 {
-  virtual void interior_assembly(FEMContext &c)
+  virtual void interior_assembly(FEMContext & c)
   {
     const unsigned int p_var = 0;
 
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( p_var, elem_fe );
+    FEBase * elem_fe = NULL;
+    c.get_element_fe(p_var, elem_fe);
 
-    const std::vector<Real> &JxW =
-      elem_fe->get_JxW();
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> >& phi =
-      elem_fe->get_phi();
+    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
-    const std::vector<std::vector<RealGradient> >& dphi =
-      elem_fe->get_dphi();
+    const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -74,27 +110,25 @@ struct AcousticsInnerProduct : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)
-          c.get_elem_jacobian()(i,j) += JxW[qp] * ( (dphi[j][qp]*dphi[i][qp]) +
-                                                    (phi[j][qp]*phi[i][qp]) );
+          c.get_elem_jacobian()(i,j) += JxW[qp] * ((dphi[j][qp]*dphi[i][qp]) +
+                                                   (phi[j][qp]*phi[i][qp]));
   }
 };
 
 struct A0 : ElemAssembly
 {
-  virtual void interior_assembly(FEMContext &c)
+  virtual void interior_assembly(FEMContext & c)
   {
     const unsigned int p_var = 0;
 
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( p_var, elem_fe );
+    FEBase * elem_fe = NULL;
+    c.get_element_fe(p_var, elem_fe);
 
-    const std::vector<Real> &JxW =
-      elem_fe->get_JxW();
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
 
     // The velocity shape function gradients at interior
     // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi =
-      elem_fe->get_dphi();
+    const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -112,18 +146,16 @@ struct A0 : ElemAssembly
 
 struct A1 : ElemAssembly
 {
-  virtual void interior_assembly(FEMContext &c)
+  virtual void interior_assembly(FEMContext & c)
   {
     const unsigned int p_var = 0;
 
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( p_var, elem_fe );
+    FEBase * elem_fe = NULL;
+    c.get_element_fe(p_var, elem_fe);
 
-    const std::vector<Real> &JxW =
-      elem_fe->get_JxW();
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> >& phi =
-      elem_fe->get_phi();
+    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -140,20 +172,18 @@ struct A1 : ElemAssembly
 
 struct A2 : ElemAssembly
 {
-  virtual void boundary_assembly(FEMContext &c)
+  virtual void boundary_assembly(FEMContext & c)
   {
-    if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
+    if (c.has_side_boundary_id(1)) // Forcing on the horn "inlet"
       {
         const unsigned int p_var = 0;
 
-        FEBase* side_fe = NULL;
-        c.get_side_fe( p_var, side_fe );
+        FEBase * side_fe = NULL;
+        c.get_side_fe(p_var, side_fe);
 
-        const std::vector<Real> &JxW_face =
-          side_fe->get_JxW();
+        const std::vector<Real> & JxW_face = side_fe->get_JxW();
 
-        const std::vector<std::vector<Real> >& phi_face =
-          side_fe->get_phi();
+        const std::vector<std::vector<Real> > & phi_face = side_fe->get_phi();
 
         // The number of local degrees of freedom in each variable
         const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -171,20 +201,18 @@ struct A2 : ElemAssembly
 
 struct A3 : ElemAssembly
 {
-  virtual void boundary_assembly(FEMContext &c)
+  virtual void boundary_assembly(FEMContext & c)
   {
-    if( c.has_side_boundary_id(2) ) // Radiation condition on the "bubble"
+    if (c.has_side_boundary_id(2)) // Radiation condition on the "bubble"
       {
         const unsigned int p_var = 0;
 
-        FEBase* side_fe = NULL;
-        c.get_side_fe( p_var, side_fe );
+        FEBase * side_fe = NULL;
+        c.get_side_fe(p_var, side_fe);
 
-        const std::vector<Real> &JxW_face =
-          side_fe->get_JxW();
+        const std::vector<Real> & JxW_face = side_fe->get_JxW();
 
-        const std::vector<std::vector<Real> >& phi_face =
-          side_fe->get_phi();
+        const std::vector<std::vector<Real> > & phi_face = side_fe->get_phi();
 
         // The number of local degrees of freedom in each variable
         const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -202,20 +230,18 @@ struct A3 : ElemAssembly
 
 struct F0 : ElemAssembly
 {
-  virtual void boundary_assembly(FEMContext &c)
+  virtual void boundary_assembly(FEMContext & c)
   {
-    if( c.has_side_boundary_id(1) ) // Output is calculated on the horn "inlet"
+    if (c.has_side_boundary_id(1)) // Output is calculated on the horn "inlet"
       {
         const unsigned int p_var = 0;
 
-        FEBase* side_fe = NULL;
-        c.get_side_fe( p_var, side_fe );
+        FEBase * side_fe = NULL;
+        c.get_side_fe(p_var, side_fe);
 
-        const std::vector<Real> &JxW_face =
-          side_fe->get_JxW();
+        const std::vector<Real> & JxW_face = side_fe->get_JxW();
 
-        const std::vector<std::vector<Real> >& phi_face =
-          side_fe->get_phi();
+        const std::vector<std::vector<Real> > & phi_face = side_fe->get_phi();
 
         // The number of local degrees of freedom in each variable
         const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -232,20 +258,18 @@ struct F0 : ElemAssembly
 
 struct Output0 : ElemAssembly
 {
-  virtual void boundary_assembly(FEMContext &c)
+  virtual void boundary_assembly(FEMContext & c)
   {
-    if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
+    if (c.has_side_boundary_id(1)) // Forcing on the horn "inlet"
       {
         const unsigned int p_var = 0;
 
-        FEBase* side_fe = NULL;
-        c.get_side_fe( p_var, side_fe );
+        FEBase * side_fe = NULL;
+        c.get_side_fe(p_var, side_fe);
 
-        const std::vector<Real> &JxW_face =
-          side_fe->get_JxW();
+        const std::vector<Real> & JxW_face = side_fe->get_JxW();
 
-        const std::vector<std::vector<Real> >& phi_face =
-          side_fe->get_phi();
+        const std::vector<std::vector<Real> > & phi_face = side_fe->get_phi();
 
         // The number of local degrees of freedom in each variable
         const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -262,7 +286,6 @@ struct Output0 : ElemAssembly
 
 struct AcousticsRBThetaExpansion : RBThetaExpansion
 {
-
   /**
    * Constructor.
    */
@@ -291,7 +314,6 @@ struct AcousticsRBThetaExpansion : RBThetaExpansion
 // Define an RBAssemblyExpansion class for this PDE
 struct AcousticsRBAssemblyExpansion : RBAssemblyExpansion
 {
-
   /**
    * Constructor.
    */

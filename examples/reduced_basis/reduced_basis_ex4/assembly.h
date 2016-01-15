@@ -38,34 +38,34 @@ using libMesh::FEBase;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
-  virtual Number evaluate(const RBParameters& mu,
-                          const Point& p,
-                          const Elem& )
+  virtual Number evaluate(const RBParameters & mu,
+                          const Point & p,
+                          const Elem &)
   {
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");
-    return exp( -2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)) );
+    return exp(-2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)));
   }
 };
 
 // Expansion of the PDE operator
-struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& )   { return 0.05;  } };
+struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters &) { return 0.05;  } };
 
 struct A0 : ElemAssembly
 {
   // Assemble the Laplacian operator
-  virtual void interior_assembly(FEMContext &c)
+  virtual void interior_assembly(FEMContext & c)
   {
     const unsigned int u_var = 0;
 
-    FEBase* elem_fe = NULL;
+    FEBase * elem_fe = NULL;
     c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<Real> &JxW = elem_fe->get_JxW();
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
 
     // The velocity shape function gradients at interior
     // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
+    const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -83,18 +83,17 @@ struct A0 : ElemAssembly
 
 struct EIM_IP_assembly : ElemAssembly
 {
-
   // Use the L2 norm to find the best fit
-  virtual void interior_assembly(FEMContext &c)
+  virtual void interior_assembly(FEMContext & c)
   {
     const unsigned int u_var = 0;
 
-    FEBase* elem_fe = NULL;
+    FEBase * elem_fe = NULL;
     c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<Real> &JxW = elem_fe->get_JxW();
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
@@ -109,27 +108,26 @@ struct EIM_IP_assembly : ElemAssembly
 
 struct EIM_F : RBEIMAssembly
 {
-
-  EIM_F(RBEIMConstruction& rb_eim_con_in,
-        unsigned int basis_function_index_in)
-    : RBEIMAssembly(rb_eim_con_in,
-                    basis_function_index_in)
+  EIM_F(RBEIMConstruction & rb_eim_con_in,
+        unsigned int basis_function_index_in) :
+    RBEIMAssembly(rb_eim_con_in,
+                  basis_function_index_in)
   {}
 
-  virtual void interior_assembly(FEMContext &c)
+  virtual void interior_assembly(FEMContext & c)
   {
     // PDE variable number
     const unsigned int u_var = 0;
 
-    FEBase* elem_fe = NULL;
+    FEBase * elem_fe = NULL;
     c.get_element_fe(u_var, elem_fe);
 
     // EIM variable number
     const unsigned int eim_var = 0;
 
-    const std::vector<Real> &JxW = elem_fe->get_JxW();
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -145,15 +143,13 @@ struct EIM_F : RBEIMAssembly
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
-        c.get_elem_residual()(i) += JxW[qp] * ( eim_values[qp]*phi[i][qp] );
+        c.get_elem_residual()(i) += JxW[qp] * (eim_values[qp]*phi[i][qp]);
   }
-
 };
 
 // Define an RBThetaExpansion class for this PDE
 struct EimTestRBThetaExpansion : RBThetaExpansion
 {
-
   /**
    * Constructor.
    */
@@ -169,7 +165,6 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
 // Define an RBAssemblyExpansion class for this PDE
 struct EimTestRBAssemblyExpansion : RBAssemblyExpansion
 {
-
   /**
    * Constructor.
    */
@@ -180,7 +175,6 @@ struct EimTestRBAssemblyExpansion : RBAssemblyExpansion
 
   // A0 assembly object
   A0 A0_assembly;
-
 };
 
 #endif

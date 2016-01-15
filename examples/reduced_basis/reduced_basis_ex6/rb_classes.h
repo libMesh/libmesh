@@ -49,7 +49,7 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation(const libMesh::Parallel::Communicator& comm)
+  SimpleRBEvaluation(const libMesh::Parallel::Communicator & comm)
     : RBEvaluation(comm)
   {
     set_rb_theta_expansion(ex6_theta_expansion);
@@ -75,8 +75,8 @@ class SimpleRBConstruction : public RBConstruction
 {
 public:
 
-  SimpleRBConstruction (EquationSystems& es,
-                        const std::string& name_in,
+  SimpleRBConstruction (EquationSystems & es,
+                        const std::string & name_in,
                         const unsigned int number_in)
     : Parent(es, name_in, number_in),
       ex6_assembly_expansion(*this),
@@ -130,13 +130,13 @@ public:
   /**
    * Pre-request all relevant element data.
    */
-  virtual void init_context(FEMContext &c)
+  virtual void init_context(FEMContext & c)
   {
     // For efficiency, we should prerequest all
     // the data we will need to build the
     // linear system before doing an element loop.
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( u_var, elem_fe );
+    FEBase * elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
 
     elem_fe->get_JxW();
     elem_fe->get_phi();
@@ -164,7 +164,6 @@ public:
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
   UniquePtr<DirichletBoundary> dirichlet_bc;
-
 };
 
 #endif
