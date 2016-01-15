@@ -79,8 +79,8 @@ using namespace libMesh;
 // name of the system we are assembling as input.  From the
 // \p EquationSystems object we have acess to the \p Mesh and
 // other objects we might need.
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name);
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name);
 
 // Exact solution function prototype.
 Real exact_solution (const Real x,
@@ -88,7 +88,7 @@ Real exact_solution (const Real x,
                      const Real z = 0.);
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
@@ -111,12 +111,12 @@ int main (int argc, char** argv)
   // and command line arguments.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
     }
 
 
@@ -124,7 +124,7 @@ int main (int argc, char** argv)
   // instead of unsigned since the GetPot overload is ambiguous
   // otherwise.
   int dim = 2;
-  if ( command_line.search(1, "-d") )
+  if (command_line.search(1, "-d"))
     dim = command_line.next(dim);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
@@ -136,17 +136,17 @@ int main (int argc, char** argv)
 
   // Read number of elements from command line
   int ps = 15;
-  if ( command_line.search(1, "-n") )
+  if (command_line.search(1, "-n"))
     ps = command_line.next(ps);
 
   // Read FE order from command line
   std::string order = "SECOND";
-  if ( command_line.search(2, "-Order", "-o") )
+  if (command_line.search(2, "-Order", "-o"))
     order = command_line.next(order);
 
   // Read FE Family from command line
   std::string family = "LAGRANGE";
-  if ( command_line.search(2, "-FEFamily", "-f") )
+  if (command_line.search(2, "-FEFamily", "-f"))
     family = command_line.next(family);
 
   // Cannot use discontinuous basis.
@@ -199,7 +199,7 @@ int main (int argc, char** argv)
 
     for ( ; el != end_el; ++el)
       {
-        Elem* elem = *el;
+        Elem * elem = *el;
         const Point cent = elem->centroid();
         if (dim > 1)
           {
@@ -222,7 +222,7 @@ int main (int argc, char** argv)
 
   // Declare the system and its variables.
   // Create a system named "Poisson"
-  LinearImplicitSystem& system =
+  LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
 
@@ -261,16 +261,16 @@ int main (int argc, char** argv)
 
   // After solving the system write the solution
   // to a GMV-formatted plot file.
-  if(dim == 1)
+  if (dim == 1)
     {
-      GnuPlotIO plot(mesh,"Subdomains Example 2, 1D",GnuPlotIO::GRID_ON);
-      plot.write_equation_systems("gnuplot_script",equation_systems);
+      GnuPlotIO plot(mesh, "Subdomains Example 2, 1D", GnuPlotIO::GRID_ON);
+      plot.write_equation_systems("gnuplot_script", equation_systems);
     }
   else
     {
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
-                                                 "out_3.e" : "out_2.e",equation_systems);
+                                                 "out_3.e" : "out_2.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
 
@@ -289,8 +289,8 @@ int main (int argc, char** argv)
 // matrices and right-hand sides, and then take into
 // account the boundary conditions, which will be handled
 // via a penalty method.
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name)
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -303,19 +303,19 @@ void assemble_poisson(EquationSystems& es,
   PerfLog perf_log ("Matrix Assembly");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Poisson");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -350,19 +350,19 @@ void assemble_poisson(EquationSystems& es,
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
   // properties at the quadrature points.
-  const std::vector<Point>& q_point = fe->get_xyz();
+  const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -397,16 +397,16 @@ void assemble_poisson(EquationSystems& es,
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
       // contribute to.
-      dof_map.dof_indices (elem, dof_indices,0);
-      dof_map.dof_indices (elem, dof_indices2,1);
+      dof_map.dof_indices (elem, dof_indices, 0);
+      dof_map.dof_indices (elem, dof_indices2, 1);
 
-      //       std::cout << "dof_indices.size()="
+      // libMesh::out << "dof_indices.size()="
       // << dof_indices.size()
       // << ", dof_indices2.size()="
       // << dof_indices2.size()
@@ -490,20 +490,20 @@ void assemble_poisson(EquationSystems& es,
 #endif
           const Real eps = 1.e-3;
 
-          const Real uxx = (exact_solution(x-eps,y,z) +
-                            exact_solution(x+eps,y,z) +
-                            -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uxx = (exact_solution(x-eps, y, z) +
+                            exact_solution(x+eps, y, z) +
+                            -2.*exact_solution(x, y, z))/eps/eps;
 
-          const Real uyy = (exact_solution(x,y-eps,z) +
-                            exact_solution(x,y+eps,z) +
-                            -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uyy = (exact_solution(x, y-eps, z) +
+                            exact_solution(x, y+eps, z) +
+                            -2.*exact_solution(x, y, z))/eps/eps;
 
-          const Real uzz = (exact_solution(x,y,z-eps) +
-                            exact_solution(x,y,z+eps) +
-                            -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uzz = (exact_solution(x, y, z-eps) +
+                            exact_solution(x, y, z+eps) +
+                            -2.*exact_solution(x, y, z))/eps/eps;
 
           Real fxy;
-          if(dim==1)
+          if (dim==1)
             {
               // In 1D, compute the rhs by differentiating the
               // exact solution twice.
@@ -548,16 +548,16 @@ void assemble_poisson(EquationSystems& es,
 
               // The value of the shape functions at the quadrature
               // points.
-              const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+              const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
-              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+              const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
               // The XYZ locations (in physical space) of the
               // quadrature points on the face.  This is where
               // we will interpolate the boundary value function.
-              const std::vector<Point >& qface_point = fe_face->get_xyz();
+              const std::vector<Point> & qface_point = fe_face->get_xyz();
 
               // Compute the shape function values on the element
               // face.
