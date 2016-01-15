@@ -231,49 +231,49 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
 
   for (unsigned int qp = 0; qp != n_qpoints; qp++)
     {
-    // Compute the displacement gradient
-    grad_u(0) = grad_u(1) = grad_u(2) = 0;
-    for (unsigned int d = 0; d < dim; ++d)
-      {
-      std::vector<Number> u_undefo;
-      aux_system.get_dof_map().dof_indices(&c.get_elem(), undefo_index, undefo_var[d]);
-      aux_system.current_local_solution->get(undefo_index, u_undefo);
-      for (unsigned int l = 0; l != n_u_dofs; l++)
-        grad_u(d).add_scaled(dphi[l][qp], u_undefo[l]); // u_current(l)); // -
-    }
+      // Compute the displacement gradient
+      grad_u(0) = grad_u(1) = grad_u(2) = 0;
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          std::vector<Number> u_undefo;
+          aux_system.get_dof_map().dof_indices(&c.get_elem(), undefo_index, undefo_var[d]);
+          aux_system.current_local_solution->get(undefo_index, u_undefo);
+          for (unsigned int l = 0; l != n_u_dofs; l++)
+            grad_u(d).add_scaled(dphi[l][qp], u_undefo[l]); // u_current(l)); // -
+        }
 
-    // initialize the constitutive formulation with the current displacement
-    // gradient
-    material.init_for_qp(grad_u, qp);
+      // initialize the constitutive formulation with the current displacement
+      // gradient
+      material.init_for_qp(grad_u, qp);
 
-    // Aquire, scale and assemble residual and stiffness
-    for (unsigned int i = 0; i < n_u_dofs; i++)
-      {
-        res.resize(dim);
-        material.get_residual(res, i);
-        res.scale(JxW[qp]);
-        for (unsigned int ii = 0; ii < dim; ++ii)
-          (c.get_elem_residual(ii))(i) += res(ii);
+      // Aquire, scale and assemble residual and stiffness
+      for (unsigned int i = 0; i < n_u_dofs; i++)
+        {
+          res.resize(dim);
+          material.get_residual(res, i);
+          res.scale(JxW[qp]);
+          for (unsigned int ii = 0; ii < dim; ++ii)
+            (c.get_elem_residual(ii))(i) += res(ii);
 
-        if (request_jacobian && c.elem_solution_derivative)
-          {
-            libmesh_assert(c.elem_solution_derivative == 1.0);
-            for (unsigned int j = (use_symmetry ? i : 0); j < n_u_dofs; j++)
-              {
-                material.get_linearized_stiffness(stiff, i, j);
-                stiff.scale(JxW[qp]);
-                for (unsigned int ii = 0; ii < dim; ++ii)
-                  {
-                    for (unsigned int jj = 0; jj < dim; ++jj)
-                      {
-                        (c.get_elem_jacobian(ii,jj))(i, j) += stiff(ii, jj);
-                        if (use_symmetry && i != j)
-                          (c.get_elem_jacobian(ii,jj))(j, i) += stiff(jj, ii);
-                      }
-                  }
-              }
-          }
-      }
+          if (request_jacobian && c.elem_solution_derivative)
+            {
+              libmesh_assert(c.elem_solution_derivative == 1.0);
+              for (unsigned int j = (use_symmetry ? i : 0); j < n_u_dofs; j++)
+                {
+                  material.get_linearized_stiffness(stiff, i, j);
+                  stiff.scale(JxW[qp]);
+                  for (unsigned int ii = 0; ii < dim; ++ii)
+                    {
+                      for (unsigned int jj = 0; jj < dim; ++jj)
+                        {
+                          (c.get_elem_jacobian(ii,jj))(i, j) += stiff(ii, jj);
+                          if (use_symmetry && i != j)
+                            (c.get_elem_jacobian(ii,jj))(j, i) += stiff(jj, ii);
+                        }
+                    }
+                }
+            }
+        }
     } // end of the quadrature point qp-loop
 
   return request_jacobian;

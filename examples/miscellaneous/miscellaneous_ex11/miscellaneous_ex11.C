@@ -204,14 +204,14 @@ int main (int argc, char ** argv)
   Node * center_node = 0;
   Real nearest_dist_sq = mesh.point(0).size_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
-  {
-    const Real dist_sq = mesh.point(nid).size_sq();
-    if (dist_sq < nearest_dist_sq)
     {
-      nearest_dist_sq = dist_sq;
-      center_node = mesh.node_ptr(nid);
+      const Real dist_sq = mesh.point(nid).size_sq();
+      if (dist_sq < nearest_dist_sq)
+        {
+          nearest_dist_sq = dist_sq;
+          center_node = mesh.node_ptr(nid);
+        }
     }
-  }
 
   // Finally, we evaluate the z-displacement "w" at the center node.
   const unsigned int w_var = system.variable_number ("w");
@@ -349,219 +349,219 @@ void assemble_shell (EquationSystems & es,
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for (; el != end_el; ++el)
-  {
-    // Store a pointer to the element we are currently
-    // working on.  This allows for nicer syntax later.
-    const Elem * elem = *el;
-
-    // The ghost elements at the boundaries need to be excluded
-    // here, as they don't belong to the physical shell,
-    // but serve for a proper boundary treatment only.
-    libmesh_assert_equal_to (elem->type(), TRI3SUBDIVISION);
-    const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *> (elem);
-    if (sd_elem->is_ghost())
-      continue;
-
-    // Get the degree of freedom indices for the
-    // current element.  These define where in the global
-    // matrix and right-hand-side this element will
-    // contribute to.
-    dof_map.dof_indices (elem, dof_indices);
-    dof_map.dof_indices (elem, dof_indices_u, u_var);
-    dof_map.dof_indices (elem, dof_indices_v, v_var);
-    dof_map.dof_indices (elem, dof_indices_w, w_var);
-
-    const std::size_t n_dofs   = dof_indices.size();
-    const std::size_t n_u_dofs = dof_indices_u.size();
-    const std::size_t n_v_dofs = dof_indices_v.size();
-    const std::size_t n_w_dofs = dof_indices_w.size();
-
-    // Compute the element-specific data for the current
-    // element.  This involves computing the location of the
-    // quadrature points and the shape functions
-    // (phi, dphi, d2phi) for the current element.
-    fe->reinit (elem);
-
-    // Zero the element matrix and right-hand side before
-    // summing them.  We use the resize member here because
-    // the number of degrees of freedom might have changed from
-    // the last element.
-    Ke.resize (n_dofs, n_dofs);
-    Fe.resize (n_dofs);
-
-    // Reposition the submatrices...  The idea is this:
-    //
-    //         -           -          -  -
-    //        | Kuu Kuv Kuw |        | Fu |
-    //   Ke = | Kvu Kvv Kvw |;  Fe = | Fv |
-    //        | Kwu Kwv Kww |        | Fw |
-    //         -           -          -  -
-    //
-    // The \p DenseSubMatrix.repostition () member takes the
-    // (row_offset, column_offset, row_size, column_size).
-    //
-    // Similarly, the \p DenseSubVector.reposition () member
-    // takes the (row_offset, row_size)
-    Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
-    Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
-    Kuw.reposition (u_var*n_u_dofs, w_var*n_u_dofs, n_u_dofs, n_w_dofs);
-
-    Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
-    Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
-    Kvw.reposition (v_var*n_v_dofs, w_var*n_v_dofs, n_v_dofs, n_w_dofs);
-
-    Kwu.reposition (w_var*n_w_dofs, u_var*n_w_dofs, n_w_dofs, n_u_dofs);
-    Kwv.reposition (w_var*n_w_dofs, v_var*n_w_dofs, n_w_dofs, n_v_dofs);
-    Kww.reposition (w_var*n_w_dofs, w_var*n_w_dofs, n_w_dofs, n_w_dofs);
-
-    Fu.reposition (u_var*n_u_dofs, n_u_dofs);
-    Fv.reposition (v_var*n_u_dofs, n_v_dofs);
-    Fw.reposition (w_var*n_u_dofs, n_w_dofs);
-
-    // Now we will build the element matrix and right-hand-side.
-    for (unsigned int qp=0; qp<qrule->n_points(); ++qp)
     {
-      // First, we compute the external force resulting
-      // from a load q distributed uniformly across the plate.
-      // Since the load is supposed to be transverse to the plate,
-      // it affects the z-direction, i.e. the "w" variable.
-      for (unsigned int i=0; i<n_u_dofs; ++i)
-        Fw(i) += JxW[qp] * phi[i][qp] * q;
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem * elem = *el;
 
-      // Next, we assemble the stiffness matrix.  This is only valid
-      // for the linear theory, i.e., for small deformations, where
-      // reference and deformed surface metrics are indistinguishable.
+      // The ghost elements at the boundaries need to be excluded
+      // here, as they don't belong to the physical shell,
+      // but serve for a proper boundary treatment only.
+      libmesh_assert_equal_to (elem->type(), TRI3SUBDIVISION);
+      const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *> (elem);
+      if (sd_elem->is_ghost())
+        continue;
 
-      // Get the three surface basis vectors.
-      const RealVectorValue & a1 = dxyzdxi[qp];
-      const RealVectorValue & a2 = dxyzdeta[qp];
-            RealVectorValue   a3 = a1.cross(a2);
-      const Real jac = a3.size(); // the surface Jacobian
-      libmesh_assert_greater (jac, 0);
-      a3 /= jac; // the shell director a3 is normalized to unit length
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
+      dof_map.dof_indices (elem, dof_indices);
+      dof_map.dof_indices (elem, dof_indices_u, u_var);
+      dof_map.dof_indices (elem, dof_indices_v, v_var);
+      dof_map.dof_indices (elem, dof_indices_w, w_var);
 
-      // Get the derivatives of the surface tangents.
-      const RealVectorValue & a11 = d2xyzdxi2[qp];
-      const RealVectorValue & a22 = d2xyzdeta2[qp];
-      const RealVectorValue & a12 = d2xyzdxideta[qp];
+      const std::size_t n_dofs   = dof_indices.size();
+      const std::size_t n_u_dofs = dof_indices_u.size();
+      const std::size_t n_v_dofs = dof_indices_v.size();
+      const std::size_t n_w_dofs = dof_indices_w.size();
 
-      // Compute the three covariant components of the first
-      // fundamental form of the surface.
-      const RealVectorValue a(a1*a1, a2*a2, a1*a2);
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points and the shape functions
+      // (phi, dphi, d2phi) for the current element.
+      fe->reinit (elem);
 
-      // The elastic H matrix in Voigt's notation, computed from the
-      // covariant components of the first fundamental form rather
-      // than the contravariant components, exploiting that the
-      // contravariant first fundamental form is the inverse of the
-      // covatiant first fundamental form (hence the determinant etc.).
-      RealTensorValue H;
-      H(0,0) = a(1) * a(1);
-      H(0,1) = H(1,0) = nu * a(1) * a(0) + (1-nu) * a(2) * a(2);
-      H(0,2) = H(2,0) = -a(1) * a(2);
-      H(1,1) = a(0) * a(0);
-      H(1,2) = H(2,1) = -a(0) * a(2);
-      H(2,2) = 0.5 * ((1-nu) * a(1) * a(0) + (1+nu) * a(2) * a(2));
-      const Real det = a(0) * a(1) - a(2) * a(2);
-      libmesh_assert_not_equal_to (det * det, 0);
-      H /= det * det;
+      // Zero the element matrix and right-hand side before
+      // summing them.  We use the resize member here because
+      // the number of degrees of freedom might have changed from
+      // the last element.
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
 
-      // Precompute come cross products for the bending part below.
-      const RealVectorValue a11xa2 = a11.cross(a2);
-      const RealVectorValue a22xa2 = a22.cross(a2);
-      const RealVectorValue a12xa2 = a12.cross(a2);
-      const RealVectorValue a1xa11 =  a1.cross(a11);
-      const RealVectorValue a1xa22 =  a1.cross(a22);
-      const RealVectorValue a1xa12 =  a1.cross(a12);
-      const RealVectorValue a2xa3  =  a2.cross(a3);
-      const RealVectorValue a3xa1  =  a3.cross(a1);
+      // Reposition the submatrices...  The idea is this:
+      //
+      //         -           -          -  -
+      //        | Kuu Kuv Kuw |        | Fu |
+      //   Ke = | Kvu Kvv Kvw |;  Fe = | Fv |
+      //        | Kwu Kwv Kww |        | Fw |
+      //         -           -          -  -
+      //
+      // The \p DenseSubMatrix.repostition () member takes the
+      // (row_offset, column_offset, row_size, column_size).
+      //
+      // Similarly, the \p DenseSubVector.reposition () member
+      // takes the (row_offset, row_size)
+      Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
+      Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
+      Kuw.reposition (u_var*n_u_dofs, w_var*n_u_dofs, n_u_dofs, n_w_dofs);
 
-      // Loop over all pairs of nodes I,J.
-      for (unsigned int i=0; i<n_u_dofs; ++i)
-      {
-        for (unsigned int j=0; j<n_u_dofs; ++j)
+      Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
+      Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
+      Kvw.reposition (v_var*n_v_dofs, w_var*n_v_dofs, n_v_dofs, n_w_dofs);
+
+      Kwu.reposition (w_var*n_w_dofs, u_var*n_w_dofs, n_w_dofs, n_u_dofs);
+      Kwv.reposition (w_var*n_w_dofs, v_var*n_w_dofs, n_w_dofs, n_v_dofs);
+      Kww.reposition (w_var*n_w_dofs, w_var*n_w_dofs, n_w_dofs, n_w_dofs);
+
+      Fu.reposition (u_var*n_u_dofs, n_u_dofs);
+      Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+      Fw.reposition (w_var*n_u_dofs, n_w_dofs);
+
+      // Now we will build the element matrix and right-hand-side.
+      for (unsigned int qp=0; qp<qrule->n_points(); ++qp)
         {
-          // The membrane strain matrices in Voigt's notation.
-          RealTensorValue MI, MJ;
-          for (unsigned int k=0; k<3; ++k)
-          {
-            MI(0,k) = dphi[i][qp](0) * a1(k);
-            MI(1,k) = dphi[i][qp](1) * a2(k);
-            MI(2,k) = dphi[i][qp](1) * a1(k)
-                    + dphi[i][qp](0) * a2(k);
+          // First, we compute the external force resulting
+          // from a load q distributed uniformly across the plate.
+          // Since the load is supposed to be transverse to the plate,
+          // it affects the z-direction, i.e. the "w" variable.
+          for (unsigned int i=0; i<n_u_dofs; ++i)
+            Fw(i) += JxW[qp] * phi[i][qp] * q;
 
-            MJ(0,k) = dphi[j][qp](0) * a1(k);
-            MJ(1,k) = dphi[j][qp](1) * a2(k);
-            MJ(2,k) = dphi[j][qp](1) * a1(k)
-                    + dphi[j][qp](0) * a2(k);
-          }
+          // Next, we assemble the stiffness matrix.  This is only valid
+          // for the linear theory, i.e., for small deformations, where
+          // reference and deformed surface metrics are indistinguishable.
 
-          // The bending strain matrices in Voigt's notation.
-          RealTensorValue BI, BJ;
-          for (unsigned int k=0; k<3; ++k)
-          {
-            const Real term_ik = dphi[i][qp](0) * a2xa3(k)
-                               + dphi[i][qp](1) * a3xa1(k);
-            BI(0,k) = -d2phi[i][qp](0,0) * a3(k)
-                      +(dphi[i][qp](0) * a11xa2(k)
-                      + dphi[i][qp](1) * a1xa11(k)
-                      + (a3*a11) * term_ik) / jac;
-            BI(1,k) = -d2phi[i][qp](1,1) * a3(k)
-                      +(dphi[i][qp](0) * a22xa2(k)
-                      + dphi[i][qp](1) * a1xa22(k)
-                      + (a3*a22) * term_ik) / jac;
-            BI(2,k) = 2 * (-d2phi[i][qp](0,1) * a3(k)
-                           +(dphi[i][qp](0) * a12xa2(k)
-                           + dphi[i][qp](1) * a1xa12(k)
-                           + (a3*a12) * term_ik) / jac);
+          // Get the three surface basis vectors.
+          const RealVectorValue & a1 = dxyzdxi[qp];
+          const RealVectorValue & a2 = dxyzdeta[qp];
+          RealVectorValue   a3 = a1.cross(a2);
+          const Real jac = a3.size(); // the surface Jacobian
+          libmesh_assert_greater (jac, 0);
+          a3 /= jac; // the shell director a3 is normalized to unit length
 
-            const Real term_jk = dphi[j][qp](0) * a2xa3(k)
-                               + dphi[j][qp](1) * a3xa1(k);
-            BJ(0,k) = -d2phi[j][qp](0,0) * a3(k)
-                      +(dphi[j][qp](0) * a11xa2(k)
-                      + dphi[j][qp](1) * a1xa11(k)
-                      + (a3*a11) * term_jk) / jac;
-            BJ(1,k) = -d2phi[j][qp](1,1) * a3(k)
-                      +(dphi[j][qp](0) * a22xa2(k)
-                      + dphi[j][qp](1) * a1xa22(k)
-                      + (a3*a22) * term_jk) / jac;
-            BJ(2,k) = 2 * (-d2phi[j][qp](0,1) * a3(k)
-                           +(dphi[j][qp](0) * a12xa2(k)
-                           + dphi[j][qp](1) * a1xa12(k)
-                           + (a3*a12) * term_jk) / jac);
-          }
+          // Get the derivatives of the surface tangents.
+          const RealVectorValue & a11 = d2xyzdxi2[qp];
+          const RealVectorValue & a22 = d2xyzdeta2[qp];
+          const RealVectorValue & a12 = d2xyzdxideta[qp];
 
-          // The total stiffness matrix coupling the nodes
-          // I and J is a sum of membrane and bending
-          // contributions according to the following formula.
-          const RealTensorValue KIJ = JxW[qp] * K * MI.transpose() * H * MJ
-                                    + JxW[qp] * D * BI.transpose() * H * BJ;
+          // Compute the three covariant components of the first
+          // fundamental form of the surface.
+          const RealVectorValue a(a1*a1, a2*a2, a1*a2);
 
-          // Insert the components of the coupling stiffness
-          // matrix \p KIJ into the corresponding directional
-          // submatrices.
-          Kuu(i,j) += KIJ(0,0);
-          Kuv(i,j) += KIJ(0,1);
-          Kuw(i,j) += KIJ(0,2);
+          // The elastic H matrix in Voigt's notation, computed from the
+          // covariant components of the first fundamental form rather
+          // than the contravariant components, exploiting that the
+          // contravariant first fundamental form is the inverse of the
+          // covatiant first fundamental form (hence the determinant etc.).
+          RealTensorValue H;
+          H(0,0) = a(1) * a(1);
+          H(0,1) = H(1,0) = nu * a(1) * a(0) + (1-nu) * a(2) * a(2);
+          H(0,2) = H(2,0) = -a(1) * a(2);
+          H(1,1) = a(0) * a(0);
+          H(1,2) = H(2,1) = -a(0) * a(2);
+          H(2,2) = 0.5 * ((1-nu) * a(1) * a(0) + (1+nu) * a(2) * a(2));
+          const Real det = a(0) * a(1) - a(2) * a(2);
+          libmesh_assert_not_equal_to (det * det, 0);
+          H /= det * det;
 
-          Kvu(i,j) += KIJ(1,0);
-          Kvv(i,j) += KIJ(1,1);
-          Kvw(i,j) += KIJ(1,2);
+          // Precompute come cross products for the bending part below.
+          const RealVectorValue a11xa2 = a11.cross(a2);
+          const RealVectorValue a22xa2 = a22.cross(a2);
+          const RealVectorValue a12xa2 = a12.cross(a2);
+          const RealVectorValue a1xa11 =  a1.cross(a11);
+          const RealVectorValue a1xa22 =  a1.cross(a22);
+          const RealVectorValue a1xa12 =  a1.cross(a12);
+          const RealVectorValue a2xa3  =  a2.cross(a3);
+          const RealVectorValue a3xa1  =  a3.cross(a1);
 
-          Kwu(i,j) += KIJ(2,0);
-          Kwv(i,j) += KIJ(2,1);
-          Kww(i,j) += KIJ(2,2);
-        }
-      }
+          // Loop over all pairs of nodes I,J.
+          for (unsigned int i=0; i<n_u_dofs; ++i)
+            {
+              for (unsigned int j=0; j<n_u_dofs; ++j)
+                {
+                  // The membrane strain matrices in Voigt's notation.
+                  RealTensorValue MI, MJ;
+                  for (unsigned int k=0; k<3; ++k)
+                    {
+                      MI(0,k) = dphi[i][qp](0) * a1(k);
+                      MI(1,k) = dphi[i][qp](1) * a2(k);
+                      MI(2,k) = dphi[i][qp](1) * a1(k)
+                        + dphi[i][qp](0) * a2(k);
 
-    } // end of the quadrature point qp-loop
+                      MJ(0,k) = dphi[j][qp](0) * a1(k);
+                      MJ(1,k) = dphi[j][qp](1) * a2(k);
+                      MJ(2,k) = dphi[j][qp](1) * a1(k)
+                        + dphi[j][qp](0) * a2(k);
+                    }
 
-    // The element matrix and right-hand-side are now built
-    // for this element.  Add them to the global matrix and
-    // right-hand-side vector.  The \p NumericMatrix::add_matrix()
-    // and \p NumericVector::add_vector() members do this for us.
-    system.matrix->add_matrix (Ke, dof_indices);
-    system.rhs->add_vector    (Fe, dof_indices);
-  } // end of non-ghost element loop
+                  // The bending strain matrices in Voigt's notation.
+                  RealTensorValue BI, BJ;
+                  for (unsigned int k=0; k<3; ++k)
+                    {
+                      const Real term_ik = dphi[i][qp](0) * a2xa3(k)
+                        + dphi[i][qp](1) * a3xa1(k);
+                      BI(0,k) = -d2phi[i][qp](0,0) * a3(k)
+                        +(dphi[i][qp](0) * a11xa2(k)
+                          + dphi[i][qp](1) * a1xa11(k)
+                          + (a3*a11) * term_ik) / jac;
+                      BI(1,k) = -d2phi[i][qp](1,1) * a3(k)
+                        +(dphi[i][qp](0) * a22xa2(k)
+                          + dphi[i][qp](1) * a1xa22(k)
+                          + (a3*a22) * term_ik) / jac;
+                      BI(2,k) = 2 * (-d2phi[i][qp](0,1) * a3(k)
+                                     +(dphi[i][qp](0) * a12xa2(k)
+                                       + dphi[i][qp](1) * a1xa12(k)
+                                       + (a3*a12) * term_ik) / jac);
+
+                      const Real term_jk = dphi[j][qp](0) * a2xa3(k)
+                        + dphi[j][qp](1) * a3xa1(k);
+                      BJ(0,k) = -d2phi[j][qp](0,0) * a3(k)
+                        +(dphi[j][qp](0) * a11xa2(k)
+                          + dphi[j][qp](1) * a1xa11(k)
+                          + (a3*a11) * term_jk) / jac;
+                      BJ(1,k) = -d2phi[j][qp](1,1) * a3(k)
+                        +(dphi[j][qp](0) * a22xa2(k)
+                          + dphi[j][qp](1) * a1xa22(k)
+                          + (a3*a22) * term_jk) / jac;
+                      BJ(2,k) = 2 * (-d2phi[j][qp](0,1) * a3(k)
+                                     +(dphi[j][qp](0) * a12xa2(k)
+                                       + dphi[j][qp](1) * a1xa12(k)
+                                       + (a3*a12) * term_jk) / jac);
+                    }
+
+                  // The total stiffness matrix coupling the nodes
+                  // I and J is a sum of membrane and bending
+                  // contributions according to the following formula.
+                  const RealTensorValue KIJ = JxW[qp] * K * MI.transpose() * H * MJ
+                    + JxW[qp] * D * BI.transpose() * H * BJ;
+
+                  // Insert the components of the coupling stiffness
+                  // matrix \p KIJ into the corresponding directional
+                  // submatrices.
+                  Kuu(i,j) += KIJ(0,0);
+                  Kuv(i,j) += KIJ(0,1);
+                  Kuw(i,j) += KIJ(0,2);
+
+                  Kvu(i,j) += KIJ(1,0);
+                  Kvv(i,j) += KIJ(1,1);
+                  Kvw(i,j) += KIJ(1,2);
+
+                  Kwu(i,j) += KIJ(2,0);
+                  Kwv(i,j) += KIJ(2,1);
+                  Kww(i,j) += KIJ(2,2);
+                }
+            }
+
+        } // end of the quadrature point qp-loop
+
+      // The element matrix and right-hand-side are now built
+      // for this element.  Add them to the global matrix and
+      // right-hand-side vector.  The \p NumericMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
+    } // end of non-ghost element loop
 
   // Next, we apply the boundary conditions.  In this case,
   // all boundaries are clamped by the penalty method, using
@@ -573,72 +573,72 @@ void assemble_shell (EquationSystems & es,
   el = mesh.active_local_elements_begin();
 
   for (; el != end_el; ++el)
-  {
-    // Store a pointer to the element we are currently
-    // working on.  This allows for nicer syntax later.
-    const Elem * elem = *el;
-
-    // For the boundary conditions, we only need to loop over
-    // the ghost elements.
-    libmesh_assert_equal_to (elem->type(), TRI3SUBDIVISION);
-    const Tri3Subdivision * gh_elem = static_cast<const Tri3Subdivision *> (elem);
-    if (!gh_elem->is_ghost())
-      continue;
-
-    // Find the side which is part of the physical plate boundary,
-    // that is, the boundary of the original mesh without ghosts.
-    for (unsigned int s=0; s<elem->n_sides(); ++s)
     {
-      const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor(s));
-      if (nb_elem == NULL || nb_elem->is_ghost())
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem * elem = *el;
+
+      // For the boundary conditions, we only need to loop over
+      // the ghost elements.
+      libmesh_assert_equal_to (elem->type(), TRI3SUBDIVISION);
+      const Tri3Subdivision * gh_elem = static_cast<const Tri3Subdivision *> (elem);
+      if (!gh_elem->is_ghost())
         continue;
 
-      /*
-       * Determine the four nodes involved in the boundary
-       * condition treatment of this side.  The \p MeshTools::Subdiv
-       * namespace provides lookup tables \p next and \p prev
-       * for an efficient determination of the next and previous
-       * nodes of an element, respectively.
-       *
-       *      n4
-       *     /  \
-       *    / gh \
-       *  n2 ---- n3
-       *    \ nb /
-       *     \  /
-       *      n1
-       */
-      Node * nodes [4]; // n1, n2, n3, n4
-      nodes[1] = gh_elem->get_node(s); // n2
-      nodes[2] = gh_elem->get_node(MeshTools::Subdivision::next[s]); // n3
-      nodes[3] = gh_elem->get_node(MeshTools::Subdivision::prev[s]); // n4
+      // Find the side which is part of the physical plate boundary,
+      // that is, the boundary of the original mesh without ghosts.
+      for (unsigned int s=0; s<elem->n_sides(); ++s)
+        {
+          const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor(s));
+          if (nb_elem == NULL || nb_elem->is_ghost())
+            continue;
 
-      // The node in the interior of the domain, \p n1, is the
-      // hardest to find.  Walk along the edges of element \p nb until
-      // we have identified it.
-      unsigned int n_int = 0;
-      nodes[0] = nb_elem->get_node(0);
-      while (nodes[0]->id() == nodes[1]->id() || nodes[0]->id() == nodes[2]->id())
-        nodes[0] = nb_elem->get_node(++n_int);
+          /*
+           * Determine the four nodes involved in the boundary
+           * condition treatment of this side.  The \p MeshTools::Subdiv
+           * namespace provides lookup tables \p next and \p prev
+           * for an efficient determination of the next and previous
+           * nodes of an element, respectively.
+           *
+           *      n4
+           *     /  \
+           *    / gh \
+           *  n2 ---- n3
+           *    \ nb /
+           *     \  /
+           *      n1
+           */
+          Node * nodes [4]; // n1, n2, n3, n4
+          nodes[1] = gh_elem->get_node(s); // n2
+          nodes[2] = gh_elem->get_node(MeshTools::Subdivision::next[s]); // n3
+          nodes[3] = gh_elem->get_node(MeshTools::Subdivision::prev[s]); // n4
 
-      // The penalty value.  \f$ \frac{1}{\epsilon} \f$
-      const Real penalty = 1.e10;
+          // The node in the interior of the domain, \p n1, is the
+          // hardest to find.  Walk along the edges of element \p nb until
+          // we have identified it.
+          unsigned int n_int = 0;
+          nodes[0] = nb_elem->get_node(0);
+          while (nodes[0]->id() == nodes[1]->id() || nodes[0]->id() == nodes[2]->id())
+            nodes[0] = nb_elem->get_node(++n_int);
 
-      // With this simple method, clamped boundary conditions are
-      // obtained by penalizing the displacements of all four nodes.
-      // This ensures that the displacement field vanishes on the
-      // boundary side \p s.
-      for (unsigned int n=0; n<4; ++n)
-      {
-        const dof_id_type u_dof = nodes[n]->dof_number (system.number(), u_var, 0);
-        const dof_id_type v_dof = nodes[n]->dof_number (system.number(), v_var, 0);
-        const dof_id_type w_dof = nodes[n]->dof_number (system.number(), w_var, 0);
-        system.matrix->add (u_dof, u_dof, penalty);
-        system.matrix->add (v_dof, v_dof, penalty);
-        system.matrix->add (w_dof, w_dof, penalty);
-      }
-    }
-  } // end of ghost element loop
+          // The penalty value.  \f$ \frac{1}{\epsilon} \f$
+          const Real penalty = 1.e10;
+
+          // With this simple method, clamped boundary conditions are
+          // obtained by penalizing the displacements of all four nodes.
+          // This ensures that the displacement field vanishes on the
+          // boundary side \p s.
+          for (unsigned int n=0; n<4; ++n)
+            {
+              const dof_id_type u_dof = nodes[n]->dof_number (system.number(), u_var, 0);
+              const dof_id_type v_dof = nodes[n]->dof_number (system.number(), v_var, 0);
+              const dof_id_type w_dof = nodes[n]->dof_number (system.number(), w_var, 0);
+              system.matrix->add (u_dof, u_dof, penalty);
+              system.matrix->add (v_dof, v_dof, penalty);
+              system.matrix->add (w_dof, w_dof, penalty);
+            }
+        }
+    } // end of ghost element loop
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES

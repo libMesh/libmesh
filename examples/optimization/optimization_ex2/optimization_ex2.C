@@ -188,33 +188,33 @@ void AssembleOptimization::assemble_A_and_F()
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem * elem = *el;
-
-    dof_map.dof_indices (elem, dof_indices);
-
-    const unsigned int n_dofs = dof_indices.size();
-
-    fe->reinit (elem);
-
-    Ke.resize (n_dofs, n_dofs);
-    Fe.resize (n_dofs);
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
-      for (unsigned int dof_i=0; dof_i<n_dofs; dof_i++)
-      {
-        for (unsigned int dof_j=0; dof_j<n_dofs; dof_j++)
-        {
-          Ke(dof_i, dof_j) += JxW[qp] * (dphi[dof_j][qp]* dphi[dof_i][qp]);
-        }
-        Fe(dof_i) += JxW[qp] * phi[dof_i][qp];
-      }
-    }
+      const Elem * elem = *el;
 
-    A_matrix->add_matrix (Ke, dof_indices);
-    F_vector->add_vector (Fe, dof_indices);
-  }
+      dof_map.dof_indices (elem, dof_indices);
+
+      const unsigned int n_dofs = dof_indices.size();
+
+      fe->reinit (elem);
+
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        {
+          for (unsigned int dof_i=0; dof_i<n_dofs; dof_i++)
+            {
+              for (unsigned int dof_j=0; dof_j<n_dofs; dof_j++)
+                {
+                  Ke(dof_i, dof_j) += JxW[qp] * (dphi[dof_j][qp]* dphi[dof_i][qp]);
+                }
+              Fe(dof_i) += JxW[qp] * phi[dof_i][qp];
+            }
+        }
+
+      A_matrix->add_matrix (Ke, dof_indices);
+      F_vector->add_vector (Fe, dof_indices);
+    }
 
   A_matrix->close();
   F_vector->close();
@@ -264,10 +264,10 @@ void AssembleOptimization::hessian (const NumericVector<Number> & /*soln*/,
   unsigned int lambda_rank = 0;
   if ((sys.lambda_ineq->first_local_index() <= ineq_index) &&
       (ineq_index < sys.lambda_ineq->last_local_index()))
-  {
-    lambda_ineq_0 = (*sys.lambda_ineq)(0);
-    lambda_rank = sys.comm().rank();
-  }
+    {
+      lambda_ineq_0 = (*sys.lambda_ineq)(0);
+      lambda_rank = sys.comm().rank();
+    }
 
   // Sync lambda_rank across all processors.
   sys.comm().sum(lambda_rank);
@@ -326,19 +326,19 @@ void AssembleOptimization::equality_constraints_jacobian (const NumericVector<Nu
   constraint_jac_indices[2][1] = 185;
 
   for (unsigned int i=0; i<constraint_jac_values.size(); i++)
-  {
-    for (unsigned int j=0; j<constraint_jac_values[i].size(); j++)
     {
+      for (unsigned int j=0; j<constraint_jac_values[i].size(); j++)
+        {
 
-      if ((sys.C_eq->first_local_index() <= i) &&
-          (i < sys.C_eq->last_local_index()))
-      {
-        dof_id_type col_index = constraint_jac_indices[i][j];
-        Number value = constraint_jac_values[i][j];
-        C_eq_jac.set(i, col_index, value);
-      }
+          if ((sys.C_eq->first_local_index() <= i) &&
+              (i < sys.C_eq->last_local_index()))
+            {
+              dof_id_type col_index = constraint_jac_indices[i][j];
+              Number value = constraint_jac_values[i][j];
+              C_eq_jac.set(i, col_index, value);
+            }
+        }
     }
-  }
 }
 
 void AssembleOptimization::inequality_constraints (const NumericVector<Number> & X,
@@ -356,10 +356,10 @@ void AssembleOptimization::inequality_constraints (const NumericVector<Number> &
   constraint_values[0] = (*X_localized)(200)*(*X_localized)(200) + (*X_localized)(201) - 5.;
 
   for (unsigned int i=0; i<constraint_values.size(); i++)
-  {
-    if ((C_ineq.first_local_index() <= i) && (i < C_ineq.last_local_index()))
-      C_ineq.set(i, constraint_values[i]);
-  }
+    {
+      if ((C_ineq.first_local_index() <= i) && (i < C_ineq.last_local_index()))
+        C_ineq.set(i, constraint_values[i]);
+    }
 }
 
 void AssembleOptimization::inequality_constraints_jacobian (const NumericVector<Number> & X,
@@ -384,28 +384,28 @@ void AssembleOptimization::inequality_constraints_jacobian (const NumericVector<
   constraint_jac_indices[0][1] = 201;
 
   for (unsigned int i=0; i<constraint_jac_values.size(); i++)
-  {
-    for (unsigned int j=0; j<constraint_jac_values[i].size(); j++)
     {
-      if ((sys.C_ineq->first_local_index() <= i) &&
-          (i < sys.C_ineq->last_local_index()))
-      {
-        dof_id_type col_index = constraint_jac_indices[i][j];
-        Number value = constraint_jac_values[i][j];
-        C_ineq_jac.set(i, col_index, value);
-      }
+      for (unsigned int j=0; j<constraint_jac_values[i].size(); j++)
+        {
+          if ((sys.C_ineq->first_local_index() <= i) &&
+              (i < sys.C_ineq->last_local_index()))
+            {
+              dof_id_type col_index = constraint_jac_indices[i][j];
+              Number value = constraint_jac_values[i][j];
+              C_ineq_jac.set(i, col_index, value);
+            }
 
+        }
     }
-  }
 }
 
 void AssembleOptimization::lower_and_upper_bounds (OptimizationSystem & sys)
 {
   for (unsigned int i=sys.get_dof_map().first_dof(); i<sys.get_dof_map().end_dof(); i++)
-  {
-    sys.get_vector("lower_bounds").set(i, -2.);
-    sys.get_vector("upper_bounds").set(i, 2.);
-  }
+    {
+      sys.get_vector("lower_bounds").set(i, -2.);
+      sys.get_vector("upper_bounds").set(i, 2.);
+    }
 }
 
 int main (int argc, char ** argv)

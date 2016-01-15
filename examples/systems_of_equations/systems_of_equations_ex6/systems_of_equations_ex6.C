@@ -90,7 +90,7 @@ class PetscSolverConfiguration : public SolverConfiguration
 public:
 
   PetscSolverConfiguration(PetscLinearSolver<Number> & petsc_linear_solver) :
-  _petsc_linear_solver(petsc_linear_solver)
+    _petsc_linear_solver(petsc_linear_solver)
   {
   }
 
@@ -147,7 +147,7 @@ public:
     const Real lambda_2 = young_modulus/(2.*(1.+poisson_ratio));
 
     return lambda_1 * kronecker_delta(i, j) * kronecker_delta(k, l) +
-           lambda_2 * (kronecker_delta(i, k) * kronecker_delta(j, l) + kronecker_delta(i, l) * kronecker_delta(j, k));
+      lambda_2 * (kronecker_delta(i, k) * kronecker_delta(j, l) + kronecker_delta(i, l) * kronecker_delta(j, k));
   }
 
   /**

@@ -156,47 +156,47 @@ void AssembleOptimization::assemble_A_and_F()
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem * elem = *el;
-
-    dof_map.dof_indices (elem, dof_indices);
-
-    const unsigned int n_dofs = dof_indices.size();
-
-    fe->reinit (elem);
-
-    Ke.resize (n_dofs, n_dofs);
-    Fe.resize (n_dofs);
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
-      for (unsigned int dof_i=0; dof_i<n_dofs; dof_i++)
-      {
-        for (unsigned int dof_j=0; dof_j<n_dofs; dof_j++)
+      const Elem * elem = *el;
+
+      dof_map.dof_indices (elem, dof_indices);
+
+      const unsigned int n_dofs = dof_indices.size();
+
+      fe->reinit (elem);
+
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          Ke(dof_i, dof_j) += JxW[qp] * (dphi[dof_j][qp]* dphi[dof_i][qp]);
+          for (unsigned int dof_i=0; dof_i<n_dofs; dof_i++)
+            {
+              for (unsigned int dof_j=0; dof_j<n_dofs; dof_j++)
+                {
+                  Ke(dof_i, dof_j) += JxW[qp] * (dphi[dof_j][qp]* dphi[dof_i][qp]);
+                }
+              Fe(dof_i) += JxW[qp] * phi[dof_i][qp];
+            }
         }
-        Fe(dof_i) += JxW[qp] * phi[dof_i][qp];
-      }
+
+      // This will zero off-diagonal entries of Ke corresponding to
+      // Dirichlet dofs.
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
+      // We want the diagonal of constrained dofs to be zero too
+      for (unsigned int local_dof_index=0; local_dof_index<n_dofs; local_dof_index++)
+        {
+          dof_id_type global_dof_index = dof_indices[local_dof_index];
+          if (dof_map.is_constrained_dof(global_dof_index))
+            {
+              Ke(local_dof_index, local_dof_index) = 0.;
+            }
+        }
+
+      A_matrix->add_matrix (Ke, dof_indices);
+      F_vector->add_vector (Fe, dof_indices);
     }
-
-    // This will zero off-diagonal entries of Ke corresponding to
-    // Dirichlet dofs.
-    dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-
-    // We want the diagonal of constrained dofs to be zero too
-    for (unsigned int local_dof_index=0; local_dof_index<n_dofs; local_dof_index++)
-    {
-      dof_id_type global_dof_index = dof_indices[local_dof_index];
-      if (dof_map.is_constrained_dof(global_dof_index))
-      {
-        Ke(local_dof_index, local_dof_index) = 0.;
-      }
-    }
-
-    A_matrix->add_matrix (Ke, dof_indices);
-    F_vector->add_vector (Fe, dof_indices);
-  }
 
   A_matrix->close();
   F_vector->close();
@@ -304,8 +304,8 @@ int main (int argc, char ** argv)
   AssembleOptimization assemble_opt(system);
 
   unsigned int u_var = system.add_variable("u",
-                       Utility::string_to_enum<Order>   (approx_order),
-                       Utility::string_to_enum<FEFamily>(fe_family));
+                                           Utility::string_to_enum<Order>   (approx_order),
+                                           Utility::string_to_enum<FEFamily>(fe_family));
 
   system.optimization_solver->objective_object = &assemble_opt;
   system.optimization_solver->gradient_object  = &assemble_opt;

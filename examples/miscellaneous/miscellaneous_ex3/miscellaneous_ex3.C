@@ -582,11 +582,11 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
 
           for (unsigned int i=0; i<phi.size(); i++)
             for (unsigned int j=0; j<phi.size(); j++)
-                Ke(i,j) += JxW[qp]*(
-                                    K * (dphi[i][qp]*dphi[j][qp]) +
-                                    dK * (grad_u*dphi[j][qp]) * (grad_u*dphi[i][qp]) +
-                                    _kappa * phi[i][qp] * phi[j][qp]
-                                    );
+              Ke(i,j) += JxW[qp]*(
+                                  K * (dphi[i][qp]*dphi[j][qp]) +
+                                  dK * (grad_u*dphi[j][qp]) * (grad_u*dphi[i][qp]) +
+                                  _kappa * phi[i][qp] * phi[j][qp]
+                                  );
         }
 
       dof_map.constrain_element_matrix (Ke, dof_indices);

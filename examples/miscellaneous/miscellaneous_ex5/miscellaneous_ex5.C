@@ -427,7 +427,7 @@ void assemble_ellipticdg(EquationSystems & es,
                         {
                           for (unsigned int j=0; j<n_neighbor_dofs; j++)
                             {
-                               // consistency
+                              // consistency
                               Knn(i,j) +=
                                 0.5 * JxW_face[qp] *
                                 (phi_neighbor_face[j][qp]*(qface_normals[qp]*dphi_neighbor_face[i][qp]) +

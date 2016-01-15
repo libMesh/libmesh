@@ -274,222 +274,222 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
 
   for ( ; el != end_el; ++el)
     {
-    // Store a pointer to the element we are currently
-    // working on.  This allows for nicer syntax later.
-    const Elem * elem = *el;
+      // Store a pointer to the element we are currently
+      // working on.  This allows for nicer syntax later.
+      const Elem * elem = *el;
 
-    // Get the degree of freedom indices for the
-    // current element.  These define where in the global
-    // matrix and right-hand-side this element will
-    // contribute to.
-    dof_map.dof_indices (elem, dof_indices);
+      // Get the degree of freedom indices for the
+      // current element.  These define where in the global
+      // matrix and right-hand-side this element will
+      // contribute to.
+      dof_map.dof_indices (elem, dof_indices);
 
-    // Compute the element-specific data for the current
-    // element.  This involves computing the location of the
-    // quadrature points (q_point) and the shape function
-    // values/derivatives (phi, dphi, d2phi) for the current element.
-    fe->reinit (elem);
+      // Compute the element-specific data for the current
+      // element.  This involves computing the location of the
+      // quadrature points (q_point) and the shape function
+      // values/derivatives (phi, dphi, d2phi) for the current element.
+      fe->reinit (elem);
 
-    // Zero the element matrix, the right-hand side and the Laplacian matrix
-    // before summing them.
-    if (J)
-      Je.resize(dof_indices.size(), dof_indices.size());
+      // Zero the element matrix, the right-hand side and the Laplacian matrix
+      // before summing them.
+      if (J)
+        Je.resize(dof_indices.size(), dof_indices.size());
 
-    if (R)
-      Re.resize(dof_indices.size());
+      if (R)
+        Re.resize(dof_indices.size());
 
-    Laplacian_phi_qp.resize(dof_indices.size());
+      Laplacian_phi_qp.resize(dof_indices.size());
 
-    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-      {
-        // AUXILIARY QUANTITIES:
-        // Residual and Jacobian share a few calculations:
-        // at the very least, in the case of interfacial energy only with a constant mobility,
-        // both calculations use Laplacian_phi_qp; more is shared the case of a concentration-dependent
-        // mobility and bulk potentials.
-        Number
-          u_qp = 0.0,
-          u_old_qp = 0.0,
-          Laplacian_u_qp = 0.0,
-          Laplacian_u_old_qp = 0.0;
+      for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+        {
+          // AUXILIARY QUANTITIES:
+          // Residual and Jacobian share a few calculations:
+          // at the very least, in the case of interfacial energy only with a constant mobility,
+          // both calculations use Laplacian_phi_qp; more is shared the case of a concentration-dependent
+          // mobility and bulk potentials.
+          Number
+            u_qp = 0.0,
+            u_old_qp = 0.0,
+            Laplacian_u_qp = 0.0,
+            Laplacian_u_old_qp = 0.0;
 
-        Gradient
-          grad_u_qp(0.0, 0.0, 0.0),
-          grad_u_old_qp(0.0, 0.0, 0.0);
+          Gradient
+            grad_u_qp(0.0, 0.0, 0.0),
+            grad_u_old_qp(0.0, 0.0, 0.0);
 
-        Number
-          M_qp = 1.0,
-          M_old_qp = 1.0,
-          M_prime_qp = 0.0,
-          M_prime_old_qp = 0.0;
+          Number
+            M_qp = 1.0,
+            M_old_qp = 1.0,
+            M_prime_qp = 0.0,
+            M_prime_old_qp = 0.0;
 
-        for (unsigned int i=0; i<phi.size(); i++)
-          {
-            Laplacian_phi_qp[i] = d2phi[i][qp](0, 0);
-            grad_u_qp(0) += u(dof_indices[i])*dphi[i][qp](0);
-            grad_u_old_qp(0) += u_old(dof_indices[i])*dphi[i][qp](0);
+          for (unsigned int i=0; i<phi.size(); i++)
+            {
+              Laplacian_phi_qp[i] = d2phi[i][qp](0, 0);
+              grad_u_qp(0) += u(dof_indices[i])*dphi[i][qp](0);
+              grad_u_old_qp(0) += u_old(dof_indices[i])*dphi[i][qp](0);
 
-            if (_biharmonic._dim > 1)
-              {
-                Laplacian_phi_qp[i] += d2phi[i][qp](1, 1);
-                grad_u_qp(1) += u(dof_indices[i])*dphi[i][qp](1);
-                grad_u_old_qp(1) += u_old(dof_indices[i])*dphi[i][qp](1);
-              }
-            if (_biharmonic._dim > 2)
-              {
-                Laplacian_phi_qp[i] += d2phi[i][qp](2, 2);
-                grad_u_qp(2) += u(dof_indices[i])*dphi[i][qp](2);
-                grad_u_old_qp(2) += u_old(dof_indices[i])*dphi[i][qp](2);
-              }
-            u_qp     += phi[i][qp]*u(dof_indices[i]);
-            u_old_qp += phi[i][qp]*u_old(dof_indices[i]);
-            Laplacian_u_qp     += Laplacian_phi_qp[i]*u(dof_indices[i]);
-            Laplacian_u_old_qp += Laplacian_phi_qp[i]*u_old(dof_indices[i]);
-          } // for i
+              if (_biharmonic._dim > 1)
+                {
+                  Laplacian_phi_qp[i] += d2phi[i][qp](1, 1);
+                  grad_u_qp(1) += u(dof_indices[i])*dphi[i][qp](1);
+                  grad_u_old_qp(1) += u_old(dof_indices[i])*dphi[i][qp](1);
+                }
+              if (_biharmonic._dim > 2)
+                {
+                  Laplacian_phi_qp[i] += d2phi[i][qp](2, 2);
+                  grad_u_qp(2) += u(dof_indices[i])*dphi[i][qp](2);
+                  grad_u_old_qp(2) += u_old(dof_indices[i])*dphi[i][qp](2);
+                }
+              u_qp     += phi[i][qp]*u(dof_indices[i]);
+              u_old_qp += phi[i][qp]*u_old(dof_indices[i]);
+              Laplacian_u_qp     += Laplacian_phi_qp[i]*u(dof_indices[i]);
+              Laplacian_u_old_qp += Laplacian_phi_qp[i]*u_old(dof_indices[i]);
+            } // for i
 
-        if (_biharmonic._degenerate)
-          {
-            M_qp           = 1.0 - u_qp*u_qp;
-            M_old_qp       = 1.0 - u_old_qp*u_old_qp;
-            M_prime_qp     = -2.0*u_qp;
-            M_prime_old_qp = -2.0*u_old_qp;
-          }
+          if (_biharmonic._degenerate)
+            {
+              M_qp           = 1.0 - u_qp*u_qp;
+              M_old_qp       = 1.0 - u_old_qp*u_old_qp;
+              M_prime_qp     = -2.0*u_qp;
+              M_prime_old_qp = -2.0*u_old_qp;
+            }
 
-        // ELEMENT RESIDUAL AND JACOBIAN
-        for (unsigned int i=0; i<phi.size(); i++)
-          {
-            // RESIDUAL
-            if (R)
-              {
-                Number ri = 0.0, ri_old = 0.0;
-                ri     -= Laplacian_phi_qp[i]*M_qp*_biharmonic._kappa*Laplacian_u_qp;
-                ri_old -= Laplacian_phi_qp[i]*M_old_qp*_biharmonic._kappa*Laplacian_u_old_qp;
+          // ELEMENT RESIDUAL AND JACOBIAN
+          for (unsigned int i=0; i<phi.size(); i++)
+            {
+              // RESIDUAL
+              if (R)
+                {
+                  Number ri = 0.0, ri_old = 0.0;
+                  ri     -= Laplacian_phi_qp[i]*M_qp*_biharmonic._kappa*Laplacian_u_qp;
+                  ri_old -= Laplacian_phi_qp[i]*M_old_qp*_biharmonic._kappa*Laplacian_u_old_qp;
 
-                if (_biharmonic._degenerate)
-                  {
-                    ri       -= (dphi[i][qp]*grad_u_qp)*M_prime_qp*(_biharmonic._kappa*Laplacian_u_qp);
-                    ri_old   -= (dphi[i][qp]*grad_u_old_qp)*M_prime_old_qp*(_biharmonic._kappa*Laplacian_u_old_qp);
-                  }
+                  if (_biharmonic._degenerate)
+                    {
+                      ri       -= (dphi[i][qp]*grad_u_qp)*M_prime_qp*(_biharmonic._kappa*Laplacian_u_qp);
+                      ri_old   -= (dphi[i][qp]*grad_u_old_qp)*M_prime_old_qp*(_biharmonic._kappa*Laplacian_u_old_qp);
+                    }
 
-                if (_biharmonic._cahn_hillard)
-                  {
-                    if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
-                      {
-                        ri += Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp;
-                        ri_old += Laplacian_phi_qp[i]*M_old_qp*_biharmonic._theta_c*(u_old_qp*u_old_qp - 1.0)*u_old_qp;
-                        if (_biharmonic._degenerate)
-                          {
-                            ri     += (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp;
-                            ri_old += (dphi[i][qp]*grad_u_old_qp)*M_prime_old_qp*_biharmonic._theta_c*(u_old_qp*u_old_qp - 1.0)*u_old_qp;
-                          }
-                      }// if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
+                  if (_biharmonic._cahn_hillard)
+                    {
+                      if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
+                        {
+                          ri += Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp;
+                          ri_old += Laplacian_phi_qp[i]*M_old_qp*_biharmonic._theta_c*(u_old_qp*u_old_qp - 1.0)*u_old_qp;
+                          if (_biharmonic._degenerate)
+                            {
+                              ri     += (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp;
+                              ri_old += (dphi[i][qp]*grad_u_old_qp)*M_prime_old_qp*_biharmonic._theta_c*(u_old_qp*u_old_qp - 1.0)*u_old_qp;
+                            }
+                        }// if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
 
-                    if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
-                      {
-                        ri -= Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*u_qp;
-                        ri_old -= Laplacian_phi_qp[i]*M_old_qp*_biharmonic._theta_c*u_old_qp;
-                        if (_biharmonic._degenerate)
-                          {
-                            ri     -= (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*u_qp;
-                            ri_old -= (dphi[i][qp]*grad_u_old_qp)*M_prime_old_qp*_biharmonic._theta_c*u_old_qp;
-                          }
-                      } // if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                      if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                        {
+                          ri -= Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*u_qp;
+                          ri_old -= Laplacian_phi_qp[i]*M_old_qp*_biharmonic._theta_c*u_old_qp;
+                          if (_biharmonic._degenerate)
+                            {
+                              ri     -= (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*u_qp;
+                              ri_old -= (dphi[i][qp]*grad_u_old_qp)*M_prime_old_qp*_biharmonic._theta_c*u_old_qp;
+                            }
+                        } // if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
 
-                    if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
-                      {
-                        switch(_biharmonic._log_truncation)
-                          {
-                          case 2:
-                            break;
-                          case 3:
-                            break;
-                          default:
-                            break;
-                          }// switch(_biharmonic._log_truncation)
-                      }// if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
-                  }// if (_biharmonic._cahn_hillard)
-                Re(i) += JxW[qp]*((u_qp-u_old_qp)*phi[i][qp]-_biharmonic._dt*0.5*((2.0-_biharmonic._cnWeight)*ri + _biharmonic._cnWeight*ri_old));
-              } // if (R)
+                      if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                        {
+                          switch(_biharmonic._log_truncation)
+                            {
+                            case 2:
+                              break;
+                            case 3:
+                              break;
+                            default:
+                              break;
+                            }// switch(_biharmonic._log_truncation)
+                        }// if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                    }// if (_biharmonic._cahn_hillard)
+                  Re(i) += JxW[qp]*((u_qp-u_old_qp)*phi[i][qp]-_biharmonic._dt*0.5*((2.0-_biharmonic._cnWeight)*ri + _biharmonic._cnWeight*ri_old));
+                } // if (R)
 
-            // JACOBIAN
-            if (J)
-              {
-                Number M_prime_prime_qp = 0.0;
-                if (_biharmonic._degenerate) M_prime_prime_qp = -2.0;
-                for (unsigned int j=0; j<phi.size(); j++)
-                  {
-                    Number ri_j = 0.0;
-                    ri_j -= Laplacian_phi_qp[i]*M_qp*_biharmonic._kappa*Laplacian_phi_qp[j];
-                    if (_biharmonic._degenerate)
-                      {
-                        ri_j -=
-                          Laplacian_phi_qp[i]*M_prime_qp*phi[j][qp]*_biharmonic._kappa*Laplacian_u_qp               +
-                          (dphi[i][qp]*dphi[j][qp])*M_prime_qp*(_biharmonic._kappa*Laplacian_u_qp)                  +
-                          (dphi[i][qp]*grad_u_qp)*(M_prime_prime_qp*phi[j][qp])*(_biharmonic._kappa*Laplacian_u_qp) +
-                          (dphi[i][qp]*grad_u_qp)*(M_prime_qp)*(_biharmonic._kappa*Laplacian_phi_qp[j]);
-                      }
+              // JACOBIAN
+              if (J)
+                {
+                  Number M_prime_prime_qp = 0.0;
+                  if (_biharmonic._degenerate) M_prime_prime_qp = -2.0;
+                  for (unsigned int j=0; j<phi.size(); j++)
+                    {
+                      Number ri_j = 0.0;
+                      ri_j -= Laplacian_phi_qp[i]*M_qp*_biharmonic._kappa*Laplacian_phi_qp[j];
+                      if (_biharmonic._degenerate)
+                        {
+                          ri_j -=
+                            Laplacian_phi_qp[i]*M_prime_qp*phi[j][qp]*_biharmonic._kappa*Laplacian_u_qp               +
+                            (dphi[i][qp]*dphi[j][qp])*M_prime_qp*(_biharmonic._kappa*Laplacian_u_qp)                  +
+                            (dphi[i][qp]*grad_u_qp)*(M_prime_prime_qp*phi[j][qp])*(_biharmonic._kappa*Laplacian_u_qp) +
+                            (dphi[i][qp]*grad_u_qp)*(M_prime_qp)*(_biharmonic._kappa*Laplacian_phi_qp[j]);
+                        }
 
-                    if (_biharmonic._cahn_hillard)
-                      {
-                        if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
-                          {
-                            ri_j +=
-                              Laplacian_phi_qp[i]*M_prime_qp*phi[j][qp]*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp +
-                              Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*(3.0*u_qp*u_qp - 1.0)*phi[j][qp]        +
-                              (dphi[i][qp]*dphi[j][qp])*M_prime_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp      +
-                              (dphi[i][qp]*grad_u_qp)*M_prime_prime_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp  +
-                              (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*(3.0*u_qp*u_qp - 1.0)*phi[j][qp];
-                          }// if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
+                      if (_biharmonic._cahn_hillard)
+                        {
+                          if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
+                            {
+                              ri_j +=
+                                Laplacian_phi_qp[i]*M_prime_qp*phi[j][qp]*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp +
+                                Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*(3.0*u_qp*u_qp - 1.0)*phi[j][qp]        +
+                                (dphi[i][qp]*dphi[j][qp])*M_prime_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp      +
+                                (dphi[i][qp]*grad_u_qp)*M_prime_prime_qp*_biharmonic._theta_c*(u_qp*u_qp - 1.0)*u_qp  +
+                                (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*(3.0*u_qp*u_qp - 1.0)*phi[j][qp];
+                            }// if (_biharmonic._energy == DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_WELL)
 
-                        if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
-                          {
-                            ri_j -=
-                              Laplacian_phi_qp[i]*M_prime_qp*phi[j][qp]*_biharmonic._theta_c*u_qp                   +
-                              Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*phi[j][qp]                              +
-                              (dphi[i][qp]*dphi[j][qp])*M_prime_qp*_biharmonic._theta_c*u_qp                        +
-                              (dphi[i][qp]*grad_u_qp)*M_prime_prime_qp*_biharmonic._theta_c*u_qp                    +
-                              (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*phi[j][qp];
-                          } // if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                          if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                            {
+                              ri_j -=
+                                Laplacian_phi_qp[i]*M_prime_qp*phi[j][qp]*_biharmonic._theta_c*u_qp                   +
+                                Laplacian_phi_qp[i]*M_qp*_biharmonic._theta_c*phi[j][qp]                              +
+                                (dphi[i][qp]*dphi[j][qp])*M_prime_qp*_biharmonic._theta_c*u_qp                        +
+                                (dphi[i][qp]*grad_u_qp)*M_prime_prime_qp*_biharmonic._theta_c*u_qp                    +
+                                (dphi[i][qp]*grad_u_qp)*M_prime_qp*_biharmonic._theta_c*phi[j][qp];
+                            } // if (_biharmonic._energy == DOUBLE_OBSTACLE || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
 
-                        if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
-                          {
-                            switch(_biharmonic._log_truncation)
-                              {
-                              case 2:
-                                break;
-                              case 3:
-                                break;
-                              default:
-                                break;
-                              }// switch(_biharmonic._log_truncation)
-                          }// if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
-                      }// if (_biharmonic._cahn_hillard)
-                    Je(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] - 0.5*_biharmonic._dt*(2.0-_biharmonic._cnWeight)*ri_j);
-                  } // for j
-              } // if (J)
-          } // for i
-      } // for qp
+                          if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                            {
+                              switch(_biharmonic._log_truncation)
+                                {
+                                case 2:
+                                  break;
+                                case 3:
+                                  break;
+                                default:
+                                  break;
+                                }// switch(_biharmonic._log_truncation)
+                            }// if (_biharmonic._energy == LOG_DOUBLE_WELL || _biharmonic._energy == LOG_DOUBLE_OBSTACLE)
+                        }// if (_biharmonic._cahn_hillard)
+                      Je(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] - 0.5*_biharmonic._dt*(2.0-_biharmonic._cnWeight)*ri_j);
+                    } // for j
+                } // if (J)
+            } // for i
+        } // for qp
 
-    // The element matrix and right-hand-side are now built
-    // for this element.  Add them to the global matrix and
-    // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-    // and \p NumericVector::add_vector() members do this for us.
-    // Start logging the insertion of the local (element)
-    // matrix and vector into the global matrix and vector
-    if (R)
-      {
-        // If the mesh has hanging nodes (e.g., as a result of refinement), those need to be constrained.
-        dof_map.constrain_element_vector(Re, dof_indices);
-        R->add_vector(Re, dof_indices);
-      }
+      // The element matrix and right-hand-side are now built
+      // for this element.  Add them to the global matrix and
+      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
+      // Start logging the insertion of the local (element)
+      // matrix and vector into the global matrix and vector
+      if (R)
+        {
+          // If the mesh has hanging nodes (e.g., as a result of refinement), those need to be constrained.
+          dof_map.constrain_element_vector(Re, dof_indices);
+          R->add_vector(Re, dof_indices);
+        }
 
-    if (J)
-      {
-        // If the mesh has hanging nodes (e.g., as a result of refinement), those need to be constrained.
-        dof_map.constrain_element_matrix(Je, dof_indices);
-        J->add_matrix(Je, dof_indices);
-      }
-  } // for el
+      if (J)
+        {
+          // If the mesh has hanging nodes (e.g., as a result of refinement), those need to be constrained.
+          dof_map.constrain_element_matrix(Je, dof_indices);
+          J->add_matrix(Je, dof_indices);
+        }
+    } // for el
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 

@@ -71,7 +71,7 @@ int main (int argc, char ** argv)
   std::string input_filename = argv[3];
 #ifndef LIBMESH_HAVE_XDR
   libmesh_example_requires(input_filename.rfind(".xdr") >=
-                         input_filename.size(), "XDR support");
+                           input_filename.size(), "XDR support");
 #endif
 
   // Read the input mesh.
@@ -88,7 +88,7 @@ int main (int argc, char ** argv)
       std::string output_filename = argv[5];
 #ifndef LIBMESH_HAVE_XDR
       libmesh_example_requires(output_filename.rfind(".xdr") >=
-                             output_filename.size(), "XDR support");
+                               output_filename.size(), "XDR support");
 #endif
 
       mesh.write (argv[5]);

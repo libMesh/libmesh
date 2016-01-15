@@ -396,10 +396,10 @@ int main (int argc, char ** argv)
                      << std::endl;
 
         libMesh::out << "The relative error in QoI 1 is "
-                  << std::setprecision(17)
-                  << std::abs(QoI_1_computed - QoI_1_exact) / std::abs(QoI_1_exact)
-                  << std::endl
-                  << std::endl;
+                     << std::setprecision(17)
+                     << std::abs(QoI_1_computed - QoI_1_exact) / std::abs(QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // Now we construct the data structures for the mesh refinement process
         ErrorVector error;

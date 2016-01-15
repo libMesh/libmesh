@@ -265,8 +265,8 @@ void assemble_poisson(EquationSystems & es,
   // the need to delete the object afterwards,
   // they clean up themselves.
   UniquePtr<QBase>  qface (QBase::build(quad_type,
-                                      dim-1,
-                                      THIRD));
+                                        dim-1,
+                                        THIRD));
 
   // Tell the finte element object to use our
   // quadrature rule.  Note that a \p UniquePtr<QBase> returns

@@ -432,10 +432,10 @@ void compute_stresses(EquationSystems & es)
 
       // Also, the von Mises stress
       Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
-                                               pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
-                                               pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
-                                               6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
-                                              ));
+                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
+                                             pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                             6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                             ));
       stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
       dof_id_type dof_index = stress_dof_indices_var[0];
       if ((stress_system.solution->first_local_index() <= dof_index) &&

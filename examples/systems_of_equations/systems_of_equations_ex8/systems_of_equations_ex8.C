@@ -183,31 +183,31 @@ int main (int argc, char ** argv)
 
   unsigned int outer_iteration = 0;
   while (current_max_gap_function > gap_function_tol)
-  {
-    libMesh::out << "Starting outer iteration " << outer_iteration << std::endl;
+    {
+      libMesh::out << "Starting outer iteration " << outer_iteration << std::endl;
 
-    // Perform inner iteration (i.e. Newton's method loop)
-    system.solve();
-    system.nonlinear_solver->print_converged_reason();
+      // Perform inner iteration (i.e. Newton's method loop)
+      system.solve();
+      system.nonlinear_solver->print_converged_reason();
 
-    // Perform augmented Lagrangian update
-    le.update_lambdas();
+      // Perform augmented Lagrangian update
+      le.update_lambdas();
 
-    std::pair<Real, Real> least_and_max_gap_function = le.get_least_and_max_gap_function();
-    Real least_gap_fn = least_and_max_gap_function.first;
-    Real max_gap_fn = least_and_max_gap_function.second;
+      std::pair<Real, Real> least_and_max_gap_function = le.get_least_and_max_gap_function();
+      Real least_gap_fn = least_and_max_gap_function.first;
+      Real max_gap_fn = least_and_max_gap_function.second;
 
-    libMesh::out << "Finished outer iteration, least gap function: "
-                 << least_gap_fn
-                 << ", max gap function: "
-                 << max_gap_fn
-                 << std::endl
-                 << std::endl;
+      libMesh::out << "Finished outer iteration, least gap function: "
+                   << least_gap_fn
+                   << ", max gap function: "
+                   << max_gap_fn
+                   << std::endl
+                   << std::endl;
 
-    current_max_gap_function = std::max(std::abs(least_gap_fn), std::abs(max_gap_fn));
+      current_max_gap_function = std::max(std::abs(least_gap_fn), std::abs(max_gap_fn));
 
-    outer_iteration++;
-  }
+      outer_iteration++;
+    }
 
   libMesh::out << "Computing stresses..." << std::endl;
 

@@ -258,30 +258,30 @@ int main (int argc, char ** argv)
             break;
           mesh_refinement.flag_elements_by_error_tolerance(error);
         }
-          else
+      else
+        {
+          // If flag_elements_by_nelem_target returns true, this
+          // should be our last adaptive step.
+          if (mesh_refinement.flag_elements_by_nelem_target(error))
             {
-              // If flag_elements_by_nelem_target returns true, this
-              // should be our last adaptive step.
-              if (mesh_refinement.flag_elements_by_nelem_target(error))
-                {
-                  mesh_refinement.refine_and_coarsen_elements();
-                  equation_systems.reinit();
-                  a_step = max_adaptivesteps;
-                  break;
-                }
+              mesh_refinement.refine_and_coarsen_elements();
+              equation_systems.reinit();
+              a_step = max_adaptivesteps;
+              break;
             }
-
-          // Carry out the adaptive mesh refinement/coarsening
-          mesh_refinement.refine_and_coarsen_elements();
-          equation_systems.reinit();
-
-          libMesh::out << "Refined mesh to "
-                       << mesh.n_active_elem()
-                       << " active elements and "
-                       << equation_systems.n_active_dofs()
-                       << " active dofs."
-                       << std::endl;
         }
+
+      // Carry out the adaptive mesh refinement/coarsening
+      mesh_refinement.refine_and_coarsen_elements();
+      equation_systems.reinit();
+
+      libMesh::out << "Refined mesh to "
+                   << mesh.n_active_elem()
+                   << " active elements and "
+                   << equation_systems.n_active_dofs()
+                   << " active dofs."
+                   << std::endl;
+    }
   // Do one last solve if necessary
   if (a_step == max_adaptivesteps)
     {

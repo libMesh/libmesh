@@ -34,13 +34,13 @@ void AugmentSparsityOnContact::augment_sparsity_pattern(SparsityPattern::Graph &
   LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
 
   for ( ; it != it_end; ++it)
-  {
-    const Node & this_node = mesh.node(it->first);
-    const Node & other_node = mesh.node(it->second);
+    {
+      const Node & this_node = mesh.node(it->first);
+      const Node & other_node = mesh.node(it->second);
 
-    set_sparsity_values(this_node, other_node, n_nz, n_oz);
-    set_sparsity_values(other_node, this_node, n_nz, n_oz);
-  }
+      set_sparsity_values(this_node, other_node, n_nz, n_oz);
+      set_sparsity_values(other_node, this_node, n_nz, n_oz);
+    }
 }
 
 void AugmentSparsityOnContact::set_sparsity_values(const Node & this_node,
@@ -51,37 +51,37 @@ void AugmentSparsityOnContact::set_sparsity_values(const Node & this_node,
   const DofMap & dof_map = _sys.get_dof_map();
 
   for (unsigned int var_i=0; var_i<3; var_i++)
-  {
-    dof_id_type dof_index_on_this_node =
-      this_node.dof_number(_sys.number(), var_i, 0);
-
-    unsigned int n_local_coupled_dofs = 0;
-    unsigned int n_remote_coupled_dofs = 0;
-
-    for (unsigned int var_j=0; var_j<3; var_j++)
     {
-      dof_id_type dof_index_on_other_node =
-        other_node.dof_number(_sys.number(), var_j, 0);
+      dof_id_type dof_index_on_this_node =
+        this_node.dof_number(_sys.number(), var_i, 0);
 
-      if ((dof_index_on_other_node >= dof_map.first_dof()) &&
-          (dof_index_on_other_node  < dof_map.end_dof()))
-        n_local_coupled_dofs++;
-      else
-        n_remote_coupled_dofs++;
+      unsigned int n_local_coupled_dofs = 0;
+      unsigned int n_remote_coupled_dofs = 0;
+
+      for (unsigned int var_j=0; var_j<3; var_j++)
+        {
+          dof_id_type dof_index_on_other_node =
+            other_node.dof_number(_sys.number(), var_j, 0);
+
+          if ((dof_index_on_other_node >= dof_map.first_dof()) &&
+              (dof_index_on_other_node  < dof_map.end_dof()))
+            n_local_coupled_dofs++;
+          else
+            n_remote_coupled_dofs++;
+        }
+
+      // only monkey with the sparsity pattern for local dofs!
+      if ((dof_index_on_this_node >= dof_map.first_dof()) &&
+          (dof_index_on_this_node  < dof_map.end_dof()))
+        {
+          const unsigned int
+            dof_offset = dof_index_on_this_node - dof_map.first_dof();
+
+          libmesh_assert_less (dof_offset, n_nz.size());
+          libmesh_assert_less (dof_offset, n_oz.size());
+
+          n_nz[dof_offset] += n_local_coupled_dofs;
+          n_oz[dof_offset] += n_remote_coupled_dofs;
+        }
     }
-
-    // only monkey with the sparsity pattern for local dofs!
-    if ((dof_index_on_this_node >= dof_map.first_dof()) &&
-        (dof_index_on_this_node  < dof_map.end_dof()))
-    {
-      const unsigned int
-        dof_offset = dof_index_on_this_node - dof_map.first_dof();
-
-      libmesh_assert_less (dof_offset, n_nz.size());
-      libmesh_assert_less (dof_offset, n_oz.size());
-
-      n_nz[dof_offset] += n_local_coupled_dofs;
-      n_oz[dof_offset] += n_remote_coupled_dofs;
-    }
-  }
 }

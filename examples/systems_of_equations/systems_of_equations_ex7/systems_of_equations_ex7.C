@@ -117,7 +117,7 @@ public:
     const Real lambda_2 = young_modulus/(2.*(1.+poisson_ratio));
 
     return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l) +
-           lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+      lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
   }
 
 
@@ -638,33 +638,33 @@ int main (int argc, char ** argv)
   // large values of "forcing_magnitude".
   // Set n_solves and force_scaling in nonlinear_elasticity.in.
   for (unsigned int count=0; count<n_solves; count++)
-  {
-    Real previous_forcing_magnitude = equation_systems.parameters.get<Real>("forcing_magnitude");
-    equation_systems.parameters.set<Real>("forcing_magnitude") = previous_forcing_magnitude*force_scaling;
+    {
+      Real previous_forcing_magnitude = equation_systems.parameters.get<Real>("forcing_magnitude");
+      equation_systems.parameters.set<Real>("forcing_magnitude") = previous_forcing_magnitude*force_scaling;
 
-    libMesh::out << "Performing solve "
-                 << count
-                 << ", forcing_magnitude: "
-                 << equation_systems.parameters.get<Real>("forcing_magnitude")
-                 << std::endl;
+      libMesh::out << "Performing solve "
+                   << count
+                   << ", forcing_magnitude: "
+                   << equation_systems.parameters.get<Real>("forcing_magnitude")
+                   << std::endl;
 
-    system.solve();
+      system.solve();
 
-    libMesh::out << "System solved at nonlinear iteration "
-                 << system.n_nonlinear_iterations()
-                 << " , final nonlinear residual norm: "
-                 << system.final_nonlinear_residual()
-                 << std::endl
-                 << std::endl;
+      libMesh::out << "System solved at nonlinear iteration "
+                   << system.n_nonlinear_iterations()
+                   << " , final nonlinear residual norm: "
+                   << system.final_nonlinear_residual()
+                   << std::endl
+                   << std::endl;
 
-    libMesh::out << "Computing stresses..." << std::endl;
+      libMesh::out << "Computing stresses..." << std::endl;
 
-    lde.compute_stresses();
+      lde.compute_stresses();
 
-    std::stringstream filename;
-    filename << "solution_" << count << ".exo";
-    ExodusII_IO (mesh).write_equation_systems(filename.str(), equation_systems);
-  }
+      std::stringstream filename;
+      filename << "solution_" << count << ".exo";
+      ExodusII_IO (mesh).write_equation_systems(filename.str(), equation_systems);
+    }
 
   return 0;
 }

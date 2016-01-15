@@ -88,7 +88,7 @@ public:
   }
 
   virtual Gradient component(unsigned int component_in, const Point & p,
-                              const Real)
+                             const Real)
   {
     const Real x=p(0), y=p(1);
     return soln.grad(x, y).row(component_in);
