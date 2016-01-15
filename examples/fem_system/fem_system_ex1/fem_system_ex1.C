@@ -50,7 +50,7 @@
 using namespace libMesh;
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -158,7 +158,7 @@ int main (int argc, char** argv)
   system.deltat = deltat;
 
   // And the nonlinear solver options
-  DiffSolver &solver = *(system.time_solver->diff_solver().get());
+  DiffSolver & solver = *(system.time_solver->diff_solver().get());
   solver.quiet = infile("solver_quiet", true);
   solver.verbose = !solver.quiet;
   solver.max_nonlinear_iterations =
@@ -184,8 +184,11 @@ int main (int argc, char** argv)
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
     {
       // A pretty update message
-      std::cout << "\n\nSolving time step " << t_step << ", time = "
-                << system.time << std::endl;
+      libMesh::out << "\n\nSolving time step "
+                   << t_step
+                   << ", time = "
+                   << system.time
+                   << std::endl;
 
       // Adaptively solve the timestep
       unsigned int a_step = 0;
@@ -207,8 +210,7 @@ int main (int argc, char** argv)
               // size at once
               libmesh_assert_equal_to (nelem_target, 0);
 
-              UniformRefinementEstimator *u =
-                new UniformRefinementEstimator;
+              UniformRefinementEstimator * u = new UniformRefinementEstimator;
 
               // The lid-driven cavity problem isn't in H1, so
               // lets estimate L2 error
@@ -243,13 +245,22 @@ int main (int argc, char** argv)
 
           // Print out status at each adaptive step.
           Real global_error = error.l2_norm();
-          std::cout << "Adaptive step " << a_step << ": " << std::endl;
+          libMesh::out << "Adaptive step "
+                       << a_step
+                       << ": "
+                       << std::endl;
+
           if (global_tolerance != 0.)
-            std::cout << "Global_error = " << global_error
-                      << std::endl;
+            libMesh::out << "Global_error = "
+                         << global_error
+                         << std::endl;
+
           if (global_tolerance != 0.)
-            std::cout << "Worst element error = " << error.maximum()
-                      << ", mean = " << error.mean() << std::endl;
+            libMesh::out << "Worst element error = "
+                         << error.maximum()
+                         << ", mean = "
+                         << error.mean()
+                         << std::endl;
 
           if (global_tolerance != 0.)
             {
@@ -276,11 +287,12 @@ int main (int argc, char** argv)
           mesh_refinement.refine_and_coarsen_elements();
           equation_systems.reinit();
 
-          std::cout << "Refined mesh to "
-                    << mesh.n_active_elem()
-                    << " active elements and "
-                    << equation_systems.n_active_dofs()
-                    << " active dofs." << std::endl;
+          libMesh::out << "Refined mesh to "
+                       << mesh.n_active_elem()
+                       << " active elements and "
+                       << equation_systems.n_active_dofs()
+                       << " active dofs."
+                       << std::endl;
         }
       // Do one last solve if necessary
       if (a_step == max_adaptivesteps)
@@ -309,8 +321,8 @@ int main (int argc, char** argv)
 
           ExodusII_IO(mesh).write_timestep(file_name.str(),
                                            equation_systems,
-                                           1, /* This number indicates how many time steps
-                                                 are being written to the file */
+                                           1, // This number indicates how many time steps
+                                              // are being written to the file
                                            system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API

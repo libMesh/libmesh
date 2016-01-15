@@ -40,8 +40,8 @@ using namespace libMesh;
 class NonlinearNeoHookeCurrentConfig
 {
 public:
-  NonlinearNeoHookeCurrentConfig(const std::vector<std::vector<RealGradient> >& dphi_in,
-                                 GetPot& args,
+  NonlinearNeoHookeCurrentConfig(const std::vector<std::vector<RealGradient> > & dphi_in,
+                                 GetPot & args,
                                  bool calculate_linearized_stiffness_in) :
     calculate_linearized_stiffness(calculate_linearized_stiffness_in),
     dphi(dphi_in)
@@ -54,18 +54,21 @@ public:
    * Initialize the class for the given displacement gradient at the
    * specified quadrature point.
    */
-  void init_for_qp(VectorValue<Gradient> & grad_u, unsigned int qp);
+  void init_for_qp(VectorValue<Gradient> & grad_u,
+                   unsigned int qp);
 
   /**
    * Return the residual vector for the current state.
    */
-  void get_residual(DenseVector<Real> & residuum, unsigned int & i);
+  void get_residual(DenseVector<Real> & residuum,
+                    unsigned int & i);
 
   /**
    * Return the stiffness matrix for the current state.
    */
   void get_linearized_stiffness(DenseMatrix<Real> & stiffness,
-                                unsigned int & i, unsigned int & j);
+                                unsigned int & i,
+                                unsigned int & j);
 
   /**
    * Flag to indicate if it is necessary to calculate values for stiffness
@@ -73,13 +76,14 @@ public:
    */
   bool calculate_linearized_stiffness;
 private:
-  void build_b_0_mat(int i, DenseMatrix<Real>& b_l_mat);
+  void build_b_0_mat(int i, DenseMatrix<Real> & b_l_mat);
   void calculate_stress();
   void calculate_tangent();
-  static void tensor_to_voigt(const RealTensor &tensor, DenseVector<Real> &vec);
+  static void tensor_to_voigt(const RealTensor & tensor,
+                              DenseVector<Real> & vec);
 
   unsigned int current_qp;
-  const std::vector<std::vector<RealGradient> >& dphi;
+  const std::vector<std::vector<RealGradient> > & dphi;
 
   DenseMatrix<Real> C_mat;
   Real E;
@@ -89,4 +93,4 @@ private:
   DenseMatrix<Real> B_K;
 };
 
-#endif /* NONLINEAR_NEOHOOKE_CC_H_ */
+#endif // NONLINEAR_NEOHOOKE_CC_H_

@@ -37,8 +37,8 @@ class ElasticitySystem : public FEMSystem
 {
 public:
   // Constructor
-  ElasticitySystem(EquationSystems& es,
-                   const std::string& name_in,
+  ElasticitySystem(EquationSystems & es,
+                   const std::string & name_in,
                    const unsigned int number_in)
     : FEMSystem(es, name_in, number_in),
       _rho(1.0)
@@ -48,19 +48,19 @@ public:
   virtual void init_data ();
 
   // Context initialization
-  virtual void init_context(DiffContext &context);
+  virtual void init_context(DiffContext & context);
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext& context);
+                                        DiffContext & context);
 
   virtual bool side_time_derivative (bool request_jacobian,
-                                     DiffContext& context);
+                                     DiffContext & context);
 
   // Mass matrix part
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext& context);
+                              DiffContext & context);
 
 private:
 
@@ -69,11 +69,10 @@ private:
 
   Real _rho;
 
-  Real kronecker_delta( unsigned int i, unsigned int j)
+  Real kronecker_delta(unsigned int i, unsigned int j)
   {
     return i == j ? 1. : 0.;
   }
 
-  Real elasticity_tensor( unsigned int i, unsigned int j, unsigned int k, unsigned int l);
-
+  Real elasticity_tensor(unsigned int i, unsigned int j, unsigned int k, unsigned int l);
 };

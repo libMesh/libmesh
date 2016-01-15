@@ -27,8 +27,8 @@ class NavierSystem : public FEMSystem
 {
 public:
   // Constructor
-  NavierSystem(EquationSystems& es,
-               const std::string& name_in,
+  NavierSystem(EquationSystems & es,
+               const std::string & name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in), Reynolds(1.), application(0) {}
 
@@ -36,22 +36,22 @@ public:
   virtual void init_data ();
 
   // Context initialization
-  virtual void init_context(DiffContext &context);
+  virtual void init_context(DiffContext & context);
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext& context);
+                                        DiffContext & context);
 
   // Constraint parts
   virtual bool element_constraint (bool request_jacobian,
-                                   DiffContext& context);
+                                   DiffContext & context);
   virtual bool side_constraint (bool request_jacobian,
-                                DiffContext& context);
+                                DiffContext & context);
 
   // Mass matrix part
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext& context);
+                              DiffContext & context);
 
   // Postprocessed output
   virtual void postprocess ();
@@ -70,5 +70,5 @@ public:
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.
-  Point forcing(const Point& p);
+  Point forcing(const Point & p);
 };
