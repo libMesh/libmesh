@@ -36,7 +36,7 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI and PETSc)

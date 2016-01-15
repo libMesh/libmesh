@@ -71,15 +71,9 @@ using namespace libMesh;
 
 
 
-
-
-
-
 // Function prototype, as before.
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name);
-
-
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name);
 
 // Exact solution function prototype, as before.
 Real exact_solution (const Real x,
@@ -87,11 +81,11 @@ Real exact_solution (const Real x,
                      const Real z = 0.);
 
 // Define a wrapper for exact_solution that will be needed below
-void exact_solution_wrapper (DenseVector<Number>& output,
-                             const Point& p,
+void exact_solution_wrapper (DenseVector<Number> & output,
+                             const Point & p,
                              const Real)
 {
-  output(0) = exact_solution(p(0),p(1),p(2));
+  output(0) = exact_solution(p(0), p(1), p(2));
 }
 
 
@@ -101,7 +95,7 @@ QuadratureType quad_type=INVALID_Q_RULE;
 
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
@@ -118,12 +112,12 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
     }
 
 
@@ -212,21 +206,20 @@ int main (int argc, char** argv)
 
 
 
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name)
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name)
 {
   libmesh_assert_equal_to (system_name, "Poisson");
 
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
 
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Poisson");
 
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   FEType fe_type = dof_map.variable_type(0);
-
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
@@ -235,14 +228,11 @@ void assemble_poisson(EquationSystems& es,
   // the context of building quadrature rules.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
-
   // Now this deviates from example 4.  we create a
   // 5th order quadrature rule of user-specified type
   // for numerical integration.  Note that not all
   // quadrature rules support this order.
   UniquePtr<QBase> qrule(QBase::build(quad_type, dim, THIRD));
-
-
 
   // Tell the finte element object to use our
   // quadrature rule.  Note that a \p UniquePtr<QBase> returns
@@ -255,11 +245,9 @@ void assemble_poisson(EquationSystems& es,
   // recommended.
   fe->attach_quadrature_rule (qrule.get());
 
-
   // Declare a special finite element object for
   // boundary integration.
   UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-
 
   // As already seen in example 3, boundary integration
   // requires a quadrature rule.  Here, however,
@@ -280,7 +268,6 @@ void assemble_poisson(EquationSystems& es,
                                       dim-1,
                                       THIRD));
 
-
   // Tell the finte element object to use our
   // quadrature rule.  Note that a \p UniquePtr<QBase> returns
   // a \p QBase* pointer to the object it handles with \p get().
@@ -291,25 +278,18 @@ void assemble_poisson(EquationSystems& es,
   // \p UniquePtr<Xyz>::release(), but is not recommended.
   fe_face->attach_quadrature_rule (qface.get());
 
-
-
   // This is again identical to example 4, and not commented.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
-  const std::vector<Point>& q_point = fe->get_xyz();
+  const std::vector<Point> & q_point = fe->get_xyz();
 
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
-
   std::vector<dof_id_type> dof_indices;
-
-
-
-
 
   // Now we will loop over all the elements in the mesh.
   // See example 3 for details.
@@ -318,7 +298,7 @@ void assemble_poisson(EquationSystems& es,
 
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       dof_map.dof_indices (elem, dof_indices);
 
@@ -329,9 +309,6 @@ void assemble_poisson(EquationSystems& es,
 
       Fe.resize (dof_indices.size());
 
-
-
-
       // Now loop over the quadrature points.  This handles
       // the numeric integration.  Note the slightly different
       // access to the QBase members!
@@ -341,7 +318,6 @@ void assemble_poisson(EquationSystems& es,
           for (unsigned int i=0; i<phi.size(); i++)
             for (unsigned int j=0; j<phi.size(); j++)
               Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-
 
           // fxy is the forcing function for the Poisson equation.
           // In this case we set fxy to be a finite difference
@@ -362,17 +338,17 @@ void assemble_poisson(EquationSystems& es,
           const Real z = q_point[qp](2);
           const Real eps = 1.e-3;
 
-          const Real uxx = (exact_solution(x-eps,y,z) +
-                            exact_solution(x+eps,y,z) +
-                            -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uxx = (exact_solution(x-eps, y, z) +
+                            exact_solution(x+eps, y, z) +
+                            -2.*exact_solution(x, y, z))/eps/eps;
 
-          const Real uyy = (exact_solution(x,y-eps,z) +
-                            exact_solution(x,y+eps,z) +
-                            -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uyy = (exact_solution(x, y-eps, z) +
+                            exact_solution(x, y+eps, z) +
+                            -2.*exact_solution(x, y, z))/eps/eps;
 
-          const Real uzz = (exact_solution(x,y,z-eps) +
-                            exact_solution(x,y,z+eps) +
-                            -2.*exact_solution(x,y,z))/eps/eps;
+          const Real uzz = (exact_solution(x, y, z-eps) +
+                            exact_solution(x, y, z+eps) +
+                            -2.*exact_solution(x, y, z))/eps/eps;
 
           const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
 
@@ -396,10 +372,4 @@ void assemble_poisson(EquationSystems& es,
       system.rhs->add_vector    (Fe, dof_indices);
 
     } // end of element loop
-
-
-
-
-  // All done!
-  return;
 }
