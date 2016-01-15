@@ -60,11 +60,11 @@ using namespace libMesh;
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
-void assemble_stokes (EquationSystems& es,
-                      const std::string& system_name);
+void assemble_stokes (EquationSystems & es,
+                      const std::string & system_name);
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -140,15 +140,15 @@ int main (int argc, char** argv)
   return 0;
 }
 
-void assemble_stokes (EquationSystems& es,
-                      const std::string& system_name)
+void assemble_stokes (EquationSystems & es,
+                      const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Stokes");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
@@ -189,15 +189,15 @@ void assemble_stokes (EquationSystems& es,
   // will be used to assemble the linear system.
   //
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe_vel->get_JxW();
+  const std::vector<Real> & JxW = fe_vel->get_JxW();
 
   // The element shape function gradients for the velocity
   // variables evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe_vel->get_dphi();
 
   // The element shape functions for the pressure variable
   // evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& psi = fe_pres->get_phi();
+  const std::vector<std::vector<Real> > & psi = fe_pres->get_phi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -244,7 +244,7 @@ void assemble_stokes (EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -411,7 +411,4 @@ void assemble_stokes (EquationSystems& es,
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
-
-  // That's it.
-  return;
 }
