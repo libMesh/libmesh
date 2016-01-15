@@ -84,20 +84,20 @@ using namespace libMesh;
 // Function prototype.  This is the function that will assemble
 // the linear system for our problem, governed by the linear
 // wave equation.
-void assemble_wave(EquationSystems& es,
-                   const std::string& system_name);
+void assemble_wave(EquationSystems & es,
+                   const std::string & system_name);
 
 
 // Function Prototype.  This function will be used to apply the
 // initial conditions.
-void apply_initial(EquationSystems& es,
-                   const std::string& system_name);
+void apply_initial(EquationSystems & es,
+                   const std::string & system_name);
 
 // Function Prototype.  This function imposes
 // Dirichlet Boundary conditions via the penalty
 // method after the system is assembled.
-void fill_dirichlet_bc(EquationSystems& es,
-                       const std::string& system_name);
+void fill_dirichlet_bc(EquationSystems & es,
+                       const std::string & system_name);
 
 // The main program
 int main (int argc, char** argv)
@@ -112,12 +112,12 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
 
     }
 
@@ -129,7 +129,7 @@ int main (int argc, char** argv)
   // Get the name of the mesh file
   // from the command line.
   std::string mesh_file = argv[1];
-  std::cout << "Mesh file is: " << mesh_file << std::endl;
+  libMesh::out << "Mesh file is: " << mesh_file << std::endl;
 
   // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
   libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
@@ -220,8 +220,8 @@ int main (int argc, char** argv)
   // get the dof_numbers for the nodes that
   // should be monitored.
   const unsigned int res_node_no = result_node;
-  const Node& res_node = mesh.node(res_node_no-1);
-  unsigned int dof_no = res_node.dof_number(0,0,0);
+  const Node & res_node = mesh.node(res_node_no-1);
+  unsigned int dof_no = res_node.dof_number(0, 0, 0);
 
   // Assemble the time independent system matrices and rhs.
   // This function will also compute the effective system matrix
@@ -279,7 +279,7 @@ int main (int argc, char** argv)
       // to a GMV-formatted plot file.
       // Do only for a few time steps.
       if (time_step == 30 || time_step == 60 ||
-          time_step == 90 || time_step == 120 )
+          time_step == 90 || time_step == 120)
         {
           std::ostringstream file_name;
 
@@ -310,8 +310,7 @@ int main (int argc, char** argv)
 
       // dof_no may not be local in parallel runs, so we may need a
       // global displacement vector
-      NumericVector<Number> &displacement
-        = t_system.get_vector("displacement");
+      NumericVector<Number> & displacement = t_system.get_vector("displacement");
       std::vector<Number> global_displacement(displacement.size());
       displacement.localize(global_displacement);
 
@@ -329,15 +328,15 @@ int main (int argc, char** argv)
 
 // This function assembles the system matrix and right-hand-side
 // for our wave equation.
-void assemble_wave(EquationSystems& es,
-                   const std::string& system_name)
+void assemble_wave(EquationSystems & es,
+                   const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Wave");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -359,11 +358,10 @@ void assemble_wave(EquationSystems& es,
   // and the additional vector "force", not to the members
   // "matrix" and "rhs".  Therefore, get writable
   // references to them.
-  SparseMatrix<Number>&   stiffness = t_system.get_matrix("stiffness");
-  SparseMatrix<Number>&   damping   = t_system.get_matrix("damping");
-  SparseMatrix<Number>&   mass      = t_system.get_matrix("mass");
-
-  NumericVector<Number>&  force     = t_system.get_vector("force");
+  SparseMatrix<Number> & stiffness = t_system.get_matrix("stiffness");
+  SparseMatrix<Number> & damping   = t_system.get_matrix("damping");
+  SparseMatrix<Number> & mass      = t_system.get_matrix("mass");
+  NumericVector<Number> & force    = t_system.get_vector("force");
 
   // Some solver packages (PETSc) are especially picky about
   // allocating sparsity structure and truly assigning values
@@ -372,8 +370,8 @@ void assemble_wave(EquationSystems& es,
   // sparsity structures.  Therefore, explicitly zero the
   // values in the collective matrix, so that matrix additions
   // encounter identical sparsity structures.
-  SparseMatrix<Number>&  matrix     = *t_system.matrix;
-  DenseMatrix<Number>    zero_matrix;
+  SparseMatrix<Number> & matrix = *t_system.matrix;
+  DenseMatrix<Number> zero_matrix;
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
@@ -388,24 +386,24 @@ void assemble_wave(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
 
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = t_system.get_dof_map();
+  const DofMap & dof_map = t_system.get_dof_map();
 
   // The element mass, damping and stiffness matrices
   // and the element contribution to the rhs.
-  DenseMatrix<Number>   Ke, Ce, Me;
-  DenseVector<Number>   Fe;
+  DenseMatrix<Number> Ke, Ce, Me;
+  DenseVector<Number> Fe;
 
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
@@ -422,7 +420,7 @@ void assemble_wave(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -496,11 +494,11 @@ void assemble_wave(EquationSystems& es,
 
               // The value of the shape functions at the quadrature
               // points.
-              const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+              const std::vector<std::vector<Real> > &  phi_face = fe_face->get_phi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
-              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+              const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
               // Compute the shape function values on the element
               // face.
@@ -552,23 +550,20 @@ void assemble_wave(EquationSystems& es,
       matrix.add_matrix(zero_matrix, dof_indices);
 
     } // end of element loop
-
-  // All done!
-  return;
 }
 
 // This function applies the initial conditions
-void apply_initial(EquationSystems& es,
-                   const std::string& system_name)
+void apply_initial(EquationSystems & es,
+                   const std::string & system_name)
 {
   // Get a reference to our system, as before
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
 
   // Numeric vectors for the pressure, velocity and acceleration
   // values.
-  NumericVector<Number>&  pres_vec       = t_system.get_vector("displacement");
-  NumericVector<Number>&  vel_vec        = t_system.get_vector("velocity");
-  NumericVector<Number>&  acc_vec        = t_system.get_vector("acceleration");
+  NumericVector<Number> & pres_vec = t_system.get_vector("displacement");
+  NumericVector<Number> & vel_vec  = t_system.get_vector("velocity");
+  NumericVector<Number> & acc_vec  = t_system.get_vector("acceleration");
 
   // Assume our fluid to be at rest, which would
   // also be the default conditions in class NewmarkSystem,
@@ -579,8 +574,8 @@ void apply_initial(EquationSystems& es,
 }
 
 // This function applies the Dirichlet boundary conditions
-void fill_dirichlet_bc(EquationSystems& es,
-                       const std::string& system_name)
+void fill_dirichlet_bc(EquationSystems & es,
+                       const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -590,11 +585,11 @@ void fill_dirichlet_bc(EquationSystems& es,
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
 
   // Get writable references to the overall matrix and vector.
-  SparseMatrix<Number>&  matrix = *t_system.matrix;
-  NumericVector<Number>& rhs    = *t_system.rhs;
+  SparseMatrix<Number> & matrix = *t_system.matrix;
+  NumericVector<Number> & rhs    = *t_system.rhs;
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // Get \p libMesh's  \f$ \pi \f$
   const Real pi = libMesh::pi;
@@ -610,7 +605,7 @@ void fill_dirichlet_bc(EquationSystems& es,
   for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
     {
       // Get a reference to the current node.
-      const Node& curr_node = mesh.node(n_cnt);
+      const Node & curr_node = mesh.node(n_cnt);
 
       // Check if Dirichlet BCs should be applied to this node.
       // Use the \p TOLERANCE from \p mesh_common.h as tolerance.
@@ -619,10 +614,10 @@ void fill_dirichlet_bc(EquationSystems& es,
       // pipe-mesh in this directory.
       const Real z_coo = 4.;
 
-      if (fabs(curr_node(2)-z_coo) < TOLERANCE)
+      if (std::abs(curr_node(2)-z_coo) < TOLERANCE)
         {
           // The global number of the respective degree of freedom.
-          unsigned int dn = curr_node.dof_number(0,0,0);
+          unsigned int dn = curr_node.dof_number(0, 0, 0);
 
           // The penalty parameter.
           const Real penalty = 1.e10;
@@ -630,7 +625,7 @@ void fill_dirichlet_bc(EquationSystems& es,
           // Here we apply sinusoidal pressure values for 0<t<0.002
           // at one end of the pipe-mesh.
           Real p_value;
-          if (t_system.time < .002 )
+          if (t_system.time < .002)
             p_value = sin(2*pi*t_system.time/.002);
           else
             p_value = .0;
