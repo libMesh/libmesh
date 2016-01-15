@@ -44,18 +44,18 @@ class DenseVector;
 class MeshlessInterpolationFunction : public FunctionBase<Number>
 {
 private:
-  const MeshfreeInterpolation &_mfi;
+  const MeshfreeInterpolation & _mfi;
   mutable std::vector<Point> _pts;
   mutable std::vector<Number> _vals;
-  Threads::spin_mutex &_mutex;
+  Threads::spin_mutex & _mutex;
 
 public:
 
   /**
    * Constructor.  Requires a \p \pMeshlessInterpolation object.
    */
-  MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
-                                 Threads::spin_mutex &mutex) :
+  MeshlessInterpolationFunction (const MeshfreeInterpolation & mfi,
+                                 Threads::spin_mutex & mutex) :
     _mfi (mfi),
     _mutex(mutex)
   {}
@@ -80,16 +80,16 @@ public:
    * @returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
-  Number operator() (const Point& p,
+  Number operator() (const Point & p,
                      const Real time=0.);
 
   /**
    * Like before, but returns the values in a
    * writable reference.
    */
-  void operator() (const Point& p,
+  void operator() (const Point & p,
                    const Real time,
-                   DenseVector<Number>& output);
+                   DenseVector<Number> & output);
 
 };
 
@@ -98,7 +98,7 @@ public:
 // ------------------------------------------------------------
 // MeshlessInterpolationFunction inline methods
 inline
-Number MeshlessInterpolationFunction::operator() (const Point& p,
+Number MeshlessInterpolationFunction::operator() (const Point & p,
                                                   const Real /* time */)
 {
   _pts.clear();
@@ -116,13 +116,12 @@ Number MeshlessInterpolationFunction::operator() (const Point& p,
 
 
 inline
-void MeshlessInterpolationFunction::operator() (const Point& p,
+void MeshlessInterpolationFunction::operator() (const Point & p,
                                                 const Real time,
-                                                DenseVector<Number>& output)
+                                                DenseVector<Number> & output)
 {
   output.resize(1);
-  output(0) = (*this)(p,time);
-  return;
+  output(0) = (*this)(p, time);
 }
 
 
@@ -145,7 +144,7 @@ inline
 UniquePtr<FunctionBase<Number> >
 MeshlessInterpolationFunction::clone () const
 {
-  return UniquePtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
+  return UniquePtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex));
 }
 
 

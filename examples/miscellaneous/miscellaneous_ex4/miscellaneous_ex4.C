@@ -78,15 +78,15 @@ using namespace libMesh;
 
 // Function prototype.  This function will assemble the system matrix
 // and right-hand-side.
-void assemble (EquationSystems& es,
-               const std::string& system_name);
+void assemble (EquationSystems & es,
+               const std::string & system_name);
 
 // Begin the main program.  Note that the first
 // statement in the program throws an error if
 // you are in complex number mode, since this
 // example is only intended to work with real
 // numbers.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -99,12 +99,12 @@ int main (int argc, char** argv)
   // Brief message to the user regarding the program name
   // and command line arguments.
 
-  std::cout << "Running: " << argv[0];
+  libMesh::out << "Running: " << argv[0];
 
   for (int i=1; i<argc; i++)
-    std::cout << " " << argv[i];
+    libMesh::out << " " << argv[i];
 
-  std::cout << std::endl << std::endl;
+  libMesh::out << std::endl << std::endl;
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -133,8 +133,8 @@ int main (int argc, char** argv)
 
   // Also, we need to add two vectors.  The tensor matrix v*w^T of
   // these two vectors will be part of the system matrix.
-  system.add_vector("v",false);
-  system.add_vector("w",false);
+  system.add_vector("v", false);
+  system.add_vector("w", false);
 
   // We need an additional matrix to be used for preconditioning since
   // a shell matrix is not suitable for that.
@@ -155,17 +155,17 @@ int main (int argc, char** argv)
     ("linear solver tolerance") = TOLERANCE;
 
   // Refine arbitrarily some elements.
-  for(unsigned int i=0; i<2; i++)
+  for (unsigned int i=0; i<2; i++)
     {
       MeshRefinement mesh_refinement(mesh);
       MeshBase::element_iterator       elem_it  = mesh.elements_begin();
       const MeshBase::element_iterator elem_end = mesh.elements_end();
       for (; elem_it != elem_end; ++elem_it)
         {
-          Elem* elem = *elem_it;
-          if(elem->active())
+          Elem * elem = *elem_it;
+          if (elem->active())
             {
-              if((elem->id()%20)>8)
+              if ((elem->id()%20)>8)
                 {
                   elem->set_refinement_flag(Elem::REFINE);
                 }
@@ -196,7 +196,7 @@ int main (int argc, char** argv)
   // store the shell matrix in the system.  We just create it locally
   // here (a shell matrix does not occupy much memory).
   SumShellMatrix<Number> shellMatrix(system.comm());
-  TensorShellMatrix<Number> shellMatrix0(system.get_vector("v"),system.get_vector("w"));
+  TensorShellMatrix<Number> shellMatrix0(system.get_vector("v"), system.get_vector("w"));
   shellMatrix.matrices.push_back(&shellMatrix0);
   SparseShellMatrix<Number> shellMatrix1(*system.matrix);
   shellMatrix.matrices.push_back(&shellMatrix1);
@@ -216,7 +216,12 @@ int main (int argc, char** argv)
   system.detach_shell_matrix();
 
   // Print a nice message.
-  std::cout << "Solved linear system in " << system.n_linear_iterations() << " iterations, residual norm is " << system.final_linear_residual() << "." << std::endl;
+  libMesh::out << "Solved linear system in "
+               << system.n_linear_iterations()
+               << " iterations, residual norm is "
+               << system.final_linear_residual()
+               << "."
+               << std::endl;
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
   // Write result to file.
@@ -233,8 +238,8 @@ int main (int argc, char** argv)
 // This function defines the assembly routine.  It is responsible for
 // computing the proper matrix entries for the element stiffness
 // matrices and right-hand sides.
-void assemble (EquationSystems& es,
-               const std::string& system_name)
+void assemble (EquationSystems & es,
+               const std::string & system_name)
 {
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
@@ -242,7 +247,7 @@ void assemble (EquationSystems& es,
   libmesh_assert_equal_to (system_name, "System");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
@@ -274,16 +279,16 @@ void assemble (EquationSystems& es,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.  We will start
   // with the element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW      = fe->get_JxW();
-  const std::vector<Real>& JxW_face = fe_face->get_JxW();
+  const std::vector<Real> & JxW      = fe->get_JxW();
+  const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // The XY locations of the quadrature points used for face integration
   //const std::vector<Point>& qface_points = fe_face->get_xyz();
@@ -292,7 +297,7 @@ void assemble (EquationSystems& es,
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -323,7 +328,7 @@ void assemble (EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -362,9 +367,7 @@ void assemble (EquationSystems& es,
           for (unsigned int i=0; i<phi.size(); i++)
             {
               // The RHS contribution
-              Fe(i) += JxW[qp]*(
-                                phi[i][qp]
-                                );
+              Fe(i) += JxW[qp]*phi[i][qp];
 
               for (unsigned int j=0; j<phi.size(); j++)
                 {
@@ -376,12 +379,8 @@ void assemble (EquationSystems& es,
                 }
 
               // V and W are the same for this example.
-              Ve(i) += JxW[qp]*(
-                                phi[i][qp]
-                                );
-              We(i) += JxW[qp]*(
-                                phi[i][qp]
-                                );
+              Ve(i) += JxW[qp]*phi[i][qp];
+              We(i) += JxW[qp]*phi[i][qp];
             }
         }
 
@@ -404,7 +403,7 @@ void assemble (EquationSystems& es,
         for (unsigned int s=0; s<elem->n_sides(); s++)
           if (elem->neighbor(s) == NULL)
             {
-              fe_face->reinit(elem,s);
+              fe_face->reinit(elem, s);
 
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -434,7 +433,7 @@ void assemble (EquationSystems& es,
       std::vector<dof_id_type> dof_indices_backup(dof_indices);
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       dof_indices = dof_indices_backup;
-      dof_map.constrain_element_dyad_matrix(Ve,We,dof_indices);
+      dof_map.constrain_element_dyad_matrix(Ve, We, dof_indices);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
@@ -442,9 +441,9 @@ void assemble (EquationSystems& es,
       // and \p NumericVector::add_vector() members do this for us.
       system.matrix->add_matrix (Ke, dof_indices);
       system.get_matrix("Preconditioner").add_matrix (Ke, dof_indices);
-      system.rhs->add_vector    (Fe, dof_indices);
-      system.get_vector("v").add_vector(Ve,dof_indices);
-      system.get_vector("w").add_vector(We,dof_indices);
+      system.rhs->add_vector (Fe, dof_indices);
+      system.get_vector("v").add_vector(Ve, dof_indices);
+      system.get_vector("w").add_vector(We, dof_indices);
     }
   // Finished computing the sytem matrix and right-hand side.
 

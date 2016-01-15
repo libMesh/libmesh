@@ -94,14 +94,14 @@ using namespace libMesh;
 // Function prototype.  This is the function that will assemble
 // the mass, damping and stiffness matrices.  It will <i>not</i>
 // form an overall system matrix ready for solution.
-void assemble_helmholtz(EquationSystems& es,
-                        const std::string& system_name);
+void assemble_helmholtz(EquationSystems & es,
+                        const std::string & system_name);
 
 // Function prototype.  This is the function that will combine
 // the previously-assembled mass, damping and stiffness matrices
 // to the overall matrix, which then renders ready for solution.
-void add_M_C_K_helmholtz(EquationSystems& es,
-                         const std::string& system_name);
+void add_M_C_K_helmholtz(EquationSystems & es,
+                         const std::string & system_name);
 #endif
 
 // Begin the main program.  Note that this example only
@@ -111,7 +111,7 @@ void add_M_C_K_helmholtz(EquationSystems& es,
 // C++ compiler that you used to build libMesh.  This is
 // so that the name mangling will be the same for the
 // routines in both libraries.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libraries, like in example 2.
   LibMeshInit init (argc, argv);
@@ -129,8 +129,9 @@ int main (int argc, char** argv)
     {
       if (init.comm().rank() == 0)
         {
-          std::cerr << "ERROR: Skipping example 7. " << std::endl;
-          std::cerr << "MeshData objects currently only work in serial." << std::endl;
+          libMesh::err << "ERROR: Skipping example 7.\n"
+                       << "MeshData objects currently only work in serial."
+                       << std::endl;
         }
       return 0;
     }
@@ -138,12 +139,12 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
     }
 
   // Get the frequency from argv[2] as a <i>float</i>,
@@ -243,7 +244,7 @@ int main (int argc, char** argv)
       // be assembled once.  Then, the system is solved for the
       // given frequencies.  Note that solve() may also solve
       // the system only for specific frequencies.
-      f_system.solve (n,n);
+      f_system.solve (n, n);
 
       // After solving the system, write the solution
       // to an ExodusII-formatted plot file, for every frequency.
@@ -273,8 +274,8 @@ int main (int argc, char** argv)
 // Here we define the matrix assembly routine for
 // the Helmholtz system.  This function will be
 // called to form the stiffness matrix and right-hand side.
-void assemble_helmholtz(EquationSystems& es,
-                        const std::string& system_name)
+void assemble_helmholtz(EquationSystems & es,
+                        const std::string & system_name)
 {
 
   // It is a good idea to make sure we are assembling
@@ -282,7 +283,7 @@ void assemble_helmholtz(EquationSystems& es,
   libmesh_assert_equal_to (system_name, "Helmholtz");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are in
   const unsigned int dim = mesh.mesh_dimension();
@@ -294,11 +295,11 @@ void assemble_helmholtz(EquationSystems& es,
   // A const reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = f_system.get_dof_map();
+  const DofMap & dof_map = f_system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
-  const FEType& fe_type = dof_map.variable_type(0);
+  const FEType & fe_type = dof_map.variable_type(0);
 
   // For the admittance boundary condition,
   // get the fluid density
@@ -309,10 +310,10 @@ void assemble_helmholtz(EquationSystems& es,
   // and the additional vector "rhs", not to the members
   // "matrix" and "rhs".  Therefore, get writable
   // references to them
-  SparseMatrix<Number>&   stiffness      = f_system.get_matrix("stiffness");
-  SparseMatrix<Number>&   damping        = f_system.get_matrix("damping");
-  SparseMatrix<Number>&   mass           = f_system.get_matrix("mass");
-  NumericVector<Number>&  freq_indep_rhs = f_system.get_vector("rhs");
+  SparseMatrix<Number> & stiffness = f_system.get_matrix("stiffness");
+  SparseMatrix<Number> & damping = f_system.get_matrix("damping");
+  SparseMatrix<Number> & mass = f_system.get_matrix("mass");
+  NumericVector<Number> & freq_indep_rhs = f_system.get_vector("rhs");
 
   // Some solver packages (PETSc) are especially picky about
   // allocating sparsity structure and truly assigning values
@@ -321,7 +322,7 @@ void assemble_helmholtz(EquationSystems& es,
   // sparsity structures.  Therefore, explicitly zero the
   // values in the collective matrix, so that matrix additions
   // encounter identical sparsity structures.
-  SparseMatrix<Number>&  matrix           = *f_system.matrix;
+  SparseMatrix<Number> & matrix = *f_system.matrix;
 
   // ------------------------------------------------------------------
   // Finite Element related stuff
@@ -339,14 +340,14 @@ void assemble_helmholtz(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
 
   // The element Jacobian// quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Now this is slightly different from example 4.
   // We will not add directly to the global matrix,
@@ -376,11 +377,11 @@ void assemble_helmholtz(EquationSystems& es,
   for ( ; el != end_el; ++el)
     {
       // Start logging the element initialization.
-      START_LOG("elem init","assemble_helmholtz");
+      START_LOG("elem init", "assemble_helmholtz");
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -408,11 +409,11 @@ void assemble_helmholtz(EquationSystems& es,
       }
 
       // Stop logging the element initialization.
-      STOP_LOG("elem init","assemble_helmholtz");
+      STOP_LOG("elem init", "assemble_helmholtz");
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
-      START_LOG("stiffness & mass","assemble_helmholtz");
+      START_LOG("stiffness & mass", "assemble_helmholtz");
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
@@ -429,7 +430,7 @@ void assemble_helmholtz(EquationSystems& es,
               }
         }
 
-      STOP_LOG("stiffness & mass","assemble_helmholtz");
+      STOP_LOG("stiffness & mass", "assemble_helmholtz");
 
       // Now compute the contribution to the element matrix
       // (due to mixed boundary conditions) if the current
@@ -442,7 +443,7 @@ void assemble_helmholtz(EquationSystems& es,
       for (unsigned int side=0; side<elem->n_sides(); side++)
         if (elem->neighbor(side) == NULL)
           {
-            START_LOG("damping","assemble_helmholtz");
+            START_LOG("damping", "assemble_helmholtz");
 
             // Declare a special finite element object for
             // boundary integration.
@@ -459,12 +460,12 @@ void assemble_helmholtz(EquationSystems& es,
 
             // The value of the shape functions at the quadrature
             // points.
-            const std::vector<std::vector<Real> >&  phi_face =
+            const std::vector<std::vector<Real> > & phi_face =
               fe_face->get_phi();
 
             // The Jacobian// Quadrature Weight at the quadrature
             // points on the face.
-            const std::vector<Real>& JxW_face = fe_face->get_JxW();
+            const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
             // Compute the shape function values on the element
             // face.
@@ -485,7 +486,7 @@ void assemble_helmholtz(EquationSystems& es,
                     Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
               }
 
-            STOP_LOG("damping","assemble_helmholtz");
+            STOP_LOG("damping", "assemble_helmholtz");
           }
 
       // If this assembly program were to be used on an adaptive mesh,
@@ -500,9 +501,9 @@ void assemble_helmholtz(EquationSystems& es,
 
       // Finally, simply add the contributions to the additional
       // matrices and vector.
-      stiffness.add_matrix      (Ke, dof_indices);
-      damping.add_matrix        (Ce, dof_indices);
-      mass.add_matrix           (Me, dof_indices);
+      stiffness.add_matrix (Ke, dof_indices);
+      damping.add_matrix (Ce, dof_indices);
+      mass.add_matrix (Me, dof_indices);
 
       // For the overall matrix, explicitly zero the entries where
       // we added values in the other ones, so that we have
@@ -516,10 +517,10 @@ void assemble_helmholtz(EquationSystems& es,
   // get the normal velocities values on the boundary from the
   // mesh data.
   {
-    START_LOG("rhs","assemble_helmholtz");
+    START_LOG("rhs", "assemble_helmholtz");
 
     // get a reference to the mesh data.
-    const MeshData& mesh_data = es.get_mesh_data();
+    const MeshData & mesh_data = es.get_mesh_data();
 
     // We will now loop over all nodes. In case nodal data
     // for a certain node is available in the MeshData, we simply
@@ -534,15 +535,15 @@ void assemble_helmholtz(EquationSystems& es,
     for ( ; node_it != node_end; ++node_it)
       {
         // the current node pointer
-        const Node* node = *node_it;
+        const Node * node = *node_it;
 
         // check if the mesh data has data for the current node
         // and do for all components
         if (mesh_data.has_data(node))
-          for (unsigned int comp=0; comp<node->n_comp(0,0); comp++)
+          for (unsigned int comp=0; comp<node->n_comp(0, 0); comp++)
             {
               // the dof number
-              unsigned int dn = node->dof_number(0,0,comp);
+              unsigned int dn = node->dof_number(0, 0, comp);
 
               // set the nodal value
               freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
@@ -550,7 +551,7 @@ void assemble_helmholtz(EquationSystems& es,
       }
 
 
-    STOP_LOG("rhs","assemble_helmholtz");
+    STOP_LOG("rhs", "assemble_helmholtz");
   }
 
   // All done!
@@ -560,10 +561,10 @@ void assemble_helmholtz(EquationSystems& es,
 // We now define the function which will combine
 // the previously-assembled mass, stiffness, and
 // damping matrices into a single system matrix.
-void add_M_C_K_helmholtz(EquationSystems& es,
-                         const std::string& system_name)
+void add_M_C_K_helmholtz(EquationSystems & es,
+                         const std::string & system_name)
 {
-  START_LOG("init phase","add_M_C_K_helmholtz");
+  START_LOG("init phase", "add_M_C_K_helmholtz");
 
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -585,39 +586,41 @@ void add_M_C_K_helmholtz(EquationSystems& es,
 
   // Get writable references to the overall matrix and vector, where the
   // frequency-dependent system is to be collected
-  SparseMatrix<Number>&  matrix          = *f_system.matrix;
-  NumericVector<Number>& rhs             = *f_system.rhs;
+  SparseMatrix<Number> & matrix = *f_system.matrix;
+  NumericVector<Number> & rhs = *f_system.rhs;
 
   // Get writable references to the frequency-independent matrices
   // and rhs, though we only need to extract values.  This write access
   // is necessary, since solver packages have to close the data structure
   // before they can extract values for computation.
-  SparseMatrix<Number>&   stiffness      = f_system.get_matrix("stiffness");
-  SparseMatrix<Number>&   damping        = f_system.get_matrix("damping");
-  SparseMatrix<Number>&   mass           = f_system.get_matrix("mass");
-  NumericVector<Number>&  freq_indep_rhs = f_system.get_vector("rhs");
+  SparseMatrix<Number> & stiffness = f_system.get_matrix("stiffness");
+  SparseMatrix<Number> & damping = f_system.get_matrix("damping");
+  SparseMatrix<Number> & mass = f_system.get_matrix("mass");
+  NumericVector<Number> & freq_indep_rhs = f_system.get_vector("rhs");
 
   // form the scaling values for the coming matrix and vector axpy's
-  const Number scale_stiffness (  1., 0.   );
-  const Number scale_damping   (  0., omega);
-  const Number scale_mass      (-k*k, 0.   );
-  const Number scale_rhs       (  0., -(rho*omega));
+  const Number scale_stiffness (1., 0.);
+  const Number scale_damping (0., omega);
+  const Number scale_mass (-k*k, 0.);
+  const Number scale_rhs (0., -(rho*omega));
 
   // Now simply add the matrices together, store the result
   // in matrix and rhs.  Clear them first.
-  matrix.close(); matrix.zero ();
-  rhs.close();    rhs.zero    ();
+  matrix.close ();
+  matrix.zero ();
+  rhs.close ();
+  rhs.zero ();
 
   // The matrices from which values are added to another matrix
   // have to be closed.  The add() method does take care of
   // that, but let us do it explicitly.
   stiffness.close ();
-  damping.close   ();
-  mass.close      ();
+  damping.close ();
+  mass.close ();
 
-  STOP_LOG("init phase","add_M_C_K_helmholtz");
+  STOP_LOG("init phase", "add_M_C_K_helmholtz");
 
-  START_LOG("global matrix & vector additions","add_M_C_K_helmholtz");
+  START_LOG("global matrix & vector additions", "add_M_C_K_helmholtz");
 
   // add the stiffness and mass with the proper frequency to the
   // overall system.  For this to work properly, matrix has
@@ -633,7 +636,7 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   matrix.add (scale_damping,   damping);
   rhs.add    (scale_rhs,       freq_indep_rhs);
 
-  STOP_LOG("global matrix & vector additions","add_M_C_K_helmholtz");
+  STOP_LOG("global matrix & vector additions", "add_M_C_K_helmholtz");
 
   // The "matrix" and "rhs" are now ready for solution
 }

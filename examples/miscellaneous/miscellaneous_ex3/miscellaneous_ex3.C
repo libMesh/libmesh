@@ -88,16 +88,16 @@ public:
   /**
    * Function which computes the residual.
    */
-  virtual void residual (const NumericVector<Number>& X,
-                         NumericVector<Number>& R,
-                         NonlinearImplicitSystem& S);
+  virtual void residual (const NumericVector<Number> & X,
+                         NumericVector<Number> & R,
+                         NonlinearImplicitSystem & S);
 
   /**
    * Function which computes the jacobian.
    */
-  virtual void jacobian (const NumericVector<Number>& X,
-                         SparseMatrix<Number>& J,
-                         NonlinearImplicitSystem& S);
+  virtual void jacobian (const NumericVector<Number> & X,
+                         SparseMatrix<Number> & J,
+                         NonlinearImplicitSystem & S);
 
   /**
    * Function which performs a postcheck on the solution.  In this
@@ -137,7 +137,7 @@ private:
 
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
@@ -173,41 +173,41 @@ int main (int argc, char** argv)
   // and command line arguments.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
     }
 
 
   // Read number of refinements
   int nr = 2;
-  if ( command_line.search(1, "-r") )
+  if (command_line.search(1, "-r"))
     nr = command_line.next(nr);
 
   // Read FE order from command line
   std::string order = "FIRST";
-  if ( command_line.search(2, "-Order", "-o") )
+  if (command_line.search(2, "-Order", "-o"))
     order = command_line.next(order);
 
   // Read FE Family from command line
   std::string family = "LAGRANGE";
-  if ( command_line.search(2, "-FEFamily", "-f") )
+  if (command_line.search(2, "-FEFamily", "-f"))
     family = command_line.next(family);
 
   // Cannot use dicontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     libmesh_error_msg("This example requires a C^0 (or higher) FE basis.");
 
-  if ( command_line.search(1, "-pre") )
+  if (command_line.search(1, "-pre"))
     {
 #ifdef LIBMESH_HAVE_PETSC
       //Use the jacobian for preconditioning.
-      PetscOptionsSetValue("-snes_mf_operator",PETSC_NULL);
+      PetscOptionsSetValue("-snes_mf_operator", PETSC_NULL);
 #else
-      std::cerr<<"Must be using PetsC to use jacobian based preconditioning"<<std::endl;
+      libMesh::err << "Must be using PETSc to use jacobian based preconditioning" << std::endl;
 
       //returning zero so that "make run" won't fail if we ever enable this capability there.
       return 0;
@@ -237,7 +237,7 @@ int main (int argc, char** argv)
   // Declare the system and its variables.
 
   // Creates a system named "Laplace-Young"
-  NonlinearImplicitSystem& system =
+  NonlinearImplicitSystem & system =
     equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
 
   // Here we specify the tolerance for the nonlinear solver and
@@ -272,11 +272,11 @@ int main (int argc, char** argv)
   // Print out final convergence information.  This duplicates some
   // output from during the solve itself, but demonstrates another way
   // to get this information after the solve is complete.
-  std::cout << "Laplace-Young system solved at nonlinear iteration "
-            << system.n_nonlinear_iterations()
-            << " , final nonlinear residual norm: "
-            << system.final_nonlinear_residual()
-            << std::endl;
+  libMesh::out << "Laplace-Young system solved at nonlinear iteration "
+               << system.n_nonlinear_iterations()
+               << " , final nonlinear residual norm: "
+               << system.final_nonlinear_residual()
+               << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution
@@ -292,28 +292,28 @@ int main (int argc, char** argv)
 
 
 // Residual assembly function for the Laplace-Young system
-void LaplaceYoung::residual (const NumericVector<Number>& soln,
-                             NumericVector<Number>& residual,
-                             NonlinearImplicitSystem& sys)
+void LaplaceYoung::residual (const NumericVector<Number> & soln,
+                             NumericVector<Number> & residual,
+                             NonlinearImplicitSystem & sys)
 {
-  EquationSystems &es = sys.get_equation_systems();
+  EquationSystems & es = sys.get_equation_systems();
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
   libmesh_assert_equal_to (dim, 2);
 
   // Get a reference to the NonlinearImplicitSystem we are solving
-  NonlinearImplicitSystem& system =
+  NonlinearImplicitSystem & system =
     es.get_system<NonlinearImplicitSystem>("Laplace-Young");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -348,14 +348,14 @@ void LaplaceYoung::residual (const NumericVector<Number>& soln,
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Define data structures to contain the resdual contributions
   DenseVector<Number> Re;
@@ -377,7 +377,7 @@ void LaplaceYoung::residual (const NumericVector<Number>& soln,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -438,11 +438,11 @@ void LaplaceYoung::residual (const NumericVector<Number>& soln,
           {
             // The value of the shape functions at the quadrature
             // points.
-            const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+            const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
 
             // The Jacobian * Quadrature Weight at the quadrature
             // points on the face.
-            const std::vector<Real>& JxW_face = fe_face->get_JxW();
+            const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
             // Compute the shape function values on the element face.
             fe_face->reinit(elem, side);
@@ -467,28 +467,28 @@ void LaplaceYoung::residual (const NumericVector<Number>& soln,
 
 
 // Jacobian assembly function for the Laplace-Young system
-void LaplaceYoung::jacobian (const NumericVector<Number>& soln,
-                             SparseMatrix<Number>& jacobian,
-                             NonlinearImplicitSystem& sys)
+void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
+                             SparseMatrix<Number> & jacobian,
+                             NonlinearImplicitSystem & sys)
 {
   // Get a reference to the equation system.
-  EquationSystems &es = sys.get_equation_systems();
+  EquationSystems & es = sys.get_equation_systems();
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the NonlinearImplicitSystem we are solving
-  NonlinearImplicitSystem& system =
+  NonlinearImplicitSystem & system =
     es.get_system<NonlinearImplicitSystem>("Laplace-Young");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -510,14 +510,14 @@ void LaplaceYoung::jacobian (const NumericVector<Number>& soln,
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Define data structures to contain the Jacobian element matrix.
   // Following basic finite element terminology we will denote these
@@ -539,7 +539,7 @@ void LaplaceYoung::jacobian (const NumericVector<Number>& soln,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global

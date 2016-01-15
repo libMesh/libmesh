@@ -69,11 +69,12 @@ using namespace libMesh;
 // Function prototype.  This is the function that will assemble
 // the stiffness matrix and the right-hand-side vector ready
 // for solution.
-void assemble_shell (EquationSystems& es, const std::string& system_name);
+void assemble_shell (EquationSystems & es,
+                     const std::string & system_name);
 #endif
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -200,7 +201,7 @@ int main (int argc, char** argv)
 #endif
 
   // Find the center node to measure the maximum deformation of the plate.
-  Node* center_node = 0;
+  Node * center_node = 0;
   Real nearest_dist_sq = mesh.point(0).size_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
   {
@@ -231,8 +232,8 @@ int main (int argc, char** argv)
   // Print the finite element solution and the analytic
   // prediction of the maximum displacement of the clamped
   // square plate to the screen.
-  std::cout << "z-displacement of the center point: " << w << std::endl;
-  std::cout << "Analytic solution for pure bending: " << w_analytic << std::endl;
+  libMesh::out << "z-displacement of the center point: " << w << std::endl;
+  libMesh::out << "Analytic solution for pure bending: " << w_analytic << std::endl;
 
 #endif // #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -249,14 +250,15 @@ int main (int argc, char** argv)
 // linear Kirchhoff-Love theory for thin shells.  At the
 // end we also take into account the boundary conditions
 // here, using the penalty method.
-void assemble_shell (EquationSystems& es, const std::string& system_name)
+void assemble_shell (EquationSystems & es,
+                     const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Shell");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // Get a reference to the shell system object.
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("Shell");
@@ -294,22 +296,22 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
   fe->attach_quadrature_rule (qrule.get());
 
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The surface tangents in both directions at the quadrature points.
-  const std::vector<RealGradient>& dxyzdxi  = fe->get_dxyzdxi();
-  const std::vector<RealGradient>& dxyzdeta = fe->get_dxyzdeta();
+  const std::vector<RealGradient> & dxyzdxi  = fe->get_dxyzdxi();
+  const std::vector<RealGradient> & dxyzdeta = fe->get_dxyzdeta();
 
   // The second partial derivatives at the quadrature points.
-  const std::vector<RealGradient>& d2xyzdxi2    = fe->get_d2xyzdxi2();
-  const std::vector<RealGradient>& d2xyzdeta2   = fe->get_d2xyzdeta2();
-  const std::vector<RealGradient>& d2xyzdxideta = fe->get_d2xyzdxideta();
+  const std::vector<RealGradient> & d2xyzdxi2    = fe->get_d2xyzdxi2();
+  const std::vector<RealGradient> & d2xyzdeta2   = fe->get_d2xyzdeta2();
+  const std::vector<RealGradient> & d2xyzdxideta = fe->get_d2xyzdxideta();
 
   // The element shape function and its derivatives evaluated at the
   // quadrature points.
-  const std::vector<std::vector<Real> >&          phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
+  const std::vector<std::vector<Real> > &          phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealTensor> > &  d2phi = fe->get_d2phi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -350,13 +352,13 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
   {
     // Store a pointer to the element we are currently
     // working on.  This allows for nicer syntax later.
-    const Elem* elem = *el;
+    const Elem * elem = *el;
 
     // The ghost elements at the boundaries need to be excluded
     // here, as they don't belong to the physical shell,
     // but serve for a proper boundary treatment only.
     libmesh_assert_equal_to (elem->type(), TRI3SUBDIVISION);
-    const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*> (elem);
+    const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *> (elem);
     if (sd_elem->is_ghost())
       continue;
 
@@ -453,12 +455,12 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
       // contravariant first fundamental form is the inverse of the
       // covatiant first fundamental form (hence the determinant etc.).
       RealTensorValue H;
-      H(0,0)          =  a(1) * a(1);
-      H(0,1) = H(1,0) =   nu  * a(1) * a(0) + (1-nu) * a(2) * a(2);
+      H(0,0) = a(1) * a(1);
+      H(0,1) = H(1,0) = nu * a(1) * a(0) + (1-nu) * a(2) * a(2);
       H(0,2) = H(2,0) = -a(1) * a(2);
-      H(1,1)          =  a(0) * a(0);
+      H(1,1) = a(0) * a(0);
       H(1,2) = H(2,1) = -a(0) * a(2);
-      H(2,2)          = 0.5 * ((1-nu) * a(1) * a(0) + (1+nu) * a(2) * a(2));
+      H(2,2) = 0.5 * ((1-nu) * a(1) * a(0) + (1+nu) * a(2) * a(2));
       const Real det = a(0) * a(1) - a(2) * a(2);
       libmesh_assert_not_equal_to (det * det, 0);
       H /= det * det;
@@ -574,12 +576,12 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
   {
     // Store a pointer to the element we are currently
     // working on.  This allows for nicer syntax later.
-    const Elem* elem = *el;
+    const Elem * elem = *el;
 
     // For the boundary conditions, we only need to loop over
     // the ghost elements.
     libmesh_assert_equal_to (elem->type(), TRI3SUBDIVISION);
-    const Tri3Subdivision* gh_elem = static_cast<const Tri3Subdivision*> (elem);
+    const Tri3Subdivision * gh_elem = static_cast<const Tri3Subdivision *> (elem);
     if (!gh_elem->is_ghost())
       continue;
 
@@ -587,7 +589,7 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
     // that is, the boundary of the original mesh without ghosts.
     for (unsigned int s=0; s<elem->n_sides(); ++s)
     {
-      const Tri3Subdivision* nb_elem = static_cast<const Tri3Subdivision*> (elem->neighbor(s));
+      const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor(s));
       if (nb_elem == NULL || nb_elem->is_ghost())
         continue;
 
@@ -606,7 +608,7 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
        *     \  /
        *      n1
        */
-      Node* nodes [4]; // n1, n2, n3, n4
+      Node * nodes [4]; // n1, n2, n3, n4
       nodes[1] = gh_elem->get_node(s); // n2
       nodes[2] = gh_elem->get_node(MeshTools::Subdivision::next[s]); // n3
       nodes[3] = gh_elem->get_node(MeshTools::Subdivision::prev[s]); // n4

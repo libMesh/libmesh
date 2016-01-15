@@ -61,12 +61,14 @@
 
 using namespace libMesh;
 
-bool compare_elements(const SerialMesh& mesh1, const SerialMesh& mesh2);
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name);
-void assemble_and_solve(MeshBase&, EquationSystems&);
+bool compare_elements(const SerialMesh & mesh1,
+                      const SerialMesh & mesh2);
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name);
+void assemble_and_solve(MeshBase &,
+                        EquationSystems &);
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   START_LOG("Initialize and create cubes", "main");
   LibMeshInit init (argc, argv);
@@ -82,12 +84,12 @@ int main (int argc, char** argv)
   // and command line arguments.
   else
     {
-      std::cout << "Running " << argv[0];
+      libMesh::out << "Running " << argv[0];
 
       for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+        libMesh::out << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
+      libMesh::out << std::endl << std::endl;
     }
 
   // This is 3D-only problem
@@ -98,7 +100,7 @@ int main (int argc, char** argv)
 
   // Read number of elements used in each cube from command line
   int ps = 10;
-  if ( command_line.search(1, "-n") )
+  if (command_line.search(1, "-n"))
     ps = command_line.next(ps);
 
   // Generate eight meshes that will be stitched
@@ -154,35 +156,32 @@ int main (int argc, char** argv)
 
   START_LOG("Output", "main");
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO(mesh).write_equation_systems(
-                                           "solution_stitch.exo",
+  ExodusII_IO(mesh).write_equation_systems("solution_stitch.exo",
                                            equation_systems_stitch);
-  ExodusII_IO(nostitch_mesh).write_equation_systems(
-                                           "solution_nostitch.exo",
-                                           equation_systems_nostitch);
+  ExodusII_IO(nostitch_mesh).write_equation_systems("solution_nostitch.exo",
+                                                    equation_systems_nostitch);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   STOP_LOG("Output", "main");
 
   return 0;
 }
 
-void assemble_and_solve(MeshBase& mesh, EquationSystems& equation_systems)
+void assemble_and_solve(MeshBase & mesh,
+                        EquationSystems & equation_systems)
 {
   mesh.print_info();
 
-  LinearImplicitSystem& system =
+  LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
   unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
 
   system.attach_assemble_function (assemble_poisson);
 
-  std::set<boundary_id_type> boundary_ids;
   // the cube has boundaries IDs 0, 1, 2, 3, 4 and 5
-  for(int j = 0; j<6; ++j)
-    {
-      boundary_ids.insert(j);
-    }
+  std::set<boundary_id_type> boundary_ids;
+  for (int j = 0; j<6; ++j)
+    boundary_ids.insert(j);
 
   // Create a vector storing the variable numbers which the BC applies to
   std::vector<unsigned int> variables(1);
@@ -206,18 +205,21 @@ void assemble_and_solve(MeshBase& mesh, EquationSystems& equation_systems)
 
   const unsigned int max_r_steps = 2;
 
-  for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
+  for (unsigned int r_step=0; r_step<=max_r_steps; r_step++)
     {
       system.solve();
-      if(r_step != max_r_steps)
+      if (r_step != max_r_steps)
         {
           ErrorVector error;
           KellyErrorEstimator error_estimator;
 
           error_estimator.estimate_error(system, error);
 
-          libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm() <<
-            "\nmaximum = " << error.maximum() << std::endl;
+          libMesh::out << "Error estimate\nl2 norm = "
+                       << error.l2_norm()
+                       << "\nmaximum = "
+                       << error.maximum()
+                       << std::endl;
 
           mesh_refinement.flag_elements_by_error_fraction (error);
 
@@ -231,16 +233,16 @@ void assemble_and_solve(MeshBase& mesh, EquationSystems& equation_systems)
 #endif
 }
 
-void assemble_poisson(EquationSystems& es,
-                      const std::string& system_name)
+void assemble_poisson(EquationSystems & es,
+                      const std::string & system_name)
 {
   libmesh_assert_equal_to (system_name, "Poisson");
 
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Poisson");
 
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   FEType fe_type = dof_map.variable_type(0);
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
@@ -250,9 +252,9 @@ void assemble_poisson(EquationSystems& es,
   QGauss qface(dim-1, FIFTH);
   fe_face->attach_quadrature_rule (&qface);
 
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<Real> & JxW = fe->get_JxW();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
@@ -264,7 +266,7 @@ void assemble_poisson(EquationSystems& es,
 
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       dof_map.dof_indices (elem, dof_indices);
 
@@ -281,9 +283,7 @@ void assemble_poisson(EquationSystems& es,
             {
               Fe(i) += JxW[qp]*phi[i][qp];
               for (unsigned int j=0; j<phi.size(); j++)
-                {
-                  Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                }
+                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
             }
         }
 
@@ -293,5 +293,3 @@ void assemble_poisson(EquationSystems& es,
       system.rhs->add_vector    (Fe, dof_indices);
     }
 }
-
-
