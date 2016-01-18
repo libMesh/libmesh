@@ -89,7 +89,7 @@ public:
    * Clone and attach arbitrary functors which compute the exact
    * values of the EquationSystems' solutions at any point.
    */
-  void attach_exact_values (std::vector<FunctionBase<Number> *> f);
+  void attach_exact_values (const std::vector<FunctionBase<Number> *> & f);
 
   /**
    * Clone and attach an arbitrary functor which computes the exact
@@ -111,7 +111,7 @@ public:
    * Clone and attach arbitrary functors which compute the exact
    * gradients of the EquationSystems' solutions at any point.
    */
-  void attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g);
+  void attach_exact_derivs (const std::vector<FunctionBase<Gradient> *> & g);
 
   /**
    * Clone and attach an arbitrary functor which computes the exact

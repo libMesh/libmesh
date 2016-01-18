@@ -120,7 +120,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point & p,
 }
 
 
-void ExactSolution::attach_exact_values (std::vector<FunctionBase<Number> *> f)
+void ExactSolution::attach_exact_values (const std::vector<FunctionBase<Number> *> & f)
 {
   // Clear out any previous _exact_values entries, then add a new
   // entry for each system.
@@ -174,7 +174,7 @@ void ExactSolution::attach_exact_deriv (Gradient gptr(const Point & p,
 }
 
 
-void ExactSolution::attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g)
+void ExactSolution::attach_exact_derivs (const std::vector<FunctionBase<Gradient> *> & g)
 {
   // Clear out any previous _exact_derivs entries, then add a new
   // entry for each system.
