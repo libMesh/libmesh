@@ -122,11 +122,12 @@ int main (int argc, char ** argv)
 
   ExactSolution exact_sol(equation_systems);
 
-  std::vector<FunctionBase<Number> *> sols;
-  std::vector<FunctionBase<Gradient> *> grads;
+  SolutionFunction soln_func(system.variable_number("u"));
+  SolutionGradient soln_grad(system.variable_number("u"));
 
-  sols.push_back(new SolutionFunction(system.variable_number("u")));
-  grads.push_back(new SolutionGradient(system.variable_number("u")));
+  // Build FunctionBase* containers to attach to the ExactSolution object.
+  std::vector<FunctionBase<Number> *> sols(1, &soln_func);
+  std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
 
   exact_sol.attach_exact_values(sols);
   exact_sol.attach_exact_derivs(grads);
