@@ -45,7 +45,9 @@ using namespace libMesh;
 
 #include "solid_system.h"
 
-void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
+void setup(EquationSystems & systems,
+           Mesh & mesh,
+           GetPot & args)
 {
   const unsigned int dim = mesh.mesh_dimension();
   // We currently invert tensors with the assumption that they're 3x3
@@ -66,11 +68,11 @@ void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
                                     origx, origx+sizex, origy, origy+sizey, origz, origz+sizez, eltype);
 
   // Creating Systems
-  SolidSystem& imms = systems.add_system<SolidSystem> ("solid");
+  SolidSystem & imms = systems.add_system<SolidSystem> ("solid");
   imms.args = args;
 
   // Build up auxiliary system
-  ExplicitSystem& aux_sys = systems.add_system<TransientExplicitSystem>("auxiliary");
+  ExplicitSystem & aux_sys = systems.add_system<TransientExplicitSystem>("auxiliary");
 
   // Initialize the system
   systems.parameters.set<unsigned int>("phase") = 0;
@@ -84,60 +86,65 @@ void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
 
 
 
-void run_timestepping(EquationSystems& systems, GetPot& args)
+void run_timestepping(EquationSystems & systems, GetPot & args)
 {
-  TransientExplicitSystem& aux_system = systems.get_system<TransientExplicitSystem>("auxiliary");
+  TransientExplicitSystem & aux_system = systems.get_system<TransientExplicitSystem>("auxiliary");
 
-  SolidSystem& solid_system = systems.get_system<SolidSystem>("solid");
+  SolidSystem & solid_system = systems.get_system<SolidSystem>("solid");
 
   UniquePtr<VTKIO> io = UniquePtr<VTKIO>(new VTKIO(systems.get_mesh()));
 
   Real duration = args("duration", 1.0);
 
-  for (unsigned int t_step = 0; t_step < duration/solid_system.deltat; t_step++) {
-    // Progress in current phase [0..1]
-    Real progress = t_step * solid_system.deltat / duration;
-    systems.parameters.set<Real>("progress") = progress;
-    systems.parameters.set<unsigned int>("step") = t_step;
+  for (unsigned int t_step = 0; t_step < duration/solid_system.deltat; t_step++)
+    {
+      // Progress in current phase [0..1]
+      Real progress = t_step * solid_system.deltat / duration;
+      systems.parameters.set<Real>("progress") = progress;
+      systems.parameters.set<unsigned int>("step") = t_step;
 
-    // Update message
+      // Update message
 
-    out << "===== Time Step " << std::setw(4) << t_step;
-    out << " (" << std::fixed << std::setprecision(2) << std::setw(6) << (progress*100.) << "%)";
-    out << ", time = " << std::setw(7) << solid_system.time;
-    out << " =====" << std::endl;
+      out << "===== Time Step " << std::setw(4) << t_step;
+      out << " (" << std::fixed << std::setprecision(2) << std::setw(6) << (progress*100.) << "%)";
+      out << ", time = " << std::setw(7) << solid_system.time;
+      out << " =====" << std::endl;
 
-    // Advance timestep in auxiliary system
-    aux_system.current_local_solution->close();
-    aux_system.old_local_solution->close();
-    *aux_system.older_local_solution = *aux_system.old_local_solution;
-    *aux_system.old_local_solution = *aux_system.current_local_solution;
+      // Advance timestep in auxiliary system
+      aux_system.current_local_solution->close();
+      aux_system.old_local_solution->close();
+      *aux_system.older_local_solution = *aux_system.old_local_solution;
+      *aux_system.old_local_solution = *aux_system.current_local_solution;
 
-    out << "Solving Solid" << std::endl;
-    solid_system.solve();
-    aux_system.reinit();
+      out << "Solving Solid" << std::endl;
+      solid_system.solve();
+      aux_system.reinit();
 
-    // Carry out the adaptive mesh refinement/coarsening
-    out << "Doing a reinit of the equation systems" << std::endl;
-    systems.reinit();
+      // Carry out the adaptive mesh refinement/coarsening
+      out << "Doing a reinit of the equation systems" << std::endl;
+      systems.reinit();
 
-    if (t_step % args("output/frequency", 1) == 0) {
-      std::stringstream file_name;
-      file_name << args("results_directory", "./") << "fem_";
-      file_name << std::setw(6) << std::setfill('0') << t_step;
-      file_name << ".pvtu";
+      if (t_step % args("output/frequency", 1) == 0)
+        {
+          std::stringstream file_name;
+          file_name << args("results_directory", "./")
+                    << "fem_"
+                    << std::setw(6)
+                    << std::setfill('0')
+                    << t_step
+                    << ".pvtu";
 
-      io->write_equation_systems(file_name.str(), systems);
+          io->write_equation_systems(file_name.str(), systems);
+        }
+      // Advance to the next timestep in a transient problem
+      out << "Advancing to next step" << std::endl;
+      solid_system.time_solver->advance_timestep();
     }
-    // Advance to the next timestep in a transient problem
-    out << "Advancing to next step" << std::endl;
-    solid_system.time_solver->advance_timestep();
-  }
 }
 
 
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libraries
   LibMeshInit init(argc, argv);
@@ -155,8 +162,8 @@ int main(int argc, char** argv)
   // We'll skip this example for now.
   if (libMesh::n_threads() > 1)
     {
-      std::cout << "We skip fem_system_ex2 when using threads.\n"
-                << std::endl;
+      libMesh::out << "We skip fem_system_ex2 when using threads.\n"
+                   << std::endl;
       return 0;
     }
 

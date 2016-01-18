@@ -37,16 +37,21 @@ using namespace libMesh;
 class BdyFunction : public FunctionBase<Number>
 {
 public:
-  BdyFunction (unsigned int u_var, unsigned int v_var, int sign)
-    : _u_var(u_var), _v_var(v_var), _sign(sign)
+  BdyFunction (unsigned int u_var,
+               unsigned int v_var,
+               int sign) :
+    _u_var(u_var),
+    _v_var(v_var),
+    _sign(sign)
   { this->_initialized = true; }
 
-  virtual Number operator() (const Point&, const Real = 0)
+  virtual Number operator() (const Point &,
+                             const Real = 0)
   { libmesh_not_implemented(); }
 
-  virtual void operator() (const Point& p,
+  virtual void operator() (const Point & p,
                            const Real,
-                           DenseVector<Number>& output)
+                           DenseVector<Number> & output)
   {
     output.resize(2);
     output.zero();
@@ -167,27 +172,27 @@ void CoupledSystem::init_data ()
   FEMSystem::init_data();
 }
 
-void CoupledSystem::init_context(DiffContext &context)
+void CoupledSystem::init_context(DiffContext & context)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // We should prerequest all the data
   // we will need to build the linear system.
   // Note that the concentration and velocity components
   // use the same basis.
-  FEBase* u_elem_fe = NULL;
-  c.get_element_fe( u_var, u_elem_fe );
+  FEBase * u_elem_fe = NULL;
+  c.get_element_fe(u_var, u_elem_fe);
   u_elem_fe->get_JxW();
   u_elem_fe->get_phi();
   u_elem_fe->get_dphi();
   u_elem_fe->get_xyz();
 
-  FEBase* p_elem_fe = NULL;
-  c.get_element_fe( p_var, p_elem_fe );
+  FEBase * p_elem_fe = NULL;
+  c.get_element_fe(p_var, p_elem_fe);
   p_elem_fe->get_phi();
 
-  FEBase* side_fe = NULL;
-  c.get_side_fe( u_var, side_fe );
+  FEBase * side_fe = NULL;
+  c.get_side_fe(u_var, side_fe);
 
   side_fe->get_JxW();
   side_fe->get_phi();
@@ -196,31 +201,31 @@ void CoupledSystem::init_context(DiffContext &context)
 
 
 bool CoupledSystem::element_time_derivative (bool request_jacobian,
-                                             DiffContext &context)
+                                             DiffContext & context)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase* u_elem_fe = NULL;
-  c.get_element_fe( u_var, u_elem_fe );
+  FEBase * u_elem_fe = NULL;
+  c.get_element_fe(u_var, u_elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = u_elem_fe->get_JxW();
+  const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<Real> >& phi = u_elem_fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  FEBase* p_elem_fe = NULL;
-  c.get_element_fe( p_var, p_elem_fe );
+  FEBase * p_elem_fe = NULL;
+  c.get_element_fe(p_var, p_elem_fe);
 
-  const std::vector<std::vector<Real> >& psi = p_elem_fe->get_phi();
+  const std::vector<std::vector<Real> > & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -228,18 +233,18 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices(v_var).size());
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &Kuu = c.get_elem_jacobian(u_var,u_var);
-  DenseSubMatrix<Number> &Kup = c.get_elem_jacobian(u_var,p_var);
-  DenseSubVector<Number> &Fu = c.get_elem_residual(u_var);
+  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
+  DenseSubMatrix<Number> & Kup = c.get_elem_jacobian(u_var, p_var);
+  DenseSubVector<Number> & Fu = c.get_elem_residual(u_var);
 
-  DenseSubMatrix<Number> &Kvv = c.get_elem_jacobian(v_var,v_var);
-  DenseSubMatrix<Number> &Kvp = c.get_elem_jacobian(v_var,p_var);
-  DenseSubVector<Number> &Fv = c.get_elem_residual(v_var);
+  DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
+  DenseSubMatrix<Number> & Kvp = c.get_elem_jacobian(v_var, p_var);
+  DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
 
-  DenseSubMatrix<Number> &KCu = c.get_elem_jacobian(C_var,u_var);
-  DenseSubMatrix<Number> &KCv = c.get_elem_jacobian(C_var,v_var);
-  DenseSubMatrix<Number> &KCC = c.get_elem_jacobian(C_var,C_var);
-  DenseSubVector<Number> &FC = c.get_elem_residual(C_var);
+  DenseSubMatrix<Number> & KCu = c.get_elem_jacobian(C_var, u_var);
+  DenseSubMatrix<Number> & KCv = c.get_elem_jacobian(C_var, v_var);
+  DenseSubMatrix<Number> & KCC = c.get_elem_jacobian(C_var, C_var);
+  DenseSubVector<Number> & FC = c.get_elem_residual(C_var);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -261,7 +266,7 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
       // Definitions for convenience.  It is sometimes simpler to do a
       // dot product if you have the full vector at your disposal.
-      NumberVectorValue U     (u,     v);
+      NumberVectorValue U (u, v);
       const Number C_x = grad_C(0);
       const Number C_y = grad_C(1);
 
@@ -281,8 +286,8 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
           // Concentration Equation Residual
           FC(i) += JxW[qp] *
-            ( (U*grad_C)*phi[i][qp] +                // convection term
-              (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term
+            ((U*grad_C)*phi[i][qp] +                // convection term
+             (1./Peclet)*(grad_C*dphi[i][qp]));     // diffusion term
 
           // Note that the Fp block is identically zero unless we are using
           // some kind of artificial compressibility scheme...
@@ -294,17 +299,17 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
               // Matrix contributions for the uu and vv couplings.
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
-                  Kuu(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); /* diffusion term  */
+                  Kuu(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); // diffusion term
 
-                  Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); /* diffusion term  */
+                  Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); // diffusion term
 
-                  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] ); /* convection term */
+                  KCu(i,j) += JxW[qp] * ((phi[j][qp]*C_x)*phi[i][qp]); // convection term
 
-                  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */
+                  KCv(i,j) += JxW[qp] * ((phi[j][qp]*C_y)*phi[i][qp]); // convection term
 
                   KCC(i,j) += JxW[qp]*
-                    ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */
-                      (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
+                    ((U*dphi[j][qp])*phi[i][qp] +            // nonlinear term (convection)
+                     (1./Peclet)*(dphi[j][qp]*dphi[i][qp])); // diffusion term
                 }
 
               // Matrix contributions for the up and vp couplings.
@@ -315,7 +320,6 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
                 }
             }
         }
-
     } // end of the quadrature point qp-loop
 
   return request_jacobian;
@@ -323,44 +327,45 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
 
 bool CoupledSystem::element_constraint (bool request_jacobian,
-                                        DiffContext &context)
+                                        DiffContext & context)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase* u_elem_fe = NULL;
-  c.get_element_fe( u_var, u_elem_fe );
+  FEBase * u_elem_fe = NULL;
+  c.get_element_fe(u_var, u_elem_fe);
 
-  FEBase* p_elem_fe = NULL;
-  c.get_element_fe( p_var, p_elem_fe );
+  FEBase * p_elem_fe = NULL;
+  c.get_element_fe(p_var, p_elem_fe);
 
   // Element Jacobian * quadrature weight for interior integration
-  const std::vector<Real> &JxW = u_elem_fe->get_JxW();
+  const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> >& psi = p_elem_fe->get_phi();
+  const std::vector<std::vector<Real> > & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
   const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &Kpu = c.get_elem_jacobian(p_var,u_var);
-  DenseSubMatrix<Number> &Kpv = c.get_elem_jacobian(p_var,v_var);
-  DenseSubVector<Number> &Fp = c.get_elem_residual(p_var);
+  DenseSubMatrix<Number> & Kpu = c.get_elem_jacobian(p_var, u_var);
+  DenseSubMatrix<Number> & Kpv = c.get_elem_jacobian(p_var, v_var);
+  DenseSubVector<Number> & Fp = c.get_elem_residual(p_var);
 
   // Add the constraint given by the continuity equation
   unsigned int n_qpoints = c.get_element_qrule().n_points();
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate
-      Gradient grad_u = c.interior_gradient(u_var, qp),
+      Gradient
+        grad_u = c.interior_gradient(u_var, qp),
         grad_v = c.interior_gradient(v_var, qp);
 
       // Now a loop over the pressure degrees of freedom.  This
@@ -388,9 +393,9 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
 
 void CoupledSystem::postprocess()
 {
-  // We need to overload the postprocess function to set the computed_QoI variable of the CoupledSystem class
-  // to the qoi value stored in System::qoi[0]
-
+  // We need to overload the postprocess function to set the
+  // computed_QoI variable of the CoupledSystem class to the qoi value
+  // stored in System::qoi[0]
   computed_QoI = System::qoi[0];
 }
 
@@ -403,7 +408,8 @@ void CoupledSystem::postprocess()
 // the object built with var = 1, returns the C,1_h weight. The switch statment
 // distinguishes the behavior of the two objects
 // Same thing for CoupledFEMFunctionsy
-Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
+Number CoupledFEMFunctionsx::operator()(const FEMContext & c,
+                                        const Point & p,
                                         const Real /* time */)
 {
   Number weight = 0.0;
@@ -435,7 +441,8 @@ Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
   return weight;
 }
 
-Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
+Number CoupledFEMFunctionsy::operator()(const FEMContext & c,
+                                        const Point & p,
                                         const Real /* time */)
 {
   Number weight = 0.0;

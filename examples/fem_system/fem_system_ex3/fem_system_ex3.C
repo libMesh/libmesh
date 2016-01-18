@@ -51,7 +51,7 @@
 using namespace libMesh;
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -94,33 +94,35 @@ int main (int argc, char** argv)
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
-      unsigned int side_max_x = 0, side_min_y = 0,
+      unsigned int
+        side_max_x = 0, side_min_y = 0,
         side_max_y = 0, side_max_z = 0;
-      bool found_side_max_x = false, found_side_max_y = false,
+      bool
+        found_side_max_x = false, found_side_max_y = false,
         found_side_min_y = false, found_side_max_z = false;
-      for(unsigned int side=0; side<elem->n_sides(); side++)
+      for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
             {
               side_max_x = side;
               found_side_max_x = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
             {
               side_min_y = side;
               found_side_min_y = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -130,34 +132,21 @@ int main (int argc, char** argv)
       // If elem has sides on boundaries
       // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
       // then let's set a node boundary condition
-      if(found_side_max_x && found_side_max_y && found_side_max_z)
-        {
-          for(unsigned int n=0; n<elem->n_nodes(); n++)
-            {
-              if (elem->is_node_on_side(n, side_max_x) &&
-                  elem->is_node_on_side(n, side_max_y) &&
-                  elem->is_node_on_side(n, side_max_z) )
-                {
-                  mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
-                }
-            }
-        }
-
+      if (found_side_max_x && found_side_max_y && found_side_max_z)
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          if (elem->is_node_on_side(n, side_max_x) &&
+              elem->is_node_on_side(n, side_max_y) &&
+              elem->is_node_on_side(n, side_max_z))
+            mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
 
       // If elem has sides on boundaries
       // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
       // then let's set an edge boundary condition
-      if(found_side_max_x && found_side_min_y)
-        {
-          for(unsigned int e=0; e<elem->n_edges(); e++)
-            {
-              if (elem->is_edge_on_side(e, side_max_x) &&
-                  elem->is_edge_on_side(e, side_min_y) )
-                {
-                  mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
-                }
-            }
-        }
+      if (found_side_max_x && found_side_min_y)
+        for (unsigned int e=0; e<elem->n_edges(); e++)
+          if (elem->is_edge_on_side(e, side_max_x) &&
+              elem->is_edge_on_side(e, side_min_y))
+            mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
     }
 
   // Create an equation systems object.
@@ -199,28 +188,22 @@ int main (int argc, char** argv)
   system.deltat = deltat;
 
   // And the nonlinear solver options
-  DiffSolver &solver = *(system.time_solver->diff_solver().get());
+  DiffSolver & solver = *(system.time_solver->diff_solver().get());
   solver.quiet = infile("solver_quiet", true);
   solver.verbose = !solver.quiet;
-  solver.max_nonlinear_iterations =
-    infile("max_nonlinear_iterations", 15);
-  solver.relative_step_tolerance =
-    infile("relative_step_tolerance", 1.e-3);
-  solver.relative_residual_tolerance =
-    infile("relative_residual_tolerance", 0.0);
-  solver.absolute_residual_tolerance =
-    infile("absolute_residual_tolerance", 0.0);
+  solver.max_nonlinear_iterations = infile("max_nonlinear_iterations", 15);
+  solver.relative_step_tolerance = infile("relative_step_tolerance", 1.e-3);
+  solver.relative_residual_tolerance = infile("relative_residual_tolerance", 0.0);
+  solver.absolute_residual_tolerance = infile("absolute_residual_tolerance", 0.0);
 
   // And the linear solver options
-  solver.max_linear_iterations =
-    infile("max_linear_iterations", 50000);
-  solver.initial_linear_tolerance =
-    infile("initial_linear_tolerance", 1.e-3);
+  solver.max_linear_iterations = infile("max_linear_iterations", 50000);
+  solver.initial_linear_tolerance = infile("initial_linear_tolerance", 1.e-3);
 
   // Print information about the system to the screen.
   equation_systems.print_info();
 
-  NewmarkSolver* newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
+  NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
   newmark->compute_initial_accel();
 
   // Copy over initial velocity and acceleration for output.
@@ -242,10 +225,9 @@ int main (int argc, char** argv)
 
     ExodusII_IO(mesh).write_timestep(file_name.str(),
                                      equation_systems,
-                                     1, /* This number indicates how many time steps
-                                           are being written to the file */
+                                     1, // This number indicates how many time steps
+                                        // are being written to the file
                                      system.time);
-
   }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -254,8 +236,11 @@ int main (int argc, char** argv)
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
     {
       // A pretty update message
-      std::cout << "\n\nSolving time step " << t_step << ", time = "
-                << system.time << std::endl;
+      libMesh::out << "\n\nSolving time step "
+                   << t_step
+                   << ", time = "
+                   << system.time
+                   << std::endl;
 
       system.solve();
 
@@ -282,8 +267,8 @@ int main (int argc, char** argv)
 
           ExodusII_IO(mesh).write_timestep(file_name.str(),
                                            equation_systems,
-                                           1, /* This number indicates how many time steps
-                                                 are being written to the file */
+                                           1, // This number indicates how many time steps
+                                              // are being written to the file
                                            system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API

@@ -32,10 +32,10 @@
 //
 // We first use EIM to construct an affine approximation to the
 // non-affine term, which is a parametrized function that is a
-// Gaussian with "center" defined by the two parameters (mu_1,mu_2)
+// Gaussian with "center" defined by the two parameters (mu_1, mu_2)
 // \in [-1,1]^2. We then employ this EIM approximation in order to
 // generate a reduced basis approximation for the parametrized PDE:
-// -0.05 * Laplacian(u) = f(mu_1,mu_2), with zero Dirichlet boundary
+// -0.05 * Laplacian(u) = f(mu_1, mu_2), with zero Dirichlet boundary
 // conditions.
 
 // Basic include file needed for the mesh functionality.
@@ -54,7 +54,7 @@
 using namespace libMesh;
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -86,7 +86,7 @@ int main (int argc, char** argv)
   // Read the "online_mode" flag from the command line
   GetPot command_line (argc, argv);
   int online_mode = 0;
-  if ( command_line.search(1, "-online_mode") )
+  if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
   // Create a mesh (just a simple square) on the default MPI
@@ -125,7 +125,7 @@ int main (int argc, char** argv)
   eim_construction.set_rb_evaluation(eim_rb_eval);
   rb_construction.set_rb_evaluation(rb_eval);
 
-  if(!online_mode)
+  if (!online_mode)
     {
       // Read data from input file and print state
       eim_construction.process_parameters_file(eim_parameters);
@@ -169,11 +169,11 @@ int main (int argc, char** argv)
 #endif
 
       // Write out the basis functions, if requested
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Write out the basis functions
-          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
-          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction, "eim_data");
+          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction, "rb_data");
         }
     }
   else
@@ -205,21 +205,20 @@ int main (int argc, char** argv)
       online_mu.set_value("center_y", online_center_y);
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
-      rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+      rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
       // plot the solution, if requested
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // read in the data from files
-          eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
-          rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+          eim_rb_eval.read_in_basis_functions(eim_construction, "eim_data");
+          rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
           eim_construction.load_rb_solution();
           rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-          ExodusII_IO(mesh).write_equation_systems("RB_sol.e",equation_systems);
+          ExodusII_IO(mesh).write_equation_systems("RB_sol.e", equation_systems);
 #endif
         }
     }
-
 }

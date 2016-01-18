@@ -30,16 +30,16 @@ public:
 
   ~CurlCurlExactSolution(){}
 
-  RealGradient operator()( Real x, Real y, Real z )
+  RealGradient operator()(Real x, Real y, Real z)
   {
     const Real ux = (1.0 - y*y)*(1.0 - z*z);
     const Real uy = (1.0 - x*x)*(1.0 - z*z);
     const Real uz = (1.0 - x*x)*(1.0 - y*y);
 
-    return RealGradient( ux, uy, uz );
+    return RealGradient(ux, uy, uz);
   }
 
-  RealTensor grad( Real x, Real y, Real z )
+  RealTensor grad(Real x, Real y, Real z)
   {
     const Real dux_dx = 0.0;
     const Real dux_dy = (1.0 - z*z)*(-2.0*y);
@@ -53,10 +53,10 @@ public:
     const Real duz_dy = (1.0 - x*x)*(-2.0*y);
     const Real duz_dz = 0.0;
 
-    return RealTensor( dux_dx, dux_dy, dux_dz, duy_dx, duy_dy, duy_dz, duz_dx, duz_dy, duz_dz );
+    return RealTensor(dux_dx, dux_dy, dux_dz, duy_dx, duy_dy, duy_dz, duz_dx, duz_dy, duz_dz);
   }
 
-  RealGradient curl( Real x, Real y, Real z )
+  RealGradient curl(Real x, Real y, Real z)
   {
     const Real duz_dy = (1.0 - x*x)*(-2.0*y);
     const Real duy_dz = (1.0 - x*x)*(-2.0*z);
@@ -67,16 +67,16 @@ public:
     const Real dux_dy = (1.0 - z*z)*(-2.0*y);
     const Real duy_dx = (1.0 - z*z)*(-2.0*x);
 
-    return RealGradient(duz_dy - duy_dz, dux_dz - duz_dx, duy_dx - dux_dy );
+    return RealGradient(duz_dy - duy_dz, dux_dz - duz_dx, duy_dx - dux_dy);
   }
 
-  RealGradient forcing(  Real x, Real y, Real z )
+  RealGradient forcing(Real x, Real y, Real z)
   {
     const Real fx = 2.0*(1.0 - y*y) + 2.0*(1.0 - z*z) + (1.0 - y*y)*(1.0 - z*z);
-    const Real fy = 2.0*(1.0 - x*x) + 2.0*(1.0 - z*z) + (1.0 - x*x)*(1.0 - z*z) ;
+    const Real fy = 2.0*(1.0 - x*x) + 2.0*(1.0 - z*z) + (1.0 - x*x)*(1.0 - z*z);
     const Real fz = 2.0*(1.0 - x*x) + 2.0*(1.0 - y*y) + (1.0 - x*x)*(1.0 - y*y);
 
-    return RealGradient( fx, fy, fz );
+    return RealGradient(fx, fy, fz);
   }
 
 };

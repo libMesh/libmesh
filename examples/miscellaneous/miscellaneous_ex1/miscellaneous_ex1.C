@@ -76,11 +76,11 @@ using namespace libMesh;
 
 // Function prototype.  This is similar to the Poisson
 // assemble function of example 4.
-void assemble_wave (EquationSystems& es,
-                    const std::string& system_name);
+void assemble_wave (EquationSystems & es,
+                    const std::string & system_name);
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh, like in example 2.
   LibMeshInit init (argc, argv);
@@ -94,7 +94,7 @@ int main (int argc, char** argv)
   libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
   // Tell the user what we are doing.
-  std::cout << "Running ex6 with dim = 3" << std::endl << std::endl;
+  libMesh::out << "Running ex6 with dim = 3" << std::endl << std::endl;
 
   // Create a serialized mesh, distributed across the default MPI
   // communicator.
@@ -183,8 +183,8 @@ int main (int argc, char** argv)
   // Set the speed of sound and fluid density
   // as \p EquationSystems parameter,
   // so that \p assemble_wave() can access it.
-  equation_systems.parameters.set<Real>("speed")          = 1.;
-  equation_systems.parameters.set<Real>("fluid density")  = 1.;
+  equation_systems.parameters.set<Real>("speed")         = 1.;
+  equation_systems.parameters.set<Real>("fluid density") = 1.;
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -213,8 +213,8 @@ int main (int argc, char** argv)
 
 // This function assembles the system matrix and right-hand-side
 // for the discrete form of our wave equation.
-void assemble_wave(EquationSystems& es,
-                   const std::string& system_name)
+void assemble_wave(EquationSystems & es,
+                   const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -224,7 +224,7 @@ void assemble_wave(EquationSystems& es,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // Get a reference to the system we are solving.
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Wave");
@@ -232,7 +232,7 @@ void assemble_wave(EquationSystems& es,
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -242,7 +242,7 @@ void assemble_wave(EquationSystems& es,
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
-  const FEType& fe_type = dof_map.variable_type(0);
+  const FEType & fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
@@ -294,14 +294,13 @@ void assemble_wave(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
-
 
       // The mesh contains both finite and infinite elements.  These
       // elements are handled through different classes, namely
@@ -310,7 +309,7 @@ void assemble_wave(EquationSystems& es,
       // and overall burden of coding is @e greatly reduced through
       // using a pointer, which is adjusted appropriately to the
       // current element type.
-      FEBase* cfe=NULL;
+      FEBase * cfe = NULL;
 
       // This here is almost the only place where we need to
       // distinguish between finite and infinite elements.
@@ -342,7 +341,7 @@ void assemble_wave(EquationSystems& es,
 
             system.rhs->add_vector (Fe, dof_indices);
           } // end boundary condition section
-        } // else ( if (elem->infinite())) )
+        } // else if (elem->infinite())
 
       // This is slightly different from the Poisson solver:
       // Since the finite element object may change, we have to
@@ -350,14 +349,14 @@ void assemble_wave(EquationSystems& es,
       // each time again, when a new element is processed.
       //
       // The element Jacobian * quadrature weight at each integration point.
-      const std::vector<Real>& JxW = cfe->get_JxW();
+      const std::vector<Real> & JxW = cfe->get_JxW();
 
       // The element shape functions evaluated at the quadrature points.
-      const std::vector<std::vector<Real> >& phi = cfe->get_phi();
+      const std::vector<std::vector<Real> > & phi = cfe->get_phi();
 
       // The element shape function gradients evaluated at the quadrature
       // points.
-      const std::vector<std::vector<RealGradient> >& dphi = cfe->get_dphi();
+      const std::vector<std::vector<RealGradient> > & dphi = cfe->get_dphi();
 
       // The infinite elements need more data fields than conventional FE.
       // These are the gradients of the phase term \p dphase, an additional
@@ -367,9 +366,9 @@ void assemble_wave(EquationSystems& es,
       // Note that these data fields are also initialized appropriately by
       // the \p FE method, so that the weak form (below) is valid for @e both
       // finite and infinite elements.
-      const std::vector<RealGradient>& dphase  = cfe->get_dphase();
-      const std::vector<Real>&         weight  = cfe->get_Sobolev_weight();
-      const std::vector<RealGradient>& dweight = cfe->get_Sobolev_dweight();
+      const std::vector<RealGradient> & dphase  = cfe->get_dphase();
+      const std::vector<Real> &         weight  = cfe->get_Sobolev_weight();
+      const std::vector<RealGradient> & dweight = cfe->get_Sobolev_dweight();
 
       // Now this is all independent of whether we use an \p FE
       // or an \p InfFE.  Nice, hm? ;-)
@@ -419,35 +418,34 @@ void assemble_wave(EquationSystems& es,
           for (unsigned int i=0; i<n_sf; i++)
             for (unsigned int j=0; j<n_sf; j++)
               {
-                //         (ndt*Ht + nHt*d) * nH
+                // (ndt*Ht + nHt*d) * nH
                 Ke(i,j) +=
-                  (                            //    (
-                   (                           //      (
-                    dweight[qp] * phi[i][qp]   //        Point * Real  = Point
-                    +                          //        +
-                    dphi[i][qp] * weight[qp]   //        Point * Real  = Point
-                                               ) * dphi[j][qp]            //      )       * Point = Real
-                                               ) * JxW[qp];                //    )         * Real  = Real
+                  (
+                   (dweight[qp] * phi[i][qp] // Point * Real  = Point
+                    +                        // +
+                    dphi[i][qp] * weight[qp] // Point * Real  = Point
+                    ) * dphi[j][qp]
+                   ) * JxW[qp];
 
                 // (d*Ht*nmut*nH - ndt*nmu*Ht*H - d*nHt*nmu*H)
                 Ce(i,j) +=
-                  (                                //    (
-                   (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real
-                   * weight[qp] * phi[i][qp]       //      * Real * Real   = Real
-                   -                               //      -
-                   (dweight[qp] * dphase[qp])      //      (Point * Point) = Real
-                   * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real
-                   -                               //      -
-                   (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real
-                   * weight[qp] * phi[j][qp]       //      * Real * Real   = Real
-                                                   ) * JxW[qp];                    //    )         * Real  = Real
+                  (
+                   (dphase[qp] * dphi[j][qp]) // (Point * Point) = Real
+                   * weight[qp] * phi[i][qp]  // * Real * Real   = Real
+                   -                          // -
+                   (dweight[qp] * dphase[qp]) // (Point * Point) = Real
+                   * phi[i][qp] * phi[j][qp]  // * Real * Real   = Real
+                   -                          // -
+                   (dphi[i][qp] * dphase[qp]) // (Point * Point) = Real
+                   * weight[qp] * phi[j][qp]  // * Real * Real   = Real
+                   ) * JxW[qp];
 
                 // (d*Ht*H * (1 - nmut*nmu))
                 Me(i,j) +=
-                  (                                       //    (
-                   (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real
-                   * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real
-                                                          ) * JxW[qp];                           //    ) * Real                    = Real
+                  (
+                   (1. - (dphase[qp] * dphase[qp]))       // (Real  - (Point * Point)) = Real
+                   * phi[i][qp] * phi[j][qp] * weight[qp] // * Real *  Real  * Real    = Real
+                   ) * JxW[qp];
 
               } // end of the matrix summation loop
         } // end of quadrature point loop
@@ -475,12 +473,12 @@ void assemble_wave(EquationSystems& es,
     for (; nd != nd_end; ++nd)
       {
         // Get a reference to the current node.
-        const Node& node = **nd;
+        const Node & node = **nd;
 
         // Check the location of the current node.
-        if (fabs(node(0)) < TOLERANCE &&
-            fabs(node(1)) < TOLERANCE &&
-            fabs(node(2)) < TOLERANCE)
+        if (std::abs(node(0)) < TOLERANCE &&
+            std::abs(node(1)) < TOLERANCE &&
+            std::abs(node(2)) < TOLERANCE)
           {
             // The global number of the respective degree of freedom.
             unsigned int dn = node.dof_number(0,0,0);
@@ -496,7 +494,4 @@ void assemble_wave(EquationSystems& es,
   libmesh_assert_not_equal_to (es.get_mesh().mesh_dimension(), 1);
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  // All done!
-  return;
 }

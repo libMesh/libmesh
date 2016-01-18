@@ -32,10 +32,10 @@ void finish_initialization()
 
 
 // Initial conditions
-Number initial_value(const Point& p,
-                     const Parameters&,
-                     const std::string&,
-                     const std::string&)
+Number initial_value(const Point & p,
+                     const Parameters &,
+                     const std::string &,
+                     const std::string &)
 {
   Real x = p(0), y = p(1);
 
@@ -44,10 +44,10 @@ Number initial_value(const Point& p,
 
 
 
-Gradient initial_grad(const Point& p,
-                      const Parameters&,
-                      const std::string&,
-                      const std::string&)
+Gradient initial_grad(const Point & p,
+                      const Parameters &,
+                      const std::string &,
+                      const std::string &)
 {
   Real x = p(0), y = p(1);
 

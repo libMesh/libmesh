@@ -120,7 +120,7 @@ std::string numbered_filename(unsigned int t_step, // The timestep count
                               std::string solution_type, // primal or adjoint solve
                               std::string type,
                               std::string extension,
-                              FEMParameters &param)
+                              FEMParameters & param)
 {
   std::ostringstream file_name;
   file_name << solution_type
@@ -148,13 +148,13 @@ std::string numbered_filename(unsigned int t_step, // The timestep count
 
 // Write tecplot, gmv and xda/xdr output
 
-void write_output(EquationSystems &es,
+void write_output(EquationSystems & es,
                   unsigned int t_step, // The timestep count
                   unsigned int a_step, // The adaptive step count
                   std::string solution_type, // primal or adjoint solve
-                  FEMParameters &param)
+                  FEMParameters & param)
 {
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)
@@ -217,7 +217,7 @@ void write_output(EquationSystems &es,
     }
 }
 
-void write_output_headers(FEMParameters &param)
+void write_output_headers(FEMParameters & param)
 {
   // Only one processor needs to take care of headers.
   if (libMesh::global_processor_id() != 0)
@@ -240,14 +240,14 @@ void write_output_headers(FEMParameters &param)
     }
 }
 
-void write_output_solvedata(EquationSystems &es,
+void write_output_solvedata(EquationSystems & es,
                             unsigned int a_step,
                             unsigned int newton_steps,
                             unsigned int krylov_steps,
                             unsigned int tv_sec,
                             unsigned int tv_usec)
 {
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
   unsigned int n_active_elem = mesh.n_active_elem();
   unsigned int n_active_dofs = es.n_active_dofs();
 
@@ -276,7 +276,7 @@ void write_output_solvedata(EquationSystems &es,
     }
 }
 
-void write_output_footers(FEMParameters &param)
+void write_output_footers(FEMParameters & param)
 {
   // Write footers on output .m files
   if (libMesh::global_processor_id() == 0)
@@ -319,11 +319,11 @@ void write_output_footers(FEMParameters &param)
 }
 
 #if defined(LIBMESH_HAVE_GMV) || defined(LIBMESH_HAVE_TECPLOT_API)
-void write_error(EquationSystems &es,
-                 ErrorVector &error,
+void write_error(EquationSystems & es,
+                 ErrorVector & error,
                  unsigned int t_number,
                  unsigned int a_number,
-                 FEMParameters &param,
+                 FEMParameters & param,
                  std::string error_type)
 #else
   void write_error(EquationSystems &,
@@ -375,13 +375,13 @@ void write_error(EquationSystems &es,
 #endif
 }
 
-void read_output(EquationSystems &es,
+void read_output(EquationSystems & es,
                  unsigned int t_step,
                  unsigned int a_step,
                  std::string solution_type,
-                 FEMParameters &param)
+                 FEMParameters & param)
 {
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   std::string file_name_mesh, file_name_soln;
   // Look for ASCII files first
@@ -451,7 +451,8 @@ void read_output(EquationSystems &es,
     es.get_system<FEMSystem>(i).time = current_time;
 }
 
-void set_system_parameters(FEMSystem &system, FEMParameters &param)
+void set_system_parameters(FEMSystem & system,
+                           FEMParameters & param)
 {
   // Verify analytic jacobians against numerical ones?
   system.verify_analytic_jacobians = param.verify_analytic_jacobians;
@@ -562,10 +563,10 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
 
 #ifdef LIBMESH_ENABLE_AMR
 
-UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
-                                              FEMParameters &param)
+UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
+                                                FEMParameters & param)
 {
-  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
+  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -580,7 +581,7 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 
 // This function builds the Kelly error indicator. This indicator can be used
 // for comparisons of adjoint and non-adjoint based error indicators
-UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters& /* param */)
+UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters & /* param */)
 {
   return UniquePtr<ErrorEstimator>(new KellyErrorEstimator);
 }
@@ -589,21 +590,18 @@ UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters& /* param */)
 // The error_non_pressure and error_pressure constributions are estimated using
 // the build_error_estimator_component_wise function below
 UniquePtr<ErrorEstimator>
-build_error_estimator_component_wise
-(FEMParameters &param,
- std::vector<std::vector<Real> > &term_weights,
- std::vector<FEMNormType> &primal_error_norm_type,
- std::vector<FEMNormType> &dual_error_norm_type)
+build_error_estimator_component_wise (FEMParameters & param,
+                                      std::vector<std::vector<Real> > & term_weights,
+                                      std::vector<FEMNormType> & primal_error_norm_type,
+                                      std::vector<FEMNormType> & dual_error_norm_type)
 {
-  AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
+  AdjointResidualErrorEstimator * adjoint_residual_estimator = new AdjointResidualErrorEstimator;
 
   // Both the primal and dual weights are going to be estimated using the patch recovery error estimator
-  PatchRecoveryErrorEstimator *p1 =
-    new PatchRecoveryErrorEstimator;
+  PatchRecoveryErrorEstimator * p1 = new PatchRecoveryErrorEstimator;
   adjoint_residual_estimator->primal_error_estimator().reset(p1);
 
-  PatchRecoveryErrorEstimator *p2 =
-    new PatchRecoveryErrorEstimator;
+  PatchRecoveryErrorEstimator * p2 = new PatchRecoveryErrorEstimator;
   adjoint_residual_estimator->dual_error_estimator().reset(p2);
 
   // Set the boolean for specifying whether we are reusing patches while building the patch recovery estimates
@@ -640,25 +638,22 @@ build_error_estimator_component_wise
 // The error_convection_diffusion_x and error_convection_diffusion_y are the nonlinear contributions which
 // are computed using the build_weighted_error_estimator_component_wise below
 UniquePtr<ErrorEstimator>
-build_weighted_error_estimator_component_wise
-(FEMParameters &param,
- std::vector<std::vector<Real> > &term_weights,
- std::vector<FEMNormType> &primal_error_norm_type,
- std::vector<FEMNormType> &dual_error_norm_type,
- std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
+build_weighted_error_estimator_component_wise (FEMParameters & param,
+                                               std::vector<std::vector<Real> > & term_weights,
+                                               std::vector<FEMNormType> & primal_error_norm_type,
+                                               std::vector<FEMNormType> & dual_error_norm_type,
+                                               std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions)
 {
-  AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
+  AdjointResidualErrorEstimator * adjoint_residual_estimator = new AdjointResidualErrorEstimator;
 
   // Using the user filled error norm type vector, we pass the type of norm to be used for
   // the error in each variable, we can have different types of norms for the primal and
   // dual variables
 
-  WeightedPatchRecoveryErrorEstimator *p1 =
-    new WeightedPatchRecoveryErrorEstimator;
+  WeightedPatchRecoveryErrorEstimator * p1 = new WeightedPatchRecoveryErrorEstimator;
   adjoint_residual_estimator->primal_error_estimator().reset(p1);
 
-  PatchRecoveryErrorEstimator *p2 =
-    new PatchRecoveryErrorEstimator;
+  PatchRecoveryErrorEstimator * p2 = new PatchRecoveryErrorEstimator;
   adjoint_residual_estimator->dual_error_estimator().reset(p2);
 
   p1->set_patch_reuse(param.patch_reuse);
@@ -697,7 +692,7 @@ build_weighted_error_estimator_component_wise
 }
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -710,7 +705,7 @@ int main (int argc, char** argv)
   // This doesn't converge with Eigen BICGSTAB for some reason...
   libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
 
-  std::cout << "Started " << argv[0] << std::endl;
+  libMesh::out << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
   {
@@ -739,18 +734,18 @@ int main (int argc, char** argv)
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);
 
-  std::cout << "Building mesh" << std::endl;
+  libMesh::out << "Building mesh" << std::endl;
 
   if (!param.initial_timestep && param.run_simulation)
     build_domain(mesh, param);
 
-  std::cout << "Building system" << std::endl;
+  libMesh::out << "Building system" << std::endl;
 
-  FEMSystem &system = build_system(equation_systems, infile, param);
+  FEMSystem & system = build_system(equation_systems, infile, param);
 
   set_system_parameters(system, param);
 
-  std::cout << "Initializing systems" << std::endl;
+  libMesh::out << "Initializing systems" << std::endl;
 
   // Create a QoI object, we will need this to compute the QoI
   {
@@ -766,13 +761,13 @@ int main (int argc, char** argv)
   mesh.print_info();
   equation_systems.print_info();
 
-  std::cout<<"Starting adaptive loop"<<std::endl<<std::endl;
+  libMesh::out << "Starting adaptive loop" << std::endl << std::endl;
 
   // Count the number of steps used
   unsigned int a_step = 0;
 
   // Get the linear solver object to set the preconditioner reuse flag
-  LinearSolver<Number> *linear_solver = system.get_linear_solver();
+  LinearSolver<Number> * linear_solver = system.get_linear_solver();
 
   // Adaptively solve the timestep
   for (; a_step <= param.max_adaptivesteps; ++a_step)
@@ -781,22 +776,26 @@ int main (int argc, char** argv)
       // tolerance or to a target number of elements, and, not to a
       // non-zero tolerance and a target number of elements
       // simultaneously
-      if(param.global_tolerance > 0 && param.nelem_target > 0)
+      if (param.global_tolerance > 0 && param.nelem_target > 0)
         {
-          std::cout<<"We cant refine to both a non-zero tolerance and a target number of elements, EXITING adaptive loop. "<<std::endl<<std::endl;
+          libMesh::out<<"We cant refine to both a non-zero tolerance and a target number of elements, EXITING adaptive loop. "<<std::endl<<std::endl;
           break;
         }
 
       // We dont want to reuse the preconditioner for the forward solve
       linear_solver->reuse_preconditioner(false);
 
-      std::cout<< "Adaptive step " << a_step << std::endl;
+      libMesh::out << "Adaptive step " << a_step << std::endl;
 
-      std::cout<< "Solving the forward problem" <<std::endl;
+      libMesh::out << "Solving the forward problem" << std::endl;
 
-      std::cout << "We have " << mesh.n_active_elem()
-                << " active elements and " << equation_systems.n_active_dofs()
-                << " active dofs." << std::endl << std::endl;
+      libMesh::out << "We have "
+                   << mesh.n_active_elem()
+                   << " active elements and "
+                   << equation_systems.n_active_dofs()
+                   << " active dofs."
+                   << std::endl
+                   << std::endl;
 
       // Solve the forward system
       system.solve();
@@ -811,19 +810,23 @@ int main (int argc, char** argv)
       system.postprocess();
 
       // Get the value of the computed_QoI variable of the CoupledSystem class
-      Number QoI_0_computed = (dynamic_cast<CoupledSystem&>(system)).get_QoI_value();
+      Number QoI_0_computed = (dynamic_cast<CoupledSystem &>(system)).get_QoI_value();
 
-      std::cout<< "The boundary QoI is " << std::setprecision(17) << QoI_0_computed << std::endl << std::endl;
+      libMesh::out << "The boundary QoI is "
+                   << std::setprecision(17)
+                   << QoI_0_computed
+                   << std::endl
+                   << std::endl;
 
       // Hard coded assert to ensure that the actual numbers we are getting are what they should be
-      if(a_step == param.max_adaptivesteps)
+      if (a_step == param.max_adaptivesteps)
         libmesh_assert_less(std::abs(QoI_0_computed - 0.0833), 2.e-4);
 
       // You dont need to compute error estimates and refine at the last
       // adaptive step, only before that
-      if(a_step!=param.max_adaptivesteps)
+      if (a_step!=param.max_adaptivesteps)
         {
-          NumericVector<Number> &primal_solution = (*system.solution);
+          NumericVector<Number> & primal_solution = (*system.solution);
 
           // Make sure we get the contributions to the adjoint RHS from the sides
           system.assemble_qoi_sides = true;
@@ -834,7 +837,7 @@ int main (int argc, char** argv)
           linear_solver->reuse_preconditioner(param.reuse_preconditioner);
 
           // Solve the adjoint system
-          std::cout<< "Solving the adjoint problem" <<std::endl;
+          libMesh::out<< "Solving the adjoint problem" <<std::endl;
           system.adjoint_solve();
 
           // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
@@ -842,7 +845,7 @@ int main (int argc, char** argv)
 
           // To plot the adjoint solution, we swap it with the primal solution
           // and use the write_output function
-          NumericVector<Number> &dual_solution = system.get_adjoint_solution();
+          NumericVector<Number> & dual_solution = system.get_adjoint_solution();
           primal_solution.swap(dual_solution);
 
           write_output(equation_systems, 0, a_step, "adjoint", param);
@@ -852,7 +855,7 @@ int main (int argc, char** argv)
 
           // We need the values of the parameters Pe from the
           // system for the adjoint error estimate
-          Real Pe = (dynamic_cast<CoupledSystem&>(system)).get_Pe();
+          Real Pe = (dynamic_cast<CoupledSystem &>(system)).get_Pe();
 
           // The total error is the sum: error = error_non_pressure +
           // error_with_pressure + ...
@@ -866,15 +869,13 @@ int main (int argc, char** argv)
           // First we build the norm_type_vector_non_pressure vectors and
           // weights_matrix_non_pressure matrix for the non-pressure term
           // error contributions
-          std::vector<FEMNormType>
-            primal_norm_type_vector_non_pressure;
+          std::vector<FEMNormType> primal_norm_type_vector_non_pressure;
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           primal_norm_type_vector_non_pressure.push_back(L2);
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
 
-          std::vector<FEMNormType>
-            dual_norm_type_vector_non_pressure;
+          std::vector<FEMNormType> dual_norm_type_vector_non_pressure;
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           dual_norm_type_vector_non_pressure.push_back(L2);
@@ -890,10 +891,10 @@ int main (int argc, char** argv)
           // We build the error estimator to estimate the contributions
           // to the QoI error from the non pressure term
           UniquePtr<ErrorEstimator> error_estimator_non_pressure =
-            build_error_estimator_component_wise
-            (param, weights_matrix_non_pressure,
-             primal_norm_type_vector_non_pressure,
-             dual_norm_type_vector_non_pressure);
+            build_error_estimator_component_wise (param,
+                                                  weights_matrix_non_pressure,
+                                                  primal_norm_type_vector_non_pressure,
+                                                  dual_norm_type_vector_non_pressure);
 
           // Estimate the contributions to the QoI error from the non
           // pressure terms
@@ -908,38 +909,33 @@ int main (int argc, char** argv)
           // Next we build the norm_type_vector_with_pressure vectors and
           // weights_matrix_with_pressure matrix for the pressure term
           // error contributions
-          std::vector<FEMNormType>
-            primal_norm_type_vector_with_pressure;
+          std::vector<FEMNormType> primal_norm_type_vector_with_pressure;
           primal_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
           primal_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
           primal_norm_type_vector_with_pressure.push_back(L2);
           primal_norm_type_vector_with_pressure.push_back(L2);
 
-          std::vector<FEMNormType>
-            dual_norm_type_vector_with_pressure;
+          std::vector<FEMNormType> dual_norm_type_vector_with_pressure;
           dual_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
           dual_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
           dual_norm_type_vector_with_pressure.push_back(L2);
           dual_norm_type_vector_with_pressure.push_back(L2);
 
           std::vector<std::vector<Real> >
-            weights_matrix_with_pressure
-            (system.n_vars(),
-             std::vector<Real>(system.n_vars(), 0.0));
+            weights_matrix_with_pressure (system.n_vars(),
+                                          std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_with_pressure[0][2] = 1.;
-
           weights_matrix_with_pressure[1][2] = 1.;
-
           weights_matrix_with_pressure[2][0] = 1.;
           weights_matrix_with_pressure[2][1] = 1.;
 
           // We build the error estimator to estimate the contributions
           // to the QoI error from the pressure term
           UniquePtr<ErrorEstimator> error_estimator_with_pressure =
-            build_error_estimator_component_wise
-            (param, weights_matrix_with_pressure,
-             primal_norm_type_vector_with_pressure,
-             dual_norm_type_vector_with_pressure);
+            build_error_estimator_component_wise (param,
+                                                  weights_matrix_with_pressure,
+                                                  primal_norm_type_vector_with_pressure,
+                                                  dual_norm_type_vector_with_pressure);
 
           // Estimate the contributions to the QoI error from the pressure terms
           error_estimator_with_pressure->estimate_error(system, error_with_pressure);
@@ -952,15 +948,13 @@ int main (int argc, char** argv)
           ErrorVector error_convection_diffusion_x;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
-          std::vector<FEMNormType>
-            primal_norm_type_vector_convection_diffusion_x;
+          std::vector<FEMNormType> primal_norm_type_vector_convection_diffusion_x;
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(H1_X_SEMINORM);
 
-          std::vector<FEMNormType>
-            dual_norm_type_vector_convection_diffusion_x;
+          std::vector<FEMNormType> dual_norm_type_vector_convection_diffusion_x;
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
@@ -968,9 +962,8 @@ int main (int argc, char** argv)
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
 
           std::vector<std::vector<Real> >
-            weights_matrix_convection_diffusion_x
-            (system.n_vars(),
-             std::vector<Real>(system.n_vars(), 0.0));
+            weights_matrix_convection_diffusion_x (system.n_vars(),
+                                                   std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_convection_diffusion_x[0][3] = 1.;
           weights_matrix_convection_diffusion_x[3][3] = 1.;
 
@@ -996,34 +989,35 @@ int main (int argc, char** argv)
           // Build the error estimator to estimate the contributions
           // to the QoI error from the convection diffusion x term
           UniquePtr<ErrorEstimator> error_estimator_convection_diffusion_x =
-            build_weighted_error_estimator_component_wise
-            (param, weights_matrix_convection_diffusion_x,
-             primal_norm_type_vector_convection_diffusion_x,
-             dual_norm_type_vector_convection_diffusion_x,
-             coupled_system_weight_functions_x);
+            build_weighted_error_estimator_component_wise (param,
+                                                           weights_matrix_convection_diffusion_x,
+                                                           primal_norm_type_vector_convection_diffusion_x,
+                                                           dual_norm_type_vector_convection_diffusion_x,
+                                                           coupled_system_weight_functions_x);
 
           // Estimate the contributions to the QoI error from the
           // convection diffusion x term
-          error_estimator_convection_diffusion_x->estimate_error
-            (system, error_convection_diffusion_x);
+          error_estimator_convection_diffusion_x->estimate_error(system, error_convection_diffusion_x);
 
           // Plot this error
-          write_error(equation_systems, error_convection_diffusion_x,
-                      0, a_step, param, "_convection_diffusion_x");
+          write_error (equation_systems,
+                       error_convection_diffusion_x,
+                       0,
+                       a_step,
+                       param,
+                       "_convection_diffusion_x");
 
           // Now for the y direction terms
           ErrorVector error_convection_diffusion_y;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
-          std::vector<FEMNormType>
-            primal_norm_type_vector_convection_diffusion_y;
+          std::vector<FEMNormType> primal_norm_type_vector_convection_diffusion_y;
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(H1_Y_SEMINORM);
 
-          std::vector<FEMNormType>
-            dual_norm_type_vector_convection_diffusion_y;
+          std::vector<FEMNormType> dual_norm_type_vector_convection_diffusion_y;
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
@@ -1031,8 +1025,8 @@ int main (int argc, char** argv)
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
 
           std::vector<std::vector<Real> >
-            weights_matrix_convection_diffusion_y
-            (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
+            weights_matrix_convection_diffusion_y (system.n_vars(),
+                                                   std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_convection_diffusion_y[1][3] = 1.;
           weights_matrix_convection_diffusion_y[3][3] = 1.;
 
@@ -1051,11 +1045,11 @@ int main (int argc, char** argv)
           // Build the error estimator to estimate the contributions
           // to the QoI error from the convection diffsion y term
           UniquePtr<ErrorEstimator> error_estimator_convection_diffusion_y =
-            build_weighted_error_estimator_component_wise
-            (param, weights_matrix_convection_diffusion_y,
-             primal_norm_type_vector_convection_diffusion_y,
-             dual_norm_type_vector_convection_diffusion_y,
-             coupled_system_weight_functions_y);
+            build_weighted_error_estimator_component_wise (param,
+                                                           weights_matrix_convection_diffusion_y,
+                                                           primal_norm_type_vector_convection_diffusion_y,
+                                                           dual_norm_type_vector_convection_diffusion_y,
+                                                           coupled_system_weight_functions_y);
 
           // Estimate the contributions to the QoI error from the
           // convection diffusion y terms
@@ -1064,22 +1058,23 @@ int main (int argc, char** argv)
           // Plot this error
           write_error(equation_systems, error_convection_diffusion_y, 0, a_step, param, "_convection_diffusion_y");
 
-          if(param.indicator_type == "adjoint_residual")
+          if (param.indicator_type == "adjoint_residual")
             {
               error.resize(error_non_pressure.size());
 
               // Now combine the contribs from the pressure and non
               // pressure terms to get the complete estimate
-              for(unsigned int i = 0; i < error.size(); i++)
+              for (unsigned int i = 0; i < error.size(); i++)
                 {
                   error[i] = error_non_pressure[i] + error_with_pressure[i] + error_convection_diffusion_x[i] + error_convection_diffusion_y[i];
                 }
             }
           else
             {
-              std::cout<<"Using Kelly Estimator"<<std::endl;
+              libMesh::out << "Using Kelly Estimator" << std::endl;
+
               // Build the Kelly error estimator
-              UniquePtr<ErrorEstimator> error_estimator =  build_error_estimator(param);
+              UniquePtr<ErrorEstimator> error_estimator = build_error_estimator(param);
 
               // Estimate the error
               error_estimator->estimate_error(system, error);
@@ -1094,11 +1089,11 @@ int main (int argc, char** argv)
           // Otherwise we flag elements by error tolerance or nelem
           // target
 
-          if(param.refine_uniformly)
+          if (param.refine_uniformly)
             {
               mesh_refinement->uniformly_refine(1);
             }
-          else if(param.global_tolerance >= 0. && param.nelem_target == 0.) // Refine based on reaching an error tolerance
+          else if (param.global_tolerance >= 0. && param.nelem_target == 0.) // Refine based on reaching an error tolerance
             {
               mesh_refinement->flag_elements_by_error_tolerance (error);
 
@@ -1111,7 +1106,7 @@ int main (int argc, char** argv)
               //dont do any more adaptive steps
               if (mesh.n_active_elem() >= param.nelem_target)
                 {
-                  std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
+                  libMesh::out << "We reached the target number of elements." << std::endl <<std::endl;
                   break;
                 }
 
@@ -1122,11 +1117,8 @@ int main (int argc, char** argv)
             }
 
           equation_systems.reinit();
-
         }
-
     }
-
 
   write_output_footers(param);
 

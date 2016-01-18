@@ -46,152 +46,200 @@ Real elasticity_tensor(unsigned int i,
 struct ElasticityAssembly : ElemAssembly
 {
 
-  ElasticityAssembly(ElasticityRBConstruction& rb_sys_in)
-    :
+  ElasticityAssembly(ElasticityRBConstruction & rb_sys_in) :
     rb_sys(rb_sys_in)
   {}
 
   /**
    * The ElasticityRBConstruction object that will use this assembly.
    */
-  ElasticityRBConstruction& rb_sys;
+  ElasticityRBConstruction & rb_sys;
 };
 
-struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& ) { return 1.; } };
+struct ThetaA0 : RBTheta
+{
+  virtual Number evaluate(const RBParameters &)
+  {
+    return 1.;
+  }
+};
+
 struct AssemblyA0 : ElasticityAssembly
 {
 
-  AssemblyA0(ElasticityRBConstruction& rb_sys_in)
-    :
+  AssemblyA0(ElasticityRBConstruction & rb_sys_in) :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-  virtual void interior_assembly(FEMContext &c);
-
+  virtual void interior_assembly(FEMContext & c);
 };
 
-struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("x_scaling"); } };
+struct ThetaA1 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("x_scaling");
+  }
+};
+
 struct AssemblyA1 : ElasticityAssembly
 {
-
-  AssemblyA1(ElasticityRBConstruction& rb_sys_in)
-    :
+  AssemblyA1(ElasticityRBConstruction & rb_sys_in) :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-  virtual void interior_assembly(FEMContext &c);
-
+  virtual void interior_assembly(FEMContext & c);
 };
 
-struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return 1./mu.get_value("x_scaling"); } };
+struct ThetaA2 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return 1./mu.get_value("x_scaling");
+  }
+};
+
 struct AssemblyA2 : ElasticityAssembly
 {
 
-  AssemblyA2(ElasticityRBConstruction& rb_sys_in)
+  AssemblyA2(ElasticityRBConstruction & rb_sys_in)
     :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-  virtual void interior_assembly(FEMContext &c);
-
+  virtual void interior_assembly(FEMContext & c);
 };
 
-struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("load_Fx"); } };
+struct ThetaF0 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("load_Fx");
+  }
+};
+
 struct AssemblyF0 : ElasticityAssembly
 {
-  AssemblyF0(ElasticityRBConstruction& rb_sys_in)
+  AssemblyF0(ElasticityRBConstruction & rb_sys_in)
     :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // Apply a traction
-  virtual void boundary_assembly(FEMContext &c);
-
+  virtual void boundary_assembly(FEMContext & c);
 };
 
-struct ThetaF1 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("load_Fy"); } };
+struct ThetaF1 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("load_Fy");
+  }
+};
+
 struct AssemblyF1 : ElasticityAssembly
 {
-  AssemblyF1(ElasticityRBConstruction& rb_sys_in)
+  AssemblyF1(ElasticityRBConstruction & rb_sys_in)
     :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // Apply a traction
-  virtual void boundary_assembly(FEMContext &c);
+  virtual void boundary_assembly(FEMContext & c);
 };
 
-struct ThetaF2 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("load_Fz"); } };
+struct ThetaF2 : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("load_Fz");
+  }
+};
+
 struct AssemblyF2 : ElasticityAssembly
 {
-  AssemblyF2(ElasticityRBConstruction& rb_sys_in)
+  AssemblyF2(ElasticityRBConstruction & rb_sys_in)
     :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // Apply a traction
-  virtual void boundary_assembly(FEMContext &c);
+  virtual void boundary_assembly(FEMContext & c);
 };
 
-struct ThetaPointLoadX : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fx"); } };
+struct ThetaPointLoadX : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("point_load_Fx");
+  }
+};
+
 struct AssemblyPointLoadX : ElemAssembly
 {
   AssemblyPointLoadX()
   {}
 
   // Apply a point load
-  virtual void
-    get_nodal_rhs_values(
-      std::map<numeric_index_type, Number>& values,
-      const System& sys,
-      const Node& node);
+  virtual void get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
+                                    const System & sys,
+                                    const Node & node);
 
 };
 
-struct ThetaPointLoadY : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fy"); } };
+struct ThetaPointLoadY : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("point_load_Fy");
+  }
+};
+
 struct AssemblyPointLoadY : ElemAssembly
 {
   AssemblyPointLoadY()
   {}
 
   // Apply a point load
-  virtual void
-    get_nodal_rhs_values(
-      std::map<numeric_index_type, Number>& values,
-      const System& sys,
-      const Node& node);
+  virtual void get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
+                                    const System & sys,
+                                    const Node & node);
 
 };
 
-struct ThetaPointLoadZ : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fz"); } };
+struct ThetaPointLoadZ : RBTheta
+{
+  virtual Number evaluate(const RBParameters & mu)
+  {
+    return mu.get_value("point_load_Fz");
+  }
+};
+
 struct AssemblyPointLoadZ : ElemAssembly
 {
   AssemblyPointLoadZ()
   {}
 
   // Apply a point load
-  virtual void
-    get_nodal_rhs_values(
-      std::map<numeric_index_type, Number>& values,
-      const System& sys,
-      const Node& node);
+  virtual void get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
+                                    const System & sys,
+                                    const Node & node);
 
 };
 
 struct InnerProductAssembly : ElasticityAssembly
 {
 
-  InnerProductAssembly(ElasticityRBConstruction& rb_sys_in)
+  InnerProductAssembly(ElasticityRBConstruction & rb_sys_in)
     :
     ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-  virtual void interior_assembly(FEMContext &c);
-
+  virtual void interior_assembly(FEMContext & c);
 };
 
 // Define an RBThetaExpansion class for this PDE
@@ -230,12 +278,10 @@ struct ElasticityThetaExpansion : RBThetaExpansion
 // Define an RBAssemblyExpansion class for this PDE
 struct ElasticityAssemblyExpansion : RBAssemblyExpansion
 {
-
   /**
    * Constructor.
    */
-  ElasticityAssemblyExpansion(ElasticityRBConstruction& rb_sys_in)
-    :
+  ElasticityAssemblyExpansion(ElasticityRBConstruction & rb_sys_in) :
     A0_assembly(rb_sys_in),
     A1_assembly(rb_sys_in),
     A2_assembly(rb_sys_in),

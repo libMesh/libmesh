@@ -28,27 +28,30 @@
 
 using namespace libMesh;
 
-class SolidSystem: public FEMSystem {
+class SolidSystem: public FEMSystem
+{
 public:
   // Constructor
-  SolidSystem(EquationSystems& es, const std::string& name,
+  SolidSystem(EquationSystems & es,
+              const std::string & name,
               const unsigned int number);
 
   // System initialization
   virtual void init_data();
 
   // Context initialization
-  virtual void init_context(DiffContext &context);
+  virtual void init_context(DiffContext & context);
 
   // Element residual and jacobian calculations
   virtual bool element_time_derivative(bool request_jacobian,
-                                       DiffContext& context);
+                                       DiffContext & context);
 
   // Contributions for adding boundary conditions
   virtual bool side_time_derivative(bool request_jacobian,
-                                    DiffContext& context);
+                                    DiffContext & context);
 
-  virtual bool eulerian_residual(bool, DiffContext &) {
+  virtual bool eulerian_residual(bool, DiffContext &)
+  {
     return false;
   }
 
@@ -56,7 +59,8 @@ public:
   GetPot args;
 
   // Custom Identifier
-  virtual std::string system_type() const {
+  virtual std::string system_type() const
+  {
     return "Solid";
   }
 

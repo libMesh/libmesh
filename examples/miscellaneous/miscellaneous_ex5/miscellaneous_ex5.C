@@ -60,7 +60,10 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-Number exact_solution (const Point& p, const Parameters& parameters, const std::string&, const std::string&)
+Number exact_solution (const Point & p,
+                       const Parameters & parameters,
+                       const std::string &,
+                       const std::string &)
 {
   const Real x = p(0);
   const Real y = p(1);
@@ -68,7 +71,7 @@ Number exact_solution (const Point& p, const Parameters& parameters, const std::
 
   if (parameters.get<bool>("singularity"))
     {
-      Real theta = atan2(y,x);
+      Real theta = atan2(y, x);
 
       if (theta < 0)
         theta += 2. * libMesh::pi;
@@ -84,11 +87,10 @@ Number exact_solution (const Point& p, const Parameters& parameters, const std::
 // We now define the gradient of the exact solution, again being careful
 // to obtain an angle from atan2 in the correct
 // quadrant.
-
-Gradient exact_derivative(const Point& p,
-                          const Parameters& parameters,  // es parameters
-                          const std::string&,            // sys_name, not needed
-                          const std::string&)            // unk_name, not needed
+Gradient exact_derivative(const Point & p,
+                          const Parameters & parameters,  // es parameters
+                          const std::string &,            // sys_name, not needed
+                          const std::string &)            // unk_name, not needed
 {
   // Gradient value to be returned.
   Gradient gradu;
@@ -111,7 +113,7 @@ Gradient exact_derivative(const Point& p,
 
       // The boundary value, given by the exact solution,
       // u_exact = r^(2/3)*sin(2*theta/3).
-      Real theta = atan2(y,x);
+      Real theta = atan2(y, x);
 
       // Make sure 0 <= theta <= 2*pi
       if (theta < 0)
@@ -136,17 +138,18 @@ Gradient exact_derivative(const Point& p,
 // matrices, and then take into account the boundary
 // conditions and the flux integrals, which will be handled
 // via an interior penalty method.
-void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
+void assemble_ellipticdg(EquationSystems & es,
+                         const std::string & system_name)
 {
-  std::cout<<" assembling elliptic dg system... ";
-  std::cout.flush();
+  libMesh::out << " assembling elliptic dg system... ";
+  libMesh::out.flush();
 
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "EllipticDG");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
@@ -194,19 +197,19 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // Data for interior volume integrals
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<Real> & JxW = fe->get_JxW();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Data for surface integrals on the element boundary
-  const std::vector<std::vector<Real> >&  phi_face = fe_elem_face->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi_face = fe_elem_face->get_dphi();
-  const std::vector<Real>& JxW_face = fe_elem_face->get_JxW();
-  const std::vector<Point>& qface_normals = fe_elem_face->get_normals();
-  const std::vector<Point>& qface_points = fe_elem_face->get_xyz();
+  const std::vector<std::vector<Real> > &  phi_face = fe_elem_face->get_phi();
+  const std::vector<std::vector<RealGradient> > & dphi_face = fe_elem_face->get_dphi();
+  const std::vector<Real> & JxW_face = fe_elem_face->get_JxW();
+  const std::vector<Point> & qface_normals = fe_elem_face->get_normals();
+  const std::vector<Point> & qface_points = fe_elem_face->get_xyz();
 
   // Data for surface integrals on the neighbor boundary
-  const std::vector<std::vector<Real> >&  phi_neighbor_face = fe_neighbor_face->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi_neighbor_face = fe_neighbor_face->get_dphi();
+  const std::vector<std::vector<Real> > &  phi_neighbor_face = fe_neighbor_face->get_phi();
+  const std::vector<std::vector<RealGradient> > & dphi_neighbor_face = fe_neighbor_face->get_dphi();
 
   // Define data structures to contain the element interior matrix
   // and right-hand-side vector contribution.  Following
@@ -239,20 +242,20 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
-      const unsigned int n_dofs   = dof_indices.size();
+      const unsigned int n_dofs = dof_indices.size();
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape functions
       // (phi, dphi) for the current element.
-      fe->reinit  (elem);
+      fe->reinit (elem);
 
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
@@ -265,15 +268,9 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
       // a double loop to integrate the test funcions (i) against
       // the trial functions (j).
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        {
-          for (unsigned int i=0; i<n_dofs; i++)
-            {
-              for (unsigned int j=0; j<n_dofs; j++)
-                {
-                  Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                }
-            }
-        }
+        for (unsigned int i=0; i<n_dofs; i++)
+          for (unsigned int j=0; j<n_dofs; j++)
+            Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
       // Now we adress boundary conditions.
       // We consider Dirichlet bc imposed via the interior penalty method
@@ -294,21 +291,33 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
 
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-                  Number bc_value = exact_solution(qface_points[qp], es.parameters,"null","void");
+                  Number bc_value = exact_solution(qface_points[qp], es.parameters, "null", "void");
                   for (unsigned int i=0; i<n_dofs; i++)
                     {
                       // Matrix contribution
                       for (unsigned int j=0; j<n_dofs; j++)
                         {
-                          Ke(i,j) += JxW_face[qp] * penalty/h_elem * phi_face[i][qp] * phi_face[j][qp]; // stability
-                          Ke(i,j) -= JxW_face[qp] * (phi_face[i][qp] * (dphi_face[j][qp]*qface_normals[qp]) + phi_face[j][qp] * (dphi_face[i][qp]*qface_normals[qp])); // consistency
+                          // stability
+                          Ke(i,j) += JxW_face[qp] * penalty/h_elem * phi_face[i][qp] * phi_face[j][qp];
+
+                          // consistency
+                          Ke(i,j) -=
+                            JxW_face[qp] *
+                            (phi_face[i][qp] * (dphi_face[j][qp]*qface_normals[qp]) +
+                             phi_face[j][qp] * (dphi_face[i][qp]*qface_normals[qp]));
                         }
-                      // RHS contribution
-                      Fe(i) += JxW_face[qp] * bc_value * penalty/h_elem * phi_face[i][qp];      // stability
-                      Fe(i) -= JxW_face[qp] * dphi_face[i][qp] * (bc_value*qface_normals[qp]);     // consistency
+
+                      // RHS contributions
+
+                      // stability
+                      Fe(i) += JxW_face[qp] * bc_value * penalty/h_elem * phi_face[i][qp];
+
+                      // consistency
+                      Fe(i) -= JxW_face[qp] * dphi_face[i][qp] * (bc_value*qface_normals[qp]);
                     }
                 }
             }
+
           // If the element is not on a boundary of the domain
           // we loop over his neighbors to compute the element
           // and neighbor boundary matrix contributions
@@ -316,7 +325,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
             {
               // Store a pointer to the neighbor we are currently
               // working on.
-              const Elem* neighbor = elem->neighbor(side);
+              const Elem * neighbor = elem->neighbor(side);
 
               // Get the global id of the element and the neighbor
               const unsigned int elem_id = elem->id();
@@ -327,7 +336,10 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
               // We don't want to compute twice the same contributions.
               // If the neighbor has a different h level perform integration
               // only if the neighbor is at a lower level.
-              if ((neighbor->active() && (neighbor->level() == elem->level()) && (elem_id < neighbor_id)) || (neighbor->level() < elem->level()))
+              if ((neighbor->active() &&
+                   (neighbor->level() == elem->level()) &&
+                   (elem_id < neighbor_id)) ||
+                  (neighbor->level() < elem->level()))
                 {
                   // Pointer to the element side
                   UniquePtr<Elem> elem_side (elem->build_side(side));
@@ -353,9 +365,18 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
                   // Find their locations on the neighbor
                   unsigned int side_neighbor = neighbor->which_neighbor_am_i(elem);
                   if (refinement_type == "p")
-                    fe_neighbor_face->side_map (neighbor, elem_side.get(), side_neighbor, qface.get_points(), qface_neighbor_point);
+                    fe_neighbor_face->side_map (neighbor,
+                                                elem_side.get(),
+                                                side_neighbor,
+                                                qface.get_points(),
+                                                qface_neighbor_point);
                   else
-                    FEInterface::inverse_map (elem->dim(), fe->get_fe_type(), neighbor, qface_point, qface_neighbor_point);
+                    FEInterface::inverse_map (elem->dim(),
+                                              fe->get_fe_type(),
+                                              neighbor,
+                                              qface_point,
+                                              qface_neighbor_point);
+
                   // Calculate the neighbor element shape functions at those locations
                   fe_neighbor_face->reinit(neighbor, &qface_neighbor_point);
 
@@ -389,8 +410,14 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
                         {
                           for (unsigned int j=0; j<n_dofs; j++)
                             {
-                              Kee(i,j) -= 0.5 * JxW_face[qp] * (phi_face[j][qp]*(qface_normals[qp]*dphi_face[i][qp]) + phi_face[i][qp]*(qface_normals[qp]*dphi_face[j][qp])); // consistency
-                              Kee(i,j) += JxW_face[qp] * penalty/h_elem * phi_face[j][qp]*phi_face[i][qp];  // stability
+                              // consistency
+                              Kee(i,j) -=
+                                0.5 * JxW_face[qp] *
+                                (phi_face[j][qp]*(qface_normals[qp]*dphi_face[i][qp]) +
+                                 phi_face[i][qp]*(qface_normals[qp]*dphi_face[j][qp]));
+
+                              // stability
+                              Kee(i,j) += JxW_face[qp] * penalty/h_elem * phi_face[j][qp]*phi_face[i][qp];
                             }
                         }
 
@@ -400,8 +427,15 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
                         {
                           for (unsigned int j=0; j<n_neighbor_dofs; j++)
                             {
-                              Knn(i,j) += 0.5 * JxW_face[qp] * (phi_neighbor_face[j][qp]*(qface_normals[qp]*dphi_neighbor_face[i][qp]) + phi_neighbor_face[i][qp]*(qface_normals[qp]*dphi_neighbor_face[j][qp])); // consistency
-                              Knn(i,j) += JxW_face[qp] * penalty/h_elem * phi_neighbor_face[j][qp]*phi_neighbor_face[i][qp]; // stability
+                              // consistency
+                              Knn(i,j) +=
+                                0.5 * JxW_face[qp] *
+                                (phi_neighbor_face[j][qp]*(qface_normals[qp]*dphi_neighbor_face[i][qp]) +
+                                 phi_neighbor_face[i][qp]*(qface_normals[qp]*dphi_neighbor_face[j][qp]));
+
+                              // stability
+                              Knn(i,j) +=
+                                JxW_face[qp] * penalty/h_elem * phi_neighbor_face[j][qp]*phi_neighbor_face[i][qp];
                             }
                         }
 
@@ -411,8 +445,14 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
                         {
                           for (unsigned int j=0; j<n_dofs; j++)
                             {
-                              Kne(i,j) += 0.5 * JxW_face[qp] * (phi_neighbor_face[i][qp]*(qface_normals[qp]*dphi_face[j][qp]) - phi_face[j][qp]*(qface_normals[qp]*dphi_neighbor_face[i][qp])); // consistency
-                              Kne(i,j) -= JxW_face[qp] * penalty/h_elem * phi_face[j][qp]*phi_neighbor_face[i][qp];  // stability
+                              // consistency
+                              Kne(i,j) +=
+                                0.5 * JxW_face[qp] *
+                                (phi_neighbor_face[i][qp]*(qface_normals[qp]*dphi_face[j][qp]) -
+                                 phi_face[j][qp]*(qface_normals[qp]*dphi_neighbor_face[i][qp]));
+
+                              // stability
+                              Kne(i,j) -= JxW_face[qp] * penalty/h_elem * phi_face[j][qp]*phi_neighbor_face[i][qp];
                             }
                         }
 
@@ -422,8 +462,14 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
                         {
                           for (unsigned int j=0; j<n_neighbor_dofs; j++)
                             {
-                              Ken(i,j) += 0.5 * JxW_face[qp] * (phi_neighbor_face[j][qp]*(qface_normals[qp]*dphi_face[i][qp]) - phi_face[i][qp]*(qface_normals[qp]*dphi_neighbor_face[j][qp]));  // consistency
-                              Ken(i,j) -= JxW_face[qp] * penalty/h_elem * phi_face[i][qp]*phi_neighbor_face[j][qp];  // stability
+                              // consistency
+                              Ken(i,j) +=
+                                0.5 * JxW_face[qp] *
+                                (phi_neighbor_face[j][qp]*(qface_normals[qp]*dphi_face[i][qp]) -
+                                 phi_face[i][qp]*(qface_normals[qp]*dphi_neighbor_face[j][qp]));
+
+                              // stability
+                              Ken(i,j) -= JxW_face[qp] * penalty/h_elem * phi_face[i][qp]*phi_neighbor_face[j][qp];
                             }
                         }
                     }
@@ -431,10 +477,10 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
                   // The element and neighbor boundary matrix are now built
                   // for this side.  Add them to the global matrix
                   // The \p SparseMatrix::add_matrix() members do this for us.
-                  ellipticdg_system.matrix->add_matrix(Kne,neighbor_dof_indices,dof_indices);
-                  ellipticdg_system.matrix->add_matrix(Ken,dof_indices,neighbor_dof_indices);
-                  ellipticdg_system.matrix->add_matrix(Kee,dof_indices);
-                  ellipticdg_system.matrix->add_matrix(Knn,neighbor_dof_indices);
+                  ellipticdg_system.matrix->add_matrix(Kne, neighbor_dof_indices, dof_indices);
+                  ellipticdg_system.matrix->add_matrix(Ken, dof_indices, neighbor_dof_indices);
+                  ellipticdg_system.matrix->add_matrix(Kee, dof_indices);
+                  ellipticdg_system.matrix->add_matrix(Knn, neighbor_dof_indices);
                 }
             }
         }
@@ -446,7 +492,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
       ellipticdg_system.rhs->add_vector(Fe, dof_indices);
     }
 
-  std::cout << "done" << std::endl;
+  libMesh::out << "done" << std::endl;
 }
 
 
@@ -464,13 +510,13 @@ int main (int argc, char** argv)
   GetPot input_file("miscellaneous_ex5.in");
 
   //Read in parameters from the input file
-  const unsigned int adaptive_refinement_steps = input_file("max_adaptive_r_steps",3);
-  const unsigned int uniform_refinement_steps  = input_file("uniform_h_r_steps",3);
-  const Real refine_fraction                   = input_file("refine_fraction",0.5);
-  const Real coarsen_fraction                  = input_file("coarsen_fraction",0.);
+  const unsigned int adaptive_refinement_steps = input_file("max_adaptive_r_steps", 3);
+  const unsigned int uniform_refinement_steps  = input_file("uniform_h_r_steps", 3);
+  const Real refine_fraction                   = input_file("refine_fraction", 0.5);
+  const Real coarsen_fraction                  = input_file("coarsen_fraction", 0.);
   const unsigned int max_h_level               = input_file("max_h_level", 10);
   const std::string refinement_type            = input_file("refinement_type","p");
-  Order p_order                                = static_cast<Order>(input_file("p_order",1));
+  Order p_order                                = static_cast<Order>(input_file("p_order", 1));
   const std::string element_type               = input_file("element_type", "tensor");
   const Real penalty                           = input_file("ip_penalty", 10.);
   const bool singularity                       = input_file("singularity", true);
@@ -485,7 +531,7 @@ int main (int argc, char** argv)
   Mesh mesh(init.comm());
 
   if (dim == 1)
-    MeshTools::Generation::build_line(mesh,1,-1.,0.);
+    MeshTools::Generation::build_line(mesh, 1, -1., 0.);
   else if (dim == 2)
     mesh.read("lshaped.xda");
   else
@@ -500,11 +546,10 @@ int main (int argc, char** argv)
   mesh_refinement.refine_fraction() = refine_fraction;
   mesh_refinement.coarsen_fraction() = coarsen_fraction;
   mesh_refinement.max_h_level() = max_h_level;
+
   // Do uniform refinement
   for (unsigned int rstep=0; rstep<uniform_refinement_steps; rstep++)
-    {
-      mesh_refinement.uniformly_refine(1);
-    }
+    mesh_refinement.uniformly_refine(1);
 
   // Crate an equation system object
   EquationSystems equation_system (mesh);
@@ -517,17 +562,19 @@ int main (int argc, char** argv)
   equation_system.parameters.set<std::string>("refinement") = refinement_type;
 
   // Create a system named ellipticdg
-  LinearImplicitSystem& ellipticdg_system = equation_system.add_system<LinearImplicitSystem> ("EllipticDG");
+  LinearImplicitSystem & ellipticdg_system = equation_system.add_system<LinearImplicitSystem> ("EllipticDG");
 
   // Add a variable "u" to "ellipticdg" using the p_order specified in the config file
-  if( on_command_line( "element_type" ) )
+  if (on_command_line("element_type"))
     {
-      std::string fe_str = command_line_value( std::string("element_type"),
-                                               std::string("MONOMIAL") );
+      std::string fe_str =
+        command_line_value(std::string("element_type"),
+                           std::string("MONOMIAL"));
+
       if (fe_str != "MONOMIAL" || fe_str != "XYZ")
         libmesh_error_msg("Error: This example must be run with MONOMIAL or XYZ element types.");
 
-      ellipticdg_system.add_variable ("u", p_order, Utility::string_to_enum<FEFamily>(fe_str) );
+      ellipticdg_system.add_variable ("u", p_order, Utility::string_to_enum<FEFamily>(fe_str));
     }
   else
     ellipticdg_system.add_variable ("u", p_order, MONOMIAL);
@@ -546,29 +593,30 @@ int main (int argc, char** argv)
   // A refinement loop.
   for (unsigned int rstep=0; rstep<adaptive_refinement_steps; ++rstep)
     {
-      std::cout << "  Beginning Solve " << rstep << std::endl;
-      std::cout << "Number of elements: " << mesh.n_elem() << std::endl;
+      libMesh::out << "  Beginning Solve " << rstep << std::endl;
+      libMesh::out << "Number of elements: " << mesh.n_elem() << std::endl;
 
       // Solve the system
       ellipticdg_system.solve();
 
-      std::cout << "System has: " << equation_system.n_active_dofs()
-                << " degrees of freedom."
-                << std::endl;
+      libMesh::out << "System has: "
+                   << equation_system.n_active_dofs()
+                   << " degrees of freedom."
+                   << std::endl;
 
-      std::cout << "Linear solver converged at step: "
-                << ellipticdg_system.n_linear_iterations()
-                << ", final residual: "
-                << ellipticdg_system.final_linear_residual()
-                << std::endl;
+      libMesh::out << "Linear solver converged at step: "
+                   << ellipticdg_system.n_linear_iterations()
+                   << ", final residual: "
+                   << ellipticdg_system.final_linear_residual()
+                   << std::endl;
 
       // Compute the error
       exact_sol.compute_error("EllipticDG", "u");
 
       // Print out the error values
-      std::cout << "L2-Error is: "
-                << exact_sol.l2_error("EllipticDG", "u")
-                << std::endl;
+      libMesh::out << "L2-Error is: "
+                   << exact_sol.l2_error("EllipticDG", "u")
+                   << std::endl;
 
       // Possibly refine the mesh
       if (rstep+1 < adaptive_refinement_steps)
@@ -589,6 +637,7 @@ int main (int argc, char** argv)
             mesh_refinement.switch_h_to_p_refinement();
           if (refinement_type == "hp")
             mesh_refinement.add_p_to_h_refinement();
+
           // Refine and coarsen the flagged elements
           mesh_refinement.refine_and_coarsen_elements();
           equation_system.reinit();
@@ -599,7 +648,7 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   // to a ExodusII-formatted plot file.
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO (mesh).write_discontinuous_exodusII("lshaped_dg.e",equation_system);
+  ExodusII_IO (mesh).write_discontinuous_exodusII("lshaped_dg.e", equation_system);
 #endif
 
 #endif // #ifndef LIBMESH_ENABLE_AMR

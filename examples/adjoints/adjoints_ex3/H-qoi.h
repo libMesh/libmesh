@@ -18,19 +18,21 @@ public:
   CoupledSystemQoI(){}
   virtual ~CoupledSystemQoI(){}
 
-  virtual void init_qoi( std::vector<Number>& sys_qoi);
-  virtual void postprocess( ){}
+  virtual void init_qoi(std::vector<Number> & sys_qoi);
+  virtual void postprocess(){}
 
-  virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);
+  virtual void side_qoi_derivative(DiffContext & context,
+                                   const QoISet & qois);
 
-  virtual void side_qoi(DiffContext &context, const QoISet & qois);
+  virtual void side_qoi(DiffContext & context,
+                        const QoISet & qois);
 
   virtual UniquePtr<DifferentiableQoI> clone()
   {
-    DifferentiableQoI* my_clone = new CoupledSystemQoI;
+    DifferentiableQoI * my_clone = new CoupledSystemQoI;
     *my_clone = *this;
     return UniquePtr<DifferentiableQoI>(my_clone);
   }
-
 };
+
 #endif // H_QOI_H

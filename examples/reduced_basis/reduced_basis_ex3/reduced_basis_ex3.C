@@ -85,7 +85,7 @@ int main (int argc, char** argv)
   // Read the "online_mode" flag from the command line
   GetPot command_line (argc, argv);
   int online_mode = 0;
-  if ( command_line.search(1, "-online_mode") )
+  if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
   // Build a mesh on the default MPI communicator.
@@ -121,7 +121,7 @@ int main (int argc, char** argv)
   // our RBEvaluation object
   rb_con.set_rb_evaluation(rb_eval);
 
-  if(!online_mode) // Perform the Offline stage of the RB method
+  if (!online_mode) // Perform the Offline stage of the RB method
     {
       // Read in the data that defines this problem from the specified text file
       rb_con.process_parameters_file(parameters_filename);
@@ -148,7 +148,7 @@ int main (int argc, char** argv)
 #endif
 
       // If requested, write out the RB basis functions for visualization purposes
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Write out the basis functions
           rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
 #endif
 
       // Read in online_N and initialize online parameters
-      unsigned int online_N = infile("online_N",1);
+      unsigned int online_N = infile("online_N", 1);
       Real online_x_vel = infile("online_x_vel", 0.);
       Real online_y_vel = infile("online_y_vel", 0.);
       RBParameters online_mu;
@@ -180,24 +180,24 @@ int main (int argc, char** argv)
       libMesh::out << "Error bound (absolute) at the final time is "
                    << error_bound_final_time << std::endl << std::endl;
 
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Read in the basis functions
           rb_eval.read_in_basis_functions(rb_con);
 
           // Plot the solution at the final time level
-          rb_con.pull_temporal_discretization_data( rb_eval );
+          rb_con.pull_temporal_discretization_data(rb_eval);
           rb_con.set_time_step(rb_con.get_n_time_steps());
           rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-          ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
+          ExodusII_IO(mesh).write_equation_systems ("RB_sol.e", equation_systems);
 #endif
 
           // Plot the first basis function that was generated from the train_reduced_basis
           // call in the Offline stage
           rb_con.load_basis_function(0);
 #ifdef LIBMESH_HAVE_EXODUS_API
-          ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
+          ExodusII_IO(mesh).write_equation_systems ("bf0.e", equation_systems);
 #endif
         }
     }

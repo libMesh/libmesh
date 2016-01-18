@@ -89,9 +89,8 @@ class PetscSolverConfiguration : public SolverConfiguration
 {
 public:
 
-  PetscSolverConfiguration(PetscLinearSolver<Number>& petsc_linear_solver)
-  :
-  _petsc_linear_solver(petsc_linear_solver)
+  PetscSolverConfiguration(PetscLinearSolver<Number> & petsc_linear_solver) :
+    _petsc_linear_solver(petsc_linear_solver)
   {
   }
 
@@ -106,7 +105,7 @@ public:
   }
 
   // The linear solver object that we are configuring
-  PetscLinearSolver<Number>& _petsc_linear_solver;
+  PetscLinearSolver<Number> & _petsc_linear_solver;
 
 };
 #endif
@@ -114,20 +113,19 @@ public:
 class LinearElasticity : public System::Assembly
 {
 private:
-  EquationSystems &es;
+  EquationSystems & es;
 
 public:
 
-  LinearElasticity (EquationSystems &es_in) :
+  LinearElasticity (EquationSystems & es_in) :
     es(es_in)
   {}
 
   /**
    * Kronecker delta function.
    */
-  Real kronecker_delta(
-    unsigned int i,
-    unsigned int j)
+  Real kronecker_delta(unsigned int i,
+                       unsigned int j)
   {
     return i == j ? 1. : 0.;
   }
@@ -135,11 +133,10 @@ public:
   /**
    * Evaluate the fourth order tensor (C_ijkl) that relates stress to strain.
    */
-  Real elasticity_tensor(
-    unsigned int i,
-    unsigned int j,
-    unsigned int k,
-    unsigned int l)
+  Real elasticity_tensor(unsigned int i,
+                         unsigned int j,
+                         unsigned int k,
+                         unsigned int l)
   {
     // Hard code material parameters for the sake of simplicity
     const Real poisson_ratio = 0.3;
@@ -149,8 +146,8 @@ public:
     const Real lambda_1 = (young_modulus*poisson_ratio)/((1.+poisson_ratio)*(1.-2.*poisson_ratio));
     const Real lambda_2 = young_modulus/(2.*(1.+poisson_ratio));
 
-    return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l) +
-           lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+    return lambda_1 * kronecker_delta(i, j) * kronecker_delta(k, l) +
+      lambda_2 * (kronecker_delta(i, k) * kronecker_delta(j, l) + kronecker_delta(i, l) * kronecker_delta(j, k));
   }
 
   /**
@@ -158,15 +155,15 @@ public:
    */
   void assemble()
   {
-    const MeshBase& mesh = es.get_mesh();
+    const MeshBase & mesh = es.get_mesh();
 
     const unsigned int dim = mesh.mesh_dimension();
 
-    LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Elasticity");
+    LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Elasticity");
 
     const unsigned int u_var = system.variable_number ("u");
 
-    const DofMap& dof_map = system.get_dof_map();
+    const DofMap & dof_map = system.get_dof_map();
     FEType fe_type = dof_map.variable_type(u_var);
     UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
     QGauss qrule (dim, fe_type.default_quadrature_order());
@@ -176,9 +173,9 @@ public:
     QGauss qface(dim-1, fe_type.default_quadrature_order());
     fe_face->attach_quadrature_rule (&qface);
 
-    const std::vector<Real>& JxW = fe->get_JxW();
-    const std::vector<std::vector<Real> >& phi = fe->get_phi();
-    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+    const std::vector<Real> & JxW = fe->get_JxW();
+    const std::vector<std::vector<Real> > & phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
     DenseMatrix<Number> Ke;
     DenseSubMatrix<Number> Ke_var[3][3] =
@@ -189,8 +186,11 @@ public:
       };
 
     DenseVector<Number> Fe;
+
     DenseSubVector<Number> Fe_var[3] =
-      {DenseSubVector<Number>(Fe), DenseSubVector<Number>(Fe), DenseSubVector<Number>(Fe)};
+      {DenseSubVector<Number>(Fe),
+       DenseSubVector<Number>(Fe),
+       DenseSubVector<Number>(Fe)};
 
     std::vector<dof_id_type> dof_indices;
     std::vector< std::vector<dof_id_type> > dof_indices_var(3);
@@ -200,50 +200,37 @@ public:
 
     for ( ; el != end_el; ++el)
       {
-        const Elem* elem = *el;
+        const Elem * elem = *el;
 
         dof_map.dof_indices (elem, dof_indices);
-        for(unsigned int var=0; var<3; var++)
-          {
-            dof_map.dof_indices (elem, dof_indices_var[var], var);
-          }
+        for (unsigned int var=0; var<3; var++)
+          dof_map.dof_indices (elem, dof_indices_var[var], var);
 
         const unsigned int n_dofs   = dof_indices.size();
         const unsigned int n_var_dofs = dof_indices_var[0].size();
 
         fe->reinit (elem);
 
-        Ke.resize (n_dofs,n_dofs);
-        for(unsigned int var_i=0; var_i<3; var_i++)
-          for(unsigned int var_j=0; var_j<3; var_j++)
-            {
-              Ke_var[var_i][var_j].reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
-            }
+        Ke.resize (n_dofs, n_dofs);
+        for (unsigned int var_i=0; var_i<3; var_i++)
+          for (unsigned int var_j=0; var_j<3; var_j++)
+            Ke_var[var_i][var_j].reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
 
         Fe.resize (n_dofs);
-        for(unsigned int var=0; var<3; var++)
-          {
-            Fe_var[var].reposition (var*n_var_dofs, n_var_dofs);
-          }
+        for (unsigned int var=0; var<3; var++)
+          Fe_var[var].reposition (var*n_var_dofs, n_var_dofs);
 
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
           {
-
             // assemble \int_Omega C_ijkl u_k,l v_i,j \dx
             for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
               for (unsigned int dof_j=0; dof_j<n_var_dofs; dof_j++)
-                {
-                  for(unsigned int i=0; i<3; i++)
-                    for(unsigned int j=0; j<3; j++)
-                      for(unsigned int k=0; k<3; k++)
-                        for(unsigned int l=0; l<3; l++)
-                          {
-                            Ke_var[i][k](dof_i,dof_j) += JxW[qp] *
-                              elasticity_tensor(i,j,k,l) *
-                              dphi[dof_j][qp](l) *
-                              dphi[dof_i][qp](j);
-                          }
-                }
+                for (unsigned int i=0; i<3; i++)
+                  for (unsigned int j=0; j<3; j++)
+                    for (unsigned int k=0; k<3; k++)
+                      for (unsigned int l=0; l<3; l++)
+                        Ke_var[i][k](dof_i,dof_j) +=
+                          JxW[qp] * elasticity_tensor(i,j,k,l) * dphi[dof_j][qp](l) * dphi[dof_i][qp](j);
 
             // assemble \int_Omega f_i v_i \dx
             DenseVector<Number> f_vec(3);
@@ -251,13 +238,8 @@ public:
             f_vec(1) =  0.;
             f_vec(2) = -1.;
             for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-              {
-                for(unsigned int i=0; i<3; i++)
-                  {
-                    Fe_var[i](dof_i) += JxW[qp] *
-                      ( f_vec(i) * phi[dof_i][qp] );
-                  }
-              }
+              for (unsigned int i=0; i<3; i++)
+                Fe_var[i](dof_i) += JxW[qp] * (f_vec(i) * phi[dof_i][qp]);
           }
 
         // assemble \int_\Gamma g_i v_i \ds
@@ -269,30 +251,17 @@ public:
           for (unsigned int side=0; side<elem->n_sides(); side++)
             if (elem->neighbor(side) == NULL)
               {
-                const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-                const std::vector<Real>& JxW_face = fe_face->get_JxW();
+                const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
+                const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
                 fe_face->reinit(elem, side);
 
+                // Apply a traction
                 for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                  {
-                    // Apply a traction
-                    if( mesh.get_boundary_info().has_boundary_id
-                          (elem, side, BOUNDARY_ID_MAX_X)
-                        )
-                      {
-
-                        for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-                          {
-                            for(unsigned int i=0; i<3; i++)
-                              {
-                                Fe_var[i](dof_i) += JxW_face[qp] *
-                                  ( g_vec(i) * phi_face[dof_i][qp] );
-                              }
-                          }
-
-                      }
-                  }
+                  if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+                    for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
+                      for (unsigned int i=0; i<3; i++)
+                        Fe_var[i](dof_i) += JxW_face[qp] * (g_vec(i) * phi_face[dof_i][qp]);
               }
         }
 
@@ -306,10 +275,10 @@ public:
   // Post-process the solution to compute stresses
   void compute_stresses()
   {
-    const MeshBase& mesh = es.get_mesh();
+    const MeshBase & mesh = es.get_mesh();
     const unsigned int dim = mesh.mesh_dimension();
 
-    LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Elasticity");
+    LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Elasticity");
 
     unsigned int displacement_vars[3];
     displacement_vars[0] = system.variable_number ("u");
@@ -317,18 +286,18 @@ public:
     displacement_vars[2] = system.variable_number ("w");
     const unsigned int u_var = system.variable_number ("u");
 
-    const DofMap& dof_map = system.get_dof_map();
+    const DofMap & dof_map = system.get_dof_map();
     FEType fe_type = dof_map.variable_type(u_var);
     UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
     QGauss qrule (dim, fe_type.default_quadrature_order());
     fe->attach_quadrature_rule (&qrule);
 
-    const std::vector<Real>& JxW = fe->get_JxW();
-    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+    const std::vector<Real> & JxW = fe->get_JxW();
+    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
     // Also, get a reference to the ExplicitSystem
-    ExplicitSystem& stress_system = es.get_system<ExplicitSystem>("StressSystem");
-    const DofMap& stress_dof_map = stress_system.get_dof_map();
+    ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
+    const DofMap & stress_dof_map = stress_system.get_dof_map();
     unsigned int sigma_vars[6];
     sigma_vars[0] = stress_system.variable_number ("sigma_00");
     sigma_vars[1] = stress_system.variable_number ("sigma_01");
@@ -343,50 +312,42 @@ public:
     std::vector<dof_id_type> stress_dof_indices_var;
 
     // To store the stress tensor on each element
-    DenseMatrix<Number> elem_avg_stress_tensor(3,3);
+    DenseMatrix<Number> elem_avg_stress_tensor(3, 3);
 
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
     for ( ; el != end_el; ++el)
       {
-        const Elem* elem = *el;
+        const Elem * elem = *el;
 
-        for(unsigned int var=0; var<3; var++)
-          {
-            dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
-          }
+        for (unsigned int var=0; var<3; var++)
+          dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
 
         const unsigned int n_var_dofs = dof_indices_var[0].size();
 
         fe->reinit (elem);
 
         // clear the stress tensor
-        elem_avg_stress_tensor.resize(3,3);
+        elem_avg_stress_tensor.resize(3, 3);
 
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
           {
-            DenseMatrix<Number> grad_u(3,3);
-            for(unsigned int var_i=0; var_i<3; var_i++)
-              for(unsigned int var_j=0; var_j<3; var_j++)
-                {
-                  for (unsigned int j=0; j<n_var_dofs; j++)
-                    {
-                      // Row is variable u1, u2, or u3, column is x, y, or z
-                      grad_u(var_i,var_j) += dphi[j][qp](var_j)*
-                        system.current_solution(dof_indices_var[var_i][j]);
-                    }
-                }
+            DenseMatrix<Number> grad_u(3, 3);
 
-            DenseMatrix<Number> stress_tensor(3,3);
-            for(unsigned int i=0; i<3; i++)
-              for(unsigned int j=0; j<3; j++)
-                for(unsigned int k=0; k<3; k++)
-                  for(unsigned int l=0; l<3; l++)
-                    {
-                      stress_tensor(i,j) +=
-                        elasticity_tensor(i,j,k,l) * grad_u(k,l);
-                    }
+            // Row is variable u1, u2, or u3, column is x, y, or z
+            for (unsigned int var_i=0; var_i<3; var_i++)
+              for (unsigned int var_j=0; var_j<3; var_j++)
+                for (unsigned int j=0; j<n_var_dofs; j++)
+                  grad_u(var_i,var_j) += dphi[j][qp](var_j) * system.current_solution(dof_indices_var[var_i][j]);
+
+            DenseMatrix<Number> stress_tensor(3, 3);
+
+            for (unsigned int i=0; i<3; i++)
+              for (unsigned int j=0; j<3; j++)
+                for (unsigned int k=0; k<3; k++)
+                  for (unsigned int l=0; l<3; l++)
+                    stress_tensor(i,j) += elasticity_tensor(i,j,k,l) * grad_u(k,l);
 
             // stress_tensor now holds the stress at point qp.
             // We want to plot the average stress on each element, hence
@@ -399,8 +360,8 @@ public:
 
         // load elem_sigma data into stress_system
         unsigned int stress_var_index = 0;
-        for(unsigned int i=0; i<3; i++)
-          for(unsigned int j=i; j<3; j++)
+        for (unsigned int i=0; i<3; i++)
+          for (unsigned int j=i; j<3; j++)
             {
               stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[stress_var_index]);
 
@@ -408,42 +369,38 @@ public:
               // one dof index per variable
               dof_id_type dof_index = stress_dof_indices_var[0];
 
-              if( (stress_system.solution->first_local_index() <= dof_index) &&
-                  (dof_index < stress_system.solution->last_local_index()) )
-                {
-                  stress_system.solution->set(dof_index, elem_avg_stress_tensor(i,j));
-                }
+              if ((stress_system.solution->first_local_index() <= dof_index) &&
+                  (dof_index < stress_system.solution->last_local_index()))
+                stress_system.solution->set(dof_index, elem_avg_stress_tensor(i,j));
 
               stress_var_index++;
             }
 
         // Also, the von Mises stress
-        Number vonMises_value = std::sqrt( 0.5*( pow(elem_avg_stress_tensor(0,0) - elem_avg_stress_tensor(1,1),2.) +
-                                                 pow(elem_avg_stress_tensor(1,1) - elem_avg_stress_tensor(2,2),2.) +
-                                                 pow(elem_avg_stress_tensor(2,2) - elem_avg_stress_tensor(0,0),2.) +
-                                                 6.*(pow(elem_avg_stress_tensor(0,1),2.) +
-                                                     pow(elem_avg_stress_tensor(1,2),2.) +
-                                                     pow(elem_avg_stress_tensor(2,0),2.))
-                                                 ) );
+        Number vonMises_value = std::sqrt(0.5*(pow(elem_avg_stress_tensor(0,0) - elem_avg_stress_tensor(1,1), 2.) +
+                                               pow(elem_avg_stress_tensor(1,1) - elem_avg_stress_tensor(2,2), 2.) +
+                                               pow(elem_avg_stress_tensor(2,2) - elem_avg_stress_tensor(0,0), 2.) +
+                                               6.*(pow(elem_avg_stress_tensor(0,1), 2.) +
+                                                   pow(elem_avg_stress_tensor(1,2), 2.) +
+                                                   pow(elem_avg_stress_tensor(2,0), 2.))));
+
         stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
         dof_id_type dof_index = stress_dof_indices_var[0];
-        if( (stress_system.solution->first_local_index() <= dof_index) &&
-            (dof_index < stress_system.solution->last_local_index()) )
-          {
-            stress_system.solution->set(dof_index, vonMises_value);
-          }
+
+        if ((stress_system.solution->first_local_index() <= dof_index) &&
+            (dof_index < stress_system.solution->last_local_index()))
+          stress_system.solution->set(dof_index, vonMises_value);
       }
 
     // Should call close and update when we set vector entries directly
     stress_system.solution->close();
     stress_system.update();
   }
-
 };
 
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libraries
   LibMeshInit init (argc, argv);
@@ -474,33 +431,37 @@ int main (int argc, char** argv)
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
-      unsigned int side_max_x = 0, side_min_y = 0,
+      unsigned int
+        side_max_x = 0, side_min_y = 0,
         side_max_y = 0, side_max_z = 0;
-      bool found_side_max_x = false, found_side_max_y = false,
+
+      bool
+        found_side_max_x = false, found_side_max_y = false,
         found_side_min_y = false, found_side_max_z = false;
-      for(unsigned int side=0; side<elem->n_sides(); side++)
+
+      for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
             {
               side_max_x = side;
               found_side_max_x = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
             {
               side_min_y = side;
               found_side_min_y = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -510,34 +471,22 @@ int main (int argc, char** argv)
       // If elem has sides on boundaries
       // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
       // then let's set a node boundary condition
-      if(found_side_max_x && found_side_max_y && found_side_max_z)
-        {
-          for(unsigned int n=0; n<elem->n_nodes(); n++)
-            {
-              if (elem->is_node_on_side(n, side_max_x) &&
-                  elem->is_node_on_side(n, side_max_y) &&
-                  elem->is_node_on_side(n, side_max_z) )
-                {
-                  mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
-                }
-            }
-        }
+      if (found_side_max_x && found_side_max_y && found_side_max_z)
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          if (elem->is_node_on_side(n, side_max_x) &&
+              elem->is_node_on_side(n, side_max_y) &&
+              elem->is_node_on_side(n, side_max_z))
+            mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
 
 
       // If elem has sides on boundaries
       // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
       // then let's set an edge boundary condition
-      if(found_side_max_x && found_side_min_y)
-        {
-          for(unsigned int e=0; e<elem->n_edges(); e++)
-            {
-              if (elem->is_edge_on_side(e, side_max_x) &&
-                  elem->is_edge_on_side(e, side_min_y) )
-                {
-                  mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
-                }
-            }
-        }
+      if (found_side_max_x && found_side_min_y)
+        for (unsigned int e=0; e<elem->n_edges(); e++)
+          if (elem->is_edge_on_side(e, side_max_x) &&
+              elem->is_edge_on_side(e, side_min_y))
+            mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
     }
 
   // Create an equation systems object.
@@ -545,12 +494,12 @@ int main (int argc, char** argv)
 
   // Declare the system and its variables.
   // Create a system named "Elasticity"
-  LinearImplicitSystem& system =
+  LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Elasticity");
 
 #ifdef LIBMESH_HAVE_PETSC
   // Attach a SolverConfiguration object to system.linear_solver
-  PetscLinearSolver<Number>* petsc_linear_solver =
+  PetscLinearSolver<Number> * petsc_linear_solver =
     libmesh_cast_ptr<PetscLinearSolver<Number>*>(system.get_linear_solver());
   libmesh_assert(petsc_linear_solver);
   PetscSolverConfiguration petsc_solver_config(*petsc_linear_solver);
@@ -588,7 +537,7 @@ int main (int argc, char** argv)
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 
   // Also, initialize an ExplicitSystem to store stresses
-  ExplicitSystem& stress_system =
+  ExplicitSystem & stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");
 
   stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
@@ -620,7 +569,7 @@ int main (int argc, char** argv)
   // First plot the displacement field using a nodal plot
   std::set<std::string> system_names;
   system_names.insert("Elasticity");
-  exo_io.write_equation_systems("displacement_and_stress.exo",equation_systems,&system_names);
+  exo_io.write_equation_systems("displacement_and_stress.exo", equation_systems, &system_names);
 
   // then append element-based discontinuous plots of the stresses
   exo_io.write_element_data(equation_systems);

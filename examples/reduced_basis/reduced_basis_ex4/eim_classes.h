@@ -19,8 +19,8 @@ class SimpleEIMEvaluation : public RBEIMEvaluation
 {
 public:
 
-  SimpleEIMEvaluation(const libMesh::Parallel::Communicator& comm)
-    : RBEIMEvaluation(comm)
+  SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm) :
+    RBEIMEvaluation(comm)
   {
     attach_parametrized_function(&sg);
   }
@@ -29,7 +29,6 @@ public:
    * Parametrized function that we approximate with EIM
    */
   ShiftedGaussian sg;
-
 };
 
 // A simple subclass of RBEIMConstruction.
@@ -40,8 +39,8 @@ public:
   /**
    * Constructor.
    */
-  SimpleEIMConstruction (EquationSystems& es,
-                         const std::string& name_in,
+  SimpleEIMConstruction (EquationSystems & es,
+                         const std::string & name_in,
                          const unsigned int number_in)
     : Parent(es, name_in, number_in)
   {
@@ -81,7 +80,6 @@ public:
    * Inner product assembly object
    */
   EIM_IP_assembly ip;
-
 };
 
 #endif

@@ -75,8 +75,8 @@ using namespace libMesh;
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
-void assemble_stokes (EquationSystems& es,
-                      const std::string& system_name);
+void assemble_stokes (EquationSystems & es,
+                      const std::string & system_name);
 
 // The main program.
 int main (int argc, char** argv)
@@ -145,7 +145,7 @@ int main (int argc, char** argv)
   PerfLog perf_log("Systems Example 2");
 
   // Get a reference to the Stokes system to use later.
-  TransientLinearImplicitSystem&  navier_stokes_system =
+  TransientLinearImplicitSystem & navier_stokes_system =
     equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
 
   // Now we begin the timestep loop to compute the time-accurate
@@ -181,9 +181,12 @@ int main (int argc, char** argv)
       navier_stokes_system.time += dt;
 
       // A pretty update message
-      std::cout << "\n\n*** Solving time step " << t_step <<
-        ", time = " << navier_stokes_system.time <<
-        " ***" << std::endl;
+      libMesh::out << "\n\n*** Solving time step "
+                   << t_step
+                   << ", time = "
+                   << navier_stokes_system.time
+                   << " ***"
+                   << std::endl;
 
       // Now we need to update the solution vector from the
       // previous time step.  This is done directly through
@@ -225,13 +228,13 @@ int main (int argc, char** argv)
 
           // Print out convergence information for the linear and
           // nonlinear iterations.
-          std::cout << "Linear solver converged at step: "
-                    << n_linear_iterations
-                    << ", final residual: "
-                    << final_linear_residual
-                    << "  Nonlinear convergence: ||u - u_old|| = "
-                    << norm_delta
-                    << std::endl;
+          libMesh::out << "Linear solver converged at step: "
+                       << n_linear_iterations
+                       << ", final residual: "
+                       << final_linear_residual
+                       << "  Nonlinear convergence: ||u - u_old|| = "
+                       << norm_delta
+                       << std::endl;
 
           // Terminate the solution iteration if the difference between
           // this nonlinear iterate and the last is sufficiently small, AND
@@ -239,9 +242,9 @@ int main (int argc, char** argv)
           if ((norm_delta < nonlinear_tolerance) &&
               (navier_stokes_system.final_linear_residual() < nonlinear_tolerance))
             {
-              std::cout << " Nonlinear solver converged at step "
-                        << l
-                        << std::endl;
+              libMesh::out << " Nonlinear solver converged at step "
+                           << l
+                           << std::endl;
               break;
             }
 
@@ -252,7 +255,6 @@ int main (int argc, char** argv)
           //Real flr2 = final_linear_residual*final_linear_residual;
           equation_systems.parameters.set<Real> ("linear solver tolerance") =
             std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
         } // end nonlinear loop
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -288,15 +290,15 @@ int main (int argc, char** argv)
 
 // The matrix assembly function to be called at each time step to
 // prepare for the linear solve.
-void assemble_stokes (EquationSystems& es,
-                      const std::string& system_name)
+void assemble_stokes (EquationSystems & es,
+                      const std::string & system_name)
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Navier-Stokes");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
@@ -337,21 +339,21 @@ void assemble_stokes (EquationSystems& es,
   // will be used to assemble the linear system.
   //
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe_vel->get_JxW();
+  const std::vector<Real> & JxW = fe_vel->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe_vel->get_phi();
 
   // The element shape function gradients for the velocity
   // variables evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe_vel->get_dphi();
 
   // The element shape functions for the pressure variable
   // evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& psi = fe_pres->get_phi();
+  const std::vector<std::vector<Real> > & psi = fe_pres->get_phi();
 
   // The value of the linear shape function gradients at the quadrature points
-  // const std::vector<std::vector<RealGradient> >& dpsi = fe_pres->get_dphi();
+  // const std::vector<std::vector<RealGradient> > & dpsi = fe_pres->get_dphi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -409,7 +411,7 @@ void assemble_stokes (EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -479,9 +481,9 @@ void assemble_stokes (EquationSystems& es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Values to hold the solution & its gradient at the previous timestep.
-          Number   u = 0., u_old = 0.;
-          Number   v = 0., v_old = 0.;
-          Number   p_old = 0.;
+          Number u = 0., u_old = 0.;
+          Number v = 0., v_old = 0.;
+          Number p_old = 0.;
           Gradient grad_u, grad_u_old;
           Gradient grad_v, grad_v_old;
 
@@ -504,18 +506,16 @@ void assemble_stokes (EquationSystems& es,
 
           // Compute the old pressure value at this quadrature point.
           for (unsigned int l=0; l<n_p_dofs; l++)
-            {
-              p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
-            }
+            p_old += psi[l][qp]*navier_stokes_system.old_solution (dof_indices_p[l]);
 
           // Definitions for convenience.  It is sometimes simpler to do a
           // dot product if you have the full vector at your disposal.
           const NumberVectorValue U_old (u_old, v_old);
           const NumberVectorValue U     (u,     v);
-          const Number  u_x = grad_u(0);
-          const Number  u_y = grad_u(1);
-          const Number  v_x = grad_v(0);
-          const Number  v_y = grad_v(1);
+          const Number u_x = grad_u(0);
+          const Number u_y = grad_u(1);
+          const Number v_x = grad_v(0);
+          const Number v_y = grad_v(1);
 
           // First, an i-loop over the velocity degrees of freedom.
           // We know that n_u_dofs == n_v_dofs so we can compute contributions
@@ -570,13 +570,11 @@ void assemble_stokes (EquationSystems& es,
           // symmetric matrix, we may (or may not) multiply the continuity equation by
           // negative one.  Here we do not.
           for (unsigned int i=0; i<n_p_dofs; i++)
-            {
-              for (unsigned int j=0; j<n_u_dofs; j++)
-                {
-                  Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                  Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-                }
-            }
+            for (unsigned int j=0; j<n_u_dofs; j++)
+              {
+                Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+                Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+              }
         } // end of the quadrature point qp-loop
 
 
@@ -612,8 +610,8 @@ void assemble_stokes (EquationSystems& es,
 
                   // Set u = 1 on the top boundary, 0 everywhere else
                   const Real u_value =
-                    (mesh.get_boundary_info().has_boundary_id(elem,s,2))
-                      ? 1. : 0.;
+                    (mesh.get_boundary_info().has_boundary_id(elem, s, 2))
+                    ? 1. : 0.;
 
                   // Set v = 0 everywhere
                   const Real v_value = 0.;
@@ -663,7 +661,4 @@ void assemble_stokes (EquationSystems& es,
       navier_stokes_system.matrix->add_matrix (Ke, dof_indices);
       navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
-
-  // That's it.
-  return;
 }

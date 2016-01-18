@@ -89,12 +89,12 @@ using namespace libMesh;
 
 // Write gmv output
 
-void write_output(EquationSystems &es,
+void write_output(EquationSystems & es,
                   unsigned int a_step,       // The adaptive step count
                   std::string solution_type) // primal or adjoint solve
 {
 #ifdef LIBMESH_HAVE_GMV
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   std::ostringstream file_name_gmv;
   file_name_gmv << solution_type
@@ -111,7 +111,8 @@ void write_output(EquationSystems &es,
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
 
-void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
+void set_system_parameters(LaplaceSystem & system,
+                           FEMParameters & param)
 {
   // Use analytical jacobians?
   system.analytic_jacobians() = param.analytic_jacobians;
@@ -137,7 +138,7 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
   // Nonlinear solver options
   {
-    NewtonSolver *solver = new NewtonSolver(system);
+    NewtonSolver * solver = new NewtonSolver(system);
     system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
 
     solver->quiet                       = param.solver_quiet;
@@ -164,10 +165,10 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
 #ifdef LIBMESH_ENABLE_AMR
 
-UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
-                                              FEMParameters &param)
+UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
+                                                FEMParameters & param)
 {
-  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
+  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -181,9 +182,9 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 // This is where declare the adjoint refined error estimator. This estimator builds an error bound
 // for Q(u) - Q(u_h), by solving the adjoint problem on a finer Finite Element space. For more details
 // see the description of the Adjoint Refinement Error Estimator in adjoint_refinement_error_estimator.C
-UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois)
+UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet & qois)
 {
-  std::cout<<"Computing the error estimate using the Adjoint Refinement Error Estimator"<<std::endl<<std::endl;
+  libMesh::out << "Computing the error estimate using the Adjoint Refinement Error Estimator" << std::endl << std::endl;
 
   AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
 
@@ -212,7 +213,7 @@ int main (int argc, char** argv)
   // This doesn't converge with Eigen BICGSTAB for some reason...
   libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
 
-  std::cout << "Started " << argv[0] << std::endl;
+  libMesh::out << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
   {
@@ -240,7 +241,7 @@ int main (int argc, char** argv)
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);
 
-  std::cout << "Reading in and building the mesh" << std::endl;
+  libMesh::out << "Reading in and building the mesh" << std::endl;
 
   // Read in the mesh
   mesh.read(param.domainfile.c_str());
@@ -253,15 +254,15 @@ int main (int argc, char** argv)
   MeshRefinement initial_uniform_refinements(mesh);
   initial_uniform_refinements.uniformly_refine(param.coarserefinements);
 
-  std::cout << "Building system" << std::endl;
+  libMesh::out << "Building system" << std::endl;
 
   // Build the FEMSystem
-  LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
+  LaplaceSystem & system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
 
   // Set its parameters
   set_system_parameters(system, param);
 
-  std::cout << "Initializing systems" << std::endl;
+  libMesh::out << "Initializing systems" << std::endl;
 
   equation_systems.init ();
 
@@ -293,7 +294,7 @@ int main (int argc, char** argv)
         write_output(equation_systems, a_step, "primal");
 
         // Get a pointer to the primal solution vector
-        NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> & primal_solution = *system.solution;
 
         // Declare a QoISet object, we need this object to set weights for our QoI error contributions
         QoISet qois;
@@ -324,7 +325,7 @@ int main (int argc, char** argv)
         system.set_adjoint_already_solved(true);
 
         // Get a pointer to the solution vector of the adjoint problem for QoI 0
-        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         // Swap the primal and dual solutions so we can write out the adjoint solution
         primal_solution.swap(dual_solution_0);
@@ -334,7 +335,7 @@ int main (int argc, char** argv)
         primal_solution.swap(dual_solution_0);
 
         // Get a pointer to the solution vector of the adjoint problem for QoI 0
-        NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
+        NumericVector<Number> & dual_solution_1 = system.get_adjoint_solution(1);
 
         // Swap again
         primal_solution.swap(dual_solution_1);
@@ -343,13 +344,17 @@ int main (int argc, char** argv)
         // Swap back again
         primal_solution.swap(dual_solution_1);
 
-        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-                  << " active elements and "
-                  << equation_systems.n_active_dofs()
-                  << " active dofs." << std::endl ;
+        libMesh::out << "Adaptive step "
+                     << a_step
+                     << ", we have "
+                     << mesh.n_active_elem()
+                     << " active elements and "
+                     << equation_systems.n_active_dofs()
+                     << " active dofs."
+                     << std::endl;
 
         // Postprocess, compute the approximate QoIs and write them out to the console
-        std::cout << "Postprocessing: " << std::endl;
+        libMesh::out << "Postprocessing: " << std::endl;
         system.postprocess_sides = true;
         system.postprocess();
         Number QoI_0_computed = system.get_QoI_value("computed", 0);
@@ -357,13 +362,16 @@ int main (int argc, char** argv)
         Number QoI_1_computed = system.get_QoI_value("computed", 1);
         Number QoI_1_exact = system.get_QoI_value("exact", 1);
 
-        std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
-                 << std::abs(QoI_0_computed - QoI_0_exact) /
-          std::abs(QoI_0_exact) << std::endl;
+        libMesh::out << "The relative error in QoI 0 is "
+                     << std::setprecision(17)
+                     << std::abs(QoI_0_computed - QoI_0_exact) / std::abs(QoI_0_exact)
+                     << std::endl;
 
-        std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
-                 << std::abs(QoI_1_computed - QoI_1_exact) /
-          std::abs(QoI_1_exact) << std::endl << std::endl;
+        libMesh::out << "The relative error in QoI 1 is "
+                     << std::setprecision(17)
+                     << std::abs(QoI_1_computed - QoI_1_exact) / std::abs(QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // We will declare an error vector for passing to the adjoint refinement error estimator
         ErrorVector QoI_elementwise_error;
@@ -377,22 +385,28 @@ int main (int argc, char** argv)
 
         // Print out the computed error estimate, note that we access the global error estimates
         // using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_error_estimate
-        std::cout<< "The computed relative error in QoI 0 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) /
-          std::abs(QoI_0_exact) << std::endl;
+        libMesh::out << "The computed relative error in QoI 0 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_exact)
+                     << std::endl;
 
-        std::cout<< "The computed relative error in QoI 1 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) /
-          std::abs(QoI_1_exact) << std::endl << std::endl;
+        libMesh::out << "The computed relative error in QoI 1 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // Also print out effecitivity indices (estimated error/true error)
-        std::cout<< "The effectivity index for the computed error in QoI 0 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) /
-          std::abs(QoI_0_computed - QoI_0_exact) << std::endl;
+        libMesh::out << "The effectivity index for the computed error in QoI 0 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact)
+                     << std::endl;
 
-        std::cout<< "The effectivity index for the computed error in QoI 1 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) /
-          std::abs(QoI_1_computed - QoI_1_exact) << std::endl << std::endl;
+        libMesh::out << "The effectivity index for the computed error in QoI 1 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // For refinement purposes we need to sort by error
         // *magnitudes*, but AdjointRefinement gives us signed errors.
@@ -406,12 +420,12 @@ int main (int argc, char** argv)
         // Otherwise we flag elements by error tolerance or nelem target
 
         // Uniform refinement
-        if(param.refine_uniformly)
+        if (param.refine_uniformly)
           {
             mesh_refinement->uniformly_refine(1);
           }
         // Adaptively refine based on reaching an error tolerance
-        else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
+        else if (param.global_tolerance >= 0. && param.nelem_target == 0.)
           {
             mesh_refinement->flag_elements_by_error_tolerance (QoI_elementwise_error);
 
@@ -422,7 +436,7 @@ int main (int argc, char** argv)
           {
             if (mesh.n_active_elem() >= param.nelem_target)
               {
-                std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
+                libMesh::out << "We reached the target number of elements." << std::endl << std::endl;
                 break;
               }
 
@@ -434,11 +448,12 @@ int main (int argc, char** argv)
         // Dont forget to reinit the system after each adaptive refinement !
         equation_systems.reinit();
 
-        std::cout << "Refined mesh to "
-                  << mesh.n_active_elem()
-                  << " active elements and "
-                  << equation_systems.n_active_dofs()
-                  << " active dofs." << std::endl;
+        libMesh::out << "Refined mesh to "
+                     << mesh.n_active_elem()
+                     << " active elements and "
+                     << equation_systems.n_active_dofs()
+                     << " active dofs."
+                     << std::endl;
       }
 
     // Do one last solve if necessary
@@ -449,7 +464,7 @@ int main (int argc, char** argv)
 
         write_output(equation_systems, a_step, "primal");
 
-        NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> & primal_solution = *system.solution;
 
         QoISet qois;
         std::vector<unsigned int> qoi_indices;
@@ -468,26 +483,30 @@ int main (int argc, char** argv)
         // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
         system.set_adjoint_already_solved(true);
 
-        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         primal_solution.swap(dual_solution_0);
         write_output(equation_systems, a_step, "adjoint_0");
 
         primal_solution.swap(dual_solution_0);
 
-        NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
+        NumericVector<Number> & dual_solution_1 = system.get_adjoint_solution(1);
 
         primal_solution.swap(dual_solution_1);
         write_output(equation_systems, a_step, "adjoint_1");
 
         primal_solution.swap(dual_solution_1);
 
-        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-                  << " active elements and "
-                  << equation_systems.n_active_dofs()
-                  << " active dofs." << std::endl ;
+        libMesh::out << "Adaptive step "
+                     << a_step
+                     << ", we have "
+                     << mesh.n_active_elem()
+                     << " active elements and "
+                     << equation_systems.n_active_dofs()
+                     << " active dofs."
+                     << std::endl;
 
-        std::cout << "Postprocessing: " << std::endl;
+        libMesh::out << "Postprocessing: " << std::endl;
         system.postprocess_sides = true;
         system.postprocess();
 
@@ -496,13 +515,16 @@ int main (int argc, char** argv)
         Number QoI_1_computed = system.get_QoI_value("computed", 1);
         Number QoI_1_exact = system.get_QoI_value("exact", 1);
 
-        std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
-                 << std::abs(QoI_0_computed - QoI_0_exact) /
-          std::abs(QoI_0_exact) << std::endl;
+        libMesh::out << "The relative error in QoI 0 is "
+                     << std::setprecision(17)
+                     << std::abs(QoI_0_computed - QoI_0_exact) / std::abs(QoI_0_exact)
+                     << std::endl;
 
-        std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
-                 << std::abs(QoI_1_computed - QoI_1_exact) /
-          std::abs(QoI_1_exact) << std::endl << std::endl;
+        libMesh::out << "The relative error in QoI 1 is "
+                     << std::setprecision(17)
+                     << std::abs(QoI_1_computed - QoI_1_exact) / std::abs(QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // We will declare an error vector for passing to the adjoint refinement error estimator
         // Right now, only the first entry of this vector will be filled (with the global QoI error estimate)
@@ -518,22 +540,28 @@ int main (int argc, char** argv)
 
         // Print out the computed error estimate, note that we access the global error estimates
         // using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_error_estimate
-        std::cout<< "The computed relative error in QoI 0 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) /
-          std::abs(QoI_0_exact) << std::endl;
+        libMesh::out << "The computed relative error in QoI 0 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_exact)
+                     << std::endl;
 
-        std::cout<< "The computed relative error in QoI 1 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) /
-          std::abs(QoI_1_exact) << std::endl << std::endl;
+        libMesh::out << "The computed relative error in QoI 1 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // Also print out effecitivity indices (estimated error/true error)
-        std::cout<< "The effectivity index for the computed error in QoI 0 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) /
-          std::abs(QoI_0_computed - QoI_0_exact) << std::endl;
+        libMesh::out << "The effectivity index for the computed error in QoI 0 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact)
+                     << std::endl;
 
-        std::cout<< "The effectivity index for the computed error in QoI 1 is " << std::setprecision(17)
-                 << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) /
-          std::abs(QoI_1_computed - QoI_1_exact) << std::endl << std::endl;
+        libMesh::out << "The effectivity index for the computed error in QoI 1 is "
+                     << std::setprecision(17)
+                     << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // Hard coded assert to ensure that the actual numbers we are getting are what they should be
 
@@ -553,8 +581,9 @@ int main (int argc, char** argv)
       }
   }
 
-  std::cerr << '[' << mesh.processor_id()
-            << "] Completing output." << std::endl;
+  libMesh::err << '[' << mesh.processor_id()
+               << "] Completing output."
+               << std::endl;
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
 

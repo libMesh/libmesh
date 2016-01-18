@@ -43,7 +43,7 @@ Real exact_solution (const int component,
 {
   static const Real pi = acos(-1.);
 
-  switch( component )
+  switch (component)
     {
     case 0:
       return cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
@@ -55,6 +55,6 @@ Real exact_solution (const int component,
       libmesh_error_msg("Invalid component = " << component);
     }
 
-  //dummy
+  // dummy
   return 0.0;
 }

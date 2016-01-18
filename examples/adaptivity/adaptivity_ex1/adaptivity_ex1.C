@@ -53,9 +53,10 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-void assemble_1D(EquationSystems& es, const std::string& system_name);
+void assemble_1D(EquationSystems & es,
+                 const std::string & system_name);
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI and PETSc)
@@ -76,22 +77,22 @@ int main(int argc, char** argv)
   GetPot command_line (argc, argv);
 
   int n = 4;
-  if ( command_line.search(1, "-n") )
+  if (command_line.search(1, "-n"))
     n = command_line.next(n);
 
   // Build a 1D mesh with 4 elements from x=0 to x=1, using
   // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements
   // because a quadratic element contains 3 nodes.
-  MeshTools::Generation::build_line(mesh,n,0.,1.,EDGE3);
+  MeshTools::Generation::build_line(mesh, n, 0., 1., EDGE3);
 
   // Define the equation systems object and the system we are going
   // to solve. See Introduction Example 2 for more details.
   EquationSystems equation_systems(mesh);
-  LinearImplicitSystem& system = equation_systems.add_system
+  LinearImplicitSystem & system = equation_systems.add_system
     <LinearImplicitSystem>("1D");
 
   // Add a variable "u" to the system, using second-order approximation
-  system.add_variable("u",SECOND);
+  system.add_variable("u", SECOND);
 
   // Give the system a pointer to the matrix assembly function. This
   // will be called when needed by the library.
@@ -117,7 +118,7 @@ int main(int argc, char** argv)
   const unsigned int max_r_steps = 5; // Refine the mesh 5 times
 
   // Define the refinement loop
-  for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
+  for (unsigned int r_step=0; r_step<=max_r_steps; r_step++)
     {
       // Solve the equation system
       equation_systems.get_system("1D").solve();
@@ -125,7 +126,7 @@ int main(int argc, char** argv)
       // We need to ensure that the mesh is not refined on the last iteration
       // of this loop, since we do not want to refine the mesh unless we are
       // going to solve the equation system for that refined mesh.
-      if(r_step != max_r_steps)
+      if (r_step != max_r_steps)
         {
           // Error estimation objects, see Adaptivity Example 2 for details
           ErrorVector error;
@@ -135,8 +136,11 @@ int main(int argc, char** argv)
           error_estimator.estimate_error(system, error);
 
           // Output error estimate magnitude
-          libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm() <<
-            "\nmaximum = " << error.maximum() << std::endl;
+          libMesh::out << "Error estimate\nl2 norm = "
+                       << error.l2_norm()
+                       << "\nmaximum = "
+                       << error.maximum()
+                       << std::endl;
 
           // Flag elements to be refined and coarsened
           mesh_refinement.flag_elements_by_error_fraction (error);
@@ -154,11 +158,11 @@ int main(int argc, char** argv)
   // Construct gnuplot plotting object, pass in mesh, title of plot
   // and boolean to indicate use of grid in plot. The grid is used to
   // show the edges of each element in the mesh.
-  GnuPlotIO plot(mesh,"Adaptivity Example 1", GnuPlotIO::GRID_ON);
+  GnuPlotIO plot(mesh, "Adaptivity Example 1", GnuPlotIO::GRID_ON);
 
   // Write out script to be called from within gnuplot:
   // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
-  plot.write_equation_systems("gnuplot_script",equation_systems);
+  plot.write_equation_systems("gnuplot_script", equation_systems);
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
   // All done.  libMesh objects are destroyed here.  Because the
@@ -172,7 +176,8 @@ int main(int argc, char** argv)
 
 
 // Define the matrix assembly function for the 1D PDE we are solving
-void assemble_1D(EquationSystems& es, const std::string& system_name)
+void assemble_1D(EquationSystems & es,
+                 const std::string & system_name)
 {
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -181,18 +186,18 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   libmesh_assert_equal_to (system_name, "1D");
 
   // Get a reference to the mesh object
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension we are using, i.e. dim==1
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the system we are solving
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("1D");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("1D");
 
   // Get a reference to the DofMap object for this system. The DofMap object
   // handles the index translation from node and element numbers to degree of
   // freedom numbers. DofMap's are discussed in more detail in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type for the first
   // (and only) variable in the system.
@@ -205,20 +210,20 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
 
   // Tell the finite element object to use fifth order Gaussian quadrature
-  QGauss qrule(dim,FIFTH);
+  QGauss qrule(dim, FIFTH);
   fe->attach_quadrature_rule(&qrule);
 
   // Here we define some references to cell-specific data that will be used to
   // assemble the linear system.
 
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Declare a dense matrix and dense vector to hold the element matrix
   // and right-hand-side contribution
@@ -234,14 +239,14 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   // the matrix and right-hand-side contribution from each element. Use a
   // const_element_iterator to loop over the elements. We make
   // el_end const as it is used only for the stopping condition of the loop.
-  MeshBase::const_element_iterator el     = mesh.active_local_elements_begin();
+  MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator el_end = mesh.active_local_elements_end();
 
   // Note that ++el is preferred to el++ when using loops with iterators
-  for( ; el != el_end; ++el)
+  for ( ; el != el_end; ++el)
     {
       // It is convenient to store a pointer to the current element
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the current element.
       // These define where in the global matrix and right-hand-side this
@@ -265,15 +270,15 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
 
 
       // Now loop over quadrature points to handle numerical integration
-      for(unsigned int qp=0; qp<qrule.n_points(); qp++)
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Now build the element matrix and right-hand-side using loops to
           // integrate the test functions (i) against the trial functions (j).
-          for(unsigned int i=0; i<phi.size(); i++)
+          for (unsigned int i=0; i<phi.size(); i++)
             {
               Fe(i) += JxW[qp]*phi[i][qp];
 
-              for(unsigned int j=0; j<phi.size(); j++)
+              for (unsigned int j=0; j<phi.size(); j++)
                 {
                   Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] +
                                       phi[i][qp]*phi[j][qp]);
@@ -292,12 +297,12 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
       // Loop over the sides of this element. For a 1D element, the "sides"
       // are defined as the nodes on each edge of the element, i.e. 1D elements
       // have 2 sides.
-      for(unsigned int s=0; s<elem->n_sides(); s++)
+      for (unsigned int s=0; s<elem->n_sides(); s++)
         {
           // If this element has a NULL neighbor, then it is on the edge of the
           // mesh and we need to enforce a boundary condition using the penalty
           // method.
-          if(elem->neighbor(s) == NULL)
+          if (elem->neighbor(s) == NULL)
             {
               Ke(s,s) += penalty;
               Fe(s)   += 0*penalty;

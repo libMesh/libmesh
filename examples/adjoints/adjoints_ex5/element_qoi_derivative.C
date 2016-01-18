@@ -33,21 +33,21 @@ using namespace libMesh;
 
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
-void HeatSystem::element_qoi_derivative (DiffContext &context,
+void HeatSystem::element_qoi_derivative (DiffContext & context,
                                          const QoISet & /* qois */)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase* elem_fe = NULL;
-  c.get_element_fe( 0, elem_fe );
+  FEBase * elem_fe = NULL;
+  c.get_element_fe(0, elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = elem_fe->get_JxW();
+  const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // The basis functions for the element
-  const std::vector<std::vector<Real> > &phi = elem_fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.get_dof_indices(0).size();
@@ -56,13 +56,13 @@ void HeatSystem::element_qoi_derivative (DiffContext &context,
   // Fill the QoI RHS corresponding to this QoI. Since this is the 0th QoI
   // we fill in the [0][i] subderivatives, i corresponding to the variable index.
   // Our system has only one variable, so we only have to fill the [0][0] subderivative
-  DenseSubVector<Number> &Q = c.get_qoi_derivatives(0,0);
+  DenseSubVector<Number> & Q = c.get_qoi_derivatives(0, 0);
 
   // A reference to the system context is built with
   const System & sys = c.get_system();
 
   // Get a pointer to the adjoint solution vector
-  NumericVector<Number> &adjoint_solution = const_cast<System &>(sys).get_adjoint_solution(0);
+  NumericVector<Number> & adjoint_solution = const_cast<System &>(sys).get_adjoint_solution(0);
 
   // Get the previous adjoint solution values at all the qps
 
@@ -75,11 +75,6 @@ void HeatSystem::element_qoi_derivative (DiffContext &context,
   // time part of the residual of the adjoint problem
   // Loop over the qps
   for (unsigned int qp=0; qp != n_qpoints; qp++)
-    {
-      for (unsigned int i=0; i != n_T_dofs; i++)
-        {
-          Q(i) += -JxW[qp] * old_adjoint[qp] * phi[i][qp] ;
-        }
-
-    } // end of the quadrature point qp-loop
+    for (unsigned int i=0; i != n_T_dofs; i++)
+      Q(i) += -JxW[qp] * old_adjoint[qp] * phi[i][qp];
 }

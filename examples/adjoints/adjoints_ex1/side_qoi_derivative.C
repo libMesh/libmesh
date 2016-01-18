@@ -14,27 +14,27 @@ using namespace libMesh;
 
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
-void LaplaceSystem::side_qoi_derivative (DiffContext &context,
+void LaplaceSystem::side_qoi_derivative (DiffContext & context,
                                          const QoISet & /* qois */)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase* side_fe = NULL;
-  c.get_side_fe( 0, side_fe );
+  FEBase * side_fe = NULL;
+  c.get_side_fe(0, side_fe);
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = side_fe->get_JxW();
+  const std::vector<Real> & JxW = side_fe->get_JxW();
 
   // The basis functions for the side
-  const std::vector<std::vector<RealGradient> > &dphi = side_fe->get_dphi();
+  const std::vector<std::vector<RealGradient> > & dphi = side_fe->get_dphi();
 
   // The side quadrature points
-  const std::vector<Point > &q_point = side_fe->get_xyz();
+  const std::vector<Point > & q_point = side_fe->get_xyz();
 
   // Get the normal to the side at each qp
-  const std::vector<Point> &face_normals = side_fe->get_normals();
+  const std::vector<Point> & face_normals = side_fe->get_normals();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.get_dof_indices(0).size();
@@ -43,7 +43,7 @@ void LaplaceSystem::side_qoi_derivative (DiffContext &context,
   // Fill the QoI RHS corresponding to this QoI. Since this is QoI 1
   // we fill in the [1][i] subderivatives, i corresponding to the variable index.
   // Our system has only one variable, so we only have to fill the [1][0] subderivative
-  DenseSubVector<Number> &Q = c.get_qoi_derivatives(1,0);
+  DenseSubVector<Number> & Q = c.get_qoi_derivatives(1, 0);
 
   const Real TOL = 1.e-5;
 
@@ -54,11 +54,8 @@ void LaplaceSystem::side_qoi_derivative (DiffContext &context,
 
       // If on the sides where the boundary QoI is supported, add contributions
       // to the adjoint rhs
-      if(fabs(y - 1.0) <= TOL && x > 0.0)
-        {
-          for (unsigned int i=0; i != n_T_dofs; i++)
-            Q(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]);
-        }
-
+      if (std::abs(y - 1.0) <= TOL && x > 0.0)
+        for (unsigned int i=0; i != n_T_dofs; i++)
+          Q(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]);
     } // end of the quadrature point qp-loop
 }

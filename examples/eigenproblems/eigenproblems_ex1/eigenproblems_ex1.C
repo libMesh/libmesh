@@ -53,145 +53,136 @@ using namespace libMesh;
 
 // Function prototype.  This is the function that will assemble
 // the eigen system. Here, we will simply assemble a mass matrix.
-void assemble_mass(EquationSystems& es,
-                   const std::string& system_name);
+void assemble_mass(EquationSystems & es,
+                   const std::string & system_name);
 
-
-
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and the dependent libraries.
   LibMeshInit init (argc, argv);
 
-  // Skip SLEPc examples on a non-SLEPc libMesh build
-#ifndef LIBMESH_HAVE_SLEPC
-  libmesh_example_requires(false, "--enable-slepc");
-}
-
-#else
-
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
-// SLEPc currently gives us a nasty crash with Real==float
-libmesh_example_requires(false, "--disable-singleprecision");
+  // SLEPc currently gives us a nasty crash with Real==float
+  libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
-// Check for proper usage.
-if (argc < 3)
-  libmesh_error_msg("\nUsage: " << argv[0] << " -n <number of eigen values>");
+#ifndef LIBMESH_HAVE_SLEPC
+  libmesh_example_requires(false, "--enable-slepc");
+#else
+  // Check for proper usage.
+  if (argc < 3)
+    libmesh_error_msg("\nUsage: " << argv[0] << " -n <number of eigen values>");
 
-// Tell the user what we are doing.
- else
-   {
-     std::cout << "Running " << argv[0];
+  // Tell the user what we are doing.
+  else
+    {
+      libMesh::out << "Running " << argv[0];
 
-     for (int i=1; i<argc; i++)
-       std::cout << " " << argv[i];
+      for (int i=1; i<argc; i++)
+        libMesh::out << " " << argv[i];
 
-     std::cout << std::endl << std::endl;
-   }
+      libMesh::out << std::endl << std::endl;
+    }
 
-// Get the number of eigen values to be computed from argv[2]
-const unsigned int nev = std::atoi(argv[2]);
+  // Get the number of eigen values to be computed from argv[2]
+  const unsigned int nev = std::atoi(argv[2]);
 
-// Skip this 2D example if libMesh was compiled as 1D-only.
-libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
+  // Skip this 2D example if libMesh was compiled as 1D-only.
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
-// Create a mesh, with dimension to be overridden later, on the
-// default MPI communicator.
-Mesh mesh(init.comm());
+  // Create a mesh, with dimension to be overridden later, on the
+  // default MPI communicator.
+  Mesh mesh(init.comm());
 
-// Use the internal mesh generator to create a uniform
-// 2D grid on a square.
-MeshTools::Generation::build_square (mesh,
-                                     20, 20,
-                                     -1., 1.,
-                                     -1., 1.,
-                                     QUAD4);
+  // Use the internal mesh generator to create a uniform
+  // 2D grid on a square.
+  MeshTools::Generation::build_square (mesh,
+                                       20, 20,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       QUAD4);
 
-// Print information about the mesh to the screen.
-mesh.print_info();
+  // Print information about the mesh to the screen.
+  mesh.print_info();
 
-// Create an equation systems object.
-EquationSystems equation_systems (mesh);
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
 
-// Create a EigenSystem named "Eigensystem" and (for convenience)
-// use a reference to the system we create.
-EigenSystem & eigen_system =
-  equation_systems.add_system<EigenSystem> ("Eigensystem");
+  // Create a EigenSystem named "Eigensystem" and (for convenience)
+  // use a reference to the system we create.
+  EigenSystem & eigen_system =
+    equation_systems.add_system<EigenSystem> ("Eigensystem");
 
-// Declare the system variables.
-// Adds the variable "p" to "Eigensystem".   "p"
-// will be approximated using second-order approximation.
-eigen_system.add_variable("p", FIRST);
+  // Declare the system variables.
+  // Adds the variable "p" to "Eigensystem".   "p"
+  // will be approximated using second-order approximation.
+  eigen_system.add_variable("p", FIRST);
 
-// Give the system a pointer to the matrix assembly
-// function defined below.
-eigen_system.attach_assemble_function (assemble_mass);
+  // Give the system a pointer to the matrix assembly
+  // function defined below.
+  eigen_system.attach_assemble_function (assemble_mass);
 
-// Set necessary parametrs used in EigenSystem::solve(),
-// i.e. the number of requested eigenpairs \p nev and the number
-// of basis vectors \p ncv used in the solution algorithm. Note that
-// ncv >= nev must hold and ncv >= 2*nev is recommended.
-equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
-equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
+  // Set necessary parametrs used in EigenSystem::solve(),
+  // i.e. the number of requested eigenpairs \p nev and the number
+  // of basis vectors \p ncv used in the solution algorithm. Note that
+  // ncv >= nev must hold and ncv >= 2*nev is recommended.
+  equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
+  equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
 
-// You may optionally change the default eigensolver used by SLEPc.
-// The Krylov-Schur method is mathematically equivalent to implicitly
-// restarted Arnoldi, the method of Arpack, so there is currently no
-// point in using SLEPc with Arpack.
-// ARNOLDI     = default in SLEPc 2.3.1 and earlier
-// KRYLOVSCHUR default in SLEPc 2.3.2 and later
-// eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
+  // You may optionally change the default eigensolver used by SLEPc.
+  // The Krylov-Schur method is mathematically equivalent to implicitly
+  // restarted Arnoldi, the method of Arpack, so there is currently no
+  // point in using SLEPc with Arpack.
+  // ARNOLDI     = default in SLEPc 2.3.1 and earlier
+  // KRYLOVSCHUR default in SLEPc 2.3.2 and later
+  // eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
 
-// Set the solver tolerance and the maximum number of iterations.
-equation_systems.parameters.set<Real>
-("linear solver tolerance") = pow(TOLERANCE, 5./3.);
-equation_systems.parameters.set<unsigned int>
-("linear solver maximum iterations") = 1000;
+  // Set the solver tolerance and the maximum number of iterations.
+  equation_systems.parameters.set<Real>
+    ("linear solver tolerance") = pow(TOLERANCE, 5./3.);
+  equation_systems.parameters.set<unsigned int>
+    ("linear solver maximum iterations") = 1000;
 
-// Initialize the data structures for the equation system.
-equation_systems.init();
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
 
-// Prints information about the system to the screen.
-equation_systems.print_info();
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
 
-// Solve the system "Eigensystem".
-eigen_system.solve();
+  // Solve the system "Eigensystem".
+  eigen_system.solve();
 
-// Get the number of converged eigen pairs.
-unsigned int nconv = eigen_system.get_n_converged();
+  // Get the number of converged eigen pairs.
+  unsigned int nconv = eigen_system.get_n_converged();
 
-std::cout << "Number of converged eigenpairs: " << nconv
-<< "\n" << std::endl;
+  libMesh::out << "Number of converged eigenpairs: " << nconv
+               << "\n" << std::endl;
 
-// Get the last converged eigenpair
-if (nconv != 0)
-  {
-    eigen_system.get_eigenpair(nconv-1);
+  // Get the last converged eigenpair
+  if (nconv != 0)
+    {
+      eigen_system.get_eigenpair(nconv-1);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    // Write the eigen vector to file.
-    ExodusII_IO (mesh).write_equation_systems ("out.e", equation_systems);
+      // Write the eigen vector to file.
+      ExodusII_IO (mesh).write_equation_systems ("out.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-  }
- else
-   {
-     std::cout << "WARNING: Solver did not converge!\n" << nconv << std::endl;
-   }
+    }
+  else
+    {
+      libMesh::out << "WARNING: Solver did not converge!\n" << nconv << std::endl;
+    }
 
-// All done.
-return 0;
+  // All done.
+  return 0;
+#endif // LIBMESH_HAVE_SLEPC
 }
 
-#endif // LIBMESH_HAVE_SLEPC
 
 
-
-
-void assemble_mass(EquationSystems& es,
-                   const std::string& system_name)
+void assemble_mass(EquationSystems & es,
+                   const std::string & system_name)
 {
-
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Eigensystem");
@@ -199,7 +190,7 @@ void assemble_mass(EquationSystems& es,
 #ifdef LIBMESH_HAVE_SLEPC
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running.
   const unsigned int dim = mesh.mesh_dimension();
@@ -212,7 +203,7 @@ void assemble_mass(EquationSystems& es,
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
 
   // A reference to the system matrix
-  SparseMatrix<Number>&  matrix_A = *eigen_system.matrix_A;
+  SparseMatrix<Number> & matrix_A = *eigen_system.matrix_A;
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
@@ -228,28 +219,23 @@ void assemble_mass(EquationSystems& es,
   fe->attach_quadrature_rule (&qrule);
 
   // The element Jacobian * quadrature weight at each integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-
-  // The element shape function gradients evaluated at the quadrature
-  // points.
-  // const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
-  const DofMap& dof_map = eigen_system.get_dof_map();
+  const DofMap & dof_map = eigen_system.get_dof_map();
 
   // The element mass matrix.
-  DenseMatrix<Number>   Me;
+  DenseMatrix<Number> Me;
 
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
-
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -264,7 +250,7 @@ void assemble_mass(EquationSystems& es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -311,18 +297,10 @@ void assemble_mass(EquationSystems& es,
       // Finally, simply add the element contribution to the
       // overall matrix.
       matrix_A.add_matrix (Me, dof_indices);
-
-
     } // end of element loop
 
 #else
   // Avoid compiler warnings
   libmesh_ignore(es);
 #endif // LIBMESH_HAVE_SLEPC
-
-  /**
-   * All done!
-   */
-  return;
-
 }

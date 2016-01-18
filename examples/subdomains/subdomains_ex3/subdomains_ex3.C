@@ -41,18 +41,18 @@
 using namespace libMesh;
 
 // declare the functions we will use
-void integrate_function (const MeshBase &mesh);
+void integrate_function (const MeshBase & mesh);
 
 // signed distance function
 const Real radius = 0.5;
 
-Real distance (const Point &p)
+Real distance (const Point & p)
 {
   Point cent(0.8, 0.9);
   return ((p-cent).size() - radius);
 }
 
-Real integrand (const Point &p)
+Real integrand (const Point & p)
 {
   return (distance(p) < 0) ? 10. : 1.;
 }
@@ -60,7 +60,7 @@ Real integrand (const Point &p)
 
 
 // Begin the main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
@@ -117,7 +117,7 @@ int main (int argc, char** argv)
 
 
 
-void integrate_function (const MeshBase &mesh)
+void integrate_function (const MeshBase & mesh)
 {
 #if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
@@ -132,12 +132,12 @@ void integrate_function (const MeshBase &mesh)
 
   Real int_val=0.;
 
-  const std::vector<Point> &q_points = fe->get_xyz();
-  const std::vector<Real>  &JxW      = fe->get_JxW();
+  const std::vector<Point> & q_points = fe->get_xyz();
+  const std::vector<Real>  & JxW      = fe->get_JxW();
 
   for (; el!=end_el; ++el)
     {
-      const Elem *elem = *el;
+      const Elem * elem = *el;
 
       vertex_distance.clear();
 
@@ -161,11 +161,11 @@ void integrate_function (const MeshBase &mesh)
 
   mesh.comm().sum (int_val);
 
-  std::cout  << "\n***********************************\n"
-             << " int_val   = " << int_val << std::endl
-             << " exact_val = " <<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
-             << "\n***********************************\n"
-             << std::endl;
+  libMesh::out << "\n***********************************\n"
+               << " int_val   = " << int_val << std::endl
+               << " exact_val = " <<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
+               << "\n***********************************\n"
+               << std::endl;
 #else
   libmesh_ignore(mesh);
 #endif

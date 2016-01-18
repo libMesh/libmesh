@@ -97,7 +97,7 @@ int main (int argc, char** argv)
   // Read the "online_mode" flag from the command line
   GetPot command_line (argc, argv);
   int online_mode = 0;
-  if ( command_line.search(1, "-online_mode") )
+  if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
   // Create a mesh on the default MPI communicator.
@@ -128,7 +128,7 @@ int main (int argc, char** argv)
   // our RBEvaluation object
   rb_con.set_rb_evaluation(rb_eval);
 
-  if(!online_mode) // Perform the Offline stage of the RB method
+  if (!online_mode) // Perform the Offline stage of the RB method
     {
       // Read in the data that defines this problem from the specified text file
       rb_con.process_parameters_file(parameters_filename);
@@ -172,7 +172,7 @@ int main (int argc, char** argv)
 #endif
 
       // If requested, write out the RB basis functions for visualization purposes
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Write out the basis functions
           rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
@@ -202,7 +202,7 @@ int main (int argc, char** argv)
       // Now do the Online solve using the precomputed reduced basis
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Read in the basis functions
           rb_eval.read_in_basis_functions(rb_con);
@@ -219,7 +219,7 @@ int main (int argc, char** argv)
 
       Real n_frequencies = infile("n_frequencies", 0.);
       Real delta_f = (rb_eval.get_parameter_max("frequency") - rb_eval.get_parameter_min("frequency")) / (n_frequencies-1);
-      for(unsigned int freq_i=0; freq_i<n_frequencies; freq_i++)
+      for (unsigned int freq_i=0; freq_i<n_frequencies; freq_i++)
         {
           Real frequency = rb_eval.get_parameter_min("frequency") + freq_i * delta_f;
           online_mu.set_value("frequency", frequency);

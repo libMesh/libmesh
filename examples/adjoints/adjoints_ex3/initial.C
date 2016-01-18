@@ -15,10 +15,10 @@ void finish_initialization()
 
 
 // Initial conditions
-Number initial_value(const Point& /* p */,
-                     const Parameters& /* param */,
-                     const std::string&,
-                     const std::string&)
+Number initial_value(const Point & /* p */,
+                     const Parameters & /* param */,
+                     const std::string &,
+                     const std::string &)
 {
 
   return Number(1.);
@@ -27,10 +27,10 @@ Number initial_value(const Point& /* p */,
 
 
 
-Gradient initial_grad(const Point& /* p */,
-                      const Parameters& /* param */,
-                      const std::string&,
-                      const std::string&)
+Gradient initial_grad(const Point & /* p */,
+                      const Parameters & /* param */,
+                      const std::string &,
+                      const std::string &)
 {
   return Gradient(0.);
 }

@@ -32,30 +32,26 @@ using namespace libMesh;
 // but we must specify element residuals
 class LaplaceSystem : public FEMSystem
 {
-
 public:
-
   // Constructor
-  LaplaceSystem( EquationSystems& es,
-                 const std::string& name,
-                 const unsigned int number);
+  LaplaceSystem(EquationSystems & es,
+                const std::string & name,
+                const unsigned int number);
 
   // System initialization
   virtual void init_data ();
 
   // Context initialization
-  virtual void init_context(DiffContext &context);
+  virtual void init_context(DiffContext & context);
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext& context);
+                                        DiffContext & context);
 
   // Constraint part
-  /*
-    virtual bool side_constraint (bool request_jacobian,
-    DiffContext& context);
-  */
+  // virtual bool side_constraint (bool request_jacobian,
+  //                               DiffContext & context);
 
 protected:
   // Indices for each variable;
@@ -64,7 +60,7 @@ protected:
   void init_dirichlet_bcs();
 
   // Returns the value of a forcing function at point p.
-  RealGradient forcing(const Point& p);
+  RealGradient forcing(const Point & p);
 
   LaplaceExactSolution exact_solution;
 };

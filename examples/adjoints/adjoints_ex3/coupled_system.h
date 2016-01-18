@@ -33,35 +33,33 @@ class CoupledSystem : public FEMSystem
 {
 public:
   // Constructor
-  CoupledSystem(EquationSystems& es,
-                const std::string& name_in,
+  CoupledSystem(EquationSystems & es,
+                const std::string & name_in,
                 const unsigned int number_in)
     : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
 
   // Function to get computed QoI values
 
-  Number &get_QoI_value()
+  Number & get_QoI_value()
   {
     return computed_QoI;
   }
 
-  Number &get_parameter_value(unsigned int parameter_index)
+  Number & get_parameter_value(unsigned int parameter_index)
   {
     return parameters[parameter_index];
   }
 
-  ParameterVector &get_parameter_vector()
+  ParameterVector & get_parameter_vector()
   {
     parameter_vector.resize(parameters.size());
-    for(unsigned int i = 0; i != parameters.size(); ++i)
-      {
-        parameter_vector[i] = &parameters[i];
-      }
+    for (unsigned int i = 0; i != parameters.size(); ++i)
+      parameter_vector[i] = &parameters[i];
 
     return parameter_vector;
   }
 
-  Real &get_Pe()
+  Real & get_Pe()
   {
     return Peclet;
   }
@@ -72,16 +70,16 @@ protected:
   virtual void init_data ();
 
   // Context initialization
-  virtual void init_context(DiffContext &context);
+  virtual void init_context(DiffContext & context);
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext& context);
+                                        DiffContext & context);
 
   // Constraint parts
   virtual bool element_constraint (bool request_jacobian,
-                                   DiffContext& context);
+                                   DiffContext & context);
 
   // Postprocessed output
   virtual void postprocess ();
@@ -101,7 +99,6 @@ protected:
 
   // The functionals to be computed as QoIs
   Number computed_QoI;
-
 };
 
 
@@ -109,25 +106,30 @@ class CoupledFEMFunctionsx : public FEMFunctionBase<Number>
 {
 public:
   // Constructor
-  CoupledFEMFunctionsx(System& /* sys */, unsigned int var_number) {var = var_number;}
+  CoupledFEMFunctionsx(System & /* sys */,
+                       unsigned int var_number)
+  {var = var_number;}
 
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
 
   virtual UniquePtr<FEMFunctionBase<Number> > clone () const
-  {return UniquePtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsx(*this) ); }
+  {
+    return UniquePtr<FEMFunctionBase<Number> >(new CoupledFEMFunctionsx(*this));
+  }
 
-  virtual void operator() (const FEMContext&, const Point&,
-                           const Real, DenseVector<Number>&)
+  virtual void operator() (const FEMContext &,
+                           const Point &,
+                           const Real,
+                           DenseVector<Number> &)
   { libmesh_not_implemented(); }
 
-  virtual Number operator() (const FEMContext&, const Point& p,
+  virtual Number operator() (const FEMContext &,
+                             const Point & p,
                              const Real time = 0.);
 
 private:
-
   unsigned int var;
-
 };
 
 
@@ -135,26 +137,30 @@ class CoupledFEMFunctionsy : public FEMFunctionBase<Number>
 {
 public:
   // Constructor
-  CoupledFEMFunctionsy(System& /* sys */, unsigned int var_number) {var = var_number;}
+  CoupledFEMFunctionsy(System & /* sys */,
+                       unsigned int var_number)
+  { var = var_number; }
 
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
 
   virtual UniquePtr<FEMFunctionBase<Number> > clone () const
-  {return UniquePtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsy(*this) ); }
+  {
+    return UniquePtr<FEMFunctionBase<Number> >(new CoupledFEMFunctionsy(*this));
+  }
 
-  virtual void operator() (const FEMContext&, const Point&,
+  virtual void operator() (const FEMContext &,
+                           const Point &,
                            const Real,
-                           DenseVector<Number>&)
+                           DenseVector<Number> &)
   { libmesh_not_implemented(); }
 
-  virtual Number operator() (const FEMContext&, const Point& p,
+  virtual Number operator() (const FEMContext &,
+                             const Point & p,
                              const Real time = 0.);
 
 private:
-
   unsigned int var;
-
 };
 
-#endif //COUPLED_SYSTEM_H
+#endif // COUPLED_SYSTEM_H

@@ -66,51 +66,70 @@ using namespace libMesh;
 // name of the system we are assembling as input.  From the
 // \p EquationSystems object we have acess to the \p Mesh and
 // other objects we might need.
-void assemble_biharmonic(EquationSystems& es,
-                         const std::string& system_name);
+void assemble_biharmonic(EquationSystems & es,
+                         const std::string & system_name);
 
 
 // Prototypes for calculation of the exact solution.  Necessary
 // for setting boundary conditions.
-Number exact_2D_solution(const Point& p,
-                         const Parameters&,   // parameters, not needed
-                         const std::string&,  // sys_name, not needed
-                         const std::string&); // unk_name, not needed);
+Number exact_2D_solution(const Point & p,
+                         const Parameters &,   // parameters, not needed
+                         const std::string &,  // sys_name, not needed
+                         const std::string &); // unk_name, not needed);
 
-Number exact_3D_solution(const Point& p,
-                         const Parameters&, const std::string&, const std::string&);
+Number exact_3D_solution(const Point & p,
+                         const Parameters &,
+                         const std::string &,
+                         const std::string &);
 
 // Prototypes for calculation of the gradient of the exact solution.
 // Necessary for setting boundary conditions in H^2_0 and testing
 // H^1 convergence of the solution
-Gradient exact_2D_derivative(const Point& p,
-                             const Parameters&, const std::string&, const std::string&);
+Gradient exact_2D_derivative(const Point & p,
+                             const Parameters &,
+                             const std::string &,
+                             const std::string &);
 
-Gradient exact_3D_derivative(const Point& p,
-                             const Parameters&, const std::string&, const std::string&);
+Gradient exact_3D_derivative(const Point & p,
+                             const Parameters &,
+                             const std::string &,
+                             const std::string &);
 
-Tensor exact_2D_hessian(const Point& p,
-                        const Parameters&, const std::string&, const std::string&);
+Tensor exact_2D_hessian(const Point & p,
+                        const Parameters &,
+                        const std::string &,
+                        const std::string &);
 
-Tensor exact_3D_hessian(const Point& p,
-                        const Parameters&, const std::string&, const std::string&);
+Tensor exact_3D_hessian(const Point & p,
+                        const Parameters &,
+                        const std::string &,
+                        const std::string &);
 
-Number forcing_function_2D(const Point& p);
+Number forcing_function_2D(const Point & p);
 
-Number forcing_function_3D(const Point& p);
+Number forcing_function_3D(const Point & p);
 
 // Pointers to dimension-independent functions
-Number (*exact_solution)(const Point& p,
-                         const Parameters&, const std::string&, const std::string&);
-Gradient (*exact_derivative)(const Point& p,
-                             const Parameters&, const std::string&, const std::string&);
-Tensor (*exact_hessian)(const Point& p,
-                        const Parameters&, const std::string&, const std::string&);
-Number (*forcing_function)(const Point& p);
+Number (*exact_solution)(const Point & p,
+                         const Parameters &,
+                         const std::string &,
+                         const std::string &);
+
+Gradient (*exact_derivative)(const Point & p,
+                             const Parameters &,
+                             const std::string &,
+                             const std::string &);
+
+Tensor (*exact_hessian)(const Point & p,
+                        const Parameters &,
+                        const std::string &,
+                        const std::string &);
+
+Number (*forcing_function)(const Point & p);
 
 
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -137,18 +156,12 @@ int main(int argc, char** argv)
   // Read in parameters from the input file
   const unsigned int max_r_level = input_file("max_r_level", 10);
   const unsigned int max_r_steps = input_file("max_r_steps", 4);
-  const std::string approx_type  = input_file("approx_type",
-                                              "HERMITE");
-  const unsigned int uniform_refine =
-    input_file("uniform_refine", 0);
-  const Real refine_percentage =
-    input_file("refine_percentage", 0.5);
-  const Real coarsen_percentage =
-    input_file("coarsen_percentage", 0.5);
-  const unsigned int dim =
-    input_file("dimension", 2);
-  const unsigned int max_linear_iterations =
-    input_file("max_linear_iterations", 10000);
+  const std::string approx_type  = input_file("approx_type", "HERMITE");
+  const unsigned int uniform_refine = input_file("uniform_refine", 0);
+  const Real refine_percentage = input_file("refine_percentage", 0.5);
+  const Real coarsen_percentage = input_file("coarsen_percentage", 0.5);
+  const unsigned int dim = input_file("dimension", 2);
+  const unsigned int max_linear_iterations = input_file("max_linear_iterations", 10000);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
@@ -235,7 +248,7 @@ int main(int argc, char** argv)
 
   // Declare the system and its variables.
   // Create a system named "Biharmonic"
-  LinearImplicitSystem& system =
+  LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
 
   // Adds the variable "u" to "Biharmonic".  "u"
@@ -284,16 +297,16 @@ int main(int argc, char** argv)
       mesh.print_info();
       equation_systems.print_info();
 
-      std::cout << "Beginning Solve " << r_step << std::endl;
+      libMesh::out << "Beginning Solve " << r_step << std::endl;
 
       // Solve the system "Biharmonic", just like example 2.
       system.solve();
 
-      std::cout << "Linear solver converged at step: "
-                << system.n_linear_iterations()
-                << ", final residual: "
-                << system.final_linear_residual()
-                << std::endl;
+      libMesh::out << "Linear solver converged at step: "
+                   << system.n_linear_iterations()
+                   << ", final residual: "
+                   << system.final_linear_residual()
+                   << std::endl;
 
       // Compute the error.
       exact_sol.compute_error("Biharmonic", "u");
@@ -301,26 +314,26 @@ int main(int argc, char** argv)
       zero_sol.compute_error("Biharmonic", "u");
 
       // Print out the error values
-      std::cout << "L2-Norm is: "
-                << zero_sol.l2_error("Biharmonic", "u")
-                << std::endl;
-      std::cout << "H1-Norm is: "
-                << zero_sol.h1_error("Biharmonic", "u")
-                << std::endl;
-      std::cout << "H2-Norm is: "
-                << zero_sol.h2_error("Biharmonic", "u")
-                << std::endl
-                << std::endl;
-      std::cout << "L2-Error is: "
-                << exact_sol.l2_error("Biharmonic", "u")
-                << std::endl;
-      std::cout << "H1-Error is: "
-                << exact_sol.h1_error("Biharmonic", "u")
-                << std::endl;
-      std::cout << "H2-Error is: "
-                << exact_sol.h2_error("Biharmonic", "u")
-                << std::endl
-                << std::endl;
+      libMesh::out << "L2-Norm is: "
+                   << zero_sol.l2_error("Biharmonic", "u")
+                   << std::endl;
+      libMesh::out << "H1-Norm is: "
+                   << zero_sol.h1_error("Biharmonic", "u")
+                   << std::endl;
+      libMesh::out << "H2-Norm is: "
+                   << zero_sol.h2_error("Biharmonic", "u")
+                   << std::endl
+                   << std::endl;
+      libMesh::out << "L2-Error is: "
+                   << exact_sol.l2_error("Biharmonic", "u")
+                   << std::endl;
+      libMesh::out << "H1-Error is: "
+                   << exact_sol.h1_error("Biharmonic", "u")
+                   << std::endl;
+      libMesh::out << "H2-Error is: "
+                   << exact_sol.h2_error("Biharmonic", "u")
+                   << std::endl
+                   << std::endl;
 
       // Print to output file
       out << equation_systems.n_active_dofs() << " "
@@ -331,7 +344,7 @@ int main(int argc, char** argv)
       // Possibly refine the mesh
       if (r_step+1 != max_r_steps)
         {
-          std::cout << "  Refining the mesh..." << std::endl;
+          libMesh::out << "  Refining the mesh..." << std::endl;
 
           if (uniform_refine == 0)
             {
@@ -341,10 +354,8 @@ int main(int argc, char** argv)
               error_estimator.estimate_error(system, error);
               mesh_refinement.flag_elements_by_elem_fraction (error);
 
-              std::cout << "Mean Error: " << error.mean() <<
-                std::endl;
-              std::cout << "Error Variance: " << error.variance() <<
-                std::endl;
+              libMesh::out << "Mean Error: " << error.mean() << std::endl;
+              libMesh::out << "Error Variance: " << error.variance() << std::endl;
 
               mesh_refinement.refine_and_coarsen_elements();
             }
@@ -388,10 +399,10 @@ int main(int argc, char** argv)
 
 
 
-Number exact_2D_solution(const Point& p,
-                         const Parameters&,  // parameters, not needed
-                         const std::string&, // sys_name, not needed
-                         const std::string&) // unk_name, not needed
+Number exact_2D_solution(const Point & p,
+                         const Parameters &,  // parameters, not needed
+                         const std::string &, // sys_name, not needed
+                         const std::string &) // unk_name, not needed
 {
   // x and y coordinates in space
   const Real x = p(0);
@@ -403,10 +414,10 @@ Number exact_2D_solution(const Point& p,
 
 
 // We now define the gradient of the exact solution
-Gradient exact_2D_derivative(const Point& p,
-                             const Parameters&,  // parameters, not needed
-                             const std::string&, // sys_name, not needed
-                             const std::string&) // unk_name, not needed
+Gradient exact_2D_derivative(const Point & p,
+                             const Parameters &,  // parameters, not needed
+                             const std::string &, // sys_name, not needed
+                             const std::string &) // unk_name, not needed
 {
   // x and y coordinates in space
   const Real x = p(0);
@@ -423,10 +434,10 @@ Gradient exact_2D_derivative(const Point& p,
 
 
 // We now define the hessian of the exact solution
-Tensor exact_2D_hessian(const Point& p,
-                        const Parameters&,  // parameters, not needed
-                        const std::string&, // sys_name, not needed
-                        const std::string&) // unk_name, not needed
+Tensor exact_2D_hessian(const Point & p,
+                        const Parameters &,  // parameters, not needed
+                        const std::string &, // sys_name, not needed
+                        const std::string &) // unk_name, not needed
 {
   // Second derivatives to be returned.
   Tensor hessu;
@@ -446,7 +457,7 @@ Tensor exact_2D_hessian(const Point& p,
 
 
 
-Number forcing_function_2D(const Point& p)
+Number forcing_function_2D(const Point & p)
 {
   // x and y coordinates in space
   const Real x = p(0);
@@ -459,10 +470,10 @@ Number forcing_function_2D(const Point& p)
 
 
 
-Number exact_3D_solution(const Point& p,
-                         const Parameters&,  // parameters, not needed
-                         const std::string&, // sys_name, not needed
-                         const std::string&) // unk_name, not needed
+Number exact_3D_solution(const Point & p,
+                         const Parameters &,  // parameters, not needed
+                         const std::string &, // sys_name, not needed
+                         const std::string &) // unk_name, not needed
 {
   // xyz coordinates in space
   const Real x = p(0);
@@ -474,10 +485,10 @@ Number exact_3D_solution(const Point& p,
 }
 
 
-Gradient exact_3D_derivative(const Point& p,
-                             const Parameters&,  // parameters, not needed
-                             const std::string&, // sys_name, not needed
-                             const std::string&) // unk_name, not needed
+Gradient exact_3D_derivative(const Point & p,
+                             const Parameters &,  // parameters, not needed
+                             const std::string &, // sys_name, not needed
+                             const std::string &) // unk_name, not needed
 {
   // First derivatives to be returned.
   Gradient gradu;
@@ -496,10 +507,10 @@ Gradient exact_3D_derivative(const Point& p,
 
 
 // We now define the hessian of the exact solution
-Tensor exact_3D_hessian(const Point& p,
-                        const Parameters&,  // parameters, not needed
-                        const std::string&, // sys_name, not needed
-                        const std::string&) // unk_name, not needed
+Tensor exact_3D_hessian(const Point & p,
+                        const Parameters &,  // parameters, not needed
+                        const std::string &, // sys_name, not needed
+                        const std::string &) // unk_name, not needed
 {
   // Second derivatives to be returned.
   Tensor hessu;
@@ -526,7 +537,7 @@ Tensor exact_3D_hessian(const Point& p,
 
 
 
-Number forcing_function_3D(const Point& p)
+Number forcing_function_3D(const Point & p)
 {
   // xyz coordinates in space
   const Real x = p(0);
@@ -549,8 +560,8 @@ Number forcing_function_3D(const Point& p)
 // matrices and right-hand sides, and then take into
 // account the boundary conditions, which will be handled
 // via a penalty method.
-void assemble_biharmonic(EquationSystems& es,
-                         const std::string& system_name)
+void assemble_biharmonic(EquationSystems & es,
+                         const std::string & system_name)
 {
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -563,22 +574,22 @@ void assemble_biharmonic(EquationSystems& es,
   // string to identify what part of the code we are
   // logging, since there may be many PerfLogs in an
   // application.
-  PerfLog perf_log ("Matrix Assembly",false);
+  PerfLog perf_log ("Matrix Assembly", false);
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
-  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Biharmonic");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Biharmonic");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
@@ -616,20 +627,20 @@ void assemble_biharmonic(EquationSystems& es,
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
   // integration point.
-  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real> & JxW = fe->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
   // These might be useful for evaluating spatially varying material
   // properties at the quadrature points.
-  const std::vector<Point>& q_point = fe->get_xyz();
+  const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // The element shape function second derivatives evaluated at the
   // quadrature points.  Note that for the simple biharmonic, shape
   // function first derivatives are unnecessary.
-  const std::vector<std::vector<RealTensor> >& d2phi = fe->get_d2phi();
+  const std::vector<std::vector<RealTensor> > & d2phi = fe->get_d2phi();
 
   // For efficiency we will compute shape function laplacians n times,
   // not n^2
@@ -663,7 +674,7 @@ void assemble_biharmonic(EquationSystems& es,
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
@@ -744,25 +755,23 @@ void assemble_biharmonic(EquationSystems& es,
             {
               // The value of the shape functions at the quadrature
               // points.
-              const std::vector<std::vector<Real> >&  phi_face =
+              const std::vector<std::vector<Real> > & phi_face =
                 fe_face->get_phi();
 
               // The value of the shape function derivatives at the
               // quadrature points.
-              const std::vector<std::vector<RealGradient> >& dphi_face =
+              const std::vector<std::vector<RealGradient> > & dphi_face =
                 fe_face->get_dphi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
-              const std::vector<Real>& JxW_face = fe_face->get_JxW();
+              const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
               // The XYZ locations (in physical space) of the
               // quadrature points on the face.  This is where
               // we will interpolate the boundary value function.
-              const std::vector<Point>& qface_point = fe_face->get_xyz();
-
-              const std::vector<Point>& face_normals =
-                fe_face->get_normals();
+              const std::vector<Point> & qface_point = fe_face->get_xyz();
+              const std::vector<Point> & face_normals = fe_face->get_normals();
 
               // Compute the shape function values on the element
               // face.

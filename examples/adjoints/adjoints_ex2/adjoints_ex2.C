@@ -101,13 +101,12 @@ using namespace libMesh;
 // whether the output is the primal solution or the dual solution for the ith QoI
 
 // Write gmv output
-
-void write_output(EquationSystems &es,
+void write_output(EquationSystems & es,
                   unsigned int a_step, // The adaptive step count
                   std::string solution_type) // primal or adjoint solve
 {
 #ifdef LIBMESH_HAVE_GMV
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   std::ostringstream file_name_gmv;
   file_name_gmv << solution_type
@@ -117,15 +116,13 @@ void write_output(EquationSystems &es,
                 << std::right
                 << a_step;
 
-  GMVIO(mesh).write_equation_systems
-    (file_name_gmv.str(), es);
+  GMVIO(mesh).write_equation_systems(file_name_gmv.str(), es);
 
 #endif
 }
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
-
-void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
+void set_system_parameters(LaplaceSystem & system, FEMParameters & param)
 {
   // Use analytical jacobians?
   system.analytic_jacobians() = param.analytic_jacobians;
@@ -151,7 +148,7 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
   // Nonlinear solver options
   {
-    NewtonSolver *solver = new NewtonSolver(system);
+    NewtonSolver * solver = new NewtonSolver(system);
     system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
 
     solver->quiet                       = param.solver_quiet;
@@ -168,9 +165,9 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
       }
 
     // And the linear solver options
-    solver->max_linear_iterations       = param.max_linear_iterations;
-    solver->initial_linear_tolerance    = param.initial_linear_tolerance;
-    solver->minimum_linear_tolerance    = param.minimum_linear_tolerance;
+    solver->max_linear_iterations    = param.max_linear_iterations;
+    solver->initial_linear_tolerance = param.initial_linear_tolerance;
+    solver->minimum_linear_tolerance = param.minimum_linear_tolerance;
   }
 }
 
@@ -178,10 +175,10 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
 #ifdef LIBMESH_ENABLE_AMR
 
-UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
-                                              FEMParameters &param)
+UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
+                                                FEMParameters & param)
 {
-  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
+  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -201,28 +198,26 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 // forward and adjoint weights. The H1 seminorm component of the error is used
 // as dictated by the weak form the Laplace equation.
 
-UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
+UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters & param)
 {
   if (param.indicator_type == "kelly")
     {
-      std::cout<<"Using Kelly Error Estimator"<<std::endl;
+      libMesh::out << "Using Kelly Error Estimator" << std::endl;
 
       return UniquePtr<ErrorEstimator>(new KellyErrorEstimator);
     }
   else if (param.indicator_type == "adjoint_residual")
     {
-      std::cout<<"Using Adjoint Residual Error Estimator with Patch Recovery Weights"<<std::endl<<std::endl;
+      libMesh::out << "Using Adjoint Residual Error Estimator with Patch Recovery Weights" << std::endl << std::endl;
 
-      AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
+      AdjointResidualErrorEstimator * adjoint_residual_estimator = new AdjointResidualErrorEstimator;
 
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
 
-      PatchRecoveryErrorEstimator *p1 =
-        new PatchRecoveryErrorEstimator;
+      PatchRecoveryErrorEstimator * p1 = new PatchRecoveryErrorEstimator;
       adjoint_residual_estimator->primal_error_estimator().reset(p1);
 
-      PatchRecoveryErrorEstimator *p2 =
-        new PatchRecoveryErrorEstimator;
+      PatchRecoveryErrorEstimator * p2 = new PatchRecoveryErrorEstimator;
       adjoint_residual_estimator->dual_error_estimator().reset(p2);
 
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
@@ -236,7 +231,7 @@ UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
 }
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -246,7 +241,7 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--enable-amr");
 #else
 
-  std::cout << "Started " << argv[0] << std::endl;
+  libMesh::out << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
   {
@@ -274,7 +269,7 @@ int main (int argc, char** argv)
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);
 
-  std::cout << "Reading in and building the mesh" << std::endl;
+  libMesh::out << "Reading in and building the mesh" << std::endl;
 
   // Read in the mesh
   mesh.read(param.domainfile.c_str());
@@ -287,10 +282,10 @@ int main (int argc, char** argv)
   MeshRefinement initial_uniform_refinements(mesh);
   initial_uniform_refinements.uniformly_refine(param.coarserefinements);
 
-  std::cout << "Building system" << std::endl;
+  libMesh::out << "Building system" << std::endl;
 
   // Build the FEMSystem
-  LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
+  LaplaceSystem & system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
 
   QoISet qois;
 
@@ -303,13 +298,13 @@ int main (int argc, char** argv)
   // Put some scope here to test that the cloning is working right
   {
     LaplaceQoI qoi;
-    system.attach_qoi( &qoi );
+    system.attach_qoi(&qoi);
   }
 
   // Set its parameters
   set_system_parameters(system, param);
 
-  std::cout << "Initializing systems" << std::endl;
+  libMesh::out << "Initializing systems" << std::endl;
 
   equation_systems.init ();
 
@@ -338,7 +333,7 @@ int main (int argc, char** argv)
         write_output(equation_systems, a_step, "primal");
 
         // Get a pointer to the primal solution vector
-        NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> & primal_solution = *system.solution;
 
         // A SensitivityData object to hold the qois and parameters
         SensitivityData sensitivities(qois, system, system.get_parameter_vector());
@@ -363,25 +358,35 @@ int main (int argc, char** argv)
         Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
         Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 
-        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-                  << " active elements and "
-                  << equation_systems.n_active_dofs()
-                  << " active dofs." << std::endl ;
+        libMesh::out << "Adaptive step "
+                     << a_step
+                     << ", we have "
+                     << mesh.n_active_elem()
+                     << " active elements and "
+                     << equation_systems.n_active_dofs()
+                     << " active dofs."
+                     << std::endl;
 
-        std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
-        std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
+        libMesh::out << "Sensitivity of QoI one to Parameter one is "
+                     << sensitivity_QoI_0_0_computed
+                     << std::endl;
+        libMesh::out << "Sensitivity of QoI one to Parameter two is "
+                     << sensitivity_QoI_0_1_computed
+                     << std::endl;
 
-        std::cout<< "The relative error in sensitivity QoI_0_0 is "
-                 << std::setprecision(17)
-                 << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact) /
-          std::abs(sensitivity_QoI_0_0_exact) << std::endl;
-        std::cout<< "The relative error in sensitivity QoI_0_1 is "
-                 << std::setprecision(17)
-                 << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact) /
-          std::abs(sensitivity_QoI_0_1_exact) << std::endl << std::endl;
+        libMesh::out << "The relative error in sensitivity QoI_0_0 is "
+                     << std::setprecision(17)
+                     << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact) / std::abs(sensitivity_QoI_0_0_exact)
+                     << std::endl;
+
+        libMesh::out << "The relative error in sensitivity QoI_0_1 is "
+                     << std::setprecision(17)
+                     << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact) / std::abs(sensitivity_QoI_0_1_exact)
+                     << std::endl
+                     << std::endl;
 
         // Get a pointer to the solution vector of the adjoint problem for QoI 0
-        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         // Swap the primal and dual solutions so we can write out the adjoint solution
         primal_solution.swap(dual_solution_0);
@@ -395,14 +400,14 @@ int main (int argc, char** argv)
         // Otherwise we flag elements by error tolerance or nelem target
 
         // Uniform refinement
-        if(param.refine_uniformly)
+        if (param.refine_uniformly)
           {
-            std::cout<<"Refining Uniformly"<<std::endl<<std::endl;
+            libMesh::out << "Refining Uniformly" << std::endl << std::endl;
 
             mesh_refinement->uniformly_refine(1);
           }
         // Adaptively refine based on reaching an error tolerance
-        else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
+        else if (param.global_tolerance >= 0. && param.nelem_target == 0.)
           {
             // Now we construct the data structures for the mesh refinement process
             ErrorVector error;
@@ -433,7 +438,7 @@ int main (int argc, char** argv)
 
             if (mesh.n_active_elem() >= param.nelem_target)
               {
-                std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
+                libMesh::out<<"We reached the target number of elements."<<std::endl <<std::endl;
                 break;
               }
 
@@ -445,11 +450,12 @@ int main (int argc, char** argv)
         // Dont forget to reinit the system after each adaptive refinement !
         equation_systems.reinit();
 
-        std::cout << "Refined mesh to "
-                  << mesh.n_active_elem()
-                  << " active elements and "
-                  << equation_systems.n_active_dofs()
-                  << " active dofs." << std::endl;
+        libMesh::out << "Refined mesh to "
+                     << mesh.n_active_elem()
+                     << " active elements and "
+                     << equation_systems.n_active_dofs()
+                     << " active dofs."
+                     << std::endl;
       }
 
     // Do one last solve if necessary
@@ -459,7 +465,7 @@ int main (int argc, char** argv)
 
         write_output(equation_systems, a_step, "primal");
 
-        NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> & primal_solution = *system.solution;
 
         SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
@@ -481,26 +487,39 @@ int main (int argc, char** argv)
         Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
         Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 
-        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-                  << " active elements and "
-                  << equation_systems.n_active_dofs()
-                  << " active dofs." << std::endl ;
+        libMesh::out << "Adaptive step "
+                     << a_step
+                     << ", we have "
+                     << mesh.n_active_elem()
+                     << " active elements and "
+                     << equation_systems.n_active_dofs()
+                     << " active dofs."
+                     << std::endl;
 
-        std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
-        std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
+        libMesh::out << "Sensitivity of QoI one to Parameter one is "
+                     << sensitivity_QoI_0_0_computed
+                     << std::endl;
 
-        std::cout<< "The error in sensitivity QoI_0_0 is "
-                 << std::setprecision(17)
-                 << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact << std::endl;
-        std::cout<< "The error in sensitivity QoI_0_1 is "
-                 << std::setprecision(17)
-                 << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
+        libMesh::out << "Sensitivity of QoI one to Parameter two is "
+                     << sensitivity_QoI_0_1_computed
+                     << std::endl;
+
+        libMesh::out << "The error in sensitivity QoI_0_0 is "
+                     << std::setprecision(17)
+                     << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact
+                     << std::endl;
+
+        libMesh::out << "The error in sensitivity QoI_0_1 is "
+                     << std::setprecision(17)
+                     << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact
+                     << std::endl
+                     << std::endl;
 
         // Hard coded asserts to ensure that the actual numbers we are getting are what they should be
         libmesh_assert_less(std::abs((sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact), 2.e-4);
         libmesh_assert_less(std::abs((sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact), 2.e-4);
 
-        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         primal_solution.swap(dual_solution_0);
         write_output(equation_systems, a_step, "adjoint_0");
@@ -509,8 +528,9 @@ int main (int argc, char** argv)
       }
   }
 
-  std::cerr << '[' << system.processor_id()
-            << "] Completing output." << std::endl;
+  libMesh::err << '[' << system.processor_id()
+               << "] Completing output."
+               << std::endl;
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
 

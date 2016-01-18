@@ -73,15 +73,14 @@ private:
   /**
    * Keep a reference to the OptimizationSystem.
    */
-  OptimizationSystem& _sys;
+  OptimizationSystem & _sys;
 
 public:
 
   /**
    * Constructor.
    */
-  AssembleOptimization(
-    OptimizationSystem &sys_in);
+  AssembleOptimization(OptimizationSystem & sys_in);
 
   /**
    * The optimization problem we consider here is:
@@ -93,43 +92,38 @@ public:
   /**
    * Evaluate the objective function.
    */
-  virtual Number objective (
-    const NumericVector<Number>& soln,
-    OptimizationSystem& /*sys*/);
+  virtual Number objective (const NumericVector<Number> & soln,
+                            OptimizationSystem & /*sys*/);
 
   /**
    * Evaluate the gradient.
    */
-  virtual void gradient (
-    const NumericVector<Number>& soln,
-    NumericVector<Number>& grad_f,
-    OptimizationSystem& /*sys*/);
+  virtual void gradient (const NumericVector<Number> & soln,
+                         NumericVector<Number> & grad_f,
+                         OptimizationSystem & /*sys*/);
 
   /**
    * Evaluate the Hessian.
    */
-  virtual void hessian (
-    const NumericVector<Number>& soln,
-    SparseMatrix<Number>& H_f,
-    OptimizationSystem& /*sys*/);
+  virtual void hessian (const NumericVector<Number> & soln,
+                        SparseMatrix<Number> & H_f,
+                        OptimizationSystem & /*sys*/);
 
   /**
    * Sparse matrix for storing the matrix A. We use
    * this to facilitate computation of objective, gradient
    * and hessian.
    */
-  SparseMatrix<Number>* A_matrix;
+  SparseMatrix<Number> * A_matrix;
 
   /**
    * Vector for storing F. We use this to facilitate
    * computation of objective, gradient and hessian.
    */
-  NumericVector<Number>* F_vector;
-
+  NumericVector<Number> * F_vector;
 };
 
-AssembleOptimization::AssembleOptimization(OptimizationSystem &sys_in)
-  :
+AssembleOptimization::AssembleOptimization(OptimizationSystem & sys_in) :
   _sys(sys_in)
 {}
 
@@ -138,20 +132,20 @@ void AssembleOptimization::assemble_A_and_F()
   A_matrix->zero();
   F_vector->zero();
 
-  const MeshBase& mesh = _sys.get_mesh();
+  const MeshBase & mesh = _sys.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
   const unsigned int u_var = _sys.variable_number ("u");
 
-  const DofMap& dof_map = _sys.get_dof_map();
+  const DofMap & dof_map = _sys.get_dof_map();
   FEType fe_type = dof_map.variable_type(u_var);
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<Real> & JxW = fe->get_JxW();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   std::vector<dof_id_type> dof_indices;
 
@@ -162,55 +156,54 @@ void AssembleOptimization::assemble_A_and_F()
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-
-    dof_map.dof_indices (elem, dof_indices);
-
-    const unsigned int n_dofs = dof_indices.size();
-
-    fe->reinit (elem);
-
-    Ke.resize (n_dofs,n_dofs);
-    Fe.resize (n_dofs);
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
-      for (unsigned int dof_i=0; dof_i<n_dofs; dof_i++)
-      {
-        for (unsigned int dof_j=0; dof_j<n_dofs; dof_j++)
+      const Elem * elem = *el;
+
+      dof_map.dof_indices (elem, dof_indices);
+
+      const unsigned int n_dofs = dof_indices.size();
+
+      fe->reinit (elem);
+
+      Ke.resize (n_dofs, n_dofs);
+      Fe.resize (n_dofs);
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          Ke(dof_i, dof_j) += JxW[qp] * (dphi[dof_j][qp]* dphi[dof_i][qp]);
+          for (unsigned int dof_i=0; dof_i<n_dofs; dof_i++)
+            {
+              for (unsigned int dof_j=0; dof_j<n_dofs; dof_j++)
+                {
+                  Ke(dof_i, dof_j) += JxW[qp] * (dphi[dof_j][qp]* dphi[dof_i][qp]);
+                }
+              Fe(dof_i) += JxW[qp] * phi[dof_i][qp];
+            }
         }
-        Fe(dof_i) += JxW[qp] * phi[dof_i][qp];
-      }
+
+      // This will zero off-diagonal entries of Ke corresponding to
+      // Dirichlet dofs.
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
+      // We want the diagonal of constrained dofs to be zero too
+      for (unsigned int local_dof_index=0; local_dof_index<n_dofs; local_dof_index++)
+        {
+          dof_id_type global_dof_index = dof_indices[local_dof_index];
+          if (dof_map.is_constrained_dof(global_dof_index))
+            {
+              Ke(local_dof_index, local_dof_index) = 0.;
+            }
+        }
+
+      A_matrix->add_matrix (Ke, dof_indices);
+      F_vector->add_vector (Fe, dof_indices);
     }
-
-    // This will zero off-diagonal entries of Ke corresponding to
-    // Dirichlet dofs.
-    dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-
-    // We want the diagonal of constrained dofs to be zero too
-    for(unsigned int local_dof_index=0; local_dof_index<n_dofs; local_dof_index++)
-    {
-      dof_id_type global_dof_index = dof_indices[local_dof_index];
-      if(dof_map.is_constrained_dof(global_dof_index))
-      {
-        Ke(local_dof_index,local_dof_index) = 0.;
-      }
-    }
-
-    A_matrix->add_matrix (Ke, dof_indices);
-    F_vector->add_vector (Fe, dof_indices);
-  }
 
   A_matrix->close();
   F_vector->close();
 }
 
-Number AssembleOptimization::objective (
-  const NumericVector<Number>& soln,
-  OptimizationSystem& /*sys*/)
+Number AssembleOptimization::objective (const NumericVector<Number> & soln,
+                                        OptimizationSystem & /*sys*/)
 {
   UniquePtr< NumericVector<Number> > AxU = soln.zero_clone();
 
@@ -223,10 +216,9 @@ Number AssembleOptimization::objective (
   return 0.5 * UTxAxU - UTxF;
 }
 
-void AssembleOptimization::gradient (
-  const NumericVector<Number>& soln,
-  NumericVector<Number>& grad_f,
-  OptimizationSystem& /*sys*/)
+void AssembleOptimization::gradient (const NumericVector<Number> & soln,
+                                     NumericVector<Number> & grad_f,
+                                     OptimizationSystem & /*sys*/)
 {
   grad_f.zero();
 
@@ -238,17 +230,16 @@ void AssembleOptimization::gradient (
 }
 
 
-void AssembleOptimization::hessian (
-  const NumericVector<Number>& /*soln*/,
-  SparseMatrix<Number>& H_f,
-  OptimizationSystem& /*sys*/)
+void AssembleOptimization::hessian (const NumericVector<Number> & /*soln*/,
+                                    SparseMatrix<Number> & H_f,
+                                    OptimizationSystem & /*sys*/)
 {
   H_f.zero();
   H_f.add(1., *A_matrix);
 }
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
@@ -291,7 +282,7 @@ int main (int argc, char** argv)
 
   EquationSystems equation_systems (mesh);
 
-  OptimizationSystem& system =
+  OptimizationSystem & system =
     equation_systems.add_system<OptimizationSystem> ("Optimization");
 
   // The default is to use PETSc/Tao solvers, but let the user change
@@ -313,8 +304,8 @@ int main (int argc, char** argv)
   AssembleOptimization assemble_opt(system);
 
   unsigned int u_var = system.add_variable("u",
-                       Utility::string_to_enum<Order>   (approx_order),
-                       Utility::string_to_enum<FEFamily>(fe_family));
+                                           Utility::string_to_enum<Order>   (approx_order),
+                                           Utility::string_to_enum<FEFamily>(fe_family));
 
   system.optimization_solver->objective_object = &assemble_opt;
   system.optimization_solver->gradient_object  = &assemble_opt;
@@ -359,9 +350,8 @@ int main (int argc, char** argv)
   system.optimization_solver->print_converged_reason();
 
   std::stringstream filename;
-  ExodusII_IO (mesh).write_equation_systems(
-    "optimization_soln.exo",
-    equation_systems);
+  ExodusII_IO (mesh).write_equation_systems("optimization_soln.exo",
+                                            equation_systems);
 
   return 0;
 }

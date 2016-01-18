@@ -37,7 +37,7 @@ private:
   /**
    * Keep a reference to the NonlinearImplicitSystem.
    */
-  NonlinearImplicitSystem& _sys;
+  NonlinearImplicitSystem & _sys;
 
   /**
    * The object that handles augmenting the sparsity pattern.
@@ -66,14 +66,13 @@ public:
   /**
    * Constructor.
    */
-  LinearElasticityWithContact(
-    NonlinearImplicitSystem &sys_in,
-    Real contact_penalty_in);
+  LinearElasticityWithContact(NonlinearImplicitSystem & sys_in,
+                              Real contact_penalty_in);
 
   /**
    * @return a reference to the object for augmenting the sparsity pattern.
    */
-  AugmentSparsityOnContact& get_augment_sparsity();
+  AugmentSparsityOnContact & get_augment_sparsity();
 
   /**
    * Update the penalty parameter.
@@ -88,28 +87,25 @@ public:
   /**
    * Kronecker delta function.
    */
-  Real kronecker_delta(
-    unsigned int i,
-    unsigned int j);
+  Real kronecker_delta(unsigned int i,
+                       unsigned int j);
 
   /**
    * Evaluate the fourth order tensor (C_ijkl) that relates stress to strain.
    */
-  Real elasticity_tensor(
-    Real young_modulus,
-    Real poisson_ratio,
-    unsigned int i,
-    unsigned int j,
-    unsigned int k,
-    unsigned int l);
+  Real elasticity_tensor(Real young_modulus,
+                         Real poisson_ratio,
+                         unsigned int i,
+                         unsigned int j,
+                         unsigned int k,
+                         unsigned int l);
 
   /**
    * Move the mesh nodes of \p input_mesh based on the displacement field
    * in \p input_solution.
    */
-  void move_mesh(
-    MeshBase& input_mesh,
-    const NumericVector<Number>& input_solution);
+  void move_mesh(MeshBase & input_mesh,
+                 const NumericVector<Number> & input_solution);
 
   /**
    * Set up the load paths on the contact surfaces.
@@ -119,11 +115,10 @@ public:
   /**
    * Evaluate the Jacobian of the nonlinear system.
    */
-  virtual void residual_and_jacobian (
-    const NumericVector<Number>& soln,
-    NumericVector<Number>* residual,
-    SparseMatrix<Number>* jacobian,
-    NonlinearImplicitSystem& /*sys*/);
+  virtual void residual_and_jacobian (const NumericVector<Number> & soln,
+                                      NumericVector<Number> * residual,
+                                      SparseMatrix<Number> * jacobian,
+                                      NonlinearImplicitSystem & /*sys*/);
 
   /**
    * Compute the Cauchy stress for the current solution.
@@ -136,13 +131,12 @@ public:
    * @return the largest change in the lambdas, and the largest
    * lambda value.
    */
-  std::pair<Real,Real> update_lambdas();
+  std::pair<Real, Real> update_lambdas();
 
   /**
    * @return the least and max gap function values for the current solution.
    */
-  std::pair<Real,Real> get_least_and_max_gap_function();
-
+  std::pair<Real, Real> get_least_and_max_gap_function();
 };
 
 #endif

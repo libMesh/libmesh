@@ -102,10 +102,12 @@
 using namespace libMesh;
 
 // Define a function to scale the mesh according to the parameter.
-void transform_mesh_and_plot(EquationSystems& es, Real curvature, const std::string& filename);
+void transform_mesh_and_plot(EquationSystems & es,
+                             Real curvature,
+                             const std::string & filename);
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -143,7 +145,7 @@ int main (int argc, char** argv)
   // Read the "online_mode" flag from the command line
   GetPot command_line (argc, argv);
   int online_mode = 0;
-  if ( command_line.search(1, "-online_mode") )
+  if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
   // Create a mesh, with dimension to be overridden by build_cube, on
@@ -184,7 +186,7 @@ int main (int argc, char** argv)
   eim_construction.set_rb_evaluation(eim_rb_eval);
   rb_construction.set_rb_evaluation(rb_eval);
 
-  if(!online_mode) // Perform the Offline stage of the RB method
+  if (!online_mode) // Perform the Offline stage of the RB method
     {
       // Read data from input file and print state
       eim_construction.process_parameters_file(eim_parameters);
@@ -229,11 +231,11 @@ int main (int argc, char** argv)
 #endif
 
       // Write out the basis functions, if requested
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Write out the basis functions
-          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
-          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction, "eim_data");
+          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction, "rb_data");
         }
     }
   else // Perform the Online stage of the RB method
@@ -267,36 +269,38 @@ int main (int argc, char** argv)
       online_mu.set_value("kappa", online_kappa);
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
-      rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+      rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
       // plot the solution, if requested
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // read in the data from files
-          eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
-          rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+          eim_rb_eval.read_in_basis_functions(eim_construction, "eim_data");
+          rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
           eim_construction.load_rb_solution();
           rb_construction.load_rb_solution();
 
-          transform_mesh_and_plot(equation_systems,online_curvature,"RB_sol.e");
+          transform_mesh_and_plot(equation_systems, online_curvature, "RB_sol.e");
         }
     }
 
   return 0;
 }
 
-void transform_mesh_and_plot(EquationSystems& es, Real curvature, const std::string& filename)
+void transform_mesh_and_plot(EquationSystems & es,
+                             Real curvature,
+                             const std::string & filename)
 {
   // Loop over the mesh nodes and move them!
-  MeshBase& mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
   const MeshBase::node_iterator node_end = mesh.nodes_end();
 
-  for( ; node_it != node_end; node_it++)
+  for ( ; node_it != node_end; node_it++)
     {
-      Node* node = *node_it;
+      Node * node = *node_it;
 
       Real x = (*node)(0);
       Real z = (*node)(2);

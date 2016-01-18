@@ -19,16 +19,17 @@ public:
   LaplaceQoI(){}
   virtual ~LaplaceQoI(){}
 
-  virtual void init_qoi( std::vector<Number>& sys_qoi );
+  virtual void init_qoi(std::vector<Number> & sys_qoi);
 
-  virtual void postprocess( ){}
+  virtual void postprocess() {}
 
-  virtual void element_qoi_derivative(DiffContext &context, const QoISet & qois);
+  virtual void element_qoi_derivative(DiffContext & context, const QoISet & qois);
 
-  virtual void element_qoi (DiffContext &context, const QoISet & qois);
+  virtual void element_qoi (DiffContext & context, const QoISet & qois);
 
-  virtual UniquePtr<DifferentiableQoI> clone( ) {
-    return UniquePtr<DifferentiableQoI> ( new LaplaceQoI(*this) );
+  virtual UniquePtr<DifferentiableQoI> clone()
+  {
+    return UniquePtr<DifferentiableQoI> (new LaplaceQoI(*this));
   }
 
 };

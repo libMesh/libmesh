@@ -9,11 +9,11 @@
 
 using namespace libMesh;
 
-void Biharmonic::Create(Biharmonic** b, const Parallel::Communicator &comm)
+void Biharmonic::Create(Biharmonic ** b, const Parallel::Communicator & comm)
 {
   // ParallelMesh doesn't yet understand periodic BCs
-  SerialMesh* mesh = new SerialMesh(comm);
-  Biharmonic *biharmonic = new Biharmonic(mesh);
+  SerialMesh * mesh = new SerialMesh(comm);
+  Biharmonic * biharmonic = new Biharmonic(mesh);
   *b = biharmonic;
 }
 
@@ -21,10 +21,10 @@ void Biharmonic::Create(Biharmonic** b, const Parallel::Communicator &comm)
 
 
 
-void Biharmonic::Destroy(Biharmonic** b)
+void Biharmonic::Destroy(Biharmonic ** b)
 {
-  Biharmonic* biharmonic = *b;
-  UnstructuredMesh* mesh = biharmonic->_mesh;
+  Biharmonic * biharmonic = *b;
+  UnstructuredMesh * mesh = biharmonic->_mesh;
   delete biharmonic;
   delete mesh;
   *b = NULL;
@@ -81,14 +81,14 @@ void Biharmonic::viewParameters()
 
 void Biharmonic::init()
 {
-  if(_verbose)
+  if (_verbose)
     libMesh::out << ">>> Initializing Biharmonic\n";
 
   _dt  =  0;
   _o_count = 0;
   this->EquationSystems::init();
 
-  if(_verbose)
+  if (_verbose)
     libMesh::out << "<<< Initializing Biharmonic\n";
 }
 
@@ -96,7 +96,7 @@ void Biharmonic::init()
 
 
 
-void Biharmonic::step(const Real& dt_in)
+void Biharmonic::step(const Real & dt_in)
 {
   // We need to update the old solution vector.
   // The old solution vector will be the current solution vector from the
@@ -115,7 +115,10 @@ void Biharmonic::step(const Real& dt_in)
 
 
 
-void Biharmonic::output(int timestep, const Real& t, Real& o_t, bool force)
+void Biharmonic::output(int timestep,
+                        const Real & t,
+                        Real & o_t,
+                        bool force)
 {
 #ifdef LIBMESH_HAVE_EXODUS_API
   if (!force && t - o_t < _o_dt)
@@ -124,7 +127,15 @@ void Biharmonic::output(int timestep, const Real& t, Real& o_t, bool force)
   ++_o_count;
 
   if (_verbose)
-    libMesh::out << "Writing state " << timestep << " at time " << t << " to file " << _ofile << "; output a total of " << _o_count << " states so far\n";
+    libMesh::out << "Writing state "
+                 << timestep
+                 << " at time "
+                 << t
+                 << " to file "
+                 << _ofile
+                 << "; output a total of "
+                 << _o_count
+                 << " states so far\n";
 
   _exio->write_timestep(_ofile, *this, timestep, t);
 
@@ -141,7 +152,7 @@ void Biharmonic::run()
   int timestep = 1;
 
   // Force-write the initial timestep
-  output(timestep,t,o_t,true);
+  output(timestep, t, o_t, true);
 
   while (t < _t1)
     {
@@ -158,31 +169,44 @@ void Biharmonic::run()
       t += _dt;
 
       // Output
-      output(timestep,t,o_t);
+      output(timestep, t, o_t);
     } // while(t < _t1)
 
   // Force-write the final timestep
-  output(timestep,t,o_t,true);
+  output(timestep, t, o_t, true);
 }
 
 
 
 
 
-Biharmonic::Biharmonic(UnstructuredMesh* m) :
+Biharmonic::Biharmonic(UnstructuredMesh * m) :
   EquationSystems(*m),
   _mesh(m)
 {
   // Retrieve parameters and set defaults
-  _verbose      = false; if(on_command_line("--verbose")) _verbose = true;
-  _growth       = false; if(on_command_line("--growth"))       _growth = true;
-  _degenerate   = false; if(on_command_line("--degenerate"))   _degenerate = true;
-  _cahn_hillard = false; if(on_command_line("--cahn_hillard")) _cahn_hillard = true;
-  _netforce     = false; if(on_command_line("--netforce"))     _netforce = true;
+  _verbose      = false;
+  _growth       = false;
+  _degenerate   = false;
+  _cahn_hillard = false;
+  _netforce     = false;
+
+  if (on_command_line("--verbose"))
+    _verbose = true;
+  if (on_command_line("--growth"))
+    _growth = true;
+  if (on_command_line("--degenerate"))
+    _degenerate = true;
+  if (on_command_line("--cahn_hillard"))
+    _cahn_hillard = true;
+  if (on_command_line("--netforce"))
+    _netforce = true;
+
   _kappa = command_line_value("kappa", 1.0);
 
   // "type of energy (double well, double obstacle, logarithmic+double well, logarithmic+double obstacle)"
   std::string energy = command_line_value("energy", std::string("double_well"));
+
   if (energy == "double_well")
     _energy = DOUBLE_WELL;
   else if (energy == "double_obstacle")
@@ -194,11 +218,11 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
   else
     libmesh_error_msg("Unknown energy type: " << energy);
 
-  _tol     = command_line_value("tol",1.0e-8);
+  _tol     = command_line_value("tol", 1.0e-8);
   _theta   = command_line_value("theta", .001);
-  _theta_c = command_line_value("theta_c",1.0);
+  _theta_c = command_line_value("theta_c", 1.0);
 
-  //"order of log truncation (0=none, 2=quadratic, 3=cubic)"
+  // "order of log truncation (0=none, 2=quadratic, 3=cubic)"
   _log_truncation = command_line_value("log_truncation", 2);
 
   if (!_log_truncation)
@@ -206,7 +230,7 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
 
 
   // Dimension
-  _dim = command_line_value("dim",1);
+  _dim = command_line_value("dim", 1);
 
   libmesh_assert_msg((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
 
@@ -246,6 +270,7 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
   // Initial state
   _initialState = STRIP;
   std::string initialState = command_line_value("initial_state", std::string("strip"));
+
   if (initialState == std::string("ball"))
     _initialState = BALL;
   else if (initialState == std::string("strip"))
@@ -270,7 +295,7 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
   for (unsigned int i = _dim; i < 3; ++i)
     icenter[i] = 0.0;
 
-  _initialCenter = Point(icenter[0],icenter[1], icenter[2]);
+  _initialCenter = Point(icenter[0], icenter[1], icenter[2]);
   _initialWidth = command_line_value("initial_width", 0.125);
 
   // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object

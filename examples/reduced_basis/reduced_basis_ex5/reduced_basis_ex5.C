@@ -71,13 +71,16 @@
 using namespace libMesh;
 
 // Define a function to scale the mesh according to the parameter.
-void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename);
+void scale_mesh_and_plot(EquationSystems & es,
+                         const RBParameters & mu,
+                         const std::string & filename);
 
 // Post-process the solution to compute stresses
-void compute_stresses(EquationSystems& es);
+void compute_stresses(EquationSystems & es);
 
 // The main program.
-int main(int argc, char** argv) {
+int main(int argc, char ** argv)
+{
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
@@ -99,21 +102,20 @@ int main(int argc, char** argv) {
   std::string parameters_filename = "reduced_basis_ex5.in";
   GetPot infile(parameters_filename);
 
-  unsigned int n_elem_x  = infile("n_elem_x",0);
-  unsigned int n_elem_y  = infile("n_elem_y",0);
-  unsigned int n_elem_z  = infile("n_elem_z",0);
-  Real x_size            = infile("x_size", 0.);
-  Real y_size            = infile("y_size", 0.);
-  Real z_size            = infile("z_size", 0.);
+  unsigned int n_elem_x = infile("n_elem_x", 0);
+  unsigned int n_elem_y = infile("n_elem_y", 0);
+  unsigned int n_elem_z = infile("n_elem_z", 0);
+  Real x_size           = infile("x_size", 0.);
+  Real y_size           = infile("y_size", 0.);
+  Real z_size           = infile("z_size", 0.);
 
   bool store_basis_functions = infile("store_basis_functions", true);
 
   // Read the "online_mode" flag from the command line
   GetPot command_line(argc, argv);
   int online_mode = 0;
-  if ( command_line.search(1, "-online_mode") ) {
+  if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
-  }
 
 
   Mesh mesh (init.comm(), dim);
@@ -131,25 +133,25 @@ int main(int argc, char** argv) {
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
       unsigned int side_max_x = 0, side_max_y = 0, side_max_z = 0;
       bool found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
-      for(unsigned int side=0; side<elem->n_sides(); side++)
+      for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
             {
               side_max_x = side;
               found_side_max_x = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -159,13 +161,13 @@ int main(int argc, char** argv) {
       // If elem has sides on boundaries
       // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
       // then let's set a node boundary condition
-      if(found_side_max_x && found_side_max_y && found_side_max_z)
+      if (found_side_max_x && found_side_max_y && found_side_max_z)
         {
-          for(unsigned int n=0; n<elem->n_nodes(); n++)
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
             {
               if (elem->is_node_on_side(n, side_max_x) &&
                   elem->is_node_on_side(n, side_max_y) &&
-                  elem->is_node_on_side(n, side_max_z) )
+                  elem->is_node_on_side(n, side_max_z))
                 {
                   mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
                 }
@@ -180,11 +182,11 @@ int main(int argc, char** argv) {
 
   // We override RBConstruction with ElasticityRBConstruction in order to
   // specialize a few functions for this particular problem.
-  ElasticityRBConstruction& rb_con =
+  ElasticityRBConstruction & rb_con =
     equation_systems.add_system<ElasticityRBConstruction>("RBElasticity");
 
   // Also, initialize an ExplicitSystem to store stresses
-  ExplicitSystem& stress_system =
+  ExplicitSystem & stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");
   stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
@@ -210,7 +212,7 @@ int main(int argc, char** argv) {
   // our RBEvaluation object
   rb_con.set_rb_evaluation(rb_eval);
 
-  if(!online_mode) // Perform the Offline stage of the RB method
+  if (!online_mode) // Perform the Offline stage of the RB method
     {
       // Use CG solver.  This echoes the Petsc command line options set
       // in run.sh, but also works for non-PETSc linear solvers.
@@ -241,7 +243,7 @@ int main(int argc, char** argv) {
 #endif
 
       // If requested, write out the RB basis functions for visualization purposes
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Write out the basis functions
           rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
@@ -277,9 +279,9 @@ int main(int argc, char** argv) {
       rb_eval.print_parameters();
 
       // Now do the Online solve using the precomputed reduced basis
-      rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+      rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
-      if(store_basis_functions)
+      if (store_basis_functions)
         {
           // Read in the basis functions
           rb_eval.read_in_basis_functions(rb_con);
@@ -287,7 +289,7 @@ int main(int argc, char** argv) {
           // Plot the solution
           rb_con.load_rb_solution();
 
-          const RBParameters& rb_eval_params = rb_eval.get_parameters();
+          const RBParameters & rb_eval_params = rb_eval.get_parameters();
           scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
         }
     }
@@ -295,17 +297,19 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
+void scale_mesh_and_plot(EquationSystems & es,
+                         const RBParameters & mu,
+                         const std::string & filename)
 {
   // Loop over the mesh nodes and move them!
-  MeshBase& mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
   const MeshBase::node_iterator node_end = mesh.nodes_end();
 
-  for( ; node_it != node_end; node_it++)
+  for ( ; node_it != node_end; node_it++)
     {
-      Node* node = *node_it;
+      Node * node = *node_it;
 
       (*node)(0) *= mu.get_value("x_scaling");
     }
@@ -320,23 +324,23 @@ void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std:
   // Loop over the mesh nodes and move them!
   node_it = mesh.nodes_begin();
 
-  for( ; node_it != node_end; node_it++)
+  for ( ; node_it != node_end; node_it++)
     {
-      Node* node = *node_it;
+      Node * node = *node_it;
 
       (*node)(0) /= mu.get_value("x_scaling");
     }
 }
 
-void compute_stresses(EquationSystems& es)
+void compute_stresses(EquationSystems & es)
 {
   START_LOG("compute_stresses()", "main");
 
-  const MeshBase& mesh = es.get_mesh();
+  const MeshBase & mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
 
-  ElasticityRBConstruction& system = es.get_system<ElasticityRBConstruction>("RBElasticity");
+  ElasticityRBConstruction & system = es.get_system<ElasticityRBConstruction>("RBElasticity");
 
   unsigned int displacement_vars[3];
   displacement_vars[0] = system.variable_number ("u");
@@ -344,18 +348,18 @@ void compute_stresses(EquationSystems& es)
   displacement_vars[2] = system.variable_number ("w");
   const unsigned int u_var = system.variable_number ("u");
 
-  const DofMap& dof_map = system.get_dof_map();
+  const DofMap & dof_map = system.get_dof_map();
   FEType fe_type = dof_map.variable_type(u_var);
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  const std::vector<Real> & JxW = fe->get_JxW();
+  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
   // Also, get a reference to the ExplicitSystem
-  ExplicitSystem& stress_system = es.get_system<ExplicitSystem>("StressSystem");
-  const DofMap& stress_dof_map = stress_system.get_dof_map();
+  ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
+  const DofMap & stress_dof_map = stress_system.get_dof_map();
   unsigned int sigma_vars[3][3];
   sigma_vars[0][0] = stress_system.variable_number ("sigma_00");
   sigma_vars[0][1] = stress_system.variable_number ("sigma_01");
@@ -369,7 +373,7 @@ void compute_stresses(EquationSystems& es)
   unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
-  std::vector< std::vector<dof_id_type> > dof_indices_var(system.n_vars());
+  std::vector<std::vector<dof_id_type> > dof_indices_var(system.n_vars());
   std::vector<dof_id_type> stress_dof_indices_var;
 
   // To store the stress tensor on each element
@@ -380,46 +384,37 @@ void compute_stresses(EquationSystems& es)
 
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;
+      const Elem * elem = *el;
 
-      for(unsigned int var=0; var<3; var++)
-        {
-          dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
-        }
+      for (unsigned int var=0; var<3; var++)
+        dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
 
       fe->reinit (elem);
 
-      elem_sigma.resize(3,3);
+      elem_sigma.resize(3, 3);
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        {
-          for(unsigned int C_i=0; C_i<3; C_i++)
-            for(unsigned int C_j=0; C_j<3; C_j++)
-              for(unsigned int C_k=0; C_k<3; C_k++)
-                {
-                  const unsigned int n_var_dofs = dof_indices_var[C_k].size();
+        for (unsigned int C_i=0; C_i<3; C_i++)
+          for (unsigned int C_j=0; C_j<3; C_j++)
+            for (unsigned int C_k=0; C_k<3; C_k++)
+              {
+                const unsigned int n_var_dofs = dof_indices_var[C_k].size();
 
-                  // Get the gradient at this quadrature point
-                  Gradient displacement_gradient;
-                  for(unsigned int l=0; l<n_var_dofs; l++)
-                    {
-                      displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
-                    }
+                // Get the gradient at this quadrature point
+                Gradient displacement_gradient;
+                for (unsigned int l=0; l<n_var_dofs; l++)
+                  displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
 
-                  for(unsigned int C_l=0; C_l<3; C_l++)
-                    {
-                      elem_sigma(C_i,C_j) += JxW[qp]*( elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
-                    }
-
-                }
-        }
+                for (unsigned int C_l=0; C_l<3; C_l++)
+                  elem_sigma(C_i,C_j) += JxW[qp] * (elasticity_tensor(C_i, C_j, C_k, C_l) * displacement_gradient(C_l));
+              }
 
       // Get the average stresses by dividing by the element volume
       elem_sigma.scale(1./elem->volume());
 
       // load elem_sigma data into stress_system
-      for(unsigned int i=0; i<3; i++)
-        for(unsigned int j=0; j<3; j++)
+      for (unsigned int i=0; i<3; i++)
+        for (unsigned int j=0; j<3; j++)
           {
             stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
 
@@ -427,8 +422,8 @@ void compute_stresses(EquationSystems& es)
             // one dof index per variable
             dof_id_type dof_index = stress_dof_indices_var[0];
 
-            if( (stress_system.solution->first_local_index() <= dof_index) &&
-                (dof_index < stress_system.solution->last_local_index()) )
+            if ((stress_system.solution->first_local_index() <= dof_index) &&
+                (dof_index < stress_system.solution->last_local_index()))
               {
                 stress_system.solution->set(dof_index, elem_sigma(i,j));
               }
@@ -436,15 +431,15 @@ void compute_stresses(EquationSystems& es)
           }
 
       // Also, the von Mises stress
-      Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
-                                               pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
-                                               pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
-                                               6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
-                                               ) );
+      Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
+                                             pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                             6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                             ));
       stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
       dof_id_type dof_index = stress_dof_indices_var[0];
-      if( (stress_system.solution->first_local_index() <= dof_index) &&
-          (dof_index < stress_system.solution->last_local_index()) )
+      if ((stress_system.solution->first_local_index() <= dof_index) &&
+          (dof_index < stress_system.solution->last_local_index()))
         {
           stress_system.solution->set(dof_index, vonMises_value);
         }

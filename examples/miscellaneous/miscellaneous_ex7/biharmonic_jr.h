@@ -35,36 +35,52 @@ public:
   /**
    * Constructor.
    */
-  JR(EquationSystems& eqSys, const std::string& name, const unsigned int number);
+  JR(EquationSystems & eqSys,
+     const std::string & name,
+     const unsigned int number);
 
   void initialize();
 
   /**
    * Static functions to be used for initialization
    */
-  static Number InitialDensityBall(const Point& p, const Parameters& parameters, const std::string&, const std::string&);
-  static Number InitialDensityRod(const Point& p, const Parameters& parameters, const std::string&, const std::string&);
-  static Number InitialDensityStrip(const Point& p, const Parameters& parameters, const std::string&, const std::string&);
-  static Gradient InitialGradientZero(const Point&, const Parameters&, const std::string&, const std::string&);
+  static Number InitialDensityBall(const Point & p,
+                                   const Parameters & parameters,
+                                   const std::string &,
+                                   const std::string &);
+
+  static Number InitialDensityRod(const Point & p,
+                                  const Parameters & parameters,
+                                  const std::string &,
+                                  const std::string &);
+
+  static Number InitialDensityStrip(const Point & p,
+                                    const Parameters & parameters,
+                                    const std::string &,
+                                    const std::string &);
+
+  static Gradient InitialGradientZero(const Point &,
+                                      const Parameters &,
+                                      const std::string &,
+                                      const std::string &);
 
   /**
    * The residual and Jacobian assembly function for the Biharmonic system.
    */
-  void residual_and_jacobian(const NumericVector<Number>& u,
-                             NumericVector<Number>* R,
-                             SparseMatrix<Number>* J,
-                             NonlinearImplicitSystem&);
-
+  void residual_and_jacobian(const NumericVector<Number> & u,
+                             NumericVector<Number> * R,
+                             SparseMatrix<Number> * J,
+                             NonlinearImplicitSystem &);
 
   /**
    * Function defining the bounds of the Biharmonic system.
    */
-  void bounds(NumericVector<Number>& XL,
-              NumericVector<Number>& XU,
-              NonlinearImplicitSystem&);
+  void bounds(NumericVector<Number> & XL,
+              NumericVector<Number> & XU,
+              NonlinearImplicitSystem &);
 
 private:
-  Biharmonic& _biharmonic;
+  Biharmonic & _biharmonic;
 };
 
 

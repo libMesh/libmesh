@@ -33,9 +33,9 @@
 using namespace libMesh;
 
 // Print usage information if requested on command line
-void print_help(int argc, char** argv);
+void print_help(int argc, char ** argv);
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -52,13 +52,13 @@ int main(int argc, char** argv)
       // This is a PETSc-specific solver
       libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
-      const int dim = command_line_value("dim",1);
+      const int dim = command_line_value("dim", 1);
 
       // Skip higher-dimensional examples on a lower-dimensional libMesh build
       libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
-      Biharmonic* biharmonic;
-      Biharmonic::Create(&biharmonic,init.comm());
+      Biharmonic * biharmonic;
+      Biharmonic::Create(&biharmonic, init.comm());
       biharmonic->viewParameters();
       biharmonic->init();
       biharmonic->run();
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
 
 
-void print_help(int, char** argv)
+void print_help(int, char ** argv)
 {
   libMesh::out << "This example solves the Cahn-Hillard equation with chemical potential f:\n"
                << "    u_t = \\div(M(u)\\grad f(u))\n"

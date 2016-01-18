@@ -64,7 +64,7 @@ using namespace libMesh;
 
 
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
@@ -73,10 +73,10 @@ int main (int argc, char** argv)
 
   // A brief message to the user to inform her of the
   // exact name of the program being run, and its command line.
-  std::cout << "Running " << argv[0];
+  libMesh::out << "Running " << argv[0];
   for (int i=1; i<argc; i++)
-    std::cout << " " << argv[i];
-  std::cout << std::endl << std::endl;
+    libMesh::out << " " << argv[i];
+  libMesh::out << std::endl << std::endl;
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
@@ -155,8 +155,8 @@ int main (int argc, char** argv)
   if (argc > 1)
     if (argv[1][0] != '-')
       {
-        std::cout << "<<< Writing system to file " << argv[1]
-                  << std::endl;
+        libMesh::out << "<<< Writing system to file " << argv[1]
+                     << std::endl;
 
         // Write the system.
         equation_systems.write (argv[1], WRITE);
@@ -164,8 +164,8 @@ int main (int argc, char** argv)
         // Clear the equation systems data structure.
         equation_systems.clear ();
 
-        std::cout << ">>> Reading system from file " << argv[1]
-                  << std::endl << std::endl;
+        libMesh::out << ">>> Reading system from file " << argv[1]
+                     << std::endl << std::endl;
 
         // Read the file we just wrote.  This better
         // work!

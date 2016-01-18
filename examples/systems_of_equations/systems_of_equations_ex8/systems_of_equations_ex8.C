@@ -57,7 +57,7 @@
 
 using namespace libMesh;
 
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
@@ -90,24 +90,30 @@ int main (int argc, char** argv)
 
   EquationSystems equation_systems (mesh);
 
-  NonlinearImplicitSystem& system =
+  NonlinearImplicitSystem & system =
     equation_systems.add_system<NonlinearImplicitSystem> ("NonlinearElasticity");
 
   LinearElasticityWithContact le(system, contact_penalty);
 
-  unsigned int u_var = system.add_variable("u",
-                      Utility::string_to_enum<Order>   (approx_order),
-                      Utility::string_to_enum<FEFamily>(fe_family));
-  unsigned int v_var = system.add_variable("v",
-                      Utility::string_to_enum<Order>   (approx_order),
-                      Utility::string_to_enum<FEFamily>(fe_family));
-  unsigned int w_var = system.add_variable("w",
-                      Utility::string_to_enum<Order>   (approx_order),
-                      Utility::string_to_enum<FEFamily>(fe_family));
+  unsigned int u_var =
+    system.add_variable("u",
+                        Utility::string_to_enum<Order>   (approx_order),
+                        Utility::string_to_enum<FEFamily>(fe_family));
+
+  unsigned int v_var =
+    system.add_variable("v",
+                        Utility::string_to_enum<Order>   (approx_order),
+                        Utility::string_to_enum<FEFamily>(fe_family));
+
+  unsigned int w_var =
+    system.add_variable("w",
+                        Utility::string_to_enum<Order>   (approx_order),
+                        Utility::string_to_enum<FEFamily>(fe_family));
 
   // Also, initialize an ExplicitSystem to store stresses
-  ExplicitSystem& stress_system =
+  ExplicitSystem & stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");
+
   stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
@@ -116,9 +122,9 @@ int main (int argc, char** argv)
   stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
   stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
 
-  equation_systems.parameters.set<Real>         ("nonlinear solver absolute residual tolerance") = nonlinear_abs_tol;
-  equation_systems.parameters.set<Real>         ("nonlinear solver relative residual tolerance") = nonlinear_rel_tol;
-  equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations")          = nonlinear_max_its;
+  equation_systems.parameters.set<Real> ("nonlinear solver absolute residual tolerance") = nonlinear_abs_tol;
+  equation_systems.parameters.set<Real> ("nonlinear solver relative residual tolerance") = nonlinear_rel_tol;
+  equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = nonlinear_max_its;
 
   system.nonlinear_solver->residual_and_jacobian_object = &le;
 
@@ -137,8 +143,7 @@ int main (int argc, char** argv)
 
     ZeroFunction<Number> zero;
 
-    system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (clamped_boundaries, uvw, &zero));
+    system.get_dof_map().add_dirichlet_boundary(DirichletBoundary (clamped_boundaries, uvw, &zero));
   }
   {
     std::set<boundary_id_type> clamped_boundaries;
@@ -150,8 +155,7 @@ int main (int argc, char** argv)
 
     ZeroFunction<Number> zero;
 
-    system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (clamped_boundaries, uv, &zero));
+    system.get_dof_map().add_dirichlet_boundary(DirichletBoundary (clamped_boundaries, uv, &zero));
   }
   {
     std::set<boundary_id_type> clamped_boundaries;
@@ -162,8 +166,7 @@ int main (int argc, char** argv)
 
     ConstFunction<Number> neg_one(-1.);
 
-    system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (clamped_boundaries, w, &neg_one));
+    system.get_dof_map().add_dirichlet_boundary(DirichletBoundary (clamped_boundaries, w, &neg_one));
   }
 
   le.initialize_contact_load_paths();
@@ -179,28 +182,32 @@ int main (int argc, char** argv)
   Real current_max_gap_function = std::numeric_limits<Real>::max();
 
   unsigned int outer_iteration = 0;
-  while( current_max_gap_function > gap_function_tol )
-  {
-    libMesh::out << "Starting outer iteration " << outer_iteration << std::endl;
+  while (current_max_gap_function > gap_function_tol)
+    {
+      libMesh::out << "Starting outer iteration " << outer_iteration << std::endl;
 
-    // Perform inner iteration (i.e. Newton's method loop)
-    system.solve();
-    system.nonlinear_solver->print_converged_reason();
+      // Perform inner iteration (i.e. Newton's method loop)
+      system.solve();
+      system.nonlinear_solver->print_converged_reason();
 
-    // Perform augmented Lagrangian update
-    le.update_lambdas();
+      // Perform augmented Lagrangian update
+      le.update_lambdas();
 
-    std::pair<Real,Real> least_and_max_gap_function = le.get_least_and_max_gap_function();
-    Real least_gap_fn = least_and_max_gap_function.first;
-    Real max_gap_fn = least_and_max_gap_function.second;
-    libMesh::out << "Finished outer iteration, least gap function: "
-      << least_gap_fn << ", max gap function: "
-      << max_gap_fn << std::endl << std::endl;
+      std::pair<Real, Real> least_and_max_gap_function = le.get_least_and_max_gap_function();
+      Real least_gap_fn = least_and_max_gap_function.first;
+      Real max_gap_fn = least_and_max_gap_function.second;
 
-    current_max_gap_function = std::max( std::abs(least_gap_fn), std::abs(max_gap_fn) );
+      libMesh::out << "Finished outer iteration, least gap function: "
+                   << least_gap_fn
+                   << ", max gap function: "
+                   << max_gap_fn
+                   << std::endl
+                   << std::endl;
 
-    outer_iteration++;
-  }
+      current_max_gap_function = std::max(std::abs(least_gap_fn), std::abs(max_gap_fn));
+
+      outer_iteration++;
+    }
 
   libMesh::out << "Computing stresses..." << std::endl;
 
@@ -208,9 +215,8 @@ int main (int argc, char** argv)
 
   std::stringstream filename;
   filename << "solution.exo";
-  ExodusII_IO (mesh).write_equation_systems(
-    filename.str(),
-    equation_systems);
+  ExodusII_IO (mesh).write_equation_systems(filename.str(),
+                                            equation_systems);
 
   return 0;
 }
