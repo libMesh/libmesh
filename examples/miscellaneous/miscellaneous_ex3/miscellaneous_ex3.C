@@ -107,13 +107,6 @@ public:
    *
    * where delta_u is the search direction, and 0 < gamma <= 1 is a
    * damping parameter.  gamma=1 corresponds to a full Newton step.
-   * We can rewrite this in a slightly more convenient way as:
-   *
-   * u_new <-- u_old + gamma*delta_u
-   *       <-- u_old + gamma*delta_u + delta_u - delta_u    (add/subtract delta_u)
-   *       <-- u_old + delta_u + (gamma-1)*delta_u
-   *       <-- u_old + (u_new - u_old) + (gamma-1)*delta_u
-   *       <-- u_new + (gamma-1)*delta_u
    *
    * This is really for demonstration purposes only, as it just
    * degrades the rate of nonlinear convergence in this particular
@@ -601,7 +594,7 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
 
 
 // Jacobian assembly function for the Laplace-Young system
-void LaplaceYoung::postcheck (const NumericVector<Number> & /*old_soln*/,
+void LaplaceYoung::postcheck (const NumericVector<Number> & old_soln,
                               NumericVector<Number> & search_direction,
                               NumericVector<Number> & new_soln,
                               bool & /*changed_search_direction*/,
@@ -611,6 +604,18 @@ void LaplaceYoung::postcheck (const NumericVector<Number> & /*old_soln*/,
   // Back up along the search direction by some amount.  Since Newton
   // already works well for this problem, the only affect of this is
   // to degrade the rate of convergence.
-  new_soln.add(_gamma - 1., search_direction);
-  changed_new_soln = true;
+  //
+  // The minus sign is due to the sign of the "search_direction"
+  // vector which comes in from the Newton solve. The RHS of the
+  // nonlinear system, i.e. the residual, is generally not multiplied
+  // by -1, so the solution vector, i.e. the search_direction, has a
+  // factor -1.
+  if (_gamma != 1.0)
+    {
+      new_soln = old_soln;
+      new_soln.add(-_gamma, search_direction);
+      changed_new_soln = true;
+    }
+  else
+    changed_new_soln = false;
 }
