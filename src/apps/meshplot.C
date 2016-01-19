@@ -73,6 +73,14 @@ int main(int argc, char ** argv)
     ExodusII_IO(mesh).write_equation_systems (outputname, es);
   else if (outputname.find(".n") != std::string::npos)
     Nemesis_IO(mesh).write_equation_systems (outputname, es);
+  else if ((outputname.find(".xda") != std::string::npos) ||
+           (outputname.find(".xdr") != std::string::npos))
+    {
+      mesh.write(outputname);
+      es.write(outputname);
+    }
+  else
+    libmesh_error();
 
   STOP_LOG("write_equation_systems()", "main");
   libMesh::out << "Wrote output " << outputname << std::endl;
