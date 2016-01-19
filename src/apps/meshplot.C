@@ -25,13 +25,10 @@ int main(int argc, char ** argv)
   EquationSystems es(mesh);
 
   if (argc < 3 || argc > 4)
-    {
-      libMesh::out << "Usage: " << argv[0]
-                   << " inputmesh [inputsolution] outputplot"
-                   << std::endl;
+    libmesh_error_msg
+      ("Usage: " << argv[0] <<
+       " inputmesh [inputsolution] outputplot");
 
-      libmesh_error();
-    }
 
   START_LOG("mesh.read()", "main");
   mesh.read(argv[1]);
