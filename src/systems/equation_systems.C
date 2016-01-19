@@ -479,8 +479,6 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
                                             const FEType * type,
                                             const std::set<std::string> * system_names) const
 {
-  libmesh_assert (this->n_systems());
-
   unsigned int var_num=0;
 
   const_system_iterator       pos = _systems.begin();
@@ -674,8 +672,6 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
 
   // This function must be run on all processors at once
   parallel_object_only();
-
-  libmesh_assert (this->n_systems());
 
   const unsigned int dim = _mesh.mesh_dimension();
   const dof_id_type nn   = _mesh.n_nodes();

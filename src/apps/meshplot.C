@@ -24,8 +24,11 @@ int main(int argc, char ** argv)
   Mesh mesh(init.comm());
   EquationSystems es(mesh);
 
-  libMesh::out << "Usage: " << argv[0]
-               << " inputmesh inputsolution outputplot" << std::endl;
+  if (argc < 3 || argc > 4)
+    libmesh_error_msg
+      ("Usage: " << argv[0] <<
+       " inputmesh [inputsolution] outputplot");
+
 
   START_LOG("mesh.read()", "main");
   mesh.read(argv[1]);
@@ -33,20 +36,23 @@ int main(int argc, char ** argv)
   libMesh::out << "Loaded mesh " << argv[1] << std::endl;
   mesh.print_info();
 
-  START_LOG("es.read()", "main");
-  std::string solnname = argv[2];
+  if (argc > 3)
+    {
+      START_LOG("es.read()", "main");
+      std::string solnname = argv[2];
 
-  es.read(solnname,
-          EquationSystems::READ_HEADER |
-          EquationSystems::READ_DATA |
-          EquationSystems::READ_ADDITIONAL_DATA |
-          EquationSystems::READ_BASIC_ONLY);
-  STOP_LOG("es.read()", "main");
-  libMesh::out << "Loaded solution " << solnname << std::endl;
-  es.print_info();
+      es.read(solnname,
+              EquationSystems::READ_HEADER |
+              EquationSystems::READ_DATA |
+              EquationSystems::READ_ADDITIONAL_DATA |
+              EquationSystems::READ_BASIC_ONLY);
+      STOP_LOG("es.read()", "main");
+      libMesh::out << "Loaded solution " << solnname << std::endl;
+      es.print_info();
+    }
 
   START_LOG("write_equation_systems()", "main");
-  std::string outputname(argv[3]);
+  std::string outputname(argv[argc-1]);
 
   if (outputname.find(".gnuplot") != std::string::npos)
     GnuPlotIO(mesh).write_equation_systems (outputname, es);
@@ -64,6 +70,14 @@ int main(int argc, char ** argv)
     ExodusII_IO(mesh).write_equation_systems (outputname, es);
   else if (outputname.find(".n") != std::string::npos)
     Nemesis_IO(mesh).write_equation_systems (outputname, es);
+  else if ((outputname.find(".xda") != std::string::npos) ||
+           (outputname.find(".xdr") != std::string::npos))
+    {
+      mesh.write(outputname);
+      es.write(outputname);
+    }
+  else
+    libmesh_error();
 
   STOP_LOG("write_equation_systems()", "main");
   libMesh::out << "Wrote output " << outputname << std::endl;
