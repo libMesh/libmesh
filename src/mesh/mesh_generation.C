@@ -1499,8 +1499,34 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
   START_LOG("build_sphere()", "MeshTools::Generation");
 
-  // Clear the mesh and start from scratch
+  // Clear the mesh and start from scratch, but save the original
+  // mesh_dimension, since the original intent of this function was to
+  // allow the geometric entity (line, circle, ball, sphere)
+  // constructed to be determined by the mesh's dimension.
+  unsigned int orig_mesh_dimension = mesh.mesh_dimension();
   mesh.clear();
+  mesh.set_mesh_dimension(orig_mesh_dimension);
+
+  // If mesh.mesh_dimension()==1, it *could* be because the user
+  // constructed a Mesh without specifying a dimension (since this is
+  // allowed now) and hence it got the default dimension of 1.  In
+  // this case, we will try to infer the dimension they *really*
+  // wanted from the requested ElemType, and if they don't match, go
+  // with the ElemType.
+  if (mesh.mesh_dimension() == 1)
+    {
+      if (type==HEX8 || type==HEX27)
+        mesh.set_mesh_dimension(3);
+
+      else if (type==TRI3 || type==QUAD4)
+        mesh.set_mesh_dimension(2);
+
+      else if (type==EDGE2 || type==EDGE3 || type==EDGE4 || type==INVALID_ELEM)
+        mesh.set_mesh_dimension(1);
+
+      else
+        libmesh_error_msg("build_sphere(): Please specify a mesh dimension or a valid ElemType (EDGE{2,3,4}, TRI3, QUAD4, HEX{8,27})");
+    }
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
