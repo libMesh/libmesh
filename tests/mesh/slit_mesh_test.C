@@ -343,7 +343,9 @@ public:
     SlitFunc slitfunc;
 
     _mesh->write("slit_mesh.xda");
-    _es->write("slit_solution.xda");
+    _es->write("slit_solution.xda",
+               EquationSystems::WRITE_DATA |
+               EquationSystems::WRITE_SERIAL_FILES);
 
     Mesh mesh2(*TestCommWorld);
     mesh2.read("slit_mesh.xda");
