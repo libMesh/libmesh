@@ -220,7 +220,7 @@ public:
    * to the l1-norm for vectors, i.e.
    * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
    */
-  virtual Real l1_norm () const libmesh_override { libmesh_not_implemented(); return 0.; }
+  virtual Real l1_norm () const libmesh_override;
 
   /**
    * Return the linfty-norm of the
@@ -233,7 +233,7 @@ public:
    * to the linfty-norm of vectors, i.e.
    * \f$|Mv|_\infty \leq |M|_\infty |v|_\infty\f$.
    */
-  virtual Real linfty_norm () const libmesh_override { libmesh_not_implemented(); return 0.; }
+  virtual Real linfty_norm () const libmesh_override;
 
   /**
    * see if Eigen matrix has been closed

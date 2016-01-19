@@ -294,6 +294,50 @@ T EigenSparseMatrix<T>::operator () (const numeric_index_type i,
 
 
 
+template <typename T>
+Real EigenSparseMatrix<T>::l1_norm () const
+{
+  // There does not seem to be a straightforward way to iterate over
+  // the columns of an EigenSparseMatrix.  So we use some extra
+  // storage and keep track of the column sums while going over the
+  // row entries...
+  std::vector<Real> abs_col_sums(this->n());
+
+  // For a row-major Eigen SparseMatrix like we're using, the
+  // InnerIterator iterates over the non-zero entries of rows.
+  for (unsigned row=0; row<this->m(); ++row)
+    {
+      EigenSM::InnerIterator it(_mat, row);
+      for (; it; ++it)
+        abs_col_sums[it.col()] += std::abs(it.value());
+    }
+
+  return *(std::max_element(abs_col_sums.begin(), abs_col_sums.end()));
+}
+
+
+
+template <typename T>
+Real EigenSparseMatrix<T>::linfty_norm () const
+{
+  Real max_abs_row_sum = 0.;
+
+  // For a row-major Eigen SparseMatrix like we're using, the
+  // InnerIterator iterates over the non-zero entries of rows.
+  for (unsigned row=0; row<this->m(); ++row)
+    {
+      Real current_abs_row_sum = 0.;
+      EigenSM::InnerIterator it(_mat, row);
+      for (; it; ++it)
+        current_abs_row_sum += std::abs(it.value());
+
+      max_abs_row_sum = std::max(max_abs_row_sum, current_abs_row_sum);
+    }
+
+  return max_abs_row_sum;
+}
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class EigenSparseMatrix<Number>;
