@@ -73,8 +73,8 @@ int main(int argc, char ** argv)
   else if ((outputname.find(".xda") != std::string::npos) ||
            (outputname.find(".xdr") != std::string::npos))
     {
-      mesh.write(outputname);
-      es.write(outputname);
+      mesh.write("mesh-"+outputname);
+      es.write("soln-"+outputname);
     }
   else
     libmesh_error();
