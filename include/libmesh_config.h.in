@@ -39,6 +39,9 @@
 /* SVN revision */
 #undef BUILD_VERSION
 
+/* define if the compiler has a broken errno_t */
+#undef COMPILER_HAS_BROKEN_ERRNO_T
+
 /* Configuration information. */
 #undef CONFIGURE_INFO
 
