@@ -23,6 +23,16 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"  // for libmesh_assert
 
+// We ran across a very strange issue with hand-built GCC 5.2.0 on OSX
+// with C++11 disabled, in which the "errno_t" type was not defined.
+// This is an attempt to fix that issue without unduly affecting other
+// compilers and build configurations.
+#if !defined(LIBMESH_HAVE_CXX11) && defined(__APPLE__) && defined(__GNUC__)
+# if (__GNUC__ == 5 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 0)
+typedef int errno_t;
+# endif
+#endif
+
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API
 #  include "libmesh/libmesh_logging.h" // only mess with the perflog if we are really multithreaded
