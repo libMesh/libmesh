@@ -38,7 +38,11 @@ using namespace libMesh;
 
 namespace ElemDataStrings
 {
+// GCC 5.2.0 warns about overlength strings in the auto-generated
+// reference_elem.data file.
+#pragma GCC diagnostic ignored "-Woverlength-strings"
 #include "reference_elem.data"
+#pragma GCC diagnostic warning "-Woverlength-strings"
 }
 
 typedef Threads::spin_mutex InitMutex;
