@@ -248,11 +248,7 @@ void process_cmd_line(int argc,
             if (names.empty())
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Input name must preceed output name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Input name must preceed output name!");
             break;
           }
 
@@ -264,11 +260,7 @@ void process_cmd_line(int argc,
             if (!names.empty())
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Input name must preceed output name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Input name must preceed output name!");
             break;
           }
 
@@ -280,11 +272,7 @@ void process_cmd_line(int argc,
             if (names.size() == 2)
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Input and output names must preceed solution name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Input and output names must preceed solution name!");
             break;
           }
 
@@ -359,11 +347,7 @@ void process_cmd_line(int argc,
         case 'b':
           {
             if (b_mesh_B_given)
-              {
-                libMesh::out << "ERROR: Do not use -b and -B concurrently!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Do not use -b and -B concurrently!");
 
             b_mesh_b_given = true;
             write_bndry = BM_MESH_ONLY;
@@ -377,11 +361,7 @@ void process_cmd_line(int argc,
         case 'B':
           {
             if (b_mesh_b_given)
-              {
-                libMesh::out << "ERROR: Do not use -b and -B concurrently!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Do not use -b and -B concurrently!");
 
             b_mesh_B_given = true;
             write_bndry = BM_WITH_MESHDATA;
@@ -602,18 +582,12 @@ int main (int argc, char ** argv)
   if(addinfelems)
     {
       if (names.size() == 3)
-        {
-          libMesh::out << "ERROR: Invalid combination: Building infinite elements " << std::endl
-                       << "not compatible with solution import." << std::endl;
-          exit(1);
-        }
+        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
+                          << "not compatible with solution import.");
 
       if (write_bndry != BM_DISABLED)
-        {
-          libMesh::out << "ERROR: Invalid combination: Building infinite elements " << std::endl
-                       << "not compatible with writing boundary conditions." << std::endl;
-          exit(1);
-        }
+        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
+                          << "not compatible with writing boundary conditions.");
 
       /*
        * Sanity checks: -X/Y/Z can only be used, when the
@@ -622,19 +596,14 @@ int main (int argc, char ** argv)
       if ((x_sym && !origin_x.first) ||     // claim x-symmetry, but x-coordinate of origin not given!
           (y_sym && !origin_y.first) ||     // the same for y
           (z_sym && !origin_z.first))       // the same for z
-        {
-          libMesh::out << "ERROR: When x-symmetry is requested using -X, then" << std::endl
-                       << "the option -x <coord> also has to be given." << std::endl
-                       << "This holds obviously for y and z, too." << std::endl;
-          exit(1);
-        }
-
+        libmesh_error_msg("ERROR: When x-symmetry is requested using -X, then\n"
+                          << "the option -x <coord> also has to be given.\n"
+                          << "This holds obviously for y and z, too.");
 
       // build infinite elements
       InfElemBuilder(mesh).build_inf_elem(origin_x, origin_y, origin_z,
                                           x_sym, y_sym, z_sym,
                                           verbose);
-
 
       if (verbose)
         {
@@ -645,13 +614,10 @@ int main (int argc, char ** argv)
     }
 
   // sanity check
-  else if((origin_x.first ||  origin_y.first || origin_z.first) ||
-          (x_sym          ||  y_sym          || z_sym))
-    {
-      libMesh::out << "ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when" << std::endl
-                   << "the option -a is also specified!" << std::endl;
-      exit(1);
-    }
+  else if ((origin_x.first ||  origin_y.first || origin_z.first) ||
+           (x_sym          ||  y_sym          || z_sym))
+    libmesh_error_msg("ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when\n"
+                      << "the option -a is also specified!");
 
 #endif
 
@@ -690,8 +656,11 @@ int main (int argc, char ** argv)
 
       // What are the quality bounds for this element?
       std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(quality_type);
-      libMesh::out << "Quality bounds for this element type are: (" << bounds.first
-                   << ", " << bounds.second << ") "
+      libMesh::out << "Quality bounds for this element type are: ("
+                   << bounds.first
+                   << ", "
+                   << bounds.second
+                   << ") "
                    << std::endl;
 
       MeshBase::const_element_iterator it  = mesh.active_elements_begin(),
