@@ -240,15 +240,19 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
       for (unsigned int var=0; var<n_vars; var++)
         {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
-                          error_estimator.error_norm.type(var) == H1_SEMINORM ||
-                          error_estimator.error_norm.type(var) == H2_SEMINORM ||
-                          error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
-                          error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
-                          error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
-                          error_estimator.error_norm.type(var) == L_INF ||
-                          error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
-                          error_estimator.error_norm.type(var) == W2_INF_SEMINORM);
+#ifdef DEBUG
+          bool is_valid_norm_type =
+            error_estimator.error_norm.type(var) == L2 ||
+            error_estimator.error_norm.type(var) == H1_SEMINORM ||
+            error_estimator.error_norm.type(var) == H2_SEMINORM ||
+            error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+            error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+            error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
+            error_estimator.error_norm.type(var) == L_INF ||
+            error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+            error_estimator.error_norm.type(var) == W2_INF_SEMINORM;
+          libmesh_assert (is_valid_norm_type);
+#endif // DEBUG
 #else
           libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
                           error_estimator.error_norm.type(var) == L_INF ||
@@ -258,26 +262,34 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                           error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
                           error_estimator.error_norm.type(var) == W1_INF_SEMINORM);
 #endif
+
+
+#ifdef DEBUG
           if (var > 0)
-            // We can't mix L_inf and L_2 norms
-            libmesh_assert (((error_estimator.error_norm.type(var) == L2 ||
-                              error_estimator.error_norm.type(var) == H1_SEMINORM ||
-                              error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
-                              error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
-                              error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
-                              error_estimator.error_norm.type(var) == H2_SEMINORM) &&
-                             (error_estimator.error_norm.type(var-1) == L2 ||
-                              error_estimator.error_norm.type(var-1) == H1_SEMINORM ||
-                              error_estimator.error_norm.type(var-1) == H1_X_SEMINORM ||
-                              error_estimator.error_norm.type(var-1) == H1_Y_SEMINORM ||
-                              error_estimator.error_norm.type(var-1) == H1_Z_SEMINORM ||
-                              error_estimator.error_norm.type(var-1) == H2_SEMINORM)) ||
-                            ((error_estimator.error_norm.type(var) == L_INF ||
-                              error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
-                              error_estimator.error_norm.type(var) == W2_INF_SEMINORM) &&
-                             (error_estimator.error_norm.type(var-1) == L_INF ||
-                              error_estimator.error_norm.type(var-1) == W1_INF_SEMINORM ||
-                              error_estimator.error_norm.type(var-1) == W2_INF_SEMINORM)));
+            {
+              // We can't mix L_inf and L_2 norms
+              bool is_valid_norm_type =
+                ((error_estimator.error_norm.type(var) == L2 ||
+                  error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                  error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+                  error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+                  error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
+                  error_estimator.error_norm.type(var) == H2_SEMINORM) &&
+                 (error_estimator.error_norm.type(var-1) == L2 ||
+                  error_estimator.error_norm.type(var-1) == H1_SEMINORM ||
+                  error_estimator.error_norm.type(var-1) == H1_X_SEMINORM ||
+                  error_estimator.error_norm.type(var-1) == H1_Y_SEMINORM ||
+                  error_estimator.error_norm.type(var-1) == H1_Z_SEMINORM ||
+                  error_estimator.error_norm.type(var-1) == H2_SEMINORM)) ||
+                ((error_estimator.error_norm.type(var) == L_INF ||
+                  error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+                  error_estimator.error_norm.type(var) == W2_INF_SEMINORM) &&
+                 (error_estimator.error_norm.type(var-1) == L_INF ||
+                  error_estimator.error_norm.type(var-1) == W1_INF_SEMINORM ||
+                  error_estimator.error_norm.type(var-1) == W2_INF_SEMINORM));
+              libmesh_assert (is_valid_norm_type);
+            }
+#endif // DEBUG
 
           // Possibly skip this variable
           if (error_estimator.error_norm.weight(var) == 0.0) continue;
