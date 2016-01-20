@@ -154,25 +154,32 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
       // Even if we're not in DEBUG mode, when we're verifying
       // analytic jacobians we'll want to verify each side's
       // jacobian contribution separately.
-      /* PB: We also need to account for the case when the user wants to
-         use numerical Jacobians and not analytic Jacobians */
-      if ( (_sys.verify_analytic_jacobians != 0.0 && need_jacobian) ||
-           (!jacobian_computed && need_jacobian) )
+      if (_sys.verify_analytic_jacobians != 0.0 && need_jacobian)
 #endif // ifndef DEBUG
         {
           old_jacobian = _femcontext.get_elem_jacobian();
           _femcontext.get_elem_jacobian().zero();
         }
+
       jacobian_computed =
         _sys.time_solver->side_residual(need_jacobian, _femcontext);
 
       // Compute a numeric jacobian if we have to
       if (need_jacobian && !jacobian_computed)
         {
-          // In DEBUG mode, we've already set elem_jacobian == 0,
-          // so we can make sure side_residual didn't compute a
-          // jacobian and lie about it
-          libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+          // If we have already backed up old_jacobian,
+          // we can make sure side_residual didn't compute a
+          // jacobian and lie about it.
+          //
+          // If we haven't, then we need to, to let
+          // numerical_side_jacobian work.
+          if (old_jacobian.m())
+            libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+          else
+            {
+              old_jacobian = _femcontext.get_elem_jacobian();
+              _femcontext.get_elem_jacobian().zero();
+            }
 
           // Logging of numerical jacobians is done separately
           _sys.numerical_side_jacobian(_femcontext);
@@ -183,8 +190,8 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
 
       // Compute a numeric jacobian if we're asked to verify the
       // analytic jacobian we got
-      if (need_jacobian && jacobian_computed &&
-          _sys.verify_analytic_jacobians != 0.0)
+      else if (need_jacobian && jacobian_computed &&
+               _sys.verify_analytic_jacobians != 0.0)
         {
           DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
 
@@ -228,11 +235,11 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
           // rest of the accumulated jacobian
           _femcontext.get_elem_jacobian() += old_jacobian;
         }
+
       // In DEBUG mode, we've set elem_jacobian == 0, and we
-      // may still need to add the old jacobian back
+      // may have yet to add the old jacobian back
 #ifdef DEBUG
-      if (need_jacobian && jacobian_computed &&
-          _sys.verify_analytic_jacobians == 0.0)
+      else
         {
           _femcontext.get_elem_jacobian() += old_jacobian;
         }

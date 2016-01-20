@@ -211,8 +211,6 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
   // We might need to save the old jacobian in case one of our physics
   // terms later is unable to update it analytically.
   DenseMatrix<Number> old_elem_jacobian(n_dofs, n_dofs);
-  if (request_jacobian)
-    old_elem_jacobian.swap(context.get_elem_jacobian());
 
   // Local velocity at old time step
   DenseVector<Number> old_elem_solution_rate(n_dofs);
@@ -260,6 +258,9 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
   // foward and is what you think it is
   else
     {
+      if (request_jacobian)
+        old_elem_jacobian.swap(context.get_elem_jacobian());
+
       // Local displacement at old timestep
       DenseVector<Number> old_elem_solution(n_dofs);
       for (unsigned int i=0; i != n_dofs; ++i)
