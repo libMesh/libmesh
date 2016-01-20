@@ -742,7 +742,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
     # GCC 4.6.3 warns about variadic macros but supports them just
     # fine, so let's turn off that warning.
     case "$GXX_VERSION" in
-      gcc4.6)
+      gcc4.6 | gcc5)
         CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
         CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"
