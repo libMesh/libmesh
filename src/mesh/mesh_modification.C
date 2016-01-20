@@ -287,7 +287,7 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
 
   // Only scale the y coordinate in 2 and 3D
-  if (mesh.spatial_dimension() < 2)
+  if (LIBMESH_DIM < 2)
     return;
 
   for (MeshBase::node_iterator nd = mesh.nodes_begin();
@@ -295,7 +295,7 @@ void MeshTools::Modification::scale (MeshBase & mesh,
     (**nd)(1) *= y_scale;
 
   // Only scale the z coordinate in 3D
-  if (mesh.spatial_dimension() < 3)
+  if (LIBMESH_DIM < 3)
     return;
 
   for (MeshBase::node_iterator nd = mesh.nodes_begin();

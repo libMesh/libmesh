@@ -24,6 +24,7 @@ unit_tests_sources = \
 	mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
