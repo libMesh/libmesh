@@ -45,53 +45,42 @@ using namespace libMesh;
 /**
  * how to use this, and command line processor
  */
-void usage(char * progName)
+void usage(const std::string & progName)
 {
-  std::string baseName;
-  static std::string helpList =
-    "usage:\n"
-    "        %s [options] ...\n"
-    "\n"
-    "options:\n"
-    "    -d <dim>                      <dim>-dimensional mesh\n"
-    "    -m <string>                   Mesh file name\n"
-    "    -l <string>                   Left Equation Systems file name\n"
-    "    -r <string>                   Right Equation Systems file name\n"
-    "    -t <float>                    threshold\n"
-    "    -a                            ASCII format (default)\n"
-    "    -b                            binary format\n"
-    "    -v                            Verbose\n"
-    "    -q                            really quiet\n"
-    "    -h                            Print help menu\n"
-    "\n"
-    "\n"
-    " This program is used to compare equation systems to a user-specified\n"
-    " threshold.  Equation systems are imported in the libMesh format\n"
-    " provided through the read and write methods in class EquationSystems.\n"
-    " \n"
-    "  ./compare -d 3 -m grid.xda -l leftfile.dat -r rightfile.dat -b -t 1.e-8\n"
-    "\n"
-    " will read in the mesh grid.xda, the equation systems leftfile.dat and\n"
-    " rightfile.dat in binary format and compare systems, and especially the\n"
-    " floats stored in vectors.  The comparison is said to be passed when the\n"
-    " floating point values agree up to the given threshold.  When no threshold\n"
-    " is set the default libMesh tolerance is used.  If neither -a or -b are set,\n"
-    " ASCII format is assumed.\n"
-    "\n"
-    " Direct questions to:\n"
-    " benkirk@cfdlab.ae.utexas.edu\n";
+  std::ostringstream helpList;
+  helpList << "usage:\n"
+           << "        "
+           << progName
+           << " [options] ...\n"
+           << "\n"
+           << "options:\n"
+           << "    -d <dim>                      <dim>-dimensional mesh\n"
+           << "    -m <string>                   Mesh file name\n"
+           << "    -l <string>                   Left Equation Systems file name\n"
+           << "    -r <string>                   Right Equation Systems file name\n"
+           << "    -t <float>                    threshold\n"
+           << "    -a                            ASCII format (default)\n"
+           << "    -b                            binary format\n"
+           << "    -v                            Verbose\n"
+           << "    -q                            really quiet\n"
+           << "    -h                            Print help menu\n"
+           << "\n"
+           << "\n"
+           << " This program is used to compare equation systems to a user-specified\n"
+           << " threshold.  Equation systems are imported in the libMesh format\n"
+           << " provided through the read and write methods in class EquationSystems.\n"
+           << " \n"
+           << "  ./compare -d 3 -m grid.xda -l leftfile.dat -r rightfile.dat -b -t 1.e-8\n"
+           << "\n"
+           << " will read in the mesh grid.xda, the equation systems leftfile.dat and\n"
+           << " rightfile.dat in binary format and compare systems, and especially the\n"
+           << " floats stored in vectors.  The comparison is said to be passed when the\n"
+           << " floating point values agree up to the given threshold.  When no threshold\n"
+           << " is set the default libMesh tolerance is used.  If neither -a or -b are set,\n"
+           << " ASCII format is assumed.\n"
+           << "\n";
 
-
-  if (progName == NULL)
-    baseName = "UNKNOWN";
-  else
-    baseName = progName;
-
-
-  fprintf(stderr, helpList.c_str(), baseName.c_str());
-  fflush(stderr);
-
-  abort();
+  libmesh_error_msg(helpList.str());
 }
 
 
@@ -114,7 +103,7 @@ void process_cmd_line(int argc,
   bool left_name_set = false;
 
   if (argc < 3)
-    usage(argv[0]);
+    usage(std::string(argv[0]));
 
 
   while ((opt = getopt(argc, argv, optionStr)) != -1)
@@ -130,11 +119,7 @@ void process_cmd_line(int argc,
             if (names.empty())
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Mesh file name must preceed left file name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Mesh file name must preceed left file name!");
             break;
           }
 
@@ -158,11 +143,7 @@ void process_cmd_line(int argc,
                 left_name_set = true;
               }
             else
-              {
-                libMesh::out << "ERROR: Mesh file name must preceed right file name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Mesh file name must preceed right file name!");
             break;
           }
 
@@ -174,12 +155,7 @@ void process_cmd_line(int argc,
             if ((!names.empty()) && (left_name_set))
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Mesh file name and left file name must preceed "
-                             << "right file name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Mesh file name and left file name must preceed right file name!");
             break;
           }
 
@@ -198,11 +174,7 @@ void process_cmd_line(int argc,
         case 'a':
           {
             if (format_set)
-              {
-                libMesh::out << "ERROR: Equation system file format already set!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Equation system file format already set!");
             else
               {
                 format = READ;
@@ -217,11 +189,7 @@ void process_cmd_line(int argc,
         case 'b':
           {
             if (format_set)
-              {
-                libMesh::out << "ERROR: Equation system file format already set!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Equation system file format already set!");
             else
               {
                 format = DECODE;

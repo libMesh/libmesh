@@ -64,125 +64,114 @@ using namespace libMesh;
 enum BoundaryMeshWriteMode {BM_DISABLED=0, BM_MESH_ONLY, BM_WITH_MESHDATA};
 
 
-void usage(char * progName)
+void usage(const std::string & progName)
 {
-  std::string baseName;
-  static std::string helpList =
-    "usage:\n"
-    "        %s [options] ...\n"
-    "\n"
-    "options:\n"
-    "    -d <dim>                      <dim>-dimensional mesh\n"
-    "    -i <string>                   Input file name\n"
-    "    -o <string>                   Output file name\n"
-    "    -s <string>                   Solution file name\n"
-    "\n    -b                            Write the boundary conditions\n"
-    "    -B                            Like -b, but with activated MeshData\n"
-    "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
-    "    -h                            Print help menu\n"
-    "    -p <count>                    Partition into <count> subdomains\n"
+  std::ostringstream helpList;
+  helpList << "usage:\n"
+           << "        "
+           << progName
+           << " [options] ...\n"
+           << "\n"
+           << "options:\n"
+           << "    -d <dim>                      <dim>-dimensional mesh\n"
+           << "    -i <string>                   Input file name\n"
+           << "    -o <string>                   Output file name\n"
+           << "    -s <string>                   Solution file name\n"
+           << "\n    -b                            Write the boundary conditions\n"
+           << "    -B                            Like -b, but with activated MeshData\n"
+           << "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
+           << "    -h                            Print help menu\n"
+           << "    -p <count>                    Partition into <count> subdomains\n"
 #ifdef LIBMESH_ENABLE_AMR
-    "    -r <count>                    Globally refine <count> times\n"
+           << "    -r <count>                    Globally refine <count> times\n"
 #endif
-    "    -t (-d 2 only)                Convert to triangles first\n"
-    "                                  (allows to write .unv file of the\n"
-    "                                  boundary with the correct node ids)\n"
-    "    -v                            Verbose\n"
-    "    -q <metric>                   Evaluates the named element quality metric\n"
-    "    -2                            Converts a mesh of linear elements\n"
-    "                                  to their second-order counterparts:\n"
-    "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
-    "    -3                            Same, but to the highest possible:\n"
-    "                                  Quad4 -> Quad9, Hex8 -> Hex27 etc\n"
+           << "    -t (-d 2 only)                Convert to triangles first\n"
+           << "                                  (allows to write .unv file of the\n"
+           << "                                  boundary with the correct node ids)\n"
+           << "    -v                            Verbose\n"
+           << "    -q <metric>                   Evaluates the named element quality metric\n"
+           << "    -2                            Converts a mesh of linear elements\n"
+           << "                                  to their second-order counterparts:\n"
+           << "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
+           << "    -3                            Same, but to the highest possible:\n"
+           << "                                  Quad4 -> Quad9, Hex8 -> Hex27 etc\n"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-    "\n    -a                            Add infinite elements\n"
-    "    -x <coord>                    Specify infinite element origin\n"
-    "    -y <coord>                    coordinates. If none given, origin\n"
-    "    -z <coord>                    is determined automatically.\n"
-    "    -X                            When building infinite elements \n"
-    "    -Y                            treat mesh as x/y/z-symmetric.\n"
-    "    -Z                            When -X is given, -x <coord> also\n"
-    "                                  has to be given.  Similar for y,z.\n"
+           << "\n    -a                            Add infinite elements\n"
+           << "    -x <coord>                    Specify infinite element origin\n"
+           << "    -y <coord>                    coordinates. If none given, origin\n"
+           << "    -z <coord>                    is determined automatically.\n"
+           << "    -X                            When building infinite elements \n"
+           << "    -Y                            treat mesh as x/y/z-symmetric.\n"
+           << "    -Z                            When -X is given, -x <coord> also\n"
+           << "                                  has to be given.  Similar for y,z.\n"
 #endif
-    /*  "\n    -l                            Build the L connectivity matrix \n"         */
-    /*    "    -L                            Build the script L connectivity matrix \n"  */
-    "\n"
-    "\n"
-    " This program is used to convert and partions from/to a variety of\n"
-    " formats.  File types are inferred from file extensions.  For example,\n"
-    " the command:\n"
-    "\n"
-    "  ./meshtool -d 2 -i in.exd -o out.plt\n"
-    "\n"
-    " will read a 2D mesh in the ExodusII format (from Cubit, for example)\n"
-    " from the file in.exd.  It will then write the mesh in the Tecplot\n"
-    " binary format to out.plt.\n"
-    "\n"
-    " and\n"
-    "\n"
-    "  ./meshtool -d 3 -i bench12.mesh.0000 -o out.gmv -s bench12.soln.0137\n"
-    "\n"
-    " will read a 3D MGF mesh from the file bench12.mesh.0000, read a\n"
-    " solution from bench12.soln.0137, and write the output in GMV format\n"
-    " to out.gmv\n"
+    // << "\n    -l                            Build the L connectivity matrix \n"
+    // <<   "    -L                            Build the script L connectivity matrix \n"
+           << "\n"
+           << "\n"
+           << " This program is used to convert and partions from/to a variety of\n"
+           << " formats.  File types are inferred from file extensions.  For example,\n"
+           << " the command:\n"
+           << "\n"
+           << "  ./meshtool -d 2 -i in.exd -o out.plt\n"
+           << "\n"
+           << " will read a 2D mesh in the ExodusII format (from Cubit, for example)\n"
+           << " from the file in.exd.  It will then write the mesh in the Tecplot\n"
+           << " binary format to out.plt.\n"
+           << "\n"
+           << " and\n"
+           << "\n"
+           << "  ./meshtool -d 3 -i bench12.mesh.0000 -o out.gmv -s bench12.soln.0137\n"
+           << "\n"
+           << " will read a 3D MGF mesh from the file bench12.mesh.0000, read a\n"
+           << " solution from bench12.soln.0137, and write the output in GMV format\n"
+           << " to out.gmv\n"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-    "\n"
-    " and\n"
-    "\n"
-    "  ./meshtool -d 3 -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -X\n"
-    "\n"
-    " will read a 3D Universal file, determine the z-coordinate of the origin\n"
-    " automatically, e.g. z_origin = 3., build infinite elements with the\n"
-    " origin (30.5, -10.5, 3.) on top of volume elements, while preserving\n"
-    " a symmetry plane through (30.5, -10.5, 3.) perpendicular to x.\n"
-    " It is imperative that the origin lies _inside_ the given volume mesh.\n"
-    " If not, infinite elements are not correctly built!\n"
+           << "\n"
+           << " and\n"
+           << "\n"
+           << "  ./meshtool -d 3 -i dry.unv -o packed.gmv -a -x 30.5 -y -10.5 -X\n"
+           << "\n"
+           << " will read a 3D Universal file, determine the z-coordinate of the origin\n"
+           << " automatically, e.g. z_origin = 3., build infinite elements with the\n"
+           << " origin (30.5, -10.5, 3.) on top of volume elements, while preserving\n"
+           << " a symmetry plane through (30.5, -10.5, 3.) perpendicular to x.\n"
+           << " It is imperative that the origin lies _inside_ the given volume mesh.\n"
+           << " If not, infinite elements are not correctly built!\n"
 #endif
-    "\n"
-    " Currently this program supports the following formats:\n"
-    "\n"
-    "INPUT:\n"
-    "     .exd -- Sandia's ExodusII binary grid format\n"
-    "     .mgf -- MGF binary mesh format\n"
-    "     .ucd -- AVS unstructured ASCII grid format\n"
-    "     .unv -- SDRC I-Deas Universal File ASCII format\n"
-    "     .xda -- libMesh human-readable ASCII format\n"
-    "     .xdr -- libMesh binary format\n"
-    "\n"
-    "OUTPUT:\n"
-    "     .dat   -- Tecplot ASCII format\n"
-    "     .e     -- Sandia's ExodusII format\n"
-    "     .exd   -- Sandia's ExodusII format\n"
-    "     .fro   -- ACDL's .fro format\n"
-    "     .gmv   -- LANL's General Mesh Viewer format\n"
-    "     .mesh  -- MEdit mesh format\n"
-    "     .mgf   -- MGF binary mesh format\n"
-    "     .msh   -- GMSH ASCII file\n"
-    "     .plt   -- Tecplot binary format\n"
-    "     .poly  -- TetGen ASCII file\n"
-    "     .pvtu  -- Paraview VTK format\n"
-    "     .ucd   -- AVS's ASCII UCD format\n"
-    "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
-    "     .unv   -- I-deas Universal format\n"
-    "     .xda   -- libMesh ASCII format\n"
-    "     .xdr   -- libMesh binary format\n"
-    "     .gz    -- any above format gzipped\n"
-    "     .bz2   -- any above format bzip2'ed\n"
-    "\n"
-    " Direct questions to:\n"
-    " benkirk@cfdlab.ae.utexas.edu\n";
+           << "\n"
+           << " Currently this program supports the following formats:\n"
+           << "\n"
+           << "INPUT:\n"
+           << "     .exd -- Sandia's ExodusII binary grid format\n"
+           << "     .mgf -- MGF binary mesh format\n"
+           << "     .ucd -- AVS unstructured ASCII grid format\n"
+           << "     .unv -- SDRC I-Deas Universal File ASCII format\n"
+           << "     .xda -- libMesh human-readable ASCII format\n"
+           << "     .xdr -- libMesh binary format\n"
+           << "\n"
+           << "OUTPUT:\n"
+           << "     .dat   -- Tecplot ASCII format\n"
+           << "     .e     -- Sandia's ExodusII format\n"
+           << "     .exd   -- Sandia's ExodusII format\n"
+           << "     .fro   -- ACDL's .fro format\n"
+           << "     .gmv   -- LANL's General Mesh Viewer format\n"
+           << "     .mesh  -- MEdit mesh format\n"
+           << "     .mgf   -- MGF binary mesh format\n"
+           << "     .msh   -- GMSH ASCII file\n"
+           << "     .plt   -- Tecplot binary format\n"
+           << "     .poly  -- TetGen ASCII file\n"
+           << "     .pvtu  -- Paraview VTK format\n"
+           << "     .ucd   -- AVS's ASCII UCD format\n"
+           << "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
+           << "     .unv   -- I-deas Universal format\n"
+           << "     .xda   -- libMesh ASCII format\n"
+           << "     .xdr   -- libMesh binary format\n"
+           << "     .gz    -- any above format gzipped\n"
+           << "     .bz2   -- any above format bzip2'ed\n"
+           << "\n";
 
-
-  if (progName == NULL)
-    baseName = "UNKNOWN";
-  else
-    baseName = progName;
-
-
-  fprintf(stderr, helpList.c_str(), baseName.c_str());
-  fflush(stderr);
-
-  exit(0);
+  libmesh_error_msg(helpList.str());
 }
 
 
@@ -242,7 +231,7 @@ void process_cmd_line(int argc,
   int opt;
 
   if (argc < 3)
-    usage(argv[0]);
+    usage(std::string(argv[0]));
 
 
 
@@ -259,11 +248,7 @@ void process_cmd_line(int argc,
             if (names.empty())
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Input name must preceed output name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Input name must preceed output name!");
             break;
           }
 
@@ -275,11 +260,7 @@ void process_cmd_line(int argc,
             if (!names.empty())
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Input name must preceed output name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Input name must preceed output name!");
             break;
           }
 
@@ -291,11 +272,7 @@ void process_cmd_line(int argc,
             if (names.size() == 2)
               names.push_back(optarg);
             else
-              {
-                libMesh::out << "ERROR: Input and output names must preceed solution name!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Input and output names must preceed solution name!");
             break;
           }
 
@@ -370,11 +347,7 @@ void process_cmd_line(int argc,
         case 'b':
           {
             if (b_mesh_B_given)
-              {
-                libMesh::out << "ERROR: Do not use -b and -B concurrently!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Do not use -b and -B concurrently!");
 
             b_mesh_b_given = true;
             write_bndry = BM_MESH_ONLY;
@@ -388,11 +361,7 @@ void process_cmd_line(int argc,
         case 'B':
           {
             if (b_mesh_b_given)
-              {
-                libMesh::out << "ERROR: Do not use -b and -B concurrently!"
-                             << std::endl;
-                exit(1);
-              }
+              libmesh_error_msg("ERROR: Do not use -b and -B concurrently!");
 
             b_mesh_B_given = true;
             write_bndry = BM_WITH_MESHDATA;
@@ -613,18 +582,12 @@ int main (int argc, char ** argv)
   if(addinfelems)
     {
       if (names.size() == 3)
-        {
-          libMesh::out << "ERROR: Invalid combination: Building infinite elements " << std::endl
-                       << "not compatible with solution import." << std::endl;
-          exit(1);
-        }
+        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
+                          << "not compatible with solution import.");
 
       if (write_bndry != BM_DISABLED)
-        {
-          libMesh::out << "ERROR: Invalid combination: Building infinite elements " << std::endl
-                       << "not compatible with writing boundary conditions." << std::endl;
-          exit(1);
-        }
+        libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"
+                          << "not compatible with writing boundary conditions.");
 
       /*
        * Sanity checks: -X/Y/Z can only be used, when the
@@ -633,19 +596,14 @@ int main (int argc, char ** argv)
       if ((x_sym && !origin_x.first) ||     // claim x-symmetry, but x-coordinate of origin not given!
           (y_sym && !origin_y.first) ||     // the same for y
           (z_sym && !origin_z.first))       // the same for z
-        {
-          libMesh::out << "ERROR: When x-symmetry is requested using -X, then" << std::endl
-                       << "the option -x <coord> also has to be given." << std::endl
-                       << "This holds obviously for y and z, too." << std::endl;
-          exit(1);
-        }
-
+        libmesh_error_msg("ERROR: When x-symmetry is requested using -X, then\n"
+                          << "the option -x <coord> also has to be given.\n"
+                          << "This holds obviously for y and z, too.");
 
       // build infinite elements
       InfElemBuilder(mesh).build_inf_elem(origin_x, origin_y, origin_z,
                                           x_sym, y_sym, z_sym,
                                           verbose);
-
 
       if (verbose)
         {
@@ -656,13 +614,10 @@ int main (int argc, char ** argv)
     }
 
   // sanity check
-  else if((origin_x.first ||  origin_y.first || origin_z.first) ||
-          (x_sym          ||  y_sym          || z_sym))
-    {
-      libMesh::out << "ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when" << std::endl
-                   << "the option -a is also specified!" << std::endl;
-      exit(1);
-    }
+  else if ((origin_x.first ||  origin_y.first || origin_z.first) ||
+           (x_sym          ||  y_sym          || z_sym))
+    libmesh_error_msg("ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when\n"
+                      << "the option -a is also specified!");
 
 #endif
 
@@ -701,8 +656,11 @@ int main (int argc, char ** argv)
 
       // What are the quality bounds for this element?
       std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(quality_type);
-      libMesh::out << "Quality bounds for this element type are: (" << bounds.first
-                   << ", " << bounds.second << ") "
+      libMesh::out << "Quality bounds for this element type are: ("
+                   << bounds.first
+                   << ", "
+                   << bounds.second
+                   << ") "
                    << std::endl;
 
       MeshBase::const_element_iterator it  = mesh.active_elements_begin(),

@@ -7431,7 +7431,7 @@ fi
     # GCC 4.6.3 warns about variadic macros but supports them just
     # fine, so let's turn off that warning.
     case "$GXX_VERSION" in
-      gcc4.6)
+      gcc4.6 | gcc5)
         CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
         CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"
@@ -29822,6 +29822,112 @@ $as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
 
 fi
 # -------------------------------------------------------------
+
+
+# See if this compiler has a broken errno_t in a very specific
+# situation (this is not common).
+
+  # Try to compile a test program that exhibits the error.
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler has working errno_t declaration" >&5
+$as_echo_n "checking if compiler has working errno_t declaration... " >&6; }
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+  namespace Foo {
+  #include <errno.h>
+  }
+  #include <cstring>
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+    errno_t_works=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+  # If errno_t does not work, verify that "typedef int errno_t;" fixes it.
+  if (test x$errno_t_works = xno); then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if errno_t typedef fixes the issue" >&5
+$as_echo_n "checking if errno_t typedef fixes the issue... " >&6; }
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    namespace Foo {
+    #include <errno.h>
+    }
+    typedef int errno_t; // the fix
+    #include <cstring>
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      typedef_errno_t_fixes_issue=yes
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  fi
+
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+  # If the compiler has the errno_t issue and the typedef fixes it, set the #define
+  if (test "x$errno_t_works" = "xno" -a "x$typedef_errno_t_fixes_issue" = "xyes"); then
+
+$as_echo "#define COMPILER_HAS_BROKEN_ERRNO_T 1" >>confdefs.h
+
+  fi
+
+  # On the other hand, if the compiler has the errno_t issue and the typedef *doesn't* fix it, error out.
+  if (test "x$errno_t_works" = "xno" -a "x$typedef_errno_t_fixes_issue" = "x"); then
+    as_fn_error $? "Compiler has the errno_t issue, but typedef does not fix it.  This
+                  compiler will most likely not be able to build libmesh correctly." "$LINENO" 5
+  fi
+
+
 
 # Restore original CXXFLAGS for now
 ac_ext=cpp

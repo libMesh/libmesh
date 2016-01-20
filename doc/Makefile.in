@@ -104,10 +104,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
 	$(top_srcdir)/m4/curl.m4 $(top_srcdir)/m4/cxx11.m4 \
 	$(top_srcdir)/m4/demangle.m4 $(top_srcdir)/m4/dlopen.m4 \
-	$(top_srcdir)/m4/eigen.m4 $(top_srcdir)/m4/exodus.m4 \
-	$(top_srcdir)/m4/feexcept.m4 $(top_srcdir)/m4/fparser.m4 \
-	$(top_srcdir)/m4/glpk.m4 $(top_srcdir)/m4/gmv.m4 \
-	$(top_srcdir)/m4/gz.m4 $(top_srcdir)/m4/hdf5.m4 \
+	$(top_srcdir)/m4/eigen.m4 $(top_srcdir)/m4/errno_test.m4 \
+	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
+	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
+	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
+	$(top_srcdir)/m4/hdf5.m4 \
 	$(top_srcdir)/m4/hinnant_unique_ptr.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \

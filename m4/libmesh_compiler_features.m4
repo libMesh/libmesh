@@ -226,6 +226,12 @@ if (test "$enableopenmp" != no) ; then
 fi
 # -------------------------------------------------------------
 
+
+# See if this compiler has a broken errno_t in a very specific
+# situation (this is not common).
+CHECK_FOR_BROKEN_ERRNO_T
+
+
 # Restore original CXXFLAGS for now
 AC_LANG_RESTORE
 CXXFLAGS="$libmesh_compiler_features_save_CXXFLAGS"
