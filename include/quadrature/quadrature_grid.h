@@ -45,7 +45,7 @@ namespace libMesh
  * \author Roy Stogner
  * \date 2005
  */
-class QGrid : public QBase
+class QGrid libmesh_final : public QBase
 {
 public:
 

@@ -32,8 +32,11 @@ namespace libMesh
  * .) Include the "end-points" of the domain (have points on edges/faces in 2D/3D).
  * .) Rules with n points can exactly integrate polynomials of degree 2n-3.
  * http://en.wikipedia.org/wiki/Gaussian_quadrature#Gauss.E2.80.93Lobatto_rules
+ *
+ * \author John W. Peterson
+ * \date 2014
  */
-class QGaussLobatto : public QBase
+class QGaussLobatto libmesh_final : public QBase
 {
 public:
 

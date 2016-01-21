@@ -46,7 +46,7 @@ namespace libMesh
  * \date 2013
  */
 template <class QSubCell>
-class QComposite : public QSubCell
+class QComposite libmesh_final : public QSubCell
 {
 public:
 

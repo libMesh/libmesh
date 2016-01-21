@@ -47,7 +47,7 @@ namespace libMesh
  * \author John W. Peterson
  * \date 2003
  */
-class QJacobi : public QBase
+class QJacobi libmesh_final : public QBase
 {
 public:
 

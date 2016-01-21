@@ -95,7 +95,7 @@ namespace libMesh
  * \author John W. Peterson
  * \date 2008
  */
-class QGrundmann_Moller : public QBase
+class QGrundmann_Moller libmesh_final : public QBase
 {
 public:
 
