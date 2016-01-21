@@ -1551,7 +1551,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     {
 		      // Vertices and edges are on sides but we're
 		      // done there.
-                      if (elem->is_vertex(n) || elem->is_edge(n))
+                      if (elem->is_vertex(n) ||
+                          ((dim > 2) && elem->is_edge(n)))
                         continue;
 
                       // Other nodes on sides need interpolation
