@@ -359,6 +359,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
                                       mesh_inserter_iterator<Node>(mesh),
+                                      (Node**)NULL,
                                       nodestag);
 
   // Receive elements.
@@ -368,6 +369,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
                                       mesh_inserter_iterator<Elem>(mesh),
+                                      (Elem**)NULL,
                                       elemstag);
 
   // Wait for all sends to complete
@@ -715,6 +717,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
                                             mesh_inserter_iterator<Node>(mesh),
+                                            (Node**)NULL,
                                             element_neighbors_tag);
         }
       //------------------------------------------------------------------
@@ -726,6 +729,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
                                             mesh_inserter_iterator<Elem>(mesh),
+                                            (Elem**)NULL,
                                             element_neighbors_tag);
         }
       //------------------------------------------------------------------
