@@ -59,7 +59,7 @@ template <typename T> class SparseMatrix;
  * \date 2002
  */
 template <typename T>
-class PetscVector : public NumericVector<T>
+class PetscVector libmesh_final : public NumericVector<T>
 {
 public:
 
