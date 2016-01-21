@@ -50,7 +50,7 @@ template <typename T> class EigenSparseLinearSolver;
  * \date 2013
  */
 template <typename T>
-class EigenSparseMatrix : public SparseMatrix<T>
+class EigenSparseMatrix libmesh_final : public SparseMatrix<T>
 {
 
 public:

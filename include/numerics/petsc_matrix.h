@@ -74,7 +74,7 @@ template <typename T> class DenseMatrix;
  * \date 2002
  */
 template <typename T>
-class PetscMatrix : public SparseMatrix<T>
+class PetscMatrix libmesh_final : public SparseMatrix<T>
 {
 public:
   /**
