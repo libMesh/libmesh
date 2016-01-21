@@ -895,6 +895,10 @@ EGREP
 GREP
 SED
 LIBTOOL
+HAVE_CXX11_FINAL_FALSE
+HAVE_CXX11_FINAL_TRUE
+HAVE_CXX11_DELETED_FUNCTIONS_FALSE
+HAVE_CXX11_DELETED_FUNCTIONS_TRUE
 HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE
 HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE
 HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_FALSE
@@ -9156,6 +9160,259 @@ fi
 else
   HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE='#'
   HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE=
+fi
+
+
+
+    have_cxx11_deleted_functions=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 deleted functions support" >&5
+$as_echo_n "checking for C++11 deleted functions support... " >&6; }
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      class Foo
+      {
+        Foo(const Foo &) = delete;
+      };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_DELETED_FUNCTIONS 1" >>confdefs.h
+
+        have_cxx11_deleted_functions=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    fi
+
+     if test x$have_cxx11_deleted_functions == xyes; then
+  HAVE_CXX11_DELETED_FUNCTIONS_TRUE=
+  HAVE_CXX11_DELETED_FUNCTIONS_FALSE='#'
+else
+  HAVE_CXX11_DELETED_FUNCTIONS_TRUE='#'
+  HAVE_CXX11_DELETED_FUNCTIONS_FALSE=
+fi
+
+
+
+    have_cxx11_final=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 'final' keyword support" >&5
+$as_echo_n "checking for C++11 'final' keyword support... " >&6; }
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      // Test that a function can be declared final.
+      struct A
+      {
+        virtual void foo() final;
+      };
+
+      // Test that a struct can be declared final.
+      struct B final : A
+      {
+      };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        have_cxx11_final=yes
+
+else
+
+        have_cxx11_final=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Confirm that you cannot declare a non-virtual function 'final'.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        struct A
+        {
+          // Error: non-virtual function cannot be final
+          void bar() final;
+        };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+          # If this code compiles, 'final' is not working correctly.
+          have_cxx11_final=no
+
+else
+
+          have_cxx11_final=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+      fi
+
+      # Confirm that you cannot override a final function.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        struct A
+        {
+          virtual void foo() final;
+        };
+        struct B : A
+        {
+          // Error: foo cannot be overridden as it's final in A
+          void foo();
+        };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+          # If this code compiles, 'final' is not working correctly.
+          have_cxx11_final=no
+
+else
+
+          have_cxx11_final=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+      fi
+
+      # Confirm that you cannot inherit from a 'final' class.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        struct A
+        {
+        };
+
+        // struct B is final
+        struct B final : A
+        {
+        };
+
+        // Error: B is final
+        struct C : B
+        {
+        };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+          # If this code compiles, 'final' is not working correctly.
+          have_cxx11_final=no
+
+else
+
+          have_cxx11_final=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+      fi
+
+      # If the flag is still 'yes' after all the tests, set the #define.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_FINAL 1" >>confdefs.h
+
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      fi
+
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    fi
+
+     if test x$have_cxx11_final == xyes; then
+  HAVE_CXX11_FINAL_TRUE=
+  HAVE_CXX11_FINAL_FALSE='#'
+else
+  HAVE_CXX11_FINAL_TRUE='#'
+  HAVE_CXX11_FINAL_FALSE=
 fi
 
 
@@ -40897,6 +41154,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_DELETED_FUNCTIONS_TRUE}" && test -z "${HAVE_CXX11_DELETED_FUNCTIONS_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_DELETED_FUNCTIONS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_FINAL_TRUE}" && test -z "${HAVE_CXX11_FINAL_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_FINAL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE}" && test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE}"; then
