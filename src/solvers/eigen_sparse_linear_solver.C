@@ -28,6 +28,10 @@
 #include "libmesh/eigen_sparse_linear_solver.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/solver_configuration.h"
+
+// GMRES is an "unsupported" iterative solver in Eigen.
+#include <unsupported/Eigen/IterativeSolvers>
 
 namespace libMesh
 {
@@ -38,7 +42,9 @@ EigenSparseLinearSolver(const Parallel::Communicator & comm_in) :
   LinearSolver<T>(comm_in),
   _comp_info(Eigen::Success)
 {
-  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
+  // The GMRES _solver_type can be used in EigenSparseLinearSolver,
+  // however, the GMRES iterative solver is currently in the Eigen
+  // "unsupported" directory, so we use BICGSTAB as our default.
   this->_solver_type = BICGSTAB;
 }
 
@@ -124,12 +130,33 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         break;
       }
 
-      //   // Generalized Minimum Residual
-      // case GMRES:
-      //   {
-      // libmesh_not_implemented();
-      // break;
-      //   }
+      // Generalized Minimum Residual
+    case GMRES:
+      {
+        Eigen::GMRES<EigenSM> solver (matrix._mat);
+        solver.setMaxIterations(m_its);
+        solver.setTolerance(tol);
+
+        // If there is an int parameter called "gmres_restart" in the
+        // SolverConfiguration object, pass it to the Eigen GMRES
+        // solver.
+        if (this->_solver_configuration)
+          {
+            std::map<std::string, int>::iterator it =
+              this->_solver_configuration->int_valued_data.find("gmres_restart");
+
+            if (it != this->_solver_configuration->int_valued_data.end())
+              solver.set_restart(it->second);
+          }
+
+        libMesh::out << "Eigen GMRES solver, restart = " << solver.get_restart() << std::endl;
+        solution._vec = solver.solveWithGuess(rhs._vec, solution._vec);
+        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
+        libMesh::out << "estimated error: " << solver.error() << std::endl;
+        retval = std::make_pair(solver.iterations(), solver.error());
+        _comp_info = solver.info();
+        break;
+      }
 
       // Unknown solver, use BICGSTAB
     default:
