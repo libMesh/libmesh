@@ -1763,8 +1763,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 {
 		  // We're done with vertices and edges and faces.
 		  if (elem->is_vertex(n) ||
-                      elem->is_edge(n) ||
-                      elem->is_face(n))
+                      ((dim > 1) && elem->is_edge(n)) ||
+                      ((dim > 2) && elem->is_face(n)))
                     continue;
 
                   // Anything left is the interior node to
