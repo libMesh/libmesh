@@ -40,6 +40,8 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/solver_configuration.h"
 
 // Define the Finite Element object.
 #include "libmesh/fe.h"
@@ -91,6 +93,18 @@ void exact_solution_wrapper (DenseVector<Number> & output,
 
 // The quadrature type the user requests.
 QuadratureType quad_type=INVALID_Q_RULE;
+
+
+
+class MySolverConfiguration : public SolverConfiguration
+{
+public:
+  MySolverConfiguration() {}
+
+  // We have to override this pure virtual function, but in this case
+  // it does nothing.
+  virtual void configure_solver() {}
+};
 
 
 
@@ -147,11 +161,21 @@ int main (int argc, char ** argv)
 
   EquationSystems equation_systems (mesh);
 
-  equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+
+  LinearImplicitSystem & system =
+    equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
   unsigned int u_var = equation_systems.get_system("Poisson").add_variable("u", FIRST);
 
   equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+
+  // Create a SolverConfiguration object for passing values to the LinearSolver.
+  MySolverConfiguration msc;
+  msc.int_valued_data["gmres_restart"] = 4;
+  system.get_linear_solver()->set_solver_configuration(msc);
+
+  // Set more standard options through the appropriate interfaces.
+  system.get_linear_solver()->set_solver_type(GMRES);
 
   // Construct a Dirichlet boundary condition object
 
