@@ -776,9 +776,11 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
                   this->comm().receive (pid, recv_coords[pid],
                                         coord_request_handles[pid-1],
                                         coord_tag);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
                   this->comm().receive (pid, recv_unique_ids[pid],
                                         unique_id_request_handles[pid-1],
                                         unique_id_tag);
+#endif // LIBMESH_ENABLE_UNIQUE_ID
                 }
             }
         }
