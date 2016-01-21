@@ -495,3 +495,108 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DELETED_FUNCTIONS],
 
     AM_CONDITIONAL(HAVE_CXX11_DELETED_FUNCTIONS, test x$have_cxx11_deleted_functions == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
+  [
+    have_cxx11_final=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 'final' keyword support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      // Test that a function can be declared final.
+      struct A
+      {
+        virtual void foo() final;
+      };
+
+      // Test that a struct can be declared final.
+      struct B final : A
+      {
+      };
+      ]], [[
+      ]])],[
+        have_cxx11_final=yes
+      ],[
+        have_cxx11_final=no
+      ])
+
+      # Confirm that you cannot declare a non-virtual function 'final'.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        struct A
+        {
+          // Error: non-virtual function cannot be final
+          void bar() final;
+        };
+        ]], [[
+        ]])],[
+          # If this code compiles, 'final' is not working correctly.
+          have_cxx11_final=no
+        ],[
+          have_cxx11_final=yes
+        ])
+      fi
+
+      # Confirm that you cannot override a final function.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        struct A
+        {
+          virtual void foo() final;
+        };
+        struct B : A
+        {
+          // Error: foo cannot be overridden as it's final in A
+          void foo();
+        };
+        ]], [[
+        ]])],[
+          # If this code compiles, 'final' is not working correctly.
+          have_cxx11_final=no
+        ],[
+          have_cxx11_final=yes
+        ])
+      fi
+
+      # Confirm that you cannot inherit from a 'final' class.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        struct A
+        {
+        };
+
+        // struct B is final
+        struct B final : A
+        {
+        };
+
+        // Error: B is final
+        struct C : B
+        {
+        };
+        ]], [[
+        ]])],[
+          # If this code compiles, 'final' is not working correctly.
+          have_cxx11_final=no
+        ],[
+          have_cxx11_final=yes
+        ])
+      fi
+
+      # If the flag is still 'yes' after all the tests, set the #define.
+      if (test "x$have_cxx11_final" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_FINAL, 1, [Flag indicating whether compiler supports f() final;])
+      else
+        AC_MSG_RESULT(no)
+      fi
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_FINAL, test x$have_cxx11_final == xyes)
+  ])
