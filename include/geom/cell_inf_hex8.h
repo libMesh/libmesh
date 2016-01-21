@@ -55,7 +55,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class InfHex8 : public InfHex
+class InfHex8 libmesh_final : public InfHex
 {
 public:
 

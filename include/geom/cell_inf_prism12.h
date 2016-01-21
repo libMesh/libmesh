@@ -60,7 +60,7 @@ namespace libMesh
  *  0       6       1
  * \endverbatim
  */
-class InfPrism12 : public InfPrism
+class InfPrism12 libmesh_final : public InfPrism
 {
 public:
 

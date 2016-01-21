@@ -39,6 +39,9 @@ namespace libMesh
  * with linear pyramids, but as of version 14 will not export
  * quadratic pyramids.  Paraview should support 13-node pyramids...
  *
+ * \author John W. Peterson
+ * \date 2014
+ *
  * The node numbering for the pyramid13 is given below:
  * \verbatim
  * PYRAMID13:
@@ -66,7 +69,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class Pyramid13 : public Pyramid
+class Pyramid13 libmesh_final : public Pyramid
 {
 public:
 

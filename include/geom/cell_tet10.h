@@ -57,7 +57,7 @@ namespace libMesh
  *             1
  *  \endverbatim
  */
-class Tet10 : public Tet
+class Tet10 libmesh_final : public Tet
 {
 public:
 

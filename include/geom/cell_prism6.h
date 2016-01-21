@@ -49,7 +49,7 @@ namespace libMesh
  *     0       1
  * \endverbatim
  */
-class Prism6 : public Prism
+class Prism6 libmesh_final : public Prism
 {
 public:
 
