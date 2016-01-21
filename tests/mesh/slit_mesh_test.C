@@ -244,7 +244,9 @@ public:
 
   CPPUNIT_TEST( testSystem );
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   CPPUNIT_TEST( testRestart );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
