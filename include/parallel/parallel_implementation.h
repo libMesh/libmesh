@@ -520,11 +520,12 @@ inline Iter pack_range (const Context * context,
 /**
  * Helper function for range unpacking
  */
-template <typename Context, typename buffertype, typename OutputIter, typename T>
+template <typename Context, typename buffertype,
+          typename OutputIter, typename T>
 inline void unpack_range (const std::vector<buffertype> & buffer,
                           Context * context,
                           OutputIter out,
-                          T * /* output_type */)
+                          const T * /* output_type */)
 {
   // Loop through the buffer and unpack each object, returning the
   // object pointer via the output iterator
@@ -1109,11 +1110,11 @@ inline void receive (const unsigned int src_processor_id,
                      const Communicator & comm = Communicator_World)
 { comm.receive (src_processor_id, buf, type, req, tag); }
 
-template <typename Context, typename OutputIter>
+template <typename Context, typename OutputIter, typename T>
 inline void receive_packed_range (const unsigned int src_processor_id,
                                   Context * context,
                                   OutputIter out,
-                                  T * output_type,
+                                  const T * output_type,
                                   const MessageTag & tag=any_tag,
                                   const Communicator & comm = Communicator_World)
 {
@@ -1158,7 +1159,8 @@ inline void send_receive(const unsigned int dest_processor_id,
 { comm.send_receive(dest_processor_id, send, source_processor_id, recv,
                     send_tag, recv_tag); }
 
-template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
+template <typename Context1, typename RangeIter,
+	  typename Context2, typename OutputIter, typename T>
 inline void send_receive_packed_range(const unsigned int dest_processor_id,
                                       const Context1 * context1,
                                       RangeIter send_begin,
@@ -1166,7 +1168,7 @@ inline void send_receive_packed_range(const unsigned int dest_processor_id,
                                       const unsigned int source_processor_id,
                                       Context2 * context2,
                                       OutputIter out,
-                                      T * output_type,
+                                      const T * output_type,
                                       const MessageTag & send_tag = no_tag,
                                       const MessageTag & recv_tag = any_tag,
                                       const Communicator & comm = Communicator_World)
@@ -2627,7 +2629,7 @@ template <typename Context, typename OutputIter, typename T>
 inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
                                                 Context * context,
                                                 OutputIter out,
-                                                T * output_type,
+                                                const T * output_type,
                                                 const MessageTag & tag) const
 {
   typedef typename Parallel::Packing<T>::buffer_type buffer_t;
@@ -2860,7 +2862,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
                                          const unsigned int source_processor_id,
                                          Context2 * context2,
                                          OutputIter out,
-                                         T * output_type,
+                                         const T * output_type,
                                          const MessageTag & send_tag,
                                          const MessageTag & recv_tag) const
 {
@@ -3635,7 +3637,7 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
  * We do not currently support this operation on one processor without MPI.
  */
 template <typename Context1, typename RangeIter,
-          typename Context2, typename OutputIter>
+          typename Context2, typename OutputIter, typename T>
 inline void
 Communicator::send_receive_packed_range (const unsigned int /* dest_processor_id */,
                                          const Context1 *,
@@ -3643,7 +3645,8 @@ Communicator::send_receive_packed_range (const unsigned int /* dest_processor_id
                                          const RangeIter /* send_end */,
                                          const unsigned int /* source_processor_id */,
                                          Context2 *,
-                                         OutputIter /* out */, T* /* output_type */,
+                                         OutputIter /* out */,
+                                         const T * /* output_type */,
                                          const MessageTag &,
                                          const MessageTag &) const
 { libmesh_not_implemented(); }
