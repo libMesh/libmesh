@@ -465,3 +465,33 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS],
     AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX, test x$have_cxx11_inverse_hyperbolic_cosine_complex == xyes)
     AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX, test x$have_cxx11_inverse_hyperbolic_tangent_complex == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_DELETED_FUNCTIONS],
+  [
+    have_cxx11_deleted_functions=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 deleted functions support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      class Foo
+      {
+        Foo(const Foo &) = delete;
+      };
+      ]], [[
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_DELETED_FUNCTIONS, 1, [Flag indicating whether compiler supports f() = delete;])
+        have_cxx11_deleted_functions=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_DELETED_FUNCTIONS, test x$have_cxx11_deleted_functions == xyes)
+  ])
