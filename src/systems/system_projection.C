@@ -1337,8 +1337,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           START_LOG ("project_edges","GenericProjector");
 
           // In 3D, handle any edge values next.  Optimize (at a
-          // slight cost of accuracy) the LAGRANGE case by using
-          // interpolation instead of L2 projection.
+	  // slight cost of accuracy in many cases) the LAGRANGE case
+	  // by using interpolation instead of L2 projection.
           if (dim > 2 && fe_type.family == LAGRANGE)
             {
               for (unsigned char e=0; e != elem->n_edges(); ++e)
