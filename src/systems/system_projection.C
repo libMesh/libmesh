@@ -1753,8 +1753,54 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             if (!dof_is_fixed[i])
               free_dof[free_dofs++] = i;
 
-          // There may be nothing to project
-          if (free_dofs)
+          // Project any remaining (interior) dofs.
+	  // Optimize (at a slight cost of accuracy in many cases) the
+	  // LAGRANGE case by using interpolation instead of L2
+	  // projection.
+          if (free_dofs && fe_type.family == LAGRANGE)
+            {
+              for (unsigned char n=0; n != elem->n_nodes(); ++n)
+                {
+		  // We're done with vertices and edges and faces.
+		  if (elem->is_vertex(n) ||
+                      elem->is_edge(n) ||
+                      elem->is_face(n))
+                    continue;
+
+                  // Anything left is the interior node to
+                  // interpolate.
+                  const Node * node = elem->get_node(n);
+
+                  // Look for dofs on the interior node
+                  const unsigned int interior_comp =
+                    node->n_comp(sysnum, var_component);
+
+                  // We're LAGRANGE so we don't double-up dofs
+                  libmesh_assert_less (interior_comp, 2);
+
+                  // But we might be subparametric
+                  if (!interior_comp)
+                    continue;
+
+                  // If we have a dof, find its index
+                  const dof_id_type new_interior_dof =
+                    node->dof_number(sysnum, var_component, 0);
+
+                  // And set its value
+                  for (unsigned int i=0; i != n_dofs; ++i)
+                    if (dof_indices[i] == new_interior_dof)
+                      {
+                        dof_is_fixed[i] = true;
+                        FValue & ui = Ue(i);
+                        ui = f.eval_at_node(context,
+                                            var_component,
+                                            *node,
+                                            system.time);
+                        break;
+                      }
+                }
+            }
+          else if (free_dofs)
             {
               const std::vector<Point> & xyz_values = fe->get_xyz();
               const std::vector<Real> & JxW = fe->get_JxW();
