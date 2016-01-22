@@ -26,7 +26,7 @@ public:
 
   ~SlitFunc () {}
 
-  virtual void init_context (const FEMContext &) {}
+  virtual void init_context (const FEMContext &) libmesh_override {}
 
   virtual UniquePtr<FEMFunctionBase<Number> >
   clone () const libmesh_override
