@@ -35,7 +35,7 @@ namespace libMesh
  * \author Roy Stogner
  * \date 2005
  */
-class QClough : public QBase
+class QClough libmesh_final : public QBase
 {
 public:
 

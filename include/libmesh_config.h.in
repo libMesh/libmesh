@@ -207,6 +207,12 @@
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
 
+/* Flag indicating whether compiler supports f() = delete; */
+#undef HAVE_CXX11_DELETED_FUNCTIONS
+
+/* Flag indicating whether compiler supports f() final; */
+#undef HAVE_CXX11_FINAL
+
 /* Flag indicating whether compiler supports initializer lists */
 #undef HAVE_CXX11_INITIALIZER_LIST
 

@@ -39,8 +39,11 @@ namespace libMesh
  *
  * Stroud, A.H. "Approximate Calculation of
  * Multiple Integrals.", 1972
+ *
+ * \author John W. Peterson
+ * \date 2008
  */
-class QConical : public QBase
+class QConical libmesh_final : public QBase
 {
 public:
 

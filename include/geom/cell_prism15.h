@@ -34,6 +34,10 @@ namespace libMesh
 
 /**
  * The \p Prism15 is an element in 3D composed of 15 nodes.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ *
  * It is numbered like this:
  * \verbatim
  * PRISM15:
@@ -67,7 +71,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class Prism15 : public Prism
+class Prism15 libmesh_final : public Prism
 {
 public:
 

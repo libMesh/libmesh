@@ -34,6 +34,10 @@ namespace libMesh
 
 /**
  * The \p Prism18 is an element in 3D composed of 18 nodes.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ *
  * It is numbered like this:
  * \verbatim
  * PRISM18:
@@ -67,7 +71,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class Prism18 : public Prism
+class Prism18 libmesh_final : public Prism
 {
 public:
 

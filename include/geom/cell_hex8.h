@@ -51,7 +51,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class Hex8 : public Hex
+class Hex8 libmesh_final : public Hex
 {
 public:
 

@@ -39,9 +39,14 @@
 // #  undef  MatType
 // #endif
 
+// Eigen uses deprecated std::binder1st/2nd classes, which GCC warns about.
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 // Eigen includes
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+
+#pragma GCC diagnostic warning "-Wdeprecated-declarations"
 
 // #ifdef libMeshSaveMatType
 // #  define libMeshSaveMatType MatType

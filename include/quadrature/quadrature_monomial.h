@@ -58,7 +58,7 @@ namespace libMesh
  * \author John W. Peterson
  * \date 2008
  */
-class QMonomial : public QBase
+class QMonomial libmesh_final : public QBase
 {
 public:
 

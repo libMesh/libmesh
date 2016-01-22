@@ -565,6 +565,20 @@ inline Tnew libmesh_cast_int (Told oldvar)
 #define libmesh_override
 #endif
 
+// Define C++03 backwards-compatible function deletion keyword.
+#ifdef LIBMESH_HAVE_CXX11_DELETED_FUNCTIONS
+#define libmesh_delete =delete
+#else
+#define libmesh_delete
+#endif
+
+// Define C++03 backwards-compatible final keyword.
+#ifdef LIBMESH_HAVE_CXX11_FINAL
+#define libmesh_final final
+#else
+#define libmesh_final
+#endif
+
 } // namespace libMesh
 
 

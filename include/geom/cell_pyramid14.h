@@ -42,6 +42,9 @@ namespace libMesh
  * element works in libmesh, we are curently limited in what we can do
  * with it outside the library...
  *
+ * \author John W. Peterson
+ * \date 2013
+ *
  * The node numbering for the pyramid14 is given below:
  * \verbatim
  * PYRAMID14:
@@ -69,7 +72,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class Pyramid14 : public Pyramid
+class Pyramid14 libmesh_final : public Pyramid
 {
 public:
 

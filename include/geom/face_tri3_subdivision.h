@@ -31,8 +31,11 @@ namespace libMesh
 
 /**
  * The \p Tri3 is an element in 2D composed of 3 nodes.
+ *
+ * \author Roman Vetter and Norbert Stoop
+ * \date 2014
  */
-class Tri3Subdivision : public Tri3
+class Tri3Subdivision libmesh_final : public Tri3
 {
 public:
 

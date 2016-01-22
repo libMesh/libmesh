@@ -50,7 +50,7 @@ namespace libMesh
  *
  * \endverbatim
  */
-class Pyramid5 : public Pyramid
+class Pyramid5 libmesh_final : public Pyramid
 {
 public:
 
