@@ -569,11 +569,12 @@ public:
  * Decode a range of potentially-variable-size objects from a data
  * array.
  */
-template <typename Context, typename buffertype, typename OutputIter, typename T>
+template <typename Context, typename buffertype,
+          typename OutputIter, typename T>
 inline void unpack_range (const typename std::vector<buffertype> & buffer,
                           Context * context,
                           OutputIter out,
-                          T * output_type /* used only to infer T */);
+                          const T * output_type /* used only to infer T */);
 
 /**
  * Encode a range of potentially-variable-size objects to a data
@@ -954,7 +955,7 @@ public:
   void receive_packed_range (const unsigned int dest_processor_id,
                              Context * context,
                              OutputIter out,
-                             T * output_type, // used only to infer T
+                             const T * output_type, // used only to infer T
                              const MessageTag & tag=any_tag) const;
 
   /**
@@ -1025,7 +1026,7 @@ public:
                                  const unsigned int source_processor_id,
                                  Context2 * context2,
                                  OutputIter out,
-                                 T * output_type,
+                                 const T * output_type, // used only to infer T
                                  const MessageTag & send_tag = no_tag,
                                  const MessageTag & recv_tag = any_tag) const;
 
