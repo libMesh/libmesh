@@ -26,7 +26,7 @@ public:
 
   ~SlitFunc () {}
 
-  virtual void init_context (const FEMContext &) {}
+  virtual void init_context (const FEMContext &) libmesh_override {}
 
   virtual UniquePtr<FEMFunctionBase<Number> >
   clone () const libmesh_override
@@ -244,7 +244,9 @@ public:
 
   CPPUNIT_TEST( testSystem );
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   CPPUNIT_TEST( testRestart );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
