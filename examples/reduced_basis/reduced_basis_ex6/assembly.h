@@ -401,35 +401,25 @@ struct Ex6InnerProduct : ElemAssembly
 
 struct Ex6EIMInnerProduct : ElemAssembly
 {
-  // Use the L2 norm to find the best fit
+  // Use the L2 inner product to find the best fit
   virtual void interior_assembly(FEMContext & c)
   {
-    const unsigned int Gx_var = 0;
-    const unsigned int Gy_var = 1;
-    const unsigned int Gz_var = 2;
-
     FEBase * elem_fe = NULL;
-    c.get_element_fe(Gx_var, elem_fe);
+    c.get_element_fe(0, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
 
     const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
 
-    const unsigned int n_u_dofs = c.get_dof_indices(Gx_var).size();
+    const unsigned int n_dofs = c.get_dof_indices().size();
 
     unsigned int n_qpoints = c.get_element_qrule().n_points();
 
-    DenseSubMatrix<Number> & Kxx = c.get_elem_jacobian(Gx_var, Gx_var);
-    DenseSubMatrix<Number> & Kyy = c.get_elem_jacobian(Gy_var, Gy_var);
-    DenseSubMatrix<Number> & Kzz = c.get_elem_jacobian(Gz_var, Gz_var);
-
     for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        for (unsigned int j=0; j != n_u_dofs; j++)
+      for (unsigned int i=0; i != n_dofs; i++)
+        for (unsigned int j=0; j != n_dofs; j++)
           {
-            Kxx(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
-            Kyy(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
-            Kzz(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+            c.get_elem_jacobian()(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
           }
   }
 };

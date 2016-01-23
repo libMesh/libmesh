@@ -79,16 +79,16 @@ public:
   NumericVector<Number> & get_ghosted_basis_function();
 
   /**
-   * Retrieve the FE object associated with variable \p var.
+   * Retrieve the FE object.
    */
-  FEBase & get_fe(unsigned int var);
+  FEBase & get_fe();
 
 private:
 
   /**
-   * Initialize the FE objects in _fe_var.
+   * Initialize the FE object.
    */
-  void initialize_fe_objects();
+  void initialize_fe();
 
   /**
    * The RBEIMConstruction object that this RBEIMAssembly is based on.
@@ -108,16 +108,10 @@ private:
   UniquePtr<NumericVector<Number> > _ghosted_basis_function;
 
   /**
-   * We store an FE object for each variable in _rb_eim_con. This is used
-   * in evaluate_basis_function. Note that by storing the FE objects (rather
-   * than recreating them each time) we benefit from caching in fe.reinit().
+   * We store an FE object and an associated quadrature rule.
    */
-  std::vector<FEBase *> _fe_var;
-
-  /**
-   * We also store the quadrature rule associated with each FE object.
-   */
-  std::vector<QBase *> _fe_qrule;
+  FEBase * _fe;
+  QBase * _qrule;
 
 };
 

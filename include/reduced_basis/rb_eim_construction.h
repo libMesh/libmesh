@@ -128,11 +128,21 @@ public:
   virtual Real compute_best_fit_error();
 
   /**
-   * Provide an implementation of init_context that is
-   * relevant to the projection calculations in
-   * load_calN_parametrized_function.
+   * Initialize \p c based on \p sys.
    */
-  virtual void init_context(FEMContext & c) libmesh_override;
+  virtual void init_context_with_sys(FEMContext & c, System & sys);
+
+  /**
+   * Add variables to the ExplicitSystem that is used to store
+   * the basis functions.
+   */
+  virtual void init_explicit_system() = 0;
+
+  /**
+   * Add one variable to the ImplicitSystem (i.e. this system) that is
+   * used to perform L2 project solves.
+   */
+  virtual void init_implicit_system() = 0;
 
   /**
    * Evaluate the mesh function at the specified point and for the specified variable.
@@ -161,6 +171,44 @@ public:
    */
   virtual UniquePtr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
 
+  /**
+   * Get the ExplicitSystem associated with this system.
+   */
+  ExplicitSystem& get_explicit_system();
+
+  /**
+   * Load the i^th RB function into the RBConstruction
+   * solution vector.
+   * Override to load the basis function into the ExplicitSystem.
+   */
+  virtual void load_basis_function(unsigned int i) libmesh_override;
+
+  /**
+   * Load the RB solution from the most recent solve with rb_eval
+   * into this system's solution vector.
+   * Override to load the solution into the ExplicitSystem.
+   */
+  virtual void load_rb_solution() libmesh_override;
+
+  /**
+   * Load \p source into the subvector of \p dest corresponding
+   * to var \p var.
+   */
+  void set_explicit_sys_subvector(
+    NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& source);
+
+  /**
+   * Load the subvector of \p source corresponding to variable \p var into
+   * \p dest.
+   */
+  void get_explicit_sys_subvector(
+    NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& source);
+
+  /**
+   * Set up the index map between the implicit and explicit systems.
+   */
+  void init_dof_map_between_systems();
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -173,14 +221,6 @@ public:
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
-
-
-  /**
-   * The matrix associated with this system should be block diagonal
-   * hence we use a CouplingMatrix to "decouple" all variables to
-   * save memory. That is, _coupling_matrix is diagonal.
-   */
-  CouplingMatrix _coupling_matrix;
 
 protected:
 
@@ -270,6 +310,20 @@ private:
    * this RBEIMConstruction.
    */
   std::vector<ElemAssembly *> _rb_eim_assembly_objects;
+
+  /**
+   * We use an ExplicitSystem to store the EIM basis functions.
+   * This is because if we have an EIM system with many variables
+   * we need to allocate a large matrix. Better to avoid this
+   * and use an ExplicitSystem instead, and only use the ImplicitSystem
+   * to deal with the per-variable L2 projections.
+   */
+  std::string _explicit_system_name;
+
+  /**
+   * The index map between the explicit system and the implicit system.
+   */
+  std::vector< std::vector<dof_id_type> > _dof_map_between_systems;
 
 };
 
