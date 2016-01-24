@@ -237,6 +237,12 @@
 /* Flag indicating whether compiler supports std::move */
 #undef HAVE_CXX11_MOVE
 
+/* Flag indicating whether compiler supports nullptr */
+#undef HAVE_CXX11_NULLPTR
+
+/* Flag indicating whether C++03 compatible nullptr workaround works */
+#undef HAVE_CXX11_NULLPTR_WORKAROUND
+
 /* Flag indicating whether compiler supports the override keyword */
 #undef HAVE_CXX11_OVERRIDE
 
