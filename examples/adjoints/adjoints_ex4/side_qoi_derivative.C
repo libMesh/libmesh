@@ -21,7 +21,7 @@ void LaplaceSystem::side_qoi_derivative (DiffContext & context,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase * side_fe = NULL;
+  FEBase * side_fe = libmesh_nullptr;
   c.get_side_fe(0, side_fe);
 
   // Element Jacobian * quadrature weights for interior integration

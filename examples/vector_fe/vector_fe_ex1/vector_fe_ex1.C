@@ -391,7 +391,7 @@ void assemble_poisson(EquationSystems & es,
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (unsigned int side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             {
               // The value of the shape functions at the quadrature
               // points.

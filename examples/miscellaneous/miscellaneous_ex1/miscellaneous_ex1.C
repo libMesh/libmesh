@@ -309,7 +309,7 @@ void assemble_wave(EquationSystems & es,
       // and overall burden of coding is @e greatly reduced through
       // using a pointer, which is adjusted appropriately to the
       // current element type.
-      FEBase * cfe = NULL;
+      FEBase * cfe = libmesh_nullptr;
 
       // This here is almost the only place where we need to
       // distinguish between finite and infinite elements.

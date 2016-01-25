@@ -277,7 +277,7 @@ void init_cd (EquationSystems & es,
   // Project initial conditions at time 0
   es.parameters.set<Real> ("time") = system.time = 0;
 
-  system.project_solution(exact_value, NULL, es.parameters);
+  system.project_solution(exact_value, libmesh_nullptr, es.parameters);
 }
 
 
@@ -477,7 +477,7 @@ void assemble_cd (EquationSystems & es,
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor(s) == NULL)
+          if (elem->neighbor(s) == libmesh_nullptr)
             {
               fe_face->reinit(elem, s);
 

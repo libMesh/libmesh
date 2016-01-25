@@ -590,7 +590,7 @@ void assemble_shell (EquationSystems & es,
       for (unsigned int s=0; s<elem->n_sides(); ++s)
         {
           const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor(s));
-          if (nb_elem == NULL || nb_elem->is_ghost())
+          if (nb_elem == libmesh_nullptr || nb_elem->is_ghost())
             continue;
 
           /*

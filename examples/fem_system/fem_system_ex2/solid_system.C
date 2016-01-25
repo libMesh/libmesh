@@ -156,7 +156,7 @@ void SolidSystem::init_context(DiffContext & context)
   FEMContext & c = cast_ref<FEMContext &>(context);
 
   // Pre-request all the data needed
-  FEBase * elem_fe = NULL;
+  FEBase * elem_fe = libmesh_nullptr;
   c.get_element_fe(0, elem_fe);
 
   elem_fe->get_JxW();
@@ -164,7 +164,7 @@ void SolidSystem::init_context(DiffContext & context)
   elem_fe->get_dphi();
   elem_fe->get_xyz();
 
-  FEBase * side_fe = NULL;
+  FEBase * side_fe = libmesh_nullptr;
   c.get_side_fe(0, side_fe);
 
   side_fe->get_JxW();
@@ -183,7 +183,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase * elem_fe = NULL;
+  FEBase * elem_fe = libmesh_nullptr;
   c.get_element_fe(0, elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration
@@ -321,7 +321,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
       Real penalty_number = args("bc/displacement_penalty", 1e7);
 
-      FEBase * fe = NULL;
+      FEBase * fe = libmesh_nullptr;
       c.get_side_fe(0, fe);
 
       const std::vector<std::vector<Real> > & phi = fe->get_phi();

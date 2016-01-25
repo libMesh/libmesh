@@ -302,7 +302,7 @@ void assemble_1D(EquationSystems & es,
           // If this element has a NULL neighbor, then it is on the edge of the
           // mesh and we need to enforce a boundary condition using the penalty
           // method.
-          if (elem->neighbor(s) == NULL)
+          if (elem->neighbor(s) == libmesh_nullptr)
             {
               Ke(s,s) += penalty;
               Fe(s)   += 0*penalty;

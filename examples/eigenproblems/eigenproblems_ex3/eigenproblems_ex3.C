@@ -450,7 +450,7 @@ void get_dirichlet_dofs(EquationSystems & es,
       {
         // All boundary dofs are Dirichlet dofs in this case
         for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor(s) == NULL)
+          if (elem->neighbor(s) == libmesh_nullptr)
             {
               std::vector<unsigned int> side_dofs;
               FEInterface::dofs_on_side(elem, dim, fe_type,

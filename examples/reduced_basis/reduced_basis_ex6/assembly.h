@@ -104,7 +104,7 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
         {
           const unsigned int u_var = 0;
 
-          FEBase * side_fe = NULL;
+          FEBase * side_fe = libmesh_nullptr;
           c.get_side_fe(u_var, side_fe);
 
           const std::vector<Real> & JxW_side = side_fe->get_JxW();
@@ -147,7 +147,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
         {
           const unsigned int u_var = 0;
 
-          FEBase * side_fe = NULL;
+          FEBase * side_fe = libmesh_nullptr;
           c.get_side_fe(u_var, side_fe);
 
           const std::vector<Real> & JxW_side = side_fe->get_JxW();
@@ -194,7 +194,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
         {
           const unsigned int u_var = 0;
 
-          FEBase * side_fe = NULL;
+          FEBase * side_fe = libmesh_nullptr;
           c.get_side_fe(u_var, side_fe);
 
           const std::vector<Real> & JxW_side = side_fe->get_JxW();
@@ -260,7 +260,7 @@ struct AssemblyEIM : RBEIMAssembly
     const unsigned int Gy_var = 1;
     const unsigned int Gz_var = 2;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -313,7 +313,7 @@ struct AssemblyF0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -347,7 +347,7 @@ struct AssemblyF1 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -379,7 +379,7 @@ struct Ex6InnerProduct : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -404,7 +404,7 @@ struct Ex6EIMInnerProduct : ElemAssembly
   // Use the L2 inner product to find the best fit
   virtual void interior_assembly(FEMContext & c)
   {
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(0, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();

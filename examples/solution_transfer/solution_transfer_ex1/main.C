@@ -54,7 +54,7 @@ void initialize(EquationSystems & es,
 {
   ExplicitSystem & system = es.get_system<ExplicitSystem>(system_name);
   es.parameters.set<Real> ("time") = system.time = 0;
-  system.project_solution(initial_value, NULL, es.parameters);
+  system.project_solution(initial_value, libmesh_nullptr, es.parameters);
 }
 
 int main(int argc, char * argv[])

@@ -241,7 +241,7 @@ void assemble_poisson(EquationSystems & es,
       // Boundary flux provides forcing in this example
       {
         for (unsigned int side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             {
               if (mesh.get_boundary_info().has_boundary_id (elem, side, MIN_Z_BOUNDARY))
                 {
@@ -258,7 +258,7 @@ void assemble_poisson(EquationSystems & es,
       // Add boundary terms on the crack
       {
         for (unsigned int side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             {
               // Found the lower side of the crack. Assemble terms due to lower and upper in here.
               if (mesh.get_boundary_info().has_boundary_id (elem, side, CRACK_BOUNDARY_LOWER))
