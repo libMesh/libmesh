@@ -355,57 +355,53 @@ void EnsightIO::write_solution_ascii()
 void EnsightIO::write_scalar_ascii(const std::string & sys,
                                    const std::string & var_name)
 {
+  // Construct scalar variable filename
   std::ostringstream scl_file;
-  scl_file << _ensight_file_name << "_" << var_name << ".scl";
-
-  scl_file << std::setw(3)
+  scl_file << _ensight_file_name
+           << "_"
+           << var_name
+           << ".scl"
+           << std::setw(3)
            << std::setprecision(0)
            << std::setfill('0')
            << std::right
            << _time_steps.size()-1;
 
-  FILE * fout = fopen(scl_file.str().c_str(),"w");
-
-  fprintf(fout,"Per node scalar value\n");
-  fprintf(fout,"part\n");
-  fprintf(fout,"%10d\n",1);
-  fprintf(fout,"coordinates\n");
+  // Open a stream and start writing scalar variable info.
+  std::ofstream scl_stream(scl_file.str().c_str());
+  scl_stream << "Per node scalar value\n";
+  scl_stream << "part\n";
+  scl_stream << std::setw(10) << 1 << "\n";
+  scl_stream << "coordinates\n";
 
   const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
-
   const unsigned int dim = the_mesh.mesh_dimension();
-
   const System & system = _equation_systems.get_system(sys);
-
   const DofMap & dof_map = system.get_dof_map();
-
-
   int var = system.variable_number(var_name);
 
-
-  std::vector<dof_id_type> dof_indices;
   std::vector<dof_id_type> dof_indices_scl;
 
-  // Now we will loop over all the elements in the mesh.
-
+  // Loop over active local elements, construct the nodal solution, and write it to file.
   MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
 
-  typedef std::map<int,Real> map_local_soln;
+  // Map from node id -> solution value.  We end up just writing this
+  // map out in order, not sure what would happen if there were holes
+  // in the numbering...
+  typedef std::map<int, Real> map_local_soln;
   typedef map_local_soln::iterator local_soln_iterator;
-
   map_local_soln local_soln;
 
-  std::vector<Number>       elem_soln;
-  std::vector<Number>       nodal_soln;
+  std::vector<Number> elem_soln;
+  std::vector<Number> nodal_soln;
 
   for ( ; el != end_el ; ++el)
     {
       const Elem * elem = *el;
 
-      const FEType & fe_type    = system.variable_type(var);
+      const FEType & fe_type = system.variable_type(var);
 
-      dof_map.dof_indices (elem, dof_indices);
       dof_map.dof_indices (elem, dof_indices_scl, var);
 
       elem_soln.resize(dof_indices_scl.size());
@@ -413,26 +409,28 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
       for (unsigned int i = 0; i < dof_indices_scl.size(); i++)
         elem_soln[i] = system.current_solution(dof_indices_scl[i]);
 
-      FEInterface::nodal_soln (dim,fe_type, elem, elem_soln, nodal_soln);
+      FEInterface::nodal_soln (dim, fe_type, elem, elem_soln, nodal_soln);
 
       libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
-      libmesh_not_implemented();
+      libmesh_error_msg("Complex-valued Ensight output not yet supported");
 #endif
 
       for (unsigned int n=0; n<elem->n_nodes(); n++)
         local_soln[elem->node(n)] = libmesh_real(nodal_soln[n]);
     }
 
-  local_soln_iterator sol = local_soln.begin();
-  const local_soln_iterator sol_end = local_soln.end();
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second));
-
-  fclose(fout);
-
+  {
+    local_soln_iterator it = local_soln.begin();
+    const local_soln_iterator it_end = local_soln.end();
+    for ( ; it != it_end; ++it)
+      scl_stream << std::setw(12)
+                 << std::setprecision(5)
+                 << std::scientific
+                 << it->second
+                 << "\n";
+  }
 }
 
 
