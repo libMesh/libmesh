@@ -44,7 +44,7 @@ std::map<ElemType, std::string> EnsightIO::build_element_map()
   ret[EDGE3] = "bar3";
   ret[QUAD4] = "quad4";
   ret[QUAD8] = "quad8";
-  ret[QUAD9] = "quad9"; // not supported
+  // ret[QUAD9] = "quad9"; // not supported
   ret[TRI3] = "tria3";
   ret[TRI6] = "tria6";
   ret[TET4] = "tetra4";
@@ -62,21 +62,15 @@ EnsightIO::EnsightIO (const std::string & filename,
   MeshOutput<MeshBase> (eq.get_mesh()),
   _equation_systems(eq)
 {
-
   if (_equation_systems.n_processors() == 1)
     _ensight_file_name = filename;
   else
     {
-      std::stringstream tmp_file;
+      std::ostringstream tmp_file;
       tmp_file << filename << "_rank" << _equation_systems.processor_id();
       _ensight_file_name = tmp_file.str();
     }
 }
-
-
-
-EnsightIO::~EnsightIO ()
-{}
 
 
 
@@ -94,7 +88,7 @@ void EnsightIO::add_vector (const std::string & system_name,
   vec.components.push_back(u);
   vec.components.push_back(v);
 
-  _systems_vars_map[system_name].EnsightVectors.push_back(vec);
+  _system_vars_map[system_name].EnsightVectors.push_back(vec);
 }
 
 
@@ -115,7 +109,7 @@ void EnsightIO::add_vector (const std::string & system_name,
   vec.components.push_back(u);
   vec.components.push_back(v);
   vec.components.push_back(w);
-  _systems_vars_map[system_name].EnsightVectors.push_back(vec);
+  _system_vars_map[system_name].EnsightVectors.push_back(vec);
 }
 
 
@@ -131,7 +125,7 @@ void EnsightIO::add_scalar(const std::string & system_name,
   scl.description = scl_description;
   scl.scalar_name = s;
 
-  _systems_vars_map[system_name].EnsightScalars.push_back(scl);
+  _system_vars_map[system_name].EnsightScalars.push_back(scl);
 }
 
 
@@ -150,7 +144,7 @@ void EnsightIO::write (const std::string & name)
 
 
 
-void EnsightIO::write (const double time)
+void EnsightIO::write (Real time)
 {
   this->write_ascii(time);
   this->write_case();
@@ -158,7 +152,7 @@ void EnsightIO::write (const double time)
 
 
 
-void EnsightIO::write_ascii (const double time)
+void EnsightIO::write_ascii (Real time)
 {
   _time_steps.push_back(time);
 
@@ -309,28 +303,26 @@ void EnsightIO::write_case()
   case_stream << "GEOMETRY\n";
   case_stream << "model:            1     " << _ensight_file_name << ".geo" << "***\n";
 
-  SystemsVarsMapIterator       sys      = _systems_vars_map.begin();
-  const SystemsVarsMapIterator sys_end  = _systems_vars_map.end();
+  system_vars_map_t::iterator sys_it = _system_vars_map.begin();
+  const system_vars_map_t::iterator sys_end  = _system_vars_map.end();
 
   // Write Variable per node section
-  if (sys != sys_end)
+  if (sys_it != sys_end)
     case_stream << "\n\nVARIABLE\n";
 
-  for (; sys != sys_end; ++sys)
+  for (; sys_it != sys_end; ++sys_it)
     {
-      SystemsVarsValue value = *sys;
-
-      for (unsigned int i=0; i < value.second.EnsightScalars.size(); i++)
+      for (unsigned int i=0; i < sys_it->second.EnsightScalars.size(); i++)
         {
-          Scalars scalar = value.second.EnsightScalars[i];
+          Scalars scalar = sys_it->second.EnsightScalars[i];
           case_stream << "scalar per node:   1  "
                       << scalar.description << " "
                       << _ensight_file_name << "_" << scalar.scalar_name << ".scl***\n";
         }
 
-      for (unsigned int i=0; i < value.second.EnsightVectors.size(); i++)
+      for (unsigned int i=0; i < sys_it->second.EnsightVectors.size(); i++)
         {
-          Vectors vec = value.second.EnsightVectors[i];
+          Vectors vec = sys_it->second.EnsightVectors[i];
           case_stream << "vector per node:      1    "
                       << vec.description << " "
                       << _ensight_file_name << "_" << vec.description << ".vec***\n";
@@ -355,22 +347,19 @@ void EnsightIO::write_case()
 // Write scalar and vector solution
 void EnsightIO::write_solution_ascii()
 {
+  system_vars_map_t::iterator sys_it = _system_vars_map.begin();
+  const system_vars_map_t::iterator sys_end = _system_vars_map.end();
 
-  SystemsVarsMapIterator       sys     = _systems_vars_map.begin();
-  const SystemsVarsMapIterator sys_end = _systems_vars_map.end();
-
-  for (; sys != sys_end; ++sys)
+  for (; sys_it != sys_end; ++sys_it)
     {
-      SystemsVarsValue value = *sys;
+      for (unsigned int i = 0; i < sys_it->second.EnsightScalars.size(); i++)
+        this->write_scalar_ascii(sys_it->first,
+                                 sys_it->second.EnsightScalars[i].scalar_name);
 
-      for (unsigned int i = 0; i < value.second.EnsightScalars.size(); i++)
-        this->write_scalar_ascii(value.first,
-                                 value.second.EnsightScalars[i].scalar_name);
-
-      for (unsigned int i = 0; i < value.second.EnsightVectors.size(); i++)
-        this->write_vector_ascii(value.first,
-                                 value.second.EnsightVectors[i].components,
-                                 value.second.EnsightVectors[i].description);
+      for (unsigned int i = 0; i < sys_it->second.EnsightVectors.size(); i++)
+        this->write_vector_ascii(sys_it->first,
+                                 sys_it->second.EnsightVectors[i].components,
+                                 sys_it->second.EnsightVectors[i].description);
     }
 }
 
