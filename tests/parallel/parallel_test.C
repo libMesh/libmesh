@@ -25,6 +25,7 @@ public:
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
   CPPUNIT_TEST( testSemiVerify );
+  CPPUNIT_TEST( testDerek );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -225,7 +226,7 @@ public:
     if (TestCommWorld->size() > 1)
       {
         // Default communication
-        TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
+//        TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
 
         TestCommWorld->receive (procdown,
                                 recv_val,
@@ -242,7 +243,7 @@ public:
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Synchronous communication
-        TestCommWorld->send_mode(Parallel::Communicator::SYNCHRONOUS);
+//       TestCommWorld->send_mode(Parallel::Communicator::SYNCHRONOUS);
         std::fill (recv_val.begin(), recv_val.end(), 0);
 
 
@@ -261,11 +262,36 @@ public:
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Restore default communication
-        TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
+//        TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
       }
   }
 
 
+  void testDerek ()
+  {
+    if (TestCommWorld->rank() == 0)
+    {
+      std::vector<int> vector_data;
+      vector_data.push_back(4);
+
+      Parallel::Request request;
+      TestCommWorld->send(1, vector_data, request);
+      request.wait();
+    }
+
+    if (TestCommWorld->rank() == 1)
+    {
+      Parallel::Request request;
+      std::vector<int> vector_data;
+      TestCommWorld->receive(0, vector_data, request);
+      request.wait();
+
+      std::cerr<<"vector_data.size(): "<<vector_data.size()<<std::endl;
+
+      CPPUNIT_ASSERT_EQUAL((int)vector_data.size(), 1);
+      CPPUNIT_ASSERT_EQUAL(vector_data[0], 4);
+    }
+  }
 
   void testSemiVerify ()
   {
