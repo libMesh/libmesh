@@ -91,9 +91,6 @@ public:
   bool & has_mesh_refinement();
 
 private:
-
-  // Define aux. structures
-
   // Represents the vectors that are used by the EnsightIO
   struct Vectors
   {
@@ -115,7 +112,6 @@ private:
     std::vector<Scalars> EnsightScalars;
   };
 
-
   typedef std::map <std::string, SystemVars>           SystemsVarsMap;
   typedef std::map <std::string, SystemVars>::iterator SystemsVarsMapIterator;
   typedef std::pair<std::string, SystemVars>           SystemsVarsValue;
@@ -127,16 +123,19 @@ private:
   void write_vector_ascii (const std::string & sys, const std::vector<std::string> & vec, const std::string & var_name);
   void write_solution_ascii ();
   void write_geometry_ascii ();
-
-
   void write_case();
-  void elem_type_to_string (ElemType, char *);
 
   // private Attributes
-  std::string     _ensight_file_name;
-  std::vector<double>   _time_steps;
-  SystemsVarsMap   _systems_vars_map;
+  std::string _ensight_file_name;
+  std::vector<double> _time_steps;
+  SystemsVarsMap _systems_vars_map;
   const EquationSystems & _equation_systems;
+
+  // static mapping between libmesh ElemTypes and Ensight element strings.
+  static std::map<ElemType, std::string> _element_map;
+
+  // Static function used to build the _element_map.
+  static std::map<ElemType, std::string> build_element_map();
 };
 
 
