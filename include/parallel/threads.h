@@ -433,15 +433,6 @@ private:
   pthread_mutexattr_t attr;
 };
 
-extern std::map<pthread_t, unsigned int> _pthread_unique_ids;
-extern spin_mutex _pthread_unique_id_mutex;
-
-/**
- * When called by a thread this will return a unique number from 0 to num_pthreads-1
- * Very useful for creating long-lived thread local storage
- */
-unsigned int pthread_unique_id();
-
 template <typename Range>
 unsigned int num_pthreads(Range & range)
 {
@@ -548,14 +539,12 @@ void parallel_for (const Range & range, const Body & body)
     {
 #if LIBMESH_HAVE_OPENMP
       run_body<Range, Body>((void *)&range_bodies[i]);
-#else // Just use Pthreads
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+#elif LIBMESH_HAVE_PTHREAD
       pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void *)&range_bodies[i]);
-      _pthread_unique_ids[threads[i]] = i;
 #endif
     }
 
-#if !LIBMESH_HAVE_OPENMP
+#if LIBMESH_HAVE_PTHREAD
   // Wait for them to finish
 
   // The use of 'int' instead of unsigned for the iteration variable
@@ -565,11 +554,7 @@ void parallel_for (const Range & range, const Body & body)
   // behavior and optimization.
   // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
   for (int i=0; i<static_cast<int>(n_threads); i++)
-    {
       pthread_join(threads[i], NULL);
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      _pthread_unique_ids.erase(threads[i]);
-    }
 #endif
 
   // Clean up
@@ -661,21 +646,15 @@ void parallel_reduce (const Range & range, Body & body)
     {
 #if LIBMESH_HAVE_OPENMP
       run_body<Range, Body>((void *)&range_bodies[i]);
-#else // Just use Pthreads
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+#elif LIBMESH_HAVE_PTHREAD
       pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void *)&range_bodies[i]);
-      _pthread_unique_ids[threads[i]] = i;
 #endif
     }
 
-#if !LIBMESH_HAVE_OPENMP
+#if LIBMESH_HAVE_PTHREAD
   // Wait for them to finish
   for(unsigned int i=0; i<n_threads; i++)
-    {
       pthread_join(threads[i], NULL);
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      _pthread_unique_ids.erase(threads[i]);
-    }
 #endif
 
   // Join them all down to the original Body
