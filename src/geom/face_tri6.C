@@ -316,6 +316,40 @@ void Tri6::connectivity(const unsigned int sf,
 
 
 
+Real Tri6::volume () const
+{
+  // Construct constant data vectors.
+  // \vec{x}_{\xi}  = \vec{a1}*xi + \vec{b1}*eta + \vec{c1}
+  // \vec{x}_{\eta} = \vec{a2}*xi + \vec{b2}*eta + \vec{c2}
+  Point
+    a1 =  4.*point(0) + 4.*point(1) - 8.*point(3),
+    b1 =  4.*point(0) - 4.*point(3) + 4.*point(4) - 4.*point(5),
+    c1 = -3.*point(0) - 1.*point(1) + 4.*point(3),
+    a2 =  b1,
+    b2 =  4.*point(0) + 4.*point(2) - 8.*point(5),
+    c2 = -3.*point(0) - 1.*point(2) + 4.*point(5);
+
+  // If a1 == b1 == a2 == b2 == 0, this is a TRI6 with straight sides,
+  // and we can use the TRI3 formula to compute the volume.
+  if (a1.relative_fuzzy_equals(Point(0,0,0)) &&
+      b1.relative_fuzzy_equals(Point(0,0,0)) &&
+      b2.relative_fuzzy_equals(Point(0,0,0)))
+    return 0.5 * c1.cross(c2).size();
+
+  // 3-point rule, exact for quadratics.
+  const unsigned int N = 3;
+  const Real xi[N]  = {Real(2)/3, Real(1)/6, Real(1)/6};
+  const Real eta[N] = {Real(1)/6, Real(2)/3, Real(1)/6};
+  const Real wts[N] = {Real(1)/6, Real(1)/6, Real(1)/6};
+
+  // Approximate the area with quadrature
+  Real vol=0.;
+  for (unsigned int q=0; q<N; ++q)
+    vol += wts[q] * (xi[q]*a1 + eta[q]*b1 + c1).cross(xi[q]*a2 + eta[q]*b2 + c2).size();
+
+  return vol;
+}
+
 
 
 unsigned short int Tri6::second_order_adjacent_vertex (const unsigned int n,

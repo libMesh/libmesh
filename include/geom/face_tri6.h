@@ -175,6 +175,11 @@ public:
    */
   static const unsigned int side_nodes_map[3][3];
 
+  /**
+   * An optimized method for approximating the area of a
+   * TRI6 using quadrature.
+   */
+  virtual Real volume () const libmesh_override;
 
 protected:
 
