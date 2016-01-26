@@ -438,20 +438,24 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
                                    const std::vector<std::string> & vec,
                                    const std::string & var_name)
 {
+  // Construct vector variable filename
   std::ostringstream vec_file;
-  vec_file<<_ensight_file_name<<"_"<<var_name<<".vec";
-
-  vec_file << std::setw(3)
+  vec_file << _ensight_file_name
+           << "_"
+           << var_name
+           << ".vec"
+           << std::setw(3)
            << std::setprecision(0)
            << std::setfill('0')
            << std::right
            << _time_steps.size()-1;
 
-  FILE * fout = fopen(vec_file.str().c_str(),"w");
-  fprintf(fout,"Per vector per value\n");
-  fprintf(fout,"part\n");
-  fprintf(fout,"%10d\n",1);
-  fprintf(fout,"coordinates\n");
+  // Open a stream and start writing vector variable info.
+  std::ofstream vec_stream(vec_file.str().c_str());
+  vec_stream << "Per vector per value\n";
+  vec_stream << "part\n";
+  vec_stream << std::setw(10) << 1 << "\n";
+  vec_stream << "coordinates\n";
 
   // Get a constant reference to the mesh object.
   const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
@@ -467,7 +471,6 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
   const unsigned int v_var = system.variable_number(vec[1]);
   const unsigned int w_var = (dim==3) ? system.variable_number(vec[2]) : 0;
 
-  std::vector<dof_id_type> dof_indices;
   std::vector<dof_id_type> dof_indices_u;
   std::vector<dof_id_type> dof_indices_v;
   std::vector<dof_id_type> dof_indices_w;
@@ -476,80 +479,86 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
   MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
 
+  // Map from node id -> solution value.  We end up just writing this
+  // map out in order, not sure what would happen if there were holes
+  // in the numbering...
   typedef std::map<int,std::vector<Real> > map_local_soln;
   typedef map_local_soln::iterator  local_soln_iterator;
-
   map_local_soln local_soln;
 
   for ( ; el != end_el ; ++el)
     {
       const Elem * elem = *el;
 
-      const FEType & fe_type    = system.variable_type(u_var);
+      const FEType & fe_type = system.variable_type(u_var);
 
-      dof_map.dof_indices (elem, dof_indices);
-      dof_map.dof_indices (elem, dof_indices_u,u_var);
-      dof_map.dof_indices (elem, dof_indices_v,v_var);
-      if(dim==3)  dof_map.dof_indices (elem, dof_indices,w_var);
+      dof_map.dof_indices (elem, dof_indices_u, u_var);
+      dof_map.dof_indices (elem, dof_indices_v, v_var);
+      if (dim==3)
+        dof_map.dof_indices (elem, dof_indices_w, w_var);
 
+      std::vector<Number> elem_soln_u;
+      std::vector<Number> elem_soln_v;
+      std::vector<Number> elem_soln_w;
 
-      std::vector<Number>       elem_soln_u;
-      std::vector<Number>       elem_soln_v;
-      std::vector<Number>       elem_soln_w;
-
-      std::vector<Number>       nodal_soln_u;
-      std::vector<Number>       nodal_soln_v;
-      std::vector<Number>       nodal_soln_w;
+      std::vector<Number> nodal_soln_u;
+      std::vector<Number> nodal_soln_v;
+      std::vector<Number> nodal_soln_w;
 
       elem_soln_u.resize(dof_indices_u.size());
       elem_soln_v.resize(dof_indices_v.size());
-      if(dim == 3) elem_soln_w.resize(dof_indices_w.size());
+      if (dim == 3)
+        elem_soln_w.resize(dof_indices_w.size());
 
       for (unsigned int i = 0; i < dof_indices_u.size(); i++)
         {
           elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
           elem_soln_v[i] = system.current_solution(dof_indices_v[i]);
-          if(dim==3) elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
+          if (dim==3)
+            elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
         }
 
-      FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_u,nodal_soln_u);
-      FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_v,nodal_soln_v);
-      if(dim == 3) FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_w,nodal_soln_w);
-
+      FEInterface::nodal_soln (dim, fe_type, elem, elem_soln_u, nodal_soln_u);
+      FEInterface::nodal_soln (dim, fe_type, elem, elem_soln_v, nodal_soln_v);
+      if (dim == 3)
+        FEInterface::nodal_soln (dim, fe_type, elem, elem_soln_w, nodal_soln_w);
 
       libmesh_assert_equal_to (nodal_soln_u.size(), elem->n_nodes());
       libmesh_assert_equal_to (nodal_soln_v.size(), elem->n_nodes());
 
 #ifdef LIBMESH_ENABLE_COMPLEX
-      libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
-      libmesh_not_implemented()
+      libmesh_error_msg("Complex-valued Ensight output not yet supported");
 #endif
 
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          {
-            std::vector<Real> node_vec(3);
-            node_vec[0]= libmesh_real(nodal_soln_u[n]);
-            node_vec[1]= libmesh_real(nodal_soln_v[n]);
-            node_vec[2]=0.0;
-            if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
-            local_soln[elem->node(n)] = node_vec;
-          }
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        {
+          std::vector<Real> node_vec(3);
+          node_vec[0] = libmesh_real(nodal_soln_u[n]);
+          node_vec[1] = libmesh_real(nodal_soln_v[n]);
+          node_vec[2] = 0.0;
+          if (dim==3)
+            node_vec[2] = libmesh_real(nodal_soln_w[n]);
+          local_soln[elem->node(n)] = node_vec;
+        }
     }
 
-  local_soln_iterator sol = local_soln.begin();
-  const local_soln_iterator sol_end = local_soln.end();
+  {
+    local_soln_iterator it = local_soln.begin();
+    const local_soln_iterator it_end = local_soln.end();
 
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[0]));
-  sol = local_soln.begin();
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[1]));
-  sol = local_soln.begin();
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[2]));
+    for (unsigned dir=0; dir<3; ++dir)
+      {
+        for (; it != it_end; ++it)
+          vec_stream << std::setw(12)
+                     << std::scientific
+                     << std::setprecision(5)
+                     << it->second[dir]
+                     << "\n";
 
-  fclose(fout);
-
+        // Reset the iterator to the beginning of the map
+        it = local_soln.begin();
+      }
+  }
 }
 
 void EnsightIO::elem_type_to_string(ElemType type, char * buffer)
