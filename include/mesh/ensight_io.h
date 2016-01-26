@@ -38,8 +38,11 @@ class EquationSystems;
 
 /**
  * This class implements writing meshes and solutions in Ensight's Gold format.
+ *
  * \author Camata
  * \date 2009
+ * \author J. W. Peterson (refactoring and iostreams implementation)
+ * \date 2016
  */
 class EnsightIO : public MeshOutput<MeshBase>
 {
@@ -51,11 +54,25 @@ public:
   EnsightIO (const std::string & filename,
              const EquationSystems & eq);
 
-  ~EnsightIO ();
+  /**
+   * Empty destructor.
+   */
+  ~EnsightIO () {}
 
   /**
-   * add 2D vector: Tell the EnsightIO interface that the variables u and v are a vector.
-   * Note that u and v should be the same variables defined in the system.
+   * Tell the EnsightIO interface to output the finite element (not
+   * SCALAR) variable named "s".  Note: you must call add_scalar() or
+   * add_vector() (see below) at least once, otherwise only the Mesh
+   * will be written out.
+   */
+  void add_scalar (const std::string & system,
+                   const std::string & scalar_description,
+                   const std::string & s);
+
+  /**
+   * Tell the EnsightIO interface that the variables (u,v) constitute
+   * a vector.  Note: u and v must have the same FEType, and be
+   * defined in the same system.
    */
   void add_vector (const std::string & system,
                    const std::string & vec_description,
@@ -63,37 +80,31 @@ public:
                    const std::string & v);
 
   /**
-   * add 3D vector: tell the EnsightIO interface that the variables u, v and w are vector components
+   * Tell the EnsightIO interface that the variables (u, v, w)
+   * constitute a vector.  Note: Requires a 3D mesh, u, v, and must
+   * have the same FEType, and must be defined in the same system.
    */
   void add_vector (const std::string & system,
                    const std::string & vec_description,
                    const std::string & u,
                    const std::string & v,
                    const std::string & w);
-
   /**
-   * add scalar: tell the EnsightIO interface that the variable s is a scalar
+   * Calls write_ascii() and write_case().
+   * Writes case, mesh, and solution files named:
+   * name.case             (contains a description of other files)
+   * name.geo000           (mesh)
+   * name_{varname}.scl000 (one file per scalar variable)
+   * name_{vecname}.vec000 (one file per vector variable)
    */
-  void add_scalar (const std::string & system,
-                   const std::string & scalar_description,
-                   const std::string & s);
+  void write (Real time = 0);
 
   /**
-   * write solution
+   * Calls this->write(0);
    */
   virtual void write (const std::string & name) libmesh_override;
 
-  /**
-   * write solution
-   */
-  void write (const double time = 0);
-
-  bool & has_mesh_refinement();
-
 private:
-
-  // Define aux. structures
-
   // Represents the vectors that are used by the EnsightIO
   struct Vectors
   {
@@ -115,28 +126,31 @@ private:
     std::vector<Scalars> EnsightScalars;
   };
 
-
-  typedef std::map <std::string, SystemVars>           SystemsVarsMap;
-  typedef std::map <std::string, SystemVars>::iterator SystemsVarsMapIterator;
-  typedef std::pair<std::string, SystemVars>           SystemsVarsValue;
-
   // private methods
   // write solution in ascii format file
-  void write_ascii (const double time = 0);
+  void write_ascii (Real time = 0);
   void write_scalar_ascii (const std::string & sys, const std::string & var);
   void write_vector_ascii (const std::string & sys, const std::vector<std::string> & vec, const std::string & var_name);
   void write_solution_ascii ();
   void write_geometry_ascii ();
-
-
   void write_case();
-  void elem_type_to_string (ElemType, char *);
 
   // private Attributes
-  std::string     _ensight_file_name;
-  std::vector<double>   _time_steps;
-  SystemsVarsMap   _systems_vars_map;
+  std::string _ensight_file_name;
+  std::vector<Real> _time_steps;
+
+  // mapping from system names to variable names+descriptions
+  typedef std::map <std::string, SystemVars> system_vars_map_t;
+  system_vars_map_t _system_vars_map;
+
+  // Reference to the EquationSystems we were constructed with
   const EquationSystems & _equation_systems;
+
+  // static mapping between libmesh ElemTypes and Ensight element strings.
+  static std::map<ElemType, std::string> _element_map;
+
+  // Static function used to build the _element_map.
+  static std::map<ElemType, std::string> build_element_map();
 };
 
 
