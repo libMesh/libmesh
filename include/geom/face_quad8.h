@@ -175,6 +175,11 @@ public:
    */
   static const unsigned int side_nodes_map[4][3];
 
+  /**
+   * An optimized method for approximating the area of a
+   * QUAD8 using quadrature.
+   */
+  virtual Real volume () const libmesh_override;
 
 protected:
 
