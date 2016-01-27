@@ -1676,6 +1676,22 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 #endif
             }
         }
+
+      // Need to delete the FE and quadrature objects to prevent a memory leak
+      for(unsigned int i=0; i<fe_ptrs.size(); i++)
+        {
+          if(fe_ptrs[i])
+            {
+              delete fe_ptrs[i];
+            }
+        }
+      for(unsigned int i=0; i<q_rules.size(); i++)
+        {
+          if(q_rules[i])
+            {
+              delete q_rules[i];
+            }
+        }
     }
 
   if (using_hilbert_norm)
