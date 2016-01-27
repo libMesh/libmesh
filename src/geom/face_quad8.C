@@ -365,6 +365,50 @@ void Quad8::connectivity(const unsigned int sf,
 
 
 
+Real Quad8::volume () const
+{
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0),
+    x1 = point(1),
+    x2 = point(2),
+    x3 = point(3),
+    x4 = point(4),
+    x5 = point(5),
+    x6 = point(6),
+    x7 = point(7);
+
+  // Construct constant data vectors.
+  // \vec{x}_{\xi}  = \vec{a1}*eta**2 + \vec{b1}*xi*eta + \vec{c1}*xi + \vec{d1}*eta + \vec{e1}
+  // \vec{x}_{\eta} = \vec{a2}*xi**2 + \vec{b2}*xi*eta + \vec{c2}*xi + \vec{d2}*eta + \vec{e2}
+  // This is copy-pasted directly from the output of a Python script.
+  Point
+    a1 = -x0/4 + x1/4 + x2/4 - x3/4 - x5/2 + x7/2,
+    b1 = -x0/2 - x1/2 + x2/2 + x3/2 + x4 - x6,
+    c1 = x0/2 + x1/2 + x2/2 + x3/2 - x4 - x6,
+    d1 = x0/4 - x1/4 + x2/4 - x3/4,
+    e1 = x5/2 - x7/2,
+    a2 = -x0/4 - x1/4 + x2/4 + x3/4 + x4/2 - x6/2,
+    b2 = -x0/2 + x1/2 + x2/2 - x3/2 - x5 + x7,
+    c2 = x0/4 - x1/4 + x2/4 - x3/4,
+    d2 = x0/2 + x1/2 + x2/2 + x3/2 - x5 - x7,
+    e2 = -x4/2 + x6/2;
+
+  // 4-point rule, exact for bi-cubics.  The weights for this rule are
+  // all equal to 1.
+  const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
+
+  Real vol=0.;
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<2; ++j)
+      vol += (q[j]*q[j]*a1 + q[i]*q[j]*b1 + q[i]*c1 + q[j]*d1 + e1).
+        cross(q[i]*q[i]*a2 + q[i]*q[j]*b2 + q[i]*c2 + q[j]*d2 + e2).size();
+
+  return vol;
+}
+
+
 
 unsigned short int Quad8::second_order_adjacent_vertex (const unsigned int n,
                                                         const unsigned int v) const
