@@ -80,10 +80,38 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // The current mesh
   MeshBase & mesh = es.get_mesh();
 
-  // Resize the error_per_cell vector to be
-  // the number of elements, initialized to 0.
-  error_per_cell.clear();
-  error_per_cell.resize (mesh.max_elem_id(), 0.);
+  // Get coarse grid adjoint solutions.  This should be a relatively
+  // quick (especially with preconditioner reuse) way to get a good
+  // initial guess for the fine grid adjoint solutions.  More
+  // importantly, subtracting off a coarse adjoint approximation gives
+  // us better local error indication, and subtracting off *some* lift
+  // function is necessary for correctness if we have heterogeneous
+  // adjoint Dirichlet conditions.
+
+  // Solve the adjoint problem(s) on the coarse FE space
+  // Only if the user didn't already solve it for us
+  if (!system.is_adjoint_already_solved())
+    system.adjoint_solve(_qoi_set);
+
+  // Loop over all the adjoint problems and, if any have heterogenous
+  // Dirichlet conditions, get the corresponding coarse lift
+  // function(s)
+  for (unsigned int j=0; j != system.qoi.size(); j++)
+    {
+      // Skip this QoI if it is not in the QoI Set or if there are no
+      // heterogeneous Dirichlet boundaries for it
+      if (_qoi_set.has_index(j) &&
+          system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+        {
+          std::ostringstream liftfunc_name;
+          liftfunc_name << "adjoint_lift_function" << j;
+          NumericVector<Number> & liftvec =
+            system.add_vector(liftfunc_name.str());
+
+          system.get_dof_map().enforce_constraints_exactly
+            (system, &liftvec, true);
+        }
+    }
 
   // We'll want to back up all coarse grid vectors
   std::map<std::string, NumericVector<Number> *> coarse_vectors;
@@ -124,42 +152,10 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       system.update();
     }
 
-  // Get coarse grid adjoint solutions.  This should be a relatively
-  // quick (especially with preconditioner reuse) way to get a good
-  // initial guess for the fine grid adjoint solutions.  More
-  // importantly, subtracting off a coarse adjoint approximation gives
-  // us better local error indication, and subtracting off *some* lift
-  // function is necessary for correctness if we have heterogeneous
-  // adjoint Dirichlet conditions.
-
-  // Solve the adjoint problem(s) on the coarse FE space
-  // Only if the user didn't already solve it for us
-  if (!system.is_adjoint_already_solved())
-    system.adjoint_solve(_qoi_set);
-
-
-  // Loop over all the adjoint problems and, if any have heterogenous
-  // Dirichlet conditions, get the corresponding coarse lift
-  // function(s)
-  for (unsigned int j=0; j != system.qoi.size(); j++)
-    {
-      // Skip this QoI if it is not in the QoI Set or if there are no
-      // heterogeneous Dirichlet boundaries for it
-      if (_qoi_set.has_index(j) &&
-          system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-        {
-          std::ostringstream liftfunc_name;
-          liftfunc_name << "adjoint_lift_function" << j;
-          NumericVector<Number> & liftvec =
-            system.add_vector(liftfunc_name.str());
-
-          system.get_dof_map().enforce_constraints_exactly
-            (system, &liftvec, true);
-        }
-    }
-
-
-
+  // Resize the error_per_cell vector to be
+  // the number of elements, initialized to 0.
+  error_per_cell.clear();
+  error_per_cell.resize (mesh.max_elem_id(), 0.);
 
 #ifndef NDEBUG
   // n_coarse_elem is only used in an assertion later so
