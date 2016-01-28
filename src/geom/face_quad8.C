@@ -395,15 +395,16 @@ Real Quad8::volume () const
     d2 = x0/2 + x1/2 + x2/2 + x3/2 - x5 - x7,
     e2 = -x4/2 + x6/2;
 
-  // 4-point rule, exact for bi-cubics.  The weights for this rule are
-  // all equal to 1.
-  const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
+  // 3x3 quadrature, exact for bi-quintics
+  const unsigned int N = 3;
+  const Real q[N] = {-std::sqrt(15)/5., 0., std::sqrt(15)/5.};
+  const Real w[N] = {5./9, 8./9, 5./9};
 
   Real vol=0.;
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int j=0; j<N; ++j)
       vol += (q[j]*q[j]*a1 + q[i]*q[j]*b1 + q[i]*c1 + q[j]*d1 + e1).
-        cross(q[i]*q[i]*a2 + q[i]*q[j]*b2 + q[i]*c2 + q[j]*d2 + e2).size();
+        cross(q[i]*q[i]*a2 + q[i]*q[j]*b2 + q[i]*c2 + q[j]*d2 + e2).size() * w[i] * w[j];
 
   return vol;
 }
