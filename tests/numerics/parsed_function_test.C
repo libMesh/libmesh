@@ -31,6 +31,7 @@ public:
   CPPUNIT_TEST(testValues);
   CPPUNIT_TEST(testInlineGetter);
   CPPUNIT_TEST(testInlineSetter);
+  CPPUNIT_TEST(testTimeDependence);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -96,6 +97,21 @@ private:
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL
       (libmesh_real(cxy8.get_inline_value("c")), 3.5, TOLERANCE*TOLERANCE);
+  }
+
+  void testTimeDependence()
+  {
+    ParsedFunction<Number> no_t("x*2+y^2-tanh(z)+atan(x-y)");
+    CPPUNIT_ASSERT(!no_t.is_time_dependent());
+
+    ParsedFunction<Number> xyt("x+y+t");
+    CPPUNIT_ASSERT(xyt.is_time_dependent());
+
+    ParsedFunction<Number> x2y2t2("x*2+y^2+t^2");
+    CPPUNIT_ASSERT(x2y2t2.is_time_dependent());
+
+    ParsedFunction<Number> ztanht("z*tanh(t)");
+    CPPUNIT_ASSERT(ztanht.is_time_dependent());
   }
 
 };
