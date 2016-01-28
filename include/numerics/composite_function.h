@@ -75,6 +75,20 @@ public:
         reverse_index_map[index_map[j]] =
           std::make_pair(subfunction_index, j);
       }
+
+    // Now check for time dependence
+    // We only check the function we just added instead of researching all subfunctions
+    // If this is the first subfunction, then that determines the time-dependence.
+    if( subfunctions.size() == 1 )
+      this->_is_time_dependent = subfunctions[0]->is_time_dependent();
+
+    // Otherwise, we have more than 1 function already.
+    // If _is_time_dependent is true, then one of the previous
+    // subfunctions is time-dependent and thus this CompositeFunction
+    // time-dependent. If _is_time_dependent is false, then the subfunction
+    // just added determines the time-dependence.
+    else if( !this->_is_time_dependent )
+      this->_is_time_dependent = (subfunctions.back())->is_time_dependent();
   }
 
   virtual Output operator() (const Point & p,
