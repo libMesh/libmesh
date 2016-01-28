@@ -70,13 +70,27 @@ public:
    */
   virtual void init_data()
   {
-    Gx_var = this->add_variable ("x_comp_of_G", libMesh::FIRST);
-    Gy_var = this->add_variable ("y_comp_of_G", libMesh::FIRST);
-    Gz_var = this->add_variable ("z_comp_of_G", libMesh::FIRST);
-
     Parent::init_data();
 
     set_inner_product_assembly(eim_ip);
+  }
+
+  /**
+   * Initialize the implicit system that is used to perform L2 projections.
+   */
+  virtual void init_implicit_system()
+  {
+    this->add_variable ("L2_proj_var", libMesh::FIRST);
+  }
+
+  /**
+   * Initialize the explicit system that is used to store the basis functions.
+   */
+  virtual void init_explicit_system()
+  {
+    Gx_var = get_explicit_system().add_variable ("x_comp_of_G", libMesh::FIRST);
+    Gy_var = get_explicit_system().add_variable ("y_comp_of_G", libMesh::FIRST);
+    Gz_var = get_explicit_system().add_variable ("z_comp_of_G", libMesh::FIRST);
   }
 
   /**

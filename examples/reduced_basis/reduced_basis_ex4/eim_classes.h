@@ -64,11 +64,25 @@ public:
    */
   virtual void init_data()
   {
-    u_var = this->add_variable ("f_EIM", libMesh::FIRST);
-
     Parent::init_data();
 
     set_inner_product_assembly(ip);
+  }
+
+  /**
+   * Initialize the implicit system that is used to perform L2 projections.
+   */
+  virtual void init_implicit_system()
+  {
+    this->add_variable ("L2_proj_var", libMesh::FIRST);
+  }
+
+  /**
+   * Initialize the explicit system that is used to store the basis functions.
+   */
+  virtual void init_explicit_system()
+  {
+    u_var = get_explicit_system().add_variable ("f_EIM", libMesh::FIRST);
   }
 
   /**

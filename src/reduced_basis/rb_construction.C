@@ -440,16 +440,18 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vec
 void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
                                                 bool skip_vector_assembly)
 {
-  // Check that the theta and assembly objects are consistently sized
-  libmesh_assert_equal_to (get_rb_theta_expansion().get_n_A_terms(), get_rb_assembly_expansion().get_n_A_terms());
-  libmesh_assert_equal_to (get_rb_theta_expansion().get_n_F_terms(), get_rb_assembly_expansion().get_n_F_terms());
-  libmesh_assert_equal_to (get_rb_theta_expansion().get_n_outputs(), get_rb_assembly_expansion().get_n_outputs());
-  for(unsigned int i=0; i<get_rb_theta_expansion().get_n_outputs(); i++)
+  if(!skip_matrix_assembly && !skip_vector_assembly)
     {
-      libmesh_assert_equal_to (get_rb_theta_expansion().get_n_output_terms(i),
-                               get_rb_assembly_expansion().get_n_output_terms(i));
+      // Check that the theta and assembly objects are consistently sized
+      libmesh_assert_equal_to (get_rb_theta_expansion().get_n_A_terms(), get_rb_assembly_expansion().get_n_A_terms());
+      libmesh_assert_equal_to (get_rb_theta_expansion().get_n_F_terms(), get_rb_assembly_expansion().get_n_F_terms());
+      libmesh_assert_equal_to (get_rb_theta_expansion().get_n_outputs(), get_rb_assembly_expansion().get_n_outputs());
+      for(unsigned int i=0; i<get_rb_theta_expansion().get_n_outputs(); i++)
+        {
+          libmesh_assert_equal_to (get_rb_theta_expansion().get_n_output_terms(i),
+                                   get_rb_assembly_expansion().get_n_output_terms(i));
+        }
     }
-
 
   // Perform the initialization
   allocate_data_structures();
