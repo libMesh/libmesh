@@ -61,7 +61,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tri6 (Elem * p=NULL) :
+  Tri6 (Elem * p=libmesh_nullptr) :
     Tri(Tri6::n_nodes(), p, _nodelinks_data) {}
 
   /**

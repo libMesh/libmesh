@@ -45,13 +45,13 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  NodeElem (Elem * p=NULL) :
+  NodeElem (Elem * p=libmesh_nullptr) :
     Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data,
          _nodelinks_data)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 0)
-      this->set_interior_parent(NULL);
+      this->set_interior_parent(libmesh_nullptr);
   }
 
   /**

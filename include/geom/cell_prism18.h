@@ -79,7 +79,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Prism18 (Elem * p=NULL) :
+  Prism18 (Elem * p=libmesh_nullptr) :
     Prism(Prism18::n_nodes(), p, _nodelinks_data)
   {}
 

@@ -803,7 +803,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
         Elem * subelem[6];
 
         for (unsigned int i = 0; i != max_subelems; ++i)
-          subelem[i] = NULL;
+          subelem[i] = libmesh_nullptr;
 
         switch (etype)
           {
@@ -1630,7 +1630,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                          * id is greater than its neighbor's.
                          * Sides get only built once.
                          */
-                        if ((elem->neighbor(s) != NULL) &&
+                        if ((elem->neighbor(s) != libmesh_nullptr) &&
                             (elem->id() > elem->neighbor(s)->id()) )
                           {
                             UniquePtr<Elem> side(elem->build_side(s));

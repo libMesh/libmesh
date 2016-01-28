@@ -86,7 +86,7 @@ public:
    */
   virtual void write_equation_systems (const std::string &,
                                        const EquationSystems &,
-                                       const std::set<std::string> * system_names=NULL);
+                                       const std::set<std::string> * system_names=libmesh_nullptr);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -146,7 +146,7 @@ private:
   void _build_variable_names_and_solution_vector(const EquationSystems & es,
                                                  std::vector<Number> & soln,
                                                  std::vector<std::string> & names,
-                                                 const std::set<std::string> * system_names=NULL);
+                                                 const std::set<std::string> * system_names=libmesh_nullptr);
 };
 
 
@@ -160,7 +160,7 @@ template <class MT>
 inline
 MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
   _is_parallel_format(is_parallel_format),
-  _obj(NULL),
+  _obj(libmesh_nullptr),
   _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
 {}
 

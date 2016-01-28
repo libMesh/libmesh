@@ -138,7 +138,7 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
     {
       // Don't compute on non-boundary sides unless requested
       if (!_sys.get_physics()->compute_internal_sides &&
-          _femcontext.get_elem().neighbor(_femcontext.side) != NULL)
+          _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr)
         continue;
 
       // Any mesh movement has already been done (and restored,
@@ -425,7 +425,7 @@ public:
             // Don't compute on non-boundary sides unless requested
             if (!_sys.postprocess_sides ||
                 (!_sys.get_physics()->compute_internal_sides &&
-                 _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
+                 _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr))
               continue;
 
             // Optionally initialize all the FE objects on this side.
@@ -553,7 +553,7 @@ public:
             // Don't compute on non-boundary sides unless requested
             if (!_diff_qoi.assemble_qoi_sides ||
                 (!_diff_qoi.assemble_qoi_internal_sides &&
-                 _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
+                 _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr))
               continue;
 
             _femcontext.side_fe_reinit();
@@ -724,7 +724,7 @@ public:
             // Don't compute on non-boundary sides unless requested
             if (!_qoi.assemble_qoi_sides ||
                 (!_qoi.assemble_qoi_internal_sides &&
-                 _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
+                 _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr))
               continue;
 
             _femcontext.side_fe_reinit();
@@ -940,7 +940,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
       UniquePtr<DiffContext> con = this->build_context();
       FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
       this->init_context(_femcontext);
-      _femcontext.pre_fe_reinit(*this, NULL);
+      _femcontext.pre_fe_reinit(*this, libmesh_nullptr);
 
       bool jacobian_computed =
         this->time_solver->nonlocal_residual(get_jacobian, _femcontext);
@@ -1229,7 +1229,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           context.get_elem_solution(v)(j) -= my_h;
 
           // Make sure to catch any moving mesh terms
-          Real * coord = NULL;
+          Real * coord = libmesh_nullptr;
           if (_mesh_sys == this)
             {
               if (_mesh_x_var == v)
@@ -1372,7 +1372,7 @@ void FEMSystem::init_context(DiffContext & c)
           {
           case( TYPE_SCALAR ):
             {
-              FEBase * elem_fe = NULL;
+              FEBase * elem_fe = libmesh_nullptr;
               context.get_element_fe(var, elem_fe);
               elem_fe->get_JxW();
               elem_fe->get_phi();
@@ -1380,7 +1380,7 @@ void FEMSystem::init_context(DiffContext & c)
             break;
           case( TYPE_VECTOR ):
             {
-              FEGenericBase<RealGradient> * elem_fe = NULL;
+              FEGenericBase<RealGradient> * elem_fe = libmesh_nullptr;
               context.get_element_fe(var, elem_fe);
               elem_fe->get_JxW();
               elem_fe->get_phi();

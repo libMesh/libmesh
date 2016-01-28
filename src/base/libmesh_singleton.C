@@ -86,7 +86,7 @@ void Singleton::setup ()
   for (SetupList::iterator it = setup_cache.begin();
        it!=setup_cache.end(); ++it)
     {
-      libmesh_assert (*it != NULL);
+      libmesh_assert (*it != libmesh_nullptr);
       (*it)->setup();
     }
 }
@@ -102,9 +102,9 @@ void Singleton::cleanup ()
   for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
        it!=singleton_cache.rend(); ++it)
     {
-      libmesh_assert (*it != NULL);
+      libmesh_assert (*it != libmesh_nullptr);
       delete *it;
-      *it = NULL;
+      *it = libmesh_nullptr;
     }
 
   singleton_cache.clear();

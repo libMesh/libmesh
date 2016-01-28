@@ -52,12 +52,12 @@ public:
 
   /**
    * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to NULL.  Defaults to L2 norm; changes to system norm are
+   * pointer to libmesh_nullptr.  Defaults to L2 norm; changes to system norm are
    * ignored.
    */
   DiscontinuityMeasure() :
     JumpErrorEstimator(),
-    _bc_function(NULL)
+    _bc_function(libmesh_nullptr)
   { error_norm = L2; }
 
   /**

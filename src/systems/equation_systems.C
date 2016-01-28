@@ -83,7 +83,7 @@ void EquationSystems::clear ()
 
       System * sys = pos->second;
       delete sys;
-      sys = NULL;
+      sys = libmesh_nullptr;
 
       _systems.erase (pos);
     }
@@ -494,7 +494,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     for (; pos != end; ++pos)
       {
         // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
+        bool use_current_system = (system_names == libmesh_nullptr);
         if (!use_current_system)
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
@@ -530,7 +530,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
   for (; pos != end; ++pos)
     {
       // Check current system is listed in system_names, and skip pos if not
-      bool use_current_system = (system_names == NULL);
+      bool use_current_system = (system_names == libmesh_nullptr);
       if (!use_current_system)
         use_current_system = system_names->count(pos->first);
       if (!use_current_system)
@@ -544,7 +544,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
           unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
 
           // Filter on the type if requested
-          if (type == NULL || (type && *type == fe_type))
+          if (type == libmesh_nullptr || (type && *type == fe_type))
             {
               if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
                 {
@@ -697,7 +697,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
     for (; pos != end; ++pos)
       {
         // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
+        bool use_current_system = (system_names == libmesh_nullptr);
         if (!use_current_system)
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
@@ -754,7 +754,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
   for (; pos != end; ++pos)
     {
       // Check current system is listed in system_names, and skip pos if not
-      bool use_current_system = (system_names == NULL);
+      bool use_current_system = (system_names == libmesh_nullptr);
       if (!use_current_system)
         use_current_system = system_names->count(pos->first);
       if (!use_current_system)
@@ -1027,7 +1027,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
     for (; pos != end; ++pos)
       {
         // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
+        bool use_current_system = (system_names == libmesh_nullptr);
         if (!use_current_system)
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)
@@ -1072,7 +1072,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
     for (; pos != end; ++pos)
       {
         // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
+        bool use_current_system = (system_names == libmesh_nullptr);
         if (!use_current_system)
           use_current_system = system_names->count(pos->first);
         if (!use_current_system)

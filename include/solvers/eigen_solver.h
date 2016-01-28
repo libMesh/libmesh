@@ -260,7 +260,7 @@ EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
   _eigen_problem_type   (NHEP),
   _position_of_spectrum (LARGEST_MAGNITUDE),
   _is_initialized       (false),
-  _solver_configuration(NULL)
+  _solver_configuration(libmesh_nullptr)
 {
 }
 

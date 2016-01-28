@@ -55,7 +55,11 @@ public:
    * Constructor. Private to force use of the \p create() member.
    */
 private:
-  RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL)
+  RemoteElem () : Elem(0,
+                       0,
+                       libmesh_nullptr,
+                       _elemlinks_data,
+                       libmesh_nullptr)
   { this->set_id(remote_elem_id); }
 
 public:

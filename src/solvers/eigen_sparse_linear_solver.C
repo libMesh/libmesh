@@ -249,7 +249,7 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
   // switch (this->_preconditioner_type)
   //   {
   //   case IDENTITY_PRECOND:
-  //     _precond_type = NULL; return;
+  //     _precond_type = libmesh_nullptr; return;
 
   //   case ILU_PRECOND:
   //     _precond_type = ILUPrecond; return;

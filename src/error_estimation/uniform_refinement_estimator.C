@@ -52,10 +52,15 @@ void UniformRefinementEstimator::estimate_error (const System & _system,
                                                  bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "UniformRefinementEstimator");
-  std::map<const System *, const NumericVector<Number> * > solution_vectors;
+  std::map<const System *, const NumericVector<Number> *> solution_vectors;
   solution_vectors[&_system] = solution_vector;
-  this->_estimate_error (NULL, &_system, &error_per_cell, NULL, NULL,
-                         &solution_vectors, estimate_parent_error);
+  this->_estimate_error (libmesh_nullptr,
+                         &_system,
+                         &error_per_cell,
+                         libmesh_nullptr,
+                         libmesh_nullptr,
+                         &solution_vectors,
+                         estimate_parent_error);
   STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
 
@@ -66,8 +71,12 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
                                                   bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
-  this->_estimate_error (&_es, NULL, &error_per_cell, NULL,
-                         &error_norms, solution_vectors,
+  this->_estimate_error (&_es,
+                         libmesh_nullptr,
+                         &error_per_cell,
+                         libmesh_nullptr,
+                         &error_norms,
+                         solution_vectors,
                          estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
@@ -78,8 +87,13 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
                                                   bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
-  this->_estimate_error (&_es, NULL, NULL, &errors_per_cell, NULL,
-                         solution_vectors, estimate_parent_error);
+  this->_estimate_error (&_es,
+                         libmesh_nullptr,
+                         libmesh_nullptr,
+                         &errors_per_cell,
+                         libmesh_nullptr,
+                         solution_vectors,
+                         estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 

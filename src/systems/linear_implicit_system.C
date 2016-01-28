@@ -42,8 +42,8 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
   linear_solver          (LinearSolver<Number>::build(es.comm())),
   _n_linear_iterations   (0),
   _final_linear_residual (1.e20),
-  _shell_matrix(NULL),
-  _subset(NULL),
+  _shell_matrix(libmesh_nullptr),
+  _subset(libmesh_nullptr),
   _subset_solve_mode(SUBSET_ZERO)
 {
 }
@@ -63,7 +63,7 @@ void LinearImplicitSystem::clear ()
   // clear the linear solver
   linear_solver->clear();
 
-  this->restrict_solve_to(NULL);
+  this->restrict_solve_to(libmesh_nullptr);
 
   // clear the parent data
   Parent::clear();
@@ -98,10 +98,9 @@ void LinearImplicitSystem::restrict_solve_to (const SystemSubset * subset,
 {
   _subset = subset;
   _subset_solve_mode = subset_solve_mode;
-  if(subset!=NULL)
-    {
-      libmesh_assert_equal_to (&subset->get_system(), this);
-    }
+
+  if (subset != libmesh_nullptr)
+    libmesh_assert_equal_to (&subset->get_system(), this);
 }
 
 
@@ -134,10 +133,8 @@ void LinearImplicitSystem::solve ()
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  if(_subset!=NULL)
-    {
-      linear_solver->restrict_solve_to(&_subset->dof_ids(),_subset_solve_mode);
-    }
+  if (_subset != libmesh_nullptr)
+    linear_solver->restrict_solve_to(&_subset->dof_ids(),_subset_solve_mode);
 
   // Solve the linear system.  Several cases:
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
@@ -148,10 +145,8 @@ void LinearImplicitSystem::solve ()
     // 2.) No shell matrix, with or without user-supplied preconditioner
     rval = linear_solver->solve (*matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
 
-  if(_subset!=NULL)
-    {
-      linear_solver->restrict_solve_to(NULL);
-    }
+  if (_subset != libmesh_nullptr)
+    linear_solver->restrict_solve_to(libmesh_nullptr);
 
   // Store the number of linear iterations required to
   // solve and the final residual.
@@ -233,7 +228,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
   // We currently don't support adjoint solves of shell matrices
   // FIXME - we should let shell matrices support
   // vector_transpose_mult so that we can use them here.
-  if(_shell_matrix!=NULL)
+  if(_shell_matrix!=libmesh_nullptr)
   libmesh_not_implemented();
 
   if (this->assemble_before_solve)

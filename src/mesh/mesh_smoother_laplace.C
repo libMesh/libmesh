@@ -72,7 +72,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
           {
             Node * node = *it;
 
-            if (node == NULL)
+            if (node == libmesh_nullptr)
               libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer.");
 
             // leave the boundary intact
@@ -90,7 +90,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                     // NULL.
                     Node * connected_node = _mesh.node_ptr(_graph[node->id()][j]);
 
-                    if (connected_node == NULL)
+                    if (connected_node == libmesh_nullptr)
                       libmesh_error_msg("Error! Libmesh returned NULL pointer for node " << _graph[connected_node->id()][j]);
 
                     avg_position.add( *connected_node );
@@ -201,7 +201,7 @@ void LaplaceMeshSmoother::init()
                 // boundary or for which the current element's
                 // id is greater than its neighbor's.
                 // Sides get only built once.
-                if ((elem->neighbor(s) == NULL) ||
+                if ((elem->neighbor(s) == libmesh_nullptr) ||
                     (elem->id() > elem->neighbor(s)->id()))
                   {
                     UniquePtr<Elem> side(elem->build_side(s));
@@ -228,7 +228,7 @@ void LaplaceMeshSmoother::init()
             const Elem * elem = *el;
 
             for (unsigned int f=0; f<elem->n_neighbors(); f++) // Loop over faces
-              if ((elem->neighbor(f) == NULL) ||
+              if ((elem->neighbor(f) == libmesh_nullptr) ||
                   (elem->id() > elem->neighbor(f)->id()))
                 {
                   // We need a full (i.e. non-proxy) element for the face, since we will

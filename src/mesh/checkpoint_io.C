@@ -279,7 +279,7 @@ void CheckpointIO::write_connectivity (Xdr & io) const
           elem_data[2] = elem.processor_id();
           elem_data[3] = elem.subdomain_id();
 
-          if(elem.parent() != NULL)
+          if(elem.parent() != libmesh_nullptr)
             elem_data[4] = elem.parent()->id();
           else
             elem_data[4] = DofObject::invalid_processor_id;
@@ -611,7 +611,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
           const dof_id_type parent_id          =
             cast_int<dof_id_type>      (elem_data[4]);
 
-          Elem * parent = (parent_id == DofObject::invalid_processor_id) ? NULL : mesh.elem(parent_id);
+          Elem * parent = (parent_id == DofObject::invalid_processor_id) ? libmesh_nullptr : mesh.elem(parent_id);
 
           // Create the element
           Elem * elem = Elem::build(elem_type, parent).release();

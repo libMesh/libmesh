@@ -1204,7 +1204,7 @@ public:
    * \p UniquePtr<>
    */
   static UniquePtr<Elem> build (const ElemType type,
-                                Elem * p=NULL);
+                                Elem * p=libmesh_nullptr);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1404,7 +1404,7 @@ Elem::Elem(const unsigned int nn,
   _nodes(nodelinkdata),
   _elemlinks(elemlinkdata),
 #ifdef LIBMESH_ENABLE_AMR
-  _children(NULL),
+  _children(libmesh_nullptr),
 #endif
   _sbd_id(0)
 #ifdef LIBMESH_ENABLE_AMR
@@ -1420,7 +1420,7 @@ Elem::Elem(const unsigned int nn,
   if (_nodes)
     {
       for (unsigned int n=0; n<nn; n++)
-        _nodes[n] = NULL;
+        _nodes[n] = libmesh_nullptr;
     }
 
   // Initialize the neighbors/parent data structure
@@ -1431,11 +1431,11 @@ Elem::Elem(const unsigned int nn,
       _elemlinks[0] = p;
 
       for (unsigned int n=1; n<ns+1; n++)
-        _elemlinks[n] = NULL;
+        _elemlinks[n] = libmesh_nullptr;
     }
 
   // Optionally initialize data from the parent
-  if (this->parent() != NULL)
+  if (this->parent() != libmesh_nullptr)
     {
       this->subdomain_id() = this->parent()->subdomain_id();
       this->processor_id() = this->parent()->processor_id();
@@ -1455,18 +1455,18 @@ Elem::~Elem()
   // Deleting my parent/neighbor/nodes storage isn't necessary since it's
   // handled by the subclass
 
-  // if (_nodes != NULL)
+  // if (_nodes != libmesh_nullptr)
   //   delete [] _nodes;
-  // _nodes = NULL;
+  // _nodes = libmesh_nullptr;
 
   // delete [] _elemlinks;
 
 #ifdef LIBMESH_ENABLE_AMR
 
   // Delete my children's storage
-  if (_children != NULL)
+  if (_children != libmesh_nullptr)
     delete [] _children;
-  _children = NULL;
+  _children = libmesh_nullptr;
 
 #endif
 }
@@ -1616,7 +1616,7 @@ Elem * Elem::child_neighbor (Elem * elem) const
         elem->neighbor(n)->parent() == this)
       return elem->neighbor(n);
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -1629,7 +1629,7 @@ const Elem * Elem::child_neighbor (const Elem * elem) const
         elem->neighbor(n)->parent() == this)
       return elem->neighbor(n);
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -1639,7 +1639,7 @@ bool Elem::on_boundary () const
 {
   // By convention, the element is on the boundary
   // if it has a NULL neighbor.
-  return this->has_neighbor(NULL);
+  return this->has_neighbor(libmesh_nullptr);
 }
 
 
@@ -1744,7 +1744,7 @@ bool Elem::subactive() const
   if (!this->has_children())
     return true;
   for (const Elem * my_ancestor = this->parent();
-       my_ancestor != NULL;
+       my_ancestor != libmesh_nullptr;
        my_ancestor = my_ancestor->parent())
     if (my_ancestor->active())
       return true;
@@ -1759,7 +1759,7 @@ inline
 bool Elem::has_children() const
 {
 #ifdef LIBMESH_ENABLE_AMR
-  if (_children == NULL)
+  if (_children == libmesh_nullptr)
     return false;
   else
     return true;
@@ -1773,7 +1773,7 @@ inline
 bool Elem::has_ancestor_children() const
 {
 #ifdef LIBMESH_ENABLE_AMR
-  if (_children == NULL)
+  if (_children == libmesh_nullptr)
     return false;
   else
     for (unsigned int c=0; c != this->n_children(); c++)
@@ -1837,7 +1837,7 @@ const Elem * Elem::top_parent () const
 
   // Keep getting the element's parent
   // until that parent is at level-0
-  while (tp->parent() != NULL)
+  while (tp->parent() != libmesh_nullptr)
     tp = tp->parent();
 
   libmesh_assert(tp);
@@ -1857,7 +1857,7 @@ unsigned int Elem::level() const
   // created directly from file
   // or by the user, so I am a
   // level-0 element
-  if (this->parent() == NULL)
+  if (this->parent() == libmesh_nullptr)
     return 0;
 
   // if the parent and this element are of different
@@ -1988,7 +1988,7 @@ inline
 void Elem::set_p_level(unsigned int p)
 {
   // Maintain the parent's p level as the minimum of it's children
-  if (this->parent() != NULL)
+  if (this->parent() != libmesh_nullptr)
     {
       unsigned int parent_p_level = this->parent()->p_level();
 
@@ -2124,7 +2124,7 @@ public:
   SideIter(const unsigned int side_number,
            Elem * parent)
     : _side(),
-      _side_ptr(NULL),
+      _side_ptr(libmesh_nullptr),
       _parent(parent),
       _side_number(side_number)
   {}
@@ -2133,8 +2133,8 @@ public:
   // Empty constructor.
   SideIter()
     : _side(),
-      _side_ptr(NULL),
-      _parent(NULL),
+      _side_ptr(libmesh_nullptr),
+      _parent(libmesh_nullptr),
       _side_number(libMesh::invalid_uint)
   {}
 
@@ -2142,7 +2142,7 @@ public:
   // Copy constructor
   SideIter(const SideIter & other)
     : _side(),
-      _side_ptr(NULL),
+      _side_ptr(libmesh_nullptr),
       _parent(other._parent),
       _side_number(other._side_number)
   {}
@@ -2188,7 +2188,7 @@ public:
   // this could possibly change in the future?
   bool side_on_boundary() const
   {
-    return this->_parent->neighbor(_side_number) == NULL;
+    return this->_parent->neighbor(_side_number) == libmesh_nullptr;
   }
 
 private:

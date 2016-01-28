@@ -42,7 +42,7 @@ namespace libMesh
 // Constructor
 TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
   : _mesh(mesh),
-    _holes(NULL),
+    _holes(libmesh_nullptr),
     _elem_type(TRI3),
     _desired_area(0.1),
     _minimum_angle(20.0),
@@ -59,7 +59,7 @@ TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
 void TriangleInterface::triangulate()
 {
   // Will the triangulation have holes?
-  const bool have_holes = ((_holes != NULL) && (!_holes->empty()));
+  const bool have_holes = ((_holes != libmesh_nullptr) && (!_holes->empty()));
 
   // If the initial PSLG is really simple, e.g. an L-shaped domain or
   // a square/rectangle, the resulting triangulation may be very
@@ -323,7 +323,7 @@ void TriangleInterface::triangulate()
   TriangleWrapper::triangulate(const_cast<char *>(flags.str().c_str()),
                                &initial,
                                &final,
-                               NULL); // voronoi ouput -- not used
+                               libmesh_nullptr); // voronoi ouput -- not used
 
 
   // Send the information computed by Triangle to the Mesh.

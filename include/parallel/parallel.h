@@ -234,7 +234,7 @@ public:
    * as tags.  Communicator::get_unique_tag is recommended instead.
    */
   explicit MessageTag(int tagvalue = invalid_tag)
-    : _tagvalue(tagvalue), _comm(NULL) {}
+    : _tagvalue(tagvalue), _comm(libmesh_nullptr) {}
 
   /**
    * Copy constructor.  Helps Communicator do reference counting on
@@ -388,7 +388,7 @@ class StandardType : public DataType
    * form.
    */
 private:
-  StandardType(const T * example = NULL);
+  StandardType(const T * example = libmesh_nullptr);
 };
 
 /*
@@ -1227,7 +1227,7 @@ struct PostWaitUnpackBuffer : public PostWaitWork {
     _buf(buffer), _context(context), _out(out) {}
 
   virtual void run() libmesh_override {
-    Parallel::unpack_range(_buf, _context, _out, (T*)NULL);
+    Parallel::unpack_range(_buf, _context, _out, (T*)libmesh_nullptr);
   }
 
 private:

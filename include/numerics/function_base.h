@@ -65,7 +65,7 @@ protected:
    * Constructor.  Optionally takes a master.
    */
   explicit
-  FunctionBase (const FunctionBase * master = NULL);
+  FunctionBase (const FunctionBase * master = libmesh_nullptr);
 
 public:
 

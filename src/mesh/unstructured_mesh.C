@@ -127,7 +127,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         const Elem * old = *it;
         //Build a new element
         Elem * newparent = old->parent() ?
-          this->elem(old->parent()->id()) : NULL;
+          this->elem(old->parent()->id()) : libmesh_nullptr;
         UniquePtr<Elem> ap = Elem::build(old->type(), newparent);
         Elem * el = ap.release();
 
@@ -249,7 +249,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
         for (unsigned int s=0; s<e->n_neighbors(); s++)
           if (e->neighbor(s) != remote_elem ||
               reset_remote_elements)
-            e->set_neighbor(s,NULL);
+            e->set_neighbor(s, libmesh_nullptr);
       }
 
   // Find neighboring elements by first finding elements
@@ -278,7 +278,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             // If we haven't yet found a neighbor on this side, try.
             // Even if we think our neighbor is remote, that
             // information may be out of date.
-            if (element->neighbor(ms) == NULL ||
+            if (element->neighbor(ms) == libmesh_nullptr ||
                 element->neighbor(ms) == remote_elem)
               {
                 // Get the key for the side of this element
@@ -415,7 +415,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
           for (unsigned int s=0; s < current_elem->n_neighbors(); s++)
             {
-              if (current_elem->neighbor(s) == NULL ||
+              if (current_elem->neighbor(s) == libmesh_nullptr ||
                   (current_elem->neighbor(s) == remote_elem &&
                    parent->is_child_on_side(my_child_num, s)))
                 {
@@ -450,7 +450,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   if (!current_elem->subactive())
                     current_elem->set_neighbor(s, neigh);
 #ifdef DEBUG
-                  if (neigh != NULL && neigh != remote_elem)
+                  if (neigh != libmesh_nullptr && neigh != remote_elem)
                     // We ignore subactive elements here because
                     // we don't care about neighbors of subactive element.
                     if ((!neigh->active()) && (!current_elem->subactive()))
@@ -489,7 +489,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             continue;
 
           // We have no interior parents unless we can find one later
-          current_elem->set_interior_parent(NULL);
+          current_elem->set_interior_parent(libmesh_nullptr);
 
           Elem * pip = parent->interior_parent();
 
@@ -779,7 +779,7 @@ bool UnstructuredMesh::contract ()
 
 #ifdef DEBUG
   for ( ; in != end; ++in)
-    if (*in != NULL)
+    if (*in != libmesh_nullptr)
       {
         Elem * el = *in;
         libmesh_assert(el->active() || el->subactive() || el->ancestor());
@@ -789,7 +789,7 @@ bool UnstructuredMesh::contract ()
 
   // Loop over the elements.
   for ( ; in != end; ++in)
-    if (*in != NULL)
+    if (*in != libmesh_nullptr)
       {
         Elem * el = *in;
 

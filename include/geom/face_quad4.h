@@ -54,7 +54,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Quad4 (Elem * p=NULL) :
+  Quad4 (Elem * p=libmesh_nullptr) :
     Quad(Quad4::n_nodes(), p, _nodelinks_data) {}
 
   /**

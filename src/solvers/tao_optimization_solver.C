@@ -76,7 +76,7 @@ extern "C"
     // Swap back
     X.swap(X_sys);
 
-    if (solver->objective_object != NULL)
+    if (solver->objective_object != libmesh_nullptr)
       (*objective) = solver->objective_object->objective(*(sys.current_local_solution), sys);
     else
       libmesh_error_msg("Objective function not defined in __libmesh_tao_objective");
@@ -128,7 +128,7 @@ extern "C"
     // Clear the gradient prior to assembly
     gradient.zero();
 
-    if (solver->gradient_object != NULL)
+    if (solver->gradient_object != libmesh_nullptr)
       solver->gradient_object->gradient(*(sys.current_local_solution), gradient, sys);
     else
       libmesh_error_msg("Gradient function not defined in __libmesh_tao_gradient");
@@ -180,7 +180,7 @@ extern "C"
     PC.attach_dof_map(sys.get_dof_map());
     hessian.attach_dof_map(sys.get_dof_map());
 
-    if (solver->hessian_object != NULL)
+    if (solver->hessian_object != libmesh_nullptr)
       {
         // Following PetscNonlinearSolver by passing in PC. It's not clear
         // why we pass in PC and not hessian though?
@@ -238,7 +238,7 @@ extern "C"
     // Clear the gradient prior to assembly
     eq_constraints.zero();
 
-    if (solver->equality_constraints_object != NULL)
+    if (solver->equality_constraints_object != libmesh_nullptr)
       solver->equality_constraints_object->equality_constraints(*(sys.current_local_solution), eq_constraints, sys);
     else
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_equality_constraints");
@@ -288,7 +288,7 @@ extern "C"
     PetscMatrix<Number> J_petsc(J, sys.comm());
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
-    if (solver->equality_constraints_jacobian_object != NULL)
+    if (solver->equality_constraints_jacobian_object != libmesh_nullptr)
       solver->equality_constraints_jacobian_object->equality_constraints_jacobian(*(sys.current_local_solution), J_petsc, sys);
     else
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_equality_constraints_jacobian");
@@ -341,7 +341,7 @@ extern "C"
     // Clear the gradient prior to assembly
     ineq_constraints.zero();
 
-    if (solver->inequality_constraints_object != NULL)
+    if (solver->inequality_constraints_object != libmesh_nullptr)
       solver->inequality_constraints_object->inequality_constraints(*(sys.current_local_solution), ineq_constraints, sys);
     else
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_inequality_constraints");
@@ -391,7 +391,7 @@ extern "C"
     PetscMatrix<Number> J_petsc(J, sys.comm());
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
-    if (solver->inequality_constraints_jacobian_object != NULL)
+    if (solver->inequality_constraints_jacobian_object != libmesh_nullptr)
       solver->inequality_constraints_jacobian_object->inequality_constraints_jacobian(*(sys.current_local_solution), J_petsc, sys);
     else
       libmesh_error_msg("Constraints function not defined in __libmesh_tao_inequality_constraints_jacobian");

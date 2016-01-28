@@ -248,7 +248,7 @@ void gen_random_string(std::string & s, const int len)
     "abcdefghijklmnopqrstuvwxyz";
 
   // Seed the random number generator with the current time
-  srand( static_cast<unsigned>(time(NULL)) );
+  srand( static_cast<unsigned>(time(libmesh_nullptr)) );
 
   s.resize(len);
   for (int i = 0; i < len; ++i)

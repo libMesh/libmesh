@@ -86,7 +86,7 @@ public:
    * to disallow renumbering, set \p MeshBase::allow_renumbering(false)
    */
   virtual void read (const std::string & name,
-                     MeshData * mesh_data=NULL,
+                     MeshData * mesh_data=libmesh_nullptr,
                      bool skip_renumber_nodes_and_elements=false) libmesh_override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
@@ -97,7 +97,7 @@ public:
    * using with this mesh, since these write methods expect it.
    */
   virtual void write (const std::string & name,
-                      MeshData * mesh_data=NULL) libmesh_override;
+                      MeshData * mesh_data=libmesh_nullptr) libmesh_override;
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the

@@ -218,9 +218,9 @@ void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
     }
   else
     {
-      const unsigned int * p_ui = NULL;
-      const std::vector<unsigned int> * p_vui = NULL;
-      const std::vector<dof_id_type> * p_vdid = NULL;
+      const unsigned int * p_ui = libmesh_nullptr;
+      const std::vector<unsigned int> * p_vui = libmesh_nullptr;
+      const std::vector<dof_id_type> * p_vdid = libmesh_nullptr;
 
       libmesh_assert(communicator.semiverify(p_ui));
       libmesh_assert(communicator.semiverify(p_vui));
@@ -402,7 +402,7 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
 
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-      if ((*el)->neighbor(s) == NULL) // on the boundary
+      if ((*el)->neighbor(s) == libmesh_nullptr) // on the boundary
         {
           const UniquePtr<Elem> side((*el)->build_side(s));
 
@@ -840,7 +840,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
               // Did we find one?
               if (found_edge)
                 {
-                  Node * node_to_save = NULL;
+                  Node * node_to_save = libmesh_nullptr;
 
                   // Find another node in this element on this edge
                   for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
@@ -853,7 +853,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                       }
 
                   // Make sure we found something
-                  libmesh_assert(node_to_save != NULL);
+                  libmesh_assert(node_to_save != libmesh_nullptr);
 
                   neighbor_set.insert(node_to_save);
                 }
@@ -893,7 +893,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
           for (unsigned int s=0; s<elem->n_sides(); s++)
             {
               //If not a boundary node
-              if (elem->neighbor(s) != NULL)
+              if (elem->neighbor(s) != libmesh_nullptr)
                 {
                   // Get pointers to the element's neighbor.
                   const Elem * neigh = elem->neighbor(s);
@@ -1312,7 +1312,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
     {
       const Elem *elem = mesh.query_elem(i);
       const unique_id_type unique_id = elem ? elem->unique_id() : 0;
-      const unique_id_type * uid_ptr = elem ? &unique_id : NULL;
+      const unique_id_type * uid_ptr = elem ? &unique_id : libmesh_nullptr;
       libmesh_assert(mesh.comm().semiverify(uid_ptr));
     }
 
@@ -1323,7 +1323,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
     {
       const Node *node = mesh.query_node_ptr(i);
       const unique_id_type unique_id = node ? node->unique_id() : 0;
-      const unique_id_type * uid_ptr = node ? &unique_id : NULL;
+      const unique_id_type * uid_ptr = node ? &unique_id : libmesh_nullptr;
       libmesh_assert(mesh.comm().semiverify(uid_ptr));
     }
 }
@@ -1604,8 +1604,8 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 
       for (unsigned int n = 0; n != n_neigh; ++n)
         {
-          dof_id_type my_neighbor = DofObject::invalid_id; // NULL
-          dof_id_type * p_my_neighbor = NULL;
+          dof_id_type my_neighbor = DofObject::invalid_id;
+          dof_id_type * p_my_neighbor = libmesh_nullptr;
 
           // If we have a non-remote_elem neighbor link, then we can
           // verify it.
@@ -1621,7 +1621,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
               if (!assert_valid_remote_elems &&
                   !elem->neighbor(n) &&
                   elem->processor_id() != mesh.processor_id())
-                p_my_neighbor = NULL;
+                p_my_neighbor = libmesh_nullptr;
             }
           libmesh_assert(mesh.comm().semiverify(p_my_neighbor));
         }

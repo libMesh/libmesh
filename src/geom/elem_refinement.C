@@ -105,7 +105,7 @@ void Elem::coarsen()
 
   // We no longer delete children until MeshRefinement::contract()
   // delete [] _children;
-  // _children = NULL;
+  // _children = libmesh_nullptr;
 
   unsigned int parent_p_level = 0;
 
@@ -171,7 +171,7 @@ void Elem::contract()
 
   // Active contracted elements no longer can have children
   delete [] _children;
-  _children = NULL;
+  _children = libmesh_nullptr;
 
   if (this->refinement_flag() == Elem::JUST_COARSENED)
     this->set_refinement_flag(Elem::DO_NOTHING);

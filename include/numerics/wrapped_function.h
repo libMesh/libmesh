@@ -54,8 +54,8 @@ public:
                    Output fptr(const Point & p,
                                const Parameters & parameters,
                                const std::string & sys_name,
-                               const std::string & unknown_name) = NULL,
-                   const Parameters * parameters = NULL,
+                               const std::string & unknown_name) = libmesh_nullptr,
+                   const Parameters * parameters = libmesh_nullptr,
                    unsigned int varnum=0)
     : _sys(sys),
       _fptr(fptr),

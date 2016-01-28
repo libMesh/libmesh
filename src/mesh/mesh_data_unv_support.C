@@ -158,7 +158,7 @@ void MeshData::read_unv_implementation (std::istream & in_file)
              * If there is no MeshDataUnvHeader object
              * attached
              */
-            if (_unv_header==NULL)
+            if (_unv_header == libmesh_nullptr)
               {
                 /*
                  * Ignore the first lines that stand for
@@ -461,7 +461,7 @@ void MeshData::write_unv_implementation (std::ostream & out_file)
   /*
    * Write the header
    */
-  if (_unv_header==NULL)
+  if (_unv_header == libmesh_nullptr)
     {
       /*
        * create a header that holds at

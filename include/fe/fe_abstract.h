@@ -134,8 +134,8 @@ public:
    * \p reinit().
    */
   virtual void reinit (const Elem * elem,
-                       const std::vector<Point> * const pts = NULL,
-                       const std::vector<Real> * const weights = NULL) = 0;
+                       const std::vector<Point> * const pts = libmesh_nullptr,
+                       const std::vector<Real> * const weights = libmesh_nullptr) = 0;
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -148,8 +148,8 @@ public:
   virtual void reinit (const Elem * elem,
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
-                       const std::vector<Point> * const pts = NULL,
-                       const std::vector<Real> * const weights = NULL) = 0;
+                       const std::vector<Point> * const pts = libmesh_nullptr,
+                       const std::vector<Real> * const weights = libmesh_nullptr) = 0;
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -162,8 +162,8 @@ public:
   virtual void edge_reinit (const Elem * elem,
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
-                            const std::vector<Point> * pts = NULL,
-                            const std::vector<Real> * weights = NULL) = 0;
+                            const std::vector<Point> * pts = libmesh_nullptr,
+                            const std::vector<Real> * weights = libmesh_nullptr) = 0;
 
   /**
    * Computes the reference space quadrature points on the side of
@@ -608,7 +608,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   fe_type(fet),
   elem_type(INVALID_ELEM),
   _p_level(0),
-  qrule(NULL),
+  qrule(libmesh_nullptr),
   shapes_on_quadrature(false)
 {
 }

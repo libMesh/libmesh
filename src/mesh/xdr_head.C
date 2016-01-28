@@ -58,7 +58,7 @@ XdrHEAD::~XdrHEAD()
 
 char * XdrHEAD::cpyString(const char * src, int len)
 {
-  char * temp = NULL;
+  char * temp = libmesh_nullptr;
   int myLen = len;
   if(src)
     {

@@ -236,7 +236,7 @@ DTKAdapter::update_variable_values(std::string var_name)
 System *
 DTKAdapter::find_sys(std::string var_name)
 {
-  System * sys = NULL;
+  System * sys = libmesh_nullptr;
 
   // Find the system this variable is from
   for(unsigned int i=0; i<es.n_systems(); i++)

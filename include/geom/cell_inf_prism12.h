@@ -68,7 +68,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfPrism12 (Elem * p=NULL) :
+  InfPrism12 (Elem * p=libmesh_nullptr) :
     InfPrism(InfPrism12::n_nodes(), p, _nodelinks_data)
   {}
 

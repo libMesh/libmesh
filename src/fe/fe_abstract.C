@@ -808,7 +808,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != NULL &&
+    if (elem->neighbor(s) != libmesh_nullptr &&
         elem->neighbor(s) != remote_elem)
       if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
         {                                                     // this element and ones coarser

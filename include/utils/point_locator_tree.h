@@ -57,7 +57,7 @@ public:
    * use the master's tree.
    */
   PointLocatorTree (const MeshBase & mesh,
-                    const PointLocatorBase * master = NULL);
+                    const PointLocatorBase * master = libmesh_nullptr);
 
 
   /**
@@ -73,7 +73,7 @@ public:
    */
   PointLocatorTree (const MeshBase & mesh,
                     const Trees::BuildType build_type,
-                    const PointLocatorBase * master = NULL);
+                    const PointLocatorBase * master = libmesh_nullptr);
 
   /**
    * Destructor.
@@ -105,7 +105,7 @@ public:
    * operator().
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = NULL) const libmesh_override;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear

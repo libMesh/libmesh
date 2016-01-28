@@ -396,8 +396,8 @@ public:
    * \p elem.
    */
   virtual void reinit (const Elem * elem,
-                       const std::vector<Point> * const pts = NULL,
-                       const std::vector<Real> * const weights = NULL) libmesh_override;
+                       const std::vector<Point> * const pts = libmesh_nullptr,
+                       const std::vector<Real> * const weights = libmesh_nullptr) libmesh_override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -407,8 +407,8 @@ public:
   virtual void reinit (const Elem * elem,
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
-                       const std::vector<Point> * const pts = NULL,
-                       const std::vector<Real> * const weights = NULL) libmesh_override;
+                       const std::vector<Point> * const pts = libmesh_nullptr,
+                       const std::vector<Real> * const weights = libmesh_nullptr) libmesh_override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -418,8 +418,8 @@ public:
   virtual void edge_reinit (const Elem * elem,
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
-                            const std::vector<Point> * const pts = NULL,
-                            const std::vector<Real> * const weights = NULL) libmesh_override;
+                            const std::vector<Point> * const pts = libmesh_nullptr,
+                            const std::vector<Real> * const weights = libmesh_nullptr) libmesh_override;
 
   /**
    * Computes the reference space quadrature points on the side of

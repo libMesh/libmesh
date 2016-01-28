@@ -43,10 +43,10 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   _n_total_approx_sf (0),
   _n_total_qp        (0),
 
-  base_qrule   (NULL),
-  radial_qrule (NULL),
-  base_elem    (NULL),
-  base_fe      (NULL),
+  base_qrule   (libmesh_nullptr),
+  radial_qrule (libmesh_nullptr),
+  base_elem    (libmesh_nullptr),
+  base_fe      (libmesh_nullptr),
 
   // initialize the current_fe_type to all the same
   // values as \p fet (since the FE families and coordinate
@@ -83,16 +83,16 @@ InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
   // delete pointers, if necessary
   delete base_qrule;
-  base_qrule = NULL;
+  base_qrule = libmesh_nullptr;
 
   delete radial_qrule;
-  radial_qrule = NULL;
+  radial_qrule = libmesh_nullptr;
 
   delete base_elem;
-  base_elem = NULL;
+  base_elem = libmesh_nullptr;
 
   delete base_fe;
-  base_fe = NULL;
+  base_fe = libmesh_nullptr;
 }
 
 
@@ -132,7 +132,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase * q)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem * inf_elem)
 {
-  if (base_elem != NULL)
+  if (base_elem != libmesh_nullptr)
     delete base_elem;
   base_elem = Base::build_elem(inf_elem);
 }
@@ -153,7 +153,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
   libmesh_assert(radial_qrule);
   libmesh_assert(inf_elem);
 
-  if (pts == NULL)
+  if (pts == libmesh_nullptr)
     {
       bool init_shape_functions_required = false;
 
@@ -227,7 +227,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->compute_shape_functions (inf_elem,base_fe->qrule->get_points());
     }
 
-  else // if pts != NULL
+  else // if pts != libmesh_nullptr
     {
       // update the elem_type
       elem_type = inf_elem->type();
@@ -241,7 +241,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // the finite element on the ifem base
       {
         UniquePtr<FEBase> ap_fb(FEBase::build(Dim-1, this->fe_type));
-        if (base_fe != NULL)
+        if (base_fe != libmesh_nullptr)
           delete base_fe;
         base_fe = ap_fb.release();
       }
@@ -256,7 +256,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->combine_base_radial (inf_elem);
 
       // weights
-      if (weights != NULL)
+      if (weights != libmesh_nullptr)
         {
           this->_fe_map->compute_map (this->dim, *weights, inf_elem, this->calculate_d2phi);
         }

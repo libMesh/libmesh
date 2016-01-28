@@ -374,7 +374,7 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * el
       // Parallel mesh can return NULL pointers, this is bad...
       Node * current_node = this->_mesh.node_ptr( mapped_node_id );
 
-      if (current_node == NULL)
+      if (current_node == libmesh_nullptr)
         libmesh_error_msg("Error! Mesh returned NULL node pointer!");
 
       elem->set_node(j) = current_node;
@@ -410,7 +410,7 @@ unsigned TetGenMeshInterface::check_hull_integrity()
 
       for (unsigned int i=0; i<elem->n_neighbors(); ++i)
         {
-          if (elem->neighbor(i) == NULL)
+          if (elem->neighbor(i) == libmesh_nullptr)
             {
               // libmesh_error_msg("ERROR: Non-convex hull, cannot be tetrahedralized.");
               return 2;

@@ -317,7 +317,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           // getting them unless the requested norm is actually going
           // to use them.
 
-          const std::vector<std::vector<Real> > * phi = NULL;
+          const std::vector<std::vector<Real> > * phi = libmesh_nullptr;
           // If we're using phi to assert the correct dof_indices
           // vector size later, then we'll need to get_phi whether we
           // plan to use it or not.
@@ -327,7 +327,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 #endif
             phi = &(fe->get_phi());
 
-          const std::vector<std::vector<RealGradient> > * dphi = NULL;
+          const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
           if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
               error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
               error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
@@ -336,7 +336,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
             dphi = &(fe->get_dphi());
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor> > * d2phi = NULL;
+          const std::vector<std::vector<RealTensor> > * d2phi = libmesh_nullptr;
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             d2phi = &(fe->get_d2phi());

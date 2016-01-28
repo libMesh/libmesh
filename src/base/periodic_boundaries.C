@@ -43,7 +43,7 @@ PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id)
 {
   iterator i = this->find(id);
   if (i == this->end())
-    return NULL;
+    return libmesh_nullptr;
   return i->second;
 }
 
@@ -53,7 +53,7 @@ const PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id) c
 {
   const_iterator i = this->find(id);
   if (i == this->end())
-    return NULL;
+    return libmesh_nullptr;
   return i->second;
 }
 

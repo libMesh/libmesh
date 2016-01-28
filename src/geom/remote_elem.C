@@ -61,21 +61,21 @@ RemoteElem::~RemoteElem()
 {
   RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
 
-  remote_elem = NULL;
+  remote_elem = libmesh_nullptr;
 }
 
 
 
 const Elem & RemoteElem::create ()
 {
-  if (remote_elem != NULL)
+  if (remote_elem != libmesh_nullptr)
     return *remote_elem;
 
   RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
 
   // check again - object could have been created while waiting
   // for the lock to acquire!
-  if (remote_elem == NULL)
+  if (remote_elem == libmesh_nullptr)
     remote_elem = new RemoteElem;
 
   return *remote_elem;

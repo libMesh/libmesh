@@ -36,21 +36,21 @@ namespace libMesh
 
 FEMContext::FEMContext (const System & sys)
   : DiffContext(sys),
-    _mesh_sys(NULL),
+    _mesh_sys(libmesh_nullptr),
     _mesh_x_var(0),
     _mesh_y_var(0),
     _mesh_z_var(0),
     side(0), edge(0),
     _atype(CURRENT),
-    _custom_solution(NULL),
+    _custom_solution(libmesh_nullptr),
     _boundary_info(sys.get_mesh().get_boundary_info()),
-    _elem(NULL),
+    _elem(libmesh_nullptr),
     _dim(sys.get_mesh().mesh_dimension()),
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
-    _element_qrule(4,NULL),
-    _side_qrule(4,NULL),
-    _edge_qrule(NULL)
+    _element_qrule(4,libmesh_nullptr),
+    _side_qrule(4,libmesh_nullptr),
+    _edge_qrule(libmesh_nullptr)
 {
   // Reserve space for the FEAbstract and QBase objects for each
   // element dimension possiblity (0,1,2,3)
@@ -114,7 +114,7 @@ FEMContext::FEMContext (const System & sys)
         {
           FEType fe_type = sys.variable_type(i);
 
-          if ( _element_fe[dim][fe_type] == NULL )
+          if ( _element_fe[dim][fe_type] == libmesh_nullptr )
             {
               _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
               _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim]);
@@ -169,7 +169,7 @@ FEMContext::~FEMContext()
   _side_qrule.clear();
 
   delete _edge_qrule;
-  _edge_qrule = NULL;
+  _edge_qrule = libmesh_nullptr;
 }
 
 
@@ -208,7 +208,7 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType & u) c
   const DenseSubVector<Number> & coef = (this->*subsolution_getter)(var);
 
   // Get finite element object
-  typename FENeeded<OutputType>::value_base * fe = NULL;
+  typename FENeeded<OutputType>::value_base * fe = libmesh_nullptr;
   (this->*fe_getter)( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -238,7 +238,7 @@ void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType & d
   const DenseSubVector<Number> & coef = (this->*subsolution_getter)(var);
 
   // Get finite element object
-  typename FENeeded<OutputType>::grad_base * fe = NULL;
+  typename FENeeded<OutputType>::grad_base * fe = libmesh_nullptr;
   (this->*fe_getter)( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -272,7 +272,7 @@ void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType & d2
   const DenseSubVector<Number> & coef = (this->*subsolution_getter)(var);
 
   // Get finite element object
-  typename FENeeded<OutputType>::hess_base * fe = NULL;
+  typename FENeeded<OutputType>::hess_base * fe = libmesh_nullptr;
   (this->*fe_getter)( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -327,7 +327,7 @@ void FEMContext::interior_values (unsigned int var,
   const DenseSubVector<Number> & coef = get_localized_subvector(_system_vector, var);
 
   // Get the finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -392,7 +392,7 @@ void FEMContext::interior_gradients(unsigned int var,
   const DenseSubVector<Number> & coef = get_localized_subvector(_system_vector, var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -457,7 +457,7 @@ void FEMContext::interior_hessians(unsigned int var,
   const DenseSubVector<Number> & coef = get_localized_subvector(_system_vector, var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -498,7 +498,7 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -532,7 +532,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -586,7 +586,7 @@ void FEMContext::side_values(unsigned int var,
   const DenseSubVector<Number> & coef = get_localized_subvector(_system_vector, var);
 
   // Get the finite element object
-  FEGenericBase<OutputShape> * the_side_fe = NULL;
+  FEGenericBase<OutputShape> * the_side_fe = libmesh_nullptr;
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -635,7 +635,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * the_side_fe = NULL;
+  FEGenericBase<OutputShape> * the_side_fe = libmesh_nullptr;
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -670,7 +670,7 @@ void FEMContext::side_gradients(unsigned int var,
   const DenseSubVector<Number> & coef = get_localized_subvector(_system_vector, var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * the_side_fe = NULL;
+  FEGenericBase<OutputShape> * the_side_fe = libmesh_nullptr;
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -740,7 +740,7 @@ void FEMContext::side_hessians(unsigned int var,
   const DenseSubVector<Number> & coef = get_localized_subvector(_system_vector, var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * the_side_fe = NULL;
+  FEGenericBase<OutputShape> * the_side_fe = libmesh_nullptr;
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
@@ -794,7 +794,7 @@ void FEMContext::point_value(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -845,7 +845,7 @@ void FEMContext::point_gradient(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -899,7 +899,7 @@ void FEMContext::point_hessian(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -938,7 +938,7 @@ void FEMContext::point_curl(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -1135,7 +1135,7 @@ void FEMContext::fixed_point_value(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -1186,7 +1186,7 @@ void FEMContext::fixed_point_gradient(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -1240,7 +1240,7 @@ void FEMContext::fixed_point_hessian(unsigned int var,
   const DenseSubVector<Number> & coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape> * fe = NULL;
+  FEGenericBase<OutputShape> * fe = libmesh_nullptr;
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
@@ -1388,7 +1388,7 @@ void FEMContext::elem_fe_reinit(const std::vector<Point> * const pts)
         i->second->reinit(&(this->get_elem()), pts);
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-        i->second->reinit(NULL);
+        i->second->reinit(libmesh_nullptr);
     }
 }
 
@@ -1577,7 +1577,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-        sys.get_dof_map().dof_indices (NULL, this->get_dof_indices());
+        sys.get_dof_map().dof_indices (libmesh_nullptr, this->get_dof_indices());
     }
   else if (algebraic_type() == OLD)
     {
@@ -1586,7 +1586,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices());
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-        sys.get_dof_map().old_dof_indices (NULL, this->get_dof_indices());
+        sys.get_dof_map().old_dof_indices (libmesh_nullptr, this->get_dof_indices());
     }
 
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -1597,7 +1597,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
       this->algebraic_type() != DOFS_ONLY)
     {
       // This also resizes elem_solution
-      if (_custom_solution == NULL)
+      if (_custom_solution == libmesh_nullptr)
         sys.current_local_solution->get(this->get_dof_indices(), this->get_elem_solution().get_values());
       else
         _custom_solution->get(this->get_dof_indices(), this->get_elem_solution().get_values());
@@ -1645,7 +1645,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-              sys.get_dof_map().dof_indices (NULL, this->get_dof_indices(i), i);
+              sys.get_dof_map().dof_indices (libmesh_nullptr, this->get_dof_indices(i), i);
           }
         else if (algebraic_type() == OLD)
           {
@@ -1653,7 +1653,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-              sys.get_dof_map().old_dof_indices (NULL, this->get_dof_indices(i), i);
+              sys.get_dof_map().old_dof_indices (libmesh_nullptr, this->get_dof_indices(i), i);
           }
 
         if (this->algebraic_type() != NONE &&
@@ -1810,7 +1810,7 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
     fe_new->reinit (&this->get_elem(), &coor);
   else
     // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-    fe_new->reinit (NULL, &coor);
+    fe_new->reinit (libmesh_nullptr, &coor);
 
   return UniquePtr<FEGenericBase<OutputShape> >(fe_new);
 }

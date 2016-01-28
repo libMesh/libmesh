@@ -169,22 +169,22 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
   // minimize the required data redistribution.
-  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? NULL : &_pmetis->vtxdist[0],
-                                       _pmetis->xadj.empty()    ? NULL : &_pmetis->xadj[0],
-                                       _pmetis->adjncy.empty()  ? NULL : &_pmetis->adjncy[0],
-                                       _pmetis->vwgt.empty()    ? NULL : &_pmetis->vwgt[0],
-                                       vsize.empty()            ? NULL : &vsize[0],
-                                       NULL,
+  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? libmesh_nullptr : &_pmetis->vtxdist[0],
+                                       _pmetis->xadj.empty()    ? libmesh_nullptr : &_pmetis->xadj[0],
+                                       _pmetis->adjncy.empty()  ? libmesh_nullptr : &_pmetis->adjncy[0],
+                                       _pmetis->vwgt.empty()    ? libmesh_nullptr : &_pmetis->vwgt[0],
+                                       vsize.empty()            ? libmesh_nullptr : &vsize[0],
+                                       libmesh_nullptr,
                                        &_pmetis->wgtflag,
                                        &_pmetis->numflag,
                                        &_pmetis->ncon,
                                        &_pmetis->nparts,
-                                       _pmetis->tpwgts.empty()  ? NULL : &_pmetis->tpwgts[0],
-                                       _pmetis->ubvec.empty()   ? NULL : &_pmetis->ubvec[0],
+                                       _pmetis->tpwgts.empty()  ? libmesh_nullptr : &_pmetis->tpwgts[0],
+                                       _pmetis->ubvec.empty()   ? libmesh_nullptr : &_pmetis->ubvec[0],
                                        &itr,
                                        &_pmetis->options[0],
                                        &_pmetis->edgecut,
-                                       _pmetis->part.empty()    ? NULL : &_pmetis->part[0],
+                                       _pmetis->part.empty()    ? libmesh_nullptr : &_pmetis->part[0],
                                        &mpi_comm);
 
   // Assign the returned processor ids
@@ -498,7 +498,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
         {
           const Elem * neighbor = elem->neighbor(ms);
 
-          if (neighbor != NULL)
+          if (neighbor != libmesh_nullptr)
             {
               // If the neighbor is active treat it
               // as a connection

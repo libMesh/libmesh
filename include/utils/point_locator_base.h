@@ -77,7 +77,7 @@ public:
    */
   static UniquePtr<PointLocatorBase> build (PointLocatorType t,
                                             const MeshBase & mesh,
-                                            const PointLocatorBase * master = NULL);
+                                            const PointLocatorBase * master = libmesh_nullptr);
 
   /**
    * Clears the \p PointLocator.
@@ -95,7 +95,8 @@ public:
    * \p p is located.  Pure virtual. Optionally allows the user to restrict
    * the subdomains searched.
    */
-  virtual const Elem * operator() (const Point & p, const std::set<subdomain_id_type> * allowed_subdomains = NULL) const = 0;
+  virtual const Elem * operator() (const Point & p,
+                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
 
   /**
    * @returns \p true when this object is properly initialized

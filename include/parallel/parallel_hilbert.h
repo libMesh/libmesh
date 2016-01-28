@@ -47,7 +47,7 @@ class StandardType<Hilbert::HilbertIndices> : public DataType
 {
 public:
   explicit
-  StandardType(const Hilbert::HilbertIndices * =NULL) {
+  StandardType(const Hilbert::HilbertIndices * =libmesh_nullptr) {
     // _static_type never gets freed, but it only gets committed once
     // so it's not a *huge* memory leak...
     static DataType _static_type;

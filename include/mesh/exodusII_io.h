@@ -130,7 +130,7 @@ public:
    */
   void write_discontinuous_exodusII (const std::string & name,
                                      const EquationSystems & es,
-                                     const std::set<std::string> * system_names=NULL);
+                                     const std::set<std::string> * system_names=libmesh_nullptr);
 
   /**
    * Write out element solution.

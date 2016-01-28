@@ -94,7 +94,7 @@ public:
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char * name = NULL) = 0;
+  virtual void init (const char * name = libmesh_nullptr) = 0;
 
   /**
    * Apply names to the system to be solved.  For most packages this
@@ -304,9 +304,9 @@ LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) 
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
-  _preconditioner      (NULL),
+  _preconditioner      (libmesh_nullptr),
   same_preconditioner  (false),
-  _solver_configuration(NULL)
+  _solver_configuration(libmesh_nullptr)
 {
 }
 

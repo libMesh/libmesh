@@ -42,7 +42,7 @@ const processor_id_type DofObject::invalid_processor_id;
 DofObject::DofObject (const DofObject & dof_obj) :
   ReferenceCountedObject<DofObject>(),
 #ifdef LIBMESH_ENABLE_AMR
-  old_dof_object (NULL),
+  old_dof_object (libmesh_nullptr),
 #endif
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id     (dof_obj._unique_id),
@@ -134,7 +134,7 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 void  DofObject::clear_old_dof_object ()
 {
   delete this->old_dof_object;
-  this->old_dof_object = NULL;
+  this->old_dof_object = libmesh_nullptr;
 }
 
 
@@ -452,7 +452,7 @@ unsigned int DofObject::packed_indexing_size() const
   return
     cast_int<unsigned int> (
 #ifdef LIBMESH_ENABLE_AMR
-                            ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
+                            ((old_dof_object == libmesh_nullptr) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
 #else
                             1 +
 #endif
@@ -526,7 +526,7 @@ DofObject::pack_indexing(std::back_insert_iterator<std::vector<largest_id_type> 
 {
 #ifdef LIBMESH_ENABLE_AMR
   // We might need to pack old_dof_object too
-  *target++ = (old_dof_object == NULL) ? 0 : 1;
+  *target++ = (old_dof_object == libmesh_nullptr) ? 0 : 1;
 #endif
 
   *target++ = _idx_buf.size();

@@ -47,7 +47,7 @@ FrequencySystem::FrequencySystem (EquationSystems & es,
                                   const std::string & name_in,
                                   const unsigned int number_in) :
   LinearImplicitSystem      (es, name_in, number_in),
-  solve_system              (NULL),
+  solve_system              (libmesh_nullptr),
   _finished_set_frequencies (false),
   _keep_solution_duplicates (true),
   _finished_init            (false),

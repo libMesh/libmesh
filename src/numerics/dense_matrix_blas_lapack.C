@@ -822,8 +822,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
 
   // Ready to call the actual factorization routine through SLEPc's interface
   LAPACKgeevx_( &BALANC, &JOBVL, &JOBVR, &SENSE, &N, &(_val[0]), &LDA, &lambda_real_val[0],
-                &lambda_imag_val[0], NULL, &LDVL, NULL, &LDVR, &ILO, &IHI, &SCALE[0], &ABNRM,
-                &RCONDE[0], &RCONDV[0], &WORK[0], &LWORK, NULL, &INFO );
+                &lambda_imag_val[0], libmesh_nullptr, &LDVL, libmesh_nullptr, &LDVR, &ILO, &IHI, &SCALE[0], &ABNRM,
+                &RCONDE[0], &RCONDV[0], &WORK[0], &LWORK, libmesh_nullptr, &INFO );
 
   // Check return value for errors
   if (INFO != 0)

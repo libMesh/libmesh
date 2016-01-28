@@ -132,7 +132,7 @@ UniquePtr<Elem> InfHex16::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem * face = NULL;
+      Elem * face = libmesh_nullptr;
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)

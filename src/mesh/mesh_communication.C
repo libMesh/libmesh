@@ -359,7 +359,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
                                       mesh_inserter_iterator<Node>(mesh),
-                                      (Node**)NULL,
+                                      (Node**)libmesh_nullptr,
                                       nodestag);
 
   // Receive elements.
@@ -369,7 +369,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
                                       mesh_inserter_iterator<Elem>(mesh),
-                                      (Elem**)NULL,
+                                      (Elem**)libmesh_nullptr,
                                       elemstag);
 
   // Wait for all sends to complete
@@ -487,7 +487,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
             my_interface_elements.push_back(elem); // add the element, but only once, even
             // if there are multiple NULL neighbors
             for (unsigned int s=0; s<elem->n_sides(); s++)
-              if (elem->neighbor(s) == NULL)
+              if (elem->neighbor(s) == libmesh_nullptr)
                 {
                   UniquePtr<Elem> side(elem->build_side(s));
 
@@ -717,7 +717,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
                                             mesh_inserter_iterator<Node>(mesh),
-                                            (Node**)NULL,
+                                            (Node**)libmesh_nullptr,
                                             element_neighbors_tag);
         }
       //------------------------------------------------------------------
@@ -729,7 +729,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
                                             mesh_inserter_iterator<Elem>(mesh),
-                                            (Elem**)NULL,
+                                            (Elem**)libmesh_nullptr,
                                             element_neighbors_tag);
         }
       //------------------------------------------------------------------
@@ -1330,7 +1330,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
           // Subactive neighbor pointers aren't preservable here
           if (elem->subactive())
             for (unsigned int s=0; s != elem->n_sides(); ++s)
-              elem->set_neighbor(s, NULL);
+              elem->set_neighbor(s, libmesh_nullptr);
 
           // delete_elem doesn't currently invalidate element
           // iterators... that had better not change

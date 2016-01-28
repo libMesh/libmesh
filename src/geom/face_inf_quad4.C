@@ -189,7 +189,7 @@ UniquePtr<Elem> InfQuad4::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem * edge = NULL;
+      Elem * edge = libmesh_nullptr;
 
       switch (i)
         {

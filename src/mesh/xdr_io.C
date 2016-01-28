@@ -858,7 +858,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
                 n_written++;
               }
 
-          io.data_stream (coords.empty() ? NULL : &coords[0],
+          io.data_stream (coords.empty() ? libmesh_nullptr : &coords[0],
                           cast_int<unsigned int>(coords.size()), 3);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -866,7 +866,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
           unsigned short write_unique_ids = 1;
 
           io.data (write_unique_ids, "# presence of unique ids");
-          io.data_stream (unique_ids.empty() ? NULL : &unique_ids[0],
+          io.data_stream (unique_ids.empty() ? libmesh_nullptr : &unique_ids[0],
                           cast_int<unsigned int>(unique_ids.size()), 1);
 #else
           unsigned short write_unique_ids = 0;
@@ -957,7 +957,7 @@ void XdrIO::write_serialized_bcs (Xdr & io, const header_id_type n_bcs) const
           for (std::size_t idx=0; idx<recv_bcs.size(); idx += 3, n_bcs_out++)
             recv_bcs[idx+0] += elem_offset;
 
-          io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0],
+          io.data_stream (recv_bcs.empty() ? libmesh_nullptr : &recv_bcs[0],
                           cast_int<unsigned int>(recv_bcs.size()), 3);
           elem_offset += my_n_local_level_0_elem;
         }
@@ -1039,7 +1039,7 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const header_id_type n_nodesets
           for (std::size_t idx=0; idx<recv_bcs.size(); idx += 2, n_nodesets_out++)
             recv_bcs[idx+0] += node_offset;
 
-          io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0],
+          io.data_stream (recv_bcs.empty() ? libmesh_nullptr : &recv_bcs[0],
                           cast_int<unsigned int>(recv_bcs.size()), 2);
           node_offset += my_n_node;
         }
@@ -1409,7 +1409,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
           ++it;
 
           Elem * parent =
-            (parent_id == DofObject::invalid_id) ? NULL : mesh.elem(parent_id);
+            (parent_id == DofObject::invalid_id) ? libmesh_nullptr : mesh.elem(parent_id);
 
           Elem * elem = Elem::build (elem_type, parent).release();
 
@@ -1512,7 +1512,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
       coords.resize(3*(last_node - first_node));
 
       if (this->processor_id() == 0)
-        io.data_stream (coords.empty() ? NULL : &coords[0],
+        io.data_stream (coords.empty() ? libmesh_nullptr : &coords[0],
                         cast_int<unsigned int>(coords.size()));
 
       // For large numbers of processors the majority of processors at any given
@@ -1574,10 +1574,10 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
           if (this->processor_id() == 0)
             {
               if (_field_width == 8)
-                io.data_stream (unique_64.empty() ? NULL : &unique_64[0],
+                io.data_stream (unique_64.empty() ? libmesh_nullptr : &unique_64[0],
                                 cast_int<unsigned int>(unique_64.size()));
               else
-                io.data_stream (unique_32.empty() ? NULL : &unique_32[0],
+                io.data_stream (unique_32.empty() ? libmesh_nullptr : &unique_32[0],
                                 cast_int<unsigned int>(unique_32.size()));
             }
 
@@ -1644,7 +1644,7 @@ void XdrIO::read_serialized_bcs (Xdr & io, T)
       input_buffer.resize (3*(last_bc - first_bc));
 
       if (this->processor_id() == 0)
-        io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0],
+        io.data_stream (input_buffer.empty() ? libmesh_nullptr : &input_buffer[0],
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
@@ -1668,7 +1668,7 @@ void XdrIO::read_serialized_bcs (Xdr & io, T)
       // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by finding all the entries
       // in dof_bc_data whose elem_id match the ID of the current element.
-      // We cannot rely on NULL neighbors at this point since the neighbor
+      // We cannot rely on libmesh_nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
       for (std::pair<std::vector<DofBCData>::iterator,
              std::vector<DofBCData>::iterator> pos; it!=end; ++it)
@@ -1723,7 +1723,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       input_buffer.resize (2*(last_bc - first_bc));
 
       if (this->processor_id() == 0)
-        io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0],
+        io.data_stream (input_buffer.empty() ? libmesh_nullptr : &input_buffer[0],
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);

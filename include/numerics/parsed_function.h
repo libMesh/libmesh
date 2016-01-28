@@ -49,8 +49,9 @@ class ParsedFunction : public FunctionBase<Output>
 {
 public:
   explicit
-  ParsedFunction (const std::string & expression, const std::vector<std::string> * additional_vars=NULL,
-                  const std::vector<Output> * initial_vals=NULL);
+  ParsedFunction (const std::string & expression,
+                  const std::vector<std::string> * additional_vars=libmesh_nullptr,
+                  const std::vector<Output> * initial_vals=libmesh_nullptr);
 
   // Re-parse with new expression
   void reparse (const std::string & expression);

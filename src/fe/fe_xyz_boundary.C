@@ -71,7 +71,7 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
                         const std::vector<Real> * const weights)
 {
   libmesh_assert(elem);
-  libmesh_assert (this->qrule != NULL || pts != NULL);
+  libmesh_assert (this->qrule != libmesh_nullptr || pts != libmesh_nullptr);
   // We don't do this for 1D elements!
   libmesh_assert_not_equal_to (Dim, 1);
 
@@ -80,7 +80,7 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
 
   // Initialize the shape functions at the user-specified
   // points
-  if (pts != NULL)
+  if (pts != libmesh_nullptr)
     {
       // We can't get away without recomputing shape functions next
       // time
@@ -91,7 +91,7 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
 
       // Initialize the face shape functions
       this->_fe_map->template init_face_shape_functions<Dim>(*pts,  side.get());
-      if (weights != NULL)
+      if (weights != libmesh_nullptr)
         {
           this->compute_face_values (elem, side.get(), *weights);
         }

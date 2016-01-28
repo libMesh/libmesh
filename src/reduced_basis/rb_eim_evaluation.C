@@ -38,7 +38,7 @@ namespace libMesh
 RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator & comm_in)
   :
   RBEvaluation(comm_in),
-  extra_interpolation_point_elem(NULL),
+  extra_interpolation_point_elem(libmesh_nullptr),
   _previous_N(0),
   _previous_error_bound(-1),
   _interpolation_points_mesh(comm_in)
@@ -354,7 +354,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
   unsigned int new_node_id = 0;
   for(unsigned int i=0; i<(interpolation_points_elem.size()+1); i++)
     {
-      Elem * old_elem = NULL;
+      Elem * old_elem = libmesh_nullptr;
       if(i < interpolation_points_elem.size())
         {
           old_elem = interpolation_points_elem[i];
@@ -390,7 +390,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
   dof_id_type new_elem_id = 0;
   for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
     {
-      Elem * old_elem = NULL;
+      Elem * old_elem = libmesh_nullptr;
       if(i < interpolation_points_elem.size())
         {
           old_elem = interpolation_points_elem[i];
@@ -406,7 +406,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
       std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
       if(id_it == elem_id_map.end())
         {
-          Elem * new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
+          Elem * new_elem = Elem::build(old_elem->type(), /*parent*/ libmesh_nullptr).release();
           new_elem->subdomain_id() = old_elem->subdomain_id();
 
           // Assign all the nodes

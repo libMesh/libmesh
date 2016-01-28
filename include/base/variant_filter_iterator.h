@@ -363,18 +363,18 @@ public:
    * Default Constructor.
    */
   variant_filter_iterator () :
-    data(NULL),
-    end(NULL),
-    pred(NULL) {}
+    data(libmesh_nullptr),
+    end(libmesh_nullptr),
+    pred(libmesh_nullptr) {}
 
   /**
    * Copy Constructor.
    * Copy the internal data instead of sharing it.
    */
   variant_filter_iterator (const Iterator & rhs) :
-    data (rhs.data != NULL ? rhs.data->clone() : NULL),
-    end  (rhs.end  != NULL ? rhs.end->clone()  : NULL),
-    pred (rhs.pred != NULL ? rhs.pred->clone() : NULL) {}
+    data (rhs.data != libmesh_nullptr ? rhs.data->clone() : libmesh_nullptr),
+    end  (rhs.end  != libmesh_nullptr ? rhs.end->clone()  : libmesh_nullptr),
+    pred (rhs.pred != libmesh_nullptr ? rhs.pred->clone() : libmesh_nullptr) {}
 
 
 
@@ -391,9 +391,9 @@ public:
    */
   template <class OtherType, class OtherReferenceType, class OtherPointerType>
   variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType> & rhs)
-    : data (rhs.data != NULL ? rhs.data->const_clone() : NULL),
-      end  (rhs.end  != NULL ? rhs.end->const_clone()  : NULL),
-      pred (rhs.pred != NULL ? rhs.pred->const_clone() : NULL)
+    : data (rhs.data != libmesh_nullptr ? rhs.data->const_clone() : libmesh_nullptr),
+      end  (rhs.end  != libmesh_nullptr ? rhs.end->const_clone()  : libmesh_nullptr),
+      pred (rhs.pred != libmesh_nullptr ? rhs.pred->const_clone() : libmesh_nullptr)
   {
     // libMesh::out << "Called templated copy constructor for variant_filter_iterator" << std::endl;
   }
@@ -408,9 +408,9 @@ public:
    */
   virtual ~variant_filter_iterator()
   {
-    delete data; data = NULL;
-    delete end;  end  = NULL;
-    delete pred; pred = NULL;
+    delete data; data = libmesh_nullptr;
+    delete end;  end  = libmesh_nullptr;
+    delete pred; pred = libmesh_nullptr;
   }
 
   /**

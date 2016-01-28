@@ -63,7 +63,7 @@ Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 

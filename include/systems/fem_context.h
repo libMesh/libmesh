@@ -679,7 +679,7 @@ public:
   /**
    * Reinitializes interior FE objects on the current geometric element
    */
-  void elem_fe_reinit(const std::vector<Point> * const pts = NULL);
+  void elem_fe_reinit(const std::vector<Point> * const pts = libmesh_nullptr);
 
   /**
    * Reinitializes side FE objects on the current geometric element
@@ -796,7 +796,7 @@ public:
    * Test for current Elem object
    */
   bool has_elem() const
-  { return (this->_elem != NULL); }
+  { return (this->_elem != libmesh_nullptr); }
 
   /**
    * Accessor for current Elem object

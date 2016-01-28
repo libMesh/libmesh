@@ -410,7 +410,7 @@ dof_id_type Tet4::key () const
 //   for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 //     {
 //       /* Unassign the current node.  */
-//       child->set_node(nc) = NULL;
+//       child->set_node(nc) = libmesh_nullptr;
 //
 //       /* We have to find the correct new node now.  We know
 //  that it exists somewhere.  We make use of the fact

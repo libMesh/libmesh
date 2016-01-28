@@ -142,8 +142,8 @@ Xdr::Xdr (const std::string & name,
   mode(m),
   file_name(name),
 #ifdef LIBMESH_HAVE_XDR
-  xdrs(NULL),
-  fp(NULL),
+  xdrs(libmesh_nullptr),
+  fp(libmesh_nullptr),
 #endif
   in(),
   out(),
@@ -288,14 +288,14 @@ void Xdr::close ()
           {
             xdr_destroy (xdrs);
             delete xdrs;
-            xdrs = NULL;
+            xdrs = libmesh_nullptr;
           }
 
         if (fp)
           {
             fflush(fp);
             fclose(fp);
-            fp = NULL;
+            fp = libmesh_nullptr;
           }
 #else
 
@@ -310,7 +310,7 @@ void Xdr::close ()
 
     case READ:
       {
-        if (in.get() != NULL)
+        if (in.get() != libmesh_nullptr)
           {
             in.reset();
 
@@ -323,7 +323,7 @@ void Xdr::close ()
 
     case WRITE:
       {
-        if (out.get() != NULL)
+        if (out.get() != libmesh_nullptr)
           {
             out.reset();
 
@@ -373,14 +373,14 @@ bool Xdr::is_open() const
 
     case READ:
       {
-        if (in.get() != NULL)
+        if (in.get() != libmesh_nullptr)
           return in->good();
         return false;
       }
 
     case WRITE:
       {
-        if (out.get() != NULL)
+        if (out.get() != libmesh_nullptr)
           return out->good();
         return false;
       }

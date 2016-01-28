@@ -127,8 +127,8 @@ private:
    * will write an ASCII or binary *.pos file, depending on the binary flag.
    */
   void write_post (const std::string &,
-                   const std::vector<Number> * = NULL,
-                   const std::vector<std::string> * = NULL);
+                   const std::vector<Number> * = libmesh_nullptr,
+                   const std::vector<std::string> * = libmesh_nullptr);
 
   /**
    * Flag to write binary data.

@@ -193,8 +193,8 @@ void MEDITIO::write_ascii (const std::string & fname,
   out_stream << '\n' << "# end of file\n";
 
   // optionally write the data
-  if ((solution_names != NULL) &&
-      (vec != NULL))
+  if ((solution_names != libmesh_nullptr) &&
+      (vec != libmesh_nullptr))
     {
       // Open the ".bb" file stream
       std::size_t idx = fname.find_last_of(".");

@@ -94,7 +94,7 @@ _build_variable_names_and_solution_vector (const EquationSystems & es,
       const_cast<EquationSystems &>(es).allgather();
     }
 
-  es.build_variable_names  (names, NULL, system_names);
+  es.build_variable_names  (names, libmesh_nullptr, system_names);
   es.build_solution_vector (soln, system_names);
 
   // For now, if we're doing a parallel format we're going to broadcast the vector from processor 0

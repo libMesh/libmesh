@@ -60,8 +60,8 @@ public:
   explicit
   ParsedFEMFunction (const System & sys,
                      const std::string & expression,
-                     const std::vector<std::string> * additional_vars=NULL,
-                     const std::vector<Output> * initial_vals=NULL);
+                     const std::vector<std::string> * additional_vars=libmesh_nullptr,
+                     const std::vector<Output> * initial_vals=libmesh_nullptr);
 
   /**
    * Destructor.

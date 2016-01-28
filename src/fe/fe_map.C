@@ -1014,7 +1014,7 @@ void FEMap::compute_affine_map( const unsigned int dim,
   this->resize_quadrature_map_vectors(dim, n_qp);
 
   // Determine the nodes contributing to element elem
-  std::vector<Node *> elem_nodes(elem->n_nodes(), NULL);
+  std::vector<Node *> elem_nodes(elem->n_nodes(), libmesh_nullptr);
   for (unsigned int i=0; i<elem->n_nodes(); i++)
     elem_nodes[i] = elem->get_node(i);
 
@@ -1166,7 +1166,7 @@ void FEMap::compute_map(const unsigned int dim,
   else
     {
       // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), NULL);
+      elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
         elem_nodes[i] = elem->get_node(i);
     }

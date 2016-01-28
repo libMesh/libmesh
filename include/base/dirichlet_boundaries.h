@@ -63,14 +63,14 @@ public:
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const FunctionBase<Number> * f_in,
-                    const FunctionBase<Gradient> * g_in = NULL) :
+                    const FunctionBase<Gradient> * g_in = libmesh_nullptr) :
     b(b_in),
     variables(variables_in),
     f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
     g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient> >()),
     f_fem(UniquePtr<FEMFunctionBase<Number> >()),
     g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
-    f_system(NULL)
+    f_system(libmesh_nullptr)
   {
     libmesh_assert(f.get());
     f->init();
@@ -87,7 +87,7 @@ public:
     g(UniquePtr<FunctionBase<Gradient> >()),
     f_fem(UniquePtr<FEMFunctionBase<Number> >()),
     g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
-    f_system(NULL)
+    f_system(libmesh_nullptr)
   {
     f->init();
   }
@@ -103,7 +103,7 @@ public:
     g(g_in.clone()),
     f_fem(UniquePtr<FEMFunctionBase<Number> >()),
     g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
-    f_system(NULL)
+    f_system(libmesh_nullptr)
   {
     f->init();
     g->init();
@@ -114,7 +114,7 @@ public:
                     const std::vector<unsigned int> & variables_in,
                     const System & f_sys_in,
                     const FEMFunctionBase<Number> * f_in,
-                    const FEMFunctionBase<Gradient> * g_in = NULL) :
+                    const FEMFunctionBase<Gradient> * g_in = libmesh_nullptr) :
     b(b_in),
     variables(variables_in),
     f(UniquePtr<FunctionBase<Number> >()),

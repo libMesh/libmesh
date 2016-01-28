@@ -120,10 +120,8 @@ void
 LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int> * const dofs,
                                    const SubsetSolveMode /*subset_solve_mode*/)
 {
-  if(dofs!=NULL)
-    {
-      libmesh_not_implemented();
-    }
+  if (dofs != libmesh_nullptr)
+    libmesh_not_implemented();
 }
 
 

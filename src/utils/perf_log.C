@@ -48,7 +48,7 @@ PerfLog::PerfLog(const std::string & ln,
   log_events(le),
   total_time(0.)
 {
-  gettimeofday (&tstart, NULL);
+  gettimeofday (&tstart, libmesh_nullptr);
 
   if (log_events)
     this->clear();
@@ -78,7 +78,7 @@ void PerfLog::clear()
                             << pos->first.second                      \
                             << " is still being monitored!");
 
-      gettimeofday (&tstart, NULL);
+      gettimeofday (&tstart, libmesh_nullptr);
 
       log.clear();
 
@@ -247,7 +247,7 @@ std::string PerfLog::get_perf_info() const
       // Stop timing for this event.
       struct timeval tstop;
 
-      gettimeofday (&tstop, NULL);
+      gettimeofday (&tstop, libmesh_nullptr);
 
       const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
                                    static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);

@@ -270,15 +270,15 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       ierr = MatSeqBAIJSetPreallocation (_mat,
                                          blocksize,
                                          0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]));
+                                         numeric_petsc_cast(b_n_nz.empty() ? libmesh_nullptr : &b_n_nz[0]));
       LIBMESH_CHKERR(ierr);
 
       ierr = MatMPIBAIJSetPreallocation (_mat,
                                          blocksize,
                                          0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]),
+                                         numeric_petsc_cast(b_n_nz.empty() ? libmesh_nullptr : &b_n_nz[0]),
                                          0,
-                                         numeric_petsc_cast(b_n_oz.empty() ? NULL : &b_n_oz[0]));
+                                         numeric_petsc_cast(b_n_oz.empty() ? libmesh_nullptr : &b_n_oz[0]));
       LIBMESH_CHKERR(ierr);
     }
   else
@@ -289,13 +289,13 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       LIBMESH_CHKERR(ierr);
       ierr = MatSeqAIJSetPreallocation (_mat,
                                         0,
-                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
+                                        numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]));
       LIBMESH_CHKERR(ierr);
       ierr = MatMPIAIJSetPreallocation (_mat,
                                         0,
-                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]),
+                                        numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]),
                                         0,
-                                        numeric_petsc_cast(n_oz.empty() ? NULL : &n_oz[0]));
+                                        numeric_petsc_cast(n_oz.empty() ? libmesh_nullptr : &n_oz[0]));
       LIBMESH_CHKERR(ierr);
     }
 
@@ -372,15 +372,15 @@ void PetscMatrix<T>::init ()
       ierr = MatSeqBAIJSetPreallocation (_mat,
                                          blocksize,
                                          0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]));
+                                         numeric_petsc_cast(b_n_nz.empty() ? libmesh_nullptr : &b_n_nz[0]));
       LIBMESH_CHKERR(ierr);
 
       ierr = MatMPIBAIJSetPreallocation (_mat,
                                          blocksize,
                                          0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]),
+                                         numeric_petsc_cast(b_n_nz.empty() ? libmesh_nullptr : &b_n_nz[0]),
                                          0,
-                                         numeric_petsc_cast(b_n_oz.empty() ? NULL : &b_n_oz[0]));
+                                         numeric_petsc_cast(b_n_oz.empty() ? libmesh_nullptr : &b_n_oz[0]));
       LIBMESH_CHKERR(ierr);
     }
   else
@@ -392,13 +392,13 @@ void PetscMatrix<T>::init ()
 
       ierr = MatSeqAIJSetPreallocation (_mat,
                                         0,
-                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
+                                        numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]));
       LIBMESH_CHKERR(ierr);
       ierr = MatMPIAIJSetPreallocation (_mat,
                                         0,
-                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]),
+                                        numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]),
                                         0,
-                                        numeric_petsc_cast(n_oz.empty() ? NULL : &n_oz[0]));
+                                        numeric_petsc_cast(n_oz.empty() ? libmesh_nullptr : &n_oz[0]));
       LIBMESH_CHKERR(ierr);
     }
 
@@ -427,7 +427,7 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
 #if !PETSC_VERSION_LESS_THAN(3,5,0)
     ierr = (*_mat->ops->destroy)(_mat);
     LIBMESH_CHKERR(ierr);
-    _mat->ops->destroy = NULL;
+    _mat->ops->destroy = libmesh_nullptr;
     _mat->preallocated = PETSC_FALSE;
     _mat->assembled    = PETSC_FALSE;
     _mat->was_assembled = PETSC_FALSE;
@@ -443,13 +443,13 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
 
     ierr = MatSeqAIJSetPreallocation (_mat,
                                       0,
-                                      numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
+                                      numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]));
     LIBMESH_CHKERR(ierr);
     ierr = MatMPIAIJSetPreallocation (_mat,
                                       0,
-                                      numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]),
+                                      numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]),
                                       0,
-                                      numeric_petsc_cast(n_oz.empty() ? NULL : &n_oz[0]));
+                                      numeric_petsc_cast(n_oz.empty() ? libmesh_nullptr : &n_oz[0]));
     LIBMESH_CHKERR(ierr);
   }
 

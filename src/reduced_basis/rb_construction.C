@@ -61,7 +61,7 @@ RBConstruction::RBConstruction (EquationSystems & es,
                                 const unsigned int number_in)
   : Parent(es, name_in, number_in),
     inner_product_solver(LinearSolver<Number>::build(es.comm())),
-    extra_linear_solver(NULL),
+    extra_linear_solver(libmesh_nullptr),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
@@ -75,8 +75,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     quiet_mode(true),
     output_dual_innerprods_computed(false),
     assert_convergence(true),
-    rb_eval(NULL),
-    inner_product_assembly(NULL),
+    rb_eval(libmesh_nullptr),
+    inner_product_assembly(libmesh_nullptr),
     training_tolerance(-1.)
 {
   // set assemble_before_solve flag to false
@@ -100,20 +100,20 @@ void RBConstruction::clear()
   for(unsigned int q=0; q<Aq_vector.size(); q++)
     {
       delete Aq_vector[q];
-      Aq_vector[q] = NULL;
+      Aq_vector[q] = libmesh_nullptr;
     }
 
   for(unsigned int q=0; q<Fq_vector.size(); q++)
     {
       delete Fq_vector[q];
-      Fq_vector[q] = NULL;
+      Fq_vector[q] = libmesh_nullptr;
     }
 
   for(unsigned int i=0; i<outputs_vector.size(); i++)
     for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
       {
         delete outputs_vector[i][q_l];
-        outputs_vector[i][q_l] = NULL;
+        outputs_vector[i][q_l] = libmesh_nullptr;
       }
 
   if(store_non_dirichlet_operators)
@@ -121,20 +121,20 @@ void RBConstruction::clear()
       for(unsigned int q=0; q<non_dirichlet_Aq_vector.size(); q++)
         {
           delete non_dirichlet_Aq_vector[q];
-          non_dirichlet_Aq_vector[q] = NULL;
+          non_dirichlet_Aq_vector[q] = libmesh_nullptr;
         }
 
       for(unsigned int q=0; q<non_dirichlet_Fq_vector.size(); q++)
         {
           delete non_dirichlet_Fq_vector[q];
-          non_dirichlet_Fq_vector[q] = NULL;
+          non_dirichlet_Fq_vector[q] = libmesh_nullptr;
         }
 
       for(unsigned int i=0; i<non_dirichlet_outputs_vector.size(); i++)
         for(unsigned int q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
           {
             delete non_dirichlet_outputs_vector[i][q_l];
-            non_dirichlet_outputs_vector[i][q_l] = NULL;
+            non_dirichlet_outputs_vector[i][q_l] = libmesh_nullptr;
           }
     }
 
@@ -142,7 +142,7 @@ void RBConstruction::clear()
   for(unsigned int q_f=0; q_f<Fq_representor.size(); q_f++)
     {
       delete Fq_representor[q_f];
-      Fq_representor[q_f] = NULL;
+      Fq_representor[q_f] = libmesh_nullptr;
     }
   // Set Fq_representor_innerprods_computed flag to false now
   // that we've cleared the Fq representors
@@ -209,7 +209,7 @@ RBEvaluation & RBConstruction::get_rb_evaluation()
 
 bool RBConstruction::is_rb_eval_initialized() const
 {
-  return (rb_eval != NULL);
+  return (rb_eval != libmesh_nullptr);
 }
 
 RBThetaExpansion & RBConstruction::get_rb_theta_expansion()
@@ -606,8 +606,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 {
   START_LOG("add_scaled_matrix_and_vector()", "RBConstruction");
 
-  bool assemble_matrix = (input_matrix != NULL);
-  bool assemble_vector = (input_vector != NULL);
+  bool assemble_matrix = (input_matrix != libmesh_nullptr);
+  bool assemble_vector = (input_vector != libmesh_nullptr);
 
   if(!assemble_matrix && !assemble_vector)
     return;
@@ -677,7 +677,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           // For subdivision shell elements, a single Gauss point per
           // element is sufficient, hence we use extraorder = 0.
           const int extraorder = 0;
-          FEBase * elem_fe = NULL;
+          FEBase * elem_fe = libmesh_nullptr;
           context.get_element_fe( 0, elem_fe );
 
           qrule = elem_fe->get_fe_type().default_quadrature_rule (2, extraorder);
@@ -695,7 +695,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
            ++context.side )
         {
           // May not need to apply fluxes on non-boundary elements
-          if( (context.get_elem().neighbor(context.get_side()) != NULL) && !impose_internal_fluxes )
+          if( (context.get_elem().neighbor(context.get_side()) != libmesh_nullptr) && !impose_internal_fluxes )
             continue;
 
           // Impose boundary (e.g. Neumann) term
@@ -849,7 +849,7 @@ void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number> * input_
   add_scaled_matrix_and_vector(1.,
                                inner_product_assembly,
                                input_matrix,
-                               NULL,
+                               libmesh_nullptr,
                                false, /* symmetrize */
                                apply_dof_constraints);
 }
@@ -866,7 +866,7 @@ void RBConstruction::assemble_Aq_matrix(unsigned int q,
   add_scaled_matrix_and_vector(1.,
                                &rb_assembly_expansion->get_A_assembly(q),
                                input_matrix,
-                               NULL,
+                               libmesh_nullptr,
                                false, /* symmetrize */
                                apply_dof_constraints);
 }
@@ -891,7 +891,7 @@ void RBConstruction::add_scaled_Aq(Number scalar,
       add_scaled_matrix_and_vector(scalar,
                                    &rb_assembly_expansion->get_A_assembly(q_a),
                                    input_matrix,
-                                   NULL,
+                                   libmesh_nullptr,
                                    symmetrize);
     }
 
@@ -956,7 +956,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
 
   add_scaled_matrix_and_vector(1.,
                                &rb_assembly_expansion->get_F_assembly(q),
-                               NULL,
+                               libmesh_nullptr,
                                input_vector,
                                false,             /* symmetrize */
                                apply_dof_constraints /* apply_dof_constraints */);
@@ -973,7 +973,7 @@ void RBConstruction::assemble_all_output_vectors()
                      << std::endl;
         get_output_vector(n, q_l)->zero();
         add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
-                                     NULL,
+                                     libmesh_nullptr,
                                      get_output_vector(n,q_l),
                                      false, /* symmetrize */
                                      true   /* apply_dof_constraints */);
@@ -990,7 +990,7 @@ void RBConstruction::assemble_all_output_vectors()
                          << std::endl;
             get_non_dirichlet_output_vector(n, q_l)->zero();
             add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
-                                         NULL,
+                                         libmesh_nullptr,
                                          get_non_dirichlet_output_vector(n,q_l),
                                          false, /* symmetrize */
                                          false  /* apply_dof_constraints */);
@@ -1618,7 +1618,7 @@ void RBConstruction::compute_output_dual_innerprods()
           if(L_q_representor[q])
             {
               delete L_q_representor[q];
-              L_q_representor[q] = NULL;
+              L_q_representor[q] = libmesh_nullptr;
             }
         }
 
@@ -1937,7 +1937,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
 
   for (unsigned int i=0; i<Fq_representor.size(); ++i)
     {
-      if (Fq_representor[i] != NULL)
+      if (Fq_representor[i] != libmesh_nullptr)
         {
           file_name.str(""); // reset filename
           file_name << riesz_representors_dir << "/Fq_representor" << i << riesz_representor_suffix;
@@ -2039,7 +2039,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   // should we be worried about leaks here?
   for (unsigned int i=0; i<Fq_representor.size(); ++i)
     {
-      if (Fq_representor[i] != NULL)
+      if (Fq_representor[i] != libmesh_nullptr)
         libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
     }
 
@@ -2084,7 +2084,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
     for (unsigned int j=0; j<get_rb_evaluation().Aq_representor[i].size(); ++j)
       {
-        if (get_rb_evaluation().Aq_representor[i][j] != NULL)
+        if (get_rb_evaluation().Aq_representor[i][j] != libmesh_nullptr)
           libmesh_error_msg("Error, must delete existing Aq_representor before reading in from file.");
       }
 

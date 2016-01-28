@@ -65,7 +65,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet10 (Elem * p=NULL) :
+  Tet10 (Elem * p=libmesh_nullptr) :
     Tet(Tet10::n_nodes(), p, _nodelinks_data)
   {}
 

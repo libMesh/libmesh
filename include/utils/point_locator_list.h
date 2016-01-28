@@ -74,7 +74,7 @@ public:
    * master's list.
    */
   PointLocatorList (const MeshBase & mesh,
-                    const PointLocatorBase * master = NULL);
+                    const PointLocatorBase * master = libmesh_nullptr);
 
   /**
    * Destructor.
@@ -99,7 +99,8 @@ public:
    * \p p is located, optionally restricted to a set of allowed subdomains.
    * Overloaded from base class.
    */
-  virtual const Elem * operator() (const Point & p, const std::set<subdomain_id_type> * allowed_subdomains = NULL) const libmesh_override;
+  virtual const Elem * operator() (const Point & p,
+                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point

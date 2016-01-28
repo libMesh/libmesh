@@ -945,7 +945,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 
     // Create the index set & scatter object
     ierr = ISCreateLibMesh(this->comm().get(), my_local_size,
-                           my_local_size ? &idx[0] : NULL, PETSC_USE_POINTER, &is);
+                           my_local_size ? &idx[0] : libmesh_nullptr, PETSC_USE_POINTER, &is);
     LIBMESH_CHKERR(ierr);
 
     ierr = VecScatterCreate(_vec,              is,
@@ -1502,7 +1502,7 @@ void PetscVector<T>::_restore_array() const
 #endif
 
           LIBMESH_CHKERR(ierr);
-          _values = NULL;
+          _values = libmesh_nullptr;
         }
       else
         {
@@ -1515,10 +1515,10 @@ void PetscVector<T>::_restore_array() const
           ierr = VecRestoreArrayRead (_local_form, &_values);
 #endif
           LIBMESH_CHKERR(ierr);
-          _values = NULL;
+          _values = libmesh_nullptr;
           ierr = VecGhostRestoreLocalForm (_vec,&_local_form);
           LIBMESH_CHKERR(ierr);
-          _local_form = NULL;
+          _local_form = libmesh_nullptr;
 #ifndef NDEBUG
           _local_size = 0;
 #endif

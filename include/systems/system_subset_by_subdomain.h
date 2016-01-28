@@ -127,7 +127,7 @@ public:
    */
   SystemSubsetBySubdomain (const System & system,
                            const SubdomainSelection & subdomain_selection,
-                           const std::set<unsigned int> * const var_nums = NULL);
+                           const std::set<unsigned int> * const var_nums = libmesh_nullptr);
 
   /**
    * Constructor.  The subset will consist of those dofs which are
@@ -139,7 +139,7 @@ public:
    */
   SystemSubsetBySubdomain (const System & system,
                            const std::set<subdomain_id_type> & subdomain_ids,
-                           const std::set<unsigned int> * const var_nums = NULL);
+                           const std::set<unsigned int> * const var_nums = libmesh_nullptr);
 
   /**
    * Destructor.

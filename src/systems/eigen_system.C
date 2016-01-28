@@ -43,8 +43,8 @@ EigenSystem::EigenSystem (EquationSystems & es,
                           const unsigned int number_in
                           ) :
   Parent           (es, name_in, number_in),
-  matrix_A         (NULL),
-  matrix_B         (NULL),
+  matrix_A         (libmesh_nullptr),
+  matrix_B         (libmesh_nullptr),
   eigen_solver     (EigenSolver<Number>::build(es.comm())),
   _n_converged_eigenpairs (0),
   _n_iterations           (0),
@@ -73,8 +73,8 @@ void EigenSystem::clear ()
   delete matrix_B;
 
   // NULL-out the matricies.
-  matrix_A = NULL;
-  matrix_B = NULL;
+  matrix_A = libmesh_nullptr;
+  matrix_B = libmesh_nullptr;
 
   // clear the solver
   eigen_solver->clear();

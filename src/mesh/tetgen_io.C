@@ -104,7 +104,7 @@ void TetGenIO::read_nodes_and_elem (std::istream & node_stream,
 
   // Tell the MeshData object that we are finished
   // reading data.
-  if (this->_mesh_data != NULL)
+  if (this->_mesh_data != libmesh_nullptr)
     this->_mesh_data->close_foreign_id_maps ();
 
   // some more clean-up
@@ -169,7 +169,7 @@ void TetGenIO::node_in (std::istream & node_stream)
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
-      if (this->_mesh_data != NULL)
+      if (this->_mesh_data != libmesh_nullptr)
         this->_mesh_data->add_foreign_node_id (newnode, node_lab);
     }
 }
@@ -232,7 +232,7 @@ void TetGenIO::element_in (std::istream & ele_stream)
 
       // Add the element to the mesh &
       // tell the MeshData object the foreign element id
-      if (this->_mesh_data != NULL)
+      if (this->_mesh_data != libmesh_nullptr)
         this->_mesh_data->add_foreign_elem_id (elem, element_lab);
 
       // Read node labels

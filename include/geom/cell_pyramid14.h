@@ -80,7 +80,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid14 (Elem * p=NULL) :
+  Pyramid14 (Elem * p=libmesh_nullptr) :
     Pyramid(Pyramid14::n_nodes(), p, _nodelinks_data)
   {}
 

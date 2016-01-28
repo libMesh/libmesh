@@ -70,7 +70,7 @@ void TransientRBEvaluation::clear_riesz_representors()
             {
               M_q_representor[q_m][i]->clear();
               delete M_q_representor[q_m][i];
-              M_q_representor[q_m][i] = NULL;
+              M_q_representor[q_m][i] = libmesh_nullptr;
             }
         }
     }

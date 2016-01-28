@@ -247,7 +247,7 @@ void VTKIO::cells_to_vtk()
               const Node * the_node = mesh.node_ptr(global_node_id);
 
               // Error checking...
-              if (the_node == NULL)
+              if (the_node == libmesh_nullptr)
                 libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
 
               // InsertNextPoint accepts either a double or float array of length 3.
@@ -363,7 +363,7 @@ VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
   _compress(false),
   _local_node_map()
 {
-  _vtk_grid = NULL;
+  _vtk_grid = libmesh_nullptr;
   libmesh_experimental();
 }
 
@@ -376,7 +376,7 @@ VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
   _compress(false),
   _local_node_map()
 {
-  _vtk_grid = NULL;
+  _vtk_grid = libmesh_nullptr;
   libmesh_experimental();
 }
 
@@ -447,7 +447,7 @@ void VTKIO::read (const std::string & name)
 
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
-      if (this->_mesh_data != NULL)
+      if (this->_mesh_data != libmesh_nullptr)
         this->_mesh_data->add_foreign_node_id (newnode, i);
     }
 
@@ -457,7 +457,7 @@ void VTKIO::read (const std::string & name)
   for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
       vtkCell * cell = _vtk_grid->GetCell(i);
-      Elem * elem = NULL;
+      Elem * elem = libmesh_nullptr;
       switch (cell->GetCellType())
         {
         case VTK_LINE:

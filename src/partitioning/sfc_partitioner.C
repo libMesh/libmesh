@@ -82,7 +82,7 @@ void SFCPartitioner::_do_partition (MeshBase & mesh,
 
   // the reverse_map maps the contiguous ids back
   // to active elements
-  std::vector<Elem *> reverse_map (n_active_elem, NULL);
+  std::vector<Elem *> reverse_map (n_active_elem, libmesh_nullptr);
 
   int size = static_cast<int>(n_active_elem);
   std::vector<double> x      (size);

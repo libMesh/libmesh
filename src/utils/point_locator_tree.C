@@ -37,8 +37,8 @@ namespace libMesh
 PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
                                     const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
-  _tree            (NULL),
-  _element         (NULL),
+  _tree            (libmesh_nullptr),
+  _element         (libmesh_nullptr),
   _out_of_mesh_mode(false),
   _target_bin_size (200),
   _build_type(Trees::NODES)
@@ -52,8 +52,8 @@ PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
                                     const Trees::BuildType build_type,
                                     const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
-  _tree            (NULL),
-  _element         (NULL),
+  _tree            (libmesh_nullptr),
+  _element         (libmesh_nullptr),
   _out_of_mesh_mode(false),
   _target_bin_size (200),
   _build_type(build_type)
@@ -73,14 +73,14 @@ PointLocatorTree::~PointLocatorTree ()
 void PointLocatorTree::clear ()
 {
   // only delete the tree when we are the master
-  if (this->_tree != NULL)
+  if (this->_tree != libmesh_nullptr)
     {
-      if (this->_master == NULL)
+      if (this->_master == libmesh_nullptr)
         // we own the tree
         delete this->_tree;
       else
         // someone else owns and therefore deletes the tree
-        this->_tree = NULL;
+        this->_tree = libmesh_nullptr;
     }
 }
 
@@ -117,7 +117,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
       // initialized before.
       _build_type = build_type;
 
-      if (this->_master == NULL)
+      if (this->_master == libmesh_nullptr)
         {
           START_LOG("init(no master)", "PointLocatorTree");
 
@@ -180,7 +180,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
       // Suppose the interpolators are used concurrently
       // at different locations in the mesh, then it makes quite
       // sense to have unique start elements.
-      this->_element = NULL;
+      this->_element = libmesh_nullptr;
     }
 
   // ready for take-off
@@ -197,15 +197,15 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   START_LOG("operator()", "PointLocatorTree");
 
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
-  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = NULL;
+  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = libmesh_nullptr;
 
   // First check the element from last time before asking the tree
-  if (this->_element==NULL || !(this->_element->contains_point(p)))
+  if (this->_element==libmesh_nullptr || !(this->_element->contains_point(p)))
     {
       // ask the tree
       this->_element = this->_tree->find_element (p,allowed_subdomains);
 
-      if (this->_element == NULL)
+      if (this->_element == libmesh_nullptr)
         {
           // No element seems to contain this point. Thus:
           // 1.) If _out_of_mesh_mode == true, we can just return NULL
@@ -307,7 +307,7 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
     }
 
   STOP_LOG("perform_linear_search", "PointLocatorTree");
-  return NULL;
+  return libmesh_nullptr;
 }
 
 

@@ -204,7 +204,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           coarse_adjoints.push_back(coarse_adjoint);
         }
       else
-        coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(NULL));
+        coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
     }
 
   // Rebuild the rhs with the projected primal solution

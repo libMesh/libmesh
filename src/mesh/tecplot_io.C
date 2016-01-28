@@ -259,7 +259,7 @@ void TecplotIO::write_ascii (const std::string & fname,
 
     out_stream << "Variables=x,y,z";
 
-    if (solution_names != NULL)
+    if (solution_names != libmesh_nullptr)
       for (unsigned int n=0; n<solution_names->size(); n++)
         {
 #ifdef LIBMESH_USE_REAL_NUMBERS
@@ -318,7 +318,7 @@ void TecplotIO::write_ascii (const std::string & fname,
       // Print the point without a newline
       the_mesh.point(i).write_unformatted(out_stream, false);
 
-      if ((v != NULL) && (solution_names != NULL))
+      if ((v != libmesh_nullptr) && (solution_names != libmesh_nullptr))
         {
           const std::size_t n_vars = solution_names->size();
 
@@ -419,7 +419,7 @@ void TecplotIO::write_binary (const std::string & fname,
   {
     tecplot_variable_names += "x, y, z";
 
-    if (solution_names != NULL)
+    if (solution_names != libmesh_nullptr)
       {
         for (unsigned int name=0; name<solution_names->size(); name++)
           {
@@ -451,10 +451,10 @@ void TecplotIO::write_binary (const std::string & fname,
 
   TecplotMacros tm(the_mesh.n_nodes(),
 #ifdef LIBMESH_USE_REAL_NUMBERS
-                   (3 + ((solution_names == NULL) ? 0 :
+                   (3 + ((solution_names == libmesh_nullptr) ? 0 :
                          cast_int<unsigned int>(solution_names->size()))),
 #else
-                   (3 + 3*((solution_names == NULL) ? 0 :
+                   (3 + 3*((solution_names == libmesh_nullptr) ? 0 :
                            cast_int<unsigned int>(solution_names->size()))),
 #endif
                    the_mesh.n_active_sub_elem(),
@@ -471,8 +471,8 @@ void TecplotIO::write_binary (const std::string & fname,
       tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
       tm.nd(2,v) = static_cast<float>(the_mesh.point(v)(2));
 
-      if ((vec != NULL) &&
-          (solution_names != NULL))
+      if ((vec != libmesh_nullptr) &&
+          (solution_names != libmesh_nullptr))
         {
           const std::size_t n_vars = solution_names->size();
 
@@ -492,7 +492,7 @@ void TecplotIO::write_binary (const std::string & fname,
 
 
   // Initialize the file
-  ierr = TECINI112 (NULL,
+  ierr = TECINI112 (libmesh_nullptr,
                     const_cast<char *>(tecplot_variable_names.c_str()),
                     const_cast<char *>(fname.c_str()),
                     const_cast<char *>("."),
@@ -602,8 +602,8 @@ void TecplotIO::write_binary (const std::string & fname,
                           &num_connect_boundary_faces,
                           &tot_num_boundary_connect,
                           &passive_var_list[0],
-                          NULL, // = all are node centered
-                          (firstzone) ? NULL : &share_var_from_zone[0],
+                          libmesh_nullptr, // = all are node centered
+                          (firstzone) ? libmesh_nullptr : &share_var_from_zone[0],
                           &share_connect_from_zone);
 
         if (ierr)
@@ -614,9 +614,9 @@ void TecplotIO::write_binary (const std::string & fname,
           {
             int total = cast_int<int>
 #ifdef LIBMESH_USE_REAL_NUMBERS
-              ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+              ((3 + ((solution_names == libmesh_nullptr) ? 0 : solution_names->size()))*num_nodes);
 #else
-            ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+            ((3 + 3*((solution_names == libmesh_nullptr) ? 0 : solution_names->size()))*num_nodes);
 #endif
 
 
@@ -672,7 +672,7 @@ void TecplotIO::write_binary (const std::string & fname,
   {
     tecplot_variable_names += "x, y, z";
 
-    if (solution_names != NULL)
+    if (solution_names != libmesh_nullptr)
       {
         for (unsigned int name=0; name<solution_names->size(); name++)
           {
@@ -705,9 +705,9 @@ void TecplotIO::write_binary (const std::string & fname,
   TecplotMacros tm(cast_int<unsigned int>(the_mesh.n_nodes()),
                    cast_int<unsigned int>
 #ifdef LIBMESH_USE_REAL_NUMBERS
-                   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
+                   (3 + ((solution_names == libmesh_nullptr) ? 0 : solution_names->size())),
 #else
-                   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
+                   (3 + 3*((solution_names == libmesh_nullptr) ? 0 : solution_names->size())),
 #endif
                    cast_int<unsigned int>
                    (the_mesh.n_active_sub_elem()),
@@ -724,8 +724,8 @@ void TecplotIO::write_binary (const std::string & fname,
       tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
       tm.nd(2,v) = static_cast<float>(the_mesh.point(v)(2));
 
-      if ((vec != NULL) &&
-          (solution_names != NULL))
+      if ((vec != libmesh_nullptr) &&
+          (solution_names != libmesh_nullptr))
         {
           const unsigned int n_vars = solution_names->size();
 
@@ -774,7 +774,7 @@ void TecplotIO::write_binary (const std::string & fname,
       num_cells = static_cast<int>(the_mesh.n_active_sub_elem());
 
 
-    ierr = TECINI (NULL,
+    ierr = TECINI (libmesh_nullptr,
                    (char *) tecplot_variable_names.c_str(),
                    (char *) fname.c_str(),
                    (char *) ".",
@@ -785,12 +785,12 @@ void TecplotIO::write_binary (const std::string & fname,
       libmesh_file_error(fname);
 
 
-    ierr = TECZNE (NULL,
+    ierr = TECZNE (libmesh_nullptr,
                    &num_nodes,
                    &num_cells,
                    &cell_type,
                    (char *) "FEBLOCK",
-                   NULL);
+                   libmesh_nullptr);
 
     if (ierr)
       libmesh_file_error(fname);
@@ -798,9 +798,9 @@ void TecplotIO::write_binary (const std::string & fname,
 
     int total =
 #ifdef LIBMESH_USE_REAL_NUMBERS
-      ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+      ((3 + ((solution_names == libmesh_nullptr) ? 0 : solution_names->size()))*num_nodes);
 #else
-    ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+    ((3 + 3*((solution_names == libmesh_nullptr) ? 0 : solution_names->size()))*num_nodes);
 #endif
 
 

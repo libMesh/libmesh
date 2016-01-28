@@ -47,7 +47,7 @@ QComposite<QSubCell>::QComposite(const unsigned int d,
   if (_dim == 1)
     QSubCell::init(EDGE2);
 
-  libmesh_assert (_lagrange_fe.get() != NULL);
+  libmesh_assert (_lagrange_fe.get() != libmesh_nullptr);
 
   _lagrange_fe->attach_quadrature_rule (&_q_subcell);
 }
@@ -86,7 +86,7 @@ void QComposite<QSubCell>::init (const Elem & elem,
   // mapping.
   const Elem * reference_elem = elem.reference_elem();
 
-  libmesh_assert (reference_elem != NULL);
+  libmesh_assert (reference_elem != libmesh_nullptr);
 
   _elem_cutter(*reference_elem, vertex_distance_func);
   //_elem_cutter(elem, vertex_distance_func);

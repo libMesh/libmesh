@@ -461,7 +461,7 @@ const PointLocatorBase & MeshBase::point_locator () const
 {
   libmesh_deprecated();
 
-  if (_point_locator.get() == NULL)
+  if (_point_locator.get() == libmesh_nullptr)
     {
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
@@ -476,7 +476,7 @@ const PointLocatorBase & MeshBase::point_locator () const
 UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   // If there's no master point locator, then we need one.
-  if (_point_locator.get() == NULL)
+  if (_point_locator.get() == libmesh_nullptr)
     {
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
@@ -496,7 +496,7 @@ UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const
 
 void MeshBase::clear_point_locator ()
 {
-  _point_locator.reset(NULL);
+  _point_locator.reset(libmesh_nullptr);
 }
 
 

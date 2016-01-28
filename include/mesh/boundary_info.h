@@ -97,8 +97,8 @@ public:
    * and the MeshData object used for this mesh.
    */
   void sync (UnstructuredMesh & boundary_mesh,
-             MeshData * boundary_mesh_data=NULL,
-             MeshData * this_mesh_data=NULL);
+             MeshData * boundary_mesh_data=libmesh_nullptr,
+             MeshData * this_mesh_data=libmesh_nullptr);
 
   /**
    * Generates \p boundary_mesh data structures corresponding to the
@@ -117,8 +117,8 @@ public:
    */
   void sync (const std::set<boundary_id_type> & requested_boundary_ids,
              UnstructuredMesh & boundary_mesh,
-             MeshData * boundary_mesh_data=NULL,
-             MeshData * this_mesh_data=NULL);
+             MeshData * boundary_mesh_data=libmesh_nullptr,
+             MeshData * this_mesh_data=libmesh_nullptr);
 
   /**
    * Suppose we have used sync to create \p boundary_mesh. Then each

@@ -45,7 +45,7 @@ public:
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 3)
-      this->set_interior_parent(NULL);
+      this->set_interior_parent(libmesh_nullptr);
   }
 
   /**

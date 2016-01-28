@@ -79,7 +79,7 @@ public:
   //    * This method implements reading a mesh from a specified file.
   //    */
   //   virtual void read (const std::string & mesh_file)
-  //   { this->read_mesh_and_nodal_data(mesh_file, NULL); }
+  //   { this->read_mesh_and_nodal_data(mesh_file, libmesh_nullptr); }
 
   //   /**
   //    * Extension of the MeshInput::read() routine which
@@ -88,7 +88,7 @@ public:
   //    * into the EquationSystems object.
   //    */
   //   virtual void read_mesh_and_nodal_data (const std::string & ,
-  //  EquationSystems * es=NULL);
+  //  EquationSystems * es=libmesh_nullptr);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -147,7 +147,7 @@ public:
   void write_discontinuous_gmv (const std::string & name,
                                 const EquationSystems & es,
                                 const bool write_partitioning,
-                                const std::set<std::string> * system_names=NULL) const;
+                                const std::set<std::string> * system_names=libmesh_nullptr) const;
 
 
   /**
@@ -157,8 +157,8 @@ public:
    * (without subcells).
    */
   void write_ascii_new_impl (const std::string &,
-                             const std::vector<Number> * = NULL,
-                             const std::vector<std::string> * = NULL);
+                             const std::vector<Number> * = libmesh_nullptr,
+                             const std::vector<std::string> * = libmesh_nullptr);
 
   /**
    * Takes a vector of cell-centered data to be plotted.
@@ -189,8 +189,8 @@ private:
    * (using subcells) which was the default in libMesh-0.4.3-rc2.
    */
   void write_ascii_old_impl (const std::string &,
-                             const std::vector<Number> * = NULL,
-                             const std::vector<std::string> * = NULL);
+                             const std::vector<Number> * = libmesh_nullptr,
+                             const std::vector<std::string> * = libmesh_nullptr);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -198,8 +198,8 @@ private:
    * provided.
    */
   void write_binary (const std::string &,
-                     const std::vector<Number> * = NULL,
-                     const std::vector<std::string> * = NULL);
+                     const std::vector<Number> * = libmesh_nullptr,
+                     const std::vector<std::string> * = libmesh_nullptr);
 
   /**
    * Helper function for writing unsigned ints to an ostream in binary format.

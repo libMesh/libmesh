@@ -347,13 +347,13 @@ public:
   class scoped_lock
   {
   public:
-    scoped_lock () : smutex(NULL) {}
+    scoped_lock () : smutex(libmesh_nullptr) {}
     explicit scoped_lock ( spin_mutex & in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
 
     ~scoped_lock () { release(); }
 
     void acquire ( spin_mutex & in_smutex ) { smutex = &in_smutex; smutex->lock(); }
-    void release () { if(smutex) smutex->unlock(); smutex = NULL; }
+    void release () { if(smutex) smutex->unlock(); smutex = libmesh_nullptr; }
 
   private:
     spin_mutex * smutex;
@@ -376,13 +376,13 @@ public:
   class scoped_lock
   {
   public:
-    scoped_lock () : smutex(NULL) {}
+    scoped_lock () : smutex(libmesh_nullptr) {}
     explicit scoped_lock ( spin_mutex & in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
 
     ~scoped_lock () { release(); }
 
     void acquire ( spin_mutex & in_smutex ) { smutex = &in_smutex; smutex->lock(); }
-    void release () { if(smutex) smutex->unlock(); smutex = NULL; }
+    void release () { if(smutex) smutex->unlock(); smutex = libmesh_nullptr; }
 
   private:
     spin_mutex * smutex;
@@ -416,13 +416,13 @@ public:
   class scoped_lock
   {
   public:
-    scoped_lock () : rmutex(NULL) {}
+    scoped_lock () : rmutex(libmesh_nullptr) {}
     explicit scoped_lock ( recursive_mutex & in_rmutex ) : rmutex(&in_rmutex) { rmutex->lock(); }
 
     ~scoped_lock () { release(); }
 
     void acquire ( recursive_mutex & in_rmutex ) { rmutex = &in_rmutex; rmutex->lock(); }
-    void release () { if(rmutex) rmutex->unlock(); rmutex = NULL; }
+    void release () { if(rmutex) rmutex->unlock(); rmutex = libmesh_nullptr; }
 
   private:
     recursive_mutex * rmutex;
@@ -468,7 +468,7 @@ void * run_body(void * args)
 
   body(range);
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 //-------------------------------------------------------------------
@@ -550,7 +550,7 @@ void parallel_for (const Range & range, const Body & body)
       run_body<Range, Body>((void *)&range_bodies[i]);
 #else // Just use Pthreads
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void *)&range_bodies[i]);
+      pthread_create(&threads[i], libmesh_nullptr, &run_body<Range, Body>, (void *)&range_bodies[i]);
       _pthread_unique_ids[threads[i]] = i;
 #endif
     }
@@ -566,7 +566,7 @@ void parallel_for (const Range & range, const Body & body)
   // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
   for (int i=0; i<static_cast<int>(n_threads); i++)
     {
-      pthread_join(threads[i], NULL);
+      pthread_join(threads[i], libmesh_nullptr);
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
       _pthread_unique_ids.erase(threads[i]);
     }
@@ -663,7 +663,7 @@ void parallel_reduce (const Range & range, Body & body)
       run_body<Range, Body>((void *)&range_bodies[i]);
 #else // Just use Pthreads
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void *)&range_bodies[i]);
+      pthread_create(&threads[i], libmesh_nullptr, &run_body<Range, Body>, (void *)&range_bodies[i]);
       _pthread_unique_ids[threads[i]] = i;
 #endif
     }
@@ -672,7 +672,7 @@ void parallel_reduce (const Range & range, Body & body)
   // Wait for them to finish
   for(unsigned int i=0; i<n_threads; i++)
     {
-      pthread_join(threads[i], NULL);
+      pthread_join(threads[i], libmesh_nullptr);
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
       _pthread_unique_ids.erase(threads[i]);
     }

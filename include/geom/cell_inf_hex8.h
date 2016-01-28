@@ -63,7 +63,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfHex8 (Elem * p=NULL) :
+  InfHex8 (Elem * p=libmesh_nullptr) :
     InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
   {}
 

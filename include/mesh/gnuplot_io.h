@@ -107,8 +107,8 @@ private:
    * provided.  This will write an ASCII file.
    */
   void write_solution (const std::string &,
-                       const std::vector<Number> * = NULL,
-                       const std::vector<std::string> * = NULL);
+                       const std::vector<Number> * = libmesh_nullptr,
+                       const std::vector<std::string> * = libmesh_nullptr);
 
   std::string _title;
 

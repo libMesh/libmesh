@@ -96,7 +96,7 @@ void ParameterVector::resize(unsigned int s)
 
   for (unsigned int i=old_size; i < s; ++i)
     this->_params[i] =
-      new ParameterPointer<Number>(NULL);
+      new ParameterPointer<Number>(libmesh_nullptr);
 }
 
 

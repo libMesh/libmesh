@@ -63,7 +63,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
       else
         this->error_norm = error_norms.find(&sys)->second;
 
-      const NumericVector<Number> * solution_vector = NULL;
+      const NumericVector<Number> * solution_vector = libmesh_nullptr;
       if (solution_vectors &&
           solution_vectors->find(&sys) != solution_vectors->end())
         solution_vector = solution_vectors->find(&sys)->second;
@@ -119,7 +119,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
             SystemNorm(std::vector<FEMNormType>(n_vars, old_error_norm.type(v)),
                        weights);
 
-          const NumericVector<Number> * solution_vector = NULL;
+          const NumericVector<Number> * solution_vector = libmesh_nullptr;
           if (solution_vectors &&
               solution_vectors->find(&sys) != solution_vectors->end())
             solution_vector = solution_vectors->find(&sys)->second;

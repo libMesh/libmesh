@@ -87,7 +87,7 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
 
-  es.build_variable_names  (solution_names, NULL, system_names);
+  es.build_variable_names  (solution_names, libmesh_nullptr, system_names);
   es.build_discontinuous_solution_vector (v, system_names);
 
   this->write_nodal_data_discontinuous(name, v, solution_names);
