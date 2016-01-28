@@ -355,6 +355,49 @@ void Quad9::connectivity(const unsigned int sf,
 
 
 
+Real Quad9::volume () const
+{
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0), x1 = point(1), x2 = point(2),
+    x3 = point(3), x4 = point(4), x5 = point(5),
+    x6 = point(6), x7 = point(7), x8 = point(8);
+
+  // Construct constant data vectors.
+  // \vec{x}_{\xi}  = \vec{a1}*xi*eta^2 + \vec{b1}*eta**2 + \vec{c1}*xi*eta + \vec{d1}*xi + \vec{e1}*eta + \vec{f1}
+  // \vec{x}_{\eta} = \vec{a2}*xi^2*eta + \vec{b2}*xi**2  + \vec{c2}*xi*eta + \vec{d2}*xi + \vec{e2}*eta + \vec{f2}
+  // This is copy-pasted directly from the output of a Python script.
+  Point
+    a1 = x0/2 + x1/2 + x2/2 + x3/2 - x4 - x5 - x6 - x7 + 2*x8,
+    b1 = -x0/4 + x1/4 + x2/4 - x3/4 - x5/2 + x7/2,
+    c1 = -x0/2 - x1/2 + x2/2 + x3/2 + x4 - x6,
+    d1 = x5 + x7 - 2*x8,
+    e1 = x0/4 - x1/4 + x2/4 - x3/4,
+    f1 = x5/2 - x7/2,
+    a2 = a1,
+    b2 = -x0/4 - x1/4 + x2/4 + x3/4 + x4/2 - x6/2,
+    c2 = -x0/2 + x1/2 + x2/2 - x3/2 - x5 + x7,
+    d2 = x0/4 - x1/4 + x2/4 - x3/4,
+    e2 = x4 + x6 - 2*x8,
+    f2 = -x4/2 + x6/2;
+
+  // 3x3 quadrature, exact for bi-quintics
+  const unsigned int N = 3;
+  const Real q[N] = {-std::sqrt(15)/5., 0., std::sqrt(15)/5.};
+  const Real w[N] = {5./9, 8./9, 5./9};
+
+  Real vol=0.;
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int j=0; j<N; ++j)
+      vol += (q[i]*q[j]*q[j]*a1 + q[j]*q[j]*b1 + q[j]*q[i]*c1 + q[i]*d1 + q[j]*e1 + f1).
+        cross(q[i]*q[i]*q[j]*a2 + q[i]*q[i]*b2 + q[j]*q[i]*c2 + q[i]*d2 + q[j]*e2 + f2).size() * w[i] * w[j];
+
+  return vol;
+}
+
+
+
 
 unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) const
 {
