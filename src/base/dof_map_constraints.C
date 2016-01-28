@@ -3188,10 +3188,31 @@ void DofMap::process_constraints (MeshBase & mesh)
 
         DofConstraintRow & constraint_row = pos->second;
 
-        DofConstraintValueMap::iterator rhsit =
+        const DofConstraintValueMap::iterator rhsit =
           _primal_constraint_values.find(*i);
         Number constraint_rhs = (rhsit == _primal_constraint_values.end()) ?
           0 : rhsit->second;
+
+        std::vector<Number>
+          adjoint_rhses(_adjoint_dirichlet_boundaries.size());
+
+        for (unsigned int qoi_index = 0;
+             qoi_index != _adjoint_dirichlet_boundaries.size();
+             ++qoi_index)
+          {
+            const AdjointDofConstraintValues::const_iterator adjoint_map_it =
+              _adjoint_constraint_values.find(qoi_index);
+
+            if (adjoint_map_it == _adjoint_constraint_values.end())
+              continue;
+
+            const DofConstraintValueMap & adjoint_map = adjoint_map_it->second;
+
+            const DofConstraintValueMap::const_iterator adjrhsit =
+              adjoint_map.find(*i);
+            adjoint_rhses[qoi_index] = (adjrhsit == adjoint_map.end()) ?
+              0 : adjrhsit->second;
+          }
 
         std::vector<dof_id_type> constraints_to_expand;
 
@@ -3207,11 +3228,11 @@ void DofMap::process_constraints (MeshBase & mesh)
         for (std::size_t j = 0; j != constraints_to_expand.size();
              ++j)
           {
-            dof_id_type expandable = constraints_to_expand[j];
+            const dof_id_type expandable = constraints_to_expand[j];
 
             const Real this_coef = constraint_row[expandable];
 
-            DofConstraints::const_iterator
+            const DofConstraints::const_iterator
               subpos = _dof_constraints.find(expandable);
 
             libmesh_assert (subpos != _dof_constraints.end());
@@ -3224,10 +3245,29 @@ void DofMap::process_constraints (MeshBase & mesh)
               {
                 constraint_row[it->first] += it->second * this_coef;
               }
-            DofConstraintValueMap::const_iterator subrhsit =
+            const DofConstraintValueMap::const_iterator subrhsit =
               _primal_constraint_values.find(expandable);
             if (subrhsit != _primal_constraint_values.end())
               constraint_rhs += subrhsit->second * this_coef;
+
+            for (unsigned int qoi_index = 0;
+                 qoi_index != _adjoint_dirichlet_boundaries.size();
+                 ++qoi_index)
+              {
+                const AdjointDofConstraintValues::const_iterator adjoint_map_it =
+                  _adjoint_constraint_values.find(qoi_index);
+
+                if (adjoint_map_it == _adjoint_constraint_values.end())
+                  continue;
+
+                const DofConstraintValueMap & adjoint_map = adjoint_map_it->second;
+
+                const DofConstraintValueMap::const_iterator adjrhsit =
+                  adjoint_map.find(expandable);
+                if (adjrhsit != adjoint_map.end())
+                  adjoint_rhses[qoi_index] += 
+                    adjrhsit->second * this_coef;
+              }
 
             constraint_row.erase(expandable);
           }
@@ -3245,6 +3285,36 @@ void DofMap::process_constraints (MeshBase & mesh)
               rhsit->second = constraint_rhs;
             else
               _primal_constraint_values.erase(rhsit);
+          }
+
+        for (unsigned int qoi_index = 0;
+             qoi_index != _adjoint_dirichlet_boundaries.size();
+             ++qoi_index)
+          {
+            const AdjointDofConstraintValues::iterator adjoint_map_it =
+              _adjoint_constraint_values.find(qoi_index);
+
+            if (adjoint_map_it == _adjoint_constraint_values.end())
+              continue;
+
+            DofConstraintValueMap & adjoint_map = adjoint_map_it->second;
+
+            DofConstraintValueMap::iterator adjrhsit =
+              adjoint_map.find(*i);
+            if (adjrhsit == adjoint_map.end())
+              {
+                if (adjoint_rhses[qoi_index] != Number(0))
+                  adjoint_map[*i] = adjoint_rhses[qoi_index];
+                else
+                  adjoint_map.erase(*i);
+              }
+            else
+              {
+                if (adjoint_rhses[qoi_index] != Number(0))
+                  adjrhsit->second = adjoint_rhses[qoi_index];
+                else
+                  adjoint_map.erase(adjrhsit);
+              }
           }
 
         if (constraints_to_expand.empty())
