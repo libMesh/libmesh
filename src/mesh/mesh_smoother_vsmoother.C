@@ -49,7 +49,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   MeshSmoother(mesh),
   _percent_to_move(1),
   _dist_norm(0.),
-  _adapt_data(NULL),
+  _adapt_data(libmesh_nullptr),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
   _maxiter(maxiter),
@@ -61,7 +61,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _n_nodes(0),
   _n_cells(0),
   _n_hanging_edges(0),
-  _area_of_interest(NULL)
+  _area_of_interest(libmesh_nullptr)
 {}
 
 
@@ -89,7 +89,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _n_nodes(0),
   _n_cells(0),
   _n_hanging_edges(0),
-  _area_of_interest(NULL)
+  _area_of_interest(libmesh_nullptr)
 {}
 
 

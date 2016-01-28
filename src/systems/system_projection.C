@@ -81,7 +81,7 @@ public:
   GenericProjector (const GenericProjector & in) :
     system(in.system),
     master_f(in.master_f),
-    master_g(in.master_g ? new GFunctor(*in.master_g) : NULL),
+    master_g(in.master_g ? new GFunctor(*in.master_g) : libmesh_nullptr),
     g_was_copied(in.master_g),
     master_action(in.master_action),
     variables(in.variables)
@@ -178,7 +178,7 @@ class OldSolutionValue
 public:
   OldSolutionValue(const libMesh::System & sys_in,
                    const NumericVector<Number> & old_sol) :
-    last_elem(NULL),
+    last_elem(libmesh_nullptr),
     sys(sys_in),
     old_context(sys_in),
     old_solution(old_sol)
@@ -188,7 +188,7 @@ public:
   }
 
   OldSolutionValue(const OldSolutionValue & in) :
-    last_elem(NULL),
+    last_elem(libmesh_nullptr),
     sys(in.sys),
     old_context(sys),
     old_solution(in.old_solution)
@@ -519,11 +519,11 @@ void System::project_vector (const NumericVector<Number> & old_v,
 #ifdef LIBMESH_ENABLE_AMR
 
   // Resize the new vector and get a serial version.
-  NumericVector<Number> * new_vector_ptr = NULL;
+  NumericVector<Number> * new_vector_ptr = libmesh_nullptr;
   UniquePtr<NumericVector<Number> > new_vector_built;
   NumericVector<Number> * local_old_vector;
   UniquePtr<NumericVector<Number> > local_old_vector_built;
-  const NumericVector<Number> * old_vector_ptr = NULL;
+  const NumericVector<Number> * old_vector_ptr = libmesh_nullptr;
 
   ConstElemRange active_local_elem_range
     (this->get_mesh().active_local_elements_begin(),
@@ -782,7 +782,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
       this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint);
     }
   else
-    this->project_vector(new_vector, &f_fem, NULL, is_adjoint);
+    this->project_vector(new_vector, &f_fem, libmesh_nullptr, is_adjoint);
 
   STOP_LOG ("project_vector(FunctionBase)", "System");
 }
@@ -831,7 +831,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
   else
     Threads::parallel_for
       (active_local_range,
-       FEMProjector(*this, fw, NULL, setter, vars));
+       FEMProjector(*this, fw, libmesh_nullptr, setter, vars));
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
@@ -1023,9 +1023,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       const unsigned int var = variables[v];
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase * fe = NULL;
-      FEBase * side_fe = NULL;
-      FEBase * edge_fe = NULL;
+      FEBase * fe = libmesh_nullptr;
+      FEBase * side_fe = libmesh_nullptr;
+      FEBase * edge_fe = libmesh_nullptr;
 
       const std::set<unsigned char> & elem_dims =
         context.elem_dimensions();
@@ -1101,9 +1101,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           if (fe_type.family == SCALAR)
             continue;
 
-          FEBase * fe = NULL;
-          FEBase * side_fe = NULL;
-          FEBase * edge_fe = NULL;
+          FEBase * fe = libmesh_nullptr;
+          FEBase * side_fe = libmesh_nullptr;
+          FEBase * edge_fe = libmesh_nullptr;
 
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
@@ -1400,7 +1400,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const std::vector<std::vector<Real> > & phi =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 edge_fe->get_phi() : fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = NULL;
+              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                   &(edge_fe->get_dphi()) : &(fe->get_dphi());
@@ -1606,7 +1606,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const std::vector<std::vector<Real> > & phi =
                 (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                 side_fe->get_phi() : fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = NULL;
+              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
                   &(side_fe->get_dphi()) : &(fe->get_dphi());
@@ -1807,7 +1807,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const std::vector<Real> & JxW = fe->get_JxW();
 
               const std::vector<std::vector<Real> > & phi = fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = NULL;
+              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi = &(fe->get_dphi());
 
@@ -2131,7 +2131,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
       // The gradients of the shape functions at the quadrature
       // points on the child element.
-      const std::vector<std::vector<RealGradient> > * dphi = NULL;
+      const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
 
       const FEContinuity cont = fe->get_continuity();
 

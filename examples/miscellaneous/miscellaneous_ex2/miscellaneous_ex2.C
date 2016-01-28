@@ -441,7 +441,7 @@ void assemble_helmholtz(EquationSystems & es,
       // side MUST live on a boundary of the domain.
 
       for (unsigned int side=0; side<elem->n_sides(); side++)
-        if (elem->neighbor(side) == NULL)
+        if (elem->neighbor(side) == libmesh_nullptr)
           {
             START_LOG("damping", "assemble_helmholtz");
 

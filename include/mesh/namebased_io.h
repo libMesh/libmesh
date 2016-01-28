@@ -81,7 +81,7 @@ public:
    */
   virtual void write_equation_systems (const std::string & filename,
                                        const EquationSystems & es,
-                                       const std::set<std::string> * system_names=NULL) libmesh_override;
+                                       const std::set<std::string> * system_names=libmesh_nullptr) libmesh_override;
 
   /**
    * This method implements writing a mesh with nodal data to a

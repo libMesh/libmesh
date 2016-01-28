@@ -600,3 +600,79 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
 
     AM_CONDITIONAL(HAVE_CXX11_FINAL, test x$have_cxx11_final == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_NULLPTR],
+  [
+    have_cxx11_nullptr=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 nullptr support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      @%:@include <cstddef>
+      void f(int * pi) {}
+      void f(double * pd) {}
+      void f(std::nullptr_t nullp) {}
+      ]], [[
+      // would be ambiguous without void f(nullptr_t)
+      f(nullptr);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_NULLPTR, 1, [Flag indicating whether compiler supports nullptr])
+        have_cxx11_nullptr=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    # Test the nullptr workaround if we don't have the real nullptr
+    if (test "x$have_cxx11_nullptr" != "xyes"); then
+      AC_MSG_CHECKING(for C++03 compatible nullptr workaround)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      const class my_nullptr_t
+      {
+      public:
+        // convertible to any type of null non-member pointer...
+        template<class T>
+        inline operator T * () const { return 0; }
+
+        // or any type of null member pointer...
+        template<class C, class T>
+        inline operator T C::*() const { return 0; }
+
+      private:
+        // Can't take address of nullptr
+        void operator & () const;
+      } my_nullptr = {};
+
+      void f(int) {}
+      void f(double *) {}
+
+      ]], [[
+      // Test that it works the same way as NULL.
+      int * p = my_nullptr;
+
+      // Test that the compiler can disambiguate the call correctly.
+      f(my_nullptr);
+      ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_NULLPTR_WORKAROUND, 1,
+                  [Flag indicating whether C++03 compatible nullptr workaround works])
+        have_cxx11_nullptr_workaround=yes
+      ],[
+        AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_NULLPTR, test x$have_cxx11_nullptr == xyes)
+    AM_CONDITIONAL(HAVE_CXX11_NULLPTR_WORKAROUND, test x$have_cxx11_nullptr_workaround == xyes)
+  ])

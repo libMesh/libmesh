@@ -81,7 +81,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
       libmesh_assert_equal_to (the_mesh.mesh_dimension(), 1);
 
       // Make sure we have a solution to plot
-      libmesh_assert ((names != NULL) && (soln != NULL));
+      libmesh_assert ((names != libmesh_nullptr) && (soln != libmesh_nullptr));
 
       // Create an output stream for script file
       std::ofstream out_stream(fname.c_str());
@@ -123,12 +123,12 @@ void GnuPlotIO::write_solution(const std::string & fname,
           const Elem * el = *it;
 
           // if el is the left edge of the mesh, print its left node position
-          if(el->neighbor(0) == NULL)
+          if(el->neighbor(0) == libmesh_nullptr)
             {
               x_min = (*(el->get_node(0)))(0);
               xtics_stream << "\"\" " << x_min << ", \\\n";
             }
-          if(el->neighbor(1) == NULL)
+          if(el->neighbor(1) == libmesh_nullptr)
             {
               x_max = (*(el->get_node(1)))(0);
             }

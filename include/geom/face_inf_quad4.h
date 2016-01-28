@@ -56,7 +56,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfQuad4 (Elem * p=NULL) :
+  InfQuad4 (Elem * p=libmesh_nullptr) :
     InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
 
   /**

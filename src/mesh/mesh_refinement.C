@@ -70,7 +70,7 @@ MeshRefinement::MeshRefinement (MeshBase & m) :
   _underrefined_boundary_limit(0),
   _enforce_mismatch_limit_prior_to_refinement(false)
 #ifdef LIBMESH_ENABLE_PERIODIC
-  , _periodic_boundaries(NULL)
+  , _periodic_boundaries(libmesh_nullptr)
 #endif
 {
 }
@@ -363,8 +363,8 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   bool failure = false;
 
 #ifndef NDEBUG
-  Elem * failed_elem = NULL;
-  Elem * failed_neighbor = NULL;
+  Elem * failed_elem = libmesh_nullptr;
+  Elem * failed_neighbor = libmesh_nullptr;
 #endif // !NDEBUG
 
   for ( ; elem_it != elem_end && !failure; ++elem_it)
@@ -433,7 +433,7 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
 #ifndef NDEBUG
-  Elem * failed_elem = NULL;
+  Elem * failed_elem = libmesh_nullptr;
 #endif
 
   for ( ; elem_it != elem_end; ++elem_it)
@@ -975,7 +975,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                       const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
 
-                      if (neighbor != NULL &&      // I have a
+                      if (neighbor != libmesh_nullptr &&      // I have a
                           neighbor != remote_elem) // neighbor here
                         {
                           if (neighbor->active()) // and it is active
@@ -1011,7 +1011,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                       const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
 
-                      if (neighbor != NULL &&      // I have a
+                      if (neighbor != libmesh_nullptr &&      // I have a
                           neighbor != remote_elem) // neighbor here
                         {
                           if (neighbor->active()) // and it is active
@@ -1268,7 +1268,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                       Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), side);
 
-                      if (neighbor != NULL        && // I have a
+                      if (neighbor != libmesh_nullptr        && // I have a
                           neighbor != remote_elem && // neighbor here
                           neighbor->active()) // and it is active
                         {
@@ -1326,7 +1326,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                       Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), side);
 
-                      if (neighbor != NULL &&      // I have a
+                      if (neighbor != libmesh_nullptr &&      // I have a
                           neighbor != remote_elem) // neighbor here
                         {
                           if (neighbor->active()) // and it is active

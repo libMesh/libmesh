@@ -65,10 +65,10 @@ void TimeSolver::init ()
 {
   // If the user hasn't given us a solver to use,
   // just build a default solver
-  if (this->diff_solver().get() == NULL)
+  if (this->diff_solver().get() == libmesh_nullptr)
     this->diff_solver() = DiffSolver::build(_system);
 
-  if (this->linear_solver().get() == NULL)
+  if (this->linear_solver().get() == libmesh_nullptr)
     this->linear_solver() = LinearSolver<Number>::build(_system.comm());
 }
 

@@ -28,7 +28,7 @@ namespace libMesh
 
 DGFEMContext::DGFEMContext (const System & sys)
   : FEMContext(sys),
-    _neighbor(NULL),
+    _neighbor(libmesh_nullptr),
     _neighbor_dof_indices_var(sys.n_vars()),
     _dg_terms_active(false)
 {
@@ -69,10 +69,9 @@ DGFEMContext::DGFEMContext (const System & sys)
     {
       FEType fe_type = sys.variable_type(i);
 
-      if ( _neighbor_side_fe[fe_type] == NULL )
-        {
-          _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-        }
+      if (_neighbor_side_fe[fe_type] == libmesh_nullptr)
+        _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
+
       _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
     }
 }

@@ -165,7 +165,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
 
       for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             {
               bool on_lower_contact_surface =
                 mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_LOWER);
@@ -191,7 +191,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
                       }
                 }
 
-            } // end if nieghbor(side_) != NULL
+            } // end if nieghbor(side_) != libmesh_nullptr
         } // end for side
     } // end for el
 

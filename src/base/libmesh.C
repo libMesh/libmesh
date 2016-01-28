@@ -84,8 +84,8 @@ libMesh::UniquePtr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
 // replacing them in the destructor before program termination.
-std::streambuf * out_buf (NULL);
-std::streambuf * err_buf (NULL);
+std::streambuf * out_buf (libmesh_nullptr);
+std::streambuf * err_buf (libmesh_nullptr);
 
 libMesh::UniquePtr<libMesh::Threads::task_scheduler_init> task_scheduler;
 #if defined(LIBMESH_HAVE_MPI)
@@ -515,14 +515,14 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       if (!SlepcInitializeCalled)
 #  endif
         {
-          ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), NULL, NULL);
+          ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), libmesh_nullptr, libmesh_nullptr);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
         {
-          ierr = PetscInitialize (&argc, const_cast<char ***>(&argv), NULL, NULL);
+          ierr = PetscInitialize (&argc, const_cast<char ***>(&argv), libmesh_nullptr, libmesh_nullptr);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
         }
 # endif
@@ -586,7 +586,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // not to via the --keep-cout command-line argument.
   if (libMesh::global_processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
-      libMesh::out.rdbuf (NULL);
+      libMesh::out.rdbuf (libmesh_nullptr);
 
   // Check command line to override printing
   // of reference count information.
@@ -767,9 +767,9 @@ void enableFPE(bool on)
       sigemptyset (&new_action.sa_mask);
       new_action.sa_flags = SA_SIGINFO;
 
-      sigaction (SIGFPE, NULL, &old_action);
+      sigaction (SIGFPE, libmesh_nullptr, &old_action);
       if (old_action.sa_handler != SIG_IGN)
-        sigaction (SIGFPE, &new_action, NULL);
+        sigaction (SIGFPE, &new_action, libmesh_nullptr);
     }
   else
     {
@@ -807,7 +807,7 @@ void enableSEGV(bool on)
   else if (was_on)
     {
       was_on = false;
-      sigaction (SIGSEGV, &old_action, NULL);
+      sigaction (SIGSEGV, &old_action, libmesh_nullptr);
     }
 }
 

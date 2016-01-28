@@ -65,14 +65,14 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  VTKIO (MeshBase & mesh, MeshData * mesh_data=NULL);
+  VTKIO (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
   /**
    * Constructor.  Takes a read-only reference to a mesh object.
    * This is the constructor required to write a mesh.
    */
   explicit
-  VTKIO (const MeshBase & mesh, MeshData * mesh_data=NULL);
+  VTKIO (const MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
   /**
    * This method implements writing a mesh with nodal data to a

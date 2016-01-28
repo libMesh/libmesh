@@ -62,7 +62,7 @@ double __libmesh_nlopt_objective(unsigned n,
   sys.update();
 
   Real objective;
-  if (solver->objective_object != NULL)
+  if (solver->objective_object != libmesh_nullptr)
     {
       objective =
         solver->objective_object->objective(
@@ -76,7 +76,7 @@ double __libmesh_nlopt_objective(unsigned n,
   // If the gradient has been requested, fill it in
   if (gradient)
     {
-      if (solver->gradient_object != NULL)
+      if (solver->gradient_object != libmesh_nullptr)
         {
           solver->gradient_object->gradient(
                                             *(sys.current_local_solution), *(sys.rhs), sys);
@@ -297,7 +297,7 @@ template <typename T>
 NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem & system_in)
   :
   OptimizationSolver<T>(system_in),
-  _opt(NULL),
+  _opt(libmesh_nullptr),
   _result(NLOPT_SUCCESS),
   _iteration_count(0),
   _constraints_tolerance(1.e-8)

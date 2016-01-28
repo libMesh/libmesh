@@ -94,7 +94,7 @@ UniquePtr<Elem> Prism::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  Elem * face = NULL;
+  Elem * face = libmesh_nullptr;
 
   // Set up the type of element
   switch (i)

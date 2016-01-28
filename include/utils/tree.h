@@ -82,7 +82,7 @@ public:
    * optionally using a non-zero relative tolerance for searches.
    */
   virtual const Elem * find_element(const Point & p,
-                                    const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
                                     Real relative_tol = TOLERANCE) const libmesh_override;
 
   /**
@@ -91,7 +91,7 @@ public:
    * optionally using a non-zero relative tolerance for searches.
    */
   const Elem * operator() (const Point & p,
-                           const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
                            Real relative_tol = TOLERANCE) const;
 
 private:

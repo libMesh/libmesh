@@ -240,7 +240,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
               {
                 const Elem * neighbor = elem->neighbor(ms);
 
-                if (neighbor != NULL)
+                if (neighbor != libmesh_nullptr)
                   {
                     // If the neighbor is active treat it
                     // as a connection
@@ -340,7 +340,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
               {
                 const Elem * neighbor = elem->neighbor(ms);
 
-                if (neighbor != NULL)
+                if (neighbor != libmesh_nullptr)
                   {
                     // If the neighbor is active treat it
                     // as a connection
@@ -433,14 +433,14 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
 
       // Use recursive if the number of partitions is less than or equal to 8
       if (n_pieces <= 8)
-        Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
-                                        NULL, &nparts, NULL, NULL, NULL,
+        Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], libmesh_nullptr,
+                                        libmesh_nullptr, &nparts, libmesh_nullptr, libmesh_nullptr, libmesh_nullptr,
                                         &edgecut, &part[0]);
 
       // Otherwise  use kway
       else
-        Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
-                                   NULL, &nparts, NULL, NULL, NULL,
+        Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], libmesh_nullptr,
+                                   libmesh_nullptr, &nparts, libmesh_nullptr, libmesh_nullptr, libmesh_nullptr,
                                    &edgecut, &part[0]);
 
     } // end processor 0 part

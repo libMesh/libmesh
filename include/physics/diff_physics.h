@@ -82,7 +82,7 @@ public:
    */
   DifferentiablePhysics () :
     compute_internal_sides (false),
-    _mesh_sys              (NULL),
+    _mesh_sys              (libmesh_nullptr),
     _mesh_x_var            (libMesh::invalid_uint),
     _mesh_y_var            (libMesh::invalid_uint),
     _mesh_z_var            (libMesh::invalid_uint)

@@ -71,7 +71,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char * name = NULL) libmesh_override;
+  virtual void init (const char * name = libmesh_nullptr) libmesh_override;
 
   /**
    * Call the Laspack solver

@@ -54,7 +54,7 @@ public:
    */
   TreeNode (const MeshBase & m,
             unsigned int tbs,
-            const TreeNode<N> * p = NULL);
+            const TreeNode<N> * p = libmesh_nullptr);
 
   /**
    * Destructor.  Deletes all children, if any.  Thus
@@ -67,7 +67,7 @@ public:
    * @returns true if this node is the root node, false
    * otherwise.
    */
-  bool is_root() const { return (parent == NULL); }
+  bool is_root() const { return (parent == libmesh_nullptr); }
 
   /**
    * @returns true if this node is active (i.e. has no
@@ -147,7 +147,7 @@ public:
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem * find_element (const Point & p,
-                             const std::set<subdomain_id_type> * allowed_subdomains = NULL,
+                             const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
                              Real relative_tol = TOLERANCE) const;
 
 
@@ -254,7 +254,7 @@ template <unsigned int N>
 inline
 unsigned int TreeNode<N>::level () const
 {
-  if (parent != NULL)
+  if (parent != libmesh_nullptr)
     return parent->level()+1;
 
   // if we have no parent, we are a level-0 box

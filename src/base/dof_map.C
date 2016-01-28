@@ -128,7 +128,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
 DofMap::DofMap(const unsigned int number,
                const ParallelObject & parent_decomp) :
   ParallelObject (parent_decomp),
-  _dof_coupling(NULL),
+  _dof_coupling(libmesh_nullptr),
   _variables(),
   _variable_groups(),
   _sys_number(number),
@@ -137,15 +137,15 @@ DofMap::DofMap(const unsigned int number,
   _end_df(),
   _first_scalar_df(),
   _send_list(),
-  _augment_sparsity_pattern(NULL),
-  _extra_sparsity_function(NULL),
-  _extra_sparsity_context(NULL),
-  _augment_send_list(NULL),
-  _extra_send_list_function(NULL),
-  _extra_send_list_context(NULL),
+  _augment_sparsity_pattern(libmesh_nullptr),
+  _extra_sparsity_function(libmesh_nullptr),
+  _extra_sparsity_context(libmesh_nullptr),
+  _augment_send_list(libmesh_nullptr),
+  _extra_send_list_function(libmesh_nullptr),
+  _extra_send_list_context(libmesh_nullptr),
   need_full_sparsity_pattern(false),
-  _n_nz(NULL),
-  _n_oz(NULL),
+  _n_nz(libmesh_nullptr),
+  _n_oz(libmesh_nullptr),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
@@ -498,7 +498,7 @@ void DofMap::reinit(MeshBase & mesh)
           {
             Node * node = elem->get_node(n);
 
-            if (node->old_dof_object == NULL)
+            if (node->old_dof_object == libmesh_nullptr)
               if (node->has_dofs(sys_num))
                 node->set_old_dof_object();
           }
@@ -1482,7 +1482,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
       // Loop over the neighbors of those elements
       for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        if (elem->neighbor(s) != NULL)
+        if (elem->neighbor(s) != libmesh_nullptr)
           {
             family.clear();
 
@@ -1710,8 +1710,8 @@ void DofMap::clear_sparsity()
       delete _n_nz;
       delete _n_oz;
     }
-  _n_nz = NULL;
-  _n_oz = NULL;
+  _n_nz = libmesh_nullptr;
+  _n_oz = libmesh_nullptr;
 }
 
 
@@ -2177,7 +2177,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
   else
     {
       // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), NULL);
+      elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
         elem_nodes[i] = elem->get_node(i);
     }
@@ -2347,7 +2347,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
 
   // If the parent lives on another processor
   // than the child
-  if (parent != NULL)
+  if (parent != libmesh_nullptr)
   if (parent->processor_id() != elem->processor_id())
   {
   // Get the DOF indices for the parent
@@ -2466,7 +2466,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange & range)
   // then all the DOFS are coupled to each other.  Furthermore,
   // we can take a shortcut and do this more quickly here.  So
   // we use an if-test.
-  if ((dof_coupling == NULL) || (dof_coupling->empty()))
+  if ((dof_coupling == libmesh_nullptr) || (dof_coupling->empty()))
     {
       std::vector<dof_id_type>
         element_dofs,
@@ -2575,7 +2575,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange & range)
               // TODO:[BSK] optimize this like above!
               if (implicit_neighbor_dofs)
                 for (unsigned int s=0; s<elem->n_sides(); s++)
-                  if (elem->neighbor(s) != NULL)
+                  if (elem->neighbor(s) != libmesh_nullptr)
                     {
                       const Elem * const neighbor_0 = elem->neighbor(s);
 #ifdef LIBMESH_ENABLE_AMR
@@ -2763,7 +2763,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange & range)
                         // TODO:[BSK] optimize this like above!
                         if (implicit_neighbor_dofs)
                           for (unsigned int s=0; s<elem->n_sides(); s++)
-                            if (elem->neighbor(s) != NULL)
+                            if (elem->neighbor(s) != libmesh_nullptr)
                               {
                                 const Elem * const neighbor_0 = elem->neighbor(s);
 #ifdef LIBMESH_ENABLE_AMR

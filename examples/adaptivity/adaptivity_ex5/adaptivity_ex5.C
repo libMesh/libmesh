@@ -109,7 +109,7 @@ Number exact_value (const Point & p,
 
 // With --enable-fparser, the user can also optionally set their own
 // exact solution equations.
-FunctionBase<Number> * parsed_solution = NULL;
+FunctionBase<Number> * parsed_solution = libmesh_nullptr;
 
 
 // Returns a string with 'number' formatted and placed directly
@@ -552,9 +552,9 @@ void init_cd (EquationSystems & es,
   es.parameters.set<Real> ("time") = system.time = 0;
 
   if (parsed_solution)
-    system.project_solution(parsed_solution, NULL);
+    system.project_solution(parsed_solution, libmesh_nullptr);
   else
-    system.project_solution(exact_value, NULL, es.parameters);
+    system.project_solution(exact_value, libmesh_nullptr, es.parameters);
 }
 
 

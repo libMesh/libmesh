@@ -230,17 +230,17 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
 
   if (get_jacobian)
     {
-      if (nonlinear_solver->jacobian != NULL)
+      if (nonlinear_solver->jacobian != libmesh_nullptr)
         nonlinear_solver->jacobian (*current_local_solution.get(), *matrix, *this);
 
-      else if (nonlinear_solver->jacobian_object != NULL)
+      else if (nonlinear_solver->jacobian_object != libmesh_nullptr)
         nonlinear_solver->jacobian_object->jacobian (*current_local_solution.get(), *matrix, *this);
 
-      else if (nonlinear_solver->matvec != NULL)
-        nonlinear_solver->matvec (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
+      else if (nonlinear_solver->matvec != libmesh_nullptr)
+        nonlinear_solver->matvec (*current_local_solution.get(), get_residual ? rhs : libmesh_nullptr, matrix, *this);
 
-      else if (nonlinear_solver->residual_and_jacobian_object != NULL)
-        nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
+      else if (nonlinear_solver->residual_and_jacobian_object != libmesh_nullptr)
+        nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual ? rhs : libmesh_nullptr, matrix, *this);
 
       else
         libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
@@ -248,24 +248,24 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
 
   if (get_residual)
     {
-      if (nonlinear_solver->residual != NULL)
+      if (nonlinear_solver->residual != libmesh_nullptr)
         nonlinear_solver->residual (*current_local_solution.get(), *rhs, *this);
 
-      else if (nonlinear_solver->residual_object != NULL)
+      else if (nonlinear_solver->residual_object != libmesh_nullptr)
         nonlinear_solver->residual_object->residual (*current_local_solution.get(), *rhs, *this);
 
-      else if (nonlinear_solver->matvec != NULL)
+      else if (nonlinear_solver->matvec != libmesh_nullptr)
         {
           // we might have already grabbed the residual and jacobian together
           if (!get_jacobian)
-            nonlinear_solver->matvec (*current_local_solution.get(), rhs, NULL, *this);
+            nonlinear_solver->matvec (*current_local_solution.get(), rhs, libmesh_nullptr, *this);
         }
 
-      else if (nonlinear_solver->residual_and_jacobian_object != NULL)
+      else if (nonlinear_solver->residual_and_jacobian_object != libmesh_nullptr)
         {
           // we might have already grabbed the residual and jacobian together
           if (!get_jacobian)
-            nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), rhs, NULL, *this);
+            nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), rhs, libmesh_nullptr, *this);
         }
 
       else

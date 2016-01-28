@@ -59,13 +59,13 @@ public:
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  UNVIO (MeshBase & mesh, MeshData * mesh_data = NULL);
+  UNVIO (MeshBase & mesh, MeshData * mesh_data = libmesh_nullptr);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  UNVIO (const MeshBase & mesh, MeshData * mesh_data = NULL);
+  UNVIO (const MeshBase & mesh, MeshData * mesh_data = libmesh_nullptr);
 
   /**
    * Destructor.

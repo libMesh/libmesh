@@ -90,7 +90,7 @@ public:
   /**
    * Constructor.
    */
-  EquationSystems (MeshBase & mesh, MeshData * mesh_data=NULL);
+  EquationSystems (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
   /**
    * Destructor.  Should be virtual, since the user may want to derive
@@ -261,8 +261,8 @@ public:
    * specified systems.
    */
   void build_variable_names (std::vector<std::string> & var_names,
-                             const FEType * type=NULL,
-                             const std::set<std::string> * system_names=NULL) const;
+                             const FEType * type=libmesh_nullptr,
+                             const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**
    * Fill the input vector \p soln with the solution values for the
@@ -282,7 +282,7 @@ public:
    * specified systems.
    */
   void build_solution_vector (std::vector<Number> & soln,
-                              const std::set<std::string> * system_names=NULL) const;
+                              const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**
    * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
@@ -300,7 +300,7 @@ public:
    * specified systems.
    */
   void build_discontinuous_solution_vector (std::vector<Number> & soln,
-                                            const std::set<std::string> * system_names=NULL) const;
+                                            const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**
    * Read & initialize the systems from disk using the XDR data format.
@@ -537,7 +537,7 @@ MeshData & EquationSystems::get_mesh_data ()
 inline
 bool EquationSystems::has_mesh_data () const
 {
-  return (_mesh_data!=NULL);
+  return (_mesh_data!=libmesh_nullptr);
 }
 
 
@@ -554,7 +554,7 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::add_system (const std::string & name)
 {
-  T_sys * ptr = NULL;
+  T_sys * ptr = libmesh_nullptr;
 
   if (!_systems.count(name))
     {

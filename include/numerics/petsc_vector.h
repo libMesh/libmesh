@@ -595,8 +595,8 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in, const Paral
   _array_is_present(false),
   _first(0),
   _last(0),
-  _local_form(NULL),
-  _values(NULL),
+  _local_form(libmesh_nullptr),
+  _values(libmesh_nullptr),
   _global_to_local_map(),
   _destroy_vec_on_exit(true)
 {
@@ -612,8 +612,8 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
                              const ParallelType ptype) :
   NumericVector<T>(comm_in, ptype),
   _array_is_present(false),
-  _local_form(NULL),
-  _values(NULL),
+  _local_form(libmesh_nullptr),
+  _values(libmesh_nullptr),
   _global_to_local_map(),
   _destroy_vec_on_exit(true)
 {
@@ -630,8 +630,8 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
                              const ParallelType ptype) :
   NumericVector<T>(comm_in, ptype),
   _array_is_present(false),
-  _local_form(NULL),
-  _values(NULL),
+  _local_form(libmesh_nullptr),
+  _values(libmesh_nullptr),
   _global_to_local_map(),
   _destroy_vec_on_exit(true)
 {
@@ -649,8 +649,8 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
                              const ParallelType ptype) :
   NumericVector<T>(comm_in, ptype),
   _array_is_present(false),
-  _local_form(NULL),
-  _values(NULL),
+  _local_form(libmesh_nullptr),
+  _values(libmesh_nullptr),
   _global_to_local_map(),
   _destroy_vec_on_exit(true)
 {
@@ -667,8 +667,8 @@ PetscVector<T>::PetscVector (Vec v,
                              const Parallel::Communicator & comm_in) :
   NumericVector<T>(comm_in, AUTOMATIC),
   _array_is_present(false),
-  _local_form(NULL),
-  _values(NULL),
+  _local_form(libmesh_nullptr),
+  _values(libmesh_nullptr),
   _global_to_local_map(),
   _destroy_vec_on_exit(false)
 {

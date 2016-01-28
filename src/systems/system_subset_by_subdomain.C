@@ -99,16 +99,14 @@ SystemSubsetBySubdomain::
 set_var_nums (const std::set<unsigned int> * const var_nums)
 {
   _var_nums.clear();
-  if(var_nums!=NULL)
-    {
-      _var_nums = *var_nums;
-    }
+
+  if (var_nums != libmesh_nullptr)
+    _var_nums = *var_nums;
+
   else
     {
-      for(unsigned int i=0; i<_system.n_vars(); i++)
-        {
-          _var_nums.insert(i);
-        }
+      for (unsigned int i=0; i<_system.n_vars(); i++)
+        _var_nums.insert(i);
     }
 }
 

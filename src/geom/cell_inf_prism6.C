@@ -127,7 +127,7 @@ UniquePtr<Elem> InfPrism6::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem * face = NULL;
+      Elem * face = libmesh_nullptr;
 
       switch (i)
         {

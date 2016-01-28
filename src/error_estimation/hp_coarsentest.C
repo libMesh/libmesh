@@ -198,7 +198,7 @@ void HPCoarsenTest::select_refinement (System & system)
       fe_coarse = FEBase::build (dim, fe_type);
 
       // Any cached coarse element results have expired
-      coarse = NULL;
+      coarse = libmesh_nullptr;
       unsigned int cached_coarse_p_level = 0;
 
       const FEContinuity cont = fe->get_continuity();

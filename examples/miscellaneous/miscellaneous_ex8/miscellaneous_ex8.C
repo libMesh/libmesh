@@ -107,7 +107,7 @@ void init_sys(EquationSystems & es,
   System & system =
     es.get_system<System>(system_name);
 
-  system.project_solution(exact_value, NULL, es.parameters);
+  system.project_solution(exact_value, libmesh_nullptr, es.parameters);
 }
 
 

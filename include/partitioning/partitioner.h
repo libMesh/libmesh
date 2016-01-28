@@ -49,7 +49,7 @@ public:
   /**
    * Constructor.
    */
-  Partitioner ():_weights(NULL) {}
+  Partitioner () : _weights(libmesh_nullptr) {}
 
   /**
    * Destructor. Virtual so that we can derive from this class.

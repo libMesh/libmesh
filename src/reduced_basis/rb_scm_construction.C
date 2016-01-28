@@ -49,7 +49,7 @@ RBSCMConstruction::RBSCMConstruction (EquationSystems & es,
   : Parent(es, name_in, number_in),
     SCM_training_tolerance(0.5),
     RB_system_name(""),
-    rb_scm_eval(NULL)
+    rb_scm_eval(libmesh_nullptr)
 {
 
   // set assemble_before_solve flag to false

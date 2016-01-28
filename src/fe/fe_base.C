@@ -822,9 +822,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   // The gradients of the shape functions at the quadrature
   // points on the child element.
   const std::vector<std::vector<OutputGradient> > * dphi_values =
-    NULL;
+    libmesh_nullptr;
   const std::vector<std::vector<OutputGradient> > * dphi_coarse =
-    NULL;
+    libmesh_nullptr;
 
   const FEContinuity cont = fe->get_continuity();
 
@@ -1407,9 +1407,9 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   const std::vector<std::vector<OutputShape> > & phi = my_fe->get_phi();
   const std::vector<std::vector<OutputShape> > & neigh_phi =
     neigh_fe->get_phi();
-  const std::vector<Point> * face_normals = NULL;
-  const std::vector<std::vector<OutputGradient> > * dphi = NULL;
-  const std::vector<std::vector<OutputGradient> > * neigh_dphi = NULL;
+  const std::vector<Point> * face_normals = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient> > * dphi = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient> > * neigh_dphi = libmesh_nullptr;
 
   std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
@@ -1434,7 +1434,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != NULL)
+    if (elem->neighbor(s) != libmesh_nullptr)
       {
         // Get pointers to the element's neighbor.
         const Elem * neigh = elem->neighbor(s);
@@ -1699,9 +1699,9 @@ compute_periodic_constraints (DofConstraints & constraints,
   const std::vector<std::vector<OutputShape> > & phi = my_fe->get_phi();
   const std::vector<std::vector<OutputShape> > & neigh_phi =
     neigh_fe->get_phi();
-  const std::vector<Point> * face_normals = NULL;
-  const std::vector<std::vector<OutputGradient> > * dphi = NULL;
-  const std::vector<std::vector<OutputGradient> > * neigh_dphi = NULL;
+  const std::vector<Point> * face_normals = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient> > * dphi = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient> > * neigh_dphi = libmesh_nullptr;
   std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
@@ -1745,7 +1745,7 @@ compute_periodic_constraints (DofConstraints & constraints,
               // Get pointers to the element's neighbor.
               const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
 
-              if (neigh == NULL)
+              if (neigh == libmesh_nullptr)
                 libmesh_error_msg("PeriodicBoundaries point locator object returned NULL!");
 
               // periodic (and possibly h refinement) constraints:
@@ -1980,8 +1980,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                             }
 
                           // What do we want to constrain against?
-                          const Elem * primary_elem = NULL;
-                          const Elem * main_neigh = NULL;
+                          const Elem * primary_elem = libmesh_nullptr;
+                          const Elem * main_neigh = libmesh_nullptr;
                           Point main_pt = *my_node,
                             primary_pt = *my_node;
 
@@ -2059,8 +2059,9 @@ compute_periodic_constraints (DofConstraints & constraints,
                           libmesh_assert_less (e, elem->n_edges());
 
                           // Find the edge end nodes
-                          Node * e1 = NULL,
-                            * e2 = NULL;
+                          Node
+                            * e1 = libmesh_nullptr,
+                            * e2 = libmesh_nullptr;
                           for (unsigned int nn = 0; nn != elem->n_nodes(); ++nn)
                             {
                               if (nn == n)
@@ -2068,7 +2069,7 @@ compute_periodic_constraints (DofConstraints & constraints,
 
                               if (elem->is_node_on_edge(nn, e))
                                 {
-                                  if (e1 == NULL)
+                                  if (e1 == libmesh_nullptr)
                                     {
                                       e1 = elem->get_node(nn);
                                     }
@@ -2125,8 +2126,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                             }
 
                           // What do we want to constrain against?
-                          const Elem * primary_elem = NULL;
-                          const Elem * main_neigh = NULL;
+                          const Elem * primary_elem = libmesh_nullptr;
+                          const Elem * main_neigh = libmesh_nullptr;
                           Point main_pt1 = *e1,
                             main_pt2 = *e2,
                             primary_pt1 = *e1,

@@ -189,7 +189,7 @@ private:
    */
   void read_mesh (const std::string &,
                   const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM,
-                  MeshData * = NULL);
+                  MeshData * = libmesh_nullptr);
 
   /**
    * Implements writing either a binary \p XDR or ASCII \p XDA mesh.

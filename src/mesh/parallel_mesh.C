@@ -320,7 +320,7 @@ const Node * ParallelMesh::query_node_ptr (const dof_id_type i) const
       return n;
     }
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -336,7 +336,7 @@ Node * ParallelMesh::query_node_ptr (const dof_id_type i)
       return n;
     }
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -374,7 +374,7 @@ const Elem * ParallelMesh::query_elem (const dof_id_type i) const
       return e;
     }
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -390,7 +390,7 @@ Elem * ParallelMesh::query_elem (const dof_id_type i)
       return e;
     }
 
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -547,7 +547,7 @@ void ParallelMesh::delete_elem(Elem * e)
 
   // Instead, we set it to NULL for now
 
-  _elements[e->id()] = NULL;
+  _elements[e->id()] = libmesh_nullptr;
 
   // delete the element
   delete e;
@@ -720,7 +720,7 @@ void ParallelMesh::delete_node(Node * n)
 
   // Instead, we set it to NULL for now
 
-  _nodes[n->id()] = NULL;
+  _nodes[n->id()] = libmesh_nullptr;
 
   // delete the node
   delete n;
@@ -873,12 +873,12 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *,
       // All processors with an object should agree on id
       const dof_id_type dofid = obj && obj->valid_id() ?
         obj->id() : DofObject::invalid_id;
-      libmesh_assert(this->comm().semiverify(obj ? &dofid : NULL));
+      libmesh_assert(this->comm().semiverify(obj ? &dofid : libmesh_nullptr));
 
       // All processors with an object should agree on processor id
       const dof_id_type procid = obj && obj->valid_processor_id() ?
         obj->processor_id() : DofObject::invalid_processor_id;
-      libmesh_assert(this->comm().semiverify(obj ? &procid : NULL));
+      libmesh_assert(this->comm().semiverify(obj ? &procid : libmesh_nullptr));
 
       dof_id_type min_procid = procid;
       this->comm().min(min_procid);
@@ -901,7 +901,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       // All processors with an object should agree on unique id
       const unique_id_type uniqueid = obj ? obj->unique_id() : 0;
-      libmesh_assert(this->comm().semiverify(obj ? &uniqueid : NULL));
+      libmesh_assert(this->comm().semiverify(obj ? &uniqueid : libmesh_nullptr));
 #endif
     }
 }
@@ -1148,7 +1148,7 @@ ParallelMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
             {
               // NULL out its original position for now
               // (our shuffling may put another object there shortly)
-              *it = NULL;
+              *it = libmesh_nullptr;
 
               // There may already be another object with this id that
               // needs to be moved itself
@@ -1286,7 +1286,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
       end = nodes.end();
 
     for (; it != end; ++it)
-      if (it->second != NULL)
+      if (it->second != libmesh_nullptr)
         it->second->set_id() = it->first;
   }
 
@@ -1297,7 +1297,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
       end = elems.end();
 
     for (; it != end; ++it)
-      if (it->second != NULL)
+      if (it->second != libmesh_nullptr)
         it->second->set_id() = it->first;
   }
 }

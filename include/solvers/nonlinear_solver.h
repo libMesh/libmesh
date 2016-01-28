@@ -92,7 +92,7 @@ public:
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char * name = NULL) = 0;
+  virtual void init (const char * name = libmesh_nullptr) = 0;
 
   /**
    * Solves the nonlinear system.
@@ -153,7 +153,7 @@ public:
    * Function that computes either the residual \f$ R(X) \f$ or the
    * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
    * iterate \f$ X \f$.  Note that either \p R or \p J could be
-   * \p XSNULL.
+   * \p NULL.
    */
   void (* matvec) (const NumericVector<Number> & X,
                    NumericVector<Number> * R,
@@ -164,7 +164,7 @@ public:
    * Object that computes either the residual \f$ R(X) \f$ or the
    * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
    * iterate \f$ X \f$.  Note that either \p R or \p J could be
-   * \p XSNULL.
+   * \p NULL.
    */
   NonlinearImplicitSystem::ComputeResidualandJacobian * residual_and_jacobian_object;
 
@@ -346,21 +346,21 @@ template <typename T>
 inline
 NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   ParallelObject               (s),
-  residual                     (NULL),
-  residual_object              (NULL),
-  jacobian                     (NULL),
-  jacobian_object              (NULL),
-  matvec                       (NULL),
-  residual_and_jacobian_object (NULL),
-  bounds                       (NULL),
-  bounds_object                (NULL),
-  nullspace                    (NULL),
-  nullspace_object             (NULL),
-  nearnullspace                (NULL),
-  nearnullspace_object         (NULL),
-  user_presolve                (NULL),
-  postcheck                    (NULL),
-  postcheck_object             (NULL),
+  residual                     (libmesh_nullptr),
+  residual_object              (libmesh_nullptr),
+  jacobian                     (libmesh_nullptr),
+  jacobian_object              (libmesh_nullptr),
+  matvec                       (libmesh_nullptr),
+  residual_and_jacobian_object (libmesh_nullptr),
+  bounds                       (libmesh_nullptr),
+  bounds_object                (libmesh_nullptr),
+  nullspace                    (libmesh_nullptr),
+  nullspace_object             (libmesh_nullptr),
+  nearnullspace                (libmesh_nullptr),
+  nearnullspace_object         (libmesh_nullptr),
+  user_presolve                (libmesh_nullptr),
+  postcheck                    (libmesh_nullptr),
+  postcheck_object             (libmesh_nullptr),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
@@ -373,8 +373,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   converged(false),
   _system(s),
   _is_initialized (false),
-  _preconditioner (NULL),
-  _solver_configuration(NULL)
+  _preconditioner (libmesh_nullptr),
+  _solver_configuration(libmesh_nullptr)
 {
 }
 

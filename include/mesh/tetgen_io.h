@@ -55,14 +55,14 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  TetGenIO (MeshBase & mesh, MeshData * mesh_data=NULL);
+  TetGenIO (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
   /**
    * Constructor.  Takes a read-only reference to a mesh object.
    * This is the constructor required to write a mesh.
    */
   explicit
-  TetGenIO (const MeshBase & mesh, MeshData * mesh_data=NULL);
+  TetGenIO (const MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
   /**
    * This method implements reading a mesh from a specified file

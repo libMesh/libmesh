@@ -48,7 +48,7 @@ DiscontinuityMeasure::init_context(FEMContext & c)
       if (error_norm.weight(v) == 0.0) continue;
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase * side_fe = NULL;
+      FEBase * side_fe = libmesh_nullptr;
 
       const std::set<unsigned char> & elem_dims =
         c.elem_dimensions();
@@ -74,10 +74,10 @@ DiscontinuityMeasure::internal_side_integration ()
   const Elem & coarse_elem = coarse_context->get_elem();
   const Elem & fine_elem = fine_context->get_elem();
 
-  FEBase * fe_fine = NULL;
+  FEBase * fe_fine = libmesh_nullptr;
   fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
 
-  FEBase * fe_coarse = NULL;
+  FEBase * fe_coarse = libmesh_nullptr;
   coarse_context->get_side_fe( var, fe_coarse, fine_elem.dim() );
 
   Real error = 1.e-30;
@@ -116,7 +116,7 @@ DiscontinuityMeasure::boundary_side_integration ()
 {
   const Elem & fine_elem = fine_context->get_elem();
 
-  FEBase * fe_fine = NULL;
+  FEBase * fe_fine = libmesh_nullptr;
   fine_context->get_side_fe( var, fe_fine, fine_elem.dim() );
 
   const std::string & var_name =

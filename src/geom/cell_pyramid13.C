@@ -140,7 +140,7 @@ UniquePtr<Elem> Pyramid13::build_side (const unsigned int i, bool proxy) const
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      Elem * face = NULL;
+      Elem * face = libmesh_nullptr;
 
       switch (i)
         {

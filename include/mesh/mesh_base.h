@@ -654,9 +654,9 @@ public:
    * implemented in derived classes.
    */
   virtual void read  (const std::string & name,
-                      MeshData * mesh_data=NULL,
+                      MeshData * mesh_data=libmesh_nullptr,
                       bool skip_renumber_nodes_and_elements=false) = 0;
-  virtual void write (const std::string & name, MeshData * mesh_data=NULL) = 0;
+  virtual void write (const std::string & name, MeshData * mesh_data=libmesh_nullptr) = 0;
 
   /**
    * Converts a mesh with higher-order

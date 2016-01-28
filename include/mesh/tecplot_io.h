@@ -108,8 +108,8 @@ private:
    * provided.  This will write an ASCII file.
    */
   void write_ascii (const std::string &,
-                    const std::vector<Number> * = NULL,
-                    const std::vector<std::string> * = NULL);
+                    const std::vector<Number> * = libmesh_nullptr,
+                    const std::vector<std::string> * = libmesh_nullptr);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -119,8 +119,8 @@ private:
    * an ASCII file will be created.
    */
   void write_binary (const std::string &,
-                     const std::vector<Number> * = NULL,
-                     const std::vector<std::string> * = NULL);
+                     const std::vector<Number> * = libmesh_nullptr,
+                     const std::vector<std::string> * = libmesh_nullptr);
 
   /**
    * Determines the logical spatial dimension of the elements in the

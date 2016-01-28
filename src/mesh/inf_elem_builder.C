@@ -148,7 +148,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
   // inner_boundary_nodes.  If so, we pass a std::set to the actual
   // implementation of the build_inf_elem(), so that we can convert
   // this to the Node * vector
-  if (inner_boundary_nodes != NULL)
+  if (inner_boundary_nodes != libmesh_nullptr)
     {
       // note that the std::set that we will get
       // from build_inf_elem() uses the index of
@@ -341,7 +341,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
         for (unsigned int s=0; s<elem->n_neighbors(); s++)
           {
             // check if elem(e) is on the boundary
-            if (elem->neighbor(s) == NULL)
+            if (elem->neighbor(s) == libmesh_nullptr)
               {
                 // note that it is safe to use the Elem::side() method,
                 // which gives a non-full-ordered element
@@ -400,7 +400,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
                 if (!sym_side)
                   faces.insert( std::make_pair(elem->id(), s) );
 
-              } // neighbor(s) == NULL
+              } // neighbor(s) == libmesh_nullptr
           } // sides
       } // elems
   }
@@ -484,7 +484,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   // When the user provided a non-null pointer to
   // inner_faces, that implies he wants to have
   // this std::set.  For now, simply copy the data.
-  if (inner_faces != NULL)
+  if (inner_faces != libmesh_nullptr)
     *inner_faces = faces;
 
   // free memory, clear our local variable, no need

@@ -129,7 +129,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
     {
       // Initialize the shape functions at the user-specified
       // points
-      if (pts != NULL)
+      if (pts != libmesh_nullptr)
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
@@ -243,9 +243,9 @@ void FE<Dim,T>::reinit(const Elem * elem,
     }
 
   // Compute the map for this element.
-  if (pts != NULL)
+  if (pts != libmesh_nullptr)
     {
-      if (weights != NULL)
+      if (weights != libmesh_nullptr)
         {
           this->_fe_map->compute_map (this->dim, *weights, elem, this->calculate_d2phi);
         }
@@ -264,7 +264,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
   // quadrature points.
   if (!cached_nodes_still_fit)
     {
-      if (pts != NULL)
+      if (pts != libmesh_nullptr)
         this->compute_shape_functions (elem,*pts);
       else
         this->compute_shape_functions(elem,this->qrule->get_points());

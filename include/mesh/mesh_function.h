@@ -67,7 +67,7 @@ public:
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
                 const std::vector<unsigned int> & vars,
-                const FunctionBase<Number> * master=NULL);
+                const FunctionBase<Number> * master=libmesh_nullptr);
 
   /**
    * Constructor for mesh based functions with a number
@@ -81,7 +81,7 @@ public:
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
                 const unsigned int var,
-                const FunctionBase<Number> * master=NULL);
+                const FunctionBase<Number> * master=libmesh_nullptr);
 
   /**
    * Destructor.
@@ -167,7 +167,7 @@ public:
   void gradient (const Point & p,
                  const Real time,
                  std::vector<Gradient> & output,
-                 const std::set<subdomain_id_type> * subdomain_ids = NULL);
+                 const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -178,7 +178,7 @@ public:
   void hessian (const Point & p,
                 const Real time,
                 std::vector<Tensor> & output,
-                const std::set<subdomain_id_type> * subdomain_ids = NULL);
+                const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr);
 
   /**
    * Returns the current \p PointLocator object, for you might want to
@@ -235,7 +235,7 @@ protected:
    * Helper function to reduce code duplication
    */
   const Elem * find_element(const Point & p,
-                            const std::set<subdomain_id_type> * subdomain_ids = NULL) const;
+                            const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
 
   /**
    * The equation systems handler, from which

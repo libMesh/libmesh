@@ -52,7 +52,7 @@ void ExactErrorEstimator::attach_exact_value (Number fptr(const Point & p,
   _exact_value = fptr;
 
   // We're not using a fine grid solution
-  _equation_systems_fine = NULL;
+  _equation_systems_fine = libmesh_nullptr;
 
   // We're not using user-provided functors
   this->clear_functors();
@@ -67,7 +67,7 @@ void ExactErrorEstimator::attach_exact_values (std::vector<FunctionBase<Number> 
     delete (_exact_values[i]);
 
   _exact_values.clear();
-  _exact_values.resize(f.size(), NULL);
+  _exact_values.resize(f.size(), libmesh_nullptr);
 
   // We use clone() to get non-sliced copies of FunctionBase
   // subclasses, but we don't currently put the resulting UniquePtrs
@@ -82,7 +82,7 @@ void ExactErrorEstimator::attach_exact_value (unsigned int sys_num,
                                               FunctionBase<Number> * f)
 {
   if (_exact_values.size() <= sys_num)
-    _exact_values.resize(sys_num+1, NULL);
+    _exact_values.resize(sys_num+1, libmesh_nullptr);
 
   if (f)
     _exact_values[sys_num] = f->clone().release();
@@ -98,7 +98,7 @@ void ExactErrorEstimator::attach_exact_deriv (Gradient gptr(const Point & p,
   _exact_deriv = gptr;
 
   // We're not using a fine grid solution
-  _equation_systems_fine = NULL;
+  _equation_systems_fine = libmesh_nullptr;
 
   // We're not using user-provided functors
   this->clear_functors();
@@ -113,7 +113,7 @@ void ExactErrorEstimator::attach_exact_derivs (std::vector<FunctionBase<Gradient
     delete (_exact_derivs[i]);
 
   _exact_derivs.clear();
-  _exact_derivs.resize(g.size(), NULL);
+  _exact_derivs.resize(g.size(), libmesh_nullptr);
 
   // We use clone() to get non-sliced copies of FunctionBase
   // subclasses, but we don't currently put the resulting UniquePtrs
@@ -128,7 +128,7 @@ void ExactErrorEstimator::attach_exact_deriv (unsigned int sys_num,
                                               FunctionBase<Gradient> * g)
 {
   if (_exact_derivs.size() <= sys_num)
-    _exact_derivs.resize(sys_num+1, NULL);
+    _exact_derivs.resize(sys_num+1, libmesh_nullptr);
 
   if (g)
     _exact_derivs[sys_num] = g->clone().release();
@@ -146,7 +146,7 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor hptr(const Point & p,
   _exact_hessian = hptr;
 
   // We're not using a fine grid solution
-  _equation_systems_fine = NULL;
+  _equation_systems_fine = libmesh_nullptr;
 
   // We're not using user-provided functors
   this->clear_functors();
@@ -161,7 +161,7 @@ void ExactErrorEstimator::attach_exact_hessians (std::vector<FunctionBase<Tensor
     delete (_exact_hessians[i]);
 
   _exact_hessians.clear();
-  _exact_hessians.resize(h.size(), NULL);
+  _exact_hessians.resize(h.size(), libmesh_nullptr);
 
   // We use clone() to get non-sliced copies of FunctionBase
   // subclasses, but we don't currently put the resulting UniquePtrs
@@ -176,7 +176,7 @@ void ExactErrorEstimator::attach_exact_hessian (unsigned int sys_num,
                                                 FunctionBase<Tensor> * h)
 {
   if (_exact_hessians.size() <= sys_num)
-    _exact_hessians.resize(sys_num+1, NULL);
+    _exact_hessians.resize(sys_num+1, libmesh_nullptr);
 
   if (h)
     _exact_hessians[sys_num] = h->clone().release();
@@ -190,9 +190,9 @@ void ExactErrorEstimator::attach_reference_solution (EquationSystems * es_fine)
 
   // If we're using a fine grid solution, we're not using exact value
   // function pointers or functors.
-  _exact_value = NULL;
-  _exact_deriv = NULL;
-  _exact_hessian = NULL;
+  _exact_value = libmesh_nullptr;
+  _exact_deriv = libmesh_nullptr;
+  _exact_hessian = libmesh_nullptr;
 
   this->clear_functors();
 }

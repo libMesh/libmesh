@@ -145,7 +145,7 @@ AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point & p,
                                                         const Real time)) :
   FunctionBase<Output> (),
   _number_fptr (fptr),
-  _vector_fptr (NULL)
+  _vector_fptr (libmesh_nullptr)
 {
   libmesh_assert(fptr);
   this->_initialized = true;
@@ -159,7 +159,7 @@ AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output> & outp
                                                       const Point & p,
                                                       const Real time)) :
   FunctionBase<Output> (),
-  _number_fptr (NULL),
+  _number_fptr (libmesh_nullptr),
   _vector_fptr (fptr)
 {
   libmesh_assert(fptr);
@@ -180,7 +180,7 @@ template <typename Output>
 void AnalyticFunction<Output>::init ()
 {
   // dumb double-test
-  libmesh_assert ((_number_fptr != NULL) || (_vector_fptr != NULL));
+  libmesh_assert ((_number_fptr != libmesh_nullptr) || (_vector_fptr != libmesh_nullptr));
 
   // definitely ready
   this->_initialized = true;
@@ -193,8 +193,8 @@ inline
 void AnalyticFunction<Output>::clear ()
 {
   // We probably need a method to reset these later...
-  _number_fptr = NULL;
-  _vector_fptr = NULL;
+  _number_fptr = libmesh_nullptr;
+  _vector_fptr = libmesh_nullptr;
 
   // definitely not ready
   this->_initialized = false;

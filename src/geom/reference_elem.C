@@ -65,7 +65,7 @@ public:
     for (unsigned int e=0; e<elem_list.size(); e++)
       {
         delete elem_list[e];
-        elem_list[e] = NULL;
+        elem_list[e] = libmesh_nullptr;
       }
 
     elem_list.clear();
@@ -73,7 +73,7 @@ public:
     for (unsigned int n=0; n<node_list.size(); n++)
       {
         delete node_list[n];
-        node_list[n] = NULL;
+        node_list[n] = libmesh_nullptr;
       }
 
     node_list.clear();
@@ -85,14 +85,14 @@ public:
 
 // singleton object, dynamically created and then
 // removed at program exit
-SingletonCache * singleton_cache = NULL;
+SingletonCache * singleton_cache = libmesh_nullptr;
 
 
 
 Elem * read_ref_elem (const ElemType Type,
                       std::istream & in)
 {
-  libmesh_assert (singleton_cache != NULL);
+  libmesh_assert (singleton_cache != libmesh_nullptr);
 
   static const unsigned int comm_len = 1024;
   char comm[comm_len];
@@ -142,7 +142,7 @@ Elem * read_ref_elem (const ElemType Type,
   if (!in)
     {
       delete elem;
-      elem = NULL;
+      elem = libmesh_nullptr;
       libmesh_error_msg("ERROR while creating element singleton!");
     }
 
@@ -159,7 +159,8 @@ Elem * read_ref_elem (const ElemType Type,
 void init_ref_elem_table()
 {
   // ouside mutex - if this pointer is set, we can trust it.
-  if (singleton_cache != NULL) return;
+  if (singleton_cache != libmesh_nullptr)
+    return;
 
   // playing with fire here - lock before touching shared
   // data structures
@@ -167,7 +168,8 @@ void init_ref_elem_table()
 
   // inside mutex - pointer may have changed while waiting
   // for the lock to acquire, check it again.
-  if (singleton_cache != NULL) return;
+  if (singleton_cache != libmesh_nullptr)
+    return;
 
   // OK, if we get here we have the lock and we are not
   // initialized.  populate singleton.
@@ -247,7 +249,7 @@ const Elem & get (const ElemType Type)
 
   init_ref_elem_table();
 
-  libmesh_assert (ref_elem_map[Type] != NULL);
+  libmesh_assert (ref_elem_map[Type] != libmesh_nullptr);
 
   return *ref_elem_map[Type];
 }

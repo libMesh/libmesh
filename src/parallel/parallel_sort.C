@@ -233,13 +233,13 @@ void Sort<KeyType,IdxType>::communicate_bins()
       dest.resize (global_bin_sizes[i]);
 
       // Points to the beginning of the bin to be sent
-      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : NULL;
+      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : libmesh_nullptr;
 
       // Enough storage to hold all bin contributions
-      void * recvbuf = (dest.empty()) ? NULL : &dest[0];
+      void * recvbuf = (dest.empty()) ? libmesh_nullptr : &dest[0];
 
       // If the sendbuf is NULL, make sure we aren't claiming to send something.
-      if (sendbuf == NULL && _local_bin_sizes[i] != 0)
+      if (sendbuf == libmesh_nullptr && _local_bin_sizes[i] != 0)
         libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
 
       KeyType example;
@@ -329,13 +329,13 @@ void Sort<Parallel::DofObjectKey,unsigned int>::communicate_bins()
       dest.resize (global_bin_sizes[i]);
 
       // Points to the beginning of the bin to be sent
-      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : NULL;
+      void * sendbuf = (_data.size() > local_offset) ? &_data[local_offset] : libmesh_nullptr;
 
       // Enough storage to hold all bin contributions
-      void * recvbuf = (dest.empty()) ? NULL : &dest[0];
+      void * recvbuf = (dest.empty()) ? libmesh_nullptr : &dest[0];
 
       // If the sendbuf is NULL, make sure we aren't claiming to send something.
-      if (sendbuf == NULL && _local_bin_sizes[i] != 0)
+      if (sendbuf == libmesh_nullptr && _local_bin_sizes[i] != 0)
         libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
 
       Parallel::DofObjectKey example;

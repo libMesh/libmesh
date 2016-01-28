@@ -154,7 +154,7 @@ public:
                                      unsigned int nz=0,
                                      Real zmin=0,
                                      Real zmax=0) :
-    FunctionBase<Real>(NULL)
+    FunctionBase<Real>(libmesh_nullptr)
   {
     _nelem.resize(3);
     _nelem[0] = nx;
@@ -673,7 +673,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
-                    Elem * elem = NULL;
+                    Elem * elem = libmesh_nullptr;
 
                     // Add first Tri3
                     elem = mesh.add_elem(new Tri3);
@@ -750,7 +750,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int j=0; j<(2*ny); j += 2)
                 for (unsigned int i=0; i<(2*nx); i += 2)
                   {
-                    Elem * elem = NULL;
+                    Elem * elem = libmesh_nullptr;
 
                     // Add first Tri6
                     elem = mesh.add_elem(new Tri6);
@@ -1017,7 +1017,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   for (unsigned int i=0; i<nx; i++)
                     {
                       // First Prism
-                      Elem * elem = NULL;
+                      Elem * elem = libmesh_nullptr;
                       elem = mesh.add_elem(new Prism6);
 
                       elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
@@ -1152,7 +1152,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   for (unsigned int i=0; i<(2*nx); i += 2)
                     {
                       // First Prism
-                      Elem * elem = NULL;
+                      Elem * elem = libmesh_nullptr;
                       elem = ((type == PRISM15) ?
                               mesh.add_elem(new Prism15) :
                               mesh.add_elem(new Prism18));
@@ -1880,7 +1880,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
           Elem * elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
-            if (elem->neighbor(s) == NULL || (mesh.mesh_dimension() == 2 && !flat))
+            if (elem->neighbor(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
               {
                 UniquePtr<Elem> side(elem->build_side(s));
 
@@ -1927,7 +1927,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
           Elem * elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
-            if (elem->neighbor(s) == NULL)
+            if (elem->neighbor(s) == libmesh_nullptr)
               {
                 UniquePtr<Elem> side(elem->build_side(s));
 
@@ -2274,7 +2274,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   t.triangulation_type() = TriangleInterface::PSLG;
   t.elem_type()          = type;
 
-  if (holes != NULL)
+  if (holes != libmesh_nullptr)
     t.attach_hole_list(holes);
 
   // Triangulate!
@@ -2290,7 +2290,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
       const Elem * elem = *el;
 
       for (unsigned int s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) == NULL)
+        if (elem->neighbor(s) == libmesh_nullptr)
           {
             UniquePtr<Elem> side (elem->build_side(s));
 

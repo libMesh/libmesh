@@ -27,7 +27,7 @@ void Biharmonic::Destroy(Biharmonic ** b)
   UnstructuredMesh * mesh = biharmonic->_mesh;
   delete biharmonic;
   delete mesh;
-  *b = NULL;
+  *b = libmesh_nullptr;
 }
 
 

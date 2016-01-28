@@ -602,7 +602,7 @@ void assemble_stokes (EquationSystems & es,
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor(s) == NULL)
+          if (elem->neighbor(s) == libmesh_nullptr)
             {
               UniquePtr<Elem> side (elem->build_side(s));
 
@@ -639,7 +639,7 @@ void assemble_stokes (EquationSystems & es,
                         Fv(n) += penalty*v_value;
                       }
                 } // end face node loop
-            } // end if (elem->neighbor(side) == NULL)
+            } // end if (elem->neighbor(side) == libmesh_nullptr)
       } // end boundary condition section
 
       // If this assembly program were to be used on an adaptive mesh,

@@ -68,7 +68,7 @@ template <typename T>
 struct is_null : predicate<T>
 {
   virtual ~is_null() {}
-  virtual bool operator()(const T & it) const libmesh_override { return *it == NULL; }
+  virtual bool operator()(const T & it) const libmesh_override { return *it == libmesh_nullptr; }
 
 protected:
   virtual predicate<T> * clone() const libmesh_override { return new is_null<T>(*this); }

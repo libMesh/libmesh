@@ -74,7 +74,7 @@ void RBConstructionBase<Base>::clear ()
     {
       NumericVector<Number> * training_vector = it->second;
       delete training_vector;
-      training_vector = NULL;
+      training_vector = libmesh_nullptr;
     }
   training_parameters.clear();
 }
@@ -283,7 +283,7 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
     {
       NumericVector<Number> * training_vector = it->second;
       delete training_vector;
-      training_vector = NULL;
+      training_vector = libmesh_nullptr;
     }
 
   // Get the number of local and global training parameters
@@ -337,7 +337,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
       {
         NumericVector<Number> * training_vector = it->second;
         delete training_vector;
-        training_vector = NULL;
+        training_vector = libmesh_nullptr;
       }
     training_parameters_in.clear();
   }
@@ -473,7 +473,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       {
         NumericVector<Number> * training_vector = it->second;
         delete training_vector;
-        training_vector = NULL;
+        training_vector = libmesh_nullptr;
       }
   }
 

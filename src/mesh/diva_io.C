@@ -148,7 +148,7 @@ void DivaIO::write_stream (std::ostream & out_file)
     for(unsigned int e=0; e<the_mesh.n_elem(); e++)
       if (the_mesh.elem(e)->active())
         for (unsigned int s=0; s<the_mesh.elem(e)->n_sides(); s++)
-          if (the_mesh.elem(e)->neighbor(s) == NULL)
+          if (the_mesh.elem(e)->neighbor(s) == libmesh_nullptr)
             {
               const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
@@ -185,7 +185,7 @@ void DivaIO::write_stream (std::ostream & out_file)
     for(unsigned int e=0; e<the_mesh.n_elem(); e++)
       if (the_mesh.elem(e)->active())
         for (unsigned int s=0; s<the_mesh.elem(e)->n_sides(); s++)
-          if (the_mesh.elem(e)->neighbor(s) == NULL)
+          if (the_mesh.elem(e)->neighbor(s) == libmesh_nullptr)
             {
               const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
@@ -234,7 +234,7 @@ void DivaIO::write_stream (std::ostream & out_file)
     for(unsigned int e=0; e<the_mesh.n_elem(); e++)
       if (the_mesh.elem(e)->active())
         for (unsigned short s=0; s<the_mesh.elem(e)->n_sides(); s++)
-          if (the_mesh.elem(e)->neighbor(s) == NULL)
+          if (the_mesh.elem(e)->neighbor(s) == libmesh_nullptr)
             {
               const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
@@ -252,7 +252,7 @@ void DivaIO::write_stream (std::ostream & out_file)
     for(unsigned int e=0; e<the_mesh.n_elem(); e++)
       if (the_mesh.elem(e)->active())
         for (unsigned short s=0; s<the_mesh.elem(e)->n_sides(); s++)
-          if (the_mesh.elem(e)->neighbor(s) == NULL)
+          if (the_mesh.elem(e)->neighbor(s) == libmesh_nullptr)
             {
               const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 

@@ -390,6 +390,7 @@ BUILT_SOURCES = \
         error_vector.h \
         hashword.h \
         ignore_warnings.h \
+        libmesh_nullptr.h \
         location_maps.h \
         mapvector.h \
         null_output_iterator.h \
@@ -1671,6 +1672,9 @@ hashword.h: $(top_srcdir)/include/utils/hashword.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ignore_warnings.h: $(top_srcdir)/include/utils/ignore_warnings.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_nullptr.h: $(top_srcdir)/include/utils/libmesh_nullptr.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 location_maps.h: $(top_srcdir)/include/utils/location_maps.h

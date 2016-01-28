@@ -46,7 +46,7 @@ void XdrMGF::fini()
   //libMesh::out << "Deleting the file handle pointer." << std::endl;
   delete mp_xdr_handle;
 
-  mp_xdr_handle = NULL;
+  mp_xdr_handle = libmesh_nullptr;
 
 #endif
 
@@ -57,7 +57,7 @@ void XdrMGF::fini()
       std::fclose(mp_fp);
     }
 
-  mp_fp = NULL;
+  mp_fp = libmesh_nullptr;
 }
 
 

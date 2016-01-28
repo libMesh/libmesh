@@ -1021,7 +1021,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       // for each entry!  We'll settle for doing some error checking instead.
       Elem * elem = mesh.elem(my_elem_offset + (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
 
-      if (elem == NULL)
+      if (elem == libmesh_nullptr)
         libmesh_error_msg("Mesh returned a NULL pointer when asked for element " \
                           << my_elem_offset                           \
                           << " + "                                    \

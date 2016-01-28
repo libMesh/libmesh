@@ -217,7 +217,7 @@ void MeshTools::Subdivision::tag_boundary_ghosts(MeshBase & mesh)
       Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(elem);
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
-          if (elem->neighbor(i) == NULL)
+          if (elem->neighbor(i) == libmesh_nullptr)
             {
               sd_elem->set_ghost(true);
               // set all other neighbors to ghosts as well
@@ -260,7 +260,8 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
         {
           libmesh_assert_not_equal_to(elem->neighbor(i), elem);
 
-          if (elem->neighbor(i) == NULL && elem->neighbor(next[i]) == NULL)
+          if (elem->neighbor(i) == libmesh_nullptr &&
+              elem->neighbor(next[i]) == libmesh_nullptr)
             {
               Elem * nelem = elem;
               unsigned int k = i;
@@ -275,7 +276,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   // happen that two mirrored ghost vertices coincide,
                   // which would then lead to a zero size ghost
                   // element below.
-                  Node * node = NULL;
+                  Node * node = libmesh_nullptr;
                   for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
                     {
                       if ((*ghost_nodes[j] - point).size() < tol * (elem->point(k) - point).size())
@@ -286,7 +287,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                     }
 
                   // add the new vertex only if no other is nearby
-                  if (node == NULL)
+                  if (node == libmesh_nullptr)
                     {
                       node = mesh.add_point(point);
                       ghost_nodes.push_back(node);
@@ -304,7 +305,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   newelem->set_neighbor(0, nelem);
                   newelem->set_ghost(true);
                   if (l>0)
-                    newelem->set_neighbor(2, NULL);
+                    newelem->set_neighbor(2, libmesh_nullptr);
                   nelem->set_neighbor(k, newelem);
 
                   mesh.add_elem(newelem);
@@ -337,7 +338,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
           libmesh_assert_not_equal_to(elem->neighbor(i), elem);
-          if (elem->neighbor(i) == NULL)
+          if (elem->neighbor(i) == libmesh_nullptr)
             {
               // this is the vertex to be mirrored
               Point point = elem->point(i) + elem->point(next[i]) - elem->point(prev[i]);
@@ -347,7 +348,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               // because for some triangulations, it can happen that
               // two mirrored ghost vertices coincide, which would
               // then lead to a zero size ghost element below.
-              Node * node = NULL;
+              Node * node = libmesh_nullptr;
               for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
                 {
                   if ((*ghost_nodes[j] - point).size() < tol * (elem->point(i) - point).size())
@@ -358,7 +359,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                 }
 
               // add the new vertex only if no other is nearby
-              if (node == NULL)
+              if (node == libmesh_nullptr)
                 {
                   node = mesh.add_point(point);
                   ghost_nodes.push_back(node);
@@ -394,19 +395,20 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
 
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
-          if (elem->neighbor(i) == NULL && elem->neighbor(prev[i]) != NULL)
+          if (elem->neighbor(i) == libmesh_nullptr &&
+              elem->neighbor(prev[i]) != libmesh_nullptr)
             {
               // go around counter-clockwise
               Tri3Subdivision * nb1 = static_cast<Tri3Subdivision *>(elem->neighbor(prev[i]));
               Tri3Subdivision * nb2 = nb1;
               unsigned int j = i;
               unsigned int n_nb = 0;
-              while (nb1 != NULL && nb1->id() != elem->id())
+              while (nb1 != libmesh_nullptr && nb1->id() != elem->id())
                 {
                   j = nb1->local_node_number(elem->node(i));
                   nb2 = nb1;
                   nb1 = static_cast<Tri3Subdivision *>(nb1->neighbor(prev[j]));
-                  libmesh_assert(nb1 == NULL || nb1->id() != nb2->id());
+                  libmesh_assert(nb1 == libmesh_nullptr || nb1->id() != nb2->id());
                   n_nb++;
                 }
 
@@ -430,7 +432,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   // Check if the proposed vertex doesn't coincide with one of the existing vertices.
                   // This is necessary because for some triangulations, it can happen that two mirrored
                   // ghost vertices coincide, which would then lead to a zero size ghost element below.
-                  Node * node = NULL;
+                  Node * node = libmesh_nullptr;
                   for (unsigned int k = 0; k < ghost_nodes.size(); ++k)
                     {
                       if ((*ghost_nodes[k] - point).size() < tol * (nb2->point(j) - point).size())
@@ -441,7 +443,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                     }
 
                   // add the new vertex only if no other is nearby
-                  if (node == NULL)
+                  if (node == libmesh_nullptr)
                     {
                       node = mesh.add_point(point);
                       ghost_nodes.push_back(node);
@@ -453,7 +455,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   newelem->set_node(1) = nb2->get_node(prev[j]);
                   newelem->set_node(2) = node;
                   newelem->set_neighbor(0, nb2);
-                  newelem->set_neighbor(1, NULL);
+                  newelem->set_neighbor(1, libmesh_nullptr);
                   newelem->set_ghost(true);
                   nb2->set_neighbor(prev[j], newelem);
 
@@ -472,7 +474,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               newelem->set_node(2) = nb2->get_node(prev[j]);
               newelem->set_neighbor(0, elem);
               newelem->set_neighbor(1, nb2);
-              newelem->set_neighbor(2, NULL);
+              newelem->set_neighbor(2, libmesh_nullptr);
               newelem->set_ghost(true);
 
               elem->set_neighbor(i, newelem);

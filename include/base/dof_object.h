@@ -89,7 +89,7 @@ public:
   DofObject * old_dof_object;
 
   /**
-   * Sets the \p old_dof_object to NULL
+   * Sets the \p old_dof_object to libmesh_nullptr
    */
   void clear_old_dof_object ();
 
@@ -508,7 +508,7 @@ public:
 inline
 DofObject::DofObject () :
 #ifdef LIBMESH_ENABLE_AMR
-  old_dof_object(NULL),
+  old_dof_object(libmesh_nullptr),
 #endif
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id (invalid_unique_id),

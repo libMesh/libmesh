@@ -434,7 +434,7 @@ void AbaqusIO::read_nodes(std::string nset_name)
   // We need to duplicate some of the read_ids code if this *NODE
   // section also defines an NSET.  We'll set up the id_storage
   // pointer and push back IDs into this vector in the loop below...
-  std::vector<dof_id_type> * id_storage = NULL;
+  std::vector<dof_id_type> * id_storage = libmesh_nullptr;
   if (nset_name != "")
     id_storage = &(_nodeset_ids[nset_name]);
 
@@ -613,7 +613,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
                   // If node_ptr() returns NULL, it may mean we have not yet read the
                   // *Nodes section, though I assumed that always came before the *Elements section...
-                  if (node == NULL)
+                  if (node == libmesh_nullptr)
                     libmesh_error_msg("Error!  Mesh returned NULL Node pointer.  Either no node exists with ID " \
                                       << libmesh_global_node_id         \
                                       << " or perhaps this input file has *Elements defined before *Nodes?");
@@ -811,7 +811,7 @@ void AbaqusIO::assign_subdomain_ids()
             // Get pointer to that element
             Elem * elem = the_mesh.elem(libmesh_elem_id);
 
-            if (elem == NULL)
+            if (elem == libmesh_nullptr)
               libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
 
             // We won't assign subdomain ids to lower-dimensional
@@ -868,7 +868,7 @@ void AbaqusIO::assign_boundary_node_ids()
           // Get node pointer from the mesh
           Node * node = the_mesh.node_ptr(libmesh_global_node_id);
 
-          if (node == NULL)
+          if (node == libmesh_nullptr)
             libmesh_error_msg("Error! Mesh returned NULL node pointer!");
 
           // Add this node with the current_id (which is determined by the
@@ -914,7 +914,7 @@ void AbaqusIO::assign_sideset_ids()
             Elem * elem = the_mesh.elem(libmesh_elem_id);
 
             // Check that the pointer returned from the Mesh is non-NULL
-            if (elem == NULL)
+            if (elem == libmesh_nullptr)
               libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
 
             // Grab a reference to the element definition for this element type
@@ -976,7 +976,7 @@ void AbaqusIO::assign_sideset_ids()
             // Get pointer to that element
             Elem * elem = the_mesh.elem(libmesh_elem_id);
 
-            if (elem == NULL)
+            if (elem == libmesh_nullptr)
               libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
 
             // If the element dimension is equal to the maximum

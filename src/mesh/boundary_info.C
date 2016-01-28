@@ -240,12 +240,12 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
 
   // When desired, copy the MeshData
   // to the boundary_mesh
-  if ((boundary_mesh_data != NULL) && (this_mesh_data != NULL))
+  if ((boundary_mesh_data != libmesh_nullptr) && (this_mesh_data != libmesh_nullptr))
     boundary_mesh_data->assign(*this_mesh_data);
 
   // Don't repartition this mesh; we want it to stay in sync with the
   // interior partitioning.
-  boundary_mesh.partitioner().reset(NULL);
+  boundary_mesh.partitioner().reset(libmesh_nullptr);
 
   // Make boundary_mesh nodes and elements contiguous
   boundary_mesh.prepare_for_use(/*skip_renumber =*/ false);
@@ -327,8 +327,11 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
                           boundary_mesh.is_serial());
 
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
-  this->_find_id_maps(requested_boundary_ids, 0, NULL,
-                      boundary_mesh.max_elem_id(), &side_id_map);
+  this->_find_id_maps(requested_boundary_ids,
+                      0,
+                      libmesh_nullptr,
+                      boundary_mesh.max_elem_id(),
+                      &side_id_map);
 
   // We have to add sides *outside* any element loop, because if
   // boundary_mesh and _mesh are the same then those additions can
@@ -345,7 +348,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       const Elem * elem = *el;
 
       for (unsigned int s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) == NULL) // on the boundary
+        if (elem->neighbor(s) == libmesh_nullptr) // on the boundary
           {
             // Get the top-level parent for this element
             const Elem * top_parent = elem->top_parent();
@@ -896,7 +899,7 @@ void BoundaryInfo::edge_boundary_ids (const Elem * const elem,
         {
           if (elem->is_edge_on_side(edge,side))
             {
-              if (elem->neighbor(side) == NULL)
+              if (elem->neighbor(side) == libmesh_nullptr)
                 {
                   searched_elem = elem->top_parent ();
                   found_boundary_edge = true;
@@ -911,7 +914,7 @@ void BoundaryInfo::edge_boundary_ids (const Elem * const elem,
           // "boundary" IDs.  We will walk up the tree, at each level checking that
           // the current child is actually on the same edge of the parent that is
           // currently being searched for (i.e. that was passed in as "edge").
-          while (searched_elem->parent() != NULL)
+          while (searched_elem->parent() != libmesh_nullptr)
             {
               const Elem * parent = searched_elem->parent();
               if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
@@ -1039,11 +1042,11 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
   const Elem * searched_elem = elem;
   if (elem->level() != 0)
     {
-      if (elem->neighbor(side) == NULL)
+      if (elem->neighbor(side) == libmesh_nullptr)
         searched_elem = elem->top_parent ();
 #ifdef LIBMESH_ENABLE_AMR
       else
-        while (searched_elem->parent() != NULL)
+        while (searched_elem->parent() != libmesh_nullptr)
           {
             const Elem * parent = searched_elem->parent();
             if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
@@ -1313,7 +1316,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
 
           // If we're on this external boundary then we share this
           // external boundary id
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             return side;
 
           // If we're on an internal boundary then we need to be sure
@@ -1322,7 +1325,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
 
 #ifdef LIBMESH_ENABLE_AMR
 
-          while (p != NULL)
+          while (p != libmesh_nullptr)
             {
               const Elem * parent = p->parent();
               if (!parent->is_child_on_side(parent->which_child_am_i(p), side))
@@ -1886,7 +1889,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
       const Elem * elem = *el;
 
       for (unsigned char s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) == NULL) // on the boundary
+        if (elem->neighbor(s) == libmesh_nullptr) // on the boundary
           {
             // Get the top-level parent for this element
             const Elem * top_parent = elem->top_parent();

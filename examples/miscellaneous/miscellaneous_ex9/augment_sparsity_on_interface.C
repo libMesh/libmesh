@@ -44,7 +44,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
 
       {
         for (unsigned char side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             {
               if (mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
                 {
@@ -57,7 +57,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
 
       {
         for (unsigned char side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
+          if (elem->neighbor(side) == libmesh_nullptr)
             {
               if (mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
                 {

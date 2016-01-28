@@ -75,7 +75,7 @@ extern "C"
       u.close();
 
       Vec petsc_res;
-      ierr = SNESGetFunction(snes, &petsc_res, NULL, NULL);
+      ierr = SNESGetFunction(snes, &petsc_res, libmesh_nullptr, libmesh_nullptr);
       CHKERRABORT(solver.comm().get(), ierr);
       PetscVector<Number> res(petsc_res, solver.comm());
       res.close();

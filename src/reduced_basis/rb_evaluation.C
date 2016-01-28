@@ -45,7 +45,7 @@ RBEvaluation::RBEvaluation (const Parallel::Communicator & comm_in)
   ParallelObject(comm_in),
   evaluate_RB_error_bound(true),
   compute_RB_inner_product(false),
-  rb_theta_expansion(NULL)
+  rb_theta_expansion(libmesh_nullptr)
 {
 
 }
@@ -66,7 +66,7 @@ void RBEvaluation::clear()
         {
           basis_functions[i]->clear();
           delete basis_functions[i];
-          basis_functions[i] = NULL;
+          basis_functions[i] = libmesh_nullptr;
         }
     }
   set_n_basis_functions(0);
@@ -420,7 +420,7 @@ void RBEvaluation::clear_riesz_representors()
       for(unsigned int i=0; i<Aq_representor[q_a].size(); i++)
         {
           delete Aq_representor[q_a][i];
-          Aq_representor[q_a][i] = NULL;
+          Aq_representor[q_a][i] = libmesh_nullptr;
         }
     }
 
@@ -894,7 +894,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
           basis_functions[i]->clear();
           delete basis_functions[i];
         }
-      basis_functions[i] = NULL;
+      basis_functions[i] = libmesh_nullptr;
     }
 
   STOP_LOG("legacy_read_offline_data_from_files()", "RBEvaluation");

@@ -63,10 +63,10 @@ RBEIMAssembly::RBEIMAssembly(RBEIMConstruction & rb_eim_con_in,
 RBEIMAssembly::~RBEIMAssembly()
 {
   delete _fe;
-  _fe = NULL;
+  _fe = libmesh_nullptr;
 
   delete _qrule;
-  _qrule = NULL;
+  _qrule = libmesh_nullptr;
 }
 
 void RBEIMAssembly::evaluate_basis_function(unsigned int var,
@@ -77,7 +77,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
   START_LOG("evaluate_basis_function", "RBEIMAssembly");
 
   bool repeated_qrule = false;
-  if(_qrule != NULL)
+  if (_qrule != libmesh_nullptr)
     {
       repeated_qrule =
         ( (element_qrule.type()      == _qrule->type()) &&

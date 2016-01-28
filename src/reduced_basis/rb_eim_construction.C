@@ -53,7 +53,7 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   : Parent(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _parametrized_functions_in_training_set_initialized(false),
-    _mesh_function(NULL),
+    _mesh_function(libmesh_nullptr),
     _performing_extra_greedy_step(false)
 {
   _explicit_system_name = name_in + "_explicit_sys";
@@ -96,7 +96,7 @@ void RBEIMConstruction::clear()
 
   // clear the mesh function
   delete _mesh_function;
-  _mesh_function = NULL;
+  _mesh_function = libmesh_nullptr;
 
   // clear the eim assembly vector
   for(unsigned int i=0; i<_rb_eim_assembly_objects.size(); i++)
@@ -112,7 +112,7 @@ void RBEIMConstruction::clear()
         {
           _parametrized_functions_in_training_set[i]->clear();
           delete _parametrized_functions_in_training_set[i];
-          _parametrized_functions_in_training_set[i] = NULL;
+          _parametrized_functions_in_training_set[i] = libmesh_nullptr;
         }
     }
   _parametrized_functions_in_training_set_initialized = false;
@@ -373,7 +373,7 @@ void RBEIMConstruction::enrich_RB_space()
                   optimal_var = var;
                   optimal_elem_id = (*el)->id();
 
-                  FEBase * elem_fe = NULL;
+                  FEBase * elem_fe = libmesh_nullptr;
                   explicit_context.get_element_fe( var, elem_fe );
                   optimal_point = elem_fe->get_xyz()[qp];
                 }
@@ -583,7 +583,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
           context.pre_fe_reinit(*this, *el);
           context.elem_fe_reinit();
 
-          FEBase * elem_fe = NULL;
+          FEBase * elem_fe = libmesh_nullptr;
           context.get_element_fe( 0, elem_fe );
           unsigned int n_qpoints = context.get_element_qrule().n_points();
           const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -686,7 +686,7 @@ void RBEIMConstruction::init_context_with_sys(FEMContext & c, System & sys)
   // for compute_best_fit
   for(unsigned int var=0; var<sys.n_vars(); var++)
     {
-      FEBase * elem_fe = NULL;
+      FEBase * elem_fe = libmesh_nullptr;
       c.get_element_fe( var, elem_fe );
       elem_fe->get_JxW();
       elem_fe->get_phi();

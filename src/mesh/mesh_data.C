@@ -41,7 +41,7 @@ MeshData::MeshData(const MeshBase & m) :
   _elem_data_closed   (false),
   _active             (false),
   _compatibility_mode (false),
-  _unv_header         (NULL)
+  _unv_header         (libmesh_nullptr)
 {
   // This class isn't actively maintained, doesn't work in parallel,
   // and usually isn't as good a solution as adding an additional
@@ -394,7 +394,7 @@ const Node * MeshData::foreign_id_to_node (const unsigned int fid) const
     return this->_mesh.node_ptr(fid);
 
   libmesh_error_msg("We'll never get here!");
-  return NULL;
+  return libmesh_nullptr;
 }
 
 
@@ -458,7 +458,7 @@ const Elem * MeshData::foreign_id_to_elem (const unsigned int fid) const
     return this->_mesh.elem(fid);
 
   libmesh_error_msg("We'll never get here!");
-  return NULL;
+  return libmesh_nullptr;
 }
 
 

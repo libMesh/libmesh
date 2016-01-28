@@ -58,7 +58,7 @@ struct A0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -88,7 +88,7 @@ struct EIM_IP_assembly : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -119,7 +119,7 @@ struct EIM_F : RBEIMAssembly
     // PDE variable number
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = NULL;
+    FEBase * elem_fe = libmesh_nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     // EIM variable number

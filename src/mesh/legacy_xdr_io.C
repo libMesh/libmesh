@@ -414,7 +414,7 @@ void LegacyXdrIO::read_mesh (const std::string & name,
                                             coords[1+innd*3],
                                             coords[2+innd*3]), innd);
 
-        if (mesh_data != NULL)
+        if (mesh_data != libmesh_nullptr)
           if (mesh_data->active())
             {
               // add the id to the MeshData, so that
@@ -543,7 +543,7 @@ void LegacyXdrIO::read_mesh (const std::string & name,
                     // should work properly.  This is an inline
                     // function, so that for disabled MeshData, this
                     // should not induce too much cost
-                    if (mesh_data != NULL)
+                    if (mesh_data != libmesh_nullptr)
                       mesh_data->add_foreign_elem_id (elem, e);
 
                     // Set the node pointers of the newly-created element
@@ -590,7 +590,7 @@ void LegacyXdrIO::read_mesh (const std::string & name,
     {
 
 #ifdef DEBUG
-      if (mesh_data != NULL)
+      if (mesh_data != libmesh_nullptr)
         if (mesh_data->active())
           libmesh_error_msg("ERROR: MeshData not implemented for MGF-style mesh.");
 #endif
@@ -625,7 +625,7 @@ void LegacyXdrIO::read_mesh (const std::string & name,
 
   // tell the MeshData object that we are finished
   // reading data
-  if (mesh_data != NULL)
+  if (mesh_data != libmesh_nullptr)
     mesh_data->close_foreign_id_maps ();
 
   // Free memory used in

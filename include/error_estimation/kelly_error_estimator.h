@@ -66,12 +66,12 @@ public:
 
   /**
    * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to NULL.  Defaults to H1 seminorm; changes to system norm
+   * pointer to libmesh_nullptr.  Defaults to H1 seminorm; changes to system norm
    * are ignored.
    */
   KellyErrorEstimator() :
     JumpErrorEstimator(),
-    _bc_function(NULL)
+    _bc_function(libmesh_nullptr)
   { error_norm = H1_SEMINORM; }
 
   /**

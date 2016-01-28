@@ -173,7 +173,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
             if (childnode1 < childnode0)
               std::swap(childnode0, childnode1);
 
-            for (const Elem * p = elem; p != NULL; p = p->parent())
+            for (const Elem * p = elem; p != libmesh_nullptr; p = p->parent())
               {
                 UniquePtr<Elem> pedge = p->build_edge(n);
                 dof_id_type node0 = pedge->node(0);
@@ -472,7 +472,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
         {
           const Elem * neighbor = elem->neighbor(n);
           // Quit if the element is on a local boundary
-          if (neighbor == NULL || neighbor == remote_elem)
+          if (neighbor == libmesh_nullptr || neighbor == remote_elem)
             {
               h_flag_me = false;
               p_flag_me = false;

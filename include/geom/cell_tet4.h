@@ -58,7 +58,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Tet4 (Elem * p=NULL) :
+  Tet4 (Elem * p=libmesh_nullptr) :
     Tet(Tet4::n_nodes(), p, _nodelinks_data)
   {}
 

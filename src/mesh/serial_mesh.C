@@ -241,8 +241,8 @@ Node * SerialMesh::node_ptr (const dof_id_type i)
 const Node * SerialMesh::query_node_ptr (const dof_id_type i) const
 {
   if (i >= this->n_nodes())
-    return NULL;
-  libmesh_assert (_nodes[i] == NULL ||
+    return libmesh_nullptr;
+  libmesh_assert (_nodes[i] == libmesh_nullptr ||
                   _nodes[i]->id() == i); // This will change soon
 
   return _nodes[i];
@@ -254,8 +254,8 @@ const Node * SerialMesh::query_node_ptr (const dof_id_type i) const
 Node * SerialMesh::query_node_ptr (const dof_id_type i)
 {
   if (i >= this->n_nodes())
-    return NULL;
-  libmesh_assert (_nodes[i] == NULL ||
+    return libmesh_nullptr;
+  libmesh_assert (_nodes[i] == libmesh_nullptr ||
                   _nodes[i]->id() == i); // This will change soon
 
   return _nodes[i];
@@ -291,8 +291,8 @@ Elem * SerialMesh::elem (const dof_id_type i)
 const Elem * SerialMesh::query_elem (const dof_id_type i) const
 {
   if (i >= this->n_elem())
-    return NULL;
-  libmesh_assert (_elements[i] == NULL ||
+    return libmesh_nullptr;
+  libmesh_assert (_elements[i] == libmesh_nullptr ||
                   _elements[i]->id() == i); // This will change soon
 
   return _elements[i];
@@ -304,8 +304,8 @@ const Elem * SerialMesh::query_elem (const dof_id_type i) const
 Elem * SerialMesh::query_elem (const dof_id_type i)
 {
   if (i >= this->n_elem())
-    return NULL;
-  libmesh_assert (_elements[i] == NULL ||
+    return libmesh_nullptr;
+  libmesh_assert (_elements[i] == libmesh_nullptr ||
                   _elements[i]->id() == i); // This will change soon
 
   return _elements[i];
@@ -340,7 +340,7 @@ Elem * SerialMesh::add_elem (Elem * e)
     }
   else
     {
-      _elements.resize(id+1, NULL);
+      _elements.resize(id+1, libmesh_nullptr);
     }
 
   _elements[id] = e;
@@ -411,7 +411,7 @@ void SerialMesh::delete_elem(Elem * e)
   delete e;
 
   // explicitly NULL the pointer
-  *pos = NULL;
+  *pos = libmesh_nullptr;
 }
 
 
@@ -426,7 +426,7 @@ void SerialMesh::renumber_elem(const dof_id_type old_id,
   el->set_id(new_id);
   libmesh_assert (!_elements[new_id]);
   _elements[new_id] = el;
-  _elements[old_id] = NULL;
+  _elements[old_id] = libmesh_nullptr;
 }
 
 
@@ -441,7 +441,7 @@ Node * SerialMesh::add_point (const Point & p,
   //   n->processor_id() = proc_id;
   //   _nodes.push_back (n);
 
-  Node * n = NULL;
+  Node * n = libmesh_nullptr;
 
   // If the user requests a valid id, either
   // provide the existing node or resize the container
@@ -452,7 +452,7 @@ Node * SerialMesh::add_point (const Point & p,
     else
       _nodes.resize(id+1);
   else
-    _nodes.push_back (static_cast<Node *>(NULL));
+    _nodes.push_back (static_cast<Node *>(libmesh_nullptr));
 
   // if the node already exists, then assign new (x,y,z) values
   if (n)
@@ -520,7 +520,7 @@ Node * SerialMesh::insert_node(Node * n)
       // redundant insert is done, but when that happens we ought to
       // always be able to make the code more efficient by avoiding
       // the redundant insert, so let's keep screaming "Error" here.
-      if (_nodes[ n->id() ] != NULL)
+      if (_nodes[ n->id() ] != libmesh_nullptr)
         libmesh_error_msg("Error, cannot insert node on top of existing node.");
     }
   else
@@ -581,7 +581,7 @@ void SerialMesh::delete_node(Node * n)
   delete n;
 
   // explicitly NULL the pointer
-  *pos = NULL;
+  *pos = libmesh_nullptr;
 }
 
 
@@ -596,7 +596,7 @@ void SerialMesh::renumber_node(const dof_id_type old_id,
   nd->set_id(new_id);
   libmesh_assert (!_nodes[new_id]);
   _nodes[new_id] = nd;
-  _nodes[old_id] = NULL;
+  _nodes[old_id] = libmesh_nullptr;
 }
 
 
@@ -683,7 +683,7 @@ void SerialMesh::renumber_nodes_and_elements ()
     const std::vector<Elem *>::iterator end = _elements.end();
 
     for (; in != end; ++in)
-      if (*in != NULL)
+      if (*in != libmesh_nullptr)
         {
           Elem * el = *in;
 
@@ -724,7 +724,7 @@ void SerialMesh::renumber_nodes_and_elements ()
                               _nodes[dst_idx] );
 
                     // Set proper indices where that makes sense
-                    if (_nodes[src_idx] != NULL)
+                    if (_nodes[src_idx] != libmesh_nullptr)
                       _nodes[src_idx]->set_id (src_idx);
                     _nodes[dst_idx]->set_id (dst_idx);
                   }
@@ -750,7 +750,7 @@ void SerialMesh::renumber_nodes_and_elements ()
       const std::vector<Node *>::iterator end = _nodes.end();
 
       for (; in != end; ++in)
-        if (*in != NULL)
+        if (*in != libmesh_nullptr)
           {
             // This is a reference so that if we change the pointer it will change in the vector
             Node * & nd = *in;
@@ -770,7 +770,7 @@ void SerialMesh::renumber_nodes_and_elements ()
 
                 // delete the node
                 delete nd;
-                nd = NULL;
+                nd = libmesh_nullptr;
               }
           }
 
@@ -796,7 +796,7 @@ void SerialMesh::renumber_nodes_and_elements ()
           {
             // Mesh modification code might have already deleted some
             // nodes
-            if (*it == NULL)
+            if (*it == libmesh_nullptr)
               continue;
 
             // remove any boundary information associated with
@@ -805,7 +805,7 @@ void SerialMesh::renumber_nodes_and_elements ()
 
             // delete the node
             delete *it;
-            *it = NULL;
+            *it = libmesh_nullptr;
           }
 
         _nodes.erase (nd, end);
@@ -826,12 +826,12 @@ void SerialMesh::fix_broken_node_and_element_numbering ()
 {
   // Nodes first
   for (dof_id_type n=0; n<this->_nodes.size(); n++)
-    if (this->_nodes[n] != NULL)
+    if (this->_nodes[n] != libmesh_nullptr)
       this->_nodes[n]->set_id() = n;
 
   // Elements next
   for (dof_id_type e=0; e<this->_elements.size(); e++)
-    if (this->_elements[e] != NULL)
+    if (this->_elements[e] != libmesh_nullptr)
       this->_elements[e]->set_id() = e;
 }
 
@@ -866,7 +866,7 @@ void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                                   bool use_binary_search,
                                   bool enforce_all_nodes_match_on_boundaries)
 {
-  stitching_helper(NULL,
+  stitching_helper(libmesh_nullptr,
                    boundary_id_1,
                    boundary_id_2,
                    tol,
@@ -946,7 +946,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
                         set_array[i]->insert( node_id );
 
                         const Elem * near_elem = (*my_locator)( mesh_array[i]->node(node_id) );
-                        if (near_elem == NULL)
+                        if (near_elem == libmesh_nullptr)
                           libmesh_error_msg("Error: PointLocator failed to find a valid element");
 
                         h_min = std::min(h_min, near_elem->hmin());
@@ -966,7 +966,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
 
                 // Now check whether elem has a face on the specified boundary
                 for (unsigned char side_id=0; side_id<el->n_sides(); ++side_id)
-                  if (el->neighbor(side_id) == NULL)
+                  if (el->neighbor(side_id) == libmesh_nullptr)
                     {
                       // Get *all* boundary IDs on this side, not just the first one!
                       mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
@@ -1386,7 +1386,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
                   fixed_elems.insert(elem_id);
                   for(unsigned int s = 0; s < el->n_neighbors(); ++s)
                     {
-                      if(el->neighbor(s) == NULL)
+                      if(el->neighbor(s) == libmesh_nullptr)
                         {
                           key_type key = el->key(s);
                           typedef map_type::iterator key_val_it_type;
@@ -1475,7 +1475,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
 
           for (unsigned short side_id=0; side_id<el->n_sides(); side_id++)
             {
-              if (el->neighbor(side_id) != NULL)
+              if (el->neighbor(side_id) != libmesh_nullptr)
                 {
                   // Completely remove the side from the boundary_info object if it has either
                   // this_mesh_boundary_id or other_mesh_boundary_id.

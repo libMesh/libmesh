@@ -38,7 +38,7 @@ typedef std::vector<Point>::const_iterator   const_list_iterator;
 PointLocatorList::PointLocatorList (const MeshBase & mesh,
                                     const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
-  _list            (NULL)
+  _list            (libmesh_nullptr)
 {
   // This code will only work if your mesh is the Voronoi mesh of its
   // own elements' centroids.  If your mesh is that regular you might
@@ -61,9 +61,9 @@ PointLocatorList::~PointLocatorList ()
 void PointLocatorList::clear ()
 {
   // only delete the list when we are the master
-  if (this->_list != NULL)
+  if (this->_list != libmesh_nullptr)
     {
-      if (this->_master == NULL)
+      if (this->_master == libmesh_nullptr)
         {
           // we own the list
           this->_list->clear();
@@ -71,7 +71,7 @@ void PointLocatorList::clear ()
         }
       else
         // someone else owns and therefore deletes the list
-        this->_list = NULL;
+        this->_list = libmesh_nullptr;
     }
 }
 
@@ -86,7 +86,7 @@ void PointLocatorList::init ()
 
   else
     {
-      if (this->_master == NULL)
+      if (this->_master == libmesh_nullptr)
         {
           START_LOG("init(no master)", "PointLocatorList");
 
@@ -163,7 +163,7 @@ const Elem * PointLocatorList::operator() (const Point & p,
     std::vector<std::pair<Point, const Elem *> > & my_list = *(this->_list);
 
     Real              last_distance_sq = std::numeric_limits<Real>::max();
-    const Elem *      last_elem        = NULL;
+    const Elem *      last_elem        = libmesh_nullptr;
     const std::size_t max_index        = my_list.size();
 
     for (std::size_t n=0; n<max_index; n++)

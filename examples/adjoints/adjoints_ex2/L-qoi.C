@@ -15,7 +15,7 @@ void LaplaceQoI::element_qoi (DiffContext & context,
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
-  FEBase * elem_fe = NULL;
+  FEBase * elem_fe = libmesh_nullptr;
   c.get_element_fe(0, elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration
@@ -58,7 +58,7 @@ void LaplaceQoI::element_qoi_derivative (DiffContext & context,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase * elem_fe = NULL;
+  FEBase * elem_fe = libmesh_nullptr;
   c.get_element_fe(0, elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration

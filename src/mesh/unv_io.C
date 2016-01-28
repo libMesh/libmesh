@@ -682,7 +682,7 @@ void UNVIO::elements_in (std::istream & in_file)
         in_file >> node_labels[j];
 
       // element pointer, to be allocated
-      Elem * elem = NULL;
+      Elem * elem = libmesh_nullptr;
 
       switch (fe_descriptor_id)
         {

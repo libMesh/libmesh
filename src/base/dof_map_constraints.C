@@ -350,7 +350,7 @@ private:
 
     // The gradients of the shape functions at the quadrature
     // points on the child element.
-    const std::vector<std::vector<OutputGradient> > * dphi = NULL;
+    const std::vector<std::vector<OutputGradient> > * dphi = libmesh_nullptr;
 
     const FEContinuity cont = fe->get_continuity();
 
@@ -1567,7 +1567,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // We may have rhs values to use later
-      const DofConstraintValueMap * rhs_values = NULL;
+      const DofConstraintValueMap * rhs_values = libmesh_nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
       else
@@ -1675,7 +1675,7 @@ void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> 
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // We may have rhs values to use later
-      const DofConstraintValueMap * rhs_values = NULL;
+      const DofConstraintValueMap * rhs_values = libmesh_nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
       else
@@ -1929,8 +1929,8 @@ void DofMap::enforce_constraints_exactly (const System & system,
   if (!v)
     v = system.solution.get();
 
-  NumericVector<Number> * v_local  = NULL; // will be initialized below
-  NumericVector<Number> * v_global = NULL; // will be initialized below
+  NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
+  NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
   UniquePtr<NumericVector<Number> > v_built;
   if (v->type() == SERIAL)
     {
@@ -2026,8 +2026,8 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
 
   START_LOG("enforce_adjoint_constraints_exactly()","DofMap");
 
-  NumericVector<Number> * v_local  = NULL; // will be initialized below
-  NumericVector<Number> * v_global = NULL; // will be initialized below
+  NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
+  NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
   UniquePtr<NumericVector<Number> > v_built;
   if (v.type() == SERIAL)
     {
@@ -2073,7 +2073,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
     adjoint_constraint_map_it = _adjoint_constraint_values.find(q);
   const DofConstraintValueMap * constraint_map =
     (adjoint_constraint_map_it == _adjoint_constraint_values.end()) ?
-    NULL : &adjoint_constraint_map_it->second;
+    libmesh_nullptr : &adjoint_constraint_map_it->second;
 
   DofConstraints::const_iterator c_it = _dof_constraints.begin();
   const DofConstraints::const_iterator c_end = _dof_constraints.end();
@@ -2384,7 +2384,7 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
   if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      const DofConstraintValueMap * rhs_values = NULL;
+      const DofConstraintValueMap * rhs_values = libmesh_nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
       else
@@ -3069,7 +3069,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
             this->comm().send_receive_packed_range
               (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
                procup,   &mesh, mesh_inserter_iterator<Node>(mesh),
-               (Node**)NULL);
+               (Node**)libmesh_nullptr);
 
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
           libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
@@ -3464,7 +3464,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
         this->comm().send_receive_packed_range
           (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
            procdown, &mesh, mesh_inserter_iterator<Node>(mesh),
-           (Node**)NULL);
+           (Node**)libmesh_nullptr);
 
       libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_keys_to_me.size());
       libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_vals_to_me.size());
@@ -3905,7 +3905,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_bounda
   // See if we already have a periodic boundary associated myboundary...
   PeriodicBoundaryBase * existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
 
-  if ( existing_boundary == NULL )
+  if ( existing_boundary == libmesh_nullptr )
     {
       // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
       PeriodicBoundaryBase * boundary = periodic_boundary.clone().release();

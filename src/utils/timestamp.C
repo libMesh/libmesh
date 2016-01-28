@@ -73,8 +73,8 @@ std::string get_timestamp()
   const unsigned int time_size = 40;
   char time_buffer[time_size];
 
-  time_t now = time ( NULL );
-  tm * tm_struct = localtime ( &now );
+  time_t now = time (NULL);
+  tm * tm_struct = localtime (&now);
 
   // No more than time_size characters will be placed into the array.  If the
   // total number of resulting characters, including the terminating

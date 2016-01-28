@@ -50,7 +50,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Edge3 (Elem * p=NULL) :
+  Edge3 (Elem * p=libmesh_nullptr) :
     Edge(Edge3::n_nodes(), p, _nodelinks_data) {}
 
   /**

@@ -20,7 +20,7 @@ void SyncNodalPositions::gather_data (const std::vector<dof_id_type> & ids,
       // Look for this node in the mesh
       Node * node = mesh.node_ptr(ids[i]);
 
-      if (node == NULL)
+      if (node == libmesh_nullptr)
         libmesh_error_msg("Error! Mesh returned a NULL node pointer in SyncNodalPosition::gather_data().");
 
       // Store this node's position in the data array.
@@ -40,7 +40,7 @@ void SyncNodalPositions::act_on_data (const std::vector<dof_id_type> & ids,
       // Get a pointer to the node whose position is to be updated.
       Node * node = mesh.node_ptr(ids[i]);
 
-      if (node == NULL)
+      if (node == libmesh_nullptr)
         libmesh_error_msg("Error! Mesh returned a NULL node pointer in SyncNodalPosition::act_on_data().");
 
       // Update this node's position.  Should call Point::op=

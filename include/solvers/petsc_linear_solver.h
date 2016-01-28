@@ -120,12 +120,13 @@ public:
    * Assigns a name, which is turned into an underscore-separated
    * prefix for the underlying KSP object.
    */
-  virtual void init (const char * name = NULL) libmesh_override;
+  virtual void init (const char * name = libmesh_nullptr) libmesh_override;
 
   /**
    * Initialize data structures if not done so already plus much more
    */
-  void init (PetscMatrix<T> * matrix, const char * name = NULL);
+  void init (PetscMatrix<T> * matrix,
+             const char * name = libmesh_nullptr);
 
   /**
    * Apply names to the system to be solved.  This sets an option
@@ -334,8 +335,8 @@ template <typename T>
 inline
 PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator & comm_in) :
   LinearSolver<T>(comm_in),
-  _restrict_solve_to_is(NULL),
-  _restrict_solve_to_is_complement(NULL),
+  _restrict_solve_to_is(libmesh_nullptr),
+  _restrict_solve_to_is_complement(libmesh_nullptr),
   _subset_solve_mode(SUBSET_ZERO)
 {
   if (this->n_processors() == 1)
@@ -385,7 +386,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
   // No ISComplement in PETSc 2.3.3
   libmesh_not_implemented();
 #else
-  if(_restrict_solve_to_is_complement==NULL)
+  if(_restrict_solve_to_is_complement==libmesh_nullptr)
     {
       int ierr = ISComplement(_restrict_solve_to_is,
                               vec_in.first_local_index(),
