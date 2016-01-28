@@ -336,11 +336,19 @@ Real Tri6::volume () const
       b2.relative_fuzzy_equals(Point(0,0,0)))
     return 0.5 * c1.cross(c2).size();
 
-  // 3-point rule, exact for quadratics.
-  const unsigned int N = 3;
-  const Real xi[N]  = {Real(2)/3, Real(1)/6, Real(1)/6};
-  const Real eta[N] = {Real(1)/6, Real(2)/3, Real(1)/6};
-  const Real wts[N] = {Real(1)/6, Real(1)/6, Real(1)/6};
+  // 7-point rule, exact for quintics.
+  const unsigned int N = 7;
+
+  // Parameters of the quadrature rule
+  Real
+    w1 = Real(31)/480 + std::sqrt(15.0L)/2400,
+    w2 = Real(31)/480 - std::sqrt(15.0L)/2400,
+    q1 = Real(2)/7 + std::sqrt(15.0L)/21,
+    q2 = Real(2)/7 - std::sqrt(15.0L)/21;
+
+  const Real xi[N]  = {Real(1)/3,  q1, q1,     1-2*q1, q2, q2,     1-2*q2};
+  const Real eta[N] = {Real(1)/3,  q1, 1-2*q1, q1,     q2, 1-2*q2, q2};
+  const Real wts[N] = {Real(9)/80, w1, w1,     w1,     w2, w2,     w2};
 
   // Approximate the area with quadrature
   Real vol=0.;
