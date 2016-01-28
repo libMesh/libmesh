@@ -115,6 +115,9 @@ protected:
   std::size_t find_name (const std::string & varname,
                          const std::string & expr) const;
 
+  // Helper function for determining time-dependence of expression
+  bool expression_is_time_dependent( const std::string & expression ) const;
+
 private:
   // Set the _spacetime argument vector
   void set_spacetime(const Point & p,
@@ -163,6 +166,7 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expre
   _additional_vars (additional_vars ? *additional_vars : std::vector<std::string>()),
   _initial_vals (initial_vals ? *initial_vals : std::vector<Output>())
 {
+  // time-dependence established in reparse function
   this->reparse(expression);
   this->_initialized = true;
 }
@@ -195,6 +199,8 @@ ParsedFunction<Output,OutputGradient>::reparse (const std::string & expression)
     }
 
   this->partial_reparse(expression);
+
+  this->_is_time_dependent = this->expression_is_time_dependent(expression);
 }
 
 template <typename Output, typename OutputGradient>
@@ -554,7 +560,20 @@ ParsedFunction<Output,OutputGradient>::find_name (const std::string & varname,
 
   return varname_i;
 }
+template <typename Output, typename OutputGradient>
+inline
+bool
+ParsedFunction<Output,OutputGradient>::expression_is_time_dependent( const std::string & expression ) const
+{
+  bool is_time_dependent = false;
 
+  // By definition, time is "t" for FunctionBase-based objects, so we just need to
+  // see if this expression has the variable "t" in it.
+  if( this->find_name( std::string("t"), expression ) != std::string::npos )
+    is_time_dependent = true;
+
+  return is_time_dependent;
+}
 
 // Set the _spacetime argument vector
 template <typename Output, typename OutputGradient>
