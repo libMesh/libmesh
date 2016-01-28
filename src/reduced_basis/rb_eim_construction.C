@@ -818,7 +818,7 @@ void RBEIMConstruction::set_explicit_sys_subvector(
 
   // For convenience we localize the source vector first to make it easier to
   // copy over (no need to do distinct send/receives).
-  AutoPtr< NumericVector<Number> > localized_source =
+  UniquePtr<NumericVector<Number> > localized_source =
     NumericVector<Number>::build(this->comm());
   localized_source->init(this->n_dofs(), false, SERIAL);
   source.localize(*localized_source);
@@ -848,7 +848,7 @@ void RBEIMConstruction::get_explicit_sys_subvector(
 
   // For convenience we localize the source vector first to make it easier to
   // copy over (no need to do distinct send/receives).
-  AutoPtr< NumericVector<Number> > localized_source =
+  UniquePtr<NumericVector<Number> > localized_source =
     NumericVector<Number>::build(this->comm());
   localized_source->init(get_explicit_system().n_dofs(), false, SERIAL);
   source.localize(*localized_source);
