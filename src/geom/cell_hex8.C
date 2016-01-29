@@ -320,51 +320,73 @@ const float Hex8::_embedding_matrix[8][8][8] =
 
 Real Hex8::volume () const
 {
-  // Compute the volume of the tri-linear hex by splitting it
-  // into 6 sub-pyramids and applying the formula in:
-  // "Calculation of the Volume of a General Hexahedron
-  // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),
+    x4 = point(4), x5 = point(5), x6 = point(6), x7 = point(7);
 
-  static const unsigned char sub_pyr[6][4] =
-    {
-      {0, 3, 2, 1},
-      {6, 7, 4, 5},
-      {0, 1, 5, 4},
-      {3, 7, 6, 2},
-      {0, 4, 7, 3},
-      {1, 2, 6, 5}
-    };
+  // Construct constant data vectors.
+  // \vec{x}_{\xi}   = \vec{a1}*eta*zeta + \vec{b1}*eta + \vec{c1}*zeta + \vec{d1}
+  // \vec{x}_{\eta}  = \vec{a2}*xi*zeta  + \vec{b2}*xi  + \vec{c2}*zeta + \vec{d2}
+  // \vec{x}_{\zeta} = \vec{a3}*xi*eta   + \vec{b3}*xi  + \vec{c3}*eta  + \vec{d3}
+  // This is copy-pasted directly from the output of a Python script, other
+  // than division by 8, which is done at the end when the volume is returned.
+  Point
+    a1 = -x0 + x1 - x2 + x3 + x4 - x5 + x6 - x7,
+    b1 = x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7,
+    c1 = x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7,
+    d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7,
 
-  // The centroid is a convenient point to use
-  // for the apex of all the pyramids.
-  const Point R = this->centroid();
-  Node * pyr_base[4];
+    a2 = a1,
+    b2 = b1,
+    c2 = x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7,
+    d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7,
+
+    a3 = a1,
+    b3 = c1,
+    c3 = c2,
+    d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
+
+  // Check for quick return for parallelpiped HEX8.
+  if (a1.relative_fuzzy_equals(Point(0,0,0)) &&
+      b1.relative_fuzzy_equals(Point(0,0,0)) &&
+      c1.relative_fuzzy_equals(Point(0,0,0)) &&
+      c2.relative_fuzzy_equals(Point(0,0,0)))
+    return (d1 * d2.cross(d3)) / 64.;
+
+  // 2x2x2 point rule, exact for tri-cubics.  The weights for this rule are
+  // all equal to 1.
+  const unsigned int N = 2;
+  const Real q[N] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
 
   Real vol=0.;
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int j=0; j<N; ++j)
+      for (unsigned int k=0; k<N; ++k)
+        {
+          // We are using += here since it creates less temporaries
+          // and speeds up the code a bit.
+          Point x_xi = q[j]*q[k]*a1;
+          x_xi += q[j]*b1;
+          x_xi += q[k]*c1;
+          x_xi += d1;
 
-  // Compute the volume using 6 sub-pyramids
-  for (unsigned int n=0; n<6; ++n)
-    {
-      // Set the nodes of the pyramid base
-      for (unsigned int i=0; i<4; ++i)
-        pyr_base[i] = this->_nodes[sub_pyr[n][i]];
+          Point x_eta = q[i]*q[k]*a2;
+          x_eta += q[i]*b2;
+          x_eta += q[k]*c2;
+          x_eta += d2;
 
-      // Compute diff vectors
-      Point a ( *pyr_base[0] - R );
-      Point b ( *pyr_base[1] - *pyr_base[3] );
-      Point c ( *pyr_base[2] - *pyr_base[0] );
-      Point d ( *pyr_base[3] - *pyr_base[0] );
-      Point e ( *pyr_base[1] - *pyr_base[0] );
+          Point x_zeta = q[i]*q[j]*a3;
+          x_zeta += q[i]*b3;
+          x_zeta += q[j]*c3;
+          x_zeta += d3;
 
-      // Compute pyramid volume
-      Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
+          // Compute scalar triple product.
+          vol += x_xi * x_eta.cross(x_zeta);
+        }
 
-      libmesh_assert (sub_vol>0.);
-
-      vol += sub_vol;
-    }
-
-  return vol;
+  return vol/512;
 }
 
 } // namespace libMesh
