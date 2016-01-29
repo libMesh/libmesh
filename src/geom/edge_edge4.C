@@ -172,4 +172,42 @@ dof_id_type Edge4::key () const
                            this->node(3));
 }
 
+
+
+Real Edge4::volume () const
+{
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0),
+    x1 = point(1),
+    x2 = point(2),
+    x3 = point(3);
+
+  // Construct constant data vectors.
+  // \vec{x}_{\xi}  = \vec{a1}*xi**2 + \vec{b1}*xi + \vec{c1}
+  // This is copy-pasted directly from the output of a Python script.
+  Point
+    a1 = -27*x0/16 + 27*x1/16 + 81*x2/16 - 81*x3/16,
+    b1 = 9*x0/8 + 9*x1/8 - 9*x2/8 - 9*x3/8,
+    c1 = x0/16 - x1/16 - 27*x2/16 + 27*x3/16;
+
+  // 4 point quadrature, 7th-order accurate
+  const unsigned int N = 4;
+  const Real q[N] = {-std::sqrt(525 + 70*std::sqrt(30.)) / 35,
+                     -std::sqrt(525 - 70*std::sqrt(30.)) / 35,
+                     std::sqrt(525 - 70*std::sqrt(30.)) / 35,
+                     std::sqrt(525 + 70*std::sqrt(30.)) / 35};
+  const Real w[N] = {(18 - std::sqrt(30.)) / 36,
+                     (18 + std::sqrt(30.)) / 36,
+                     (18 + std::sqrt(30.)) / 36,
+                     (18 - std::sqrt(30.)) / 36};
+
+  Real vol=0.;
+  for (unsigned int i=0; i<N; ++i)
+    vol += w[i] * (q[i]*q[i]*a1 + q[i]*b1 + c1).size();
+
+  return vol;
+}
+
 } // namespace libMesh
