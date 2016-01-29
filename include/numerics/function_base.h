@@ -147,6 +147,19 @@ public:
    */
   bool initialized () const;
 
+  /**
+   * Function to set whether this is a time-dependent function or not.
+   * This is intended to be only used by subclasses who cannot natively
+   * determine time-dependence. In such a case, this function should
+   * be used immediately following construction.
+   */
+  void set_is_time_dependent( bool is_time_dependent);
+
+  /**
+   * @returns \p true when the function this object represents
+   * is actually time-dependent, \p false otherwise.
+   */
+  bool is_time_dependent() const;
 
 protected:
 
@@ -164,6 +177,11 @@ protected:
    */
   bool _initialized;
 
+  /**
+   * Cache whether or not this function is actually time-dependent.
+   */
+  bool _is_time_dependent;
+
 };
 
 
@@ -174,7 +192,8 @@ template<typename Output>
 inline
 FunctionBase<Output>::FunctionBase (const FunctionBase * master) :
   _master             (master),
-  _initialized        (false)
+  _initialized        (false),
+  _is_time_dependent  (true) // Assume we are time-dependent until the user says otherwise
 {
 }
 
@@ -195,6 +214,19 @@ bool FunctionBase<Output>::initialized() const
   return (this->_initialized);
 }
 
+template <typename Output>
+inline
+void FunctionBase<Output>::set_is_time_dependent( bool is_time_dependent )
+{
+  this->_is_time_dependent = is_time_dependent;
+}
+
+template <typename Output>
+inline
+bool FunctionBase<Output>::is_time_dependent() const
+{
+  return (this->_is_time_dependent);
+}
 
 
 template <typename Output>

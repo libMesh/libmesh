@@ -8,6 +8,8 @@
 #include <libmesh/composite_function.h>
 #include <libmesh/const_function.h>
 #include <libmesh/dense_vector.h>
+#include <libmesh/parsed_function.h>
+#include <libmesh/zero_function.h>
 
 using namespace libMesh;
 
@@ -21,6 +23,7 @@ public:
   CPPUNIT_TEST_SUITE(CompositeFunctionTest);
 
   CPPUNIT_TEST(testRemap);
+  CPPUNIT_TEST(testTimeDependence);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -84,6 +87,80 @@ private:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(test_two(7), 1, 1.e-12);
   }
 
+  void testTimeDependence()
+  {
+
+    // We'll test the order of adding these functions to
+    // make sure time dependence gets detected/updated correctly
+    // for each
+    ParsedFunction<Real> no_t("x*2+y^2-tanh(z)+atan(x-y)");
+    ParsedFunction<Real> no_t2("x*2+y^2+z^2");
+    ZeroFunction<Real> zero;
+
+    ParsedFunction<Real> xyt("x+y+t");
+    ParsedFunction<Real> x2y2t2("x*2+y^2+t^2");
+
+
+    std::vector<unsigned int> index_set(1,0);
+
+    {
+      // composite should not be time dependent since this is the first subfunction
+      // added and it's not time-dependent
+      CompositeFunction<Real> composite;
+      composite.attach_subfunction(no_t, index_set);
+      CPPUNIT_ASSERT(!composite.is_time_dependent());
+
+      // Now composite should be time-dependent since we've now added a time dependent function
+      index_set[0] = 1;
+      composite.attach_subfunction(xyt, index_set);
+      CPPUNIT_ASSERT(composite.is_time_dependent());
+
+      // Composite should still be time-dependent
+      index_set[0] = 2;
+      composite.attach_subfunction(x2y2t2, index_set);
+      CPPUNIT_ASSERT(composite.is_time_dependent());
+    }
+
+
+    {
+      CompositeFunction<Real> composite;
+
+      // composite should be time-dependent since we've added a time dependent function
+      index_set[0] = 0;
+      composite.attach_subfunction(xyt, index_set);
+      CPPUNIT_ASSERT(composite.is_time_dependent());
+
+      // composite should still be time-dependent since the previous function was time-dependent
+      index_set[0] = 1;
+      composite.attach_subfunction(no_t, index_set);
+      CPPUNIT_ASSERT(composite.is_time_dependent());
+
+      // Composite should still be time-dependent
+      index_set[0] = 2;
+      composite.attach_subfunction(x2y2t2, index_set);
+      CPPUNIT_ASSERT(composite.is_time_dependent());
+    }
+
+    {
+      CompositeFunction<Real> composite;
+
+      // composite should not be time-dependent since we've added a time independent function
+      index_set[0] = 0;
+      composite.attach_subfunction(no_t, index_set);
+      CPPUNIT_ASSERT(!composite.is_time_dependent());
+
+      // composite should still be time-independent
+      index_set[0] = 1;
+      composite.attach_subfunction(no_t2, index_set);
+      CPPUNIT_ASSERT(!composite.is_time_dependent());
+
+      // Composite should still be time-independent
+      index_set[0] = 2;
+      composite.attach_subfunction(zero, index_set);
+      CPPUNIT_ASSERT(!composite.is_time_dependent());
+    }
+
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(CompositeFunctionTest);
