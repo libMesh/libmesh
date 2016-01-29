@@ -191,63 +191,38 @@ void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 
 Real Quad4::volume () const
 {
-  // The A,B,C,D naming scheme here corresponds exactly to the
-  // libmesh counter-clockwise numbering scheme.
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0), x1 = point(1),
+    x2 = point(2), x3 = point(3);
 
-  //        3           2        D           C
-  // QUAD4: o-----------o        o-----------o
-  //        |           |        |           |
-  //        |           |        |           |
-  //        |           |        |           |
-  //        |           |        |           |
-  //        |           |        |           |
-  //        o-----------o        o-----------o
-  //        0           1        A           B
+  // Construct constant data vectors.
+  // \vec{x}_{\xi}  = \vec{a1}*eta + \vec{b1}
+  // \vec{x}_{\eta} = \vec{a2}*xi  + \vec{b2}
+  // This is copy-pasted directly from the output of a Python script.
+  Point
+    a1 = x0/4 - x1/4 + x2/4 - x3/4,
+    b1 = -x0/4 + x1/4 + x2/4 - x3/4,
+    a2 = a1,
+    b2 = -x0/4 - x1/4 + x2/4 + x3/4;
 
-  // Vector pointing from A to C
-  Point AC ( this->point(2) - this->point(0) );
+  // Check for quick return for parallelogram QUAD4.
+  if (a1.relative_fuzzy_equals(Point(0,0,0)))
+    return 4. * b1.cross(b2).size();
 
-  // Vector pointing from A to B
-  Point AB ( this->point(1) - this->point(0) );
+  // Otherwise, use 2x2 quadrature to approximate the surface area.
 
-  // Vector pointing from A to D
-  Point AD ( this->point(3) - this->point(0) );
+  // 4-point rule, exact for bi-cubics.  The weights for this rule are
+  // all equal to 1.
+  const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
 
-  // The diagonal vector minus the side vectors
-  Point AC_AB_AD (AC - AB - AD);
+  Real vol=0.;
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<2; ++j)
+      vol += (q[j]*a1 + b1).cross(q[i]*a2 + b2).size();
 
-  // Check for quick return for planar QUAD4.  This will
-  // be the most common case, occuring for all purely 2D meshes.
-  if (AC_AB_AD == Point(0.,0.,0.))
-    return AB.cross(AD).size();
-
-  else
-    {
-      // Use 2x2 quadrature to approximate the surface area.  (The
-      // true integral is too difficult to compute analytically.)  The
-      // accuracy here is exactly the same as would be obtained via a
-      // call to Elem::volume(), however it is a bit more optimized to
-      // do it this way.  The technique used is to integrate the magnitude
-      // of the normal vector over the whole area.  See for example,
-      //
-      // Y. Zhang, C. Bajaj, G. Xu. Surface Smoothing and Quality
-      // Improvement of Quadrilateral/Hexahedral Meshes with Geometric
-      // Flow. The special issue of the Journal Communications in
-      // Numerical Methods in Engineering (CNME), submitted as an
-      // invited paper, 2006.
-      // http://www.ices.utexas.edu/~jessica/paper/quadhexgf/quadhex_geomflow_CNM.pdf
-
-      // 4-point rule
-      const Real q[2] = {0.5 - std::sqrt(3.) / 6.,
-                         0.5 + std::sqrt(3.) / 6.};
-
-      Real vol=0.;
-      for (unsigned int i=0; i<2; ++i)
-        for (unsigned int j=0; j<2; ++j)
-          vol += (AB + q[i]*AC_AB_AD).cross(AD + q[j]*AC_AB_AD).size();
-
-      return 0.25*vol;
-    }
+  return vol;
 }
 
 } // namespace libMesh
