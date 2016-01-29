@@ -160,6 +160,12 @@ public:
    */
   virtual dof_id_type key () const libmesh_override;
 
+  /**
+   * An optimized method for approximating the length of an
+   * EDGE4 using quadrature.
+   */
+  virtual Real volume () const libmesh_override;
+
 protected:
 
   /**
