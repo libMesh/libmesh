@@ -23,6 +23,7 @@
 #include "libmesh/cell_hex27.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad9.h"
+#include "libmesh/fe.h" // for volume()
 
 namespace libMesh
 {
@@ -634,6 +635,46 @@ Hex27::second_order_child_vertex (const unsigned int n) const
   return std::pair<unsigned short int, unsigned short int>
     (_second_order_vertex_child_number[n],
      _second_order_vertex_child_index[n]);
+}
+
+
+
+Real Hex27::volume () const
+{
+  // 3x3 quadrature, exact for bi-quintics
+  const unsigned int N = 3;
+  const Real q[N] = {-std::sqrt(15)/5., 0., std::sqrt(15)/5.};
+  const Real w[N] = {5./9, 8./9, 5./9};
+
+  Real vol = 0.;
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int j=0; j<N; ++j)
+      for (unsigned int k=0; k<N; ++k)
+        {
+          // Shortcut variables for current quadrature point.
+          // Real
+          //   xi = q[i],
+          //   eta = q[j],
+          //   zeta = q[k];
+          Point qp(q[i], q[j], q[k]);
+
+          // Sum up contribution from each basis function (bf) derivative.
+          Point dx_dxi, dx_deta, dx_dzeta;
+          for (unsigned int bf = 0; bf<27; ++bf)
+            {
+              dx_dxi += point(bf) *
+                FE<3,LAGRANGE>::shape_deriv(HEX27, SECOND, bf, /*derivative=*/0, qp);
+              dx_deta += point(bf) *
+                FE<3,LAGRANGE>::shape_deriv(HEX27, SECOND, bf, /*derivative=*/1, qp);
+              dx_dzeta += point(bf) *
+                FE<3,LAGRANGE>::shape_deriv(HEX27, SECOND, bf, /*derivative=*/2, qp);
+            }
+
+          // Compute scalar triple product, multiply by weight, and accumulate volume.
+          vol += w[i] * w[j] * w[k] * dx_dxi * dx_deta.cross(dx_dzeta);
+        }
+
+  return vol;
 }
 
 

@@ -203,6 +203,10 @@ public:
    */
   static const unsigned int edge_nodes_map[12][3];
 
+  /**
+   * A specialization for computing the volume of a Hex27.
+   */
+  virtual Real volume () const libmesh_override;
 
 protected:
 
