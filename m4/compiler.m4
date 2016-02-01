@@ -741,11 +741,17 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
     # GCC 4.6.3 warns about variadic macros but supports them just
     # fine, so let's turn off that warning.
+    # GCC also warns about an "unknown pragma" on every file that
+    # includes threads.h when you configure with --disable-openmp.
+    # This is really annoying if you know what you are doing, and
+    # really don't want openmp enabled.  It's also a little unexpected
+    # for a pragma, presumably the compiler silently ignores unknown
+    # ones all the time...
     case "$GXX_VERSION" in
       gcc4.6 | gcc5)
-        CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
-        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
-        CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"
+        CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros -Wno-unknown-pragmas"
+        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros -Wno-unknown-pragmas"
+        CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros -Wno-unknown-pragmas"
         ;;
 
       *)
