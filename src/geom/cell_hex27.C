@@ -23,7 +23,6 @@
 #include "libmesh/cell_hex27.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad9.h"
-#include "libmesh/fe.h" // for volume()
 
 namespace libMesh
 {
@@ -641,37 +640,216 @@ Hex27::second_order_child_vertex (const unsigned int n) const
 
 Real Hex27::volume () const
 {
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0),   x1 = point(1),   x2 = point(2),   x3 = point(3),   x4 = point(4),   x5 = point(5),   x6 = point(6),   x7 = point(7),   x8 = point(8),
+    x9 = point(9),   x10 = point(10), x11 = point(11), x12 = point(12), x13 = point(13), x14 = point(14), x15 = point(15), x16 = point(16), x17 = point(17),
+    x18 = point(18), x19 = point(19), x20 = point(20), x21 = point(21), x22 = point(22), x23 = point(23), x24 = point(24), x25 = point(25), x26 = point(26);
+
+  // The constant components of the dx/dxi vector,
+  // dx/dxi = \vec{a000} + \vec{a001}*zeta + \vec{a002}*zeta^2 + ...
+  // All of the xi^2 terms are zero.
+  // These were copied directly from the output of a Python script.
+  Point dx_dxi[3][3][3] =
+    {
+      {
+        {
+          x22/2 - x24/2, // 0, 0, 0
+          x11/4 + x17/4 - x19/4 - x9/4, // 0, 0, 1
+          -x11/4 + x17/4 - x19/4 - x22/2 + x24/2 + x9/4 // 0, 0, 2
+        },
+
+        {
+          x12/4 - x13/4 + x14/4 - x15/4, // 0, 1, 0
+          -x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8, // 0, 1, 1
+          x0/8 - x1/8 - x12/4 + x13/4 - x14/4 + x15/4 + x2/8 - x3/8 + x4/8 - x5/8 + x6/8 - x7/8 // 0, 1, 2
+        },
+
+        {
+          -x12/4 + x13/4 + x14/4 - x15/4 - x22/2 + x24/2, // 0, 2, 0
+          x0/8 - x1/8 - x11/4 - x17/4 + x19/4 - x2/8 + x3/8 - x4/8 + x5/8 + x6/8 - x7/8 + x9/4, // 0, 2, 1
+          -x0/8 + x1/8 + x11/4 + x12/4 - x13/4 - x14/4 + x15/4 - x17/4 + x19/4 + x2/8 + x22/2 - x24/2 - x3/8 - x4/8 + x5/8 + x6/8 - x7/8 - x9/4 // 0, 2, 2
+        }
+      },
+      {
+        {
+          x22 + x24 - 2*x26, // 1, 0, 0
+          -x11/2 + x17/2 + x19/2 + x20 - x25 - x9/2, // 1, 0, 1
+          x11/2 + x17/2 + x19/2 - x20 - x22 - x24 - x25 + 2*x26 + x9/2 // 1, 0, 2
+        },
+
+        {
+          -x12/2 - x13/2 + x14/2 + x15/2 + x21 - x23, // 1, 1, 0
+          x0/4 + x1/4 + x10/2 + x16/2 - x18/2 - x2/4 - x3/4 - x4/4 - x5/4 + x6/4 + x7/4 - x8/2, // 1, 1, 1
+          -x0/4 - x1/4 - x10/2 + x12/2 + x13/2 - x14/2 - x15/2 + x16/2 - x18/2 + x2/4 - x21 + x23 + x3/4 - x4/4 - x5/4 + x6/4 + x7/4 + x8/2 // 1, 1, 2
+        },
+
+        {
+          x12/2 + x13/2 + x14/2 + x15/2 - x21 - x22 - x23 - x24 + 2*x26, // 1, 2, 0
+          -x0/4 - x1/4 + x10/2 + x11/2 - x16/2 - x17/2 - x18/2 - x19/2 - x2/4 - x20 + x25 - x3/4 + x4/4 + x5/4 + x6/4 + x7/4 + x8/2 + x9/2, // 1, 2, 1
+          x0/4 + x1/4 - x10/2 - x11/2 - x12/2 - x13/2 - x14/2 - x15/2 - x16/2 - x17/2 - x18/2 - x19/2 + x2/4 + x20 + x21 + x22 + x23 + x24 + x25 - 2*x26 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x8/2 - x9/2 // 1, 2, 2
+        }
+      },
+      {
+        {Point(0,0,0), Point(0,0,0), Point(0,0,0)},
+        {Point(0,0,0), Point(0,0,0), Point(0,0,0)},
+        {Point(0,0,0), Point(0,0,0), Point(0,0,0)}
+      }
+    };
+
+
+
+  // The constant components of the dx/deta vector, all of the eta^2
+  // terms are zero. These were copied directly from the output of a
+  // Python script.
+  Point dx_deta[3][3][3] =
+    {
+      {
+        {
+          -x21/2 + x23/2, // 0, 0, 0
+          -x10/4 - x16/4 + x18/4 + x8/4, // 0, 0, 1
+          x10/4 - x16/4 + x18/4 + x21/2 - x23/2 - x8/4 // 0, 0, 2
+        },
+        {
+          x21 + x23 - 2*x26, // 0, 1, 0
+          -x10/2 + x16/2 + x18/2 + x20 - x25 - x8/2, // 0, 1, 1
+          x10/2 + x16/2 + x18/2 - x20 - x21 - x23 - x25 + 2*x26 + x8/2 // 0, 1, 2
+        },
+        {
+          Point(0,0,0), // 0, 2, 0
+          Point(0,0,0), // 0, 2, 1
+          Point(0,0,0)  // 0, 2, 2
+        }
+      },
+
+      {
+        {
+          x12/4 - x13/4 + x14/4 - x15/4, // 1, 0, 0
+          -x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8, // 1, 0, 1
+          x0/8 - x1/8 - x12/4 + x13/4 - x14/4 + x15/4 + x2/8 - x3/8 + x4/8 - x5/8 + x6/8 - x7/8 // 1, 0, 2
+        },
+        {
+          -x12/2 + x13/2 + x14/2 - x15/2 - x22 + x24, // 1, 1, 0
+          x0/4 - x1/4 - x11/2 - x17/2 + x19/2 - x2/4 + x3/4 - x4/4 + x5/4 + x6/4 - x7/4 + x9/2, // 1, 1, 1
+          -x0/4 + x1/4 + x11/2 + x12/2 - x13/2 - x14/2 + x15/2 - x17/2 + x19/2 + x2/4 + x22 - x24 - x3/4 - x4/4 + x5/4 + x6/4 - x7/4 - x9/2 // 1, 1, 2
+        },
+        {
+          Point(0,0,0), // 1, 2, 0
+          Point(0,0,0), // 1, 2, 1
+          Point(0,0,0)  // 1, 2, 2
+        }
+      },
+
+      {
+        {
+          -x12/4 - x13/4 + x14/4 + x15/4 + x21/2 - x23/2, // 2, 0, 0
+          x0/8 + x1/8 + x10/4 + x16/4 - x18/4 - x2/8 - x3/8 - x4/8 - x5/8 + x6/8 + x7/8 - x8/4, // 2, 0, 1
+          -x0/8 - x1/8 - x10/4 + x12/4 + x13/4 - x14/4 - x15/4 + x16/4 - x18/4 + x2/8 - x21/2 + x23/2 + x3/8 - x4/8 - x5/8 + x6/8 + x7/8 + x8/4, // 2, 0, 2
+        },
+        {
+          x12/2 + x13/2 + x14/2 + x15/2 - x21 - x22 - x23 - x24 + 2*x26, // 2, 1, 0
+          -x0/4 - x1/4 + x10/2 + x11/2 - x16/2 - x17/2 - x18/2 - x19/2 - x2/4 - x20 + x25 - x3/4 + x4/4 + x5/4 + x6/4 + x7/4 + x8/2 + x9/2, // 2, 1, 1
+          x0/4 + x1/4 - x10/2 - x11/2 - x12/2 - x13/2 - x14/2 - x15/2 - x16/2 - x17/2 - x18/2 - x19/2 + x2/4 + x20 + x21 + x22 + x23 + x24 + x25 - 2*x26 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x8/2 - x9/2 // 2, 1, 2
+        },
+        {
+          Point(0,0,0), // 2, 2, 0
+          Point(0,0,0), // 2, 2, 1
+          Point(0,0,0)  // 2, 2, 2
+        }
+      }
+    };
+
+
+
+  // The constant components of the dx/dzeta vector, all of the zeta^2
+  // terms are zero. These were copied directly from the output of a
+  // Python script.
+  Point dx_dzeta[3][3][3] =
+    {
+      {
+        {
+          -x20/2 + x25/2, // 0, 0, 0
+          x20 + x25 - 2*x26, // 0, 0, 1
+          Point(0,0,0) // 0, 0, 2
+        },
+        {
+          -x10/4 - x16/4 + x18/4 + x8/4, // 0, 1, 0
+          x10/2 - x16/2 + x18/2 + x21 - x23 - x8/2, // 0, 1, 1
+          Point(0,0,0) // 0, 1, 2
+        },
+        {
+          -x10/4 + x16/4 + x18/4 + x20/2 - x25/2 - x8/4, // 0, 2, 0
+          x10/2 + x16/2 + x18/2 - x20 - x21 - x23 - x25 + 2*x26 + x8/2, // 0, 2, 1
+          Point(0,0,0) // 0, 2, 2
+        }
+      },
+      {
+        {
+          x11/4 + x17/4 - x19/4 - x9/4, // 1, 0, 0
+          -x11/2 + x17/2 - x19/2 - x22 + x24 + x9/2, // 1, 0, 1
+          Point(0,0,0) // 1, 0, 2
+        },
+        {
+          -x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8, // 1, 1, 0
+          x0/4 - x1/4 - x12/2 + x13/2 - x14/2 + x15/2 + x2/4 - x3/4 + x4/4 - x5/4 + x6/4 - x7/4, // 1, 1, 1
+          Point(0,0,0) // 1, 1, 2
+        },
+        {
+          x0/8 - x1/8 - x11/4 - x17/4 + x19/4 - x2/8 + x3/8 - x4/8 + x5/8 + x6/8 - x7/8 + x9/4, // 1, 2, 0
+          -x0/4 + x1/4 + x11/2 + x12/2 - x13/2 - x14/2 + x15/2 - x17/2 + x19/2 + x2/4 + x22 - x24 - x3/4 - x4/4 + x5/4 + x6/4 - x7/4 - x9/2, // 1, 2, 1
+          Point(0,0,0) // 1, 2, 2
+        }
+      },
+      {
+        {
+          -x11/4 + x17/4 + x19/4 + x20/2 - x25/2 - x9/4, // 2, 0, 0
+          x11/2 + x17/2 + x19/2 - x20 - x22 - x24 - x25 + 2*x26 + x9/2, // 2, 0, 1
+          Point(0,0,0) // 2, 0, 2
+        },
+        {
+          x0/8 + x1/8 + x10/4 + x16/4 - x18/4 - x2/8 - x3/8 - x4/8 - x5/8 + x6/8 + x7/8 - x8/4, // 2, 1, 0
+          -x0/4 - x1/4 - x10/2 + x12/2 + x13/2 - x14/2 - x15/2 + x16/2 - x18/2 + x2/4 - x21 + x23 + x3/4 - x4/4 - x5/4 + x6/4 + x7/4 + x8/2, // 2, 1, 1
+          Point(0,0,0)  // 2, 1, 2
+        },
+        {
+          -x0/8 - x1/8 + x10/4 + x11/4 - x16/4 - x17/4 - x18/4 - x19/4 - x2/8 - x20/2 + x25/2 - x3/8 + x4/8 + x5/8 + x6/8 + x7/8 + x8/4 + x9/4, // 2, 2, 0
+          x0/4 + x1/4 - x10/2 - x11/2 - x12/2 - x13/2 - x14/2 - x15/2 - x16/2 - x17/2 - x18/2 - x19/2 + x2/4 + x20 + x21 + x22 + x23 + x24 + x25 - 2*x26 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x8/2 - x9/2, // 2, 2, 1
+          Point(0,0,0) // 2, 2, 2
+        }
+      }
+    };
+
   // 3x3 quadrature, exact for bi-quintics
-  const unsigned int N = 3;
+  const int N = 3;
   const Real q[N] = {-std::sqrt(15)/5., 0., std::sqrt(15)/5.};
   const Real w[N] = {5./9, 8./9, 5./9};
 
   Real vol = 0.;
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int j=0; j<N; ++j)
-      for (unsigned int k=0; k<N; ++k)
+  for (int i=0; i<N; ++i)
+    for (int j=0; j<N; ++j)
+      for (int k=0; k<N; ++k)
         {
-          // Shortcut variables for current quadrature point.
-          // Real
-          //   xi = q[i],
-          //   eta = q[j],
-          //   zeta = q[k];
-          Point qp(q[i], q[j], q[k]);
+          Real
+            xi = q[i],
+            eta = q[j],
+            zeta = q[k];
 
-          // Sum up contribution from each basis function (bf) derivative.
-          Point dx_dxi, dx_deta, dx_dzeta;
-          for (unsigned int bf = 0; bf<27; ++bf)
-            {
-              dx_dxi += point(bf) *
-                FE<3,LAGRANGE>::shape_deriv(HEX27, SECOND, bf, /*derivative=*/0, qp);
-              dx_deta += point(bf) *
-                FE<3,LAGRANGE>::shape_deriv(HEX27, SECOND, bf, /*derivative=*/1, qp);
-              dx_dzeta += point(bf) *
-                FE<3,LAGRANGE>::shape_deriv(HEX27, SECOND, bf, /*derivative=*/2, qp);
-            }
+          // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
+          Point dx_dxi_q, dx_deta_q, dx_dzeta_q;
+          for (int ii=0; ii<N; ++ii)
+            for (int jj=0; jj<N; ++jj)
+              for (int kk=0; kk<N; ++kk)
+                {
+                  // Can't use Utility::pow, that only works with compile-time constant.
+                  Real coeff = std::pow(xi, ii) * std::pow(eta, jj) * std::pow(zeta, kk);
+                  dx_dxi_q   += coeff * dx_dxi[ii][jj][kk];
+                  dx_deta_q  += coeff * dx_deta[ii][jj][kk];
+                  dx_dzeta_q += coeff * dx_dzeta[ii][jj][kk];
+                }
 
           // Compute scalar triple product, multiply by weight, and accumulate volume.
-          vol += w[i] * w[j] * w[k] * dx_dxi * dx_deta.cross(dx_dzeta);
+          vol += w[i] * w[j] * w[k] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
         }
 
   return vol;
