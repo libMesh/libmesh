@@ -24,11 +24,11 @@ public:
 static unsigned int get_string_len
   (typename std::vector<T>::const_iterator in)
 {
-  unsigned int string_len = in[size_bytes-1];
+  unsigned int string_len = reinterpret_cast<const unsigned char &>(in[size_bytes-1]);
   for (signed int i=size_bytes-2; i >= 0; --i)
     {
       string_len *= 256;
-      string_len += in[i];
+      string_len += reinterpret_cast<const unsigned char &>(in[i]);
     }
   return string_len;
 }
@@ -68,7 +68,7 @@ static std::basic_string<T> unpack
 
   std::ostringstream oss;
   for (unsigned int i = 0; i < string_len; ++i)
-    oss << static_cast<char>(in[i+size_bytes]);
+    oss << reinterpret_cast<const unsigned char &>(in[i+size_bytes]);
 
   in += size_bytes + string_len;
 
