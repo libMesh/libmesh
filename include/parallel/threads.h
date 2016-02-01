@@ -533,8 +533,13 @@ void parallel_for (const Range & range, const Body & body)
       range_bodies[i].body = &body;
     }
 
-  // Create the threads
+  // Create the threads.  It may seem redundant to wrap a pragma in
+  // #ifdefs... but GCC warns about an "unknown pragma" if it
+  // encounters this line of code when -fopenmp is not passed to the
+  // compiler.
+#ifdef LIBMESH_HAVE_OPENMP
 #pragma omp parallel for schedule (static)
+#endif
   for(unsigned int i=0; i<n_threads; i++)
     {
 #if LIBMESH_HAVE_OPENMP
@@ -635,7 +640,12 @@ void parallel_reduce (const Range & range, Body & body)
   // Create the threads
   std::vector<pthread_t> threads(n_threads);
 
+  // It may seem redundant to wrap a pragma in #ifdefs... but GCC
+  // warns about an "unknown pragma" if it encounters this line of
+  // code when -fopenmp is not passed to the compiler.
+#ifdef LIBMESH_HAVE_OPENMP
 #pragma omp parallel for schedule (static)
+#endif
   // The use of 'int' instead of unsigned for the iteration variable
   // is deliberate here.  This is an OpenMP loop, and some older
   // compilers warn when you don't use int for the loop index.  The
