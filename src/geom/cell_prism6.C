@@ -329,84 +329,92 @@ const float Prism6::_embedding_matrix[8][6][6] =
 
 Real Prism6::volume () const
 {
-  // The volume of the prism is computed by splitting
-  // it into 2 tetrahedra and 3 pyramids with bilinear bases.
-  // Then the volume formulae for the tetrahedron and pyramid
-  // are applied and summed to obtain the prism's volume.
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0), x1 = point(1), x2 = point(2),
+    x3 = point(3), x4 = point(4), x5 = point(5);
 
-  static const unsigned char sub_pyr[3][4] =
+  // constant and zeta terms only.  These are copied directly from a
+  // Python script.
+  Point dx_dxi[2] =
     {
-      {0, 1, 4, 3},
-      {1, 2, 5, 4},
-      {0, 3, 5, 2}
+      -x0/2 + x1/2 - x3/2 + x4/2, // constant
+      x0/2 - x1/2 - x3/2 + x4/2,  // zeta
     };
 
-  static const unsigned char sub_tet[2][3] =
+  // constant and zeta terms only.  These are copied directly from a
+  // Python script.
+  Point dx_deta[2] =
     {
-      {0, 1, 2},
-      {5, 4, 3}
+      -x0/2 + x2/2 - x3/2 + x5/2, // constant
+      x0/2 - x2/2 - x3/2 + x5/2,  // zeta
     };
 
-  // The centroid is a convenient point to use
-  // for the apex of all the pyramids.
-  const Point R = this->centroid();
-
-  // temporary storage for Nodes which form the base of the
-  // subelements
-  Node * base[4];
-
-  // volume accumulation variable
-  Real vol=0.;
-
-  // Add up the sub-pyramid volumes
-  for (unsigned int n=0; n<3; ++n)
+  // Constant, xi, and eta terms
+  Point dx_dzeta[3] =
     {
-      // Set the nodes of the pyramid base
-      for (unsigned int i=0; i<4; ++i)
-        base[i] = this->_nodes[sub_pyr[n][i]];
+      -x0/2 + x3/2,              // constant
+      x0/2 - x2/2 - x3/2 + x5/2, // eta
+      x0/2 - x1/2 - x3/2 + x4/2  // xi
+    };
 
-      // Compute diff vectors
-      Point a ( *base[0] - R );
-      Point b ( *base[1] - *base[3] );
-      Point c ( *base[2] - *base[0] );
-      Point d ( *base[3] - *base[0] );
-      Point e ( *base[1] - *base[0] );
+  // The quadrature rule the Prism6 is a tensor product between a
+  // four-point TRI3 rule (in xi, eta) and a two-point EDGE2 rule (in
+  // zeta) which is capable of integrating cubics exactly.
 
-      // Compute pyramid volume
-      Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
+  // Number of points in the 2D quadrature rule.
+  const int N2D = 4;
 
-      libmesh_assert (sub_vol>0.);
-
-      vol += sub_vol;
-    }
-
-
-  // Add up the sub-tet volumes
-  for (unsigned int n=0; n<2; ++n)
+  static const Real w2D[N2D] =
     {
-      // Set the nodes of the pyramid base
-      for (unsigned int i=0; i<3; ++i)
-        base[i] = this->_nodes[sub_tet[n][i]];
+      1.5902069087198858469718450103758e-01L,
+      9.0979309128011415302815498962418e-02L,
+      1.5902069087198858469718450103758e-01L,
+      9.0979309128011415302815498962418e-02L
+    };
 
-      // The volume of a tetrahedron is 1/6 the box product formed
-      // by its base and apex vectors
-      Point a ( R - *base[0] );
+  static const Real xi[N2D] =
+    {
+      1.5505102572168219018027159252941e-01L,
+      6.4494897427831780981972840747059e-01L,
+      1.5505102572168219018027159252941e-01L,
+      6.4494897427831780981972840747059e-01L
+    };
 
-      // b is the vector pointing from 0 to 1
-      Point b ( *base[1] - *base[0] );
+  static const Real eta[N2D] =
+    {
+      1.7855872826361642311703513337422e-01L,
+      7.5031110222608118177475598324603e-02L,
+      6.6639024601470138670269327409637e-01L,
+      2.8001991549907407200279599420481e-01L
+    };
 
-      // c is the vector pointing from 0 to 2
-      Point c ( *base[2] - *base[0] );
+  // Number of points in the 1D quadrature rule.  The weights of the
+  // 1D quadrature rule are equal to 1.
+  const int N1D = 2;
 
-      Real sub_vol =  (1.0 / 6.0) * (a * (b.cross(c)));
+  // Points of the 1D quadrature rule
+  static const Real zeta[N1D] =
+    {
+      -std::sqrt(3.)/3,
+      std::sqrt(3.)/3.
+    };
 
-      libmesh_assert (sub_vol>0.);
+  Real vol = 0.;
+  for (int i=0; i<N2D; ++i)
+    for (int j=0; j<N1D; ++j)
+      {
+        // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
+        Point
+          dx_dxi_q   = dx_dxi[0]   + zeta[j]*dx_dxi[1],
+          dx_deta_q  = dx_deta[0]  + zeta[j]*dx_deta[1],
+          dx_dzeta_q = dx_dzeta[0] + eta[i]*dx_dzeta[1] + xi[i]*dx_dzeta[2];
 
-      vol += sub_vol;
-    }
+        // Compute scalar triple product, multiply by weight, and accumulate volume.
+        vol += w2D[i] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+      }
 
-
-  // Done with all sub-volumes, so return
   return vol;
 }
 
