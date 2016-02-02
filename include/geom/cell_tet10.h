@@ -186,6 +186,11 @@ public:
    */
   static const unsigned int edge_nodes_map[6][3];
 
+  /**
+   * A specialization for computing the volume of a Tet10.
+   */
+  virtual Real volume () const libmesh_override;
+
 protected:
 
   /**
