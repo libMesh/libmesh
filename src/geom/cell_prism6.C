@@ -403,17 +403,21 @@ Real Prism6::volume () const
 
   Real vol = 0.;
   for (int i=0; i<N2D; ++i)
-    for (int j=0; j<N1D; ++j)
-      {
-        // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
-        Point
-          dx_dxi_q   = dx_dxi[0]   + zeta[j]*dx_dxi[1],
-          dx_deta_q  = dx_deta[0]  + zeta[j]*dx_deta[1],
-          dx_dzeta_q = dx_dzeta[0] + eta[i]*dx_dzeta[1] + xi[i]*dx_dzeta[2];
+    {
+      // dx_dzeta depends only on the 2D quadrature rule points.
+      Point dx_dzeta_q = dx_dzeta[0] + eta[i]*dx_dzeta[1] + xi[i]*dx_dzeta[2];
 
-        // Compute scalar triple product, multiply by weight, and accumulate volume.
-        vol += w2D[i] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
-      }
+      for (int j=0; j<N1D; ++j)
+        {
+          // dx_dxi and dx_deta only depend on the 1D quadrature rule points.
+          Point
+            dx_dxi_q  = dx_dxi[0]  + zeta[j]*dx_dxi[1],
+            dx_deta_q = dx_deta[0] + zeta[j]*dx_deta[1];
+
+          // Compute scalar triple product, multiply by weight, and accumulate volume.
+          vol += w2D[i] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+        }
+    }
 
   return vol;
 }
