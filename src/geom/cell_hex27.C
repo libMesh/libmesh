@@ -822,27 +822,32 @@ Real Hex27::volume () const
 
   // 3x3 quadrature, exact for bi-quintics
   const int N = 3;
-  const Real q[N] = {-std::sqrt(15)/5., 0., std::sqrt(15)/5.};
   const Real w[N] = {5./9, 8./9, 5./9};
+
+  // Quadrature point locations raised to powers.  q[0][2] is
+  // quadrature point 0, squared, q[1][1] is quadrature point 1 to the
+  // first power, etc.
+  const Real q[N][N] =
+    {
+      //^0   ^1                 ^2
+      {  1., -std::sqrt(15)/5., 15./25},
+      {  1., 0.,                0.},
+      {  1., std::sqrt(15)/5.,  15./25}
+    };
 
   Real vol = 0.;
   for (int i=0; i<N; ++i)
     for (int j=0; j<N; ++j)
       for (int k=0; k<N; ++k)
         {
-          Real
-            xi = q[i],
-            eta = q[j],
-            zeta = q[k];
-
           // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
           Point dx_dxi_q, dx_deta_q, dx_dzeta_q;
           for (int ii=0; ii<N; ++ii)
             for (int jj=0; jj<N; ++jj)
               for (int kk=0; kk<N; ++kk)
                 {
-                  // Can't use Utility::pow, that only works with compile-time constant.
-                  Real coeff = std::pow(xi, ii) * std::pow(eta, jj) * std::pow(zeta, kk);
+                  Real coeff = q[i][ii] * q[j][jj] * q[k][kk];
+
                   dx_dxi_q   += coeff * dx_dxi[ii][jj][kk];
                   dx_deta_q  += coeff * dx_deta[ii][jj][kk];
                   dx_dzeta_q += coeff * dx_dzeta[ii][jj][kk];
