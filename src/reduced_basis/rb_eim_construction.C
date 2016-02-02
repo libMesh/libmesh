@@ -449,6 +449,29 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
 }
 
+void RBEIMConstruction::plot_parametrized_functions_in_training_set(const std::string& pathname)
+{
+  libmesh_assert(_parametrized_functions_in_training_set_initialized);
+
+  for(unsigned int i=0; i<_parametrized_functions_in_training_set.size(); i++)
+    {
+#ifdef LIBMESH_HAVE_EXODUS_API
+      *get_explicit_system().solution = *_parametrized_functions_in_training_set[i];
+
+      std::stringstream pathname_i;
+      pathname_i << pathname << "_" << i << ".exo";
+
+      std::set<std::string> system_names;
+      system_names.insert(get_explicit_system().name());
+      ExodusII_IO(get_mesh()).write_equation_systems (pathname_i.str(),
+                                                      this->get_equation_systems(),
+                                                      &system_names);
+      libMesh::out << "Plotted parameterized function " << i << std::endl;
+#endif
+    }
+}
+
+
 
 Real RBEIMConstruction::compute_best_fit_error()
 {
