@@ -209,6 +209,13 @@ public:
    */
   void init_dof_map_between_systems();
 
+  /**
+   * Plot all the parameterized functions that we are storing
+   * in _parametrized_functions_in_training_set. \p pathname
+   * provides the path to where the plot data will be saved.
+   */
+  void plot_parametrized_functions_in_training_set(const std::string& pathname);
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
