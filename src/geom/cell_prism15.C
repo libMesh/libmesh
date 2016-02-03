@@ -285,6 +285,159 @@ Prism15::second_order_child_vertex (const unsigned int n) const
      _second_order_vertex_child_index[n]);
 }
 
+
+
+Real Prism15::volume () const
+{
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0),   x1 = point(1),   x2 = point(2),   x3 = point(3),   x4 = point(4),
+    x5 = point(5),   x6 = point(6),   x7 = point(7),   x8 = point(8),   x9 = point(9),
+    x10 = point(10), x11 = point(11), x12 = point(12), x13 = point(13), x14 = point(14);
+
+  // Terms are copied directly from a Python script.
+  Point dx_dxi[10] =
+    {
+      -x0 - x1 + x10 + 2*x12 - x3 - x4 + 2*x6 - x9,
+      3*x0/2 + x1/2 + 2*x12 - 3*x3/2 - x4/2 - 2*x6,
+      -x0/2 + x1/2 - x10 - x3/2 + x4/2 + x9,
+      2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 - 2*x6 + 2*x7 - 2*x8,
+      -2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 + 2*x6 - 2*x7 + 2*x8,
+      Point(0,0,0),
+      2*x0 + 2*x1 - 4*x12 + 2*x3 + 2*x4 - 4*x6,
+      -2*x0 - 2*x1 - 4*x12 + 2*x3 + 2*x4 + 4*x6,
+      Point(0,0,0),
+      Point(0,0,0)
+    };
+
+  Point dx_deta[10] =
+    {
+      -x0 + x11 + 2*x14 - x2 - x3 - x5 + 2*x8 - x9,
+      3*x0/2 + 2*x14 + x2/2 - 3*x3/2 - x5/2 - 2*x8,
+      -x0/2 - x11 + x2/2 - x3/2 + x5/2 + x9,
+      2*x0 - 4*x14 + 2*x2 + 2*x3 + 2*x5 - 4*x8,
+      -2*x0 - 4*x14 - 2*x2 + 2*x3 + 2*x5 + 4*x8,
+      Point(0,0,0),
+      2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 - 2*x6 + 2*x7 - 2*x8,
+      -2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 + 2*x6 - 2*x7 + 2*x8,
+      Point(0,0,0),
+      Point(0,0,0)
+    };
+
+  Point dx_dzeta[10] =
+    {
+      -x0/2 + x3/2,
+      x0 + x3 - 2*x9,
+      Point(0,0,0),
+      3*x0/2 + 2*x14 + x2/2 - 3*x3/2 - x5/2 - 2*x8,
+      -x0 - 2*x11 + x2 - x3 + x5 + 2*x9,
+      -x0 - 2*x14 - x2 + x3 + x5 + 2*x8,
+      3*x0/2 + x1/2 + 2*x12 - 3*x3/2 - x4/2 - 2*x6,
+      -x0 + x1 - 2*x10 - x3 + x4 + 2*x9,
+      -2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 + 2*x6 - 2*x7 + 2*x8,
+      -x0 - x1 - 2*x12 + x3 + x4 + 2*x6
+    };
+
+  // The quadrature rule for the Prism15 is a tensor product between a
+  // FOURTH-order TRI3 rule (in xi, eta) and a FIFTH-order EDGE2 rule
+  // in zeta.
+
+  // Number of points in the 2D quadrature rule.
+  const int N2D = 6;
+
+  // Parameters of the 2D rule
+  static const Real
+    w1 = 1.1169079483900573284750350421656140e-01L,
+    w2 = 5.4975871827660933819163162450105264e-02L,
+    a1 = 4.4594849091596488631832925388305199e-01L,
+    a2 = 9.1576213509770743459571463402201508e-02L;
+
+  // Points and weights of the 2D rule
+  static const Real w2D[N2D] = {w1, w1, w1, w2, w2, w2};
+
+  // Quadrature point locations raised to powers.  xi[0][2] is
+  // quadrature point 0, squared, xi[1][1] is quadrature point 1 to the
+  // first power, etc.  This lets us avoid calling std::pow inside the
+  // loops below.
+  static const Real xi[N2D][3] =
+    {
+      // ^0   ^1      ^2
+      {   1., a1,     a1*a1},
+      {   1., 1-2*a1, (1-2*a1)*(1-2*a1)},
+      {   1., a1,     a1*a1},
+      {   1., a2,     a2*a2},
+      {   1., 1-2*a2, (1-2*a2)*(1-2*a2)},
+      {   1., a2,     a2*a2}
+    };
+
+  static const Real eta[N2D][3] =
+    {
+      // ^0   ^1      ^2
+      {   1., a1,     a1*a1},
+      {   1., a1,     a1*a1},
+      {   1., 1-2*a1, (1-2*a1)*(1-2*a1)},
+      {   1., a2,     a2*a2},
+      {   1., a2,     a2*a2},
+      {   1., 1-2*a2, (1-2*a2)*(1-2*a2)}
+    };
+
+  // Number of points in the 1D quadrature rule.
+  const int N1D = 3;
+
+  // Points and weights of the 1D quadrature rule.
+  static const Real w1D[N1D] = {5./9, 8./9, 5./9};
+
+  const Real zeta[N1D][3] =
+    {
+      //^0   ^1                 ^2
+      {  1., -std::sqrt(15)/5., 15./25},
+      {  1., 0.,                0.},
+      {  1., std::sqrt(15)/5.,  15./25}
+    };
+
+  // The integer exponents for each term.
+  static const int exponents[10][3] =
+    {
+      {0, 0, 0},
+      {0, 0, 1},
+      {0, 0, 2},
+      {0, 1, 0},
+      {0, 1, 1},
+      {0, 2, 0},
+      {1, 0, 0},
+      {1, 0, 1},
+      {1, 1, 0},
+      {2, 0, 0}
+    };
+
+  Real vol = 0.;
+  for (int i=0; i<N2D; ++i)
+    for (int j=0; j<N1D; ++j)
+      {
+        // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
+        Point dx_dxi_q, dx_deta_q, dx_dzeta_q;
+        for (int c=0; c<10; ++c)
+          {
+            Real coeff =
+              xi[i][exponents[c][0]]*
+              eta[i][exponents[c][1]]*
+              zeta[j][exponents[c][2]];
+
+            dx_dxi_q   += coeff * dx_dxi[c];
+            dx_deta_q  += coeff * dx_deta[c];
+            dx_dzeta_q += coeff * dx_dzeta[c];
+          }
+
+        // Compute scalar triple product, multiply by weight, and accumulate volume.
+        vol += w2D[i] * w1D[j] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+      }
+
+  return vol;
+}
+
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Prism15::_embedding_matrix[8][15][15] =
