@@ -219,68 +219,24 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 Real Pyramid5::volume () const
 {
-  // Make copies of our points.  It makes the subsequent calculations a bit
-  // shorter and avoids dereferencing the same pointer multiple times.
-  Point
-    x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3), x4 = point(4);
+  // The pyramid with a bilinear base has volume given by the
+  // formula in: "Calculation of the Volume of a General Hexahedron
+  // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
+  Node * node0 = this->get_node(0);
+  Node * node1 = this->get_node(1);
+  Node * node2 = this->get_node(2);
+  Node * node3 = this->get_node(3);
+  Node * node4 = this->get_node(4);
 
-  // The number of components in the dx_dxi, dx_deta, and dx_dzeta arrays.
-  const int n_components = 4;
+  // Construct Various edge and diagonal vectors
+  Point v40 ( *node0 - *node4 );
+  Point v13 ( *node3 - *node1 );
+  Point v02 ( *node2 - *node0 );
+  Point v03 ( *node3 - *node0 );
+  Point v01 ( *node1 - *node0 );
 
-  Point dx_dxi[n_components] =
-    {
-      -x0/4 + x1/4 + x2/4 - x3/4, // const
-      x0/4 - x1/4 - x2/4 + x3/4,  // zeta
-      x0/4 - x1/4 + x2/4 - x3/4   // eta
-    };
-
-  Point dx_deta[n_components] =
-    {
-      -x0/4 - x1/4 + x2/4 + x3/4, // const
-      x0/4 + x1/4 - x2/4 - x3/4,  // zeta
-      x0/4 - x1/4 + x2/4 - x3/4,  // xi
-    };
-
-  Point dx_dzeta[n_components] =
-    {
-      -x0/4 - x1/4 - x2/4 - x3/4 + x4,  // const
-      x0/2 + x1/2 + x2/2 + x3/2 - 2*x4, // zeta
-      -x0/4 - x1/4 - x2/4 - x3/4 + x4,  // zeta**2
-      x0/4 - x1/4 + x2/4 - x3/4         // xi*eta
-    };
-
-  // Number of points in the 2D quadrature rule
-  const int N = 8;
-
-  // Parameters of the quadrature rule
-  static const Real
-    a1 = -5.0661630334978742377431469429037e-01L,
-    a2 = -2.6318405556971359557121701304557e-01L,
-    b1 = 1.2251482265544137786674043037115e-01L,
-    b2 = 5.4415184401122528879992623629551e-01L,
-    w1 = 2.3254745125350790274997694884235e-01L,
-    w2 = 1.0078588207982543058335638449098e-01L;
-
-  // The points and weights of the 2x2x2 quadrature rule
-  static const Real xi[8]   = {a1,  a2,  a1,  a2, -a1, -a2, -a1, -a2};
-  static const Real eta[8]  = {a1,  a2, -a1, -a2,  a1,  a2, -a1, -a2};
-  static const Real zeta[8] = {b1,  b2,  b1,  b2,  b1,  b2,  b1,  b2};
-  static const Real w[8] = {w1, w2, w1, w2, w1, w2, w1, w2};
-
-  Real vol = 0.;
-  for (int q=0; q<N; ++q)
-    {
-      // Note: we need to scale dx/dxi and dx/deta by (1-z), and dx/dzeta by (1-z)**2
-      Point
-        dx_dxi_q   = (dx_dxi[0] + zeta[q]*dx_dxi[1] + eta[q]*dx_dxi[2]) / (1. - zeta[q]),
-        dx_deta_q  = (dx_deta[0] + zeta[q]*dx_deta[1] + xi[q]*dx_deta[2]) / (1. - zeta[q]),
-        dx_dzeta_q = (dx_dzeta[0] + zeta[q]*dx_dzeta[1] + zeta[q]*zeta[q]*dx_dzeta[2] + xi[q]*eta[q]*dx_dzeta[3]) / (1. - zeta[q]) / (1. - zeta[q]);
-
-      // Compute scalar triple product, multiply by weight, and accumulate volume.
-      vol += w[q] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
-    }
-
-  return vol;
+  // Finally, ready to return the volume!
+  return (1./6.)*(v40*(v13.cross(v02))) + (1./12.)*(v02*(v01.cross(v03)));
 }
 
 } // namespace libMesh
