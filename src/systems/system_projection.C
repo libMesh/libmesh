@@ -1173,11 +1173,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 {
                   libmesh_assert_equal_to (nc, 0);
                 }
+              else if (!nc)
+                {
+                  // This should only occur for first-order LAGRANGE
+                  // FE on non-vertices of higher-order elements
+                  libmesh_assert (!elem->is_vertex(n));
+                  libmesh_assert_equal_to(fe_type.family, LAGRANGE);
+                }
               // Assume that C_ZERO elements have a single nodal
-              // value shape function
+              // value shape function at vertices
               else if (cont == C_ZERO)
                 {
-                  libmesh_assert_equal_to (nc, 1);
                   Ue(current_dof) = f.eval_at_node(context,
                                                    var_component,
                                                    *elem->get_node(n),
