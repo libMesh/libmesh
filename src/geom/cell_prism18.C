@@ -612,6 +612,181 @@ Prism18::second_order_child_vertex (const unsigned int n) const
 
 
 
+Real Prism18::volume () const
+{
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0),   x1 = point(1),   x2 = point(2),   x3 = point(3),   x4 = point(4), x5 = point(5),
+    x6 = point(6),   x7 = point(7),   x8 = point(8),   x9 = point(9),  x10 = point(10), x11 = point(11),
+    x12 = point(12), x13 = point(13), x14 = point(14), x15 = point(15), x16 = point(16), x17 = point(17);
+
+  // The number of components in the dx_dxi, dx_deta, and dx_dzeta arrays.
+  const int n_components = 16;
+
+  // Terms are copied directly from a Python script.
+  Point dx_dxi[n_components] =
+    {
+      -x10 + 4*x15 - 3*x9,
+      3*x0/2 + x1/2 + 2*x12 - 3*x3/2 - x4/2 - 2*x6,
+      -3*x0/2 - x1/2 + x10 + 2*x12 - 4*x15 - 3*x3/2 - x4/2 + 2*x6 + 3*x9,
+      -4*x15 + 4*x16 - 4*x17 + 4*x9,
+      -2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 + 2*x6 - 2*x7 + 2*x8,
+      2*x0 - 2*x12 + 2*x13 - 2*x14 + 4*x15 - 4*x16 + 4*x17 + 2*x3 - 2*x6 + 2*x7 - 2*x8 - 4*x9,
+      Point(0,0,0),
+      Point(0,0,0),
+      4*x10 - 8*x15 + 4*x9,
+      -2*x0 - 2*x1 - 4*x12 + 2*x3 + 2*x4 + 4*x6,
+      2*x0 + 2*x1 - 4*x10 - 4*x12 + 8*x15 + 2*x3 + 2*x4 - 4*x6 - 4*x9,
+      Point(0,0,0),
+      Point(0,0,0),
+      Point(0,0,0),
+      Point(0,0,0),
+      Point(0,0,0)
+    };
+
+  Point dx_deta[n_components] =
+    {
+      -x11 + 4*x17 - 3*x9,
+      3*x0/2 + 2*x14 + x2/2 - 3*x3/2 - x5/2 - 2*x8,
+      -3*x0/2 + x11 + 2*x14 - 4*x17 - x2/2 - 3*x3/2 - x5/2 + 2*x8 + 3*x9,
+      4*x11 - 8*x17 + 4*x9,
+      -2*x0 - 4*x14 - 2*x2 + 2*x3 + 2*x5 + 4*x8,
+      2*x0 - 4*x11 - 4*x14 + 8*x17 + 2*x2 + 2*x3 + 2*x5 - 4*x8 - 4*x9,
+      Point(0,0,0),
+      Point(0,0,0),
+      -4*x15 + 4*x16 - 4*x17 + 4*x9,
+      -2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 + 2*x6 - 2*x7 + 2*x8,
+      2*x0 - 2*x12 + 2*x13 - 2*x14 + 4*x15 - 4*x16 + 4*x17 + 2*x3 - 2*x6 + 2*x7 - 2*x8 - 4*x9,
+      Point(0,0,0),
+      Point(0,0,0),
+      Point(0,0,0),
+      Point(0,0,0),
+      Point(0,0,0)
+    };
+
+  Point dx_dzeta[n_components] =
+    {
+      -x0/2 + x3/2,
+      x0 + x3 - 2*x9,
+      Point(0,0,0),
+      3*x0/2 + 2*x14 + x2/2 - 3*x3/2 - x5/2 - 2*x8,
+      -3*x0 + 2*x11 + 4*x14 - 8*x17 - x2 - 3*x3 - x5 + 4*x8 + 6*x9,
+      Point(0,0,0),
+      -x0 - 2*x14 - x2 + x3 + x5 + 2*x8,
+      2*x0 - 4*x11 - 4*x14 + 8*x17 + 2*x2 + 2*x3 + 2*x5 - 4*x8 - 4*x9,
+      3*x0/2 + x1/2 + 2*x12 - 3*x3/2 - x4/2 - 2*x6,
+      -3*x0 - x1 + 2*x10 + 4*x12 - 8*x15 - 3*x3 - x4 + 4*x6 + 6*x9,
+      Point(0,0,0),
+      -2*x0 - 2*x12 + 2*x13 - 2*x14 + 2*x3 + 2*x6 - 2*x7 + 2*x8,
+      4*x0 - 4*x12 + 4*x13 - 4*x14 + 8*x15 - 8*x16 + 8*x17 + 4*x3 - 4*x6 + 4*x7 - 4*x8 - 8*x9,
+      Point(0,0,0),
+      -x0 - x1 - 2*x12 + x3 + x4 + 2*x6,
+      2*x0 + 2*x1 - 4*x10 - 4*x12 + 8*x15 + 2*x3 + 2*x4 - 4*x6 - 4*x9
+    };
+
+  // The quadrature rule for the Prism18 is a tensor product between a
+  // FOURTH-order TRI rule (in xi, eta) and a FIFTH-order EDGE rule
+  // in zeta.
+
+  // Number of points in the 2D quadrature rule.
+  const int N2D = 6;
+
+  // Parameters of the 2D rule
+  static const Real
+    w1 = 1.1169079483900573284750350421656140e-01L,
+    w2 = 5.4975871827660933819163162450105264e-02L,
+    a1 = 4.4594849091596488631832925388305199e-01L,
+    a2 = 9.1576213509770743459571463402201508e-02L;
+
+  // Points and weights of the 2D rule
+  static const Real w2D[N2D] = {w1, w1, w1, w2, w2, w2};
+
+  // Quadrature point locations raised to powers.  xi[0][2] is
+  // quadrature point 0, squared, xi[1][1] is quadrature point 1 to the
+  // first power, etc.  This lets us avoid calling std::pow inside the
+  // loops below.
+  static const Real xi[N2D][3] =
+    {
+      // ^0   ^1      ^2
+      {   1., a1,     a1*a1},
+      {   1., 1-2*a1, (1-2*a1)*(1-2*a1)},
+      {   1., a1,     a1*a1},
+      {   1., a2,     a2*a2},
+      {   1., 1-2*a2, (1-2*a2)*(1-2*a2)},
+      {   1., a2,     a2*a2}
+    };
+
+  static const Real eta[N2D][3] =
+    {
+      // ^0   ^1      ^2
+      {   1., a1,     a1*a1},
+      {   1., a1,     a1*a1},
+      {   1., 1-2*a1, (1-2*a1)*(1-2*a1)},
+      {   1., a2,     a2*a2},
+      {   1., a2,     a2*a2},
+      {   1., 1-2*a2, (1-2*a2)*(1-2*a2)}
+    };
+
+  // Number of points in the 1D quadrature rule.
+  const int N1D = 3;
+
+  // Points and weights of the 1D quadrature rule.
+  static const Real w1D[N1D] = {5./9, 8./9, 5./9};
+
+  const Real zeta[N1D][3] =
+    {
+      //^0   ^1                 ^2
+      {  1., -std::sqrt(15)/5., 15./25},
+      {  1., 0.,                0.},
+      {  1., std::sqrt(15)/5.,  15./25}
+    };
+
+  // The integer exponents for each term.
+  static const int exponents[n_components][3] =
+    {
+      {0, 0, 0},
+      {0, 0, 1},
+      {0, 0, 2},
+      {0, 1, 0},
+      {0, 1, 1},
+      {0, 1, 2},
+      {0, 2, 0},
+      {0, 2, 1},
+      {1, 0, 0},
+      {1, 0, 1},
+      {1, 0, 2},
+      {1, 1, 0},
+      {1, 1, 1},
+      {1, 2, 0},
+      {2, 0, 0},
+      {2, 0, 1}
+    };
+
+  Real vol = 0.;
+  for (int i=0; i<N2D; ++i)
+    for (int j=0; j<N1D; ++j)
+      {
+        // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
+        Point dx_dxi_q, dx_deta_q, dx_dzeta_q;
+        for (int c=0; c<n_components; ++c)
+          {
+            Real coeff =
+              xi[i][exponents[c][0]]*
+              eta[i][exponents[c][1]]*
+              zeta[j][exponents[c][2]];
+
+            dx_dxi_q   += coeff * dx_dxi[c];
+            dx_deta_q  += coeff * dx_deta[c];
+            dx_dzeta_q += coeff * dx_dzeta[c];
+          }
+
+        // Compute scalar triple product, multiply by weight, and accumulate volume.
+        vol += w2D[i] * w1D[j] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+      }
+
+  return vol;
+}
 
 
 
