@@ -1148,8 +1148,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // hold those fixed and project edges, then
           // hold those fixed and project faces, then
           // hold those fixed and project interiors
+          //
+          // In the LAGRANGE case, we will save a lot of solution
+	  // evaluations (at a slight cost in accuracy) by simply
+	  // interpolating all nodes rather than projecting.
 
-          // Interpolate node values first
+          // Interpolate vertex (or for LAGRANGE, all node) values first.
           unsigned int current_dof = 0;
           for (unsigned int n=0; n!= n_nodes; ++n)
             {
@@ -1158,7 +1162,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const unsigned int nc =
                 FEInterface::n_dofs_at_node (dim, fe_type, elem_type, n);
 
-              if (!elem->is_vertex(n))
+              if (!elem->is_vertex(n) &&
+                  fe_type.family != LAGRANGE)
                 {
                   current_dof += nc;
                   continue;
@@ -1168,11 +1173,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 {
                   libmesh_assert_equal_to (nc, 0);
                 }
+              else if (!nc)
+                {
+                  // This should only occur for first-order LAGRANGE
+                  // FE on non-vertices of higher-order elements
+                  libmesh_assert (!elem->is_vertex(n));
+                  libmesh_assert_equal_to(fe_type.family, LAGRANGE);
+                }
               // Assume that C_ZERO elements have a single nodal
-              // value shape function
+              // value shape function at vertices
               else if (cont == C_ZERO)
                 {
-                  libmesh_assert_equal_to (nc, 1);
                   Ue(current_dof) = f.eval_at_node(context,
                                                    var_component,
                                                    *elem->get_node(n),
@@ -1336,57 +1347,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           START_LOG ("project_edges","GenericProjector");
 
-          // In 3D, handle any edge values next.  Optimize (at a
-	  // slight cost of accuracy in many cases) the LAGRANGE case
-	  // by using interpolation instead of L2 projection.
-          if (dim > 2 && fe_type.family == LAGRANGE)
-            {
-              for (unsigned char e=0; e != elem->n_edges(); ++e)
-                {
-                  for (unsigned char n=0; n != elem->n_nodes(); ++n)
-                    {
-                      // Vertices are on edges but we're done there
-                      if (elem->is_vertex(n))
-                        continue;
-
-                      // Other nodes on edges need interpolation
-                      if (!elem->is_node_on_edge(n,e))
-                        continue;
-
-                      const Node * node = elem->get_node(n);
-
-                      // Look for dofs on this edge node
-                      const unsigned int edge_comp =
-                        node->n_comp(sysnum, var_component);
-
-                      // We're LAGRANGE so we don't double-up dofs
-                      libmesh_assert_less (edge_comp, 2);
-
-                      // But we might be subparametric
-                      if (!edge_comp)
-                        continue;
-
-                      // If we have a dof, find its index
-                      const dof_id_type new_edge_dof =
-                        node->dof_number(sysnum, var_component, 0);
-
-                      // And set its value
-                      for (unsigned int i=0; i != n_dofs; ++i)
-                        if (dof_indices[i] == new_edge_dof)
-                          {
-                            dof_is_fixed[i] = true;
-                            FValue & ui = Ue(i);
-                            ui = f.eval_at_node(context,
-                                                var_component,
-                                                *node,
-                                                system.time);
-                            break;
-                          }
-                    }
-                }
-            }
           // In 3D with non-LAGRANGE, project any edge values next
-          else if (dim > 2 && cont != DISCONTINUOUS)
+	  if (dim > 2 &&
+	      cont != DISCONTINUOUS &&
+              fe_type.family != LAGRANGE)
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
@@ -1533,66 +1497,17 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       dof_is_fixed[side_dofs[free_dof[i]]] = true;
                     }
                 }
-            } // end if (dim > 2 && cont != DISCONTINUOUS)
+            } // end if (dim > 2, !DISCONTINUOUS, !LAGRANGE)
 
           STOP_LOG ("project_edges","GenericProjector");
 
           START_LOG ("project_sides","GenericProjector");
 
-	  // Project any side values (edges in 2D, faces in 3D) next.
-	  // Optimize (at a slight cost of accuracy in many cases) the
-	  // LAGRANGE case by using interpolation instead of L2
-	  // projection.
-          if (dim > 1 && fe_type.family == LAGRANGE)
-            {
-              for (unsigned char s=0; s != elem->n_sides(); ++s)
-                {
-                  for (unsigned char n=0; n != elem->n_nodes(); ++n)
-                    {
-		      // Vertices and edges are on sides but we're
-		      // done there.
-                      if (elem->is_vertex(n) ||
-                          ((dim > 2) && elem->is_edge(n)))
-                        continue;
-
-                      // Other nodes on sides need interpolation
-                      if (!elem->is_node_on_side(n,s))
-                        continue;
-
-                      const Node * node = elem->get_node(n);
-
-                      // Look for dofs on this side node
-                      const unsigned int side_comp =
-                        node->n_comp(sysnum, var_component);
-
-                      // We're LAGRANGE so we don't double-up dofs
-                      libmesh_assert_less (side_comp, 2);
-
-                      // But we might be subparametric
-                      if (!side_comp)
-                        continue;
-
-                      // If we have a dof, find its index
-                      const dof_id_type new_side_dof =
-                        node->dof_number(sysnum, var_component, 0);
-
-                      // And set its value
-                      for (unsigned int i=0; i != n_dofs; ++i)
-                        if (dof_indices[i] == new_side_dof)
-                          {
-                            dof_is_fixed[i] = true;
-                            FValue & ui = Ue(i);
-                            ui = f.eval_at_node(context,
-                                                var_component,
-                                                *node,
-                                                system.time);
-                            break;
-                          }
-                    }
-                }
-            }
-          // With non-LAGRANGE, project any side values next
-          else if (dim > 1 && cont != DISCONTINUOUS)
+	  // With non-LAGRANGE, project any side values (edges in 2D,
+	  // faces in 3D) next.
+          if (dim > 1 &&
+              cont != DISCONTINUOUS &&
+              fe_type.family != LAGRANGE)
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard side FE
@@ -1739,7 +1654,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       dof_is_fixed[side_dofs[free_dof[i]]] = true;
                     }
                 }
-            }// end if (dim > 1 && cont != DISCONTINUOUS)
+            } // end if (dim > 1, !DISCONTINUOUS, !LAGRANGE)
 
           STOP_LOG ("project_sides","GenericProjector");
 
@@ -1754,54 +1669,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             if (!dof_is_fixed[i])
               free_dof[free_dofs++] = i;
 
-          // Project any remaining (interior) dofs.
-	  // Optimize (at a slight cost of accuracy in many cases) the
-	  // LAGRANGE case by using interpolation instead of L2
-	  // projection.
-          if (free_dofs && fe_type.family == LAGRANGE)
-            {
-              for (unsigned char n=0; n != elem->n_nodes(); ++n)
-                {
-		  // We're done with vertices and edges and faces.
-		  if (elem->is_vertex(n) ||
-                      ((dim > 1) && elem->is_edge(n)) ||
-                      ((dim > 2) && elem->is_face(n)))
-                    continue;
-
-                  // Anything left is the interior node to
-                  // interpolate.
-                  const Node * node = elem->get_node(n);
-
-                  // Look for dofs on the interior node
-                  const unsigned int interior_comp =
-                    node->n_comp(sysnum, var_component);
-
-                  // We're LAGRANGE so we don't double-up dofs
-                  libmesh_assert_less (interior_comp, 2);
-
-                  // But we might be subparametric
-                  if (!interior_comp)
-                    continue;
-
-                  // If we have a dof, find its index
-                  const dof_id_type new_interior_dof =
-                    node->dof_number(sysnum, var_component, 0);
-
-                  // And set its value
-                  for (unsigned int i=0; i != n_dofs; ++i)
-                    if (dof_indices[i] == new_interior_dof)
-                      {
-                        dof_is_fixed[i] = true;
-                        FValue & ui = Ue(i);
-                        ui = f.eval_at_node(context,
-                                            var_component,
-                                            *node,
-                                            system.time);
-                        break;
-                      }
-                }
-            }
-          else if (free_dofs)
+          // Project any remaining (interior) dofs in the non-LAGRANGE
+          // case.
+          if (free_dofs && fe_type.family != LAGRANGE)
             {
               const std::vector<Point> & xyz_values = fe->get_xyz();
               const std::vector<Real> & JxW = fe->get_JxW();
