@@ -197,6 +197,11 @@ public:
    */
   static const unsigned int edge_nodes_map[8][3];
 
+  /**
+   * Specialization for computing the volume of a Pyramid14.
+   */
+  virtual Real volume () const libmesh_override;
+
 protected:
 
   /**
