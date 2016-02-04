@@ -677,17 +677,13 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
               dof_id_type elem_id = (*el)->id();
 
               context.pre_fe_reinit(*this, *el);
-              //context.elem_fe_reinit(); <-- skip this because we cached all the FE data
-
-              FEBase * elem_fe = NULL;
-              context.get_element_fe( 0, elem_fe );
-              unsigned int n_qpoints = context.get_element_qrule().n_points();
+              //context.elem_fe_reinit(); <--- skip this because we cached all the FE data
 
               // Loop over qp before var because parametrized functions often use
               // some caching based on qp.
-              for (unsigned int qp=0; qp<n_qpoints; qp++)
+              for (unsigned int qp=0; qp<JxW_values[elem_id].size(); qp++)
                 {
-                  unsigned int n_var_dofs = cast_int<unsigned int>(context.get_dof_indices().size());
+                  unsigned int n_var_dofs = phi_values[elem_id][qp].size();
 
                   Number eval_result = parametrized_fn_vals[elem_id][qp][var];
                   for (unsigned int i=0; i != n_var_dofs; i++)
