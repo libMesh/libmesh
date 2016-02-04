@@ -116,6 +116,16 @@ void RBEIMConstruction::clear()
         }
     }
   _parametrized_functions_in_training_set_initialized = false;
+
+  for(unsigned int i=0; i<_matrix_times_bfs.size(); i++)
+    {
+      if(_matrix_times_bfs[i])
+        {
+          _matrix_times_bfs[i]->clear();
+          delete _matrix_times_bfs[i];
+          _matrix_times_bfs[i] = libmesh_nullptr;
+        }
+    }
 }
 
 void RBEIMConstruction::process_parameters_file (const std::string & parameters_filename)
@@ -412,6 +422,36 @@ void RBEIMConstruction::enrich_RB_space()
       new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
       *new_bf = *get_explicit_system().solution;
       get_rb_evaluation().basis_functions.push_back( new_bf );
+
+      if(best_fit_type_flag == PROJECTION_BEST_FIT)
+        {
+          // In order to speed up dot products, we store the product
+          // of the basis function and the inner product matrix
+
+          UniquePtr< NumericVector<Number> > implicit_sys_temp1 = this->solution->zero_clone();
+          UniquePtr< NumericVector<Number> > implicit_sys_temp2 = this->solution->zero_clone();
+          NumericVector<Number>* matrix_times_new_bf =
+            get_explicit_system().solution->zero_clone().release();
+
+          // We must localize new_bf before calling get_explicit_sys_subvector
+          UniquePtr<NumericVector<Number> > localized_new_bf =
+            NumericVector<Number>::build(this->comm());
+          localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
+          new_bf->localize(*localized_new_bf);
+
+          for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
+            {
+              get_explicit_sys_subvector(
+                *implicit_sys_temp1, var, *localized_new_bf);
+
+              inner_product_matrix->vector_mult(*implicit_sys_temp2, *implicit_sys_temp1);
+
+              set_explicit_sys_subvector(
+                *matrix_times_new_bf, var, *implicit_sys_temp2);
+            }
+
+          _matrix_times_bfs.push_back(matrix_times_new_bf);
+        }
     }
   else
     {
@@ -487,26 +527,12 @@ Real RBEIMConstruction::compute_best_fit_error()
       // Perform an L2 projection in order to find an approximation to solution (from truth_solve above)
     case(PROJECTION_BEST_FIT):
       {
-        // compute the rhs by performing inner products
+        // We have pre-stored inner_product_matrix * basis_function[i] for each i
+        // so we can just evaluate the dot product here.
         DenseVector<Number> best_fit_rhs(RB_size);
-        UniquePtr< NumericVector<Number> > implicit_sys_temp1 = this->solution->zero_clone();
-        UniquePtr< NumericVector<Number> > implicit_sys_temp2 = this->solution->zero_clone();
-        UniquePtr< NumericVector<Number> > explicit_sys_temp = get_explicit_system().solution->zero_clone();
-
-        for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
-        {
-          get_explicit_sys_subvector(
-            *implicit_sys_temp1, var, *get_explicit_system().solution);
-
-          inner_product_matrix->vector_mult(*implicit_sys_temp2, *implicit_sys_temp1);
-
-          set_explicit_sys_subvector(
-            *explicit_sys_temp, var, *implicit_sys_temp2);
-        }
-
         for(unsigned int i=0; i<RB_size; i++)
           {
-            best_fit_rhs(i) = explicit_sys_temp->dot(get_rb_evaluation().get_basis_function(i));
+            best_fit_rhs(i) = get_explicit_system().solution->dot(*_matrix_times_bfs[i]);
           }
 
         // Now compute the best fit by an LU solve
@@ -735,10 +761,17 @@ void RBEIMConstruction::update_RB_system_matrices()
       {
         for(unsigned int j=0; j<RB_size; j++)
           {
+            // We must localize get_rb_evaluation().get_basis_function(j) before calling
+            // get_explicit_sys_subvector
+            UniquePtr<NumericVector<Number> > localized_basis_function =
+              NumericVector<Number>::build(this->comm());
+            localized_basis_function->init(get_explicit_system().n_dofs(), false, SERIAL);
+            get_rb_evaluation().get_basis_function(j).localize(*localized_basis_function);
+
             // Compute reduced inner_product_matrix via a series of matvecs
             for(unsigned int var=0; var<get_explicit_system().n_vars(); var++)
               {
-                get_explicit_sys_subvector(*temp1, var, get_rb_evaluation().get_basis_function(j));
+                get_explicit_sys_subvector(*temp1, var, *localized_basis_function);
                 inner_product_matrix->vector_mult(
                   *temp2, *temp1);
                 set_explicit_sys_subvector(*explicit_sys_temp, var, *temp2);
@@ -865,16 +898,9 @@ void RBEIMConstruction::set_explicit_sys_subvector(
 }
 
 void RBEIMConstruction::get_explicit_sys_subvector(
-  NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& source)
+  NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& localized_source)
 {
   START_LOG("get_explicit_sys_subvector()", "RBEIMConstruction");
-
-  // For convenience we localize the source vector first to make it easier to
-  // copy over (no need to do distinct send/receives).
-  UniquePtr<NumericVector<Number> > localized_source =
-    NumericVector<Number>::build(this->comm());
-  localized_source->init(get_explicit_system().n_dofs(), false, SERIAL);
-  source.localize(*localized_source);
 
   for(unsigned int i=0; i<_dof_map_between_systems[var].size(); i++)
     {
@@ -885,7 +911,7 @@ void RBEIMConstruction::get_explicit_sys_subvector(
           (implicit_sys_dof_index < dest.last_local_index()) )
       {
         dest.set(
-          implicit_sys_dof_index, (*localized_source)(explicit_sys_dof_index));
+          implicit_sys_dof_index, localized_source(explicit_sys_dof_index));
       }
     }
 
