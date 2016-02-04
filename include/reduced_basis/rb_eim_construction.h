@@ -198,11 +198,11 @@ public:
     NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& source);
 
   /**
-   * Load the subvector of \p source corresponding to variable \p var into
-   * \p dest.
+   * Load the subvector of \p localized_source corresponding to variable \p var into
+   * \p dest. We require localized_source to be localized before we call this method.
    */
   void get_explicit_sys_subvector(
-    NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& source);
+    NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& localized_source);
 
   /**
    * Set up the index map between the implicit and explicit systems.
@@ -331,6 +331,12 @@ private:
    * The index map between the explicit system and the implicit system.
    */
   std::vector< std::vector<dof_id_type> > _dof_map_between_systems;
+
+  /**
+   * This vector is used to store inner_product_matrix * basis_function[i] for each i,
+   * since we frequently use this data.
+   */
+  std::vector< NumericVector<Number>* > _matrix_times_bfs;
 
 };
 
