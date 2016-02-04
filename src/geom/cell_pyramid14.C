@@ -326,4 +326,317 @@ unsigned short int Pyramid14::second_order_adjacent_vertex (const unsigned int n
   return static_cast<unsigned short int>(-1);
 }
 
+
+
+Real Pyramid14::volume () const
+{
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),   x4 = point(4),   x5 = point(5),   x6 = point(6),
+    x7 = point(7), x8 = point(8), x9 = point(9), x10 = point(10), x11 = point(11), x12 = point(12), x13 = point(13);
+
+  // dx/dxi and dx/deta have 15 components while dx/dzeta has 20.
+  // These are copied directly from the output of a Python script.
+  Point dx_dxi[15] =
+    {
+      x6/2 - x8/2,
+      x0/4 - x1/4 + x10 + x11 - x12 - x2/4 + x3/4 - 3*x6/2 + 3*x8/2 - x9,
+      -x0/2 + x1/2 - 2*x10 - 2*x11 + 2*x12 + x2/2 - x3/2 + 3*x6/2 - 3*x8/2 + 2*x9,
+      x0/4 - x1/4 + x10 + x11 - x12 - x2/4 + x3/4 - x6/2 + x8/2 - x9,
+      x0/4 - x1/4 + x2/4 - x3/4,
+      -3*x0/4 + 3*x1/4 - x10 + x11 - x12 - 3*x2/4 + 3*x3/4 + x9,
+      x0/2 - x1/2 + x10 - x11 + x12 + x2/2 - x3/2 - x9,
+      -x0/4 + x1/4 + x2/4 - x3/4 - x6/2 + x8/2,
+      x0/4 - x1/4 - x2/4 + x3/4 + x6/2 - x8/2,
+      -2*x13 + x6 + x8,
+      4*x13 - 2*x6 - 2*x8,
+      -2*x13 + x6 + x8,
+      -x0/2 - x1/2 + x2/2 + x3/2 + x5 - x7,
+      x0/2 + x1/2 - x2/2 - x3/2 - x5 + x7,
+      x0/2 + x1/2 + 2*x13 + x2/2 + x3/2 - x5 - x6 - x7 - x8
+    };
+
+  // dx/dxi and dx/deta have 15 components while dx/dzeta has 20.
+  // These are copied directly from the output of a Python script.
+  Point dx_deta[15] =
+    {
+      -x5/2 + x7/2,
+      x0/4 + x1/4 - x10 + x11 + x12 - x2/4 - x3/4 + 3*x5/2 - 3*x7/2 - x9,
+      -x0/2 - x1/2 + 2*x10 - 2*x11 - 2*x12 + x2/2 + x3/2 - 3*x5/2 + 3*x7/2 + 2*x9,
+      x0/4 + x1/4 - x10 + x11 + x12 - x2/4 - x3/4 + x5/2 - x7/2 - x9,
+      -2*x13 + x5 + x7,
+      4*x13 - 2*x5 - 2*x7,
+      -2*x13 + x5 + x7,
+      x0/4 - x1/4 + x2/4 - x3/4,
+      -3*x0/4 + 3*x1/4 - x10 + x11 - x12 - 3*x2/4 + 3*x3/4 + x9,
+      x0/2 - x1/2 + x10 - x11 + x12 + x2/2 - x3/2 - x9,
+      -x0/2 + x1/2 + x2/2 - x3/2 - x6 + x8,
+      x0/2 - x1/2 - x2/2 + x3/2 + x6 - x8,
+      -x0/4 - x1/4 + x2/4 + x3/4 + x5/2 - x7/2,
+      x0/4 + x1/4 - x2/4 - x3/4 - x5/2 + x7/2,
+      x0/2 + x1/2 + 2*x13 + x2/2 + x3/2 - x5 - x6 - x7 - x8
+    };
+
+  // dx/dxi and dx/deta have 15 components while dx/dzeta has 20.
+  // These are copied directly from the output of a Python script.
+  Point dx_dzeta[20] =
+    {
+      -x0/4 - x1/4 + x10 + x11 + x12 - 2*x13 - x2/4 - x3/4 - x4 + x9,
+      5*x0/4 + 5*x1/4 - 5*x10 - 5*x11 - 5*x12 + 8*x13 + 5*x2/4 + 5*x3/4 + 7*x4 - 5*x9,
+      -9*x0/4 - 9*x1/4 + 9*x10 + 9*x11 + 9*x12 - 12*x13 - 9*x2/4 - 9*x3/4 - 15*x4 + 9*x9,
+      7*x0/4 + 7*x1/4 - 7*x10 - 7*x11 - 7*x12 + 8*x13 + 7*x2/4 + 7*x3/4 + 13*x4 - 7*x9,
+      -x0/2 - x1/2 + 2*x10 + 2*x11 + 2*x12 - 2*x13 - x2/2 - x3/2 - 4*x4 + 2*x9,
+      x0/4 + x1/4 - x10 + x11 + x12 - x2/4 - x3/4 + x5/2 - x7/2 - x9,
+      -3*x0/4 - 3*x1/4 + 3*x10 - 3*x11 - 3*x12 + 3*x2/4 + 3*x3/4 - 3*x5/2 + 3*x7/2 + 3*x9,
+      3*x0/4 + 3*x1/4 - 3*x10 + 3*x11 + 3*x12 - 3*x2/4 - 3*x3/4 + 3*x5/2 - 3*x7/2 - 3*x9,
+      -x0/4 - x1/4 + x10 - x11 - x12 + x2/4 + x3/4 - x5/2 + x7/2 + x9,
+      x0/4 - x1/4 + x10 + x11 - x12 - x2/4 + x3/4 - x6/2 + x8/2 - x9,
+      -3*x0/4 + 3*x1/4 - 3*x10 - 3*x11 + 3*x12 + 3*x2/4 - 3*x3/4 + 3*x6/2 - 3*x8/2 + 3*x9,
+      3*x0/4 - 3*x1/4 + 3*x10 + 3*x11 - 3*x12 - 3*x2/4 + 3*x3/4 - 3*x6/2 + 3*x8/2 - 3*x9,
+      -x0/4 + x1/4 - x10 - x11 + x12 + x2/4 - x3/4 + x6/2 - x8/2 + x9,
+      -x0/4 + x1/4 - x10 + x11 - x12 - x2/4 + x3/4 + x9,
+      x0/4 - x1/4 + x10 - x11 + x12 + x2/4 - x3/4 - x9,
+      -x0/4 + x1/4 + x2/4 - x3/4 - x6/2 + x8/2,
+      x0/4 - x1/4 - x2/4 + x3/4 + x6/2 - x8/2,
+      -x0/4 - x1/4 + x2/4 + x3/4 + x5/2 - x7/2,
+      x0/4 + x1/4 - x2/4 - x3/4 - x5/2 + x7/2,
+      x0/2 + x1/2 + 2*x13 + x2/2 + x3/2 - x5 - x6 - x7 - x8
+    };
+
+  // The (xi, eta, zeta) exponents for each of the dx_dxi terms
+  static const int dx_dxi_exponents[15][3] =
+    {
+      {0, 0, 0},
+      {0, 0, 1},
+      {0, 0, 2},
+      {0, 0, 3},
+      {0, 1, 0},
+      {0, 1, 1},
+      {0, 1, 2},
+      {0, 2, 0},
+      {0, 2, 1},
+      {1, 0, 0},
+      {1, 0, 1},
+      {1, 0, 2},
+      {1, 1, 0},
+      {1, 1, 1},
+      {1, 2, 0}
+    };
+
+  // The (xi, eta, zeta) exponents for each of the dx_deta terms
+  static const int dx_deta_exponents[15][3] =
+    {
+      {0, 0, 0},
+      {0, 0, 1},
+      {0, 0, 2},
+      {0, 0, 3},
+      {0, 1, 0},
+      {0, 1, 1},
+      {0, 1, 2},
+      {1, 0, 0},
+      {1, 0, 1},
+      {1, 0, 2},
+      {1, 1, 0},
+      {1, 1, 1},
+      {2, 0, 0},
+      {2, 0, 1},
+      {2, 1, 0}
+    };
+
+  // The (xi, eta, zeta) exponents for each of the dx_dzeta terms
+  static const int dx_dzeta_exponents[20][3] =
+    {
+      {0, 0, 0},
+      {0, 0, 1},
+      {0, 0, 2},
+      {0, 0, 3},
+      {0, 0, 4},
+      {0, 1, 0},
+      {0, 1, 1},
+      {0, 1, 2},
+      {0, 1, 3},
+      {1, 0, 0},
+      {1, 0, 1},
+      {1, 0, 2},
+      {1, 0, 3},
+      {1, 1, 0},
+      {1, 1, 1},
+      {1, 2, 0},
+      {1, 2, 1},
+      {2, 1, 0},
+      {2, 1, 1},
+      {2, 2, 0},
+    };
+
+  // Number of points in the quadrature rule
+  const int N = 27;
+
+  // Parameters of the quadrature rule
+  static const Real
+    // Parameters used for (xi, eta) quadrature points.
+    a1 = -7.1805574131988893873307823958101e-01L,
+    a2 = -5.0580870785392503961340276902425e-01L,
+    a3 = -2.2850430565396735359574351631314e-01L,
+    // Parameters used for zeta quadrature points.
+    b1 =  7.2994024073149732155837979012003e-02L,
+    b2 =  3.4700376603835188472176354340395e-01L,
+    b3 =  7.0500220988849838312239847758405e-01L,
+    // There are 9 unique weight values since there are three
+    // for each of the three unique zeta values.
+    w1 =  4.8498876871878584357513834016440e-02L,
+    w2 =  4.5137737425884574692441981593901e-02L,
+    w3 =  9.2440441384508327195915094925393e-03L,
+    w4 =  7.7598202995005734972022134426305e-02L,
+    w5 =  7.2220379881415319507907170550242e-02L,
+    w6 =  1.4790470621521332351346415188063e-02L,
+    w7 =  1.2415712479200917595523541508209e-01L,
+    w8 =  1.1555260781026451121265147288039e-01L,
+    w9 =  2.3664752994434131762154264300901e-02L;
+
+  // The points and weights of the 3x3x3 quadrature rule
+  static const Real xi[N][3] =
+    {// ^0   ^1  ^2
+      { 1.,  a1, a1*a1},
+      { 1.,  a2, a2*a2},
+      { 1.,  a3, a3*a3},
+      { 1.,  a1, a1*a1},
+      { 1.,  a2, a2*a2},
+      { 1.,  a3, a3*a3},
+      { 1.,  a1, a1*a1},
+      { 1.,  a2, a2*a2},
+      { 1.,  a3, a3*a3},
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1., -a1, a1*a1},
+      { 1., -a2, a2*a2},
+      { 1., -a3, a3*a3},
+      { 1., -a1, a1*a1},
+      { 1., -a2, a2*a2},
+      { 1., -a3, a3*a3},
+      { 1., -a1, a1*a1},
+      { 1., -a2, a2*a2},
+      { 1., -a3, a3*a3}
+    };
+
+  static const Real eta[N][3] =
+    {// ^0   ^1  ^2
+      { 1.,  a1, a1*a1},
+      { 1.,  a2, a2*a2},
+      { 1.,  a3, a3*a3},
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1., -a1, a1*a1},
+      { 1., -a2, a2*a2},
+      { 1., -a3, a3*a3},
+      { 1.,  a1, a1*a1},
+      { 1.,  a2, a2*a2},
+      { 1.,  a3, a3*a3},
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1., -a1, a1*a1},
+      { 1., -a2, a2*a2},
+      { 1., -a3, a3*a3},
+      { 1.,  a1, a1*a1},
+      { 1.,  a2, a2*a2},
+      { 1.,  a3, a3*a3},
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1.,  0., 0.   },
+      { 1., -a1, a1*a1},
+      { 1., -a2, a2*a2},
+      { 1., -a3, a3*a3}
+    };
+
+  static const Real zeta[N][5] =
+    {// ^0  ^1  ^2     ^3        ^4
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3},
+      { 1., b1, b1*b1, b1*b1*b1, b1*b1*b1*b1},
+      { 1., b2, b2*b2, b2*b2*b2, b2*b2*b2*b2},
+      { 1., b3, b3*b3, b3*b3*b3, b3*b3*b3*b3}
+    };
+
+  static const Real w[N] = {w1, w2, w3, w4, w5, w6, // 0-5
+                            w1, w2, w3, w4, w5, w6, // 6-11
+                            w7, w8, w9, w4, w5, w6, // 12-17
+                            w1, w2, w3, w4, w5, w6, // 18-23
+                            w1, w2, w3};            // 24-26
+
+  Real vol = 0.;
+  for (int q=0; q<N; ++q)
+    {
+      // Compute denominators for the current q.
+      Real
+        den2 = (1. - zeta[q][1])*(1. - zeta[q][1]),
+        den3 = den2*(1. - zeta[q][1]);
+
+      // Compute dx/dxi and dx/deta at the current q.
+      Point dx_dxi_q, dx_deta_q;
+      for (int c=0; c<15; ++c)
+        {
+          dx_dxi_q +=
+            xi[q][dx_dxi_exponents[c][0]]*
+            eta[q][dx_dxi_exponents[c][1]]*
+            zeta[q][dx_dxi_exponents[c][2]]*dx_dxi[c];
+
+          dx_deta_q +=
+            xi[q][dx_deta_exponents[c][0]]*
+            eta[q][dx_deta_exponents[c][1]]*
+            zeta[q][dx_deta_exponents[c][2]]*dx_deta[c];
+        }
+
+      // Compute dx/dzeta at the current q.
+      Point dx_dzeta_q;
+      for (int c=0; c<20; ++c)
+        {
+          dx_dzeta_q +=
+            xi[q][dx_dzeta_exponents[c][0]]*
+            eta[q][dx_dzeta_exponents[c][1]]*
+            zeta[q][dx_dzeta_exponents[c][2]]*dx_dzeta[c];
+        }
+
+      // Scale everything appropriately
+      dx_dxi_q /= den2;
+      dx_deta_q /= den2;
+      dx_dzeta_q /= den3;
+
+      // Compute scalar triple product, multiply by weight, and accumulate volume.
+      vol += w[q] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+    }
+
+  return vol;
+}
+
 } // namespace libMesh
