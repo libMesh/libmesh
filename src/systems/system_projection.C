@@ -1011,8 +1011,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   // The new element degree of freedom coefficients
   DenseVector<FValue> Ue;
 
-  const unsigned int sysnum = system.number();
-
   // Context objects to contain all our required FE objects
   FEMContext context( system );
 
