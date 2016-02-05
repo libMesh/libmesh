@@ -78,7 +78,7 @@ public:
    */
   operator int() const
   {
-    _order;
+    return _order;
   }
 
   /**
