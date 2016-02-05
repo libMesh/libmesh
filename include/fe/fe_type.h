@@ -73,15 +73,6 @@ public:
   }
 
   /**
-   * Operator that enables implicit conversion to
-   * an int.
-   */
-  operator int() const
-  {
-    return _order;
-  }
-
-  /**
    * Explicity request the order as an int.
    */
   int get_order() const
