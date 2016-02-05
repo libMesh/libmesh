@@ -550,7 +550,7 @@ void DofMap::reinit(MeshBase & mesh)
       // Just increment _n_SCALAR_dofs
       if(base_fe_type.family == SCALAR)
         {
-          this->_n_SCALAR_dofs += base_fe_type.order*n_var_in_group;
+          this->_n_SCALAR_dofs += base_fe_type.order.get_order()*n_var_in_group;
           continue;
         }
 
@@ -585,7 +585,7 @@ void DofMap::reinit(MeshBase & mesh)
               FEInterface::max_order(base_fe_type, type))
             {
 #  ifdef DEBUG
-              if (FEInterface::max_order(base_fe_type,type) < static_cast<unsigned int>(base_fe_type.order))
+              if (FEInterface::max_order(base_fe_type,type) < static_cast<unsigned int>(base_fe_type.order.get_order()))
                 libmesh_error_msg("ERROR: Finite element "              \
                                   << Utility::enum_to_string(base_fe_type.family) \
                                   << " on geometric element "           \
@@ -991,7 +991,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     if(this->variable(v).type().family == SCALAR)
       {
         _first_scalar_df[v] = current_SCALAR_dof_index;
-        current_SCALAR_dof_index += this->variable(v).type().order;
+        current_SCALAR_dof_index += this->variable(v).type().order.get_order();
       }
 
   STOP_LOG("distribute_dofs()", "DofMap");
@@ -1212,7 +1212,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
       if( vg_description.type().family == SCALAR )
         {
           this->_n_SCALAR_dofs += (vg_description.n_variables()*
-                                   vg_description.type().order);
+                                   vg_description.type().order.get_order());
           continue;
         }
     }
@@ -1362,7 +1362,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
       if( vg_description.type().family == SCALAR )
         {
           this->_n_SCALAR_dofs += (vg_description.n_variables()*
-                                   vg_description.type().order);
+                                   vg_description.type().order.get_order());
           continue;
         }
     }
@@ -2109,7 +2109,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
   libmesh_assert_not_equal_to(my_idx, DofObject::invalid_id);
 
   // The number of SCALAR dofs comes from the variable order
-  const int n_dofs_vn = this->variable(vn).type().order;
+  const int n_dofs_vn = this->variable(vn).type().order.get_order();
 
   di.resize(n_dofs_vn);
   for(int i = 0; i != n_dofs_vn; ++i)

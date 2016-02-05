@@ -227,8 +227,8 @@ void System::read_header (Xdr & io,
         // to be an unlikely occurance, but catch it anyway.
         if (read_legacy_format)
           if ((type.family == MONOMIAL || type.family == XYZ) &&
-              ((type.order > 2 && this->get_mesh().mesh_dimension() == 2) ||
-               (type.order > 1 && this->get_mesh().mesh_dimension() == 3)))
+              ((type.order.get_order() > 2 && this->get_mesh().mesh_dimension() == 2) ||
+               (type.order.get_order() > 1 && this->get_mesh().mesh_dimension() == 3)))
             {
               libmesh_here();
               libMesh::out << "*****************************************************************\n"
@@ -1103,7 +1103,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
   unsigned int n_assigned_vals = 0; // the number of values assigned, this will be returned.
 
   // Processor 0 will read the block from the buffer stream and send it to the last processor
-  const unsigned int n_SCALAR_dofs = this->variable(var).type().order;
+  const unsigned int n_SCALAR_dofs = this->variable(var).type().order.get_order();
   std::vector<Number> input_buffer(n_SCALAR_dofs);
   if (this->processor_id() == 0)
     {

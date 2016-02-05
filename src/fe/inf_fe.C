@@ -106,7 +106,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase * q)
   libmesh_assert(base_fe);
 
   const Order base_int_order   = q->get_order();
-  const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order) + 1) +2);
+  const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order.get_order()) + 1) +2);
   const unsigned int qrule_dim = q->get_dim();
 
   if (Dim != 1)
