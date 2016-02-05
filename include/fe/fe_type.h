@@ -98,6 +98,24 @@ private:
 
 };
 
+/**
+ * Overload comparison operators for OrderWrapper.
+ */
+inline bool operator==(const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() == rhs.get_order(); }
+inline bool operator!=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
+inline bool operator< (const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() < rhs.get_order(); }
+inline bool operator> (const OrderWrapper& lhs, const OrderWrapper& rhs){ return rhs < lhs; }
+inline bool operator<=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
+inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+
+/**
+ * Overload stream operators.
+ */
+inline std::ostream & operator << (std::ostream & os, const OrderWrapper& order)
+{
+  os << order.get_order();
+  return os;
+}
 
 /**
  * class FEType hides (possibly multiple) FEFamily and approximation
@@ -169,12 +187,12 @@ public:
   /**
    * The approximation order in radial direction of the infinite element.
    */
-  Order order;
+  OrderWrapper order;
 
   /**
    * The approximation order in the base of the infinite element.
    */
-  Order radial_order;
+  OrderWrapper radial_order;
 
   /**
    * The type of approximation in radial direction.  Valid types are
@@ -272,7 +290,7 @@ private:
 inline
 Order FEType::default_quadrature_order () const
 {
-  return static_cast<Order>(2*static_cast<unsigned int>(order) + 1);
+  return static_cast<Order>(2*static_cast<unsigned int>(order.get_order()) + 1);
 }
 
 } // namespace libMesh
