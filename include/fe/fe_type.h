@@ -35,6 +35,69 @@ namespace libMesh
 // Forward declarations
 class QBase;
 
+/**
+ * This provides a shim class that wraps the Order enum.
+ * The purpose of this is to store the order as an int
+ * instead of an enum (to enable higher orders) while
+ * retaining backwards compatibility.
+ */
+class OrderWrapper
+{
+public:
+
+  /**
+   * Constructor. Enables implicit conversion from an Order
+   * enum to an OrderWrapper.
+   */
+  OrderWrapper(Order order)
+  :
+    _order(static_cast<int>(order))
+  {}
+
+  /**
+   * Constructor. Enables implicit conversion from an int
+   * to an OrderWrapper.
+   */
+  OrderWrapper(int order)
+  :
+    _order(order)
+  {}
+
+  /**
+   * Operator that enables implicit conversion to
+   * an Order enum.
+   */
+  operator Order() const
+  {
+    return static_cast<Order>(_order);
+  }
+
+  /**
+   * Operator that enables implicit conversion to
+   * an int.
+   */
+  operator int() const
+  {
+    _order;
+  }
+
+  /**
+   * Explicity request the order as an int.
+   */
+  int get_order() const
+  {
+    return _order;
+  }
+
+private:
+
+  /**
+   * The approximation order of the element.
+   */
+  int _order;
+
+};
+
 
 /**
  * class FEType hides (possibly multiple) FEFamily and approximation
@@ -56,13 +119,23 @@ public:
     family(f)
   {}
 
+  /**
+   * Constructor.  Same as above except the order is specified as
+   * an int.
+   */
+  FEType(const int      o = 1,
+         const FEFamily f = LAGRANGE) :
+    order(o),
+    family(f)
+  {}
+
 
   //TODO:[BSK] Could these data types all be const?
   // [RHS] Order can't in the case of p refinement!
   /**
    * The approximation order of the element.
    */
-  Order order;
+  OrderWrapper order;
 
   /**
    * The type of finite element.  Valid types are \p LAGRANGE,
