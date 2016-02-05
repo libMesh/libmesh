@@ -163,7 +163,7 @@ public:
    */
   FEType(const int        o  = 1,
          const FEFamily   f  = LAGRANGE,
-         const Order      ro = THIRD,
+         const int        ro = THIRD,
          const FEFamily   rf = JACOBI_20_00,
          const InfMapType im = CARTESIAN) :
     order(o),
