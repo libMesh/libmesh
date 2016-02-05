@@ -131,16 +131,6 @@ public:
    * Constructor.  Optionally takes the approximation \p Order
    * and the finite element family \p FEFamily
    */
-  FEType(const Order    o = FIRST,
-         const FEFamily f = LAGRANGE) :
-    order(o),
-    family(f)
-  {}
-
-  /**
-   * Constructor.  Same as above except the order is specified as
-   * an int.
-   */
   FEType(const int      o = 1,
          const FEFamily f = LAGRANGE) :
     order(o),
@@ -171,7 +161,7 @@ public:
    * so, otherwise what we switch on would change when infinite
    * elements are not compiled in.
    */
-  FEType(const Order      o  = FIRST,
+  FEType(const int        o  = 1,
          const FEFamily   f  = LAGRANGE,
          const Order      ro = THIRD,
          const FEFamily   rf = JACOBI_20_00,
@@ -182,7 +172,6 @@ public:
     radial_family(rf),
     inf_map(im)
   {}
-
 
   /**
    * The approximation order in radial direction of the infinite element.
