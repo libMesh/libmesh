@@ -584,7 +584,7 @@ Real Pyramid13::volume () const
       dx_dzeta_q /= den3;
 
       // Compute scalar triple product, multiply by weight, and accumulate volume.
-      vol += w[q] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+      vol += w[q] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
     }
 
   return vol;

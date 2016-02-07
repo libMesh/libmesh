@@ -716,7 +716,7 @@ Real Tet10::volume () const
         dx_dzeta_q = dx_dzeta[0] + zeta[q]*dx_dzeta[1] + eta[q]*dx_dzeta[2] + xi[q]*dx_dzeta[3];
 
       // Compute scalar triple product, multiply by weight, and accumulate volume.
-      vol += w[q] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+      vol += w[q] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
     }
 
   return vol;
