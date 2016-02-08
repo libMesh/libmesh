@@ -854,7 +854,7 @@ Real Hex27::volume () const
                 }
 
           // Compute scalar triple product, multiply by weight, and accumulate volume.
-          vol += w[i] * w[j] * w[k] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+          vol += w[i] * w[j] * w[k] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
         }
 
   return vol;

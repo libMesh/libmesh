@@ -348,7 +348,11 @@ Real Hex8::volume () const
 
   // We could check for a quick return, but it's almost faster to just
   // compute the result...
-  return (b1 * d2.cross(c3) + d1 * b2.cross(b3) + c1 * c2.cross(d3)) / 192. + (d1 * d2.cross(d3)) / 64.;
+  return
+    (triple_product(b1,d2,c3) +
+     triple_product(d1,b2,b3) +
+     triple_product(c1,c2,d3)) / 192. +
+    triple_product(d1,d2,d3) / 64.;
 }
 
 } // namespace libMesh

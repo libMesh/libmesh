@@ -782,7 +782,7 @@ Real Prism18::volume () const
           }
 
         // Compute scalar triple product, multiply by weight, and accumulate volume.
-        vol += w2D[i] * w1D[j] * dx_dxi_q * dx_deta_q.cross(dx_dzeta_q);
+        vol += w2D[i] * w1D[j] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
       }
 
   return vol;

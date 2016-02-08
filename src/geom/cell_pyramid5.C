@@ -222,21 +222,21 @@ Real Pyramid5::volume () const
   // The pyramid with a bilinear base has volume given by the
   // formula in: "Calculation of the Volume of a General Hexahedron
   // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
-  Node * node0 = this->get_node(0);
-  Node * node1 = this->get_node(1);
-  Node * node2 = this->get_node(2);
-  Node * node3 = this->get_node(3);
-  Node * node4 = this->get_node(4);
+  Point
+    x0 = point(0), x1 = point(1), x2 = point(2),
+    x3 = point(3), x4 = point(4);
 
-  // Construct Various edge and diagonal vectors
-  Point v40 ( *node0 - *node4 );
-  Point v13 ( *node3 - *node1 );
-  Point v02 ( *node2 - *node0 );
-  Point v03 ( *node3 - *node0 );
-  Point v01 ( *node1 - *node0 );
+  // Construct various edge and diagonal vectors.
+  Point v40 = x0 - x4;
+  Point v13 = x3 - x1;
+  Point v02 = x2 - x0;
+  Point v03 = x3 - x0;
+  Point v01 = x1 - x0;
 
   // Finally, ready to return the volume!
-  return (1./6.)*(v40*(v13.cross(v02))) + (1./12.)*(v02*(v01.cross(v03)));
+  return
+    triple_product(v40, v13, v02) / 6. +
+    triple_product(v02, v01, v03) / 12.;
 }
 
 } // namespace libMesh
