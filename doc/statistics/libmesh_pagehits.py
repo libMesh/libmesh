@@ -173,6 +173,7 @@ data = [
     'Oct 2015',  12912,      0, 0.0,
     'Nov 2015',  13894,      0, 0.0,
     'Dec 2015',  11694,      0, 0.0,
+    'Jan 2016',  11837,      0, 0.0,
 ]
 
 # Extract number of hits/month
@@ -203,7 +204,7 @@ ax.bar(date_nums, n_hits_month, width=30, color='b')
 fig.suptitle('LibMesh Page Hits/Month (in Thousands)')
 
 # Set up x-tick locations -- August of each year
-ticks_names = ['Aug 2011', 'Aug 2012', 'Aug 2013', 'Aug 2014']
+ticks_names = ['Aug 2011', 'Aug 2012', 'Aug 2013', 'Aug 2014', 'Aug 2015']
 
 # Get numerical values for the names
 tick_nums = []
