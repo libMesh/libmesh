@@ -39,7 +39,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh.h"
+#include "libmesh/serial_mesh.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/dof_map.h"
@@ -83,7 +83,8 @@ int main (int argc, char ** argv)
   const Real contact_penalty = infile("contact_penalty", 1.e2);
   const Real gap_function_tol = infile("gap_function_tol", 1.e-8);
 
-  Mesh mesh(init.comm());
+  // This example code has not been written to cope with a distributed mesh
+  SerialMesh mesh(init.comm());
   mesh.read("systems_of_equations_ex8.exo");
 
   mesh.print_info();
