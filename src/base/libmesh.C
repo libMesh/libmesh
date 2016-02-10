@@ -60,18 +60,14 @@
 
 #if defined(LIBMESH_HAVE_PETSC)
 # include "libmesh/petsc_macro.h"
-EXTERN_C_FOR_PETSC_BEGIN
 # include <petsc.h>
 # include <petscerror.h>
 #if !PETSC_RELEASE_LESS_THAN(3,3,0)
 #include "libmesh/petscdmlibmesh.h"
 #endif
-EXTERN_C_FOR_PETSC_END
 # if defined(LIBMESH_HAVE_SLEPC)
 #  include "libmesh/slepc_macro.h"
-EXTERN_C_FOR_PETSC_BEGIN
 #  include <slepc.h>
-EXTERN_C_FOR_PETSC_END
 # endif // #if defined(LIBMESH_HAVE_SLEPC)
 #endif // #if defined(LIBMESH_HAVE_PETSC)
 
@@ -511,9 +507,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // duplicate Initialize/Finalize.
       // We assume that SLEPc will handle PETSc appropriately,
       // which it does in the versions we've checked.
-#  if !SLEPC_VERSION_LESS_THAN(2,3,3)
       if (!SlepcInitializeCalled)
-#  endif
         {
           ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), libmesh_nullptr, libmesh_nullptr);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);

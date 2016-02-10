@@ -48,14 +48,6 @@ namespace libMesh
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
-  // Older versions of PETSc do not have the different int typedefs.
-  // On 64-bit machines, PetscInt may actually be a long long int.
-  // This change occurred in Petsc-2.2.1.
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
-
   //-------------------------------------------------------------------
   // this function is called by PETSc at the end of each nonlinear step
   PetscErrorCode
@@ -419,19 +411,8 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       PetscErrorCode ierr=0;
 
-#if PETSC_VERSION_LESS_THAN(2,1,2)
-      // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
-      // The second argument was of type SNESProblemType, and could have a value of
-      // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
-      ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
-      LIBMESH_CHKERR(ierr);
-
-#else
-
       ierr = SNESCreate(this->comm().get(),&_snes);
       LIBMESH_CHKERR(ierr);
-
-#endif
 
       if (name)
         {
@@ -459,14 +440,8 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       if (_default_monitor)
         {
-#if PETSC_VERSION_LESS_THAN(2,3,3)
-          ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-                                 this, PETSC_NULL);
-#else
-          // API name change in PETSc 2.3.3
           ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
                                  this, PETSC_NULL);
-#endif
           LIBMESH_CHKERR(ierr);
         }
 
@@ -707,25 +682,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
       this->_solver_configuration->configure_solver();
     }
 
-  //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-  //           LIBMESH_CHKERR(ierr);
-
-  // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
-  // the last one being a pointer to an int to hold the number of iterations required.
-# if PETSC_VERSION_LESS_THAN(2,2,0)
-
-  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.2.x style
-#elif PETSC_VERSION_LESS_THAN(2,3,0)
-
-  ierr = SNESSolve (_snes, x->vec());
-  LIBMESH_CHKERR(ierr);
-
-  // 2.3.x & newer style
-#else
-
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
   LIBMESH_CHKERR(ierr);
 
@@ -734,8 +690,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
 
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
   LIBMESH_CHKERR(ierr);
-
-#endif
 
   // Enforce constraints exactly now that the solve is done.  We have
   // been enforcing them on the current_local_solution during the

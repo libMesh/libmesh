@@ -22,21 +22,16 @@
 
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
-#include "libmesh/petsc_macro.h"
-
-EXTERN_C_FOR_PETSC_BEGIN
-#include <petscblaslapack.h>
-EXTERN_C_FOR_PETSC_END
+# include "libmesh/petsc_macro.h"
+# include <petscblaslapack.h>
 #endif
 
 #if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
-#include <slepcblaslapack.h>
+# include <slepcblaslapack.h>
 #endif
 
 namespace libMesh
 {
-
-
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 

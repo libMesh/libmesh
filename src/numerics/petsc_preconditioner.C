@@ -30,11 +30,7 @@
 
 // PCBJacobiGetSubKSP was defined in petscksp.h in PETSc 2.3.3, 3.1.0
 #if PETSC_VERSION_LESS_THAN(3,1,0)
-
-EXTERN_C_FOR_PETSC_BEGIN
-#include "petscksp.h"
-EXTERN_C_FOR_PETSC_END
-
+# include "petscksp.h"
 #endif
 
 namespace libMesh
@@ -220,13 +216,10 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
       CHKERRABORT(comm,ierr);
       break;
 
-#if !(PETSC_VERSION_LESS_THAN(2,1,2))
-      // Only available for PETSC >= 2.1.2
     case USER_PRECOND:
       ierr = PCSetType (pc, const_cast<KSPType>(PCMAT));
       CHKERRABORT(comm,ierr);
       break;
-#endif
 
     case SHELL_PRECOND:
       ierr = PCSetType (pc, const_cast<KSPType>(PCSHELL));

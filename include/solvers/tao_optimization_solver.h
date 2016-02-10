@@ -30,11 +30,7 @@
 #include "libmesh/optimization_solver.h"
 
 // Include header for the Tao optimization library
-EXTERN_C_FOR_PETSC_BEGIN
-# include <petsctao.h>
-EXTERN_C_FOR_PETSC_END
-
-// C++ includes
+#include <petsctao.h>
 
 namespace libMesh
 {

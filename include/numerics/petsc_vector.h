@@ -33,12 +33,8 @@
 #include "libmesh/petsc_solver_exception.h"
 #include LIBMESH_INCLUDE_UNORDERED_MAP
 
-/**
- * Petsc include files.
- */
-EXTERN_C_FOR_PETSC_BEGIN
-# include <petscvec.h>
-EXTERN_C_FOR_PETSC_END
+// Petsc include files.
+#include <petscvec.h>
 
 // C++ includes
 #include <cstddef>
@@ -1002,15 +998,8 @@ void PetscVector<T>::zero ()
 
   if(this->type() != GHOSTED)
     {
-#if PETSC_VERSION_LESS_THAN(2,3,0)
-      // 2.2.x & earlier style
-      ierr = VecSet (&z, _vec);
-      LIBMESH_CHKERR(ierr);
-#else
-      // 2.3.x & newer
       ierr = VecSet (_vec, z);
       LIBMESH_CHKERR(ierr);
-#endif
     }
   else
     {
@@ -1019,15 +1008,10 @@ void PetscVector<T>::zero ()
       Vec loc_vec;
       ierr = VecGhostGetLocalForm (_vec,&loc_vec);
       LIBMESH_CHKERR(ierr);
-#if PETSC_VERSION_LESS_THAN(2,3,0)
-      // 2.2.x & earlier style
-      ierr = VecSet (&z, loc_vec);
-      LIBMESH_CHKERR(ierr);
-#else
-      // 2.3.x & newer
+
       ierr = VecSet (loc_vec, z);
       LIBMESH_CHKERR(ierr);
-#endif
+
       ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
       LIBMESH_CHKERR(ierr);
     }

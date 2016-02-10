@@ -36,19 +36,6 @@
 namespace libMesh
 {
 
-extern "C"
-{
-  // Older versions of PETSc do not have the different int typedefs.
-  // On 64-bit machines, PetscInt may actually be a long long int.
-  // This change occurred in Petsc-2.2.1.
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
-}
-
-
-/*----------------------- functions ----------------------------------*/
 template <typename T>
 void SlepcEigenSolver<T>::clear ()
 {
@@ -62,12 +49,7 @@ void SlepcEigenSolver<T>::clear ()
       LIBMESH_CHKERR(ierr);
 
       // SLEPc default eigenproblem solver
-#if SLEPC_VERSION_LESS_THAN(2,3,2)
-      this->_eigen_solver_type = ARNOLDI;
-#else
-      // Krylov-Schur showed up as of Slepc 2.3.2
       this->_eigen_solver_type = KRYLOVSCHUR;
-#endif
     }
 }
 
@@ -610,11 +592,8 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
       ierr = EPSSetType (_eps, (char *) EPSARNOLDI);  LIBMESH_CHKERR(ierr); return;
     case LANCZOS:
       ierr = EPSSetType (_eps, (char *) EPSLANCZOS);  LIBMESH_CHKERR(ierr); return;
-#if !SLEPC_VERSION_LESS_THAN(2,3,2)
-      // EPSKRYLOVSCHUR added in 2.3.2
     case KRYLOVSCHUR:
       ierr = EPSSetType (_eps, (char *) EPSKRYLOVSCHUR);  LIBMESH_CHKERR(ierr); return;
-#endif
       // case ARPACK:
       // ierr = EPSSetType (_eps, (char *) EPSARPACK);   LIBMESH_CHKERR(ierr); return;
 

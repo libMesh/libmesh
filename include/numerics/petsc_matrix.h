@@ -49,12 +49,8 @@
 #endif
 
 
-/**
- * Petsc include files.
- */
-EXTERN_C_FOR_PETSC_BEGIN
-# include <petscmat.h>
-EXTERN_C_FOR_PETSC_END
+// Petsc include files.
+#include <petscmat.h>
 
 
 

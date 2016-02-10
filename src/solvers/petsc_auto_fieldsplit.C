@@ -19,9 +19,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-EXTERN_C_FOR_PETSC_BEGIN
-#  include <petscksp.h>
-EXTERN_C_FOR_PETSC_END
+#include <petscksp.h>
 
 // Local includes
 #include "libmesh/dof_map.h"

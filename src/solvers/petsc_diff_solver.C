@@ -37,14 +37,6 @@ namespace libMesh
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
-  // Older versions of PETSc do not have the different int typedefs.
-  // On 64-bit machines, PetscInt may actually be a long long int.
-  // This change occurred in Petsc-2.2.1.
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
-
   // Function to hand to PETSc's SNES,
   // which monitors convergence at X
   PetscErrorCode
@@ -222,26 +214,11 @@ void PetscDiffSolver::init ()
 
   int ierr=0;
 
-#if PETSC_VERSION_LESS_THAN(2,1,2)
-  // At least until Petsc 2.1.1, the SNESCreate had a different
-  // calling syntax.  The second argument was of type SNESProblemType,
-  // and could have a value of either SNES_NONLINEAR_EQUATIONS or
-  // SNES_UNCONSTRAINED_MINIMIZATION.
-  ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
-  LIBMESH_CHKERR(ierr);
-#else
   ierr = SNESCreate(this->comm().get(),&_snes);
   LIBMESH_CHKERR(ierr);
-#endif
 
-#if PETSC_VERSION_LESS_THAN(2,3,3)
-  ierr = SNESSetMonitor (_snes, __libmesh_petsc_diff_solver_monitor,
-                         this, PETSC_NULL);
-#else
-  // API name change in PETSc 2.3.3
   ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
                          this, PETSC_NULL);
-#endif
   LIBMESH_CHKERR(ierr);
 
   if (libMesh::on_command_line("--solver_system_names"))
@@ -317,9 +294,7 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
     case SNES_CONVERGED_SNORM_RELATIVE:
 #endif
       return DiffSolver::CONVERGED_RELATIVE_STEP;
-#if !PETSC_VERSION_LESS_THAN(2,3,3)
     case SNES_CONVERGED_ITS:
-#endif
     case SNES_CONVERGED_TR_DELTA:
       return DiffSolver::CONVERGED_NO_REASON;
     case SNES_DIVERGED_FUNCTION_DOMAIN:
@@ -328,9 +303,7 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
     case SNES_DIVERGED_INNER:
 #endif
-#if !PETSC_VERSION_LESS_THAN(2,3,2)
     case SNES_DIVERGED_LINEAR_SOLVE:
-#endif
     case SNES_DIVERGED_LOCAL_MIN:
       return DiffSolver::DIVERGED_NO_REASON;
     case SNES_DIVERGED_MAX_IT:
@@ -383,24 +356,8 @@ unsigned int PetscDiffSolver::solve()
                           __libmesh_petsc_diff_solver_jacobian, this);
   LIBMESH_CHKERR(ierr);
 
-# if PETSC_VERSION_LESS_THAN(2,2,0)
-
-  ierr = SNESSolve (_snes, x.vec(), &_outer_iterations);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.2.x style
-#elif PETSC_VERSION_LESS_THAN(2,3,0)
-
-  ierr = SNESSolve (_snes, x.vec());
-  LIBMESH_CHKERR(ierr);
-
-  // 2.3.x & newer style
-#else
-
   ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
   LIBMESH_CHKERR(ierr);
-
-#endif
 
   STOP_LOG("solve()", "PetscDiffSolver");
 

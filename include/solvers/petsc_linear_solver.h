@@ -27,17 +27,8 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_solver_exception.h"
 
-/**
- * Petsc include files.
- */
-
-EXTERN_C_FOR_PETSC_BEGIN
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-#  include <petscsles.h>
-#else
-#  include <petscksp.h>
-#endif
-EXTERN_C_FOR_PETSC_END
+// Petsc include files.
+#include <petscksp.h>
 
 // Local includes
 #include "libmesh/linear_solver.h"
@@ -54,14 +45,6 @@ EXTERN_C_FOR_PETSC_END
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
-  // Older versions of PETSc do not have the different int typedefs.
-  // On 64-bit machines, PetscInt may actually be a long long int.
-  // This change occurred in Petsc-2.2.1.
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
-
 #if PETSC_RELEASE_LESS_THAN(3,0,1)
   /**
    * This function is called by PETSc to initialize the preconditioner.
@@ -275,16 +258,6 @@ private:
    * Internal function if shell matrix mode is used.
    */
   static PetscErrorCode _petsc_shell_matrix_get_diagonal(Mat mat, Vec dest);
-
-  // SLES removed from >= PETSc 2.2.0
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-
-  /**
-   * Linear solver context
-   */
-  SLES _sles;
-
-#endif
 
   /**
    * Preconditioner context
