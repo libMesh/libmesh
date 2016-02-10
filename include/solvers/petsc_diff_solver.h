@@ -29,11 +29,7 @@
 #include "libmesh/petsc_macro.h"
 
 // PETSc includes
-EXTERN_C_FOR_PETSC_BEGIN
 # include <petscsnes.h>
-EXTERN_C_FOR_PETSC_END
-
-// C++ includes
 
 namespace libMesh
 {

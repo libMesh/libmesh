@@ -41,12 +41,6 @@ namespace libMesh
 
 extern "C"
 {
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
-
-
 #if PETSC_RELEASE_LESS_THAN(3,0,1)
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
   {
@@ -129,20 +123,8 @@ void PetscLinearSolver<T>::clear ()
 
       PetscErrorCode ierr=0;
 
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-
-      // 2.1.x & earlier style
-      ierr = SLESDestroy(_sles);
-      LIBMESH_CHKERR(ierr);
-
-#else
-
-      // 2.2.0 & newer style
       ierr = LibMeshKSPDestroy(&_ksp);
       LIBMESH_CHKERR(ierr);
-
-#endif
-
 
       // Mimic PETSc default solver and preconditioner
       this->_solver_type           = GMRES;
@@ -168,35 +150,6 @@ void PetscLinearSolver<T>::init (const char * name)
       this->_is_initialized = true;
 
       PetscErrorCode ierr=0;
-
-      // 2.1.x & earlier style
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-
-      // Create the linear solver context
-      ierr = SLESCreate (this->comm().get(), &_sles);
-      LIBMESH_CHKERR(ierr);
-
-      // Create the Krylov subspace & preconditioner contexts
-      ierr = SLESGetKSP       (_sles, &_ksp);
-      LIBMESH_CHKERR(ierr);
-      ierr = SLESGetPC        (_sles, &_pc);
-      LIBMESH_CHKERR(ierr);
-
-      // Set user-specified  solver and preconditioner types
-      this->set_petsc_solver_type();
-
-      // Set the options from user-input
-      // Set runtime options, e.g.,
-      //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
-      //  These options will override those specified above as long as
-      //  SLESSetFromOptions() is called _after_ any other customization
-      //  routines.
-
-      ierr = SLESSetFromOptions (_sles);
-      LIBMESH_CHKERR(ierr);
-
-      // 2.2.0 & newer style
-#else
 
       // Create the linear solver context
       ierr = KSPCreate (this->comm().get(), &_ksp);
@@ -236,9 +189,6 @@ void PetscLinearSolver<T>::init (const char * name)
       // NOT NECESSARY!!!!
       //ierr = PCSetFromOptions (_pc);
       //LIBMESH_CHKERR(ierr);
-
-
-#endif
 
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
@@ -295,35 +245,6 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
 
       PetscErrorCode ierr=0;
 
-      // 2.1.x & earlier style
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-
-      // Create the linear solver context
-      ierr = SLESCreate (this->comm().get(), &_sles);
-      LIBMESH_CHKERR(ierr);
-
-      // Create the Krylov subspace & preconditioner contexts
-      ierr = SLESGetKSP       (_sles, &_ksp);
-      LIBMESH_CHKERR(ierr);
-      ierr = SLESGetPC        (_sles, &_pc);
-      LIBMESH_CHKERR(ierr);
-
-      // Set user-specified  solver and preconditioner types
-      this->set_petsc_solver_type();
-
-      // Set the options from user-input
-      // Set runtime options, e.g.,
-      //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
-      //  These options will override those specified above as long as
-      //  SLESSetFromOptions() is called _after_ any other customization
-      //  routines.
-
-      ierr = SLESSetFromOptions (_sles);
-      LIBMESH_CHKERR(ierr);
-
-      // 2.2.0 & newer style
-#else
-
       // Create the linear solver context
       ierr = KSPCreate (this->comm().get(), &_ksp);
       LIBMESH_CHKERR(ierr);
@@ -373,9 +294,6 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
       // NOT NECESSARY!!!!
       //ierr = PCSetFromOptions (_pc);
       //LIBMESH_CHKERR(ierr);
-
-
-#endif
 
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
@@ -498,83 +416,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
   //       this->_preconditioner_type = USER_PRECOND;
   //       this->set_petsc_preconditioner_type ();
   //     }
-
-  // 2.1.x & earlier style
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-
-  if (_restrict_solve_to_is != libmesh_nullptr)
-    libmesh_not_implemented();
-
-  // Set operators. The input matrix works as the preconditioning matrix
-  ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
-                          DIFFERENT_NONZERO_PATTERN);
-  LIBMESH_CHKERR(ierr);
-
-  // Set the tolerances for the iterative solver.  Use the user-supplied
-  // tolerance for the relative residual & leave the others at default values.
-  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
-                           PETSC_DEFAULT, max_its);
-  LIBMESH_CHKERR(ierr);
-
-
-  // Solve the linear system
-  ierr = SLESSolve (_sles, rhs->vec(), solution->vec(), &its);
-  LIBMESH_CHKERR(ierr);
-
-
-  // Get the norm of the final residual to return to the user.
-  ierr = KSPGetResidualNorm (_ksp, &final_resid);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.2.0
-#elif PETSC_VERSION_LESS_THAN(2,2,1)
-
-  if (_restrict_solve_to_is != libmesh_nullptr)
-    libmesh_not_implemented();
-
-  // Set operators. The input matrix works as the preconditioning matrix
-  //ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-  // SAME_NONZERO_PATTERN);
-  //       LIBMESH_CHKERR(ierr);
-
-
-  // Set the tolerances for the iterative solver.  Use the user-supplied
-  // tolerance for the relative residual & leave the others at default values.
-  // Convergence is detected at iteration k if
-  // ||r_k||_2 < max(rtol*||b||_2 , abstol)
-  // where r_k is the residual vector and b is the right-hand side.  Note that
-  // it is the *maximum* of the two values, the larger of which will almost
-  // always be rtol*||b||_2.
-  ierr = KSPSetTolerances (_ksp,
-                           tol,           // rtol   = relative decrease in residual  (1.e-5)
-                           PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
-                           PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
-                           max_its);
-  LIBMESH_CHKERR(ierr);
-
-
-  // Set the solution vector to use
-  ierr = KSPSetSolution (_ksp, solution->vec());
-  LIBMESH_CHKERR(ierr);
-
-  // Set the RHS vector to use
-  ierr = KSPSetRhs (_ksp, rhs->vec());
-  LIBMESH_CHKERR(ierr);
-
-  // Solve the linear system
-  ierr = KSPSolve (_ksp);
-  LIBMESH_CHKERR(ierr);
-
-  // Get the number of iterations required for convergence
-  ierr = KSPGetIterationNumber (_ksp, &its);
-  LIBMESH_CHKERR(ierr);
-
-  // Get the norm of the final residual to return to the user.
-  ierr = KSPGetResidualNorm (_ksp, &final_resid);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.2.1 & newer style
-#else
 
   Mat submat = libmesh_nullptr;
   Mat subprecond = libmesh_nullptr;
@@ -811,8 +652,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       LIBMESH_CHKERR(ierr);
     }
 
-#endif
-
   STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
@@ -846,92 +685,6 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   precond->close ();
   solution->close ();
   rhs->close ();
-
-  //   // If matrix != precond, then this means we have specified a
-  //   // special preconditioner, so reset preconditioner type to PCMAT.
-  //   if (matrix != precond)
-  //     {
-  //       this->_preconditioner_type = USER_PRECOND;
-  //       this->set_petsc_preconditioner_type ();
-  //     }
-
-  // 2.1.x & earlier style
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-
-  if (_restrict_solve_to_is != libmesh_nullptr)
-    libmesh_not_implemented();
-
-  // Based on http://wolfgang.math.tamu.edu/svn/public/deal.II/branches/MATH676/2008/deal.II/lac/source/petsc_solver.cc, http://tccc.iesl.forth.gr/AMS_EPEAEK/Elements/doc/in_html/petsc/SLES/index.html
-
-  SLES sles;
-  ierr = SLESCreate (this->comm().get(), &sles);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = SLESSetOperators (sles, matrix->mat(), precond->mat(), this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
-  LIBMESH_CHKERR(ierr);
-
-  KSP ksp;
-  ierr = SLESGetKSP (sles, &ksp);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = SLESSetUp (sles, rhs->vec(), solution->vec());
-  LIBMESH_CHKERR(ierr);
-
-  // See http://tccc.iesl.forth.gr/AMS_EPEAEK/Elements/doc/in_html/petsc/KSP/KSPSolveTrans.html#KSPSolveTrans
-  ierr = SLESSolveTrans (ksp, &its);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.2.0
-#elif PETSC_VERSION_LESS_THAN(2,2,1)
-
-  if (_restrict_solve_to_is != libmesh_nullptr)
-    libmesh_not_implemented();
-
-  // Set operators. The input matrix works as the preconditioning matrix
-  // This was commented earlier but it looks like KSPSetOperators is supported
-  // after PETSc 2.2.0
-  ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-                         this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
-  LIBMESH_CHKERR(ierr);
-
-
-  // Set the tolerances for the iterative solver.  Use the user-supplied
-  // tolerance for the relative residual & leave the others at default values.
-  // Convergence is detected at iteration k if
-  // ||r_k||_2 < max(rtol*||b||_2 , abstol)
-  // where r_k is the residual vector and b is the right-hand side.  Note that
-  // it is the *maximum* of the two values, the larger of which will almost
-  // always be rtol*||b||_2.
-  ierr = KSPSetTolerances (_ksp,
-                           tol,           // rtol   = relative decrease in residual  (1.e-5)
-                           PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
-                           PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
-                           max_its);
-  LIBMESH_CHKERR(ierr);
-
-
-  // Set the solution vector to use
-  ierr = KSPSetSolution (_ksp, solution->vec());
-  LIBMESH_CHKERR(ierr);
-
-  // Set the RHS vector to use
-  ierr = KSPSetRhs (_ksp, rhs->vec());
-  LIBMESH_CHKERR(ierr);
-
-  // Solve the linear system
-  ierr = KSPSolveTranspose (_ksp);
-  LIBMESH_CHKERR(ierr);
-
-  // Get the number of iterations required for convergence
-  ierr = KSPGetIterationNumber (_ksp, &its);
-  LIBMESH_CHKERR(ierr);
-
-  // Get the norm of the final residual to return to the user.
-  ierr = KSPGetResidualNorm (_ksp, &final_resid);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.2.1 & newer style
-#else
 
   Mat submat = libmesh_nullptr;
   Mat subprecond = libmesh_nullptr;
@@ -1161,8 +914,6 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       LIBMESH_CHKERR(ierr);
     }
 
-#endif
-
   STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
@@ -1177,16 +928,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                              const double tol,
                              const unsigned int m_its)
 {
-
-#if PETSC_VERSION_LESS_THAN(2,3,1)
-  // FIXME[JWP]: There will be a bunch of unused variable warnings
-  // for older PETScs here.
-  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
-                    << "No one has made it backwards compatible with older " \
-                    << "versions of PETSc so far; however, it might work " \
-                    << "without any change with some older version.");
-
-#else
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
   if (_restrict_solve_to_is != libmesh_nullptr)
@@ -1441,9 +1182,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
-
-#endif
-
 }
 
 
@@ -1457,16 +1195,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                              const double tol,
                              const unsigned int m_its)
 {
-
-#if PETSC_VERSION_LESS_THAN(2,3,1)
-  // FIXME[JWP]: There will be a bunch of unused variable warnings
-  // for older PETScs here.
-  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
-                    << "No one has made it backwards compatible with older " \
-                    << "versions of PETSc so far; however, it might work " \
-                    << "without any change with some older version.");
-
-#else
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
   if (_restrict_solve_to_is != libmesh_nullptr)
@@ -1755,9 +1483,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
-
-#endif
-
 }
 
 

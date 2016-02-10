@@ -870,23 +870,9 @@ void PetscMatrix<T>::get_diagonal (NumericVector<T> & dest) const
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
 
-  // Call PETSc function.
-
-#if PETSC_VERSION_LESS_THAN(2,3,1)
-
-  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
-                    << "No one has made it backwards compatible with older " \
-                    << "versions of PETSc so far; however, it might work " \
-                    << "without any change with some older version.");
-
-#else
-
   // Needs a const_cast since PETSc does not work with const.
   PetscErrorCode ierr =
     MatGetDiagonal(const_cast<PetscMatrix<T> *>(this)->mat(),petsc_dest.vec()); LIBMESH_CHKERR(ierr);
-
-#endif
-
 }
 
 
@@ -1080,24 +1066,12 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
   PetscErrorCode ierr=0;
 
   // the matrix from which we copy the values has to be assembled/closed
-  // X->close ();
   libmesh_assert(X->closed());
 
   semiparallel_only();
 
-  // 2.2.x & earlier style
-#if PETSC_VERSION_LESS_THAN(2,3,0)
-
-  ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
-  LIBMESH_CHKERR(ierr);
-
-  // 2.3.x & newer
-#else
-
   ierr = MatAXPY(_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN);
   LIBMESH_CHKERR(ierr);
-
-#endif
 }
 
 
@@ -1109,20 +1083,9 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
 {
   libmesh_assert (this->initialized());
 
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-
-  // PETSc 2.2.0 & older
-  PetscScalar * petsc_row;
-  int * petsc_cols;
-
-#else
-
   // PETSc 2.2.1 & newer
   const PetscScalar * petsc_row;
   const PetscInt    * petsc_cols;
-
-#endif
-
 
   // If the entry is not in the sparse matrix, it is 0.
   T value=0.;
