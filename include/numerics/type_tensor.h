@@ -291,15 +291,29 @@ public:
 
   /**
    * Returns the Frobenius norm of the tensor, i.e. the square-root of
-   * the sum of the elements squared.
+   * the sum of the elements squared.  This function is deprecated,
+   * used norm() instead.
    */
   Real size() const;
+
+  /**
+   * Returns the Frobenius norm of the tensor, i.e. the square-root of
+   * the sum of the elements squared.
+   */
+  Real norm() const;
+
+  /**
+   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+   * element magnitudes squared.  This function is deprecated,
+   * used norm() instead.
+   */
+  Real size_sq() const;
 
   /**
    * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
    * element magnitudes squared.
    */
-  Real size_sq() const;
+  Real norm_sq() const;
 
   /**
    * Returns the determinant of the tensor.  Because these are 3x3
@@ -1077,7 +1091,17 @@ template <typename T>
 inline
 Real TypeTensor<T>::size() const
 {
-  return std::sqrt(this->size_sq());
+  libmesh_deprecated();
+  return this->norm();
+}
+
+
+
+template <typename T>
+inline
+Real TypeTensor<T>::norm() const
+{
+  return std::sqrt(this->norm_sq());
 }
 
 
@@ -1135,6 +1159,16 @@ void TypeTensor<T>::zero()
 template <typename T>
 inline
 Real TypeTensor<T>::size_sq () const
+{
+  libmesh_deprecated();
+  return this->norm_sq();
+}
+
+
+
+template <typename T>
+inline
+Real TypeTensor<T>::norm_sq () const
 {
   Real sum = 0.;
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)

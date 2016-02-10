@@ -155,7 +155,13 @@ public:
    * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
    * element magnitudes squared.
    */
-  Real size_sq() const { return 0.;}
+  Real size_sq() const { libmesh_deprecated(); return 0.;}
+
+  /**
+   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+   * element magnitudes squared.
+   */
+  Real norm_sq() const { return 0.;}
 
   /**
    * @returns \p true if two tensors are equal valued.

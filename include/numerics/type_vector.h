@@ -267,15 +267,29 @@ public:
 
   /**
    * Returns the magnitude of the vector, i.e. the square-root of the
-   * sum of the elements squared.
+   * sum of the elements squared.  This function is deprecated, instead
+   * call norm().
    */
   Real size() const;
 
   /**
-   * Returns the magnitude of the vector squared, i.e. the sum of the element
-   * magnitudes squared.
+   * Returns the magnitude of the vector, i.e. the square-root of the
+   * sum of the elements squared.
+   */
+  Real norm() const;
+
+  /**
+   * Returns the magnitude of the vector squared, i.e. the sum of the
+   * element magnitudes squared.  This function is deprecated, instead
+   * call norm_sq().
    */
   Real size_sq() const;
+
+  /**
+   * Returns the magnitude of the vector squared, i.e. the sum of the
+   * element magnitudes squared.
+   */
+  Real norm_sq() const;
 
   /**
    * Zero the vector in any dimension.
@@ -861,7 +875,17 @@ template <typename T>
 inline
 Real TypeVector<T>::size() const
 {
-  return std::sqrt(this->size_sq());
+  libmesh_deprecated();
+  return this->norm();
+}
+
+
+
+template <typename T>
+inline
+Real TypeVector<T>::norm() const
+{
+  return std::sqrt(this->norm_sq());
 }
 
 
@@ -879,6 +903,16 @@ void TypeVector<T>::zero()
 template <typename T>
 inline
 Real TypeVector<T>::size_sq() const
+{
+  libmesh_deprecated();
+  return this->norm_sq();
+}
+
+
+
+template <typename T>
+inline
+Real TypeVector<T>::norm_sq() const
 {
 #if LIBMESH_DIM == 1
   return (TensorTools::norm_sq(_coords[0]));
