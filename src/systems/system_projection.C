@@ -1148,8 +1148,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // hold those fixed and project interiors
           //
           // In the LAGRANGE case, we will save a lot of solution
-	  // evaluations (at a slight cost in accuracy) by simply
-	  // interpolating all nodes rather than projecting.
+          // evaluations (at a slight cost in accuracy) by simply
+          // interpolating all nodes rather than projecting.
 
           // Interpolate vertex (or for LAGRANGE, all node) values first.
           unsigned int current_dof = 0;
@@ -1346,8 +1346,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           START_LOG ("project_edges","GenericProjector");
 
           // In 3D with non-LAGRANGE, project any edge values next
-	  if (dim > 2 &&
-	      cont != DISCONTINUOUS &&
+          if (dim > 2 &&
+              cont != DISCONTINUOUS &&
               fe_type.family != LAGRANGE)
             {
               // If we're JUST_COARSENED we'll need a custom
@@ -1501,8 +1501,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           START_LOG ("project_sides","GenericProjector");
 
-	  // With non-LAGRANGE, project any side values (edges in 2D,
-	  // faces in 3D) next.
+          // With non-LAGRANGE, project any side values (edges in 2D,
+          // faces in 3D) next.
           if (dim > 1 &&
               cont != DISCONTINUOUS &&
               fe_type.family != LAGRANGE)

@@ -1160,7 +1160,7 @@ inline void send_receive(const unsigned int dest_processor_id,
                     send_tag, recv_tag); }
 
 template <typename Context1, typename RangeIter,
-	  typename Context2, typename OutputIter, typename T>
+          typename Context2, typename OutputIter, typename T>
 inline void send_receive_packed_range(const unsigned int dest_processor_id,
                                       const Context1 * context1,
                                       RangeIter send_begin,
