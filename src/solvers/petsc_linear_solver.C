@@ -576,6 +576,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
                            PETSC_DEFAULT, max_its);
   LIBMESH_CHKERR(ierr);
 
+  // Allow command line options to override anything set programmatically.
+  ierr = KSPSetFromOptions(_ksp);
+  LIBMESH_CHKERR(ierr);
+
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
   if(this->_solver_configuration)
@@ -843,6 +847,10 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
                            PETSC_DEFAULT, max_its);
+  LIBMESH_CHKERR(ierr);
+
+  // Allow command line options to override anything set programmatically.
+  ierr = KSPSetFromOptions(_ksp);
   LIBMESH_CHKERR(ierr);
 
   // Solve the linear system
@@ -1116,6 +1124,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
                            PETSC_DEFAULT, max_its);
+  LIBMESH_CHKERR(ierr);
+
+  // Allow command line options to override anything set programmatically.
+  ierr = KSPSetFromOptions(_ksp);
   LIBMESH_CHKERR(ierr);
 
   // Solve the linear system
@@ -1405,6 +1417,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
                            PETSC_DEFAULT, max_its);
+  LIBMESH_CHKERR(ierr);
+
+  // Allow command line options to override anything set programmatically.
+  ierr = KSPSetFromOptions(_ksp);
   LIBMESH_CHKERR(ierr);
 
   // Solve the linear system
