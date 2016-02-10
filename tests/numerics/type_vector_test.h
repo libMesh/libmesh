@@ -7,8 +7,8 @@
 #include <cppunit/TestCase.h>
 
 #define TYPEVECTORTEST                          \
-  CPPUNIT_TEST( testSize );                     \
-  CPPUNIT_TEST( testSizeSq );                   \
+  CPPUNIT_TEST( testNorm );                     \
+  CPPUNIT_TEST( testNormSq );                   \
                                                 \
   CPPUNIT_TEST( testValue );                    \
   CPPUNIT_TEST( testZero );                     \
@@ -29,8 +29,8 @@
   CPPUNIT_TEST( testVectorAddAssign );          \
   CPPUNIT_TEST( testVectorSubAssign );          \
                                                 \
-  CPPUNIT_TEST( testSizeBase );                 \
-  CPPUNIT_TEST( testSizeSqBase );               \
+  CPPUNIT_TEST( testNormBase );                 \
+  CPPUNIT_TEST( testNormSqBase );               \
   CPPUNIT_TEST( testValueBase );                \
   CPPUNIT_TEST( testZeroBase );                 \
                                                 \
@@ -100,14 +100,14 @@ public:
     CPPUNIT_ASSERT_EQUAL( T(0), avector(2));
   }
 
-  void testSize()
+  void testNorm()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , m_1_1_1->size() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , m_1_1_1->norm() , TOLERANCE*TOLERANCE );
   }
 
-  void testSizeSq()
+  void testNormSq()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 3.0 , m_1_1_1->size_sq() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 3.0 , m_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
   }
 
   void testEquality()
@@ -248,14 +248,14 @@ public:
     CPPUNIT_ASSERT_EQUAL( T(0), avector(2));
   }
 
-  void testSizeBase()
+  void testNormBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , basem_1_1_1->size() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , basem_1_1_1->norm() , TOLERANCE*TOLERANCE );
   }
 
-  void testSizeSqBase()
+  void testNormSqBase()
   {
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 3.0 , basem_1_1_1->size_sq() , TOLERANCE*TOLERANCE );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 3.0 , basem_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
   }
 
   void testEqualityBase()

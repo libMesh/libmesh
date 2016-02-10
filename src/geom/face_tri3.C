@@ -176,7 +176,7 @@ Real Tri3::volume () const
 
   Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
 
-  return 0.5 * (v10.cross(v20)).size() ;
+  return 0.5 * (v10.cross(v20)).norm() ;
 }
 
 
@@ -188,10 +188,9 @@ std::pair<Real, Real> Tri3::min_and_max_angle() const
   Point v21 ( this->point(2) - this->point(1) );
 
   const Real
-    len_10=v10.size(),
-    len_20=v20.size(),
-    len_21=v21.size()
-    ;
+    len_10=v10.norm(),
+    len_20=v20.norm(),
+    len_21=v21.norm();
 
   const Real
     theta0=std::acos(( v10*v20)/len_10/len_20),

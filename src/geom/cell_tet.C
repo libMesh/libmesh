@@ -146,9 +146,9 @@ void Tet::choose_diagonal() const
   // Check for uninitialized diagonal selection
   if (this->_diagonal_selection==INVALID_DIAG)
     {
-      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
-      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
-      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+      Real diag_01_23 = (this->point(0) + this->point(1) - this->point(2) - this->point(3)).norm_sq();
+      Real diag_02_13 = (this->point(0) - this->point(1) + this->point(2) - this->point(3)).norm_sq();
+      Real diag_03_12 = (this->point(0) - this->point(1) - this->point(2) + this->point(3)).norm_sq();
 
       this->_diagonal_selection=DIAG_02_13;
 

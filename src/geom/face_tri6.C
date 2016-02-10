@@ -334,7 +334,7 @@ Real Tri6::volume () const
   if (a1.relative_fuzzy_equals(Point(0,0,0)) &&
       b1.relative_fuzzy_equals(Point(0,0,0)) &&
       b2.relative_fuzzy_equals(Point(0,0,0)))
-    return 0.5 * c1.cross(c2).size();
+    return 0.5 * c1.cross(c2).norm();
 
   // 7-point rule, exact for quintics.
   const unsigned int N = 7;
@@ -353,7 +353,7 @@ Real Tri6::volume () const
   // Approximate the area with quadrature
   Real vol=0.;
   for (unsigned int q=0; q<N; ++q)
-    vol += wts[q] * (xi[q]*a1 + eta[q]*b1 + c1).cross(xi[q]*a2 + eta[q]*b2 + c2).size();
+    vol += wts[q] * (xi[q]*a1 + eta[q]*b1 + c1).cross(xi[q]*a2 + eta[q]*b2 + c2).norm();
 
   return vol;
 }

@@ -37,7 +37,7 @@ template <typename T>
 TypeVector<T> TypeVector<T>::unit() const
 {
 
-  const Real length = size();
+  const Real length = norm();
 
   libmesh_assert_not_equal_to (length, static_cast<Real>(0.));
 

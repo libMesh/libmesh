@@ -1642,7 +1642,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
-                    JxW[qp] * grad_u_h.size_sq();
+                    JxW[qp] * grad_u_h.norm_sq();
                 }
 
               if (norm_type == W1_INF_SEMINORM)
@@ -1650,7 +1650,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm = std::max(v_norm, norm_weight * grad_u_h.size());
+                  v_norm = std::max(v_norm, norm_weight * grad_u_h.norm());
                 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -1661,7 +1661,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
-                    JxW[qp] * hess_u_h.size_sq();
+                    JxW[qp] * hess_u_h.norm_sq();
                 }
 
               if (norm_type == W2_INF_SEMINORM)
@@ -1669,7 +1669,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm = std::max(v_norm, norm_weight * hess_u_h.size());
+                  v_norm = std::max(v_norm, norm_weight * hess_u_h.norm());
                 }
 #endif
             }

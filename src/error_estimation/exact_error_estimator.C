@@ -527,7 +527,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
           else if(_equation_systems_fine)
             grad_error -= fine_values->gradient(q_point[qp]);
 
-          error_val += JxW[qp]*grad_error.size_sq();
+          error_val += JxW[qp]*grad_error.norm_sq();
         }
 
 
@@ -546,7 +546,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
           else if (_equation_systems_fine)
             grad2_error -= fine_values->hessian(q_point[qp]);
 
-          error_val += JxW[qp]*grad2_error.size_sq();
+          error_val += JxW[qp]*grad2_error.norm_sq();
         }
 #endif
 

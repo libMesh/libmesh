@@ -380,7 +380,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         // where T'= transpose of T, so
         //
         // jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
-        jac[p] = dxyzdxi_map[p].size();
+        jac[p] = dxyzdxi_map[p].norm();
 
         if (jac[p] <= 0.)
           {
@@ -1537,7 +1537,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
 
 
       //  ||P_n+1 - P_n||
-      inverse_map_error = dp.size();
+      inverse_map_error = dp.norm();
 
       //  P_n+1 = P_n + dp
       p.add (dp);
@@ -1634,11 +1634,11 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
       const Point check = FE<Dim,T>::map (elem, p);
       const Point diff  = physical_point - check;
 
-      if (diff.size() > tolerance)
+      if (diff.norm() > tolerance)
         {
           libmesh_here();
           libMesh::err << "WARNING:  diff is "
-                       << diff.size()
+                       << diff.norm()
                        << std::endl
                        << " point="
                        << physical_point;

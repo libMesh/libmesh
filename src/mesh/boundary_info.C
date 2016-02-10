@@ -284,7 +284,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       for(unsigned char side=0; side<interior_parent->n_sides(); side++)
         {
           UniquePtr<Elem> interior_parent_side = interior_parent->build_side(side);
-          Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).size();
+          Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
 
           if( centroid_distance < (tolerance * boundary_elem->hmin()) )
             {

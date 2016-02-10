@@ -209,7 +209,7 @@ Real Quad4::volume () const
 
   // Check for quick return for parallelogram QUAD4.
   if (a1.relative_fuzzy_equals(Point(0,0,0)))
-    return 4. * b1.cross(b2).size();
+    return 4. * b1.cross(b2).norm();
 
   // Otherwise, use 2x2 quadrature to approximate the surface area.
 
@@ -220,7 +220,7 @@ Real Quad4::volume () const
   Real vol=0.;
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
-      vol += (q[j]*a1 + b1).cross(q[i]*a2 + b2).size();
+      vol += (q[j]*a1 + b1).cross(q[i]*a2 + b2).norm();
 
   return vol;
 }

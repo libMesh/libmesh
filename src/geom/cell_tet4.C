@@ -316,7 +316,7 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
   // Compute dihedral angles
   for (unsigned int k=0,i=0; i<4; ++i)
     for (unsigned int j=i+1; j<4; ++j,k+=1)
-      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].size() / n[j].size()); // return value is between 0 and PI
+      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].norm() / n[j].norm()); // return value is between 0 and PI
 
   // Return max/min dihedral angles
   return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
@@ -455,9 +455,9 @@ dof_id_type Tet4::key () const
 
 // void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
 // {
-//   Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
-//   Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
-//   Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+//   Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).norm_sq();
+//   Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).norm_sq();
+//   Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).norm_sq();
 //
 //   Diagonal use_this = INVALID_DIAG;
 //   switch (exclude_this)

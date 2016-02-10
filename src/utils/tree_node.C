@@ -200,7 +200,7 @@ bool TreeNode<N>::bounds_point (const Point & p,
   const Point & min = bounding_box.first;
   const Point & max = bounding_box.second;
 
-  const Real tol = (max - min).size() * relative_tol;
+  const Real tol = (max - min).norm() * relative_tol;
 
   if ((p(0) >= min(0) - tol)
       && (p(0) <= max(0) + tol)

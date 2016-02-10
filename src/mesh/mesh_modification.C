@@ -813,8 +813,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               subelem[1] = new Tri3;
 
               // Check for possible edge swap
-              if ((elem->point(0) - elem->point(2)).size() <
-                  (elem->point(1) - elem->point(3)).size())
+              if ((elem->point(0) - elem->point(2)).norm() <
+                  (elem->point(1) - elem->point(3)).norm())
                 {
                   subelem[0]->set_node(0) = elem->get_node(0);
                   subelem[0]->set_node(1) = elem->get_node(1);
@@ -857,8 +857,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                                                elem->processor_id());
 
               // Check for possible edge swap
-              if ((elem->point(0) - elem->point(2)).size() <
-                  (elem->point(1) - elem->point(3)).size())
+              if ((elem->point(0) - elem->point(2)).norm() <
+                  (elem->point(1) - elem->point(3)).norm())
                 {
                   subelem[0]->set_node(0) = elem->get_node(0);
                   subelem[0]->set_node(1) = elem->get_node(1);
@@ -902,8 +902,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               subelem[1] = new Tri6;
 
               // Check for possible edge swap
-              if ((elem->point(0) - elem->point(2)).size() <
-                  (elem->point(1) - elem->point(3)).size())
+              if ((elem->point(0) - elem->point(2)).norm() <
+                  (elem->point(1) - elem->point(3)).norm())
                 {
                   subelem[0]->set_node(0) = elem->get_node(0);
                   subelem[0]->set_node(1) = elem->get_node(1);
@@ -1643,7 +1643,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                             if (power > 0)
                               {
                                 Point diff = (*node0)-(*node1);
-                                node_weight = std::pow( diff.size(), power );
+                                node_weight = std::pow(diff.norm(), power);
                               }
 
                             const dof_id_type id0 = node0->id(), id1 = node1->id();
