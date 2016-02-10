@@ -683,7 +683,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
   std::vector<std::vector<Real> >         recv_coords(this->n_processors());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  std::vector<xdr_id_type> xfer_unique_ids; 
+  std::vector<xdr_id_type> xfer_unique_ids;
   std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
   std::vector<std::vector<xdr_id_type> > recv_unique_ids (this->n_processors());
 #endif // LIBMESH_ENABLE_UNIQUE_ID
