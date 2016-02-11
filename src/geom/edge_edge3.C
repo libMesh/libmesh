@@ -174,13 +174,13 @@ Real Edge3::volume () const
   Point A = this->point(0) + this->point(1) - 2*this->point(2);
   Point B = (this->point(1) - this->point(0))/2;
 
-  const Real a = A.size_sq();
+  const Real a = A.norm_sq();
   const Real b = 2.*(A*B);
-  const Real c = B.size_sq();
+  const Real c = B.norm_sq();
 
   // Degenerate straight line case
   if (a < TOLERANCE*TOLERANCE*TOLERANCE)
-    return (this->point(1) - this->point(0)).size();
+    return (this->point(1) - this->point(0)).norm();
 
   const Real ba=b/a;
   const Real ca=c/a;

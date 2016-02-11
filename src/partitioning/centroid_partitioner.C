@@ -174,7 +174,7 @@ bool CentroidPartitioner::sort_z (const std::pair<Point, Elem *> & lhs,
 bool CentroidPartitioner::sort_radial (const std::pair<Point, Elem *> & lhs,
                                        const std::pair<Point, Elem *> & rhs)
 {
-  return (lhs.first.size() < rhs.first.size());
+  return (lhs.first.norm() < rhs.first.norm());
 }
 
 } // namespace libMesh

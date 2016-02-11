@@ -205,7 +205,7 @@ Point Sphere::surface_coords (const Point & cart) const
   // phi: special care, so that it gives 0..2pi results
   const Real phi = std::atan2(c(1), c(0));
 
-  return Point(/* radius */ c.size(),
+  return Point(/* radius */ c.norm(),
                /* theta  */ std::atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
                /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
 }

@@ -404,7 +404,7 @@ Real Quad8::volume () const
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
       vol += (q[j]*q[j]*a1 + q[i]*q[j]*b1 + q[i]*c1 + q[j]*d1 + e1).
-        cross(q[i]*q[i]*a2 + q[i]*q[j]*b2 + q[i]*c2 + q[j]*d2 + e2).size() * w[i] * w[j];
+        cross(q[i]*q[i]*a2 + q[i]*q[j]*b2 + q[i]*c2 + q[j]*d2 + e2).norm() * w[i] * w[j];
 
   return vol;
 }

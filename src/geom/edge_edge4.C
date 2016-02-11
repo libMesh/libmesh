@@ -205,7 +205,7 @@ Real Edge4::volume () const
 
   Real vol=0.;
   for (unsigned int i=0; i<N; ++i)
-    vol += w[i] * (q[i]*q[i]*a1 + q[i]*b1 + c1).size();
+    vol += w[i] * (q[i]*q[i]*a1 + q[i]*b1 + c1).norm();
 
   return vol;
 }

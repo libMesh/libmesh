@@ -279,7 +279,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   Node * node = libmesh_nullptr;
                   for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
                     {
-                      if ((*ghost_nodes[j] - point).size() < tol * (elem->point(k) - point).size())
+                      if ((*ghost_nodes[j] - point).norm() < tol * (elem->point(k) - point).norm())
                         {
                           node = ghost_nodes[j];
                           break;
@@ -351,7 +351,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               Node * node = libmesh_nullptr;
               for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
                 {
-                  if ((*ghost_nodes[j] - point).size() < tol * (elem->point(i) - point).size())
+                  if ((*ghost_nodes[j] - point).norm() < tol * (elem->point(i) - point).norm())
                     {
                       node = ghost_nodes[j];
                       break;
@@ -435,7 +435,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   Node * node = libmesh_nullptr;
                   for (unsigned int k = 0; k < ghost_nodes.size(); ++k)
                     {
-                      if ((*ghost_nodes[k] - point).size() < tol * (nb2->point(j) - point).size())
+                      if ((*ghost_nodes[k] - point).norm() < tol * (nb2->point(j) - point).norm())
                         {
                           node = ghost_nodes[k];
                           break;

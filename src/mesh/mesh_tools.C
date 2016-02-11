@@ -444,7 +444,7 @@ MeshTools::bounding_sphere(const MeshBase & mesh)
 {
   BoundingBox bbox = bounding_box(mesh);
 
-  const Real  diag = (bbox.second - bbox.first).size();
+  const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
 
   return Sphere (cent, .5*diag);
@@ -475,7 +475,7 @@ MeshTools::processor_bounding_sphere (const MeshBase & mesh,
 {
   BoundingBox bbox = processor_bounding_box(mesh,pid);
 
-  const Real  diag = (bbox.second - bbox.first).size();
+  const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
 
   return Sphere (cent, .5*diag);
@@ -512,7 +512,7 @@ MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
 {
   BoundingBox bbox = subdomain_bounding_box(mesh,sid);
 
-  const Real  diag = (bbox.second - bbox.first).size();
+  const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
 
   return Sphere (cent, .5*diag);

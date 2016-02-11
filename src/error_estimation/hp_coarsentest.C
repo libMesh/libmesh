@@ -428,11 +428,11 @@ void HPCoarsenTest::select_refinement (System & system)
               if (cont == C_ZERO || cont == C_ONE)
                 p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                   (component_scale[var] *
-                   (*JxW)[qp] * grad_error.size_sq());
+                   (*JxW)[qp] * grad_error.norm_sq());
               if (cont == C_ONE)
                 p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                   (component_scale[var] *
-                   (*JxW)[qp] * hessian_error.size_sq());
+                   (*JxW)[qp] * hessian_error.norm_sq());
             }
 
           // Calculate this variable's contribution to the h
@@ -500,11 +500,11 @@ void HPCoarsenTest::select_refinement (System & system)
                   if (cont == C_ZERO || cont == C_ONE)
                     h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                       (component_scale[var] *
-                       (*JxW)[qp] * grad_error.size_sq());
+                       (*JxW)[qp] * grad_error.norm_sq());
                   if (cont == C_ONE)
                     h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
                       (component_scale[var] *
-                       (*JxW)[qp] * hessian_error.size_sq());
+                       (*JxW)[qp] * hessian_error.norm_sq());
                 }
 
             }

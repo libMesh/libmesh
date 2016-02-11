@@ -76,12 +76,12 @@ T norm_sq(std::complex<T> a) { return std::norm(a); }
 template <typename T>
 inline
 Real norm_sq(const TypeVector<T> & a)
-{return a.size_sq();}
+{return a.norm_sq();}
 
 template <typename T>
 inline
 Real norm_sq(const VectorValue<T> & a)
-{return a.size_sq();}
+{return a.norm_sq();}
 
 // Any tensor-rank-independent code will need to include
 // tensor_tools.h, so we define rank-increasing and real-to-number type

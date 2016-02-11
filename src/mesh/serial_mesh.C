@@ -1142,7 +1142,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
                   dof_id_type other_node_id = *other_set_it;
                   Node & other_node = other_mesh->node(other_node_id);
 
-                  Real node_distance = (this_node - other_node).size();
+                  Real node_distance = (this_node - other_node).norm();
 
                   if(node_distance < tol*h_min)
                     {

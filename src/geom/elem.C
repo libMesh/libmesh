@@ -427,7 +427,7 @@ Real Elem::hmin() const
       {
         const Point diff = (this->point(n_outer) - this->point(n_inner));
 
-        h_min = std::min(h_min,diff.size_sq());
+        h_min = std::min(h_min, diff.norm_sq());
       }
 
   return std::sqrt(h_min);
@@ -444,7 +444,7 @@ Real Elem::hmax() const
       {
         const Point diff = (this->point(n_outer) - this->point(n_inner));
 
-        h_max = std::max(h_max,diff.size_sq());
+        h_max = std::max(h_max, diff.norm_sq());
       }
 
   return std::sqrt(h_max);
@@ -458,7 +458,7 @@ Real Elem::length(const unsigned int n1,
   libmesh_assert_less ( n1, this->n_vertices() );
   libmesh_assert_less ( n2, this->n_vertices() );
 
-  return (this->point(n1) - this->point(n2)).size();
+  return (this->point(n1) - this->point(n2)).norm();
 }
 
 
@@ -2330,7 +2330,7 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
 
       // Compute the distance between the original point and the re-mapped point.
       // They should be in the same place.
-      Real dist = (xyz - p).size();
+      Real dist = (xyz - p).norm();
 
 
       // If dist is larger than some fraction of the tolerance, then return false.

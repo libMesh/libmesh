@@ -792,7 +792,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
           const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
 
-          error_vals[1] += JxW[qp]*grad_error.size_sq();
+          error_vals[1] += JxW[qp]*grad_error.norm_sq();
 
 
           if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
@@ -863,7 +863,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
 
           // FIXME: PB: Is this what we want for rank 3 tensors?
-          error_vals[2] += JxW[qp]*grad2_error.size_sq();
+          error_vals[2] += JxW[qp]*grad2_error.norm_sq();
 #endif
 
         } // end qp loop

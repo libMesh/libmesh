@@ -90,7 +90,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             // curvature.  Concave-downward curves (frowns) have a
             // negative curvature.  Be sure to take that into account!
             const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
-            const Real denominator = this->dxyzdxi_map[p].size_sq();
+            const Real denominator = this->dxyzdxi_map[p].norm_sq();
             libmesh_assert_not_equal_to (denominator, 0);
             this->curvatures[p] = numerator / denominator;
           }
@@ -171,9 +171,9 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             const Real L  = -this->d2xyzdxi2_map[p]    * this->normals[p];
             const Real M  = -this->d2xyzdxideta_map[p] * this->normals[p];
             const Real N  = -this->d2xyzdeta2_map[p]   * this->normals[p];
-            const Real E  =  this->dxyzdxi_map[p].size_sq();
+            const Real E  =  this->dxyzdxi_map[p].norm_sq();
             const Real F  =  this->dxyzdxi_map[p]      * this->dxyzdeta_map[p];
-            const Real G  =  this->dxyzdeta_map[p].size_sq();
+            const Real G  =  this->dxyzdeta_map[p].norm_sq();
 
             const Real numerator   = E*N -2.*F*M + G*L;
             const Real denominator = E*G - F*F;

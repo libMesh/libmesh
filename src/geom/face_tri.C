@@ -111,9 +111,9 @@ Real Tri::quality (const ElemQuality q) const
         Point v1 = (*p2) - (*p1);
         Point v2 = (*p3) - (*p1);
         Point v3 = (*p3) - (*p2);
-        const Real l1 = v1.size();
-        const Real l2 = v2.size();
-        const Real l3 = v3.size();
+        const Real l1 = v1.norm();
+        const Real l2 = v2.norm();
+        const Real l3 = v3.norm();
 
         // if one length is 0, quality is quite bad!
         if ((l1 <=0.) || (l2 <= 0.) || (l3 <= 0.))

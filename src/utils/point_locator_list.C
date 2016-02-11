@@ -156,7 +156,7 @@ const Elem * PointLocatorList::operator() (const Point & p,
   // element is closer, but we simply don't consider
   // it!
   //
-  // We _can_, however, use size_sq() instead of size()
+  // We _can_, however, use norm_sq() instead of norm()
   // here to avoid repeated calls to std::sqrt(), which is
   // pretty expensive.
   {
@@ -172,7 +172,7 @@ const Elem * PointLocatorList::operator() (const Point & p,
         if (!allowed_subdomains ||
             allowed_subdomains->count(my_list[n].second->subdomain_id()))
           {
-            const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
+            const Real current_distance_sq = Point(my_list[n].first -p).norm_sq();
 
             if (current_distance_sq < last_distance_sq)
               {
