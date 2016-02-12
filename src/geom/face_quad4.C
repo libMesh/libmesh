@@ -205,9 +205,9 @@ Real Quad4::volume () const
   // \vec{x}_{\xi}  = \vec{a}*eta + \vec{b}
   // \vec{x}_{\eta} = \vec{a}*xi  + \vec{c}
   Point
-    a = x0/4 - x1/4 + x2/4 - x3/4,
-    b = -x0/4 + x1/4 + x2/4 - x3/4,
-    c = -x0/4 - x1/4 + x2/4 + x3/4;
+    a = x0 - x1 + x2 - x3,
+    b = -x0 + x1 + x2 - x3,
+    c = -x0 - x1 + x2 + x3;
 
   Point
     ba = b.cross(a),
@@ -223,7 +223,7 @@ Real Quad4::volume () const
 
   Real sqrt_c00 = std::sqrt(c00);
 
-  return 4*sqrt_c00 + 1./(3.*sqrt_c00) * (2.*(c02+c20) - (c10*c10 + c01*c01)/(2.*c00));
+  return .25*sqrt_c00 + 1./(48.*sqrt_c00) * (2.*(c02+c20) - (c10*c10 + c01*c01)/(2.*c00));
 }
 
 } // namespace libMesh
