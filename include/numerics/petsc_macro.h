@@ -50,6 +50,13 @@
 
 #endif
 
+// We used to have workarounds for missing extern "C" in old PETSc
+// versions.  We no longer support PETSc versions so old, but we do
+// still support libMesh applications old enough to have used these
+// macros.
+#define EXTERN_C_FOR_PETSC_BEGIN
+#define EXTERN_C_FOR_PETSC_END
+
 // Petsc include files
 #include <petsc.h>
 
