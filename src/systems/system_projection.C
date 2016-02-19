@@ -163,6 +163,13 @@ public:
                         const Real time)
   { return _f->component(c, i, n, time); }
 
+  bool is_grid_projection() { return false; }
+
+  Output eval_old_dof (const FEMContext & /* c */,
+                       unsigned int /* var_component */,
+                       unsigned int /* dof_index */)
+  { libmesh_error(); }
+
 private:
   UniquePtr<FEMFunctionBase<Output> > _f;
 };
@@ -225,6 +232,25 @@ public:
     (old_context.*point_output)(i, p, n, out_of_elem_tol);
     STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
     return n;
+  }
+
+  bool is_grid_projection() { return true; }
+
+  Output eval_old_dof (const FEMContext & c,
+                       unsigned int var,
+                       unsigned int dof_index)
+  {
+    if (!this->check_old_context(c, c.get_elem().point(0)))
+      libmesh_error();
+
+    const std::vector<dof_id_type> & old_dof_indices =
+      old_context.get_dof_indices(var);
+
+    libmesh_assert_greater(old_dof_indices.size(), dof_index);
+
+    const dof_id_type old_id = old_dof_indices[dof_index];
+
+    return old_solution(old_id);
   }
 
 protected:
@@ -1081,6 +1107,16 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
       context.pre_fe_reinit(system, elem);
 
+      // If this element doesn't have an old_dof_object, but it
+      // wasn't just refined or just coarsened into activity, then
+      // it must be newly added, so the user is responsible for
+      // setting the new dofs on it during a grid projection.
+      if (!elem->old_dof_object &&
+          elem->refinement_flag() != Elem::JUST_REFINED &&
+          elem->refinement_flag() != Elem::JUST_COARSENED &&
+          f.is_grid_projection())
+        continue;
+
       // Loop over all the variables we've been requested to project, to
       // do the projection
       for (unsigned int v=0; v!=variables.size(); v++)
@@ -1089,15 +1125,47 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           const Variable & variable = dof_map.variable(var);
 
+          const FEType & fe_type = variable.type();
+
+          if (fe_type.family == SCALAR)
+            continue;
+
           // Per-subdomain variables don't need to be projected on
           // elements where they're not active
           if (!variable.active_on_subdomain(elem->subdomain_id()))
             continue;
 
-          const FEType & fe_type = variable.type();
+          const std::vector<dof_id_type> & dof_indices =
+            context.get_dof_indices(var);
 
-          if (fe_type.family == SCALAR)
-            continue;
+          // The number of DOFs on the element
+          const unsigned int n_dofs =
+            cast_int<unsigned int>(dof_indices.size());
+
+          const unsigned int var_component =
+            system.variable_scalar_number(var, 0);
+
+          // Zero the interpolated values
+          Ue.resize (n_dofs); Ue.zero();
+
+	  // If this element hasn't been changed, and we're projecting
+	  // from its old self, then we can simply move its old dof
+	  // values to new indices.
+          if (f.is_grid_projection() &&
+              elem->refinement_flag() != Elem::JUST_REFINED &&
+              elem->refinement_flag() != Elem::JUST_COARSENED &&
+              elem->p_refinement_flag() != Elem::JUST_REFINED &&
+              elem->p_refinement_flag() != Elem::JUST_COARSENED)
+            {
+              for (unsigned int d=0; d != n_dofs; ++d)
+                {
+                  Ue(d) = f.eval_old_dof(context, var_component, d);
+                }
+
+              action.insert(context, var, Ue);
+
+              continue;
+            }
 
           FEBase * fe = libmesh_nullptr;
           FEBase * side_fe = libmesh_nullptr;
@@ -1113,16 +1181,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           const FEContinuity cont = fe->get_continuity();
 
-          const unsigned int var_component =
-            system.variable_scalar_number(var, 0);
-
-          const std::vector<dof_id_type> & dof_indices =
-            context.get_dof_indices(var);
-
-          // The number of DOFs on the element
-          const unsigned int n_dofs =
-            cast_int<unsigned int>(dof_indices.size());
-
           std::vector<unsigned int> side_dofs;
 
           // Fixed vs. free DoFs on edge/face projections
@@ -1134,9 +1192,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           // The number of nodes on the new element
           const unsigned int n_nodes = elem->n_nodes();
-
-          // Zero the interpolated values
-          Ue.resize (n_dofs); Ue.zero();
 
           START_LOG ("project_nodes","GenericProjector");
 
