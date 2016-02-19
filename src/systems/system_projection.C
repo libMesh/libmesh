@@ -240,8 +240,11 @@ public:
                        unsigned int var,
                        unsigned int dof_index)
   {
+    if (!this->check_old_context(c, c.get_elem().point(0)))
+      libmesh_error();
+
     const std::vector<dof_id_type> & old_dof_indices =
-      c.get_old_dof_indices(var);
+      old_context.get_dof_indices(var);
 
     libmesh_assert_greater(old_dof_indices.size(), dof_index);
 
