@@ -1755,18 +1755,27 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
   row_dofs = orig_row_dofs;
   col_dofs = orig_col_dofs;
 
+  bool constraint_found = false;
+
+  // K_constrained = R^T K C
+
+  if ((R.m() == matrix.m()) &&
+      (R.n() == row_dofs.size()))
+    {
+      matrix.left_multiply_transpose  (R);
+      constraint_found = true;
+    }
+
+  if ((C.m() == matrix.n()) &&
+      (C.n() == col_dofs.size()))
+    {
+      matrix.right_multiply (C);
+      constraint_found = true;
+    }
 
   // It is possible that the matrix is not constrained at all.
-  if ((R.m() == matrix.m()) &&
-      (R.n() == row_dofs.size()) &&
-      (C.m() == matrix.n()) &&
-      (C.n() == col_dofs.size())) // If the matrix is constrained
+  if (constraint_found)
     {
-      // K_constrained = R^T K C
-      matrix.left_multiply_transpose  (R);
-      matrix.right_multiply (C);
-
-
       libmesh_assert_equal_to (matrix.m(), row_dofs.size());
       libmesh_assert_equal_to (matrix.n(), col_dofs.size());
 
