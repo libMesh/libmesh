@@ -197,33 +197,32 @@ Real Quad4::volume () const
     x0 = point(0), x1 = point(1),
     x2 = point(2), x3 = point(3);
 
-  // This volume formula is derived by replacing the volume integrand,
-  // which contains a square root, with a Taylor series approximation,
-  // and integrating it exactly (hence there is no quadrature).
-
   // Construct constant data vectors.
-  // \vec{x}_{\xi}  = \vec{a}*eta + \vec{b}
-  // \vec{x}_{\eta} = \vec{a}*xi  + \vec{c}
+  // \vec{x}_{\xi}  = \vec{a1}*eta + \vec{b1}
+  // \vec{x}_{\eta} = \vec{a2}*xi  + \vec{b2}
+  // This is copy-pasted directly from the output of a Python script.
   Point
-    a = x0 - x1 + x2 - x3,
-    b = -x0 + x1 + x2 - x3,
-    c = -x0 - x1 + x2 + x3;
+    a1 = x0/4 - x1/4 + x2/4 - x3/4,
+    b1 = -x0/4 + x1/4 + x2/4 - x3/4,
+    a2 = a1,
+    b2 = -x0/4 - x1/4 + x2/4 + x3/4;
 
-  Point
-    ba = b.cross(a),
-    ac = a.cross(c),
-    bc = b.cross(c);
+  // Check for quick return for parallelogram QUAD4.
+  if (a1.relative_fuzzy_equals(Point(0,0,0)))
+    return 4. * b1.cross(b2).norm();
 
-  Real
-    c00 = bc.norm_sq(),
-    c10 = 2*(bc*ba),
-    c01 = 2*(ac*bc),
-    c20 = ba.norm_sq(),
-    c02 = ac.norm_sq();
+  // Otherwise, use 2x2 quadrature to approximate the surface area.
 
-  Real sqrt_c00 = std::sqrt(c00);
+  // 4-point rule, exact for bi-cubics.  The weights for this rule are
+  // all equal to 1.
+  const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
 
-  return .25*sqrt_c00 + 1./(48.*sqrt_c00) * (2.*(c02+c20) - (c10*c10 + c01*c01)/(2.*c00));
+  Real vol=0.;
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<2; ++j)
+      vol += (q[j]*a1 + b1).cross(q[i]*a2 + b2).norm();
+
+  return vol;
 }
 
 } // namespace libMesh
