@@ -126,44 +126,44 @@ int main (int argc, char ** argv)
   // Edge AD is the actual edge of the cylinder and is rigid in the xz-plane.
   // Other edges have symmetric boundary conditions.
 
-  //AB w,theta_x,theta_y
+  // AB w, theta_x, theta_y
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(7);
-    unsigned int variables[] = {2,3,4};
+    unsigned int variables[] = {2, 3, 4};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
                                    std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
-  //BC v,theta_x,theta_z
+  // BC v, theta_x, theta_z
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(8);
-    unsigned int variables[] = {1,3,5};
+    unsigned int variables[] = {1, 3, 5};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
                                    std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
-  //CD u,theta_y,theta_z
+  // CD u, theta_y, theta_z
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(9);
-    unsigned int variables[] = {0,4,5};
+    unsigned int variables[] = {0, 4, 5};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
                                    std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
-  //AD u,w,theta_y
+  // AD u, w, theta_y
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(10);
-    unsigned int variables[] = {0,2,4};
+    unsigned int variables[] = {0, 2, 4};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
                                    std::vector<unsigned int>(variables, variables+3),
@@ -187,11 +187,11 @@ int main (int argc, char ** argv)
 
   // Find the point C.
   Node * node_C = nullptr;
-  Point point_C(0,3,3);
-  Real nearest_dist_sq = (mesh.point(0)-point_C).size_sq();
+  Point point_C(0, 3, 3);
+  Real nearest_dist_sq = (mesh.point(0)-point_C).norm_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
     {
-      const Real dist_sq = (mesh.point(nid)-point_C).size_sq();
+      const Real dist_sq = (mesh.point(nid)-point_C).norm_sq();
       if (dist_sq < nearest_dist_sq)
         {
           nearest_dist_sq = dist_sq;
@@ -204,11 +204,11 @@ int main (int argc, char ** argv)
   dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
   Number w = 0;
   if (w_dof >= system.get_dof_map().first_dof() &&
-      w_dof <  system.get_dof_map().end_dof())
+      w_dof < system.get_dof_map().end_dof())
     w = system.current_solution(w_dof);
   system.comm().sum(w);
 
-  Real w_C_bar = -E*h*w/q ;
+  Real w_C_bar = -E*h*w/q;
   const Real w_C_bar_analytic = 164.24;
 
   // Print the finite element solution and the analytic
@@ -218,11 +218,11 @@ int main (int argc, char ** argv)
 
   // Find the point D.
   Node * node_D = nullptr;
-  Point point_D(0,0,3);
-  nearest_dist_sq = (mesh.point(0)-point_D).size_sq();
+  Point point_D(0, 0, 3);
+  nearest_dist_sq = (mesh.point(0)-point_D).norm_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
     {
-      const Real dist_sq = (mesh.point(nid)-point_D).size_sq();
+      const Real dist_sq = (mesh.point(nid)-point_D).norm_sq();
       if (dist_sq < nearest_dist_sq)
         {
           nearest_dist_sq = dist_sq;
@@ -239,7 +239,7 @@ int main (int argc, char ** argv)
     v = system.current_solution(v_dof);
   system.comm().sum(v);
 
-  Real v_D_bar = E*h*v/q ;
+  Real v_D_bar = E*h*v/q;
   const Real v_D_bar_analytic = 4.114;
 
   // Print the finite element solution and the analytic
@@ -250,6 +250,8 @@ int main (int argc, char ** argv)
   // All done.
   return 0;
 }
+
+
 
 // We now define the matrix and rhs vector assembly function
 // for the shell system.
@@ -276,24 +278,24 @@ void assemble_shell (EquationSystems & es,
   // The membrane elastic matrix.
   Eigen::Matrix3d Hm;
   Hm <<
-    1.,nu,0.,
-    nu,1.,0.,
-    0.,0.,0.5 * (1-nu);
+    1., nu, 0.,
+    nu, 1., 0.,
+    0., 0., 0.5 * (1-nu);
   Hm *= h * E/(1-nu*nu);
 
   // The bending elastic matrix.
   Eigen::Matrix3d Hf;
   Hf <<
-    1.,nu,0.,
-    nu,1.,0.,
-    0.,0.,0.5 * (1-nu);
+    1., nu, 0.,
+    nu, 1., 0.,
+    0., 0., 0.5 * (1-nu);
   Hf *= h*h*h/12 * E/(1-nu*nu);
 
   // The shear elastic matrices.
-  Eigen::Matrix2d Hc0 = Eigen::Matrix2d::Identity() ;
+  Eigen::Matrix2d Hc0 = Eigen::Matrix2d::Identity();
   Hc0 *= h * 5./6*E/(2*(1+nu));
 
-  Eigen::Matrix2d Hc1 = Eigen::Matrix2d::Identity() ;
+  Eigen::Matrix2d Hc1 = Eigen::Matrix2d::Identity();
   Hc1 *= h*h*h/12 * 5./6*E/(2*(1+nu));
 
   // Get the Finite Element type, this will be
@@ -365,13 +367,13 @@ void assemble_shell (EquationSystems & es,
       std::vector<Point> nodes;
       for (unsigned int i=0; i<elem->n_nodes(); ++i)
         nodes.push_back(*(elem->get_node(i)));
-      fe->reinit (elem,&nodes);
+      fe->reinit (elem, &nodes);
 
       // Convenient notation for the element node positions
-      Eigen::Vector3d X1(nodes[0](0),nodes[0](1),nodes[0](2));
-      Eigen::Vector3d X2(nodes[1](0),nodes[1](1),nodes[1](2));
-      Eigen::Vector3d X3(nodes[2](0),nodes[2](1),nodes[2](2));
-      Eigen::Vector3d X4(nodes[3](0),nodes[3](1),nodes[3](2));
+      Eigen::Vector3d X1(nodes[0](0), nodes[0](1), nodes[0](2));
+      Eigen::Vector3d X2(nodes[1](0), nodes[1](1), nodes[1](2));
+      Eigen::Vector3d X3(nodes[2](0), nodes[2](1), nodes[2](2));
+      Eigen::Vector3d X4(nodes[3](0), nodes[3](1), nodes[3](2));
 
       //Store covariant basis and local orthonormal basis at the nodes
       std::vector<Eigen::Matrix3d> F0node;
@@ -379,17 +381,17 @@ void assemble_shell (EquationSystems & es,
       for (unsigned int i=0; i<elem->n_nodes(); ++i)
       {
          Eigen::Vector3d a1;
-         a1 << dxyzdxi[i](0),dxyzdxi[i](1),dxyzdxi[i](2);
+         a1 << dxyzdxi[i](0), dxyzdxi[i](1), dxyzdxi[i](2);
          Eigen::Vector3d a2;
-         a2 << dxyzdeta[i](0),dxyzdeta[i](1),dxyzdeta[i](2);
+         a2 << dxyzdeta[i](0), dxyzdeta[i](1), dxyzdeta[i](2);
          Eigen::Vector3d n;
          n = a1.cross(a2);
          n /= n.norm();
          Eigen::Matrix3d F0;
          F0 <<
-           a1(0),a2(0),n(0),
-           a1(1),a2(1),n(1),
-           a1(2),a2(2),n(2);
+           a1(0), a2(0), n(0),
+           a1(1), a2(1), n(1),
+           a1(2), a2(2), n(2);
          F0node.push_back(F0);
 
         Real nx = n(0);
@@ -399,9 +401,9 @@ void assemble_shell (EquationSystems & es,
         {
           Eigen::Matrix3d Q;
           Q <<
-            1,0,0,
-            0,-1,0,
-            0,0,-1;
+            1, 0, 0,
+            0, -1, 0,
+            0, 0, -1;
           Qnode.push_back(Q);
         }
         else
@@ -412,7 +414,6 @@ void assemble_shell (EquationSystems & es,
             -1./(1+C)*nx*ny, C+1./(1+C)*nx*nx, ny,
             -nx,             -ny,              C;
           Qnode.push_back(Q);
-
         }
       }
 
@@ -430,17 +431,17 @@ void assemble_shell (EquationSystems & es,
 
         //Covariant basis at the quadrature point
         Eigen::Vector3d a1;
-        a1 << dxyzdxi[qp](0),dxyzdxi[qp](1),dxyzdxi[qp](2);
+        a1 << dxyzdxi[qp](0), dxyzdxi[qp](1), dxyzdxi[qp](2);
         Eigen::Vector3d a2;
-        a2 << dxyzdeta[qp](0),dxyzdeta[qp](1),dxyzdeta[qp](2);
+        a2 << dxyzdeta[qp](0), dxyzdeta[qp](1), dxyzdeta[qp](2);
         Eigen::Vector3d n;
         n = a1.cross(a2);
         n /= n.norm();
         Eigen::Matrix3d F0;
         F0 <<
-          a1(0),a2(0),n(0),
-          a1(1),a2(1),n(1),
-          a1(2),a2(2),n(2);
+          a1(0), a2(0), n(0),
+          a1(1), a2(1), n(1),
+          a1(2), a2(2), n(2);
 
         //Contravariant basis
         Eigen::Matrix3d F0it;
@@ -451,12 +452,12 @@ void assemble_shell (EquationSystems & es,
         Real ny = n(1);
         Real C  = n(2);
         Eigen::Matrix3d Q;
-        if (std::abs(1.+C)<1e-6)
+        if (std::abs(1.+C) < 1e-6)
         {
           Q <<
-            1,0,0,
-            0,-1,0,
-            0,0,-1;
+            1, 0, 0,
+            0, -1, 0,
+            0, 0, -1;
         }
         else
         {
@@ -470,17 +471,17 @@ void assemble_shell (EquationSystems & es,
         C0 = F0it.block<3,2>(0,0).transpose()*Q.block<3,2>(0,0);
 
         // Normal derivatives in reference coordinates
-        Eigen::Vector3d d2Xdxi2(d2xyzdxi2[qp](0),d2xyzdxi2[qp](1),d2xyzdxi2[qp](2));
-        Eigen::Vector3d d2Xdeta2(d2xyzdeta2[qp](0),d2xyzdeta2[qp](1),d2xyzdeta2[qp](2));
-        Eigen::Vector3d d2Xdxideta(d2xyzdxideta[qp](0),d2xyzdxideta[qp](1),d2xyzdxideta[qp](2));
+        Eigen::Vector3d d2Xdxi2(d2xyzdxi2[qp](0), d2xyzdxi2[qp](1), d2xyzdxi2[qp](2));
+        Eigen::Vector3d d2Xdeta2(d2xyzdeta2[qp](0), d2xyzdeta2[qp](1), d2xyzdeta2[qp](2));
+        Eigen::Vector3d d2Xdxideta(d2xyzdxideta[qp](0), d2xyzdxideta[qp](1), d2xyzdxideta[qp](2));
 
         Eigen::Matrix2d b;
         b <<
-          n.dot(d2Xdxi2),n.dot(d2Xdxideta),
-          n.dot(d2Xdxideta),n.dot(d2Xdeta2);
+          n.dot(d2Xdxi2), n.dot(d2Xdxideta),
+          n.dot(d2Xdxideta), n.dot(d2Xdeta2);
 
-        Eigen::Vector3d dndxi = -b(0,0)*F0it.col(0)-b(0,1)*F0it.col(1) ;
-        Eigen::Vector3d dndeta = -b(1,0)*F0it.col(0)-b(1,1)*F0it.col(1);
+        Eigen::Vector3d dndxi = -b(0,0)*F0it.col(0) - b(0,1)*F0it.col(1);
+        Eigen::Vector3d dndeta = -b(1,0)*F0it.col(0) - b(1,1)*F0it.col(1);
 
         Eigen::Matrix2d bhat;
         bhat <<
@@ -507,16 +508,16 @@ void assemble_shell (EquationSystems & es,
         // Multiplication by the assumed shear strain shape function.
         Eigen::Vector3d nA1 = 0.5*(Qnode[0].col(2)+Qnode[1].col(2));
         nA1 /= nA1.norm();
-        nA1 *= (1-eta)/4 ;
+        nA1 *= (1-eta)/4;
         Eigen::Vector3d nB2 = 0.5*(Qnode[1].col(2)+Qnode[2].col(2));
         nB2 /= nB2.norm();
-        nB2 *= (1+xi)/4 ;
+        nB2 *= (1+xi)/4;
         Eigen::Vector3d nA2 = 0.5*(Qnode[2].col(2)+Qnode[3].col(2));
         nA2 /= nA2.norm();
-        nA2 *= (1+eta)/4 ;
+        nA2 *= (1+eta)/4;
         Eigen::Vector3d nB1 = 0.5*(Qnode[3].col(2)+Qnode[0].col(2));
         nB1 /= nB1.norm();
-        nB1 *= (1-xi)/4 ;
+        nB1 *= (1-xi)/4;
 
         // Edge tangents
         Eigen::Vector3d aA1 = 0.5*(X2-X1);
@@ -525,29 +526,29 @@ void assemble_shell (EquationSystems & es,
         Eigen::Vector3d aB2 = 0.5*(X3-X2);
 
         // Contribution of the rotational dofs to the shear strain
-        Eigen::Vector2d AS1A1(-aA1.dot(Qnode[0].col(1)),aA1.dot(Qnode[0].col(0)));
-        Eigen::Vector2d AS2A1(-aA1.dot(Qnode[1].col(1)),aA1.dot(Qnode[1].col(0)));
-        AS1A1 *= (1-eta)/4 ;
-        AS2A1 *= (1-eta)/4 ;
+        Eigen::Vector2d AS1A1(-aA1.dot(Qnode[0].col(1)), aA1.dot(Qnode[0].col(0)));
+        Eigen::Vector2d AS2A1(-aA1.dot(Qnode[1].col(1)), aA1.dot(Qnode[1].col(0)));
+        AS1A1 *= (1-eta)/4;
+        AS2A1 *= (1-eta)/4;
 
-        Eigen::Vector2d AS1A2(-aA2.dot(Qnode[3].col(1)),aA2.dot(Qnode[3].col(0)));
-        Eigen::Vector2d AS2A2(-aA2.dot(Qnode[2].col(1)),aA2.dot(Qnode[2].col(0)));
-        AS1A2 *= (1+eta)/4 ;
-        AS2A2 *= (1+eta)/4 ;
+        Eigen::Vector2d AS1A2(-aA2.dot(Qnode[3].col(1)), aA2.dot(Qnode[3].col(0)));
+        Eigen::Vector2d AS2A2(-aA2.dot(Qnode[2].col(1)), aA2.dot(Qnode[2].col(0)));
+        AS1A2 *= (1+eta)/4;
+        AS2A2 *= (1+eta)/4;
 
-        Eigen::Vector2d AS1B1(-aB1.dot(Qnode[0].col(1)),aB1.dot(Qnode[0].col(0)));
-        Eigen::Vector2d AS2B1(-aB1.dot(Qnode[3].col(1)),aB1.dot(Qnode[3].col(0)));
-        AS1B1 *= (1-xi)/4 ;
-        AS2B1 *= (1-xi)/4 ;
+        Eigen::Vector2d AS1B1(-aB1.dot(Qnode[0].col(1)), aB1.dot(Qnode[0].col(0)));
+        Eigen::Vector2d AS2B1(-aB1.dot(Qnode[3].col(1)), aB1.dot(Qnode[3].col(0)));
+        AS1B1 *= (1-xi)/4;
+        AS2B1 *= (1-xi)/4;
 
-        Eigen::Vector2d AS1B2(-aB2.dot(Qnode[1].col(1)),aB2.dot(Qnode[1].col(0)));
-        Eigen::Vector2d AS2B2(-aB2.dot(Qnode[2].col(1)),aB2.dot(Qnode[2].col(0)));
-        AS1B2 *= (1+xi)/4 ;
-        AS2B2 *= (1+xi)/4 ;
+        Eigen::Vector2d AS1B2(-aB2.dot(Qnode[1].col(1)), aB2.dot(Qnode[1].col(0)));
+        Eigen::Vector2d AS2B2(-aB2.dot(Qnode[2].col(1)), aB2.dot(Qnode[2].col(0)));
+        AS1B2 *= (1+xi)/4;
+        AS2B2 *= (1+xi)/4;
 
         // Store previous quantities in the shear strain matrices for each node
         std::vector<Eigen::MatrixXd> Bcnode;
-        Eigen::MatrixXd Bc(2,5);
+        Eigen::MatrixXd Bc(2, 5);
         // Node 1
         Bc.block<1,3>(0,0) = -nA1.transpose();
         Bc.block<1,2>(0,3) = AS1A1.transpose();
@@ -580,8 +581,8 @@ void assemble_shell (EquationSystems & es,
           Real C1i = dphidxi[i][qp]*C0(0,0) + dphideta[i][qp]*C0(1,0);
           Real C2i = dphidxi[i][qp]*C0(0,1) + dphideta[i][qp]*C0(1,1);
 
-          Eigen::MatrixXd B0I(3,5);
-          B0I = Eigen::MatrixXd::Zero(3,5);
+          Eigen::MatrixXd B0I(3, 5);
+          B0I = Eigen::MatrixXd::Zero(3, 5);
           B0I.block<1,3>(0,0) = C1i*Q.col(0).transpose();
           B0I.block<1,3>(1,0) = C2i*Q.col(1).transpose();
           B0I.block<1,3>(2,0) = C2i*Q.col(0).transpose()+C1i*Q.col(1).transpose();
@@ -668,20 +669,20 @@ void assemble_shell (EquationSystems & es,
             B2J.block<1,2>(2,3) = bc2j*V1j.transpose()+bc1j*V2j.transpose();
 
             // Matrix Bc0, zeroth order shear strain
-            Eigen::MatrixXd Bc0J(2,5);
+            Eigen::MatrixXd Bc0J(2, 5);
             Bc0J = C0.transpose()*Bcnode[j];
 
             // Matrix Bc1, first order shear strain
-            Eigen::MatrixXd Bc1J(2,5);
+            Eigen::MatrixXd Bc1J(2, 5);
             Bc1J = bc.transpose()*Bcnode[j];
 
             // Drilling dof
-            Eigen::Vector2d BdxiJ(dphidxi[j][qp],dphideta[j][qp]);
+            Eigen::Vector2d BdxiJ(dphidxi[j][qp], dphideta[j][qp]);
             Eigen::Vector2d BdJ = C0.transpose()*BdxiJ;
 
             // The total stiffness matrix coupling the nodes
             // I and J is a sum of membrane, bending and shear contributions.
-            Eigen::MatrixXd local_KIJ(5,5);
+            Eigen::MatrixXd local_KIJ(5, 5);
             local_KIJ = JxW[qp] * (
                  B0I.transpose() * Hm * B0J
               +  B2I.transpose() * Hf * B0J
@@ -696,8 +697,8 @@ void assemble_shell (EquationSystems & es,
               );
 
             // Going from 5 to 6 dofs to add drilling dof
-            Eigen::MatrixXd full_local_KIJ(6,6);
-            full_local_KIJ = Eigen::MatrixXd::Zero(6,6);
+            Eigen::MatrixXd full_local_KIJ(6, 6);
+            full_local_KIJ = Eigen::MatrixXd::Zero(6, 6);
             full_local_KIJ.block<5,5>(0,0)=local_KIJ;
 
             // Drilling dof stiffness contribution
@@ -716,8 +717,8 @@ void assemble_shell (EquationSystems & es,
             // Insert the components of the coupling stiffness
             // matrix \p KIJ into the corresponding directional
             // submatrices.
-            for(unsigned int k=0;k<6;k++)
-              for(unsigned int l=0;l<6;l++)
+            for (unsigned int k=0;k<6;k++)
+              for (unsigned int l=0;l<6;l++)
                 Ke_var[k][l](i,j) += global_KIJ(k,l);
           }
         }
@@ -730,24 +731,20 @@ void assemble_shell (EquationSystems & es,
       dof_map.constrain_element_matrix (Ke,dof_indices);
 
       system.matrix->add_matrix (Ke, dof_indices);
-
     }
 
   //Adding point load to the RHS
 
   //Pinch position
-  Point C(0,3,3);
+  Point C(0, 3, 3);
 
   MeshBase::const_node_iterator nodeit = mesh.nodes_begin();
   const MeshBase::const_node_iterator node_end = mesh.nodes_end();
 
   for ( ; nodeit!=node_end; ++nodeit)
-  {
-    Node & node = **nodeit;
-     if ((node-C).size()<1e-3)
-     {
-       system.rhs->set(node.dof_number(0,2,0),-q/4);
-     }
-  }
-
+    {
+      Node & node = **nodeit;
+      if ((node-C).norm() < 1e-3)
+        system.rhs->set(node.dof_number(0, 2, 0), -q/4);
+    }
 }
