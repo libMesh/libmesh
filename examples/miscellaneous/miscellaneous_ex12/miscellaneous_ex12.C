@@ -130,10 +130,10 @@ int main (int argc, char ** argv)
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(7);
-    std::vector<unsigned int> variables = {2,3,4};
+    unsigned int variables[] = {2,3,4};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
-                                   variables,
+                                   std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
@@ -141,10 +141,10 @@ int main (int argc, char ** argv)
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(8);
-    std::vector<unsigned int> variables = {1,3,5};
+    unsigned int variables[] = {1,3,5};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
-                                   variables,
+                                   std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
@@ -152,10 +152,10 @@ int main (int argc, char ** argv)
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(9);
-    std::vector<unsigned int> variables = {0,4,5};
+    unsigned int variables[] = {0,4,5};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
-                                   variables,
+                                   std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
@@ -163,10 +163,10 @@ int main (int argc, char ** argv)
   {
     std::set<boundary_id_type> boundary_ids;
     boundary_ids.insert(10);
-    std::vector<unsigned int> variables = {0,2,4};
+    unsigned int variables[] = {0,2,4};
     ZeroFunction<> zf;
     DirichletBoundary dirichlet_bc(boundary_ids,
-                                   variables,
+                                   std::vector<unsigned int>(variables, variables+3),
                                    &zf);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
@@ -309,13 +309,13 @@ void assemble_shell (EquationSystems & es,
 
   // The element shape function and its derivatives evaluated at the
   // quadrature points.
-  const auto & dxyzdxi = fe->get_dxyzdxi();
-  const auto & dxyzdeta = fe->get_dxyzdeta();
-  const auto & d2xyzdxi2 = fe->get_d2xyzdxi2();
-  const auto & d2xyzdeta2 = fe->get_d2xyzdeta2();
-  const auto & d2xyzdxideta = fe->get_d2xyzdxideta();
-  const auto & dphidxi = fe->get_dphidxi();
-  const auto & dphideta = fe->get_dphideta();
+  const std::vector<RealGradient> & dxyzdxi = fe->get_dxyzdxi();
+  const std::vector<RealGradient> & dxyzdeta = fe->get_dxyzdeta();
+  const std::vector<RealGradient> & d2xyzdxi2 = fe->get_d2xyzdxi2();
+  const std::vector<RealGradient> & d2xyzdeta2 = fe->get_d2xyzdeta2();
+  const std::vector<RealGradient> & d2xyzdxideta = fe->get_d2xyzdxideta();
+  const std::vector<std::vector<Real> > & dphidxi = fe->get_dphidxi();
+  const std::vector<std::vector<Real> > & dphideta = fe->get_dphideta();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -352,7 +352,7 @@ void assemble_shell (EquationSystems & es,
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const auto elem = *el;
+      const Elem * elem = *el;
 
       dof_map.dof_indices (elem, dof_indices);
       for (unsigned int var=0; var<6; var++)
@@ -738,12 +738,12 @@ void assemble_shell (EquationSystems & es,
   //Pinch position
   Point C(0,3,3);
 
-  auto nodeit = mesh.nodes_begin();
-  const auto node_end = mesh.nodes_end();
+  MeshBase::const_node_iterator nodeit = mesh.nodes_begin();
+  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
 
-  for(;nodeit!=node_end;nodeit++)
+  for ( ; nodeit!=node_end; ++nodeit)
   {
-     auto node = **nodeit;
+    Node & node = **nodeit;
      if ((node-C).size()<1e-3)
      {
        system.rhs->set(node.dof_number(0,2,0),-q/4);
