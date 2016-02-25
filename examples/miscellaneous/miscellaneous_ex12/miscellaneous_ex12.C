@@ -25,7 +25,7 @@
 // The implementation follows very closely the notations of the french
 // reference book on structural analysis with finite elements:
 // Batoz, Jean-Louis, and Gouri Dhatt.
-// "Modélisation des structures par éléments finis, Vol. 3: Coques." Hermès, Paris (1992).
+// "Modelisation des structures par elements finis, Vol. 3: Coques." Hermes, Paris (1992).
 
 // C++ include files that we need
 #include <iostream>
