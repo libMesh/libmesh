@@ -20,11 +20,11 @@
 // \date 2016
 //
 // This example implements a variation of MITC4 shell elements.
-// The infamous "pinched cylinder" problem is solved and the solution 
+// The infamous "pinched cylinder" problem is solved and the solution
 // is compared to analytical values at selected points.
 // The implementation follows very closely the notations of the french
 // reference book on structural analysis with finite elements:
-// Batoz, Jean-Louis, and Gouri Dhatt. 
+// Batoz, Jean-Louis, and Gouri Dhatt.
 // "Modélisation des structures par éléments finis, Vol. 3: Coques." Hermès, Paris (1992).
 
 // C++ include files that we need
@@ -90,7 +90,7 @@ int main (int argc, char ** argv)
   LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem> ("Shell");
 
   // Add the three displacement variables "u", "v", "w",
-  // and the three rotational variables "theta_x", "theta_y", "theta_z".  
+  // and the three rotational variables "theta_x", "theta_y", "theta_z".
   // All variables are Q1 (first order on a quad mesh).
   system.add_variable ("u");
   system.add_variable ("v");
@@ -122,7 +122,7 @@ int main (int argc, char ** argv)
   // The point load (pinch) is applied at C in the -z direction.
   // Edge AD is the actual edge of the cylinder and is rigid in the xz-plane.
   // Other edges have symmetric boundary conditions.
-  
+
   //AB w,theta_x,theta_y
   {
     std::set<boundary_id_type> boundary_ids;
@@ -387,7 +387,7 @@ void assemble_shell (EquationSystems & es,
            a1(0),a2(0),n(0),
            a1(1),a2(1),n(1),
            a1(2),a2(2),n(2);
-         F0node.push_back(F0);    
+         F0node.push_back(F0);
 
         Real nx = n(0);
         Real ny = n(1);
@@ -410,7 +410,7 @@ void assemble_shell (EquationSystems & es,
             -nx,             -ny,              C;
           Qnode.push_back(Q);
 
-        }    
+        }
       }
 
       Ke.resize (n_dofs, n_dofs);
@@ -494,9 +494,9 @@ void assemble_shell (EquationSystems & es,
         Real xi = qrule.qp(qp)(0);
         Real eta = qrule.qp(qp)(1);
 
-        // Preassemble the MITC4 shear strain matrix for all nodes as they involve 
+        // Preassemble the MITC4 shear strain matrix for all nodes as they involve
         // cross references to midside nodes.
-        // The QUAD4 element has nodes X1,X2,X3,X4 with coordinates (xi,eta) 
+        // The QUAD4 element has nodes X1,X2,X3,X4 with coordinates (xi,eta)
         // in the reference element: (-1,-1),(1,-1),(1,1),(-1,1).
         // The midside nodes are denoted A1=(X1+X2)/2, B2=(X2+X3)/2, A2=(X3+X4)/2, B1=(X4+X1)/2.
 
@@ -592,7 +592,7 @@ void assemble_shell (EquationSystems & es,
 
           Eigen::Vector2d V2i(-Q.col(1).dot(Qnode[i].col(1)),
                                Q.col(1).dot(Qnode[i].col(0)));
-          
+
           Eigen::MatrixXd B1I(3,5);
           B1I = Eigen::MatrixXd::Zero(3,5);
           B1I.block<1,3>(0,0) = bc1i*Q.col(0).transpose();
@@ -644,7 +644,7 @@ void assemble_shell (EquationSystems & es,
                                  Q.col(0).dot(Qnode[j].col(0)));
 
             Eigen::Vector2d V2j(-Q.col(1).dot(Qnode[j].col(1)),
-                                 Q.col(1).dot(Qnode[j].col(0)));            
+                                 Q.col(1).dot(Qnode[j].col(0)));
 
             Eigen::MatrixXd B1J(3,5);
             B1J = Eigen::MatrixXd::Zero(3,5);
@@ -721,14 +721,14 @@ void assemble_shell (EquationSystems & es,
 
       } // end of the quadrature point qp-loop
 
-      // The element matrix is now built for this element. 
+      // The element matrix is now built for this element.
       // Add it to the global matrix.
 
       dof_map.constrain_element_matrix (Ke,dof_indices);
 
       system.matrix->add_matrix (Ke, dof_indices);
 
-    } 
+    }
 
   //Adding point load to the RHS
 
@@ -748,4 +748,3 @@ void assemble_shell (EquationSystems & es,
   }
 
 }
-
