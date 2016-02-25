@@ -53,8 +53,10 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
 
-//Eigen includes
-#include <Eigen/Dense>
+// Eigen includes
+#ifdef LIBMESH_HAVE_EIGEN
+# include <Eigen/Dense>
+#endif
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -74,8 +76,15 @@ int main (int argc, char ** argv)
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
 
-  // This example currently produces a NaN when used with Eigen, so require PETSc for now.
+  // This example currently produces a NaN when used with
+  // EigenSparseLinearSolver, so require PETSc solvers for now.
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
+  // This example does a bunch of linear algebra during assembly, and
+  // therefore requires Eigen.
+#ifndef LIBMESH_HAVE_EIGEN
+  libmesh_example_requires(false, "--enable-eigen");
+#endif
 
   // Create a mesh distributed across the default MPI communicator.
   Mesh mesh (init.comm(), 3);
@@ -258,6 +267,9 @@ int main (int argc, char ** argv)
 void assemble_shell (EquationSystems & es,
                      const std::string & system_name)
 {
+  // This example requires Eigen to actually work, but we should still
+  // let it compile and throw a runtime error if you don't.
+#ifdef LIBMESH_HAVE_EIGEN
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Shell");
@@ -267,7 +279,7 @@ void assemble_shell (EquationSystems & es,
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the shell system object.
-  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("Shell");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> (system_name);
 
   // Get the shell parameters that we need during assembly.
   const Real h  = es.parameters.get<Real> ("thickness");
@@ -747,4 +759,9 @@ void assemble_shell (EquationSystems & es,
       if ((node-C).norm() < 1e-3)
         system.rhs->set(node.dof_number(0, 2, 0), -q/4);
     }
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
+#endif // LIBMESH_HAVE_EIGEN
 }
