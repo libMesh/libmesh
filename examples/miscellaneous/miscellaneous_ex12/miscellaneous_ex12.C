@@ -74,6 +74,9 @@ int main (int argc, char ** argv)
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
 
+  // This example currently produces a NaN when used with Eigen, so require PETSc for now.
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
   // Create a mesh distributed across the default MPI communicator.
   Mesh mesh (init.comm(), 3);
 
