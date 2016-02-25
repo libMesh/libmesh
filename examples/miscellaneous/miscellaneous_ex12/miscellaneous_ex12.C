@@ -52,6 +52,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/linear_solver.h"
 
 // Eigen includes
 #ifdef LIBMESH_HAVE_EIGEN
@@ -75,10 +76,6 @@ int main (int argc, char ** argv)
 
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
-
-  // This example currently produces a NaN when used with
-  // EigenSparseLinearSolver, so require PETSc solvers for now.
-  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // This example does a bunch of linear algebra during assembly, and
   // therefore requires Eigen.
@@ -185,6 +182,12 @@ int main (int argc, char ** argv)
 
   // Print information about the system to the screen.
   equation_systems.print_info();
+
+  // This example can be run with EigenSparseLinearSolvers, but it
+  // only works with either the CG or SPARSELU types, and SparseLU
+  // turns out to be faster.
+  if (libMesh::default_solver_package() == EIGEN_SOLVERS)
+    system.get_linear_solver()->set_solver_type(SPARSELU);
 
   // Solve the linear system.
   system.solve();

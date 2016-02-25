@@ -45,6 +45,7 @@ enum SolverType {CG=0,
                  SSOR,
                  RICHARDSON,
                  CHEBYSHEV,
+                 SPARSELU,
 
                  INVALID_SOLVER};
 }
