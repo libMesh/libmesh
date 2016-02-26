@@ -549,7 +549,7 @@ void parallel_for (const Range & range, const Body & body)
 #endif
     }
 
-#if LIBMESH_HAVE_PTHREAD
+#if !LIBMESH_HAVE_OPENMP
   // Wait for them to finish
 
   // The use of 'int' instead of unsigned for the iteration variable
