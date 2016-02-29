@@ -1125,7 +1125,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           const Variable & variable = dof_map.variable(var);
 
-          const FEType & fe_type = variable.type();
+          FEType fe_type = variable.type();
+
+          // This may be a p refined element
+          fe_type.order =
+            libMesh::Order (fe_type.order + elem->p_level());
 
           if (fe_type.family == SCALAR)
             continue;
