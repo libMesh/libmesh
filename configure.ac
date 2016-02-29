@@ -71,10 +71,33 @@ AM_INIT_AUTOMAKE([dist-xz dist-bzip2 tar-ustar color-tests serial-tests 1.12])
 # use silent rules - automake 1.11
 AM_SILENT_RULES(yes)
 
-# by default we want 'maintainer mode', which means automake will generate rules to recreate e.g. Makefile.in from
-# Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to
-# work on systems with no autotools
-AM_MAINTAINER_MODE([enable])
+# We originally passed [enable] to AM_MAINTAINER_MODE, but this caused
+# ordinary users to have to configure with --disable-maintainer-mode,
+# which is easy to forget unless you are closely following the
+# instructions, or are aware of the issue and have run the provided
+# ./bootstrap script.
+#
+# We've now switched this to simply AM_MAINTAINER_MODE with no
+# arguments, which is equivalent to AM_MAINTAINER_MODE([disable]).  In
+# this configuration, developers who modify Makefile.am files (or
+# other build system files) *must* configure with
+# --enable-maintainer-mode in order for dependent files (Makefile.in,
+# etc) to be properly rebuilt whenever changes to the build system are
+# made.
+#
+# Note that this approach is not without its drawbacks and detractors:
+# https://blogs.gnome.org/desrt/2011/09/08/am_maintainer_mode-is-not-cool
+# https://www.gnu.org/software/automake/manual/html_node/maintainer_002dmode.html
+# but the benefit is that casual and first-time users are not
+# surprised by the default behavior of simply running ./configure.
+#
+# Note that we also do things a bit differently than most other
+# projects regarding the number of auto-generated build files
+# (Makefile.in) that are checked in, and it seems like the new
+# approach makes more sense for the way our project works --
+# rebuilding the build files are not part of a normal build for most
+# users.
+AM_MAINTAINER_MODE
 
 
 # --------------------------------------------------------------
