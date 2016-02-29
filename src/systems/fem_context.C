@@ -77,12 +77,13 @@ FEMContext::FEMContext (const System & sys)
       // different families which require different quadrature rules
       // libmesh_assert_equal_to (fe_type.family, hardest_fe_type.family);
 
-      if (fe_type.order > hardest_fe_type.order)
-        hardest_fe_type = fe_type;
-
-      // We need to detect SCALAR's so we can prepare FE objects for them.
+      // We need to detect SCALAR's so we can prepare FE objects for
+      // them, and so we don't mistake high order scalars as a reason
+      // to crank up the quadrature order on other types.
       if( fe_type.family == SCALAR )
         have_scalar = true;
+      else if (fe_type.order > hardest_fe_type.order)
+        hardest_fe_type = fe_type;
     }
 
   if(have_scalar)
