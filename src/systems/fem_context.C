@@ -73,6 +73,14 @@ FEMContext::FEMContext (const System & sys)
     {
       FEType fe_type = sys.variable_type(i);
 
+      // Make sure we find a non-SCALAR FE family, even in the case
+      // where the first variable(s) weren't
+      if (hardest_fe_type.family == SCALAR)
+        {
+          hardest_fe_type.family = fe_type.family;
+          hardest_fe_type.order = fe_type.order;
+        }
+
       // FIXME - we don't yet handle mixed finite elements from
       // different families which require different quadrature rules
       // libmesh_assert_equal_to (fe_type.family, hardest_fe_type.family);
