@@ -73,16 +73,25 @@ FEMContext::FEMContext (const System & sys)
     {
       FEType fe_type = sys.variable_type(i);
 
+      // Make sure we find a non-SCALAR FE family, even in the case
+      // where the first variable(s) weren't
+      if (hardest_fe_type.family == SCALAR)
+        {
+          hardest_fe_type.family = fe_type.family;
+          hardest_fe_type.order = fe_type.order;
+        }
+
       // FIXME - we don't yet handle mixed finite elements from
       // different families which require different quadrature rules
       // libmesh_assert_equal_to (fe_type.family, hardest_fe_type.family);
 
-      if (fe_type.order > hardest_fe_type.order)
-        hardest_fe_type = fe_type;
-
-      // We need to detect SCALAR's so we can prepare FE objects for them.
+      // We need to detect SCALAR's so we can prepare FE objects for
+      // them, and so we don't mistake high order scalars as a reason
+      // to crank up the quadrature order on other types.
       if( fe_type.family == SCALAR )
         have_scalar = true;
+      else if (fe_type.order > hardest_fe_type.order)
+        hardest_fe_type = fe_type;
     }
 
   if(have_scalar)
