@@ -142,7 +142,11 @@ public:
     _periodic_boundaries(periodic_boundaries),
 #endif
     _mesh(mesh)
-  {}
+  {
+    // Clang detects that _dof_map is not used for anything (other
+    // than being initialized) so let's prevent that warning.
+    libmesh_ignore(_dof_map);
+  }
 
   void operator()(const ConstElemRange & range) const
   {
