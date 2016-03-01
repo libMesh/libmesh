@@ -150,24 +150,18 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'version....................... : $netcdfversion
   fi
   echo '  'nlopt............................ : $enablenlopt
-  echo '  'openmp........................... : $enableopenmp
   echo '  'parmetis......................... : $enableparmetis
   echo '  'petsc............................ : $enablepetsc
   if (test "x$enablepetsc" = "xyes"); then
   echo '     'version....................... : $petscversion
   fi
-  echo '  'pthreads......................... : $enablepthreads
   echo '  'qhull............................ : $enableqhull
   echo '  'sfcurves......................... : $enablesfc
   echo '  'slepc............................ : $enableslepc
   if (test "x$enableslepc" = "xyes"); then
   echo '     'version....................... : $slepcversion
   fi
-  echo '  'tbb.............................. : $enabletbb
-  echo '  'c++ threads...................... : $enablecppthreads
-  if (test "x$enablecppthreads" = "xyes"); then
-  echo '     'flavor........................ : $cppthreadflavor
-  fi
+  echo '  'thread model..................... : $found_thread_model
   echo '  'c++ rtti ........................ : $ac_cv_cxx_rtti
   echo '  'tecio............................ : $enabletecio
   echo '  'tecplot...\(vendor binaries\)...... : $enabletecplot
