@@ -305,7 +305,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
         @%:@include <thread>
         void my_thread_func() {}
       ]], [[
+        thread_local int i;
         std::thread t(my_thread_func);
+        t.join();
       ]])],[
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_THREAD, 1, [Flag indicating whether compiler supports std::thread])
@@ -338,7 +340,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
         bool c = std::is_floating_point<char>::value;
       ]])],[
         AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_CXX11_TYPE_TRAITS, 1, [Flag indicating whether compiler supports std::thread])
+        AC_DEFINE(HAVE_CXX11_TYPE_TRAITS, 1, [Flag indicating whether compiler supports <type_traits>])
         have_cxx11_type_traits=yes
       ],[
         AC_MSG_RESULT(no)

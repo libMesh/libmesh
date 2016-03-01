@@ -17,8 +17,7 @@ ac_cv_cxx_thread,
  AC_LANG_RESTORE
 ])
 if test "$ac_cv_cxx_thread" = yes; then
-  AC_DEFINE(HAVE_STD_THREAD,1,
-            [define if the compiler supports std::thread])
+  true
   [$1]
 else
   false
@@ -55,8 +54,7 @@ if test "x$enabletbb" = "xno"; then
 fi
 
 if test "$ac_cv_tbb_cxx_thread" = yes; then
-  AC_DEFINE(HAVE_TBB_CXX_THREAD,1,
-            [define if the compiler supports tbb::tbb_thread])
+  true
   [$1]
 else
   false

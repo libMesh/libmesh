@@ -42,9 +42,9 @@
 #endif
 
 // C++ includes
-#ifdef LIBMESH_HAVE_STD_THREAD
+#ifdef LIBMESH_HAVE_CXX11_THREAD
 #  include <thread>
-#elif LIBMESH_HAVE_TBB_CXX_THREAD
+#elif LIBMESH_HAVE_TBB_API
 #  include "tbb/tbb_thread.h"
 #endif
 
@@ -62,7 +62,7 @@
 
 // Thread-Local-Storage macros
 
-#ifdef LIBMESH_HAVE_STD_THREAD
+#ifdef LIBMESH_HAVE_CXX11_THREAD
 #  define LIBMESH_TLS_TYPE(type)  thread_local type
 #  define LIBMESH_TLS_REF(value)  (value)
 #else
@@ -110,14 +110,14 @@ private:
 };
 
 
-#ifdef LIBMESH_HAVE_STD_THREAD
+#ifdef LIBMESH_HAVE_CXX11_THREAD
 //--------------------------------------------------------------------
 /**
  * Use std::thread when available.
  */
 typedef std::thread Thread;
 
-#elif LIBMESH_HAVE_TBB_CXX_THREAD
+#elif LIBMESH_HAVE_TBB_API
 //--------------------------------------------------------------------
 /**
  * Fall back to tbb::tbb_thread when available.
