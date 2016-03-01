@@ -70,7 +70,19 @@ fi
 # ------------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_THREAD],
 [
-ACX_STD_THREAD([cppthreadflavor="std::thread"],
-ACX_TBB_STD_THREAD([cppthreadflavor="tbb::tbb_thread"],
-[enablecppthreads=no]))
+  AC_ARG_WITH(thread-model,
+              AS_HELP_STRING([--with-thread-model=tbb,openmp,pthread,auto],[Specify the thread model to use]),
+              [case "${withval}" in
+                tbb)     requested_thread_model=tbb     ;;
+                openmp)  requested_thread_model=openmp  ;;
+                pthread) requested_thread_model=pthread ;;
+                auto)    requested_thread_model=auto    ;;
+                *)       AC_MSG_ERROR(bad value ${withval} for --with-thread-model) ;;
+              esac],
+              requested_thread_model=auto)
+
+  AC_MSG_RESULT([User requested thread model: $requested_thread_model])
+
+  ACX_STD_THREAD([cppthreadflavor="std::thread"],
+                  ACX_TBB_STD_THREAD([cppthreadflavor="tbb::tbb_thread"], [enablecppthreads=no]))
 ])
