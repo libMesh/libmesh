@@ -176,7 +176,7 @@ typedef tbb::split split;
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
+ * Execute the provided function object in parallel on the specified
  * range.
  */
 template <typename Range, typename Body>
@@ -208,7 +208,7 @@ void parallel_for (const Range & range, const Body & body)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
+ * Execute the provided function object in parallel on the specified
  * range with the specified partitioner.
  */
 template <typename Range, typename Body, typename Partitioner>
@@ -240,7 +240,7 @@ void parallel_for (const Range & range, const Body & body, const Partitioner & p
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
+ * Execute the provided reduction operation in parallel on the specified
  * range.
  */
 template <typename Range, typename Body>
@@ -272,7 +272,7 @@ void parallel_reduce (const Range & range, Body & body)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
+ * Execute the provided reduction operation in parallel on the specified
  * range with the specified partitioner.
  */
 template <typename Range, typename Body, typename Partitioner>
@@ -326,7 +326,7 @@ typedef tbb::recursive_mutex recursive_mutex;
 template <typename T>
 class atomic : public tbb::atomic<T> {};
 
-#else //LIBMESH_HAVE_TBB_API
+#else // !LIBMESH_HAVE_TBB_API
 #ifdef LIBMESH_HAVE_PTHREAD
 
 //-------------------------------------------------------------------
@@ -391,7 +391,7 @@ public:
 private:
   pthread_spinlock_t slock;
 };
-#endif
+#endif // __APPLE__
 
 //-------------------------------------------------------------------
 /**
@@ -487,7 +487,7 @@ class split {};
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
+ * Execute the provided function object in parallel on the specified
  * range.
  */
 template <typename Range, typename Body>
@@ -574,7 +574,7 @@ void parallel_for (const Range & range, const Body & body)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
+ * Execute the provided function object in parallel on the specified
  * range with the specified partitioner.
  */
 template <typename Range, typename Body, typename Partitioner>
@@ -586,7 +586,7 @@ void parallel_for (const Range & range, const Body & body, const Partitioner &)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
+ * Execute the provided reduction operation in parallel on the specified
  * range.
  */
 template <typename Range, typename Body>
@@ -685,7 +685,7 @@ void parallel_reduce (const Range & range, Body & body)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
+ * Execute the provided reduction operation in parallel on the specified
  * range with the specified partitioner.
  */
 template <typename Range, typename Body, typename Partitioner>
@@ -770,7 +770,7 @@ private:
   spin_mutex smutex;
 };
 
-#else //LIBMESH_HAVE_PTHREAD
+#else // !LIBMESH_HAVE_PTHREAD
 
 //-------------------------------------------------------------------
 /**
@@ -794,7 +794,7 @@ class split {};
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
+ * Execute the provided function object in parallel on the specified
  * range.
  */
 template <typename Range, typename Body>
@@ -807,7 +807,7 @@ void parallel_for (const Range & range, const Body & body)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
+ * Execute the provided function object in parallel on the specified
  * range with the specified partitioner.
  */
 template <typename Range, typename Body, typename Partitioner>
@@ -820,7 +820,7 @@ void parallel_for (const Range & range, const Body & body, const Partitioner &)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
+ * Execute the provided reduction operation in parallel on the specified
  * range.
  */
 template <typename Range, typename Body>
@@ -833,7 +833,7 @@ void parallel_reduce (const Range & range, Body & body)
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
+ * Execute the provided reduction operation in parallel on the specified
  * range with the specified partitioner.
  */
 template <typename Range, typename Body, typename Partitioner>
@@ -902,7 +902,7 @@ private:
 };
 
 #endif // LIBMESH_HAVE_PTHREAD
-#endif // #ifdef LIBMESH_HAVE_TBB_API
+#endif // LIBMESH_HAVE_TBB_API
 
 
 
