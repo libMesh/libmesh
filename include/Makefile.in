@@ -839,6 +839,9 @@ include_HEADERS = \
         parallel/parallel_sort.h \
         parallel/threads.h \
         parallel/threads_allocators.h \
+        parallel/threads_none.h \
+        parallel/threads_pthread.h \
+        parallel/threads_tbb.h \
         partitioning/centroid_partitioner.h \
         partitioning/hilbert_sfc_partitioner.h \
         partitioning/linear_partitioner.h \

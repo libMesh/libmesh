@@ -255,7 +255,7 @@
 /* Flag indicating whether compiler supports std::thread */
 #undef HAVE_CXX11_THREAD
 
-/* Flag indicating whether compiler supports std::thread */
+/* Flag indicating whether compiler supports <type_traits> */
 #undef HAVE_CXX11_TYPE_TRAITS
 
 /* Flag indicating whether compiler supports std::unique_ptr */
@@ -450,9 +450,6 @@
 /* define if the compiler supports std::hash */
 #undef HAVE_STD_HASH
 
-/* define if the compiler supports std::thread */
-#undef HAVE_STD_THREAD
-
 /* define if the compiler supports std::unordered_map */
 #undef HAVE_STD_UNORDERED_MAP
 
@@ -489,9 +486,6 @@
 /* Flag indicating whether the library shall be compiled to use the Threading
    Building Blocks */
 #undef HAVE_TBB_API
-
-/* define if the compiler supports tbb::tbb_thread */
-#undef HAVE_TBB_CXX_THREAD
 
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
