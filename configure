@@ -1873,8 +1873,8 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
-  --disable-maintainer-mode
-                          disable make rules and dependencies not useful (and
+  --enable-maintainer-mode
+                          enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --disable-mpi           build without MPI message passing support
   --enable-dependency-tracking
@@ -4541,9 +4541,32 @@ fi
 AM_BACKSLASH='\'
 
 
-# by default we want 'maintainer mode', which means automake will generate rules to recreate e.g. Makefile.in from
-# Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to
-# work on systems with no autotools
+# We originally passed [enable] to AM_MAINTAINER_MODE, but this caused
+# ordinary users to have to configure with --disable-maintainer-mode,
+# which is easy to forget unless you are closely following the
+# instructions, or are aware of the issue and have run the provided
+# ./bootstrap script.
+#
+# We've now switched this to simply AM_MAINTAINER_MODE with no
+# arguments, which is equivalent to AM_MAINTAINER_MODE([disable]).  In
+# this configuration, developers who modify Makefile.am files (or
+# other build system files) *must* configure with
+# --enable-maintainer-mode in order for dependent files (Makefile.in,
+# etc) to be properly rebuilt whenever changes to the build system are
+# made.
+#
+# Note that this approach is not without its drawbacks and detractors:
+# https://blogs.gnome.org/desrt/2011/09/08/am_maintainer_mode-is-not-cool
+# https://www.gnu.org/software/automake/manual/html_node/maintainer_002dmode.html
+# but the benefit is that casual and first-time users are not
+# surprised by the default behavior of simply running ./configure.
+#
+# Note that we also do things a bit differently than most other
+# projects regarding the number of auto-generated build files
+# (Makefile.in) that are checked in, and it seems like the new
+# approach makes more sense for the way our project works --
+# rebuilding the build files are not part of a normal build for most
+# users.
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
 $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
@@ -4551,7 +4574,7 @@ $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles
 if test "${enable_maintainer_mode+set}" = set; then :
   enableval=$enable_maintainer_mode; USE_MAINTAINER_MODE=$enableval
 else
-  USE_MAINTAINER_MODE=yes
+  USE_MAINTAINER_MODE=no
 fi
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USE_MAINTAINER_MODE" >&5
