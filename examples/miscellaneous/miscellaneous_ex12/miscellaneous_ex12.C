@@ -53,6 +53,7 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/linear_solver.h"
+#include "libmesh/libmesh_nullptr.h"
 
 // Eigen includes
 #ifdef LIBMESH_HAVE_EIGEN
@@ -198,7 +199,7 @@ int main (int argc, char ** argv)
   ExodusII_IO(mesh).write_equation_systems ("out.e", equation_systems);
 
   // Find the point C.
-  Node * node_C = nullptr;
+  Node * node_C = libmesh_nullptr;
   Point point_C(0, 3, 3);
   Real nearest_dist_sq = (mesh.point(0)-point_C).norm_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
@@ -229,7 +230,7 @@ int main (int argc, char ** argv)
   libMesh::out << "Analytic solution: " << w_C_bar_analytic << std::endl;
 
   // Find the point D.
-  Node * node_D = nullptr;
+  Node * node_D = libmesh_nullptr;
   Point point_D(0, 0, 3);
   nearest_dist_sq = (mesh.point(0)-point_D).norm_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
