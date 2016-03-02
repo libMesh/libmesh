@@ -21,10 +21,6 @@
 // Local Includes
 #include "libmesh/threads.h"
 
-#if LIBMESH_HAVE_OPENMP
-#include <omp.h>
-#endif
-
 namespace libMesh
 {
 
