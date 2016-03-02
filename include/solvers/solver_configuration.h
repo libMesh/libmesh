@@ -71,7 +71,7 @@ public:
    * \p solve_failure_count specifies the number of times we've tried to
    * recover from a failure.
    */
-  virtual void respond_to_solve_failure(unsigned int solve_failure_count) {}
+  virtual void respond_to_solve_failure(unsigned int /*solve_failure_count*/) {}
 
   /**
    * Store real-valued solver parameters in this map, e.g. solver tolerances.
