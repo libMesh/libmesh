@@ -265,6 +265,9 @@ BUILT_SOURCES = \
         parallel_sort.h \
         threads.h \
         threads_allocators.h \
+        threads_none.h \
+        threads_pthread.h \
+        threads_tbb.h \
         centroid_partitioner.h \
         hilbert_sfc_partitioner.h \
         linear_partitioner.h \
@@ -1297,6 +1300,15 @@ threads.h: $(top_srcdir)/include/parallel/threads.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_allocators.h: $(top_srcdir)/include/parallel/threads_allocators.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_none.h: $(top_srcdir)/include/parallel/threads_none.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_pthread.h: $(top_srcdir)/include/parallel/threads_pthread.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 centroid_partitioner.h: $(top_srcdir)/include/partitioning/centroid_partitioner.h
