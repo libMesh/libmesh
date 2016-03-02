@@ -45,16 +45,9 @@
 #  define LIBMESH_TLS_REF(value)  (value)
 #endif
 
-
-
 namespace libMesh
 {
 
-
-/**
- * The Threads namespace is for wrapper functions
- * for common general multithreading algorithms and tasks.
- */
 namespace Threads
 {
 
@@ -66,31 +59,12 @@ namespace Threads
 typedef std::thread Thread;
 
 #else
+
 /**
- * Simple compatibility class for std::thread 'concurrent' execution.
- * Not at all concurrent, but provides a compatible interface.
+ * Use the non-concurrent placeholder.
  */
-class Thread
-{
-public:
-  /**
-   * Constructor.  Takes a callable function object and executes it.
-   * Our wrapper class actually blocks execution until the thread
-   * is complete.
-   */
-  template <typename Callable>
-  Thread (Callable f) { f(); }
+typedef NonConcurrentThread Thread;
 
-  /**
-   * Join is a no-op, since the constructor blocked until completion.
-   */
-  void join() {}
-
-  /**
-   * Always joinable.
-   */
-  bool joinable() const { return true; }
-};
 #endif // LIBMESH_HAVE_CXX11_THREAD
 
 

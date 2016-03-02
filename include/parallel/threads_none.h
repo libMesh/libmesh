@@ -27,31 +27,16 @@
 #define LIBMESH_TLS_TYPE(type)  type
 #define LIBMESH_TLS_REF(value)  (value)
 
-/**
- * Simple compatibility class for std::thread 'concurrent' execution.
- * Not at all concurrent, but provides a compatible interface.
- */
-class Thread
+namespace libMesh
 {
-public:
-  /**
-   * Constructor.  Takes a callable function object and executes it.
-   * Our wrapper class actually blocks execution until the thread
-   * is complete.
-   */
-  template <typename Callable>
-  Thread (Callable f) { f(); }
 
-  /**
-   * Join is a no-op, since the constructor blocked until completion.
-   */
-  void join() {}
+namespace Threads
+{
 
-  /**
-   * Always joinable.
-   */
-  bool joinable() const { return true; }
-};
+/**
+ * Use the non-concurrent placeholder.
+ */
+typedef NonConcurrentThread Thread;
 
 /**
  * Scheduler to manage threads.
@@ -188,6 +173,10 @@ public:
 private:
   T _val;
 };
+
+} // namespace Threads
+
+} // namespace libMesh
 
 #endif // !defined(LIBMESH_HAVE_TBB_API) && !defined(LIBMESH_HAVE_PTHREAD)
 

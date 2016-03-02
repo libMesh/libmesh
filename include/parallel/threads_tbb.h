@@ -42,24 +42,21 @@
 #define TBB_VERSION_LESS_THAN(major,minor)                              \
   ((LIBMESH_DETECTED_TBB_VERSION_MAJOR < (major) ||                     \
     (LIBMESH_DETECTED_TBB_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_TBB_VERSION_MINOR < (minor)))) ? 1 : 0)
-#endif
 
 // Thread-Local-Storage macros
 #define LIBMESH_TLS_TYPE(type)  tbb::enumerable_thread_specific<type>
 #define LIBMESH_TLS_REF(value)  (value).local()
 
-
 namespace libMesh
 {
 
-
-/**
- * The Threads namespace is for wrapper functions
- * for common general multithreading algorithms and tasks.
- */
 namespace Threads
 {
 
+/**
+ * Thread object abstraction that provides a basic constructor and
+ * support for join().
+ */
 typedef tbb::tbb_thread Thread;
 
 /**
@@ -217,7 +214,6 @@ typedef tbb::recursive_mutex recursive_mutex;
  */
 template <typename T>
 class atomic : public tbb::atomic<T> {};
-
 
 } // namespace Threads
 
