@@ -189,7 +189,7 @@ fi
 # Choose between TBB, OpenMP, and pthreads thread models.
 # The user can control this by configuring with
 #
-# --with-thread-model={tbb,openmp,pthread,auto}
+# --with-thread-model={tbb,pthread,auto,none}
 #
 # where "auto" will try to automatically detect the best possible
 # version (see threads.m4).
