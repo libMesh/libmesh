@@ -359,6 +359,16 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     libMesh::libMeshPrivateData::_n_threads =
       libMesh::command_line_value (n_threads, 1);
 
+    // If there's no threading model active, force _n_threads==1
+#if !LIBMESH_USING_THREADS
+    if (libMesh::libMeshPrivateData::_n_threads != 1)
+      {
+        libMesh::libMeshPrivateData::_n_threads = 1;
+        libmesh_warning("Warning: You requested --n-threads>1 but no threading model is active!\n"
+                        << "Forcing --n-threads==1 instead!");
+      }
+#endif
+
     // Set the number of OpenMP threads to the same as the number of threads libMesh is going to use
 #ifdef LIBMESH_HAVE_OPENMP
     omp_set_num_threads(libMesh::libMeshPrivateData::_n_threads);
