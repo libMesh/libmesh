@@ -40,13 +40,16 @@
 namespace libMesh
 {
 /**
- * Helper functions for printing scalar and vector types.  Called from Parameters::Parameter<T>::print(...).
+ * Helper functions for printing scalar, vector and vector<vector> types.  Called from Parameters::Parameter<T>::print(...).
  */
 template<typename P>
 void print_helper(std::ostream & os, const P * param);
 
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<P> * param);
+
+template<typename P>
+void print_helper(std::ostream & os, const std::vector<std::vector<P> > * param);
 
 /**
  * This class provides the ability to map between
@@ -544,6 +547,15 @@ void print_helper(std::ostream & os, const std::vector<P> * param)
 {
   for (unsigned int i=0; i<param->size(); ++i)
     os << (*param)[i] << " ";
+}
+
+//non-member vector<vector> print function
+template<typename P>
+void print_helper(std::ostream & os, const std::vector<std::vector<P> > * param)
+{
+  for (unsigned int i=0; i<param->size(); ++i)
+    for (unsigned int j=0; j<(*param)[i].size(); ++j)
+      os << (*param)[i][j] << " ";
 }
 
 } // namespace libMesh
