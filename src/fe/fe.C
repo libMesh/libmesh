@@ -571,7 +571,7 @@ void FE<Dim,T>::init_base_shape_functions(const std::vector<Point> & qp,
 {
   // I don't understand infinite elements well enough to risk
   // calculating too little.  :-(  RHS
-  this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = true;
+  this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
 
   this->elem_type = e->type();
   this->_fe_map->template init_reference_to_physical_map<Dim>(qp, e);

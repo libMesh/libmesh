@@ -418,7 +418,9 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   //  from faces to ofaces, nodes are collected in onodes.
   //  Here, the search is done iteratively, because, depending on
   //  the mesh, a very high level of recursion might be necessary.
-  if (max_r_node > 0)
+  if (max_r_node >= 0)
+    // include the possibility of the 1st element being most far away.
+    // Only the case of no outer boundary is to be excluded.
     onodes.insert(max_r_node);
 
 

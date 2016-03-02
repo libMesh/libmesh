@@ -1363,6 +1363,12 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       subdomain_map_type::mapped_type & tmp_vec = (*it).second;
 
       ExodusII_IO_Helper::ElementMaps em(*this);
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      // Skip infinite element-blocks; they can not be viewed in most visualization software
+      // as paraview.
+      if (mesh.elem(tmp_vec[0])->infinite())
+        continue;
+#endif
 
       //Use the first element in this block to get representative information.
       //Note that Exodus assumes all elements in a block are of the same type!
