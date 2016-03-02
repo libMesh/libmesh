@@ -32,6 +32,7 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 #include "libmesh/getpot.h"
+#include "libmesh/libmesh_nullptr.h"
 
 #define EXODUS_DIM 0x8
 #define BLOCKS     0x4
