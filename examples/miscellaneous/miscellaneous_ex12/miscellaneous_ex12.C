@@ -198,11 +198,14 @@ int main (int argc, char ** argv)
   // Paraview.
   ExodusII_IO(mesh).write_equation_systems ("out.e", equation_systems);
 
-  // Find the point C.
+  // Find the node nearest point C.
   Node * node_C = libmesh_nullptr;
   Point point_C(0, 3, 3);
   {
     Real nearest_dist_sq = std::numeric_limits<Real>::max();
+
+    // Find the closest local node.  On a ParallelMesh we may not even
+    // know about the existence of closer non-local nodes.
     libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
     const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
     for (; it != end; ++it)
@@ -216,9 +219,12 @@ int main (int argc, char ** argv)
           }
       }
 
+    // Check with other processors to see if any found a closer node
     unsigned int minrank = 0;
     system.comm().minloc(nearest_dist_sq, minrank);
 
+    // Broadcast the ID of the closest node, so every processor can
+    // see for certain whether they have it or not.
     dof_id_type nearest_node_id;
     if (system.processor_id() == minrank)
       nearest_node_id = node_C->id();
@@ -228,6 +234,9 @@ int main (int argc, char ** argv)
 
   // Evaluate the z-displacement "w" at the point C.
   Number w = 0;
+
+  // If we know about the closest node, and if we also own the DoFs
+  // on that node, then we can evaluate the solution at that node.
   if (node_C)
     {
       const unsigned int w_var = system.variable_number ("w");
@@ -247,7 +256,7 @@ int main (int argc, char ** argv)
   libMesh::out << "z-displacement of the point C: " << w_C_bar << std::endl;
   libMesh::out << "Analytic solution: " << w_C_bar_analytic << std::endl;
 
-  // Find the point D.
+  // Find the node nearest point D, the same as we did for point C.
   Node * node_D = libmesh_nullptr;
   Point point_D(0, 0, 3);
   {
