@@ -232,7 +232,7 @@ int main (int argc, char ** argv)
     node_C = mesh.query_node_ptr(nearest_node_id);
   }
 
-  // Evaluate the z-displacement "w" at the point C.
+  // Evaluate the z-displacement "w" at the node nearest C.
   Number w = 0;
 
   // If we know about the closest node, and if we also own the DoFs
@@ -256,46 +256,11 @@ int main (int argc, char ** argv)
   libMesh::out << "z-displacement of the point C: " << w_C_bar << std::endl;
   libMesh::out << "Analytic solution: " << w_C_bar_analytic << std::endl;
 
-  // Find the node nearest point D, the same as we did for point C.
-  Node * node_D = libmesh_nullptr;
+  // Evaluate the y-displacement "v" at point D.  This time we'll
+  // evaluate at the exact point, not just the closest node.
   Point point_D(0, 0, 3);
-  {
-    Real nearest_dist_sq = std::numeric_limits<Real>::max();
-    libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
-    const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
-    for (; it != end; ++it)
-      {
-        Node *n = *it;
-        const Real dist_sq = (*n-point_C).norm_sq();
-        if (dist_sq < nearest_dist_sq)
-          {
-            nearest_dist_sq = dist_sq;
-            node_D = n;
-          }
-      }
-
-    unsigned int minrank = 0;
-    system.comm().minloc(nearest_dist_sq, minrank);
-
-    dof_id_type nearest_node_id;
-    if (system.processor_id() == minrank)
-      nearest_node_id = node_D->id();
-    system.comm().broadcast(nearest_node_id, minrank);
-    node_D = mesh.query_node_ptr(nearest_node_id);
-  }
-
-  // Evaluate the y-displacement "v" at the point D.
-  Number v = 0;
-  if (node_D)
-    {
-      const unsigned int v_var = system.variable_number ("v");
-      dof_id_type v_dof = node_D->dof_number (system.number(), v_var, 0);
-      if (v_dof >= system.get_dof_map().first_dof() &&
-          v_dof <  system.get_dof_map().end_dof())
-        v = system.current_solution(v_dof);
-    }
-  system.comm().sum(v);
-
+  const unsigned int v_var = system.variable_number ("v");
+  Number v = system.point_value(v_var, point_D);
 
   Real v_D_bar = E*h*v/q;
   const Real v_D_bar_analytic = 4.114;
