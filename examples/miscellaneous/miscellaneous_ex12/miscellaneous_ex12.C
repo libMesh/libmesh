@@ -201,25 +201,43 @@ int main (int argc, char ** argv)
   // Find the point C.
   Node * node_C = libmesh_nullptr;
   Point point_C(0, 3, 3);
-  Real nearest_dist_sq = (mesh.point(0)-point_C).norm_sq();
-  for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
-    {
-      const Real dist_sq = (mesh.point(nid)-point_C).norm_sq();
-      if (dist_sq < nearest_dist_sq)
-        {
-          nearest_dist_sq = dist_sq;
-          node_C = mesh.node_ptr(nid);
-        }
-    }
+  {
+    Real nearest_dist_sq = std::numeric_limits<Real>::max();
+    libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
+    const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
+    for (; it != end; ++it)
+      {
+        Node *n = *it;
+        const Real dist_sq = (*n-point_C).norm_sq();
+        if (dist_sq < nearest_dist_sq)
+          {
+            nearest_dist_sq = dist_sq;
+            node_C = n;
+          }
+      }
+
+    unsigned int minrank = 0;
+    system.comm().minloc(nearest_dist_sq, minrank);
+
+    dof_id_type nearest_node_id;
+    if (system.processor_id() == minrank)
+      nearest_node_id = node_C->id();
+    system.comm().broadcast(nearest_node_id, minrank);
+    node_C = mesh.query_node_ptr(nearest_node_id);
+  }
 
   // Evaluate the z-displacement "w" at the point C.
-  const unsigned int w_var = system.variable_number ("w");
-  dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
   Number w = 0;
-  if (w_dof >= system.get_dof_map().first_dof() &&
-      w_dof < system.get_dof_map().end_dof())
-    w = system.current_solution(w_dof);
+  if (node_C)
+    {
+      const unsigned int w_var = system.variable_number ("w");
+      dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
+      if (w_dof >= system.get_dof_map().first_dof() &&
+          w_dof < system.get_dof_map().end_dof())
+        w = system.current_solution(w_dof);
+    }
   system.comm().sum(w);
+
 
   Real w_C_bar = -E*h*w/q;
   const Real w_C_bar_analytic = 164.24;
@@ -232,25 +250,43 @@ int main (int argc, char ** argv)
   // Find the point D.
   Node * node_D = libmesh_nullptr;
   Point point_D(0, 0, 3);
-  nearest_dist_sq = (mesh.point(0)-point_D).norm_sq();
-  for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
-    {
-      const Real dist_sq = (mesh.point(nid)-point_D).norm_sq();
-      if (dist_sq < nearest_dist_sq)
-        {
-          nearest_dist_sq = dist_sq;
-          node_D = mesh.node_ptr(nid);
-        }
-    }
+  {
+    Real nearest_dist_sq = std::numeric_limits<Real>::max();
+    libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
+    const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
+    for (; it != end; ++it)
+      {
+        Node *n = *it;
+        const Real dist_sq = (*n-point_C).norm_sq();
+        if (dist_sq < nearest_dist_sq)
+          {
+            nearest_dist_sq = dist_sq;
+            node_D = n;
+          }
+      }
+
+    unsigned int minrank = 0;
+    system.comm().minloc(nearest_dist_sq, minrank);
+
+    dof_id_type nearest_node_id;
+    if (system.processor_id() == minrank)
+      nearest_node_id = node_D->id();
+    system.comm().broadcast(nearest_node_id, minrank);
+    node_D = mesh.query_node_ptr(nearest_node_id);
+  }
 
   // Evaluate the y-displacement "v" at the point D.
-  const unsigned int v_var = system.variable_number ("v");
-  dof_id_type v_dof = node_D->dof_number (system.number(), v_var, 0);
   Number v = 0;
-  if (v_dof >= system.get_dof_map().first_dof() &&
-      v_dof <  system.get_dof_map().end_dof())
-    v = system.current_solution(v_dof);
+  if (node_D)
+    {
+      const unsigned int v_var = system.variable_number ("v");
+      dof_id_type v_dof = node_D->dof_number (system.number(), v_var, 0);
+      if (v_dof >= system.get_dof_map().first_dof() &&
+          v_dof <  system.get_dof_map().end_dof())
+        v = system.current_solution(v_dof);
+    }
   system.comm().sum(v);
+
 
   Real v_D_bar = E*h*v/q;
   const Real v_D_bar_analytic = 4.114;
