@@ -31,22 +31,24 @@ AC_DEFUN([ACX_BEST_THREAD],
       libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
       libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
       found_thread_model=tbb
-      break
     fi
+  fi
 
-  elif (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto"); then
-    AX_PTHREAD
+  # If TBB wasn't selected, try pthreads as long as the user requested it (or auto)
+  if (test "$found_thread_model" = none) ; then
+    if (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto"); then
+      AX_PTHREAD
 
-    if (test x$ax_pthread_ok = xyes); then
-      AC_DEFINE(USING_THREADS, 1,
-                [Flag indicating whether the library shall be compiled to use any particular thread API.])
-      AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
-      libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
-      libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
-      found_thread_model=pthread
-      break
-    else
-      enablepthreads=no
+      if (test x$ax_pthread_ok = xyes); then
+        AC_DEFINE(USING_THREADS, 1,
+                  [Flag indicating whether the library shall be compiled to use any particular thread API.])
+        AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
+        libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
+        libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+        found_thread_model=pthread
+      else
+        enablepthreads=no
+      fi
     fi
   fi
 
