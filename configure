@@ -1173,6 +1173,7 @@ with_thread_model
 enable_tbb
 with_tbb
 with_tbb_lib
+enable_pthreads
 enable_openmp
 enable_laspack
 enable_sfc
@@ -1959,6 +1960,7 @@ Optional Features:
   --disable-trilinos      build without Trilinos support
   --disable-tbb           build without threading support via Threading
                           Building Blocks
+  --disable-pthreads      build without POSIX threading (pthreads) support
   --disable-openmp        Build without OpenMP Support
   --disable-laspack       build without LASPACK iterative solver suppport
   --disable-sfc           build without space-filling curves suppport
@@ -35872,6 +35874,7 @@ if test "${with_thread_model+set}" = set; then :
   withval=$with_thread_model; case "${withval}" in
                 tbb)     requested_thread_model=tbb     ;;
                 pthread) requested_thread_model=pthread ;;
+                pthreads) requested_thread_model=pthread ;;
                 auto)    requested_thread_model=auto    ;;
                 none)    requested_thread_model=none    ;;
                 *)       as_fn_error $? "bad value ${withval} for --with-thread-model" "$LINENO" 5 ;;
@@ -35881,8 +35884,8 @@ else
 fi
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: User requested thread model: $requested_thread_model" >&5
-$as_echo "User requested thread model: $requested_thread_model" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< User requested thread model: $requested_thread_model >>>" >&5
+$as_echo "<<< User requested thread model: $requested_thread_model >>>" >&6; }
 
   # Set this variable when a threading model is found
   found_thread_model=none
@@ -36104,10 +36107,27 @@ $as_echo "$ac_cv_tls" >&6; }
       libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
       libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
       found_thread_model=tbb
-      break
     fi
+  fi
 
-  elif (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto"); then
+  # If TBB wasn't selected, try pthreads as long as the user requested it (or auto)
+  if (test "$found_thread_model" = none) ; then
+    if (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto"); then
+
+      # Let the user explicitly specify --{enable,disable}-pthreads.
+      # Check whether --enable-pthreads was given.
+if test "${enable_pthreads+set}" = set; then :
+  enableval=$enable_pthreads; case "${enableval}" in
+                      yes)  enablepthreads=yes ;;
+                      no)  enablepthreads=no ;;
+                      *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
+                    esac
+else
+  enablepthreads=$enableoptional
+fi
+
+
+      if (test "$enablepthreads" = yes) ; then
 
 
 ac_ext=c
@@ -36520,18 +36540,19 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-    if (test x$ax_pthread_ok = xyes); then
+        if (test x$ax_pthread_ok = xyes); then
 
 $as_echo "#define USING_THREADS 1" >>confdefs.h
 
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
 $as_echo "<<< Configuring library with pthread support >>>" >&6; }
-      libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
-      libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
-      found_thread_model=pthread
-      break
-    else
-      enablepthreads=no
+          libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
+          libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+          found_thread_model=pthread
+        else
+          enablepthreads=no
+        fi
+      fi
     fi
   fi
 
