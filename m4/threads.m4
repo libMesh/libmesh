@@ -8,6 +8,7 @@ AC_DEFUN([ACX_BEST_THREAD],
               [case "${withval}" in
                 tbb)     requested_thread_model=tbb     ;;
                 pthread) requested_thread_model=pthread ;;
+                pthreads) requested_thread_model=pthread ;;
                 auto)    requested_thread_model=auto    ;;
                 none)    requested_thread_model=none    ;;
                 *)       AC_MSG_ERROR(bad value ${withval} for --with-thread-model) ;;
@@ -37,17 +38,31 @@ AC_DEFUN([ACX_BEST_THREAD],
   # If TBB wasn't selected, try pthreads as long as the user requested it (or auto)
   if (test "$found_thread_model" = none) ; then
     if (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto"); then
-      AX_PTHREAD
 
-      if (test x$ax_pthread_ok = xyes); then
-        AC_DEFINE(USING_THREADS, 1,
-                  [Flag indicating whether the library shall be compiled to use any particular thread API.])
-        AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
-        libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
-        found_thread_model=pthread
-      else
-        enablepthreads=no
+      # Let the user explicitly specify --{enable,disable}-pthreads.
+      AC_ARG_ENABLE(pthreads,
+                    AS_HELP_STRING([--disable-pthreads],
+                                   [build without POSIX threading (pthreads) support]),
+                    [case "${enableval}" in
+                      yes)  enablepthreads=yes ;;
+                      no)  enablepthreads=no ;;
+                      *)  AC_MSG_ERROR(bad value ${enableval} for --enable-pthreads) ;;
+                    esac],
+                    [enablepthreads=$enableoptional])
+
+      if (test "$enablepthreads" = yes) ; then
+        AX_PTHREAD
+
+        if (test x$ax_pthread_ok = xyes); then
+          AC_DEFINE(USING_THREADS, 1,
+                    [Flag indicating whether the library shall be compiled to use any particular thread API.])
+          AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
+          libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
+          libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+          found_thread_model=pthread
+        else
+          enablepthreads=no
+        fi
       fi
     fi
   fi
