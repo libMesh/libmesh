@@ -14,7 +14,7 @@ AC_DEFUN([ACX_BEST_THREAD],
               esac],
               requested_thread_model=auto)
 
-  AC_MSG_RESULT([User requested thread model: $requested_thread_model])
+  AC_MSG_RESULT([<<< User requested thread model: $requested_thread_model >>>])
 
   # Set this variable when a threading model is found
   found_thread_model=none
