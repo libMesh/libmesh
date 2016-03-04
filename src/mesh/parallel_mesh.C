@@ -1225,13 +1225,14 @@ void ParallelMesh::renumber_nodes_and_elements ()
 {
   parallel_object_only();
 
-  START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
-
 #ifdef DEBUG
   // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
+  this->libmesh_assert_valid_parallel_p_levels();
 #endif
+
+  START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
   std::set<dof_id_type> used_nodes;
 
