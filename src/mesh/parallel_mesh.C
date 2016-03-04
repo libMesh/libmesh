@@ -1214,12 +1214,6 @@ void ParallelMesh::renumber_nodes_and_elements ()
 {
   parallel_object_only();
 
-  if (_skip_renumber_nodes_and_elements)
-    {
-      this->update_parallel_id_counts();
-      return;
-    }
-
   START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
 #ifdef DEBUG
@@ -1270,6 +1264,13 @@ void ParallelMesh::renumber_nodes_and_elements ()
           ++it;
       }
   }
+
+  if (_skip_renumber_nodes_and_elements)
+    {
+      this->update_parallel_id_counts();
+      STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
+      return;
+    }
 
   // Finally renumber all the elements
   _n_elem = this->renumber_dof_objects (this->_elements);
