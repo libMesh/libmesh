@@ -116,8 +116,8 @@ public:
   { return _is_serial; }
 
   /**
-   * Verify id and processor_id consistency of a parallel
-   * objects container.
+   * Verify id, processor_id, and if applicable unique_id consistency
+   * of a parallel objects container.
    * Calls libmesh_assert() on each possible failure in that container.
    */
   template <typename T>

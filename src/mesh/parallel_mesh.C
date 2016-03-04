@@ -964,21 +964,11 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
       unsigned int refinement_flag   = el ?
         static_cast<unsigned int> (el->refinement_flag()) : libMesh::invalid_uint;
-#ifndef NDEBUG
       unsigned int p_refinement_flag = el ?
         static_cast<unsigned int> (el->p_refinement_flag()) : libMesh::invalid_uint;
-#endif
 
-      unsigned int min_rflag = refinement_flag;
-      this->comm().min(min_rflag);
-      // All processors with this element should agree on flag
-      libmesh_assert (!el || min_rflag == refinement_flag);
-
-#ifndef NDEBUG
-      unsigned int min_pflag = p_refinement_flag;
-#endif
-      // All processors with this element should agree on flag
-      libmesh_assert (!el || min_pflag == p_refinement_flag);
+      libmesh_assert(this->comm().semiverify(el ? &refinement_flag : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify(el ? &p_refinement_flag : libmesh_nullptr));
     }
 #endif // LIBMESH_ENABLE_AMR
 }
