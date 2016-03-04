@@ -1125,7 +1125,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           const Variable & variable = dof_map.variable(var);
 
-          FEType fe_type = variable.type();
+          const FEType & base_fe_type = variable.type();
+
+          FEType fe_type = base_fe_type;
 
           // This may be a p refined element
           fe_type.order =
@@ -1437,10 +1439,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       std::vector<Point> fine_points;
 
                       UniquePtr<FEBase> fine_fe
-                        (FEBase::build (dim, fe_type));
+                        (FEBase::build (dim, base_fe_type));
 
                       UniquePtr<QBase> qrule
-                        (fe_type.default_quadrature_rule(1));
+                        (base_fe_type.default_quadrature_rule(1));
                       fine_fe->attach_quadrature_rule(qrule.get());
 
                       const std::vector<Point> & child_xyz =
@@ -1459,7 +1461,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                         }
 
                       std::vector<Point> fine_qp;
-                      FEInterface::inverse_map (dim, fe_type, elem,
+                      FEInterface::inverse_map (dim, base_fe_type, elem,
                                                 fine_points, fine_qp);
 
                       context.elem_fe_reinit(&fine_qp);
@@ -1467,8 +1469,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
                   const unsigned int n_qp = xyz_values.size();
 
-                  FEInterface::dofs_on_edge(elem, dim, fe_type, e,
-                                            side_dofs);
+                  FEInterface::dofs_on_edge(elem, dim, base_fe_type,
+                                            e, side_dofs);
 
                   // Some edge dofs are on nodes and already
                   // fixed, others are free to calculate
@@ -1585,8 +1587,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
               for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {
-                  FEInterface::dofs_on_side(elem, dim, fe_type, s,
-                                            side_dofs);
+                  FEInterface::dofs_on_side(elem, dim, base_fe_type,
+                                            s, side_dofs);
 
                   // Some side dofs are on nodes/edges and already
                   // fixed, others are free to calculate
@@ -1613,10 +1615,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       std::vector<Point> fine_points;
 
                       UniquePtr<FEBase> fine_fe
-                        (FEBase::build (dim, fe_type));
+                        (FEBase::build (dim, base_fe_type));
 
                       UniquePtr<QBase> qrule
-                        (fe_type.default_quadrature_rule(dim-1));
+                        (base_fe_type.default_quadrature_rule(dim-1));
                       fine_fe->attach_quadrature_rule(qrule.get());
 
                       const std::vector<Point> & child_xyz =
@@ -1635,7 +1637,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                         }
 
                       std::vector<Point> fine_qp;
-                      FEInterface::inverse_map (dim, fe_type, elem,
+                      FEInterface::inverse_map (dim, base_fe_type, elem,
                                                 fine_points, fine_qp);
 
                       context.elem_fe_reinit(&fine_qp);
@@ -1745,10 +1747,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   std::vector<Point> fine_points;
 
                   UniquePtr<FEBase> fine_fe
-                    (FEBase::build (dim, fe_type));
+                    (FEBase::build (dim, base_fe_type));
 
                   UniquePtr<QBase> qrule
-                    (fe_type.default_quadrature_rule(dim));
+                    (base_fe_type.default_quadrature_rule(dim));
                   fine_fe->attach_quadrature_rule(qrule.get());
 
                   const std::vector<Point> & child_xyz =
@@ -1764,7 +1766,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     }
 
                   std::vector<Point> fine_qp;
-                  FEInterface::inverse_map (dim, fe_type, elem,
+                  FEInterface::inverse_map (dim, base_fe_type, elem,
                                             fine_points, fine_qp);
 
                   context.elem_fe_reinit(&fine_qp);
