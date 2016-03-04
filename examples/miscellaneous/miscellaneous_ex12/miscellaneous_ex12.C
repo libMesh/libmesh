@@ -198,28 +198,55 @@ int main (int argc, char ** argv)
   // Paraview.
   ExodusII_IO(mesh).write_equation_systems ("out.e", equation_systems);
 
-  // Find the point C.
+  // Find the node nearest point C.
   Node * node_C = libmesh_nullptr;
   Point point_C(0, 3, 3);
-  Real nearest_dist_sq = (mesh.point(0)-point_C).norm_sq();
-  for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
-    {
-      const Real dist_sq = (mesh.point(nid)-point_C).norm_sq();
-      if (dist_sq < nearest_dist_sq)
-        {
-          nearest_dist_sq = dist_sq;
-          node_C = mesh.node_ptr(nid);
-        }
-    }
+  {
+    Real nearest_dist_sq = std::numeric_limits<Real>::max();
 
-  // Evaluate the z-displacement "w" at the point C.
-  const unsigned int w_var = system.variable_number ("w");
-  dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
+    // Find the closest local node.  On a ParallelMesh we may not even
+    // know about the existence of closer non-local nodes.
+    libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
+    const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
+    for (; it != end; ++it)
+      {
+        Node *n = *it;
+        const Real dist_sq = (*n-point_C).norm_sq();
+        if (dist_sq < nearest_dist_sq)
+          {
+            nearest_dist_sq = dist_sq;
+            node_C = n;
+          }
+      }
+
+    // Check with other processors to see if any found a closer node
+    unsigned int minrank = 0;
+    system.comm().minloc(nearest_dist_sq, minrank);
+
+    // Broadcast the ID of the closest node, so every processor can
+    // see for certain whether they have it or not.
+    dof_id_type nearest_node_id;
+    if (system.processor_id() == minrank)
+      nearest_node_id = node_C->id();
+    system.comm().broadcast(nearest_node_id, minrank);
+    node_C = mesh.query_node_ptr(nearest_node_id);
+  }
+
+  // Evaluate the z-displacement "w" at the node nearest C.
   Number w = 0;
-  if (w_dof >= system.get_dof_map().first_dof() &&
-      w_dof < system.get_dof_map().end_dof())
-    w = system.current_solution(w_dof);
+
+  // If we know about the closest node, and if we also own the DoFs
+  // on that node, then we can evaluate the solution at that node.
+  if (node_C)
+    {
+      const unsigned int w_var = system.variable_number ("w");
+      dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
+      if (w_dof >= system.get_dof_map().first_dof() &&
+          w_dof < system.get_dof_map().end_dof())
+        w = system.current_solution(w_dof);
+    }
   system.comm().sum(w);
+
 
   Real w_C_bar = -E*h*w/q;
   const Real w_C_bar_analytic = 164.24;
@@ -229,28 +256,11 @@ int main (int argc, char ** argv)
   libMesh::out << "z-displacement of the point C: " << w_C_bar << std::endl;
   libMesh::out << "Analytic solution: " << w_C_bar_analytic << std::endl;
 
-  // Find the point D.
-  Node * node_D = libmesh_nullptr;
+  // Evaluate the y-displacement "v" at point D.  This time we'll
+  // evaluate at the exact point, not just the closest node.
   Point point_D(0, 0, 3);
-  nearest_dist_sq = (mesh.point(0)-point_D).norm_sq();
-  for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
-    {
-      const Real dist_sq = (mesh.point(nid)-point_D).norm_sq();
-      if (dist_sq < nearest_dist_sq)
-        {
-          nearest_dist_sq = dist_sq;
-          node_D = mesh.node_ptr(nid);
-        }
-    }
-
-  // Evaluate the y-displacement "v" at the point D.
   const unsigned int v_var = system.variable_number ("v");
-  dof_id_type v_dof = node_D->dof_number (system.number(), v_var, 0);
-  Number v = 0;
-  if (v_dof >= system.get_dof_map().first_dof() &&
-      v_dof <  system.get_dof_map().end_dof())
-    v = system.current_solution(v_dof);
-  system.comm().sum(v);
+  Number v = system.point_value(v_var, point_D);
 
   Real v_D_bar = E*h*v/q;
   const Real v_D_bar_analytic = 4.114;
