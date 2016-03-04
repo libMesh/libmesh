@@ -131,6 +131,12 @@ public:
   virtual void libmesh_assert_valid_parallel_ids() const libmesh_override;
 
   /**
+   * Verify p_level consistency of our elements containers.
+   * Calls libmesh_assert() on each possible failure.
+   */
+  void libmesh_assert_valid_parallel_p_levels() const;
+
+  /**
    * Verify refinement_flag and p_refinement_flag consistency of our
    * elements containers.
    * Calls libmesh_assert() on each possible failure.

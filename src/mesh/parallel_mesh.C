@@ -950,6 +950,27 @@ void ParallelMesh::libmesh_assert_valid_parallel_ids () const
 
 
 
+void ParallelMesh::libmesh_assert_valid_parallel_p_levels () const
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  dof_id_type pmax_elem_id = this->parallel_max_elem_id();
+
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
+    {
+      Elem * el = _elements[i]; // Returns NULL if there's no map entry
+
+      unsigned int p_level = el ?  (el->p_level()) : libMesh::invalid_uint;
+
+      // All processors with this element should agree on p level
+      libmesh_assert(this->comm().semiverify(el ? &p_level : libmesh_nullptr));
+    }
+}
+
+
+
+
 void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 {
 #ifdef LIBMESH_ENABLE_AMR
