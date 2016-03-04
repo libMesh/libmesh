@@ -179,8 +179,8 @@ void HPCoarsenTest::select_refinement (System & system)
 
   // Resize the error_per_cell vectors to handle
   // the number of elements, initialize them to 0.
-  std::vector<ErrorVectorReal> h_error_per_cell(mesh.n_elem(), 0.);
-  std::vector<ErrorVectorReal> p_error_per_cell(mesh.n_elem(), 0.);
+  std::vector<ErrorVectorReal> h_error_per_cell(mesh.max_elem_id(), 0.);
+  std::vector<ErrorVectorReal> p_error_per_cell(mesh.max_elem_id(), 0.);
 
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
