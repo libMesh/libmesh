@@ -1368,7 +1368,11 @@ void PetscVector<T>::_get_array() const
             _last = static_cast<numeric_index_type>(petsc_last);
           }
 
-          _array_is_present = true;
+	  // Ok, I know this is funky.  What we're trying to do is delay
+	  // setting _array_is_present until the values of _first and _last
+	  // have been proagated to the other processors when doing threading.
+	  // See the discussion here: https://github.com/idaholab/moose/issues/6436
+          _array_is_present = std::cos(_first) + std::sin(_last) + 10;
         }
     }
 }
