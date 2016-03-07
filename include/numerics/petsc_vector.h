@@ -41,6 +41,11 @@
 #include <cstring>
 #include <vector>
 
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+#include <atomic>
+#include <mutex>
+#endif
+
 namespace libMesh
 {
 
@@ -507,7 +512,12 @@ private:
    * currently accessible.  That means that the members \p _local_form
    * and \p _values are valid.
    */
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  // Note: we can't use std::atomic_flag here because we need load and store operations
+  mutable std::atomic<bool> _array_is_present;
+#else
   mutable bool _array_is_present;
+#endif
 
   /**
    * First local index.
@@ -548,6 +558,17 @@ private:
    * (otherwise it is a "const PetscScalar * const" in that context).
    */
   mutable const PetscScalar * _values;
+
+  /**
+   * Mutex for _get_array and _restore_array.  This is part of the
+   * object to keep down thread contention when reading frmo multiple
+   * PetscVectors simultaneously
+   */
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  mutable std::mutex _petsc_vector_mutex;
+#else
+  mutable Threads::spin_mutex _petsc_vector_mutex;
+#endif
 
   /**
    * Queries the array (and the local form if the vector is ghosted)
@@ -1286,7 +1307,14 @@ void PetscVector<T>::swap (NumericVector<T> & other)
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
   std::swap(_global_to_local_map, v._global_to_local_map);
+
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  // Only truly atomic for v... but swap() doesn't really need to be thread safe!
+  _array_is_present = v._array_is_present.exchange(_array_is_present);
+#else
   std::swap(_array_is_present, v._array_is_present);
+#endif
+
   std::swap(_local_form, v._local_form);
   std::swap(_values, v._values);
 }
