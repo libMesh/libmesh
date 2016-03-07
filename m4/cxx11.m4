@@ -323,6 +323,17 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
 
 AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
   [
+    # This is designed to be an exhaustive test of the capabilities of
+    # the <type_traits> header, as defined by the C++11 standard.  We
+    # don't use all of these in libmesh, but we want application code
+    # to be able to rely on the value of LIBMESH_HAVE_CXX11_TYPE_TRAITS.
+    #
+    # Not all compilers fully implement the header.  For example, GCC
+    # 4.9.1 does not provide the is_trivially_copyable() function, but
+    # it does provide support for other <type_traits> functions.
+    #
+    # See also:
+    # http://en.cppreference.com/w/cpp/header/type_traits
     have_cxx11_type_traits=no
 
     # Only run the test if enablecxx11==yes
@@ -331,11 +342,116 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
       AC_LANG_PUSH([C++])
 
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <iostream>
         @%:@include <type_traits>
+
+        // std::enable_if - the return type of the function is only defined if
+        // T is an integral type.  Therefore, it's a *compile* error if you
+        // try to call it with a non-integral type.
+        template <class T>
+        typename std::enable_if<std::is_integral<T>::value, bool>::type
+        is_odd (T i)
+        {
+          return static_cast<bool>(i%2);
+        }
+
+        // std::underlying_type - names the underlying type of an enum
+        enum e1 {};
+
+        // typedef (named fn_ptr) for a function that takes nothing and returns char.
+        typedef char (*fn_ptr)();
       ]], [[
-        bool a = std::is_void<char>::value;
-        bool b = std::is_integral<char>::value;
-        bool c = std::is_floating_point<char>::value;
+        std::cout << std::is_void<char>::value
+          // << std::is_null_pointer<char>::value                  // C++14
+                  << std::is_integral<char>::value
+                  << std::is_floating_point<char>::value
+                  << std::is_array<char>::value
+                  << std::is_enum<char>::value
+                  << std::is_union<char>::value
+                  << std::is_class<char>::value
+                  << std::is_function<char>::value
+                  << std::is_pointer<char>::value
+                  << std::is_lvalue_reference<char>::value
+                  << std::is_rvalue_reference<char>::value
+                  << std::is_member_object_pointer<char>::value
+                  << std::is_fundamental<char>::value
+                  << std::is_arithmetic<char>::value
+                  << std::is_scalar<char>::value
+                  << std::is_object<char>::value
+                  << std::is_compound<char>::value
+                  << std::is_reference<char>::value
+                  << std::is_member_pointer<char>::value
+                  << std::is_const<char>::value
+                  << std::is_volatile<char>::value
+                  << std::is_trivial<char>::value
+                  << std::is_trivially_copyable<char>::value // Not supported by GCC 4.6.3 with -std=c++0x
+                  << std::is_standard_layout<char>::value
+                  << std::is_pod<char>::value
+                  << std::is_literal_type<char>::value
+                  << std::is_empty<char>::value
+                  << std::is_polymorphic<char>::value
+                  << std::is_abstract<char>::value
+                  << std::is_signed<char>::value
+                  << std::is_unsigned<char>::value
+                  << std::is_constructible<char>::value
+                  << std::is_trivially_constructible<char>::value
+                  << std::is_nothrow_constructible<char>::value
+                  << std::is_default_constructible<char>::value
+                  << std::is_trivially_default_constructible<char>::value
+                  << std::is_nothrow_default_constructible<char>::value
+                  << std::is_copy_constructible<char>::value
+                  << std::is_trivially_copy_constructible<char>::value
+                  << std::is_nothrow_copy_constructible<char>::value
+                  << std::is_move_constructible<char>::value
+                  << std::is_trivially_move_constructible<char>::value
+                  << std::is_nothrow_move_constructible<char>::value
+                  << std::is_assignable<char, char>::value
+                  << std::is_trivially_assignable<char, char>::value
+                  << std::is_nothrow_assignable<char, char>::value
+                  << std::is_copy_assignable<char>::value
+                  << std::is_trivially_copy_assignable<char>::value
+                  << std::is_nothrow_copy_assignable<char>::value
+                  << std::is_move_assignable<char>::value
+                  << std::is_trivially_move_assignable<char>::value
+                  << std::is_nothrow_move_assignable<char>::value
+                  << std::is_destructible<char>::value
+                  << std::is_trivially_destructible<char>::value
+                  << std::is_nothrow_destructible<char>::value
+                  << std::has_virtual_destructor<char>::value
+                  << std::alignment_of<char>::value
+                  << std::rank<char>::value
+                  << std::extent<char>::value
+                  << std::is_same<char, char>::value
+                  << std::is_base_of<char, char>::value
+                  << std::is_convertible<char, char>::value
+                  << std::is_same<char, std::remove_cv<const char>::type>::value // std::remove_cv
+                  << std::is_same<char, std::remove_const<const char>::type>::value // std::remove_const
+                  << std::is_same<char, std::remove_volatile<volatile char>::type>::value // std::remove_volatile
+                  << std::is_same<const volatile char, std::add_cv<char>::type>::value // std::add_cv
+                  << std::is_same<const char, std::add_const<char>::type>::value // std::add_const
+                  << std::is_same<volatile char, std::add_volatile<char>::type>::value // std::add_volatile
+                  << std::is_same<char, std::remove_reference<char &>::type>::value // std::remove_reference
+                  << std::is_same<char &, std::add_lvalue_reference<char>::type>::value // std::add_lvalue_reference
+                  << std::is_same<char &&, std::add_rvalue_reference<char>::type>::value // std::add_rvalue_reference
+                  << std::is_same<char, std::remove_pointer<char *>::type>::value // std::remove_pointer
+                  << std::is_same<char *, std::add_pointer<char>::type>::value // std::add_pointer
+                  << std::is_same<char, std::make_signed<unsigned char>::type>::value // std::make_signed
+                  << std::is_same<unsigned char, std::make_unsigned<char>::type>::value // std::make_unsigned
+                  << std::is_same<char, std::remove_extent<char>::type>::value // std::remove_extent
+                  << std::is_same<char, std::remove_all_extents<char>::type>::value // std::remove_all_extents
+                  << std::is_same<char, std::decay<const char &>::type>::value // std::decay
+                  << is_odd(13) // std::enable_if
+                  << std::is_same<char, std::conditional<true, /*type if true*/char, /*type if false*/int>::type>::value // std::conditional
+                  << std::is_same<long, std::common_type<char, short, int, long>::type>::value // std::common_type
+                  << std::is_same<int, std::underlying_type<e1>::type>::value // std::underlying_type
+                  << std::is_same<char, std::result_of<fn_ptr()>::type>::value // std::result_of
+                  << std::endl;
+
+        // std::aligned_storage
+        typedef std::aligned_storage</*store objects of length=*/1>::type aligned_t;
+
+        // std::aligned_union
+        typedef std::aligned_union</*size of at least*/32, int, char, double>::type union_t;
       ]])],[
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_TYPE_TRAITS, 1, [Flag indicating whether compiler supports std::thread])
