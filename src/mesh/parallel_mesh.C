@@ -205,8 +205,25 @@ dof_id_type ParallelMesh::parallel_max_elem_id() const
   // This function must be run on all processors at once
   parallel_object_only();
 
-  dof_id_type max_local = _elements.empty() ?
-    0 : _elements.rbegin()->first + 1;
+  dof_id_type max_local = 0;
+
+  mapvector<Elem *,dof_id_type>::maptype::const_reverse_iterator
+    rit = _elements.rbegin();
+
+  const mapvector<Elem *,dof_id_type>::maptype::const_reverse_iterator
+    rend = _elements.rend();
+
+  // Look for the maximum element id.  Search backwards through
+  // elements so we can break out early.  Beware of NULL entries that
+  // haven't yet been cleared from _elements.
+  for (; rit != rend; ++rit)
+    if (rit->second)
+      {
+        libmesh_assert_equal_to(rit->second->id(), rit->first);
+        max_local = rit->first + 1;
+        break;
+      }
+
   this->comm().max(max_local);
   return max_local;
 }
@@ -246,8 +263,25 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
   // This function must be run on all processors at once
   parallel_object_only();
 
-  dof_id_type max_local = _nodes.empty() ?
-    0 : _nodes.rbegin()->first + 1;
+  dof_id_type max_local = 0;
+
+  mapvector<Node *,dof_id_type>::maptype::const_reverse_iterator
+    rit = _nodes.rbegin();
+
+  const mapvector<Node *,dof_id_type>::maptype::const_reverse_iterator
+    rend = _nodes.rend();
+
+  // Look for the maximum element id.  Search backwards through
+  // elements so we can break out early.  Beware of NULL entries that
+  // haven't yet been cleared from _elements.
+  for (; rit != rend; ++rit)
+    if (rit->second)
+      {
+        libmesh_assert_equal_to(rit->second->id(), rit->first);
+        max_local = rit->first + 1;
+        break;
+      }
+
   this->comm().max(max_local);
   return max_local;
 }
@@ -1180,12 +1214,6 @@ void ParallelMesh::renumber_nodes_and_elements ()
 {
   parallel_object_only();
 
-  if (_skip_renumber_nodes_and_elements)
-    {
-      this->update_parallel_id_counts();
-      return;
-    }
-
   START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
 #ifdef DEBUG
@@ -1236,6 +1264,13 @@ void ParallelMesh::renumber_nodes_and_elements ()
           ++it;
       }
   }
+
+  if (_skip_renumber_nodes_and_elements)
+    {
+      this->update_parallel_id_counts();
+      STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
+      return;
+    }
 
   // Finally renumber all the elements
   _n_elem = this->renumber_dof_objects (this->_elements);
