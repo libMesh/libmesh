@@ -33,6 +33,13 @@ AC_DEFUN([ACX_BEST_THREAD],
       libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
       found_thread_model=tbb
     fi
+
+    # If TBB was not enabled, but the user requested it, we treat that as an error:
+    # we want to alert the user as soon as possible that their requested thread model
+    # could not be configured correctly.
+    if (test $enabletbb = no -a "x$requested_thread_model" = "xtbb"); then
+      AC_MSG_ERROR([requested threading model, TBB, could not be found.])
+    fi
   fi
 
   # If TBB wasn't selected, try pthreads as long as the user requested it (or auto)
@@ -63,6 +70,13 @@ AC_DEFUN([ACX_BEST_THREAD],
         else
           enablepthreads=no
         fi
+      fi
+
+      # If pthreads were not enabled, but the user requested it, we treat that as an error:
+      # we want to alert the user as soon as possible that their requested thread model
+      # could not be configured correctly.
+      if (test $enablepthreads = no -a "x$requested_thread_model" = "xpthread"); then
+        AC_MSG_ERROR([requested threading model, pthreads, could not be found.])
       fi
     fi
   fi
