@@ -16,7 +16,7 @@ coarsen_percentage = 0.0
 uniform_refine = 0
 
 # Basis function type (as named in enum_fe_family.h)
-approx_type = LAGRANGE
+approx_type = HIERARCHIC
 
 # minimum approximation order
 # Use approx_order = 1 or 2 for LAGRANGE elements
@@ -37,7 +37,7 @@ indicator_type = kelly
 # Use an exact indicator with matchedhp/hp.
 # matchedhp refinement stupidly does both h and p or neither
 # on every element; hp refinement tries to do one or the other
-refinement_type = h
+# refinement_type = h
 
 # Mesh dimensionality
 # We generate 1D meshes on [-1, 0].

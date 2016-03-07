@@ -47,6 +47,8 @@
 #include "libmesh/periodic_boundaries.h"
 #endif
 
+#include "libmesh/parallel_mesh.h"
+
 namespace libMesh
 {
 
@@ -533,6 +535,7 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   const bool coarsening_changed_mesh =
     this->_coarsen_elements ();
 
+  // First coarsen the flagged elements.
   // FIXME: test_level_one now tests consistency across periodic
   // boundaries, which requires a point_locator, which just got
   // invalidated by _coarsen_elements() and hasn't yet been cleared by
@@ -551,11 +554,13 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // need to restrict old coefficient vectors first
   // _mesh.contract();
 
+  // First coarsen the flagged elements.
   // Now refine the flagged elements.  This will
   // take up some space, maybe more than what was freed.
   const bool refining_changed_mesh =
     this->_refine_elements();
 
+  // First coarsen the flagged elements.
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
     {
@@ -1406,8 +1411,9 @@ bool MeshRefinement::_coarsen_elements ()
 
   START_LOG ("_coarsen_elements()", "MeshRefinement");
 
-  // Flag indicating if this call actually changes the mesh
+  // Flags indicating if this call actually changes the mesh
   bool mesh_changed = false;
+  bool mesh_p_changed = false;
 
   // Clear the unused_elements data structure.
   // The elements have been packed since it was built,
@@ -1471,7 +1477,7 @@ bool MeshRefinement::_coarsen_elements ()
             {
               elem->set_p_refinement_flag(Elem::JUST_COARSENED);
               elem->set_p_level(elem->p_level() - 1);
-              mesh_changed = true;
+              mesh_p_changed = true;
             }
           else
             {
@@ -1482,6 +1488,8 @@ bool MeshRefinement::_coarsen_elements ()
 
   // If the mesh changed on any processor, it changed globally
   this->comm().max(mesh_changed);
+  this->comm().max(mesh_p_changed);
+
   // And we may need to update ParallelMesh values reflecting the changes
   if (mesh_changed)
     _mesh.update_parallel_id_counts();
@@ -1504,9 +1512,16 @@ bool MeshRefinement::_coarsen_elements ()
 #endif
     }
 
+  // If p levels changed all we need to do is make sure that parent p
+  // levels changed in sync
+  if (mesh_p_changed && !_mesh.is_serial())
+    {
+      MeshCommunication().make_p_levels_parallel_consistent (_mesh);
+    }
+
   STOP_LOG ("_coarsen_elements()", "MeshRefinement");
 
-  return mesh_changed;
+  return (mesh_changed || mesh_p_changed);
 }
 
 
@@ -1542,6 +1557,10 @@ bool MeshRefinement::_refine_elements ()
   std::vector<Elem *> local_copy_of_elements;
   local_copy_of_elements.reserve(n_elems_flagged);
 
+  // If mesh p levels changed, we might need to synchronize parent p
+  // levels on a distributed mesh.
+  bool mesh_p_changed = false;
+
   // Iterate over the elements, looking for elements
   // flagged for refinement.
   for (it = _mesh.elements_begin(); it != end; ++it)
@@ -1554,6 +1573,7 @@ bool MeshRefinement::_refine_elements ()
         {
           elem->set_p_level(elem->p_level()+1);
           elem->set_p_refinement_flag(Elem::JUST_REFINED);
+          mesh_p_changed = true;
         }
     }
 
@@ -1569,6 +1589,7 @@ bool MeshRefinement::_refine_elements ()
 
   // If the mesh changed on any processor, it changed globally
   this->comm().max(mesh_changed);
+  this->comm().max(mesh_p_changed);
 
   // And we may need to update ParallelMesh values reflecting the changes
   if (mesh_changed)
@@ -1583,12 +1604,17 @@ bool MeshRefinement::_refine_elements ()
 #endif
     }
 
+  if (mesh_p_changed && !_mesh.is_serial())
+    {
+      MeshCommunication().make_p_levels_parallel_consistent (_mesh);
+    }
+
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
 
   STOP_LOG ("_refine_elements()", "MeshRefinement");
 
-  return mesh_changed;
+  return (mesh_changed || mesh_p_changed);
 }
 
 

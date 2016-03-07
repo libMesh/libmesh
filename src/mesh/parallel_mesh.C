@@ -950,6 +950,27 @@ void ParallelMesh::libmesh_assert_valid_parallel_ids () const
 
 
 
+void ParallelMesh::libmesh_assert_valid_parallel_p_levels () const
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  dof_id_type pmax_elem_id = this->parallel_max_elem_id();
+
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
+    {
+      Elem * el = _elements[i]; // Returns NULL if there's no map entry
+
+      unsigned int p_level = el ?  (el->p_level()) : libMesh::invalid_uint;
+
+      // All processors with this element should agree on p level
+      libmesh_assert(this->comm().semiverify(el ? &p_level : libmesh_nullptr));
+    }
+}
+
+
+
+
 void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 {
 #ifdef LIBMESH_ENABLE_AMR
@@ -964,21 +985,11 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
       unsigned int refinement_flag   = el ?
         static_cast<unsigned int> (el->refinement_flag()) : libMesh::invalid_uint;
-#ifndef NDEBUG
       unsigned int p_refinement_flag = el ?
         static_cast<unsigned int> (el->p_refinement_flag()) : libMesh::invalid_uint;
-#endif
 
-      unsigned int min_rflag = refinement_flag;
-      this->comm().min(min_rflag);
-      // All processors with this element should agree on flag
-      libmesh_assert (!el || min_rflag == refinement_flag);
-
-#ifndef NDEBUG
-      unsigned int min_pflag = p_refinement_flag;
-#endif
-      // All processors with this element should agree on flag
-      libmesh_assert (!el || min_pflag == p_refinement_flag);
+      libmesh_assert(this->comm().semiverify(el ? &refinement_flag : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify(el ? &p_refinement_flag : libmesh_nullptr));
     }
 #endif // LIBMESH_ENABLE_AMR
 }
@@ -1214,13 +1225,14 @@ void ParallelMesh::renumber_nodes_and_elements ()
 {
   parallel_object_only();
 
-  START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
-
 #ifdef DEBUG
   // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
+  this->libmesh_assert_valid_parallel_p_levels();
 #endif
+
+  START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
   std::set<dof_id_type> used_nodes;
 

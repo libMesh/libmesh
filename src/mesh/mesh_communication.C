@@ -942,6 +942,43 @@ struct SyncIds
   }
 };
 
+
+struct SyncPLevels
+{
+  typedef unsigned char datum;
+
+  SyncPLevels(MeshBase & _mesh) :
+    mesh(_mesh) {}
+
+  MeshBase & mesh;
+
+  // Find the p_level of each requested Elem
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & ids_out)
+  {
+    ids_out.reserve(ids.size());
+
+    for (unsigned int i=0; i != ids.size(); ++i)
+      {
+        Elem *elem = mesh.elem(ids[i]);
+
+        ids_out.push_back(elem->p_level());
+      }
+  }
+
+  void act_on_data (const std::vector<dof_id_type> & old_ids,
+                    std::vector<datum> & new_p_levels)
+  {
+    for (unsigned int i=0; i != old_ids.size(); ++i)
+      {
+        Elem *elem = mesh.elem(old_ids[i]);
+
+        elem->set_p_level(new_p_levels[i]);
+      }
+  }
+};
+
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 template <typename DofObjSubclass>
 struct SyncUniqueIds
@@ -1048,6 +1085,24 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
 #endif
 
   STOP_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
+}
+
+
+
+// ------------------------------------------------------------
+void MeshCommunication::make_p_levels_parallel_consistent(MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  START_LOG ("make_p_levels_parallel_consistent()", "MeshCommunication");
+
+  SyncPLevels syncplevels(mesh);
+  Parallel::sync_dofobject_data_by_id
+    (mesh.comm(), mesh.elements_begin(), mesh.elements_end(),
+     syncplevels);
+
+  STOP_LOG ("make_p_levels_parallel_consistent()", "MeshCommunication");
 }
 
 

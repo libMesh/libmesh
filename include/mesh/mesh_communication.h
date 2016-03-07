@@ -172,6 +172,11 @@ public:
   void make_elems_parallel_consistent (MeshBase &);
 
   /**
+   * Copy p levels of ghost elements from their local processors.
+   */
+  void make_p_levels_parallel_consistent (MeshBase &);
+
+  /**
    * Assuming all ids on local nodes are globally unique, and
    * assuming all processor ids are parallel consistent, this function makes
    * all other ids parallel consistent.
