@@ -152,6 +152,18 @@ AC_DEFUN([CONFIGURE_VTK],
          old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
 
+         # If this compiler supports -rpath commands, create a
+         # variable for them now that can be used in $LIBS below.  We
+         # ran across an issue where GCC's linker actually needed
+         # -rpath flags in order to *link* a test program.  From the
+         # man page for GNU ld:
+         #   The -rpath option is also used when locating shared objects
+         #   which are needed by shared objects explicitly included in
+         #   the link; see the description of the -rpath-link option.
+         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then
+           VTK_RPATH_FLAGS="${RPATHFLAG}${VTK_LIB}"
+         fi
+
          dnl VTK 5.x
          if (test $vtkmajor -eq 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
@@ -191,7 +203,7 @@ AC_DEFUN([CONFIGURE_VTK],
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
            dnl 1. First try linking the NO_VERSION library names
-           LIBS="$old_LIBS $VTK_LIBRARY_NO_VERSION"
+           LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_NO_VERSION"
            AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
                           [enablevtk=yes
                            VTK_LIBRARY=$VTK_LIBRARY_NO_VERSION],
@@ -199,7 +211,7 @@ AC_DEFUN([CONFIGURE_VTK],
 
            dnl 2. If that didn't work, try linking the library names with version numbers.
            if (test x$enablevtk = xno); then
-             LIBS="$old_LIBS $VTK_LIBRARY_WITH_VERSION"
+             LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_WITH_VERSION"
              AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
                             [enablevtk=yes
                              VTK_LIBRARY=$VTK_LIBRARY_WITH_VERSION],
@@ -217,7 +229,7 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl Check for VTK 5.x libraries
          else
-           LIBS="$old_LIBS $VTK_LIBRARY"
+           LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
            AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
