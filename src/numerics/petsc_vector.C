@@ -1328,7 +1328,7 @@ void PetscVector<T>::_get_array() const
       if (!_array_is_present)
         {
 #ifdef LIBMESH_HAVE_CXX11_THREAD
-	  std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
+          std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
 #endif
           PetscErrorCode ierr=0;
           if(this->type() != GHOSTED)

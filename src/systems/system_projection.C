@@ -1154,9 +1154,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
-	  // If this element hasn't been changed, and we're projecting
-	  // from its old self, then we can simply move its old dof
-	  // values to new indices.
+          // If this element hasn't been changed, and we're projecting
+          // from its old self, then we can simply move its old dof
+          // values to new indices.
           if (f.is_grid_projection() &&
               elem->refinement_flag() != Elem::JUST_REFINED &&
               elem->refinement_flag() != Elem::JUST_COARSENED &&
