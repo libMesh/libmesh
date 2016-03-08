@@ -38354,6 +38354,18 @@ _ACEOF
                   old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
 
+         # If this compiler supports -rpath commands, create a
+         # variable for them now that can be used in $LIBS below.  We
+         # ran across an issue where GCC's linker actually needed
+         # -rpath flags in order to *link* a test program.  From the
+         # man page for GNU ld:
+         #   The -rpath option is also used when locating shared objects
+         #   which are needed by shared objects explicitly included in
+         #   the link; see the description of the -rpath-link option.
+         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then
+           VTK_RPATH_FLAGS="${RPATHFLAG}${VTK_LIB}"
+         fi
+
                   if (test $vtkmajor -eq 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
 
@@ -38385,7 +38397,7 @@ _ACEOF
                                              if (test $vtkmajor -gt 5); then
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-                      LIBS="$old_LIBS $VTK_LIBRARY_NO_VERSION"
+                      LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_NO_VERSION"
            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -38422,7 +38434,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
                       if (test x$enablevtk = xno); then
-             LIBS="$old_LIBS $VTK_LIBRARY_WITH_VERSION"
+             LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_WITH_VERSION"
              cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -38468,7 +38480,7 @@ $as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; 
            CPPFLAGS="$old_CPPFLAGS"
 
                   else
-           LIBS="$old_LIBS $VTK_LIBRARY"
+           LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
