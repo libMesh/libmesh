@@ -121,11 +121,13 @@ protected:
 
 private:
   // Set the _spacetime argument vector
-  void set_spacetime(const Point & p,
+  void set_spacetime(std::vector<Output> & spacetime,
+                     const Point & p,
                      const Real time = 0);
 
   // Evaluate the ith FunctionParser and check the result
   inline Output eval(FunctionParserADBase<Output> & parser,
+                     const std::vector<Output> & spacetime,
                      const std::string & libmesh_dbg_var(function_name),
                      unsigned int libmesh_dbg_var(component_idx)) const;
 
@@ -209,8 +211,9 @@ inline
 Output
 ParsedFunction<Output,OutputGradient>::operator() (const Point & p, const Real time)
 {
-  set_spacetime(p, time);
-  return eval(parsers[0], "f", 0);
+  std::vector<Output> spacetime(_spacetime);
+  set_spacetime(spacetime, p, time);
+  return eval(parsers[0], spacetime, "f", 0);
 }
 
 template <typename Output, typename OutputGradient>
@@ -218,8 +221,9 @@ inline
 Output
 ParsedFunction<Output,OutputGradient>::dot (const Point & p, const Real time)
 {
-  set_spacetime(p, time);
-  return eval(dt_parsers[0], "df/dt", 0);
+  std::vector<Output> spacetime(_spacetime);
+  set_spacetime(spacetime, p, time);
+  return eval(dt_parsers[0], spacetime, "df/dt", 0);
 }
 
 template <typename Output, typename OutputGradient>
@@ -228,14 +232,15 @@ OutputGradient
 ParsedFunction<Output,OutputGradient>::gradient (const Point & p, const Real time)
 {
   OutputGradient grad;
-  set_spacetime(p, time);
+  std::vector<Output> spacetime(_spacetime);
+  set_spacetime(spacetime, p, time);
 
-  grad(0) = eval(dx_parsers[0], "df/dx", 0);
+  grad(0) = eval(dx_parsers[0], spacetime, "df/dx", 0);
 #if LIBMESH_DIM > 1
-  grad(1) = eval(dy_parsers[0], "df/dy", 0);
+  grad(1) = eval(dy_parsers[0], spacetime, "df/dy", 0);
 #endif
 #if LIBMESH_DIM > 2
-  grad(2) = eval(dz_parsers[0], "df/dz", 0);
+  grad(2) = eval(dz_parsers[0], spacetime, "df/dz", 0);
 #endif
 
   return grad;
@@ -249,7 +254,8 @@ ParsedFunction<Output,OutputGradient>::operator()
    const Real time,
    DenseVector<Output> & output)
 {
-  set_spacetime(p, time);
+  std::vector<Output> spacetime(_spacetime);
+  set_spacetime(spacetime, p, time);
 
   unsigned int size = output.size();
 
@@ -258,7 +264,7 @@ ParsedFunction<Output,OutputGradient>::operator()
   // The remaining locations in _spacetime are currently fixed at construction
   // but could potentially be made dynamic
   for (unsigned int i=0; i != size; ++i)
-    output(i) = eval(parsers[i], "f", i);
+    output(i) = eval(parsers[i], spacetime, "f", i);
 }
 
 /**
@@ -272,13 +278,14 @@ ParsedFunction<Output,OutputGradient>::component (unsigned int i,
                                                   const Point & p,
                                                   Real time)
 {
-  set_spacetime(p, time);
+  std::vector<Output> spacetime(_spacetime);
+  set_spacetime(spacetime, p, time);
   libmesh_assert_less (i, parsers.size());
 
   // The remaining locations in _spacetime are currently fixed at construction
   // but could potentially be made dynamic
   libmesh_assert_less(i, parsers.size());
-  return eval(parsers[i], "f", i);
+  return eval(parsers[i], spacetime, "f", i);
 }
 
 /**
@@ -580,17 +587,18 @@ ParsedFunction<Output,OutputGradient>::expression_is_time_dependent( const std::
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::set_spacetime (const Point & p,
+ParsedFunction<Output,OutputGradient>::set_spacetime (std::vector<Output> & spacetime,
+                                                      const Point & p,
                                                       const Real time)
 {
-  _spacetime[0] = p(0);
+  spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
-  _spacetime[1] = p(1);
+  spacetime[1] = p(1);
 #endif
 #if LIBMESH_DIM > 2
-  _spacetime[2] = p(2);
+  spacetime[2] = p(2);
 #endif
-  _spacetime[LIBMESH_DIM] = time;
+  spacetime[LIBMESH_DIM] = time;
 
   // The remaining locations in _spacetime are currently fixed at construction
   // but could potentially be made dynamic
@@ -601,11 +609,12 @@ template <typename Output, typename OutputGradient>
 inline
 Output
 ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & parser,
+                                             const std::vector<Output> & spacetime,
                                              const std::string & libmesh_dbg_var(function_name),
                                              unsigned int libmesh_dbg_var(component_idx)) const
 {
 #ifndef NDEBUG
-  Output result = parser.Eval(&_spacetime[0]);
+  Output result = parser.Eval(&spacetime[0]);
   int error_code = parser.EvalError();
   if (error_code)
     {
@@ -614,8 +623,8 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
                    << " of expression '"
                    << function_name
                    << "' with arguments:\n";
-      for (unsigned int j=0; j<_spacetime.size(); ++j)
-        libMesh::err << '\t' << _spacetime[j] << '\n';
+      for (unsigned int j=0; j<spacetime.size(); ++j)
+        libMesh::err << '\t' << spacetime[j] << '\n';
       libMesh::err << '\n';
 
       // Currently no API to report error messages, we'll do it manually
@@ -647,7 +656,7 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
 
   return result;
 #else
-  return parser.Eval(&_spacetime[0]);
+  return parser.Eval(&spacetime[0]);
 #endif
 }
 
