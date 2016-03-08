@@ -52,7 +52,47 @@ AC_DEFUN([CONFIGURE_TBB],
       dnl TBB_VERSION_LESS_THAN macro.
       tbbmajor=`grep "define TBB_VERSION_MAJOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MAJOR[ ]*//g"`
       tbbminor=`grep "define TBB_VERSION_MINOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MINOR[ ]*//g"`
+    else
+      enabletbb=no
+    fi
 
+    # If TBB is still enabled at this point, make sure we can compile
+    # a test code which uses tbb::tbb_thread
+    if test "$enabletbb" != no ; then
+
+      AC_MSG_CHECKING(for tbb::tbb_thread support)
+      AC_LANG_PUSH([C++])
+
+      # Add TBB headers to CXXFLAGS, which will be used by AC_COMPILE_IFELSE.
+      saveCXXFLAGS="$CXXFLAGS"
+      CXXFLAGS="$saveCXXFLAGS $TBB_INCLUDE"
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+          @%:@include <tbb/tbb_thread.h>
+        ],
+        [
+          tbb::tbb_thread t;
+          t.join();
+        ])],
+        [
+          AC_MSG_RESULT(yes)
+          enabletbb=yes
+        ],
+        [
+          AC_MSG_RESULT(no)
+          enabletbb=no
+        ])
+
+      # Restore original flags
+      CXXFLAGS=$saveCXXFLAGS
+
+      AC_LANG_POP([C++])
+    fi
+
+
+    # If TBB is still enabled at this point, set all the necessary defines and print
+    # a success message.
+    if test "$enabletbb" != no ; then
       AC_DEFINE_UNQUOTED(DETECTED_TBB_VERSION_MAJOR, [$tbbmajor],
         [TBB's major version number, as detected by tbb.m4])
 
@@ -70,8 +110,6 @@ AC_DEFUN([CONFIGURE_TBB],
 
       dnl look for thread-local storage
       AX_TLS
-    else
-      enabletbb=no
     fi
   fi
 ])

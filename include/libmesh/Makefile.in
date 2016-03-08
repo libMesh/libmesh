@@ -566,13 +566,13 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	parallel_conversion_utils.h parallel_elem.h \
 	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
 	parallel_implementation.h parallel_node.h parallel_object.h \
-	parallel_sort.h threads.h threads_allocators.h \
-	centroid_partitioner.h hilbert_sfc_partitioner.h \
-	linear_partitioner.h metis_csr_graph.h metis_partitioner.h \
-	morton_sfc_partitioner.h parmetis_helper.h \
-	parmetis_partitioner.h partitioner.h sfc_partitioner.h \
-	diff_physics.h diff_qoi.h fem_physics.h quadrature.h \
-	quadrature_clough.h quadrature_composite.h \
+	parallel_sort.h threads.h threads_allocators.h threads_none.h \
+	threads_pthread.h threads_tbb.h centroid_partitioner.h \
+	hilbert_sfc_partitioner.h linear_partitioner.h \
+	metis_csr_graph.h metis_partitioner.h morton_sfc_partitioner.h \
+	parmetis_helper.h parmetis_partitioner.h partitioner.h \
+	sfc_partitioner.h diff_physics.h diff_qoi.h fem_physics.h \
+	quadrature.h quadrature_clough.h quadrature_composite.h \
 	quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_simpson.h \
@@ -1645,6 +1645,15 @@ threads.h: $(top_srcdir)/include/parallel/threads.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_allocators.h: $(top_srcdir)/include/parallel/threads_allocators.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_none.h: $(top_srcdir)/include/parallel/threads_none.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_pthread.h: $(top_srcdir)/include/parallel/threads_pthread.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 centroid_partitioner.h: $(top_srcdir)/include/partitioning/centroid_partitioner.h

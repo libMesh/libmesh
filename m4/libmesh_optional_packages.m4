@@ -185,58 +185,16 @@ fi
 # -------------------------------------------------------------
 
 
-
 # -------------------------------------------------------------
-# Intel's Threading Building Blocks -- enabled by default
+# Choose between TBB, OpenMP, and pthreads thread models.
+# The user can control this by configuring with
+#
+# --with-thread-model={tbb,pthread,auto,none}
+#
+# where "auto" will try to automatically detect the best possible
+# version (see threads.m4).
 # -------------------------------------------------------------
-CONFIGURE_TBB
-if (test $enabletbb = yes); then
-  libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
-  libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
-fi
-# -------------------------------------------------------------
-
-# -------------------------------------------------------------
-# Pthread support -- enabled by default
-# -------------------------------------------------------------
-AC_ARG_ENABLE(pthreads,
-              AS_HELP_STRING([--disable-pthreads],
-                             [build without POSIX threading (pthreads) support]),
-              [case "${enableval}" in
-                yes)  enablepthreads=yes ;;
-                no)  enablepthreads=no ;;
-                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-pthreads) ;;
-              esac],
-              [enablepthreads=$enableoptional])
-
-if (test "$enablepthreads" != no) ; then
-  AX_PTHREAD
-fi
-
-if (test x$ax_pthread_ok = xyes); then
-  AC_DEFINE(USING_THREADS, 1,
-            [Flag indicating whether the library shall be compiled to use any particular thread API.])
-  AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
-  libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
-  libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
-else
-  enablepthreads=no
-fi
-# -------------------------------------------------------------
-
-
-# -------------------------------------------------------------
-# C++ Thread Support  -- enabled by default
-# -------------------------------------------------------------
-AC_ARG_ENABLE(cppthreads,
-             AS_HELP_STRING([--disable-cppthreads],
-                            [Build without C++ std::thread support]),
-             enablecppthreads=$enableval,
-             enablecppthreads=yes)
-if (test "$enablecppthreads" != no) ; then
-  ACX_BEST_THREAD
-fi
-# -------------------------------------------------------------
+ACX_BEST_THREAD
 
 
 

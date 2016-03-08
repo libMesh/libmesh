@@ -193,40 +193,6 @@ AX_CXX_GLIBC_BACKTRACE
 
 
 
-# -------------------------------------------------------------
-# OpenMP Support  -- enabled by default
-# -------------------------------------------------------------
-AC_ARG_ENABLE(openmp,
-             AS_HELP_STRING([--disable-openmp],
-                            [Build without OpenMP Support]),
-             enableopenmp=$enableval,
-             enableopenmp=yes)
-if (test "$enableopenmp" != no) ; then
-   AX_OPENMP([],[enableopenmp=no])
-   #The above call only sets the flag for C++
-   if (test "x$OPENMP_CXXFLAGS" != x) ; then
-     AC_MSG_RESULT(<<< Configuring library with OpenMP support >>>)
-     OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-     OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-     CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-     CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-     CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-     CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-     CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-     CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-     CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-     CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-     CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-     CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-     FFLAGS="$FFLAGS $OPENMP_FFLAGS"
-   fi
-   AC_SUBST(OPENMP_CXXFLAGS)
-   AC_SUBST(OPENMP_CFLAGS)
-   AC_SUBST(OPENMP_FFLAGS)
-fi
-# -------------------------------------------------------------
-
-
 # See if this compiler has a broken errno_t in a very specific
 # situation (this is not common).
 CHECK_FOR_BROKEN_ERRNO_T
