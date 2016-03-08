@@ -34,9 +34,6 @@
 namespace libMesh
 {
 
-// Mutex for Petsc vector thread safety
-Threads::spin_mutex petsc_vector_mutex;
-
 //-----------------------------------------------------------------------
 // PetscVector members
 
@@ -1318,13 +1315,21 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
 template <typename T>
 void PetscVector<T>::_get_array() const
 {
+#ifndef LIBMESH_HAVE_CXX11_THREAD
+  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
+#endif
+
   libmesh_assert (this->initialized());
   if(!_array_is_present)
     {
-      Threads::spin_mutex::scoped_lock lock(petsc_vector_mutex);
-
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+      std::atomic_thread_fence(std::memory_order_acquire);
+#endif
       if (!_array_is_present)
         {
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+	  std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
+#endif
           PetscErrorCode ierr=0;
           if(this->type() != GHOSTED)
             {
@@ -1367,8 +1372,12 @@ void PetscVector<T>::_get_array() const
             _first = static_cast<numeric_index_type>(petsc_first);
             _last = static_cast<numeric_index_type>(petsc_last);
           }
-
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+          std::atomic_thread_fence(std::memory_order_release);
+          _array_is_present.store(true, std::memory_order_relaxed);
+#else
           _array_is_present = true;
+#endif
         }
     }
 }
@@ -1378,12 +1387,22 @@ void PetscVector<T>::_get_array() const
 template <typename T>
 void PetscVector<T>::_restore_array() const
 {
+#ifndef LIBMESH_HAVE_CXX11_THREAD
+  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
+#endif
+
   libmesh_assert (this->initialized());
   if(_array_is_present)
     {
-      Threads::spin_mutex::scoped_lock lock(petsc_vector_mutex);
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+      std::atomic_thread_fence(std::memory_order_acquire);
+#endif
+
       if(_array_is_present)
         {
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+          std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
+#endif
           PetscErrorCode ierr=0;
           if(this->type() != GHOSTED)
             {
@@ -1418,7 +1437,12 @@ void PetscVector<T>::_restore_array() const
               _local_size = 0;
 #endif
             }
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+          std::atomic_thread_fence(std::memory_order_release);
+          _array_is_present.store(false, std::memory_order_relaxed);
+#else
           _array_is_present = false;
+#endif
         }
     }
 }
