@@ -303,11 +303,24 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
 
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <thread>
+        @%:@include <atomic>
+        @%:@include <mutex>
         void my_thread_func() {}
       ]], [[
         thread_local int i;
         std::thread t(my_thread_func);
         t.join();
+
+        std::atomic<bool> ab1, ab2;
+        ab1.store(true, std::memory_order_relaxed);
+        ab2.store(false, std::memory_order_relaxed);
+        ab1.exchange(ab2);
+
+        std::mutex m;
+        std::lock_guard<std::mutex> lock(m);
+
+        std::atomic_thread_fence(std::memory_order_acquire);
+        std::atomic_thread_fence(std::memory_order_release);
       ]])],[
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_THREAD, 1, [Flag indicating whether compiler supports std::thread])
