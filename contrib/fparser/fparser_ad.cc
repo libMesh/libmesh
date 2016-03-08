@@ -1,3 +1,9 @@
+#include "libmesh_config.h"
+// Communicate to fparser that threads are being utilized
+#ifdef LIBMESH_USING_THREADS
+#  define FP_USE_THREAD_SAFE_EVAL
+#endif
+
 #include "fparser_ad.hh"
 #include "extrasrc/fpaux.hh"
 #include "extrasrc/fptypes.hh"
@@ -19,6 +25,12 @@ using namespace FPoptimizer_CodeTree;
 #  include <dlfcn.h>
 #  include <errno.h>
 #  include <sys/stat.h>
+#endif
+
+#ifdef FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
+#ifndef FP_USE_THREAD_SAFE_EVAL
+#define FP_USE_THREAD_SAFE_EVAL
+#endif
 #endif
 
 #include "lib/sha1.h"
