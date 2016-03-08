@@ -143,11 +143,6 @@ AC_DEFUN([CONFIGURE_VTK],
        fi
 
        if (test x$enablevtk = xyes); then
-         dnl Also Check for existence of required libraries.
-
-         dnl AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
-         dnl Note: Basically tries to compile a function which calls main().
-
          dnl Save original value of LIBS, then append $VTK_LIB
          old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
@@ -196,9 +191,7 @@ AC_DEFUN([CONFIGURE_VTK],
          fi
 
          dnl Try to compile test prog to check for existence of VTK libraries.
-         dnl AC_LINK_IFELSE uses the LIBS variable.  Note that we cannot use
-         dnl AC_HAVE_LIBRARY here because its first argument must be a literal
-         dnl string.
+         dnl AC_LINK_IFELSE uses the LIBS variable.
          if (test $vtkmajor -gt 5); then
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
@@ -232,15 +225,16 @@ AC_DEFUN([CONFIGURE_VTK],
            LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-           AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
+           dnl AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
+           AC_CHECK_LIB([vtkIO], main, [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
 
            if (test $enablevtk = yes); then
-             AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
+             AC_CHECK_LIB([vtkCommon], main, [enablevtk=yes], [enablevtk=no])
            fi
 
            dnl As of VTK 5.4 it seems we also need vtkFiltering
            if (test $enablevtk = yes); then
-             AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
+             AC_CHECK_LIB([vtkFiltering], main, [enablevtk=yes], [enablevtk=no])
            fi
 
            dnl Reset $LIBS, $CPPFLAGS
