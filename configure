@@ -38349,8 +38349,6 @@ _ACEOF
        fi
 
        if (test x$enablevtk = xyes); then
-
-
                   old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
 
@@ -38394,7 +38392,7 @@ _ACEOF
                                    -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML"
          fi
 
-                                             if (test $vtkmajor -gt 5); then
+                           if (test $vtkmajor -gt 5); then
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
                       LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_NO_VERSION"
@@ -38483,7 +38481,7 @@ $as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; 
            LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-           { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
+                      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
 $as_echo_n "checking for main in -lvtkIO... " >&6; }
 if ${ac_cv_lib_vtkIO_main+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -38518,7 +38516,6 @@ if test "x$ac_cv_lib_vtkIO_main" = xyes; then :
 else
   enablevtk=no
 fi
-ac_cv_lib_vtkIO=ac_cv_lib_vtkIO_main
 
 
            if (test $enablevtk = yes); then
@@ -38557,7 +38554,6 @@ if test "x$ac_cv_lib_vtkCommon_main" = xyes; then :
 else
   enablevtk=no
 fi
-ac_cv_lib_vtkCommon=ac_cv_lib_vtkCommon_main
 
            fi
 
@@ -38597,7 +38593,6 @@ if test "x$ac_cv_lib_vtkFiltering_main" = xyes; then :
 else
   enablevtk=no
 fi
-ac_cv_lib_vtkFiltering=ac_cv_lib_vtkFiltering_main
 
            fi
 
