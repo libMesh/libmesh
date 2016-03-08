@@ -8789,6 +8789,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 /* end confdefs.h.  */
 
         #include <thread>
+        #include <atomic>
+        #include <mutex>
         void my_thread_func() {}
 
 int
@@ -8798,6 +8800,17 @@ main ()
         thread_local int i;
         std::thread t(my_thread_func);
         t.join();
+
+        std::atomic<bool> ab1, ab2;
+        ab1.store(true, std::memory_order_relaxed);
+        ab2.store(false, std::memory_order_relaxed);
+        ab1.exchange(ab2);
+
+        std::mutex m;
+        std::lock_guard<std::mutex> lock(m);
+
+        std::atomic_thread_fence(std::memory_order_acquire);
+        std::atomic_thread_fence(std::memory_order_release);
 
   ;
   return 0;
