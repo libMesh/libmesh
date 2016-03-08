@@ -122,7 +122,7 @@ private:
   bool JITCompileHelper(const std::string &);
 
   /// JIT function pointer
-  Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
+  Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t, Value_t *);
 
   /// pointer to the mImmed values (or NULL if the mImmed vector is empty)
   Value_t * pImmed;

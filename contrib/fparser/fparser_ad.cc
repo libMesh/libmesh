@@ -1,3 +1,9 @@
+#include "libmesh_config.h"
+// Communicate to fparser that threads are being utilized
+#ifdef LIBMESH_USING_THREADS
+#  define FP_USE_THREAD_SAFE_EVAL
+#endif
+
 #include "fparser_ad.hh"
 #include "extrasrc/fpaux.hh"
 #include "extrasrc/fptypes.hh"
@@ -19,6 +25,12 @@ using namespace FPoptimizer_CodeTree;
 #  include <dlfcn.h>
 #  include <errno.h>
 #  include <sys/stat.h>
+#endif
+
+#ifdef FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
+#ifndef FP_USE_THREAD_SAFE_EVAL
+#define FP_USE_THREAD_SAFE_EVAL
+#endif
 #endif
 
 #include "lib/sha1.h"
@@ -576,7 +588,24 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   if (compiledFunction == NULL)
     return FunctionParserBase<Value_t>::Eval(Vars);
   else
-    return (*compiledFunction)(Vars, pImmed, Epsilon<Value_t>::value);
+  {
+    // Use a local stack (alloca or new/delete), or the global stack for this parser object
+    #ifdef FP_USE_THREAD_SAFE_EVAL
+      #ifdef FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
+        Value_t* const Stack = (Value_t*)alloca(this->mData->mStackSize * sizeof(Value_t));
+      #else
+        struct AutoDealloc {
+          Value_t * ptr;
+          ~AutoDealloc() { delete[] ptr; }
+        } AutoDeallocStack = { new Value_t[this->mData->mStackSize] };
+        Value_t * & Stack = AutoDeallocStack.ptr;
+      #endif
+    #else
+      Value_t * Stack Stack = &this->mData->mStack[0];
+    #endif
+
+    return (*compiledFunction)(Vars, pImmed, Epsilon<Value_t>::value, Stack);
+  }
 }
 
 template<typename Value_t>
@@ -601,7 +630,11 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   // generate a sha1 hash of the current program and the Value type name
   SHA1 *sha1 = new SHA1();
   char result[41];
+  // 1. version string
+  sha1->addBytes("2.0", 3);
+  // 2. byte code content
   sha1->addBytes(reinterpret_cast<const char *>(&ByteCode[0]), ByteCode.size() * sizeof(unsigned));
+  // 3. value type name
   sha1->addBytes(Value_t_name.c_str(), Value_t_name.size());
   unsigned char* digest = sha1->getDigest();
   for (unsigned int i = 0; i<20; ++i)
@@ -682,8 +715,8 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   ccfile << "#define _USE_MATH_DEFINES\n";
   ccfile << "#include <cmath>\n";
   ccfile << "extern \"C\" " << Value_t_name << ' '
-         << fnname << "(const " << Value_t_name << " *params, const " << Value_t_name << " *immed, const " << Value_t_name << " eps) {\n";
-  ccfile << Value_t_name << " r, s[" << this->mData->mStackSize << "];\n";
+         << fnname << "(const " << Value_t_name << " *params, const " << Value_t_name << " *immed, const " << Value_t_name << " eps, " << Value_t_name << " s) {\n";
+  //ccfile << Value_t_name << " r;\n";
   int nImmed = 0, sp = -1, op;
   for (unsigned int i = 0; i < ByteCode.size(); ++i)
   {
