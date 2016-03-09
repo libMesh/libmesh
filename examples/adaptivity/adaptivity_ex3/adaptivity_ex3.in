@@ -58,3 +58,6 @@ singularity = true
 
 # Output intermediate solves?
 output_intermediate = false
+
+# Use how many linear iterations max before giving up?
+max_linear_iterations = 50000
