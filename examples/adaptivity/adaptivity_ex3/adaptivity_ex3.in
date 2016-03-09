@@ -4,11 +4,11 @@ max_r_steps = 10
 # Maximum h refinement level for an element.
 max_r_level = 15
 
-# Percentage of elements to refine at each step
+# Fraction of elements to refine at each step
 refine_percentage = 0.7
 
-# Percentage of elements to (attempt to) coarsen at each step
-coarsen_percentage = 0.0
+# Fraction of elements to (attempt to) coarsen at each step
+coarsen_percentage = 0.05
 
 # Option to uniformly or adaptively refine.
 # If uniform_refine == 1, uniform refinement is done.
