@@ -961,6 +961,12 @@ template double       command_line_value<double>      (const std::string &, doub
 template long double  command_line_value<long double> (const std::string &, long double);
 template std::string  command_line_value<std::string> (const std::string &, std::string);
 
+template int          command_line_value<int>         (const std::vector<std::string> &, int);
+template float        command_line_value<float>       (const std::vector<std::string> &, float);
+template double       command_line_value<double>      (const std::vector<std::string> &, double);
+template long double  command_line_value<long double> (const std::vector<std::string> &, long double);
+template std::string  command_line_value<std::string> (const std::vector<std::string> &, std::string);
+
 template int          command_line_next<int>         (const std::string &, int);
 template float        command_line_next<float>       (const std::string &, float);
 template double       command_line_next<double>      (const std::string &, double);
