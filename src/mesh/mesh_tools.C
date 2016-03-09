@@ -1565,6 +1565,9 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
         }
       else
         libmesh_assert(elem->subactive());
+
+      if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+        libmesh_assert_greater(elem->p_level(), 0);
     }
 }
 #else
