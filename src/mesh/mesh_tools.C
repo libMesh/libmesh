@@ -1633,7 +1633,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 
 
 
-#endif
+#endif // DEBUG
 
 
 
