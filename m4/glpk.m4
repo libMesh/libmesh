@@ -95,16 +95,13 @@ AC_DEFUN([CONFIGURE_GLPK],
        if (test $enableglpk = yes); then
          # Also Check for existence of required libraries.
 
-         # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
-         # Note: Basically tries to compile a function which calls main().
-
          # Save original value of LIBS, then append $GLPK_LIB
          old_LIBS="$LIBS"
          LIBS="$old_LIBS -L$GLPK_LIB"
 
-         # Try to compile test prog to check for existence of GLPK libraries
-         # AC_HAVE_LIBRARY uses the LIBS variable.
-         AC_HAVE_LIBRARY([glpk], [enableglpk=yes], [enableglpk=no])
+         # AC_CHECK_LIB tries to link a test code that calls a certain function.
+         # AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
+         AC_CHECK_LIB([glpk], main, [enableglpk=yes], [enableglpk=no])
 
          # Reset $LIBS
          LIBS="$old_LIBS"
