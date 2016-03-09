@@ -5,7 +5,7 @@ For generic installation instructions, refer also to the INSTALL file.
 
 Build Process
 -------------
-0. ./bootstrap (or pass --disable-maintainer-mode to ./configure in the next step)
+0. ./bootstrap (optional, needed *only* if you add/modify m4 files or configure.ac)
 
 1. ./configure --prefix=/path/to/libmesh/install
 
