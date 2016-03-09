@@ -222,8 +222,24 @@ void ErrorVector::plot_error(const std::string & filename,
 
   // The all_first_order routine requires that renumbering be allowed
   mesh.allow_renumbering(true);
-
   mesh.all_first_order();
+
+  // We don't want p elevation when plotting a single constant value
+  // per element
+  {
+    MeshBase::element_iterator       el     =
+      mesh.elements_begin();
+    const MeshBase::element_iterator end_el =
+      mesh.elements_end();
+
+    for ( ; el != end_el; ++el)
+      {
+        Elem * elem = *el;
+        elem->set_p_level(0);
+        elem->set_p_refinement_flag(Elem::DO_NOTHING);
+      }
+  }
+
   EquationSystems temp_es (mesh);
   ExplicitSystem & error_system
     = temp_es.add_system<ExplicitSystem> ("Error");
