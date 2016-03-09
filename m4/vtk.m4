@@ -143,14 +143,21 @@ AC_DEFUN([CONFIGURE_VTK],
        fi
 
        if (test x$enablevtk = xyes); then
-         dnl Also Check for existence of required libraries.
-
-         dnl AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
-         dnl Note: Basically tries to compile a function which calls main().
-
          dnl Save original value of LIBS, then append $VTK_LIB
          old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
+
+         # If this compiler supports -rpath commands, create a
+         # variable for them now that can be used in $LIBS below.  We
+         # ran across an issue where GCC's linker actually needed
+         # -rpath flags in order to *link* a test program.  From the
+         # man page for GNU ld:
+         #   The -rpath option is also used when locating shared objects
+         #   which are needed by shared objects explicitly included in
+         #   the link; see the description of the -rpath-link option.
+         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then
+           VTK_RPATH_FLAGS="${RPATHFLAG}${VTK_LIB}"
+         fi
 
          dnl VTK 5.x
          if (test $vtkmajor -eq 5); then
@@ -184,14 +191,12 @@ AC_DEFUN([CONFIGURE_VTK],
          fi
 
          dnl Try to compile test prog to check for existence of VTK libraries.
-         dnl AC_LINK_IFELSE uses the LIBS variable.  Note that we cannot use
-         dnl AC_HAVE_LIBRARY here because its first argument must be a literal
-         dnl string.
+         dnl AC_LINK_IFELSE uses the LIBS variable.
          if (test $vtkmajor -gt 5); then
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
            dnl 1. First try linking the NO_VERSION library names
-           LIBS="$old_LIBS $VTK_LIBRARY_NO_VERSION"
+           LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_NO_VERSION"
            AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
                           [enablevtk=yes
                            VTK_LIBRARY=$VTK_LIBRARY_NO_VERSION],
@@ -199,7 +204,7 @@ AC_DEFUN([CONFIGURE_VTK],
 
            dnl 2. If that didn't work, try linking the library names with version numbers.
            if (test x$enablevtk = xno); then
-             LIBS="$old_LIBS $VTK_LIBRARY_WITH_VERSION"
+             LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY_WITH_VERSION"
              AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
                             [enablevtk=yes
                              VTK_LIBRARY=$VTK_LIBRARY_WITH_VERSION],
@@ -217,18 +222,19 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl Check for VTK 5.x libraries
          else
-           LIBS="$old_LIBS $VTK_LIBRARY"
+           LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-           AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
+           dnl AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
+           AC_CHECK_LIB([vtkIO], main, [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
 
            if (test $enablevtk = yes); then
-             AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
+             AC_CHECK_LIB([vtkCommon], main, [enablevtk=yes], [enablevtk=no])
            fi
 
            dnl As of VTK 5.4 it seems we also need vtkFiltering
            if (test $enablevtk = yes); then
-             AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
+             AC_CHECK_LIB([vtkFiltering], main, [enablevtk=yes], [enablevtk=no])
            fi
 
            dnl Reset $LIBS, $CPPFLAGS
