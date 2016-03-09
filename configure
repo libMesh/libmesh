@@ -39078,15 +39078,12 @@ $as_echo "<<< Configuring library with GLPK version $glpkversion support >>>" >&
        if (test $enableglpk = yes); then
          # Also Check for existence of required libraries.
 
-         # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
-         # Note: Basically tries to compile a function which calls main().
-
          # Save original value of LIBS, then append $GLPK_LIB
          old_LIBS="$LIBS"
          LIBS="$old_LIBS -L$GLPK_LIB"
 
-         # Try to compile test prog to check for existence of GLPK libraries
-         # AC_HAVE_LIBRARY uses the LIBS variable.
+         # AC_CHECK_LIB tries to link a test code that calls a certain function.
+         # AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lglpk" >&5
 $as_echo_n "checking for main in -lglpk... " >&6; }
 if ${ac_cv_lib_glpk_main+:} false; then :
@@ -39122,7 +39119,6 @@ if test "x$ac_cv_lib_glpk_main" = xyes; then :
 else
   enableglpk=no
 fi
-ac_cv_lib_glpk=ac_cv_lib_glpk_main
 
 
          # Reset $LIBS
@@ -40970,15 +40966,12 @@ $as_echo "<<< Configuring library with CURL version $curlversion support >>>" >&
        if (test $enablecurl = yes); then
          # Also Check for existence of required libraries.
 
-         # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
-         # Note: Basically tries to compile a function which calls main().
-
          # Save original value of LIBS, then append $CURL_LIB
          old_LIBS="$LIBS"
          LIBS="$old_LIBS -L$CURL_LIB"
 
-         # Try to compile test prog to check for existence of CURL libraries
-         # AC_HAVE_LIBRARY uses the LIBS variable.
+         # AC_CHECK_LIB tries to link a test code that calls a certain function.
+         # AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lcurl" >&5
 $as_echo_n "checking for main in -lcurl... " >&6; }
 if ${ac_cv_lib_curl_main+:} false; then :
@@ -41014,7 +41007,6 @@ if test "x$ac_cv_lib_curl_main" = xyes; then :
 else
   enablecurl=no
 fi
-ac_cv_lib_curl=ac_cv_lib_curl_main
 
 
          # Reset $LIBS
