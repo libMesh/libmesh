@@ -367,7 +367,7 @@ public:
   { return this->_fe_map->get_tangents(); }
 
   /**
-   * @returns the normal vectors for face integration.
+   * @returns the outward pointing normal vectors for face integration.
    */
   const std::vector<Point> & get_normals() const
   { return this->_fe_map->get_normals(); }

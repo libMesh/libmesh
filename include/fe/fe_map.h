@@ -328,7 +328,7 @@ public:
   { return tangents; }
 
   /**
-   * @returns the normal vectors for face integration.
+   * @returns the outward pointing normal vectors for face integration.
    */
   const std::vector<Point> & get_normals() const
   { return normals; }
