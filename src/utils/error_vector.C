@@ -235,8 +235,8 @@ void ErrorVector::plot_error(const std::string & filename,
     for ( ; el != end_el; ++el)
       {
         Elem * elem = *el;
-        elem->set_p_level(0);
         elem->set_p_refinement_flag(Elem::DO_NOTHING);
+        elem->set_p_level(0);
       }
   }
 

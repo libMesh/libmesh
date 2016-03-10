@@ -152,11 +152,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
         // Copy the refinement flags
         el->set_refinement_flag(old->refinement_flag());
-        el->set_p_refinement_flag(old->p_refinement_flag());
 
         // Use hack_p_level since we may not have sibling elements
         // added yet
         el->hack_p_level(old->p_level());
+
+        el->set_p_refinement_flag(old->p_refinement_flag());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
         //Assign all the nodes
