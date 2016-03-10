@@ -1923,20 +1923,10 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
       if (elem->refinement_flag() == Elem::JUST_REFINED)
         {
           libmesh_assert(parent);
-          unsigned int old_parent_level = parent->p_level();
 
-          if (elem->p_refinement_flag() == Elem::JUST_REFINED)
-            {
-              // We may have done p refinement or coarsening as well;
-              // if so then we need to reset the parent's p level
-              // so we can get the right DoFs from it
-              libmesh_assert_greater (elem->p_level(), 0);
-              (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
-            }
-          else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
-            {
-              (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() + 1);
-            }
+          // We used to hack_p_level here, but that wasn't thread-safe
+          // so now we take p refinement flags into account in
+          // old_dof_indices
 
           dof_map.old_dof_indices (parent, di);
 
@@ -1964,9 +1954,6 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
           std::vector<dof_id_type>::iterator new_end =
             std::unique(di.begin(), di.end());
           std::vector<dof_id_type>(di.begin(), new_end).swap(di);
-
-          // Fix up the parent's p level in case we changed it
-          (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
         }
       else if (elem->refinement_flag() == Elem::JUST_COARSENED)
         {
