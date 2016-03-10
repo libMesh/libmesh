@@ -567,8 +567,11 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // doing a projection on this inactive element on this
       // processor, so we won't need correct p settings.  Couldn't
       // hurt to update, though.
-      elem->set_p_level(p_level);
-      elem->set_p_refinement_flag(p_refinement_flag);
+      if (elem->processor_id() != mesh->processor_id())
+        {
+          elem->hack_p_level(p_level);
+          elem->set_p_refinement_flag(p_refinement_flag);
+        }
 
       // FIXME: We should add some debug mode tests to ensure that the
       // encoded indexing and boundary conditions are consistent.
