@@ -2013,7 +2013,7 @@ void Elem::set_p_level(unsigned int p)
 
 	  // When its children all have a higher p level, the parent's
 	  // should rise
-          if (parent_p_level != this->parent()->p_level())
+          if (parent_p_level > this->parent()->p_level())
             {
               this->parent()->set_p_level(parent_p_level);
 
