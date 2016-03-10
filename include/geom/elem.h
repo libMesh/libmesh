@@ -1961,6 +1961,10 @@ Elem::RefinementState Elem::p_refinement_flag () const
 inline
 void Elem::set_p_refinement_flag(RefinementState pflag)
 {
+  if (this->p_level() == 0)
+    libmesh_assert_not_equal_to
+      (pflag, Elem::JUST_REFINED);
+
   _pflag = cast_int<unsigned char>(pflag);
 }
 
@@ -2026,6 +2030,10 @@ void Elem::set_p_level(unsigned int p)
         }
     }
 
+  if (p == 0)
+    libmesh_assert_not_equal_to
+      (this->p_refinement_flag(), Elem::JUST_REFINED);
+
   _p_level = cast_int<unsigned char>(p);
 }
 
@@ -2034,6 +2042,10 @@ void Elem::set_p_level(unsigned int p)
 inline
 void Elem::hack_p_level(unsigned int p)
 {
+  if (p == 0)
+    libmesh_assert_not_equal_to
+      (this->p_refinement_flag(), Elem::JUST_REFINED);
+
   _p_level = cast_int<unsigned char>(p);
 }
 
