@@ -882,7 +882,7 @@ public:
   /*
    * Get the current AlgebraicType setting
    */
-  AlgebraicType algebraic_type() { return _atype; }
+  AlgebraicType algebraic_type() const { return _atype; }
 
   /**
    * Set a NumericVector to be used in place of current_local_solution
