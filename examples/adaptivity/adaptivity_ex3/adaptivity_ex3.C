@@ -58,6 +58,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/error_vector.h"
+#include "libmesh/discontinuity_measure.h"
 #include "libmesh/exact_error_estimator.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/patch_recovery_error_estimator.h"
@@ -286,6 +287,19 @@ int main(int argc, char ** argv)
       libMesh::out << "H1-Error is: "
                    << exact_sol.h1_error("Laplace", "u")
                    << std::endl;
+
+      // Compute any discontinuity.  There should be none.
+      {
+        DiscontinuityMeasure disc;
+        ErrorVector disc_error;
+        disc.estimate_error(system, disc_error);
+
+        Real mean_disc_error = disc_error.mean();
+
+        libMesh::out << "Mean discontinuity error = " << mean_disc_error << std::endl;
+
+        libmesh_assert_less (mean_disc_error, 1e-14);
+      }
 
       // Print to output file
       out << equation_systems.n_active_dofs() << " "
