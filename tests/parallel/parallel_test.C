@@ -25,6 +25,7 @@ public:
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
   CPPUNIT_TEST( testSemiVerify );
+  CPPUNIT_TEST( testSplit );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -278,6 +279,15 @@ public:
     inf = -std::numeric_limits<double>::infinity();
 
     CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
+  }
+
+
+  void testSplit ()
+  {
+    Parallel::Communicator subcomm;
+    unsigned int rank = TestCommWorld->rank();
+    unsigned int color = rank % 2;
+    TestCommWorld->split(color, rank, subcomm);
   }
 
 
