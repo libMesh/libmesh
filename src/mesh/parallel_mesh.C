@@ -963,8 +963,8 @@ void ParallelMesh::libmesh_assert_valid_parallel_p_levels () const
 
       unsigned int p_level = el ?  (el->p_level()) : libMesh::invalid_uint;
 
-      // All processors with this element should agree on p level
-      libmesh_assert(this->comm().semiverify(el ? &p_level : libmesh_nullptr));
+      // All processors with an active element should agree on p level
+      libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_level : libmesh_nullptr));
     }
 }
 
@@ -989,7 +989,10 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
         static_cast<unsigned int> (el->p_refinement_flag()) : libMesh::invalid_uint;
 
       libmesh_assert(this->comm().semiverify(el ? &refinement_flag : libmesh_nullptr));
-      libmesh_assert(this->comm().semiverify(el ? &p_refinement_flag : libmesh_nullptr));
+
+      // p refinement flags aren't always kept correct on inactive
+      // ghost elements
+      libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_refinement_flag : libmesh_nullptr));
     }
 #endif // LIBMESH_ENABLE_AMR
 }

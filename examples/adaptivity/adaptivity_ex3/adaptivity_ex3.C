@@ -386,18 +386,18 @@ int main(int argc, char ** argv)
                 mesh_refinement.switch_h_to_p_refinement();
               // If we are doing "matched hp" refinement, we
               // flag elements for both h and p
-              if (refine_type == "matchedhp")
+              else if (refine_type == "matchedhp")
                 mesh_refinement.add_p_to_h_refinement();
               // If we are doing hp refinement, we
               // try switching some elements from h to p
-              if (refine_type == "hp")
+              else if (refine_type == "hp")
                 {
                   HPCoarsenTest hpselector;
                   hpselector.select_refinement(system);
                 }
               // If we are doing "singular hp" refinement, we
               // try switching most elements from h to p
-              if (refine_type == "singularhp")
+              else if (refine_type == "singularhp")
                 {
                   // This only differs from p refinement for
                   // the singular problem
@@ -407,6 +407,8 @@ int main(int argc, char ** argv)
                   hpselector.singular_points.push_back(Point());
                   hpselector.select_refinement(system);
                 }
+              else if (refine_type != "h")
+                libmesh_error_msg("Unknown refinement_type = " << refine_type);
 
               // This call actually refines and coarsens the flagged
               // elements.

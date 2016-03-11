@@ -437,10 +437,16 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      libmesh_assert_equal_to (elem->p_level(), p_level);
       libmesh_assert_equal_to (elem->refinement_flag(), refinement_flag);
       libmesh_assert_equal_to (elem->has_children(), has_children);
-      libmesh_assert_equal_to (elem->p_refinement_flag(), p_refinement_flag);
+
+#ifdef DEBUG
+      if (elem->active())
+        {
+          libmesh_assert_equal_to (elem->p_level(), p_level);
+          libmesh_assert_equal_to (elem->p_refinement_flag(), p_refinement_flag);
+        }
+#endif
 
       libmesh_assert (!level || elem->parent() != libmesh_nullptr);
       libmesh_assert (!level || elem->parent()->id() == parent_id);
@@ -552,6 +558,20 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
                 elem->make_links_to_me_local(n);
               }
           }
+
+      // Our p level and refinement flags should be "close to" correct
+      // if we're not an active element - we might have a p level
+      // increased or decreased by changes in remote_elem children.
+      //
+      // But if we have remote_elem children, then we shouldn't be
+      // doing a projection on this inactive element on this
+      // processor, so we won't need correct p settings.  Couldn't
+      // hurt to update, though.
+      if (elem->processor_id() != mesh->processor_id())
+        {
+          elem->hack_p_level(p_level);
+          elem->set_p_refinement_flag(p_refinement_flag);
+        }
 
       // FIXME: We should add some debug mode tests to ensure that the
       // encoded indexing and boundary conditions are consistent.

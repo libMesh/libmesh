@@ -1961,6 +1961,10 @@ Elem::RefinementState Elem::p_refinement_flag () const
 inline
 void Elem::set_p_refinement_flag(RefinementState pflag)
 {
+  if (this->p_level() == 0)
+    libmesh_assert_not_equal_to
+      (pflag, Elem::JUST_REFINED);
+
   _pflag = cast_int<unsigned char>(pflag);
 }
 
@@ -1996,6 +2000,10 @@ void Elem::set_p_level(unsigned int p)
       if (parent_p_level > p)
         {
           this->parent()->set_p_level(p);
+
+          // And we should keep track of the drop, in case we need to
+          // do a projection later.
+          this->parent()->set_p_refinement_flag(Elem::JUST_COARSENED);
         }
       // If we are the lowest p level and it increases, so might
       // our parent's, but we have to check every other child to see
@@ -2007,12 +2015,24 @@ void Elem::set_p_level(unsigned int p)
             parent_p_level = std::min(parent_p_level,
                                       this->parent()->child(c)->p_level());
 
-          if (parent_p_level != this->parent()->p_level())
-            this->parent()->set_p_level(parent_p_level);
+	  // When its children all have a higher p level, the parent's
+	  // should rise
+          if (parent_p_level > this->parent()->p_level())
+            {
+              this->parent()->set_p_level(parent_p_level);
+
+              // And we should keep track of the rise, in case we need to
+              // do a projection later.
+              this->parent()->set_p_refinement_flag(Elem::JUST_REFINED);
+            }
 
           return;
         }
     }
+
+  if (p == 0)
+    libmesh_assert_not_equal_to
+      (this->p_refinement_flag(), Elem::JUST_REFINED);
 
   _p_level = cast_int<unsigned char>(p);
 }
@@ -2022,6 +2042,10 @@ void Elem::set_p_level(unsigned int p)
 inline
 void Elem::hack_p_level(unsigned int p)
 {
+  if (p == 0)
+    libmesh_assert_not_equal_to
+      (this->p_refinement_flag(), Elem::JUST_REFINED);
+
   _p_level = cast_int<unsigned char>(p);
 }
 

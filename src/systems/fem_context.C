@@ -1798,6 +1798,15 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   // everywhere.
   libmesh_assert(this->has_elem() || fe_type.family == SCALAR);
 
+  if ((algebraic_type() == OLD) &&
+      this->has_elem())
+    {
+      if (this->get_elem().p_refinement_flag() == Elem::JUST_REFINED)
+        fe_type.order = static_cast<Order>(fe_type.order - 1);
+      else if (this->get_elem().p_refinement_flag() == Elem::JUST_COARSENED)
+        fe_type.order = static_cast<Order>(fe_type.order + 1);
+    }
+
   unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
 
   FEGenericBase<OutputShape>* fe_new =

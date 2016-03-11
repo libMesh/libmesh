@@ -86,7 +86,10 @@ void Elem::refine (MeshRefinement & mesh_refinement)
 
   // Un-set my refinement flag now
   this->set_refinement_flag(Elem::INACTIVE);
-  this->set_p_refinement_flag(Elem::INACTIVE);
+
+  // Leave the p refinement flag set - we will need that later to get
+  // projection operations correct
+  // this->set_p_refinement_flag(Elem::INACTIVE);
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {
