@@ -118,7 +118,7 @@ public:
    * The number of components of this variable.
    */
   unsigned int n_components() const
-  { return type().family == SCALAR ? _type.order : 1; }
+  { return type().family == SCALAR ? _type.order.get_order() : 1; }
 
   /**
    * \p returns \p true if this variable is active on subdomain \p sid,

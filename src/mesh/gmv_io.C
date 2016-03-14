@@ -2390,7 +2390,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
               // The only type of nodal data we can read in from GMV is for
               // linear LAGRANGE type elements.
               const FEType & fe_type = system.variable_type(var_num);
-              if ((fe_type.order != FIRST) || (fe_type.family != LAGRANGE))
+              if ((fe_type.order.get_order() != FIRST) || (fe_type.family != LAGRANGE))
                 {
                   libMesh::err << "Only FIRST-order LAGRANGE variables can be read from GMV files. "
                                << "Skipping variable " << var_name << std::endl;
