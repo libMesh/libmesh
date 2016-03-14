@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/auto_ptr.h"
+#include "libmesh/compare_types.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_fe_family.h"
@@ -101,18 +102,35 @@ inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return
 
 // First disambiguate everything that would be ambiguated by the
 // subsequent disambiguations
-inline bool operator==(int lhs, Order rhs){ return lhs == static_cast<int>(rhs); }
-inline bool operator==(Order lhs, int rhs){ return static_cast<int>(lhs) == rhs; }
-inline bool operator!=(int lhs, Order rhs){ return !(lhs == rhs); }
-inline bool operator!=(Order lhs, int rhs){ return !(lhs == rhs); }
-inline bool operator< (int lhs, Order rhs){ return lhs < static_cast<int>(rhs); }
-inline bool operator< (Order lhs, int rhs){ return static_cast<int>(lhs) < rhs; }
-inline bool operator> (int lhs, Order rhs){ return rhs < lhs; }
-inline bool operator> (Order lhs, int rhs){ return rhs < lhs; }
-inline bool operator<=(int lhs, Order rhs){ return !(lhs > rhs); }
-inline bool operator<=(Order lhs, int rhs){ return !(lhs > rhs); }
-inline bool operator>=(int lhs, Order rhs){ return !(lhs < rhs); }
-inline bool operator>=(Order lhs, int rhs){ return !(lhs < rhs); }
+#define OrderWrapperOperators(comparisontype) \
+inline bool operator==(comparisontype lhs, Order rhs) \
+{ return lhs == static_cast<comparisontype>(rhs); } \
+inline bool operator==(Order lhs, comparisontype rhs) \
+{ return static_cast<comparisontype>(lhs) == rhs; } \
+inline bool operator!=(comparisontype lhs, Order rhs) \
+{ return !(lhs == rhs); } \
+inline bool operator!=(Order lhs, comparisontype rhs) \
+{ return !(lhs == rhs); } \
+inline bool operator< (comparisontype lhs, Order rhs) \
+{ return lhs < static_cast<comparisontype>(rhs); } \
+inline bool operator< (Order lhs, comparisontype rhs) \
+{ return static_cast<comparisontype>(lhs) < rhs; } \
+inline bool operator> (comparisontype lhs, Order rhs) \
+{ return rhs < lhs; } \
+inline bool operator> (Order lhs, comparisontype rhs) \
+{ return rhs < lhs; } \
+inline bool operator<=(comparisontype lhs, Order rhs) \
+{ return !(lhs > rhs); } \
+inline bool operator<=(Order lhs, comparisontype rhs) \
+{ return !(lhs > rhs); } \
+inline bool operator>=(comparisontype lhs, Order rhs) \
+{ return !(lhs < rhs); } \
+inline bool operator>=(Order lhs, comparisontype rhs) \
+{ return !(lhs < rhs); }
+
+OrderWrapperOperators(int)
+OrderWrapperOperators(unsigned int)
+OrderWrapperOperators(std::size_t)
 
 
 // Now disambiguate all the things
