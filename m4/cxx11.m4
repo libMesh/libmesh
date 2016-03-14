@@ -39,6 +39,192 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX11_DECLTYPE],
+  [
+    have_cxx11_decltype=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 decltype support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      ]], [[
+          int a;
+          decltype(a) b;
+      ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_DECLTYPE, 1, [Flag indicating whether compiler supports decltype])
+          have_cxx11_decltype=yes
+      ],[
+          AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_DECLTYPE, test x$have_cxx11_decltype == xyes)
+  ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_RVALUE_REFERENCES],
+  [
+    have_cxx11_rvalue_references=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 rvalue references support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        int foo(int && x) { return x; }
+        int bar() { return 4; }
+      ]], [[
+        // Call function that takes an rvalue reference.
+        foo (bar());
+      ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_RVALUE_REFERENCES, 1, [Flag indicating whether compiler supports rvalue references])
+          have_cxx11_rvalue_references=yes
+      ],[
+          AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_RVALUE_REFERENCES, test x$have_cxx11_rvalue_references == xyes)
+  ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_AUTO],
+  [
+    have_cxx11_auto=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 auto keyword support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      ]], [[
+        int x = 5;
+        auto y = x;
+      ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_AUTO, 1, [Flag indicating whether compiler supports the auto keyword])
+          have_cxx11_auto=yes
+      ],[
+          AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_AUTO, test x$have_cxx11_auto == xyes)
+  ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_LAMBDA],
+  [
+    have_cxx11_lambda=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 lambda support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        // typedef for a function pointer that takes int and returns bool.
+        typedef bool (*FunctionPointer) (int);
+
+        // A function that takes a pointer to a function that takes an int,
+        // calls it with the number 4, and returns the result.
+        bool f(FunctionPointer g) { return g(4); }
+      ]], [[
+        // Call f, passing it a lambda constructed on the fly instead
+        // of a standard function pointer.  The result should be true.
+        f ( [](int x) { return x > 3; } );
+      ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_LAMBDA, 1, [Flag indicating whether compiler supports lambdas])
+          have_cxx11_lambda=yes
+      ],[
+          AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_LAMBDA, test x$have_cxx11_lambda == xyes)
+  ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_CONSTEXPR],
+  [
+    have_cxx11_constexpr=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 constexpr support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        constexpr int multiply (int x, int y) { return x * y; }
+      ]], [[
+        // The compiler should compute "val" at compile time.
+        const int val = multiply(10, 10);
+      ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_CONSTEXPR, 1, [Flag indicating whether compiler supports constexpr])
+          have_cxx11_constexpr=yes
+      ],[
+          AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_CONSTEXPR, test x$have_cxx11_constexpr == xyes)
+  ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS],
+  [
+    have_cxx11_alias_declarations=no
+
+    # Only run the test if enablecxx11==yes
+    if (test "x$enablecxx11" = "xyes"); then
+      AC_MSG_CHECKING(for C++11 alias declarations support)
+      AC_LANG_PUSH([C++])
+
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        template <typename T>
+        struct check
+        {
+          T t;
+        };
+
+        // An alias declaration is like a templated typedef
+        template <typename T>
+        using MyCheck = check<T>;
+      ]], [[
+        MyCheck<int> mc;
+      ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_ALIAS_DECLARATIONS, 1, [Flag indicating whether compiler supports alias declarations])
+          have_cxx11_alias_declarations=yes
+      ],[
+          AC_MSG_RESULT(no)
+      ])
+
+      AC_LANG_POP([C++])
+    fi
+
+    AM_CONDITIONAL(HAVE_CXX11_ALIAS_DECLARATIONS, test x$have_cxx11_alias_declarations == xyes)
+  ])
+
+
 AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
   [
     have_cxx11_shared_ptr=init
