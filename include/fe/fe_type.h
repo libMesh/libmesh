@@ -99,6 +99,48 @@ inline bool operator> (const OrderWrapper& lhs, const OrderWrapper& rhs){ return
 inline bool operator<=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
 inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
 
+// First disambiguate everything that would be ambiguated by the
+// subsequent disambiguations
+inline bool operator==(int lhs, Order rhs){ return lhs == static_cast<int>(rhs); }
+inline bool operator==(Order lhs, int rhs){ return static_cast<int>(lhs) == rhs; }
+inline bool operator!=(int lhs, Order rhs){ return !(lhs == rhs); }
+inline bool operator!=(Order lhs, int rhs){ return !(lhs == rhs); }
+inline bool operator< (int lhs, Order rhs){ return lhs < static_cast<int>(rhs); }
+inline bool operator< (Order lhs, int rhs){ return static_cast<int>(lhs) < rhs; }
+inline bool operator> (int lhs, Order rhs){ return rhs < lhs; }
+inline bool operator> (Order lhs, int rhs){ return rhs < lhs; }
+inline bool operator<=(int lhs, Order rhs){ return !(lhs > rhs); }
+inline bool operator<=(Order lhs, int rhs){ return !(lhs > rhs); }
+inline bool operator>=(int lhs, Order rhs){ return !(lhs < rhs); }
+inline bool operator>=(Order lhs, int rhs){ return !(lhs < rhs); }
+
+
+// Now disambiguate all the things
+inline bool operator==(int lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
+inline bool operator==(const OrderWrapper& lhs, int rhs){ return lhs.get_order() == rhs; }
+inline bool operator==(Order lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
+inline bool operator==(const OrderWrapper& lhs, Order rhs){ return lhs.get_order() == rhs; }
+inline bool operator!=(int lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
+inline bool operator!=(const OrderWrapper& lhs, int rhs){ return !(lhs == rhs); }
+inline bool operator!=(Order lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
+inline bool operator!=(const OrderWrapper& lhs, Order rhs){ return !(lhs == rhs); }
+inline bool operator< (int lhs, const OrderWrapper& rhs){ return lhs < rhs.get_order(); }
+inline bool operator< (const OrderWrapper& lhs, int rhs){ return lhs.get_order() < rhs; }
+inline bool operator< (Order lhs, const OrderWrapper& rhs){ return lhs < rhs.get_order(); }
+inline bool operator< (const OrderWrapper& lhs, Order rhs){ return lhs.get_order() < rhs; }
+inline bool operator> (int lhs, const OrderWrapper& rhs){ return rhs < lhs; }
+inline bool operator> (const OrderWrapper& lhs, int rhs){ return rhs < lhs; }
+inline bool operator> (Order lhs, const OrderWrapper& rhs){ return rhs < lhs; }
+inline bool operator> (const OrderWrapper& lhs, Order rhs){ return rhs < lhs; }
+inline bool operator<=(int lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
+inline bool operator<=(const OrderWrapper& lhs, int rhs){ return !(lhs > rhs); }
+inline bool operator<=(Order lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
+inline bool operator<=(const OrderWrapper& lhs, Order rhs){ return !(lhs > rhs); }
+inline bool operator>=(int lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+inline bool operator>=(const OrderWrapper& lhs, int rhs){ return !(lhs < rhs); }
+inline bool operator>=(Order lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+inline bool operator>=(const OrderWrapper& lhs, Order rhs){ return !(lhs < rhs); }
+
 /**
  * Overload stream operators.
  */
