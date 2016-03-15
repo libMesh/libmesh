@@ -145,14 +145,12 @@ AC_ARG_ENABLE(cxx11,
                    esac],
                    [enablecxx11=yes])
 
-if (test "x$enablecxx11" = "xyes"); then
-  # --------------------------------------------------------------
-  # Standard autoconf macro for determining the proper -std=c++11
-  # flag for the current compiler.  Adds the result to CXXFLAGS if
-  # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
-  # --------------------------------------------------------------
-  AX_CXX_COMPILE_STDCXX_11([],[optional])
-fi
+# --------------------------------------------------------------
+# Standard autoconf macro for determining the proper -std=c++11
+# flag for the current compiler.  Adds the result to CXXFLAGS if
+# one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
+# --------------------------------------------------------------
+AX_CXX_COMPILE_STDCXX_11([],[optional])
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
