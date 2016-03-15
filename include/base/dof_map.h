@@ -517,11 +517,13 @@ public:
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
-   * for the element.  For one variable
+   * for the element.  For one variable, and potentially for a
+   * non-default element p refinement level
    */
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di,
-                    const unsigned int vn) const;
+                    const unsigned int vn,
+                    int p_level = -12345) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -1102,7 +1104,9 @@ private:
    * @param tot_size In DEBUG mode this will add up the total number of
    * dof indices that should have been added to di.
    */
-  void _dof_indices (const Elem * const elem, std::vector<dof_id_type> & di,
+  void _dof_indices (const Elem * const elem,
+                     int p_level,
+                     std::vector<dof_id_type> & di,
                      const unsigned int v,
                      const Node * const * nodes,
                      unsigned int       n_nodes
