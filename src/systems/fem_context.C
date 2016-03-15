@@ -1460,17 +1460,17 @@ void FEMContext::elem_position_get()
   libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
-                  this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().order
+                  this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
   libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
-                  this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().order
+                  this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
   libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
                  (this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
-                  this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().order
+                  this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
 
   // Get degree of freedom coefficients from point coordinates

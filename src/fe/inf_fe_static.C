@@ -730,7 +730,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
    * 8. element-associated dof further out
    */
 
-  const unsigned int radial_order       = static_cast<unsigned int>(fet.radial_order);             // 4
+  const unsigned int radial_order       = static_cast<unsigned int>(fet.radial_order.get_order()); // 4
   const unsigned int radial_order_p_one = radial_order+1;                                          // 5
 
   const ElemType base_elem_type           (Base::get_elem_type(inf_elem_type));                    // QUAD9

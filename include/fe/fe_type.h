@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/auto_ptr.h"
+#include "libmesh/compare_types.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_fe_family.h"
@@ -35,6 +36,137 @@ namespace libMesh
 // Forward declarations
 class QBase;
 
+/**
+ * This provides a shim class that wraps the Order enum.
+ * The purpose of this is to store the order as an int
+ * instead of an enum (to enable higher orders) while
+ * retaining backwards compatibility.
+ */
+class OrderWrapper
+{
+public:
+
+  /**
+   * Constructor. Enables implicit conversion from an Order
+   * enum to an OrderWrapper.
+   */
+  OrderWrapper(Order order)
+  :
+    _order(static_cast<int>(order))
+  {}
+
+  /**
+   * Constructor. Enables implicit conversion from an int
+   * to an OrderWrapper.
+   */
+  OrderWrapper(int order)
+  :
+    _order(order)
+  {}
+
+  /**
+   * Operator that enables implicit conversion to
+   * an Order enum.
+   */
+  operator Order() const
+  {
+    return static_cast<Order>(_order);
+  }
+
+  /**
+   * Explicity request the order as an int.
+   */
+  int get_order() const
+  {
+    return _order;
+  }
+
+private:
+
+  /**
+   * The approximation order of the element.
+   */
+  int _order;
+
+};
+
+/**
+ * Overload comparison operators for OrderWrapper.
+ */
+inline bool operator==(const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() == rhs.get_order(); }
+inline bool operator!=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
+inline bool operator< (const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() < rhs.get_order(); }
+inline bool operator> (const OrderWrapper& lhs, const OrderWrapper& rhs){ return rhs < lhs; }
+inline bool operator<=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
+inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+
+// First disambiguate everything that would be ambiguated by the
+// subsequent disambiguations
+#define OrderWrapperOperators(comparisontype) \
+inline bool operator==(comparisontype lhs, Order rhs) \
+{ return lhs == static_cast<comparisontype>(rhs); } \
+inline bool operator==(Order lhs, comparisontype rhs) \
+{ return static_cast<comparisontype>(lhs) == rhs; } \
+inline bool operator!=(comparisontype lhs, Order rhs) \
+{ return !(lhs == rhs); } \
+inline bool operator!=(Order lhs, comparisontype rhs) \
+{ return !(lhs == rhs); } \
+inline bool operator< (comparisontype lhs, Order rhs) \
+{ return lhs < static_cast<comparisontype>(rhs); } \
+inline bool operator< (Order lhs, comparisontype rhs) \
+{ return static_cast<comparisontype>(lhs) < rhs; } \
+inline bool operator> (comparisontype lhs, Order rhs) \
+{ return rhs < lhs; } \
+inline bool operator> (Order lhs, comparisontype rhs) \
+{ return rhs < lhs; } \
+inline bool operator<=(comparisontype lhs, Order rhs) \
+{ return !(lhs > rhs); } \
+inline bool operator<=(Order lhs, comparisontype rhs) \
+{ return !(lhs > rhs); } \
+inline bool operator>=(comparisontype lhs, Order rhs) \
+{ return !(lhs < rhs); } \
+inline bool operator>=(Order lhs, comparisontype rhs) \
+{ return !(lhs < rhs); }
+
+OrderWrapperOperators(int)
+OrderWrapperOperators(unsigned int)
+OrderWrapperOperators(std::size_t)
+
+
+// Now disambiguate all the things
+inline bool operator==(int lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
+inline bool operator==(const OrderWrapper& lhs, int rhs){ return lhs.get_order() == rhs; }
+inline bool operator==(Order lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
+inline bool operator==(const OrderWrapper& lhs, Order rhs){ return lhs.get_order() == rhs; }
+inline bool operator!=(int lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
+inline bool operator!=(const OrderWrapper& lhs, int rhs){ return !(lhs == rhs); }
+inline bool operator!=(Order lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
+inline bool operator!=(const OrderWrapper& lhs, Order rhs){ return !(lhs == rhs); }
+inline bool operator< (int lhs, const OrderWrapper& rhs){ return lhs < rhs.get_order(); }
+inline bool operator< (const OrderWrapper& lhs, int rhs){ return lhs.get_order() < rhs; }
+inline bool operator< (Order lhs, const OrderWrapper& rhs){ return lhs < rhs.get_order(); }
+inline bool operator< (const OrderWrapper& lhs, Order rhs){ return lhs.get_order() < rhs; }
+inline bool operator> (int lhs, const OrderWrapper& rhs){ return rhs < lhs; }
+inline bool operator> (const OrderWrapper& lhs, int rhs){ return rhs < lhs; }
+inline bool operator> (Order lhs, const OrderWrapper& rhs){ return rhs < lhs; }
+inline bool operator> (const OrderWrapper& lhs, Order rhs){ return rhs < lhs; }
+inline bool operator<=(int lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
+inline bool operator<=(const OrderWrapper& lhs, int rhs){ return !(lhs > rhs); }
+inline bool operator<=(Order lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
+inline bool operator<=(const OrderWrapper& lhs, Order rhs){ return !(lhs > rhs); }
+inline bool operator>=(int lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+inline bool operator>=(const OrderWrapper& lhs, int rhs){ return !(lhs < rhs); }
+inline bool operator>=(Order lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+inline bool operator>=(const OrderWrapper& lhs, Order rhs){ return !(lhs < rhs); }
+
+/**
+ * Overload stream operators.
+ */
+inline std::ostream & operator << (std::ostream & os, const OrderWrapper& order)
+{
+  os << order.get_order();
+  return os;
+}
 
 /**
  * class FEType hides (possibly multiple) FEFamily and approximation
@@ -50,7 +182,7 @@ public:
    * Constructor.  Optionally takes the approximation \p Order
    * and the finite element family \p FEFamily
    */
-  FEType(const Order    o = FIRST,
+  FEType(const int      o = 1,
          const FEFamily f = LAGRANGE) :
     order(o),
     family(f)
@@ -62,7 +194,7 @@ public:
   /**
    * The approximation order of the element.
    */
-  Order order;
+  OrderWrapper order;
 
   /**
    * The type of finite element.  Valid types are \p LAGRANGE,
@@ -80,9 +212,9 @@ public:
    * so, otherwise what we switch on would change when infinite
    * elements are not compiled in.
    */
-  FEType(const Order      o  = FIRST,
+  FEType(const int        o  = 1,
          const FEFamily   f  = LAGRANGE,
-         const Order      ro = THIRD,
+         const int        ro = THIRD,
          const FEFamily   rf = JACOBI_20_00,
          const InfMapType im = CARTESIAN) :
     order(o),
@@ -92,16 +224,15 @@ public:
     inf_map(im)
   {}
 
-
   /**
    * The approximation order in radial direction of the infinite element.
    */
-  Order order;
+  OrderWrapper order;
 
   /**
    * The approximation order in the base of the infinite element.
    */
-  Order radial_order;
+  OrderWrapper radial_order;
 
   /**
    * The type of approximation in radial direction.  Valid types are
@@ -199,7 +330,7 @@ private:
 inline
 Order FEType::default_quadrature_order () const
 {
-  return static_cast<Order>(2*static_cast<unsigned int>(order) + 1);
+  return static_cast<Order>(2*static_cast<unsigned int>(order.get_order()) + 1);
 }
 
 } // namespace libMesh
