@@ -159,6 +159,11 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
     if test x$ac_success = xno; then
       HAVE_CXX11=0
       AC_MSG_NOTICE([No compiler with C++11 support was found])
+      dnl We couldn't find a working C++11 compiler, so we need to set
+      dnl enablecxx11=no. This way, other C++11 features can potentially
+      dnl still be detected, and listed as "have but disabled" by
+      dnl configure.
+      enablecxx11=no
     else
       dnl Only set LIBMESH_HAVE_CXX11 if the user has actually configured with --enable-cxx11.
       if (test "x$enablecxx11" = "xyes"); then
