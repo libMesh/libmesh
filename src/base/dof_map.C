@@ -1851,7 +1851,8 @@ void DofMap::dof_indices (const Elem * const elem,
                   di.insert( di.end(), di_new.begin(), di_new.end());
                 }
               else
-                _dof_indices(elem, di, v, &elem_nodes[0], elem_nodes.size()
+		_dof_indices(elem, elem->p_level(), di, v,
+                             &elem_nodes[0], elem_nodes.size()
 #ifdef DEBUG
                              , tot_size
 #endif
@@ -1879,7 +1880,8 @@ void DofMap::dof_indices (const Elem * const elem,
           di.insert( di.end(), di_new.begin(), di_new.end());
         }
       else if (elem)
-        _dof_indices(elem, di, v, elem->get_nodes(), elem->n_nodes()
+	_dof_indices(elem, elem->p_level(), di, v, elem->get_nodes(),
+                     elem->n_nodes()
 #ifdef DEBUG
                      , tot_size
 #endif
@@ -1896,7 +1898,8 @@ void DofMap::dof_indices (const Elem * const elem,
 
 void DofMap::dof_indices (const Elem * const elem,
                           std::vector<dof_id_type> & di,
-                          const unsigned int vn) const
+                          const unsigned int vn,
+                          int p_level) const
 {
   // We now allow elem==NULL to request just SCALAR dofs
   // libmesh_assert(elem);
@@ -1905,6 +1908,10 @@ void DofMap::dof_indices (const Elem * const elem,
 
   // Clear the DOF indices vector
   di.clear();
+
+  // Use the default p refinement level?
+  if (p_level == -12345)
+    p_level = elem->p_level();
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
@@ -1923,7 +1930,8 @@ void DofMap::dof_indices (const Elem * const elem,
           std::vector<Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
-          _dof_indices(elem, di, vn, &elem_nodes[0], elem_nodes.size()
+	  _dof_indices(elem, p_level, di, vn, &elem_nodes[0],
+                       elem_nodes.size()
 #ifdef DEBUG
                        , tot_size
 #endif
@@ -1949,7 +1957,8 @@ void DofMap::dof_indices (const Elem * const elem,
       di.insert( di.end(), di_new.begin(), di_new.end());
     }
   else if (elem)
-    _dof_indices(elem, di, vn, elem->get_nodes(), elem->n_nodes()
+    _dof_indices(elem, p_level, di, vn, elem->get_nodes(),
+                 elem->n_nodes()
 #ifdef DEBUG
                  , tot_size
 #endif
@@ -1964,6 +1973,7 @@ void DofMap::dof_indices (const Elem * const elem,
 
 
 void DofMap::_dof_indices (const Elem * const elem,
+                           int p_level,
                            std::vector<dof_id_type> & di,
                            const unsigned int v,
                            const Node * const * nodes,
@@ -1987,8 +1997,7 @@ void DofMap::_dof_indices (const Elem * const elem,
 
       // Increase the polynomial order on p refined elements
       FEType fe_type = var.type();
-      fe_type.order = static_cast<Order>(fe_type.order +
-                                         elem->p_level());
+      fe_type.order = static_cast<Order>(fe_type.order + p_level);
 
       const bool extra_hanging_dofs =
         FEInterface::extra_hanging_dofs(fe_type);
