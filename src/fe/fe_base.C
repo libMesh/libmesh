@@ -1457,15 +1457,12 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
             // we may need to make the FE objects reinit with the
             // minimum shared p_level
-            // FIXME - I hate using const_cast<> and avoiding
-            // accessor functions; there's got to be a
-            // better way to do this!
             const unsigned int old_elem_level = elem->p_level();
-            if (old_elem_level != min_p_level)
-              (const_cast<Elem *>(elem))->hack_p_level(min_p_level);
+            if (elem->p_level() != min_p_level)
+              my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() - old_elem_level + min_p_level);
             const unsigned int old_neigh_level = neigh->p_level();
             if (old_neigh_level != min_p_level)
-              (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
+              neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() - old_neigh_level + min_p_level);
 
             my_fe->reinit(elem, s);
 
@@ -1479,9 +1476,11 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
             neigh_dof_indices.reserve (neigh->n_nodes());
 
             dof_map.dof_indices (elem, my_dof_indices,
-                                 variable_number);
+                                 variable_number,
+                                 min_p_level);
             dof_map.dof_indices (neigh, neigh_dof_indices,
-                                 variable_number);
+                                 variable_number,
+                                 min_p_level);
 
             const unsigned int n_qp = my_qface.n_points();
 
@@ -1492,15 +1491,14 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
             // We're only concerned with DOFs whose values (and/or first
             // derivatives for C1 elements) are supported on side nodes
-            FEInterface::dofs_on_side(elem,  Dim, base_fe_type, s,       my_side_dofs);
-            FEInterface::dofs_on_side(neigh, Dim, base_fe_type, s_neigh, neigh_side_dofs);
-
-            // We're done with functions that examine Elem::p_level(),
-            // so let's unhack those levels
-            if (elem->p_level() != old_elem_level)
-              (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
-            if (neigh->p_level() != old_neigh_level)
-              (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
+            FEType elem_fe_type = base_fe_type;
+            if (old_elem_level != min_p_level)
+              elem_fe_type.order = base_fe_type.order.get_order() - old_elem_level + min_p_level;
+            FEType neigh_fe_type = base_fe_type;
+            if (old_neigh_level != min_p_level)
+              neigh_fe_type.order = base_fe_type.order.get_order() - old_neigh_level + min_p_level;
+            FEInterface::dofs_on_side(elem,  Dim, elem_fe_type,  s,       my_side_dofs);
+            FEInterface::dofs_on_side(neigh, Dim, neigh_fe_type, s_neigh, neigh_side_dofs);
 
             const unsigned int n_side_dofs =
               cast_int<unsigned int>(my_side_dofs.size());
@@ -1622,7 +1620,11 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
                                                           their_dof_value));
                   }
               }
+
+            my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() + old_elem_level - min_p_level);
+            neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() + old_neigh_level - min_p_level);
           }
+
         // p refinement constraints:
         // constrain dofs shared between
         // active elements and neighbors with
