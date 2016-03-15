@@ -358,7 +358,12 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
         {
           // seed the random number generator with the system time
           // only so that the seed is the same on all processors
-          std::srand( static_cast<unsigned>( std::time(0) ));
+          //
+          // Note that we broadcast the time on processor 0 to make
+          // sure all processors agree.
+          unsigned int current_time = static_cast<unsigned>( std::time(0) );
+          communicator.broadcast(current_time, 0);
+          std::srand(current_time);
         }
     }
   else
