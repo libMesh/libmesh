@@ -421,6 +421,11 @@ public:
   Order get_order()  const { return static_cast<Order>(fe_type.order + _p_level); }
 
   /**
+   * @sets the *base* FE order of the finite element.
+   */
+  void set_fe_order(int new_order) { fe_type.order = new_order; }
+
+  /**
    * @returns the continuity level of the finite element.
    */
   virtual FEContinuity get_continuity() const = 0;
@@ -553,7 +558,7 @@ protected:
    * The finite element type for this object.  Note that this
    * should be constant for the object.
    */
-  const FEType fe_type;
+  FEType fe_type;
 
   /**
    * The element type the current data structures are
