@@ -204,12 +204,32 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
+  static void get_shape_outputs(FEBase& fe);
+
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
   void init_context (FEMContext & c)
   {
     c.set_algebraic_type(FEMContext::DOFS_ONLY);
+
+    // Loop over variables, to prerequest
+    for (unsigned int var=0; var!=sys.n_vars(); ++var)
+      {
+        FEBase * fe = libmesh_nullptr;
+        const std::set<unsigned char> & elem_dims =
+          old_context.elem_dimensions();
+
+        for (std::set<unsigned char>::const_iterator dim_it =
+               elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+          {
+            const unsigned char dim = *dim_it;
+            old_context.get_element_fe( var, fe, dim );
+            get_shape_outputs(*fe);
+          }
+      }
   }
+
+
 
   Output eval_at_node (const FEMContext & c,
                        unsigned int i,
@@ -221,16 +241,16 @@ public:
                        const Point & p,
                        Real /* time */ =0.)
   {
-    START_LOG ("component(c,i,p,t)", "OldSolutionValue");
+    START_LOG ("eval_at_point()", "OldSolutionValue");
     if (!this->check_old_context(c, p))
       {
-        STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
+        STOP_LOG ("eval_at_point()", "OldSolutionValue");
         return 0;
       }
 
     Output n;
     (old_context.*point_output)(i, p, n, out_of_elem_tol);
-    STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
+    STOP_LOG ("eval_at_point()", "OldSolutionValue");
     return n;
   }
 
@@ -240,6 +260,8 @@ public:
                        unsigned int var,
                        unsigned int dof_index)
   {
+    START_LOG ("eval_old_dof()", "OldSolutionValue");
+
     if (!this->check_old_context(c, c.get_elem().point(0)))
       libmesh_error();
 
@@ -249,6 +271,8 @@ public:
     libmesh_assert_greater(old_dof_indices.size(), dof_index);
 
     const dof_id_type old_id = old_dof_indices[dof_index];
+
+    STOP_LOG ("eval_old_dof()", "OldSolutionValue");
 
     return old_solution(old_id);
   }
@@ -333,6 +357,22 @@ private:
 
   static const Real out_of_elem_tol;
 };
+
+
+template<>
+inline void
+OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase& fe)
+{
+  fe.get_phi();
+}
+
+
+template<>
+inline void
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase& fe)
+{
+  fe.get_dphi();
+}
 
 
 template<>
