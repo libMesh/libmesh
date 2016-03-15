@@ -1851,7 +1851,7 @@ void DofMap::dof_indices (const Elem * const elem,
                   di.insert( di.end(), di_new.begin(), di_new.end());
                 }
               else
-		_dof_indices(elem, elem->p_level(), di, v,
+                _dof_indices(elem, elem->p_level(), di, v,
                              &elem_nodes[0], elem_nodes.size()
 #ifdef DEBUG
                              , tot_size
@@ -1880,7 +1880,7 @@ void DofMap::dof_indices (const Elem * const elem,
           di.insert( di.end(), di_new.begin(), di_new.end());
         }
       else if (elem)
-	_dof_indices(elem, elem->p_level(), di, v, elem->get_nodes(),
+        _dof_indices(elem, elem->p_level(), di, v, elem->get_nodes(),
                      elem->n_nodes()
 #ifdef DEBUG
                      , tot_size
@@ -1930,7 +1930,7 @@ void DofMap::dof_indices (const Elem * const elem,
           std::vector<Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
-	  _dof_indices(elem, p_level, di, vn, &elem_nodes[0],
+          _dof_indices(elem, p_level, di, vn, &elem_nodes[0],
                        elem_nodes.size()
 #ifdef DEBUG
                        , tot_size
