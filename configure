@@ -931,6 +931,18 @@ HAVE_CXX11_UNIQUE_PTR_FALSE
 HAVE_CXX11_UNIQUE_PTR_TRUE
 HAVE_CXX11_SHARED_PTR_FALSE
 HAVE_CXX11_SHARED_PTR_TRUE
+HAVE_CXX11_ALIAS_DECLARATIONS_FALSE
+HAVE_CXX11_ALIAS_DECLARATIONS_TRUE
+HAVE_CXX11_CONSTEXPR_FALSE
+HAVE_CXX11_CONSTEXPR_TRUE
+HAVE_CXX11_LAMBDA_FALSE
+HAVE_CXX11_LAMBDA_TRUE
+HAVE_CXX11_AUTO_FALSE
+HAVE_CXX11_AUTO_TRUE
+HAVE_CXX11_RVALUE_REFERENCES_FALSE
+HAVE_CXX11_RVALUE_REFERENCES_TRUE
+HAVE_CXX11_DECLTYPE_FALSE
+HAVE_CXX11_DECLTYPE_TRUE
 HAVE_CXX11_MOVE_FALSE
 HAVE_CXX11_MOVE_TRUE
 CFLAGS_OPROF
@@ -6942,12 +6954,11 @@ else
 fi
 
 
-if (test "x$enablecxx11" = "xyes"); then
-  # --------------------------------------------------------------
-  # Standard autoconf macro for determining the proper -std=c++11
-  # flag for the current compiler.  Adds the result to CXXFLAGS if
-  # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
-  # --------------------------------------------------------------
+# --------------------------------------------------------------
+# Standard autoconf macro for determining the proper -std=c++11
+# flag for the current compiler.  Adds the result to CXXFLAGS if
+# one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
+# --------------------------------------------------------------
 
     ax_cxx_compile_cxx11_required=false
   ac_ext=cpp
@@ -7058,17 +7069,19 @@ eval ac_res=\$$cachevar
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
       if eval test x\$$cachevar = xyes; then
-        CXXFLAGS="$CXXFLAGS $switch"
-                                CXXFLAGS_OPT="$CXXFLAGS_OPT $switch"
-        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $switch"
-        CXXFLAGS_DBG="$CXXFLAGS_DBG $switch"
+                                                if (test "x$enablecxx11" = "xyes"); then
+          CXXFLAGS="$CXXFLAGS $switch"
+          CXXFLAGS_OPT="$CXXFLAGS_OPT $switch"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $switch"
+          CXXFLAGS_DBG="$CXXFLAGS_DBG $switch"
+        fi
         ac_success=yes
         break
       fi
     done
   fi
 
-    if test x$ac_success = xno; then
+              if test x$ac_success = xno; then
     for switch in -std=c++11 -std=c++0x; do
       cachevar=`$as_echo "ax_cv_cxx_compile_cxx11_$switch" | $as_tr_sh`
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CXX supports C++11 features with $switch" >&5
@@ -7121,10 +7134,12 @@ eval ac_res=\$$cachevar
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
       if eval test x\$$cachevar = xyes; then
-        CXXFLAGS="$CXXFLAGS $switch"
-                                CXXFLAGS_OPT="$CXXFLAGS_OPT $switch"
-        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $switch"
-        CXXFLAGS_DBG="$CXXFLAGS_DBG $switch"
+                                                if (test "x$enablecxx11" = "xyes"); then
+          CXXFLAGS="$CXXFLAGS $switch"
+          CXXFLAGS_OPT="$CXXFLAGS_OPT $switch"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $switch"
+          CXXFLAGS_DBG="$CXXFLAGS_DBG $switch"
+        fi
         ac_success=yes
         break
       fi
@@ -7136,6 +7151,7 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+
   if test x$ax_cxx_compile_cxx11_required = xtrue; then
     if test x$ac_success = xno; then
       as_fn_error $? "*** A compiler with support for C++11 language features is required." "$LINENO" 5
@@ -7145,17 +7161,19 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
       HAVE_CXX11=0
       { $as_echo "$as_me:${as_lineno-$LINENO}: No compiler with C++11 support was found" >&5
 $as_echo "$as_me: No compiler with C++11 support was found" >&6;}
+                              enablecxx11=no
     else
-      HAVE_CXX11=1
+            if (test "x$enablecxx11" = "xyes"); then
+        HAVE_CXX11=1
 
 $as_echo "#define HAVE_CXX11 1" >>confdefs.h
 
+      fi
     fi
 
 
   fi
 
-fi
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
@@ -8246,35 +8264,39 @@ fi
 
     have_cxx11_move=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::move support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::move support" >&5
 $as_echo_n "checking for C++11 std::move support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      #include <utility>
-      template <class T>
-      void move_swap(T& a, T& b)
-      {
-        T tmp(std::move(a));
-        a = std::move(b);
-        b = std::move(tmp);
-      }
+    #include <utility>
+    template <class T>
+    void move_swap(T& a, T& b)
+    {
+      T tmp(std::move(a));
+      a = std::move(b);
+      b = std::move(tmp);
+    }
 
 int
 main ()
 {
 
-          int one = 1, two = 2;
-          move_swap(one,two);
+        int one = 1, two = 2;
+        move_swap(one,two);
 
   ;
   return 0;
@@ -8282,28 +8304,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+        if (test "x$enablecxx11" = "xyes"); then
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_MOVE 1" >>confdefs.h
 
           have_cxx11_move=yes
+        else
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_MOVE_BUT_DISABLED 1" >>confdefs.h
+
+        fi
 
 else
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_move == xyes; then
   HAVE_CXX11_MOVE_TRUE=
@@ -8315,62 +8346,33 @@ fi
 
 
 
-    have_cxx11_shared_ptr=init
+    have_cxx11_decltype=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      ac_ext=cpp
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 decltype support" >&5
+$as_echo_n "checking for C++11 decltype support... " >&6; }
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      # Save any original value that CXXFLAGS had
-      saveCXXFLAGS="$CXXFLAGS"
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
 
-      # Try compiling the test code in all methods requested by the user
-      for method in ${METHODS}; do
-          case "${method}" in
-              optimized|opt)
-                CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT";;
-
-              debug|dbg)
-                CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG";;
-
-              devel)
-                CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL";;
-
-              profiling|pro|prof)
-                CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF";;
-
-              oprofile|oprof)
-                CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF";;
-
-              *)
-              as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
-              ;;
-          esac
-
-          # If compilation fails for *any* of the methods, we'll disable
-          # shared_ptr support for *all* methods.
-          if test "x$have_cxx11_shared_ptr" != xno; then
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::shared_ptr support with ${method} flags" >&5
-$as_echo_n "checking for C++11 std::shared_ptr support with ${method} flags... " >&6; }
-
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-            #include <memory>
 
 int
 main ()
 {
 
-                std::shared_ptr<int> p1;
-                std::shared_ptr<int> p2 (new int);
-                std::shared_ptr<int> p3 (p2);
-                p3.reset(new int);
+        int a;
+        decltype(a) b;
 
   ;
   return 0;
@@ -8378,38 +8380,558 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-                have_cxx11_shared_ptr=yes
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_DECLTYPE 1" >>confdefs.h
+
+        have_cxx11_decltype=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_DECLTYPE_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-                have_cxx11_shared_ptr=no
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-          fi
-      done
-
-      # Only set the header file variable if our flag was set to 'yes'.
-      if test "x$have_cxx11_shared_ptr" = xyes; then
-
-$as_echo "#define HAVE_CXX11_SHARED_PTR 1" >>confdefs.h
-
-      fi
-
-      # Restore the original flags, whatever they were.
-      CXXFLAGS="$saveCXXFLAGS"
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+
+     if test x$have_cxx11_decltype == xyes; then
+  HAVE_CXX11_DECLTYPE_TRUE=
+  HAVE_CXX11_DECLTYPE_FALSE='#'
+else
+  HAVE_CXX11_DECLTYPE_TRUE='#'
+  HAVE_CXX11_DECLTYPE_FALSE=
+fi
+
+
+
+    have_cxx11_rvalue_references=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 rvalue references support" >&5
+$as_echo_n "checking for C++11 rvalue references support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      int foo(int && x) { return x; }
+      int bar() { return 4; }
+
+int
+main ()
+{
+
+      // Call function that takes an rvalue reference.
+      foo (bar());
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_RVALUE_REFERENCES 1" >>confdefs.h
+
+        have_cxx11_rvalue_references=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_RVALUE_REFERENCES_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_rvalue_references == xyes; then
+  HAVE_CXX11_RVALUE_REFERENCES_TRUE=
+  HAVE_CXX11_RVALUE_REFERENCES_FALSE='#'
+else
+  HAVE_CXX11_RVALUE_REFERENCES_TRUE='#'
+  HAVE_CXX11_RVALUE_REFERENCES_FALSE=
+fi
+
+
+
+    have_cxx11_auto=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 auto keyword support" >&5
+$as_echo_n "checking for C++11 auto keyword support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+
+      int x = 5;
+      auto y = x;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_AUTO 1" >>confdefs.h
+
+        have_cxx11_auto=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_AUTO_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_auto == xyes; then
+  HAVE_CXX11_AUTO_TRUE=
+  HAVE_CXX11_AUTO_FALSE='#'
+else
+  HAVE_CXX11_AUTO_TRUE='#'
+  HAVE_CXX11_AUTO_FALSE=
+fi
+
+
+
+    have_cxx11_lambda=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 lambda support" >&5
+$as_echo_n "checking for C++11 lambda support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      // typedef for a function pointer that takes int and returns bool.
+      typedef bool (*FunctionPointer) (int);
+
+      // A function that takes a pointer to a function that takes an int,
+      // calls it with the number 4, and returns the result.
+      bool f(FunctionPointer g) { return g(4); }
+
+int
+main ()
+{
+
+      // Call f, passing it a lambda constructed on the fly instead
+      // of a standard function pointer.  The result should be true.
+      f ( [](int x) { return x > 3; } );
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_LAMBDA 1" >>confdefs.h
+
+        have_cxx11_lambda=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_LAMBDA_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_lambda == xyes; then
+  HAVE_CXX11_LAMBDA_TRUE=
+  HAVE_CXX11_LAMBDA_FALSE='#'
+else
+  HAVE_CXX11_LAMBDA_TRUE='#'
+  HAVE_CXX11_LAMBDA_FALSE=
+fi
+
+
+
+    have_cxx11_constexpr=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 constexpr support" >&5
+$as_echo_n "checking for C++11 constexpr support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      constexpr int multiply (int x, int y) { return x * y; }
+
+int
+main ()
+{
+
+      // The compiler should compute "val" at compile time.
+      const int val = multiply(10, 10);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_CONSTEXPR 1" >>confdefs.h
+
+        have_cxx11_constexpr=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_CONSTEXPR_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_constexpr == xyes; then
+  HAVE_CXX11_CONSTEXPR_TRUE=
+  HAVE_CXX11_CONSTEXPR_FALSE='#'
+else
+  HAVE_CXX11_CONSTEXPR_TRUE='#'
+  HAVE_CXX11_CONSTEXPR_FALSE=
+fi
+
+
+
+    have_cxx11_alias_declarations=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 alias declarations support" >&5
+$as_echo_n "checking for C++11 alias declarations support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      template <typename T>
+      struct check
+      {
+        T t;
+      };
+
+      // An alias declaration is like a templated typedef
+      template <typename T>
+      using MyCheck = check<T>;
+
+int
+main ()
+{
+
+      MyCheck<int> mc;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_ALIAS_DECLARATIONS 1" >>confdefs.h
+
+        have_cxx11_alias_declarations=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_ALIAS_DECLARATIONS_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_alias_declarations == xyes; then
+  HAVE_CXX11_ALIAS_DECLARATIONS_TRUE=
+  HAVE_CXX11_ALIAS_DECLARATIONS_FALSE='#'
+else
+  HAVE_CXX11_ALIAS_DECLARATIONS_TRUE='#'
+  HAVE_CXX11_ALIAS_DECLARATIONS_FALSE=
+fi
+
+
+
+    have_cxx11_shared_ptr=init
+    have_cxx11_shared_ptr_but_disabled=init
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save any original value that CXXFLAGS had
+    saveCXXFLAGS="$CXXFLAGS"
+
+    # Try compiling the test code in all methods requested by the user
+    for method in ${METHODS}; do
+        case "${method}" in
+            optimized|opt)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT";;
+
+            debug|dbg)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG";;
+
+            devel)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL";;
+
+            profiling|pro|prof)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF";;
+
+            oprofile|oprof)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF";;
+
+            *)
+            as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
+            ;;
+        esac
+
+        # Also append the $switch determined in AX_CXX_COMPILE_STDCXX_11.
+        # Note that this might append the same flag twice, but that
+        # shouldn't matter...
+        CXXFLAGS="$CXXFLAGS $switch"
+
+        # If compilation fails for *any* of the methods, we'll disable
+        # shared_ptr support for *all* methods.
+        if test "x$have_cxx11_shared_ptr" != xno; then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::shared_ptr support with ${method} flags" >&5
+$as_echo_n "checking for C++11 std::shared_ptr support with ${method} flags... " >&6; }
+
+          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <memory>
+
+int
+main ()
+{
+
+              std::shared_ptr<int> p1;
+              std::shared_ptr<int> p2 (new int);
+              std::shared_ptr<int> p3 (p2);
+              p3.reset(new int);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+            if (test "x$enablecxx11" = "xyes"); then
+              have_cxx11_shared_ptr=yes
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+            else
+              have_cxx11_shared_ptr_but_disabled=yes
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+            fi
+
+else
+
+              have_cxx11_shared_ptr=no
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        fi
+
+        # Restore the original flags, whatever they were.
+        CXXFLAGS="$saveCXXFLAGS"
+    done
+
+    # Only set the header file variable if our flag was set to 'yes'.
+    if test "x$have_cxx11_shared_ptr" = xyes; then
+
+$as_echo "#define HAVE_CXX11_SHARED_PTR 1" >>confdefs.h
+
     fi
+
+    # If the test compilation succeeded, but we have disabled C++11, set a different #define.
+    if test "x$have_cxx11_shared_ptr_but_disabled" = xyes; then
+
+$as_echo "#define HAVE_CXX11_SHARED_PTR_BUT_DISABLED 1" >>confdefs.h
+
+    fi
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
 
      if test x$have_cxx11_shared_ptr == xyes; then
   HAVE_CXX11_SHARED_PTR_TRUE=
@@ -8423,37 +8945,40 @@ fi
 
     have_cxx11_unique_ptr=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::unique_ptr support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::unique_ptr support" >&5
 $as_echo_n "checking for C++11 std::unique_ptr support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      #include <iostream>
-      #include <memory>
-      struct Foo
-      {
-        Foo()      { std::cout << "Foo::Foo\n";  }
-        ~Foo()     { std::cout << "Foo::~Foo\n"; }
-      };
+    #include <iostream>
+    #include <memory>
+    struct Foo
+    {
+      Foo()      { std::cout << "Foo::Foo\n";  }
+      ~Foo()     { std::cout << "Foo::~Foo\n"; }
+    };
 
 int
 main ()
 {
 
-      {
-        // up now owns a Foo
-        std::unique_ptr<Foo> up(new Foo);
-      } // Foo deleted when up goes out of scope
+    {
+      // up now owns a Foo
+      std::unique_ptr<Foo> up(new Foo);
+    } // Foo deleted when up goes out of scope
 
   ;
   return 0;
@@ -8461,28 +8986,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_UNIQUE_PTR 1" >>confdefs.h
 
         have_cxx11_unique_ptr=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_UNIQUE_PTR_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_unique_ptr == xyes; then
   HAVE_CXX11_UNIQUE_PTR_TRUE=
@@ -8496,35 +9030,39 @@ fi
 
     have_cxx11_regex=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::regex support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::regex support" >&5
 $as_echo_n "checking for C++11 std::regex support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-                                                if test "$cross_compiling" = yes; then :
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
 
-                                { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+                                if test "$cross_compiling" = yes; then :
+
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      #include <regex>
+    #include <regex>
 
 int
 main ()
 {
 
-        std::regex integer_regex("(\\\\+|-)?[[:digit:]]+");
-        regex_match("abc", integer_regex);
-        regex_match("123", integer_regex);
+      std::regex integer_regex("(\\\\+|-)?[[:digit:]]+");
+      regex_match("abc", integer_regex);
+      regex_match("123", integer_regex);
 
   ;
   return 0;
@@ -8532,16 +9070,24 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_run "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_REGEX 1" >>confdefs.h
 
         have_cxx11_regex=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_REGEX 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
@@ -8550,13 +9096,14 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
 fi
 
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_regex == xyes; then
   HAVE_CXX11_REGEX_TRUE=
@@ -8570,18 +9117,22 @@ fi
 
     have_cxx11_override=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 override keyword support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 override keyword support" >&5
 $as_echo_n "checking for C++11 override keyword support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 
@@ -8589,12 +9140,12 @@ int
 main ()
 {
 
-        struct Base {
-        virtual void f() {}
-        };
-        struct Child : public Base {
-        virtual void f() override {}
-        };
+      struct Base {
+      virtual void f() {}
+      };
+      struct Child : public Base {
+      virtual void f() override {}
+      };
 
   ;
   return 0;
@@ -8602,28 +9153,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_OVERRIDE 1" >>confdefs.h
 
         have_cxx11_override=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_OVERRIDE_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_override == xyes; then
   HAVE_CXX11_OVERRIDE_TRUE=
@@ -8637,28 +9197,32 @@ fi
 
     have_cxx11_initializer_list=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 initializer list support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 initializer list support" >&5
 $as_echo_n "checking for C++11 initializer list support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <vector>
-        #include <string>
+      #include <vector>
+      #include <string>
 
 int
 main ()
 {
 
-        std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
+      std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
 
   ;
   return 0;
@@ -8666,28 +9230,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INITIALIZER_LIST 1" >>confdefs.h
 
         have_cxx11_initializer_list=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INITIALIZER_LIST_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_initializer_list == xyes; then
   HAVE_CXX11_INITIALIZER_LIST_TRUE=
@@ -8701,37 +9274,41 @@ fi
 
     have_cxx11_variadic_templates=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 variadic template support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 variadic template support" >&5
 $as_echo_n "checking for C++11 variadic template support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        // Base case
-        template <typename T>
-        T sum(T t) { return t; }
+      // Base case
+      template <typename T>
+      T sum(T t) { return t; }
 
-        // Compute sum of arbitary number of passed parameters.
-        template <typename T, typename ...P>
-        T sum(T t, P ...p)
-        {
-          t += sum(p...);
-          return t;
-        }
+      // Compute sum of arbitary number of passed parameters.
+      template <typename T, typename ...P>
+      T sum(T t, P ...p)
+      {
+        t += sum(p...);
+        return t;
+      }
 
 int
 main ()
 {
 
-        sum(1, 2, 3, 4, 5);
+      sum(1, 2, 3, 4, 5);
 
   ;
   return 0;
@@ -8739,28 +9316,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_VARIADIC_TEMPLATES 1" >>confdefs.h
 
         have_cxx11_variadic_templates=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_VARIADIC_TEMPLATES_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_variadic_templates == xyes; then
   HAVE_CXX11_VARIADIC_TEMPLATES_TRUE=
@@ -8774,43 +9360,47 @@ fi
 
     have_cxx11_thread=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 <thread> support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 <thread> support" >&5
 $as_echo_n "checking for C++11 <thread> support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <thread>
-        #include <atomic>
-        #include <mutex>
-        void my_thread_func() {}
+      #include <thread>
+      #include <atomic>
+      #include <mutex>
+      void my_thread_func() {}
 
 int
 main ()
 {
 
-        thread_local int i;
-        std::thread t(my_thread_func);
-        t.join();
+      thread_local int i;
+      std::thread t(my_thread_func);
+      t.join();
 
-        std::atomic<bool> ab1, ab2;
-        ab1.store(true, std::memory_order_relaxed);
-        ab2.store(false, std::memory_order_relaxed);
-        ab1.exchange(ab2);
+      std::atomic<bool> ab1, ab2;
+      ab1.store(true, std::memory_order_relaxed);
+      ab2.store(false, std::memory_order_relaxed);
+      ab1.exchange(ab2);
 
-        std::mutex m;
-        std::lock_guard<std::mutex> lock(m);
+      std::mutex m;
+      std::lock_guard<std::mutex> lock(m);
 
-        std::atomic_thread_fence(std::memory_order_acquire);
-        std::atomic_thread_fence(std::memory_order_release);
+      std::atomic_thread_fence(std::memory_order_acquire);
+      std::atomic_thread_fence(std::memory_order_release);
 
   ;
   return 0;
@@ -8818,28 +9408,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_THREAD 1" >>confdefs.h
 
         have_cxx11_thread=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_THREAD_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_thread == xyes; then
   HAVE_CXX11_THREAD_TRUE=
@@ -8864,134 +9463,138 @@ fi
     # http://en.cppreference.com/w/cpp/header/type_traits
     have_cxx11_type_traits=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 <type_traits> support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 <type_traits> support" >&5
 $as_echo_n "checking for C++11 <type_traits> support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <iostream>
-        #include <type_traits>
+      #include <iostream>
+      #include <type_traits>
 
-        // std::enable_if - the return type of the function is only defined if
-        // T is an integral type.  Therefore, it's a *compile* error if you
-        // try to call it with a non-integral type.
-        template <class T>
-        typename std::enable_if<std::is_integral<T>::value, bool>::type
-        is_odd (T i)
-        {
-          return static_cast<bool>(i%2);
-        }
+      // std::enable_if - the return type of the function is only defined if
+      // T is an integral type.  Therefore, it's a *compile* error if you
+      // try to call it with a non-integral type.
+      template <class T>
+      typename std::enable_if<std::is_integral<T>::value, bool>::type
+      is_odd (T i)
+      {
+        return static_cast<bool>(i%2);
+      }
 
-        // std::underlying_type - names the underlying type of an enum
-        enum e1 {};
+      // std::underlying_type - names the underlying type of an enum
+      enum e1 {};
 
-        // typedef (named fn_ptr) for a function that takes nothing and returns char.
-        typedef char (*fn_ptr)();
+      // typedef (named fn_ptr) for a function that takes nothing and returns char.
+      typedef char (*fn_ptr)();
 
 int
 main ()
 {
 
-        std::cout << std::is_void<char>::value
-          // << std::is_null_pointer<char>::value                  // C++14
-                  << std::is_integral<char>::value
-                  << std::is_floating_point<char>::value
-                  << std::is_array<char>::value
-                  << std::is_enum<char>::value
-                  << std::is_union<char>::value
-                  << std::is_class<char>::value
-                  << std::is_function<char>::value
-                  << std::is_pointer<char>::value
-                  << std::is_lvalue_reference<char>::value
-                  << std::is_rvalue_reference<char>::value
-                  << std::is_member_object_pointer<char>::value
-                  << std::is_fundamental<char>::value
-                  << std::is_arithmetic<char>::value
-                  << std::is_scalar<char>::value
-                  << std::is_object<char>::value
-                  << std::is_compound<char>::value
-                  << std::is_reference<char>::value
-                  << std::is_member_pointer<char>::value
-                  << std::is_const<char>::value
-                  << std::is_volatile<char>::value
-                  << std::is_trivial<char>::value
-                  << std::is_trivially_copyable<char>::value // Not supported by GCC 4.6.3 with -std=c++0x
-                  << std::is_standard_layout<char>::value
-                  << std::is_pod<char>::value
-                  << std::is_literal_type<char>::value
-                  << std::is_empty<char>::value
-                  << std::is_polymorphic<char>::value
-                  << std::is_abstract<char>::value
-                  << std::is_signed<char>::value
-                  << std::is_unsigned<char>::value
-                  << std::is_constructible<char>::value
-                  << std::is_trivially_constructible<char>::value
-                  << std::is_nothrow_constructible<char>::value
-                  << std::is_default_constructible<char>::value
-                  << std::is_trivially_default_constructible<char>::value
-                  << std::is_nothrow_default_constructible<char>::value
-                  << std::is_copy_constructible<char>::value
-                  << std::is_trivially_copy_constructible<char>::value
-                  << std::is_nothrow_copy_constructible<char>::value
-                  << std::is_move_constructible<char>::value
-                  << std::is_trivially_move_constructible<char>::value
-                  << std::is_nothrow_move_constructible<char>::value
-                  << std::is_assignable<char, char>::value
-                  << std::is_trivially_assignable<char, char>::value
-                  << std::is_nothrow_assignable<char, char>::value
-                  << std::is_copy_assignable<char>::value
-                  << std::is_trivially_copy_assignable<char>::value
-                  << std::is_nothrow_copy_assignable<char>::value
-                  << std::is_move_assignable<char>::value
-                  << std::is_trivially_move_assignable<char>::value
-                  << std::is_nothrow_move_assignable<char>::value
-                  << std::is_destructible<char>::value
-                  << std::is_trivially_destructible<char>::value
-                  << std::is_nothrow_destructible<char>::value
-                  << std::has_virtual_destructor<char>::value
-                  << std::alignment_of<char>::value
-                  << std::rank<char>::value
-                  << std::extent<char>::value
-                  << std::is_same<char, char>::value
-                  << std::is_base_of<char, char>::value
-                  << std::is_convertible<char, char>::value
-                  << std::is_same<char, std::remove_cv<const char>::type>::value // std::remove_cv
-                  << std::is_same<char, std::remove_const<const char>::type>::value // std::remove_const
-                  << std::is_same<char, std::remove_volatile<volatile char>::type>::value // std::remove_volatile
-                  << std::is_same<const volatile char, std::add_cv<char>::type>::value // std::add_cv
-                  << std::is_same<const char, std::add_const<char>::type>::value // std::add_const
-                  << std::is_same<volatile char, std::add_volatile<char>::type>::value // std::add_volatile
-                  << std::is_same<char, std::remove_reference<char &>::type>::value // std::remove_reference
-                  << std::is_same<char &, std::add_lvalue_reference<char>::type>::value // std::add_lvalue_reference
-                  << std::is_same<char &&, std::add_rvalue_reference<char>::type>::value // std::add_rvalue_reference
-                  << std::is_same<char, std::remove_pointer<char *>::type>::value // std::remove_pointer
-                  << std::is_same<char *, std::add_pointer<char>::type>::value // std::add_pointer
-                  << std::is_same<char, std::make_signed<unsigned char>::type>::value // std::make_signed
-                  << std::is_same<unsigned char, std::make_unsigned<char>::type>::value // std::make_unsigned
-                  << std::is_same<char, std::remove_extent<char>::type>::value // std::remove_extent
-                  << std::is_same<char, std::remove_all_extents<char>::type>::value // std::remove_all_extents
-                  << std::is_same<char, std::decay<const char &>::type>::value // std::decay
-                  << is_odd(13) // std::enable_if
-                  << std::is_same<char, std::conditional<true, /*type if true*/char, /*type if false*/int>::type>::value // std::conditional
-                  << std::is_same<long, std::common_type<char, short, int, long>::type>::value // std::common_type
-                  << std::is_same<int, std::underlying_type<e1>::type>::value // std::underlying_type
-                  << std::is_same<char, std::result_of<fn_ptr()>::type>::value // std::result_of
-                  << std::endl;
+      std::cout << std::is_void<char>::value
+        // << std::is_null_pointer<char>::value                  // C++14
+                << std::is_integral<char>::value
+                << std::is_floating_point<char>::value
+                << std::is_array<char>::value
+                << std::is_enum<char>::value
+                << std::is_union<char>::value
+                << std::is_class<char>::value
+                << std::is_function<char>::value
+                << std::is_pointer<char>::value
+                << std::is_lvalue_reference<char>::value
+                << std::is_rvalue_reference<char>::value
+                << std::is_member_object_pointer<char>::value
+                << std::is_fundamental<char>::value
+                << std::is_arithmetic<char>::value
+                << std::is_scalar<char>::value
+                << std::is_object<char>::value
+                << std::is_compound<char>::value
+                << std::is_reference<char>::value
+                << std::is_member_pointer<char>::value
+                << std::is_const<char>::value
+                << std::is_volatile<char>::value
+                << std::is_trivial<char>::value
+                << std::is_trivially_copyable<char>::value // Not supported by GCC 4.6.3 with -std=c++0x
+                << std::is_standard_layout<char>::value
+                << std::is_pod<char>::value
+                << std::is_literal_type<char>::value
+                << std::is_empty<char>::value
+                << std::is_polymorphic<char>::value
+                << std::is_abstract<char>::value
+                << std::is_signed<char>::value
+                << std::is_unsigned<char>::value
+                << std::is_constructible<char>::value
+                << std::is_trivially_constructible<char>::value
+                << std::is_nothrow_constructible<char>::value
+                << std::is_default_constructible<char>::value
+                << std::is_trivially_default_constructible<char>::value
+                << std::is_nothrow_default_constructible<char>::value
+                << std::is_copy_constructible<char>::value
+                << std::is_trivially_copy_constructible<char>::value
+                << std::is_nothrow_copy_constructible<char>::value
+                << std::is_move_constructible<char>::value
+                << std::is_trivially_move_constructible<char>::value
+                << std::is_nothrow_move_constructible<char>::value
+                << std::is_assignable<char, char>::value
+                << std::is_trivially_assignable<char, char>::value
+                << std::is_nothrow_assignable<char, char>::value
+                << std::is_copy_assignable<char>::value
+                << std::is_trivially_copy_assignable<char>::value
+                << std::is_nothrow_copy_assignable<char>::value
+                << std::is_move_assignable<char>::value
+                << std::is_trivially_move_assignable<char>::value
+                << std::is_nothrow_move_assignable<char>::value
+                << std::is_destructible<char>::value
+                << std::is_trivially_destructible<char>::value
+                << std::is_nothrow_destructible<char>::value
+                << std::has_virtual_destructor<char>::value
+                << std::alignment_of<char>::value
+                << std::rank<char>::value
+                << std::extent<char>::value
+                << std::is_same<char, char>::value
+                << std::is_base_of<char, char>::value
+                << std::is_convertible<char, char>::value
+                << std::is_same<char, std::remove_cv<const char>::type>::value // std::remove_cv
+                << std::is_same<char, std::remove_const<const char>::type>::value // std::remove_const
+                << std::is_same<char, std::remove_volatile<volatile char>::type>::value // std::remove_volatile
+                << std::is_same<const volatile char, std::add_cv<char>::type>::value // std::add_cv
+                << std::is_same<const char, std::add_const<char>::type>::value // std::add_const
+                << std::is_same<volatile char, std::add_volatile<char>::type>::value // std::add_volatile
+                << std::is_same<char, std::remove_reference<char &>::type>::value // std::remove_reference
+                << std::is_same<char &, std::add_lvalue_reference<char>::type>::value // std::add_lvalue_reference
+                << std::is_same<char &&, std::add_rvalue_reference<char>::type>::value // std::add_rvalue_reference
+                << std::is_same<char, std::remove_pointer<char *>::type>::value // std::remove_pointer
+                << std::is_same<char *, std::add_pointer<char>::type>::value // std::add_pointer
+                << std::is_same<char, std::make_signed<unsigned char>::type>::value // std::make_signed
+                << std::is_same<unsigned char, std::make_unsigned<char>::type>::value // std::make_unsigned
+                << std::is_same<char, std::remove_extent<char>::type>::value // std::remove_extent
+                << std::is_same<char, std::remove_all_extents<char>::type>::value // std::remove_all_extents
+                << std::is_same<char, std::decay<const char &>::type>::value // std::decay
+                << is_odd(13) // std::enable_if
+                << std::is_same<char, std::conditional<true, /*type if true*/char, /*type if false*/int>::type>::value // std::conditional
+                << std::is_same<long, std::common_type<char, short, int, long>::type>::value // std::common_type
+                << std::is_same<int, std::underlying_type<e1>::type>::value // std::underlying_type
+                << std::is_same<char, std::result_of<fn_ptr()>::type>::value // std::result_of
+                << std::endl;
 
-        // std::aligned_storage
-        typedef std::aligned_storage</*store objects of length=*/1>::type aligned_t;
+      // std::aligned_storage
+      typedef std::aligned_storage</*store objects of length=*/1>::type aligned_t;
 
-        // std::aligned_union
-        typedef std::aligned_union</*size of at least*/32, int, char, double>::type union_t;
+      // std::aligned_union
+      typedef std::aligned_union</*size of at least*/32, int, char, double>::type union_t;
 
   ;
   return 0;
@@ -8999,28 +9602,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_TYPE_TRAITS 1" >>confdefs.h
 
         have_cxx11_type_traits=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_TYPE_TRAITS_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_type_traits == xyes; then
   HAVE_CXX11_TYPE_TRAITS_TRUE=
@@ -9040,28 +9652,32 @@ fi
     have_cxx11_inverse_hyperbolic_cosine_complex=no
     have_cxx11_inverse_hyperbolic_tangent_complex=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      # Test for asinh
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh support in <cmath>" >&5
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    # Test for asinh
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh support in <cmath>" >&5
 $as_echo_n "checking for C++11 std::asinh support in <cmath>... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <cmath>
+      #include <cmath>
 
 int
 main ()
 {
 
-        double x = std::asinh(1.);
+      double x = std::asinh(1.);
 
   ;
   return 0;
@@ -9069,34 +9685,42 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_SINE 1" >>confdefs.h
 
         have_cxx11_inverse_hyperbolic_sine=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      # Test for acosh
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::acosh support in <cmath>" >&5
+    # Test for acosh
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::acosh support in <cmath>" >&5
 $as_echo_n "checking for C++11 std::acosh support in <cmath>... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <cmath>
+      #include <cmath>
 
 int
 main ()
 {
 
-        double x = std::acosh(1.);
+      double x = std::acosh(1.);
 
   ;
   return 0;
@@ -9104,34 +9728,42 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE 1" >>confdefs.h
 
         have_cxx11_inverse_hyperbolic_cosine=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      # Test for atanh
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::atanh support in <cmath>" >&5
+    # Test for atanh
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::atanh support in <cmath>" >&5
 $as_echo_n "checking for C++11 std::atanh support in <cmath>... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <cmath>
+      #include <cmath>
 
 int
 main ()
 {
 
-        double x = std::atanh(0.);
+      double x = std::atanh(0.);
 
   ;
   return 0;
@@ -9139,36 +9771,44 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT 1" >>confdefs.h
 
         have_cxx11_inverse_hyperbolic_tangent=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-      # Test for asinh(complex)
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh(complex) support in <complex>" >&5
+    # Test for asinh(complex)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh(complex) support in <complex>" >&5
 $as_echo_n "checking for C++11 std::asinh(complex) support in <complex>... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <complex>
+      #include <complex>
 
 int
 main ()
 {
 
-        std::complex<double> z(0, -2);
-        std::complex<double> x = std::asinh(z);
+      std::complex<double> z(0, -2);
+      std::complex<double> x = std::asinh(z);
 
   ;
   return 0;
@@ -9176,35 +9816,43 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX 1" >>confdefs.h
 
         have_cxx11_inverse_hyperbolic_sine_complex=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      # Test for acosh(complex)
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::acosh(complex) support in <complex>" >&5
+    # Test for acosh(complex)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::acosh(complex) support in <complex>" >&5
 $as_echo_n "checking for C++11 std::acosh(complex) support in <complex>... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <complex>
+      #include <complex>
 
 int
 main ()
 {
 
-        std::complex<double> z(0.5, 0);
-        std::complex<double> x = std::acosh(z);
+      std::complex<double> z(0.5, 0);
+      std::complex<double> x = std::acosh(z);
 
   ;
   return 0;
@@ -9212,35 +9860,43 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX 1" >>confdefs.h
 
         have_cxx11_inverse_hyperbolic_cosine_complex=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      # Test for atanh(complex)
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::atanh(complex) support in <complex>" >&5
+    # Test for atanh(complex)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::atanh(complex) support in <complex>" >&5
 $as_echo_n "checking for C++11 std::atanh(complex) support in <complex>... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <complex>
+      #include <complex>
 
 int
 main ()
 {
 
-        std::complex<double> z(2, 0);
-        std::complex<double> x = std::atanh(z);
+      std::complex<double> z(2, 0);
+      std::complex<double> x = std::atanh(z);
 
   ;
   return 0;
@@ -9248,29 +9904,38 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX 1" >>confdefs.h
 
         have_cxx11_inverse_hyperbolic_tangent_complex=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_inverse_hyperbolic_sine == xyes; then
   HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_TRUE=
@@ -9325,24 +9990,28 @@ fi
 
     have_cxx11_deleted_functions=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 deleted functions support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 deleted functions support" >&5
 $as_echo_n "checking for C++11 deleted functions support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      class Foo
-      {
-        Foo(const Foo &) = delete;
-      };
+    class Foo
+    {
+      Foo(const Foo &) = delete;
+    };
 
 int
 main ()
@@ -9355,28 +10024,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_DELETED_FUNCTIONS 1" >>confdefs.h
 
         have_cxx11_deleted_functions=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_DELETED_FUNCTIONS_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_deleted_functions == xyes; then
   HAVE_CXX11_DELETED_FUNCTIONS_TRUE=
@@ -9389,29 +10067,155 @@ fi
 
 
     have_cxx11_final=no
+    have_cxx11_final_but_disabled=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 'final' keyword support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 'final' keyword support" >&5
 $as_echo_n "checking for C++11 'final' keyword support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    // Test that a function can be declared final.
+    struct A
+    {
+      virtual void foo() final;
+    };
+
+    // Test that a struct can be declared final.
+    struct B final : A
+    {
+    };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        have_cxx11_final=yes
+      else
+        have_cxx11_final_but_disabled=yes
+      fi
+
+else
+
+      have_cxx11_final=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Confirm that you cannot declare a non-virtual function 'final'.
+    if (test "x$have_cxx11_final" != "xno"); then
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      // Test that a function can be declared final.
+      struct A
+      {
+        // Error: non-virtual function cannot be final
+        void bar() final;
+      };
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        # If this code compiles, 'final' is not working correctly.
+        have_cxx11_final=no
+
+else
+
+        if (test "x$enablecxx11" = "xyes"); then
+          have_cxx11_final=yes
+        else
+          have_cxx11_final_but_disabled=yes
+        fi
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+    fi
+
+    # Confirm that you cannot override a final function.
+    if (test "x$have_cxx11_final" != "xno"); then
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
       struct A
       {
         virtual void foo() final;
       };
+      struct B : A
+      {
+        // Error: foo cannot be overridden as it's final in A
+        void foo();
+      };
 
-      // Test that a struct can be declared final.
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        # If this code compiles, 'final' is not working correctly.
+        have_cxx11_final=no
+
+else
+
+        if (test "x$enablecxx11" = "xyes"); then
+          have_cxx11_final=yes
+        else
+          have_cxx11_final_but_disabled=yes
+        fi
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+    fi
+
+    # Confirm that you cannot inherit from a 'final' class.
+    if (test "x$have_cxx11_final" != "xno"); then
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      struct A
+      {
+      };
+
+      // struct B is final
       struct B final : A
+      {
+      };
+
+      // Error: B is final
+      struct C : B
       {
       };
 
@@ -9426,145 +10230,47 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-        have_cxx11_final=yes
-
-else
-
+        # If this code compiles, 'final' is not working correctly.
         have_cxx11_final=no
 
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-      # Confirm that you cannot declare a non-virtual function 'final'.
-      if (test "x$have_cxx11_final" = "xyes"); then
-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-        struct A
-        {
-          // Error: non-virtual function cannot be final
-          void bar() final;
-        };
-
-int
-main ()
-{
-
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-          # If this code compiles, 'final' is not working correctly.
-          have_cxx11_final=no
-
 else
 
+        if (test "x$enablecxx11" = "xyes"); then
           have_cxx11_final=yes
+        else
+          have_cxx11_final_but_disabled=yes
+        fi
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      fi
+    fi
 
-      # Confirm that you cannot override a final function.
-      if (test "x$have_cxx11_final" = "xyes"); then
-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-        struct A
-        {
-          virtual void foo() final;
-        };
-        struct B : A
-        {
-          // Error: foo cannot be overridden as it's final in A
-          void foo();
-        };
-
-int
-main ()
-{
-
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-          # If this code compiles, 'final' is not working correctly.
-          have_cxx11_final=no
-
-else
-
-          have_cxx11_final=yes
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      fi
-
-      # Confirm that you cannot inherit from a 'final' class.
-      if (test "x$have_cxx11_final" = "xyes"); then
-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-        struct A
-        {
-        };
-
-        // struct B is final
-        struct B final : A
-        {
-        };
-
-        // Error: B is final
-        struct C : B
-        {
-        };
-
-int
-main ()
-{
-
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-          # If this code compiles, 'final' is not working correctly.
-          have_cxx11_final=no
-
-else
-
-          have_cxx11_final=yes
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      fi
-
-      # If the flag is still 'yes' after all the tests, set the #define.
-      if (test "x$have_cxx11_final" = "xyes"); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+    # If the flag is still 'yes' after all the tests, set the #define.
+    if (test "x$have_cxx11_final" = "xyes"); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_FINAL 1" >>confdefs.h
 
-      else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-      fi
+    elif (test "x$have_cxx11_final_but_disabled" = "xyes"); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
 
-      ac_ext=cpp
+$as_echo "#define HAVE_CXX11_FINAL_BUT_DISABLED 1" >>confdefs.h
+
+    else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    fi
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
      if test x$have_cxx11_final == xyes; then
   HAVE_CXX11_FINAL_TRUE=
@@ -9578,31 +10284,35 @@ fi
 
     have_cxx11_nullptr=no
 
-    # Only run the test if enablecxx11==yes
-    if (test "x$enablecxx11" = "xyes"); then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 nullptr support" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 nullptr support" >&5
 $as_echo_n "checking for C++11 nullptr support... " >&6; }
-      ac_ext=cpp
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-      #include <cstddef>
-      void f(int * pi) {}
-      void f(double * pd) {}
-      void f(std::nullptr_t nullp) {}
+    #include <cstddef>
+    void f(int * pi) {}
+    void f(double * pd) {}
+    void f(std::nullptr_t nullp) {}
 
 int
 main ()
 {
 
-      // would be ambiguous without void f(nullptr_t)
-      f(nullptr);
+    // would be ambiguous without void f(nullptr_t)
+    f(nullptr);
 
   ;
   return 0;
@@ -9610,28 +10320,37 @@ main ()
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
+      if (test "x$enablecxx11" = "xyes"); then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_CXX11_NULLPTR 1" >>confdefs.h
 
         have_cxx11_nullptr=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_NULLPTR_BUT_DISABLED 1" >>confdefs.h
+
+      fi
 
 else
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-      ac_ext=cpp
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    fi
 
     # Test the nullptr workaround if we don't have the real nullptr
     if (test "x$have_cxx11_nullptr" != "xyes"); then
@@ -41404,6 +42123,30 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_MOVE_TRUE}" && test -z "${HAVE_CXX11_MOVE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_MOVE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_DECLTYPE_TRUE}" && test -z "${HAVE_CXX11_DECLTYPE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_DECLTYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_RVALUE_REFERENCES_TRUE}" && test -z "${HAVE_CXX11_RVALUE_REFERENCES_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_RVALUE_REFERENCES\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_AUTO_TRUE}" && test -z "${HAVE_CXX11_AUTO_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_AUTO\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_LAMBDA_TRUE}" && test -z "${HAVE_CXX11_LAMBDA_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_LAMBDA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_CONSTEXPR_TRUE}" && test -z "${HAVE_CXX11_CONSTEXPR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_CONSTEXPR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_ALIAS_DECLARATIONS_TRUE}" && test -z "${HAVE_CXX11_ALIAS_DECLARATIONS_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_ALIAS_DECLARATIONS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_SHARED_PTR_TRUE}" && test -z "${HAVE_CXX11_SHARED_PTR_FALSE}"; then

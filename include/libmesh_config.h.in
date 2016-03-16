@@ -207,38 +207,101 @@
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
 
+/* Flag indicating whether compiler supports alias declarations */
+#undef HAVE_CXX11_ALIAS_DECLARATIONS
+
+/* Compiler supports alias declarations, but they are disabled in libmesh */
+#undef HAVE_CXX11_ALIAS_DECLARATIONS_BUT_DISABLED
+
+/* Flag indicating whether compiler supports the auto keyword */
+#undef HAVE_CXX11_AUTO
+
+/* Compiler supports auto keyword, but it is disabled in libmesh */
+#undef HAVE_CXX11_AUTO_BUT_DISABLED
+
+/* Flag indicating whether compiler supports constexpr */
+#undef HAVE_CXX11_CONSTEXPR
+
+/* Compiler supports constexper, but it is disabled in libmesh */
+#undef HAVE_CXX11_CONSTEXPR_BUT_DISABLED
+
+/* Flag indicating whether compiler supports decltype */
+#undef HAVE_CXX11_DECLTYPE
+
+/* Compiler supports decltype, but it is disabled in libmesh */
+#undef HAVE_CXX11_DECLTYPE_BUT_DISABLED
+
 /* Flag indicating whether compiler supports f() = delete; */
 #undef HAVE_CXX11_DELETED_FUNCTIONS
+
+/* Compiler supports deleted functions, but they are disabled in libmesh */
+#undef HAVE_CXX11_DELETED_FUNCTIONS_BUT_DISABLED
 
 /* Flag indicating whether compiler supports f() final; */
 #undef HAVE_CXX11_FINAL
 
+/* Compiler supports final keyword, but it is disabled in libmesh */
+#undef HAVE_CXX11_FINAL_BUT_DISABLED
+
 /* Flag indicating whether compiler supports initializer lists */
 #undef HAVE_CXX11_INITIALIZER_LIST
+
+/* Compiler supports initializer lists, but it is disabled in libmesh */
+#undef HAVE_CXX11_INITIALIZER_LIST_BUT_DISABLED
 
 /* Flag indicating whether compiler supports std::acosh */
 #undef HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE
 
-/* Flag indicating whether compiler supports std::asinh */
+/* Compiler supports std::acosh, but it is disabled in libmesh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_BUT_DISABLED
+
+/* Flag indicating whether compiler supports std::acosh(complex) */
 #undef HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX
+
+/* Compiler supports std::acosh(complex), but it is disabled in libmesh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_BUT_DISABLED
 
 /* Flag indicating whether compiler supports std::asinh */
 #undef HAVE_CXX11_INVERSE_HYPERBOLIC_SINE
 
-/* Flag indicating whether compiler supports std::asinh */
+/* Compiler supports std::asinh, but it is disabled in libmesh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_BUT_DISABLED
+
+/* Flag indicating whether compiler supports std::asinh(complex) */
 #undef HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX
+
+/* Compiler supports std::asinh(complex), but it is disabled in libmesh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_BUT_DISABLED
 
 /* Flag indicating whether compiler supports std::atanh */
 #undef HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT
 
-/* Flag indicating whether compiler supports std::asinh */
+/* Compiler supports std::atanh, but it is disabled in libmesh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_BUT_DISABLED
+
+/* Flag indicating whether compiler supports std::atanh(complex) */
 #undef HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX
+
+/* Compiler supports std::atanh(complex), but it is disabled in libmesh */
+#undef HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_BUT_DISABLED
+
+/* Flag indicating whether compiler supports lambdas */
+#undef HAVE_CXX11_LAMBDA
+
+/* Compiler supports lambdas, but they are disabled in libmesh */
+#undef HAVE_CXX11_LAMBDA_BUT_DISABLED
 
 /* Flag indicating whether compiler supports std::move */
 #undef HAVE_CXX11_MOVE
 
+/* Compiler supports std::move, but it is disabled in libmesh */
+#undef HAVE_CXX11_MOVE_BUT_DISABLED
+
 /* Flag indicating whether compiler supports nullptr */
 #undef HAVE_CXX11_NULLPTR
+
+/* Compiler supports nullptr, but it is disabled in libmesh */
+#undef HAVE_CXX11_NULLPTR_BUT_DISABLED
 
 /* Flag indicating whether C++03 compatible nullptr workaround works */
 #undef HAVE_CXX11_NULLPTR_WORKAROUND
@@ -246,23 +309,47 @@
 /* Flag indicating whether compiler supports the override keyword */
 #undef HAVE_CXX11_OVERRIDE
 
-/* Flag indicating whether compiler supports std::regex */
+/* Compiler supports the override keyword, but it is disabled in libmesh */
+#undef HAVE_CXX11_OVERRIDE_BUT_DISABLED
+
+/* Compiler supports std::regex, but it is disabled in libmesh */
 #undef HAVE_CXX11_REGEX
+
+/* Flag indicating whether compiler supports rvalue references */
+#undef HAVE_CXX11_RVALUE_REFERENCES
+
+/* Compiler supports rvalue references, but they are disabled in libmesh */
+#undef HAVE_CXX11_RVALUE_REFERENCES_BUT_DISABLED
 
 /* Flag indicating whether compiler supports std::shared_ptr */
 #undef HAVE_CXX11_SHARED_PTR
 
+/* Compiler supports std::shared_ptr, but it is disabled in libmesh */
+#undef HAVE_CXX11_SHARED_PTR_BUT_DISABLED
+
 /* Flag indicating whether compiler supports std::thread */
 #undef HAVE_CXX11_THREAD
+
+/* Compiler supports std::thread, but it is disabled in libmesh */
+#undef HAVE_CXX11_THREAD_BUT_DISABLED
 
 /* Flag indicating whether compiler supports <type_traits> */
 #undef HAVE_CXX11_TYPE_TRAITS
 
+/* Compiler supports <type_traits>, but it is disabled in libmesh */
+#undef HAVE_CXX11_TYPE_TRAITS_BUT_DISABLED
+
 /* Flag indicating whether compiler supports std::unique_ptr */
 #undef HAVE_CXX11_UNIQUE_PTR
 
+/* Compiler supports std::unique_ptr, but it is disabled in libmesh */
+#undef HAVE_CXX11_UNIQUE_PTR_BUT_DISABLED
+
 /* Flag indicating whether compiler supports variadic templates */
 #undef HAVE_CXX11_VARIADIC_TEMPLATES
+
+/* Compiler supports variadic templates, but it is disabled in libmesh */
+#undef HAVE_CXX11_VARIADIC_TEMPLATES_BUT_DISABLED
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
