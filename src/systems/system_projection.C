@@ -262,8 +262,7 @@ public:
   {
     START_LOG ("eval_old_dof()", "OldSolutionValue");
 
-    if (!this->check_old_context(c, c.get_elem().point(0)))
-      libmesh_error();
+    this->check_old_context(c);
 
     const std::vector<dof_id_type> & old_dof_indices =
       old_context.get_dof_indices(var);
@@ -278,9 +277,44 @@ public:
   }
 
 protected:
+  void check_old_context (const FEMContext & c)
+  {
+    START_LOG ("check_old_context(c)", "OldSolutionValue");
+    const Elem & elem = c.get_elem();
+    if (last_elem != &elem)
+      {
+        if (elem.refinement_flag() == Elem::JUST_REFINED)
+          {
+            old_context.pre_fe_reinit(sys, elem.parent());
+          }
+        else if (elem.refinement_flag() == Elem::JUST_COARSENED)
+          {
+            libmesh_error();
+          }
+        else
+          {
+            if (!elem.old_dof_object)
+              {
+                libmesh_error();
+              }
+
+            old_context.pre_fe_reinit(sys, &elem);
+          }
+
+        last_elem = &elem;
+      }
+    else
+      {
+        libmesh_assert(old_context.has_elem());
+      }
+
+    STOP_LOG ("check_old_context(c)", "OldSolutionValue");
+  }
+
+
   bool check_old_context (const FEMContext & c, const Point & p)
   {
-    START_LOG ("check_old_context", "OldSolutionValue");
+    START_LOG ("check_old_context(c,p)", "OldSolutionValue");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -313,7 +347,7 @@ protected:
           {
             if (!elem.old_dof_object)
               {
-                STOP_LOG ("check_old_context", "OldSolutionValue");
+                STOP_LOG ("check_old_context(c,p)", "OldSolutionValue");
                 return false;
               }
 
@@ -345,7 +379,7 @@ protected:
           }
       }
 
-    STOP_LOG ("check_old_context", "OldSolutionValue");
+    STOP_LOG ("check_old_context(c,p)", "OldSolutionValue");
     return true;
   }
 
