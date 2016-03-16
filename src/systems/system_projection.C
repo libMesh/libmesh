@@ -1212,12 +1212,16 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // then we can simply copy its old dof
           // values to new indices.
             {
+              START_LOG ("copy_dofs","GenericProjector");
+
               for (unsigned int d=0; d != n_dofs; ++d)
                 {
                   Ue(d) = f.eval_old_dof(context, var_component, d);
                 }
 
               action.insert(context, var, Ue);
+
+              STOP_LOG ("copy_dofs","GenericProjector");
 
               continue;
             }
