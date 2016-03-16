@@ -1911,7 +1911,7 @@ void DofMap::dof_indices (const Elem * const elem,
 
   // Use the default p refinement level?
   if (p_level == -12345)
-    p_level = elem->p_level();
+    p_level = elem ? elem->p_level() : 0;
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
