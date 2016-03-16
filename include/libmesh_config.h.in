@@ -312,6 +312,12 @@
 /* Compiler supports the override keyword, but it is disabled in libmesh */
 #undef HAVE_CXX11_OVERRIDE_BUT_DISABLED
 
+/* Flag indicating whether compiler supports range-based for loops */
+#undef HAVE_CXX11_RANGEFOR
+
+/* Compiler supports range-based for loops, but it is disabled in libmesh */
+#undef HAVE_CXX11_RANGEFOR_BUT_DISABLED
+
 /* Compiler supports std::regex, but it is disabled in libmesh */
 #undef HAVE_CXX11_REGEX
 
