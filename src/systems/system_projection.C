@@ -165,9 +165,9 @@ public:
 
   bool is_grid_projection() { return false; }
 
-  Output eval_old_dof (const FEMContext & /* c */,
-                       unsigned int /* var_component */,
-                       unsigned int /* dof_index */)
+  void eval_old_dofs (const FEMContext & /* c */,
+                      unsigned int /* var_component */,
+                      std::vector<Output> /* values */)
   { libmesh_error(); }
 
 private:
@@ -256,24 +256,20 @@ public:
 
   bool is_grid_projection() { return true; }
 
-  Output eval_old_dof (const FEMContext & c,
-                       unsigned int var,
-                       unsigned int dof_index)
+  void eval_old_dofs (const FEMContext & c,
+                      unsigned int var,
+                      std::vector<Output> & values)
   {
-    START_LOG ("eval_old_dof()", "OldSolutionValue");
+    START_LOG ("eval_old_dofs()", "OldSolutionValue");
 
     this->check_old_context(c);
 
     const std::vector<dof_id_type> & old_dof_indices =
       old_context.get_dof_indices(var);
 
-    libmesh_assert_greater(old_dof_indices.size(), dof_index);
+    old_solution.get(old_dof_indices, values);
 
-    const dof_id_type old_id = old_dof_indices[dof_index];
-
-    STOP_LOG ("eval_old_dof()", "OldSolutionValue");
-
-    return old_solution(old_id);
+    STOP_LOG ("eval_old_dofs()", "OldSolutionValue");
   }
 
 protected:
@@ -1248,10 +1244,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             {
               START_LOG ("copy_dofs","GenericProjector");
 
-              for (unsigned int d=0; d != n_dofs; ++d)
-                {
-                  Ue(d) = f.eval_old_dof(context, var_component, d);
-                }
+              f.eval_old_dofs(context, var_component, Ue.get_values());
 
               action.insert(context, var, Ue);
 
