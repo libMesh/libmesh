@@ -1632,14 +1632,17 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
             }
         }
 
-      // These resize calls also zero out the residual and jacobian
-      this->get_elem_residual().resize(n_dofs);
-      this->get_elem_jacobian().resize(n_dofs, n_dofs);
+      if (algebraic_type() != OLD)
+        {
+          // These resize calls also zero out the residual and jacobian
+          this->get_elem_residual().resize(n_dofs);
+          this->get_elem_jacobian().resize(n_dofs, n_dofs);
 
-      this->get_qoi_derivatives().resize(n_qoi);
-      this->_elem_qoi_subderivatives.resize(n_qoi);
-      for (std::size_t q=0; q != n_qoi; ++q)
-        (this->get_qoi_derivatives())[q].resize(n_dofs);
+          this->get_qoi_derivatives().resize(n_qoi);
+          this->_elem_qoi_subderivatives.resize(n_qoi);
+          for (std::size_t q=0; q != n_qoi; ++q)
+            (this->get_qoi_derivatives())[q].resize(n_dofs);
+        }
     }
 
   // Initialize the per-variable data for elem.
@@ -1698,36 +1701,41 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               this->get_elem_fixed_solution(i).reposition
                 (sub_dofs, n_dofs_var);
 
-            this->get_elem_residual(i).reposition
-              (sub_dofs, n_dofs_var);
-
-            for (std::size_t q=0; q != n_qoi; ++q)
-              this->get_qoi_derivatives(q,i).reposition
-                (sub_dofs, n_dofs_var);
-
-            for (unsigned int j=0; j != i; ++j)
+            if (algebraic_type() != OLD)
               {
-                const unsigned int n_dofs_var_j =
-                  cast_int<unsigned int>
-                  (this->get_dof_indices(j).size());
+                this->get_elem_residual(i).reposition
+                  (sub_dofs, n_dofs_var);
 
-                this->get_elem_jacobian(i,j).reposition
-                  (sub_dofs, this->get_elem_residual(j).i_off(),
-                   n_dofs_var, n_dofs_var_j);
-                this->get_elem_jacobian(j,i).reposition
-                  (this->get_elem_residual(j).i_off(), sub_dofs,
-                   n_dofs_var_j, n_dofs_var);
+                for (std::size_t q=0; q != n_qoi; ++q)
+                  this->get_qoi_derivatives(q,i).reposition
+                    (sub_dofs, n_dofs_var);
+
+                for (unsigned int j=0; j != i; ++j)
+                  {
+                    const unsigned int n_dofs_var_j =
+                      cast_int<unsigned int>
+                      (this->get_dof_indices(j).size());
+
+                    this->get_elem_jacobian(i,j).reposition
+                      (sub_dofs, this->get_elem_residual(j).i_off(),
+                       n_dofs_var, n_dofs_var_j);
+                    this->get_elem_jacobian(j,i).reposition
+                      (this->get_elem_residual(j).i_off(), sub_dofs,
+                       n_dofs_var_j, n_dofs_var);
+                  }
+                this->get_elem_jacobian(i,i).reposition
+                  (sub_dofs, sub_dofs,
+                   n_dofs_var,
+                   n_dofs_var);
               }
-            this->get_elem_jacobian(i,i).reposition
-              (sub_dofs, sub_dofs,
-               n_dofs_var,
-               n_dofs_var);
+
             sub_dofs += n_dofs_var;
           }
       }
 
     if (this->algebraic_type() != NONE &&
-        this->algebraic_type() != DOFS_ONLY)
+        this->algebraic_type() != DOFS_ONLY &&
+        this->algebraic_type() != OLD)
       libmesh_assert_equal_to (sub_dofs, n_dofs);
   }
 
