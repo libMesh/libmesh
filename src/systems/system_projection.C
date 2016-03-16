@@ -1194,14 +1194,21 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
-          // If this element hasn't been changed, and we're projecting
-          // from its old self, then we can simply move its old dof
-          // values to new indices.
+          // If we're projecting from an old grid
           if (f.is_grid_projection() &&
-              elem->refinement_flag() != Elem::JUST_REFINED &&
-              elem->refinement_flag() != Elem::JUST_COARSENED &&
-              elem->p_refinement_flag() != Elem::JUST_REFINED &&
-              elem->p_refinement_flag() != Elem::JUST_COARSENED)
+          // And either this is an unchanged element
+              ((elem->refinement_flag() != Elem::JUST_REFINED &&
+                elem->refinement_flag() != Elem::JUST_COARSENED &&
+                elem->p_refinement_flag() != Elem::JUST_REFINED &&
+                elem->p_refinement_flag() != Elem::JUST_COARSENED) ||
+          // Or this is a low order monomial element
+               (fe_type.family == MONOMIAL &&
+                fe_type.order == CONSTANT &&
+                elem->p_level() == 0 &&
+                elem->p_refinement_flag() != Elem::JUST_COARSENED))
+             )
+          // then we can simply copy its old dof
+          // values to new indices.
             {
               for (unsigned int d=0; d != n_dofs; ++d)
                 {
