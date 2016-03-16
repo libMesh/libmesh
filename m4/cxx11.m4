@@ -49,6 +49,52 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX11_RANGEFOR],
+  [
+    have_cxx11_rangefor=no
+
+    AC_MSG_CHECKING(for C++11 range-based for loop support)
+    AC_LANG_PUSH([C++])
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <iostream>
+        @%:@include <vector>
+        void print(const std::vector<int> & v)
+        {
+          for (const int & x : v)
+            std::cout << x << ' ';
+          std::cout << std::endl;
+        }
+    ]], [[
+        std::vector<int> v(3);
+        print(v);
+    ]])],[
+      if (test "x$enablecxx11" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_RANGEFOR, 1, [Flag indicating whether compiler supports range-based for loops])
+        have_cxx11_rangefor=yes
+      else
+        AC_MSG_RESULT([yes, but disabled.])
+        AC_DEFINE(HAVE_CXX11_RANGEFOR_BUT_DISABLED, 1, [Compiler supports range-based for loops, but it is disabled in libmesh])
+      fi
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_RANGEFOR, test x$have_cxx11_rangefor == xyes)
+  ])
+
+
 AC_DEFUN([LIBMESH_TEST_CXX11_DECLTYPE],
   [
     have_cxx11_decltype=no
