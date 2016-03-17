@@ -267,6 +267,8 @@ public:
     const std::vector<dof_id_type> & old_dof_indices =
       old_context.get_dof_indices(var);
 
+    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
+
     old_solution.get(old_dof_indices, values);
 
     STOP_LOG ("eval_old_dofs()", "OldSolutionValue");
