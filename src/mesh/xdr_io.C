@@ -872,7 +872,8 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
 #else
   unsigned short write_unique_ids = 0;
 #endif
-  io.data (write_unique_ids, "# presence of unique ids");
+  if (this->processor_id() == 0)
+    io.data (write_unique_ids, "# presence of unique ids");
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   n_written = 0;
