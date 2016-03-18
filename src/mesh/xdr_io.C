@@ -860,23 +860,140 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
 
           io.data_stream (coords.empty() ? libmesh_nullptr : &coords[0],
                           cast_int<unsigned int>(coords.size()), 3);
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          // XDR unsigned char doesn't work as anticipated
-          unsigned short write_unique_ids = 1;
-
-          io.data (write_unique_ids, "# presence of unique ids");
-          io.data_stream (unique_ids.empty() ? libmesh_nullptr : &unique_ids[0],
-                          cast_int<unsigned int>(unique_ids.size()), 1);
-#else
-          unsigned short write_unique_ids = 0;
-
-          io.data_stream (&write_unique_ids, 1, 1);
-#endif
         }
     }
+
   if (this->processor_id() == 0)
     libmesh_assert_equal_to (n_written, n_nodes);
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // XDR unsigned char doesn't work as anticipated
+  unsigned short write_unique_ids = 1;
+#else
+  unsigned short write_unique_ids = 0;
+#endif
+  io.data (write_unique_ids, "# presence of unique ids");
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  n_written = 0;
+
+  for (std::size_t blk=0, last_node=0; last_node<n_nodes; blk++)
+    {
+      const std::size_t first_node = blk*io_blksize;
+      last_node = std::min((blk+1)*io_blksize, std::size_t(n_nodes));
+
+      // Build up the xfer buffers on each processor
+      MeshBase::const_node_iterator
+        it  = mesh.local_nodes_begin(),
+        end = mesh.local_nodes_end();
+
+      xfer_ids.clear();
+      xfer_unique_ids.clear();
+
+      for (; it!=end; ++it)
+        if (((*it)->id() >= first_node) && // node in [first_node, last_node)
+            ((*it)->id() <  last_node))
+          {
+            xfer_ids.push_back((*it)->id());
+            xfer_unique_ids.push_back((*it)->unique_id());
+          }
+
+      //-------------------------------------
+      // Send the xfer buffers to processor 0
+      std::vector<std::size_t> ids_size;
+
+      const std::size_t my_ids_size = xfer_ids.size();
+
+      // explicitly gather ids_size
+      this->comm().gather (0, my_ids_size, ids_size);
+
+      // We will have lots of simultaneous receives if we are
+      // processor 0, so let's use nonblocking receives.
+      std::vector<Parallel::Request>
+        unique_id_request_handles(this->n_processors()-1),
+        id_request_handles(this->n_processors()-1);
+
+      Parallel::MessageTag
+        unique_id_tag = mesh.comm().get_unique_tag(1236),
+        id_tag    = mesh.comm().get_unique_tag(1237);
+
+      // Post the receives -- do this on processor 0 only.
+      if (this->processor_id() == 0)
+        {
+          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+            {
+              recv_ids[pid].resize(ids_size[pid]);
+              recv_unique_ids[pid].resize(ids_size[pid]);
+
+              if (pid == 0)
+                {
+                  recv_ids[0] = xfer_ids;
+                  recv_unique_ids[0] = xfer_unique_ids;
+                }
+              else
+                {
+                  this->comm().receive (pid, recv_ids[pid],
+                                        id_request_handles[pid-1],
+                                        id_tag);
+                  this->comm().receive (pid, recv_unique_ids[pid],
+                                        unique_id_request_handles[pid-1],
+                                        unique_id_tag);
+                }
+            }
+        }
+      else
+        {
+          // Send -- do this on all other processors.
+          this->comm().send(0, xfer_ids,    id_tag);
+          this->comm().send(0, xfer_unique_ids, unique_id_tag);
+        }
+
+      // -------------------------------------------------------
+      // Receive the messages and write the output on processor 0.
+      if (this->processor_id() == 0)
+        {
+          // Wait for all the receives to complete. We have no
+          // need for the statuses since we already know the
+          // buffer sizes.
+          Parallel::wait (id_request_handles);
+          Parallel::wait (unique_id_request_handles);
+
+          // Write the unique ids in this block.
+          std::size_t tot_id_size=0;
+
+          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+            {
+              tot_id_size    += recv_ids[pid].size();
+              libmesh_assert_equal_to
+                (recv_ids[pid].size(), recv_unique_ids[pid].size());
+            }
+
+          libmesh_assert_less_equal
+            (tot_id_size, std::min(io_blksize, std::size_t(n_nodes)));
+
+          unique_ids.resize(tot_id_size);
+
+          for (unsigned int pid=0; pid<this->n_processors(); pid++)
+            for (std::size_t idx=0; idx<recv_ids[pid].size(); idx++)
+              {
+                const std::size_t local_idx = recv_ids[pid][idx] - first_node;
+
+                libmesh_assert_less (local_idx, unique_ids.size());
+
+                unique_ids[local_idx] = recv_unique_ids[pid][idx];
+
+                n_written++;
+              }
+
+          io.data_stream (unique_ids.empty() ? libmesh_nullptr : &unique_ids[0],
+                          cast_int<unsigned int>(unique_ids.size()), 1);
+        }
+    }
+
+  if (this->processor_id() == 0)
+    libmesh_assert_equal_to (n_written, n_nodes);
+
+#endif // LIBMESH_ENABLE_UNIQUE_ID
 }
 
 
