@@ -71,14 +71,23 @@ public:
   /**
    * Loop over the dofs on each processor to initialize the list
    * of non-condensed dofs. These are the dofs in the system that
-   * are not contained in \p global_dirichlet_dofs_set.
+   * are not contained in \p global_dirichlet_dofs_set and are not
+   * subject to constraints due to adaptive mesh hanging nodes,
+   * periodic boundary conditions, or Dirichlet boundary conditions.
+   *
+   * Most users will not need to use the \p global_condensed_dofs_set
+   * argument; simply call initialize_condensed_dofs() after any time
+   * the EquationSystems (and therefore its constraint equations) gets
+   * initialized or reinitialized.
    */
-  void initialize_condensed_dofs(std::set<unsigned int> & global_dirichlet_dofs_set);
+  void initialize_condensed_dofs(const std::set<dof_id_type> &
+                                 global_condensed_dofs_set =
+                                 std::set<dof_id_type>());
 
   /**
    * @return the global number of non-condensed dofs in the system.
    */
-  unsigned int n_global_non_condensed_dofs() const;
+  dof_id_type n_global_non_condensed_dofs() const;
 
   /**
    * Override to solve the condensed eigenproblem with
@@ -93,7 +102,7 @@ public:
    * entries of the solution vector (the condensed
    * entries are set to zero by default).
    */
-  virtual std::pair<Real, Real> get_eigenpair(unsigned int i) libmesh_override;
+  virtual std::pair<Real, Real> get_eigenpair(dof_id_type i) libmesh_override;
 
   /**
    * The (condensed) system matrix for standard eigenvalue problems.
