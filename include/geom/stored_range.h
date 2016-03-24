@@ -67,7 +67,8 @@ public:
     _last(),
     _first(),
     _grainsize(new_grainsize),
-    _objs()
+    _objs(new std::vector<object_type>()),
+    _should_release(true)
   {}
 
   /**
@@ -84,9 +85,33 @@ public:
     _last(),
     _first(),
     _grainsize(new_grainsize),
-    _objs()
+    _objs(new std::vector<object_type>()),
+    _should_release(true)
   {
     this->reset(first, last);
+  }
+
+  /**
+   * Constructor.  Takes a std::vector of objects.
+   * Optionally takes the \p grainsize parameter, which is the
+   * smallest chunk the range may be broken into for parallel
+   * execution.
+   *
+   * Note: The std::vector passed in here MUST live for the
+   * lifetime of this StoredRange!
+   *
+   * TODO: This should be a std::shared_ptr in the future!
+   */
+  StoredRange (std::vector<object_type> * objs,
+               const unsigned int new_grainsize = 1000) :
+    _end(objs->end()),
+    _begin(objs->begin()),
+    _last(objs->size()),
+    _first(0),
+    _grainsize(new_grainsize),
+    _objs(objs),
+    _should_release(false)
+  {
   }
 
   /**
@@ -108,7 +133,8 @@ public:
     _last(er._last),
     _first(er._first),
     _grainsize(er._grainsize),
-    _objs()
+    _objs(NULL),
+    _should_release(false)
   {
     // specifically, do *not* copy the vector
   }
@@ -138,7 +164,8 @@ public:
     _last(0), // Initialize these in a moment
     _first(0),
     _grainsize(er._grainsize),
-    _objs()
+    _objs(NULL),
+    _should_release(false)
   {
     // specifically, do *not* copy the vector
 
@@ -157,7 +184,8 @@ public:
     _last(r._last),
     _first(r._first),
     _grainsize(r._grainsize),
-    _objs()
+    _objs(NULL),
+    _should_release(false)
   {
     const_iterator
       beginning = r._begin,
@@ -175,6 +203,15 @@ public:
   }
 
   /**
+   * Destructor.  Releases the object array if we created it
+   */
+  ~StoredRange ()
+  {
+    if (_should_release)
+      delete _objs;
+  }
+
+  /**
    * Resets the \p StoredRange to contain [first,last).  Returns
    * a reference to itself for convenience, so functions
    * expecting a StoredRange<> can be passed e.g. foo.reset(begin,end).
@@ -183,16 +220,16 @@ public:
   reset (const iterator_type & first,
          const iterator_type & last)
   {
-    _objs.clear();
+    _objs->clear();
 
     for (iterator_type it=first; it!=last; ++it)
-      _objs.push_back(*it);
+      _objs->push_back(*it);
 
-    _begin = _objs.begin();
-    _end   = _objs.end();
+    _begin = _objs->begin();
+    _end   = _objs->end();
 
     _first = 0;
-    _last  = _objs.size();
+    _last  = _objs->size();
 
     return *this;
   }
@@ -206,11 +243,11 @@ public:
    */
   StoredRange<iterator_type, object_type> & reset ()
   {
-    _begin = _objs.begin();
-    _end   = _objs.end();
+    _begin = _objs->begin();
+    _end   = _objs->end();
 
     _first = 0;
-    _last  = _objs.size();
+    _last  = _objs->size();
 
     return *this;
   }
@@ -272,7 +309,10 @@ private:
   std::size_t _last;
   std::size_t _first;
   std::size_t _grainsize;
-  std::vector<object_type> _objs;
+
+  // TODO: Make this a std::shared_ptr in the future!
+  std::vector<object_type> * _objs;
+  bool _should_release;
 };
 
 } // namespace libMesh
