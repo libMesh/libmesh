@@ -265,7 +265,8 @@ protected:
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
-  virtual bool greedy_termination_test(Real training_greedy_error, int count) libmesh_override;
+  virtual bool greedy_termination_test(
+    Real abs_greedy_error, Real initial_greedy_error, int count) libmesh_override;
 
   /**
    * Loop over the training set and compute the parametrized function for each

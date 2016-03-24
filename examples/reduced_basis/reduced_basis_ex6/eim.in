@@ -1,7 +1,7 @@
 # ========= EIM system parameters =========
 
 Nmax = 20
-training_tolerance = 0.001
+rel_training_tolerance = 0.001
 
 parameter_names = 'curvature'
 

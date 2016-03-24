@@ -817,12 +817,6 @@ void RBEIMConstruction::update_RB_system_matrices()
 Real RBEIMConstruction::get_RB_error_bound()
 {
   Real best_fit_error = compute_best_fit_error();
-
-  if(use_relative_bound_in_greedy)
-    {
-      best_fit_error /= get_rb_evaluation().get_rb_solution_norm();
-    }
-
   return best_fit_error;
 }
 
@@ -832,7 +826,8 @@ void RBEIMConstruction::update_system()
   update_RB_system_matrices();
 }
 
-bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
+bool RBEIMConstruction::greedy_termination_test(
+  Real abs_greedy_error, Real initial_error, int)
 {
   if(_performing_extra_greedy_step)
     {
@@ -843,9 +838,18 @@ bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
 
   _performing_extra_greedy_step = false;
 
-  if(training_greedy_error < get_training_tolerance())
+  if(abs_greedy_error < get_abs_training_tolerance())
     {
-      libMesh::out << "Specified error tolerance reached." << std::endl
+      libMesh::out << "Absolute error tolerance reached." << std::endl
+                   << "Perform one more Greedy iteration for error bounds." << std::endl;
+      _performing_extra_greedy_step = true;
+      return false;
+    }
+
+  Real rel_greedy_error = abs_greedy_error/initial_error;
+  if(rel_greedy_error < get_rel_training_tolerance())
+    {
+      libMesh::out << "Relative error tolerance reached." << std::endl
                    << "Perform one more Greedy iteration for error bounds." << std::endl;
       _performing_extra_greedy_step = true;
       return false;
