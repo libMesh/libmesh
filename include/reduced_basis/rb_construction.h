@@ -172,11 +172,18 @@ public:
   const RBParameters & get_greedy_parameter(unsigned int i);
 
   /**
-   * Get/set the tolerance for the basis training.
+   * Get/set the relative tolerance for the basis training.
    */
-  void set_training_tolerance(Real new_training_tolerance)
-  {this->training_tolerance = new_training_tolerance; }
-  Real get_training_tolerance() { return training_tolerance; }
+  void set_rel_training_tolerance(Real new_training_tolerance)
+  {this->rel_training_tolerance = new_training_tolerance; }
+  Real get_rel_training_tolerance() { return rel_training_tolerance; }
+
+  /**
+   * Get/set the absolute tolerance for the basis training.
+   */
+  void set_abs_training_tolerance(Real new_training_tolerance)
+  {this->abs_training_tolerance = new_training_tolerance; }
+  Real get_abs_training_tolerance() { return abs_training_tolerance; }
 
   /**
    * Get/set Nmax, the maximum number of RB
@@ -346,11 +353,11 @@ public:
    */
   void set_rb_construction_parameters(unsigned int n_training_samples_in,
                                       bool deterministic_training_in,
-                                      bool use_relative_bound_in_greedy_in,
                                       unsigned int training_parameters_random_seed_in,
                                       bool quiet_mode_in,
                                       unsigned int Nmax_in,
-                                      Real training_tolerance_in,
+                                      Real rel_training_tolerance_in,
+                                      Real abs_training_tolerance_in,
                                       RBParameters mu_min_in,
                                       RBParameters mu_max_in,
                                       std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
@@ -466,13 +473,6 @@ public:
   std::vector<Number> Fq_representor_innerprods;
 
   /**
-   * Boolean flag to indicate whether we use an absolute or
-   * relative error bound in the Greedy algorithm for training
-   * a Reduced Basis.
-   */
-  bool use_relative_bound_in_greedy;
-
-  /**
    * Boolean flag to indicate whether we exit the greedy if
    * we select the same parameters twice in a row. In some
    * problems this indicates that the greedy has "saturated"
@@ -548,7 +548,8 @@ protected:
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
-  virtual bool greedy_termination_test(Real training_greedy_error, int count);
+  virtual bool greedy_termination_test(
+    Real abs_greedy_error, Real initial_greedy_error, int count);
 
   /**
    * Update the list of Greedily chosen parameters with
@@ -754,9 +755,11 @@ private:
   std::vector< std::vector< NumericVector<Number> * > > non_dirichlet_outputs_vector;
 
   /**
-   * Tolerance for training reduced basis using the Greedy scheme.
+   * Relative and absolute tolerances for training reduced basis
+   * using the Greedy scheme.
    */
-  Real training_tolerance;
+  Real rel_training_tolerance;
+  Real abs_training_tolerance;
 
 };
 

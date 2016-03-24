@@ -21,7 +21,7 @@ store_basis_functions = true                # Do we store the basis functions in
 # ========= RB system parameters =========
 
 Nmax = 15                                   # The maximum number of basis functions we can generate in the Offline stage
-training_tolerance = 1.e-3                  # The error bound tolerance used to terminate the Greedy algorithm
+rel_training_tolerance = 1.e-3              # The error bound tolerance used to terminate the Greedy algorithm
 
 parameter_names = 'x_scaling load_Fx load_Fy load_Fz point_load_Fx point_load_Fy point_load_Fz'
 
