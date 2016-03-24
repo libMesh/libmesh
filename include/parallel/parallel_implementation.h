@@ -463,17 +463,14 @@ template <typename Context, typename buffertype, typename Iter>
 inline Iter pack_range (const Context * context,
                         Iter range_begin,
                         const Iter range_end,
-                        std::vector<buffertype> & buffer)
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-
+                        std::vector<buffertype> & buffer,
   // When we serialize into buffers, we need to use large buffers to optimize MPI
   // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
   // is measured in number of buffer type entries; number of bytes may be 4 or 8
   // times larger depending on configuration.
-
-  static const std::size_t max_buffer_size = 1000000;
-  // static const std::size_t max_buffer_size = std::size_t(-1);
+                        std::size_t max_buffer_size)
+{
+  typedef typename std::iterator_traits<Iter>::value_type T;
 
   // Count the total size of and preallocate buffer for efficiency.
   // Prepare to stop early if the buffer would be too large.
@@ -2011,6 +2008,31 @@ inline status Communicator::probe (const unsigned int src_processor_id,
   return stat;
 }
 
+template<typename T>
+inline Status Communicator::packed_range_probe (const unsigned int src_processor_id,
+                                                const MessageTag & tag,
+                                                bool & flag) const
+{
+  START_LOG("packed_range_probe()", "Parallel");
+
+  libmesh_experimental();
+
+  Status stat((StandardType<typename Packing<T>::buffer_type>()));
+
+  int int_flag;
+
+  libmesh_call_mpi(MPI_Iprobe(src_processor_id,
+                              tag.value(),
+                              this->get(),
+                              &int_flag,
+                              stat.get()));
+
+  flag = int_flag;
+
+  STOP_LOG("packed_range_probe()", "Parallel");
+
+  return stat;
+}
 
 
 template<typename T>
@@ -2043,6 +2065,8 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
+
+  std::cerr<<"Sending: "<<buf.size()<<std::endl;
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2345,6 +2369,51 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
 
 
+
+
+
+
+template <typename Context, typename Iter>
+inline void Communicator::nonblocking_send_packed_range (const unsigned int dest_processor_id,
+                                                         const Context * context,
+                                                         Iter range_begin,
+                                                         const Iter range_end,
+                                                         Request & req,
+                                                         const MessageTag & tag) const
+{
+  libmesh_experimental();
+
+  // Allocate a buffer on the heap so we don't have to free it until
+  // after the Request::wait()
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
+
+  if (range_begin != range_end)
+    {
+      std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
+
+      range_begin =
+        Parallel::pack_range(context,
+                             range_begin,
+                             range_end,
+                             *buffer,
+                             // MPI-2 can only use integers for size
+                             std::numeric_limits<int>::max());
+
+      if (range_begin != range_end)
+        libmesh_error_msg("Non-blocking packed range sends cannot exceed " << std::numeric_limits<int>::max() << "in size");
+
+      // Make the Request::wait() handle deleting the buffer
+      req.add_post_wait_work
+        (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >
+         (buffer));
+
+      // Non-blocking send of the buffer
+      this->send(dest_processor_id, *buffer, req, tag);
+    }
+}
+
+
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
                                      std::basic_string<T> & buf,
@@ -2622,6 +2691,35 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 //   req.add_post_wait_work
 //     (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >(buffer));
 // }
+
+template <typename Context, typename OutputIter, typename T>
+inline void Communicator::nonblocking_receive_packed_range (const unsigned int src_processor_id,
+                                                            Context * context,
+                                                            OutputIter out,
+                                                            const T * /* output_type */,
+                                                            Request & req,
+                                                            Status & stat,
+                                                            const MessageTag & tag) const
+{
+  libmesh_experimental();
+
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
+
+  // Receive serialized variable size objects as a sequence of
+  // buffer_t.
+  // Allocate a buffer on the heap so we don't have to free it until
+  // after the Request::wait()
+  std::vector<buffer_t> * buffer = new std::vector<buffer_t>(stat.size());
+  this->receive(src_processor_id, *buffer, req, tag);
+
+  // Make the Request::wait() handle unpacking the buffer
+  req.add_post_wait_work
+    (new Parallel::PostWaitUnpackBuffer<std::vector<buffer_t>, Context, OutputIter, T>(*buffer, context, out));
+
+  // Make the Request::wait() then handle deleting the buffer
+  req.add_post_wait_work
+    (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >(buffer));
+}
 
 
 
