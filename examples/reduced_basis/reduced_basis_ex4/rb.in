@@ -1,7 +1,7 @@
 # ========= RB system parameters =========
 
 Nmax = 15
-training_tolerance = 0.001
+rel_training_tolerance = 0.001
 
 parameter_names = 'center_x center_y'
 

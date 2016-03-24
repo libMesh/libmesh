@@ -63,7 +63,6 @@ RBConstruction::RBConstruction (EquationSystems & es,
     inner_product_solver(LinearSolver<Number>::build(es.comm())),
     extra_linear_solver(libmesh_nullptr),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
-    use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
@@ -77,7 +76,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     assert_convergence(true),
     rb_eval(libmesh_nullptr),
     inner_product_assembly(libmesh_nullptr),
-    training_tolerance(-1.)
+    rel_training_tolerance(1.e-4),
+    abs_training_tolerance(1.e-12)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -224,16 +224,16 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
 
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
-  const bool use_relative_bound_in_greedy_in = infile("use_relative_bound_in_greedy",
-                                                      use_relative_bound_in_greedy);
   unsigned int training_parameters_random_seed_in =
     static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
                                               training_parameters_random_seed_in);
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
   const unsigned int Nmax_in = infile("Nmax", Nmax);
-  const Real training_tolerance_in = infile("training_tolerance",
-                                            training_tolerance);
+  const Real rel_training_tolerance_in = infile("rel_training_tolerance",
+                                                 rel_training_tolerance);
+  const Real abs_training_tolerance_in = infile("abs_training_tolerance",
+                                                 abs_training_tolerance);
 
   // Read in the parameters from the input file too
   unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
@@ -288,11 +288,11 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
   // Set the parameters that have been read in
   set_rb_construction_parameters(n_training_samples,
                                  deterministic_training,
-                                 use_relative_bound_in_greedy_in,
                                  training_parameters_random_seed_in,
                                  quiet_mode_in,
                                  Nmax_in,
-                                 training_tolerance_in,
+                                 rel_training_tolerance_in,
+                                 abs_training_tolerance_in,
                                  mu_min_in,
                                  mu_max_in,
                                  discrete_parameter_values_in,
@@ -302,20 +302,16 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
 void RBConstruction::set_rb_construction_parameters(
                                                     unsigned int n_training_samples_in,
                                                     bool deterministic_training_in,
-                                                    bool use_relative_bound_in_greedy_in,
                                                     unsigned int training_parameters_random_seed_in,
                                                     bool quiet_mode_in,
                                                     unsigned int Nmax_in,
-                                                    Real training_tolerance_in,
+                                                    Real rel_training_tolerance_in,
+                                                    Real abs_training_tolerance_in,
                                                     RBParameters mu_min_in,
                                                     RBParameters mu_max_in,
                                                     std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
                                                     std::map<std::string,bool> log_scaling_in)
 {
-  // Tell the system whether or not to use a relative error bound
-  // in the Greedy algorithm
-  use_relative_bound_in_greedy = use_relative_bound_in_greedy_in;
-
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
@@ -327,7 +323,8 @@ void RBConstruction::set_rb_construction_parameters(
   // Initialize RB parameters
   set_Nmax(Nmax_in);
 
-  set_training_tolerance(training_tolerance_in);
+  set_rel_training_tolerance(rel_training_tolerance_in);
+  set_abs_training_tolerance(abs_training_tolerance_in);
 
   // Initialize the parameter ranges and the parameters themselves
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
@@ -345,8 +342,8 @@ void RBConstruction::print_info()
   libMesh::out << std::endl << "RBConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
   libMesh::out << "Nmax: " << Nmax << std::endl;
-  if(training_tolerance > 0.)
-    libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
+  libMesh::out << "Greedy relative error tolerance: " << get_rel_training_tolerance() << std::endl;
+  libMesh::out << "Greedy absolute error tolerance: " << get_abs_training_tolerance() << std::endl;
   if( is_rb_eval_initialized() )
     {
       libMesh::out << "Aq operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
@@ -374,7 +371,6 @@ void RBConstruction::print_info()
     }
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
-  libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
   libMesh::out << std::endl;
 }
@@ -1041,6 +1037,8 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
   compute_Fq_representor_innerprods();
 
   libMesh::out << std::endl << "---- Performing Greedy basis enrichment ----" << std::endl;
+  Real initial_greedy_error = 0.;
+  bool initial_greedy_error_initialized = false;
   while(true)
     {
       libMesh::out << std::endl << "---- Basis dimension: "
@@ -1051,12 +1049,18 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
           libMesh::out << "Performing RB solves on training set" << std::endl;
           training_greedy_error = compute_max_error_bound();
 
-          libMesh::out << "Maximum " << (use_relative_bound_in_greedy ? "(relative)" : "(absolute)")
-                       << " error bound is " << training_greedy_error << std::endl << std::endl;
+          libMesh::out << "Maximum error bound is " << training_greedy_error << std::endl << std::endl;
+
+          // record the initial error
+          if(!initial_greedy_error_initialized)
+          {
+            initial_greedy_error = training_greedy_error;
+            initial_greedy_error_initialized = true;
+          }
 
           // Break out of training phase if we have reached Nmax
           // or if the training_tolerance is satisfied.
-          if( greedy_termination_test(training_greedy_error, count) )
+          if( greedy_termination_test(training_greedy_error, initial_greedy_error, count) )
             {
               break;
             }
@@ -1086,11 +1090,19 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
   return training_greedy_error;
 }
 
-bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
+bool RBConstruction::greedy_termination_test(
+  Real abs_greedy_error, Real initial_error, int)
 {
-  if(training_greedy_error < this->training_tolerance)
+  if(abs_greedy_error < this->abs_training_tolerance)
     {
-      libMesh::out << "Specified error tolerance reached." << std::endl;
+      libMesh::out << "Absolute error tolerance reached." << std::endl;
+      return true;
+    }
+
+  Real rel_greedy_error = abs_greedy_error/initial_error;
+  if(rel_greedy_error < this->rel_training_tolerance)
+    {
+      libMesh::out << "Relative error tolerance reached." << std::endl;
       return true;
     }
 
@@ -1259,12 +1271,6 @@ Real RBConstruction::get_RB_error_bound()
   get_rb_evaluation().set_parameters( get_parameters() );
 
   Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
-
-  // Should we normalize the error bound to return a relative bound?
-  if(use_relative_bound_in_greedy)
-    {
-      error_bound /= get_rb_evaluation().get_rb_solution_norm();
-    }
 
   return error_bound;
 }
