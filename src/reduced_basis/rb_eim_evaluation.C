@@ -219,6 +219,15 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number> & EIM_rhs)
   STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
+Real RBEIMEvaluation::get_error_bound_normalization()
+{
+  // Just set the normalization factor to 1 in this case.
+  // Users can override this method if specific behavior
+  // is required.
+
+  return 1.;
+}
+
 void RBEIMEvaluation::initialize_eim_theta_objects()
 {
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation

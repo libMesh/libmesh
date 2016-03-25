@@ -125,6 +125,12 @@ public:
   void rb_solve(DenseVector<Number> & EIM_rhs);
 
   /**
+   * @return a scaling factor that we can use to provide a consistent
+   * scaling of the RB error bound across different parameter values.
+   */
+  virtual Real get_error_bound_normalization() libmesh_override;
+
+  /**
    * Build a vector of RBTheta objects that accesses the components
    * of the RB_solution member variable of this RBEvaluation.
    * Store these objects in the member vector rb_theta_objects.

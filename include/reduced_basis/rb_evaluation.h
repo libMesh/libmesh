@@ -111,9 +111,10 @@ public:
   virtual Real rb_solve(unsigned int N);
 
   /**
-   * Return the norm of RB_solution.
+   * @return a scaling factor that we can use to provide a consistent
+   * scaling of the RB error bound across different parameter values.
    */
-  virtual Real get_rb_solution_norm();
+  virtual Real get_error_bound_normalization();
 
   /**
    * Compute the dual norm of the residual for the solution

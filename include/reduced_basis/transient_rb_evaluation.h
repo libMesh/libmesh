@@ -98,9 +98,10 @@ public:
   virtual Real rb_solve_again();
 
   /**
-   * Override to return the L2 norm of RB_solution.
+   * @return a scaling factor that we can use to provide a consistent
+   * scaling of the RB error bound across different parameter values.
    */
-  virtual Real get_rb_solution_norm() libmesh_override;
+  virtual Real get_error_bound_normalization() libmesh_override;
 
   /**
    * Specifies the residual scaling on the numerator to

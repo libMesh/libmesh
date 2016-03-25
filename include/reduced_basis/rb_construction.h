@@ -186,6 +186,13 @@ public:
   Real get_abs_training_tolerance() { return abs_training_tolerance; }
 
   /**
+   * Get/set the boolean to indicate if we normalize the RB error in the greedy.
+   */
+  void set_normalize_rb_bound_in_greedy(bool normalize_rb_bound_in_greedy)
+  {this->normalize_rb_bound_in_greedy = normalize_rb_bound_in_greedy; }
+  bool get_normalize_rb_bound_in_greedy() { return normalize_rb_bound_in_greedy; }
+
+  /**
    * Get/set Nmax, the maximum number of RB
    * functions we are willing to compute.
    */
@@ -358,6 +365,7 @@ public:
                                       unsigned int Nmax_in,
                                       Real rel_training_tolerance_in,
                                       Real abs_training_tolerance_in,
+                                      bool normalize_rb_error_bound_in_greedy_in,
                                       RBParameters mu_min_in,
                                       RBParameters mu_max_in,
                                       std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
@@ -760,6 +768,12 @@ private:
    */
   Real rel_training_tolerance;
   Real abs_training_tolerance;
+
+  /**
+   * This boolean indicates if we normalize the RB error in the greedy using
+   * RBEvaluation::get_error_bound_normalization().
+   */
+  bool normalize_rb_bound_in_greedy;
 
 };
 

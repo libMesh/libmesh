@@ -77,7 +77,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     rb_eval(libmesh_nullptr),
     inner_product_assembly(libmesh_nullptr),
     rel_training_tolerance(1.e-4),
-    abs_training_tolerance(1.e-12)
+    abs_training_tolerance(1.e-12),
+    normalize_rb_bound_in_greedy(false)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -227,13 +228,15 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
   unsigned int training_parameters_random_seed_in =
     static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
-                                              training_parameters_random_seed_in);
+                                               training_parameters_random_seed_in);
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
   const unsigned int Nmax_in = infile("Nmax", Nmax);
   const Real rel_training_tolerance_in = infile("rel_training_tolerance",
                                                  rel_training_tolerance);
   const Real abs_training_tolerance_in = infile("abs_training_tolerance",
                                                  abs_training_tolerance);
+  const bool normalize_rb_bound_in_greedy_in = infile("normalize_rb_bound_in_greedy",
+                                                       normalize_rb_bound_in_greedy_in);
 
   // Read in the parameters from the input file too
   unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
@@ -293,6 +296,7 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
                                  Nmax_in,
                                  rel_training_tolerance_in,
                                  abs_training_tolerance_in,
+                                 normalize_rb_bound_in_greedy_in,
                                  mu_min_in,
                                  mu_max_in,
                                  discrete_parameter_values_in,
@@ -307,6 +311,7 @@ void RBConstruction::set_rb_construction_parameters(
                                                     unsigned int Nmax_in,
                                                     Real rel_training_tolerance_in,
                                                     Real abs_training_tolerance_in,
+                                                    bool normalize_rb_bound_in_greedy_in,
                                                     RBParameters mu_min_in,
                                                     RBParameters mu_max_in,
                                                     std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
@@ -326,6 +331,8 @@ void RBConstruction::set_rb_construction_parameters(
   set_rel_training_tolerance(rel_training_tolerance_in);
   set_abs_training_tolerance(abs_training_tolerance_in);
 
+  set_normalize_rb_bound_in_greedy(normalize_rb_bound_in_greedy_in);
+
   // Initialize the parameter ranges and the parameters themselves
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
@@ -344,6 +351,7 @@ void RBConstruction::print_info()
   libMesh::out << "Nmax: " << Nmax << std::endl;
   libMesh::out << "Greedy relative error tolerance: " << get_rel_training_tolerance() << std::endl;
   libMesh::out << "Greedy absolute error tolerance: " << get_abs_training_tolerance() << std::endl;
+  libMesh::out << "Do we normalize RB error bound in greedy? " << get_normalize_rb_bound_in_greedy() << std::endl;
   if( is_rb_eval_initialized() )
     {
       libMesh::out << "Aq operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
@@ -1271,6 +1279,23 @@ Real RBConstruction::get_RB_error_bound()
   get_rb_evaluation().set_parameters( get_parameters() );
 
   Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
+
+  if(normalize_rb_bound_in_greedy)
+  {
+    Real error_bound_normalization = get_rb_evaluation().get_error_bound_normalization();
+
+    if( (error_bound < abs_training_tolerance) ||
+        (error_bound_normalization < abs_training_tolerance) )
+    {
+      // We don't want to normalize this error bound if the bound or the
+      // normalization value are below the absolute tolerance. Hence do nothing
+      // in this case.
+    }
+    else
+    {
+      error_bound /= error_bound_normalization;
+    }
+  }
 
   return error_bound;
 }

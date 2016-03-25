@@ -418,19 +418,13 @@ Real TransientRBEvaluation::rb_solve_again()
   }
 }
 
-Real TransientRBEvaluation::get_rb_solution_norm()
+Real TransientRBEvaluation::get_error_bound_normalization()
 {
-  // Return the L2 norm of RB_solution
-  // After an rb_solve, RB_solution will hold the
-  // solution vector for the final time level.
+  // Just set the normalization factor to 1 in this case.
+  // Users can override this method if specific behavior
+  // is required.
 
-  const unsigned int N = RB_solution.size();
-  DenseVector<Number> temp(N);
-  DenseMatrix<Number> RB_L2_matrix_N;
-  RB_L2_matrix.get_principal_submatrix(N, RB_L2_matrix_N);
-  RB_L2_matrix_N.vector_mult(temp, RB_solution);
-
-  return libmesh_real(std::sqrt(RB_solution.dot(temp)));
+  return 1.;
 }
 
 Real TransientRBEvaluation::residual_scaling_numer(Real)
