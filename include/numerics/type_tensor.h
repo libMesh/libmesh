@@ -167,7 +167,7 @@ public:
   /**
    * Return one row of the tensor as a TypeVector.
    */
-  TypeVector<T> row(const unsigned int r);
+  TypeVector<T> row(const unsigned int r) const;
 
   /**
    * Add two tensors.
@@ -664,7 +664,7 @@ TypeTensor<T>::slice (const unsigned int i)
 template <typename T>
 inline
 TypeVector<T>
-TypeTensor<T>::row(const unsigned int r)
+TypeTensor<T>::row(const unsigned int r) const
 {
   TypeVector<T> return_vector;
 
