@@ -1924,8 +1924,7 @@ Optional Features:
                           (helps ccache)
   --disable-unordered-containers
                           Use map/set instead of unordered_map/unordered_set
-  --enable-unique-ptr     Use a true unique_ptr implementation instead of
-                          libMesh AutoPtr
+  --disable-unique-ptr    Use libMesh's deprecated, less safe AutoPtr
   --disable-warnings      Do not warn about deprecated, experimental, or
                           questionable code
   --enable-blocked-storage
@@ -31383,22 +31382,24 @@ $as_echo "configuring gdb command... \"$gdb_command\"" >&6; }
 
 
 # --------------------------------------------------------------
-# Use a true unique_ptr implementation - disabled by default.
+# Use a true unique_ptr implementation - enabled by default.
 #
 # When enabled, the 'UniquePtr' type in libMesh is a C++03/11
 # compatible (non-deprecated) unique_ptr type.  Otherwise, it is
 # libMesh's (deprecated) AutoPtr type, allowing for backwards
 # compatibility.
 #
-# At some point in the future, this option will become enabled by
-# default, forcing applications to either upgrade or explicitly
-# configure with --disable-unique-ptr.
+# We now have about a year of experience using --enable-unique-ptr
+# in MOOSE (first enabled April 2015) in both C++11 and C++03 modes,
+# and I'm reasonably confident about enabling this by default.
+# Turning this on also prevents really annoying bugs like the one
+# discussed in http://tinyurl.com/hz63wje
 # --------------------------------------------------------------
 # Check whether --enable-unique-ptr was given.
 if test "${enable_unique_ptr+set}" = set; then :
   enableval=$enable_unique_ptr; enableuniqueptr=$enableval
 else
-  enableuniqueptr=no
+  enableuniqueptr=yes
 fi
 
 
