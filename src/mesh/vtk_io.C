@@ -24,25 +24,11 @@
 #include "libmesh/vtk_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/equation_systems.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/edge_edge3.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_tri6.h"
-#include "libmesh/face_quad4.h"
-#include "libmesh/face_quad8.h"
-#include "libmesh/face_quad9.h"
-#include "libmesh/cell_tet4.h"
-#include "libmesh/cell_tet10.h"
-#include "libmesh/cell_prism6.h"
-#include "libmesh/cell_prism15.h"
-#include "libmesh/cell_prism18.h"
-#include "libmesh/cell_pyramid5.h"
-#include "libmesh/cell_hex8.h"
-#include "libmesh/cell_hex20.h"
-#include "libmesh/cell_hex27.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh_data.h"
+#include "libmesh/node.h"
+#include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_VTK
 
@@ -144,14 +130,14 @@ void VTKIO::nodes_to_vtk()
   MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
   for (; nd != nd_end; nd++, ++local_node_counter)
     {
-      Node * node = (*nd);
+      Node & node = **nd;
 
       double pnt[LIBMESH_DIM];
       for (unsigned int i=0; i<LIBMESH_DIM; ++i)
-        pnt[i] = (*node)(i);
+        pnt[i] = node(i);
 
       // Fill mapping between global and local node numbers
-      _local_node_map[node->id()] = local_node_counter;
+      _local_node_map[node.id()] = local_node_counter;
 
       // add point
       pcoords->InsertNextTupleValue(pnt);
@@ -205,7 +191,7 @@ void VTKIO::cells_to_vtk()
             {
               dof_id_type global_node_id = elem->node(i);
 
-              const Node * the_node = mesh.node_ptr(global_node_id);
+              const Node * the_node = mesh.query_node_ptr(global_node_id);
 
               // Error checking...
               if (the_node == libmesh_nullptr)
@@ -243,7 +229,7 @@ void VTKIO::cells_to_vtk()
 
 
 
-/*
+/**
  * FIXME: This is known to write nonsense on AMR meshes
  * and it strips the imaginary parts of complex Numbers
  */
@@ -298,19 +284,6 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems & es,
 
 
 
-// write out mesh data to the VTK file, this might come in handy to display
-// boundary conditions and material data
-// void VTKIO::meshdata_to_vtk(const MeshData & meshdata,
-//                             vtkUnstructuredGrid * grid)
-// {
-//   vtkPointData* pointdata = vtkPointData::New();
-//
-//   const unsigned int n_vn = meshdata.n_val_per_node();
-//   const unsigned int n_dat = meshdata.n_node_data();
-//
-//   pointdata->SetNumberOfTuples(n_dat);
-// }
-
 #endif // LIBMESH_HAVE_VTK
 
 
@@ -320,11 +293,10 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems & es,
 VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
+  _vtk_grid(libmesh_nullptr),
   _mesh_data(mesh_data),
-  _compress(false),
-  _local_node_map()
+  _compress(false)
 {
-  _vtk_grid = libmesh_nullptr;
   libmesh_experimental();
 }
 
@@ -333,11 +305,10 @@ VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
 // Constructor for writing
 VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
   MeshOutput<MeshBase>(mesh),
+  _vtk_grid(libmesh_nullptr),
   _mesh_data(mesh_data),
-  _compress(false),
-  _local_node_map()
+  _compress(false)
 {
-  _vtk_grid = libmesh_nullptr;
   libmesh_experimental();
 }
 
@@ -378,7 +349,7 @@ void VTKIO::read (const std::string & name)
   MyReader reader = MyReader::New();
 
   // Pass the filename along to the reader
-  reader->SetFileName( name.c_str() );
+  reader->SetFileName(name.c_str());
 
   // Force reading
   reader->Update();
@@ -456,7 +427,7 @@ void VTKIO::read (const std::string & name)
                       << " mesh file when configured without "  \
                       << mesh.mesh_dimension()                  \
                       << "D support.");
-#endif
+#endif // LIBMESH_DIM < 3
 
 #endif // LIBMESH_HAVE_VTK
 }

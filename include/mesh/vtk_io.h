@@ -33,10 +33,7 @@
 #include <map>
 
 // Forward declarations
-
 class vtkUnstructuredGrid;
-class vtkPoints;
-class vtkCellArray;
 
 namespace libMesh
 {
@@ -94,14 +91,14 @@ public:
   virtual void write (const std::string &) libmesh_override;
 
   /**
-   * Get a pointer to the VTK datastructure
-   */
-  vtkUnstructuredGrid * get_vtk_grid();
-
-  /**
    * Setter for compression flag
    */
   void set_compression(bool b);
+
+  /**
+   * Get a pointer to the VTK unstructed grid data structure.
+   */
+  vtkUnstructuredGrid * get_vtk_grid();
 
 private:
   /**
