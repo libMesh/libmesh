@@ -74,6 +74,10 @@ public:
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
+   *
+   * As with other Mesh IO classes, this interface is still still
+   * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
+   * runtime error.
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
@@ -82,13 +86,23 @@ public:
   /**
    * This method implements reading a mesh from a specified file
    * in VTK format.
+   *
+   * As with other Mesh IO classes, this interface is still still
+   * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
+   * runtime error.
    */
   virtual void read (const std::string &) libmesh_override;
 
   /**
-   * Output the mesh without solutions to a .pvtu file
+   * Output the mesh without solutions to a .pvtu file.
+   *
+   * As with other Mesh IO classes, this interface is still still
+   * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
+   * runtime error.
    */
   virtual void write (const std::string &) libmesh_override;
+
+#ifdef LIBMESH_HAVE_VTK
 
   /**
    * Setter for compression flag
@@ -112,10 +126,13 @@ private:
   void cells_to_vtk();
 
   /**
-   * write the system vectors to vtk
+   * Write the system vectors to vtk
+   *
+   * This function is not currently used by anything, so it is commented
+   * out, and may eventually be removed entirely.
    */
-  void system_vectors_to_vtk(const EquationSystems & es,
-                             vtkUnstructuredGrid * & grid);
+  // void system_vectors_to_vtk(const EquationSystems & es,
+  //                            vtkUnstructuredGrid * & grid);
 
   /**
    * pointer to the VTK grid
@@ -138,7 +155,6 @@ private:
    */
   std::map<dof_id_type, dof_id_type> _local_node_map;
 
-#ifdef LIBMESH_HAVE_VTK
 
   /**
    * Helper object that holds a map from VTK to libMesh element types
