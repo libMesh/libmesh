@@ -89,80 +89,41 @@ namespace libMesh
 {
 
 #ifdef LIBMESH_HAVE_VTK
-vtkIdType VTKIO::get_elem_type(ElemType type)
-{
-  vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
 
-  switch(type)
-    {
-    case EDGE2:
-      celltype = VTK_LINE;
-      break;
-    case EDGE3:
-      celltype = VTK_QUADRATIC_EDGE;
-      break;// 1
-    case TRI3:
-    case TRI3SUBDIVISION:
-      celltype = VTK_TRIANGLE;
-      break;// 3
-    case TRI6:
-      celltype = VTK_QUADRATIC_TRIANGLE;
-      break;// 4
-    case QUAD4:
-      celltype = VTK_QUAD;
-      break;// 5
-    case QUAD8:
-      celltype = VTK_QUADRATIC_QUAD;
-      break;// 6
-    case TET4:
-      celltype = VTK_TETRA;
-      break;// 8
-    case TET10:
-      celltype = VTK_QUADRATIC_TETRA;
-      break;// 9
-    case HEX8:
-      celltype = VTK_HEXAHEDRON;
-      break;// 10
-    case HEX20:
-      celltype = VTK_QUADRATIC_HEXAHEDRON;
-      break;// 12
-    case HEX27:
-      celltype = VTK_TRIQUADRATIC_HEXAHEDRON;
-      break;
-    case PRISM6:
-      celltype = VTK_WEDGE;
-      break;// 13
-    case PRISM15:
-      celltype = VTK_QUADRATIC_WEDGE;
-      break;// 14
-    case PRISM18:
-      celltype = VTK_BIQUADRATIC_QUADRATIC_WEDGE;
-      break;// 15
-    case PYRAMID5:
-      celltype = VTK_PYRAMID;
-      break;// 16
+// Initialize the static _element_maps struct.
+VTKIO::ElementMaps VTKIO::_element_maps = VTKIO::build_element_maps();
+
+// Static function which constructs the ElementMaps object.
+VTKIO::ElementMaps VTKIO::build_element_maps()
+{
+  // Object to be filled up
+  ElementMaps em;
+
+  em.associate(EDGE2, VTK_LINE);
+  em.associate(EDGE3, VTK_QUADRATIC_EDGE);
+  em.associate(TRI3, VTK_TRIANGLE);
+  em.associate(TRI6, VTK_QUADRATIC_TRIANGLE);
+  em.associate(QUAD4, VTK_QUAD);
+  em.associate(QUAD8, VTK_QUADRATIC_QUAD);
+  em.associate(TET4, VTK_TETRA);
+  em.associate(TET10, VTK_QUADRATIC_TETRA);
+  em.associate(HEX8, VTK_HEXAHEDRON);
+  em.associate(HEX20, VTK_QUADRATIC_HEXAHEDRON);
+  em.associate(HEX27, VTK_TRIQUADRATIC_HEXAHEDRON);
+  em.associate(PRISM6, VTK_WEDGE);
+  em.associate(PRISM15, VTK_QUADRATIC_WEDGE);
+  em.associate(PRISM18, VTK_BIQUADRATIC_QUADRATIC_WEDGE);
+  em.associate(PYRAMID5, VTK_PYRAMID);
+
+  // VTK_BIQUADRATIC_QUAD has been around since VTK 5.0
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-    case QUAD9:
-      celltype = VTK_BIQUADRATIC_QUAD;
-      break;
-#else
-    case QUAD9:
+  em.associate(QUAD9, VTK_BIQUADRATIC_QUAD);
 #endif
-    case EDGE4:
-    case INFEDGE2:
-    case INFQUAD4:
-    case INFQUAD6:
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-    case INFPRISM6:
-    case INFPRISM12:
-    case NODEELEM:
-    case INVALID_ELEM:
-    default:
-      libmesh_error_msg("Element type " << type << " not implemented.");
-    }
-  return celltype;
+
+  // TRI3SUBDIVISION is for writing only
+  em.writing_map[TRI3SUBDIVISION] = VTK_TRIANGLE;
+
+  return em;
 }
 
 
@@ -269,8 +230,8 @@ void VTKIO::cells_to_vtk()
         }
 
       vtkIdType vtkcellid = cells->InsertNextCell(pts);
-      types[active_element_counter] =
-        cast_int<int>(this->get_elem_type(elem->type()));
+      types[active_element_counter] = cast_int<int>(_element_maps.find(elem->type()));
+
       elem_id->InsertTuple1(vtkcellid, elem->id());
       subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
     } // end loop over active elements
@@ -457,62 +418,10 @@ void VTKIO::read (const std::string & name)
   for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
       vtkCell * cell = _vtk_grid->GetCell(i);
-      Elem * elem = libmesh_nullptr;
-      switch (cell->GetCellType())
-        {
-        case VTK_LINE:
-          elem = new Edge2;
-          break;
-        case VTK_QUADRATIC_EDGE:
-          elem = new Edge3;
-          break;
-        case VTK_TRIANGLE:
-          elem = new Tri3();
-          break;
-        case VTK_QUADRATIC_TRIANGLE:
-          elem = new Tri6();
-          break;
-        case VTK_QUAD:
-          elem = new Quad4();
-          break;
-        case VTK_QUADRATIC_QUAD:
-          elem = new Quad8();
-          break;
-#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-        case VTK_BIQUADRATIC_QUAD:
-          elem = new Quad9();
-          break;
-#endif
-        case VTK_TETRA:
-          elem = new Tet4();
-          break;
-        case VTK_QUADRATIC_TETRA:
-          elem = new Tet10();
-          break;
-        case VTK_WEDGE:
-          elem = new Prism6();
-          break;
-        case VTK_QUADRATIC_WEDGE:
-          elem = new Prism15();
-          break;
-        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
-          elem = new Prism18();
-          break;
-        case VTK_HEXAHEDRON:
-          elem = new Hex8();
-          break;
-        case VTK_QUADRATIC_HEXAHEDRON:
-          elem = new Hex20();
-          break;
-        case VTK_TRIQUADRATIC_HEXAHEDRON:
-          elem = new Hex27();
-          break;
-        case VTK_PYRAMID:
-          elem = new Pyramid5();
-          break;
-        default:
-          libmesh_error_msg("Element type not implemented in vtkinterface " << cell->GetCellType());
-        }
+
+      // Get the libMesh element type corresponding to this VTK element type.
+      ElemType libmesh_elem_type = _element_maps.find(cell->GetCellType());
+      Elem * elem = Elem::build(libmesh_elem_type).release();
 
       // get the straightforward numbering from the VTK cells
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
