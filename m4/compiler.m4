@@ -829,6 +829,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               # #266: 'function declared implicitly'
               #       Metis function "GKfree" caused this error
               #       in almost every file.
+              # #488: 'template parameter "Scalar1" is not used in declaring the
+              #       parameter types of function template'
+              #       This warning was generated from one of the type_vector.h
+              #       constructors that uses some SFINAE tricks.
               # #1476: 'field uses tail padding of a base class'
               # #1505: 'size of class is affected by tail padding'
               #        simply warns of a possible incompatibility with
@@ -837,10 +841,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               #        Well, duh, when the tested value is computed...  OK when it
               #        was from an assignment.
               PROFILING_FLAGS="-p"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488"
+              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488"
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
