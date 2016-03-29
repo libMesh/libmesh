@@ -165,9 +165,9 @@ public:
 
   bool is_grid_projection() { return false; }
 
-  Output eval_old_dof (const FEMContext & /* c */,
-                       unsigned int /* var_component */,
-                       unsigned int /* dof_index */)
+  void eval_old_dofs (const FEMContext & /* c */,
+                      unsigned int /* var_component */,
+                      std::vector<Output> /* values */)
   { libmesh_error(); }
 
 private:
@@ -204,12 +204,32 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
+  static void get_shape_outputs(FEBase& fe);
+
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
   void init_context (FEMContext & c)
   {
     c.set_algebraic_type(FEMContext::DOFS_ONLY);
+
+    // Loop over variables, to prerequest
+    for (unsigned int var=0; var!=sys.n_vars(); ++var)
+      {
+        FEBase * fe = libmesh_nullptr;
+        const std::set<unsigned char> & elem_dims =
+          old_context.elem_dimensions();
+
+        for (std::set<unsigned char>::const_iterator dim_it =
+               elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+          {
+            const unsigned char dim = *dim_it;
+            old_context.get_element_fe( var, fe, dim );
+            get_shape_outputs(*fe);
+          }
+      }
   }
+
+
 
   Output eval_at_node (const FEMContext & c,
                        unsigned int i,
@@ -221,42 +241,78 @@ public:
                        const Point & p,
                        Real /* time */ =0.)
   {
-    START_LOG ("component(c,i,p,t)", "OldSolutionValue");
+    START_LOG ("eval_at_point()", "OldSolutionValue");
     if (!this->check_old_context(c, p))
       {
-        STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
+        STOP_LOG ("eval_at_point()", "OldSolutionValue");
         return 0;
       }
 
     Output n;
     (old_context.*point_output)(i, p, n, out_of_elem_tol);
-    STOP_LOG ("component(c,i,p,t)", "OldSolutionValue");
+    STOP_LOG ("eval_at_point()", "OldSolutionValue");
     return n;
   }
 
   bool is_grid_projection() { return true; }
 
-  Output eval_old_dof (const FEMContext & c,
-                       unsigned int var,
-                       unsigned int dof_index)
+  void eval_old_dofs (const FEMContext & c,
+                      unsigned int var,
+                      std::vector<Output> & values)
   {
-    if (!this->check_old_context(c, c.get_elem().point(0)))
-      libmesh_error();
+    START_LOG ("eval_old_dofs()", "OldSolutionValue");
+
+    this->check_old_context(c);
 
     const std::vector<dof_id_type> & old_dof_indices =
       old_context.get_dof_indices(var);
 
-    libmesh_assert_greater(old_dof_indices.size(), dof_index);
+    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
 
-    const dof_id_type old_id = old_dof_indices[dof_index];
+    old_solution.get(old_dof_indices, values);
 
-    return old_solution(old_id);
+    STOP_LOG ("eval_old_dofs()", "OldSolutionValue");
   }
 
 protected:
+  void check_old_context (const FEMContext & c)
+  {
+    START_LOG ("check_old_context(c)", "OldSolutionValue");
+    const Elem & elem = c.get_elem();
+    if (last_elem != &elem)
+      {
+        if (elem.refinement_flag() == Elem::JUST_REFINED)
+          {
+            old_context.pre_fe_reinit(sys, elem.parent());
+          }
+        else if (elem.refinement_flag() == Elem::JUST_COARSENED)
+          {
+            libmesh_error();
+          }
+        else
+          {
+            if (!elem.old_dof_object)
+              {
+                libmesh_error();
+              }
+
+            old_context.pre_fe_reinit(sys, &elem);
+          }
+
+        last_elem = &elem;
+      }
+    else
+      {
+        libmesh_assert(old_context.has_elem());
+      }
+
+    STOP_LOG ("check_old_context(c)", "OldSolutionValue");
+  }
+
+
   bool check_old_context (const FEMContext & c, const Point & p)
   {
-    START_LOG ("check_old_context", "OldSolutionValue");
+    START_LOG ("check_old_context(c,p)", "OldSolutionValue");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -289,7 +345,7 @@ protected:
           {
             if (!elem.old_dof_object)
               {
-                STOP_LOG ("check_old_context", "OldSolutionValue");
+                STOP_LOG ("check_old_context(c,p)", "OldSolutionValue");
                 return false;
               }
 
@@ -321,7 +377,7 @@ protected:
           }
       }
 
-    STOP_LOG ("check_old_context", "OldSolutionValue");
+    STOP_LOG ("check_old_context(c,p)", "OldSolutionValue");
     return true;
   }
 
@@ -333,6 +389,22 @@ private:
 
   static const Real out_of_elem_tol;
 };
+
+
+template<>
+inline void
+OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase& fe)
+{
+  fe.get_phi();
+}
+
+
+template<>
+inline void
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase& fe)
+{
+  fe.get_dphi();
+}
 
 
 template<>
@@ -1154,21 +1226,31 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
-          // If this element hasn't been changed, and we're projecting
-          // from its old self, then we can simply move its old dof
-          // values to new indices.
+          // If we're projecting from an old grid
           if (f.is_grid_projection() &&
-              elem->refinement_flag() != Elem::JUST_REFINED &&
-              elem->refinement_flag() != Elem::JUST_COARSENED &&
-              elem->p_refinement_flag() != Elem::JUST_REFINED &&
-              elem->p_refinement_flag() != Elem::JUST_COARSENED)
+          // And either this is an unchanged element
+              ((elem->refinement_flag() != Elem::JUST_REFINED &&
+                elem->refinement_flag() != Elem::JUST_COARSENED &&
+                elem->p_refinement_flag() != Elem::JUST_REFINED &&
+                elem->p_refinement_flag() != Elem::JUST_COARSENED) ||
+	  // Or this is a low order monomial element which has merely
+	  // been h refined
+               (fe_type.family == MONOMIAL &&
+                fe_type.order == CONSTANT &&
+                elem->p_level() == 0 &&
+                elem->refinement_flag() != Elem::JUST_COARSENED &&
+                elem->p_refinement_flag() != Elem::JUST_COARSENED))
+             )
+          // then we can simply copy its old dof
+          // values to new indices.
             {
-              for (unsigned int d=0; d != n_dofs; ++d)
-                {
-                  Ue(d) = f.eval_old_dof(context, var_component, d);
-                }
+              START_LOG ("copy_dofs","GenericProjector");
+
+              f.eval_old_dofs(context, var_component, Ue.get_values());
 
               action.insert(context, var, Ue);
+
+              STOP_LOG ("copy_dofs","GenericProjector");
 
               continue;
             }
