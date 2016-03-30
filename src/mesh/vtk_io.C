@@ -75,8 +75,8 @@ namespace libMesh
 
 // Constructor for reading
 VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh)
+  MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
+  MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
   ,_vtk_grid(libmesh_nullptr)
   ,_mesh_data(mesh_data)
@@ -90,7 +90,7 @@ VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
 
 // Constructor for writing
 VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
-  MeshOutput<MeshBase>(mesh)
+  MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
   ,_vtk_grid(libmesh_nullptr)
   ,_mesh_data(mesh_data)
@@ -259,8 +259,17 @@ void VTKIO::write_nodal_data (const std::string & fname,
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // Is this really important?  If so, it should be more than an assert...
-  // libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
+  // Warn that the .pvtu file extension should be used.  Paraview
+  // recognizes this, and it works in both serial and parallel.  Only
+  // warn about this once.
+  if (fname.substr(fname.rfind("."), fname.size()) != ".pvtu")
+    libmesh_do_once(libMesh::err << "The .pvtu extension should be used when writing VTK files in libMesh.");
+
+  // The solution vector should not be empty, it should have been
+  // broadcast to all processors by the MeshOutput base class, since
+  // VTK is a parallel format.  Verify this before going further.
+  if (soln.empty())
+    libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
 
   // we only use Unstructured grids
   _vtk_grid = vtkUnstructuredGrid::New();
@@ -291,24 +300,18 @@ void VTKIO::write_nodal_data (const std::string & fname,
           // variable, if the node is in the current partition
           for (dof_id_type k=0; k<num_nodes; ++k)
             {
-              if (_local_node_map.find(k) == _local_node_map.end())
+              std::map<dof_id_type, dof_id_type>::iterator local_node_it = _local_node_map.find(k);
+              if (local_node_it == _local_node_map.end())
                 continue; // not a local node
 
-              if (!soln.empty())
-                {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                  libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-                                   << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-                                   << std::endl);
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
+              libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
+                               << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+                               << std::endl);
+              data->SetValue(local_node_it->second, soln[k*num_vars + variable].real());
 #else
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
+              data->SetValue(local_node_it->second, soln[k*num_vars + variable]);
 #endif
-                }
-              else
-                {
-                  data->SetValue(_local_node_map[k], 0);
-                }
             }
           _vtk_grid->GetPointData()->AddArray(data);
         }
@@ -424,6 +427,10 @@ void VTKIO::cells_to_vtk()
   subdomain_id->SetName("subdomain_id");
   subdomain_id->SetNumberOfComponents(1);
 
+  vtkSmartPointer<vtkIntArray> elem_proc_id = vtkSmartPointer<vtkIntArray>::New();
+  elem_proc_id->SetName("processor_id");
+  elem_proc_id->SetNumberOfComponents(1);
+
   MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
   for (; it != end; ++it, ++active_element_counter)
@@ -474,11 +481,13 @@ void VTKIO::cells_to_vtk()
 
       elem_id->InsertTuple1(vtkcellid, elem->id());
       subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
+      elem_proc_id->InsertTuple1(vtkcellid, elem->processor_id());
     } // end loop over active elements
 
   _vtk_grid->SetCells(&types[0], cells);
   _vtk_grid->GetCellData()->AddArray(elem_id);
   _vtk_grid->GetCellData()->AddArray(subdomain_id);
+  _vtk_grid->GetCellData()->AddArray(elem_proc_id);
 }
 
 
