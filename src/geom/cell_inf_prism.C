@@ -39,20 +39,20 @@ namespace libMesh
 
 // We need to require C++11...
 const Real InfPrism::_master_points[12][3] =
-  {
-    {0, 0, 0},
-    {1, 0, 0},
-    {0, 1, 0},
-    {0, 0, 1},
-    {1, 0, 1},
-    {0, 1, 1},
-    {.5, 0, 0},
-    {.5, .5, 0},
-    {0, .5, 0},
-    {.5, 0, 1},
-    {.5, .5, 1},
-    {0, .5, 1}
-  };
+{
+{0, 0, 0},
+{1, 0, 0},
+{0, 1, 0},
+{0, 0, 1},
+{1, 0, 1},
+{0, 1, 1},
+{.5, 0, 0},
+{.5, .5, 0},
+{0, .5, 0},
+{.5, 0, 1},
+{.5, .5, 1},
+{0, .5, 1}
+};
 
 
 
@@ -60,87 +60,87 @@ const Real InfPrism::_master_points[12][3] =
 // InfPrism class member functions
 dof_id_type InfPrism::key (const unsigned int s) const
 {
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-    case 0: // the triangular face at z=-1, base face
-      return this->compute_key (this->node(InfPrism6::side_nodes_map[s][0]),
-                                this->node(InfPrism6::side_nodes_map[s][1]),
-                                this->node(InfPrism6::side_nodes_map[s][2]));
+switch (s)
+{
+case 0: // the triangular face at z=-1, base face
+return this->compute_key (this->node(InfPrism6::side_nodes_map[s][0]),
+this->node(InfPrism6::side_nodes_map[s][1]),
+this->node(InfPrism6::side_nodes_map[s][2]));
 
-    case 1: // the quad face at y=0
-    case 2: // the other quad face
-    case 3: // the quad face at x=0
-      return this->compute_key (this->node(InfPrism6::side_nodes_map[s][0]),
-                                this->node(InfPrism6::side_nodes_map[s][1]),
-                                this->node(InfPrism6::side_nodes_map[s][2]),
-                                this->node(InfPrism6::side_nodes_map[s][3]));
+case 1: // the quad face at y=0
+case 2: // the other quad face
+case 3: // the quad face at x=0
+return this->compute_key (this->node(InfPrism6::side_nodes_map[s][0]),
+this->node(InfPrism6::side_nodes_map[s][1]),
+this->node(InfPrism6::side_nodes_map[s][2]),
+this->node(InfPrism6::side_nodes_map[s][3]));
 
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
-    }
+default:
+libmesh_error_msg("Invalid side s = " << s);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 }
 
 
 
 UniquePtr<Elem> InfPrism::side (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  Elem * face = libmesh_nullptr;
+Elem * face = libmesh_nullptr;
 
-  switch (i)
-    {
-    case 0: // the triangular face at z=-1, base face
-      {
-        face = new Tri3;
-        break;
-      }
+switch (i)
+{
+case 0: // the triangular face at z=-1, base face
+{
+face = new Tri3;
+break;
+}
 
-    case 1: // the quad face at y=0
-    case 2: // the other quad face
-    case 3: // the quad face at x=0
-      {
-        face = new InfQuad4;
-        break;
-      }
+case 1: // the quad face at y=0
+case 2: // the other quad face
+case 3: // the quad face at x=0
+{
+face = new InfQuad4;
+break;
+}
 
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
-    }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-  // Set the nodes
-  for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(InfPrism6::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(InfPrism6::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(face);
+return UniquePtr<Elem>(face);
 }
 
 
 
 bool InfPrism::is_child_on_side(const unsigned int c,
-                                const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (c, this->n_children());
+libmesh_assert_less (s, this->n_sides());
 
-  return (s == 0 || c+1 == s || c == s%3);
+return (s == 0 || c+1 == s || c == s%3);
 }
 
 
 
 bool InfPrism::is_edge_on_side (const unsigned int e,
-                                const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (e, this->n_edges());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (e, this->n_edges());
+libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(InfPrism6::edge_nodes_map[e][0],s) &&
-          is_node_on_side(InfPrism6::edge_nodes_map[e][1],s));
+return (is_node_on_side(InfPrism6::edge_nodes_map[e][0],s) &&
+is_node_on_side(InfPrism6::edge_nodes_map[e][1],s));
 }
 
 

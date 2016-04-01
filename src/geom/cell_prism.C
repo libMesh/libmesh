@@ -34,26 +34,26 @@ namespace libMesh
 
 // We need to require C++11...
 const Real Prism::_master_points[18][3] =
-  {
-    {0, 0, -1},
-    {1, 0, -1},
-    {0, 1, -1},
-    {0, 0, 1},
-    {1, 0, 1},
-    {0, 1, 1},
-    {0.5, 0, -1},
-    {0.5, 0.5, -1},
-    {0, 0.5, -1},
-    {0, 0, 0},
-    {1, 0, 0},
-    {0, 1, 0},
-    {0.5, 0, 1},
-    {0.5, 0.5, 1},
-    {0, 0.5, 1},
-    {0.5, 0, 0},
-    {0.5, 0.5, 0},
-    {0, 0.5, 0}
-  };
+{
+{0, 0, -1},
+{1, 0, -1},
+{0, 1, -1},
+{0, 0, 1},
+{1, 0, 1},
+{0, 1, 1},
+{0.5, 0, -1},
+{0.5, 0.5, -1},
+{0, 0.5, -1},
+{0, 0, 0},
+{1, 0, 0},
+{0, 1, 0},
+{0.5, 0, 1},
+{0.5, 0.5, 1},
+{0, 0.5, 1},
+{0.5, 0, 0},
+{0.5, 0.5, 0},
+{0, 0.5, 0}
+};
 
 
 
@@ -62,125 +62,125 @@ const Real Prism::_master_points[18][3] =
 // Prism class member functions
 dof_id_type Prism::key (const unsigned int s) const
 {
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-    case 0: // the triangular face at z=0
-    case 4: // the triangular face at z=1
-      return this->compute_key (this->node(Prism6::side_nodes_map[s][0]),
-                                this->node(Prism6::side_nodes_map[s][1]),
-                                this->node(Prism6::side_nodes_map[s][2]));
+switch (s)
+{
+case 0: // the triangular face at z=0
+case 4: // the triangular face at z=1
+return this->compute_key (this->node(Prism6::side_nodes_map[s][0]),
+this->node(Prism6::side_nodes_map[s][1]),
+this->node(Prism6::side_nodes_map[s][2]));
 
-    case 1: // the quad face at y=0
-    case 2: // the other quad face
-    case 3: // the quad face at x=0
-      return this->compute_key (this->node(Prism6::side_nodes_map[s][0]),
-                                this->node(Prism6::side_nodes_map[s][1]),
-                                this->node(Prism6::side_nodes_map[s][2]),
-                                this->node(Prism6::side_nodes_map[s][3]));
+case 1: // the quad face at y=0
+case 2: // the other quad face
+case 3: // the quad face at x=0
+return this->compute_key (this->node(Prism6::side_nodes_map[s][0]),
+this->node(Prism6::side_nodes_map[s][1]),
+this->node(Prism6::side_nodes_map[s][2]),
+this->node(Prism6::side_nodes_map[s][3]));
 
-    default:
-      libmesh_error_msg("Invalid side " << s);
-    }
+default:
+libmesh_error_msg("Invalid side " << s);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 }
 
 
 
 UniquePtr<Elem> Prism::side (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  Elem * face = libmesh_nullptr;
+Elem * face = libmesh_nullptr;
 
-  // Set up the type of element
-  switch (i)
-    {
-    case 0: // the triangular face at z=0
-    case 4: // the triangular face at z=1
-      {
-        face = new Tri3;
-        break;
-      }
-    case 1: // the quad face at y=0
-    case 2: // the other quad face
-    case 3: // the quad face at x=0
-      {
-        face = new Quad4;
-        break;
-      }
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
-    }
+// Set up the type of element
+switch (i)
+{
+case 0: // the triangular face at z=0
+case 4: // the triangular face at z=1
+{
+face = new Tri3;
+break;
+}
+case 1: // the quad face at y=0
+case 2: // the other quad face
+case 3: // the quad face at x=0
+{
+face = new Quad4;
+break;
+}
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-  // Set the nodes
-  for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(Prism6::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Prism6::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(face);
+return UniquePtr<Elem>(face);
 }
 
 
 
 bool Prism::is_child_on_side(const unsigned int c,
-                             const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (c, this->n_children());
+libmesh_assert_less (s, this->n_sides());
 
-  for (unsigned int i = 0; i != 4; ++i)
-    if (Prism6::side_elems_map[s][i] == c)
-      return true;
-  return false;
+for (unsigned int i = 0; i != 4; ++i)
+if (Prism6::side_elems_map[s][i] == c)
+return true;
+return false;
 }
 
 
 
 bool Prism::is_edge_on_side(const unsigned int e,
-                            const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (e, this->n_edges());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (e, this->n_edges());
+libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(Prism6::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Prism6::edge_nodes_map[e][1],s));
+return (is_node_on_side(Prism6::edge_nodes_map[e][0],s) &&
+is_node_on_side(Prism6::edge_nodes_map[e][1],s));
 }
 
 
 
 const unsigned short int Prism::_second_order_vertex_child_number[18] =
-  {
-    99,99,99,99,99,99, // Vertices
-    0,1,0,0,1,2,3,4,3, // Edges
-    0,1,0              // Faces
-  };
+{
+99,99,99,99,99,99, // Vertices
+0,1,0,0,1,2,3,4,3, // Edges
+0,1,0              // Faces
+};
 
 
 
 const unsigned short int Prism::_second_order_vertex_child_index[18] =
-  {
-    99,99,99,99,99,99, // Vertices
-    1,2,2,3,4,5,4,5,5, // Edges
-    4,5,5              // Faces
-  };
+{
+99,99,99,99,99,99, // Vertices
+1,2,2,3,4,5,4,5,5, // Edges
+4,5,5              // Faces
+};
 
 
 const unsigned short int Prism::_second_order_adjacent_vertices[9][2] =
-  {
-    { 0,  1}, // vertices adjacent to node 6
-    { 1,  2}, // vertices adjacent to node 7
-    { 0,  2}, // vertices adjacent to node 8
+{
+{ 0,  1}, // vertices adjacent to node 6
+{ 1,  2}, // vertices adjacent to node 7
+{ 0,  2}, // vertices adjacent to node 8
 
-    { 0,  3}, // vertices adjacent to node 9
-    { 1,  4}, // vertices adjacent to node 10
-    { 2,  5}, // vertices adjacent to node 11
+{ 0,  3}, // vertices adjacent to node 9
+{ 1,  4}, // vertices adjacent to node 10
+{ 2,  5}, // vertices adjacent to node 11
 
-    { 3,  4}, // vertices adjacent to node 12
-    { 4,  5}, // vertices adjacent to node 13
-    { 3,  5}  // vertices adjacent to node 14
-  };
+{ 3,  4}, // vertices adjacent to node 12
+{ 4,  5}, // vertices adjacent to node 13
+{ 3,  5}  // vertices adjacent to node 14
+};
 
 } // namespace libMesh

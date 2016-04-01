@@ -29,203 +29,203 @@ namespace libMesh
 {
 
 /**
- * This class is intended to be reseatable like a pointer-to-ostream
- * for flexibility, but to look like a reference when used to produce
- * less awkward user code.
- *
- * It is up to the user to ensure that the target ostream remains valid.
- *
- * \author Roy Stogner
- * \date 2010
- */
+* This class is intended to be reseatable like a pointer-to-ostream
+* for flexibility, but to look like a reference when used to produce
+* less awkward user code.
+*
+* It is up to the user to ensure that the target ostream remains valid.
+*
+* \author Roy Stogner
+* \date 2010
+*/
 template <typename charT=char, typename traits=std::char_traits<charT> >
 class BasicOStreamProxy
 {
 public:
-  /**
-   * This class is going to be used to proxy for ostream, but other
-   * character and traits types are possible
-   */
-  typedef std::basic_ostream<charT,traits> streamT;
+/**
+* This class is going to be used to proxy for ostream, but other
+* character and traits types are possible
+*/
+typedef std::basic_ostream<charT,traits> streamT;
 
-  /**
-   * This class is going to be used to proxy for ostream, but other
-   * character and traits types are possible
-   */
-  typedef std::basic_streambuf<charT,traits> streambufT;
+/**
+* This class is going to be used to proxy for ostream, but other
+* character and traits types are possible
+*/
+typedef std::basic_streambuf<charT,traits> streambufT;
 
-  /**
-   * Default constructor.  Takes a reference to the \p target ostream
-   * to which we pass output.  The user is responsible for ensuring
-   * that this target exists for as long as the proxy does.
-   */
-  BasicOStreamProxy (streamT & target) : _target(&target) {}
+/**
+* Default constructor.  Takes a reference to the \p target ostream
+* to which we pass output.  The user is responsible for ensuring
+* that this target exists for as long as the proxy does.
+*/
+BasicOStreamProxy (streamT & target) : _target(&target) {}
 
-  /**
-   * Shallow copy constructor.  Output in the new object is passed to
-   * the same target ostream as in the old object.  The user is
-   * responsible for ensuring that this target exists for as long as
-   * the proxies do.
-   */
-  BasicOStreamProxy (BasicOStreamProxy & old) : _target(old._target) {}
+/**
+* Shallow copy constructor.  Output in the new object is passed to
+* the same target ostream as in the old object.  The user is
+* responsible for ensuring that this target exists for as long as
+* the proxies do.
+*/
+BasicOStreamProxy (BasicOStreamProxy & old) : _target(old._target) {}
 
-  /**
-   * Reset the internal target to a new \p target output stream.
-   */
-  BasicOStreamProxy & operator= (streamT & target)
-  {
-    _target = &target;
-    return *this;
-  }
+/**
+* Reset the internal target to a new \p target output stream.
+*/
+BasicOStreamProxy & operator= (streamT & target)
+{
+_target = &target;
+return *this;
+}
 
-  /**
-   * Reset the target to the same output stream as in \p old
-   */
-  BasicOStreamProxy & operator= (const BasicOStreamProxy & old)
-  {
-    _target = old._target;
-    return *this;
-  }
+/**
+* Reset the target to the same output stream as in \p old
+*/
+BasicOStreamProxy & operator= (const BasicOStreamProxy & old)
+{
+_target = old._target;
+return *this;
+}
 
-  /**
-   * Default destructor.
-   */
-  ~BasicOStreamProxy () {}
+/**
+* Default destructor.
+*/
+~BasicOStreamProxy () {}
 
-  //
-  // Functions that get passed to the proxied target:
-  //
+//
+// Functions that get passed to the proxied target:
+//
 
-  /**
-   * Conversion to ostream &, for when we get passed to a function
-   * requesting one.
-   */
-  operator streamT & () { return *_target; }
+/**
+* Conversion to ostream &, for when we get passed to a function
+* requesting one.
+*/
+operator streamT & () { return *_target; }
 
-  /**
-   * Conversion to const ostream &, for when we get passed to a
-   * function requesting one.
-   */
-  operator const streamT &() const { return *_target; }
+/**
+* Conversion to const ostream &, for when we get passed to a
+* function requesting one.
+*/
+operator const streamT &() const { return *_target; }
 
-  /**
-   * Redirect any output to the target.
-   */
-  template<typename T>
-  BasicOStreamProxy & operator<< (const T & in) {
-    (*_target) << in; return *this;
-  }
+/**
+* Redirect any output to the target.
+*/
+template<typename T>
+BasicOStreamProxy & operator<< (const T & in) {
+(*_target) << in; return *this;
+}
 
-  /**
-   * Redirect any ostream manipulators to the target.
-   */
-  BasicOStreamProxy & operator<< (streamT & (*in)(streamT &)) {
-    (*_target) << in; return *this;
-  }
+/**
+* Redirect any ostream manipulators to the target.
+*/
+BasicOStreamProxy & operator<< (streamT & (*in)(streamT &)) {
+(*_target) << in; return *this;
+}
 
-  /**
-   * Redirect any ios manipulators to the target.
-   */
-  BasicOStreamProxy & operator<< (std::basic_ios<charT,traits> & (*in)(std::basic_ios<charT,traits> &)) {
-    (*_target) << in; return *this;
-  }
+/**
+* Redirect any ios manipulators to the target.
+*/
+BasicOStreamProxy & operator<< (std::basic_ios<charT,traits> & (*in)(std::basic_ios<charT,traits> &)) {
+(*_target) << in; return *this;
+}
 
-  /**
-   * Redirect any ios_base manipulators to the target.
-   */
-  BasicOStreamProxy & operator<< (std::ios_base & (*in)(std::ios_base &)) {
-    (*_target) << in; return *this;
-  }
+/**
+* Redirect any ios_base manipulators to the target.
+*/
+BasicOStreamProxy & operator<< (std::ios_base & (*in)(std::ios_base &)) {
+(*_target) << in; return *this;
+}
 
-  /**
-   * Get the associated stream buffer
-   */
-  streambufT * rdbuf () const { return _target->rdbuf(); }
+/**
+* Get the associated stream buffer
+*/
+streambufT * rdbuf () const { return _target->rdbuf(); }
 
-  /**
-   * Set the associated stream buffer
-   */
-  streambufT * rdbuf ( streambufT * sb ) { return _target->rdbuf(sb); }
+/**
+* Set the associated stream buffer
+*/
+streambufT * rdbuf ( streambufT * sb ) { return _target->rdbuf(sb); }
 
-  /**
-   * Flush the associated stream buffer
-   */
-  BasicOStreamProxy & flush () { _target->flush(); return *this; }
+/**
+* Flush the associated stream buffer
+*/
+BasicOStreamProxy & flush () { _target->flush(); return *this; }
 
-  /**
-   * Get the associated format flags
-   */
-  std::ios_base::fmtflags flags ( ) const
-  { return _target->flags(); }
+/**
+* Get the associated format flags
+*/
+std::ios_base::fmtflags flags ( ) const
+{ return _target->flags(); }
 
-  /**
-   * Set/get the associated format flags
-   */
-  std::ios_base::fmtflags flags ( std::ios_base::fmtflags fmtfl )
-  { return _target->flags(fmtfl); }
+/**
+* Set/get the associated format flags
+*/
+std::ios_base::fmtflags flags ( std::ios_base::fmtflags fmtfl )
+{ return _target->flags(fmtfl); }
 
-  /**
-   * Set the associated flags
-   */
-  std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl )
-  { return _target->setf(fmtfl); }
+/**
+* Set the associated flags
+*/
+std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl )
+{ return _target->setf(fmtfl); }
 
-  /**
-   * Set the associated flags
-   */
-  std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl,
-                                 std::ios_base::fmtflags mask )
-  { return _target->setf(fmtfl, mask); }
+/**
+* Set the associated flags
+*/
+std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl,
+std::ios_base::fmtflags mask )
+{ return _target->setf(fmtfl, mask); }
 
-  /**
-   * Clear the associated flags
-   */
-  void unsetf ( std::ios_base::fmtflags mask )
-  { _target->unsetf(mask); }
+/**
+* Clear the associated flags
+*/
+void unsetf ( std::ios_base::fmtflags mask )
+{ _target->unsetf(mask); }
 
-  /**
-   * Get the associated write precision
-   */
-  std::streamsize precision () const
-  { return _target->precision(); }
+/**
+* Get the associated write precision
+*/
+std::streamsize precision () const
+{ return _target->precision(); }
 
-  /**
-   * Set the associated write precision
-   */
-  std::streamsize precision ( std::streamsize prec )
-  { return _target->precision(prec); }
+/**
+* Set the associated write precision
+*/
+std::streamsize precision ( std::streamsize prec )
+{ return _target->precision(prec); }
 
-  //
-  // Functions that affect the Proxy class:
-  //
+//
+// Functions that affect the Proxy class:
+//
 
-  /**
-   * Reset the proxy to point to a different \p target.  Note that this
-   * does not delete the previous target.
-   */
-  void reset (streamT & target) { _target = &target; }
+/**
+* Reset the proxy to point to a different \p target.  Note that this
+* does not delete the previous target.
+*/
+void reset (streamT & target) { _target = &target; }
 
-  /**
-   * Rather than implement every ostream/ios/ios_base function, we'll
-   * be lazy and make esoteric uses go through a \p get() function.
-   */
-  streamT * get() {
-    return _target;
-  }
+/**
+* Rather than implement every ostream/ios/ios_base function, we'll
+* be lazy and make esoteric uses go through a \p get() function.
+*/
+streamT * get() {
+return _target;
+}
 
-  /**
-   * Rather than implement every ostream/ios/ios_base function, we'll
-   * be lazy and make esoteric uses go through a \p get() function.
-   */
-  const streamT * get() const {
-    return _target;
-  }
+/**
+* Rather than implement every ostream/ios/ios_base function, we'll
+* be lazy and make esoteric uses go through a \p get() function.
+*/
+const streamT * get() const {
+return _target;
+}
 
 private:
-  /**
-   * The pointer to the "real" ostream we send everything to.
-   */
-  streamT * _target;
+/**
+* The pointer to the "real" ostream we send everything to.
+*/
+streamT * _target;
 };
 
 typedef BasicOStreamProxy<> OStreamProxy;

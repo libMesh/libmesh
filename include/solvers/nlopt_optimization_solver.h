@@ -38,170 +38,170 @@ namespace libMesh
 
 // NLopt callback to set the objective function.
 double __libmesh_nlopt_objective(unsigned n,
-                                 const double * x,
-                                 double * gradient,
-                                 void * data);
+const double * x,
+double * gradient,
+void * data);
 
 // NLopt callback to set equality constraints.
 void __libmesh_nlopt_equality_constraints(unsigned m,
-                                          double * result,
-                                          unsigned n,
-                                          const double * x,
-                                          double * gradient,
-                                          void * data);
+double * result,
+unsigned n,
+const double * x,
+double * gradient,
+void * data);
 
 // NLopt callback to set inequality constraints.
 void __libmesh_nlopt_inequality_constraints(unsigned m,
-                                            double * result,
-                                            unsigned n,
-                                            const double * x,
-                                            double * gradient,
-                                            void * data);
+double * result,
+unsigned n,
+const double * x,
+double * gradient,
+void * data);
 
 /**
- * This class provides an interface to the NLopt optimization solvers.
- * http://ab-initio.mit.edu/wiki/index.php/NLopt
- *
- * \author David Knezevic
- * \author John Peterson
- * \date 2015
- */
+* This class provides an interface to the NLopt optimization solvers.
+* http://ab-initio.mit.edu/wiki/index.php/NLopt
+*
+* \author David Knezevic
+* \author John Peterson
+* \date 2015
+*/
 template <typename T>
 class NloptOptimizationSolver : public OptimizationSolver<T>
 {
 public:
 
-  /**
-   * The type of system that we use in conjunction with this solver.
-   */
-  typedef OptimizationSystem sys_type;
+/**
+* The type of system that we use in conjunction with this solver.
+*/
+typedef OptimizationSystem sys_type;
 
-  /**
-   * Constructor.
-   */
-  explicit
-  NloptOptimizationSolver (sys_type & system);
+/**
+* Constructor.
+*/
+explicit
+NloptOptimizationSolver (sys_type & system);
 
-  /**
-   * Destructor.
-   */
-  ~NloptOptimizationSolver ();
+/**
+* Destructor.
+*/
+~NloptOptimizationSolver ();
 
-  /**
-   * Release all memory and clear data structures.
-   */
-  virtual void clear () libmesh_override;
+/**
+* Release all memory and clear data structures.
+*/
+virtual void clear () libmesh_override;
 
-  /**
-   * Initialize data structures if not done so already.
-   */
-  virtual void init () libmesh_override;
+/**
+* Initialize data structures if not done so already.
+*/
+virtual void init () libmesh_override;
 
-  /**
-   * Returns the raw NLopt object.
-   */
-  nlopt_opt get_nlopt_object() { this->init(); return _opt; }
+/**
+* Returns the raw NLopt object.
+*/
+nlopt_opt get_nlopt_object() { this->init(); return _opt; }
 
-  /**
-   * Call the NLopt solver.
-   */
-  virtual void solve () libmesh_override;
+/**
+* Call the NLopt solver.
+*/
+virtual void solve () libmesh_override;
 
-  /**
-   * Prints a useful message about why the latest optimization solve
-   * con(di)verged.
-   */
-  virtual void print_converged_reason() libmesh_override;
+/**
+* Prints a useful message about why the latest optimization solve
+* con(di)verged.
+*/
+virtual void print_converged_reason() libmesh_override;
 
-  /**
-   * Returns the currently-available (or most recently obtained, if the NLopt object has
-   * been destroyed) convergence reason.  Refer to NLopt docs for the meaning of different
-   * the value.
-   */
-  virtual int get_converged_reason() libmesh_override;
+/**
+* Returns the currently-available (or most recently obtained, if the NLopt object has
+* been destroyed) convergence reason.  Refer to NLopt docs for the meaning of different
+* the value.
+*/
+virtual int get_converged_reason() libmesh_override;
 
-  /**
-   * Returns a writeable reference to the current iteration count
-   * which can be incremented in the objective function.
-   */
-  unsigned & get_iteration_count() { return _iteration_count; }
+/**
+* Returns a writeable reference to the current iteration count
+* which can be incremented in the objective function.
+*/
+unsigned & get_iteration_count() { return _iteration_count; }
 
 protected:
 
-  /**
-   * Optimization solver context
-   */
-  nlopt_opt _opt;
+/**
+* Optimization solver context
+*/
+nlopt_opt _opt;
 
-  /**
-   * Store the result (i.e. convergence/divergence) for the most recent NLopt solve.
-   */
-  nlopt_result _result;
+/**
+* Store the result (i.e. convergence/divergence) for the most recent NLopt solve.
+*/
+nlopt_result _result;
 
-  /**
-   * Stores the current iteration index (incremented at each call of __libmesh_nlopt_objective).
-   */
-  unsigned _iteration_count;
+/**
+* Stores the current iteration index (incremented at each call of __libmesh_nlopt_objective).
+*/
+unsigned _iteration_count;
 
-  /**
-   * NLopt requires us to specify a tolerance for the constraints.
-   */
-  double _constraints_tolerance;
+/**
+* NLopt requires us to specify a tolerance for the constraints.
+*/
+double _constraints_tolerance;
 
 private:
 
-  // Make NLopt callback functions friends
-  friend double __libmesh_nlopt_objective (unsigned n,
-                                           const double * x,
-                                           double * gradient,
-                                           void * data);
+// Make NLopt callback functions friends
+friend double __libmesh_nlopt_objective (unsigned n,
+const double * x,
+double * gradient,
+void * data);
 
-  friend void __libmesh_nlopt_equality_constraints(unsigned m,
-                                                   double * result,
-                                                   unsigned n,
-                                                   const double * x,
-                                                   double * gradient,
-                                                   void * data);
+friend void __libmesh_nlopt_equality_constraints(unsigned m,
+double * result,
+unsigned n,
+const double * x,
+double * gradient,
+void * data);
 
-  friend void __libmesh_nlopt_inequality_constraints(unsigned m,
-                                                     double * result,
-                                                     unsigned n,
-                                                     const double * x,
-                                                     double * gradient,
-                                                     void * data);
+friend void __libmesh_nlopt_inequality_constraints(unsigned m,
+double * result,
+unsigned n,
+const double * x,
+double * gradient,
+void * data);
 
-  // Map between strings and NLopt algorithms for command line parsing.
-  static std::map<std::string, nlopt_algorithm> _nlopt_algorithms;
+// Map between strings and NLopt algorithms for command line parsing.
+static std::map<std::string, nlopt_algorithm> _nlopt_algorithms;
 
-  // Static function used to initialize the _nlopt_algorithms map, see
-  // below for its use.  Naming scheme:
-  // G/L == global/local optimization
-  // N/D == no/yes gradient required
-  // See the full list of algorithms at:
-  // http://ab-initio.mit.edu/wiki/index.php/NLopt_Algorithms
-  static std::map<std::string, nlopt_algorithm> build_map()
-  {
-    std::map<std::string, nlopt_algorithm> ret;
-    ret["LD_SLSQP"]                   = NLOPT_LD_SLSQP;
-    ret["LD_MMA"]                     = NLOPT_LD_MMA;
-    ret["LD_CCSAQ"]                   = NLOPT_LD_CCSAQ;
-    ret["LD_LBFGS"]                   = NLOPT_LD_LBFGS;
-    ret["LD_LBFGS_NOCEDAL"]           = NLOPT_LD_LBFGS_NOCEDAL;
-    ret["LD_TNEWTON"]                 = NLOPT_LD_TNEWTON;
-    ret["LD_TNEWTON_RESTART"]         = NLOPT_LD_TNEWTON_RESTART;
-    ret["LD_TNEWTON_PRECOND"]         = NLOPT_LD_TNEWTON_PRECOND;
-    ret["LD_TNEWTON_PRECOND_RESTART"] = NLOPT_LD_TNEWTON_PRECOND_RESTART;
-    ret["LD_AUGLAG"]                  = NLOPT_LD_AUGLAG;
-    ret["LD_VAR1"]                    = NLOPT_LD_VAR1;
-    ret["LD_VAR2"]                    = NLOPT_LD_VAR2;
-    ret["LN_COBYLA"]                  = NLOPT_LN_COBYLA;
-    ret["LN_BOBYQA"]                  = NLOPT_LN_BOBYQA;
-    ret["LN_PRAXIS"]                  = NLOPT_LN_PRAXIS;
-    ret["LN_NELDERMEAD"]              = NLOPT_LN_NELDERMEAD;
-    ret["LN_SBPLX"]                   = NLOPT_LN_SBPLX;
-    ret["GN_ISRES"]                   = NLOPT_GN_ISRES;
-    return ret;
-  }
+// Static function used to initialize the _nlopt_algorithms map, see
+// below for its use.  Naming scheme:
+// G/L == global/local optimization
+// N/D == no/yes gradient required
+// See the full list of algorithms at:
+// http://ab-initio.mit.edu/wiki/index.php/NLopt_Algorithms
+static std::map<std::string, nlopt_algorithm> build_map()
+{
+std::map<std::string, nlopt_algorithm> ret;
+ret["LD_SLSQP"]                   = NLOPT_LD_SLSQP;
+ret["LD_MMA"]                     = NLOPT_LD_MMA;
+ret["LD_CCSAQ"]                   = NLOPT_LD_CCSAQ;
+ret["LD_LBFGS"]                   = NLOPT_LD_LBFGS;
+ret["LD_LBFGS_NOCEDAL"]           = NLOPT_LD_LBFGS_NOCEDAL;
+ret["LD_TNEWTON"]                 = NLOPT_LD_TNEWTON;
+ret["LD_TNEWTON_RESTART"]         = NLOPT_LD_TNEWTON_RESTART;
+ret["LD_TNEWTON_PRECOND"]         = NLOPT_LD_TNEWTON_PRECOND;
+ret["LD_TNEWTON_PRECOND_RESTART"] = NLOPT_LD_TNEWTON_PRECOND_RESTART;
+ret["LD_AUGLAG"]                  = NLOPT_LD_AUGLAG;
+ret["LD_VAR1"]                    = NLOPT_LD_VAR1;
+ret["LD_VAR2"]                    = NLOPT_LD_VAR2;
+ret["LN_COBYLA"]                  = NLOPT_LN_COBYLA;
+ret["LN_BOBYQA"]                  = NLOPT_LN_BOBYQA;
+ret["LN_PRAXIS"]                  = NLOPT_LN_PRAXIS;
+ret["LN_NELDERMEAD"]              = NLOPT_LN_NELDERMEAD;
+ret["LN_SBPLX"]                   = NLOPT_LN_SBPLX;
+ret["GN_ISRES"]                   = NLOPT_GN_ISRES;
+return ret;
+}
 };
 
 

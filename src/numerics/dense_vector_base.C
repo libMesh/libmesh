@@ -31,27 +31,27 @@ void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision
 {
 #ifndef LIBMESH_BROKEN_IOSTREAM
 
-  // save the initial format flags
-  std::ios_base::fmtflags os_flags = os.flags();
+// save the initial format flags
+std::ios_base::fmtflags os_flags = os.flags();
 
-  // Print the vector entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setw(10)
-       << std::scientific
-       << std::setprecision(precision)
-       << this->el(i)
-       << std::endl;
+// Print the vector entries.
+for (unsigned int i=0; i<this->size(); i++)
+os << std::setw(10)
+<< std::scientific
+<< std::setprecision(precision)
+<< this->el(i)
+<< std::endl;
 
-  // reset the original format flags
-  os.flags(os_flags);
+// reset the original format flags
+os.flags(os_flags);
 
 #else
 
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setprecision(precision)
-       << this->el(i)
-       << std::endl;
+// Print the matrix entries.
+for (unsigned int i=0; i<this->size(); i++)
+os << std::setprecision(precision)
+<< this->el(i)
+<< std::endl;
 
 #endif
 }
@@ -61,10 +61,10 @@ void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision
 template<typename T>
 void DenseVectorBase<T>::print (std::ostream & os) const
 {
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setw(8)
-       << this->el(i)
-       << std::endl;
+for (unsigned int i=0; i<this->size(); i++)
+os << std::setw(8)
+<< this->el(i)
+<< std::endl;
 }
 
 

@@ -38,79 +38,79 @@ namespace libMesh
 
 // We need to require C++11...
 const Real InfQuad::_master_points[6][3] =
-  {
-    {-1, 0},
-    {1, 0},
-    {-1, 1},
-    {1, 1},
-    {0, 0},
-    {0, 1}
-  };
+{
+{-1, 0},
+{1, 0},
+{-1, 1},
+{1, 1},
+{0, 0},
+{0, 1}
+};
 
 
 // ------------------------------------------------------------
 // InfQuad class member functions
 dof_id_type InfQuad::key (const unsigned int s) const
 {
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (s, this->n_sides());
 
-  // The order of the node ids does not matter, they are sorted by the
-  // compute_key() function.
-  return this->compute_key(this->node(InfQuad4::side_nodes_map[s][0]),
-                           this->node(InfQuad4::side_nodes_map[s][1]));
+// The order of the node ids does not matter, they are sorted by the
+// compute_key() function.
+return this->compute_key(this->node(InfQuad4::side_nodes_map[s][0]),
+this->node(InfQuad4::side_nodes_map[s][1]));
 }
 
 
 
 UniquePtr<Elem> InfQuad::side (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an UniquePtr
-  Elem * edge = libmesh_nullptr;
+// To be returned wrapped in an UniquePtr
+Elem * edge = libmesh_nullptr;
 
-  switch (i)
-    {
-    case 0: // base face
-      {
-        edge = new Edge2;
-        break;
-      }
+switch (i)
+{
+case 0: // base face
+{
+edge = new Edge2;
+break;
+}
 
-    case 1: // adjacent to another infinite element
-    case 2: // adjacent to another infinite element
-      {
-        edge = new InfEdge2;
-        break;
-      }
+case 1: // adjacent to another infinite element
+case 2: // adjacent to another infinite element
+{
+edge = new InfEdge2;
+break;
+}
 
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
-    }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-  // Set the nodes
-  for (unsigned n=0; n<edge->n_nodes(); ++n)
-    edge->set_node(n) = this->get_node(InfQuad4::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<edge->n_nodes(); ++n)
+edge->set_node(n) = this->get_node(InfQuad4::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(edge);
+return UniquePtr<Elem>(edge);
 }
 
 
 
 bool InfQuad::is_child_on_side(const unsigned int c,
-                               const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (c, this->n_children());
+libmesh_assert_less (s, this->n_sides());
 
-  return (s == 0 || s == c+1);
+return (s == 0 || s == c+1);
 }
 
 
 
 Real InfQuad::quality (const ElemQuality) const
 {
-  return 0.; // Not implemented
+return 0.; // Not implemented
 }
 
 
@@ -118,75 +118,75 @@ Real InfQuad::quality (const ElemQuality) const
 
 std::pair<Real, Real> InfQuad::qual_bounds (const ElemQuality q) const
 {
-  std::pair<Real, Real> bounds;
+std::pair<Real, Real> bounds;
 
-  switch (q)
-    {
+switch (q)
+{
 
-    case ASPECT_RATIO:
-      bounds.first  = 1.;
-      bounds.second = 4.;
-      break;
+case ASPECT_RATIO:
+bounds.first  = 1.;
+bounds.second = 4.;
+break;
 
-    case SKEW:
-      bounds.first  = 0.;
-      bounds.second = 0.5;
-      break;
+case SKEW:
+bounds.first  = 0.;
+bounds.second = 0.5;
+break;
 
-    case TAPER:
-      bounds.first  = 0.;
-      bounds.second = 0.7;
-      break;
+case TAPER:
+bounds.first  = 0.;
+bounds.second = 0.7;
+break;
 
-    case WARP:
-      bounds.first  = 0.9;
-      bounds.second = 1.;
-      break;
+case WARP:
+bounds.first  = 0.9;
+bounds.second = 1.;
+break;
 
-    case STRETCH:
-      bounds.first  = 0.25;
-      bounds.second = 1.;
-      break;
+case STRETCH:
+bounds.first  = 0.25;
+bounds.second = 1.;
+break;
 
-    case MIN_ANGLE:
-      bounds.first  = 45.;
-      bounds.second = 90.;
-      break;
+case MIN_ANGLE:
+bounds.first  = 45.;
+bounds.second = 90.;
+break;
 
-    case MAX_ANGLE:
-      bounds.first  = 90.;
-      bounds.second = 135.;
-      break;
+case MAX_ANGLE:
+bounds.first  = 90.;
+bounds.second = 135.;
+break;
 
-    case CONDITION:
-      bounds.first  = 1.;
-      bounds.second = 4.;
-      break;
+case CONDITION:
+bounds.first  = 1.;
+bounds.second = 4.;
+break;
 
-    case JACOBIAN:
-      bounds.first  = 0.5;
-      bounds.second = 1.;
-      break;
+case JACOBIAN:
+bounds.first  = 0.5;
+bounds.second = 1.;
+break;
 
-    case SHEAR:
-    case SHAPE:
-    case SIZE:
-      bounds.first  = 0.3;
-      bounds.second = 1.;
-      break;
+case SHEAR:
+case SHAPE:
+case SIZE:
+bounds.first  = 0.3;
+bounds.second = 1.;
+break;
 
-    case DISTORTION:
-      bounds.first  = 0.6;
-      bounds.second = 1.;
-      break;
+case DISTORTION:
+bounds.first  = 0.6;
+bounds.second = 1.;
+break;
 
-    default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-      bounds.first  = -1;
-      bounds.second = -1;
-    }
+default:
+libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+bounds.first  = -1;
+bounds.second = -1;
+}
 
-  return bounds;
+return bounds;
 }
 
 } // namespace libMesh

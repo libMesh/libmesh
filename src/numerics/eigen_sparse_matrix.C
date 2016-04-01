@@ -38,23 +38,23 @@ namespace libMesh
 // EigenSparseMatrix members
 template <typename T>
 void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
-                                 const numeric_index_type n_in,
-                                 const numeric_index_type libmesh_dbg_var(m_l),
-                                 const numeric_index_type libmesh_dbg_var(n_l),
-                                 const numeric_index_type nnz,
-                                 const numeric_index_type,
-                                 const numeric_index_type)
+const numeric_index_type n_in,
+const numeric_index_type libmesh_dbg_var(m_l),
+const numeric_index_type libmesh_dbg_var(n_l),
+const numeric_index_type nnz,
+const numeric_index_type,
+const numeric_index_type)
 {
-  // noz ignored...  only used for multiple processors!
-  libmesh_assert_equal_to (m_in, m_l);
-  libmesh_assert_equal_to (n_in, n_l);
-  libmesh_assert_equal_to (m_in, n_in);
-  libmesh_assert_greater  (nnz, 0);
+// noz ignored...  only used for multiple processors!
+libmesh_assert_equal_to (m_in, m_l);
+libmesh_assert_equal_to (n_in, n_l);
+libmesh_assert_equal_to (m_in, n_in);
+libmesh_assert_greater  (nnz, 0);
 
-  _mat.resize(m_in, n_in);
-  _mat.reserve(Eigen::Matrix<numeric_index_type, Eigen::Dynamic, 1>::Constant(m_in,nnz));
+_mat.resize(m_in, n_in);
+_mat.reserve(Eigen::Matrix<numeric_index_type, Eigen::Dynamic, 1>::Constant(m_in,nnz));
 
-  this->_is_initialized = true;
+this->_is_initialized = true;
 }
 
 
@@ -62,77 +62,77 @@ void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
 template <typename T>
 void EigenSparseMatrix<T>::init ()
 {
-  // Ignore calls on initialized objects
-  if (this->initialized())
-    return;
+// Ignore calls on initialized objects
+if (this->initialized())
+return;
 
-  // We need the DofMap for this!
-  libmesh_assert(this->_dof_map);
+// We need the DofMap for this!
+libmesh_assert(this->_dof_map);
 
-  // Clear intialized matrices
-  if (this->initialized())
-    this->clear();
+// Clear intialized matrices
+if (this->initialized())
+this->clear();
 
-  const numeric_index_type n_rows   = this->_dof_map->n_dofs();
-  const numeric_index_type n_cols   = n_rows;
-
-#ifndef NDEBUG
-  // The following variables are only used for assertions,
-  // so avoid declaring them when asserts are inactive.
-  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(0);
-  const numeric_index_type m_l = n_l;
-#endif
-
-  // Laspack Matrices only work for uniprocessor cases
-  libmesh_assert_equal_to (n_rows, n_cols);
-  libmesh_assert_equal_to (m_l, n_rows);
-  libmesh_assert_equal_to (n_l, n_cols);
-
-  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
+const numeric_index_type n_rows   = this->_dof_map->n_dofs();
+const numeric_index_type n_cols   = n_rows;
 
 #ifndef NDEBUG
-  // The following variables are only used for assertions,
-  // so avoid declaring them when asserts are inactive.
-  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
+// The following variables are only used for assertions,
+// so avoid declaring them when asserts are inactive.
+const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(0);
+const numeric_index_type m_l = n_l;
 #endif
 
-  // Make sure the sparsity pattern isn't empty
-  libmesh_assert_equal_to (n_nz.size(), n_l);
-  libmesh_assert_equal_to (n_oz.size(), n_l);
+// Laspack Matrices only work for uniprocessor cases
+libmesh_assert_equal_to (n_rows, n_cols);
+libmesh_assert_equal_to (m_l, n_rows);
+libmesh_assert_equal_to (n_l, n_cols);
 
-  if (n_rows==0)
-    {
-      _mat.resize(0,0);
-      return;
-    }
+const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
 
-  _mat.resize(n_rows,n_cols);
-  _mat.reserve(n_nz);
+#ifndef NDEBUG
+// The following variables are only used for assertions,
+// so avoid declaring them when asserts are inactive.
+const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
+#endif
 
-  this->_is_initialized = true;
+// Make sure the sparsity pattern isn't empty
+libmesh_assert_equal_to (n_nz.size(), n_l);
+libmesh_assert_equal_to (n_oz.size(), n_l);
 
-  libmesh_assert_equal_to (n_rows, this->m());
-  libmesh_assert_equal_to (n_cols, this->n());
+if (n_rows==0)
+{
+_mat.resize(0,0);
+return;
+}
+
+_mat.resize(n_rows,n_cols);
+_mat.reserve(n_nz);
+
+this->_is_initialized = true;
+
+libmesh_assert_equal_to (n_rows, this->m());
+libmesh_assert_equal_to (n_cols, this->n());
 }
 
 
 
 template <typename T>
 void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
-                                      const std::vector<numeric_index_type> & rows,
-                                      const std::vector<numeric_index_type> & cols)
+const std::vector<numeric_index_type> & rows,
+const std::vector<numeric_index_type> & cols)
 
 {
-  libmesh_assert (this->initialized());
-  unsigned int n_rows = cast_int<unsigned int>(rows.size());
-  unsigned int n_cols = cast_int<unsigned int>(cols.size());
-  libmesh_assert_equal_to (dm.m(), n_rows);
-  libmesh_assert_equal_to (dm.n(), n_cols);
+libmesh_assert (this->initialized());
+unsigned int n_rows = cast_int<unsigned int>(rows.size());
+unsigned int n_cols = cast_int<unsigned int>(cols.size());
+libmesh_assert_equal_to (dm.m(), n_rows);
+libmesh_assert_equal_to (dm.n(), n_cols);
 
 
-  for (unsigned int i=0; i<n_rows; i++)
-    for (unsigned int j=0; j<n_cols; j++)
-      this->add(rows[i],cols[j],dm(i,j));
+for (unsigned int i=0; i<n_rows; i++)
+for (unsigned int j=0; j<n_cols; j++)
+this->add(rows[i],cols[j],dm(i,j));
 }
 
 
@@ -140,9 +140,9 @@ void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 template <typename T>
 void EigenSparseMatrix<T>::get_diagonal (NumericVector<T> & dest_in) const
 {
-  EigenSparseVector<T> & dest = cast_ref<EigenSparseVector<T> &>(dest_in);
+EigenSparseVector<T> & dest = cast_ref<EigenSparseVector<T> &>(dest_in);
 
-  dest._vec = _mat.diagonal();
+dest._vec = _mat.diagonal();
 }
 
 
@@ -150,17 +150,17 @@ void EigenSparseMatrix<T>::get_diagonal (NumericVector<T> & dest_in) const
 template <typename T>
 void EigenSparseMatrix<T>::get_transpose (SparseMatrix<T> & dest_in) const
 {
-  EigenSparseMatrix<T> & dest = cast_ref<EigenSparseMatrix<T> &>(dest_in);
+EigenSparseMatrix<T> & dest = cast_ref<EigenSparseMatrix<T> &>(dest_in);
 
-  dest._mat = _mat.transpose();
+dest._mat = _mat.transpose();
 }
 
 
 
 template <typename T>
 EigenSparseMatrix<T>::EigenSparseMatrix (const Parallel::Communicator & comm_in) :
-  SparseMatrix<T>(comm_in),
-  _closed (false)
+SparseMatrix<T>(comm_in),
+_closed (false)
 {
 }
 
@@ -169,7 +169,7 @@ EigenSparseMatrix<T>::EigenSparseMatrix (const Parallel::Communicator & comm_in)
 template <typename T>
 EigenSparseMatrix<T>::~EigenSparseMatrix ()
 {
-  this->clear ();
+this->clear ();
 }
 
 
@@ -177,10 +177,10 @@ EigenSparseMatrix<T>::~EigenSparseMatrix ()
 template <typename T>
 void EigenSparseMatrix<T>::clear ()
 {
-  _mat.resize(0,0);
+_mat.resize(0,0);
 
-  _closed = false;
-  this->_is_initialized = false;
+_closed = false;
+this->_is_initialized = false;
 }
 
 
@@ -188,7 +188,7 @@ void EigenSparseMatrix<T>::clear ()
 template <typename T>
 void EigenSparseMatrix<T>::zero ()
 {
-  _mat.setZero();
+_mat.setZero();
 }
 
 
@@ -196,9 +196,9 @@ void EigenSparseMatrix<T>::zero ()
 template <typename T>
 numeric_index_type EigenSparseMatrix<T>::m () const
 {
-  libmesh_assert (this->initialized());
+libmesh_assert (this->initialized());
 
-  return _mat.rows();
+return _mat.rows();
 }
 
 
@@ -206,9 +206,9 @@ numeric_index_type EigenSparseMatrix<T>::m () const
 template <typename T>
 numeric_index_type EigenSparseMatrix<T>::n () const
 {
-  libmesh_assert (this->initialized());
+libmesh_assert (this->initialized());
 
-  return _mat.cols();
+return _mat.cols();
 }
 
 
@@ -216,7 +216,7 @@ numeric_index_type EigenSparseMatrix<T>::n () const
 template <typename T>
 numeric_index_type EigenSparseMatrix<T>::row_start () const
 {
-  return 0;
+return 0;
 }
 
 
@@ -224,44 +224,44 @@ numeric_index_type EigenSparseMatrix<T>::row_start () const
 template <typename T>
 numeric_index_type EigenSparseMatrix<T>::row_stop () const
 {
-  return this->m();
+return this->m();
 }
 
 
 
 template <typename T>
 void EigenSparseMatrix<T>::set (const numeric_index_type i,
-                                const numeric_index_type j,
-                                const T value)
+const numeric_index_type j,
+const T value)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_less (i, this->m());
-  libmesh_assert_less (j, this->n());
+libmesh_assert (this->initialized());
+libmesh_assert_less (i, this->m());
+libmesh_assert_less (j, this->n());
 
-  _mat.coeffRef(i,j) = value;
+_mat.coeffRef(i,j) = value;
 }
 
 
 
 template <typename T>
 void EigenSparseMatrix<T>::add (const numeric_index_type i,
-                                const numeric_index_type j,
-                                const T value)
+const numeric_index_type j,
+const T value)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_less (i, this->m());
-  libmesh_assert_less (j, this->n());
+libmesh_assert (this->initialized());
+libmesh_assert_less (i, this->m());
+libmesh_assert_less (j, this->n());
 
-  _mat.coeffRef(i,j) += value;
+_mat.coeffRef(i,j) += value;
 }
 
 
 
 template <typename T>
 void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
-                                      const std::vector<numeric_index_type> & dof_indices)
+const std::vector<numeric_index_type> & dof_indices)
 {
-  this->add_matrix (dm, dof_indices, dof_indices);
+this->add_matrix (dm, dof_indices, dof_indices);
 }
 
 
@@ -269,13 +269,13 @@ void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 template <typename T>
 void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (this->m(), X_in.m());
-  libmesh_assert_equal_to (this->n(), X_in.n());
+libmesh_assert (this->initialized());
+libmesh_assert_equal_to (this->m(), X_in.m());
+libmesh_assert_equal_to (this->n(), X_in.n());
 
-  EigenSparseMatrix<T> & X = cast_ref<EigenSparseMatrix<T> &> (X_in);
+EigenSparseMatrix<T> & X = cast_ref<EigenSparseMatrix<T> &> (X_in);
 
-  _mat += X._mat*a_in;
+_mat += X._mat*a_in;
 }
 
 
@@ -283,13 +283,13 @@ void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> & X_in)
 
 template <typename T>
 T EigenSparseMatrix<T>::operator () (const numeric_index_type i,
-                                     const numeric_index_type j) const
+const numeric_index_type j) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_less (i, this->m());
-  libmesh_assert_less (j, this->n());
+libmesh_assert (this->initialized());
+libmesh_assert_less (i, this->m());
+libmesh_assert_less (j, this->n());
 
-  return _mat.coeff(i,j);
+return _mat.coeff(i,j);
 }
 
 
@@ -297,22 +297,22 @@ T EigenSparseMatrix<T>::operator () (const numeric_index_type i,
 template <typename T>
 Real EigenSparseMatrix<T>::l1_norm () const
 {
-  // There does not seem to be a straightforward way to iterate over
-  // the columns of an EigenSparseMatrix.  So we use some extra
-  // storage and keep track of the column sums while going over the
-  // row entries...
-  std::vector<Real> abs_col_sums(this->n());
+// There does not seem to be a straightforward way to iterate over
+// the columns of an EigenSparseMatrix.  So we use some extra
+// storage and keep track of the column sums while going over the
+// row entries...
+std::vector<Real> abs_col_sums(this->n());
 
-  // For a row-major Eigen SparseMatrix like we're using, the
-  // InnerIterator iterates over the non-zero entries of rows.
-  for (unsigned row=0; row<this->m(); ++row)
-    {
-      EigenSM::InnerIterator it(_mat, row);
-      for (; it; ++it)
-        abs_col_sums[it.col()] += std::abs(it.value());
-    }
+// For a row-major Eigen SparseMatrix like we're using, the
+// InnerIterator iterates over the non-zero entries of rows.
+for (unsigned row=0; row<this->m(); ++row)
+{
+EigenSM::InnerIterator it(_mat, row);
+for (; it; ++it)
+abs_col_sums[it.col()] += std::abs(it.value());
+}
 
-  return *(std::max_element(abs_col_sums.begin(), abs_col_sums.end()));
+return *(std::max_element(abs_col_sums.begin(), abs_col_sums.end()));
 }
 
 
@@ -320,21 +320,21 @@ Real EigenSparseMatrix<T>::l1_norm () const
 template <typename T>
 Real EigenSparseMatrix<T>::linfty_norm () const
 {
-  Real max_abs_row_sum = 0.;
+Real max_abs_row_sum = 0.;
 
-  // For a row-major Eigen SparseMatrix like we're using, the
-  // InnerIterator iterates over the non-zero entries of rows.
-  for (unsigned row=0; row<this->m(); ++row)
-    {
-      Real current_abs_row_sum = 0.;
-      EigenSM::InnerIterator it(_mat, row);
-      for (; it; ++it)
-        current_abs_row_sum += std::abs(it.value());
+// For a row-major Eigen SparseMatrix like we're using, the
+// InnerIterator iterates over the non-zero entries of rows.
+for (unsigned row=0; row<this->m(); ++row)
+{
+Real current_abs_row_sum = 0.;
+EigenSM::InnerIterator it(_mat, row);
+for (; it; ++it)
+current_abs_row_sum += std::abs(it.value());
 
-      max_abs_row_sum = std::max(max_abs_row_sum, current_abs_row_sum);
-    }
+max_abs_row_sum = std::max(max_abs_row_sum, current_abs_row_sum);
+}
 
-  return max_abs_row_sum;
+return max_abs_row_sum;
 }
 
 

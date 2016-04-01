@@ -49,32 +49,32 @@ class FEType;
 template <typename T> class NumericVector;
 
 /**
- * Implements the evaluate() function to compute FE solution values at
- * points requested by DTK.
- *
- * \author Derek Gaston
- * \date 2013
- */
+* Implements the evaluate() function to compute FE solution values at
+* points requested by DTK.
+*
+* \author Derek Gaston
+* \date 2013
+*/
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {
 public:
-  typedef DataTransferKit::MeshContainer<int> MeshContainerType;
-  typedef DataTransferKit::FieldContainer<Number> FieldContainerType;
+typedef DataTransferKit::MeshContainer<int> MeshContainerType;
+typedef DataTransferKit::FieldContainer<Number> FieldContainerType;
 
-  DTKEvaluator(System & in_sys, std::string var_name);
+DTKEvaluator(System & in_sys, std::string var_name);
 
-  virtual FieldContainerType evaluate(const Teuchos::ArrayRCP<int> & elements,
-                                      const Teuchos::ArrayRCP<double> & coords) libmesh_override;
+virtual FieldContainerType evaluate(const Teuchos::ArrayRCP<int> & elements,
+const Teuchos::ArrayRCP<double> & coords) libmesh_override;
 
 protected:
-  System & sys;
-  NumericVector<Number> & current_local_solution;
-  EquationSystems & es;
-  MeshBase & mesh;
-  unsigned int dim;
-  DofMap & dof_map;
-  unsigned int var_num;
-  const FEType & fe_type;
+System & sys;
+NumericVector<Number> & current_local_solution;
+EquationSystems & es;
+MeshBase & mesh;
+unsigned int dim;
+DofMap & dof_map;
+unsigned int var_num;
+const FEType & fe_type;
 };
 
 } // namespace libMesh

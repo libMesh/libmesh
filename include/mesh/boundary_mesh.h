@@ -29,35 +29,35 @@ namespace libMesh
 {
 
 /**
- * The \p BoundaryMesh is a \p Mesh in its own right, but it
- * contains a description of the boundary of some other mesh.
- * This is useful for writing the boundary of a domain for inspecting
- * boundary conditions and other things.
- */
+* The \p BoundaryMesh is a \p Mesh in its own right, but it
+* contains a description of the boundary of some other mesh.
+* This is useful for writing the boundary of a domain for inspecting
+* boundary conditions and other things.
+*/
 class BoundaryMesh : public Mesh
 {
 public:
-  /**
-   * Constructor. Initializes dimenstion and processor id.
-   */
-  explicit
-  BoundaryMesh (const Parallel::Communicator & comm_in,
-                unsigned char dim=1);
+/**
+* Constructor. Initializes dimenstion and processor id.
+*/
+explicit
+BoundaryMesh (const Parallel::Communicator & comm_in,
+unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-  /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
-   */
-  explicit
-  BoundaryMesh (unsigned char dim=1);
+/**
+* Deprecated constructor.  Takes \p dim, the dimension of the mesh.
+* The mesh dimension can be changed (and may automatically be
+* changed by mesh generation/loading) later.
+*/
+explicit
+BoundaryMesh (unsigned char dim=1);
 #endif
 
-  /**
-   * Destructor.
-   */
-  ~BoundaryMesh();
+/**
+* Destructor.
+*/
+~BoundaryMesh();
 };
 
 } // namespace libMesh

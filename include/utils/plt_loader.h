@@ -32,412 +32,412 @@ namespace libMesh
 
 
 /**
- * This class will read a binary \p .plt file.  These types of files
- * are for use with Amtec's <a href="http://www.tecplot.com">Tecplot</a>
- * visualization package.
- *
- * \author Benjamin S. Kirk
- * \date 2004
- */
+* This class will read a binary \p .plt file.  These types of files
+* are for use with Amtec's <a href="http://www.tecplot.com">Tecplot</a>
+* visualization package.
+*
+* \author Benjamin S. Kirk
+* \date 2004
+*/
 class PltLoader
 {
 public:
 
-  /**
-   * Constructor.  Initializes data.
-   */
-  PltLoader  (const bool v=false);
+/**
+* Constructor.  Initializes data.
+*/
+PltLoader  (const bool v=false);
 
-  /**
-   * Constructor.  Reads the file specified by \p name.
-   */
-  PltLoader  (const std::string & name, const bool v=false);
+/**
+* Constructor.  Reads the file specified by \p name.
+*/
+PltLoader  (const std::string & name, const bool v=false);
 
-  /**
-   * Destructor.
-   */
-  ~PltLoader ();
+/**
+* Destructor.
+*/
+~PltLoader ();
 
-  /**
-   * Clear all data and return to a pristine state.
-   */
-  void clear ();
+/**
+* Clear all data and return to a pristine state.
+*/
+void clear ();
 
-  /**
-   * Returns the verbosity.
-   */
-  bool verbose () const { return _verbose; }
+/**
+* Returns the verbosity.
+*/
+bool verbose () const { return _verbose; }
 
-  /**
-   * Reads the .plt file specified by \p name.
-   */
-  void read (const std::string & name);
+/**
+* Reads the .plt file specified by \p name.
+*/
+void read (const std::string & name);
 
-  /**
-   * Writes an ASCII Tecplot file.  The optional parameter \p version
-   * specifies the version format to write.
-   */
-  void write_dat (const std::string & name,
-                  const unsigned int version=10) const;
+/**
+* Writes an ASCII Tecplot file.  The optional parameter \p version
+* specifies the version format to write.
+*/
+void write_dat (const std::string & name,
+const unsigned int version=10) const;
 
-  // BSK - this functionality requires FORTRAN subrouitine calls,
-  //       and there is no need to "dirty up" \p libMesh with FORTRAN
-  //       just to enable these methods.
-  //   /**
-  //    * Writes a plot3d files.  The grid will be in basename.g and
-  //    * the solution will be in basename.q.  It is assumed that the
-  //    * first three variables from the .plt file are the (x,y,z)
-  //    * locations of the grid points.  The optional parameter \p reverse
-  //    * specifies if the output file will have reversed byte ordering.
-  //    */
-  //   void write_plot3d (const std::string & basename,
-  //      const bool reverse=false,
-  //      const bool gridonly=false) const;
+// BSK - this functionality requires FORTRAN subrouitine calls,
+//       and there is no need to "dirty up" \p libMesh with FORTRAN
+//       just to enable these methods.
+//   /**
+//    * Writes a plot3d files.  The grid will be in basename.g and
+//    * the solution will be in basename.q.  It is assumed that the
+//    * first three variables from the .plt file are the (x,y,z)
+//    * locations of the grid points.  The optional parameter \p reverse
+//    * specifies if the output file will have reversed byte ordering.
+//    */
+//   void write_plot3d (const std::string & basename,
+//      const bool reverse=false,
+//      const bool gridonly=false) const;
 
-  //   /**
-  //    * Writes a Cart3D .tri component file.  The number of components
-  //    * will be the number of zones in the .plt file.
-  //    */
-  //   void write_tri (const std::string & name,
-  //   const bool reverse=false,
-  //   const bool gridonly=false) const;
-
-
-
-  //--------------------------------------------------------------
-  // Data access
+//   /**
+//    * Writes a Cart3D .tri component file.  The number of components
+//    * will be the number of zones in the .plt file.
+//    */
+//   void write_tri (const std::string & name,
+//   const bool reverse=false,
+//   const bool gridonly=false) const;
 
 
 
-  /**
-   * Enum defining the zone type in the Tecplot binary file,
-   * for use with the old .plt format.
-   */
-  enum OldZoneType { BLOCK=0,
-                     POINT,
-                     FEBLOCK,
-                     FEPOINT };
-
-  /**
-   * Enum defining the zone type in the Tecplot binary file,
-   * for use with the new .plt format.
-   */
-  enum NewZoneType { ORDERED=0,
-                     FELINESEG,
-                     FETRIANGLE,
-                     FEQUADRILATERAL,
-                     FETETRAHEDRON,
-                     FEBRICK };
-
-  /**
-   * Enum defining the data type of each variable.
-   */
-  enum DataType { FLOAT=1,
-                  DOUBLE,
-                  LONGINT,
-                  SHORTINT,
-                  BYTE,
-                  BIT};
-
-  /**
-   * Enum defining the finite element types
-   */
-  enum FEType { TRI=0,
-                QUAD,
-                TET,
-                HEX };
+//--------------------------------------------------------------
+// Data access
 
 
 
-  //--------------------------------------------------------------
-  // Public Data Access
+/**
+* Enum defining the zone type in the Tecplot binary file,
+* for use with the old .plt format.
+*/
+enum OldZoneType { BLOCK=0,
+POINT,
+FEBLOCK,
+FEPOINT };
+
+/**
+* Enum defining the zone type in the Tecplot binary file,
+* for use with the new .plt format.
+*/
+enum NewZoneType { ORDERED=0,
+FELINESEG,
+FETRIANGLE,
+FEQUADRILATERAL,
+FETETRAHEDRON,
+FEBRICK };
+
+/**
+* Enum defining the data type of each variable.
+*/
+enum DataType { FLOAT=1,
+DOUBLE,
+LONGINT,
+SHORTINT,
+BYTE,
+BIT};
+
+/**
+* Enum defining the finite element types
+*/
+enum FEType { TRI=0,
+QUAD,
+TET,
+HEX };
 
 
 
-  /**
-   * @returns the Tecplot version number string.  This identifies the
-   * version of Tecplot (or preplot) that wrote the binary file.  Currently,
-   * PltLoader understands versions "#!TDV7X " and "#!TDV1XX"
-   */
-  const std::string & version () const { return _version; }
+//--------------------------------------------------------------
+// Public Data Access
 
-  /**
-   * @returns \p true if the binary type of the file is different than the
-   * machine that is reading it.  If this is the case we must perform an
-   * endian-swap on all input data.
-   */
-  bool is_foreign () const { return _is_foreign; }
 
-  /**
-   * @returns the data set title
-   */
-  const std::string & title () const { return _title; }
 
-  /**
-   * @returns the number of variables in the data set.
-   */
-  unsigned int n_vars () const { return _n_vars; }
+/**
+* @returns the Tecplot version number string.  This identifies the
+* version of Tecplot (or preplot) that wrote the binary file.  Currently,
+* PltLoader understands versions "#!TDV7X " and "#!TDV1XX"
+*/
+const std::string & version () const { return _version; }
 
-  /**
-   * @returns the name of variable \p v.
-   */
-  const std::string & var_name (const unsigned int v) const;
+/**
+* @returns \p true if the binary type of the file is different than the
+* machine that is reading it.  If this is the case we must perform an
+* endian-swap on all input data.
+*/
+bool is_foreign () const { return _is_foreign; }
 
-  /**
-   * @returns the type of variable \p v
-   */
-  unsigned int var_type (const unsigned int v) const;
+/**
+* @returns the data set title
+*/
+const std::string & title () const { return _title; }
 
-  /**
-   * @returns the number of zones.
-   */
-  unsigned int n_zones () const { return _n_zones; }
+/**
+* @returns the number of variables in the data set.
+*/
+unsigned int n_vars () const { return _n_vars; }
 
-  /**
-   * @returns the type of zone \p z
-   */
-  unsigned int zone_type (const unsigned int z) const;
+/**
+* @returns the name of variable \p v.
+*/
+const std::string & var_name (const unsigned int v) const;
 
-  /**
-   * @returns the name of zone \p z.
-   */
-  const std::string & zone_name (const unsigned int z) const;
+/**
+* @returns the type of variable \p v
+*/
+unsigned int var_type (const unsigned int v) const;
 
-  /**
-   * @returns the data packing flag for zone \p z.
-   */
-  unsigned int zone_pack (const unsigned int z) const;
+/**
+* @returns the number of zones.
+*/
+unsigned int n_zones () const { return _n_zones; }
 
-  /**
-   * @returns \p imax for zone \p z.
-   */
-  unsigned int imax (const unsigned int z) const;
+/**
+* @returns the type of zone \p z
+*/
+unsigned int zone_type (const unsigned int z) const;
 
-  /**
-   * @returns \p jmax for zone \p z.
-   */
-  unsigned int jmax (const unsigned int z) const;
+/**
+* @returns the name of zone \p z.
+*/
+const std::string & zone_name (const unsigned int z) const;
 
-  /**
-   * @returns \p kmax for zone \p z.
-   */
-  unsigned int kmax (const unsigned int z) const;
+/**
+* @returns the data packing flag for zone \p z.
+*/
+unsigned int zone_pack (const unsigned int z) const;
 
-  /**
-   * @returns the number of nodes in the mesh (for unstructured meshes).
-   */
-  unsigned int n_nodes (const unsigned int z) const;
+/**
+* @returns \p imax for zone \p z.
+*/
+unsigned int imax (const unsigned int z) const;
 
-  /**
-   * @returns the number of elements in the mesh (for unstructured meshes).
-   */
-  unsigned int n_elem (const unsigned int z) const;
+/**
+* @returns \p jmax for zone \p z.
+*/
+unsigned int jmax (const unsigned int z) const;
 
-  /**
-   * @returns the element type for the \p zth zone (for unstructured meshes).
-   */
-  FEType elem_type (const unsigned int z) const;
+/**
+* @returns \p kmax for zone \p z.
+*/
+unsigned int kmax (const unsigned int z) const;
 
-  /**
-   * @returns a reference to the data read from the file
-   */
-  const std::vector<std::vector<std::vector<float> > > & get_data () const;
+/**
+* @returns the number of nodes in the mesh (for unstructured meshes).
+*/
+unsigned int n_nodes (const unsigned int z) const;
 
-  /**
-   * Enum defining the number of nodes for each element type.
-   */
-  static const unsigned int NNodes[4];
+/**
+* @returns the number of elements in the mesh (for unstructured meshes).
+*/
+unsigned int n_elem (const unsigned int z) const;
+
+/**
+* @returns the element type for the \p zth zone (for unstructured meshes).
+*/
+FEType elem_type (const unsigned int z) const;
+
+/**
+* @returns a reference to the data read from the file
+*/
+const std::vector<std::vector<std::vector<float> > > & get_data () const;
+
+/**
+* Enum defining the number of nodes for each element type.
+*/
+static const unsigned int NNodes[4];
 
 
 private:
 
 
-  /**
-   * Read the header of the binary file.
-   */
-  void read_header (std::istream & in);
+/**
+* Read the header of the binary file.
+*/
+void read_header (std::istream & in);
 
-  /**
-   * Read data from the binary file.
-   */
-  void read_data (std::istream & in);
+/**
+* Read data from the binary file.
+*/
+void read_data (std::istream & in);
 
-  /**
-   * Read data for the zth zone in BLOCK structured format.
-   */
-  void read_block_data (std::istream & in, const unsigned int zn);
+/**
+* Read data for the zth zone in BLOCK structured format.
+*/
+void read_block_data (std::istream & in, const unsigned int zn);
 
-  /**
-   * Read data for the zth zone in POINT structured format.
-   */
-  void read_point_data (std::istream & in, const unsigned int zn);
+/**
+* Read data for the zth zone in POINT structured format.
+*/
+void read_point_data (std::istream & in, const unsigned int zn);
 
-  /**
-   * Read data for the zth zone in FEBLOCK unstructured format.
-   */
-  void read_feblock_data (std::istream & in, const unsigned int zn);
+/**
+* Read data for the zth zone in FEBLOCK unstructured format.
+*/
+void read_feblock_data (std::istream & in, const unsigned int zn);
 
-  /**
-   * Read data for the zth zone in FEPOINT unstructured format.
-   */
-  void read_fepoint_data (std::istream & in, const unsigned int zn);
-
-
-  //--------------------------------------------------------------
-  // Private Data Access
+/**
+* Read data for the zth zone in FEPOINT unstructured format.
+*/
+void read_fepoint_data (std::istream & in, const unsigned int zn);
 
 
-
-  /**
-   * @returns the Tecplot version number string.
-   */
-  std::string & version () { return _version; }
-
-  /**
-   * @returns \p true if the binary type of the file is different than the
-   * machine that is reading it.  If this is the case we must perform an
-   * endian-swap on all input data.
-   */
-  bool & is_foreign () { return _is_foreign; }
-
-  /**
-   * @returns the data set title
-   */
-  std::string & title () { return _title; }
-
-  /**
-   * @returns the number of variables in the data set.
-   */
-  void set_n_vars (const unsigned int nv);
-
-  /**
-   * @returns the name of variable \p v.
-   */
-  std::string & var_name (const unsigned int v);
-
-  /**
-   * @returns the type of variable \p v
-   */
-  unsigned int & var_type (const unsigned int v);
-
-  /**
-   * @returns the number of zones.
-   */
-  void set_n_zones (const unsigned int nz);
-
-  /**
-   * @returns the type of zone \p z
-   */
-  unsigned int & zone_type (const unsigned int z);
-
-  /**
-   * @returns the name of zone \p z.
-   */
-  std::string & zone_name (const unsigned int z);
-
-  /**
-   * @returns the data pack flag for zone \p z.
-   */
-  unsigned int & zone_pack (const unsigned int z);
-
-  /**
-   * @returns \p imax for zone \p z.
-   */
-  unsigned int & imax (const unsigned int z);
-
-  /**
-   * @returns \p jmax for zone \p z.
-   */
-  unsigned int & jmax (const unsigned int z);
-
-  /**
-   * @returns \p kmax for zone \p z.
-   */
-  unsigned int & kmax (const unsigned int z);
+//--------------------------------------------------------------
+// Private Data Access
 
 
-  //--------------------------------------------------------------
-  // Private Data
+
+/**
+* @returns the Tecplot version number string.
+*/
+std::string & version () { return _version; }
+
+/**
+* @returns \p true if the binary type of the file is different than the
+* machine that is reading it.  If this is the case we must perform an
+* endian-swap on all input data.
+*/
+bool & is_foreign () { return _is_foreign; }
+
+/**
+* @returns the data set title
+*/
+std::string & title () { return _title; }
+
+/**
+* @returns the number of variables in the data set.
+*/
+void set_n_vars (const unsigned int nv);
+
+/**
+* @returns the name of variable \p v.
+*/
+std::string & var_name (const unsigned int v);
+
+/**
+* @returns the type of variable \p v
+*/
+unsigned int & var_type (const unsigned int v);
+
+/**
+* @returns the number of zones.
+*/
+void set_n_zones (const unsigned int nz);
+
+/**
+* @returns the type of zone \p z
+*/
+unsigned int & zone_type (const unsigned int z);
+
+/**
+* @returns the name of zone \p z.
+*/
+std::string & zone_name (const unsigned int z);
+
+/**
+* @returns the data pack flag for zone \p z.
+*/
+unsigned int & zone_pack (const unsigned int z);
+
+/**
+* @returns \p imax for zone \p z.
+*/
+unsigned int & imax (const unsigned int z);
+
+/**
+* @returns \p jmax for zone \p z.
+*/
+unsigned int & jmax (const unsigned int z);
+
+/**
+* @returns \p kmax for zone \p z.
+*/
+unsigned int & kmax (const unsigned int z);
 
 
-  /**
-   * Verbosity
-   */
-  const bool _verbose;
+//--------------------------------------------------------------
+// Private Data
 
-  /**
-   * The Tecplot Version number string.
-   */
-  std::string _version;
 
-  /**
-   * Is the data foreign?
-   */
-  bool _is_foreign;
+/**
+* Verbosity
+*/
+const bool _verbose;
 
-  /**
-   * The Tecplot data set title.
-   */
-  std::string _title;
+/**
+* The Tecplot Version number string.
+*/
+std::string _version;
 
-  /**
-   * The number of variables in the data set.
-   */
-  unsigned int _n_vars;
+/**
+* Is the data foreign?
+*/
+bool _is_foreign;
 
-  /**
-   * The name for each variable.
-   */
-  std::vector<std::string> _var_names;
+/**
+* The Tecplot data set title.
+*/
+std::string _title;
 
-  /**
-   * The type of each variable.  Must be one of the
-   * enumerated \p DataType types.
-   */
-  std::vector<unsigned int> _var_types;
+/**
+* The number of variables in the data set.
+*/
+unsigned int _n_vars;
 
-  /**
-   * The number of zones.
-   */
-  unsigned int _n_zones;
+/**
+* The name for each variable.
+*/
+std::vector<std::string> _var_names;
 
-  /**
-   * The type of each zone.
-   */
-  std::vector<unsigned int> _zone_types;
+/**
+* The type of each variable.  Must be one of the
+* enumerated \p DataType types.
+*/
+std::vector<unsigned int> _var_types;
 
-  /**
-   * The name of each zone.
-   */
-  std::vector<std::string> _zone_names;
+/**
+* The number of zones.
+*/
+unsigned int _n_zones;
 
-  /**
-   * The data packing for each zone (new version only)
-   */
-  std::vector<unsigned int> _zone_pack;
+/**
+* The type of each zone.
+*/
+std::vector<unsigned int> _zone_types;
 
-  /**
-   * The (imax,jmax,kmax) value for each zone.
-   */
-  std::vector<unsigned int> _imax;
-  std::vector<unsigned int> _jmax;
-  std::vector<unsigned int> _kmax;
+/**
+* The name of each zone.
+*/
+std::vector<std::string> _zone_names;
 
-  /**
-   * Vector to hold the data.
-   */
-  std::vector<std::vector<std::vector<float> > >  _data;
+/**
+* The data packing for each zone (new version only)
+*/
+std::vector<unsigned int> _zone_pack;
 
-  /**
-   * Vectors to hold the connectivity for each zone
-   * (only for unstructured files).
-   */
-  std::vector<std::vector<int> > _conn;
+/**
+* The (imax,jmax,kmax) value for each zone.
+*/
+std::vector<unsigned int> _imax;
+std::vector<unsigned int> _jmax;
+std::vector<unsigned int> _kmax;
 
-  /**
-   * Scratch data & relevant sizes.
-   */
-  mutable char buf[512];
+/**
+* Vector to hold the data.
+*/
+std::vector<std::vector<std::vector<float> > >  _data;
+
+/**
+* Vectors to hold the connectivity for each zone
+* (only for unstructured files).
+*/
+std::vector<std::vector<int> > _conn;
+
+/**
+* Scratch data & relevant sizes.
+*/
+mutable char buf[512];
 };
 
 
@@ -446,10 +446,10 @@ private:
 // PltLoader inline members
 inline
 PltLoader::PltLoader (const bool v) :
-  _verbose      (v),
-  _is_foreign   (false),
-  _n_vars       (0),
-  _n_zones      (0)
+_verbose      (v),
+_is_foreign   (false),
+_n_vars       (0),
+_n_zones      (0)
 {
 }
 
@@ -457,12 +457,12 @@ PltLoader::PltLoader (const bool v) :
 
 inline
 PltLoader::PltLoader (const std::string & name, const bool v) :
-  _verbose      (v),
-  _is_foreign   (false),
-  _n_vars       (0),
-  _n_zones      (0)
+_verbose      (v),
+_is_foreign   (false),
+_n_vars       (0),
+_n_zones      (0)
 {
-  this->read (name);
+this->read (name);
 }
 
 
@@ -477,11 +477,11 @@ PltLoader::~PltLoader()
 inline
 const std::string & PltLoader::var_name (const unsigned int v) const
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_names.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_names.size());
+libmesh_assert_less (v, this->n_vars());
+libmesh_assert_less (v, _var_names.size());
+libmesh_assert_equal_to (this->n_vars(), _var_names.size());
 
-  return _var_names[v];
+return _var_names[v];
 }
 
 
@@ -489,11 +489,11 @@ const std::string & PltLoader::var_name (const unsigned int v) const
 inline
 std::string & PltLoader::var_name (const unsigned int v)
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_names.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_names.size());
+libmesh_assert_less (v, this->n_vars());
+libmesh_assert_less (v, _var_names.size());
+libmesh_assert_equal_to (this->n_vars(), _var_names.size());
 
-  return _var_names[v];
+return _var_names[v];
 }
 
 
@@ -501,11 +501,11 @@ std::string & PltLoader::var_name (const unsigned int v)
 inline
 unsigned int PltLoader::var_type (const unsigned int v) const
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_types.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_types.size());
+libmesh_assert_less (v, this->n_vars());
+libmesh_assert_less (v, _var_types.size());
+libmesh_assert_equal_to (this->n_vars(), _var_types.size());
 
-  return _var_types[v];
+return _var_types[v];
 }
 
 
@@ -513,11 +513,11 @@ unsigned int PltLoader::var_type (const unsigned int v) const
 inline
 unsigned int & PltLoader::var_type (const unsigned int v)
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_types.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_types.size());
+libmesh_assert_less (v, this->n_vars());
+libmesh_assert_less (v, _var_types.size());
+libmesh_assert_equal_to (this->n_vars(), _var_types.size());
 
-  return _var_types[v];
+return _var_types[v];
 }
 
 
@@ -525,11 +525,11 @@ unsigned int & PltLoader::var_type (const unsigned int v)
 inline
 unsigned int PltLoader::zone_type (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_types.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_types.size());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, _zone_types.size());
+libmesh_assert_equal_to (this->n_zones(), _zone_types.size());
 
-  return _zone_types[z];
+return _zone_types[z];
 }
 
 
@@ -537,11 +537,11 @@ unsigned int PltLoader::zone_type (const unsigned int z) const
 inline
 unsigned int & PltLoader::zone_type (const unsigned int z)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_types.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_types.size());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, _zone_types.size());
+libmesh_assert_equal_to (this->n_zones(), _zone_types.size());
 
-  return _zone_types[z];
+return _zone_types[z];
 }
 
 
@@ -549,11 +549,11 @@ unsigned int & PltLoader::zone_type (const unsigned int z)
 inline
 const std::string & PltLoader::zone_name (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_names.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_names.size());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, _zone_names.size());
+libmesh_assert_equal_to (this->n_zones(), _zone_names.size());
 
-  return _zone_names[z];
+return _zone_names[z];
 }
 
 
@@ -561,11 +561,11 @@ const std::string & PltLoader::zone_name (const unsigned int z) const
 inline
 std::string & PltLoader::zone_name (const unsigned int z)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_names.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_names.size());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, _zone_names.size());
+libmesh_assert_equal_to (this->n_zones(), _zone_names.size());
 
-  return _zone_names[z];
+return _zone_names[z];
 }
 
 
@@ -573,11 +573,11 @@ std::string & PltLoader::zone_name (const unsigned int z)
 inline
 unsigned int PltLoader::zone_pack (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_pack.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_pack.size());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, _zone_pack.size());
+libmesh_assert_equal_to (this->n_zones(), _zone_pack.size());
 
-  return _zone_pack[z];
+return _zone_pack[z];
 }
 
 
@@ -585,11 +585,11 @@ unsigned int PltLoader::zone_pack (const unsigned int z) const
 inline
 unsigned int & PltLoader::zone_pack (const unsigned int z)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_pack.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_pack.size());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, _zone_pack.size());
+libmesh_assert_equal_to (this->n_zones(), _zone_pack.size());
 
-  return _zone_pack[z];
+return _zone_pack[z];
 }
 
 
@@ -597,10 +597,10 @@ unsigned int & PltLoader::zone_pack (const unsigned int z)
 inline
 unsigned int PltLoader::imax (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_imax.size(), this->n_zones());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_equal_to (_imax.size(), this->n_zones());
 
-  return _imax[z];
+return _imax[z];
 }
 
 
@@ -608,10 +608,10 @@ unsigned int PltLoader::imax (const unsigned int z) const
 inline
 unsigned int & PltLoader::imax (const unsigned int z)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_imax.size(), this->n_zones());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_equal_to (_imax.size(), this->n_zones());
 
-  return _imax[z];
+return _imax[z];
 }
 
 
@@ -619,10 +619,10 @@ unsigned int & PltLoader::imax (const unsigned int z)
 inline
 unsigned int PltLoader::jmax (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_jmax.size(), this->n_zones());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_equal_to (_jmax.size(), this->n_zones());
 
-  return _jmax[z];
+return _jmax[z];
 }
 
 
@@ -630,10 +630,10 @@ unsigned int PltLoader::jmax (const unsigned int z) const
 inline
 unsigned int & PltLoader::jmax (const unsigned int z)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_jmax.size(), this->n_zones());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_equal_to (_jmax.size(), this->n_zones());
 
-  return _jmax[z];
+return _jmax[z];
 }
 
 
@@ -641,10 +641,10 @@ unsigned int & PltLoader::jmax (const unsigned int z)
 inline
 unsigned int PltLoader::kmax (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_kmax.size(), this->n_zones());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_equal_to (_kmax.size(), this->n_zones());
 
-  return _kmax[z];
+return _kmax[z];
 }
 
 
@@ -652,10 +652,10 @@ unsigned int PltLoader::kmax (const unsigned int z) const
 inline
 unsigned int & PltLoader::kmax (const unsigned int z)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_kmax.size(), this->n_zones());
+libmesh_assert_less (z, this->n_zones());
+libmesh_assert_equal_to (_kmax.size(), this->n_zones());
 
-  return _kmax[z];
+return _kmax[z];
 }
 
 
@@ -663,12 +663,12 @@ unsigned int & PltLoader::kmax (const unsigned int z)
 inline
 unsigned int PltLoader::n_nodes (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, this->n_zones());
 
-  // Only for unstructured zones!
-  libmesh_assert_greater (this->zone_type(z), 1);
+// Only for unstructured zones!
+libmesh_assert_greater (this->zone_type(z), 1);
 
-  return this->imax(z);
+return this->imax(z);
 }
 
 
@@ -676,12 +676,12 @@ unsigned int PltLoader::n_nodes (const unsigned int z) const
 inline
 unsigned int PltLoader::n_elem (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, this->n_zones());
 
-  // Only for unstructured zones!
-  libmesh_assert_greater (this->zone_type(z), 1);
+// Only for unstructured zones!
+libmesh_assert_greater (this->zone_type(z), 1);
 
-  return this->jmax(z);
+return this->jmax(z);
 }
 
 
@@ -689,12 +689,12 @@ unsigned int PltLoader::n_elem (const unsigned int z) const
 inline
 PltLoader::FEType PltLoader::elem_type (const unsigned int z) const
 {
-  libmesh_assert_less (z, this->n_zones());
+libmesh_assert_less (z, this->n_zones());
 
-  // Only for unstructured zones!
-  libmesh_assert_greater (this->zone_type(z), 1);
+// Only for unstructured zones!
+libmesh_assert_greater (this->zone_type(z), 1);
 
-  return static_cast<FEType>(this->kmax(z));
+return static_cast<FEType>(this->kmax(z));
 }
 
 
@@ -702,7 +702,7 @@ inline
 const std::vector<std::vector<std::vector<float> > > &
 PltLoader::get_data () const
 {
-  return _data;
+return _data;
 }
 
 

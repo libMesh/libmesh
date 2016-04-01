@@ -33,27 +33,27 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class implements writing meshes in the .fro format
- * used by the MIT ACDL.  Valid only for triangular meshes.
- *
- * \author Benjamin S. Kirk
- * \date 2007
- */
+* This class implements writing meshes in the .fro format
+* used by the MIT ACDL.  Valid only for triangular meshes.
+*
+* \author Benjamin S. Kirk
+* \date 2007
+*/
 class FroIO : public MeshOutput<MeshBase>
 {
 public:
 
-  /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
-   */
-  explicit
-  FroIO (const MeshBase &);
+/**
+* Constructor.  Takes a reference to a constant mesh object.
+* This constructor will only allow us to write the mesh.
+*/
+explicit
+FroIO (const MeshBase &);
 
-  /**
-   * This method implements writing a mesh to a specified file.
-   */
-  virtual void write (const std::string &) libmesh_override;
+/**
+* This method implements writing a mesh to a specified file.
+*/
+virtual void write (const std::string &) libmesh_override;
 };
 
 
@@ -62,7 +62,7 @@ public:
 // FroIO inline members
 inline
 FroIO::FroIO (const MeshBase & mesh_in) :
-  MeshOutput<MeshBase> (mesh_in)
+MeshOutput<MeshBase> (mesh_in)
 {
 }
 

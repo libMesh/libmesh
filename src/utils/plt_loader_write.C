@@ -448,124 +448,124 @@ namespace libMesh
 
 
 void PltLoader::write_dat (const std::string & name,
-                           const unsigned int version_in) const
+const unsigned int version_in) const
 {
-  std::ofstream out_stream (name.c_str());
+std::ofstream out_stream (name.c_str());
 
-  out_stream << "TITLE=\""
-             << this->title()
-             << "\""
-             << '\n';
+out_stream << "TITLE=\""
+<< this->title()
+<< "\""
+<< '\n';
 
-  out_stream << "VARIABLES = ";
+out_stream << "VARIABLES = ";
 
-  for (unsigned int v=0; v<this->n_vars(); v++)
-    out_stream << "\"" << this->var_name(v) << "\"\n";
+for (unsigned int v=0; v<this->n_vars(); v++)
+out_stream << "\"" << this->var_name(v) << "\"\n";
 
-  for (unsigned int z=0; z<this->n_zones(); z++)
-    {
-      out_stream << "ZONE T=\"" << this->zone_name(z) << "\"\n";
-      out_stream << " I="  << this->imax(z)
-                 << ", J=" << this->jmax(z)
-                 << ", K=" << this->kmax(z);
+for (unsigned int z=0; z<this->n_zones(); z++)
+{
+out_stream << "ZONE T=\"" << this->zone_name(z) << "\"\n";
+out_stream << " I="  << this->imax(z)
+<< ", J=" << this->jmax(z)
+<< ", K=" << this->kmax(z);
 
-      // Write BLOCK data for this zone
-      if (this->zone_type(z) == BLOCK)
-        {
-          if (version_in < 10)
-            {
-              out_stream << ", F=BLOCK\n";
-            }
-          else
-            {
-              out_stream << ", ZONETYPE=Ordered\n"
-                         << "DATAPACKING=BLOCK\n";
-            }
+// Write BLOCK data for this zone
+if (this->zone_type(z) == BLOCK)
+{
+if (version_in < 10)
+{
+out_stream << ", F=BLOCK\n";
+}
+else
+{
+out_stream << ", ZONETYPE=Ordered\n"
+<< "DATAPACKING=BLOCK\n";
+}
 
-          out_stream << "DT=(";
-          for (unsigned int v=0; v<this->n_vars(); v++)
-            out_stream << "SINGLE ";
-          out_stream << ")\n";
+out_stream << "DT=(";
+for (unsigned int v=0; v<this->n_vars(); v++)
+out_stream << "SINGLE ";
+out_stream << ")\n";
 
-          out_stream.precision(9);
+out_stream.precision(9);
 
-          for (unsigned int v=0; v<this->n_vars(); v++)
-            {
-              unsigned int l=0;
+for (unsigned int v=0; v<this->n_vars(); v++)
+{
+unsigned int l=0;
 
-              for (unsigned int k=0; k<this->kmax(z); k++)
-                for (unsigned int j=0; j<this->jmax(z); j++)
-                  for (unsigned int i=0; i<this->imax(z); i++)
-                    {
-                      // GCC 2.95.3 has scientific in the ios class instead
-                      // of in namespace std::
+for (unsigned int k=0; k<this->kmax(z); k++)
+for (unsigned int j=0; j<this->jmax(z); j++)
+for (unsigned int i=0; i<this->imax(z); i++)
+{
+// GCC 2.95.3 has scientific in the ios class instead
+// of in namespace std::
 #ifndef LIBMESH_BROKEN_IOSTREAM
-                      out_stream << std::scientific
-                                 << _data[z][v][l++] << " ";
+out_stream << std::scientific
+<< _data[z][v][l++] << " ";
 #else
-                      out_stream << std::ios::scientific
-                                 << _data[z][v][l++] << " ";
+out_stream << std::ios::scientific
+<< _data[z][v][l++] << " ";
 #endif
-                      // Throw in a newline every 5 entries to
-                      // avoid really long lines.
-                      if (l%5 == 0)
-                        out_stream << '\n';
-                    }
+// Throw in a newline every 5 entries to
+// avoid really long lines.
+if (l%5 == 0)
+out_stream << '\n';
+}
 
-              if (l%5 != 0)
-                out_stream << '\n';
-            }
-        } // end if (this->zone_type(z) == BLOCK)
+if (l%5 != 0)
+out_stream << '\n';
+}
+} // end if (this->zone_type(z) == BLOCK)
 
-      // Write POINT data for this zone
-      else if (this->zone_type(z) == POINT)
-        {
-          if (version_in < 10)
-            {
-              out_stream << ", F=POINT\n";
-            }
-          else
-            {
-              out_stream << ", ZONETYPE=Ordered\n"
-                         << "DATAPACKING=POINT\n";
-            }
+// Write POINT data for this zone
+else if (this->zone_type(z) == POINT)
+{
+if (version_in < 10)
+{
+out_stream << ", F=POINT\n";
+}
+else
+{
+out_stream << ", ZONETYPE=Ordered\n"
+<< "DATAPACKING=POINT\n";
+}
 
-          out_stream << "DT=(";
-          for (unsigned int v=0; v<this->n_vars(); v++)
-            out_stream << "SINGLE ";
-          out_stream << ")\n";
+out_stream << "DT=(";
+for (unsigned int v=0; v<this->n_vars(); v++)
+out_stream << "SINGLE ";
+out_stream << ")\n";
 
-          out_stream.precision(9);
+out_stream.precision(9);
 
-          {
-            unsigned int l=0;
+{
+unsigned int l=0;
 
-            for (unsigned int k=0; k<this->kmax(z); k++)
-              for (unsigned int j=0; j<this->jmax(z); j++)
-                for (unsigned int i=0; i<this->imax(z); i++)
-                  {
-                    for (unsigned int v=0; v<this->n_vars(); v++)
+for (unsigned int k=0; k<this->kmax(z); k++)
+for (unsigned int j=0; j<this->jmax(z); j++)
+for (unsigned int i=0; i<this->imax(z); i++)
+{
+for (unsigned int v=0; v<this->n_vars(); v++)
 
-                      // GCC 2.95.3 has scientific in the ios class instead
-                      // of in namespace std::
+// GCC 2.95.3 has scientific in the ios class instead
+// of in namespace std::
 #ifndef LIBMESH_BROKEN_IOSTREAM
-                      out_stream << std::scientific
-                                 << _data[z][v][l] << " ";
+out_stream << std::scientific
+<< _data[z][v][l] << " ";
 #else
-                    out_stream << std::ios::scientific
-                               << _data[z][v][l] << " ";
+out_stream << std::ios::scientific
+<< _data[z][v][l] << " ";
 #endif
-                    out_stream << '\n';
+out_stream << '\n';
 
-                    l++;
-                  }
-          }
-        } // end else if (this->zone_type(z) == POINT)
+l++;
+}
+}
+} // end else if (this->zone_type(z) == POINT)
 
-      // Otherwise, unrecognized zone type
-      else
-        libmesh_error_msg("Unrecognized zone type: this->zone_type(z)==" << this->zone_type(z));
-    }
+// Otherwise, unrecognized zone type
+else
+libmesh_error_msg("Unrecognized zone type: this->zone_type(z)==" << this->zone_type(z));
+}
 }
 
 } // namespace libMesh

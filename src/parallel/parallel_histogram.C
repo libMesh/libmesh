@@ -33,57 +33,57 @@ namespace libMesh
 namespace Parallel {
 template <typename KeyType, typename IdxType>
 Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator & comm_in,
-                                       const std::vector<KeyType> & d) :
-  ParallelObject(comm_in),
-  data(d)
+const std::vector<KeyType> & d) :
+ParallelObject(comm_in),
+data(d)
 {
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+libmesh_assert (Parallel::Utils::is_sorted (data));
 }
 
 
 
 template <typename KeyType, typename IdxType>
 void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
-                                                 KeyType max,
-                                                 KeyType min)
+KeyType max,
+KeyType min)
 {
-  libmesh_assert_less (min, max);
+libmesh_assert_less (min, max);
 
-  // The width of each bin.  Store this as a floating point value
-  double bin_width = (Parallel::Utils::to_double(max)-
-                      Parallel::Utils::to_double(min))/static_cast<double>(nbins);
-
-
-  // The idea for 4 bins of size d is this:
-  //
-  //  0          1          2           3          4
-  //  |----------|----------|-----------|----------|
-  // min   0   min+d  1   min+2d  2  min+3d   3   max
+// The width of each bin.  Store this as a floating point value
+double bin_width = (Parallel::Utils::to_double(max)-
+Parallel::Utils::to_double(min))/static_cast<double>(nbins);
 
 
+// The idea for 4 bins of size d is this:
+//
+//  0          1          2           3          4
+//  |----------|----------|-----------|----------|
+// min   0   min+d  1   min+2d  2  min+3d   3   max
 
-  // Set the iterators corresponding to the boundaries
-  // as defined above.  This takes nbins * O(log N) time.
-  bin_bounds.resize (nbins+1);
-  bin_iters.resize  (nbins+1, data.begin());
 
-  // Set the minimum bin boundary iterator
-  bin_iters[0]  = data.begin();
-  bin_bounds[0] = Parallel::Utils::to_double(min);
 
-  // Set the internal bin boundary iterators
-  for (IdxType b=1; b<nbins; ++b)
-    {
-      bin_bounds[b] = Parallel::Utils::to_double(min) + bin_width * b;
+// Set the iterators corresponding to the boundaries
+// as defined above.  This takes nbins * O(log N) time.
+bin_bounds.resize (nbins+1);
+bin_iters.resize  (nbins+1, data.begin());
 
-      bin_iters[b] =
-        std::lower_bound (bin_iters[b-1], data.end(),
-                          Parallel::Utils::Convert<KeyType>::to_key_type
-                            (bin_bounds[b]));
-    }
+// Set the minimum bin boundary iterator
+bin_iters[0]  = data.begin();
+bin_bounds[0] = Parallel::Utils::to_double(min);
 
-  bin_iters[nbins]  = data.end();
-  bin_bounds[nbins] = Parallel::Utils::to_double(max);
+// Set the internal bin boundary iterators
+for (IdxType b=1; b<nbins; ++b)
+{
+bin_bounds[b] = Parallel::Utils::to_double(min) + bin_width * b;
+
+bin_iters[b] =
+std::lower_bound (bin_iters[b-1], data.end(),
+Parallel::Utils::Convert<KeyType>::to_key_type
+(bin_bounds[b]));
+}
+
+bin_iters[nbins]  = data.end();
+bin_bounds[nbins] = Parallel::Utils::to_double(max);
 }
 
 
@@ -91,17 +91,17 @@ void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
 template <typename KeyType, typename IdxType>
 void Histogram<KeyType,IdxType>::build_histogram ()
 {
-  // Build a local histogram
-  std::vector<IdxType> local_hist (this->n_bins());
+// Build a local histogram
+std::vector<IdxType> local_hist (this->n_bins());
 
-  for (IdxType b=0; b<this->n_bins(); b++)
-    local_hist[b] = this->local_bin_size(b);
+for (IdxType b=0; b<this->n_bins(); b++)
+local_hist[b] = this->local_bin_size(b);
 
-  // Add all the local histograms to get the global histogram
-  hist = local_hist;
-  this->comm().sum(hist);
+// Add all the local histograms to get the global histogram
+hist = local_hist;
+this->comm().sum(hist);
 
-  // All done!
+// All done!
 }
 
 }

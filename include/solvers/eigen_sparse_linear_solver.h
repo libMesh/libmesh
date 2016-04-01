@@ -37,128 +37,128 @@ namespace libMesh
 {
 
 /**
- * This class provides an interface to Eigen
- * iterative solvers that is compatible with the \p libMesh
- * \p LinearSolver<>
- *
- * \author Benjamin Kirk
- * \date 2013
- */
+* This class provides an interface to Eigen
+* iterative solvers that is compatible with the \p libMesh
+* \p LinearSolver<>
+*
+* \author Benjamin Kirk
+* \date 2013
+*/
 template <typename T>
 class EigenSparseLinearSolver : public LinearSolver<T>
 {
 public:
-  /**
-   *  Constructor. Initializes Eigen data structures
-   */
-  EigenSparseLinearSolver (const libMesh::Parallel::Communicator & comm_in
-                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+/**
+*  Constructor. Initializes Eigen data structures
+*/
+EigenSparseLinearSolver (const libMesh::Parallel::Communicator & comm_in
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
-  /**
-   * Destructor.
-   */
-  ~EigenSparseLinearSolver ();
+/**
+* Destructor.
+*/
+~EigenSparseLinearSolver ();
 
-  /**
-   * Release all memory and clear data structures.
-   */
-  virtual void clear () libmesh_override;
+/**
+* Release all memory and clear data structures.
+*/
+virtual void clear () libmesh_override;
 
-  /**
-   * Initialize data structures if not done so already.
-   */
-  virtual void init (const char * name=libmesh_nullptr) libmesh_override;
+/**
+* Initialize data structures if not done so already.
+*/
+virtual void init (const char * name=libmesh_nullptr) libmesh_override;
 
-  /**
-   * Call the Eigen solver
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T> & matrix,
-         NumericVector<T> & solution,
-         NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* Call the Eigen solver
+*/
+virtual std::pair<unsigned int, Real>
+solve (SparseMatrix<T> & matrix,
+NumericVector<T> & solution,
+NumericVector<T> & rhs,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * Call the Eigen solver to solve A^T x = b
-   */
-  virtual std::pair<unsigned int, Real>
-  adjoint_solve (SparseMatrix<T> & matrix,
-                 NumericVector<T> & solution,
-                 NumericVector<T> & rhs,
-                 const double tol,
-                 const unsigned int m_its) libmesh_override;
+/**
+* Call the Eigen solver to solve A^T x = b
+*/
+virtual std::pair<unsigned int, Real>
+adjoint_solve (SparseMatrix<T> & matrix,
+NumericVector<T> & solution,
+NumericVector<T> & rhs,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * Call the Eigen solver
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T> & matrix,
-         SparseMatrix<T> & pc,
-         NumericVector<T> & solution,
-         NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* Call the Eigen solver
+*/
+virtual std::pair<unsigned int, Real>
+solve (SparseMatrix<T> & matrix,
+SparseMatrix<T> & pc,
+NumericVector<T> & solution,
+NumericVector<T> & rhs,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * This function solves a system whose matrix is a shell matrix.
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T> & shell_matrix,
-         NumericVector<T> & solution_in,
-         NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* This function solves a system whose matrix is a shell matrix.
+*/
+virtual std::pair<unsigned int, Real>
+solve (const ShellMatrix<T> & shell_matrix,
+NumericVector<T> & solution_in,
+NumericVector<T> & rhs_in,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * This function solves a system whose matrix is a shell matrix, but
-   * a sparse matrix is used as preconditioning matrix, this allowing
-   * other preconditioners than JACOBI.
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T> & shell_matrix,
-         const SparseMatrix<T> & precond_matrix,
-         NumericVector<T> & solution_in,
-         NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* This function solves a system whose matrix is a shell matrix, but
+* a sparse matrix is used as preconditioning matrix, this allowing
+* other preconditioners than JACOBI.
+*/
+virtual std::pair<unsigned int, Real>
+solve (const ShellMatrix<T> & shell_matrix,
+const SparseMatrix<T> & precond_matrix,
+NumericVector<T> & solution_in,
+NumericVector<T> & rhs_in,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * Returns the solver's convergence flag
-   */
-  virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
+/**
+* Returns the solver's convergence flag
+*/
+virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 
 private:
 
-  /**
-   * Tells Eigen to use the user-specified preconditioner stored in
-   * \p _preconditioner_type
-   */
-  void set_eigen_preconditioner_type ();
+/**
+* Tells Eigen to use the user-specified preconditioner stored in
+* \p _preconditioner_type
+*/
+void set_eigen_preconditioner_type ();
 
-  /**
-   * Store the result of the last solve.
-   */
-  Eigen::ComputationInfo _comp_info;
+/**
+* Store the result of the last solve.
+*/
+Eigen::ComputationInfo _comp_info;
 
-  /**
-   * Static map between Eigen ComputationInfo enumerations and libMesh
-   * LinearConvergenceReason enumerations.
-   */
-  static std::map<Eigen::ComputationInfo, LinearConvergenceReason> _convergence_reasons;
+/**
+* Static map between Eigen ComputationInfo enumerations and libMesh
+* LinearConvergenceReason enumerations.
+*/
+static std::map<Eigen::ComputationInfo, LinearConvergenceReason> _convergence_reasons;
 
-  /**
-   * Static function used to initialize _covergence_reasons map
-   */
-  static std::map<Eigen::ComputationInfo, LinearConvergenceReason> build_map()
-  {
-    std::map<Eigen::ComputationInfo, LinearConvergenceReason> ret;
-    ret[Eigen::Success]        = CONVERGED_ITS;
-    ret[Eigen::NumericalIssue] = DIVERGED_BREAKDOWN;
-    ret[Eigen::NoConvergence]  = DIVERGED_ITS;
-    ret[Eigen::InvalidInput]   = DIVERGED_NULL;
-    return ret;
-  }
+/**
+* Static function used to initialize _covergence_reasons map
+*/
+static std::map<Eigen::ComputationInfo, LinearConvergenceReason> build_map()
+{
+std::map<Eigen::ComputationInfo, LinearConvergenceReason> ret;
+ret[Eigen::Success]        = CONVERGED_ITS;
+ret[Eigen::NumericalIssue] = DIVERGED_BREAKDOWN;
+ret[Eigen::NoConvergence]  = DIVERGED_ITS;
+ret[Eigen::InvalidInput]   = DIVERGED_NULL;
+return ret;
+}
 };
 
 
@@ -176,7 +176,7 @@ template <typename T>
 inline
 EigenSparseLinearSolver<T>::~EigenSparseLinearSolver ()
 {
-  this->clear ();
+this->clear ();
 }
 
 
@@ -185,16 +185,16 @@ template <typename T>
 inline
 std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &,
-                                   SparseMatrix<T> &,
-                                   NumericVector<T> &,
-                                   NumericVector<T> &,
-                                   const double,
-                                   const unsigned int)
+SparseMatrix<T> &,
+NumericVector<T> &,
+NumericVector<T> &,
+const double,
+const unsigned int)
 {
-  libmesh_error_msg("ERROR: Eigen does not support a user-supplied preconditioner!");
+libmesh_error_msg("ERROR: Eigen does not support a user-supplied preconditioner!");
 
-  std::pair<unsigned int, Real> p;
-  return p;
+std::pair<unsigned int, Real> p;
+return p;
 }
 
 } // namespace libMesh

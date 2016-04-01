@@ -33,30 +33,30 @@ namespace libMesh
 // ------------------------------------------------------------
 // Hex8 class static member initializations
 const unsigned int Hex8::side_nodes_map[6][4] =
-  {
-    {0, 3, 2, 1}, // Side 0
-    {0, 1, 5, 4}, // Side 1
-    {1, 2, 6, 5}, // Side 2
-    {2, 3, 7, 6}, // Side 3
-    {3, 0, 4, 7}, // Side 4
-    {4, 5, 6, 7}  // Side 5
-  };
+{
+{0, 3, 2, 1}, // Side 0
+{0, 1, 5, 4}, // Side 1
+{1, 2, 6, 5}, // Side 2
+{2, 3, 7, 6}, // Side 3
+{3, 0, 4, 7}, // Side 4
+{4, 5, 6, 7}  // Side 5
+};
 
 const unsigned int Hex8::edge_nodes_map[12][2] =
-  {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {2, 3}, // Side 2
-    {0, 3}, // Side 3
-    {0, 4}, // Side 4
-    {1, 5}, // Side 5
-    {2, 6}, // Side 6
-    {3, 7}, // Side 7
-    {4, 5}, // Side 8
-    {5, 6}, // Side 9
-    {6, 7}, // Side 10
-    {4, 7}  // Side 11
-  };
+{
+{0, 1}, // Side 0
+{1, 2}, // Side 1
+{2, 3}, // Side 2
+{0, 3}, // Side 3
+{0, 4}, // Side 4
+{1, 5}, // Side 5
+{2, 6}, // Side 6
+{3, 7}, // Side 7
+{4, 5}, // Side 8
+{5, 6}, // Side 9
+{6, 7}, // Side 10
+{4, 7}  // Side 11
+};
 
 
 // ------------------------------------------------------------
@@ -64,134 +64,134 @@ const unsigned int Hex8::edge_nodes_map[12][2] =
 
 bool Hex8::is_vertex(const unsigned int) const
 {
-  return true;
+return true;
 }
 
 bool Hex8::is_edge(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Hex8::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Hex8::is_node_on_side(const unsigned int n,
-                           const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 4; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 bool Hex8::is_node_on_edge(const unsigned int n,
-                           const unsigned int e) const
+const unsigned int e) const
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (e, n_edges());
+for (unsigned int i = 0; i != 2; ++i)
+if (edge_nodes_map[e][i] == n)
+return true;
+return false;
 }
 
 
 
 bool Hex8::has_affine_map() const
 {
-  // Make sure x-edge endpoints are affine
-  Point v = this->point(1) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
-    return false;
-  // Make sure xz-faces are identical parallelograms
-  v = this->point(4) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
-    return false;
-  // If all the above checks out, the map is affine
-  return true;
+// Make sure x-edge endpoints are affine
+Point v = this->point(1) - this->point(0);
+if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
+!v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
+!v.relative_fuzzy_equals(this->point(6) - this->point(7)))
+return false;
+// Make sure xz-faces are identical parallelograms
+v = this->point(4) - this->point(0);
+if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
+return false;
+// If all the above checks out, the map is affine
+return true;
 }
 
 
 
 UniquePtr<Elem> Hex8::build_side (const unsigned int i,
-                                  bool proxy) const
+bool proxy) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    return UniquePtr<Elem>(new Side<Quad4,Hex8>(this,i));
+if (proxy)
+return UniquePtr<Elem>(new Side<Quad4,Hex8>(this,i));
 
-  else
-    {
-      Elem * face = new Quad4;
-      face->subdomain_id() = this->subdomain_id();
+else
+{
+Elem * face = new Quad4;
+face->subdomain_id() = this->subdomain_id();
 
-      for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Hex8::side_nodes_map[i][n]);
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Hex8::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
-    }
+return UniquePtr<Elem>(face);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 
 UniquePtr<Elem> Hex8::build_edge (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_edges());
+libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Hex8>(this,i));
+return UniquePtr<Elem>(new SideEdge<Edge2,Hex8>(this,i));
 }
 
 
 
 void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
-                        const IOPackage iop,
-                        std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert(_nodes);
+libmesh_assert_less (sc, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-  conn.resize(8);
+conn.resize(8);
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(3)+1;
-        conn[4] = this->node(4)+1;
-        conn[5] = this->node(5)+1;
-        conn[6] = this->node(6)+1;
-        conn[7] = this->node(7)+1;
-        return;
-      }
+switch (iop)
+{
+case TECPLOT:
+{
+conn[0] = this->node(0)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(2)+1;
+conn[3] = this->node(3)+1;
+conn[4] = this->node(4)+1;
+conn[5] = this->node(5)+1;
+conn[6] = this->node(6)+1;
+conn[7] = this->node(7)+1;
+return;
+}
 
-    case VTK:
-      {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
-        conn[4] = this->node(4);
-        conn[5] = this->node(5);
-        conn[6] = this->node(6);
-        conn[7] = this->node(7);
-        return;
-      }
+case VTK:
+{
+conn[0] = this->node(0);
+conn[1] = this->node(1);
+conn[2] = this->node(2);
+conn[3] = this->node(3);
+conn[4] = this->node(4);
+conn[5] = this->node(5);
+conn[6] = this->node(6);
+conn[7] = this->node(7);
+return;
+}
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 
@@ -199,117 +199,117 @@ void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Hex8::_embedding_matrix[8][8][8] =
-  {
-    // The 8 children of the Hex-type elements can be thought of as being
-    // associated with the 8 vertices of the Hex.  Some of the children are
-    // numbered the same as their corresponding vertex, while some are
-    // not.  The children which are numbered differently have been marked
-    // with ** in the comments below.
+{
+// The 8 children of the Hex-type elements can be thought of as being
+// associated with the 8 vertices of the Hex.  Some of the children are
+// numbered the same as their corresponding vertex, while some are
+// not.  The children which are numbered differently have been marked
+// with ** in the comments below.
 
-    // embedding matrix for child 0 (child 0 is associated with vertex 0)
-    {
-      //  0     1     2     3     4     5     6     7
-      { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 2
-      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
-      { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 4
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 5
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 6
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}  // 7
-    },
+// embedding matrix for child 0 (child 0 is associated with vertex 0)
+{
+//  0     1     2     3     4     5     6     7
+{ 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
+{ 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
+{ .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 2
+{ 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
+{ 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 4
+{ .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 5
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 6
+{ .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}  // 7
+},
 
-    // embedding matrix for child 1 (child 1 is associated with vertex 1)
-    {
-      //  0     1     2     3     4     5     6     7
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 3
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 4
-      { 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 5
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 6
-      {.125, .125, .125, .125, .125, .125, .125, .125}  // 7
-    },
+// embedding matrix for child 1 (child 1 is associated with vertex 1)
+{
+//  0     1     2     3     4     5     6     7
+{ 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
+{ 0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
+{ 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
+{ .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 3
+{ .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 4
+{ 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 5
+{ 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 6
+{.125, .125, .125, .125, .125, .125, .125, .125}  // 7
+},
 
-    // embedding matrix for child 2 (child 2 is associated with vertex 3**)
-    {
-      //  0      1    2     3     4     5     6     7
-      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 2
-      { 0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0}, // 3
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 4
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 5
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 6
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}  // 7
-    },
+// embedding matrix for child 2 (child 2 is associated with vertex 3**)
+{
+//  0      1    2     3     4     5     6     7
+{ 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
+{ .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 1
+{ 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 2
+{ 0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0}, // 3
+{ .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 4
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 5
+{ 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 6
+{ 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}  // 7
+},
 
-    // embedding matrix for child 3 (child 3 is associated with vertex 2**)
-    {
-      //  0      1    2     3     4     5     6     7
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
-      { 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 4
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 5
-      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 6
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}  // 7
-    },
+// embedding matrix for child 3 (child 3 is associated with vertex 2**)
+{
+//  0      1    2     3     4     5     6     7
+{ .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 0
+{ 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
+{ 0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
+{ 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 4
+{ 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 5
+{ 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 6
+{ 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}  // 7
+},
 
-    // embedding matrix for child 4 (child 4 is associated with vertex 4)
-    {
-      //  0      1    2     3     4     5     6     7
-      { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 1
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 2
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 7
-    },
+// embedding matrix for child 4 (child 4 is associated with vertex 4)
+{
+//  0      1    2     3     4     5     6     7
+{ 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
+{ .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 1
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 2
+{ .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 3
+{ 0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0}, // 4
+{ 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 5
+{ 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 6
+{ 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 7
+},
 
-    // embedding matrix for child 5 (child 5 is associated with vertex 5)
-    {
-      //  0      1    2     3     4     5     6     7
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 0
-      { 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 1
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 2
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}  // 7
-    },
+// embedding matrix for child 5 (child 5 is associated with vertex 5)
+{
+//  0      1    2     3     4     5     6     7
+{ .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 0
+{ 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 1
+{ 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 2
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 3
+{ 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 4
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0}, // 5
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 6
+{ 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}  // 7
+},
 
-    // embedding matrix for child 6 (child 6 is associated with vertex 7**)
-    {
-      //  0      1    2     3     4     5     6     7
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 0
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 1
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 2
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 7
-    },
+// embedding matrix for child 6 (child 6 is associated with vertex 7**)
+{
+//  0      1    2     3     4     5     6     7
+{ .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 0
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 1
+{ 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 2
+{ 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}, // 3
+{ 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}, // 4
+{ 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 5
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 6
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 7
+},
 
-    // embedding matrix for child 7 (child 7 is associated with vertex 6**)
-    {
-      //  0      1    2     3     4     5     6     7
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 0
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 1
-      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 2
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}  // 7
-    }
-  };
+// embedding matrix for child 7 (child 7 is associated with vertex 6**)
+{
+//  0      1    2     3     4     5     6     7
+{.125, .125, .125, .125, .125, .125, .125, .125}, // 0
+{ 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 1
+{ 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 2
+{ 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 3
+{ 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 4
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 5
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0}, // 6
+{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}  // 7
+}
+};
 
 
 
@@ -320,39 +320,39 @@ const float Hex8::_embedding_matrix[8][8][8] =
 
 Real Hex8::volume () const
 {
-  // Make copies of our points.  It makes the subsequent calculations a bit
-  // shorter and avoids dereferencing the same pointer multiple times.
-  Point
-    x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),
-    x4 = point(4), x5 = point(5), x6 = point(6), x7 = point(7);
+// Make copies of our points.  It makes the subsequent calculations a bit
+// shorter and avoids dereferencing the same pointer multiple times.
+Point
+x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),
+x4 = point(4), x5 = point(5), x6 = point(6), x7 = point(7);
 
-  // Construct constant data vectors.  The notation is:
-  // \vec{x}_{\xi}   = \vec{a1}*eta*zeta + \vec{b1}*eta + \vec{c1}*zeta + \vec{d1}
-  // \vec{x}_{\eta}  = \vec{a2}*xi*zeta  + \vec{b2}*xi  + \vec{c2}*zeta + \vec{d2}
-  // \vec{x}_{\zeta} = \vec{a3}*xi*eta   + \vec{b3}*xi  + \vec{c3}*eta  + \vec{d3}
-  // but it turns out that a1, a2, and a3 are not needed for the volume calculation.
-  // This is copy-pasted directly from the output of a Python script, other
-  // than division by 8, which is done at the end when the volume is returned.
-  Point
-    b1 = x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7,
-    c1 = x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7,
-    d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7,
+// Construct constant data vectors.  The notation is:
+// \vec{x}_{\xi}   = \vec{a1}*eta*zeta + \vec{b1}*eta + \vec{c1}*zeta + \vec{d1}
+// \vec{x}_{\eta}  = \vec{a2}*xi*zeta  + \vec{b2}*xi  + \vec{c2}*zeta + \vec{d2}
+// \vec{x}_{\zeta} = \vec{a3}*xi*eta   + \vec{b3}*xi  + \vec{c3}*eta  + \vec{d3}
+// but it turns out that a1, a2, and a3 are not needed for the volume calculation.
+// This is copy-pasted directly from the output of a Python script, other
+// than division by 8, which is done at the end when the volume is returned.
+Point
+b1 = x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7,
+c1 = x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7,
+d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7,
 
-    b2 = b1,
-    c2 = x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7,
-    d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7,
+b2 = b1,
+c2 = x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7,
+d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7,
 
-    b3 = c1,
-    c3 = c2,
-    d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
+b3 = c1,
+c3 = c2,
+d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
 
-  // We could check for a quick return, but it's almost faster to just
-  // compute the result...
-  return
-    (triple_product(b1,d2,c3) +
-     triple_product(d1,b2,b3) +
-     triple_product(c1,c2,d3)) / 192. +
-    triple_product(d1,d2,d3) / 64.;
+// We could check for a quick return, but it's almost faster to just
+// compute the result...
+return
+(triple_product(b1,d2,c3) +
+triple_product(d1,b2,b3) +
+triple_product(c1,c2,d3)) / 192. +
+triple_product(d1,d2,d3) / 64.;
 }
 
 } // namespace libMesh

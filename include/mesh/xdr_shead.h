@@ -30,104 +30,104 @@ namespace libMesh
 class XdrSOLN;
 
 /**
- * The \p XdrSHEAD class.  This class is responsible for
- * reading/writing \p xdr solution file headers.
- *
- * \author Bill Barth
- * \author Robert McLay
- * \date 2000
- */
+* The \p XdrSHEAD class.  This class is responsible for
+* reading/writing \p xdr solution file headers.
+*
+* \author Bill Barth
+* \author Robert McLay
+* \date 2000
+*/
 class XdrSHEAD : public XdrHEAD
 {
-  friend class XdrSOLN;
+friend class XdrSOLN;
 public:
-  /**
-   * Constructor.
-   */
-  XdrSHEAD()                                    {}
+/**
+* Constructor.
+*/
+XdrSHEAD()                                    {}
 
-  /**
-   * Destructor.
-   */
-  ~XdrSHEAD()                                   {}
+/**
+* Destructor.
+*/
+~XdrSHEAD()                                   {}
 
-  /**
-   * Set the total number of
-   * solution variables.
-   */
-  void setNumVar(int numvar)                    { m_numvar = numvar; }
+/**
+* Set the total number of
+* solution variables.
+*/
+void setNumVar(int numvar)                    { m_numvar = numvar; }
 
-  //     /**
-  //      * Get the total number of
-  //      * solution variables.
-  //      */
-  //     int  getNumVar() const                        { return m_numvar; }
+//     /**
+//      * Get the total number of
+//      * solution variables.
+//      */
+//     int  getNumVar() const                        { return m_numvar; }
 
-  /**
-   * Set the number of written
-   * solution variables.
-   */
-  void setWrtVar(int wrtVar)                    { m_wrtVar = wrtVar; }
+/**
+* Set the number of written
+* solution variables.
+*/
+void setWrtVar(int wrtVar)                    { m_wrtVar = wrtVar; }
 
-  /**
-   * Get the number of written
-   * solution variables.
-   */
-  int  getWrtVar() const                        { return m_wrtVar; }
+/**
+* Get the number of written
+* solution variables.
+*/
+int  getWrtVar() const                        { return m_wrtVar; }
 
-  /**
-   * Set the mesh file number.
-   */
-  void setMeshCnt(int meshCnt)                  { m_meshCnt = meshCnt; }
+/**
+* Set the mesh file number.
+*/
+void setMeshCnt(int meshCnt)                  { m_meshCnt = meshCnt; }
 
-  //     /**
-  //      * Get the mesh file number.
-  //      */
-  //     int  getMeshCnt() const                       { return m_meshCnt; }
+//     /**
+//      * Get the mesh file number.
+//      */
+//     int  getMeshCnt() const                       { return m_meshCnt; }
 
-  /**
-   * Set the solution step
-   * number.
-   */
-  void setKstep(int kstep)                      { m_kstep = kstep; }
+/**
+* Set the solution step
+* number.
+*/
+void setKstep(int kstep)                      { m_kstep = kstep; }
 
-  //     /**
-  //      * Get the solution step
-  //      * number.
-  //      */
-  //     int  getKstep() const                         { return m_kstep; }
+//     /**
+//      * Get the solution step
+//      * number.
+//      */
+//     int  getKstep() const                         { return m_kstep; }
 
-  /**
-   * Set the solution time.
-   */
-  void setTime(Real time)                       { m_time = time; }
+/**
+* Set the solution time.
+*/
+void setTime(Real time)                       { m_time = time; }
 
-  //     /**
-  //      * Get the solution time.
-  //      */
-  //     Real getTime() const                          { return m_time; }
+//     /**
+//      * Get the solution time.
+//      */
+//     Real getTime() const                          { return m_time; }
 
-  /**
-   * Set the user solution title.
-   */
-  void setUserTitle(const char * title)          { delete [] mp_userTitle; mp_userTitle = cpyString(title); }
+/**
+* Set the user solution title.
+*/
+void setUserTitle(const char * title)          { delete [] mp_userTitle; mp_userTitle = cpyString(title); }
 
-  /**
-   * Get the user solution title.
-   */
-  const char * getUserTitle() const              { return mp_userTitle; }
+/**
+* Get the user solution title.
+*/
+const char * getUserTitle() const              { return mp_userTitle; }
 
-  /**
-   * Set null-terminated list of
-   * variable names.
-   */
-  void setVarTitle(const char * titles, int len) { delete [] mp_varTitle; mp_varTitle = cpyString(titles, len); }
+/**
+* Set null-terminated list of
+* variable names.
+*/
+void setVarTitle(const char * titles, int len) { delete [] mp_varTitle; mp_varTitle = cpyString(titles, len); }
 
-  /**
-   * Get null-terminated list of
-   * variable names.
-   */
-  const char * getVarTitle() const               { return mp_varTitle; }
+/**
+* Get null-terminated list of
+* variable names.
+*/
+const char * getVarTitle() const               { return mp_varTitle; }
 
 };
 

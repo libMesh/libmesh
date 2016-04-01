@@ -33,25 +33,25 @@ class Point;
 class Elem;
 
 /**
- * A simple functor class that provides a RBParameter-dependent function.
- */
+* A simple functor class that provides a RBParameter-dependent function.
+*/
 class RBParametrizedFunction
 {
 public:
 
-  /**
-   * Virtual evaluate() gives us a vtable, so there's no cost in adding a
-   * virtual destructor for safety's sake.
-   */
-  virtual ~RBParametrizedFunction() {}
+/**
+* Virtual evaluate() gives us a vtable, so there's no cost in adding a
+* virtual destructor for safety's sake.
+*/
+virtual ~RBParametrizedFunction() {}
 
-  /**
-   * Evaluate this parametrized function for the parameter value
-   * \p mu at the point \p p.
-   */
-  virtual Number evaluate(const RBParameters &,
-                          const Point &,
-                          const Elem &) { return 0.; }
+/**
+* Evaluate this parametrized function for the parameter value
+* \p mu at the point \p p.
+*/
+virtual Number evaluate(const RBParameters &,
+const Point &,
+const Elem &) { return 0.; }
 };
 
 }

@@ -31,90 +31,90 @@ namespace libMesh
 
 Tri3Subdivision::Tri3Subdivision(Elem * p) : Tri3(p), _subdivision_updated(true)
 {
-  if (p)
-    {
-      libmesh_assert_equal_to(p->type(), TRI3SUBDIVISION);
-      Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(p);
-      _is_ghost = sd_elem->is_ghost();
+if (p)
+{
+libmesh_assert_equal_to(p->type(), TRI3SUBDIVISION);
+Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(p);
+_is_ghost = sd_elem->is_ghost();
 
-      if (!_is_ghost)
-        {
-          _ordered_nodes[0] = sd_elem->get_ordered_node(0);
-          _ordered_nodes[1] = sd_elem->get_ordered_node(1);
-          _ordered_nodes[2] = sd_elem->get_ordered_node(2);
-        }
-    }
+if (!_is_ghost)
+{
+_ordered_nodes[0] = sd_elem->get_ordered_node(0);
+_ordered_nodes[1] = sd_elem->get_ordered_node(1);
+_ordered_nodes[2] = sd_elem->get_ordered_node(2);
+}
+}
 }
 
 
 void Tri3Subdivision::prepare_subdivision_properties()
 {
-  /*
-   * Find the index of the irregular vertex, if any.
-   * The current implementation can only handle triangles with
-   * no more than one irregular vertex. That is, a vertex with
-   * valence != 6.
-   */
-  unsigned int irregular_idx = 0;
-  for (unsigned int i = 0; i < 3; ++i)
-    {
-      if (this->get_node(i)->valence() != 6)
-        {
-          irregular_idx = i;
-          if (this->get_node(MeshTools::Subdivision::next[i])->valence() != 6 || this->get_node(MeshTools::Subdivision::prev[i])->valence() != 6)
-            libmesh_error_msg("Error: The mesh contains elements with more than one irregular vertex!");
-        }
-    }
+/*
+* Find the index of the irregular vertex, if any.
+* The current implementation can only handle triangles with
+* no more than one irregular vertex. That is, a vertex with
+* valence != 6.
+*/
+unsigned int irregular_idx = 0;
+for (unsigned int i = 0; i < 3; ++i)
+{
+if (this->get_node(i)->valence() != 6)
+{
+irregular_idx = i;
+if (this->get_node(MeshTools::Subdivision::next[i])->valence() != 6 || this->get_node(MeshTools::Subdivision::prev[i])->valence() != 6)
+libmesh_error_msg("Error: The mesh contains elements with more than one irregular vertex!");
+}
+}
 
-  /*
-   * Rotate ordered vertices such that ordered_nodes[0] is the
-   * irregular vertex. Doing this once in advance lets the evaluation
-   * of subdivision interpolation be much more efficient afterwards.
-   */
-  switch (irregular_idx)
-    {
-    case 0:
-      _ordered_nodes[0] = this->get_node(0);
-      _ordered_nodes[1] = this->get_node(1);
-      _ordered_nodes[2] = this->get_node(2);
-      break;
-    case 1:
-      _ordered_nodes[0] = this->get_node(1);
-      _ordered_nodes[1] = this->get_node(2);
-      _ordered_nodes[2] = this->get_node(0);
-      break;
-    case 2:
-      _ordered_nodes[0] = this->get_node(2);
-      _ordered_nodes[1] = this->get_node(0);
-      _ordered_nodes[2] = this->get_node(1);
-      break;
-    default:
-      libmesh_error_msg("Unrecognized irregular_idx = " << irregular_idx);
-    }
+/*
+* Rotate ordered vertices such that ordered_nodes[0] is the
+* irregular vertex. Doing this once in advance lets the evaluation
+* of subdivision interpolation be much more efficient afterwards.
+*/
+switch (irregular_idx)
+{
+case 0:
+_ordered_nodes[0] = this->get_node(0);
+_ordered_nodes[1] = this->get_node(1);
+_ordered_nodes[2] = this->get_node(2);
+break;
+case 1:
+_ordered_nodes[0] = this->get_node(1);
+_ordered_nodes[1] = this->get_node(2);
+_ordered_nodes[2] = this->get_node(0);
+break;
+case 2:
+_ordered_nodes[0] = this->get_node(2);
+_ordered_nodes[1] = this->get_node(0);
+_ordered_nodes[2] = this->get_node(1);
+break;
+default:
+libmesh_error_msg("Unrecognized irregular_idx = " << irregular_idx);
+}
 
-  _subdivision_updated = true;
+_subdivision_updated = true;
 }
 
 
 unsigned int Tri3Subdivision::local_node_number(unsigned int node_id) const
 {
-  return (_nodes[0]->id() == node_id) ? 0 : ( (_nodes[1]->id() == node_id) ? 1 : ( (_nodes[2]->id() == node_id) ? 2 : 3 ) );
+return (_nodes[0]->id() == node_id) ? 0 : ( (_nodes[1]->id() == node_id) ? 1 : ( (_nodes[2]->id() == node_id) ? 2 : 3 ) );
 }
 
 
 unsigned int Tri3Subdivision::get_ordered_valence(unsigned int node_id) const
 {
-  libmesh_assert_less(node_id, n_neighbors());
-  libmesh_assert(_subdivision_updated);
-  return get_ordered_node(node_id)->valence();
+libmesh_assert_less(node_id, n_neighbors());
+libmesh_assert(_subdivision_updated);
+return get_ordered_node(node_id)->valence();
 }
 
 
 Node * Tri3Subdivision::get_ordered_node(unsigned int node_id) const
 {
-  libmesh_assert_less(node_id, 3);
-  libmesh_assert(_subdivision_updated);
-  return _ordered_nodes[node_id];
+libmesh_assert_less(node_id, 3);
+libmesh_assert(_subdivision_updated);
+return _ordered_nodes[node_id];
 }
 
 } // namespace libMesh

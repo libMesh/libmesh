@@ -25,29 +25,29 @@
 namespace libMesh {
 
 /**
- * Defines an \p enum for iterative solver types
- */
+* Defines an \p enum for iterative solver types
+*/
 enum SolverType {CG=0,
-                 CGN,
-                 CGS,
-                 CR,
-                 QMR,
-                 TCQMR,
-                 TFQMR,
-                 BICG,
-                 BICGSTAB,
-                 MINRES,
-                 GMRES,
-                 LSQR,
-                 JACOBI,
-                 SOR_FORWARD,
-                 SOR_BACKWARD,
-                 SSOR,
-                 RICHARDSON,
-                 CHEBYSHEV,
-                 SPARSELU,
+CGN,
+CGS,
+CR,
+QMR,
+TCQMR,
+TFQMR,
+BICG,
+BICGSTAB,
+MINRES,
+GMRES,
+LSQR,
+JACOBI,
+SOR_FORWARD,
+SOR_BACKWARD,
+SSOR,
+RICHARDSON,
+CHEBYSHEV,
+SPARSELU,
 
-                 INVALID_SOLVER};
+INVALID_SOLVER};
 }
 
 #endif // LIBMESH_ENUM_SOLVER_TYPE_H

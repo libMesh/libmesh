@@ -35,25 +35,25 @@ namespace libMesh
 template <typename T>
 Real StatisticsVector<T>::l2_norm() const
 {
-  Real normsq = 0.;
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
-  for (dof_id_type i = 0; i != n; ++i)
-    normsq += ((*this)[i] * (*this)[i]);
+Real normsq = 0.;
+const dof_id_type n = cast_int<dof_id_type>(this->size());
+for (dof_id_type i = 0; i != n; ++i)
+normsq += ((*this)[i] * (*this)[i]);
 
-  return std::sqrt(normsq);
+return std::sqrt(normsq);
 }
 
 
 template <typename T>
 T StatisticsVector<T>::minimum() const
 {
-  START_LOG ("minimum()", "StatisticsVector");
+START_LOG ("minimum()", "StatisticsVector");
 
-  const T min = *(std::min_element(this->begin(), this->end()));
+const T min = *(std::min_element(this->begin(), this->end()));
 
-  STOP_LOG ("minimum()", "StatisticsVector");
+STOP_LOG ("minimum()", "StatisticsVector");
 
-  return min;
+return min;
 }
 
 
@@ -62,13 +62,13 @@ T StatisticsVector<T>::minimum() const
 template <typename T>
 T StatisticsVector<T>::maximum() const
 {
-  START_LOG ("maximum()", "StatisticsVector");
+START_LOG ("maximum()", "StatisticsVector");
 
-  const T max = *(std::max_element(this->begin(), this->end()));
+const T max = *(std::max_element(this->begin(), this->end()));
 
-  STOP_LOG ("maximum()", "StatisticsVector");
+STOP_LOG ("maximum()", "StatisticsVector");
 
-  return max;
+return max;
 }
 
 
@@ -77,21 +77,21 @@ T StatisticsVector<T>::maximum() const
 template <typename T>
 Real StatisticsVector<T>::mean() const
 {
-  START_LOG ("mean()", "StatisticsVector");
+START_LOG ("mean()", "StatisticsVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  Real the_mean = 0;
+Real the_mean = 0;
 
-  for (dof_id_type i=0; i<n; i++)
-    {
-      the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) /
-        static_cast<Real>(i + 1);
-    }
+for (dof_id_type i=0; i<n; i++)
+{
+the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) /
+static_cast<Real>(i + 1);
+}
 
-  STOP_LOG ("mean()", "StatisticsVector");
+STOP_LOG ("mean()", "StatisticsVector");
 
-  return the_mean;
+return the_mean;
 }
 
 
@@ -100,35 +100,35 @@ Real StatisticsVector<T>::mean() const
 template <typename T>
 Real StatisticsVector<T>::median()
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  if (n == 0)
-    return 0.;
+if (n == 0)
+return 0.;
 
-  START_LOG ("median()", "StatisticsVector");
+START_LOG ("median()", "StatisticsVector");
 
-  std::sort(this->begin(), this->end());
+std::sort(this->begin(), this->end());
 
-  const dof_id_type lhs = (n-1) / 2;
-  const dof_id_type rhs = n / 2;
+const dof_id_type lhs = (n-1) / 2;
+const dof_id_type rhs = n / 2;
 
-  Real the_median = 0;
+Real the_median = 0;
 
 
-  if (lhs == rhs)
-    {
-      the_median = static_cast<Real>((*this)[lhs]);
-    }
+if (lhs == rhs)
+{
+the_median = static_cast<Real>((*this)[lhs]);
+}
 
-  else
-    {
-      the_median = ( static_cast<Real>((*this)[lhs]) +
-                     static_cast<Real>((*this)[rhs]) ) / 2.0;
-    }
+else
+{
+the_median = ( static_cast<Real>((*this)[lhs]) +
+static_cast<Real>((*this)[rhs]) ) / 2.0;
+}
 
-  STOP_LOG ("median()", "StatisticsVector");
+STOP_LOG ("median()", "StatisticsVector");
 
-  return the_median;
+return the_median;
 }
 
 
@@ -137,9 +137,9 @@ Real StatisticsVector<T>::median()
 template <typename T>
 Real StatisticsVector<T>::median() const
 {
-  StatisticsVector<T> sv = (*this);
+StatisticsVector<T> sv = (*this);
 
-  return sv.median();
+return sv.median();
 }
 
 
@@ -148,38 +148,38 @@ Real StatisticsVector<T>::median() const
 template <typename T>
 Real StatisticsVector<T>::variance(const Real mean_in) const
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  START_LOG ("variance()", "StatisticsVector");
+START_LOG ("variance()", "StatisticsVector");
 
-  Real the_variance = 0;
+Real the_variance = 0;
 
-  for (dof_id_type i=0; i<n; i++)
-    {
-      const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
-      the_variance += (delta * delta - the_variance) /
-        static_cast<Real>(i + 1);
-    }
+for (dof_id_type i=0; i<n; i++)
+{
+const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
+the_variance += (delta * delta - the_variance) /
+static_cast<Real>(i + 1);
+}
 
-  if (n > 1)
-    the_variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
+if (n > 1)
+the_variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
 
-  STOP_LOG ("variance()", "StatisticsVector");
+STOP_LOG ("variance()", "StatisticsVector");
 
-  return the_variance;
+return the_variance;
 }
 
 
 template <typename T>
 void StatisticsVector<T>::normalize()
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
-  const Real max = this->maximum();
+const dof_id_type n = cast_int<dof_id_type>(this->size());
+const Real max = this->maximum();
 
-  for (dof_id_type i=0; i<n; i++)
-    {
-      (*this)[i] = static_cast<T>((*this)[i] / max);
-    }
+for (dof_id_type i=0; i<n; i++)
+{
+(*this)[i] = static_cast<T>((*this)[i] / max);
+}
 }
 
 
@@ -188,93 +188,93 @@ void StatisticsVector<T>::normalize()
 
 template <typename T>
 void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
-                                    unsigned int n_bins)
+unsigned int n_bins)
 {
-  // Must have at least 1 bin
-  libmesh_assert (n_bins>0);
+// Must have at least 1 bin
+libmesh_assert (n_bins>0);
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  std::sort(this->begin(), this->end());
+std::sort(this->begin(), this->end());
 
-  // The StatisticsVector can hold both integer and float types.
-  // We will define all the bins, etc. using Reals.
-  Real min      = static_cast<Real>(this->minimum());
-  Real max      = static_cast<Real>(this->maximum());
-  Real bin_size = (max - min) / static_cast<Real>(n_bins);
+// The StatisticsVector can hold both integer and float types.
+// We will define all the bins, etc. using Reals.
+Real min      = static_cast<Real>(this->minimum());
+Real max      = static_cast<Real>(this->maximum());
+Real bin_size = (max - min) / static_cast<Real>(n_bins);
 
-  START_LOG ("histogram()", "StatisticsVector");
+START_LOG ("histogram()", "StatisticsVector");
 
-  std::vector<Real> bin_bounds(n_bins+1);
-  for (unsigned int i=0; i<bin_bounds.size(); i++)
-    bin_bounds[i] = min + i * bin_size;
+std::vector<Real> bin_bounds(n_bins+1);
+for (unsigned int i=0; i<bin_bounds.size(); i++)
+bin_bounds[i] = min + i * bin_size;
 
-  // Give the last bin boundary a little wiggle room: we don't want
-  // it to be just barely less than the max, otherwise our bin test below
-  // may fail.
-  bin_bounds.back() += 1.e-6 * bin_size;
+// Give the last bin boundary a little wiggle room: we don't want
+// it to be just barely less than the max, otherwise our bin test below
+// may fail.
+bin_bounds.back() += 1.e-6 * bin_size;
 
-  // This vector will store the number of members each bin has.
-  bin_members.resize(n_bins);
+// This vector will store the number of members each bin has.
+bin_members.resize(n_bins);
 
-  dof_id_type data_index = 0;
-  for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
-    {
-      // libMesh::out << "(debug) Filling bin " << j << std::endl;
+dof_id_type data_index = 0;
+for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
+{
+// libMesh::out << "(debug) Filling bin " << j << std::endl;
 
-      for (dof_id_type i=data_index; i<n; i++) // data vector indexing
-        {
-          //libMesh::out << "(debug) Processing index=" << i << std::endl;
-          Real current_val = static_cast<Real>( (*this)[i] );
+for (dof_id_type i=data_index; i<n; i++) // data vector indexing
+{
+//libMesh::out << "(debug) Processing index=" << i << std::endl;
+Real current_val = static_cast<Real>( (*this)[i] );
 
-          // There may be entries in the vector smaller than the value
-          // reported by this->minimum().  (e.g. inactive elements in an
-          // ErrorVector.)  We just skip entries like that.
-          if ( current_val < min )
-            {
-              //     libMesh::out << "(debug) Skipping entry v[" << i << "]="
-              //       << (*this)[i]
-              //       << " which is less than the min value: min="
-              //       << min << std::endl;
-              continue;
-            }
+// There may be entries in the vector smaller than the value
+// reported by this->minimum().  (e.g. inactive elements in an
+// ErrorVector.)  We just skip entries like that.
+if ( current_val < min )
+{
+//     libMesh::out << "(debug) Skipping entry v[" << i << "]="
+//       << (*this)[i]
+//       << " which is less than the min value: min="
+//       << min << std::endl;
+continue;
+}
 
-          if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
-            // by bin_bounds[j] and bin_bounds[j+1])
-            {
-              // libMesh::out.precision(16);
-              //     libMesh::out.setf(std::ios_base::fixed);
-              //     libMesh::out << "(debug) (*this)[i]= " << (*this)[i]
-              //       << " is greater than bin_bounds[j+1]="
-              //      << bin_bounds[j+1] << std::endl;
-              data_index = i; // start searching here for next bin
-              break; // go to next bin
-            }
+if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
+// by bin_bounds[j] and bin_bounds[j+1])
+{
+// libMesh::out.precision(16);
+//     libMesh::out.setf(std::ios_base::fixed);
+//     libMesh::out << "(debug) (*this)[i]= " << (*this)[i]
+//       << " is greater than bin_bounds[j+1]="
+//      << bin_bounds[j+1] << std::endl;
+data_index = i; // start searching here for next bin
+break; // go to next bin
+}
 
-          // Otherwise, increment current bin's count
-          bin_members[j]++;
-          // libMesh::out << "(debug) Binned index=" << i << std::endl;
-        }
-    }
+// Otherwise, increment current bin's count
+bin_members[j]++;
+// libMesh::out << "(debug) Binned index=" << i << std::endl;
+}
+}
 
 #ifdef DEBUG
-  // Check the number of binned entries
-  const dof_id_type n_binned = std::accumulate(bin_members.begin(),
-                                               bin_members.end(),
-                                               static_cast<dof_id_type>(0),
-                                               std::plus<dof_id_type>());
+// Check the number of binned entries
+const dof_id_type n_binned = std::accumulate(bin_members.begin(),
+bin_members.end(),
+static_cast<dof_id_type>(0),
+std::plus<dof_id_type>());
 
-  if (n != n_binned)
-    {
-      libMesh::out << "Warning: The number of binned entries, n_binned="
-                   << n_binned
-                   << ", did not match the total number of entries, n="
-                   << n << "." << std::endl;
-    }
+if (n != n_binned)
+{
+libMesh::out << "Warning: The number of binned entries, n_binned="
+<< n_binned
+<< ", did not match the total number of entries, n="
+<< n << "." << std::endl;
+}
 #endif
 
 
-  STOP_LOG ("histogram()", "StatisticsVector");
+STOP_LOG ("histogram()", "StatisticsVector");
 }
 
 
@@ -283,54 +283,54 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
 
 template <typename T>
 void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
-                                         const std::string & filename,
-                                         unsigned int n_bins)
+const std::string & filename,
+unsigned int n_bins)
 {
-  // First generate the histogram with the desired number of bins
-  std::vector<dof_id_type> bin_members;
-  this->histogram(bin_members, n_bins);
+// First generate the histogram with the desired number of bins
+std::vector<dof_id_type> bin_members;
+this->histogram(bin_members, n_bins);
 
-  // The max, min and bin size are used to generate x-axis values.
-  T min      = this->minimum();
-  T max      = this->maximum();
-  T bin_size = (max - min) / static_cast<T>(n_bins);
+// The max, min and bin size are used to generate x-axis values.
+T min      = this->minimum();
+T max      = this->maximum();
+T bin_size = (max - min) / static_cast<T>(n_bins);
 
-  // On processor 0: Write histogram to file
-  if (my_procid==0)
-    {
-      std::ofstream out_stream (filename.c_str());
+// On processor 0: Write histogram to file
+if (my_procid==0)
+{
+std::ofstream out_stream (filename.c_str());
 
-      out_stream << "clear all\n";
-      out_stream << "clf\n";
-      //out_stream << "x=linspace(" << min << "," << max << "," << n_bins+1 << ");\n";
+out_stream << "clear all\n";
+out_stream << "clf\n";
+//out_stream << "x=linspace(" << min << "," << max << "," << n_bins+1 << ");\n";
 
-      // abscissa values are located at the center of each bin.
-      out_stream << "x=[";
-      for (unsigned int i=0; i<bin_members.size(); ++i)
-        {
-          out_stream << min + (i+0.5)*bin_size << " ";
-        }
-      out_stream << "];\n";
+// abscissa values are located at the center of each bin.
+out_stream << "x=[";
+for (unsigned int i=0; i<bin_members.size(); ++i)
+{
+out_stream << min + (i+0.5)*bin_size << " ";
+}
+out_stream << "];\n";
 
-      out_stream << "y=[";
-      for (unsigned int i=0; i<bin_members.size(); ++i)
-        {
-          out_stream << bin_members[i] << " ";
-        }
-      out_stream << "];\n";
-      out_stream << "bar(x,y);\n";
-    }
+out_stream << "y=[";
+for (unsigned int i=0; i<bin_members.size(); ++i)
+{
+out_stream << bin_members[i] << " ";
+}
+out_stream << "];\n";
+out_stream << "bar(x,y);\n";
+}
 }
 
 
 
 template <typename T>
 void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
-                                    unsigned int n_bins) const
+unsigned int n_bins) const
 {
-  StatisticsVector<T> sv = (*this);
+StatisticsVector<T> sv = (*this);
 
-  return sv.histogram(bin_members, n_bins);
+return sv.histogram(bin_members, n_bins);
 }
 
 
@@ -339,24 +339,24 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
 template <typename T>
 std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
 {
-  START_LOG ("cut_below()", "StatisticsVector");
+START_LOG ("cut_below()", "StatisticsVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+std::vector<dof_id_type> cut_indices;
+cut_indices.reserve(n/2);  // Arbitrary
 
-  for (dof_id_type i=0; i<n; i++)
-    {
-      if ((*this)[i] < cut)
-        {
-          cut_indices.push_back(i);
-        }
-    }
+for (dof_id_type i=0; i<n; i++)
+{
+if ((*this)[i] < cut)
+{
+cut_indices.push_back(i);
+}
+}
 
-  STOP_LOG ("cut_below()", "StatisticsVector");
+STOP_LOG ("cut_below()", "StatisticsVector");
 
-  return cut_indices;
+return cut_indices;
 }
 
 
@@ -365,24 +365,24 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
 template <typename T>
 std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
 {
-  START_LOG ("cut_above()", "StatisticsVector");
+START_LOG ("cut_above()", "StatisticsVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+std::vector<dof_id_type> cut_indices;
+cut_indices.reserve(n/2);  // Arbitrary
 
-  for (dof_id_type i=0; i<n; i++)
-    {
-      if ((*this)[i] > cut)
-        {
-          cut_indices.push_back(i);
-        }
-    }
+for (dof_id_type i=0; i<n; i++)
+{
+if ((*this)[i] > cut)
+{
+cut_indices.push_back(i);
+}
+}
 
-  STOP_LOG ("cut_above()", "StatisticsVector");
+STOP_LOG ("cut_above()", "StatisticsVector");
 
-  return cut_indices;
+return cut_indices;
 }
 
 

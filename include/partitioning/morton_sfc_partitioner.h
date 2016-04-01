@@ -31,39 +31,39 @@ namespace libMesh
 
 
 /**
- * The \p MortonSFCPartitioner uses a Morton space
- * filling curve to partition the elements.
- */
+* The \p MortonSFCPartitioner uses a Morton space
+* filling curve to partition the elements.
+*/
 class MortonSFCPartitioner : public SFCPartitioner
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  MortonSFCPartitioner ()
-  {
-    this->set_sfc_type ("Morton");
-  }
+/**
+* Constructor.
+*/
+MortonSFCPartitioner ()
+{
+this->set_sfc_type ("Morton");
+}
 
-  /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
-  {
-    return UniquePtr<Partitioner>(new MortonSFCPartitioner());
-  }
+/**
+* Creates a new partitioner of this type and returns it in
+* an \p UniquePtr.
+*/
+virtual UniquePtr<Partitioner> clone () const libmesh_override
+{
+return UniquePtr<Partitioner>(new MortonSFCPartitioner());
+}
 
 protected:
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override
-  {
-    SFCPartitioner::_do_partition (mesh, n);
-  }
+/**
+* Partition the \p MeshBase into \p n subdomains.
+*/
+virtual void _do_partition (MeshBase & mesh,
+const unsigned int n) libmesh_override
+{
+SFCPartitioner::_do_partition (mesh, n);
+}
 };
 
 } // namespace libMesh

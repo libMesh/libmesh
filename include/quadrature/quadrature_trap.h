@@ -29,52 +29,52 @@ namespace libMesh
 {
 
 /**
- * This class implemenets trapezoidal quadratue.  Sometimes also known
- * as Newton-Cotes quadrature with two points.  These rules sample at
- * the corners and will integrate linears exactly.
- *
- * \author Benjamin Kirk
- * \date 2003
- */
+* This class implemenets trapezoidal quadratue.  Sometimes also known
+* as Newton-Cotes quadrature with two points.  These rules sample at
+* the corners and will integrate linears exactly.
+*
+* \author Benjamin Kirk
+* \date 2003
+*/
 class QTrap : public QBase
 {
 public:
 
-  /**
-   * Constructor.  Declares the dimension of the quadrature rule.
-   */
-  explicit
-  QTrap (const unsigned int _dim,
-         const Order o=FIRST) :
-    QBase(_dim,o)
-  {
-    // explicitly call the init function in 1D since the
-    // other tensor-product rules require this one.
-    // note that EDGE will not be used internally, however
-    // if we called the function with INVALID_ELEM it would try to
-    // be smart and return, thinking it had already done the work.
-    if (_dim == 1)
-      init(EDGE2);
-  }
+/**
+* Constructor.  Declares the dimension of the quadrature rule.
+*/
+explicit
+QTrap (const unsigned int _dim,
+const Order o=FIRST) :
+QBase(_dim,o)
+{
+// explicitly call the init function in 1D since the
+// other tensor-product rules require this one.
+// note that EDGE will not be used internally, however
+// if we called the function with INVALID_ELEM it would try to
+// be smart and return, thinking it had already done the work.
+if (_dim == 1)
+init(EDGE2);
+}
 
-  /**
-   * Destructor. Empty.
-   */
-  ~QTrap() {}
+/**
+* Destructor. Empty.
+*/
+~QTrap() {}
 
-  /**
-   * @returns \p QTRAP
-   */
-  virtual QuadratureType type() const libmesh_override { return QTRAP; }
+/**
+* @returns \p QTRAP
+*/
+virtual QuadratureType type() const libmesh_override { return QTRAP; }
 
 private:
 
-  virtual void init_1D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
-  virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
+virtual void init_1D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+virtual void init_2D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+virtual void init_3D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
 };
 
 } // namespace libMesh

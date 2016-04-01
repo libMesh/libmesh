@@ -25,49 +25,49 @@ namespace libMesh
 // XdrHEAD members
 XdrHEAD::XdrHEAD()
 {
-  m_wrtVar = 0;
-  m_numvar = 0;
+m_wrtVar = 0;
+m_numvar = 0;
 
-  m_meshCnt = 0;
-  m_kstep = 0;
+m_meshCnt = 0;
+m_kstep = 0;
 
-  m_numel = 0;
-  m_numNodes = 0;
-  m_sumWghts = 0;
-  m_numBCs = 0;
-  m_strSize = 0;
-  mp_id = 0;
-  mp_title = 0;
-  mp_userTitle = 0;
-  mp_varTitle = 0;
+m_numel = 0;
+m_numNodes = 0;
+m_sumWghts = 0;
+m_numBCs = 0;
+m_strSize = 0;
+mp_id = 0;
+mp_title = 0;
+mp_userTitle = 0;
+mp_varTitle = 0;
 
-  m_time = 0;
+m_time = 0;
 }
 
 
 
 XdrHEAD::~XdrHEAD()
 {
-  delete [] mp_id;
-  delete [] mp_title;
-  delete [] mp_userTitle;
-  delete [] mp_varTitle;
+delete [] mp_id;
+delete [] mp_title;
+delete [] mp_userTitle;
+delete [] mp_varTitle;
 }
 
 
 
 char * XdrHEAD::cpyString(const char * src, int len)
 {
-  char * temp = libmesh_nullptr;
-  int myLen = len;
-  if(src)
-    {
-      if (myLen == -1)
-        myLen = cast_int<int>(std::strlen(src))+1;
-      temp = new char[myLen];
-      temp = (char *) std::memcpy(temp, src, (myLen)*sizeof(char));
-    }
-  return temp;
+char * temp = libmesh_nullptr;
+int myLen = len;
+if(src)
+{
+if (myLen == -1)
+myLen = cast_int<int>(std::strlen(src))+1;
+temp = new char[myLen];
+temp = (char *) std::memcpy(temp, src, (myLen)*sizeof(char));
+}
+return temp;
 }
 
 } // namespace libMesh

@@ -48,32 +48,32 @@ std::string ReferenceCounter::get_info ()
 {
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-  std::ostringstream oss;
+std::ostringstream oss;
 
-  oss << '\n'
-      << " ---------------------------------------------------------------------------- \n"
-      << "| Reference count information                                                |\n"
-      << " ---------------------------------------------------------------------------- \n";
+oss << '\n'
+<< " ---------------------------------------------------------------------------- \n"
+<< "| Reference count information                                                |\n"
+<< " ---------------------------------------------------------------------------- \n";
 
-  for (Counts::iterator it = _counts.begin();
-       it != _counts.end(); ++it)
-    {
-      const std::string name(it->first);
-      const unsigned int creations    = it->second.first;
-      const unsigned int destructions = it->second.second;
+for (Counts::iterator it = _counts.begin();
+it != _counts.end(); ++it)
+{
+const std::string name(it->first);
+const unsigned int creations    = it->second.first;
+const unsigned int destructions = it->second.second;
 
-      oss << "| " << name << " reference count information:\n"
-          << "|  Creations:    " << creations    << '\n'
-          << "|  Destructions: " << destructions << '\n';
-    }
+oss << "| " << name << " reference count information:\n"
+<< "|  Creations:    " << creations    << '\n'
+<< "|  Destructions: " << destructions << '\n';
+}
 
-  oss << " ---------------------------------------------------------------------------- \n";
+oss << " ---------------------------------------------------------------------------- \n";
 
-  return oss.str();
+return oss.str();
 
 #else
 
-  return "";
+return "";
 
 #endif
 }
@@ -87,7 +87,7 @@ std::string ReferenceCounter::get_info ()
 
 void ReferenceCounter::print_info (std::ostream & out_stream)
 {
-  if( _enable_print_counter ) out_stream << ReferenceCounter::get_info();
+if( _enable_print_counter ) out_stream << ReferenceCounter::get_info();
 }
 
 #else
@@ -99,14 +99,14 @@ void ReferenceCounter::print_info (std::ostream & /* out_stream */)
 
 void ReferenceCounter::enable_print_counter_info()
 {
-  _enable_print_counter = true;
-  return;
+_enable_print_counter = true;
+return;
 }
 
 void ReferenceCounter::disable_print_counter_info()
 {
-  _enable_print_counter = false;
-  return;
+_enable_print_counter = false;
+return;
 }
 
 } // namespace libMesh

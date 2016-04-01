@@ -37,11 +37,11 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfQuad6 class static member initializations
 const unsigned int InfQuad6::side_nodes_map[3][3] =
-  {
-    {0, 1, 4}, // Side 0
-    {1, 3},    // Side 1
-    {0, 2}     // Side 2
-  };
+{
+{0, 1, 4}, // Side 0
+{1, 3},    // Side 1
+{0, 2}     // Side 2
+};
 
 
 // ------------------------------------------------------------
@@ -49,59 +49,59 @@ const unsigned int InfQuad6::side_nodes_map[3][3] =
 
 bool InfQuad6::is_vertex(const unsigned int i) const
 {
-  if (i < 2)
-    return true;
-  return false;
+if (i < 2)
+return true;
+return false;
 }
 
 bool InfQuad6::is_edge(const unsigned int i) const
 {
-  if (i < 2)
-    return false;
-  return true;
+if (i < 2)
+return false;
+return true;
 }
 
 bool InfQuad6::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool InfQuad6::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 3; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 #ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad6::_embedding_matrix[2][6][6] =
-  {
-    // embedding matrix for child 0
-    {
-      //     0       1       2       3       4       5th parent node
-      {    1.0,    0.0,    0.0,    0.0,    0.0,    0.0 }, // 0th child node
-      {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 1
-      {    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
-      {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
-      {  0.375, -0.125,    0.0,    0.0,   0.75,    0.0 }, // 4
-      {    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
-    },
+{
+// embedding matrix for child 0
+{
+//     0       1       2       3       4       5th parent node
+{    1.0,    0.0,    0.0,    0.0,    0.0,    0.0 }, // 0th child node
+{    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 1
+{    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
+{    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
+{  0.375, -0.125,    0.0,    0.0,   0.75,    0.0 }, // 4
+{    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
+},
 
-    // embedding matrix for child 1
-    {
-      //     0       1       2       3       4       5th parent node
-      {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 0th child node
-      {    0.0,    1.0,    0.0,    0.0,    0.0,    0.0 }, // 1
-      {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
-      {    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
-      { -0.125,  0.375,    0.0,    0.0,   0.75,    0.0 }, // 4
-      {    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
-    }
-  };
+// embedding matrix for child 1
+{
+//     0       1       2       3       4       5th parent node
+{    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 0th child node
+{    0.0,    1.0,    0.0,    0.0,    0.0,    0.0 }, // 1
+{    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
+{    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
+{ -0.125,  0.375,    0.0,    0.0,   0.75,    0.0 }, // 4
+{    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
+}
+};
 
 #endif
 
@@ -110,164 +110,164 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 dof_id_type InfQuad6::key (const unsigned int s) const
 {
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-      // Edge3 side
-    case 0:
-      return this->compute_key (this->node(4));
+switch (s)
+{
+// Edge3 side
+case 0:
+return this->compute_key (this->node(4));
 
-      // InfEdge
-    case 1:
-    case 2:
-      return InfQuad::key(s);
+// InfEdge
+case 1:
+case 2:
+return InfQuad::key(s);
 
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
-    }
+default:
+libmesh_error_msg("Invalid side s = " << s);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 }
 
 
 
 UniquePtr<Elem> InfQuad6::build_side (const unsigned int i,
-                                      bool proxy) const
+bool proxy) const
 {
-  // libmesh_assert_less (i, this->n_sides());
+// libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    {
-      switch (i)
-        {
-        case 0:
-          return UniquePtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
+if (proxy)
+{
+switch (i)
+{
+case 0:
+return UniquePtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
 
-        case 1:
-        case 2:
-          return UniquePtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
+case 1:
+case 2:
+return UniquePtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-    }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
+}
 
-  else
-    {
-      // Create NULL pointer to be initialized, returned later.
-      Elem * edge = libmesh_nullptr;
+else
+{
+// Create NULL pointer to be initialized, returned later.
+Elem * edge = libmesh_nullptr;
 
-      switch (i)
-        {
-        case 0:
-          {
-            edge = new Edge3;
-            break;
-          }
+switch (i)
+{
+case 0:
+{
+edge = new Edge3;
+break;
+}
 
-          // adjacent to another infinite element
-        case 1:
-        case 2:
-          {
-            edge = new InfEdge2;
-            break;
-          }
+// adjacent to another infinite element
+case 1:
+case 2:
+{
+edge = new InfEdge2;
+break;
+}
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-      edge->subdomain_id() = this->subdomain_id();
+edge->subdomain_id() = this->subdomain_id();
 
-      // Set the nodes
-      for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(InfQuad6::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<edge->n_nodes(); ++n)
+edge->set_node(n) = this->get_node(InfQuad6::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(edge);
-    }
+return UniquePtr<Elem>(edge);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 
 
 void InfQuad6::connectivity(const unsigned int sf,
-                            const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert_less (sf, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert_less (sf, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-  conn.resize(4);
+conn.resize(4);
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        switch(sf)
-          {
-          case 0:
-            // linear sub-quad 0
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(4)+1;
-            conn[2] = this->node(5)+1;
-            conn[3] = this->node(2)+1;
+switch (iop)
+{
+case TECPLOT:
+{
+switch(sf)
+{
+case 0:
+// linear sub-quad 0
+conn[0] = this->node(0)+1;
+conn[1] = this->node(4)+1;
+conn[2] = this->node(5)+1;
+conn[3] = this->node(2)+1;
 
-            return;
+return;
 
-          case 1:
-            // linear sub-quad 1
-            conn[0] = this->node(4)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(3)+1;
-            conn[3] = this->node(5)+1;
+case 1:
+// linear sub-quad 1
+conn[0] = this->node(4)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(3)+1;
+conn[3] = this->node(5)+1;
 
-            return;
+return;
 
-          default:
-            libmesh_error_msg("Invalid sf = " << sf);
-          }
-      }
+default:
+libmesh_error_msg("Invalid sf = " << sf);
+}
+}
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 
 
 
 unsigned short int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
-                                                           const unsigned int v) const
+const unsigned int v) const
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
-  libmesh_assert_less (v, 2);
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
+libmesh_assert_greater_equal (n, this->n_vertices());
+libmesh_assert_less (n, this->n_nodes());
+libmesh_assert_less (v, 2);
+return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 
 
 const unsigned short int InfQuad6::_second_order_adjacent_vertices[2][2] =
-  {
-    {0, 1}, // vertices adjacent to node 4
-    {2, 3}  // vertices adjacent to node 5
-  };
+{
+{0, 1}, // vertices adjacent to node 4
+{2, 3}  // vertices adjacent to node 5
+};
 
 
 
 std::pair<unsigned short int, unsigned short int>
 InfQuad6::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
+libmesh_assert_greater_equal (n, this->n_vertices());
+libmesh_assert_less (n, this->n_nodes());
 
-  return std::pair<unsigned short int, unsigned short int>
-    (0, 2*n-7);
+return std::pair<unsigned short int, unsigned short int>
+(0, 2*n-7);
 }
 
 } // namespace libMesh

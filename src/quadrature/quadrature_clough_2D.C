@@ -26,54 +26,54 @@ namespace libMesh
 
 
 void QClough::init_2D(const ElemType type_in,
-                      unsigned int p)
+unsigned int p)
 {
 #if LIBMESH_DIM > 1
-  QGauss gauss_rule(2, _order);
-  gauss_rule.init(TRI6, p);
+QGauss gauss_rule(2, _order);
+gauss_rule.init(TRI6, p);
 
-  //-----------------------------------------------------------------------
-  // 2D quadrature rules
-  switch (type_in)
-    {
+//-----------------------------------------------------------------------
+// 2D quadrature rules
+switch (type_in)
+{
 
-      //---------------------------------------------
-      // Triangle quadrature rules
-    case TRI3:
-    case TRI6:
-      {
-        std::vector<Point> & gausspoints = gauss_rule.get_points();
-        std::vector<Real> & gaussweights = gauss_rule.get_weights();
-        std::size_t numgausspts = gausspoints.size();
-        _points.resize(numgausspts*3);
-        _weights.resize(numgausspts*3);
-        for (std::size_t i = 0; i != numgausspts; ++i)
-          {
-            _points[3*i](0) = gausspoints[i](0) +
-              gausspoints[i](1) / 3.;
-            _points[3*i](1) = gausspoints[i](1) / 3.;
-            _points[3*i+1](0) = gausspoints[i](1) / 3.;
-            _points[3*i+1](1) = gausspoints[i](0) +
-              gausspoints[i](1) / 3.;
-            _points[3*i+2](0) = 1./3. +
-              gausspoints[i](0) * 2./3. -
-              gausspoints[i](1) / 3.;
-            _points[3*i+2](1) = 1./3. -
-              gausspoints[i](0) / 3. +
-              gausspoints[i](1) * 2./3.;
-            _weights[3*i] = gaussweights[i] / 3.;
-            _weights[3*i+1] = _weights[3*i];
-            _weights[3*i+2] = _weights[3*i];
-          }
-        return;
-      }
+//---------------------------------------------
+// Triangle quadrature rules
+case TRI3:
+case TRI6:
+{
+std::vector<Point> & gausspoints = gauss_rule.get_points();
+std::vector<Real> & gaussweights = gauss_rule.get_weights();
+std::size_t numgausspts = gausspoints.size();
+_points.resize(numgausspts*3);
+_weights.resize(numgausspts*3);
+for (std::size_t i = 0; i != numgausspts; ++i)
+{
+_points[3*i](0) = gausspoints[i](0) +
+gausspoints[i](1) / 3.;
+_points[3*i](1) = gausspoints[i](1) / 3.;
+_points[3*i+1](0) = gausspoints[i](1) / 3.;
+_points[3*i+1](1) = gausspoints[i](0) +
+gausspoints[i](1) / 3.;
+_points[3*i+2](0) = 1./3. +
+gausspoints[i](0) * 2./3. -
+gausspoints[i](1) / 3.;
+_points[3*i+2](1) = 1./3. -
+gausspoints[i](0) / 3. +
+gausspoints[i](1) * 2./3.;
+_weights[3*i] = gaussweights[i] / 3.;
+_weights[3*i+1] = _weights[3*i];
+_weights[3*i+2] = _weights[3*i];
+}
+return;
+}
 
 
-      //---------------------------------------------
-      // Unsupported type
-    default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
-    }
+//---------------------------------------------
+// Unsupported type
+default:
+libmesh_error_msg("Element type not supported!:" << type_in);
+}
 #endif
 }
 

@@ -25,18 +25,18 @@ namespace libMesh
 
 template <typename T>
 void SparseShellMatrix<T>::vector_mult (NumericVector<T> & dest,
-                                        const NumericVector<T> & arg) const
+const NumericVector<T> & arg) const
 {
-  _m.vector_mult(dest,arg);
+_m.vector_mult(dest,arg);
 }
 
 
 
 template <typename T>
 void SparseShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
-                                            const NumericVector<T> & arg) const
+const NumericVector<T> & arg) const
 {
-  _m.vector_mult_add(dest,arg);
+_m.vector_mult_add(dest,arg);
 }
 
 

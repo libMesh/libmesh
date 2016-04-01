@@ -34,107 +34,107 @@ namespace libMesh
 namespace Parallel
 {
 /**
- * The parallel sorting method is templated on the
- * type of data which is to be sorted.  It may later
- * be templated on other things if we are ambitious.
- * This class knows about MPI, and knows how many
- * processors there are.  It is responsible for
- * transmitting data between the processors and
- * ensuring that the data is properly sorted between
- * all the processors.  We assume that a Sort
- * is instantiated on all processors.
- */
+* The parallel sorting method is templated on the
+* type of data which is to be sorted.  It may later
+* be templated on other things if we are ambitious.
+* This class knows about MPI, and knows how many
+* processors there are.  It is responsible for
+* transmitting data between the processors and
+* ensuring that the data is properly sorted between
+* all the processors.  We assume that a Sort
+* is instantiated on all processors.
+*/
 template <typename KeyType, typename IdxType=unsigned int>
 class Sort : public ParallelObject
 {
 public:
-  /**
-   * Constructor takes the number of processors,
-   * the processor id, and a reference to a vector of data
-   * to be sorted.  This vector is sorted by
-   * the constructor, therefore, construction of
-   * a Sort object takes O(nlogn) time,
-   * where n is the length of the vector.
-   */
-  Sort (const Parallel::Communicator & comm,
-        std::vector<KeyType> & d);
+/**
+* Constructor takes the number of processors,
+* the processor id, and a reference to a vector of data
+* to be sorted.  This vector is sorted by
+* the constructor, therefore, construction of
+* a Sort object takes O(nlogn) time,
+* where n is the length of the vector.
+*/
+Sort (const Parallel::Communicator & comm,
+std::vector<KeyType> & d);
 
 
-  /**
-   * This is the only method which needs to be
-   * called by the user.  Its only responsibility
-   * is to call three private methods in the correct
-   * order.
-   */
-  void sort();
+/**
+* This is the only method which needs to be
+* called by the user.  Its only responsibility
+* is to call three private methods in the correct
+* order.
+*/
+void sort();
 
-  /**
-   * Return a constant reference to _my_bin.  This allows
-   * us to do things like check if sorting was successful
-   * by printing _my_bin.
-   */
-  const std::vector<KeyType> & bin();
+/**
+* Return a constant reference to _my_bin.  This allows
+* us to do things like check if sorting was successful
+* by printing _my_bin.
+*/
+const std::vector<KeyType> & bin();
 
 private:
 
-  /**
-   * The number of processors to work with.
-   */
-  const processor_id_type _n_procs;
+/**
+* The number of processors to work with.
+*/
+const processor_id_type _n_procs;
 
-  /**
-   * The identity of this processor.
-   */
-  const processor_id_type _proc_id;
+/**
+* The identity of this processor.
+*/
+const processor_id_type _proc_id;
 
-  /**
-   * Flag which lets you know if sorting is complete
-   */
-  bool _bin_is_sorted;
+/**
+* Flag which lets you know if sorting is complete
+*/
+bool _bin_is_sorted;
 
-  /**
-   * The raw, unsorted data which will need to
-   * be sorted (in parallel) across all
-   * processors.
-   */
-  std::vector<KeyType> & _data;
+/**
+* The raw, unsorted data which will need to
+* be sorted (in parallel) across all
+* processors.
+*/
+std::vector<KeyType> & _data;
 
-  /**
-   * Vector which holds the size of each
-   * bin on this processor.  It has
-   * size equal to _n_procs.
-   */
-  std::vector<IdxType> _local_bin_sizes;
+/**
+* Vector which holds the size of each
+* bin on this processor.  It has
+* size equal to _n_procs.
+*/
+std::vector<IdxType> _local_bin_sizes;
 
-  /**
-   * The bin which will eventually be held
-   * by this processor.  It may be shorter or
-   * longer than _data.  It will be dynamically
-   * resized when it is needed.
-   */
-  std::vector<KeyType> _my_bin;
+/**
+* The bin which will eventually be held
+* by this processor.  It may be shorter or
+* longer than _data.  It will be dynamically
+* resized when it is needed.
+*/
+std::vector<KeyType> _my_bin;
 
-  /**
-   * Sorts the local data into bins across all processors.
-   * Right now it constructs a BenSorter<KeyType> object.
-   * In the future this could be a template parameter.
-   */
-  void binsort ();
+/**
+* Sorts the local data into bins across all processors.
+* Right now it constructs a BenSorter<KeyType> object.
+* In the future this could be a template parameter.
+*/
+void binsort ();
 
-  /**
-   * Communicates the bins from each processor to the
-   * appropriate processor.  By the time this function
-   * is finished, each processor will hold only its
-   * own bin(s).
-   */
-  void communicate_bins();
+/**
+* Communicates the bins from each processor to the
+* appropriate processor.  By the time this function
+* is finished, each processor will hold only its
+* own bin(s).
+*/
+void communicate_bins();
 
-  /**
-   * After all the bins have been communicated, we can
-   * sort our local bin.  This is nothing more than a
-   * call to std::sort
-   */
-  void sort_local_bin();
+/**
+* After all the bins have been communicated, we can
+* sort our local bin.  This is nothing more than a
+* call to std::sort
+*/
+void sort_local_bin();
 
 };
 }

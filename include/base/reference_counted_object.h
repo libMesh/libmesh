@@ -30,82 +30,82 @@ namespace libMesh
 {
 
 /**
- * This class implements reference counting. Any class that
- * is properly derived from this class will get reference counted, provided
- * that the library is configured with \p --enable-reference-counting
- * and you are compiling with \p DEBUG defined.
- * For example, the following is sufficient to define the class \p Foo
- * as a reference counted class:
- *
- * \code
- * class Foo : public ReferenceCountedObject<Foo>
- * {
- *  public:
- *
- *    Foo  () {}
- *
- *    ~Foo () {}
- *
- *    void bar ();
- *
- *  private:
- * };
- *
- * \endcode
- *
- * \par
- * If the library is configured with \p --disable-reference-counting
- * or \p DEBUG is not defined then this class does nothing.
- * All members are inlined and empty, so they should effectively disappear.
- *
- * \author Benjamin S. Kirk
- * \date 2002-2007
- */
+* This class implements reference counting. Any class that
+* is properly derived from this class will get reference counted, provided
+* that the library is configured with \p --enable-reference-counting
+* and you are compiling with \p DEBUG defined.
+* For example, the following is sufficient to define the class \p Foo
+* as a reference counted class:
+*
+* \code
+* class Foo : public ReferenceCountedObject<Foo>
+* {
+*  public:
+*
+*    Foo  () {}
+*
+*    ~Foo () {}
+*
+*    void bar ();
+*
+*  private:
+* };
+*
+* \endcode
+*
+* \par
+* If the library is configured with \p --disable-reference-counting
+* or \p DEBUG is not defined then this class does nothing.
+* All members are inlined and empty, so they should effectively disappear.
+*
+* \author Benjamin S. Kirk
+* \date 2002-2007
+*/
 template <typename T>
 class ReferenceCountedObject : public ReferenceCounter
 {
 protected:
 
-  /**
-   * Constructor. Protected so that you cannont
-   * instantiate a \p ReferenceCountedObject, only derive
-   * from it.
-   */
-  ReferenceCountedObject ()
-  {
+/**
+* Constructor. Protected so that you cannont
+* instantiate a \p ReferenceCountedObject, only derive
+* from it.
+*/
+ReferenceCountedObject ()
+{
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-    increment_constructor_count(typeid(T).name());
+increment_constructor_count(typeid(T).name());
 
 #endif
-  }
+}
 
-  /**
-   * Also, increment the counter if the copy-constructor is called.
-   */
-  ReferenceCountedObject (const ReferenceCountedObject & other)
-    : ReferenceCounter(other)
-  {
+/**
+* Also, increment the counter if the copy-constructor is called.
+*/
+ReferenceCountedObject (const ReferenceCountedObject & other)
+: ReferenceCounter(other)
+{
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-    increment_constructor_count(typeid(T).name());
+increment_constructor_count(typeid(T).name());
 
 #endif
-  }
+}
 
 public:
 
-  /**
-   * Destructor.
-   */
-  ~ReferenceCountedObject ()
-  {
+/**
+* Destructor.
+*/
+~ReferenceCountedObject ()
+{
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-    increment_destructor_count(typeid(T).name());
+increment_destructor_count(typeid(T).name());
 
 #endif
-  }
+}
 
 private:
 

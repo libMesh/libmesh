@@ -35,135 +35,135 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class implements writing meshes in the Tecplot format.
- *
- * \author Benjamin S. Kirk
- * \date 2004
- */
+* This class implements writing meshes in the Tecplot format.
+*
+* \author Benjamin S. Kirk
+* \date 2004
+*/
 class TecplotIO : public MeshOutput<MeshBase>
 {
 public:
 
-  /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
-   * The optional parameter \p binary can be used to switch
-   * between ASCII (\p false, the default) or binary (\p true)
-   * output files.
-   */
-  explicit
-  TecplotIO (const MeshBase &, const bool binary=false,
-             const double time=0., const int strand_offset=0);
+/**
+* Constructor.  Takes a reference to a constant mesh object.
+* This constructor will only allow us to write the mesh.
+* The optional parameter \p binary can be used to switch
+* between ASCII (\p false, the default) or binary (\p true)
+* output files.
+*/
+explicit
+TecplotIO (const MeshBase &, const bool binary=false,
+const double time=0., const int strand_offset=0);
 
-  /**
-   * This method implements writing a mesh to a specified file.
-   */
-  virtual void write (const std::string &) libmesh_override;
+/**
+* This method implements writing a mesh to a specified file.
+*/
+virtual void write (const std::string &) libmesh_override;
 
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
-   */
-  virtual void write_nodal_data (const std::string &,
-                                 const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are provided.
+*/
+virtual void write_nodal_data (const std::string &,
+const std::vector<Number> &,
+const std::vector<std::string> &) libmesh_override;
 
-  /**
-   * Flag indicating whether or not to write a binary file
-   * (if the tecio.a library was found by \p configure).
-   */
-  bool & binary ();
+/**
+* Flag indicating whether or not to write a binary file
+* (if the tecio.a library was found by \p configure).
+*/
+bool & binary ();
 
-  /**
-   * Solution time for transient data.
-   * Written to newer binary formats that are time-aware.
-   */
-  double & time ();
+/**
+* Solution time for transient data.
+* Written to newer binary formats that are time-aware.
+*/
+double & time ();
 
-  /**
-   * Strand offset for this file.  Each mesh block will
-   * be written to (strand_id=block_id+1+strand_offset).
-   * Written to newer binary formats that are time-aware,
-   * defaults to 0.
-   */
-  int & strand_offset ();
+/**
+* Strand offset for this file.  Each mesh block will
+* be written to (strand_id=block_id+1+strand_offset).
+* Written to newer binary formats that are time-aware,
+* defaults to 0.
+*/
+int & strand_offset ();
 
-  /**
-   *  The zone title to write.
-   */
-  std::string & zone_title ();
+/**
+*  The zone title to write.
+*/
+std::string & zone_title ();
 
-  /**
-   * Set to true to write multiple solutions to a single file (ASCII
-   * only).  Tecplot will read multiple zones in a single file, but
-   * currently you have to repeat the mesh information each time.
-   */
-  bool & ascii_append ();
+/**
+* Set to true to write multiple solutions to a single file (ASCII
+* only).  Tecplot will read multiple zones in a single file, but
+* currently you have to repeat the mesh information each time.
+*/
+bool & ascii_append ();
 
 private:
 
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write an ASCII file.
-   */
-  void write_ascii (const std::string &,
-                    const std::vector<Number> * = libmesh_nullptr,
-                    const std::vector<std::string> * = libmesh_nullptr);
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are optionally
+* provided.  This will write an ASCII file.
+*/
+void write_ascii (const std::string &,
+const std::vector<Number> * = libmesh_nullptr,
+const std::vector<std::string> * = libmesh_nullptr);
 
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write a binary file if the tecio.a library was
-   * found at compile time, otherwise a warning message will be printed and
-   * an ASCII file will be created.
-   */
-  void write_binary (const std::string &,
-                     const std::vector<Number> * = libmesh_nullptr,
-                     const std::vector<std::string> * = libmesh_nullptr);
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are optionally
+* provided.  This will write a binary file if the tecio.a library was
+* found at compile time, otherwise a warning message will be printed and
+* an ASCII file will be created.
+*/
+void write_binary (const std::string &,
+const std::vector<Number> * = libmesh_nullptr,
+const std::vector<std::string> * = libmesh_nullptr);
 
-  /**
-   * Determines the logical spatial dimension of the elements in the
-   * Mesh.  Ex: A 1D edge element living in 3D is a logically
-   * one-dimensional element as far as Tecplot is concerned.  Throws
-   * an error if mixed-dimension element types are found, since I'm
-   * not sure how to handle that case currently.
-   */
-  unsigned elem_dimension();
+/**
+* Determines the logical spatial dimension of the elements in the
+* Mesh.  Ex: A 1D edge element living in 3D is a logically
+* one-dimensional element as far as Tecplot is concerned.  Throws
+* an error if mixed-dimension element types are found, since I'm
+* not sure how to handle that case currently.
+*/
+unsigned elem_dimension();
 
-  //---------------------------------------------------------------------------
-  // local data
+//---------------------------------------------------------------------------
+// local data
 
-  /**
-   * Flag to write binary data.
-   */
-  bool _binary;
+/**
+* Flag to write binary data.
+*/
+bool _binary;
 
-  /**
-   * Solution time.
-   */
-  double _time;
+/**
+* Solution time.
+*/
+double _time;
 
-  /**
-   * Offset for Tecplot's STRANDID.
-   */
-  int _strand_offset;
+/**
+* Offset for Tecplot's STRANDID.
+*/
+int _strand_offset;
 
-  /**
-   * The zone title to write.
-   */
-  std::string _zone_title;
+/**
+* The zone title to write.
+*/
+std::string _zone_title;
 
-  /**
-   * If true, when writing in ASCII format, open the file in
-   * std::ofstream::app mode.
-   */
-  bool _ascii_append;
+/**
+* If true, when writing in ASCII format, open the file in
+* std::ofstream::app mode.
+*/
+bool _ascii_append;
 
-  /**
-   * The subdomains in the mesh.
-   */
-  std::set<subdomain_id_type> _subdomain_ids;
+/**
+* The subdomains in the mesh.
+*/
+std::set<subdomain_id_type> _subdomain_ids;
 };
 
 } // namespace libMesh

@@ -41,27 +41,27 @@ class PeriodicBoundaryBase;
 class PointLocatorBase;
 
 /**
- * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Note that std::map has no
- * virtual destructor, so downcasting here would be dangerous.
- */
+* We're using a class instead of a typedef to allow forward
+* declarations and future flexibility.  Note that std::map has no
+* virtual destructor, so downcasting here would be dangerous.
+*/
 class PeriodicBoundaries : public std::map<boundary_id_type, PeriodicBoundaryBase *>
 {
 public:
-  PeriodicBoundaryBase * boundary(boundary_id_type id);
+PeriodicBoundaryBase * boundary(boundary_id_type id);
 
-  const PeriodicBoundaryBase * boundary(boundary_id_type id) const;
+const PeriodicBoundaryBase * boundary(boundary_id_type id) const;
 
-  PeriodicBoundaries() {}
+PeriodicBoundaries() {}
 
-  ~PeriodicBoundaries();
+~PeriodicBoundaries();
 
-  // The periodic neighbor of \p e in direction \p side, if it
-  // exists.  NULL otherwise
-  const Elem * neighbor(boundary_id_type boundary_id,
-                        const PointLocatorBase & point_locator,
-                        const Elem * e,
-                        unsigned int side) const;
+// The periodic neighbor of \p e in direction \p side, if it
+// exists.  NULL otherwise
+const Elem * neighbor(boundary_id_type boundary_id,
+const PointLocatorBase & point_locator,
+const Elem * e,
+unsigned int side) const;
 };
 
 } // namespace libMesh

@@ -56,49 +56,49 @@ namespace
 #if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 std::string process_trace(const char * name)
 {
-  std::string fullname = name;
-  std::string saved_begin, saved_end;
-  size_t namestart, nameend;
+std::string fullname = name;
+std::string saved_begin, saved_end;
+size_t namestart, nameend;
 
-  // The Apple backtrace function returns more information than the Linux version.
-  // We need to pass only the function name to the demangler or it won't decode it for us.
-  //
-  // lineno: stackframeno address functionname + offset
+// The Apple backtrace function returns more information than the Linux version.
+// We need to pass only the function name to the demangler or it won't decode it for us.
+//
+// lineno: stackframeno address functionname + offset
 
 #ifdef __APPLE__
-  namestart = fullname.find("0x");
-  if (namestart != std::string::npos)
-    {
-      namestart = fullname.find(' ', namestart) + 1;
-      saved_begin = fullname.substr(0, namestart);
-    }
-  else
-    namestart = 0;
-  nameend = fullname.find('+');
-  if (nameend == std::string::npos ||
-      nameend <= namestart)
-    nameend = fullname.size();
-  else
-    {
-      nameend -= 1;
-      saved_end = fullname.substr(nameend, fullname.length());
-    }
+namestart = fullname.find("0x");
+if (namestart != std::string::npos)
+{
+namestart = fullname.find(' ', namestart) + 1;
+saved_begin = fullname.substr(0, namestart);
+}
+else
+namestart = 0;
+nameend = fullname.find('+');
+if (nameend == std::string::npos ||
+nameend <= namestart)
+nameend = fullname.size();
+else
+{
+nameend -= 1;
+saved_end = fullname.substr(nameend, fullname.length());
+}
 #else
-  namestart = fullname.find('(');
-  if (namestart == std::string::npos)
-    return fullname;
-  else
-    namestart++;
-  nameend = fullname.find('+');
-  if (nameend == std::string::npos ||
-      nameend <= namestart)
-    return fullname;
+namestart = fullname.find('(');
+if (namestart == std::string::npos)
+return fullname;
+else
+namestart++;
+nameend = fullname.find('+');
+if (nameend == std::string::npos ||
+nameend <= namestart)
+return fullname;
 #endif
 
-  std::string type_name = fullname.substr(namestart, nameend - namestart);
+std::string type_name = fullname.substr(namestart, nameend - namestart);
 
-  // Try to demangle now
-  return saved_begin + libMesh::demangle(type_name.c_str()) + saved_end;
+// Try to demangle now
+return saved_begin + libMesh::demangle(type_name.c_str()) + saved_end;
 }
 #endif
 
@@ -111,62 +111,62 @@ std::string process_trace(const char * name)
 bool gdb_backtrace(std::ostream & out_stream)
 {
 #ifdef LIBMESH_GDB_COMMAND
-  // Eventual return value, true if gdb succeeds, false otherwise.
-  bool success = true;
+// Eventual return value, true if gdb succeeds, false otherwise.
+bool success = true;
 
-  // The system() call does not allow us to redirect the output to a
-  // C++ ostream, so we redirect gdb's output to a (known) temporary
-  // file, and then send output that to the user's stream.
-  char temp_file[] = "temp_print_trace.XXXXXX";
-  int fd = mkstemp(temp_file);
+// The system() call does not allow us to redirect the output to a
+// C++ ostream, so we redirect gdb's output to a (known) temporary
+// file, and then send output that to the user's stream.
+char temp_file[] = "temp_print_trace.XXXXXX";
+int fd = mkstemp(temp_file);
 
-  // If mkstemp fails, we failed.
-  if (fd == -1)
-    success = false;
-  else
-    {
-      // Run gdb using a system() call, redirecting the output to our
-      // temporary file.
-      pid_t this_pid = getpid();
+// If mkstemp fails, we failed.
+if (fd == -1)
+success = false;
+else
+{
+// Run gdb using a system() call, redirecting the output to our
+// temporary file.
+pid_t this_pid = getpid();
 
-      int exit_status = 1;
+int exit_status = 1;
 
-      try
-        {
-          std::string gdb_command =
-            libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
+try
+{
+std::string gdb_command =
+libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
 
-          std::ostringstream command;
-          command << gdb_command
-                  << " -p "
-                  << this_pid
-                  << " -batch -ex bt -ex detach 2>/dev/null 1>"
-                  << temp_file;
-          exit_status = std::system(command.str().c_str());
-        }
-      catch (...)
-        {
-          std::cerr << "Unable to run gdb" << std::endl;
-        }
+std::ostringstream command;
+command << gdb_command
+<< " -p "
+<< this_pid
+<< " -batch -ex bt -ex detach 2>/dev/null 1>"
+<< temp_file;
+exit_status = std::system(command.str().c_str());
+}
+catch (...)
+{
+std::cerr << "Unable to run gdb" << std::endl;
+}
 
-      // If we can open the temp_file, the file is not empty, and the
-      // exit status from the system call is 0, we'll assume that gdb
-      // worked, and copy the file's contents to the user's requested
-      // stream.  This rdbuf() thing is apparently how you do
-      // this... Otherwise, report failure.
-      std::ifstream fin(temp_file);
-      if (fin && (fin.peek() != std::ifstream::traits_type::eof()) && (exit_status == 0))
-        out_stream << fin.rdbuf();
-      else
-        success = false;
-    }
+// If we can open the temp_file, the file is not empty, and the
+// exit status from the system call is 0, we'll assume that gdb
+// worked, and copy the file's contents to the user's requested
+// stream.  This rdbuf() thing is apparently how you do
+// this... Otherwise, report failure.
+std::ifstream fin(temp_file);
+if (fin && (fin.peek() != std::ifstream::traits_type::eof()) && (exit_status == 0))
+out_stream << fin.rdbuf();
+else
+success = false;
+}
 
-  // Clean up the temporary file, regardless of whether it was opened successfully.
-  std::remove(temp_file);
+// Clean up the temporary file, regardless of whether it was opened successfully.
+std::remove(temp_file);
 
-  return success;
+return success;
 #else
-  return false;
+return false;
 #endif
 }
 
@@ -178,35 +178,35 @@ namespace libMesh
 
 void print_trace(std::ostream & out_stream)
 {
-  // First try a GDB backtrace.  They are better than what you get
-  // from calling backtrace() because you don't have to do any
-  // demangling, and they include line numbers!  If the GDB backtrace
-  // fails, for example if your system does not have GDB, fall back to
-  // calling backtrace().
-  bool gdb_worked = false;
+// First try a GDB backtrace.  They are better than what you get
+// from calling backtrace() because you don't have to do any
+// demangling, and they include line numbers!  If the GDB backtrace
+// fails, for example if your system does not have GDB, fall back to
+// calling backtrace().
+bool gdb_worked = false;
 
-  // Let the user disable GDB backtraces by configuring with
-  // --without-gdb-command or with a command line option.
-  if (std::string(LIBMESH_GDB_COMMAND) != std::string("no") &&
-      !libMesh::on_command_line("--no-gdb-backtrace"))
-    gdb_worked = gdb_backtrace(out_stream);
+// Let the user disable GDB backtraces by configuring with
+// --without-gdb-command or with a command line option.
+if (std::string(LIBMESH_GDB_COMMAND) != std::string("no") &&
+!libMesh::on_command_line("--no-gdb-backtrace"))
+gdb_worked = gdb_backtrace(out_stream);
 
-  // This part requires that your compiler at least supports
-  // backtraces.  Demangling is also nice, but it will still run
-  // without it.
+// This part requires that your compiler at least supports
+// backtraces.  Demangling is also nice, but it will still run
+// without it.
 #if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
-  if (!gdb_worked)
-    {
-      void * addresses[40];
-      char ** strings;
+if (!gdb_worked)
+{
+void * addresses[40];
+char ** strings;
 
-      int size = backtrace(addresses, 40);
-      strings = backtrace_symbols(addresses, size);
-      out_stream << "Stack frames: " << size << std::endl;
-      for(int i = 0; i < size; i++)
-        out_stream << i << ": " << process_trace(strings[i]) << std::endl;
-      std::free(strings);
-    }
+int size = backtrace(addresses, 40);
+strings = backtrace_symbols(addresses, size);
+out_stream << "Stack frames: " << size << std::endl;
+for(int i = 0; i < size; i++)
+out_stream << i << ": " << process_trace(strings[i]) << std::endl;
+std::free(strings);
+}
 #endif
 }
 
@@ -216,10 +216,10 @@ void print_trace(std::ostream & out_stream)
 void write_traceout()
 {
 #ifdef LIBMESH_ENABLE_TRACEFILES
-  std::stringstream outname;
-  outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
-  std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
-  libMesh::print_trace(traceout);
+std::stringstream outname;
+outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
+std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
+libMesh::print_trace(traceout);
 #endif
 }
 
@@ -232,21 +232,21 @@ void write_traceout()
 #if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
 std::string demangle(const char * name)
 {
-  int status = 0;
-  std::string ret = name;
+int status = 0;
+std::string ret = name;
 
-  // Actually do the demangling
-  char * demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
+// Actually do the demangling
+char * demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
 
-  // If demangling returns non-NULL, save the result in a string.
-  if (demangled_name)
-    ret = demangled_name;
+// If demangling returns non-NULL, save the result in a string.
+if (demangled_name)
+ret = demangled_name;
 
-  // According to cxxabi.h docs, the caller is responsible for
-  // deallocating memory.
-  std::free(demangled_name);
+// According to cxxabi.h docs, the caller is responsible for
+// deallocating memory.
+std::free(demangled_name);
 
-  return ret;
+return ret;
 }
 #else
 std::string demangle(const char * name) { return std::string(name); }

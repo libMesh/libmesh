@@ -39,9 +39,9 @@ namespace libMesh
 class PerfLog;
 
 /**
- * A \p PerfLog object to log performance.  If the library is configured
- * with \p --enable-perflog then it will log key functions.
- */
+* A \p PerfLog object to log performance.  If the library is configured
+* with \p --enable-perflog then it will log key functions.
+*/
 extern PerfLog perflog;
 
 

@@ -34,86 +34,86 @@ RBParameters::RBParameters()
 
 RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
 {
-  _parameters = parameter_map;
+_parameters = parameter_map;
 }
 
 void RBParameters::clear()
 {
-  _parameters.clear();
+_parameters.clear();
 }
 
 Real RBParameters::get_value(const std::string & param_name) const
 {
-  // find the parameter value
-  const_iterator it = _parameters.find(param_name);
+// find the parameter value
+const_iterator it = _parameters.find(param_name);
 
-  // throw and error if the parameter doesn't exist
-  if( it == _parameters.end() )
-    libmesh_error_msg("Error: parameter " << param_name << " does not exist in RBParameters object.");
+// throw and error if the parameter doesn't exist
+if( it == _parameters.end() )
+libmesh_error_msg("Error: parameter " << param_name << " does not exist in RBParameters object.");
 
-  return it->second;
+return it->second;
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
 {
-  _parameters[param_name] = value;
+_parameters[param_name] = value;
 }
 
 unsigned int RBParameters::n_parameters() const
 {
-  return cast_int<unsigned int>
-    (_parameters.size());
+return cast_int<unsigned int>
+(_parameters.size());
 }
 
 void RBParameters::get_parameter_names(std::set<std::string> & param_names) const
 {
-  param_names.clear();
+param_names.clear();
 
-  const_iterator it     = _parameters.begin();
-  const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
-    {
-      param_names.insert( it->first );
-    }
+const_iterator it     = _parameters.begin();
+const_iterator it_end = _parameters.end();
+for( ; it != it_end; ++it)
+{
+param_names.insert( it->first );
+}
 }
 
 RBParameters::const_iterator RBParameters::begin() const
 {
-  return _parameters.begin();
+return _parameters.begin();
 }
 
 RBParameters::const_iterator RBParameters::end() const
 {
-  return _parameters.end();
+return _parameters.end();
 }
 
 bool RBParameters::operator==(const RBParameters & rhs) const
 {
-  return this->_parameters == rhs._parameters;
+return this->_parameters == rhs._parameters;
 }
 
 bool RBParameters::operator!=(const RBParameters & rhs) const
 {
-  return !(*this == rhs);
+return !(*this == rhs);
 }
 
 std::string RBParameters::get_string(unsigned int precision) const
 {
-  std::stringstream param_stringstream;
-  param_stringstream.precision(precision);
+std::stringstream param_stringstream;
+param_stringstream.precision(precision);
 
-  const_iterator it     = _parameters.begin();
-  const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
-    {
-      param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
-    }
-  return param_stringstream.str();
+const_iterator it     = _parameters.begin();
+const_iterator it_end = _parameters.end();
+for( ; it != it_end; ++it)
+{
+param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
+}
+return param_stringstream.str();
 }
 
 void RBParameters::print() const
 {
-  libMesh::out << get_string() << std::endl;
+libMesh::out << get_string() << std::endl;
 }
 
 }

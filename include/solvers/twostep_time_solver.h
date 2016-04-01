@@ -34,40 +34,40 @@ class System;
 // UPDATE THIS DESCRIPTION
 
 /**
- * This class wraps another UnsteadySolver derived class, and compares
- * the results of timestepping with deltat and timestepping with
- * 2*deltat to adjust future timestep lengths.
- *
- * Currently this class only works on fully coupled Systems
- *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
- * \author Roy H. Stogner
- * \date 2007
- */
+* This class wraps another UnsteadySolver derived class, and compares
+* the results of timestepping with deltat and timestepping with
+* 2*deltat to adjust future timestep lengths.
+*
+* Currently this class only works on fully coupled Systems
+*
+* This class is part of the new DifferentiableSystem framework,
+* which is still experimental.  Users of this framework should
+* beware of bugs and future API changes.
+*
+* \author Roy H. Stogner
+* \date 2007
+*/
 class TwostepTimeSolver : public AdaptiveTimeSolver
 {
 public:
-  /**
-   * The parent class
-   */
-  typedef AdaptiveTimeSolver Parent;
+/**
+* The parent class
+*/
+typedef AdaptiveTimeSolver Parent;
 
-  /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
-   */
-  explicit
-  TwostepTimeSolver (sys_type & s);
+/**
+* Constructor. Requires a reference to the system
+* to be solved.
+*/
+explicit
+TwostepTimeSolver (sys_type & s);
 
-  /**
-   * Destructor.
-   */
-  ~TwostepTimeSolver ();
+/**
+* Destructor.
+*/
+~TwostepTimeSolver ();
 
-  virtual void solve() libmesh_override;
+virtual void solve() libmesh_override;
 };
 
 

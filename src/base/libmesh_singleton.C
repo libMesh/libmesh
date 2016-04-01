@@ -41,15 +41,15 @@ typedef std::vector<Singleton *> SingletonList;
 
 SingletonList & get_singleton_cache()
 {
-  static SingletonList singleton_cache;
-  return singleton_cache;
+static SingletonList singleton_cache;
+return singleton_cache;
 }
 
 typedef std::vector<Singleton::Setup *> SetupList;
 SetupList & get_setup_cache()
 {
-  static SetupList setup_cache;
-  return setup_cache;
+static SetupList setup_cache;
+return setup_cache;
 }
 
 } // end anonymous namespace
@@ -63,51 +63,51 @@ namespace libMesh
 
 Singleton::Singleton ()
 {
-  SingletonMutex::scoped_lock lock(singleton_mtx);
+SingletonMutex::scoped_lock lock(singleton_mtx);
 
-  get_singleton_cache().push_back (this);
+get_singleton_cache().push_back (this);
 }
 
 
 
 Singleton::Setup::Setup ()
 {
-  get_setup_cache().push_back (this);
+get_setup_cache().push_back (this);
 }
 
 
 
 void Singleton::setup ()
 {
-  SingletonMutex::scoped_lock lock(setup_mtx);
+SingletonMutex::scoped_lock lock(setup_mtx);
 
-  SetupList & setup_cache = get_setup_cache();
+SetupList & setup_cache = get_setup_cache();
 
-  for (SetupList::iterator it = setup_cache.begin();
-       it!=setup_cache.end(); ++it)
-    {
-      libmesh_assert (*it != libmesh_nullptr);
-      (*it)->setup();
-    }
+for (SetupList::iterator it = setup_cache.begin();
+it!=setup_cache.end(); ++it)
+{
+libmesh_assert (*it != libmesh_nullptr);
+(*it)->setup();
+}
 }
 
 
 
 void Singleton::cleanup ()
 {
-  SingletonMutex::scoped_lock lock(singleton_mtx);
+SingletonMutex::scoped_lock lock(singleton_mtx);
 
-  SingletonList & singleton_cache = get_singleton_cache();
+SingletonList & singleton_cache = get_singleton_cache();
 
-  for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
-       it!=singleton_cache.rend(); ++it)
-    {
-      libmesh_assert (*it != libmesh_nullptr);
-      delete *it;
-      *it = libmesh_nullptr;
-    }
+for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
+it!=singleton_cache.rend(); ++it)
+{
+libmesh_assert (*it != libmesh_nullptr);
+delete *it;
+*it = libmesh_nullptr;
+}
 
-  singleton_cache.clear();
+singleton_cache.clear();
 }
 
 

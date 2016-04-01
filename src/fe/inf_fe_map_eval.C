@@ -29,49 +29,49 @@ namespace {
 
 Real infinite_map_eval(Real v, unsigned i)
 {
-  libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
-  switch (i)
-    {
-    case 0:
-      return -2.*v/(1.-v);
-    case 1:
-      return (1.+v)/(1.-v);
+switch (i)
+{
+case 0:
+return -2.*v/(1.-v);
+case 1:
+return (1.+v)/(1.-v);
 
-    default:
-      libmesh_error_msg("bad index i = " << i);
-    }
+default:
+libmesh_error_msg("bad index i = " << i);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+libmesh_error_msg("We'll never get here!");
+return 0.;
 }
 
 
 
 Real infinite_map_eval_deriv(Real v, unsigned i)
 {
-  libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
-  switch (i)
-    {
-    case 0:
-      return -2./((1.-v)*(1.-v));
-    case 1:
-      return 2./((1.-v)*(1.-v));
+switch (i)
+{
+case 0:
+return -2./((1.-v)*(1.-v));
+case 1:
+return 2./((1.-v)*(1.-v));
 
-    default:
-      libmesh_error_msg("bad index i = " << i);
-    }
+default:
+libmesh_error_msg("bad index i = " << i);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+libmesh_error_msg("We'll never get here!");
+return 0.;
 }
 
 } // anonymous namespace
 
 
-  // Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
-  // to call the local helper function from the anonymous namespace.
+// Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
+// to call the local helper function from the anonymous namespace.
 template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
 template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
 template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }

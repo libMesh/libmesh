@@ -31,35 +31,35 @@ namespace libMesh
 
 
 /**
- * The \p LinearPartitioner is the simplest of all possible partitioners.
- * It takes the element list and splits it into equal-sized chunks assigned
- * to each processor.  Health Warning: THIS PARTITIONER COULD BE ARBITRARILY
- * BAD!!
- */
+* The \p LinearPartitioner is the simplest of all possible partitioners.
+* It takes the element list and splits it into equal-sized chunks assigned
+* to each processor.  Health Warning: THIS PARTITIONER COULD BE ARBITRARILY
+* BAD!!
+*/
 class LinearPartitioner : public Partitioner
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  LinearPartitioner () {}
+/**
+* Constructor.
+*/
+LinearPartitioner () {}
 
-  /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
-  {
-    return UniquePtr<Partitioner>(new LinearPartitioner());
-  }
+/**
+* Creates a new partitioner of this type and returns it in
+* an \p UniquePtr.
+*/
+virtual UniquePtr<Partitioner> clone () const libmesh_override
+{
+return UniquePtr<Partitioner>(new LinearPartitioner());
+}
 
 protected:
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override;
+/**
+* Partition the \p MeshBase into \p n subdomains.
+*/
+virtual void _do_partition (MeshBase & mesh,
+const unsigned int n) libmesh_override;
 };
 
 

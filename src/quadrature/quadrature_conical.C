@@ -33,7 +33,7 @@ namespace libMesh
 
 // Constructor
 QConical::QConical(const unsigned int d,
-                   const Order o) : QBase(d,o)
+const Order o) : QBase(d,o)
 {
 }
 
@@ -51,47 +51,47 @@ QConical::~QConical()
 // of a 2D conical product rule.
 void QConical::conical_product_tri(unsigned int p)
 {
-  // Be sure the underlying rule object was built with the same dimension as the
-  // rule we are about to construct.
-  libmesh_assert_equal_to (this->get_dim(), 2);
+// Be sure the underlying rule object was built with the same dimension as the
+// rule we are about to construct.
+libmesh_assert_equal_to (this->get_dim(), 2);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jac1D(1,static_cast<Order>(_order+2*p),1,0);
+QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
+QJacobi jac1D(1,static_cast<Order>(_order+2*p),1,0);
 
-  // The Gauss rule needs to be scaled to [0,1]
-  std::pair<Real, Real> old_range(-1.0L, 1.0L);
-  std::pair<Real, Real> new_range( 0.0L, 1.0L);
-  gauss1D.scale(old_range,
-                new_range);
+// The Gauss rule needs to be scaled to [0,1]
+std::pair<Real, Real> old_range(-1.0L, 1.0L);
+std::pair<Real, Real> new_range( 0.0L, 1.0L);
+gauss1D.scale(old_range,
+new_range);
 
-  // Now construct the points and weights for the conical product rule.
+// Now construct the points and weights for the conical product rule.
 
-  // Both rules should have the same number of points.
-  libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());
+// Both rules should have the same number of points.
+libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());
 
-  // Save the number of points as a convenient variable
-  const unsigned int np = gauss1D.n_points();
+// Save the number of points as a convenient variable
+const unsigned int np = gauss1D.n_points();
 
-  // Both rules should be between x=0 and x=1
-  libmesh_assert_greater_equal (gauss1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (gauss1D.qp(np-1)(0), 1.0);
-  libmesh_assert_greater_equal (jac1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (jac1D.qp(np-1)(0), 1.0);
+// Both rules should be between x=0 and x=1
+libmesh_assert_greater_equal (gauss1D.qp(0)(0), 0.0);
+libmesh_assert_less_equal (gauss1D.qp(np-1)(0), 1.0);
+libmesh_assert_greater_equal (jac1D.qp(0)(0), 0.0);
+libmesh_assert_less_equal (jac1D.qp(np-1)(0), 1.0);
 
-  // Resize the points and weights vectors
-  _points.resize(np * np);
-  _weights.resize(np * np);
+// Resize the points and weights vectors
+_points.resize(np * np);
+_weights.resize(np * np);
 
-  // Compute the conical product
-  unsigned int gp = 0;
-  for (unsigned int i=0; i<np; i++)
-    for (unsigned int j=0; j<np; j++)
-      {
-        _points[gp](0) = jac1D.qp(j)(0);                          //s[j];
-        _points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
-        _weights[gp]   = gauss1D.w(i) * jac1D.w(j);              //A[i]*B[j];
-        gp++;
-      }
+// Compute the conical product
+unsigned int gp = 0;
+for (unsigned int i=0; i<np; i++)
+for (unsigned int j=0; j<np; j++)
+{
+_points[gp](0) = jac1D.qp(j)(0);                          //s[j];
+_points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
+_weights[gp]   = gauss1D.w(i) * jac1D.w(j);              //A[i]*B[j];
+gp++;
+}
 }
 
 
@@ -102,53 +102,53 @@ void QConical::conical_product_tri(unsigned int p)
 // of a 3D conical product rule for the Tet.
 void QConical::conical_product_tet(unsigned int p)
 {
-  // Be sure the underlying rule object was built with the same dimension as the
-  // rule we are about to construct.
-  libmesh_assert_equal_to (this->get_dim(), 3);
+// Be sure the underlying rule object was built with the same dimension as the
+// rule we are about to construct.
+libmesh_assert_equal_to (this->get_dim(), 3);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
-  QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
+QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
+QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
+QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
 
-  // The Gauss rule needs to be scaled to [0,1]
-  std::pair<Real, Real> old_range(-1.0L, 1.0L);
-  std::pair<Real, Real> new_range( 0.0L, 1.0L);
-  gauss1D.scale(old_range,
-                new_range);
+// The Gauss rule needs to be scaled to [0,1]
+std::pair<Real, Real> old_range(-1.0L, 1.0L);
+std::pair<Real, Real> new_range( 0.0L, 1.0L);
+gauss1D.scale(old_range,
+new_range);
 
-  // Now construct the points and weights for the conical product rule.
+// Now construct the points and weights for the conical product rule.
 
-  // All rules should have the same number of points
-  libmesh_assert_equal_to (gauss1D.n_points(), jacA1D.n_points());
-  libmesh_assert_equal_to (jacA1D.n_points(), jacB1D.n_points());
+// All rules should have the same number of points
+libmesh_assert_equal_to (gauss1D.n_points(), jacA1D.n_points());
+libmesh_assert_equal_to (jacA1D.n_points(), jacB1D.n_points());
 
-  // Save the number of points as a convenient variable
-  const unsigned int np = gauss1D.n_points();
+// Save the number of points as a convenient variable
+const unsigned int np = gauss1D.n_points();
 
-  // All rules should be between x=0 and x=1
-  libmesh_assert_greater_equal (gauss1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (gauss1D.qp(np-1)(0), 1.0);
-  libmesh_assert_greater_equal (jacA1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (jacA1D.qp(np-1)(0), 1.0);
-  libmesh_assert_greater_equal (jacB1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (jacB1D.qp(np-1)(0), 1.0);
+// All rules should be between x=0 and x=1
+libmesh_assert_greater_equal (gauss1D.qp(0)(0), 0.0);
+libmesh_assert_less_equal (gauss1D.qp(np-1)(0), 1.0);
+libmesh_assert_greater_equal (jacA1D.qp(0)(0), 0.0);
+libmesh_assert_less_equal (jacA1D.qp(np-1)(0), 1.0);
+libmesh_assert_greater_equal (jacB1D.qp(0)(0), 0.0);
+libmesh_assert_less_equal (jacB1D.qp(np-1)(0), 1.0);
 
-  // Resize the points and weights vectors
-  _points.resize(np * np * np);
-  _weights.resize(np * np * np);
+// Resize the points and weights vectors
+_points.resize(np * np * np);
+_weights.resize(np * np * np);
 
-  // Compute the conical product
-  unsigned int gp = 0;
-  for (unsigned int i=0; i<np; i++)
-    for (unsigned int j=0; j<np; j++)
-      for (unsigned int k=0; k<np; k++)
-        {
-          _points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
-          _points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
-          _points[gp](2) = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
-          _weights[gp]   = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
-          gp++;
-        }
+// Compute the conical product
+unsigned int gp = 0;
+for (unsigned int i=0; i<np; i++)
+for (unsigned int j=0; j<np; j++)
+for (unsigned int k=0; k<np; k++)
+{
+_points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
+_points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
+_points[gp](2) = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
+_weights[gp]   = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
+gp++;
+}
 }
 
 
@@ -179,38 +179,38 @@ void QConical::conical_product_tet(unsigned int p)
 // we can obtain 3D rules to any order for which the 1D rules exist.
 void QConical::conical_product_pyramid(unsigned int p)
 {
-  // Be sure the underlying rule object was built with the same dimension as the
-  // rule we are about to construct.
-  libmesh_assert_equal_to (this->get_dim(), 3);
+// Be sure the underlying rule object was built with the same dimension as the
+// rule we are about to construct.
+libmesh_assert_equal_to (this->get_dim(), 3);
 
-  QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
-  QJacobi jac1D(1,static_cast<Order>(_order+2*p),2,0);
+QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
+QJacobi jac1D(1,static_cast<Order>(_order+2*p),2,0);
 
-  // These rules should have the same number of points
-  libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());
+// These rules should have the same number of points
+libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());
 
-  // Save the number of points as a convenient variable
-  const unsigned int np = gauss1D.n_points();
+// Save the number of points as a convenient variable
+const unsigned int np = gauss1D.n_points();
 
-  // Resize the points and weights vectors
-  _points.resize(np * np * np);
-  _weights.resize(np * np * np);
+// Resize the points and weights vectors
+_points.resize(np * np * np);
+_weights.resize(np * np * np);
 
-  // Compute the conical product
-  unsigned int q = 0;
-  for (unsigned int i=0; i<np; ++i)
-    for (unsigned int j=0; j<np; ++j)
-      for (unsigned int k=0; k<np; ++k, ++q)
-        {
-          const Real xi=gauss1D.qp(i)(0);
-          const Real yj=gauss1D.qp(j)(0);
-          const Real zk=jac1D.qp(k)(0);
+// Compute the conical product
+unsigned int q = 0;
+for (unsigned int i=0; i<np; ++i)
+for (unsigned int j=0; j<np; ++j)
+for (unsigned int k=0; k<np; ++k, ++q)
+{
+const Real xi=gauss1D.qp(i)(0);
+const Real yj=gauss1D.qp(j)(0);
+const Real zk=jac1D.qp(k)(0);
 
-          _points[q](0) = (1.-zk) * xi;
-          _points[q](1) = (1.-zk) * yj;
-          _points[q](2) = zk;
-          _weights[q]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
-        }
+_points[q](0) = (1.-zk) * xi;
+_points[q](1) = (1.-zk) * yj;
+_points[q](2) = zk;
+_weights[q]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
+}
 }
 
 } // namespace libMesh

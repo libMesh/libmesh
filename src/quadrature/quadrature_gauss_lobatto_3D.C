@@ -24,29 +24,29 @@ namespace libMesh
 {
 
 void QGaussLobatto::init_3D(const ElemType type_in,
-                            unsigned int p)
+unsigned int p)
 {
-  switch (type_in)
-    {
-    case HEX8:
-    case HEX20:
-    case HEX27:
-      {
-        // We compute the 3D quadrature rule as a tensor
-        // product of the 1D quadrature rule.
-        QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, p);
-        tensor_product_hex(q1D);
-        return;
-      }
+switch (type_in)
+{
+case HEX8:
+case HEX20:
+case HEX27:
+{
+// We compute the 3D quadrature rule as a tensor
+// product of the 1D quadrature rule.
+QGaussLobatto q1D(1, _order);
+q1D.init(EDGE2, p);
+tensor_product_hex(q1D);
+return;
+}
 
-      // We *could* fall back to a Gauss type rule for other types
-      // elements, but the assumption here is that the user has asked
-      // for a Gauss-Lobatto rule, i.e. a rule with integration points
-      // on the element boundary, for a reason.
-    default:
-      libmesh_error_msg("ERROR: Unsupported type: " << type_in);
-    }
+// We *could* fall back to a Gauss type rule for other types
+// elements, but the assumption here is that the user has asked
+// for a Gauss-Lobatto rule, i.e. a rule with integration points
+// on the element boundary, for a reason.
+default:
+libmesh_error_msg("ERROR: Unsupported type: " << type_in);
+}
 }
 
 } // namespace libMesh

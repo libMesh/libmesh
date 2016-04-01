@@ -40,44 +40,44 @@ namespace libMesh
 {
 
 /**
- * Implementation of a SolutionTransfer object that uses the
- * DataTransferKit (https://github.com/CNERG/DataTransferKit) to
- * transfer variables back and forth between systems.
- *
- * \author Derek Gaston
- * \date 2013
- */
+* Implementation of a SolutionTransfer object that uses the
+* DataTransferKit (https://github.com/CNERG/DataTransferKit) to
+* transfer variables back and forth between systems.
+*
+* \author Derek Gaston
+* \date 2013
+*/
 class DTKSolutionTransfer : public SolutionTransfer
 {
 public:
-  DTKSolutionTransfer(const libMesh::Parallel::Communicator & comm
-                      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
-  virtual ~DTKSolutionTransfer();
+DTKSolutionTransfer(const libMesh::Parallel::Communicator & comm
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+virtual ~DTKSolutionTransfer();
 
-  /**
-   * Transfer the values of a variable to another.
-   *
-   * This is meant for transferring values from one EquationSystems to
-   * another even in the case of having different meshes.
-   *
-   * Note that the first time this function is called for one
-   * combination of EquationSystems a lot of setup and caching is
-   * done.  Subsequent transfers between the same EquationSystems will
-   * be _much_ faster.
-   */
-  virtual void transfer(const Variable & from_var, const Variable & to_var) libmesh_override;
+/**
+* Transfer the values of a variable to another.
+*
+* This is meant for transferring values from one EquationSystems to
+* another even in the case of having different meshes.
+*
+* Note that the first time this function is called for one
+* combination of EquationSystems a lot of setup and caching is
+* done.  Subsequent transfers between the same EquationSystems will
+* be _much_ faster.
+*/
+virtual void transfer(const Variable & from_var, const Variable & to_var) libmesh_override;
 
 protected:
-  typedef DataTransferKit::SharedDomainMap<DTKAdapter::MeshContainerType,DTKAdapter::MeshContainerType> shared_domain_map_type;
+typedef DataTransferKit::SharedDomainMap<DTKAdapter::MeshContainerType,DTKAdapter::MeshContainerType> shared_domain_map_type;
 
-  /// COMM_WORLD for now
-  Teuchos::RCP<const Teuchos::Comm<int> > comm_default;
+/// COMM_WORLD for now
+Teuchos::RCP<const Teuchos::Comm<int> > comm_default;
 
-  /// The DTKAdapter associated with each EquationSystems
-  std::map<EquationSystems *, DTKAdapter *> adapters;
+/// The DTKAdapter associated with each EquationSystems
+std::map<EquationSystems *, DTKAdapter *> adapters;
 
-  /// The dtk shared domain maps for pairs of EquationSystems (from, to)
-  std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type * > dtk_maps;
+/// The dtk shared domain maps for pairs of EquationSystems (from, to)
+std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type * > dtk_maps;
 };
 
 } // namespace libMesh

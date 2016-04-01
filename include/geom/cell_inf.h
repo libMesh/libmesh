@@ -34,43 +34,43 @@ namespace libMesh
 
 
 /**
- * The \p InfCell is an abstract element type that lives in
- * three dimensions.  An infinite cell could be an infinite hexahedron,
- * or an infinite prism.
- */
+* The \p InfCell is an abstract element type that lives in
+* three dimensions.  An infinite cell could be an infinite hexahedron,
+* or an infinite prism.
+*/
 class InfCell : public Elem
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  InfCell (const unsigned int nn,
-           const unsigned int ns,
-           Elem * p,
-           Elem ** elemlinkdata,
-           Node ** nodelinkdata) :
-    Elem (nn, ns, p, elemlinkdata, nodelinkdata)
-  {}
+/**
+* Constructor.
+*/
+InfCell (const unsigned int nn,
+const unsigned int ns,
+Elem * p,
+Elem ** elemlinkdata,
+Node ** nodelinkdata) :
+Elem (nn, ns, p, elemlinkdata, nodelinkdata)
+{}
 
-  /**
-   * @returns 3, the dimensionality of the object.
-   */
-  virtual unsigned int dim () const libmesh_override { return 3; }
+/**
+* @returns 3, the dimensionality of the object.
+*/
+virtual unsigned int dim () const libmesh_override { return 3; }
 
-  /**
-   * @returns \p true.  All classes derived from \p InfCell
-   * are infinite elements.
-   */
-  virtual bool infinite () const libmesh_override { return true; }
+/**
+* @returns \p true.  All classes derived from \p InfCell
+* are infinite elements.
+*/
+virtual bool infinite () const libmesh_override { return true; }
 
-  /**
-   * @returns the origin of this infinite element.
-   */
-  virtual Point origin () const libmesh_override
-  {
-    return (this->point(0)*2 - this->point(this->n_vertices()/2));
-  }
+/**
+* @returns the origin of this infinite element.
+*/
+virtual Point origin () const libmesh_override
+{
+return (this->point(0)*2 - this->point(this->n_vertices()/2));
+}
 };
 
 } // namespace libMesh

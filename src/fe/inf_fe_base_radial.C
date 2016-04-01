@@ -35,8 +35,8 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 Elem * InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem * inf_elem)
 {
-  UniquePtr<Elem> ape(inf_elem->build_side(0));
-  return ape.release();
+UniquePtr<Elem> ape(inf_elem->build_side(0));
+return ape.release();
 }
 
 
@@ -45,47 +45,47 @@ Elem * InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem * inf_elem)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
 {
-  switch (type)
-    {
-      // 3D infinite elements:
-      // with Dim=3 -> infinite elements on their own
-    case INFHEX8:
-      return QUAD4;
+switch (type)
+{
+// 3D infinite elements:
+// with Dim=3 -> infinite elements on their own
+case INFHEX8:
+return QUAD4;
 
-    case INFHEX16:
-      return QUAD8;
+case INFHEX16:
+return QUAD8;
 
-    case INFHEX18:
-      return QUAD9;
+case INFHEX18:
+return QUAD9;
 
-    case INFPRISM6:
-      return TRI3;
+case INFPRISM6:
+return TRI3;
 
-    case INFPRISM12:
-      return TRI6;
+case INFPRISM12:
+return TRI6;
 
-      // 2D infinite elements:
-      // with Dim=3 -> used as boundary condition,
-      // with Dim=2 -> infinite elements on their own
-    case INFQUAD4:
-      return EDGE2;
+// 2D infinite elements:
+// with Dim=3 -> used as boundary condition,
+// with Dim=2 -> infinite elements on their own
+case INFQUAD4:
+return EDGE2;
 
-    case INFQUAD6:
-      return EDGE3;
+case INFQUAD6:
+return EDGE3;
 
-      // 1D infinite elements:
-      // with Dim=2 -> used as boundary condition,
-      // with Dim=1 -> infinite elements on their own,
-      //               but no base element!
-    case INFEDGE2:
-      return INVALID_ELEM;
+// 1D infinite elements:
+// with Dim=2 -> used as boundary condition,
+// with Dim=1 -> infinite elements on their own,
+//               but no base element!
+case INFEDGE2:
+return INVALID_ELEM;
 
-    default:
-      libmesh_error_msg("ERROR: Unsupported element type!: " << type);
-    }
+default:
+libmesh_error_msg("ERROR: Unsupported element type!: " << type);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return INVALID_ELEM;
+libmesh_error_msg("We'll never get here!");
+return INVALID_ELEM;
 }
 
 
@@ -94,22 +94,22 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType base_elem_type,
-                                                                  const Order base_mapping_order)
+const Order base_mapping_order)
 {
-  if (Dim == 1)
-    return 1;
+if (Dim == 1)
+return 1;
 
-  else if (Dim == 2)
-    return FE<1,LAGRANGE>::n_shape_functions (base_elem_type,
-                                              base_mapping_order);
-  else if (Dim == 3)
-    return FE<2,LAGRANGE>::n_shape_functions (base_elem_type,
-                                              base_mapping_order);
-  else
-    {
-      libmesh_error_msg("Unsupported Dim = " << Dim);
-      return 0;
-    }
+else if (Dim == 2)
+return FE<1,LAGRANGE>::n_shape_functions (base_elem_type,
+base_mapping_order);
+else if (Dim == 3)
+return FE<2,LAGRANGE>::n_shape_functions (base_elem_type,
+base_mapping_order);
+else
+{
+libmesh_error_msg("Unsupported Dim = " << Dim);
+return 0;
+}
 }
 
 
@@ -120,22 +120,22 @@ unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType
 // InfFE::Radial class members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_radial,
-                                                                const unsigned int n_onion)
+const unsigned int n_onion)
 {
-  libmesh_assert_less (n_onion, 2);
+libmesh_assert_less (n_onion, 2);
 
-  if (n_onion == 0)
-    /*
-     * in the base, no matter what, we have 1 node associated
-     * with radial direction
-     */
-    return 1;
-  else
-    /*
-     * this works, since for Order o_radial=CONST=0, we still
-     * have the (1-v)/2 mode, associated to the base
-     */
-    return static_cast<unsigned int>(o_radial);
+if (n_onion == 0)
+/*
+* in the base, no matter what, we have 1 node associated
+* with radial direction
+*/
+return 1;
+else
+/*
+* this works, since for Order o_radial=CONST=0, we still
+* have the (1-v)/2 mode, associated to the base
+*/
+return static_cast<unsigned int>(o_radial);
 }
 
 

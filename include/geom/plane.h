@@ -29,122 +29,122 @@ namespace libMesh
 {
 
 /**
- * This class defines a plane.
- *
- * \author Benjamin S. Kirk
- * \date 2002
- */
+* This class defines a plane.
+*
+* \author Benjamin S. Kirk
+* \date 2002
+*/
 class Plane : public Surface
 {
 public:
 
-  /**
-   * Dummy Constructor.
-   */
-  Plane ();
+/**
+* Dummy Constructor.
+*/
+Plane ();
 
-  /**
-   * Constructs a plane containing point p with normal n.
-   */
-  Plane (const Point & p, const Point & n);
+/**
+* Constructs a plane containing point p with normal n.
+*/
+Plane (const Point & p, const Point & n);
 
-  /**
-   * Constructs a plane containing the three points.  The
-   * normal is determined in a counter-clockwise sense.  See
-   * the create_from_three_points method for more details.
-   */
-  Plane (const Point & p0, const Point & p1, const Point & p2);
+/**
+* Constructs a plane containing the three points.  The
+* normal is determined in a counter-clockwise sense.  See
+* the create_from_three_points method for more details.
+*/
+Plane (const Point & p0, const Point & p1, const Point & p2);
 
-  /**
-   * Copy-constructor.
-   */
-  Plane (const Plane & other_plane);
+/**
+* Copy-constructor.
+*/
+Plane (const Plane & other_plane);
 
-  /**
-   * Destructor.  Does nothing at the moment.
-   */
-  ~Plane ();
+/**
+* Destructor.  Does nothing at the moment.
+*/
+~Plane ();
 
-  /**
-   * Defines a plane containing point p with normal n.
-   */
-  void create_from_point_normal (const Point & p, const Point & n);
+/**
+* Defines a plane containing point p with normal n.
+*/
+void create_from_point_normal (const Point & p, const Point & n);
 
-  /**
-   * Defines a plane intersecting the three points
-   * p0, p1, and p2.  The normal is constructed in a
-   * counter-clockwise sense, i.e. (p1-p0)x(p2-p0);
-   */
-  void create_from_three_points (const Point & p0,
-                                 const Point & p1,
-                                 const Point & p2 );
+/**
+* Defines a plane intersecting the three points
+* p0, p1, and p2.  The normal is constructed in a
+* counter-clockwise sense, i.e. (p1-p0)x(p2-p0);
+*/
+void create_from_three_points (const Point & p0,
+const Point & p1,
+const Point & p2 );
 
-  /**
-   * Creates an XY plane located at z=zpos,
-   */
-  void xy_plane (const Real zpos=0.);
+/**
+* Creates an XY plane located at z=zpos,
+*/
+void xy_plane (const Real zpos=0.);
 
-  /**
-   * Creates an XZ plane located at y=ypos,
-   */
-  void xz_plane (const Real ypos=0.);
+/**
+* Creates an XZ plane located at y=ypos,
+*/
+void xz_plane (const Real ypos=0.);
 
-  /**
-   * Creates an YZ plane located at x=xpos,
-   */
-  void yz_plane (const Real xpos=0.);
+/**
+* Creates an YZ plane located at x=xpos,
+*/
+void yz_plane (const Real xpos=0.);
 
-  /**
-   * @returns true if the point p is above the surface,
-   * false otherwise.
-   */
-  virtual bool above_surface (const Point & p) const libmesh_override;
+/**
+* @returns true if the point p is above the surface,
+* false otherwise.
+*/
+virtual bool above_surface (const Point & p) const libmesh_override;
 
-  /**
-   * @returns true if the point p is below the surface,
-   * false otherwise.
-   */
-  virtual bool below_surface (const Point & p) const libmesh_override;
+/**
+* @returns true if the point p is below the surface,
+* false otherwise.
+*/
+virtual bool below_surface (const Point & p) const libmesh_override;
 
-  /**
-   * @returns true if the point p is on the surface,
-   * false otherwise.  Note that the definition of on
-   * the surface really means "very close" to account
-   * for roundoff error.
-   */
-  virtual bool on_surface (const Point & p) const libmesh_override;
+/**
+* @returns true if the point p is on the surface,
+* false otherwise.  Note that the definition of on
+* the surface really means "very close" to account
+* for roundoff error.
+*/
+virtual bool on_surface (const Point & p) const libmesh_override;
 
-  /**
-   * @returns the closest point on the surface to point p.
-   */
-  virtual Point closest_point (const Point & p) const libmesh_override;
+/**
+* @returns the closest point on the surface to point p.
+*/
+virtual Point closest_point (const Point & p) const libmesh_override;
 
-  /**
-   * @returns a unit vector normal to the surface at
-   * point p.
-   */
-  virtual Point unit_normal (const Point & p) const libmesh_override;
+/**
+* @returns a unit vector normal to the surface at
+* point p.
+*/
+virtual Point unit_normal (const Point & p) const libmesh_override;
 
-  /**
-   * @returns a point on the plane useful
-   * for determining position
-   */
-  const Point & get_planar_point() const;
+/**
+* @returns a point on the plane useful
+* for determining position
+*/
+const Point & get_planar_point() const;
 
 
 private:
 
 
-  /**
-   * Returns the normal for the plane.
-   */
-  const Point & normal () const;
+/**
+* Returns the normal for the plane.
+*/
+const Point & normal () const;
 
-  /**
-   *  The plane is defined by a point and a normal.
-   */
-  Point _point;
-  Point _normal;
+/**
+*  The plane is defined by a point and a normal.
+*/
+Point _point;
+Point _normal;
 
 };
 
@@ -154,7 +154,7 @@ private:
 // Plane class inline members
 inline const Point & Plane::normal () const
 {
-  return _normal;
+return _normal;
 }
 
 } // namespace libMesh

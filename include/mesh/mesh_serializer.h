@@ -30,21 +30,21 @@ namespace libMesh
 class MeshBase;
 
 /**
- * Temporarily serialize a ParallelMesh for output; a distributed
- * mesh is allgathered by the MeshSerializer constructor if
- * need_serial is true, then remote elements are deleted again by the
- * destructor.
- */
+* Temporarily serialize a ParallelMesh for output; a distributed
+* mesh is allgathered by the MeshSerializer constructor if
+* need_serial is true, then remote elements are deleted again by the
+* destructor.
+*/
 class MeshSerializer
 {
 public:
-  MeshSerializer(MeshBase & mesh, bool need_serial = true);
+MeshSerializer(MeshBase & mesh, bool need_serial = true);
 
-  ~MeshSerializer();
+~MeshSerializer();
 
 private:
-  MeshBase & _mesh;
-  bool reparallelize;
+MeshBase & _mesh;
+bool reparallelize;
 };
 
 } // namespace libMesh

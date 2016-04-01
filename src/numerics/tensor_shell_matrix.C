@@ -25,19 +25,19 @@ namespace libMesh
 
 template <typename T>
 void TensorShellMatrix<T>::vector_mult (NumericVector<T> & dest,
-                                        const NumericVector<T> & arg) const
+const NumericVector<T> & arg) const
 {
-  dest = _v;
-  dest.scale(_w.dot(arg));
+dest = _v;
+dest.scale(_w.dot(arg));
 }
 
 
 
 template <typename T>
 void TensorShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
-                                            const NumericVector<T> & arg) const
+const NumericVector<T> & arg) const
 {
-  dest.add(_w.dot(arg),_v);
+dest.add(_w.dot(arg),_v);
 }
 
 
@@ -45,7 +45,7 @@ void TensorShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
 template <typename T>
 void TensorShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 {
-  dest.pointwise_mult(_v,_w);
+dest.pointwise_mult(_v,_w);
 }
 
 

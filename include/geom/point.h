@@ -29,53 +29,53 @@ namespace libMesh
 {
 
 /**
- * A \p Point defines a location in LIBMESH_DIM dimensional Real space.  Points
- * are always real-valued, even if the library is configured with
- * \p --enable-complex.
- *
- * \author Benjamin S. Kirk
- * \date 2003
- */
+* A \p Point defines a location in LIBMESH_DIM dimensional Real space.  Points
+* are always real-valued, even if the library is configured with
+* \p --enable-complex.
+*
+* \author Benjamin S. Kirk
+* \date 2003
+*/
 class Point : public TypeVector<Real>
 {
 public:
 
-  /**
-   * Constructor.  By default sets all entries to 0.  Gives the point 0 in
-   * \p LIBMESH_DIM dimensions.
-   */
-  Point  (const Real x=0.,
-          const Real y=0.,
-          const Real z=0.);
+/**
+* Constructor.  By default sets all entries to 0.  Gives the point 0 in
+* \p LIBMESH_DIM dimensions.
+*/
+Point  (const Real x=0.,
+const Real y=0.,
+const Real z=0.);
 
-  /**
-   * Copy-constructor.
-   */
-  Point (const Point & p);
+/**
+* Copy-constructor.
+*/
+Point (const Point & p);
 
-  /**
-   * Copy-constructor.
-   */
-  Point (const TypeVector<Real> & p);
+/**
+* Copy-constructor.
+*/
+Point (const TypeVector<Real> & p);
 
-  /**
-   * Empty.
-   */
-  ~Point() {}
+/**
+* Empty.
+*/
+~Point() {}
 
-  //   /**
-  //    * @returns a key associated with this point.  Useful for sorting.
-  //    */
-  //   dof_id_type key() const;
+//   /**
+//    * @returns a key associated with this point.  Useful for sorting.
+//    */
+//   dof_id_type key() const;
 
 
 protected:
 
 
-  /**
-   * Make the derived class a friend
-   */
-  friend class Node;
+/**
+* Make the derived class a friend
+*/
+friend class Node;
 };
 
 
@@ -84,9 +84,9 @@ protected:
 // Inline functions
 inline
 Point::Point (const Real x,
-              const Real y,
-              const Real z) :
-  TypeVector<Real> (x,y,z)
+const Real y,
+const Real z) :
+TypeVector<Real> (x,y,z)
 {
 }
 
@@ -94,7 +94,7 @@ Point::Point (const Real x,
 
 inline
 Point::Point (const Point & p) :
-  TypeVector<Real> (p)
+TypeVector<Real> (p)
 {
 }
 
@@ -102,7 +102,7 @@ Point::Point (const Point & p) :
 
 inline
 Point::Point (const TypeVector<Real> & p) :
-  TypeVector<Real> (p)
+TypeVector<Real> (p)
 {
 }
 

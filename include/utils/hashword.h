@@ -43,7 +43,7 @@ namespace
 inline
 uint32_t rot(uint32_t x, uint32_t k)
 {
-  return (x<<k) | (x>>(32-k));
+return (x<<k) | (x>>(32-k));
 }
 
 
@@ -56,12 +56,12 @@ uint32_t rot(uint32_t x, uint32_t k)
 inline
 void mix(uint32_t & a, uint32_t & b, uint32_t & c)
 {
-  a -= c;  a ^= rot(c, 4);  c += b;
-  b -= a;  b ^= rot(a, 6);  a += c;
-  c -= b;  c ^= rot(b, 8);  b += a;
-  a -= c;  a ^= rot(c,16);  c += b;
-  b -= a;  b ^= rot(a,19);  a += c;
-  c -= b;  c ^= rot(b, 4);  b += a;
+a -= c;  a ^= rot(c, 4);  c += b;
+b -= a;  b ^= rot(a, 6);  a += c;
+c -= b;  c ^= rot(b, 8);  b += a;
+a -= c;  a ^= rot(c,16);  c += b;
+b -= a;  b ^= rot(a,19);  a += c;
+c -= b;  c ^= rot(b, 4);  b += a;
 }
 
 
@@ -73,13 +73,13 @@ void mix(uint32_t & a, uint32_t & b, uint32_t & c)
 inline
 void final(uint32_t & a, uint32_t & b, uint32_t & c)
 {
-  c ^= b; c -= rot(b,14);
-  a ^= c; a -= rot(c,11);
-  b ^= a; b -= rot(a,25);
-  c ^= b; c -= rot(b,16);
-  a ^= c; a -= rot(c,4);
-  b ^= a; b -= rot(a,14);
-  c ^= b; c -= rot(b,24);
+c ^= b; c -= rot(b,14);
+a ^= c; a -= rot(c,11);
+b ^= a; b -= rot(a,25);
+c ^= b; c -= rot(b,16);
+a ^= c; a -= rot(c,4);
+b ^= a; b -= rot(a,14);
+c ^= b; c -= rot(b,24);
 }
 
 
@@ -99,28 +99,28 @@ void final(uint32_t & a, uint32_t & b, uint32_t & c)
 // returns: 64 bit hash as a static hash type
 uint64_t fnv_64_buf(const void * buf, size_t len)
 {
-  // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
-  uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
+// Initializing hval with this value corresponds to the FNV-1 hash algorithm.
+uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
 
-  // start of buffer
-  const unsigned char * bp = static_cast<const unsigned char *>(buf);
+// start of buffer
+const unsigned char * bp = static_cast<const unsigned char *>(buf);
 
-  // beyond end of buffer
-  const unsigned char * be = bp + len;
+// beyond end of buffer
+const unsigned char * be = bp + len;
 
-  // FNV-1 hash each octet of the buffer
-  while (bp < be)
-    {
-      hval +=
-        (hval << 1) + (hval << 4) + (hval << 5) +
-        (hval << 7) + (hval << 8) + (hval << 40);
+// FNV-1 hash each octet of the buffer
+while (bp < be)
+{
+hval +=
+(hval << 1) + (hval << 4) + (hval << 5) +
+(hval << 7) + (hval << 8) + (hval << 40);
 
-      // xor the bottom with the current octet
-      hval ^= static_cast<uint64_t>(*bp++);
-    }
+// xor the bottom with the current octet
+hval ^= static_cast<uint64_t>(*bp++);
+}
 
-  // return our new hash value
-  return hval;
+// return our new hash value
+return hval;
 }
 
 } // end anonymous namespace
@@ -140,35 +140,35 @@ namespace Utility
 inline
 uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
 {
-  uint32_t a,b,c;
+uint32_t a,b,c;
 
-  // Set up the internal state
-  a = b = c = 0xdeadbeef + ((static_cast<uint32_t>(length))<<2) + initval;
+// Set up the internal state
+a = b = c = 0xdeadbeef + ((static_cast<uint32_t>(length))<<2) + initval;
 
-  //------------------------------------------------- handle most of the key
-  while (length > 3)
-    {
-      a += k[0];
-      b += k[1];
-      c += k[2];
-      mix(a,b,c);
-      length -= 3;
-      k += 3;
-    }
+//------------------------------------------------- handle most of the key
+while (length > 3)
+{
+a += k[0];
+b += k[1];
+c += k[2];
+mix(a,b,c);
+length -= 3;
+k += 3;
+}
 
-  //------------------------------------------- handle the last 3 uint32_t's
-  switch(length)                     // all the case statements fall through
-    {
-    case 3 : c+=k[2];
-    case 2 : b+=k[1];
-    case 1 : a+=k[0];
-      final(a,b,c);
-    default:     // case 0: nothing left to add
-      break;
-    }
+//------------------------------------------- handle the last 3 uint32_t's
+switch(length)                     // all the case statements fall through
+{
+case 3 : c+=k[2];
+case 2 : b+=k[1];
+case 1 : a+=k[0];
+final(a,b,c);
+default:     // case 0: nothing left to add
+break;
+}
 
-  //------------------------------------------------------ report the result
-  return c;
+//------------------------------------------------------ report the result
+return c;
 }
 
 
@@ -177,7 +177,7 @@ uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
 inline
 uint32_t hashword(const std::vector<uint32_t> & keys, uint32_t initval=0)
 {
-  return hashword(&keys[0], keys.size(), initval);
+return hashword(&keys[0], keys.size(), initval);
 }
 
 // This is a hard-coded version of hashword for hashing exactly 2 numbers
@@ -188,42 +188,42 @@ uint32_t hashword(const std::vector<uint32_t> & keys, uint32_t initval=0)
 inline
 uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t initval=0)
 {
-  uint32_t a,b,c;
+uint32_t a,b,c;
 
-  // Set up the internal state
-  a = b = c = 0xdeadbeef + 8 + initval;
+// Set up the internal state
+a = b = c = 0xdeadbeef + 8 + initval;
 
-  b+=second;
-  a+=first;
-  final(a,b,c);
+b+=second;
+a+=first;
+final(a,b,c);
 
-  return c;
+return c;
 }
 
 // Call the 64-bit FNV hash function.
 inline
 uint64_t hashword2(const uint64_t first, const uint64_t second)
 {
-  // This isn't optimal (it would be nice to avoid this packing step)
-  // but we are going to go ahead and conform to the 32-bit
-  // hashword2() interface.
-  uint64_t k[2] = {first, second};
+// This isn't optimal (it would be nice to avoid this packing step)
+// but we are going to go ahead and conform to the 32-bit
+// hashword2() interface.
+uint64_t k[2] = {first, second};
 
-  // len is the total number of bytes in two 64-bit ints
-  return fnv_64_buf(k, /*len=*/8*2);
+// len is the total number of bytes in two 64-bit ints
+return fnv_64_buf(k, /*len=*/8*2);
 }
 
 inline
 uint16_t hashword2(const uint16_t first, const uint16_t second)
 {
-  return static_cast<uint16_t>(first%65449 + (second<<5)%65449);
+return static_cast<uint16_t>(first%65449 + (second<<5)%65449);
 }
 
 // Call the 64-bit FNV hash function.
 inline
 uint64_t hashword(const uint64_t * k, size_t length)
 {
-  return fnv_64_buf(k, 8*length);
+return fnv_64_buf(k, 8*length);
 }
 
 
@@ -232,7 +232,7 @@ uint64_t hashword(const uint64_t * k, size_t length)
 inline
 uint64_t hashword(const std::vector<uint64_t> & keys)
 {
-  return hashword(&keys[0], keys.size());
+return hashword(&keys[0], keys.size());
 }
 
 // In a personal communication from Bob Jenkins, he recommended using
@@ -242,36 +242,36 @@ uint64_t hashword(const std::vector<uint64_t> & keys)
 inline
 uint16_t hashword(const uint16_t * k, size_t length)
 {
-  // Three values that will be passed to final() after they are initialized.
-  uint32_t a = 0;
-  uint32_t b = 0;
-  uint32_t c = 0;
+// Three values that will be passed to final() after they are initialized.
+uint32_t a = 0;
+uint32_t b = 0;
+uint32_t c = 0;
 
-  switch (length)
-    {
-    case 3:
-      {
-        // Cast the inputs to 32 bit integers and call final().
-        a = k[0];
-        b = k[1];
-        c = k[2];
-        break;
-      }
-    case 4:
-      {
-        // Combine the 4 16-bit inputs, "w, x, y, z" into two 32-bit
-        // inputs "wx" and "yz" using bit operations and call final.
-        a = ((k[0]<<16) | (k[1] & 0xffff)); // wx
-        b = ((k[2]<<16) | (k[3] & 0xffff)); // yz
-        break;
-      }
-    default:
-      libmesh_error_msg("Unsupported length: " << length);
-    }
+switch (length)
+{
+case 3:
+{
+// Cast the inputs to 32 bit integers and call final().
+a = k[0];
+b = k[1];
+c = k[2];
+break;
+}
+case 4:
+{
+// Combine the 4 16-bit inputs, "w, x, y, z" into two 32-bit
+// inputs "wx" and "yz" using bit operations and call final.
+a = ((k[0]<<16) | (k[1] & 0xffff)); // wx
+b = ((k[2]<<16) | (k[3] & 0xffff)); // yz
+break;
+}
+default:
+libmesh_error_msg("Unsupported length: " << length);
+}
 
-  // Result is returned in c
-  final(a,b,c);
-  return static_cast<uint16_t>(c);
+// Result is returned in c
+final(a,b,c);
+return static_cast<uint16_t>(c);
 }
 
 } // end Utility namespace

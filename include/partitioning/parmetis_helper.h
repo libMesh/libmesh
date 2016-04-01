@@ -41,40 +41,40 @@ namespace libMesh
 {
 
 /**
- * The \p ParmetisHelper class allows us to use a 'pimpl' strategy in
- * the ParmetisPartitioner class.  Since we don't install this header
- * file, apps do not include parmetis.h, and consequently we don't
- * have to install it, either.  This class is empty when Parmetis
- * is not available, when it is it is simply a data container.
- */
+* The \p ParmetisHelper class allows us to use a 'pimpl' strategy in
+* the ParmetisPartitioner class.  Since we don't install this header
+* file, apps do not include parmetis.h, and consequently we don't
+* have to install it, either.  This class is empty when Parmetis
+* is not available, when it is it is simply a data container.
+*/
 class ParmetisHelper
 {
 public:
-  /**
-   * Constructor.
-   */
-  ParmetisHelper () {}
+/**
+* Constructor.
+*/
+ParmetisHelper () {}
 
 #ifdef LIBMESH_HAVE_PARMETIS
 
-  /**
-   * Data structures used by ParMETIS to describe the connectivity graph
-   * of the mesh.  Consult the ParMETIS documentation.
-   */
-  std::vector<Parmetis::idx_t>  vtxdist;
-  std::vector<Parmetis::idx_t>  xadj;
-  std::vector<Parmetis::idx_t>  adjncy;
-  std::vector<Parmetis::idx_t>  part;
-  std::vector<Parmetis::real_t> tpwgts;
-  std::vector<Parmetis::real_t> ubvec;
-  std::vector<Parmetis::idx_t>  options;
-  std::vector<Parmetis::idx_t>  vwgt;
+/**
+* Data structures used by ParMETIS to describe the connectivity graph
+* of the mesh.  Consult the ParMETIS documentation.
+*/
+std::vector<Parmetis::idx_t>  vtxdist;
+std::vector<Parmetis::idx_t>  xadj;
+std::vector<Parmetis::idx_t>  adjncy;
+std::vector<Parmetis::idx_t>  part;
+std::vector<Parmetis::real_t> tpwgts;
+std::vector<Parmetis::real_t> ubvec;
+std::vector<Parmetis::idx_t>  options;
+std::vector<Parmetis::idx_t>  vwgt;
 
-  Parmetis::idx_t wgtflag;
-  Parmetis::idx_t ncon;
-  Parmetis::idx_t numflag;
-  Parmetis::idx_t nparts;
-  Parmetis::idx_t edgecut;
+Parmetis::idx_t wgtflag;
+Parmetis::idx_t ncon;
+Parmetis::idx_t numflag;
+Parmetis::idx_t nparts;
+Parmetis::idx_t edgecut;
 
 #endif
 };

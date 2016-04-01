@@ -39,18 +39,18 @@ namespace libMesh
 template <typename T>
 void AztecLinearSolver<T>::clear ()
 {
-  if (this->initialized())
-    {
-      this->_is_initialized = false;
+if (this->initialized())
+{
+this->_is_initialized = false;
 
-      // Mimic PETSc default solver and preconditioner
-      this->_solver_type           = GMRES;
+// Mimic PETSc default solver and preconditioner
+this->_solver_type           = GMRES;
 
-      if (this->n_processors() == 1)
-        this->_preconditioner_type = ILU_PRECOND;
-      else
-        this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
-    }
+if (this->n_processors() == 1)
+this->_preconditioner_type = ILU_PRECOND;
+else
+this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+}
 }
 
 
@@ -58,41 +58,41 @@ void AztecLinearSolver<T>::clear ()
 template <typename T>
 void AztecLinearSolver<T>::init (const char * /*name*/)
 {
-  // Initialize the data structures if not done so already.
-  if (!this->initialized())
-    {
-      this->_is_initialized = true;
+// Initialize the data structures if not done so already.
+if (!this->initialized())
+{
+this->_is_initialized = true;
 
-      _linear_solver = new AztecOO();
+_linear_solver = new AztecOO();
 
-      set_solver_type();
+set_solver_type();
 
-      switch(this->_preconditioner_type)
-        {
-        case ILU_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
-          break;
+switch(this->_preconditioner_type)
+{
+case ILU_PRECOND:
+_linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+_linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
+break;
 
-        case BLOCK_JACOBI_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
-          break;
+case BLOCK_JACOBI_PRECOND:
+_linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
+break;
 
-        case ICC_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_icc);
-          break;
+case ICC_PRECOND:
+_linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+_linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_icc);
+break;
 
-        case LU_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_lu);
-          break;
+case LU_PRECOND:
+_linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+_linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_lu);
+break;
 
-        default:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
-        }
-    }
+default:
+_linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+_linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
+}
+}
 }
 
 
@@ -101,41 +101,41 @@ void AztecLinearSolver<T>::init (const char * /*name*/)
 template <typename T>
 std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
-                             SparseMatrix<T> & precond_in,
-                             NumericVector<T> & solution_in,
-                             NumericVector<T> & rhs_in,
-                             const double tol,
-                             const unsigned int m_its)
+SparseMatrix<T> & precond_in,
+NumericVector<T> & solution_in,
+NumericVector<T> & rhs_in,
+const double tol,
+const unsigned int m_its)
 {
-  START_LOG("solve()", "AztecLinearSolver");
+START_LOG("solve()", "AztecLinearSolver");
 
-  // Make sure the data passed in are really of Epetra types
-  EpetraMatrix<T> * matrix   = cast_ptr<EpetraMatrix<T> *>(&matrix_in);
-  EpetraMatrix<T> * precond  = cast_ptr<EpetraMatrix<T> *>(&precond_in);
-  EpetraVector<T> * solution = cast_ptr<EpetraVector<T> *>(&solution_in);
-  EpetraVector<T> * rhs      = cast_ptr<EpetraVector<T> *>(&rhs_in);
+// Make sure the data passed in are really of Epetra types
+EpetraMatrix<T> * matrix   = cast_ptr<EpetraMatrix<T> *>(&matrix_in);
+EpetraMatrix<T> * precond  = cast_ptr<EpetraMatrix<T> *>(&precond_in);
+EpetraVector<T> * solution = cast_ptr<EpetraVector<T> *>(&solution_in);
+EpetraVector<T> * rhs      = cast_ptr<EpetraVector<T> *>(&rhs_in);
 
-  this->init();
+this->init();
 
-  // Close the matrices and vectors in case this wasn't already done.
-  matrix->close ();
-  precond->close ();
-  solution->close ();
-  rhs->close ();
+// Close the matrices and vectors in case this wasn't already done.
+matrix->close ();
+precond->close ();
+solution->close ();
+rhs->close ();
 
-  _linear_solver->SetAztecOption(AZ_max_iter,m_its);
-  _linear_solver->SetAztecParam(AZ_tol,tol);
+_linear_solver->SetAztecOption(AZ_max_iter,m_its);
+_linear_solver->SetAztecParam(AZ_tol,tol);
 
-  Epetra_FECrsMatrix * emat = matrix->mat();
-  Epetra_Vector * esol = solution->vec();
-  Epetra_Vector * erhs = rhs->vec();
+Epetra_FECrsMatrix * emat = matrix->mat();
+Epetra_Vector * esol = solution->vec();
+Epetra_Vector * erhs = rhs->vec();
 
-  _linear_solver->Iterate(emat, esol, erhs, m_its, tol);
+_linear_solver->Iterate(emat, esol, erhs, m_its, tol);
 
-  STOP_LOG("solve()", "AztecLinearSolver");
+STOP_LOG("solve()", "AztecLinearSolver");
 
-  // return the # of its. and the final residual norm.
-  return std::make_pair(_linear_solver->NumIters(), _linear_solver->TrueResidual());
+// return the # of its. and the final residual norm.
+return std::make_pair(_linear_solver->NumIters(), _linear_solver->TrueResidual());
 }
 
 
@@ -143,17 +143,17 @@ AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
 template <typename T>
 std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
-                             NumericVector<T> &,
-                             NumericVector<T> &,
-                             const double,
-                             const unsigned int)
+NumericVector<T> &,
+NumericVector<T> &,
+const double,
+const unsigned int)
 //AztecLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 //     NumericVector<T> & solution_in,
 //     NumericVector<T> & rhs_in,
 //     const double tol,
 //     const unsigned int m_its)
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 }
 
 
@@ -161,11 +161,11 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
 template <typename T>
 std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
-                             const SparseMatrix<T> &,
-                             NumericVector<T> &,
-                             NumericVector<T> &,
-                             const double,
-                             const unsigned int)
+const SparseMatrix<T> &,
+NumericVector<T> &,
+NumericVector<T> &,
+const double,
+const unsigned int)
 //AztecLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 //     const SparseMatrix<T> & precond_matrix,
 //     NumericVector<T> & solution_in,
@@ -173,7 +173,7 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
 //     const double tol,
 //     const unsigned int m_its)
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 }
 
 
@@ -181,7 +181,7 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
 template <typename T>
 void AztecLinearSolver<T>::get_residual_history(std::vector<double> & /* hist */)
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 }
 
 
@@ -190,7 +190,7 @@ void AztecLinearSolver<T>::get_residual_history(std::vector<double> & /* hist */
 template <typename T>
 Real AztecLinearSolver<T>::get_initial_residual()
 {
-  return _linear_solver->TrueResidual();
+return _linear_solver->TrueResidual();
 }
 
 
@@ -198,9 +198,9 @@ Real AztecLinearSolver<T>::get_initial_residual()
 template <typename T>
 LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 
-  return UNKNOWN_FLAG;
+return UNKNOWN_FLAG;
 }
 
 
@@ -208,28 +208,28 @@ LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
 template <typename T>
 void AztecLinearSolver<T>::set_solver_type()
 {
-  switch (this->_solver_type)
-    {
-    case CG:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_cg); return;
+switch (this->_solver_type)
+{
+case CG:
+_linear_solver->SetAztecOption(AZ_solver, AZ_cg); return;
 
-    case CGS:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_cgs); return;
+case CGS:
+_linear_solver->SetAztecOption(AZ_solver, AZ_cgs); return;
 
-    case TFQMR:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_tfqmr); return;
+case TFQMR:
+_linear_solver->SetAztecOption(AZ_solver, AZ_tfqmr); return;
 
-    case BICGSTAB:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_bicgstab); return;
+case BICGSTAB:
+_linear_solver->SetAztecOption(AZ_solver, AZ_bicgstab); return;
 
-    case GMRES:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_gmres); return;
+case GMRES:
+_linear_solver->SetAztecOption(AZ_solver, AZ_gmres); return;
 
-    default:
-      libMesh::err << "ERROR:  Unsupported AztecOO Solver: "
-                   << Utility::enum_to_string(this->_solver_type) << std::endl
-                   << "Continuing with AztecOO defaults" << std::endl;
-    }
+default:
+libMesh::err << "ERROR:  Unsupported AztecOO Solver: "
+<< Utility::enum_to_string(this->_solver_type) << std::endl
+<< "Continuing with AztecOO defaults" << std::endl;
+}
 }
 
 //------------------------------------------------------------------

@@ -35,64 +35,64 @@ namespace libMesh
 {
 
 /**
- * This class defines a solver which uses a PETSc SNES
- * context to handle a DifferentiableSystem
- *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
- * \author Roy H. Stogner
- * \date 2008
- */
+* This class defines a solver which uses a PETSc SNES
+* context to handle a DifferentiableSystem
+*
+* This class is part of the new DifferentiableSystem framework,
+* which is still experimental.  Users of this framework should
+* beware of bugs and future API changes.
+*
+* \author Roy H. Stogner
+* \date 2008
+*/
 class PetscDiffSolver : public DiffSolver
 {
 public:
-  /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
-   */
-  explicit
-  PetscDiffSolver (sys_type & system);
+/**
+* Constructor. Requires a reference to the system
+* to be solved.
+*/
+explicit
+PetscDiffSolver (sys_type & system);
 
-  /**
-   * Destructor.
-   */
-  virtual ~PetscDiffSolver ();
+/**
+* Destructor.
+*/
+virtual ~PetscDiffSolver ();
 
-  typedef DiffSolver Parent;
+typedef DiffSolver Parent;
 
-  /**
-   * The reinitialization function.  This method is used after
-   * changes in the mesh.
-   */
-  virtual void reinit () libmesh_override;
+/**
+* The reinitialization function.  This method is used after
+* changes in the mesh.
+*/
+virtual void reinit () libmesh_override;
 
-  /**
-   * The initialization function.  solve() calls this to create
-   * a new SNES context.
-   */
-  virtual void init () libmesh_override;
+/**
+* The initialization function.  solve() calls this to create
+* a new SNES context.
+*/
+virtual void init () libmesh_override;
 
-  /**
-   * The clear function.  solve() calls this to destroy
-   * a used SNES context.
-   */
-  void clear ();
+/**
+* The clear function.  solve() calls this to destroy
+* a used SNES context.
+*/
+void clear ();
 
-  /**
-   * This method performs a solve.  What occurs in
-   * this method will depend on the PETSc SNES settings.
-   * See the PETSc documentation for more details.
-   */
-  virtual unsigned int solve () libmesh_override;
+/**
+* This method performs a solve.  What occurs in
+* this method will depend on the PETSc SNES settings.
+* See the PETSc documentation for more details.
+*/
+virtual unsigned int solve () libmesh_override;
 
 protected:
 
-  /**
-   * Nonlinear solver context
-   */
-  SNES _snes;
+/**
+* Nonlinear solver context
+*/
+SNES _snes;
 };
 
 } // namespace libMesh

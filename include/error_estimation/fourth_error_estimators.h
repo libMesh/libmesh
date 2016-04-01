@@ -31,46 +31,46 @@ namespace libMesh
 {
 
 /**
- * This class is an error indicator based on laplacian jumps between
- * elements.
- * See the JumpErrorEstimator class for most user APIs
- *
- * \author Roy H. Stogner
- * \date 2005
- */
+* This class is an error indicator based on laplacian jumps between
+* elements.
+* See the JumpErrorEstimator class for most user APIs
+*
+* \author Roy H. Stogner
+* \date 2005
+*/
 class LaplacianErrorEstimator : public JumpErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Defaults to H2 seminorm; changes to error_norm are
-   * ignored.
-   */
-  LaplacianErrorEstimator() :
-    JumpErrorEstimator()
-  { error_norm = H2_SEMINORM; }
+/**
+* Constructor.  Defaults to H2 seminorm; changes to error_norm are
+* ignored.
+*/
+LaplacianErrorEstimator() :
+JumpErrorEstimator()
+{ error_norm = H2_SEMINORM; }
 
-  /**
-   * Destructor.
-   */
-  ~LaplacianErrorEstimator() {}
+/**
+* Destructor.
+*/
+~LaplacianErrorEstimator() {}
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return LAPLACIAN;}
+virtual ErrorEstimatorType type() const libmesh_override
+{ return LAPLACIAN;}
 
 protected:
 
-  /**
-   * An initialization function, for requesting specific data from the FE
-   * objects
-   */
-  virtual void init_context(FEMContext & c) libmesh_override;
+/**
+* An initialization function, for requesting specific data from the FE
+* objects
+*/
+virtual void init_context(FEMContext & c) libmesh_override;
 
-  /**
-   * The function which calculates a laplacian jump based error
-   * term on an internal side
-   */
-  virtual void internal_side_integration() libmesh_override;
+/**
+* The function which calculates a laplacian jump based error
+* term on an internal side
+*/
+virtual void internal_side_integration() libmesh_override;
 };
 
 

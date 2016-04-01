@@ -33,134 +33,134 @@ namespace libMesh
 // MeshDate TetGen support function
 void MeshData::read_tetgen (const std::string & name)
 {
-  std::string name_node, name_ele, dummy;
-  std::string desc = name;
+std::string name_node, name_ele, dummy;
+std::string desc = name;
 
 
-  // Check name for *.node or *.ele extension.
-  // Set std::istream for node_stream and ele_stream.
-  if (name.rfind(".node") < name.size())
-    {
-      name_node = name;
-      dummy     = name;
-      std::size_t position = dummy.rfind(".node");
-      name_ele     = dummy.replace(position, 5, ".ele");
-      desc.erase(position);
-    }
-  else if (name.rfind(".ele") < name.size())
-    {
-      name_ele = name;
-      dummy    = name;
-      std::size_t position = dummy.rfind(".ele");
-      name_node    = dummy.replace(position, 4, ".node");
-      desc.erase(position);
-    }
-  else
-    libmesh_error_msg("ERROR: Unrecognized file name: " << name);
+// Check name for *.node or *.ele extension.
+// Set std::istream for node_stream and ele_stream.
+if (name.rfind(".node") < name.size())
+{
+name_node = name;
+dummy     = name;
+std::size_t position = dummy.rfind(".node");
+name_ele     = dummy.replace(position, 5, ".ele");
+desc.erase(position);
+}
+else if (name.rfind(".ele") < name.size())
+{
+name_ele = name;
+dummy    = name;
+std::size_t position = dummy.rfind(".ele");
+name_node    = dummy.replace(position, 4, ".node");
+desc.erase(position);
+}
+else
+libmesh_error_msg("ERROR: Unrecognized file name: " << name);
 
-  // Set the streams from which to read in.
-  std::ifstream node_stream (name_node.c_str());
-  std::ifstream ele_stream  (name_ele.c_str());
+// Set the streams from which to read in.
+std::ifstream node_stream (name_node.c_str());
+std::ifstream ele_stream  (name_ele.c_str());
 
-  if ( !node_stream.good() || !ele_stream.good() )
-    libmesh_error_msg("ERROR: One or both Input file(s) not good.\n"  \
-                      << "Error opening files "                       \
-                      << name_node                                    \
-                      << " and "                                      \
-                      << name_ele);
-
-
-  // Set the descriptive name.
-  // TetGen won't give a name, so we use the filename.
-  this->_data_descriptor = desc;
+if ( !node_stream.good() || !ele_stream.good() )
+libmesh_error_msg("ERROR: One or both Input file(s) not good.\n"  \
+<< "Error opening files "                       \
+<< name_node                                    \
+<< " and "                                      \
+<< name_ele);
 
 
-  //--------------------------------------------------
-  // Read in the data associated with the nodes.
-  {
-    unsigned int n_node=0, f_n_id=0, nAttri=0, BoundMark=0;
-    Real dummy_val=0.0;
-    std::vector<Number> AttriValue;
-
-    // Read the parameters from the node_stream.
-    node_stream >> n_node     // Read the number of nodes
-                >> dummy_val  // Read the dimension
-                >> nAttri     // Read the number of attributes
-                >> BoundMark; // (0 or 1) boundary markers are in the stream or not.
-
-    // Resize the values vector.
-    AttriValue.resize(nAttri);
-
-    for (unsigned int i=0; i<n_node; i++)
-      {
-        node_stream >> f_n_id;
+// Set the descriptive name.
+// TetGen won't give a name, so we use the filename.
+this->_data_descriptor = desc;
 
 
-        // Read the nodal coordinates for this node into dummy_val,
-        // since we don't need them.
-        for (unsigned int j=0; j<3; j++)
-          node_stream >> dummy_val;
+//--------------------------------------------------
+// Read in the data associated with the nodes.
+{
+unsigned int n_node=0, f_n_id=0, nAttri=0, BoundMark=0;
+Real dummy_val=0.0;
+std::vector<Number> AttriValue;
 
-        // Read the attributes from the stream.
-        for (unsigned int j=0; j<nAttri; j++)
-          node_stream >> AttriValue[j];
+// Read the parameters from the node_stream.
+node_stream >> n_node     // Read the number of nodes
+>> dummy_val  // Read the dimension
+>> nAttri     // Read the number of attributes
+>> BoundMark; // (0 or 1) boundary markers are in the stream or not.
 
-        // Read boundary marker if BoundaryMarker=1.
-        if (BoundMark == 1)
-          node_stream >> dummy_val;
+// Resize the values vector.
+AttriValue.resize(nAttri);
 
-        // For the foreign node id locate the Node *.
-        const Node * node = foreign_id_to_node(f_n_id);
-
-        // Insert this node and the values in our _node_data.
-        _node_data.insert (std::make_pair(node, AttriValue));
-      }
-  }
+for (unsigned int i=0; i<n_node; i++)
+{
+node_stream >> f_n_id;
 
 
-  //--------------------------------------------------
-  // Read in the data associated with the elements.
-  {
-    unsigned int n_elem, f_e_id, n_nodes, nAttri=0;
-    Real dummy_val=0.0;
-    std::vector<Number> AttriValue;
+// Read the nodal coordinates for this node into dummy_val,
+// since we don't need them.
+for (unsigned int j=0; j<3; j++)
+node_stream >> dummy_val;
 
-    // Read the parameters from the ele_stream.
-    ele_stream >> n_elem   // Read the number of tetrahedrons
-               >> n_nodes  // Read the points per tetrahedron
-               >> nAttri;  // Read the number of attributes
+// Read the attributes from the stream.
+for (unsigned int j=0; j<nAttri; j++)
+node_stream >> AttriValue[j];
 
-    // Resize the values vector.
-    AttriValue.resize(nAttri);
+// Read boundary marker if BoundaryMarker=1.
+if (BoundMark == 1)
+node_stream >> dummy_val;
 
-    for (unsigned int i=0; i<n_elem; i++)
-      {
-        ele_stream >> f_e_id;
+// For the foreign node id locate the Node *.
+const Node * node = foreign_id_to_node(f_n_id);
 
-        // For the number of nodes for this element read them into dummy_val,
-        // since we don't need them.
-        for (unsigned int n=0; n<n_nodes; n++)
-          ele_stream >> dummy_val;
+// Insert this node and the values in our _node_data.
+_node_data.insert (std::make_pair(node, AttriValue));
+}
+}
 
-        // Read the attributes from the stream.
-        for (unsigned int j=0; j<nAttri; j++)
-          ele_stream >> AttriValue[j];
 
-        // For the foreign elem id locate the Elem *.
-        const Elem * elem = foreign_id_to_elem(f_e_id);
+//--------------------------------------------------
+// Read in the data associated with the elements.
+{
+unsigned int n_elem, f_e_id, n_nodes, nAttri=0;
+Real dummy_val=0.0;
+std::vector<Number> AttriValue;
 
-        // Insert this elem and the values in our _elem_data.
-        _elem_data.insert (std::make_pair(elem, AttriValue));
-      }
-  }
+// Read the parameters from the ele_stream.
+ele_stream >> n_elem   // Read the number of tetrahedrons
+>> n_nodes  // Read the points per tetrahedron
+>> nAttri;  // Read the number of attributes
 
-  //--------------------------------------------------
-  // Finished reading.  Now ready for use.
-  this->_node_data_closed = true;
-  this->_elem_data_closed = true;
+// Resize the values vector.
+AttriValue.resize(nAttri);
 
-  node_stream.close();
-  ele_stream.close();
+for (unsigned int i=0; i<n_elem; i++)
+{
+ele_stream >> f_e_id;
+
+// For the number of nodes for this element read them into dummy_val,
+// since we don't need them.
+for (unsigned int n=0; n<n_nodes; n++)
+ele_stream >> dummy_val;
+
+// Read the attributes from the stream.
+for (unsigned int j=0; j<nAttri; j++)
+ele_stream >> AttriValue[j];
+
+// For the foreign elem id locate the Elem *.
+const Elem * elem = foreign_id_to_elem(f_e_id);
+
+// Insert this elem and the values in our _elem_data.
+_elem_data.insert (std::make_pair(elem, AttriValue));
+}
+}
+
+//--------------------------------------------------
+// Finished reading.  Now ready for use.
+this->_node_data_closed = true;
+this->_elem_data_closed = true;
+
+node_stream.close();
+ele_stream.close();
 }
 
 } // namespace libMesh

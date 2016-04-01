@@ -38,36 +38,36 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfQuad4 class static member initializations
 const unsigned int InfQuad4::side_nodes_map[3][2] =
-  {
-    {0, 1}, // Side 0
-    {1, 3}, // Side 1
-    {0, 2}  // Side 2
-  };
+{
+{0, 1}, // Side 0
+{1, 3}, // Side 1
+{0, 2}  // Side 2
+};
 
 
 
 #ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad4::_embedding_matrix[2][4][4] =
-  {
-    // embedding matrix for child 0
-    {
-      // 0    1    2    3rd parent node
-      {1.0, 0.0, 0.0, 0.0}, // 0th child node
-      {0.5, 0.5, 0.0, 0.0}, // 1
-      {0.0, 0.0, 1.0, 0.0}, // 2
-      {0.0, 0.0, 0.5, 0.5}  // 3
-    },
+{
+// embedding matrix for child 0
+{
+// 0    1    2    3rd parent node
+{1.0, 0.0, 0.0, 0.0}, // 0th child node
+{0.5, 0.5, 0.0, 0.0}, // 1
+{0.0, 0.0, 1.0, 0.0}, // 2
+{0.0, 0.0, 0.5, 0.5}  // 3
+},
 
-    // embedding matrix for child 1
-    {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 1.0, 0.0, 0.0}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.0, 0.0, 0.0, 1.0}  // 3
-    }
-  };
+// embedding matrix for child 1
+{
+// 0    1    2    3
+{0.5, 0.5, 0.0, 0.0}, // 0
+{0.0, 1.0, 0.0, 0.0}, // 1
+{0.0, 0.0, 0.5, 0.5}, // 2
+{0.0, 0.0, 0.0, 1.0}  // 3
+}
+};
 
 #endif
 
@@ -77,183 +77,183 @@ const float InfQuad4::_embedding_matrix[2][4][4] =
 
 bool InfQuad4::is_vertex(const unsigned int i) const
 {
-  if (i < 2)
-    return true;
-  return false;
+if (i < 2)
+return true;
+return false;
 }
 
 bool InfQuad4::is_edge(const unsigned int i) const
 {
-  if (i < 2)
-    return false;
-  return true;
+if (i < 2)
+return false;
+return true;
 }
 
 bool InfQuad4::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool InfQuad4::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 2; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 bool InfQuad4::contains_point (const Point & p, Real tol) const
 {
-  /*
-   * make use of the fact that infinite elements do not
-   * live inside the envelope.  Use a fast scheme to
-   * check whether point \p p is inside or outside
-   * our relevant part of the envelope.  Note that
-   * this is not exclusive: the point may be outside
-   * the envelope, but contained in another infinite element.
-   * Therefore, if the distance is greater, do fall back
-   * to the scheme of using FEInterface::inverse_map().
-   */
-  const Point my_origin (this->origin());
+/*
+* make use of the fact that infinite elements do not
+* live inside the envelope.  Use a fast scheme to
+* check whether point \p p is inside or outside
+* our relevant part of the envelope.  Note that
+* this is not exclusive: the point may be outside
+* the envelope, but contained in another infinite element.
+* Therefore, if the distance is greater, do fall back
+* to the scheme of using FEInterface::inverse_map().
+*/
+const Point my_origin (this->origin());
 
-  /*
-   * determine the minimal distance of the base from the origin
-   * use size_sq() instead of size(), it is slightly faster
-   */
-  const Real min_distance_sq = std::min((Point(this->point(0)-my_origin)).size_sq(),
-                                        (Point(this->point(1)-my_origin)).size_sq());
+/*
+* determine the minimal distance of the base from the origin
+* use size_sq() instead of size(), it is slightly faster
+*/
+const Real min_distance_sq = std::min((Point(this->point(0)-my_origin)).size_sq(),
+(Point(this->point(1)-my_origin)).size_sq());
 
-  /*
-   * work with 1% allowable deviation.  Can still fall
-   * back to the InfFE::inverse_map()
-   */
-  const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).size_sq());
+/*
+* work with 1% allowable deviation.  Can still fall
+* back to the InfFE::inverse_map()
+*/
+const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).size_sq());
 
-  if (conservative_p_dist_sq < min_distance_sq)
-    {
-      /*
-       * the physical point is definitely not contained
-       * in the element, return false.
-       */
-      return false;
-    }
-  else
-    {
-      /*
-       * cannot say anything, fall back to the FEInterface::inverse_map()
-       *
-       * Declare a basic FEType.  Will use default in the base,
-       * and something else (not important) in radial direction.
-       */
-      FEType fe_type(default_order());
+if (conservative_p_dist_sq < min_distance_sq)
+{
+/*
+* the physical point is definitely not contained
+* in the element, return false.
+*/
+return false;
+}
+else
+{
+/*
+* cannot say anything, fall back to the FEInterface::inverse_map()
+*
+* Declare a basic FEType.  Will use default in the base,
+* and something else (not important) in radial direction.
+*/
+FEType fe_type(default_order());
 
-      const Point mapped_point = FEInterface::inverse_map(dim(),
-                                                          fe_type,
-                                                          this,
-                                                          p,
-                                                          tol,
-                                                          false);
+const Point mapped_point = FEInterface::inverse_map(dim(),
+fe_type,
+this,
+p,
+tol,
+false);
 
-      return FEInterface::on_reference_element(mapped_point, this->type(), tol);
-    }
+return FEInterface::on_reference_element(mapped_point, this->type(), tol);
+}
 }
 
 
 
 
 UniquePtr<Elem> InfQuad4::build_side (const unsigned int i,
-                                      bool proxy) const
+bool proxy) const
 {
-  // libmesh_assert_less (i, this->n_sides());
+// libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    {
-      switch (i)
-        {
-          // base
-        case 0:
-          return UniquePtr<Elem>(new Side<Edge2,InfQuad4>(this,i));
+if (proxy)
+{
+switch (i)
+{
+// base
+case 0:
+return UniquePtr<Elem>(new Side<Edge2,InfQuad4>(this,i));
 
-          // ifem edges
-        case 1:
-        case 2:
-          return UniquePtr<Elem>(new Side<InfEdge2,InfQuad4>(this,i));
+// ifem edges
+case 1:
+case 2:
+return UniquePtr<Elem>(new Side<InfEdge2,InfQuad4>(this,i));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-    }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
+}
 
-  else
-    {
-      // Create NULL pointer to be initialized, returned later.
-      Elem * edge = libmesh_nullptr;
+else
+{
+// Create NULL pointer to be initialized, returned later.
+Elem * edge = libmesh_nullptr;
 
-      switch (i)
-        {
-        case 0:
-          {
-            edge = new Edge2;
-            break;
-          }
+switch (i)
+{
+case 0:
+{
+edge = new Edge2;
+break;
+}
 
-          // adjacent to another infinite element
-        case 1:
-        case 2:
-          {
-            edge = new InfEdge2;
-            break;
-          }
+// adjacent to another infinite element
+case 1:
+case 2:
+{
+edge = new InfEdge2;
+break;
+}
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-      edge->subdomain_id() = this->subdomain_id();
+edge->subdomain_id() = this->subdomain_id();
 
-      // Set the nodes
-      for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(InfQuad4::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<edge->n_nodes(); ++n)
+edge->set_node(n) = this->get_node(InfQuad4::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(edge);
-    }
+return UniquePtr<Elem>(edge);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
-                            const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert_less (sf, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert_less (sf, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-  conn.resize(4);
+conn.resize(4);
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(3)+1;
-        conn[3] = this->node(2)+1;
-        return;
-      }
-    case VTK:
-      {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(3);
-        conn[3] = this->node(2);
-      }
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+switch (iop)
+{
+case TECPLOT:
+{
+conn[0] = this->node(0)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(3)+1;
+conn[3] = this->node(2)+1;
+return;
+}
+case VTK:
+{
+conn[0] = this->node(0);
+conn[1] = this->node(1);
+conn[2] = this->node(3);
+conn[3] = this->node(2);
+}
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 } // namespace libMesh

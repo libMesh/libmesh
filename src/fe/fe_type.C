@@ -29,30 +29,30 @@ namespace libMesh
 
 UniquePtr<QBase>
 FEType::default_quadrature_rule (const unsigned int dim,
-                                 const int extraorder) const
+const int extraorder) const
 {
 
-  // Clough elements have at least piecewise cubic functions
-  if (family == CLOUGH)
-    {
-      // this seems ridiculous but for some reason gcc 3.3.5 wants
-      // this when using complex numbers (spetersen 04/20/06)
-      const unsigned int seven = 7;
+// Clough elements have at least piecewise cubic functions
+if (family == CLOUGH)
+{
+// this seems ridiculous but for some reason gcc 3.3.5 wants
+// this when using complex numbers (spetersen 04/20/06)
+const unsigned int seven = 7;
 
-      return UniquePtr<QBase>
-        (new QClough(dim,
-                     static_cast<Order>
-                     (std::max(static_cast<unsigned int>
-                               (this->default_quadrature_order()), seven + extraorder))));
-    }
+return UniquePtr<QBase>
+(new QClough(dim,
+static_cast<Order>
+(std::max(static_cast<unsigned int>
+(this->default_quadrature_order()), seven + extraorder))));
+}
 
-  if (family == SUBDIVISION)
-    return UniquePtr<QBase>
-      (new QGauss(dim, static_cast<Order>(1 + extraorder)));
+if (family == SUBDIVISION)
+return UniquePtr<QBase>
+(new QGauss(dim, static_cast<Order>(1 + extraorder)));
 
-  return UniquePtr<QBase>
-    (new QGauss(dim, static_cast<Order>(this->default_quadrature_order()
-                                        + extraorder)));
+return UniquePtr<QBase>
+(new QGauss(dim, static_cast<Order>(this->default_quadrature_order()
++ extraorder)));
 }
 
 } // namespace libMesh

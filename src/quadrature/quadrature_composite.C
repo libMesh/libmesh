@@ -34,22 +34,22 @@ namespace libMesh
 
 template <class QSubCell>
 QComposite<QSubCell>::QComposite(const unsigned int d,
-                                 const Order o) :
-  QSubCell(d,o), // explicitly call base class constructor
-  _q_subcell(d,o),
-  _lagrange_fe(FEBase::build (d, FEType (FIRST, LAGRANGE)))
+const Order o) :
+QSubCell(d,o), // explicitly call base class constructor
+_q_subcell(d,o),
+_lagrange_fe(FEBase::build (d, FEType (FIRST, LAGRANGE)))
 {
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    QSubCell::init(EDGE2);
+// explicitly call the init function in 1D since the
+// other tensor-product rules require this one.
+// note that EDGE will not be used internally, however
+// if we called the function with INVALID_ELEM it would try to
+// be smart and return, thinking it had already done the work.
+if (_dim == 1)
+QSubCell::init(EDGE2);
 
-  libmesh_assert (_lagrange_fe.get() != libmesh_nullptr);
+libmesh_assert (_lagrange_fe.get() != libmesh_nullptr);
 
-  _lagrange_fe->attach_quadrature_rule (&_q_subcell);
+_lagrange_fe->attach_quadrature_rule (&_q_subcell);
 }
 
 
@@ -62,56 +62,56 @@ QComposite<QSubCell>::~QComposite()
 
 template <class QSubCell>
 void QComposite<QSubCell>::init (const Elem & elem,
-                                 const std::vector<Real> & vertex_distance_func,
-                                 unsigned int p_level)
+const std::vector<Real> & vertex_distance_func,
+unsigned int p_level)
 {
-  libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
-  libmesh_assert_equal_to (_dim, elem.dim());
+libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
+libmesh_assert_equal_to (_dim, elem.dim());
 
-  // if we are not cut, revert to simple base class init() method.
-  if (!_elem_cutter.is_cut (elem, vertex_distance_func))
-    {
-      _q_subcell.init (elem.type(), p_level);
-      _points  = _q_subcell.get_points();
-      _weights = _q_subcell.get_weights();
+// if we are not cut, revert to simple base class init() method.
+if (!_elem_cutter.is_cut (elem, vertex_distance_func))
+{
+_q_subcell.init (elem.type(), p_level);
+_points  = _q_subcell.get_points();
+_weights = _q_subcell.get_weights();
 
-      //this->print_info();
-      return;
-    }
+//this->print_info();
+return;
+}
 
-  // Get a pointer to the element's reference element.  We want to
-  // perform cutting on the reference element such that the quadrature
-  // point locations of the subelements live in the reference
-  // coordinate system, thereby eliminating the need for inverse
-  // mapping.
-  const Elem * reference_elem = elem.reference_elem();
+// Get a pointer to the element's reference element.  We want to
+// perform cutting on the reference element such that the quadrature
+// point locations of the subelements live in the reference
+// coordinate system, thereby eliminating the need for inverse
+// mapping.
+const Elem * reference_elem = elem.reference_elem();
 
-  libmesh_assert (reference_elem != libmesh_nullptr);
+libmesh_assert (reference_elem != libmesh_nullptr);
 
-  _elem_cutter(*reference_elem, vertex_distance_func);
-  //_elem_cutter(elem, vertex_distance_func);
+_elem_cutter(*reference_elem, vertex_distance_func);
+//_elem_cutter(elem, vertex_distance_func);
 
-  // clear our state & accumulate points from subelements
-  _points.clear();
-  _weights.clear();
+// clear our state & accumulate points from subelements
+_points.clear();
+_weights.clear();
 
-  // inside subelem
-  {
-    const std::vector<Elem const *> & inside_elem (_elem_cutter.inside_elements());
-    std::cout << inside_elem.size() << " elements inside\n";
+// inside subelem
+{
+const std::vector<Elem const *> & inside_elem (_elem_cutter.inside_elements());
+std::cout << inside_elem.size() << " elements inside\n";
 
-    this->add_subelem_values(inside_elem);
-  }
+this->add_subelem_values(inside_elem);
+}
 
-  // outside subelem
-  {
-    const std::vector<Elem const *> & outside_elem (_elem_cutter.outside_elements());
-    std::cout << outside_elem.size() << " elements outside\n";
+// outside subelem
+{
+const std::vector<Elem const *> & outside_elem (_elem_cutter.outside_elements());
+std::cout << outside_elem.size() << " elements outside\n";
 
-    this->add_subelem_values(outside_elem);
-  }
+this->add_subelem_values(outside_elem);
+}
 
-  this->print_info();
+this->print_info();
 }
 
 
@@ -120,38 +120,38 @@ template <class QSubCell>
 void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const *> & subelem)
 
 {
-  const std::vector<Real>  & subelem_weights = _lagrange_fe->get_JxW();
-  const std::vector<Point> & subelem_points  = _lagrange_fe->get_xyz();
+const std::vector<Real>  & subelem_weights = _lagrange_fe->get_JxW();
+const std::vector<Point> & subelem_points  = _lagrange_fe->get_xyz();
 
-  for (std::vector<Elem const *>::const_iterator it = subelem.begin();
-       it!=subelem.end(); ++it)
-    {
-      // tetgen seems to create 0-volume cells on occasion, but we *should*
-      // be catching that appropriately now inside the ElemCutter class.
-      // Just in case trap here, describe the error, and abort.
+for (std::vector<Elem const *>::const_iterator it = subelem.begin();
+it!=subelem.end(); ++it)
+{
+// tetgen seems to create 0-volume cells on occasion, but we *should*
+// be catching that appropriately now inside the ElemCutter class.
+// Just in case trap here, describe the error, and abort.
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
-      try
-        {
+try
+{
 #endif
-          _lagrange_fe->reinit(*it);
-          _weights.insert(_weights.end(),
-                          subelem_weights.begin(), subelem_weights.end());
+_lagrange_fe->reinit(*it);
+_weights.insert(_weights.end(),
+subelem_weights.begin(), subelem_weights.end());
 
-          _points.insert(_points.end(),
-                         subelem_points.begin(), subelem_points.end());
+_points.insert(_points.end(),
+subelem_points.begin(), subelem_points.end());
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
-        }
-      catch (...)
-        {
-          libMesh::err << "ERROR: found a bad cut cell!\n";
+}
+catch (...)
+{
+libMesh::err << "ERROR: found a bad cut cell!\n";
 
-          for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-            libMesh::err << (*it)->point(n) << std::endl;
+for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+libMesh::err << (*it)->point(n) << std::endl;
 
-          libmesh_error_msg("Tetgen may have created a 0-volume cell during Cutcell integration.");
-        }
+libmesh_error_msg("Tetgen may have created a 0-volume cell during Cutcell integration.");
+}
 #endif
-    }
+}
 }
 
 

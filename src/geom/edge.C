@@ -27,51 +27,51 @@ namespace libMesh
 
 UniquePtr<Elem> Edge::side (const unsigned int i) const
 {
-  libmesh_assert_less (i, 2);
-  const Elem * the_parent = this;
-  Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
-  nodeelem->set_node(0) = this->get_node(i);
-  return UniquePtr<Elem>(nodeelem);
+libmesh_assert_less (i, 2);
+const Elem * the_parent = this;
+Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
+nodeelem->set_node(0) = this->get_node(i);
+return UniquePtr<Elem>(nodeelem);
 }
 
 
 UniquePtr<Elem> Edge::build_side (const unsigned int i, bool) const
 {
-  libmesh_assert_less (i, 2);
-  const Elem * the_parent = this;
-  Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
-  nodeelem->set_node(0) = this->get_node(i);
-  return UniquePtr<Elem>(nodeelem);
+libmesh_assert_less (i, 2);
+const Elem * the_parent = this;
+Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
+nodeelem->set_node(0) = this->get_node(i);
+return UniquePtr<Elem>(nodeelem);
 }
 
 
 bool Edge::is_child_on_side(const unsigned int c,
-                            const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (c, this->n_children());
+libmesh_assert_less (s, this->n_sides());
 
-  return (c == s);
+return (c == s);
 }
 
 
 
 unsigned int Edge::opposite_side(const unsigned int side_in) const
 {
-  libmesh_assert_less (side_in, 2);
-  return 1 - side_in;
+libmesh_assert_less (side_in, 2);
+return 1 - side_in;
 }
 
 
 
 unsigned int Edge::opposite_node(const unsigned int node_in,
-                                 const unsigned int libmesh_dbg_var(side_in)) const
+const unsigned int libmesh_dbg_var(side_in)) const
 {
-  libmesh_assert_less (node_in, 2);
-  libmesh_assert_less (side_in, this->n_sides());
-  libmesh_assert(this->is_node_on_side(node_in, side_in));
+libmesh_assert_less (node_in, 2);
+libmesh_assert_less (side_in, this->n_sides());
+libmesh_assert(this->is_node_on_side(node_in, side_in));
 
-  return 1 - node_in;
+return 1 - node_in;
 }
 
 

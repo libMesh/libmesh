@@ -40,76 +40,76 @@ namespace Parallel {
 namespace Utils {
 
 /**
- * Utility function that returns true if the vector v
- * is sorted, false otherwise.  O(N), the length of the
- * vector.  This is implemented solely because the std::is_sorted
- * appears to be an STL extension.
- */
+* Utility function that returns true if the vector v
+* is sorted, false otherwise.  O(N), the length of the
+* vector.  This is implemented solely because the std::is_sorted
+* appears to be an STL extension.
+*/
 template <typename KeyType>
 inline
 bool is_sorted (const std::vector<KeyType> & v)
 {
-  if (v.empty())
-    return true;
+if (v.empty())
+return true;
 
-  for (unsigned int i=1; i<v.size(); i++)
-    if (v[i] < v[i-1])
-      return false;
+for (unsigned int i=1; i<v.size(); i++)
+if (v[i] < v[i-1])
+return false;
 
-  return true;
+return true;
 }
 
 /**
- * A utility function which converts whatever \p KeyType is to
- * a \p double for the histogram bounds
- */
+* A utility function which converts whatever \p KeyType is to
+* a \p double for the histogram bounds
+*/
 template <typename KeyType>
 inline
 double to_double (const KeyType & k)
 {
-  return static_cast<double>(k);
+return static_cast<double>(k);
 }
 
 /**
- * A utility to convert a \p double to some sort of \p KeyType, for
- * interpreting how histogram bounds relate to \p KeyType positions.
- *
- * This is a class to allow partial template specialization for the
- * std::pair case without adding a "dummy" variable.
- */
+* A utility to convert a \p double to some sort of \p KeyType, for
+* interpreting how histogram bounds relate to \p KeyType positions.
+*
+* This is a class to allow partial template specialization for the
+* std::pair case without adding a "dummy" variable.
+*/
 template <typename KeyType>
 struct Convert {
-  inline static
-  KeyType to_key_type (const double f)
-  {
-    return static_cast<KeyType>(f);
-  }
+inline static
+KeyType to_key_type (const double f)
+{
+return static_cast<KeyType>(f);
+}
 };
 
 /**
- * A pseudoinverse for converting bounds back to pairs of key types.
- */
+* A pseudoinverse for converting bounds back to pairs of key types.
+*/
 template <typename FirstKeyType, typename SecondKeyType>
 struct Convert<std::pair<FirstKeyType, SecondKeyType> > {
-  inline static
-  std::pair<FirstKeyType,SecondKeyType> to_key_type (const double f)
-  {
-    return std::make_pair
-      (Convert<FirstKeyType>::to_key_type(f),SecondKeyType());
-  }
+inline static
+std::pair<FirstKeyType,SecondKeyType> to_key_type (const double f)
+{
+return std::make_pair
+(Convert<FirstKeyType>::to_key_type(f),SecondKeyType());
+}
 };
 
 
 
 /**
- * A utility function for pairs of key types.  When finding bounds,
- * the second entry of the pair is effectively "rounded away".
- */
+* A utility function for pairs of key types.  When finding bounds,
+* the second entry of the pair is effectively "rounded away".
+*/
 template <typename FirstKeyType, typename SecondKeyType>
 inline
 double to_double (const std::pair<FirstKeyType,SecondKeyType> &k)
 {
-  return to_double(k.first);
+return to_double(k.first);
 }
 
 
@@ -119,23 +119,23 @@ template <>
 inline
 double to_double (const Hilbert::HilbertIndices & bvt)
 {
-  return static_cast<double>(bvt.rack2);
+return static_cast<double>(bvt.rack2);
 }
 
 template <>
 struct Convert<Hilbert::HilbertIndices> {
-  inline static
-  Hilbert::HilbertIndices
-  to_key_type (const double f)
-  {
-    Hilbert::HilbertIndices bvt;
+inline static
+Hilbert::HilbertIndices
+to_key_type (const double f)
+{
+Hilbert::HilbertIndices bvt;
 
-    bvt.rack0 = 0;
-    bvt.rack1 = 0;
-    bvt.rack2 = static_cast<Hilbert::inttype>(f);
+bvt.rack0 = 0;
+bvt.rack1 = 0;
+bvt.rack2 = static_cast<Hilbert::inttype>(f);
 
-    return bvt;
-  }
+return bvt;
+}
 };
 #endif // LIBMESH_HAVE_LIBHILBERT
 }

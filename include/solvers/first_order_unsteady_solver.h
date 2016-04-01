@@ -23,36 +23,36 @@
 namespace libMesh
 {
 /**
- * Generic class from which first order UnsteadySolvers should subclass.
- *
- * Subclasses of this class are meant to solve problems of the form
- * \f[ M(u)\dot{u} = F(u)\f]
- *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
- * \author Paul T. Bauman
- * \date 2015
- */
+* Generic class from which first order UnsteadySolvers should subclass.
+*
+* Subclasses of this class are meant to solve problems of the form
+* \f[ M(u)\dot{u} = F(u)\f]
+*
+* This class is part of the new DifferentiableSystem framework,
+* which is still experimental.  Users of this framework should
+* beware of bugs and future API changes.
+*
+* \author Paul T. Bauman
+* \date 2015
+*/
 class FirstOrderUnsteadySolver : public UnsteadySolver
 {
 public:
-  /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
-   */
-  explicit
-  FirstOrderUnsteadySolver (sys_type & s)
-    : UnsteadySolver(s) {}
+/**
+* Constructor. Requires a reference to the system
+* to be solved.
+*/
+explicit
+FirstOrderUnsteadySolver (sys_type & s)
+: UnsteadySolver(s) {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~FirstOrderUnsteadySolver (){}
+/**
+* Destructor.
+*/
+virtual ~FirstOrderUnsteadySolver (){}
 
-  virtual unsigned int time_order() const libmesh_override
-  { return 1; }
+virtual unsigned int time_order() const libmesh_override
+{ return 1; }
 };
 
 } // end namespace libMesh

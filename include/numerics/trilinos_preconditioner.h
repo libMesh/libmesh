@@ -50,90 +50,90 @@ template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
 /**
- * This class provides an interface to the suite of preconditioners available
- * from Trilinos.
- *
- * \author David Andrs
- * \date 2011
- */
+* This class provides an interface to the suite of preconditioners available
+* from Trilinos.
+*
+* \author David Andrs
+* \date 2011
+*/
 template <typename T>
 class TrilinosPreconditioner :
-    public Preconditioner<T>,
-    public Epetra_Operator
+public Preconditioner<T>,
+public Epetra_Operator
 {
 public:
 
-  /**
-   *  Constructor. Initializes PetscPreconditioner data structures
-   */
-  TrilinosPreconditioner (const libMesh::Parallel::Communicator & comm
-                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+/**
+*  Constructor. Initializes PetscPreconditioner data structures
+*/
+TrilinosPreconditioner (const libMesh::Parallel::Communicator & comm
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
-  /**
-   * Destructor.
-   */
-  virtual ~TrilinosPreconditioner ();
+/**
+* Destructor.
+*/
+virtual ~TrilinosPreconditioner ();
 
-  /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
-   */
-  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
+/**
+* Computes the preconditioned vector "y" based on input "x".
+* Usually by solving Py=x to get the action of P^-1 x.
+*/
+virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
 
-  /**
-   * Release all memory and clear data structures.
-   */
-  virtual void clear () libmesh_override {}
+/**
+* Release all memory and clear data structures.
+*/
+virtual void clear () libmesh_override {}
 
-  /**
-   * Initialize data structures if not done so already.
-   */
-  virtual void init () libmesh_override;
+/**
+* Initialize data structures if not done so already.
+*/
+virtual void init () libmesh_override;
 
-  void set_params(Teuchos::ParameterList & list);
+void set_params(Teuchos::ParameterList & list);
 
-  /**
-   * Returns the actual Trilinos preconditioner object.
-   */
-  Epetra_FECrsMatrix * mat() { return _mat; }
+/**
+* Returns the actual Trilinos preconditioner object.
+*/
+Epetra_FECrsMatrix * mat() { return _mat; }
 
-  /**
-   */
-  void set_preconditioner_type (const PreconditionerType & preconditioner_type);
+/**
+*/
+void set_preconditioner_type (const PreconditionerType & preconditioner_type);
 
-  /**
-   * Compute the preconditioner. In Trilinos, we need to call this explicitly.
-   */
-  void compute();
+/**
+* Compute the preconditioner. In Trilinos, we need to call this explicitly.
+*/
+void compute();
 
 protected:
 
-  /**
-   * Trilinos preconditioner
-   */
-  Epetra_Operator * _prec;
+/**
+* Trilinos preconditioner
+*/
+Epetra_Operator * _prec;
 
-  /**
-   * Trilinos matrix that's been pulled out of the _matrix object.
-   */
-  Epetra_FECrsMatrix * _mat;
+/**
+* Trilinos matrix that's been pulled out of the _matrix object.
+*/
+Epetra_FECrsMatrix * _mat;
 
-  /**
-   * Parameter list to be used for building the preconditioner
-   */
-  Teuchos::ParameterList _param_list;
+/**
+* Parameter list to be used for building the preconditioner
+*/
+Teuchos::ParameterList _param_list;
 
-  // Epetra_Operator interface
-  virtual int SetUseTranspose(bool UseTranspose);
-  virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const;
-  virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const;
-  virtual double NormInf() const;
-  virtual const char * Label() const;
-  virtual bool UseTranspose() const;
-  virtual bool HasNormInf() const;
-  virtual const Epetra_Comm & Comm() const;
-  virtual const Epetra_Map & OperatorDomainMap() const;
-  virtual const Epetra_Map & OperatorRangeMap() const;
+// Epetra_Operator interface
+virtual int SetUseTranspose(bool UseTranspose);
+virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const;
+virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const;
+virtual double NormInf() const;
+virtual const char * Label() const;
+virtual bool UseTranspose() const;
+virtual bool HasNormInf() const;
+virtual const Epetra_Comm & Comm() const;
+virtual const Epetra_Map & OperatorDomainMap() const;
+virtual const Epetra_Map & OperatorRangeMap() const;
 };
 
 
@@ -143,9 +143,9 @@ protected:
 template <typename T>
 inline
 TrilinosPreconditioner<T>::TrilinosPreconditioner (const libMesh::Parallel::Communicator & comm) :
-  Preconditioner<T>(comm),
-  _prec(libmesh_nullptr),
-  _mat(libmesh_nullptr)
+Preconditioner<T>(comm),
+_prec(libmesh_nullptr),
+_mat(libmesh_nullptr)
 {
 }
 
@@ -155,7 +155,7 @@ template <typename T>
 inline
 TrilinosPreconditioner<T>::~TrilinosPreconditioner ()
 {
-  this->clear ();
+this->clear ();
 }
 
 } // namespace libMesh

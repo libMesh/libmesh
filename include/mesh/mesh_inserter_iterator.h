@@ -39,32 +39,32 @@ namespace libMesh
 // iterator_traits will work.
 template <typename T>
 struct mesh_inserter_iterator
-  : std::iterator<std::output_iterator_tag, T>
+: std::iterator<std::output_iterator_tag, T>
 {
-  mesh_inserter_iterator (MeshBase & m) : mesh(m) {}
+mesh_inserter_iterator (MeshBase & m) : mesh(m) {}
 
-  void operator=(Elem * e) { mesh.add_elem(e); }
+void operator=(Elem * e) { mesh.add_elem(e); }
 
-  void operator=(Node * n) { mesh.insert_node(n); }
+void operator=(Node * n) { mesh.insert_node(n); }
 
-  void operator=(Point * p) { mesh.add_point(*p); }
+void operator=(Point * p) { mesh.add_point(*p); }
 
-  mesh_inserter_iterator & operator++() {
-    return *this;
-  }
+mesh_inserter_iterator & operator++() {
+return *this;
+}
 
-  mesh_inserter_iterator operator++(int) {
-    return mesh_inserter_iterator(*this);
-  }
+mesh_inserter_iterator operator++(int) {
+return mesh_inserter_iterator(*this);
+}
 
-  // We don't return a reference-to-T here because we don't want to
-  // construct one or have any of its methods called.  We just want
-  // to allow the returned object to be able to do mesh insertions
-  // with operator=().
-  mesh_inserter_iterator & operator*() { return *this; }
+// We don't return a reference-to-T here because we don't want to
+// construct one or have any of its methods called.  We just want
+// to allow the returned object to be able to do mesh insertions
+// with operator=().
+mesh_inserter_iterator & operator*() { return *this; }
 private:
 
-  MeshBase & mesh;
+MeshBase & mesh;
 };
 
 } // namespace libMesh

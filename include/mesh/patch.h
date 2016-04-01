@@ -36,100 +36,100 @@ namespace libMesh
 class Elem;
 
 /**
- * This class implements useful utility functions for a patch of
- * elements
- *
- * \author Varis Carey
- * \author Benjamin S. Kirk
- * \date 2004
- * \author Roy H. Stogner
- * \date 2007
- */
+* This class implements useful utility functions for a patch of
+* elements
+*
+* \author Varis Carey
+* \author Benjamin S. Kirk
+* \date 2004
+* \author Roy H. Stogner
+* \date 2007
+*/
 class Patch : public std::set<const Elem *>
 {
 public:
 
-  /**
-   * Constructor. Requires the processor ID to be interpreted as "local".
-   */
-  Patch(const processor_id_type my_procid = static_cast<processor_id_type>(-1)) :
-    _my_procid(my_procid)
-  {}
+/**
+* Constructor. Requires the processor ID to be interpreted as "local".
+*/
+Patch(const processor_id_type my_procid = static_cast<processor_id_type>(-1)) :
+_my_procid(my_procid)
+{}
 
-  /**
-   * Destructor.
-   */
-  ~Patch() {}
+/**
+* Destructor.
+*/
+~Patch() {}
 
-  /**
-   * This function finds all elements which touch the current patch at
-   * a face, and adds them to the patch.
-   */
-  void add_face_neighbors();
+/**
+* This function finds all elements which touch the current patch at
+* a face, and adds them to the patch.
+*/
+void add_face_neighbors();
 
-  /**
-   * This function finds all elements on the current processor which
-   * touch the current patch at a face, and adds them to the patch.
-   */
-  void add_local_face_neighbors();
+/**
+* This function finds all elements on the current processor which
+* touch the current patch at a face, and adds them to the patch.
+*/
+void add_local_face_neighbors();
 
-  /**
-   * This function finds all elements which touch the current patch at
-   * a face and which touch one of our processor's elements at any
-   * point, and it adds them to the patch.
-   */
-  void add_semilocal_face_neighbors();
+/**
+* This function finds all elements which touch the current patch at
+* a face and which touch one of our processor's elements at any
+* point, and it adds them to the patch.
+*/
+void add_semilocal_face_neighbors();
 
-  /**
-   * This function finds all elements which touch the current patch at
-   * any point, and adds them to the patch.
-   */
-  void add_point_neighbors();
+/**
+* This function finds all elements which touch the current patch at
+* any point, and adds them to the patch.
+*/
+void add_point_neighbors();
 
-  /**
-   * This function finds all elements on the current processor which
-   * touch the current patch at any point, and adds them to the patch.
-   */
-  void add_local_point_neighbors();
+/**
+* This function finds all elements on the current processor which
+* touch the current patch at any point, and adds them to the patch.
+*/
+void add_local_point_neighbors();
 
-  /**
-   * This function finds all elements which touch the current patch at
-   * any point and which touch one of our processor's elements at any
-   * point, and it adds them to the patch.
-   */
-  void add_semilocal_point_neighbors();
+/**
+* This function finds all elements which touch the current patch at
+* any point and which touch one of our processor's elements at any
+* point, and it adds them to the patch.
+*/
+void add_semilocal_point_neighbors();
 
-  /**
-   * Pointer to Member Function typedef
-   */
-  typedef void (Patch::*PMF)();
+/**
+* Pointer to Member Function typedef
+*/
+typedef void (Patch::*PMF)();
 
-  /**
-   * Erases any elements in the current patch, then builds a new patch
-   * containing element \p elem by repeated addition of neighbors on
-   * the current processor.  This procedure is repeated until the
-   * number of elements meets or exceeds \p target_patch_size, or
-   * until the patch has no more local neighbors.
-   */
-  void build_around_element(const Elem * elem,
-                            const unsigned int target_patch_size = 10,
-                            PMF patchtype = &Patch::add_local_face_neighbors);
+/**
+* Erases any elements in the current patch, then builds a new patch
+* containing element \p elem by repeated addition of neighbors on
+* the current processor.  This procedure is repeated until the
+* number of elements meets or exceeds \p target_patch_size, or
+* until the patch has no more local neighbors.
+*/
+void build_around_element(const Elem * elem,
+const unsigned int target_patch_size = 10,
+PMF patchtype = &Patch::add_local_face_neighbors);
 
 protected:
 
-  /**
-   * This function finds all elements which
-   * touch the current patch at a face
-   */
-  void find_face_neighbors(std::set<const Elem *> & neighbor_set);
+/**
+* This function finds all elements which
+* touch the current patch at a face
+*/
+void find_face_neighbors(std::set<const Elem *> & neighbor_set);
 
-  /**
-   * This function finds all elements which
-   * touch the current patch at any point
-   */
-  void find_point_neighbors(std::set<const Elem *> & neighbor_set);
+/**
+* This function finds all elements which
+* touch the current patch at any point
+*/
+void find_point_neighbors(std::set<const Elem *> & neighbor_set);
 
-  const processor_id_type _my_procid;
+const processor_id_type _my_procid;
 };
 
 } // namespace libMesh

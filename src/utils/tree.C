@@ -35,77 +35,77 @@ namespace libMesh
 // constructor
 template <unsigned int N>
 Tree<N>::Tree (const MeshBase & m,
-               unsigned int target_bin_size,
-               const Trees::BuildType bt) :
-  TreeBase(m),
-  root(m,target_bin_size),
-  build_type(bt)
+unsigned int target_bin_size,
+const Trees::BuildType bt) :
+TreeBase(m),
+root(m,target_bin_size),
+build_type(bt)
 {
-  // Set the root node bounding box equal to the bounding
-  // box for the entire domain.
-  root.set_bounding_box (MeshTools::bounding_box(mesh));
+// Set the root node bounding box equal to the bounding
+// box for the entire domain.
+root.set_bounding_box (MeshTools::bounding_box(mesh));
 
-  if (build_type == Trees::NODES)
-    {
-      // Add all the nodes to the root node.  It will
-      // automagically build the tree for us.
-      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.nodes_end();
+if (build_type == Trees::NODES)
+{
+// Add all the nodes to the root node.  It will
+// automagically build the tree for us.
+MeshBase::const_node_iterator       it  = mesh.nodes_begin();
+const MeshBase::const_node_iterator end = mesh.nodes_end();
 
-      for (; it != end; ++it)
-        {
+for (; it != end; ++it)
+{
 #ifndef NDEBUG
-          bool node_was_inserted =
+bool node_was_inserted =
 #endif
-            root.insert (*it);
-          libmesh_assert(node_was_inserted);
-        }
+root.insert (*it);
+libmesh_assert(node_was_inserted);
+}
 
-      // Now the tree contains the nodes.
-      // However, we want element pointers, so here we
-      // convert between the two.
-      std::vector<std::vector<const Elem *> > nodes_to_elem;
+// Now the tree contains the nodes.
+// However, we want element pointers, so here we
+// convert between the two.
+std::vector<std::vector<const Elem *> > nodes_to_elem;
 
-      MeshTools::build_nodes_to_elem_map (mesh, nodes_to_elem);
-      root.transform_nodes_to_elements (nodes_to_elem);
-    }
+MeshTools::build_nodes_to_elem_map (mesh, nodes_to_elem);
+root.transform_nodes_to_elements (nodes_to_elem);
+}
 
-  else if (build_type == Trees::ELEMENTS)
-    {
-      // Add all active elements to the root node.  It will
-      // automatically build the tree for us.
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
+else if (build_type == Trees::ELEMENTS)
+{
+// Add all active elements to the root node.  It will
+// automatically build the tree for us.
+MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-      for (; it != end; ++it)
-        {
+for (; it != end; ++it)
+{
 #ifndef NDEBUG
-          bool elem_was_inserted =
+bool elem_was_inserted =
 #endif
-            root.insert (*it);
-          libmesh_assert(elem_was_inserted);
-        }
-    }
+root.insert (*it);
+libmesh_assert(elem_was_inserted);
+}
+}
 
-  else if (build_type == Trees::LOCAL_ELEMENTS)
-    {
-      // Add all active, local elements to the root node.  It will
-      // automatically build the tree for us.
-      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+else if (build_type == Trees::LOCAL_ELEMENTS)
+{
+// Add all active, local elements to the root node.  It will
+// automatically build the tree for us.
+MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
 
-      for (; it != end; ++it)
-        {
+for (; it != end; ++it)
+{
 #ifndef NDEBUG
-          bool elem_was_inserted =
+bool elem_was_inserted =
 #endif
-            root.insert (*it);
-          libmesh_assert(elem_was_inserted);
-        }
-    }
+root.insert (*it);
+libmesh_assert(elem_was_inserted);
+}
+}
 
-  else
-    libmesh_error_msg("Unknown build_type = " << build_type);
+else
+libmesh_error_msg("Unknown build_type = " << build_type);
 }
 
 
@@ -113,11 +113,11 @@ Tree<N>::Tree (const MeshBase & m,
 // copy-constructor is not implemented
 template <unsigned int N>
 Tree<N>::Tree (const Tree<N> & other_tree) :
-  TreeBase   (other_tree),
-  root       (other_tree.root),
-  build_type (other_tree.build_type)
+TreeBase   (other_tree),
+root       (other_tree.root),
+build_type (other_tree.build_type)
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 }
 
 
@@ -128,8 +128,8 @@ Tree<N>::Tree (const Tree<N> & other_tree) :
 template <unsigned int N>
 void Tree<N>::print_nodes(std::ostream & my_out) const
 {
-  my_out << "Printing nodes...\n";
-  root.print_nodes(my_out);
+my_out << "Printing nodes...\n";
+root.print_nodes(my_out);
 }
 
 
@@ -137,8 +137,8 @@ void Tree<N>::print_nodes(std::ostream & my_out) const
 template <unsigned int N>
 void Tree<N>::print_elements(std::ostream & my_out) const
 {
-  my_out << "Printing elements...\n";
-  root.print_elements(my_out);
+my_out << "Printing elements...\n";
+root.print_elements(my_out);
 }
 
 
@@ -146,10 +146,10 @@ void Tree<N>::print_elements(std::ostream & my_out) const
 template <unsigned int N>
 const Elem *
 Tree<N>::find_element (const Point & p,
-                       const std::set<subdomain_id_type> * allowed_subdomains,
-                       Real relative_tol) const
+const std::set<subdomain_id_type> * allowed_subdomains,
+Real relative_tol) const
 {
-  return root.find_element(p, allowed_subdomains, relative_tol);
+return root.find_element(p, allowed_subdomains, relative_tol);
 }
 
 
@@ -157,10 +157,10 @@ Tree<N>::find_element (const Point & p,
 template <unsigned int N>
 const Elem *
 Tree<N>::operator() (const Point & p,
-                     const std::set<subdomain_id_type> * allowed_subdomains,
-                     Real relative_tol) const
+const std::set<subdomain_id_type> * allowed_subdomains,
+Real relative_tol) const
 {
-  return this->find_element(p, allowed_subdomains, relative_tol);
+return this->find_element(p, allowed_subdomains, relative_tol);
 }
 
 

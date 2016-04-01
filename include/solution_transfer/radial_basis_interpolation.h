@@ -32,70 +32,70 @@
 namespace libMesh
 {
 /**
- * Radial Basis Function interplation.
- */
+* Radial Basis Function interplation.
+*/
 template <unsigned int KDDim, class RBF = WendlandRBF<KDDim, 2> >
 class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>
 {
-  /**
-   * Bring base class data into our namespace.
-   */
-  using InverseDistanceInterpolation<KDDim>::_src_pts;
-  using InverseDistanceInterpolation<KDDim>::_src_vals;
-  using InverseDistanceInterpolation<KDDim>::_names;
+/**
+* Bring base class data into our namespace.
+*/
+using InverseDistanceInterpolation<KDDim>::_src_pts;
+using InverseDistanceInterpolation<KDDim>::_src_vals;
+using InverseDistanceInterpolation<KDDim>::_names;
 
 protected:
 
-  /**
-   * Bounding box for our source points.
-   */
-  MeshTools::BoundingBox _src_bbox;
+/**
+* Bounding box for our source points.
+*/
+MeshTools::BoundingBox _src_bbox;
 
-  /**
-   * basis coefficients.
-   */
-  std::vector<Number> _weights;
+/**
+* basis coefficients.
+*/
+std::vector<Number> _weights;
 
-  /**
-   * Diagonal of the bounding box.
-   */
-  Real _r_bbox;
+/**
+* Diagonal of the bounding box.
+*/
+Real _r_bbox;
 
-  /**
-   * Diagonal override
-   */
-  Real _r_override;
+/**
+* Diagonal override
+*/
+Real _r_override;
 
 public:
 
-  /**
-   * Constructor.
-   */
-  RadialBasisInterpolation (const libMesh::Parallel::Communicator & comm_in,
-                            Real radius=-1) :
-    InverseDistanceInterpolation<KDDim> (comm_in,8,2),
-    _r_bbox(0.),
-    _r_override(radius)
-  { libmesh_experimental(); }
+/**
+* Constructor.
+*/
+RadialBasisInterpolation (const libMesh::Parallel::Communicator & comm_in,
+Real radius=-1) :
+InverseDistanceInterpolation<KDDim> (comm_in,8,2),
+_r_bbox(0.),
+_r_override(radius)
+{ libmesh_experimental(); }
 
-  /**
-   * Clears all internal data structures and restores to a
-   * pristine state.
-   */
-  virtual void clear() libmesh_override;
+/**
+* Clears all internal data structures and restores to a
+* pristine state.
+*/
+virtual void clear() libmesh_override;
 
-  /**
-   * Prepares data structures for use.
-   */
-  virtual void prepare_for_use () libmesh_override;
+/**
+* Prepares data structures for use.
+*/
+virtual void prepare_for_use () libmesh_override;
 
-  /**
-   * Interpolate source data at target points.
-   * Pure virtual, must be overriden in derived classes.
-   */
-  virtual void interpolate_field_data (const std::vector<std::string> & field_names,
-                                       const std::vector<Point> & tgt_pts,
-                                       std::vector<Number> & tgt_vals) const libmesh_override;
+/**
+* Interpolate source data at target points.
+* Pure virtual, must be overriden in derived classes.
+*/
+virtual void interpolate_field_data (const std::vector<std::string> & field_names,
+const std::vector<Point> & tgt_pts,
+std::vector<Number> & tgt_vals) const libmesh_override;
 };
 
 } // namespace libMesh

@@ -34,47 +34,47 @@ class EquationSystems;
 class System;
 
 /**
- * This abstract class provides an interface to methods for
- * selecting the type of refinement to be used on each element
- * in a given mesh.  Currently we assume that a set of elements
- * has already been flagged for h refinement, and the only concrete
- * subclass will change some of those elements to be flagged for p
- * refinement.  Future subclasses may handle anisotropic refinement
- * instead.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* This abstract class provides an interface to methods for
+* selecting the type of refinement to be used on each element
+* in a given mesh.  Currently we assume that a set of elements
+* has already been flagged for h refinement, and the only concrete
+* subclass will change some of those elements to be flagged for p
+* refinement.  Future subclasses may handle anisotropic refinement
+* instead.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class RefinementSelector
 {
 public:
 
-  /**
-   * Constructor. Empty.
-   */
-  RefinementSelector() {}
+/**
+* Constructor. Empty.
+*/
+RefinementSelector() {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~RefinementSelector() {}
+/**
+* Destructor.
+*/
+virtual ~RefinementSelector() {}
 
 
-  /**
-   * This pure virtual function must be redefined
-   * in derived classes to take a mesh flagged for h
-   * refinement and potentially change the desired
-   * refinement type.
-   */
-  virtual void select_refinement (const System & system);
+/**
+* This pure virtual function must be redefined
+* in derived classes to take a mesh flagged for h
+* refinement and potentially change the desired
+* refinement type.
+*/
+virtual void select_refinement (const System & system);
 
-  /**
-   * This vector can be used to "scale" certain
-   * variables in a system.
-   * If the mask is not empty, the consideration given to each
-   * component will be scaled by component_scale[c].
-   */
-  std::vector<float> component_scale;
+/**
+* This vector can be used to "scale" certain
+* variables in a system.
+* If the mask is not empty, the consideration given to each
+* component will be scaled by component_scale[c].
+*/
+std::vector<float> component_scale;
 };
 
 } // namespace libMesh

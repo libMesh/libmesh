@@ -25,60 +25,60 @@
 namespace libMesh {
 
 /**
- * Base class for all library singleton objects.
- */
+* Base class for all library singleton objects.
+*/
 class Singleton
 {
 protected:
 
-  /**
-   * Constructor.  Adds the derived object to the singleton cache list.
-   */
-  Singleton();
+/**
+* Constructor.  Adds the derived object to the singleton cache list.
+*/
+Singleton();
 
-  /**
-   * Destructor.
-   */
-  virtual ~Singleton() {}
+/**
+* Destructor.
+*/
+virtual ~Singleton() {}
 
 public:
 
-  /**
-   * Abstract base class for runtime singleton setup.
-   * This will be called from the \p LibMeshInit constructor.
-   */
-  class Setup
-  {
-  protected:
-    /**
-     * Constructor.  Adds the derived object to the setup cache list.
-     */
-    Setup ();
+/**
+* Abstract base class for runtime singleton setup.
+* This will be called from the \p LibMeshInit constructor.
+*/
+class Setup
+{
+protected:
+/**
+* Constructor.  Adds the derived object to the setup cache list.
+*/
+Setup ();
 
-  public:
-    /**
-     * Destructor.
-     */
-    virtual ~Setup() {}
+public:
+/**
+* Destructor.
+*/
+virtual ~Setup() {}
 
-    /**
-     * Setup method.  Importantly, this is called *after main()* from the
-     * \p LibMeshInit constructor.
-     */
-    virtual void setup () = 0;
-  };
+/**
+* Setup method.  Importantly, this is called *after main()* from the
+* \p LibMeshInit constructor.
+*/
+virtual void setup () = 0;
+};
 
-  /**
-   * Setup function.  Initializes any derived \p Singleton::Setup objects.
-   * objects.
-   */
-  static void setup();
+/**
+* Setup function.  Initializes any derived \p Singleton::Setup objects.
+* objects.
+*/
+static void setup();
 
-  /**
-   * Cleanup function.  Removes all dynamically created \p Singleton
-   * objects.
-   */
-  static void cleanup();
+/**
+* Cleanup function.  Removes all dynamically created \p Singleton
+* objects.
+*/
+static void cleanup();
 };
 
 } // namespace libMesh

@@ -39,107 +39,107 @@ class Point;
 class Elem;
 
 /**
- * This abstract base class implements utility functions for error estimators
- * which are based on integrated jumps between elements.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* This abstract base class implements utility functions for error estimators
+* which are based on integrated jumps between elements.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class JumpErrorEstimator : public ErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  JumpErrorEstimator()
-    : ErrorEstimator(),
-      scale_by_n_flux_faces(false),
-      integrate_boundary_sides(false),
-      fine_context(),
-      coarse_context(),
-      fine_error(0),
-      coarse_error(0) {}
+/**
+* Constructor.
+*/
+JumpErrorEstimator()
+: ErrorEstimator(),
+scale_by_n_flux_faces(false),
+integrate_boundary_sides(false),
+fine_context(),
+coarse_context(),
+fine_error(0),
+coarse_error(0) {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~JumpErrorEstimator() {}
+/**
+* Destructor.
+*/
+virtual ~JumpErrorEstimator() {}
 
 
-  /**
-   * This function uses the derived class's jump error
-   * estimate formula to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System & system,
-                               ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
+/**
+* This function uses the derived class's jump error
+* estimate formula to estimate the error on each cell.
+* The estimated error is output in the vector
+* \p error_per_cell
+*/
+virtual void estimate_error (const System & system,
+ErrorVector & error_per_cell,
+const NumericVector<Number> * solution_vector = libmesh_nullptr,
+bool estimate_parent_error = false) libmesh_override;
 
-  /**
-   * This boolean flag allows you to scale the error indicator
-   * result for each element by the number of "flux faces" the element
-   * actually has.  This tends to weight more evenly cells which are
-   * on the boundaries and thus have fewer contributions to their flux.
-   * The value is initialized to false, simply set it to true if you
-   * want to use the feature.
-   */
-  bool scale_by_n_flux_faces;
+/**
+* This boolean flag allows you to scale the error indicator
+* result for each element by the number of "flux faces" the element
+* actually has.  This tends to weight more evenly cells which are
+* on the boundaries and thus have fewer contributions to their flux.
+* The value is initialized to false, simply set it to true if you
+* want to use the feature.
+*/
+bool scale_by_n_flux_faces;
 
 protected:
-  /**
-   * A utility function to reinit the finite element data on elements sharing a
-   * side
-   */
-  void reinit_sides();
+/**
+* A utility function to reinit the finite element data on elements sharing a
+* side
+*/
+void reinit_sides();
 
-  /**
-   * A utility function to correctly increase n_flux_faces for the coarse element
-   */
-  float coarse_n_flux_faces_increment();
+/**
+* A utility function to correctly increase n_flux_faces for the coarse element
+*/
+float coarse_n_flux_faces_increment();
 
-  /**
-   * An initialization function, to give derived classes a chance to
-   * request specific data from the FE objects
-   */
-  virtual void init_context(FEMContext & c);
+/**
+* An initialization function, to give derived classes a chance to
+* request specific data from the FE objects
+*/
+virtual void init_context(FEMContext & c);
 
-  /**
-   * The function, to be implemented by derived classes, which calculates an error
-   * term on an internal side
-   */
-  virtual void internal_side_integration() = 0;
+/**
+* The function, to be implemented by derived classes, which calculates an error
+* term on an internal side
+*/
+virtual void internal_side_integration() = 0;
 
-  /**
-   * The function, to be implemented by derived classes, which calculates an error
-   * term on a boundary side
-   * Returns true if the flux bc function is in fact defined on the current side
-   */
-  virtual bool boundary_side_integration() { return false; }
+/**
+* The function, to be implemented by derived classes, which calculates an error
+* term on a boundary side
+* Returns true if the flux bc function is in fact defined on the current side
+*/
+virtual bool boundary_side_integration() { return false; }
 
-  /**
-   * A boolean flag, by default false, to be set to true if integrations
-   * with boundary_side_integration() should be performed
-   */
-  bool integrate_boundary_sides;
+/**
+* A boolean flag, by default false, to be set to true if integrations
+* with boundary_side_integration() should be performed
+*/
+bool integrate_boundary_sides;
 
-  /**
-   * Context objects for integrating on the fine and coarse elements
-   * sharing a face
-   */
-  UniquePtr<FEMContext> fine_context, coarse_context;
+/**
+* Context objects for integrating on the fine and coarse elements
+* sharing a face
+*/
+UniquePtr<FEMContext> fine_context, coarse_context;
 
-  /**
-   * The fine and coarse error values to be set by each side_integration();
-   */
-  Real fine_error, coarse_error;
+/**
+* The fine and coarse error values to be set by each side_integration();
+*/
+Real fine_error, coarse_error;
 
-  /**
-   * The variable number currently being evaluated
-   */
-  unsigned int var;
+/**
+* The variable number currently being evaluated
+*/
+unsigned int var;
 };
 
 

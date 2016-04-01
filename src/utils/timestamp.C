@@ -37,60 +37,60 @@ namespace Utility
 std::string get_timestamp()
 {
 #ifdef LIBMESH_HAVE_LOCALE
-  // Create time_put "facet"
-  std::locale loc;
-  const std::time_put<char> & tp = std::use_facet <std::time_put<char> > (loc);
+// Create time_put "facet"
+std::locale loc;
+const std::time_put<char> & tp = std::use_facet <std::time_put<char> > (loc);
 
-  // Call C-style time getting functions
-  time_t now = time(NULL);
-  tm * tm_struct = localtime(&now);
+// Call C-style time getting functions
+time_t now = time(NULL);
+tm * tm_struct = localtime(&now);
 
-  // Date will eventually be stored in this ostringstream's string
-  std::ostringstream date_stream;
+// Date will eventually be stored in this ostringstream's string
+std::ostringstream date_stream;
 
-  // See below for documentation on the use of the
-  // std::time_put::put() function
-  tp.put(date_stream,        /*s*/
-         date_stream,        /*str*/
-         date_stream.fill(), /*fill*/
-         tm_struct,          /*tm*/
-         'c');               /*format*/
+// See below for documentation on the use of the
+// std::time_put::put() function
+tp.put(date_stream,        /*s*/
+date_stream,        /*str*/
+date_stream.fill(), /*fill*/
+tm_struct,          /*tm*/
+'c');               /*format*/
 
-  // Another way to use it is to totally customize the format...
-  //    char pattern[]="%d %B %Y %I:%M:%S %p";
-  //    tp.put(date_stream,                /*s*/
-  //   date_stream,                /*str*/
-  //   date_stream.fill(),         /*fill*/
-  //   tm_struct,                  /*tm*/
-  //   pattern,                    /*format begin*/
-  //   pattern+sizeof(pattern)-1); /*format end  */
+// Another way to use it is to totally customize the format...
+//    char pattern[]="%d %B %Y %I:%M:%S %p";
+//    tp.put(date_stream,                /*s*/
+//   date_stream,                /*str*/
+//   date_stream.fill(),         /*fill*/
+//   tm_struct,                  /*tm*/
+//   pattern,                    /*format begin*/
+//   pattern+sizeof(pattern)-1); /*format end  */
 
-  return date_stream.str();
+return date_stream.str();
 #else
-  // C-stye code originally found here:
-  // http://people.sc.fsu.edu/~burkardt/cpp_src/timestamp/timestamp.C
-  // Author: John Burkardt, 24 September 2003
-  const unsigned int time_size = 40;
-  char time_buffer[time_size];
+// C-stye code originally found here:
+// http://people.sc.fsu.edu/~burkardt/cpp_src/timestamp/timestamp.C
+// Author: John Burkardt, 24 September 2003
+const unsigned int time_size = 40;
+char time_buffer[time_size];
 
-  time_t now = time (NULL);
-  tm * tm_struct = localtime (&now);
+time_t now = time (NULL);
+tm * tm_struct = localtime (&now);
 
-  // No more than time_size characters will be placed into the array.  If the
-  // total number of resulting characters, including the terminating
-  // NUL character, is not more than time_size, strftime() returns the
-  // number of characters in the array, not counting the terminating
-  // NUL.  Otherwise, zero is returned and the buffer contents are
-  // indeterminate.
-  size_t len = strftime ( time_buffer, time_size, "%c", tm_struct );
+// No more than time_size characters will be placed into the array.  If the
+// total number of resulting characters, including the terminating
+// NUL character, is not more than time_size, strftime() returns the
+// number of characters in the array, not counting the terminating
+// NUL.  Otherwise, zero is returned and the buffer contents are
+// indeterminate.
+size_t len = strftime ( time_buffer, time_size, "%c", tm_struct );
 
-  if (len != 0)
-    return std::string(time_buffer);
-  else
-    {
-      libMesh::out << "Error formatting time buffer, returning empty string!" << std::endl;
-      return std::string("");
-    }
+if (len != 0)
+return std::string(time_buffer);
+else
+{
+libMesh::out << "Error formatting time buffer, returning empty string!" << std::endl;
+return std::string("");
+}
 
 #endif // LIBMESH_HAVE_LOCALE
 }

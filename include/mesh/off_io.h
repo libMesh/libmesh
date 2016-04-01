@@ -33,33 +33,33 @@ class MeshBase;
 
 
 /**
- * This class is repsonsible for reading an unstructured,
- * triangulated surface in the
- * standard OFF OOGL format.
- */
+* This class is repsonsible for reading an unstructured,
+* triangulated surface in the
+* standard OFF OOGL format.
+*/
 class OFFIO : public MeshInput<MeshBase>
 {
 public:
-  /**
-   *  Constructor.  Takes a non-const Mesh reference which it
-   * will fill up with elements.
-   */
-  explicit
-  OFFIO (MeshBase &);
+/**
+*  Constructor.  Takes a non-const Mesh reference which it
+* will fill up with elements.
+*/
+explicit
+OFFIO (MeshBase &);
 
-  /**
-   * Reads in an OFF OOGL data file based on the string
-   * you pass it.
-   */
-  virtual void read (const std::string & name) libmesh_override;
+/**
+* Reads in an OFF OOGL data file based on the string
+* you pass it.
+*/
+virtual void read (const std::string & name) libmesh_override;
 
 private:
-  /**
-   * Implementation of the read() function.  This function
-   * is called by the public interface function and implements
-   * reading the file.
-   */
-  void read_stream (std::istream & in);
+/**
+* Implementation of the read() function.  This function
+* is called by the public interface function and implements
+* reading the file.
+*/
+void read_stream (std::istream & in);
 };
 
 
@@ -67,7 +67,7 @@ private:
 // OFFIO inline members
 inline
 OFFIO::OFFIO (MeshBase & mesh_in) :
-  MeshInput<MeshBase> (mesh_in)
+MeshInput<MeshBase> (mesh_in)
 {}
 
 

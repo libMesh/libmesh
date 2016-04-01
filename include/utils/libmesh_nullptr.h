@@ -28,43 +28,43 @@
 #elif defined(LIBMESH_HAVE_CXX11_NULLPTR_WORKAROUND)
 
 /**
- * A C++03-compatible nullptr type implemented as a library solution
- * rather than a language keyword.  Originally due to Scott Meyers,
- * Effective C++, 2nd Edition, Item 25.  The main benefits of using
- * this type over NULL are
- * 1.) Expressiveness:
- * 2.) Disambiguating overloads, e.g.
- *     void f(int);
- *     void f(double *);
- *     f(NULL); // ambiguous
- *     f(nullptr); // unambiguous - calls the version of f taking a pointer
- *
- * We are specifically *not* attempting to redefine the 'nullptr'
- * keyword itself -- that can lead to issues when C++11 is disabled,
- * yet the compiler still has 'nullptr' defined.  Therefore, client
- * code that wishes to be more expressive/correct should use
- * 'libmesh_nullptr' for maximum backwards compatibility.
- *
- * Note: the leading const applies to the following nullptr
- * instance.
- *
- * Code originally coped from:
- * https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/nullptr#Solution_and_Sample_Code
- */
+* A C++03-compatible nullptr type implemented as a library solution
+* rather than a language keyword.  Originally due to Scott Meyers,
+* Effective C++, 2nd Edition, Item 25.  The main benefits of using
+* this type over NULL are
+* 1.) Expressiveness:
+* 2.) Disambiguating overloads, e.g.
+*     void f(int);
+*     void f(double *);
+*     f(NULL); // ambiguous
+*     f(nullptr); // unambiguous - calls the version of f taking a pointer
+*
+* We are specifically *not* attempting to redefine the 'nullptr'
+* keyword itself -- that can lead to issues when C++11 is disabled,
+* yet the compiler still has 'nullptr' defined.  Therefore, client
+* code that wishes to be more expressive/correct should use
+* 'libmesh_nullptr' for maximum backwards compatibility.
+*
+* Note: the leading const applies to the following nullptr
+* instance.
+*
+* Code originally coped from:
+* https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/nullptr#Solution_and_Sample_Code
+*/
 const class libmesh_nullptr_t
 {
 public:
-  // convertible to any type of null non-member pointer...
-  template<class T>
-  inline operator T * () const { return 0; }
+// convertible to any type of null non-member pointer...
+template<class T>
+inline operator T * () const { return 0; }
 
-  // or any type of null member pointer...
-  template<class C, class T>
-  inline operator T C::*() const { return 0; }
+// or any type of null member pointer...
+template<class C, class T>
+inline operator T C::*() const { return 0; }
 
 private:
-  // Can't take address of nullptr
-  void operator & () const;
+// Can't take address of nullptr
+void operator & () const;
 } libmesh_nullptr = {};
 
 #else

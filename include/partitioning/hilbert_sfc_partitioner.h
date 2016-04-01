@@ -31,39 +31,39 @@ namespace libMesh
 
 
 /**
- * The \p HilbertSFCPartitioner uses a Hilbert space
- * filling curve to partition the elements.
- */
+* The \p HilbertSFCPartitioner uses a Hilbert space
+* filling curve to partition the elements.
+*/
 class HilbertSFCPartitioner : public SFCPartitioner
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  HilbertSFCPartitioner ()
-  {
-    this->set_sfc_type ("Hilbert");
-  }
+/**
+* Constructor.
+*/
+HilbertSFCPartitioner ()
+{
+this->set_sfc_type ("Hilbert");
+}
 
-  /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
-  {
-    return UniquePtr<Partitioner>(new HilbertSFCPartitioner());
-  }
+/**
+* Creates a new partitioner of this type and returns it in
+* an \p UniquePtr.
+*/
+virtual UniquePtr<Partitioner> clone () const libmesh_override
+{
+return UniquePtr<Partitioner>(new HilbertSFCPartitioner());
+}
 
 protected:
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override
-  {
-    SFCPartitioner::_do_partition (mesh, n);
-  }
+/**
+* Partition the \p MeshBase into \p n subdomains.
+*/
+virtual void _do_partition (MeshBase & mesh,
+const unsigned int n) libmesh_override
+{
+SFCPartitioner::_do_partition (mesh, n);
+}
 };
 
 } // namespace libMesh

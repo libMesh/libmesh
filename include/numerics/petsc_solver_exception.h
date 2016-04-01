@@ -29,20 +29,20 @@ namespace libMesh
 {
 
 /**
- * A specialization of the SolverException class for PETSc.
- */
+* A specialization of the SolverException class for PETSc.
+*/
 class PetscSolverException : public SolverException
 {
 public:
-  PetscSolverException(int error_code_in) :
-    SolverException(error_code_in)
-  {
-    const char * text;
-    // This is one scenario where we don't catch the error code
-    // returned by a PETSc function :)
-    PetscErrorMessage(error_code, &text, libmesh_nullptr);
-    what_message = text;
-  }
+PetscSolverException(int error_code_in) :
+SolverException(error_code_in)
+{
+const char * text;
+// This is one scenario where we don't catch the error code
+// returned by a PETSc function :)
+PetscErrorMessage(error_code, &text, libmesh_nullptr);
+what_message = text;
+}
 };
 
 
@@ -51,10 +51,10 @@ public:
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 
 #define LIBMESH_CHKERR(ierr)                    \
-  do {                                          \
-    if (ierr != 0) {                            \
-      throw PetscSolverException(ierr);         \
-    } } while(0)
+do {                                          \
+if (ierr != 0) {                            \
+throw PetscSolverException(ierr);         \
+} } while(0)
 
 #else
 

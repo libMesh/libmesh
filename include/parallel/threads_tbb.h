@@ -40,8 +40,8 @@
 #include "tbb/enumerable_thread_specific.h"
 
 #define TBB_VERSION_LESS_THAN(major,minor)                              \
-  ((LIBMESH_DETECTED_TBB_VERSION_MAJOR < (major) ||                     \
-    (LIBMESH_DETECTED_TBB_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_TBB_VERSION_MINOR < (minor)))) ? 1 : 0)
+((LIBMESH_DETECTED_TBB_VERSION_MAJOR < (major) ||                     \
+(LIBMESH_DETECTED_TBB_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_TBB_VERSION_MINOR < (minor)))) ? 1 : 0)
 
 // Thread-Local-Storage macros
 #define LIBMESH_TLS_TYPE(type)  tbb::enumerable_thread_specific<type>
@@ -54,164 +54,164 @@ namespace Threads
 {
 
 /**
- * Thread object abstraction that provides a basic constructor and
- * support for join().
- */
+* Thread object abstraction that provides a basic constructor and
+* support for join().
+*/
 typedef tbb::tbb_thread Thread;
 
 /**
- * Scheduler to manage threads.
- */
+* Scheduler to manage threads.
+*/
 typedef tbb::task_scheduler_init task_scheduler_init;
 
 /**
- * Dummy "splitting object" used to distinguish splitting constructors
- * from copy constructors.
- */
+* Dummy "splitting object" used to distinguish splitting constructors
+* from copy constructors.
+*/
 typedef tbb::split split;
 
 /**
- * Execute the provided function object in parallel on the specified
- * range.
- */
+* Execute the provided function object in parallel on the specified
+* range.
+*/
 template <typename Range, typename Body>
 inline
 void parallel_for (const Range & range, const Body & body)
 {
-  BoolAcquire b(in_threads);
+BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+const bool logging_was_enabled = libMesh::perflog.logging_enabled();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
+if (libMesh::n_threads() > 1)
+libMesh::perflog.disable_logging();
 #endif
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_for (range, body, tbb::auto_partitioner());
+if (libMesh::n_threads() > 1)
+tbb::parallel_for (range, body, tbb::auto_partitioner());
 
-  else
-    body(range);
+else
+body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
+if (libMesh::n_threads() > 1 && logging_was_enabled)
+libMesh::perflog.enable_logging();
 #endif
 }
 
 
 
 /**
- * Execute the provided function object in parallel on the specified
- * range with the specified partitioner.
- */
+* Execute the provided function object in parallel on the specified
+* range with the specified partitioner.
+*/
 template <typename Range, typename Body, typename Partitioner>
 inline
 void parallel_for (const Range & range, const Body & body, const Partitioner & partitioner)
 {
-  BoolAcquire b(in_threads);
+BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+const bool logging_was_enabled = libMesh::perflog.logging_enabled();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
+if (libMesh::n_threads() > 1)
+libMesh::perflog.disable_logging();
 #endif
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_for (range, body, partitioner);
+if (libMesh::n_threads() > 1)
+tbb::parallel_for (range, body, partitioner);
 
-  else
-    body(range);
+else
+body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
+if (libMesh::n_threads() > 1 && logging_was_enabled)
+libMesh::perflog.enable_logging();
 #endif
 }
 
 
 
 /**
- * Execute the provided reduction operation in parallel on the specified
- * range.
- */
+* Execute the provided reduction operation in parallel on the specified
+* range.
+*/
 template <typename Range, typename Body>
 inline
 void parallel_reduce (const Range & range, Body & body)
 {
-  BoolAcquire b(in_threads);
+BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+const bool logging_was_enabled = libMesh::perflog.logging_enabled();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
+if (libMesh::n_threads() > 1)
+libMesh::perflog.disable_logging();
 #endif
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_reduce (range, body, tbb::auto_partitioner());
+if (libMesh::n_threads() > 1)
+tbb::parallel_reduce (range, body, tbb::auto_partitioner());
 
-  else
-    body(range);
+else
+body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
+if (libMesh::n_threads() > 1 && logging_was_enabled)
+libMesh::perflog.enable_logging();
 #endif
 }
 
 
 
 /**
- * Execute the provided reduction operation in parallel on the specified
- * range with the specified partitioner.
- */
+* Execute the provided reduction operation in parallel on the specified
+* range with the specified partitioner.
+*/
 template <typename Range, typename Body, typename Partitioner>
 inline
 void parallel_reduce (const Range & range, Body & body, const Partitioner & partitioner)
 {
-  BoolAcquire b(in_threads);
+BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+const bool logging_was_enabled = libMesh::perflog.logging_enabled();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
+if (libMesh::n_threads() > 1)
+libMesh::perflog.disable_logging();
 #endif
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_reduce (range, body, partitioner);
+if (libMesh::n_threads() > 1)
+tbb::parallel_reduce (range, body, partitioner);
 
-  else
-    body(range);
+else
+body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
+if (libMesh::n_threads() > 1 && logging_was_enabled)
+libMesh::perflog.enable_logging();
 #endif
 }
 
 
 
 /**
- * Spin mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
- */
+* Spin mutex.  Implements mutual exclusion by busy-waiting in user
+* space for the lock to be acquired.
+*/
 typedef tbb::spin_mutex spin_mutex;
 
 /**
- * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.  The same thread can aquire the
- * same lock multiple times
- */
+* Recursive mutex.  Implements mutual exclusion by busy-waiting in user
+* space for the lock to be acquired.  The same thread can aquire the
+* same lock multiple times
+*/
 typedef tbb::recursive_mutex recursive_mutex;
 
 /**
- * Defines atomic operations which can only be executed on a
- * single thread at a time.  This is used in reference counting,
- * for example, to allow count++/count-- to work.
- */
+* Defines atomic operations which can only be executed on a
+* single thread at a time.  This is used in reference counting,
+* for example, to allow count++/count-- to work.
+*/
 template <typename T>
 class atomic : public tbb::atomic<T> {};
 

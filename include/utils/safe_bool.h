@@ -22,36 +22,36 @@ namespace libMesh
 {
 
 /**
- * This is a helper class which can be used to make pre-C++11 operator
- * bool() comparisons safer by making them behave a bit more like they
- * have the "explicit" keyword attached.  The idea is to define your
- * class using the CRTP idiom and implement the non-virtual boolean_test()
- * function, e.g.:
- *
- * class Foo : public safe_bool<Foo>
- * {
- * public:
- *   bool boolean_test() const
- *   {
- *     // Perform actual logic here to determine true/false return value.
- *     return false;
- *   }
- * };
- *
- * The idea is from:
- * https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Safe_bool
- */
+* This is a helper class which can be used to make pre-C++11 operator
+* bool() comparisons safer by making them behave a bit more like they
+* have the "explicit" keyword attached.  The idea is to define your
+* class using the CRTP idiom and implement the non-virtual boolean_test()
+* function, e.g.:
+*
+* class Foo : public safe_bool<Foo>
+* {
+* public:
+*   bool boolean_test() const
+*   {
+*     // Perform actual logic here to determine true/false return value.
+*     return false;
+*   }
+* };
+*
+* The idea is from:
+* https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Safe_bool
+*/
 class safe_bool_base
 {
 public:
-  typedef void (safe_bool_base::*bool_type)() const;
-  void this_type_does_not_support_comparisons() const {}
+typedef void (safe_bool_base::*bool_type)() const;
+void this_type_does_not_support_comparisons() const {}
 protected:
 
-  safe_bool_base() {}
-  safe_bool_base(const safe_bool_base &) {}
-  safe_bool_base & operator=(const safe_bool_base &) {return *this;}
-  ~safe_bool_base() {}
+safe_bool_base() {}
+safe_bool_base(const safe_bool_base &) {}
+safe_bool_base & operator=(const safe_bool_base &) {return *this;}
+~safe_bool_base() {}
 };
 
 
@@ -59,16 +59,16 @@ protected:
 template <typename T>
 class safe_bool : private safe_bool_base
 {
-  // private or protected inheritance is very important here as it triggers the
-  // access control violation in main.
+// private or protected inheritance is very important here as it triggers the
+// access control violation in main.
 public:
-  operator bool_type() const
-  {
-    return (static_cast<const T *>(this))->boolean_test()
-      ? &safe_bool_base::this_type_does_not_support_comparisons : 0;
-  }
+operator bool_type() const
+{
+return (static_cast<const T *>(this))->boolean_test()
+? &safe_bool_base::this_type_does_not_support_comparisons : 0;
+}
 protected:
-  ~safe_bool() {}
+~safe_bool() {}
 };
 
 
@@ -77,13 +77,13 @@ protected:
 template <typename T>
 bool operator==(const safe_bool<T> & lhs, bool b)
 {
-  return b == static_cast<bool>(lhs);
+return b == static_cast<bool>(lhs);
 }
 
 template <typename T>
 bool operator==(bool b, const safe_bool<T> & rhs)
 {
-  return b == static_cast<bool>(rhs);
+return b == static_cast<bool>(rhs);
 }
 
 
@@ -91,18 +91,18 @@ bool operator==(bool b, const safe_bool<T> & rhs)
 // Disallow equality comparison operators between safe_bool<T> and safe_bool<U>
 template <typename T, typename U>
 bool operator==(const safe_bool<T> & lhs,
-                const safe_bool<U> & /*rhs*/)
+const safe_bool<U> & /*rhs*/)
 {
-  lhs.this_type_does_not_support_comparisons();
-  return false;
+lhs.this_type_does_not_support_comparisons();
+return false;
 }
 
 template <typename T,typename U>
 bool operator!=(const safe_bool<T> & lhs,
-                const safe_bool<U> & /*rhs*/)
+const safe_bool<U> & /*rhs*/)
 {
-  lhs.this_type_does_not_support_comparisons();
-  return false;
+lhs.this_type_does_not_support_comparisons();
+return false;
 }
 
 } // namespace libMesh

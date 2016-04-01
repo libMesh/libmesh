@@ -37,26 +37,26 @@ template <typename T>
 UniquePtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 {
-  // Build the appropriate solver
-  switch (solver_package)
-    {
+// Build the appropriate solver
+switch (solver_package)
+{
 
 #ifdef LIBMESH_HAVE_PETSC
-    case PETSC_SOLVERS:
-      return UniquePtr<NonlinearSolver<T> >(new PetscNonlinearSolver<T>(s));
+case PETSC_SOLVERS:
+return UniquePtr<NonlinearSolver<T> >(new PetscNonlinearSolver<T>(s));
 #endif // LIBMESH_HAVE_PETSC
 
 #ifdef LIBMESH_TRILINOS_HAVE_NOX
-    case TRILINOS_SOLVERS:
-      return UniquePtr<NonlinearSolver<T> >(new NoxNonlinearSolver<T>(s));
+case TRILINOS_SOLVERS:
+return UniquePtr<NonlinearSolver<T> >(new NoxNonlinearSolver<T>(s));
 #endif
 
-    default:
-      libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
-    }
+default:
+libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<NonlinearSolver<T> >();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<NonlinearSolver<T> >();
 }
 
 #else // LIBMESH_HAVE_PETSC || LIBMESH_TRILINOS_HAVE_NOX
@@ -65,7 +65,7 @@ template <typename T>
 UniquePtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type &, const SolverPackage)
 {
-  libmesh_not_implemented_msg("ERROR: libMesh was compiled without nonlinear solver support");
+libmesh_not_implemented_msg("ERROR: libMesh was compiled without nonlinear solver support");
 }
 #endif
 
@@ -74,16 +74,16 @@ template <typename T>
 void
 NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 {
-  if (this->_is_initialized)
-    libmesh_error_msg("Preconditioner must be attached before the solver is initialized!");
+if (this->_is_initialized)
+libmesh_error_msg("Preconditioner must be attached before the solver is initialized!");
 
-  _preconditioner = preconditioner;
+_preconditioner = preconditioner;
 }
 
 template <typename T>
 void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_configuration)
 {
-  _solver_configuration = &solver_configuration;
+_solver_configuration = &solver_configuration;
 }
 
 

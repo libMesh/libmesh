@@ -31,22 +31,22 @@
 // LIBMESH_HAVE_PETSC is not defined, none of the LIBMESH_DETECTED_PETSC_VERSION_* variables will
 // be defined either.
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor)                   \
-  ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||                   \
-    (LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_PETSC_VERSION_MINOR < (minor) || \
-                                                         (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) && \
-                                                          LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||                   \
+(LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_PETSC_VERSION_MINOR < (minor) || \
+(LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) && \
+LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
 // The PETSC_VERSION_RELEASE constant was introduced just prior to 2.3.0 (ca. Apr 22 2005),
 // so fall back to using PETSC_VERSION_LESS_THAN in case it doesn't exist.
 #ifdef LIBMESH_DETECTED_PETSC_VERSION_RELEASE
 
 #define PETSC_RELEASE_LESS_THAN(major,minor,subminor)                   \
-  (PETSC_VERSION_LESS_THAN(major,minor,subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
+(PETSC_VERSION_LESS_THAN(major,minor,subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
 
 #else
 
 #define PETSC_RELEASE_LESS_THAN(major,minor,subminor)   \
-  (PETSC_VERSION_LESS_THAN(major,minor,subminor))
+(PETSC_VERSION_LESS_THAN(major,minor,subminor))
 
 #endif
 
@@ -87,11 +87,11 @@ typedef PetscTruth PetscBool;
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
 #  define ISCreateLibMesh(comm,n,idx,mode,is)           \
-  ((mode) == PETSC_USE_POINTER                          \
-   ? ISCreateGeneralWithArray((comm),(n),(idx),(is))    \
-   : ((mode) == PETSC_OWN_POINTER                       \
-      ? ISCreateGeneralNC((comm),(n),(idx),(is))        \
-      : ISCreateGeneral((comm),(n),(idx),(is))))
+((mode) == PETSC_USE_POINTER                          \
+? ISCreateGeneralWithArray((comm),(n),(idx),(is))    \
+: ((mode) == PETSC_OWN_POINTER                       \
+? ISCreateGeneralNC((comm),(n),(idx),(is))        \
+: ISCreateGeneral((comm),(n),(idx),(is))))
 #else
 #  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 #endif

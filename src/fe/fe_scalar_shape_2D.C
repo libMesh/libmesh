@@ -27,62 +27,62 @@ namespace libMesh
 
 template <>
 Real FE<2,SCALAR>::shape(const ElemType,
-                         const Order,
-                         const unsigned int,
-                         const Point &)
+const Order,
+const unsigned int,
+const Point &)
 {
-  return 1.;
+return 1.;
 }
 
 template <>
 Real FE<2,SCALAR>::shape(const Elem *,
-                         const Order,
-                         const unsigned int,
-                         const Point &)
+const Order,
+const unsigned int,
+const Point &)
 {
-  return 1.;
+return 1.;
 }
 
 
 template <>
 Real FE<2,SCALAR>::shape_deriv(const ElemType,
-                               const Order,
-                               const unsigned int,
-                               const unsigned int,
-                               const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  return 0.;
+return 0.;
 }
 
 template <>
 Real FE<2,SCALAR>::shape_deriv(const Elem *,
-                               const Order,
-                               const unsigned int,
-                               const unsigned int,
-                               const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  return 0.;
+return 0.;
 }
 
 
 template <>
 Real FE<2,SCALAR>::shape_second_deriv(const ElemType,
-                                      const Order,
-                                      const unsigned int,
-                                      const unsigned int,
-                                      const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  return 0.;
+return 0.;
 }
 
 template <>
 Real FE<2,SCALAR>::shape_second_deriv(const Elem *,
-                                      const Order,
-                                      const unsigned int,
-                                      const unsigned int,
-                                      const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  return 0.;
+return 0.;
 }
 
 } // namespace libMesh

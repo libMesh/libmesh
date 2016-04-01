@@ -26,36 +26,36 @@ namespace libMesh
 
 
 void QGrundmann_Moller::init_2D(const ElemType type_in,
-                                unsigned int p)
+unsigned int p)
 {
-  // Nearly all GM rules contain negative weights, so if you are not
-  // allowing rules with negative weights, we cannot continue!
-  if (!allow_rules_with_negative_weights)
-    libmesh_error_msg("You requested a Grundmann-Moller rule but\n"        \
-                      << "are not allowing rules with negative weights!\n" \
-                      << "Either select a different quadrature class or\n" \
-                      << "set allow_rules_with_negative_weights==true.");
+// Nearly all GM rules contain negative weights, so if you are not
+// allowing rules with negative weights, we cannot continue!
+if (!allow_rules_with_negative_weights)
+libmesh_error_msg("You requested a Grundmann-Moller rule but\n"        \
+<< "are not allowing rules with negative weights!\n" \
+<< "Either select a different quadrature class or\n" \
+<< "set allow_rules_with_negative_weights==true.");
 
-  switch (type_in)
-    {
-    case TRI3:
-    case TRI6:
-      {
-        switch(_order + 2*p)
-          {
+switch (type_in)
+{
+case TRI3:
+case TRI6:
+{
+switch(_order + 2*p)
+{
 
-          default:
-            {
-              // Untested above _order=23 but should work...
-              gm_rule((_order + 2*p)/2, /*dim=*/2);
-              return;
-            }
-          } // end switch (order)
-      } // end case TRI3, TRI6
+default:
+{
+// Untested above _order=23 but should work...
+gm_rule((_order + 2*p)/2, /*dim=*/2);
+return;
+}
+} // end switch (order)
+} // end case TRI3, TRI6
 
-    default:
-      libmesh_error_msg("ERROR: Unsupported element type: " << type_in);
-    } // end switch (type_in)
+default:
+libmesh_error_msg("ERROR: Unsupported element type: " << type_in);
+} // end switch (type_in)
 }
 
 } // namespace libMesh

@@ -34,111 +34,111 @@ RBThetaExpansion::RBThetaExpansion()
 
 unsigned int RBThetaExpansion::get_n_A_terms() const
 {
-  return cast_int<unsigned int>
-    (_A_theta_vector.size());
+return cast_int<unsigned int>
+(_A_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_F_terms() const
 {
-  return cast_int<unsigned int>
-    (_F_theta_vector.size());
+return cast_int<unsigned int>
+(_F_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_outputs() const
 {
-  return cast_int<unsigned int>
-    (_output_theta_vector.size());
+return cast_int<unsigned int>
+(_output_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
 {
-  if(index >= get_n_outputs())
-    libmesh_error_msg("Error: We must have index < n_outputs in get_Q_l.");
+if(index >= get_n_outputs())
+libmesh_error_msg("Error: We must have index < n_outputs in get_Q_l.");
 
-  return cast_int<unsigned int>
-    (_output_theta_vector[index].size());
+return cast_int<unsigned int>
+(_output_theta_vector[index].size());
 }
 
 void RBThetaExpansion::attach_A_theta(RBTheta * theta_q_a)
 {
-  libmesh_assert(theta_q_a);
+libmesh_assert(theta_q_a);
 
-  _A_theta_vector.push_back(theta_q_a);
+_A_theta_vector.push_back(theta_q_a);
 }
 
 void RBThetaExpansion::attach_multiple_A_theta(std::vector<RBTheta *> theta_q_a)
 {
-  for(std::size_t i=0; i<theta_q_a.size(); i++)
-    {
-      libmesh_assert(theta_q_a[i]);
-      _A_theta_vector.push_back(theta_q_a[i]);
-    }
+for(std::size_t i=0; i<theta_q_a.size(); i++)
+{
+libmesh_assert(theta_q_a[i]);
+_A_theta_vector.push_back(theta_q_a[i]);
+}
 }
 
 void RBThetaExpansion::attach_F_theta(RBTheta * theta_q_f)
 {
-  libmesh_assert(theta_q_f);
+libmesh_assert(theta_q_f);
 
-  _F_theta_vector.push_back(theta_q_f);
+_F_theta_vector.push_back(theta_q_f);
 }
 
 void RBThetaExpansion::attach_multiple_F_theta(std::vector<RBTheta *> theta_q_f)
 {
-  for(unsigned int i=0; i<theta_q_f.size(); i++)
-    {
-      libmesh_assert(theta_q_f[i]);
-      _F_theta_vector.push_back(theta_q_f[i]);
-    }
+for(unsigned int i=0; i<theta_q_f.size(); i++)
+{
+libmesh_assert(theta_q_f[i]);
+_F_theta_vector.push_back(theta_q_f[i]);
+}
 }
 
 void RBThetaExpansion::attach_output_theta(std::vector<RBTheta *> theta_q_l)
 {
-  _output_theta_vector.push_back(theta_q_l);
+_output_theta_vector.push_back(theta_q_l);
 }
 
 void RBThetaExpansion::attach_output_theta(RBTheta * theta_q_l)
 {
-  libmesh_assert(theta_q_l);
+libmesh_assert(theta_q_l);
 
-  std::vector<RBTheta *> theta_l_vector(1);
-  theta_l_vector[0] = theta_q_l;
+std::vector<RBTheta *> theta_l_vector(1);
+theta_l_vector[0] = theta_q_l;
 
-  attach_output_theta(theta_l_vector);
+attach_output_theta(theta_l_vector);
 }
 
 Number RBThetaExpansion::eval_A_theta(unsigned int q,
-                                      const RBParameters & mu)
+const RBParameters & mu)
 {
-  if(q >= get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < get_n_A_terms in eval_A_theta.");
+if(q >= get_n_A_terms())
+libmesh_error_msg("Error: We must have q < get_n_A_terms in eval_A_theta.");
 
-  libmesh_assert(_A_theta_vector[q]);
+libmesh_assert(_A_theta_vector[q]);
 
-  return _A_theta_vector[q]->evaluate( mu );
+return _A_theta_vector[q]->evaluate( mu );
 }
 
 Number RBThetaExpansion::eval_F_theta(unsigned int q,
-                                      const RBParameters & mu)
+const RBParameters & mu)
 {
-  if(q >= get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < get_n_F_terms in eval_F_theta.");
+if(q >= get_n_F_terms())
+libmesh_error_msg("Error: We must have q < get_n_F_terms in eval_F_theta.");
 
-  libmesh_assert(_F_theta_vector[q]);
+libmesh_assert(_F_theta_vector[q]);
 
-  return _F_theta_vector[q]->evaluate( mu );
+return _F_theta_vector[q]->evaluate( mu );
 }
 
 Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
-                                           unsigned int q_l,
-                                           const RBParameters & mu)
+unsigned int q_l,
+const RBParameters & mu)
 {
-  if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
-                      << "q_l < get_n_output_terms(output_index) in eval_output_theta.");
+if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
+libmesh_error_msg("Error: We must have output_index < n_outputs and " \
+<< "q_l < get_n_output_terms(output_index) in eval_output_theta.");
 
-  libmesh_assert(_output_theta_vector[output_index][q_l]);
+libmesh_assert(_output_theta_vector[output_index][q_l]);
 
-  return _output_theta_vector[output_index][q_l]->evaluate( mu );
+return _output_theta_vector[output_index][q_l]->evaluate( mu );
 }
 
 

@@ -38,112 +38,112 @@ class MeshData;
 
 
 /**
- * This class implements reading and writing meshes in the TetGen format.
- * Format description:
- * cf. <a href="http://tetgen.berlios.de/">TetGen home page</a>.
- *
- * \author Benjamin S. Kirk
- * \date 2004
- */
+* This class implements reading and writing meshes in the TetGen format.
+* Format description:
+* cf. <a href="http://tetgen.berlios.de/">TetGen home page</a>.
+*
+* \author Benjamin S. Kirk
+* \date 2004
+*/
 class TetGenIO : public MeshInput<MeshBase>,
-                 public MeshOutput<MeshBase>
+public MeshOutput<MeshBase>
 {
 public:
 
-  /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This is the constructor required to read a mesh.
-   */
-  explicit
-  TetGenIO (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
+/**
+* Constructor.  Takes a writeable reference to a mesh object.
+* This is the constructor required to read a mesh.
+*/
+explicit
+TetGenIO (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
-  /**
-   * Constructor.  Takes a read-only reference to a mesh object.
-   * This is the constructor required to write a mesh.
-   */
-  explicit
-  TetGenIO (const MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
+/**
+* Constructor.  Takes a read-only reference to a mesh object.
+* This is the constructor required to write a mesh.
+*/
+explicit
+TetGenIO (const MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
 
-  /**
-   * This method implements reading a mesh from a specified file
-   * in TetGen format.
-   */
-  virtual void read (const std::string &) libmesh_override;
+/**
+* This method implements reading a mesh from a specified file
+* in TetGen format.
+*/
+virtual void read (const std::string &) libmesh_override;
 
-  /**
-   * This method implements writing a mesh to a specified ".poly" file.
-   * ".poly" files defines so called Piecewise Linear Complex (PLC).
-   */
-  virtual void write (const std::string &) libmesh_override;
+/**
+* This method implements writing a mesh to a specified ".poly" file.
+* ".poly" files defines so called Piecewise Linear Complex (PLC).
+*/
+virtual void write (const std::string &) libmesh_override;
 
-  /**
-   * Data structure to hold node attributes read in from file.
-   * What you do with these is up to you!
-   */
-  std::vector<std::vector<Real> > node_attributes;
+/**
+* Data structure to hold node attributes read in from file.
+* What you do with these is up to you!
+*/
+std::vector<std::vector<Real> > node_attributes;
 
-  /**
-   * Data structure to hold element attributes read in from file.
-   * What you do with these is up to you!
-   */
-  std::vector<std::vector<Real> > element_attributes;
+/**
+* Data structure to hold element attributes read in from file.
+* What you do with these is up to you!
+*/
+std::vector<std::vector<Real> > element_attributes;
 
 private:
 
 
-  //-------------------------------------------------------------
-  // read support methods
+//-------------------------------------------------------------
+// read support methods
 
-  /**
-   * Reads a mesh (nodes & elements) from the file
-   * provided through \p node_stream and ele_stream.
-   */
-  void read_nodes_and_elem (std::istream & node_stream,
-                            std::istream & ele_stream);
+/**
+* Reads a mesh (nodes & elements) from the file
+* provided through \p node_stream and ele_stream.
+*/
+void read_nodes_and_elem (std::istream & node_stream,
+std::istream & ele_stream);
 
-  /**
-   * Method reads nodes from \p node_stream and stores them in
-   * vector<Node *> \p nodes in the order they come in.
-   * The original node labels are being stored in the
-   * map \p _assign_nodes in order to assign the elements to
-   * the right nodes later.  In addition, provided it is
-   * active, the \p MeshData gets to know the node id from
-   * the file, too.
-   */
-  void node_in (std::istream & node_stream);
+/**
+* Method reads nodes from \p node_stream and stores them in
+* vector<Node *> \p nodes in the order they come in.
+* The original node labels are being stored in the
+* map \p _assign_nodes in order to assign the elements to
+* the right nodes later.  In addition, provided it is
+* active, the \p MeshData gets to know the node id from
+* the file, too.
+*/
+void node_in (std::istream & node_stream);
 
-  /**
-   * Method reads elements and stores them in
-   * vector<Elem *> \p elements in the same order as they
-   * come in. Within \p TetGenMeshInterface, element labels are
-   * ignored, but \p MeshData takes care of such things
-   * (if active).
-   */
-  void element_in (std::istream & ele_stream);
+/**
+* Method reads elements and stores them in
+* vector<Elem *> \p elements in the same order as they
+* come in. Within \p TetGenMeshInterface, element labels are
+* ignored, but \p MeshData takes care of such things
+* (if active).
+*/
+void element_in (std::istream & ele_stream);
 
-  //-------------------------------------------------------------
-  // local data
+//-------------------------------------------------------------
+// local data
 
-  /**
-   * stores new positions of nodes. Used when reading.
-   */
-  std::map<dof_id_type,dof_id_type> _assign_nodes;
+/**
+* stores new positions of nodes. Used when reading.
+*/
+std::map<dof_id_type,dof_id_type> _assign_nodes;
 
-  /**
-   * total number of nodes. Primarily used when reading.
-   */
-  dof_id_type _num_nodes;
+/**
+* total number of nodes. Primarily used when reading.
+*/
+dof_id_type _num_nodes;
 
-  /**
-   * total number of elements. Primarily used when reading.
-   */
-  dof_id_type _num_elements;
+/**
+* total number of elements. Primarily used when reading.
+*/
+dof_id_type _num_elements;
 
-  /**
-   * A pointer to the MeshData object you would like to use.
-   * with this TetGenIO object.  Can be NULL.
-   */
-  MeshData * _mesh_data;
+/**
+* A pointer to the MeshData object you would like to use.
+* with this TetGenIO object.  Can be NULL.
+*/
+MeshData * _mesh_data;
 };
 
 
@@ -152,9 +152,9 @@ private:
 // TetGenIO inline members
 inline
 TetGenIO::TetGenIO (MeshBase & mesh, MeshData * mesh_data) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data)
+MeshInput<MeshBase> (mesh),
+MeshOutput<MeshBase>(mesh),
+_mesh_data(mesh_data)
 {
 }
 
@@ -162,8 +162,8 @@ TetGenIO::TetGenIO (MeshBase & mesh, MeshData * mesh_data) :
 
 inline
 TetGenIO::TetGenIO (const MeshBase & mesh, MeshData * mesh_data) :
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data)
+MeshOutput<MeshBase>(mesh),
+_mesh_data(mesh_data)
 {
 }
 

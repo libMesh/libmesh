@@ -32,94 +32,94 @@ namespace libMesh
 {
 
 /**
- * This class is part of the rbOOmit framework.
- *
- * This class defines a set of parameters index by strings.
- *
- * \author David J. Knezevic
- * \date 2012
- */
+* This class is part of the rbOOmit framework.
+*
+* This class defines a set of parameters index by strings.
+*
+* \author David J. Knezevic
+* \date 2012
+*/
 class RBParameters
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  RBParameters();
+/**
+* Constructor.
+*/
+RBParameters();
 
-  /**
-   * Constructor. Set parameters based on the std::map \p parameter_map.
-   */
-  RBParameters(const std::map<std::string, Real> & parameter_map);
+/**
+* Constructor. Set parameters based on the std::map \p parameter_map.
+*/
+RBParameters(const std::map<std::string, Real> & parameter_map);
 
-  // Define a constant iterator for this class
-  typedef std::map<std::string, Real>::const_iterator const_iterator;
+// Define a constant iterator for this class
+typedef std::map<std::string, Real>::const_iterator const_iterator;
 
-  /**
-   * Clear this object.
-   */
-  void clear();
+/**
+* Clear this object.
+*/
+void clear();
 
-  /**
-   * Get the value of the specific parameter.
-   */
-  Real get_value(const std::string & param_name) const;
+/**
+* Get the value of the specific parameter.
+*/
+Real get_value(const std::string & param_name) const;
 
-  /**
-   * Set the value of the specified parameter. If param_name
-   * doesn't already exist, it is added to the RBParameters object.
-   */
-  void set_value(const std::string & param_name, Real value);
+/**
+* Set the value of the specified parameter. If param_name
+* doesn't already exist, it is added to the RBParameters object.
+*/
+void set_value(const std::string & param_name, Real value);
 
-  /**
-   * Get the number of parameters that have been added.
-   */
-  unsigned int n_parameters() const;
+/**
+* Get the number of parameters that have been added.
+*/
+unsigned int n_parameters() const;
 
-  /**
-   * Fill \p param_names with the names of the parameters.
-   */
-  void get_parameter_names(std::set<std::string> & param_names) const;
+/**
+* Fill \p param_names with the names of the parameters.
+*/
+void get_parameter_names(std::set<std::string> & param_names) const;
 
-  /**
-   * Get a constant iterator to beginning of this RBParameters object.
-   */
-  const_iterator begin() const;
+/**
+* Get a constant iterator to beginning of this RBParameters object.
+*/
+const_iterator begin() const;
 
-  /**
-   * Get a constant iterator to the end of this RBParameters object.
-   */
-  const_iterator end() const;
+/**
+* Get a constant iterator to the end of this RBParameters object.
+*/
+const_iterator end() const;
 
-  /**
-   * Two RBParameters are equal if they have the same _parameters map.
-   */
-  bool operator== (const RBParameters & rhs) const;
+/**
+* Two RBParameters are equal if they have the same _parameters map.
+*/
+bool operator== (const RBParameters & rhs) const;
 
-  /**
-   * @return !(*this == rhs).
-   */
-  bool operator!= (const RBParameters & node) const;
+/**
+* @return !(*this == rhs).
+*/
+bool operator!= (const RBParameters & node) const;
 
-  /**
-   * Get a string that specifies the contents of this RBParameters object.
-   * \p precision specifies the number of digits of precision we use
-   * in scientific notation in the string.
-   */
-  std::string get_string(unsigned int precision=6) const;
+/**
+* Get a string that specifies the contents of this RBParameters object.
+* \p precision specifies the number of digits of precision we use
+* in scientific notation in the string.
+*/
+std::string get_string(unsigned int precision=6) const;
 
-  /**
-   * Print the parameters.
-   */
-  void print() const;
+/**
+* Print the parameters.
+*/
+void print() const;
 
 private:
 
-  /**
-   * The map that stores the actual parameters, indexed by names.
-   */
-  std::map<std::string, Real> _parameters;
+/**
+* The map that stores the actual parameters, indexed by names.
+*/
+std::map<std::string, Real> _parameters;
 
 };
 

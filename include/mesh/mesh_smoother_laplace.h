@@ -35,77 +35,77 @@ namespace libMesh
 
 
 /**
- * This class defines the data structures necessary
- * for Laplace smoothing.  Note that this is a simple
- * averaging smoother, which does NOT guarantee that
- * points will be smoothed to valid locations, e.g.
- * locations inside the boundary!  This aspect could
- * use work.
- *
- * \author John W. Peterson
- * \date 2002-2007
- */
+* This class defines the data structures necessary
+* for Laplace smoothing.  Note that this is a simple
+* averaging smoother, which does NOT guarantee that
+* points will be smoothed to valid locations, e.g.
+* locations inside the boundary!  This aspect could
+* use work.
+*
+* \author John W. Peterson
+* \date 2002-2007
+*/
 class LaplaceMeshSmoother : public MeshSmoother
 {
 public:
-  /**
-   * Constructor.  Sets the constant mesh reference
-   * in the protected data section of the class.
-   */
-  explicit
-  LaplaceMeshSmoother(UnstructuredMesh & mesh);
+/**
+* Constructor.  Sets the constant mesh reference
+* in the protected data section of the class.
+*/
+explicit
+LaplaceMeshSmoother(UnstructuredMesh & mesh);
 
-  /**
-   * Destructor.
-   */
-  virtual ~LaplaceMeshSmoother() {}
+/**
+* Destructor.
+*/
+virtual ~LaplaceMeshSmoother() {}
 
-  /**
-   * Redefinition of the smooth function from the
-   * base class.  All this does is call the smooth
-   * function in this class which takes an int, using
-   * a default value of 1.
-   */
-  virtual void smooth() libmesh_override { this->smooth(1); }
+/**
+* Redefinition of the smooth function from the
+* base class.  All this does is call the smooth
+* function in this class which takes an int, using
+* a default value of 1.
+*/
+virtual void smooth() libmesh_override { this->smooth(1); }
 
-  /**
-   * The actual smoothing function, gets called whenever
-   * the user specifies an actual number of smoothing
-   * iterations.
-   */
-  void smooth(unsigned int n_iterations);
+/**
+* The actual smoothing function, gets called whenever
+* the user specifies an actual number of smoothing
+* iterations.
+*/
+void smooth(unsigned int n_iterations);
 
-  /**
-   * Initialization for the Laplace smoothing routine
-   * is basically identical to building an "L-graph"
-   * which is expensive.  It's provided separately from
-   * the constructor since you may or may not want
-   * to build the L-graph on construction.
-   */
-  void init();
+/**
+* Initialization for the Laplace smoothing routine
+* is basically identical to building an "L-graph"
+* which is expensive.  It's provided separately from
+* the constructor since you may or may not want
+* to build the L-graph on construction.
+*/
+void init();
 
-  /**
-   * Mainly for debugging, this function will print
-   * out the connectivity graph which has been created.
-   */
-  void print_graph(std::ostream & out = libMesh::out) const;
+/**
+* Mainly for debugging, this function will print
+* out the connectivity graph which has been created.
+*/
+void print_graph(std::ostream & out = libMesh::out) const;
 
 private:
-  /**
-   * This function allgather's the (local) graph after
-   * it is computed on each processor by the init() function.
-   */
-  void allgather_graph();
+/**
+* This function allgather's the (local) graph after
+* it is computed on each processor by the init() function.
+*/
+void allgather_graph();
 
-  /**
-   * True if the L-graph has been created, false otherwise.
-   */
-  bool _initialized;
+/**
+* True if the L-graph has been created, false otherwise.
+*/
+bool _initialized;
 
-  /**
-   * Data structure for holding the L-graph
-   */
-  std::vector<std::vector<dof_id_type> > _graph;
+/**
+* Data structure for holding the L-graph
+*/
+std::vector<std::vector<dof_id_type> > _graph;
 };
 
 

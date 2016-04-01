@@ -33,182 +33,182 @@ namespace libMesh
 class System;
 
 /**
- * This class wraps another UnsteadySolver derived class, and compares
- * the results of timestepping with deltat and timestepping with
- * 2*deltat to adjust future timestep lengths.
- *
- * Currently this class only works on fully coupled Systems
- *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
- * \author Roy H. Stogner
- * \date 2007
- */
+* This class wraps another UnsteadySolver derived class, and compares
+* the results of timestepping with deltat and timestepping with
+* 2*deltat to adjust future timestep lengths.
+*
+* Currently this class only works on fully coupled Systems
+*
+* This class is part of the new DifferentiableSystem framework,
+* which is still experimental.  Users of this framework should
+* beware of bugs and future API changes.
+*
+* \author Roy H. Stogner
+* \date 2007
+*/
 class AdaptiveTimeSolver : public FirstOrderUnsteadySolver
 {
 public:
-  /**
-   * The parent class
-   */
-  typedef FirstOrderUnsteadySolver Parent;
+/**
+* The parent class
+*/
+typedef FirstOrderUnsteadySolver Parent;
 
-  /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
-   */
-  explicit
-  AdaptiveTimeSolver (sys_type & s);
+/**
+* Constructor. Requires a reference to the system
+* to be solved.
+*/
+explicit
+AdaptiveTimeSolver (sys_type & s);
 
-  /**
-   * Destructor.
-   */
-  virtual ~AdaptiveTimeSolver ();
+/**
+* Destructor.
+*/
+virtual ~AdaptiveTimeSolver ();
 
-  virtual void init() libmesh_override;
+virtual void init() libmesh_override;
 
-  virtual void reinit() libmesh_override;
+virtual void reinit() libmesh_override;
 
-  virtual void solve() libmesh_override = 0;
+virtual void solve() libmesh_override = 0;
 
-  virtual void advance_timestep() libmesh_override;
+virtual void advance_timestep() libmesh_override;
 
-  /**
-   * This method is passed on to the core_time_solver
-   */
-  virtual Real error_order () const libmesh_override;
+/**
+* This method is passed on to the core_time_solver
+*/
+virtual Real error_order () const libmesh_override;
 
-  /**
-   * This method is passed on to the core_time_solver
-   */
-  virtual bool element_residual (bool get_jacobian,
-                                 DiffContext &) libmesh_override;
+/**
+* This method is passed on to the core_time_solver
+*/
+virtual bool element_residual (bool get_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * This method is passed on to the core_time_solver
-   */
-  virtual bool side_residual (bool get_jacobian,
-                              DiffContext &) libmesh_override;
+/**
+* This method is passed on to the core_time_solver
+*/
+virtual bool side_residual (bool get_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * This method is passed on to the core_time_solver
-   */
-  virtual bool nonlocal_residual (bool get_jacobian,
-                                  DiffContext &) libmesh_override;
+/**
+* This method is passed on to the core_time_solver
+*/
+virtual bool nonlocal_residual (bool get_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * An implicit linear or nonlinear solver to use at each timestep.
-   */
-  virtual UniquePtr<DiffSolver> & diff_solver() libmesh_override;
+/**
+* An implicit linear or nonlinear solver to use at each timestep.
+*/
+virtual UniquePtr<DiffSolver> & diff_solver() libmesh_override;
 
-  /**
-   * An implicit linear solver to use for adjoint and sensitivity
-   * problems.
-   */
-  virtual UniquePtr<LinearSolver<Number> > & linear_solver() libmesh_override;
+/**
+* An implicit linear solver to use for adjoint and sensitivity
+* problems.
+*/
+virtual UniquePtr<LinearSolver<Number> > & linear_solver() libmesh_override;
 
-  /**
-   * This object is used to take timesteps
-   */
-  UniquePtr<UnsteadySolver> core_time_solver;
+/**
+* This object is used to take timesteps
+*/
+UniquePtr<UnsteadySolver> core_time_solver;
 
-  /**
-   * Error calculations are done in this norm, DISCRETE_L2 by default.
-   */
-  SystemNorm component_norm;
+/**
+* Error calculations are done in this norm, DISCRETE_L2 by default.
+*/
+SystemNorm component_norm;
 
-  /**
-   * If component_norms is non-empty, each variable's contribution to the error
-   * of a system will also be scaled by component_scale[var], unless
-   * component_scale is empty in which case all variables will be weighted
-   * equally.
-   */
-  std::vector<float> component_scale;
+/**
+* If component_norms is non-empty, each variable's contribution to the error
+* of a system will also be scaled by component_scale[var], unless
+* component_scale is empty in which case all variables will be weighted
+* equally.
+*/
+std::vector<float> component_scale;
 
-  /**
-   * This tolerance is the target relative error between an exact
-   * time integration and a single time step output, scaled by deltat.
-   * integrator, scaled by deltat.  If the estimated error exceeds or
-   * undershoots the target error tolerance, future timesteps will be
-   * run with deltat shrunk or grown to compensate.
-   *
-   * The default value is 1.0e-2; obviously users should select their
-   * own tolerance.
-   *
-   * If a *negative* target_tolerance is specified, then its absolute
-   * value is used to scale the estimated error from the first
-   * simulation time step, and this becomes the target tolerance of
-   * all future time steps.
-   */
-  Real target_tolerance;
+/**
+* This tolerance is the target relative error between an exact
+* time integration and a single time step output, scaled by deltat.
+* integrator, scaled by deltat.  If the estimated error exceeds or
+* undershoots the target error tolerance, future timesteps will be
+* run with deltat shrunk or grown to compensate.
+*
+* The default value is 1.0e-2; obviously users should select their
+* own tolerance.
+*
+* If a *negative* target_tolerance is specified, then its absolute
+* value is used to scale the estimated error from the first
+* simulation time step, and this becomes the target tolerance of
+* all future time steps.
+*/
+Real target_tolerance;
 
-  /**
-   * This tolerance is the maximum relative error between an exact
-   * time integration and a single time step output, scaled by deltat.
-   * If this error tolerance is exceeded by the estimated error of the
-   * current time step, that time step will be repeated with a smaller
-   * deltat.
-   *
-   * If you use the default upper_tolerance=0.0, then the current
-   * time step will not be repeated regardless of estimated error.
-   *
-   * If a *negative* upper_tolerance is specified, then its absolute
-   * value is used to scale the estimated error from the first
-   * simulation time step, and this becomes the upper tolerance of
-   * all future time steps.
-   */
-  Real upper_tolerance;
+/**
+* This tolerance is the maximum relative error between an exact
+* time integration and a single time step output, scaled by deltat.
+* If this error tolerance is exceeded by the estimated error of the
+* current time step, that time step will be repeated with a smaller
+* deltat.
+*
+* If you use the default upper_tolerance=0.0, then the current
+* time step will not be repeated regardless of estimated error.
+*
+* If a *negative* upper_tolerance is specified, then its absolute
+* value is used to scale the estimated error from the first
+* simulation time step, and this becomes the upper tolerance of
+* all future time steps.
+*/
+Real upper_tolerance;
 
-  /**
-   * Do not allow the adaptive time solver to select deltat > max_deltat.
-   * If you use the default max_deltat=0.0, then deltat is unlimited.
-   */
-  Real max_deltat;
+/**
+* Do not allow the adaptive time solver to select deltat > max_deltat.
+* If you use the default max_deltat=0.0, then deltat is unlimited.
+*/
+Real max_deltat;
 
-  /**
-   * Do not allow the adaptive time solver to select deltat < min_deltat.
-   * The default value is 0.0.
-   */
-  Real min_deltat;
+/**
+* Do not allow the adaptive time solver to select deltat < min_deltat.
+* The default value is 0.0.
+*/
+Real min_deltat;
 
-  /**
-   * Do not allow the adaptive time solver to select
-   * a new deltat greater than max_growth times the old deltat.
-   * If you use the default max_growth=0.0, then the deltat growth is
-   * unlimited.
-   */
-  Real max_growth;
+/**
+* Do not allow the adaptive time solver to select
+* a new deltat greater than max_growth times the old deltat.
+* If you use the default max_growth=0.0, then the deltat growth is
+* unlimited.
+*/
+Real max_growth;
 
-  /**
-   * This flag, which is true by default, grows (shrinks) the timestep
-   * based on the expected global accuracy of the timestepping scheme.
-   * Global in this sense means the cumulative final-time accuracy of
-   * the scheme.  For example, the backward Euler scheme's truncation
-   * error is locally of order 2, so that after N timesteps of size
-   * deltat, the result is first-order accurate.  If you set this to
-   * false, you can grow (shrink) your timestep based on the local
-   * accuracy rather than the global accuracy of the core TimeSolver.
-   * Note that by setting this value to false you may fail to achieve
-   * the predicted convergence in time of the underlying method, however
-   * it may be possible to get more fine-grained control over step sizes
-   * as well.
-   */
-  bool global_tolerance;
+/**
+* This flag, which is true by default, grows (shrinks) the timestep
+* based on the expected global accuracy of the timestepping scheme.
+* Global in this sense means the cumulative final-time accuracy of
+* the scheme.  For example, the backward Euler scheme's truncation
+* error is locally of order 2, so that after N timesteps of size
+* deltat, the result is first-order accurate.  If you set this to
+* false, you can grow (shrink) your timestep based on the local
+* accuracy rather than the global accuracy of the core TimeSolver.
+* Note that by setting this value to false you may fail to achieve
+* the predicted convergence in time of the underlying method, however
+* it may be possible to get more fine-grained control over step sizes
+* as well.
+*/
+bool global_tolerance;
 
 protected:
 
-  /**
-   * We need to store the value of the last deltat used, so
-   * that advance_timestep() will increment the system time
-   * correctly.
-   */
-  Real last_deltat;
+/**
+* We need to store the value of the last deltat used, so
+* that advance_timestep() will increment the system time
+* correctly.
+*/
+Real last_deltat;
 
-  /**
-   * A helper function to calculate error norms
-   */
-  virtual Real calculate_norm(System &, NumericVector<Number> &);
+/**
+* A helper function to calculate error norms
+*/
+virtual Real calculate_norm(System &, NumericVector<Number> &);
 };
 
 

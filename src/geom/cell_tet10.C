@@ -32,22 +32,22 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tet10 class static member initializations
 const unsigned int Tet10::side_nodes_map[4][6] =
-  {
-    {0, 2, 1, 6, 5, 4}, // Side 0
-    {0, 1, 3, 4, 8, 7}, // Side 1
-    {1, 2, 3, 5, 9, 8}, // Side 2
-    {2, 0, 3, 6, 7, 9}  // Side 3
-  };
+{
+{0, 2, 1, 6, 5, 4}, // Side 0
+{0, 1, 3, 4, 8, 7}, // Side 1
+{1, 2, 3, 5, 9, 8}, // Side 2
+{2, 0, 3, 6, 7, 9}  // Side 3
+};
 
 const unsigned int Tet10::edge_nodes_map[6][3] =
-  {
-    {0, 1, 4}, // Side 0
-    {1, 2, 5}, // Side 1
-    {0, 2, 6}, // Side 2
-    {0, 3, 7}, // Side 3
-    {1, 3, 8}, // Side 4
-    {2, 3, 9}  // Side 5
-  };
+{
+{0, 1, 4}, // Side 0
+{1, 2, 5}, // Side 1
+{0, 2, 6}, // Side 2
+{0, 3, 7}, // Side 3
+{1, 3, 8}, // Side 4
+{2, 3, 9}  // Side 5
+};
 
 
 
@@ -56,41 +56,41 @@ const unsigned int Tet10::edge_nodes_map[6][3] =
 
 bool Tet10::is_vertex(const unsigned int i) const
 {
-  if (i < 4)
-    return true;
-  return false;
+if (i < 4)
+return true;
+return false;
 }
 
 bool Tet10::is_edge(const unsigned int i) const
 {
-  if (i < 4)
-    return false;
-  return true;
+if (i < 4)
+return false;
+return true;
 }
 
 bool Tet10::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Tet10::is_node_on_side(const unsigned int n,
-                            const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 6; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 6; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 bool Tet10::is_node_on_edge(const unsigned int n,
-                            const unsigned int e) const
+const unsigned int e) const
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (e, n_edges());
+for (unsigned int i = 0; i != 3; ++i)
+if (edge_nodes_map[e][i] == n)
+return true;
+return false;
 }
 
 
@@ -98,29 +98,29 @@ bool Tet10::is_node_on_edge(const unsigned int n,
 
 // This function only works if LIBMESH_ENABLE_AMR...
 bool Tet10::is_child_on_side(const unsigned int c,
-                             const unsigned int s) const
+const unsigned int s) const
 {
-  // Table of local IDs for the midege nodes on the side opposite a given node.
-  // See the ASCII art in the header file for this class to confirm this.
-  const unsigned int midedge_nodes_opposite[4][3] =
-    {
-      {5,8,9}, // midedge nodes opposite node 0
-      {6,7,9}, // midedge nodes opposite node 1
-      {4,7,8}, // midedge nodes opposite node 2
-      {4,5,6}  // midedge nodes opposite node 3
-    };
+// Table of local IDs for the midege nodes on the side opposite a given node.
+// See the ASCII art in the header file for this class to confirm this.
+const unsigned int midedge_nodes_opposite[4][3] =
+{
+{5,8,9}, // midedge nodes opposite node 0
+{6,7,9}, // midedge nodes opposite node 1
+{4,7,8}, // midedge nodes opposite node 2
+{4,5,6}  // midedge nodes opposite node 3
+};
 
-  // Call the base class helper function
-  return Tet::is_child_on_side_helper(c, s, midedge_nodes_opposite);
+// Call the base class helper function
+return Tet::is_child_on_side_helper(c, s, midedge_nodes_opposite);
 }
 
 #else
 
 bool Tet10::is_child_on_side(const unsigned int /*c*/,
-                             const unsigned int /*s*/) const
+const unsigned int /*s*/) const
 {
-  libmesh_not_implemented();
-  return false;
+libmesh_not_implemented();
+return false;
 }
 
 #endif //LIBMESH_ENABLE_AMR
@@ -129,360 +129,360 @@ bool Tet10::is_child_on_side(const unsigned int /*c*/,
 
 bool Tet10::has_affine_map() const
 {
-  // Make sure edges are straight
-  if (!this->point(4).relative_fuzzy_equals
-      ((this->point(0) + this->point(1))/2))
-    return false;
-  if (!this->point(5).relative_fuzzy_equals
-      ((this->point(1) + this->point(2))/2))
-    return false;
-  if (!this->point(6).relative_fuzzy_equals
-      ((this->point(2) + this->point(0))/2))
-    return false;
-  if (!this->point(7).relative_fuzzy_equals
-      ((this->point(3) + this->point(0))/2))
-    return false;
-  if (!this->point(8).relative_fuzzy_equals
-      ((this->point(3) + this->point(1))/2))
-    return false;
-  if (!this->point(9).relative_fuzzy_equals
-      ((this->point(3) + this->point(2))/2))
-    return false;
-  return true;
+// Make sure edges are straight
+if (!this->point(4).relative_fuzzy_equals
+((this->point(0) + this->point(1))/2))
+return false;
+if (!this->point(5).relative_fuzzy_equals
+((this->point(1) + this->point(2))/2))
+return false;
+if (!this->point(6).relative_fuzzy_equals
+((this->point(2) + this->point(0))/2))
+return false;
+if (!this->point(7).relative_fuzzy_equals
+((this->point(3) + this->point(0))/2))
+return false;
+if (!this->point(8).relative_fuzzy_equals
+((this->point(3) + this->point(1))/2))
+return false;
+if (!this->point(9).relative_fuzzy_equals
+((this->point(3) + this->point(2))/2))
+return false;
+return true;
 }
 
 
 
 UniquePtr<Elem> Tet10::build_side (const unsigned int i,
-                                   bool proxy) const
+bool proxy) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    return UniquePtr<Elem>(new Side<Tri6,Tet10>(this,i));
+if (proxy)
+return UniquePtr<Elem>(new Side<Tri6,Tet10>(this,i));
 
-  else
-    {
-      Elem * face = new Tri6;
-      face->subdomain_id() = this->subdomain_id();
+else
+{
+Elem * face = new Tri6;
+face->subdomain_id() = this->subdomain_id();
 
-      for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Tet10::side_nodes_map[i][n]);
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Tet10::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
-    }
+return UniquePtr<Elem>(face);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 
 UniquePtr<Elem> Tet10::build_edge (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_edges());
+libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge3,Tet10>(this,i));
+return UniquePtr<Elem>(new SideEdge<Edge3,Tet10>(this,i));
 }
 
 
 
 void Tet10::connectivity(const unsigned int sc,
-                         const IOPackage iop,
-                         std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert(_nodes);
+libmesh_assert_less (sc, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn.resize(8);
-        switch (sc)
-          {
-
-
-            // Linear sub-tet 0
-          case 0:
-
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(4)+1;
-            conn[2] = this->node(6)+1;
-            conn[3] = this->node(6)+1;
-            conn[4] = this->node(7)+1;
-            conn[5] = this->node(7)+1;
-            conn[6] = this->node(7)+1;
-            conn[7] = this->node(7)+1;
-
-            return;
-
-            // Linear sub-tet 1
-          case 1:
-
-            conn[0] = this->node(4)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(5)+1;
-            conn[3] = this->node(5)+1;
-            conn[4] = this->node(8)+1;
-            conn[5] = this->node(8)+1;
-            conn[6] = this->node(8)+1;
-            conn[7] = this->node(8)+1;
-
-            return;
-
-            // Linear sub-tet 2
-          case 2:
-
-            conn[0] = this->node(5)+1;
-            conn[1] = this->node(2)+1;
-            conn[2] = this->node(6)+1;
-            conn[3] = this->node(6)+1;
-            conn[4] = this->node(9)+1;
-            conn[5] = this->node(9)+1;
-            conn[6] = this->node(9)+1;
-            conn[7] = this->node(9)+1;
-
-            return;
-
-            // Linear sub-tet 3
-          case 3:
-
-            conn[0] = this->node(7)+1;
-            conn[1] = this->node(8)+1;
-            conn[2] = this->node(9)+1;
-            conn[3] = this->node(9)+1;
-            conn[4] = this->node(3)+1;
-            conn[5] = this->node(3)+1;
-            conn[6] = this->node(3)+1;
-            conn[7] = this->node(3)+1;
-
-            return;
-
-            // Linear sub-tet 4
-          case 4:
-
-            conn[0] = this->node(4)+1;
-            conn[1] = this->node(8)+1;
-            conn[2] = this->node(6)+1;
-            conn[3] = this->node(6)+1;
-            conn[4] = this->node(7)+1;
-            conn[5] = this->node(7)+1;
-            conn[6] = this->node(7)+1;
-            conn[7] = this->node(7)+1;
-
-            return;
-
-            // Linear sub-tet 5
-          case 5:
-
-            conn[0] = this->node(4)+1;
-            conn[1] = this->node(5)+1;
-            conn[2] = this->node(6)+1;
-            conn[3] = this->node(6)+1;
-            conn[4] = this->node(8)+1;
-            conn[5] = this->node(8)+1;
-            conn[6] = this->node(8)+1;
-            conn[7] = this->node(8)+1;
-
-            return;
-
-            // Linear sub-tet 6
-          case 6:
-
-            conn[0] = this->node(5)+1;
-            conn[1] = this->node(9)+1;
-            conn[2] = this->node(6)+1;
-            conn[3] = this->node(6)+1;
-            conn[4] = this->node(8)+1;
-            conn[5] = this->node(8)+1;
-            conn[6] = this->node(8)+1;
-            conn[7] = this->node(8)+1;
-
-            return;
-
-            // Linear sub-tet 7
-          case 7:
-
-            conn[0] = this->node(7)+1;
-            conn[1] = this->node(6)+1;
-            conn[2] = this->node(9)+1;
-            conn[3] = this->node(9)+1;
-            conn[4] = this->node(8)+1;
-            conn[5] = this->node(8)+1;
-            conn[6] = this->node(8)+1;
-            conn[7] = this->node(8)+1;
-
-            return;
+switch (iop)
+{
+case TECPLOT:
+{
+conn.resize(8);
+switch (sc)
+{
 
 
-          default:
-            libmesh_error_msg("Invalid sc = " << sc);
-          }
-      }
+// Linear sub-tet 0
+case 0:
 
-    case VTK:
-      {
-        conn.resize(10);
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
-        conn[4] = this->node(4);
-        conn[5] = this->node(5);
-        conn[6] = this->node(6);
-        conn[7] = this->node(7);
-        conn[8] = this->node(8);
-        conn[9] = this->node(9);
-        return;
-        /*
-          conn.resize(4);
-          switch (sc)
-          {
-          // Linear sub-tet 0
-          case 0:
+conn[0] = this->node(0)+1;
+conn[1] = this->node(4)+1;
+conn[2] = this->node(6)+1;
+conn[3] = this->node(6)+1;
+conn[4] = this->node(7)+1;
+conn[5] = this->node(7)+1;
+conn[6] = this->node(7)+1;
+conn[7] = this->node(7)+1;
 
-          conn[0] = this->node(0);
-          conn[1] = this->node(4);
-          conn[2] = this->node(6);
-          conn[3] = this->node(7);
+return;
 
-          return;
+// Linear sub-tet 1
+case 1:
 
-          // Linear sub-tet 1
-          case 1:
+conn[0] = this->node(4)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(5)+1;
+conn[3] = this->node(5)+1;
+conn[4] = this->node(8)+1;
+conn[5] = this->node(8)+1;
+conn[6] = this->node(8)+1;
+conn[7] = this->node(8)+1;
 
-          conn[0] = this->node(4);
-          conn[1] = this->node(1);
-          conn[2] = this->node(5);
-          conn[3] = this->node(8);
+return;
 
-          return;
+// Linear sub-tet 2
+case 2:
 
-          // Linear sub-tet 2
-          case 2:
+conn[0] = this->node(5)+1;
+conn[1] = this->node(2)+1;
+conn[2] = this->node(6)+1;
+conn[3] = this->node(6)+1;
+conn[4] = this->node(9)+1;
+conn[5] = this->node(9)+1;
+conn[6] = this->node(9)+1;
+conn[7] = this->node(9)+1;
 
-          conn[0] = this->node(5);
-          conn[1] = this->node(2);
-          conn[2] = this->node(6);
-          conn[3] = this->node(9);
+return;
 
-          return;
+// Linear sub-tet 3
+case 3:
 
-          // Linear sub-tet 3
-          case 3:
+conn[0] = this->node(7)+1;
+conn[1] = this->node(8)+1;
+conn[2] = this->node(9)+1;
+conn[3] = this->node(9)+1;
+conn[4] = this->node(3)+1;
+conn[5] = this->node(3)+1;
+conn[6] = this->node(3)+1;
+conn[7] = this->node(3)+1;
 
-          conn[0] = this->node(7);
-          conn[1] = this->node(8);
-          conn[2] = this->node(9);
-          conn[3] = this->node(3);
+return;
 
-          return;
+// Linear sub-tet 4
+case 4:
 
-          // Linear sub-tet 4
-          case 4:
+conn[0] = this->node(4)+1;
+conn[1] = this->node(8)+1;
+conn[2] = this->node(6)+1;
+conn[3] = this->node(6)+1;
+conn[4] = this->node(7)+1;
+conn[5] = this->node(7)+1;
+conn[6] = this->node(7)+1;
+conn[7] = this->node(7)+1;
 
-          conn[0] = this->node(4);
-          conn[1] = this->node(8);
-          conn[2] = this->node(6);
-          conn[3] = this->node(7);
+return;
 
-          return;
+// Linear sub-tet 5
+case 5:
 
-          // Linear sub-tet 5
-          case 5:
+conn[0] = this->node(4)+1;
+conn[1] = this->node(5)+1;
+conn[2] = this->node(6)+1;
+conn[3] = this->node(6)+1;
+conn[4] = this->node(8)+1;
+conn[5] = this->node(8)+1;
+conn[6] = this->node(8)+1;
+conn[7] = this->node(8)+1;
 
-          conn[0] = this->node(4);
-          conn[1] = this->node(5);
-          conn[2] = this->node(6);
-          conn[3] = this->node(8);
+return;
 
-          return;
+// Linear sub-tet 6
+case 6:
 
-          // Linear sub-tet 6
-          case 6:
+conn[0] = this->node(5)+1;
+conn[1] = this->node(9)+1;
+conn[2] = this->node(6)+1;
+conn[3] = this->node(6)+1;
+conn[4] = this->node(8)+1;
+conn[5] = this->node(8)+1;
+conn[6] = this->node(8)+1;
+conn[7] = this->node(8)+1;
 
-          conn[0] = this->node(5);
-          conn[1] = this->node(9);
-          conn[2] = this->node(6);
-          conn[3] = this->node(8);
+return;
 
-          return;
+// Linear sub-tet 7
+case 7:
 
-          // Linear sub-tet 7
-          case 7:
+conn[0] = this->node(7)+1;
+conn[1] = this->node(6)+1;
+conn[2] = this->node(9)+1;
+conn[3] = this->node(9)+1;
+conn[4] = this->node(8)+1;
+conn[5] = this->node(8)+1;
+conn[6] = this->node(8)+1;
+conn[7] = this->node(8)+1;
 
-          conn[0] = this->node(7);
-          conn[1] = this->node(6);
-          conn[2] = this->node(9);
-          conn[3] = this->node(8);
-
-          return;
+return;
 
 
-          default:
+default:
+libmesh_error_msg("Invalid sc = " << sc);
+}
+}
 
-          libmesh_error_msg("Invalid sc = " << sc);
-          }
-        */
-      }
+case VTK:
+{
+conn.resize(10);
+conn[0] = this->node(0);
+conn[1] = this->node(1);
+conn[2] = this->node(2);
+conn[3] = this->node(3);
+conn[4] = this->node(4);
+conn[5] = this->node(5);
+conn[6] = this->node(6);
+conn[7] = this->node(7);
+conn[8] = this->node(8);
+conn[9] = this->node(9);
+return;
+/*
+conn.resize(4);
+switch (sc)
+{
+// Linear sub-tet 0
+case 0:
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+conn[0] = this->node(0);
+conn[1] = this->node(4);
+conn[2] = this->node(6);
+conn[3] = this->node(7);
+
+return;
+
+// Linear sub-tet 1
+case 1:
+
+conn[0] = this->node(4);
+conn[1] = this->node(1);
+conn[2] = this->node(5);
+conn[3] = this->node(8);
+
+return;
+
+// Linear sub-tet 2
+case 2:
+
+conn[0] = this->node(5);
+conn[1] = this->node(2);
+conn[2] = this->node(6);
+conn[3] = this->node(9);
+
+return;
+
+// Linear sub-tet 3
+case 3:
+
+conn[0] = this->node(7);
+conn[1] = this->node(8);
+conn[2] = this->node(9);
+conn[3] = this->node(3);
+
+return;
+
+// Linear sub-tet 4
+case 4:
+
+conn[0] = this->node(4);
+conn[1] = this->node(8);
+conn[2] = this->node(6);
+conn[3] = this->node(7);
+
+return;
+
+// Linear sub-tet 5
+case 5:
+
+conn[0] = this->node(4);
+conn[1] = this->node(5);
+conn[2] = this->node(6);
+conn[3] = this->node(8);
+
+return;
+
+// Linear sub-tet 6
+case 6:
+
+conn[0] = this->node(5);
+conn[1] = this->node(9);
+conn[2] = this->node(6);
+conn[3] = this->node(8);
+
+return;
+
+// Linear sub-tet 7
+case 7:
+
+conn[0] = this->node(7);
+conn[1] = this->node(6);
+conn[2] = this->node(9);
+conn[3] = this->node(8);
+
+return;
+
+
+default:
+
+libmesh_error_msg("Invalid sc = " << sc);
+}
+*/
+}
+
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 
 
 const unsigned short int Tet10::_second_order_vertex_child_number[10] =
-  {
-    99,99,99,99, // Vertices
-    0,1,0,0,1,2  // Edges
-  };
+{
+99,99,99,99, // Vertices
+0,1,0,0,1,2  // Edges
+};
 
 
 
 const unsigned short int Tet10::_second_order_vertex_child_index[10] =
-  {
-    99,99,99,99, // Vertices
-    1,2,2,3,3,3  // Edges
-  };
+{
+99,99,99,99, // Vertices
+1,2,2,3,3,3  // Edges
+};
 
 
 
 std::pair<unsigned short int, unsigned short int>
 Tet10::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
-  return std::pair<unsigned short int, unsigned short int>
-    (_second_order_vertex_child_number[n],
-     _second_order_vertex_child_index[n]);
+libmesh_assert_greater_equal (n, this->n_vertices());
+libmesh_assert_less (n, this->n_nodes());
+return std::pair<unsigned short int, unsigned short int>
+(_second_order_vertex_child_number[n],
+_second_order_vertex_child_index[n]);
 }
 
 
 
 unsigned short int Tet10::second_order_adjacent_vertex (const unsigned int n,
-                                                        const unsigned int v) const
+const unsigned int v) const
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
-  libmesh_assert_less (v, 2);
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
+libmesh_assert_greater_equal (n, this->n_vertices());
+libmesh_assert_less (n, this->n_nodes());
+libmesh_assert_less (v, 2);
+return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 
 
 const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] =
-  {
-    {0, 1}, // vertices adjacent to node 4
-    {1, 2}, // vertices adjacent to node 5
-    {0, 2}, // vertices adjacent to node 6
-    {0, 3}, // vertices adjacent to node 7
-    {1, 3}, // vertices adjacent to node 8
-    {2, 3}  // vertices adjacent to node 9
-  };
+{
+{0, 1}, // vertices adjacent to node 4
+{1, 2}, // vertices adjacent to node 5
+{0, 2}, // vertices adjacent to node 6
+{0, 3}, // vertices adjacent to node 7
+{1, 3}, // vertices adjacent to node 8
+{2, 3}  // vertices adjacent to node 9
+};
 
 
 
@@ -491,291 +491,291 @@ const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] =
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Tet10::_embedding_matrix[8][10][10] =
-  {
-    // embedding matrix for child 0
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
-      { 0.375,-0.125,    0.,    0.,  0.75,    0.,    0.,    0.,    0.,    0.}, // 4
-      {    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 5
-      { 0.375,    0.,-0.125,    0.,    0.,    0.,  0.75,    0.,    0.,    0.}, // 6
-      { 0.375,    0.,    0.,-0.125,    0.,    0.,    0.,  0.75,    0.,    0.}, // 7
-      {    0.,-0.125,    0.,-0.125,   0.5,    0.,    0.,   0.5,  0.25,    0.}, // 8
-      {    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}  // 9
-    },
+{
+// embedding matrix for child 0
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
+{ 0.375,-0.125,    0.,    0.,  0.75,    0.,    0.,    0.,    0.,    0.}, // 4
+{    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 5
+{ 0.375,    0.,-0.125,    0.,    0.,    0.,  0.75,    0.,    0.,    0.}, // 6
+{ 0.375,    0.,    0.,-0.125,    0.,    0.,    0.,  0.75,    0.,    0.}, // 7
+{    0.,-0.125,    0.,-0.125,   0.5,    0.,    0.,   0.5,  0.25,    0.}, // 8
+{    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}  // 9
+},
 
-    // embedding matrix for child 1
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
-      {    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
-      {-0.125, 0.375,    0.,    0.,  0.75,    0.,    0.,    0.,    0.,    0.}, // 4
-      {    0., 0.375,-0.125,    0.,    0.,  0.75,    0.,    0.,    0.,    0.}, // 5
-      {-0.125,    0.,-0.125,    0.,   0.5,   0.5,  0.25,    0.,    0.,    0.}, // 6
-      {-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 7
-      {    0., 0.375,    0.,-0.125,    0.,    0.,    0.,    0.,  0.75,    0.}, // 8
-      {    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}  // 9
-    },
+// embedding matrix for child 1
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
+{    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
+{-0.125, 0.375,    0.,    0.,  0.75,    0.,    0.,    0.,    0.,    0.}, // 4
+{    0., 0.375,-0.125,    0.,    0.,  0.75,    0.,    0.,    0.,    0.}, // 5
+{-0.125,    0.,-0.125,    0.,   0.5,   0.5,  0.25,    0.,    0.,    0.}, // 6
+{-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 7
+{    0., 0.375,    0.,-0.125,    0.,    0.,    0.,    0.,  0.75,    0.}, // 8
+{    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}  // 9
+},
 
-    // embedding matrix for child 2
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
-      {    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 3
-      {-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 4
-      {    0.,-0.125, 0.375,    0.,    0.,  0.75,    0.,    0.,    0.,    0.}, // 5
-      {-0.125,    0., 0.375,    0.,    0.,    0.,  0.75,    0.,    0.,    0.}, // 6
-      {-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 7
-      {    0.,-0.125,    0.,-0.125,    0.,   0.5,    0.,    0.,  0.25,   0.5}, // 8
-      {    0.,    0., 0.375,-0.125,    0.,    0.,    0.,    0.,    0.,  0.75}  // 9
-    },
+// embedding matrix for child 2
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
+{    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.,    0.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 3
+{-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 4
+{    0.,-0.125, 0.375,    0.,    0.,  0.75,    0.,    0.,    0.,    0.}, // 5
+{-0.125,    0., 0.375,    0.,    0.,    0.,  0.75,    0.,    0.,    0.}, // 6
+{-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 7
+{    0.,-0.125,    0.,-0.125,    0.,   0.5,    0.,    0.,  0.25,   0.5}, // 8
+{    0.,    0., 0.375,-0.125,    0.,    0.,    0.,    0.,    0.,  0.75}  // 9
+},
 
-    // embedding matrix for child 3
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
-      {    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.}, // 3
-      {-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 4
-      {    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}, // 5
-      {-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}, // 6
-      {-0.125,    0.,    0., 0.375,    0.,    0.,    0.,  0.75,    0.,    0.}, // 7
-      {    0.,-0.125,    0., 0.375,    0.,    0.,    0.,    0.,  0.75,    0.}, // 8
-      {    0.,    0.,-0.125, 0.375,    0.,    0.,    0.,    0.,    0.,  0.75}  // 9
-    },
+// embedding matrix for child 3
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
+{    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.,    0.}, // 3
+{-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 4
+{    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}, // 5
+{-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}, // 6
+{-0.125,    0.,    0., 0.375,    0.,    0.,    0.,  0.75,    0.,    0.}, // 7
+{    0.,-0.125,    0., 0.375,    0.,    0.,    0.,    0.,  0.75,    0.}, // 8
+{    0.,    0.,-0.125, 0.375,    0.,    0.,    0.,    0.,    0.,  0.75}  // 9
+},
 
-    // embedding matrix for child 4
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
-      {-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 4
-      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 5
-      {    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 6
-      {    0.,-0.125,    0.,-0.125,   0.5,    0.,    0.,   0.5,  0.25,    0.}, // 7
-      {-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 8
-      {    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}  // 9
-    },
+// embedding matrix for child 4
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
+{-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 4
+{-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 5
+{    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 6
+{    0.,-0.125,    0.,-0.125,   0.5,    0.,    0.,   0.5,  0.25,    0.}, // 7
+{-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 8
+{    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}  // 9
+},
 
-    // embedding matrix for child 5
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
-      {-0.125,    0.,-0.125,    0.,   0.5,   0.5,  0.25,    0.,    0.,    0.}, // 4
-      {-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 5
-      {    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 6
-      {-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 7
-      {    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}, // 8
-      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}  // 9
-    },
+// embedding matrix for child 5
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
+{-0.125,    0.,-0.125,    0.,   0.5,   0.5,  0.25,    0.,    0.,    0.}, // 4
+{-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 5
+{    0.,-0.125,-0.125,    0.,   0.5,  0.25,   0.5,    0.,    0.,    0.}, // 6
+{-0.125,    0.,    0.,-0.125,   0.5,    0.,    0.,  0.25,   0.5,    0.}, // 7
+{    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}, // 8
+{-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}  // 9
+},
 
-    // embedding matrix for child 6
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
-      {-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 4
-      {    0.,-0.125,    0.,-0.125,    0.,   0.5,    0.,    0.,  0.25,   0.5}, // 5
-      {-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 6
-      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 7
-      {    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}, // 8
-      {    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}  // 9
-    },
+// embedding matrix for child 6
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 3
+{-0.125,-0.125,    0.,    0.,  0.25,   0.5,   0.5,    0.,    0.,    0.}, // 4
+{    0.,-0.125,    0.,-0.125,    0.,   0.5,    0.,    0.,  0.25,   0.5}, // 5
+{-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 6
+{-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 7
+{    0.,    0.,-0.125,-0.125,    0.,   0.5,    0.,    0.,   0.5,  0.25}, // 8
+{    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}  // 9
+},
 
-    // embedding matrix for child 7
-    {
-      //    0      1      2      3      4      5      6      7      8      9
-      {    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
-      {    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
-      {-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 4
-      {    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}, // 5
-      {-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 6
-      {    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}, // 7
-      {-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 8
-      {-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}  // 9
-    }
-  };
+// embedding matrix for child 7
+{
+//    0      1      2      3      4      5      6      7      8      9
+{    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.,    0.}, // 0
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.}, // 1
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.}, // 2
+{    0.,    0.,    0.,    0.,    0.,    0.,    0.,    1.,    0.,    0.}, // 3
+{-0.125,-0.125,-0.125,-0.125,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25}, // 4
+{    0.,-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5}, // 5
+{-0.125,    0.,    0.,-0.125,    0.,    0.,   0.5,  0.25,    0.,   0.5}, // 6
+{    0.,    0.,-0.125,-0.125,    0.,    0.,   0.5,   0.5,    0.,  0.25}, // 7
+{-0.125,-0.125,    0.,    0.,  0.25,    0.,    0.,   0.5,   0.5,    0.}, // 8
+{-0.125,    0.,-0.125,    0.,    0.,    0.,  0.25,   0.5,    0.,   0.5}  // 9
+}
+};
 
 
 
 Real Tet10::volume () const
 {
-  // Make copies of our points.  It makes the subsequent calculations a bit
-  // shorter and avoids dereferencing the same pointer multiple times.
-  Point
-    x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3), x4 = point(4),
-    x5 = point(5), x6 = point(6), x7 = point(7), x8 = point(8), x9 = point(9);
+// Make copies of our points.  It makes the subsequent calculations a bit
+// shorter and avoids dereferencing the same pointer multiple times.
+Point
+x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3), x4 = point(4),
+x5 = point(5), x6 = point(6), x7 = point(7), x8 = point(8), x9 = point(9);
 
-  // The constant components of the dx/dxi vector, linear in xi, eta, zeta.
-  // These were copied directly from the output of a Python script.
-  Point dx_dxi[4] =
-    {
-      -3*x0 - x1 + 4*x4,         // constant
-      4*x0 - 4*x4 - 4*x7 + 4*x8, // zeta
-      4*x0 - 4*x4 + 4*x5 - 4*x6, // eta
-      4*x0 + 4*x1 - 8*x4         // xi
-    };
+// The constant components of the dx/dxi vector, linear in xi, eta, zeta.
+// These were copied directly from the output of a Python script.
+Point dx_dxi[4] =
+{
+-3*x0 - x1 + 4*x4,         // constant
+4*x0 - 4*x4 - 4*x7 + 4*x8, // zeta
+4*x0 - 4*x4 + 4*x5 - 4*x6, // eta
+4*x0 + 4*x1 - 8*x4         // xi
+};
 
-  // The constant components of the dx/deta vector, linear in xi, eta, zeta.
-  // These were copied directly from the output of a Python script.
-  Point dx_deta[4] =
-    {
-      -3*x0 - x2 + 4*x6,         // constant
-      4*x0 - 4*x6 - 4*x7 + 4*x9, // zeta
-      4*x0 + 4*x2 - 8*x6,        // eta
-      4*x0 - 4*x4 + 4*x5 - 4*x6  // xi
-    };
+// The constant components of the dx/deta vector, linear in xi, eta, zeta.
+// These were copied directly from the output of a Python script.
+Point dx_deta[4] =
+{
+-3*x0 - x2 + 4*x6,         // constant
+4*x0 - 4*x6 - 4*x7 + 4*x9, // zeta
+4*x0 + 4*x2 - 8*x6,        // eta
+4*x0 - 4*x4 + 4*x5 - 4*x6  // xi
+};
 
-  // The constant components of the dx/dzeta vector, linear in xi, eta, zeta.
-  // These were copied directly from the output of a Python script.
-  Point dx_dzeta[4] =
-    {
-      -3*x0 - x3 + 4*x7,         // constant
-      4*x0 + 4*x3 - 8*x7,        // zeta
-      4*x0 - 4*x6 - 4*x7 + 4*x9, // eta
-      4*x0 - 4*x4 - 4*x7 + 4*x8  // xi
-    };
+// The constant components of the dx/dzeta vector, linear in xi, eta, zeta.
+// These were copied directly from the output of a Python script.
+Point dx_dzeta[4] =
+{
+-3*x0 - x3 + 4*x7,         // constant
+4*x0 + 4*x3 - 8*x7,        // zeta
+4*x0 - 4*x6 - 4*x7 + 4*x9, // eta
+4*x0 - 4*x4 - 4*x7 + 4*x8  // xi
+};
 
-  // 2x2x2 conical quadrature rule.  Note: there is also a five point
-  // rule for tets with a negative weight which would be cheaper, but
-  // we'll use this one to preclude any possible issues with
-  // cancellation error.
-  const int N = 8;
-  static const Real w[N] =
-    {
-      3.6979856358852914509238091810505e-02L,
-      1.6027040598476613723156741868689e-02L,
-      2.1157006454524061178256145400082e-02L,
-      9.1694299214797439226823542540576e-03L,
-      3.6979856358852914509238091810505e-02L,
-      1.6027040598476613723156741868689e-02L,
-      2.1157006454524061178256145400082e-02L,
-      9.1694299214797439226823542540576e-03L
-    };
+// 2x2x2 conical quadrature rule.  Note: there is also a five point
+// rule for tets with a negative weight which would be cheaper, but
+// we'll use this one to preclude any possible issues with
+// cancellation error.
+const int N = 8;
+static const Real w[N] =
+{
+3.6979856358852914509238091810505e-02L,
+1.6027040598476613723156741868689e-02L,
+2.1157006454524061178256145400082e-02L,
+9.1694299214797439226823542540576e-03L,
+3.6979856358852914509238091810505e-02L,
+1.6027040598476613723156741868689e-02L,
+2.1157006454524061178256145400082e-02L,
+9.1694299214797439226823542540576e-03L
+};
 
-  static const Real xi[N] =
-    {
-      1.2251482265544137786674043037115e-01L,
-      5.4415184401122528879992623629551e-01L,
-      1.2251482265544137786674043037115e-01L,
-      5.4415184401122528879992623629551e-01L,
-      1.2251482265544137786674043037115e-01L,
-      5.4415184401122528879992623629551e-01L,
-      1.2251482265544137786674043037115e-01L,
-      5.4415184401122528879992623629551e-01L
-    };
+static const Real xi[N] =
+{
+1.2251482265544137786674043037115e-01L,
+5.4415184401122528879992623629551e-01L,
+1.2251482265544137786674043037115e-01L,
+5.4415184401122528879992623629551e-01L,
+1.2251482265544137786674043037115e-01L,
+5.4415184401122528879992623629551e-01L,
+1.2251482265544137786674043037115e-01L,
+5.4415184401122528879992623629551e-01L
+};
 
-  static const Real eta[N] =
-    {
-      1.3605497680284601717109468420738e-01L,
-      7.0679724159396903069267439165167e-02L,
-      5.6593316507280088053551297149570e-01L,
-      2.9399880063162286589079157179842e-01L,
-      1.3605497680284601717109468420738e-01L,
-      7.0679724159396903069267439165167e-02L,
-      5.6593316507280088053551297149570e-01L,
-      2.9399880063162286589079157179842e-01L
-    };
+static const Real eta[N] =
+{
+1.3605497680284601717109468420738e-01L,
+7.0679724159396903069267439165167e-02L,
+5.6593316507280088053551297149570e-01L,
+2.9399880063162286589079157179842e-01L,
+1.3605497680284601717109468420738e-01L,
+7.0679724159396903069267439165167e-02L,
+5.6593316507280088053551297149570e-01L,
+2.9399880063162286589079157179842e-01L
+};
 
-  static const Real zeta[N] =
-    {
-      1.5668263733681830907933725249176e-01L,
-      8.1395667014670255076709592007207e-02L,
-      6.5838687060044409936029672711329e-02L,
-      3.4202793236766414300604458388142e-02L,
-      5.8474756320489429588282763292971e-01L,
-      3.0377276481470755305409673253211e-01L,
-      2.4571332521171333166171692542182e-01L,
-      1.2764656212038543100867773351792e-01L
-    };
+static const Real zeta[N] =
+{
+1.5668263733681830907933725249176e-01L,
+8.1395667014670255076709592007207e-02L,
+6.5838687060044409936029672711329e-02L,
+3.4202793236766414300604458388142e-02L,
+5.8474756320489429588282763292971e-01L,
+3.0377276481470755305409673253211e-01L,
+2.4571332521171333166171692542182e-01L,
+1.2764656212038543100867773351792e-01L
+};
 
-  Real vol = 0.;
-  for (int q=0; q<N; ++q)
-    {
-      // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
-      Point
-        dx_dxi_q   = dx_dxi[0]   + zeta[q]*dx_dxi[1]   + eta[q]*dx_dxi[2]   + xi[q]*dx_dxi[3],
-        dx_deta_q  = dx_deta[0]  + zeta[q]*dx_deta[1]  + eta[q]*dx_deta[2]  + xi[q]*dx_deta[3],
-        dx_dzeta_q = dx_dzeta[0] + zeta[q]*dx_dzeta[1] + eta[q]*dx_dzeta[2] + xi[q]*dx_dzeta[3];
+Real vol = 0.;
+for (int q=0; q<N; ++q)
+{
+// Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
+Point
+dx_dxi_q   = dx_dxi[0]   + zeta[q]*dx_dxi[1]   + eta[q]*dx_dxi[2]   + xi[q]*dx_dxi[3],
+dx_deta_q  = dx_deta[0]  + zeta[q]*dx_deta[1]  + eta[q]*dx_deta[2]  + xi[q]*dx_deta[3],
+dx_dzeta_q = dx_dzeta[0] + zeta[q]*dx_dzeta[1] + eta[q]*dx_dzeta[2] + xi[q]*dx_dzeta[3];
 
-      // Compute scalar triple product, multiply by weight, and accumulate volume.
-      vol += w[q] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
-    }
+// Compute scalar triple product, multiply by weight, and accumulate volume.
+vol += w[q] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
+}
 
-  return vol;
+return vol;
 }
 
 
 
 float Tet10::embedding_matrix (const unsigned int i,
-                               const unsigned int j,
-                               const unsigned int k) const
+const unsigned int j,
+const unsigned int k) const
 {
-  // Choose an optimal diagonal, if one has not already been selected
-  this->choose_diagonal();
+// Choose an optimal diagonal, if one has not already been selected
+this->choose_diagonal();
 
-  // Permuted j and k indices
-  unsigned int
-    jp=j,
-    kp=k;
+// Permuted j and k indices
+unsigned int
+jp=j,
+kp=k;
 
-  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
-    {
-      // Just the enum value cast to an unsigned int...
-      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection); // == 1 or 2
+if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
+{
+// Just the enum value cast to an unsigned int...
+const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection); // == 1 or 2
 
-      // Instead of doing a lot of arithmetic, use these
-      // straightforward arrays for the permutations.  Note that 3 ->
-      // 3, and the first array consists of "forward" permutations of
-      // the sets {0,1,2}, {4,5,6}, and {7,8,9} while the second array
-      // consists of "reverse" permutations of the same sets.
-      const unsigned int perms[2][10] =
-        {
-          {1, 2, 0, 3, 5, 6, 4, 8, 9, 7},
-          {2, 0, 1, 3, 6, 4, 5, 9, 7, 8}
-        };
+// Instead of doing a lot of arithmetic, use these
+// straightforward arrays for the permutations.  Note that 3 ->
+// 3, and the first array consists of "forward" permutations of
+// the sets {0,1,2}, {4,5,6}, and {7,8,9} while the second array
+// consists of "reverse" permutations of the same sets.
+const unsigned int perms[2][10] =
+{
+{1, 2, 0, 3, 5, 6, 4, 8, 9, 7},
+{2, 0, 1, 3, 6, 4, 5, 9, 7, 8}
+};
 
-      // Permute j
-      jp = perms[ds-1][j];
-      //      if (jp<3)
-      //        jp = (jp+ds)%3;
-      //      else if (jp>3)
-      //        jp = (jp-1+ds)%3 + 1 + 3*((jp-1)/3);
+// Permute j
+jp = perms[ds-1][j];
+//      if (jp<3)
+//        jp = (jp+ds)%3;
+//      else if (jp>3)
+//        jp = (jp-1+ds)%3 + 1 + 3*((jp-1)/3);
 
-      // Permute k
-      kp = perms[ds-1][k];
-      //      if (kp<3)
-      //        kp = (kp+ds)%3;
-      //      else if (kp>3)
-      //        kp = (kp-1+ds)%3 + 1 + 3*((kp-1)/3);
-    }
+// Permute k
+kp = perms[ds-1][k];
+//      if (kp<3)
+//        kp = (kp+ds)%3;
+//      else if (kp>3)
+//        kp = (kp-1+ds)%3 + 1 + 3*((kp-1)/3);
+}
 
-  // Debugging:
-  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
-  // libMesh::err << "j=" << j << std::endl;
-  // libMesh::err << "k=" << k << std::endl;
-  // libMesh::err << "jp=" << jp << std::endl;
-  // libMesh::err << "kp=" << kp << std::endl;
+// Debugging:
+// libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
+// libMesh::err << "j=" << j << std::endl;
+// libMesh::err << "k=" << k << std::endl;
+// libMesh::err << "jp=" << jp << std::endl;
+// libMesh::err << "kp=" << kp << std::endl;
 
-  // Call embedding matrx with permuted indices
-  return this->_embedding_matrix[i][jp][kp];
+// Call embedding matrx with permuted indices
+return this->_embedding_matrix[i][jp][kp];
 }
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

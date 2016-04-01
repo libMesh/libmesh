@@ -36,46 +36,46 @@ class System;
 
 
 /**
- * Subclasses of this abstract base class choose between h
- * refining and p elevation.
- * Currently we assume that a set of elements has already been flagged
- * for h refinement, and we may want to change some of those elements
- * to be flagged for p refinement.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* Subclasses of this abstract base class choose between h
+* refining and p elevation.
+* Currently we assume that a set of elements has already been flagged
+* for h refinement, and we may want to change some of those elements
+* to be flagged for p refinement.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class HPSelector
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  HPSelector() {}
+/**
+* Constructor.
+*/
+HPSelector() {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~HPSelector() {}
+/**
+* Destructor.
+*/
+virtual ~HPSelector() {}
 
 
-  /**
-   * This pure virtual function must be redefined
-   * in derived classes to take a mesh flagged for h
-   * refinement and potentially change the desired
-   * refinement type.
-   */
-  virtual void select_refinement (System & system) = 0;
+/**
+* This pure virtual function must be redefined
+* in derived classes to take a mesh flagged for h
+* refinement and potentially change the desired
+* refinement type.
+*/
+virtual void select_refinement (System & system) = 0;
 
-  /**
-   * This vector can be used to "scale" certain
-   * variables in a system.
-   * If the mask is not empty, the consideration given to each
-   * component's h and p error estimates will be scaled by
-   * component_scale[c].
-   */
-  std::vector<float> component_scale;
+/**
+* This vector can be used to "scale" certain
+* variables in a system.
+* If the mask is not empty, the consideration given to each
+* component's h and p error estimates will be scaled by
+* component_scale[c].
+*/
+std::vector<float> component_scale;
 };
 
 } // namespace libMesh

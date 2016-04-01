@@ -37,62 +37,62 @@ namespace libMesh
 class QBase;
 
 /**
- * This provides a shim class that wraps the Order enum.
- * The purpose of this is to store the order as an int
- * instead of an enum (to enable higher orders) while
- * retaining backwards compatibility.
- */
+* This provides a shim class that wraps the Order enum.
+* The purpose of this is to store the order as an int
+* instead of an enum (to enable higher orders) while
+* retaining backwards compatibility.
+*/
 class OrderWrapper
 {
 public:
 
-  /**
-   * Constructor. Enables implicit conversion from an Order
-   * enum to an OrderWrapper.
-   */
-  OrderWrapper(Order order)
-  :
-    _order(static_cast<int>(order))
-  {}
+/**
+* Constructor. Enables implicit conversion from an Order
+* enum to an OrderWrapper.
+*/
+OrderWrapper(Order order)
+:
+_order(static_cast<int>(order))
+{}
 
-  /**
-   * Constructor. Enables implicit conversion from an int
-   * to an OrderWrapper.
-   */
-  OrderWrapper(int order)
-  :
-    _order(order)
-  {}
+/**
+* Constructor. Enables implicit conversion from an int
+* to an OrderWrapper.
+*/
+OrderWrapper(int order)
+:
+_order(order)
+{}
 
-  /**
-   * Operator that enables implicit conversion to
-   * an Order enum.
-   */
-  operator Order() const
-  {
-    return static_cast<Order>(_order);
-  }
+/**
+* Operator that enables implicit conversion to
+* an Order enum.
+*/
+operator Order() const
+{
+return static_cast<Order>(_order);
+}
 
-  /**
-   * Explicity request the order as an int.
-   */
-  int get_order() const
-  {
-    return _order;
-  }
+/**
+* Explicity request the order as an int.
+*/
+int get_order() const
+{
+return _order;
+}
 
 private:
 
-  /**
-   * The approximation order of the element.
-   */
-  int _order;
+/**
+* The approximation order of the element.
+*/
+int _order;
 
 };
 
 /**
- * Overload comparison operators for OrderWrapper.
- */
+* Overload comparison operators for OrderWrapper.
+*/
 inline bool operator==(const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() == rhs.get_order(); }
 inline bool operator!=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
 inline bool operator< (const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() < rhs.get_order(); }
@@ -160,163 +160,163 @@ inline bool operator>=(Order lhs, const OrderWrapper& rhs){ return !(lhs < rhs);
 inline bool operator>=(const OrderWrapper& lhs, Order rhs){ return !(lhs < rhs); }
 
 /**
- * Overload stream operators.
- */
+* Overload stream operators.
+*/
 inline std::ostream & operator << (std::ostream & os, const OrderWrapper& order)
 {
-  os << order.get_order();
-  return os;
+os << order.get_order();
+return os;
 }
 
 /**
- * class FEType hides (possibly multiple) FEFamily and approximation
- * orders, thereby enabling specialized finite element families.
- */
+* class FEType hides (possibly multiple) FEFamily and approximation
+* orders, thereby enabling specialized finite element families.
+*/
 class FEType
 {
 public:
 
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  /**
-   * Constructor.  Optionally takes the approximation \p Order
-   * and the finite element family \p FEFamily
-   */
-  FEType(const int      o = 1,
-         const FEFamily f = LAGRANGE) :
-    order(o),
-    family(f)
-  {}
+/**
+* Constructor.  Optionally takes the approximation \p Order
+* and the finite element family \p FEFamily
+*/
+FEType(const int      o = 1,
+const FEFamily f = LAGRANGE) :
+order(o),
+family(f)
+{}
 
 
-  //TODO:[BSK] Could these data types all be const?
-  // [RHS] Order can't in the case of p refinement!
-  /**
-   * The approximation order of the element.
-   */
-  OrderWrapper order;
+//TODO:[BSK] Could these data types all be const?
+// [RHS] Order can't in the case of p refinement!
+/**
+* The approximation order of the element.
+*/
+OrderWrapper order;
 
-  /**
-   * The type of finite element.  Valid types are \p LAGRANGE,
-   * \p HIERARCHIC, etc...
-   */
-  FEFamily family;
+/**
+* The type of finite element.  Valid types are \p LAGRANGE,
+* \p HIERARCHIC, etc...
+*/
+FEFamily family;
 
 #else
 
-  /**
-   * Constructor.  Optionally takes the approximation \p Order
-   * and the finite element family \p FEFamily.  Note that for
-   * non-infinite elements the \p order and \p base order are the
-   * same, as with the \p family and \p base_family.  It must be
-   * so, otherwise what we switch on would change when infinite
-   * elements are not compiled in.
-   */
-  FEType(const int        o  = 1,
-         const FEFamily   f  = LAGRANGE,
-         const int        ro = THIRD,
-         const FEFamily   rf = JACOBI_20_00,
-         const InfMapType im = CARTESIAN) :
-    order(o),
-    radial_order(ro),
-    family(f),
-    radial_family(rf),
-    inf_map(im)
-  {}
+/**
+* Constructor.  Optionally takes the approximation \p Order
+* and the finite element family \p FEFamily.  Note that for
+* non-infinite elements the \p order and \p base order are the
+* same, as with the \p family and \p base_family.  It must be
+* so, otherwise what we switch on would change when infinite
+* elements are not compiled in.
+*/
+FEType(const int        o  = 1,
+const FEFamily   f  = LAGRANGE,
+const int        ro = THIRD,
+const FEFamily   rf = JACOBI_20_00,
+const InfMapType im = CARTESIAN) :
+order(o),
+radial_order(ro),
+family(f),
+radial_family(rf),
+inf_map(im)
+{}
 
-  /**
-   * The approximation order in radial direction of the infinite element.
-   */
-  OrderWrapper order;
+/**
+* The approximation order in radial direction of the infinite element.
+*/
+OrderWrapper order;
 
-  /**
-   * The approximation order in the base of the infinite element.
-   */
-  OrderWrapper radial_order;
+/**
+* The approximation order in the base of the infinite element.
+*/
+OrderWrapper radial_order;
 
-  /**
-   * The type of approximation in radial direction.  Valid types are
-   * \p JACOBI_20_00, \p JACOBI_30_00, etc...
-   */
-  FEFamily family;
+/**
+* The type of approximation in radial direction.  Valid types are
+* \p JACOBI_20_00, \p JACOBI_30_00, etc...
+*/
+FEFamily family;
 
-  /**
-   * For InfFE, \p family contains the radial shape family, while
-   * \p base_family contains the approximation type in circumferential
-   * direction.  Valid types are \p LAGRANGE, \p HIERARCHIC, etc...
-   */
-  FEFamily radial_family;
+/**
+* For InfFE, \p family contains the radial shape family, while
+* \p base_family contains the approximation type in circumferential
+* direction.  Valid types are \p LAGRANGE, \p HIERARCHIC, etc...
+*/
+FEFamily radial_family;
 
-  /**
-   * The coordinate mapping type of the infinite element.
-   * When the infinite elements are defined over a surface with
-   * a separable coordinate system (sphere, spheroid, ellipsoid),
-   * the infinite elements may take advantage of this fact.
-   */
-  InfMapType inf_map;
+/**
+* The coordinate mapping type of the infinite element.
+* When the infinite elements are defined over a surface with
+* a separable coordinate system (sphere, spheroid, ellipsoid),
+* the infinite elements may take advantage of this fact.
+*/
+InfMapType inf_map;
 
 #endif // ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  /**
-   * Tests equality
-   */
-  bool operator== (const FEType & f2) const
-  {
-    return (order == f2.order
-            && family == f2.family
+/**
+* Tests equality
+*/
+bool operator== (const FEType & f2) const
+{
+return (order == f2.order
+&& family == f2.family
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-            && radial_order == f2.radial_order
-            && radial_family == f2.radial_family
-            && inf_map == f2.inf_map
+&& radial_order == f2.radial_order
+&& radial_family == f2.radial_family
+&& inf_map == f2.inf_map
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-            );
-  }
+);
+}
 
-  /**
-   * Tests inequality
-   */
-  bool operator!= (const FEType & f2) const
-  {
-    return !(*this == f2);
-  }
+/**
+* Tests inequality
+*/
+bool operator!= (const FEType & f2) const
+{
+return !(*this == f2);
+}
 
-  /**
-   * An ordering to make FEType useful as a std::map key
-   */
-  bool operator< (const FEType & f2) const
-  {
-    if (order != f2.order)
-      return (order < f2.order);
-    if (family != f2.family)
-      return (family < f2.family);
+/**
+* An ordering to make FEType useful as a std::map key
+*/
+bool operator< (const FEType & f2) const
+{
+if (order != f2.order)
+return (order < f2.order);
+if (family != f2.family)
+return (family < f2.family);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-    if (radial_order != f2.radial_order)
-      return (radial_order < f2.radial_order);
-    if (radial_family != f2.radial_family)
-      return (radial_family < f2.radial_family);
-    if (inf_map != f2.inf_map)
-      return (inf_map < f2.inf_map);
+if (radial_order != f2.radial_order)
+return (radial_order < f2.radial_order);
+if (radial_family != f2.radial_family)
+return (radial_family < f2.radial_family);
+if (inf_map != f2.inf_map)
+return (inf_map < f2.inf_map);
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-    return false;
-  }
+return false;
+}
 
-  /**
-   * @returns the default quadrature order for this \p FEType.  The
-   * default quadrature order is calculated assuming a polynomial of
-   * degree \p order and is based on integrating the mass matrix for
-   * such an element exactly.
-   */
-  Order default_quadrature_order () const;
+/**
+* @returns the default quadrature order for this \p FEType.  The
+* default quadrature order is calculated assuming a polynomial of
+* degree \p order and is based on integrating the mass matrix for
+* such an element exactly.
+*/
+Order default_quadrature_order () const;
 
-  /**
-   * @returns a quadrature rule of appropriate type and order for this \p
-   * FEType.  The default quadrature rule is based on integrating the mass
-   * matrix for such an element exactly.  Higher or lower degree rules can
-   * be chosen by changing the extraorder parameter.
-   */
-  UniquePtr<QBase> default_quadrature_rule (const unsigned int dim,
-                                            const int extraorder=0) const;
+/**
+* @returns a quadrature rule of appropriate type and order for this \p
+* FEType.  The default quadrature rule is based on integrating the mass
+* matrix for such an element exactly.  Higher or lower degree rules can
+* be chosen by changing the extraorder parameter.
+*/
+UniquePtr<QBase> default_quadrature_rule (const unsigned int dim,
+const int extraorder=0) const;
 
 
 private:
@@ -330,7 +330,7 @@ private:
 inline
 Order FEType::default_quadrature_order () const
 {
-  return static_cast<Order>(2*static_cast<unsigned int>(order.get_order()) + 1);
+return static_cast<Order>(2*static_cast<unsigned int>(order.get_order()) + 1);
 }
 
 } // namespace libMesh

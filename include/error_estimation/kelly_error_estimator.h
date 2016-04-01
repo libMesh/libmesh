@@ -39,84 +39,84 @@ class Point;
 
 
 /**
- * This class implements the Kelly error indicator
- * which is based on the flux jumps between elements.
- * See the JumpErrorEstimator class for most user APIs
- *
- * Full BibteX reference:
- *
- * \verbatim
- * @Article{Kelly83error,
- * author = {D.~W.~Kelly and J.~P.~Gago and O.~C.~Zienkiewicz and I.~Babuska},
- * title  = {{A posteriori error analysis and adaptive
- *            processes in the finite element method: Part I Error analysis}},
- * journal = {Int. J. Num. Meth. Engng.},
- * volume  = {19},
- * pages   = {1593--1619},
- * year    = {1983}
- * }
- * \endverbatim
- *
- * \author Benjamin S. Kirk
- * \date 2003
- */
+* This class implements the Kelly error indicator
+* which is based on the flux jumps between elements.
+* See the JumpErrorEstimator class for most user APIs
+*
+* Full BibteX reference:
+*
+* \verbatim
+* @Article{Kelly83error,
+* author = {D.~W.~Kelly and J.~P.~Gago and O.~C.~Zienkiewicz and I.~Babuska},
+* title  = {{A posteriori error analysis and adaptive
+*            processes in the finite element method: Part I Error analysis}},
+* journal = {Int. J. Num. Meth. Engng.},
+* volume  = {19},
+* pages   = {1593--1619},
+* year    = {1983}
+* }
+* \endverbatim
+*
+* \author Benjamin S. Kirk
+* \date 2003
+*/
 class KellyErrorEstimator : public JumpErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to libmesh_nullptr.  Defaults to H1 seminorm; changes to system norm
-   * are ignored.
-   */
-  KellyErrorEstimator() :
-    JumpErrorEstimator(),
-    _bc_function(libmesh_nullptr)
-  { error_norm = H1_SEMINORM; }
+/**
+* Constructor.  Responsible for initializing the _bc_function function
+* pointer to libmesh_nullptr.  Defaults to H1 seminorm; changes to system norm
+* are ignored.
+*/
+KellyErrorEstimator() :
+JumpErrorEstimator(),
+_bc_function(libmesh_nullptr)
+{ error_norm = H1_SEMINORM; }
 
-  /**
-   * Destructor.
-   */
-  ~KellyErrorEstimator() {}
+/**
+* Destructor.
+*/
+~KellyErrorEstimator() {}
 
-  /**
-   * Register a user function to use in computing the flux BCs.
-   * The return value is std::pair<bool, Real>
-   */
-  void attach_flux_bc_function (std::pair<bool,Real> fptr(const System & system,
-                                                          const Point & p,
-                                                          const std::string & var_name));
+/**
+* Register a user function to use in computing the flux BCs.
+* The return value is std::pair<bool, Real>
+*/
+void attach_flux_bc_function (std::pair<bool,Real> fptr(const System & system,
+const Point & p,
+const std::string & var_name));
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return KELLY;}
+virtual ErrorEstimatorType type() const libmesh_override
+{ return KELLY;}
 
 protected:
 
-  /**
-   * An initialization function, for requesting specific data from the FE
-   * objects
-   */
-  virtual void init_context(FEMContext & c) libmesh_override;
+/**
+* An initialization function, for requesting specific data from the FE
+* objects
+*/
+virtual void init_context(FEMContext & c) libmesh_override;
 
-  /**
-   * The function which calculates a normal derivative jump based error
-   * term on an internal side
-   */
-  virtual void internal_side_integration() libmesh_override;
+/**
+* The function which calculates a normal derivative jump based error
+* term on an internal side
+*/
+virtual void internal_side_integration() libmesh_override;
 
-  /**
-   * The function which calculates a normal derivative jump based error
-   * term on a boundary side.
-   * Returns true if the flux bc function is in fact defined on the current side.
-   */
-  virtual bool boundary_side_integration() libmesh_override;
+/**
+* The function which calculates a normal derivative jump based error
+* term on a boundary side.
+* Returns true if the flux bc function is in fact defined on the current side.
+*/
+virtual bool boundary_side_integration() libmesh_override;
 
-  /**
-   * Pointer to function that returns BC information.
-   */
-  std::pair<bool,Real> (* _bc_function) (const System & system,
-                                         const Point & p,
-                                         const std::string & var_name);
+/**
+* Pointer to function that returns BC information.
+*/
+std::pair<bool,Real> (* _bc_function) (const System & system,
+const Point & p,
+const std::string & var_name);
 };
 
 

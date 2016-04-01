@@ -41,70 +41,70 @@ class Node;
 // Fix for STL laziness
 struct myhash {
 public:
-  template <typename T1, typename T2>
-  std::size_t operator()(const std::pair<T1, T2> & x) const
-  {
-    // recommendation from
-    // http://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes
-    return 3 * LIBMESH_BEST_HASH<T1>()(x.first) + LIBMESH_BEST_HASH<T2>()(x.second);
-  }
+template <typename T1, typename T2>
+std::size_t operator()(const std::pair<T1, T2> & x) const
+{
+// recommendation from
+// http://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes
+return 3 * LIBMESH_BEST_HASH<T1>()(x.first) + LIBMESH_BEST_HASH<T2>()(x.second);
+}
 };
 
 /**
- * Data structures that enable topology-based lookups of nodes created
- * by mesh refinement.
- *
- * The key is a pair of node ids for two nodes bracketing the new
- * node, sorted lowest id first.
- *
- * A node created in the middle of a cell's quad face will be the
- * value of two keys, one for each node pair bracketing it.
- *
- * For efficiency we will use a hashed map if it is available,
- * otherwise a regular map.
- */
+* Data structures that enable topology-based lookups of nodes created
+* by mesh refinement.
+*
+* The key is a pair of node ids for two nodes bracketing the new
+* node, sorted lowest id first.
+*
+* A node created in the middle of a cell's quad face will be the
+* value of two keys, one for each node pair bracketing it.
+*
+* For efficiency we will use a hashed map if it is available,
+* otherwise a regular map.
+*/
 class TopologyMap
 {
-  // We need to supply our own hash function if we're hashing
+// We need to supply our own hash function if we're hashing
 #if defined(LIBMESH_HAVE_STD_UNORDERED_MAP) ||  \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) ||    \
-  defined(LIBMESH_HAVE_EXT_HASH_MAP) ||         \
-  defined(LIBMESH_HAVE_HASH_MAP)
+defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) ||    \
+defined(LIBMESH_HAVE_EXT_HASH_MAP) ||         \
+defined(LIBMESH_HAVE_HASH_MAP)
 #  define MYHASH ,myhash
 #else
 #  define MYHASH
 #endif
 
-  typedef LIBMESH_BEST_UNORDERED_MAP<std::pair<dof_id_type, dof_id_type>,
-                                     dof_id_type MYHASH> map_type;
+typedef LIBMESH_BEST_UNORDERED_MAP<std::pair<dof_id_type, dof_id_type>,
+dof_id_type MYHASH> map_type;
 public:
-  void init(MeshBase &);
+void init(MeshBase &);
 
-  void clear() { _map.clear(); }
+void clear() { _map.clear(); }
 
-  /**
-   * Add a node to the map, between each pair of specified bracketing
-   * nodes.
-   */
-  void add_node(const Node & mid_node,
-                const std::vector<
-                std::pair<dof_id_type, dof_id_type> > &
-                bracketing_nodes);
+/**
+* Add a node to the map, between each pair of specified bracketing
+* nodes.
+*/
+void add_node(const Node & mid_node,
+const std::vector<
+std::pair<dof_id_type, dof_id_type> > &
+bracketing_nodes);
 
-  bool empty() const { return _map.empty(); }
+bool empty() const { return _map.empty(); }
 
-  dof_id_type find(dof_id_type bracket_node1,
-                   dof_id_type bracket_node2) const;
+dof_id_type find(dof_id_type bracket_node1,
+dof_id_type bracket_node2) const;
 
-  dof_id_type find(const std::vector<
-                   std::pair<dof_id_type, dof_id_type> > &
-                   bracketing_nodes) const;
+dof_id_type find(const std::vector<
+std::pair<dof_id_type, dof_id_type> > &
+bracketing_nodes) const;
 
 protected:
-  void fill(const MeshBase &);
+void fill(const MeshBase &);
 
 private:
-  map_type          _map;
+map_type          _map;
 };
 
 } // namespace libMesh

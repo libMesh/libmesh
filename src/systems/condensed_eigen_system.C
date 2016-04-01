@@ -32,194 +32,194 @@ namespace libMesh
 {
 
 CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
-                                            const std::string & name_in,
-                                            const unsigned int number_in)
-  : Parent(es, name_in, number_in),
-    condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
-    condensed_matrix_B(SparseMatrix<Number>::build(es.comm())),
-    condensed_dofs_initialized(false)
+const std::string & name_in,
+const unsigned int number_in)
+: Parent(es, name_in, number_in),
+condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
+condensed_matrix_B(SparseMatrix<Number>::build(es.comm())),
+condensed_dofs_initialized(false)
 {
 }
 
 void
 CondensedEigenSystem::initialize_condensed_dofs
-  (const std::set<dof_id_type> & global_dirichlet_dofs_set)
+(const std::set<dof_id_type> & global_dirichlet_dofs_set)
 {
-  const DofMap & dof_map = this->get_dof_map();
+const DofMap & dof_map = this->get_dof_map();
 
-  // First, put all unconstrained local dofs into non_dirichlet_dofs_set
-  std::set<dof_id_type> local_non_condensed_dofs_set;
-  for(dof_id_type i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
-    if (!dof_map.is_constrained_dof(i))
-      local_non_condensed_dofs_set.insert(i);
+// First, put all unconstrained local dofs into non_dirichlet_dofs_set
+std::set<dof_id_type> local_non_condensed_dofs_set;
+for(dof_id_type i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
+if (!dof_map.is_constrained_dof(i))
+local_non_condensed_dofs_set.insert(i);
 
-  // Now erase the condensed dofs
-  std::set<dof_id_type>::iterator iter     = global_dirichlet_dofs_set.begin();
-  std::set<dof_id_type>::iterator iter_end = global_dirichlet_dofs_set.end();
+// Now erase the condensed dofs
+std::set<dof_id_type>::iterator iter     = global_dirichlet_dofs_set.begin();
+std::set<dof_id_type>::iterator iter_end = global_dirichlet_dofs_set.end();
 
-  for ( ; iter != iter_end ; ++iter)
-    {
-      dof_id_type condensed_dof_index = *iter;
-      if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
-           (condensed_dof_index < this->get_dof_map().end_dof()) )
-        {
-          local_non_condensed_dofs_set.erase(condensed_dof_index);
-        }
-    }
+for ( ; iter != iter_end ; ++iter)
+{
+dof_id_type condensed_dof_index = *iter;
+if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
+(condensed_dof_index < this->get_dof_map().end_dof()) )
+{
+local_non_condensed_dofs_set.erase(condensed_dof_index);
+}
+}
 
-  // Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
-  iter     = local_non_condensed_dofs_set.begin();
-  iter_end = local_non_condensed_dofs_set.end();
+// Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
+iter     = local_non_condensed_dofs_set.begin();
+iter_end = local_non_condensed_dofs_set.end();
 
-  this->local_non_condensed_dofs_vector.clear();
+this->local_non_condensed_dofs_vector.clear();
 
-  for ( ; iter != iter_end; ++iter)
-    {
-      dof_id_type non_condensed_dof_index = *iter;
+for ( ; iter != iter_end; ++iter)
+{
+dof_id_type non_condensed_dof_index = *iter;
 
-      this->local_non_condensed_dofs_vector.push_back(non_condensed_dof_index);
-    }
+this->local_non_condensed_dofs_vector.push_back(non_condensed_dof_index);
+}
 
-  condensed_dofs_initialized = true;
+condensed_dofs_initialized = true;
 }
 
 dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
 {
-  if(!condensed_dofs_initialized)
-    {
-      return this->n_dofs();
-    }
-  else
-    {
-      dof_id_type n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
-      this->comm().sum(n_global_non_condensed_dofs);
+if(!condensed_dofs_initialized)
+{
+return this->n_dofs();
+}
+else
+{
+dof_id_type n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
+this->comm().sum(n_global_non_condensed_dofs);
 
-      return n_global_non_condensed_dofs;
-    }
+return n_global_non_condensed_dofs;
+}
 }
 
 
 void CondensedEigenSystem::solve()
 {
-  START_LOG("solve()", "CondensedEigenSystem");
+START_LOG("solve()", "CondensedEigenSystem");
 
-  // If we haven't initialized any condensed dofs,
-  // just use the default eigen_system
-  if(!condensed_dofs_initialized)
-    {
-      STOP_LOG("solve()", "CondensedEigenSystem");
-      Parent::solve();
-      return;
-    }
+// If we haven't initialized any condensed dofs,
+// just use the default eigen_system
+if(!condensed_dofs_initialized)
+{
+STOP_LOG("solve()", "CondensedEigenSystem");
+Parent::solve();
+return;
+}
 
-  // A reference to the EquationSystems
-  EquationSystems & es = this->get_equation_systems();
+// A reference to the EquationSystems
+EquationSystems & es = this->get_equation_systems();
 
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+// check that necessary parameters have been set
+libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
+libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
-  if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assemble ();
+if (this->assemble_before_solve)
+// Assemble the linear system
+this->assemble ();
 
-  // If we reach here, then there should be some non-condensed dofs
-  libmesh_assert(!local_non_condensed_dofs_vector.empty());
+// If we reach here, then there should be some non-condensed dofs
+libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
-  // Now condense the matrices
-  matrix_A->create_submatrix(*condensed_matrix_A,
-                             local_non_condensed_dofs_vector,
-                             local_non_condensed_dofs_vector);
+// Now condense the matrices
+matrix_A->create_submatrix(*condensed_matrix_A,
+local_non_condensed_dofs_vector,
+local_non_condensed_dofs_vector);
 
-  if(generalized())
-    {
-      matrix_B->create_submatrix(*condensed_matrix_B,
-                                 local_non_condensed_dofs_vector,
-                                 local_non_condensed_dofs_vector);
-    }
+if(generalized())
+{
+matrix_B->create_submatrix(*condensed_matrix_B,
+local_non_condensed_dofs_vector,
+local_non_condensed_dofs_vector);
+}
 
 
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+// Get the tolerance for the solver and the maximum
+// number of iterations. Here, we simply adopt the linear solver
+// specific parameters.
+const Real tol            =
+es.parameters.get<Real>("linear solver tolerance");
 
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+const unsigned int maxits =
+es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
+const unsigned int nev    =
+es.parameters.get<unsigned int>("eigenpairs");
 
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
+const unsigned int ncv    =
+es.parameters.get<unsigned int>("basis vectors");
 
-  std::pair<unsigned int, unsigned int> solve_data;
+std::pair<unsigned int, unsigned int> solve_data;
 
-  // call the solver depending on the type of eigenproblem
-  if ( generalized() )
-    {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized
-        (*condensed_matrix_A,*condensed_matrix_B, nev, ncv, tol, maxits);
-    }
+// call the solver depending on the type of eigenproblem
+if ( generalized() )
+{
+//in case of a generalized eigenproblem
+solve_data = eigen_solver->solve_generalized
+(*condensed_matrix_A,*condensed_matrix_B, nev, ncv, tol, maxits);
+}
 
-  else
-    {
-      libmesh_assert (!matrix_B);
+else
+{
+libmesh_assert (!matrix_B);
 
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*condensed_matrix_A, nev, ncv, tol, maxits);
-    }
+//in case of a standard eigenproblem
+solve_data = eigen_solver->solve_standard (*condensed_matrix_A, nev, ncv, tol, maxits);
+}
 
-  set_n_converged(solve_data.first);
-  set_n_iterations(solve_data.second);
+set_n_converged(solve_data.first);
+set_n_iterations(solve_data.second);
 
-  STOP_LOG("solve()", "CondensedEigenSystem");
+STOP_LOG("solve()", "CondensedEigenSystem");
 }
 
 
 
 std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 {
-  START_LOG("get_eigenpair()", "CondensedEigenSystem");
+START_LOG("get_eigenpair()", "CondensedEigenSystem");
 
-  // If we haven't initialized any condensed dofs,
-  // just use the default eigen_system
-  if(!condensed_dofs_initialized)
-    {
-      STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
-      return Parent::get_eigenpair(i);
-    }
+// If we haven't initialized any condensed dofs,
+// just use the default eigen_system
+if(!condensed_dofs_initialized)
+{
+STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
+return Parent::get_eigenpair(i);
+}
 
-  // If we reach here, then there should be some non-condensed dofs
-  libmesh_assert(!local_non_condensed_dofs_vector.empty());
+// If we reach here, then there should be some non-condensed dofs
+libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
-  // This function assumes that condensed_solve has just been called.
-  // If this is not the case, then we will trip an asset in get_eigenpair
-  UniquePtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
-  dof_id_type n_local = local_non_condensed_dofs_vector.size();
-  dof_id_type n       = n_local;
-  this->comm().sum(n);
+// This function assumes that condensed_solve has just been called.
+// If this is not the case, then we will trip an asset in get_eigenpair
+UniquePtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
+dof_id_type n_local = local_non_condensed_dofs_vector.size();
+dof_id_type n       = n_local;
+this->comm().sum(n);
 
-  temp->init (n, n_local, false, PARALLEL);
+temp->init (n, n_local, false, PARALLEL);
 
-  std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
+std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
 
-  // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
-  this->solution->zero();
-  for (dof_id_type j=0; j<local_non_condensed_dofs_vector.size(); j++)
-    {
-      dof_id_type index = local_non_condensed_dofs_vector[j];
-      solution->set(index,(*temp)(temp->first_local_index()+j));
-    }
+// Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
+this->solution->zero();
+for (dof_id_type j=0; j<local_non_condensed_dofs_vector.size(); j++)
+{
+dof_id_type index = local_non_condensed_dofs_vector[j];
+solution->set(index,(*temp)(temp->first_local_index()+j));
+}
 
-  solution->close();
-  this->update();
+solution->close();
+this->update();
 
-  STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
+STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
 
-  return eval;
+return eval;
 }
 
 

@@ -32,172 +32,172 @@ namespace libMesh
 {
 
 /**
- * This class will eventually define a rank-N tensor in \p LIBMESH_DIM
- * dimensional space of type T.
- * Right now it defines a shim to allow for rank-independent code to
- * compile (but not give correct results) in the case of vector-valued
- * elements and second derivatives.
- *
- * \author Roy Stogner
- * \date 2012
- */
+* This class will eventually define a rank-N tensor in \p LIBMESH_DIM
+* dimensional space of type T.
+* Right now it defines a shim to allow for rank-independent code to
+* compile (but not give correct results) in the case of vector-valued
+* elements and second derivatives.
+*
+* \author Roy Stogner
+* \date 2012
+*/
 template <unsigned int N, typename T>
 class TypeNTensor
 {
 public:
-  TypeNTensor () {}
+TypeNTensor () {}
 
-  TypeNTensor (const T &) {}
+TypeNTensor (const T &) {}
 
-  TypeNTensor (const TypeVector<T> &) {}
+TypeNTensor (const TypeVector<T> &) {}
 
-  TypeNTensor (const TypeTensor<T> &) {}
+TypeNTensor (const TypeTensor<T> &) {}
 
-  operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
-  operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
+operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
+operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
 
-  operator TypeTensor<T> () const { libmesh_not_implemented(); return 0; }
-  operator TensorValue<T> () const { libmesh_not_implemented(); return 0; }
+operator TypeTensor<T> () const { libmesh_not_implemented(); return 0; }
+operator TensorValue<T> () const { libmesh_not_implemented(); return 0; }
 
-  /**
-   * Destructor.
-   */
-  ~TypeNTensor() {}
+/**
+* Destructor.
+*/
+~TypeNTensor() {}
 
-  /**
-   * Return a proxy for the \f$ i^{th} \f$ slice of the tensor.
-   */
-  const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
-  { return TypeNTensor<N-1,T>(); }
+/**
+* Return a proxy for the \f$ i^{th} \f$ slice of the tensor.
+*/
+const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
+{ return TypeNTensor<N-1,T>(); }
 
-  /**
-   * Return a writeable proxy for the \f$ i^{th} \f$ slice of the tensor.
-   */
-  TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
-  { return TypeNTensor<N-1,T>(); }
+/**
+* Return a writeable proxy for the \f$ i^{th} \f$ slice of the tensor.
+*/
+TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
+{ return TypeNTensor<N-1,T>(); }
 
-  /**
-   * Add two tensors.
-   */
-  template<typename T2>
-  TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
-  operator + (const TypeNTensor<N,T2> &) const
-  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+/**
+* Add two tensors.
+*/
+template<typename T2>
+TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
+operator + (const TypeNTensor<N,T2> &) const
+{ return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
 
-  /**
-   * Add to this tensor.
-   */
-  template<typename T2>
-  const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
-  { return *this; }
+/**
+* Add to this tensor.
+*/
+template<typename T2>
+const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
+{ return *this; }
 
-  /**
-   * Subtract two tensors.
-   */
-  template<typename T2>
-  TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
-  operator - (const TypeNTensor<N,T2> &) const
-  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+/**
+* Subtract two tensors.
+*/
+template<typename T2>
+TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
+operator - (const TypeNTensor<N,T2> &) const
+{ return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
 
-  /**
-   * Subtract from this tensor.
-   */
-  template<typename T2>
-  const TypeNTensor<N,T> & operator -= (const TypeNTensor<N,T2> &)
-  { return *this; }
+/**
+* Subtract from this tensor.
+*/
+template<typename T2>
+const TypeNTensor<N,T> & operator -= (const TypeNTensor<N,T2> &)
+{ return *this; }
 
-  /**
-   * Return the opposite of a tensor
-   */
-  TypeNTensor<N,T> operator - () const
-  { return *this; }
+/**
+* Return the opposite of a tensor
+*/
+TypeNTensor<N,T> operator - () const
+{ return *this; }
 
-  /**
-   * Multiply a tensor by a number, i.e. scale.
-   */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
-  operator * (const Scalar) const
-  { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
+/**
+* Multiply a tensor by a number, i.e. scale.
+*/
+template <typename Scalar>
+typename boostcopy::enable_if_c<
+ScalarTraits<Scalar>::value,
+TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
+operator * (const Scalar) const
+{ return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
 
-  /**
-   * Multiply this tensor by a number, i.e. scale.
-   */
-  template <typename Scalar>
-  const TypeNTensor<N,T> & operator *= (const Scalar) { return *this; }
+/**
+* Multiply this tensor by a number, i.e. scale.
+*/
+template <typename Scalar>
+const TypeNTensor<N,T> & operator *= (const Scalar) { return *this; }
 
-  /**
-   * Divide a tensor by a number, i.e. scale.
-   */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
-  operator / (const Scalar) const { return *this; }
+/**
+* Divide a tensor by a number, i.e. scale.
+*/
+template <typename Scalar>
+typename boostcopy::enable_if_c<
+ScalarTraits<Scalar>::value,
+TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
+operator / (const Scalar) const { return *this; }
 
-  /**
-   * Divide this tensor by a number, i.e. scale.
-   */
-  const TypeNTensor<N,T> & operator /= (const T) { return *this; }
+/**
+* Divide this tensor by a number, i.e. scale.
+*/
+const TypeNTensor<N,T> & operator /= (const T) { return *this; }
 
-  /**
-   * Multiply 2 tensors together, i.e. dyadic product
-   * sum_ij Aij*Bij.
-   * The tensors may be of different types.
-   */
-  template <typename T2>
-  typename CompareTypes<T,T2>::supertype
-  contract (const TypeNTensor<N,T2> &) const { return 0; }
+/**
+* Multiply 2 tensors together, i.e. dyadic product
+* sum_ij Aij*Bij.
+* The tensors may be of different types.
+*/
+template <typename T2>
+typename CompareTypes<T,T2>::supertype
+contract (const TypeNTensor<N,T2> &) const { return 0; }
 
-  /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
-   * element magnitudes squared.
-   */
-  Real size_sq() const { libmesh_deprecated(); return 0.;}
+/**
+* Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+* element magnitudes squared.
+*/
+Real size_sq() const { libmesh_deprecated(); return 0.;}
 
-  /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
-   * element magnitudes squared.
-   */
-  Real norm_sq() const { return 0.;}
+/**
+* Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+* element magnitudes squared.
+*/
+Real norm_sq() const { return 0.;}
 
-  /**
-   * @returns \p true if two tensors are equal valued.
-   */
-  bool operator == (const TypeNTensor<N,T> & /*rhs*/) const
-  { return true; }
+/**
+* @returns \p true if two tensors are equal valued.
+*/
+bool operator == (const TypeNTensor<N,T> & /*rhs*/) const
+{ return true; }
 
-  /**
-   * @returns \p true if this tensor is "less"
-   * than another.  Useful for sorting.
-   */
-  bool operator < (const TypeNTensor<N,T> & /*rhs*/) const
-  { return false; }
+/**
+* @returns \p true if this tensor is "less"
+* than another.  Useful for sorting.
+*/
+bool operator < (const TypeNTensor<N,T> & /*rhs*/) const
+{ return false; }
 
-  /**
-   * @returns \p true if this tensor is "greater"
-   * than another.
-   */
-  bool operator > (const TypeNTensor<N,T> & /*rhs*/) const
-  { return false; }
+/**
+* @returns \p true if this tensor is "greater"
+* than another.
+*/
+bool operator > (const TypeNTensor<N,T> & /*rhs*/) const
+{ return false; }
 
-  /**
-   * Formatted print, by default to \p libMesh::out.
-   */
-  void print(std::ostream & /*os = libMesh::out*/) const {}
+/**
+* Formatted print, by default to \p libMesh::out.
+*/
+void print(std::ostream & /*os = libMesh::out*/) const {}
 
-  /**
-   * Formatted print as above but allows you to do
-   * std::cout << t << std::endl;
-   */
-  friend std::ostream & operator << (std::ostream & os,
-                                     const TypeNTensor<N,T> & t)
-  {
-    t.print(os);
-    return os;
-  }
+/**
+* Formatted print as above but allows you to do
+* std::cout << t << std::endl;
+*/
+friend std::ostream & operator << (std::ostream & os,
+const TypeNTensor<N,T> & t)
+{
+t.print(os);
+return os;
+}
 };
 
 

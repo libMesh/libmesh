@@ -39,17 +39,17 @@ namespace libMesh
 // ------------------------------------------------------------
 // EigenSystem implementation
 EigenSystem::EigenSystem (EquationSystems & es,
-                          const std::string & name_in,
-                          const unsigned int number_in
-                          ) :
-  Parent           (es, name_in, number_in),
-  matrix_A         (libmesh_nullptr),
-  matrix_B         (libmesh_nullptr),
-  eigen_solver     (EigenSolver<Number>::build(es.comm())),
-  _n_converged_eigenpairs (0),
-  _n_iterations           (0),
-  _is_generalized_eigenproblem (false),
-  _eigen_problem_type (NHEP)
+const std::string & name_in,
+const unsigned int number_in
+) :
+Parent           (es, name_in, number_in),
+matrix_A         (libmesh_nullptr),
+matrix_B         (libmesh_nullptr),
+eigen_solver     (EigenSolver<Number>::build(es.comm())),
+_n_converged_eigenpairs (0),
+_n_iterations           (0),
+_is_generalized_eigenproblem (false),
+_eigen_problem_type (NHEP)
 {
 }
 
@@ -57,65 +57,65 @@ EigenSystem::EigenSystem (EquationSystems & es,
 
 EigenSystem::~EigenSystem ()
 {
-  // clear data
-  this->clear();
+// clear data
+this->clear();
 }
 
 
 
 void EigenSystem::clear ()
 {
-  // Clear the parent data
-  Parent::clear();
+// Clear the parent data
+Parent::clear();
 
-  // delete the matricies
-  delete matrix_A;
-  delete matrix_B;
+// delete the matricies
+delete matrix_A;
+delete matrix_B;
 
-  // NULL-out the matricies.
-  matrix_A = libmesh_nullptr;
-  matrix_B = libmesh_nullptr;
+// NULL-out the matricies.
+matrix_A = libmesh_nullptr;
+matrix_B = libmesh_nullptr;
 
-  // clear the solver
-  eigen_solver->clear();
+// clear the solver
+eigen_solver->clear();
 
 }
 
 
 void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 {
-  _eigen_problem_type = ept;
+_eigen_problem_type = ept;
 
-  eigen_solver->set_eigenproblem_type(ept);
+eigen_solver->set_eigenproblem_type(ept);
 
-  // libMesh::out << "The Problem type is set to be: " << std::endl;
+// libMesh::out << "The Problem type is set to be: " << std::endl;
 
-  switch (_eigen_problem_type)
-    {
-    case HEP:
-      // libMesh::out << "Hermitian" << std::endl;
-      break;
+switch (_eigen_problem_type)
+{
+case HEP:
+// libMesh::out << "Hermitian" << std::endl;
+break;
 
-    case NHEP:
-      // libMesh::out << "Non-Hermitian" << std::endl;
-      break;
+case NHEP:
+// libMesh::out << "Non-Hermitian" << std::endl;
+break;
 
-    case GHEP:
-      // libMesh::out << "Gerneralized Hermitian" << std::endl;
-      break;
+case GHEP:
+// libMesh::out << "Gerneralized Hermitian" << std::endl;
+break;
 
-    case GNHEP:
-      // libMesh::out << "Generalized Non-Hermitian" << std::endl;
-      break;
+case GNHEP:
+// libMesh::out << "Generalized Non-Hermitian" << std::endl;
+break;
 
-    case GHIEP:
-      // libMesh::out << "Generalized indefinite Hermitian" << std::endl;
-      break;
+case GHIEP:
+// libMesh::out << "Generalized indefinite Hermitian" << std::endl;
+break;
 
-    default:
-      // libMesh::out << "not properly specified" << std::endl;
-      libmesh_error_msg("Unrecognized _eigen_problem_type = " << _eigen_problem_type);
-    }
+default:
+// libMesh::out << "not properly specified" << std::endl;
+libmesh_error_msg("Unrecognized _eigen_problem_type = " << _eigen_problem_type);
+}
 }
 
 
@@ -123,82 +123,82 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
 void EigenSystem::init_data ()
 {
-  // initialize parent data
-  Parent::init_data();
+// initialize parent data
+Parent::init_data();
 
-  // define the type of eigenproblem
-  if (_eigen_problem_type == GNHEP ||
-      _eigen_problem_type == GHEP  ||
-      _eigen_problem_type == GHIEP)
-    _is_generalized_eigenproblem = true;
+// define the type of eigenproblem
+if (_eigen_problem_type == GNHEP ||
+_eigen_problem_type == GHEP  ||
+_eigen_problem_type == GHIEP)
+_is_generalized_eigenproblem = true;
 
-  // build the system matrix
-  matrix_A = SparseMatrix<Number>::build(this->comm()).release();
+// build the system matrix
+matrix_A = SparseMatrix<Number>::build(this->comm()).release();
 
-  this->init_matrices();
+this->init_matrices();
 }
 
 
 
 void EigenSystem::init_matrices ()
 {
-  DofMap & dof_map = this->get_dof_map();
+DofMap & dof_map = this->get_dof_map();
 
-  dof_map.attach_matrix(*matrix_A);
+dof_map.attach_matrix(*matrix_A);
 
-  // build matrix_B only in case of a
-  // generalized problem
-  if (_is_generalized_eigenproblem)
-    {
-      matrix_B = SparseMatrix<Number>::build(this->comm()).release();
-      dof_map.attach_matrix(*matrix_B);
-    }
+// build matrix_B only in case of a
+// generalized problem
+if (_is_generalized_eigenproblem)
+{
+matrix_B = SparseMatrix<Number>::build(this->comm()).release();
+dof_map.attach_matrix(*matrix_B);
+}
 
-  dof_map.compute_sparsity(this->get_mesh());
+dof_map.compute_sparsity(this->get_mesh());
 
-  // initialize and zero system matrix
-  matrix_A->init();
-  matrix_A->zero();
+// initialize and zero system matrix
+matrix_A->init();
+matrix_A->zero();
 
-  // eventually initialize and zero system matrix_B
-  if (_is_generalized_eigenproblem)
-    {
-      matrix_B->init();
-      matrix_B->zero();
-    }
+// eventually initialize and zero system matrix_B
+if (_is_generalized_eigenproblem)
+{
+matrix_B->init();
+matrix_B->zero();
+}
 }
 
 
 
 void EigenSystem::reinit ()
 {
-  // initialize parent data
-  Parent::reinit();
+// initialize parent data
+Parent::reinit();
 
-  // Clear the matrices
-  matrix_A->clear();
+// Clear the matrices
+matrix_A->clear();
 
-  if (_is_generalized_eigenproblem)
-    matrix_B->clear();
+if (_is_generalized_eigenproblem)
+matrix_B->clear();
 
-  DofMap & dof_map = this->get_dof_map();
+DofMap & dof_map = this->get_dof_map();
 
-  // Clear the sparsity pattern
-  dof_map.clear_sparsity();
+// Clear the sparsity pattern
+dof_map.clear_sparsity();
 
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // both matrices, \p DofMap now knows them
-  dof_map.compute_sparsity(this->get_mesh());
+// Compute the sparsity pattern for the current
+// mesh and DOF distribution.  This also updates
+// both matrices, \p DofMap now knows them
+dof_map.compute_sparsity(this->get_mesh());
 
-  matrix_A->init();
-  matrix_A->zero();
+matrix_A->init();
+matrix_A->zero();
 
-  if (_is_generalized_eigenproblem)
-    {
-      matrix_B->init();
-      matrix_B->zero();
-    }
+if (_is_generalized_eigenproblem)
+{
+matrix_B->init();
+matrix_B->zero();
+}
 }
 
 
@@ -206,53 +206,53 @@ void EigenSystem::reinit ()
 void EigenSystem::solve ()
 {
 
-  // A reference to the EquationSystems
-  EquationSystems & es = this->get_equation_systems();
+// A reference to the EquationSystems
+EquationSystems & es = this->get_equation_systems();
 
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+// check that necessary parameters have been set
+libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
+libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
-  if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assemble ();
+if (this->assemble_before_solve)
+// Assemble the linear system
+this->assemble ();
 
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+// Get the tolerance for the solver and the maximum
+// number of iterations. Here, we simply adopt the linear solver
+// specific parameters.
+const Real tol            =
+es.parameters.get<Real>("linear solver tolerance");
 
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+const unsigned int maxits =
+es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
+const unsigned int nev    =
+es.parameters.get<unsigned int>("eigenpairs");
 
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
+const unsigned int ncv    =
+es.parameters.get<unsigned int>("basis vectors");
 
-  std::pair<unsigned int, unsigned int> solve_data;
+std::pair<unsigned int, unsigned int> solve_data;
 
-  // call the solver depending on the type of eigenproblem
-  if (_is_generalized_eigenproblem)
-    {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized (*matrix_A,*matrix_B, nev, ncv, tol, maxits);
+// call the solver depending on the type of eigenproblem
+if (_is_generalized_eigenproblem)
+{
+//in case of a generalized eigenproblem
+solve_data = eigen_solver->solve_generalized (*matrix_A,*matrix_B, nev, ncv, tol, maxits);
 
-    }
+}
 
-  else
-    {
-      libmesh_assert (!matrix_B);
+else
+{
+libmesh_assert (!matrix_B);
 
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
+//in case of a standard eigenproblem
+solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
 
-    }
+}
 
-  this->_n_converged_eigenpairs = solve_data.first;
-  this->_n_iterations           = solve_data.second;
+this->_n_converged_eigenpairs = solve_data.first;
+this->_n_iterations           = solve_data.second;
 
 }
 
@@ -260,16 +260,16 @@ void EigenSystem::solve ()
 void EigenSystem::assemble ()
 {
 
-  // Assemble the linear system
-  Parent::assemble ();
+// Assemble the linear system
+Parent::assemble ();
 
 }
 
 
 std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
 {
-  // call the eigen_solver get_eigenpair method
-  return eigen_solver->get_eigenpair (i, *solution);
+// call the eigen_solver get_eigenpair method
+return eigen_solver->get_eigenpair (i, *solution);
 }
 
 } // namespace libMesh

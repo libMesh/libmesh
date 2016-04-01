@@ -41,115 +41,115 @@ namespace libMesh
 {
 
 /**
- * This class provides an interface to Laspack
- * iterative solvers that is compatible with the \p libMesh
- * \p LinearSolver<>
- *
- * \author Benjamin Kirk
- * \date 2002-2007
- */
+* This class provides an interface to Laspack
+* iterative solvers that is compatible with the \p libMesh
+* \p LinearSolver<>
+*
+* \author Benjamin Kirk
+* \date 2002-2007
+*/
 template <typename T>
 class LaspackLinearSolver : public LinearSolver<T>
 {
 public:
-  /**
-   *  Constructor. Initializes Laspack data structures
-   */
-  LaspackLinearSolver (const libMesh::Parallel::Communicator & comm
-                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+/**
+*  Constructor. Initializes Laspack data structures
+*/
+LaspackLinearSolver (const libMesh::Parallel::Communicator & comm
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
-  /**
-   * Destructor.
-   */
-  ~LaspackLinearSolver ();
+/**
+* Destructor.
+*/
+~LaspackLinearSolver ();
 
-  /**
-   * Release all memory and clear data structures.
-   */
-  virtual void clear () libmesh_override;
+/**
+* Release all memory and clear data structures.
+*/
+virtual void clear () libmesh_override;
 
-  /**
-   * Initialize data structures if not done so already.
-   */
-  virtual void init (const char * name = libmesh_nullptr) libmesh_override;
+/**
+* Initialize data structures if not done so already.
+*/
+virtual void init (const char * name = libmesh_nullptr) libmesh_override;
 
-  /**
-   * Call the Laspack solver
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T> & matrix,
-         NumericVector<T> & solution,
-         NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* Call the Laspack solver
+*/
+virtual std::pair<unsigned int, Real>
+solve (SparseMatrix<T> & matrix,
+NumericVector<T> & solution,
+NumericVector<T> & rhs,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * Call the Laspack solver to solve A^T x = b
-   */
-  virtual std::pair<unsigned int, Real>
-  adjoint_solve (SparseMatrix<T> & matrix,
-                 NumericVector<T> & solution,
-                 NumericVector<T> & rhs,
-                 const double tol,
-                 const unsigned int m_its) libmesh_override;
+/**
+* Call the Laspack solver to solve A^T x = b
+*/
+virtual std::pair<unsigned int, Real>
+adjoint_solve (SparseMatrix<T> & matrix,
+NumericVector<T> & solution,
+NumericVector<T> & rhs,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * Call the Laspack solver
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T> & matrix,
-         SparseMatrix<T> & pc,
-         NumericVector<T> & solution,
-         NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* Call the Laspack solver
+*/
+virtual std::pair<unsigned int, Real>
+solve (SparseMatrix<T> & matrix,
+SparseMatrix<T> & pc,
+NumericVector<T> & solution,
+NumericVector<T> & rhs,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * This function solves a system whose matrix is a shell matrix.
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T> & shell_matrix,
-         NumericVector<T> & solution_in,
-         NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* This function solves a system whose matrix is a shell matrix.
+*/
+virtual std::pair<unsigned int, Real>
+solve (const ShellMatrix<T> & shell_matrix,
+NumericVector<T> & solution_in,
+NumericVector<T> & rhs_in,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * This function solves a system whose matrix is a shell matrix, but
-   * a sparse matrix is used as preconditioning matrix, this allowing
-   * other preconditioners than JACOBI.
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T> & shell_matrix,
-         const SparseMatrix<T> & precond_matrix,
-         NumericVector<T> & solution_in,
-         NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) libmesh_override;
+/**
+* This function solves a system whose matrix is a shell matrix, but
+* a sparse matrix is used as preconditioning matrix, this allowing
+* other preconditioners than JACOBI.
+*/
+virtual std::pair<unsigned int, Real>
+solve (const ShellMatrix<T> & shell_matrix,
+const SparseMatrix<T> & precond_matrix,
+NumericVector<T> & solution_in,
+NumericVector<T> & rhs_in,
+const double tol,
+const unsigned int m_its) libmesh_override;
 
-  /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
-   */
-  virtual void print_converged_reason() const libmesh_override;
+/**
+* Prints a useful message about why the latest linear solve
+* con(di)verged.
+*/
+virtual void print_converged_reason() const libmesh_override;
 
-  /**
-   * Returns the solver's convergence flag
-   */
-  virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
+/**
+* Returns the solver's convergence flag
+*/
+virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 
 private:
 
-  /**
-   * Tells LASPACK to use the user-specified preconditioner stored in
-   * \p _preconditioner_type
-   */
-  void set_laspack_preconditioner_type ();
+/**
+* Tells LASPACK to use the user-specified preconditioner stored in
+* \p _preconditioner_type
+*/
+void set_laspack_preconditioner_type ();
 
-  /**
-   * Preconditioner type
-   */
-  PrecondProcType _precond_type;
+/**
+* Preconditioner type
+*/
+PrecondProcType _precond_type;
 };
 
 
@@ -157,8 +157,8 @@ private:
 template <typename T>
 inline
 LaspackLinearSolver<T>::LaspackLinearSolver (const libMesh::Parallel::Communicator & comm) :
-  LinearSolver<T>(comm),
-  _precond_type (ILUPrecond)
+LinearSolver<T>(comm),
+_precond_type (ILUPrecond)
 {
 }
 
@@ -168,7 +168,7 @@ template <typename T>
 inline
 LaspackLinearSolver<T>::~LaspackLinearSolver ()
 {
-  this->clear ();
+this->clear ();
 }
 
 
@@ -177,16 +177,16 @@ template <typename T>
 inline
 std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (SparseMatrix<T> &,
-                               SparseMatrix<T> &,
-                               NumericVector<T> &,
-                               NumericVector<T> &,
-                               const double,
-                               const unsigned int)
+SparseMatrix<T> &,
+NumericVector<T> &,
+NumericVector<T> &,
+const double,
+const unsigned int)
 {
-  libmesh_error_msg("ERROR: LASPACK does not support a user-supplied preconditioner!");
+libmesh_error_msg("ERROR: LASPACK does not support a user-supplied preconditioner!");
 
-  std::pair<unsigned int, Real> p;
-  return p;
+std::pair<unsigned int, Real> p;
+return p;
 }
 
 } // namespace libMesh

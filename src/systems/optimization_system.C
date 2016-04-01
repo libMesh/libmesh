@@ -34,17 +34,17 @@ namespace libMesh
 // ------------------------------------------------------------
 // OptimizationSystem implementation
 OptimizationSystem::OptimizationSystem (EquationSystems & es,
-                                        const std::string & name_in,
-                                        const unsigned int number_in) :
+const std::string & name_in,
+const unsigned int number_in) :
 
-  Parent(es, name_in, number_in),
-  optimization_solver(OptimizationSolver<Number>::build(*this)),
-  C_eq(NumericVector<Number>::build(this->comm())),
-  C_eq_jac(SparseMatrix<Number>::build(this->comm())),
-  C_ineq(NumericVector<Number>::build(this->comm())),
-  C_ineq_jac(SparseMatrix<Number>::build(this->comm())),
-  lambda_eq(NumericVector<Number>::build(this->comm())),
-  lambda_ineq(NumericVector<Number>::build(this->comm()))
+Parent(es, name_in, number_in),
+optimization_solver(OptimizationSolver<Number>::build(*this)),
+C_eq(NumericVector<Number>::build(this->comm())),
+C_eq_jac(SparseMatrix<Number>::build(this->comm())),
+C_ineq(NumericVector<Number>::build(this->comm())),
+C_ineq_jac(SparseMatrix<Number>::build(this->comm())),
+lambda_eq(NumericVector<Number>::build(this->comm())),
+lambda_ineq(NumericVector<Number>::build(this->comm()))
 {
 }
 
@@ -52,119 +52,119 @@ OptimizationSystem::OptimizationSystem (EquationSystems & es,
 
 OptimizationSystem::~OptimizationSystem ()
 {
-  // Clear data
-  this->clear();
+// Clear data
+this->clear();
 }
 
 
 
 void OptimizationSystem::clear ()
 {
-  // clear the optimization solver
-  optimization_solver->clear();
+// clear the optimization solver
+optimization_solver->clear();
 
-  // clear the parent data
-  Parent::clear();
+// clear the parent data
+Parent::clear();
 }
 
 
 void OptimizationSystem::init_data ()
 {
-  this->add_vector("lower_bounds");
-  this->add_vector("upper_bounds");
+this->add_vector("lower_bounds");
+this->add_vector("upper_bounds");
 
-  Parent::init_data();
+Parent::init_data();
 
-  optimization_solver->clear();
+optimization_solver->clear();
 }
 
 
 void OptimizationSystem::reinit ()
 {
-  optimization_solver->clear();
+optimization_solver->clear();
 
-  Parent::reinit();
+Parent::reinit();
 }
 
 
 void OptimizationSystem::
 initialize_equality_constraints_storage(const std::vector< std::set<numeric_index_type> > & constraint_jac_sparsity)
 {
-  unsigned int n_eq_constraints = constraint_jac_sparsity.size();
+unsigned int n_eq_constraints = constraint_jac_sparsity.size();
 
-  // Assign rows to each processor as evenly as possible
-  unsigned int n_procs = comm().size();
-  unsigned int n_local_rows = n_eq_constraints / n_procs;
-  if (comm().rank() < (n_eq_constraints % n_procs))
-    n_local_rows++;
+// Assign rows to each processor as evenly as possible
+unsigned int n_procs = comm().size();
+unsigned int n_local_rows = n_eq_constraints / n_procs;
+if (comm().rank() < (n_eq_constraints % n_procs))
+n_local_rows++;
 
-  C_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
-  lambda_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
+C_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
+lambda_eq->init(n_eq_constraints, n_local_rows, false, PARALLEL);
 
-  // Get the maximum number of non-zeros per row
-  unsigned int max_nnz = 0;
-  for (unsigned int i=0; i<n_eq_constraints; i++)
-    {
-      unsigned int nnz = constraint_jac_sparsity[i].size();
-      if (nnz > max_nnz)
-        max_nnz = nnz;
-    }
+// Get the maximum number of non-zeros per row
+unsigned int max_nnz = 0;
+for (unsigned int i=0; i<n_eq_constraints; i++)
+{
+unsigned int nnz = constraint_jac_sparsity[i].size();
+if (nnz > max_nnz)
+max_nnz = nnz;
+}
 
-  C_eq_jac->init(n_eq_constraints,
-                 get_dof_map().n_dofs(),
-                 n_local_rows,
-                 get_dof_map().n_local_dofs(),
-                 max_nnz,
-                 max_nnz);
+C_eq_jac->init(n_eq_constraints,
+get_dof_map().n_dofs(),
+n_local_rows,
+get_dof_map().n_local_dofs(),
+max_nnz,
+max_nnz);
 
-  eq_constraint_jac_sparsity = constraint_jac_sparsity;
+eq_constraint_jac_sparsity = constraint_jac_sparsity;
 }
 
 
 void OptimizationSystem::
 initialize_inequality_constraints_storage(const std::vector<std::set<numeric_index_type> > & constraint_jac_sparsity)
 {
-  unsigned int n_ineq_constraints = constraint_jac_sparsity.size();
+unsigned int n_ineq_constraints = constraint_jac_sparsity.size();
 
-  // Assign rows to each processor as evenly as possible
-  unsigned int n_procs = comm().size();
-  unsigned int n_local_rows = n_ineq_constraints / n_procs;
-  if (comm().rank() < (n_ineq_constraints % n_procs))
-    n_local_rows++;
+// Assign rows to each processor as evenly as possible
+unsigned int n_procs = comm().size();
+unsigned int n_local_rows = n_ineq_constraints / n_procs;
+if (comm().rank() < (n_ineq_constraints % n_procs))
+n_local_rows++;
 
-  C_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
-  lambda_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
+C_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
+lambda_ineq->init(n_ineq_constraints, n_local_rows, false, PARALLEL);
 
-  // Get the maximum number of non-zeros per row
-  unsigned int max_nnz = 0;
-  for(unsigned int i=0; i<n_ineq_constraints; i++)
-    {
-      unsigned int nnz = constraint_jac_sparsity[i].size();
-      if (nnz > max_nnz)
-        max_nnz = nnz;
-    }
+// Get the maximum number of non-zeros per row
+unsigned int max_nnz = 0;
+for(unsigned int i=0; i<n_ineq_constraints; i++)
+{
+unsigned int nnz = constraint_jac_sparsity[i].size();
+if (nnz > max_nnz)
+max_nnz = nnz;
+}
 
-  C_ineq_jac->init(n_ineq_constraints,
-                   get_dof_map().n_dofs(),
-                   n_local_rows,
-                   get_dof_map().n_local_dofs(),
-                   max_nnz,
-                   max_nnz);
+C_ineq_jac->init(n_ineq_constraints,
+get_dof_map().n_dofs(),
+n_local_rows,
+get_dof_map().n_local_dofs(),
+max_nnz,
+max_nnz);
 
-  ineq_constraint_jac_sparsity = constraint_jac_sparsity;
+ineq_constraint_jac_sparsity = constraint_jac_sparsity;
 }
 
 
 void OptimizationSystem::solve ()
 {
-  START_LOG("solve()", "OptimizationSystem");
+START_LOG("solve()", "OptimizationSystem");
 
-  optimization_solver->init();
-  optimization_solver->solve ();
+optimization_solver->init();
+optimization_solver->solve ();
 
-  STOP_LOG("solve()", "OptimizationSystem");
+STOP_LOG("solve()", "OptimizationSystem");
 
-  this->update();
+this->update();
 }
 
 

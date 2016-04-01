@@ -21,12 +21,12 @@
 
 
 /**
- * Sanity check, _without_ prior inclusion of libmesh_config.h.
- *
- * This file is no typical header file. It is only to be
- * included at the _end_ of an implementation file, so that
- * the proper variations of the InfFE class are instantiated.
- */
+* Sanity check, _without_ prior inclusion of libmesh_config.h.
+*
+* This file is no typical header file. It is only to be
+* included at the _end_ of an implementation file, so that
+* the proper variations of the InfFE class are instantiated.
+*/
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
@@ -39,8 +39,8 @@ namespace libMesh
 
 
 /**
- * Collect all 3D explicit instantiations for class InfFE
- */
+* Collect all 3D explicit instantiations for class InfFE
+*/
 INSTANTIATE_INF_FE(3,CARTESIAN);
 
 /* INSTANTIATE_INF_FE(3,SPHERICAL); */

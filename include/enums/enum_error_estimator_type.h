@@ -23,15 +23,15 @@
 namespace libMesh {
 
 enum ErrorEstimatorType {INVALID                 = -1,
-                         ADJOINT_REFINEMENT      =  0,
-                         ADJOINT_RESIDUAL        =  1,
-                         DISCONTINUITY_MEASURE   =  2,
-                         EXACT                   =  3,
-                         KELLY                   =  4,
-                         LAPLACIAN               =  5,
-                         PATCH_RECOVERY          =  6,
-                         WEIGHTED_PATCH_RECOVERY =  7,
-                         UNIFORM_REFINEMENT      =  8};
+ADJOINT_REFINEMENT      =  0,
+ADJOINT_RESIDUAL        =  1,
+DISCONTINUITY_MEASURE   =  2,
+EXACT                   =  3,
+KELLY                   =  4,
+LAPLACIAN               =  5,
+PATCH_RECOVERY          =  6,
+WEIGHTED_PATCH_RECOVERY =  7,
+UNIFORM_REFINEMENT      =  8};
 
 } // end namespace libMesh
 

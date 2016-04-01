@@ -28,65 +28,65 @@ namespace libMesh
 {
 
 /**
- * This class stores solver configuration data, e.g. tolerances
- * and iteration limits. Override the pure virtual function
- * configure_solver() in order to provide specific behavior for
- * particular types of solvers (e.g. LinearSolver, EigenSolver, etc).
- *
- * \author David Knezevic
- * \date 2015
- */
+* This class stores solver configuration data, e.g. tolerances
+* and iteration limits. Override the pure virtual function
+* configure_solver() in order to provide specific behavior for
+* particular types of solvers (e.g. LinearSolver, EigenSolver, etc).
+*
+* \author David Knezevic
+* \date 2015
+*/
 class SolverConfiguration : public ReferenceCountedObject<SolverConfiguration>
 {
 public:
 
-  /**
-   *  Constructor.
-   */
-  SolverConfiguration () {}
+/**
+*  Constructor.
+*/
+SolverConfiguration () {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~SolverConfiguration () {}
+/**
+* Destructor.
+*/
+virtual ~SolverConfiguration () {}
 
-  /**
-   * Apply options during initialization of a solver.
-   * Default is a no-op. Override in subclasses to provide
-   * specific behavior.
-   */
-  virtual void set_options_during_init() {}
+/**
+* Apply options during initialization of a solver.
+* Default is a no-op. Override in subclasses to provide
+* specific behavior.
+*/
+virtual void set_options_during_init() {}
 
-  /**
-   * Apply solver options to a particular solver.
-   * Override in subclasses to provide specific behavior.
-   */
-  virtual void configure_solver() = 0;
+/**
+* Apply solver options to a particular solver.
+* Override in subclasses to provide specific behavior.
+*/
+virtual void configure_solver() = 0;
 
-  /**
-   * This method can be called after the solver has failed (e.g. on
-   * catching an exception thrown by a solver). It allows an appropriate
-   * response to the failure, e.g. terminate the program, or change
-   * configuation options and try again.
-   * \p solve_failure_count specifies the number of times we've tried to
-   * recover from a failure.
-   */
-  virtual void respond_to_solve_failure(unsigned int /*solve_failure_count*/) {}
+/**
+* This method can be called after the solver has failed (e.g. on
+* catching an exception thrown by a solver). It allows an appropriate
+* response to the failure, e.g. terminate the program, or change
+* configuation options and try again.
+* \p solve_failure_count specifies the number of times we've tried to
+* recover from a failure.
+*/
+virtual void respond_to_solve_failure(unsigned int /*solve_failure_count*/) {}
 
-  /**
-   * Store real-valued solver parameters in this map, e.g. solver tolerances.
-   */
-  std::map<std::string, Real> real_valued_data;
+/**
+* Store real-valued solver parameters in this map, e.g. solver tolerances.
+*/
+std::map<std::string, Real> real_valued_data;
 
-  /**
-   * Store integer solver parameters in this map, e.g. iteration limits.
-   */
-  std::map<std::string, int> int_valued_data;
+/**
+* Store integer solver parameters in this map, e.g. iteration limits.
+*/
+std::map<std::string, int> int_valued_data;
 
-  /**
-   * Store string data in this map, e.g. "solver_type" : "gmres".
-   */
-  std::map<std::string, std::string> string_data;
+/**
+* Store string data in this map, e.g. "solver_type" : "gmres".
+*/
+std::map<std::string, std::string> string_data;
 
 };
 

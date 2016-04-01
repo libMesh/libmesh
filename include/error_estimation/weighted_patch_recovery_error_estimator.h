@@ -41,81 +41,81 @@ class Elem;
 
 
 /**
- * This class implements the Patch Recovery error indicator.
- *
- * \author Vikram Garg
- * \date 2012
- */
+* This class implements the Patch Recovery error indicator.
+*
+* \author Vikram Garg
+* \date 2012
+*/
 class WeightedPatchRecoveryErrorEstimator : public PatchRecoveryErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Defaults to H1 seminorm.  All Hilbert norms and
-   * seminorms should be supported now.  W1,p and W2,p norms would
-   * be natural to support if any contributors make the effort.
-   */
-  WeightedPatchRecoveryErrorEstimator() :
-    PatchRecoveryErrorEstimator()
-  {}
+/**
+* Constructor.  Defaults to H1 seminorm.  All Hilbert norms and
+* seminorms should be supported now.  W1,p and W2,p norms would
+* be natural to support if any contributors make the effort.
+*/
+WeightedPatchRecoveryErrorEstimator() :
+PatchRecoveryErrorEstimator()
+{}
 
-  /**
-   * Destructor.
-   */
-  ~WeightedPatchRecoveryErrorEstimator() {}
+/**
+* Destructor.
+*/
+~WeightedPatchRecoveryErrorEstimator() {}
 
-  /**
-   * This function uses the Patch Recovery error
-   * estimate to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System & system,
-                               ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
+/**
+* This function uses the Patch Recovery error
+* estimate to estimate the error on each cell.
+* The estimated error is output in the vector
+* \p error_per_cell
+*/
+virtual void estimate_error (const System & system,
+ErrorVector & error_per_cell,
+const NumericVector<Number> * solution_vector = libmesh_nullptr,
+bool estimate_parent_error = false) libmesh_override;
 
-  /**
-     Vector of fem function base pointers, the user will fill this in
-     with pointers to the appropriate weight functions
-  */
-  std::vector<FEMFunctionBase<Number> *> weight_functions;
+/**
+Vector of fem function base pointers, the user will fill this in
+with pointers to the appropriate weight functions
+*/
+std::vector<FEMFunctionBase<Number> *> weight_functions;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return WEIGHTED_PATCH_RECOVERY;}
+virtual ErrorEstimatorType type() const libmesh_override
+{ return WEIGHTED_PATCH_RECOVERY;}
 
 private:
 
-  /**
-   * Class to compute the error contribution for a range
-   * of elements. May be executed in parallel on separate threads.
-   */
-  class EstimateError
-  {
-  public:
-    EstimateError (const System & sys,
-                   const WeightedPatchRecoveryErrorEstimator & ee,
-                   ErrorVector & epc) :
-      system(sys),
-      error_estimator(ee),
-      error_per_cell(epc)
-    {}
+/**
+* Class to compute the error contribution for a range
+* of elements. May be executed in parallel on separate threads.
+*/
+class EstimateError
+{
+public:
+EstimateError (const System & sys,
+const WeightedPatchRecoveryErrorEstimator & ee,
+ErrorVector & epc) :
+system(sys),
+error_estimator(ee),
+error_per_cell(epc)
+{}
 
-    void operator()(const ConstElemRange & range) const;
+void operator()(const ConstElemRange & range) const;
 
-    /**
-     * Function to set the boolean patch_reuse in case the user
-     * wants to change the default behaviour of patch_recovery_error_estimator
-     */
+/**
+* Function to set the boolean patch_reuse in case the user
+* wants to change the default behaviour of patch_recovery_error_estimator
+*/
 
-  private:
+private:
 
-    const System & system;
-    const WeightedPatchRecoveryErrorEstimator & error_estimator;
-    ErrorVector & error_per_cell;
-  };
+const System & system;
+const WeightedPatchRecoveryErrorEstimator & error_estimator;
+ErrorVector & error_per_cell;
+};
 
-  friend class EstimateError;
+friend class EstimateError;
 };
 
 

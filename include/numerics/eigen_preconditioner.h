@@ -42,42 +42,42 @@ template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
 /**
- * This class provides an interface to the suite of preconditioners available
- * from Eigen.
- *
- * \author Benjamin Kirk
- * \date 2013
- */
+* This class provides an interface to the suite of preconditioners available
+* from Eigen.
+*
+* \author Benjamin Kirk
+* \date 2013
+*/
 template <typename T>
 class EigenPreconditioner : public Preconditioner<T>
 {
 public:
-  /**
-   *  Constructor. Initializes EigenPreconditioner data structures
-   */
-  EigenPreconditioner (const libMesh::Parallel::Communicator & comm_in
-                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+/**
+*  Constructor. Initializes EigenPreconditioner data structures
+*/
+EigenPreconditioner (const libMesh::Parallel::Communicator & comm_in
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
-  /**
-   * Destructor.
-   */
-  virtual ~EigenPreconditioner ();
+/**
+* Destructor.
+*/
+virtual ~EigenPreconditioner ();
 
-  /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
-   */
-  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
+/**
+* Computes the preconditioned vector "y" based on input "x".
+* Usually by solving Py=x to get the action of P^-1 x.
+*/
+virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
 
-  /**
-   * Release all memory and clear data structures.
-   */
-  virtual void clear () libmesh_override {}
+/**
+* Release all memory and clear data structures.
+*/
+virtual void clear () libmesh_override {}
 
-  /**
-   * Initialize data structures if not done so already.
-   */
-  virtual void init () libmesh_override;
+/**
+* Initialize data structures if not done so already.
+*/
+virtual void init () libmesh_override;
 };
 
 
@@ -87,7 +87,7 @@ public:
 template <typename T>
 inline
 EigenPreconditioner<T>::EigenPreconditioner(const libMesh::Parallel::Communicator & comm_in) :
-  Preconditioner<T>(comm_in)
+Preconditioner<T>(comm_in)
 {
 }
 
@@ -97,7 +97,7 @@ template <typename T>
 inline
 EigenPreconditioner<T>::~EigenPreconditioner ()
 {
-  this->clear ();
+this->clear ();
 }
 
 } // namespace libMesh

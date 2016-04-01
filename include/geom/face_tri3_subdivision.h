@@ -30,107 +30,107 @@ namespace libMesh
 {
 
 /**
- * The \p Tri3 is an element in 2D composed of 3 nodes.
- *
- * \author Roman Vetter and Norbert Stoop
- * \date 2014
- */
+* The \p Tri3 is an element in 2D composed of 3 nodes.
+*
+* \author Roman Vetter and Norbert Stoop
+* \date 2014
+*/
 class Tri3Subdivision libmesh_final : public Tri3
 {
 public:
 
-  /**
-   * Constructor without parent specification.
-   */
-  Tri3Subdivision() :
-    Tri3(), _subdivision_updated(false), _is_ghost(false) {}
+/**
+* Constructor without parent specification.
+*/
+Tri3Subdivision() :
+Tri3(), _subdivision_updated(false), _is_ghost(false) {}
 
-  /**
-   * Constructor with parent specification.
-   */
-  Tri3Subdivision(Elem * p);
+/**
+* Constructor with parent specification.
+*/
+Tri3Subdivision(Elem * p);
 
-  /**
-   * @returns \p TRI3SUBDIVISION
-   */
-  virtual ElemType type () const libmesh_override { return TRI3SUBDIVISION; }
+/**
+* @returns \p TRI3SUBDIVISION
+*/
+virtual ElemType type () const libmesh_override { return TRI3SUBDIVISION; }
 
-  /**
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
-   */
-  virtual bool has_affine_map () const libmesh_override { return false; }
+/**
+* @returns true iff the element map is definitely affine within
+* numerical tolerances
+*/
+virtual bool has_affine_map () const libmesh_override { return false; }
 
-  /**
-   * @returns true iff the Lagrange shape functions on this element
-   * are linear
-   */
-  virtual bool is_linear () const libmesh_override { return false; }
+/**
+* @returns true iff the Lagrange shape functions on this element
+* are linear
+*/
+virtual bool is_linear () const libmesh_override { return false; }
 
-  /**
-   * @returns FOURTH
-   */
-  virtual Order default_order() const libmesh_override { return FOURTH; }
+/**
+* @returns FOURTH
+*/
+virtual Order default_order() const libmesh_override { return FOURTH; }
 
-  /**
-   * Prepares the element for use by reordering the nodes such that
-   * the irregular node (valence != 6), if there is one, is the first.
-   * The nodes are ordered once in advance for efficiency.
-   */
-  void prepare_subdivision_properties();
+/**
+* Prepares the element for use by reordering the nodes such that
+* the irregular node (valence != 6), if there is one, is the first.
+* The nodes are ordered once in advance for efficiency.
+*/
+void prepare_subdivision_properties();
 
-  /**
-   * @returns \p true iff the subdivision element is ready for use,
-   * i.e. the nodes have been reordered.
-   */
-  bool is_subdivision_updated() const { return _subdivision_updated; }
+/**
+* @returns \p true iff the subdivision element is ready for use,
+* i.e. the nodes have been reordered.
+*/
+bool is_subdivision_updated() const { return _subdivision_updated; }
 
-  /**
-   * @returns a pointer to the node whose ordered id is \p node_id.
-   */
-  Node * get_ordered_node(unsigned int node_id) const;
+/**
+* @returns a pointer to the node whose ordered id is \p node_id.
+*/
+Node * get_ordered_node(unsigned int node_id) const;
 
-  /**
-   * @returns the number of nodes connected to the ordered node
-   * whose id is \p node_id.
-   */
-  unsigned int get_ordered_valence(unsigned int node_id) const;
+/**
+* @returns the number of nodes connected to the ordered node
+* whose id is \p node_id.
+*/
+unsigned int get_ordered_valence(unsigned int node_id) const;
 
-  /**
-   * @returns the order number of the node whose unordered id is
-   * \p node_id. This is the inverse of an \p _ordered_nodes lookup.
-   */
-  unsigned int local_node_number(unsigned int node_id) const;
+/**
+* @returns the order number of the node whose unordered id is
+* \p node_id. This is the inverse of an \p _ordered_nodes lookup.
+*/
+unsigned int local_node_number(unsigned int node_id) const;
 
-  /**
-   * @returns \p true iff the element is a ghost element.
-   */
-  bool is_ghost() const { return _is_ghost; }
+/**
+* @returns \p true iff the element is a ghost element.
+*/
+bool is_ghost() const { return _is_ghost; }
 
-  /**
-   * Sets the boolean flag identifying ghost elements.
-   */
-  void set_ghost(bool ghosted) { _is_ghost = ghosted; }
+/**
+* Sets the boolean flag identifying ghost elements.
+*/
+void set_ghost(bool ghosted) { _is_ghost = ghosted; }
 
 private:
 
-  /**
-   * A list containing the ordered nodes such that the irregular
-   * node (valence != 6), if there is one, is the first.
-   */
-  Node * _ordered_nodes[3];
+/**
+* A list containing the ordered nodes such that the irregular
+* node (valence != 6), if there is one, is the first.
+*/
+Node * _ordered_nodes[3];
 
-  /**
-   * \p true iff the subdivision element is ready for use,
-   * i.e. the nodes have been reordered.
-   */
-  bool _subdivision_updated;
+/**
+* \p true iff the subdivision element is ready for use,
+* i.e. the nodes have been reordered.
+*/
+bool _subdivision_updated;
 
-  /**
-   * \p true iff the element is a ghost element
-   * (e.g. for boundary conditions).
-   */
-  bool _is_ghost;
+/**
+* \p true iff the element is a ghost element
+* (e.g. for boundary conditions).
+*/
+bool _is_ghost;
 };
 
 

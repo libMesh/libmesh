@@ -35,102 +35,102 @@ namespace libMesh
 {
 
 /**
- * This class implements a ``brute force'' goal-oriented error
- * estimator which computes an estimate of error in a quantity of
- * interest based on the residual of the current coarse grid primal
- * solution as weighted against an adjoint solution on a uniformly
- * refined (in h and/or p, for an arbitrary number of levels) grid.
- *
- * \author Roy H. Stogner
- * \date 2009
- */
+* This class implements a ``brute force'' goal-oriented error
+* estimator which computes an estimate of error in a quantity of
+* interest based on the residual of the current coarse grid primal
+* solution as weighted against an adjoint solution on a uniformly
+* refined (in h and/or p, for an arbitrary number of levels) grid.
+*
+* \author Roy H. Stogner
+* \date 2009
+*/
 class AdjointRefinementEstimator : public ErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Sets the most common default parameter values.
-   */
-  AdjointRefinementEstimator() :
-    ErrorEstimator(),
-    number_h_refinements(1),
-    number_p_refinements(0),
-    _qoi_set(QoISet())
-  {
-    // We're not actually going to use error_norm; our norms are
-    // absolute values of QoI error.
-    error_norm = INVALID_NORM;
-  }
+/**
+* Constructor.  Sets the most common default parameter values.
+*/
+AdjointRefinementEstimator() :
+ErrorEstimator(),
+number_h_refinements(1),
+number_p_refinements(0),
+_qoi_set(QoISet())
+{
+// We're not actually going to use error_norm; our norms are
+// absolute values of QoI error.
+error_norm = INVALID_NORM;
+}
 
-  /**
-   * Destructor.
-   */
-  ~AdjointRefinementEstimator() {}
+/**
+* Destructor.
+*/
+~AdjointRefinementEstimator() {}
 
-  /**
-   * Access to the QoISet (default: weight all QoIs equally) to use
-   * when computing errors
-   */
-  QoISet & qoi_set() { return _qoi_set; }
+/**
+* Access to the QoISet (default: weight all QoIs equally) to use
+* when computing errors
+*/
+QoISet & qoi_set() { return _qoi_set; }
 
-  /**
-   * Access to the QoISet (default: weight all QoIs equally) to use
-   * when computing errors
-   */
-  const QoISet & qoi_set() const { return _qoi_set; }
+/**
+* Access to the QoISet (default: weight all QoIs equally) to use
+* when computing errors
+*/
+const QoISet & qoi_set() const { return _qoi_set; }
 
-  /**
-   * This function does uniform refinements and an adjoint
-   * solve to get an adjoint solution on each cell,
-   * then estimates the error by finding the weighted residual
-   * of the coarse solution with the fine adjoint solution.
-   *
-   * system.solve() and system.assembly() must be called, and so
-   * should have no side effects.
-   *
-   * Only the provided system is solved on the refined mesh;
-   * we don't support adjoint solves on loosely coupled
-   * collections of Systems.
-   *
-   * The estimated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System & system,
-                               ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false);
+/**
+* This function does uniform refinements and an adjoint
+* solve to get an adjoint solution on each cell,
+* then estimates the error by finding the weighted residual
+* of the coarse solution with the fine adjoint solution.
+*
+* system.solve() and system.assembly() must be called, and so
+* should have no side effects.
+*
+* Only the provided system is solved on the refined mesh;
+* we don't support adjoint solves on loosely coupled
+* collections of Systems.
+*
+* The estimated error is output in the vector
+* \p error_per_cell
+*/
+virtual void estimate_error (const System & system,
+ErrorVector & error_per_cell,
+const NumericVector<Number> * solution_vector = libmesh_nullptr,
+bool estimate_parent_error = false);
 
-  /**
-   * This is an accessor function to access the computed global
-   * QoI error estimates
-   */
-  Number & get_global_QoI_error_estimate(unsigned int qoi_index)
-  {
-    return computed_global_QoI_errors[qoi_index];
-  }
+/**
+* This is an accessor function to access the computed global
+* QoI error estimates
+*/
+Number & get_global_QoI_error_estimate(unsigned int qoi_index)
+{
+return computed_global_QoI_errors[qoi_index];
+}
 
-  virtual ErrorEstimatorType type() const
-  { return ADJOINT_REFINEMENT;}
+virtual ErrorEstimatorType type() const
+{ return ADJOINT_REFINEMENT;}
 
-  /**
-   * How many h refinements to perform to get the fine grid
-   */
-  unsigned char number_h_refinements;
+/**
+* How many h refinements to perform to get the fine grid
+*/
+unsigned char number_h_refinements;
 
-  /**
-   * How many p refinements to perform to get the fine grid
-   */
-  unsigned char number_p_refinements;
+/**
+* How many p refinements to perform to get the fine grid
+*/
+unsigned char number_p_refinements;
 
 protected:
 
-  /* A vector to hold the computed global QoI error estimate */
-  std::vector<Number> computed_global_QoI_errors;
+/* A vector to hold the computed global QoI error estimate */
+std::vector<Number> computed_global_QoI_errors;
 
-  /**
-   * A QoISet to handle cases with multiple QoIs available
-   */
-  QoISet _qoi_set;
+/**
+* A QoISet to handle cases with multiple QoIs available
+*/
+QoISet _qoi_set;
 };
 
 } // namespace libMesh

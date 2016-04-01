@@ -34,86 +34,86 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class implements writing meshes using GNUplot, designed for
- * use only with 1D meshes.
- *
- * \author David Knezevic
- * \date 2005
- */
+* This class implements writing meshes using GNUplot, designed for
+* use only with 1D meshes.
+*
+* \author David Knezevic
+* \date 2005
+*/
 class GnuPlotIO : public MeshOutput<MeshBase>
 {
 public:
 
-  /**
-   * Define enumerations to set plotting properties on construction
-   */
-  enum PlottingProperties { GRID_ON    = 1,
-                            PNG_OUTPUT = 2};
+/**
+* Define enumerations to set plotting properties on construction
+*/
+enum PlottingProperties { GRID_ON    = 1,
+PNG_OUTPUT = 2};
 
-  /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * To set the properties, we input a bitwise OR of the
-   * GnuPlotIO::PlottingProperties enumerations,
-   * e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
-   */
-  explicit
-  GnuPlotIO (const MeshBase &,
-             const std::string & = std::string("FE 1D Solution"),
-             int properties=0);
+/**
+* Constructor.  Takes a reference to a constant mesh object.
+* To set the properties, we input a bitwise OR of the
+* GnuPlotIO::PlottingProperties enumerations,
+* e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
+*/
+explicit
+GnuPlotIO (const MeshBase &,
+const std::string & = std::string("FE 1D Solution"),
+int properties=0);
 
-  /**
-   * Write the mesh to the specified file.
-   */
-  virtual void write(const std::string &) libmesh_override;
+/**
+* Write the mesh to the specified file.
+*/
+virtual void write(const std::string &) libmesh_override;
 
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
-   */
-  virtual void write_nodal_data (const std::string &,
-                                 const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are provided.
+*/
+virtual void write_nodal_data (const std::string &,
+const std::vector<Number> &,
+const std::vector<std::string> &) libmesh_override;
 
-  /**
-   * Set title of plot
-   */
-  void set_title(const std::string & title) { _title = title; }
+/**
+* Set title of plot
+*/
+void set_title(const std::string & title) { _title = title; }
 
-  /**
-   * Turn grid on or off.
-   */
-  void use_grid(bool grid) { _grid = grid; }
+/**
+* Turn grid on or off.
+*/
+void use_grid(bool grid) { _grid = grid; }
 
 
-  /**
-   * Write output to a .png file using gnuplot
-   */
-  void set_png_output(bool png_output) { _png_output = png_output; }
+/**
+* Write output to a .png file using gnuplot
+*/
+void set_png_output(bool png_output) { _png_output = png_output; }
 
-  /**
-   * GNUplot automatically adjusts the x and y-axes of 2D plots
-   * to "zoom in" on the data.  You can set this string to force
-   * GNUplot to maintain a fixed set of axes.
-   * Example: axes_limits = "[0:1] [0:1]" would force x and y
-   * to be plotted on the range 0<=x<=1 and 0<=y<=1 regardless
-   * of where the data lie.
-   */
-  std::string axes_limits;
+/**
+* GNUplot automatically adjusts the x and y-axes of 2D plots
+* to "zoom in" on the data.  You can set this string to force
+* GNUplot to maintain a fixed set of axes.
+* Example: axes_limits = "[0:1] [0:1]" would force x and y
+* to be plotted on the range 0<=x<=1 and 0<=y<=1 regardless
+* of where the data lie.
+*/
+std::string axes_limits;
 
 private:
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write an ASCII file.
-   */
-  void write_solution (const std::string &,
-                       const std::vector<Number> * = libmesh_nullptr,
-                       const std::vector<std::string> * = libmesh_nullptr);
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are optionally
+* provided.  This will write an ASCII file.
+*/
+void write_solution (const std::string &,
+const std::vector<Number> * = libmesh_nullptr,
+const std::vector<std::string> * = libmesh_nullptr);
 
-  std::string _title;
+std::string _title;
 
-  bool _grid;
-  bool _png_output;
+bool _grid;
+bool _png_output;
 };
 
 } // namespace libMesh

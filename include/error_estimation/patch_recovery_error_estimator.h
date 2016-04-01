@@ -39,109 +39,109 @@ class Elem;
 
 
 /**
- * This class implements the Patch Recovery error indicator.
- *
- * \author Varis Carey
- * \author Benjamin S. Kirk
- * \date 2004
- */
+* This class implements the Patch Recovery error indicator.
+*
+* \author Varis Carey
+* \author Benjamin S. Kirk
+* \date 2004
+*/
 class PatchRecoveryErrorEstimator : public ErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Defaults to H1 seminorm.  All Hilbert norms and
-   * seminorms should be supported now.  W1,p and W2,p norms would
-   * be natural to support if any contributors make the effort.
-   */
-  PatchRecoveryErrorEstimator() :
-    ErrorEstimator(),
-    target_patch_size(20),
-    patch_growth_strategy(&Patch::add_local_face_neighbors),
-    patch_reuse(true)
-  { error_norm = H1_SEMINORM; }
+/**
+* Constructor.  Defaults to H1 seminorm.  All Hilbert norms and
+* seminorms should be supported now.  W1,p and W2,p norms would
+* be natural to support if any contributors make the effort.
+*/
+PatchRecoveryErrorEstimator() :
+ErrorEstimator(),
+target_patch_size(20),
+patch_growth_strategy(&Patch::add_local_face_neighbors),
+patch_reuse(true)
+{ error_norm = H1_SEMINORM; }
 
-  /**
-   * Destructor.
-   */
-  ~PatchRecoveryErrorEstimator() {}
+/**
+* Destructor.
+*/
+~PatchRecoveryErrorEstimator() {}
 
 
-  /**
-   * This function uses the Patch Recovery error
-   * estimate to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System & system,
-                               ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
+/**
+* This function uses the Patch Recovery error
+* estimate to estimate the error on each cell.
+* The estimated error is output in the vector
+* \p error_per_cell
+*/
+virtual void estimate_error (const System & system,
+ErrorVector & error_per_cell,
+const NumericVector<Number> * solution_vector = libmesh_nullptr,
+bool estimate_parent_error = false) libmesh_override;
 
-  /**
-   * The PatchErrorEstimator will build patches of at least this many
-   * elements to perform estimates
-   */
-  unsigned int target_patch_size;
+/**
+* The PatchErrorEstimator will build patches of at least this many
+* elements to perform estimates
+*/
+unsigned int target_patch_size;
 
-  /**
-   * The PatchErrorEstimator will use this pointer to a Patch member
-   * function when growing patches.  The default strategy used is
-   * Patch::add_local_face_neighbors.
-   * Patch::add_local_point_neighbors may be more reliable but slower.
-   */
-  Patch::PMF patch_growth_strategy;
+/**
+* The PatchErrorEstimator will use this pointer to a Patch member
+* function when growing patches.  The default strategy used is
+* Patch::add_local_face_neighbors.
+* Patch::add_local_point_neighbors may be more reliable but slower.
+*/
+Patch::PMF patch_growth_strategy;
 
-  void set_patch_reuse (bool);
+void set_patch_reuse (bool);
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return PATCH_RECOVERY;}
+virtual ErrorEstimatorType type() const libmesh_override
+{ return PATCH_RECOVERY;}
 
 protected:
 
-  /**
-   * Returns the spectral polynomial basis function values at a point x,y,z
-   */
+/**
+* Returns the spectral polynomial basis function values at a point x,y,z
+*/
 
-  static std::vector<Real> specpoly(const unsigned int dim,
-                                    const Order order,
-                                    const Point p,
-                                    const unsigned int matsize);
+static std::vector<Real> specpoly(const unsigned int dim,
+const Order order,
+const Point p,
+const unsigned int matsize);
 
-  bool patch_reuse;
+bool patch_reuse;
 
 private:
 
-  /**
-   * Class to compute the error contribution for a range
-   * of elements. May be executed in parallel on separate threads.
-   */
-  class EstimateError
-  {
-  public:
-    EstimateError (const System & sys,
-                   const PatchRecoveryErrorEstimator & ee,
-                   ErrorVector & epc) :
-      system(sys),
-      error_estimator(ee),
-      error_per_cell(epc)
-    {}
+/**
+* Class to compute the error contribution for a range
+* of elements. May be executed in parallel on separate threads.
+*/
+class EstimateError
+{
+public:
+EstimateError (const System & sys,
+const PatchRecoveryErrorEstimator & ee,
+ErrorVector & epc) :
+system(sys),
+error_estimator(ee),
+error_per_cell(epc)
+{}
 
-    void operator()(const ConstElemRange & range) const;
+void operator()(const ConstElemRange & range) const;
 
-    /**
-     * Function to set the boolean patch_reuse in case the user
-     * wants to change the default behaviour of patch_recovery_error_estimator
-     */
+/**
+* Function to set the boolean patch_reuse in case the user
+* wants to change the default behaviour of patch_recovery_error_estimator
+*/
 
-  private:
+private:
 
-    const System & system;
-    const PatchRecoveryErrorEstimator & error_estimator;
-    ErrorVector & error_per_cell;
-  };
+const System & system;
+const PatchRecoveryErrorEstimator & error_estimator;
+ErrorVector & error_per_cell;
+};
 
-  friend class EstimateError;
+friend class EstimateError;
 };
 
 

@@ -26,23 +26,23 @@
 namespace libMesh {
 
 /**
- * libMesh interfaces with several different software packages
- * for the purposes of creating, reading, and writing mesh files.
- * These enumerations give an easy way of selecting one or the
- * other.
- */
+* libMesh interfaces with several different software packages
+* for the purposes of creating, reading, and writing mesh files.
+* These enumerations give an easy way of selecting one or the
+* other.
+*/
 enum IOPackage
-  {
-    TECPLOT,
-    GMV,
-    GMSH,
-    VTK,
-    DIVA,
-    TETGEN,
-    UCD,
-    LIBMESH,
-    INVALID_IO_PACKAGE
-  };
+{
+TECPLOT,
+GMV,
+GMSH,
+VTK,
+DIVA,
+TETGEN,
+UCD,
+LIBMESH,
+INVALID_IO_PACKAGE
+};
 }
 
 #endif // LIBMESH_ENUM_IO_PACKAGE_H

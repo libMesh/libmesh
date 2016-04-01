@@ -32,17 +32,17 @@ namespace libMesh
 namespace {
 
 void scalar_nodal_soln(const Elem * elem,
-                       const Order order,
-                       const std::vector<Number> & elem_soln,
-                       std::vector<Number> &       nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> &       nodal_soln)
 {
-  const unsigned int n_nodes = elem->n_nodes();
-  nodal_soln.resize(n_nodes);
+const unsigned int n_nodes = elem->n_nodes();
+nodal_soln.resize(n_nodes);
 
-  // If the SCALAR order is CONSTANT, just set the nodal values
-  // to zero, otherwise, set to the value of the first SCALAR dof
-  for(unsigned int i=0; i<n_nodes; i++)
-    nodal_soln[i] = (order == CONSTANT) ? 0. : elem_soln[0];
+// If the SCALAR order is CONSTANT, just set the nodal values
+// to zero, otherwise, set to the value of the first SCALAR dof
+for(unsigned int i=0; i<n_nodes; i++)
+nodal_soln[i] = (order == CONSTANT) ? 0. : elem_soln[0];
 } // scalar_nodal_soln()
 
 } // anonymous namespace
@@ -50,36 +50,36 @@ void scalar_nodal_soln(const Elem * elem,
 
 
 
-  // Do full-specialization of nodal_soln() function for every
-  // dimension, instead of explicit instantiation at the end of this
-  // file.
-  // This could be macro-ified so that it fits on one line...
+// Do full-specialization of nodal_soln() function for every
+// dimension, instead of explicit instantiation at the end of this
+// file.
+// This could be macro-ified so that it fits on one line...
 template <>
 void FE<0,SCALAR>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { scalar_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<1,SCALAR>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { scalar_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<2,SCALAR>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { scalar_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<3,SCALAR>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { scalar_nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 // Full specialization of n_dofs() function for every dimension
@@ -120,16 +120,16 @@ template <> bool FE<3,SCALAR>::is_hierarchic() const { return false; }
 // compute_constraints() just returns for SCALAR FEMs
 template <>
 void FE<2,SCALAR>::compute_constraints (DofConstraints &,
-                                        DofMap &,
-                                        const unsigned int,
-                                        const Elem *)
+DofMap &,
+const unsigned int,
+const Elem *)
 { }
 
 template <>
 void FE<3,SCALAR>::compute_constraints (DofConstraints &,
-                                        DofMap &,
-                                        const unsigned int,
-                                        const Elem *)
+DofMap &,
+const unsigned int,
+const Elem *)
 { }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

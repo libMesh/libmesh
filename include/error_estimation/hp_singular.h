@@ -37,46 +37,46 @@ class System;
 
 
 /**
- * This class uses a user-provided list of singularity locations
- * to choose between h refining and p elevation.
- * Currently we assume that a set of elements has already been flagged
- * for h refinement - any elements which do not contain a
- * user-provided singular point are instead flagged for p refinement.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* This class uses a user-provided list of singularity locations
+* to choose between h refining and p elevation.
+* Currently we assume that a set of elements has already been flagged
+* for h refinement - any elements which do not contain a
+* user-provided singular point are instead flagged for p refinement.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class HPSingularity
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  HPSingularity()
-  {
-    libmesh_experimental();
-  }
+/**
+* Constructor.
+*/
+HPSingularity()
+{
+libmesh_experimental();
+}
 
-  /**
-   * Destructor.
-   */
-  virtual ~HPSingularity () {}
+/**
+* Destructor.
+*/
+virtual ~HPSingularity () {}
 
 
-  /**
-   * This pure virtual function must be redefined
-   * in derived classes to take a mesh flagged for h
-   * refinement and potentially change the desired
-   * refinement type.
-   */
-  virtual void select_refinement (System & system);
+/**
+* This pure virtual function must be redefined
+* in derived classes to take a mesh flagged for h
+* refinement and potentially change the desired
+* refinement type.
+*/
+virtual void select_refinement (System & system);
 
-  /**
-   * This list, to be filled by the user, should include
-   * all singular points in the solution.
-   */
-  std::list<Point> singular_points;
+/**
+* This list, to be filled by the user, should include
+* all singular points in the solution.
+*/
+std::list<Point> singular_points;
 };
 
 } // namespace libMesh

@@ -26,22 +26,22 @@ namespace libMesh
 
 
 void QSimpson::init_1D(const ElemType,
-                       unsigned int)
+unsigned int)
 {
-  //----------------------------------------------------------------------
-  // 1D quadrature rules
-  _points.resize(3);
-  _weights.resize(3);
+//----------------------------------------------------------------------
+// 1D quadrature rules
+_points.resize(3);
+_weights.resize(3);
 
-  _points[0](0) = -1.;
-  _points[1](0) =  0.;
-  _points[2](0) =  1.;
+_points[0](0) = -1.;
+_points[1](0) =  0.;
+_points[2](0) =  1.;
 
-  _weights[0] = Real(1)/3;
-  _weights[1] = Real(4)/3;
-  _weights[2] = Real(1)/3;
+_weights[0] = Real(1)/3;
+_weights[1] = Real(4)/3;
+_weights[2] = Real(1)/3;
 
-  return;
+return;
 }
 
 } // namespace libMesh
