@@ -45,36 +45,36 @@ template <typename T>
 UniquePtr<NumericVector<T> >
 NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage solver_package)
 {
-  // Build the appropriate vector
-  switch (solver_package)
-    {
+// Build the appropriate vector
+switch (solver_package)
+{
 
 #ifdef LIBMESH_HAVE_LASPACK
-    case LASPACK_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new LaspackVector<T>(comm, AUTOMATIC));
+case LASPACK_SOLVERS:
+return UniquePtr<NumericVector<T> >(new LaspackVector<T>(comm, AUTOMATIC));
 #endif
 
 #ifdef LIBMESH_HAVE_PETSC
-    case PETSC_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
+case PETSC_SOLVERS:
+return UniquePtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
 #endif
 
 #ifdef LIBMESH_HAVE_TRILINOS
-    case TRILINOS_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
+case TRILINOS_SOLVERS:
+return UniquePtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
-    case EIGEN_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new EigenSparseVector<T>(comm, AUTOMATIC));
+case EIGEN_SOLVERS:
+return UniquePtr<NumericVector<T> >(new EigenSparseVector<T>(comm, AUTOMATIC));
 #endif
 
-    default:
-      return UniquePtr<NumericVector<T> >(new DistributedVector<T>(comm, AUTOMATIC));
-    }
+default:
+return UniquePtr<NumericVector<T> >(new DistributedVector<T>(comm, AUTOMATIC));
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<NumericVector<T> >();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<NumericVector<T> >();
 }
 
 
@@ -83,8 +83,8 @@ template <typename T>
 UniquePtr<NumericVector<T> >
 NumericVector<T>::build(const SolverPackage solver_package)
 {
-  libmesh_deprecated();
-  return NumericVector<T>::build(CommWorld, solver_package);
+libmesh_deprecated();
+return NumericVector<T>::build(CommWorld, solver_package);
 }
 #endif
 
@@ -92,124 +92,124 @@ NumericVector<T>::build(const SolverPackage solver_package)
 
 template <typename T>
 void NumericVector<T>::insert (const T * v,
-                               const std::vector<numeric_index_type> & dof_indices)
+const std::vector<numeric_index_type> & dof_indices)
 {
-  for (numeric_index_type i=0; i<dof_indices.size(); i++)
-    this->set (dof_indices[i], v[i]);
+for (numeric_index_type i=0; i<dof_indices.size(); i++)
+this->set (dof_indices[i], v[i]);
 }
 
 
 
 template <typename T>
 void NumericVector<T>::insert (const NumericVector<T> & V,
-                               const std::vector<numeric_index_type> & dof_indices)
+const std::vector<numeric_index_type> & dof_indices)
 {
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
+libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (numeric_index_type i=0; i<dof_indices.size(); i++)
-    this->set (dof_indices[i], V(i));
+for (numeric_index_type i=0; i<dof_indices.size(); i++)
+this->set (dof_indices[i], V(i));
 }
 
 
 
 template <typename T>
 int NumericVector<T>::compare (const NumericVector<T> & other_vector,
-                               const Real threshold) const
+const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int first_different_i = std::numeric_limits<int>::max();
-  numeric_index_type i = first_local_index();
+int first_different_i = std::numeric_limits<int>::max();
+numeric_index_type i = first_local_index();
 
-  do
-    {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-        first_different_i = i;
-      else
-        i++;
-    }
-  while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+do
+{
+if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+first_different_i = i;
+else
+i++;
+}
+while (first_different_i==std::numeric_limits<int>::max()
+&& i<last_local_index());
 
-  // Find the correct first differing index in parallel
-  this->comm().min(first_different_i);
+// Find the correct first differing index in parallel
+this->comm().min(first_different_i);
 
-  if (first_different_i == std::numeric_limits<int>::max())
-    return -1;
+if (first_different_i == std::numeric_limits<int>::max())
+return -1;
 
-  return first_different_i;
+return first_different_i;
 }
 
 
 template <typename T>
 int NumericVector<T>::local_relative_compare (const NumericVector<T> & other_vector,
-                                              const Real threshold) const
+const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int first_different_i = std::numeric_limits<int>::max();
-  numeric_index_type i = first_local_index();
+int first_different_i = std::numeric_limits<int>::max();
+numeric_index_type i = first_local_index();
 
-  do
-    {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold *
-           std::max(std::abs((*this)(i)), std::abs(other_vector(i))))
-        first_different_i = i;
-      else
-        i++;
-    }
-  while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+do
+{
+if ( std::abs( (*this)(i) - other_vector(i) ) > threshold *
+std::max(std::abs((*this)(i)), std::abs(other_vector(i))))
+first_different_i = i;
+else
+i++;
+}
+while (first_different_i==std::numeric_limits<int>::max()
+&& i<last_local_index());
 
-  // Find the correct first differing index in parallel
-  this->comm().min(first_different_i);
+// Find the correct first differing index in parallel
+this->comm().min(first_different_i);
 
-  if (first_different_i == std::numeric_limits<int>::max())
-    return -1;
+if (first_different_i == std::numeric_limits<int>::max())
+return -1;
 
-  return first_different_i;
+return first_different_i;
 }
 
 
 template <typename T>
 int NumericVector<T>::global_relative_compare (const NumericVector<T> & other_vector,
-                                               const Real threshold) const
+const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int first_different_i = std::numeric_limits<int>::max();
-  numeric_index_type i = first_local_index();
+int first_different_i = std::numeric_limits<int>::max();
+numeric_index_type i = first_local_index();
 
-  const Real my_norm = this->linfty_norm();
-  const Real other_norm = other_vector.linfty_norm();
-  const Real abs_threshold = std::max(my_norm, other_norm) * threshold;
+const Real my_norm = this->linfty_norm();
+const Real other_norm = other_vector.linfty_norm();
+const Real abs_threshold = std::max(my_norm, other_norm) * threshold;
 
-  do
-    {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > abs_threshold )
-        first_different_i = i;
-      else
-        i++;
-    }
-  while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+do
+{
+if ( std::abs( (*this)(i) - other_vector(i) ) > abs_threshold )
+first_different_i = i;
+else
+i++;
+}
+while (first_different_i==std::numeric_limits<int>::max()
+&& i<last_local_index());
 
-  // Find the correct first differing index in parallel
-  this->comm().min(first_different_i);
+// Find the correct first differing index in parallel
+this->comm().min(first_different_i);
 
-  if (first_different_i == std::numeric_limits<int>::max())
-    return -1;
+if (first_different_i == std::numeric_limits<int>::max())
+return -1;
 
-  return first_different_i;
+return first_different_i;
 }
 
 /*
@@ -322,91 +322,91 @@ return rvalue;
 template <class T>
 Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indices) const
 {
-  const NumericVector<T> & v = *this;
+const NumericVector<T> & v = *this;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
+std::set<numeric_index_type>::const_iterator it = indices.begin();
+const std::set<numeric_index_type>::const_iterator it_end = indices.end();
 
-  Real norm = 0;
+Real norm = 0;
 
-  for(; it!=it_end; ++it)
-    norm += std::abs(v(*it));
+for(; it!=it_end; ++it)
+norm += std::abs(v(*it));
 
-  this->comm().sum(norm);
+this->comm().sum(norm);
 
-  return norm;
+return norm;
 }
 
 template <class T>
 Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indices) const
 {
-  const NumericVector<T> & v = *this;
+const NumericVector<T> & v = *this;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
+std::set<numeric_index_type>::const_iterator it = indices.begin();
+const std::set<numeric_index_type>::const_iterator it_end = indices.end();
 
-  Real norm = 0;
+Real norm = 0;
 
-  for(; it!=it_end; ++it)
-    norm += TensorTools::norm_sq(v(*it));
+for(; it!=it_end; ++it)
+norm += TensorTools::norm_sq(v(*it));
 
-  this->comm().sum(norm);
+this->comm().sum(norm);
 
-  return std::sqrt(norm);
+return std::sqrt(norm);
 }
 
 template <class T>
 Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & indices) const
 {
-  const NumericVector<T> & v = *this;
+const NumericVector<T> & v = *this;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
+std::set<numeric_index_type>::const_iterator it = indices.begin();
+const std::set<numeric_index_type>::const_iterator it_end = indices.end();
 
-  Real norm = 0;
+Real norm = 0;
 
-  for(; it!=it_end; ++it)
-    {
-      Real value = std::abs(v(*it));
-      if(value > norm)
-        norm = value;
-    }
+for(; it!=it_end; ++it)
+{
+Real value = std::abs(v(*it));
+if(value > norm)
+norm = value;
+}
 
-  this->comm().max(norm);
+this->comm().max(norm);
 
-  return norm;
+return norm;
 }
 
 
 
 template <typename T>
 void NumericVector<T>::add_vector (const T * v,
-                                   const std::vector<numeric_index_type> & dof_indices)
+const std::vector<numeric_index_type> & dof_indices)
 {
-  int n = dof_indices.size();
-  for (int i=0; i<n; i++)
-    this->add (dof_indices[i], v[i]);
+int n = dof_indices.size();
+for (int i=0; i<n; i++)
+this->add (dof_indices[i], v[i]);
 }
 
 
 
 template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T> & v,
-                                   const std::vector<numeric_index_type> & dof_indices)
+const std::vector<numeric_index_type> & dof_indices)
 {
-  int n = dof_indices.size();
-  libmesh_assert_equal_to(v.size(), static_cast<unsigned>(n));
-  for (int i=0; i<n; i++)
-    this->add (dof_indices[i], v(i));
+int n = dof_indices.size();
+libmesh_assert_equal_to(v.size(), static_cast<unsigned>(n));
+for (int i=0; i<n; i++)
+this->add (dof_indices[i], v(i));
 }
 
 
 
 template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T> & v,
-                                   const ShellMatrix<T> & a)
+const ShellMatrix<T> & a)
 {
-  a.vector_mult_add(*this,v);
+a.vector_mult_add(*this,v);
 }
 
 

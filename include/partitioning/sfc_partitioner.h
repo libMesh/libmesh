@@ -30,52 +30,52 @@ namespace libMesh
 {
 
 /**
- * The \p SFCPartitioner uses a Hilbert or Morton-ordered space
- * filling curve to partition the elements.
- */
+* The \p SFCPartitioner uses a Hilbert or Morton-ordered space
+* filling curve to partition the elements.
+*/
 class SFCPartitioner : public Partitioner
 {
 public:
 
-  /**
-   * Constructor.  Sets the default space filling
-   * curve type to "Hilbert".
-   */
-  SFCPartitioner () :
-    _sfc_type ("Hilbert")
-  {}
+/**
+* Constructor.  Sets the default space filling
+* curve type to "Hilbert".
+*/
+SFCPartitioner () :
+_sfc_type ("Hilbert")
+{}
 
-  /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
-  {
-    return UniquePtr<Partitioner>(new SFCPartitioner());
-  }
+/**
+* Creates a new partitioner of this type and returns it in
+* an \p UniquePtr.
+*/
+virtual UniquePtr<Partitioner> clone () const libmesh_override
+{
+return UniquePtr<Partitioner>(new SFCPartitioner());
+}
 
-  /**
-   * Sets the type of space-filling curve to use.  Valid types are
-   * "Hilbert" (the default) and "Morton"
-   */
-  void set_sfc_type (const std::string & sfc_type);
+/**
+* Sets the type of space-filling curve to use.  Valid types are
+* "Hilbert" (the default) and "Morton"
+*/
+void set_sfc_type (const std::string & sfc_type);
 
 
 protected:
 
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override;
+/**
+* Partition the \p MeshBase into \p n subdomains.
+*/
+virtual void _do_partition (MeshBase & mesh,
+const unsigned int n) libmesh_override;
 
 
 private:
 
-  /**
-   * The type of space-filling curve to use.  Hilbert by default.
-   */
-  std::string _sfc_type;
+/**
+* The type of space-filling curve to use.  Hilbert by default.
+*/
+std::string _sfc_type;
 };
 
 
@@ -85,10 +85,10 @@ private:
 inline
 void SFCPartitioner::set_sfc_type (const std::string & sfc_type)
 {
-  libmesh_assert ((sfc_type == "Hilbert") ||
-                  (sfc_type == "Morton"));
+libmesh_assert ((sfc_type == "Hilbert") ||
+(sfc_type == "Morton"));
 
-  _sfc_type = sfc_type;
+_sfc_type = sfc_type;
 }
 
 

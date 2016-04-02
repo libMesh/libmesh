@@ -29,43 +29,43 @@ namespace libMesh
 {
 
 /**
- * This class creates a gaussian quadrature rule duplicated for each
- * subelement of a Clough-Tocher divided macroelement.
- *
- * \author Roy Stogner
- * \date 2005
- */
+* This class creates a gaussian quadrature rule duplicated for each
+* subelement of a Clough-Tocher divided macroelement.
+*
+* \author Roy Stogner
+* \date 2005
+*/
 class QClough libmesh_final : public QBase
 {
 public:
 
-  /**
-   * Constructor.  Declares the order of the quadrature rule.
-   */
-  QClough (const unsigned int _dim,
-           const Order _order=INVALID_ORDER) :
-    QBase(_dim, _order)
-  {}
+/**
+* Constructor.  Declares the order of the quadrature rule.
+*/
+QClough (const unsigned int _dim,
+const Order _order=INVALID_ORDER) :
+QBase(_dim, _order)
+{}
 
-  /**
-   * Destructor.
-   */
-  ~QClough() {}
+/**
+* Destructor.
+*/
+~QClough() {}
 
-  /**
-   * @returns \p QCLOUGH
-   */
-  virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
+/**
+* @returns \p QCLOUGH
+*/
+virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
 
 
 private:
 
-  void init_1D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0) libmesh_override;
-  void init_2D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0) libmesh_override;
-  void init_3D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0) libmesh_override;
+void init_1D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+void init_2D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+void init_3D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
 };
 
 } // namespace libMesh

@@ -29,12 +29,12 @@ template <typename Output=Number>
 class ZeroFunction : public ConstFunction<Output>
 {
 public:
-  ZeroFunction () : ConstFunction<Output>(0) {}
+ZeroFunction () : ConstFunction<Output>(0) {}
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override
-  {
-    return UniquePtr<FunctionBase<Output> >(new ZeroFunction<Output>());
-  }
+virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override
+{
+return UniquePtr<FunctionBase<Output> >(new ZeroFunction<Output>());
+}
 };
 
 } // namespace libMesh

@@ -34,102 +34,102 @@ namespace libMesh
 
 void OFFIO::read(const std::string & name)
 {
-  std::ifstream in (name.c_str());
+std::ifstream in (name.c_str());
 
-  read_stream(in);
+read_stream(in);
 }
 
 
 
 void OFFIO::read_stream(std::istream & in)
 {
-  // This is a serial-only process for now;
-  // the Mesh should be read on processor 0 and
-  // broadcast later
-  libmesh_assert_equal_to (this->mesh().processor_id(), 0);
+// This is a serial-only process for now;
+// the Mesh should be read on processor 0 and
+// broadcast later
+libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 
-  // Get a reference to the mesh
-  MeshBase & the_mesh = MeshInput<MeshBase>::mesh();
+// Get a reference to the mesh
+MeshBase & the_mesh = MeshInput<MeshBase>::mesh();
 
-  // Clear any existing mesh data
-  the_mesh.clear();
+// Clear any existing mesh data
+the_mesh.clear();
 
-  // Check the input buffer
-  libmesh_assert (in.good());
+// Check the input buffer
+libmesh_assert (in.good());
 
-  unsigned int nn, ne, nf;
+unsigned int nn, ne, nf;
 
-  std::string label;
+std::string label;
 
-  // Read the first string.  It should say "OFF"
-  in >> label;
+// Read the first string.  It should say "OFF"
+in >> label;
 
-  libmesh_assert_equal_to (label, "OFF");
+libmesh_assert_equal_to (label, "OFF");
 
-  // read the number of nodes, faces, and edges
-  in >> nn >> nf >> ne;
+// read the number of nodes, faces, and edges
+in >> nn >> nf >> ne;
 
 
-  Real x=0., y=0., z=0.;
+Real x=0., y=0., z=0.;
 
-  // Read the nodes
-  for (unsigned int n=0; n<nn; n++)
-    {
-      libmesh_assert (in.good());
+// Read the nodes
+for (unsigned int n=0; n<nn; n++)
+{
+libmesh_assert (in.good());
 
-      in >> x
-         >> y
-         >> z;
+in >> x
+>> y
+>> z;
 
-      the_mesh.add_point ( Point(x,y,z), n );
-    }
+the_mesh.add_point ( Point(x,y,z), n );
+}
 
-  unsigned int nv, nid;
+unsigned int nv, nid;
 
-  // Read the elements
-  for (unsigned int e=0; e<nf; e++)
-    {
-      libmesh_assert (in.good());
+// Read the elements
+for (unsigned int e=0; e<nf; e++)
+{
+libmesh_assert (in.good());
 
-      // The number of vertices in the element
-      in >> nv;
+// The number of vertices in the element
+in >> nv;
 
-      libmesh_assert(nv == 2 || nv == 3);
-      if (e == 0)
-        {
-          the_mesh.set_mesh_dimension(cast_int<unsigned char>(nv-1));
-          if (nv == 3)
-            {
+libmesh_assert(nv == 2 || nv == 3);
+if (e == 0)
+{
+the_mesh.set_mesh_dimension(cast_int<unsigned char>(nv-1));
+if (nv == 3)
+{
 #if LIBMESH_DIM < 2
-              libmesh_error_msg("Cannot open dimension 2 mesh file when configured without 2D support.");
+libmesh_error_msg("Cannot open dimension 2 mesh file when configured without 2D support.");
 #endif
-            }
-        }
+}
+}
 
-      Elem * elem;
-      switch (nv)
-        {
-        case 2:
-          elem = new Edge2;
-          break;
+Elem * elem;
+switch (nv)
+{
+case 2:
+elem = new Edge2;
+break;
 
-        case 3:
-          elem = new Tri3;
-          break;
+case 3:
+elem = new Tri3;
+break;
 
-        default:
-          libmesh_error_msg("Unsupported nv = " << nv);
-        }
+default:
+libmesh_error_msg("Unsupported nv = " << nv);
+}
 
-      elem->set_id(e);
-      the_mesh.add_elem (elem);
+elem->set_id(e);
+the_mesh.add_elem (elem);
 
-      for (unsigned int i=0; i<nv; i++)
-        {
-          in >> nid;
-          elem->set_node(i) = the_mesh.node_ptr(nid);
-        }
-    }
+for (unsigned int i=0; i<nv; i++)
+{
+in >> nid;
+elem->set_node(i) = the_mesh.node_ptr(nid);
+}
+}
 }
 
 } // namespace libMesh

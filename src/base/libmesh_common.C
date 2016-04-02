@@ -35,56 +35,56 @@ namespace MacroFunctions
 {
 void here(const char * file, int line, const char * date, const char * time)
 {
-  libMesh::err << "[" << static_cast<std::size_t>(libMesh::global_processor_id()) << "] "
-               << file
-               << ", line " << line
-               << ", compiled " << date
-               << " at " << time
-               << std::endl;
+libMesh::err << "[" << static_cast<std::size_t>(libMesh::global_processor_id()) << "] "
+<< file
+<< ", line " << line
+<< ", compiled " << date
+<< " at " << time
+<< std::endl;
 }
 
 
 
 void stop(const char * file, int line, const char * date, const char * time)
 {
-  if (libMesh::global_n_processors() == 1)
-    {
-      libMesh::MacroFunctions::here(file, line, date, time);
+if (libMesh::global_n_processors() == 1)
+{
+libMesh::MacroFunctions::here(file, line, date, time);
 #ifdef LIBMESH_HAVE_CSIGNAL
-      libMesh::out << "Stopping process " << getpid() << "..." << std::endl;
-      std::raise(SIGSTOP);
-      libMesh::out << "Continuing process " << getpid() << "..." << std::endl;
+libMesh::out << "Stopping process " << getpid() << "..." << std::endl;
+std::raise(SIGSTOP);
+libMesh::out << "Continuing process " << getpid() << "..." << std::endl;
 #else
-      libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
+libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
 #endif
-    }
+}
 }
 
 
 void report_error(const char * file, int line, const char * date, const char * time)
 {
-  // It is possible to have an error *inside* report_error; e.g. from
-  // print_trace.  We don't want to infinitely recurse.
-  static bool reporting_error = false;
-  if (reporting_error)
-    {
-      // I heard you like error reporting, so we put an error report
-      // in report_error() so you can report errors from the report.
-      libMesh::err << "libMesh encountered an error while attempting to report_error." << std::endl;
-      return;
-    }
-  reporting_error = true;
+// It is possible to have an error *inside* report_error; e.g. from
+// print_trace.  We don't want to infinitely recurse.
+static bool reporting_error = false;
+if (reporting_error)
+{
+// I heard you like error reporting, so we put an error report
+// in report_error() so you can report errors from the report.
+libMesh::err << "libMesh encountered an error while attempting to report_error." << std::endl;
+return;
+}
+reporting_error = true;
 
-  if (libMesh::global_n_processors() == 1 ||
-      // Note: support both 'underscore' and 'dash' flavors of the option
-      libMesh::on_command_line("--print_trace") ||
-      libMesh::on_command_line("--print-trace"))
-    libMesh::print_trace();
-  else
-    libMesh::write_traceout();
-  libMesh::MacroFunctions::here(file, line, date, time);
+if (libMesh::global_n_processors() == 1 ||
+// Note: support both 'underscore' and 'dash' flavors of the option
+libMesh::on_command_line("--print_trace") ||
+libMesh::on_command_line("--print-trace"))
+libMesh::print_trace();
+else
+libMesh::write_traceout();
+libMesh::MacroFunctions::here(file, line, date, time);
 
-  reporting_error = false;
+reporting_error = false;
 }
 
 } // namespace MacroFunctions

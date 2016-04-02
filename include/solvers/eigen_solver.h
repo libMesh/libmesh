@@ -45,206 +45,206 @@ template <typename T> class NumericVector;
 class SolverConfiguration;
 
 /**
- * This class provides an interface to solvers for eigenvalue
- * problems.
- */
+* This class provides an interface to solvers for eigenvalue
+* problems.
+*/
 
 template <typename T>
 class EigenSolver : public ReferenceCountedObject<EigenSolver<T> >,
-                    public ParallelObject
+public ParallelObject
 {
 public:
 
-  /**
-   *  Constructor. Initializes Solver data structures
-   */
-  EigenSolver (const Parallel::Communicator & comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+/**
+*  Constructor. Initializes Solver data structures
+*/
+EigenSolver (const Parallel::Communicator & comm_in
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
-  /**
-   * Destructor.
-   */
-  virtual ~EigenSolver ();
+/**
+* Destructor.
+*/
+virtual ~EigenSolver ();
 
-  /**
-   * Builds an \p EigenSolver using the linear solver package specified by
-   * \p solver_package
-   */
-  static UniquePtr<EigenSolver<T> > build(const Parallel::Communicator & comm_in
-                                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
-                                          const SolverPackage solver_package = SLEPC_SOLVERS);
+/**
+* Builds an \p EigenSolver using the linear solver package specified by
+* \p solver_package
+*/
+static UniquePtr<EigenSolver<T> > build(const Parallel::Communicator & comm_in
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+const SolverPackage solver_package = SLEPC_SOLVERS);
 
-  /**
-   * @returns true if the data structures are
-   * initialized, false otherwise.
-   */
-  bool initialized () const { return _is_initialized; }
-
-
-  /**
-   * Release all memory and clear data structures.
-   */
-  virtual void clear () {}
-
-  /**
-   * Initialize data structures if not done so already.
-   */
-  virtual void init () = 0;
-
-  /**
-   * Returns the type of eigensolver to use.
-   */
-  EigenSolverType eigen_solver_type () const { return _eigen_solver_type; }
-
-  /**
-   * Returns the type of the eigen problem.
-   */
-  EigenProblemType eigen_problem_type () const { return _eigen_problem_type;}
-
-  /**
-   * Returns the position of the spectrum to compute.
-   */
-  PositionOfSpectrum position_of_spectrum () const
-  { return _position_of_spectrum;}
-
-  /**
-   * Sets the type of eigensolver to use.
-   */
-  void set_eigensolver_type (const EigenSolverType est)
-  { _eigen_solver_type = est; }
-
-  /**
-   * Sets the type of the eigenproblem.
-   */
-  void set_eigenproblem_type ( EigenProblemType ept)
-  {_eigen_problem_type = ept;}
-
-  /**
-   * Sets the position of the spectrum.
-   */
-  void set_position_of_spectrum (PositionOfSpectrum pos)
-  {_position_of_spectrum= pos;}
-
-  /**
-   * Solves the standard eigen problem when matrix_A is a
-   * \p SparseMatrix, and returns the number of converged
-   * eigenpairs and the number of iterations.
-   */
-  virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> & matrix_A,
-                                                                int nev,
-                                                                int ncv,
-                                                                const double tol,
-                                                                const unsigned int m_its) = 0;
-
-  /**
-   * Solves the standard eigen problem when matrix_A is a
-   * \p ShellMatrix, and returns the number of converged
-   * eigenpairs and the number of iterations.
-   */
-  virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> & matrix_A,
-                                                                int nev,
-                                                                int ncv,
-                                                                const double tol,
-                                                                const unsigned int m_its) = 0;
+/**
+* @returns true if the data structures are
+* initialized, false otherwise.
+*/
+bool initialized () const { return _is_initialized; }
 
 
-  /**
-   * Solves the generalized eigen problem when both matrix_A
-   * and matrix_B are of type \p SparseMatrix and returns the
-   * number of converged eigenpairs and the number
-   * of iterations.
-   */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
-                                                                   SparseMatrix<T> & matrix_B,
-                                                                   int nev,
-                                                                   int ncv,
-                                                                   const double tol,
-                                                                   const unsigned int m_its) = 0;
+/**
+* Release all memory and clear data structures.
+*/
+virtual void clear () {}
 
-  /**
-   * Solves the generalized eigen problem when matrix_A is
-   * a ShellMatrix and matrix_B is a SparseMatrix.
-   */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
-                                                                   SparseMatrix<T> & matrix_B,
-                                                                   int nev,
-                                                                   int ncv,
-                                                                   const double tol,
-                                                                   const unsigned int m_its) = 0;
+/**
+* Initialize data structures if not done so already.
+*/
+virtual void init () = 0;
 
-  /**
-   * Solves the generalized eigen problem when matrix_A is
-   * a SparseMatrix and matrix_B is a ShellMatrix.
-   */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
-                                                                   ShellMatrix<T> & matrix_B,
-                                                                   int nev,
-                                                                   int ncv,
-                                                                   const double tol,
-                                                                   const unsigned int m_its) = 0;
+/**
+* Returns the type of eigensolver to use.
+*/
+EigenSolverType eigen_solver_type () const { return _eigen_solver_type; }
 
-  /**
-   * Solves the generalized eigen problem when both matrix_A
-   * and matrix_B are of type ShellMatrix.
-   */
-  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
-                                                                   ShellMatrix<T> & matrix_B,
-                                                                   int nev,
-                                                                   int ncv,
-                                                                   const double tol,
-                                                                   const unsigned int m_its) = 0;
+/**
+* Returns the type of the eigen problem.
+*/
+EigenProblemType eigen_problem_type () const { return _eigen_problem_type;}
+
+/**
+* Returns the position of the spectrum to compute.
+*/
+PositionOfSpectrum position_of_spectrum () const
+{ return _position_of_spectrum;}
+
+/**
+* Sets the type of eigensolver to use.
+*/
+void set_eigensolver_type (const EigenSolverType est)
+{ _eigen_solver_type = est; }
+
+/**
+* Sets the type of the eigenproblem.
+*/
+void set_eigenproblem_type ( EigenProblemType ept)
+{_eigen_problem_type = ept;}
+
+/**
+* Sets the position of the spectrum.
+*/
+void set_position_of_spectrum (PositionOfSpectrum pos)
+{_position_of_spectrum= pos;}
+
+/**
+* Solves the standard eigen problem when matrix_A is a
+* \p SparseMatrix, and returns the number of converged
+* eigenpairs and the number of iterations.
+*/
+virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> & matrix_A,
+int nev,
+int ncv,
+const double tol,
+const unsigned int m_its) = 0;
+
+/**
+* Solves the standard eigen problem when matrix_A is a
+* \p ShellMatrix, and returns the number of converged
+* eigenpairs and the number of iterations.
+*/
+virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> & matrix_A,
+int nev,
+int ncv,
+const double tol,
+const unsigned int m_its) = 0;
 
 
-  /**
-   * Returns the \p ith eigenvalue (real and imaginary part),
-   * and copies the \ ith eigen vector to the solution vector.
-   */
-  virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
-                                               NumericVector<T> & solution) = 0;
+/**
+* Solves the generalized eigen problem when both matrix_A
+* and matrix_B are of type \p SparseMatrix and returns the
+* number of converged eigenpairs and the number
+* of iterations.
+*/
+virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
+SparseMatrix<T> & matrix_B,
+int nev,
+int ncv,
+const double tol,
+const unsigned int m_its) = 0;
 
-  /**
-   * Returns the \p ith eigenvalue (real and imaginary part).
-   * Same as above function, except it does copy the eigenvector.
-   */
-  virtual std::pair<Real, Real> get_eigenvalue (unsigned int i) = 0;
+/**
+* Solves the generalized eigen problem when matrix_A is
+* a ShellMatrix and matrix_B is a SparseMatrix.
+*/
+virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
+SparseMatrix<T> & matrix_B,
+int nev,
+int ncv,
+const double tol,
+const unsigned int m_its) = 0;
 
-  /**
-   * Attach a deflation space defined by a single vector.
-   */
-  virtual void attach_deflation_space(NumericVector<T> & deflation_vector) = 0;
+/**
+* Solves the generalized eigen problem when matrix_A is
+* a SparseMatrix and matrix_B is a ShellMatrix.
+*/
+virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
+ShellMatrix<T> & matrix_B,
+int nev,
+int ncv,
+const double tol,
+const unsigned int m_its) = 0;
 
-  /**
-   * Set the solver configuration object.
-   */
-  void set_solver_configuration(SolverConfiguration & solver_configuration);
+/**
+* Solves the generalized eigen problem when both matrix_A
+* and matrix_B are of type ShellMatrix.
+*/
+virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
+ShellMatrix<T> & matrix_B,
+int nev,
+int ncv,
+const double tol,
+const unsigned int m_its) = 0;
+
+
+/**
+* Returns the \p ith eigenvalue (real and imaginary part),
+* and copies the \ ith eigen vector to the solution vector.
+*/
+virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
+NumericVector<T> & solution) = 0;
+
+/**
+* Returns the \p ith eigenvalue (real and imaginary part).
+* Same as above function, except it does copy the eigenvector.
+*/
+virtual std::pair<Real, Real> get_eigenvalue (unsigned int i) = 0;
+
+/**
+* Attach a deflation space defined by a single vector.
+*/
+virtual void attach_deflation_space(NumericVector<T> & deflation_vector) = 0;
+
+/**
+* Set the solver configuration object.
+*/
+void set_solver_configuration(SolverConfiguration & solver_configuration);
 
 protected:
 
-  /**
-   * Enum stating which type of eigensolver to use.
-   */
-  EigenSolverType _eigen_solver_type;
+/**
+* Enum stating which type of eigensolver to use.
+*/
+EigenSolverType _eigen_solver_type;
 
-  /**
-   * Enum stating which type of eigen problem we deal with.
-   */
-  EigenProblemType _eigen_problem_type;
+/**
+* Enum stating which type of eigen problem we deal with.
+*/
+EigenProblemType _eigen_problem_type;
 
-  /**
-   * Enum stating where to evaluate the spectrum.
-   */
-  PositionOfSpectrum _position_of_spectrum;
+/**
+* Enum stating where to evaluate the spectrum.
+*/
+PositionOfSpectrum _position_of_spectrum;
 
-  /**
-   * Flag indicating if the data structures have been initialized.
-   */
-  bool _is_initialized;
+/**
+* Flag indicating if the data structures have been initialized.
+*/
+bool _is_initialized;
 
-  /**
-   * Optionally store a SolverOptions object that can be used
-   * to set parameters like solver type, tolerances and iteration limits.
-   */
-  SolverConfiguration * _solver_configuration;
+/**
+* Optionally store a SolverOptions object that can be used
+* to set parameters like solver type, tolerances and iteration limits.
+*/
+SolverConfiguration * _solver_configuration;
 
 };
 
@@ -255,12 +255,12 @@ protected:
 template <typename T>
 inline
 EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
-  ParallelObject(comm_in),
-  _eigen_solver_type    (ARNOLDI),
-  _eigen_problem_type   (NHEP),
-  _position_of_spectrum (LARGEST_MAGNITUDE),
-  _is_initialized       (false),
-  _solver_configuration(libmesh_nullptr)
+ParallelObject(comm_in),
+_eigen_solver_type    (ARNOLDI),
+_eigen_problem_type   (NHEP),
+_position_of_spectrum (LARGEST_MAGNITUDE),
+_is_initialized       (false),
+_solver_configuration(libmesh_nullptr)
 {
 }
 
@@ -270,7 +270,7 @@ template <typename T>
 inline
 EigenSolver<T>::~EigenSolver ()
 {
-  this->clear ();
+this->clear ();
 }
 
 } // namespace libMesh

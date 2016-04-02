@@ -28,37 +28,37 @@ class UnstructuredMesh;
 
 
 /**
- * This class provides the necessary interface for
- * mesh smoothing.  Concrete mesh smoothers will be
- * derived from this abstract base class.
- *
- * \author John W. Peterson
- * \date 2002-2007
- */
+* This class provides the necessary interface for
+* mesh smoothing.  Concrete mesh smoothers will be
+* derived from this abstract base class.
+*
+* \author John W. Peterson
+* \date 2002-2007
+*/
 class MeshSmoother
 {
 public:
-  /**
-   * Constructor.  Sets the mesh reference
-   * in the protected data section of the class.
-   */
-  explicit
-  MeshSmoother(UnstructuredMesh & mesh) : _mesh(mesh) {}
+/**
+* Constructor.  Sets the mesh reference
+* in the protected data section of the class.
+*/
+explicit
+MeshSmoother(UnstructuredMesh & mesh) : _mesh(mesh) {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~MeshSmoother() {}
+/**
+* Destructor.
+*/
+virtual ~MeshSmoother() {}
 
-  /**
-   * Function which actually performs the smoothing operations.
-   * In this abstract base class, this function does nothing.
-   */
-  virtual void smooth() = 0;
+/**
+* Function which actually performs the smoothing operations.
+* In this abstract base class, this function does nothing.
+*/
+virtual void smooth() = 0;
 
 protected:
 
-  UnstructuredMesh & _mesh;
+UnstructuredMesh & _mesh;
 };
 
 } // namespace libMesh

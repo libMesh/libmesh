@@ -36,88 +36,88 @@ namespace libMesh
 class ParmetisHelper;
 
 /**
- * The \p ParmetisPartitioner uses the Parmetis graph partitioner
- * to partition the elements.
- */
+* The \p ParmetisPartitioner uses the Parmetis graph partitioner
+* to partition the elements.
+*/
 class ParmetisPartitioner : public Partitioner
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  ParmetisPartitioner ();
+/**
+* Constructor.
+*/
+ParmetisPartitioner ();
 
-  /**
-   * Destructor.
-   */
-  ~ParmetisPartitioner ();
+/**
+* Destructor.
+*/
+~ParmetisPartitioner ();
 
-  /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
-  {
-    return UniquePtr<Partitioner>(new ParmetisPartitioner());
-  }
+/**
+* Creates a new partitioner of this type and returns it in
+* an \p UniquePtr.
+*/
+virtual UniquePtr<Partitioner> clone () const libmesh_override
+{
+return UniquePtr<Partitioner>(new ParmetisPartitioner());
+}
 
 
 protected:
 
-  /**
-   * Parmetis can handle dynamically repartitioning a mesh such
-   * that the redistribution costs are minimized.  This method
-   * takes a previously partitioned domain (which may have
-   * then been adaptively refined) and repartitions it.
-   */
-  virtual void _do_repartition (MeshBase & mesh,
-                                const unsigned int n) libmesh_override;
+/**
+* Parmetis can handle dynamically repartitioning a mesh such
+* that the redistribution costs are minimized.  This method
+* takes a previously partitioned domain (which may have
+* then been adaptively refined) and repartitions it.
+*/
+virtual void _do_repartition (MeshBase & mesh,
+const unsigned int n) libmesh_override;
 
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override;
+/**
+* Partition the \p MeshBase into \p n subdomains.
+*/
+virtual void _do_partition (MeshBase & mesh,
+const unsigned int n) libmesh_override;
 
 private:
 
-  // These methods & data only need to be available if the
-  // ParMETIS library is available.
+// These methods & data only need to be available if the
+// ParMETIS library is available.
 #ifdef LIBMESH_HAVE_PARMETIS
 
-  /**
-   * Initialize data structures.
-   */
-  void initialize (const MeshBase & mesh, const unsigned int n_sbdmns);
+/**
+* Initialize data structures.
+*/
+void initialize (const MeshBase & mesh, const unsigned int n_sbdmns);
 
-  /**
-   * Build the graph.
-   */
-  void build_graph (const MeshBase & mesh);
+/**
+* Build the graph.
+*/
+void build_graph (const MeshBase & mesh);
 
-  /**
-   * Assign the computed partitioning to the mesh.
-   */
-  void assign_partitioning (MeshBase & mesh);
+/**
+* Assign the computed partitioning to the mesh.
+*/
+void assign_partitioning (MeshBase & mesh);
 
-  /**
-   * The number of active elements on each processor.  Note that
-   * ParMETIS requires that each processor have some active elements,
-   * it will abort if any processor passes a NULL _part array.
-   */
-  std::vector<dof_id_type> _n_active_elem_on_proc;
+/**
+* The number of active elements on each processor.  Note that
+* ParMETIS requires that each processor have some active elements,
+* it will abort if any processor passes a NULL _part array.
+*/
+std::vector<dof_id_type> _n_active_elem_on_proc;
 
-  /**
-   * Maps active element ids into a contiguous range, as needed by ParMETIS.
-   */
-  vectormap<dof_id_type, dof_id_type> _global_index_by_pid_map;
+/**
+* Maps active element ids into a contiguous range, as needed by ParMETIS.
+*/
+vectormap<dof_id_type, dof_id_type> _global_index_by_pid_map;
 
-  /**
-   * Pointer to the Parmetis-specific data structures.  Lets us avoid
-   * including parmetis.h here.
-   */
-  ParmetisHelper * _pmetis;
+/**
+* Pointer to the Parmetis-specific data structures.  Lets us avoid
+* including parmetis.h here.
+*/
+ParmetisHelper * _pmetis;
 
 #endif
 };

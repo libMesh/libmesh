@@ -40,98 +40,98 @@ namespace libMesh
 
 
 /**
- * This class implements a goal oriented error indicator, by weighting
- * residual-based estimates from the primal problem against estimates
- * from the adjoint problem.
- *
- * This is based on a trick suggested by Brian Carnes, (first proposed by
- * Babuska and Miller in 1984) but if it
- * doesn't actually work then the misunderstanding or
- * misimplementation will be the fault of Roy Stogner.  It's also
- * Roy's fault there's no literature reference here yet.
- *
- * \author Roy H. Stogner
- * \date 2009
- */
+* This class implements a goal oriented error indicator, by weighting
+* residual-based estimates from the primal problem against estimates
+* from the adjoint problem.
+*
+* This is based on a trick suggested by Brian Carnes, (first proposed by
+* Babuska and Miller in 1984) but if it
+* doesn't actually work then the misunderstanding or
+* misimplementation will be the fault of Roy Stogner.  It's also
+* Roy's fault there's no literature reference here yet.
+*
+* \author Roy H. Stogner
+* \date 2009
+*/
 class AdjointResidualErrorEstimator : public ErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Responsible for picking default subestimators.
-   */
-  AdjointResidualErrorEstimator();
+/**
+* Constructor.  Responsible for picking default subestimators.
+*/
+AdjointResidualErrorEstimator();
 
-  /**
-   * Destructor.
-   */
-  ~AdjointResidualErrorEstimator() {}
+/**
+* Destructor.
+*/
+~AdjointResidualErrorEstimator() {}
 
-  /**
-   * Access to the "subestimator" (default: PatchRecovery) to use on
-   * the primal/forward solution
-   */
-  UniquePtr<ErrorEstimator> & primal_error_estimator() { return _primal_error_estimator; }
+/**
+* Access to the "subestimator" (default: PatchRecovery) to use on
+* the primal/forward solution
+*/
+UniquePtr<ErrorEstimator> & primal_error_estimator() { return _primal_error_estimator; }
 
-  /**
-   * Access to the "subestimator" (default: PatchRecovery) to use on
-   * the dual/adjoint solution
-   */
-  UniquePtr<ErrorEstimator> & dual_error_estimator() { return _dual_error_estimator; }
+/**
+* Access to the "subestimator" (default: PatchRecovery) to use on
+* the dual/adjoint solution
+*/
+UniquePtr<ErrorEstimator> & dual_error_estimator() { return _dual_error_estimator; }
 
-  /**
-   * Access to the QoISet (default: weight all QoIs equally) to use
-   * when computing errors
-   */
-  QoISet & qoi_set() { return _qoi_set; }
+/**
+* Access to the QoISet (default: weight all QoIs equally) to use
+* when computing errors
+*/
+QoISet & qoi_set() { return _qoi_set; }
 
-  /**
-   * Access to the QoISet (default: weight all QoIs equally) to use
-   * when computing errors
-   */
-  const QoISet & qoi_set() const { return _qoi_set; }
+/**
+* Access to the QoISet (default: weight all QoIs equally) to use
+* when computing errors
+*/
+const QoISet & qoi_set() const { return _qoi_set; }
 
-  /**
-   * To aid in investigating error estimator behavior, set this string
-   * to a suffix with which to plot (prefixed by "primal_" or "dual_")
-   * the subestimator results.  The suffix should end with a file
-   * extension (e.g. ".gmv") that the ErrorVector::plot_error
-   * recognizes.
-   */
-  std::string error_plot_suffix;
+/**
+* To aid in investigating error estimator behavior, set this string
+* to a suffix with which to plot (prefixed by "primal_" or "dual_")
+* the subestimator results.  The suffix should end with a file
+* extension (e.g. ".gmv") that the ErrorVector::plot_error
+* recognizes.
+*/
+std::string error_plot_suffix;
 
-  /**
-   * Compute the adjoint-weighted error on each element and place it
-   * in the \p error_per_cell vector.  Note that this->error_norm is
-   * ignored; the error estimate is in the seminorm given by the
-   * absolute value of the error in the quantity of interest
-   * functional.  The primal and dual subestimator error_norm values
-   * are used, and should be chosen appropriately for your model.
-   */
-  virtual void estimate_error (const System & system,
-                               ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
+/**
+* Compute the adjoint-weighted error on each element and place it
+* in the \p error_per_cell vector.  Note that this->error_norm is
+* ignored; the error estimate is in the seminorm given by the
+* absolute value of the error in the quantity of interest
+* functional.  The primal and dual subestimator error_norm values
+* are used, and should be chosen appropriately for your model.
+*/
+virtual void estimate_error (const System & system,
+ErrorVector & error_per_cell,
+const NumericVector<Number> * solution_vector = libmesh_nullptr,
+bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return ADJOINT_RESIDUAL;}
+virtual ErrorEstimatorType type() const libmesh_override
+{ return ADJOINT_RESIDUAL;}
 
 protected:
 
-  /**
-   * An error estimator for the forward problem
-   */
-  UniquePtr<ErrorEstimator> _primal_error_estimator;
+/**
+* An error estimator for the forward problem
+*/
+UniquePtr<ErrorEstimator> _primal_error_estimator;
 
-  /**
-   * An error estimator for the adjoint problem
-   */
-  UniquePtr<ErrorEstimator> _dual_error_estimator;
+/**
+* An error estimator for the adjoint problem
+*/
+UniquePtr<ErrorEstimator> _dual_error_estimator;
 
-  /**
-   * A QoISet to handle cases with multiple QoIs available
-   */
-  QoISet _qoi_set;
+/**
+* A QoISet to handle cases with multiple QoIs available
+*/
+QoISet _qoi_set;
 };
 
 

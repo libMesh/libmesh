@@ -46,29 +46,29 @@ namespace libMesh
 void
 LaplacianErrorEstimator::init_context(FEMContext & c)
 {
-  const unsigned int n_vars = c.n_vars();
-  for (unsigned int v=0; v<n_vars; v++)
-    {
-      // Possibly skip this variable
-      if (error_norm.weight(v) == 0.0) continue;
+const unsigned int n_vars = c.n_vars();
+for (unsigned int v=0; v<n_vars; v++)
+{
+// Possibly skip this variable
+if (error_norm.weight(v) == 0.0) continue;
 
-      // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase * side_fe = libmesh_nullptr;
+// FIXME: Need to generalize this to vector-valued elements. [PB]
+FEBase * side_fe = libmesh_nullptr;
 
-      const std::set<unsigned char> & elem_dims =
-        c.elem_dimensions();
+const std::set<unsigned char> & elem_dims =
+c.elem_dimensions();
 
-      for (std::set<unsigned char>::const_iterator dim_it =
-             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
-        {
-          const unsigned char dim = *dim_it;
+for (std::set<unsigned char>::const_iterator dim_it =
+elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+{
+const unsigned char dim = *dim_it;
 
-          fine_context->get_side_fe( v, side_fe, dim );
+fine_context->get_side_fe( v, side_fe, dim );
 
-          // We'll need hessians on both sides for flux jump computation
-          side_fe->get_d2phi();
-        }
-    }
+// We'll need hessians on both sides for flux jump computation
+side_fe->get_d2phi();
+}
+}
 }
 
 
@@ -76,68 +76,68 @@ LaplacianErrorEstimator::init_context(FEMContext & c)
 void
 LaplacianErrorEstimator::internal_side_integration ()
 {
-  const Elem & coarse_elem = coarse_context->get_elem();
-  const Elem & fine_elem   = fine_context->get_elem();
+const Elem & coarse_elem = coarse_context->get_elem();
+const Elem & fine_elem   = fine_context->get_elem();
 
-  const DenseVector<Number> & Ucoarse = coarse_context->get_elem_solution();
-  const DenseVector<Number> & Ufine   = fine_context->get_elem_solution();
+const DenseVector<Number> & Ucoarse = coarse_context->get_elem_solution();
+const DenseVector<Number> & Ufine   = fine_context->get_elem_solution();
 
-  unsigned int dim = fine_elem.dim();
+unsigned int dim = fine_elem.dim();
 
-  FEBase * fe_fine = libmesh_nullptr;
-  fine_context->get_side_fe( var, fe_fine, dim );
+FEBase * fe_fine = libmesh_nullptr;
+fine_context->get_side_fe( var, fe_fine, dim );
 
-  FEBase * fe_coarse = libmesh_nullptr;
-  coarse_context->get_side_fe( var, fe_coarse, dim );
+FEBase * fe_coarse = libmesh_nullptr;
+coarse_context->get_side_fe( var, fe_coarse, dim );
 
-  Real error = 1.e-30;
-  unsigned int n_qp = fe_fine->n_quadrature_points();
+Real error = 1.e-30;
+unsigned int n_qp = fe_fine->n_quadrature_points();
 
-  std::vector<std::vector<RealTensor> > d2phi_coarse = fe_coarse->get_d2phi();
-  std::vector<std::vector<RealTensor> > d2phi_fine = fe_fine->get_d2phi();
-  std::vector<Real> JxW_face = fe_fine->get_JxW();
+std::vector<std::vector<RealTensor> > d2phi_coarse = fe_coarse->get_d2phi();
+std::vector<std::vector<RealTensor> > d2phi_fine = fe_fine->get_d2phi();
+std::vector<Real> JxW_face = fe_fine->get_JxW();
 
-  for (unsigned int qp=0; qp != n_qp; ++qp)
-    {
-      // Calculate solution gradients on fine and coarse elements
-      // at this quadrature point
-      Number laplacian_fine = 0., laplacian_coarse = 0.;
+for (unsigned int qp=0; qp != n_qp; ++qp)
+{
+// Calculate solution gradients on fine and coarse elements
+// at this quadrature point
+Number laplacian_fine = 0., laplacian_coarse = 0.;
 
-      const unsigned int n_coarse_dofs = Ucoarse.size();
-      for (unsigned int i=0; i != n_coarse_dofs; ++i)
-        {
-          laplacian_coarse += d2phi_coarse[i][qp](0,0) * Ucoarse(i);
-          if (dim > 1)
-            laplacian_coarse += d2phi_coarse[i][qp](1,1) * Ucoarse(i);
-          if (dim > 2)
-            laplacian_coarse += d2phi_coarse[i][qp](2,2) * Ucoarse(i);
-        }
+const unsigned int n_coarse_dofs = Ucoarse.size();
+for (unsigned int i=0; i != n_coarse_dofs; ++i)
+{
+laplacian_coarse += d2phi_coarse[i][qp](0,0) * Ucoarse(i);
+if (dim > 1)
+laplacian_coarse += d2phi_coarse[i][qp](1,1) * Ucoarse(i);
+if (dim > 2)
+laplacian_coarse += d2phi_coarse[i][qp](2,2) * Ucoarse(i);
+}
 
-      const unsigned int n_fine_dofs = Ufine.size();
-      for (unsigned int i=0; i != n_fine_dofs; ++i)
-        {
-          laplacian_fine += d2phi_fine[i][qp](0,0) * Ufine(i);
-          if (dim > 1)
-            laplacian_fine += d2phi_fine[i][qp](1,1) * Ufine(i);
-          if (dim > 2)
-            laplacian_fine += d2phi_fine[i][qp](2,2) * Ufine(i);
-        }
+const unsigned int n_fine_dofs = Ufine.size();
+for (unsigned int i=0; i != n_fine_dofs; ++i)
+{
+laplacian_fine += d2phi_fine[i][qp](0,0) * Ufine(i);
+if (dim > 1)
+laplacian_fine += d2phi_fine[i][qp](1,1) * Ufine(i);
+if (dim > 2)
+laplacian_fine += d2phi_fine[i][qp](2,2) * Ufine(i);
+}
 
 
-      // Find the jump in the Laplacian
-      // at this quadrature point
-      const Number jump = laplacian_fine - laplacian_coarse;
-      const Real jump2 = TensorTools::norm_sq(jump);
+// Find the jump in the Laplacian
+// at this quadrature point
+const Number jump = laplacian_fine - laplacian_coarse;
+const Real jump2 = TensorTools::norm_sq(jump);
 
-      // Accumulate the jump integral
-      error += JxW_face[qp] * jump2;
-    }
+// Accumulate the jump integral
+error += JxW_face[qp] * jump2;
+}
 
-  // Add the h-weighted jump integral to each error term
-  fine_error =
-    error * fine_elem.hmax() * error_norm.weight(var);
-  coarse_error =
-    error * coarse_elem.hmax() * error_norm.weight(var);
+// Add the h-weighted jump integral to each error term
+fine_error =
+error * fine_elem.hmax() * error_norm.weight(var);
+coarse_error =
+error * coarse_elem.hmax() * error_norm.weight(var);
 }
 
 } // namespace libMesh
@@ -152,18 +152,18 @@ namespace libMesh
 void
 LaplacianErrorEstimator::init_context (FEMContext &)
 {
-  libmesh_error_msg("Error: LaplacianErrorEstimator requires second " \
-                    << "derivative support; try configuring libmesh with " \
-                    << "--enable-second");
+libmesh_error_msg("Error: LaplacianErrorEstimator requires second " \
+<< "derivative support; try configuring libmesh with " \
+<< "--enable-second");
 }
 
 
 void
 LaplacianErrorEstimator::internal_side_integration ()
 {
-  libmesh_error_msg("Error: LaplacianErrorEstimator requires second "   \
-                    << "derivative support; try configuring libmesh with " \
-                    << "--enable-second");
+libmesh_error_msg("Error: LaplacianErrorEstimator requires second "   \
+<< "derivative support; try configuring libmesh with " \
+<< "--enable-second");
 }
 
 } // namespace libMesh

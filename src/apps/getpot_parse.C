@@ -8,24 +8,24 @@
 
 int main(int argc, char ** argv)
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  if (argc < 2)
-    libmesh_error_msg("Usage: " << argv[0] << " inputconfigfile [outputconfigfile]");
+if (argc < 2)
+libmesh_error_msg("Usage: " << argv[0] << " inputconfigfile [outputconfigfile]");
 
-  GetPot gp(argv[1]);
+GetPot gp(argv[1]);
 
-  std::ostream *my_out;
-  std::ofstream fout;
-  fout.exceptions ( std::ofstream::failbit | std::ofstream::badbit );
+std::ostream *my_out;
+std::ofstream fout;
+fout.exceptions ( std::ofstream::failbit | std::ofstream::badbit );
 
-  if (argc < 3)
-    my_out = &std::cout;
-  else
-    {
-      fout.open(argv[2]);
-      my_out = &fout;
-    }
+if (argc < 3)
+my_out = &std::cout;
+else
+{
+fout.open(argv[2]);
+my_out = &fout;
+}
 
-  gp.print("", *my_out, 1);
+gp.print("", *my_out, 1);
 }

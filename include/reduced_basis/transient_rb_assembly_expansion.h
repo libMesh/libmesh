@@ -29,60 +29,60 @@ namespace libMesh
 {
 
 /**
- * This extends RBAssemblyExpansion to provide an assembly
- * expansion for the case of time-dependent PDEs.
- * This just requires an extra set of ElemAssembly functors
- * for the time-derivative term.
- *
- * \author David J. Knezevic
- * \date 2011
- */
+* This extends RBAssemblyExpansion to provide an assembly
+* expansion for the case of time-dependent PDEs.
+* This just requires an extra set of ElemAssembly functors
+* for the time-derivative term.
+*
+* \author David J. Knezevic
+* \date 2011
+*/
 class TransientRBAssemblyExpansion : public RBAssemblyExpansion
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  TransientRBAssemblyExpansion();
+/**
+* Constructor.
+*/
+TransientRBAssemblyExpansion();
 
-  /**
-   * Perform the specified M interior assembly.
-   */
-  void perform_M_interior_assembly(unsigned int q,
-                                   FEMContext & context);
+/**
+* Perform the specified M interior assembly.
+*/
+void perform_M_interior_assembly(unsigned int q,
+FEMContext & context);
 
-  /**
-   * Perform the specified M boundary assembly.
-   */
-  void perform_M_boundary_assembly(unsigned int q,
-                                   FEMContext & context);
+/**
+* Perform the specified M boundary assembly.
+*/
+void perform_M_boundary_assembly(unsigned int q,
+FEMContext & context);
 
-  /**
-   * Get Q_m, the number of terms in the affine
-   * expansion for the bilinear form.
-   */
-  unsigned int get_n_M_terms() const;
+/**
+* Get Q_m, the number of terms in the affine
+* expansion for the bilinear form.
+*/
+unsigned int get_n_M_terms() const;
 
-  /**
-   * Attach ElemAssembly object for the time-derivative
-   * (both interior and boundary assembly).
-   */
-  void attach_M_assembly(ElemAssembly * A_q_assembly);
+/**
+* Attach ElemAssembly object for the time-derivative
+* (both interior and boundary assembly).
+*/
+void attach_M_assembly(ElemAssembly * A_q_assembly);
 
-  /**
-   * Return a reference to the specified M_assembly object.
-   */
-  ElemAssembly & get_M_assembly(unsigned int q);
+/**
+* Return a reference to the specified M_assembly object.
+*/
+ElemAssembly & get_M_assembly(unsigned int q);
 
 private:
 
-  /**
-   * Vectors storing the function pointers to the assembly
-   * routines for the time-derivative operators, both interior and boundary
-   * assembly.
-   */
-  std::vector<ElemAssembly *> _M_assembly_vector;
+/**
+* Vectors storing the function pointers to the assembly
+* routines for the time-derivative operators, both interior and boundary
+* assembly.
+*/
+std::vector<ElemAssembly *> _M_assembly_vector;
 };
 
 }

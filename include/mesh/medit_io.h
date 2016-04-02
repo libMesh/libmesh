@@ -34,69 +34,69 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class implements writing meshes in the mesh format
- * used by the MEdit visualization tool developed in the Gamma Project
- * at INRIA Roquencourt.
- * For a full description of the mesh format and to obtain the
- * MEdit software see the
- * <a href="http://www-rocq1.inria.fr/gamma/medit/medit.html">MEdit home page</a>.
- *
- * \author Florian Prill
- * \date 2004
- */
+* This class implements writing meshes in the mesh format
+* used by the MEdit visualization tool developed in the Gamma Project
+* at INRIA Roquencourt.
+* For a full description of the mesh format and to obtain the
+* MEdit software see the
+* <a href="http://www-rocq1.inria.fr/gamma/medit/medit.html">MEdit home page</a>.
+*
+* \author Florian Prill
+* \date 2004
+*/
 class MEDITIO : public MeshOutput<MeshBase>
 {
 public:
 
-  /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
-   */
-  explicit
-  MEDITIO (const MeshBase &);
+/**
+* Constructor.  Takes a reference to a constant mesh object.
+* This constructor will only allow us to write the mesh.
+*/
+explicit
+MEDITIO (const MeshBase &);
 
-  /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * and the desired scalar index for mesh colouring.
-   * MEdit seems to understand only one scalar value.
-   */
-  MEDITIO (const MeshBase &, unsigned int c);
+/**
+* Constructor.  Takes a reference to a constant mesh object.
+* and the desired scalar index for mesh colouring.
+* MEdit seems to understand only one scalar value.
+*/
+MEDITIO (const MeshBase &, unsigned int c);
 
-  /**
-   * This method implements writing a mesh to a specified ".mesh" file.
-   */
-  virtual void write (const std::string &) libmesh_override;
+/**
+* This method implements writing a mesh to a specified ".mesh" file.
+*/
+virtual void write (const std::string &) libmesh_override;
 
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
-   */
-  virtual void write_nodal_data (const std::string &,
-                                 const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are provided.
+*/
+virtual void write_nodal_data (const std::string &,
+const std::vector<Number> &,
+const std::vector<std::string> &) libmesh_override;
 
-  /**
-   * Flag indicating whether or not to write a binary file
-   */
-  bool & binary ();
+/**
+* Flag indicating whether or not to write a binary file
+*/
+bool & binary ();
 
 private:
 
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write an ASCII file.
-   */
-  void write_ascii (const std::string &,
-                    const std::vector<Number> * = libmesh_nullptr,
-                    const std::vector<std::string> * = libmesh_nullptr);
+/**
+* This method implements writing a mesh with nodal data to a
+* specified file where the nodal data and variable names are optionally
+* provided.  This will write an ASCII file.
+*/
+void write_ascii (const std::string &,
+const std::vector<Number> * = libmesh_nullptr,
+const std::vector<std::string> * = libmesh_nullptr);
 
-  /**
-   * Flag to write binary data.
-   */
-  bool _binary;
+/**
+* Flag to write binary data.
+*/
+bool _binary;
 
-  unsigned int scalar_idx;
+unsigned int scalar_idx;
 };
 
 
@@ -105,17 +105,17 @@ private:
 // medit_io inline members
 inline
 MEDITIO::MEDITIO (const MeshBase & mesh_in) :
-  MeshOutput<MeshBase> (mesh_in),
-  _binary (false),
-  scalar_idx (0)
+MeshOutput<MeshBase> (mesh_in),
+_binary (false),
+scalar_idx (0)
 {
 }
 
 inline
 MEDITIO::MEDITIO (const MeshBase & mesh_in, unsigned int c) :
-  MeshOutput<MeshBase> (mesh_in),
-  _binary    (false),
-  scalar_idx (c)
+MeshOutput<MeshBase> (mesh_in),
+_binary    (false),
+scalar_idx (c)
 {
 }
 
@@ -123,7 +123,7 @@ MEDITIO::MEDITIO (const MeshBase & mesh_in, unsigned int c) :
 inline
 bool & MEDITIO::binary ()
 {
-  return _binary;
+return _binary;
 }
 
 

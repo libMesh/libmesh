@@ -30,17 +30,17 @@ namespace libMesh {
 
 
 PeriodicBoundaryBase::PeriodicBoundaryBase() :
-  myboundary(BoundaryInfo::invalid_id),
-  pairedboundary(BoundaryInfo::invalid_id)
+myboundary(BoundaryInfo::invalid_id),
+pairedboundary(BoundaryInfo::invalid_id)
 {
 }
 
 
 
 PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase & o) :
-  myboundary(o.myboundary),
-  pairedboundary(o.pairedboundary),
-  variables(o.variables)
+myboundary(o.myboundary),
+pairedboundary(o.pairedboundary),
+variables(o.variables)
 {
 }
 
@@ -48,22 +48,22 @@ PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase & o) :
 
 void PeriodicBoundaryBase::set_variable(unsigned int var)
 {
-  variables.insert(var);
+variables.insert(var);
 }
 
 
 
 void PeriodicBoundaryBase::merge(const PeriodicBoundaryBase & pb)
 {
-  variables.insert(pb.variables.begin(), pb.variables.end());
+variables.insert(pb.variables.begin(), pb.variables.end());
 }
 
 
 
 bool PeriodicBoundaryBase::is_my_variable(unsigned int var_num) const
 {
-  bool a = variables.empty() || (!variables.empty() && variables.find(var_num) != variables.end());
-  return a;
+bool a = variables.empty() || (!variables.empty() && variables.find(var_num) != variables.end());
+return a;
 }
 
 

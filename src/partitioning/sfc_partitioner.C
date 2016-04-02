@@ -43,145 +43,145 @@ namespace libMesh
 // ------------------------------------------------------------
 // SFCPartitioner implementation
 void SFCPartitioner::_do_partition (MeshBase & mesh,
-                                    const unsigned int n)
+const unsigned int n)
 {
 
-  libmesh_assert_greater (n, 0);
+libmesh_assert_greater (n, 0);
 
-  // Check for an easy return
-  if (n == 1)
-    {
-      this->single_partition (mesh);
-      return;
-    }
+// Check for an easy return
+if (n == 1)
+{
+this->single_partition (mesh);
+return;
+}
 
-  // What to do if the sfcurves library IS NOT present
+// What to do if the sfcurves library IS NOT present
 #ifndef LIBMESH_HAVE_SFCURVES
 
-  libmesh_here();
-  libMesh::err << "ERROR: The library has been built without"    << std::endl
-               << "Space Filling Curve support.  Using a linear" << std::endl
-               << "partitioner instead!" << std::endl;
+libmesh_here();
+libMesh::err << "ERROR: The library has been built without"    << std::endl
+<< "Space Filling Curve support.  Using a linear" << std::endl
+<< "partitioner instead!" << std::endl;
 
-  LinearPartitioner lp;
+LinearPartitioner lp;
 
-  lp.partition (mesh, n);
+lp.partition (mesh, n);
 
-  // What to do if the sfcurves library IS present
+// What to do if the sfcurves library IS present
 #else
 
-  START_LOG("sfc_partition()", "SFCPartitioner");
+START_LOG("sfc_partition()", "SFCPartitioner");
 
-  const dof_id_type n_active_elem = mesh.n_active_elem();
-  const dof_id_type n_elem        = mesh.n_elem();
+const dof_id_type n_active_elem = mesh.n_active_elem();
+const dof_id_type n_elem        = mesh.n_elem();
 
-  // the forward_map maps the active element id
-  // into a contiguous block of indices
-  std::vector<dof_id_type>
-    forward_map (n_elem, DofObject::invalid_id);
+// the forward_map maps the active element id
+// into a contiguous block of indices
+std::vector<dof_id_type>
+forward_map (n_elem, DofObject::invalid_id);
 
-  // the reverse_map maps the contiguous ids back
-  // to active elements
-  std::vector<Elem *> reverse_map (n_active_elem, libmesh_nullptr);
+// the reverse_map maps the contiguous ids back
+// to active elements
+std::vector<Elem *> reverse_map (n_active_elem, libmesh_nullptr);
 
-  int size = static_cast<int>(n_active_elem);
-  std::vector<double> x      (size);
-  std::vector<double> y      (size);
-  std::vector<double> z      (size);
-  std::vector<int>    table  (size);
-
-
-  // We need to map the active element ids into a
-  // contiguous range.
-  {
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-    dof_id_type el_num = 0;
-
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        libmesh_assert_less ((*elem_it)->id(), forward_map.size());
-        libmesh_assert_less (el_num, reverse_map.size());
-
-        forward_map[(*elem_it)->id()] = el_num;
-        reverse_map[el_num]           = *elem_it;
-        el_num++;
-      }
-    libmesh_assert_equal_to (el_num, n_active_elem);
-  }
+int size = static_cast<int>(n_active_elem);
+std::vector<double> x      (size);
+std::vector<double> y      (size);
+std::vector<double> z      (size);
+std::vector<int>    table  (size);
 
 
-  // Get the centroid for each active element
-  {
-    //     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-    //     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+// We need to map the active element ids into a
+// contiguous range.
+{
+MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+dof_id_type el_num = 0;
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
+for (; elem_it != elem_end; ++elem_it)
+{
+libmesh_assert_less ((*elem_it)->id(), forward_map.size());
+libmesh_assert_less (el_num, reverse_map.size());
 
-        libmesh_assert_less (elem->id(), forward_map.size());
-
-        const Point p = elem->centroid();
-
-        x[forward_map[elem->id()]] = p(0);
-        y[forward_map[elem->id()]] = p(1);
-        z[forward_map[elem->id()]] = p(2);
-      }
-  }
-
-  // build the space-filling curve
-  if (_sfc_type == "Hilbert")
-    Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
-
-  else if (_sfc_type == "Morton")
-    Sfc::morton  (&x[0], &y[0], &z[0], &size, &table[0]);
-
-  else
-    {
-      libmesh_here();
-      libMesh::err << "ERROR: Unknown type: " << _sfc_type << std::endl
-                   << " Valid types are"                   << std::endl
-                   << "  \"Hilbert\""                      << std::endl
-                   << "  \"Morton\""                       << std::endl
-                   << " "                                  << std::endl
-                   << "Proceeding with a Hilbert curve."   << std::endl;
-
-      Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
-    }
+forward_map[(*elem_it)->id()] = el_num;
+reverse_map[el_num]           = *elem_it;
+el_num++;
+}
+libmesh_assert_equal_to (el_num, n_active_elem);
+}
 
 
-  // Assign the partitioning to the active elements
-  {
-    //      {
-    //        std::ofstream out ("sfc.dat");
-    //        out << "variables=x,y,z" << std::endl;
-    //        out << "zone f=point" << std::endl;
+// Get the centroid for each active element
+{
+//     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+//     const const_active_elem_iterator elem_end(mesh.const_elements_end());
 
-    //        for (unsigned int i=0; i<n_active_elem; i++)
-    //  out << x[i] << " "
-    //      << y[i] << " "
-    //      << z[i] << std::endl;
-    //      }
+MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-    const dof_id_type blksize = (n_active_elem+n-1)/n;
+for (; elem_it != elem_end; ++elem_it)
+{
+const Elem * elem = *elem_it;
 
-    for (dof_id_type i=0; i<n_active_elem; i++)
-      {
-        libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
+libmesh_assert_less (elem->id(), forward_map.size());
 
-        Elem * elem = reverse_map[table[i]-1];
+const Point p = elem->centroid();
 
-        elem->processor_id() = cast_int<processor_id_type>
-          (i/blksize);
-      }
-  }
+x[forward_map[elem->id()]] = p(0);
+y[forward_map[elem->id()]] = p(1);
+z[forward_map[elem->id()]] = p(2);
+}
+}
 
-  STOP_LOG("sfc_partition()", "SFCPartitioner");
+// build the space-filling curve
+if (_sfc_type == "Hilbert")
+Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
+
+else if (_sfc_type == "Morton")
+Sfc::morton  (&x[0], &y[0], &z[0], &size, &table[0]);
+
+else
+{
+libmesh_here();
+libMesh::err << "ERROR: Unknown type: " << _sfc_type << std::endl
+<< " Valid types are"                   << std::endl
+<< "  \"Hilbert\""                      << std::endl
+<< "  \"Morton\""                       << std::endl
+<< " "                                  << std::endl
+<< "Proceeding with a Hilbert curve."   << std::endl;
+
+Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
+}
+
+
+// Assign the partitioning to the active elements
+{
+//      {
+//        std::ofstream out ("sfc.dat");
+//        out << "variables=x,y,z" << std::endl;
+//        out << "zone f=point" << std::endl;
+
+//        for (unsigned int i=0; i<n_active_elem; i++)
+//  out << x[i] << " "
+//      << y[i] << " "
+//      << z[i] << std::endl;
+//      }
+
+const dof_id_type blksize = (n_active_elem+n-1)/n;
+
+for (dof_id_type i=0; i<n_active_elem; i++)
+{
+libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
+
+Elem * elem = reverse_map[table[i]-1];
+
+elem->processor_id() = cast_int<processor_id_type>
+(i/blksize);
+}
+}
+
+STOP_LOG("sfc_partition()", "SFCPartitioner");
 
 #endif
 

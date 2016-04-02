@@ -28,36 +28,36 @@ namespace libMesh
 
 
 /**
- * The \p Cell is an abstract element type that lives in
- * three dimensions.  A cell could be a tetrahedron, a hexahedron,
- * a pyramid, a prism, etc...
- */
+* The \p Cell is an abstract element type that lives in
+* three dimensions.  A cell could be a tetrahedron, a hexahedron,
+* a pyramid, a prism, etc...
+*/
 class Cell : public Elem
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  Cell (const unsigned int nn,
-        const unsigned int ns,
-        Elem * p,
-        Elem ** elemlinkdata,
-        Node ** nodelinkdata) :
-    Elem (nn, ns, p, elemlinkdata, nodelinkdata) {}
+/**
+* Constructor.
+*/
+Cell (const unsigned int nn,
+const unsigned int ns,
+Elem * p,
+Elem ** elemlinkdata,
+Node ** nodelinkdata) :
+Elem (nn, ns, p, elemlinkdata, nodelinkdata) {}
 
-  /**
-   * @returns 3, the dimensionality of the object.
-   */
-  virtual unsigned int dim () const libmesh_override { return 3; }
+/**
+* @returns 3, the dimensionality of the object.
+*/
+virtual unsigned int dim () const libmesh_override { return 3; }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  /**
-   * @returns \p false.  All classes derived from \p Cell
-   * are finite elements.
-   */
-  virtual bool infinite () const libmesh_override { return false; }
+/**
+* @returns \p false.  All classes derived from \p Cell
+* are finite elements.
+*/
+virtual bool infinite () const libmesh_override { return false; }
 
 #endif
 };

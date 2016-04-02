@@ -46,11 +46,11 @@ class Elem;
 namespace MeshTools
 {
 /**
- * Tools for \p Mesh generation.
- *
- * \author Benjamin S. Kirk
- * \date 2004
- */
+* Tools for \p Mesh generation.
+*
+* \author Benjamin S. Kirk
+* \date 2004
+*/
 namespace Generation
 {
 
@@ -58,102 +58,102 @@ namespace Generation
 class QueryElemSubdomainIDBase;
 
 /**
- * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
- * Defaults to a unit cube (or line in 1D, square in 2D),
- * but the dimensions can be specified through the optional
- * arguments.
- *
- * Boundary ids are set to be equal to the side indexing on a
- * master hex
- */
+* Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
+* Defaults to a unit cube (or line in 1D, square in 2D),
+* but the dimensions can be specified through the optional
+* arguments.
+*
+* Boundary ids are set to be equal to the side indexing on a
+* master hex
+*/
 void build_cube (UnstructuredMesh & mesh,
-                 const unsigned int nx=0,
-                 const unsigned int ny=0,
-                 const unsigned int nz=0,
-                 const Real xmin=0., const Real xmax=1.,
-                 const Real ymin=0., const Real ymax=1.,
-                 const Real zmin=0., const Real zmax=1.,
-                 const ElemType type=INVALID_ELEM,
-                 const bool gauss_lobatto_grid=false);
+const unsigned int nx=0,
+const unsigned int ny=0,
+const unsigned int nz=0,
+const Real xmin=0., const Real xmax=1.,
+const Real ymin=0., const Real ymax=1.,
+const Real zmin=0., const Real zmax=1.,
+const ElemType type=INVALID_ELEM,
+const bool gauss_lobatto_grid=false);
 
 /**
- * A specialized \p build_cube() for 0D meshes.  The resulting
- * mesh is a single NodeElem suitable for ODE tests
- */
+* A specialized \p build_cube() for 0D meshes.  The resulting
+* mesh is a single NodeElem suitable for ODE tests
+*/
 void build_point (UnstructuredMesh & mesh,
-                  const ElemType type=INVALID_ELEM,
-                  const bool gauss_lobatto_grid=false);
+const ElemType type=INVALID_ELEM,
+const bool gauss_lobatto_grid=false);
 
 /**
- * A specialized \p build_cube() for 1D meshes
- *
- * Boundary ids are set to be equal to the side indexing on a
- * master edge
- */
+* A specialized \p build_cube() for 1D meshes
+*
+* Boundary ids are set to be equal to the side indexing on a
+* master edge
+*/
 void build_line (UnstructuredMesh & mesh,
-                 const unsigned int nx,
-                 const Real xmin=0., const Real xmax=1.,
-                 const ElemType type=INVALID_ELEM,
-                 const bool gauss_lobatto_grid=false);
+const unsigned int nx,
+const Real xmin=0., const Real xmax=1.,
+const ElemType type=INVALID_ELEM,
+const bool gauss_lobatto_grid=false);
 
 /**
- * A specialized \p build_cube() for 2D meshes.
- *
- * Boundary ids are set to be equal to the side indexing on a
- * master quad
- */
+* A specialized \p build_cube() for 2D meshes.
+*
+* Boundary ids are set to be equal to the side indexing on a
+* master quad
+*/
 void build_square (UnstructuredMesh & mesh,
-                   const unsigned int nx,
-                   const unsigned int ny,
-                   const Real xmin=0., const Real xmax=1.,
-                   const Real ymin=0., const Real ymax=1.,
-                   const ElemType type=INVALID_ELEM,
-                   const bool gauss_lobatto_grid=false);
+const unsigned int nx,
+const unsigned int ny,
+const Real xmin=0., const Real xmax=1.,
+const Real ymin=0., const Real ymax=1.,
+const ElemType type=INVALID_ELEM,
+const bool gauss_lobatto_grid=false);
 
 /**
- * Meshes a spherical or mapped-spherical domain.
- */
+* Meshes a spherical or mapped-spherical domain.
+*/
 void build_sphere (UnstructuredMesh & mesh,
-                   const Real rad=1,
-                   const unsigned int nr=2,
-                   const ElemType type=INVALID_ELEM,
-                   const unsigned int n_smooth=2,
-                   const bool flat=true);
+const Real rad=1,
+const unsigned int nr=2,
+const ElemType type=INVALID_ELEM,
+const unsigned int n_smooth=2,
+const bool flat=true);
 
 /**
- * Meshes the tensor product of a 1D and a 1D-or-2D domain.
- */
+* Meshes the tensor product of a 1D and a 1D-or-2D domain.
+*/
 void build_extrusion (UnstructuredMesh & mesh,
-                      const MeshBase & cross_section,
-                      const unsigned int nz,
-                      RealVectorValue extrusion_vector,
-                      QueryElemSubdomainIDBase * elem_subdomain = libmesh_nullptr);
+const MeshBase & cross_section,
+const unsigned int nz,
+RealVectorValue extrusion_vector,
+QueryElemSubdomainIDBase * elem_subdomain = libmesh_nullptr);
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 /**
- * Meshes a rectangular (2D) region (with or without holes) with a
- * Delaunay triangulation.  This function internally calls the
- * triangle library written by J.R. Shewchuk.
- */
+* Meshes a rectangular (2D) region (with or without holes) with a
+* Delaunay triangulation.  This function internally calls the
+* triangle library written by J.R. Shewchuk.
+*/
 void build_delaunay_square(UnstructuredMesh & mesh,
-                           const unsigned int nx, // num. of elements in x-dir
-                           const unsigned int ny, // num. of elements in y-dir
-                           const Real xmin, const Real xmax,
-                           const Real ymin, const Real ymax,
-                           const ElemType type,
-                           const std::vector<TriangleInterface::Hole*> * holes=libmesh_nullptr);
+const unsigned int nx, // num. of elements in x-dir
+const unsigned int ny, // num. of elements in y-dir
+const Real xmin, const Real xmax,
+const Real ymin, const Real ymax,
+const ElemType type,
+const std::vector<TriangleInterface::Hole*> * holes=libmesh_nullptr);
 #endif // #define LIBMESH_HAVE_TRIANGLE
 
 /**
- * Class for receiving the callback during extrusion generation and providing user-defined
- * subdomains based on the old (existing) element id and the current layer.
- */
+* Class for receiving the callback during extrusion generation and providing user-defined
+* subdomains based on the old (existing) element id and the current layer.
+*/
 class QueryElemSubdomainIDBase
 {
 public:
-  virtual ~QueryElemSubdomainIDBase() {}
+virtual ~QueryElemSubdomainIDBase() {}
 
-  virtual subdomain_id_type get_subdomain_for_layer(const Elem * old_elem, unsigned int layer) = 0;
+virtual subdomain_id_type get_subdomain_for_layer(const Elem * old_elem, unsigned int layer) = 0;
 };
 
 } // end namespace Meshtools::Generation

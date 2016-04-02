@@ -36,71 +36,71 @@ namespace libMesh
 
 
 /**
- * Factory class defintion.
- */
+* Factory class defintion.
+*/
 template <class Base>
 class Factory
 {
 protected:
 
-  /**
-   * Constructor. Takes the name to be mapped.
-   */
-  Factory (const std::string & name);
+/**
+* Constructor. Takes the name to be mapped.
+*/
+Factory (const std::string & name);
 
 public:
 
-  /**
-   * Destructor. (Empty.)
-   */
-  virtual ~Factory () {}
+/**
+* Destructor. (Empty.)
+*/
+virtual ~Factory () {}
 
-  /**
-   * Builds an object of type Base identified by name.
-   */
-  static UniquePtr<Base> build (const std::string & name);
+/**
+* Builds an object of type Base identified by name.
+*/
+static UniquePtr<Base> build (const std::string & name);
 
-  /**
-   * Create a Base class.  Force this to be implemented
-   * later.
-   */
-  virtual UniquePtr<Base> create () = 0;
+/**
+* Create a Base class.  Force this to be implemented
+* later.
+*/
+virtual UniquePtr<Base> create () = 0;
 
 
 protected:
 
-  /**
-   * Map from a name to a Factory<Base> * pointer.
-   */
-  static std::map<std::string, Factory<Base> *> & factory_map();
+/**
+* Map from a name to a Factory<Base> * pointer.
+*/
+static std::map<std::string, Factory<Base> *> & factory_map();
 };
 
 
 
 /**
- * Factory implementation class.
- */
+* Factory implementation class.
+*/
 template <class Derived, class Base>
 class FactoryImp: public Factory<Base>
 {
 public:
 
-  /**
-   * Constructor.  Takes a name as input.
-   */
-  FactoryImp (const std::string & name) : Factory<Base>(name) { }
+/**
+* Constructor.  Takes a name as input.
+*/
+FactoryImp (const std::string & name) : Factory<Base>(name) { }
 
-  /**
-   * Destructor.  Empty.
-   */
-  ~FactoryImp () {}
+/**
+* Destructor.  Empty.
+*/
+~FactoryImp () {}
 
 private:
 
-  /**
-   * @returns a new object of type Derived.
-   */
-  virtual UniquePtr<Base> create () libmesh_override;
+/**
+* @returns a new object of type Derived.
+*/
+virtual UniquePtr<Base> create () libmesh_override;
 };
 
 
@@ -111,11 +111,11 @@ template <class Base>
 inline
 Factory<Base>::Factory (const std::string & name)
 {
-  // Make sure we haven't already added this name
-  // to the map
-  libmesh_assert (!factory_map().count(name));
+// Make sure we haven't already added this name
+// to the map
+libmesh_assert (!factory_map().count(name));
 
-  factory_map()[name] = this;
+factory_map()[name] = this;
 }
 
 
@@ -124,25 +124,25 @@ template <class Base>
 inline
 UniquePtr<Base> Factory<Base>::build (const std::string & name)
 {
-  // name not found in the map
-  if (!factory_map().count(name))
-    {
-      libMesh::err << "Tried to build an unknown type: " << name << std::endl;
+// name not found in the map
+if (!factory_map().count(name))
+{
+libMesh::err << "Tried to build an unknown type: " << name << std::endl;
 
-      libMesh::err << "valid options are:" << std::endl;
+libMesh::err << "valid options are:" << std::endl;
 
-      for (typename std::map<std::string,Factory<Base> *>::const_iterator
-             it = factory_map().begin(); it != factory_map().end(); ++it)
-        libMesh::err << "  " << it->first << std::endl;
+for (typename std::map<std::string,Factory<Base> *>::const_iterator
+it = factory_map().begin(); it != factory_map().end(); ++it)
+libMesh::err << "  " << it->first << std::endl;
 
-      libmesh_error_msg("Exiting...");
+libmesh_error_msg("Exiting...");
 
-      // We'll never get here
-      return UniquePtr<Base>();
-    }
+// We'll never get here
+return UniquePtr<Base>();
+}
 
-  Factory<Base> * f = factory_map()[name];
-  return UniquePtr<Base>(f->create());
+Factory<Base> * f = factory_map()[name];
+return UniquePtr<Base>(f->create());
 }
 
 
@@ -162,7 +162,7 @@ template <class Derived, class Base>
 inline
 UniquePtr<Base> FactoryImp<Derived,Base>::create ()
 {
-  return UniquePtr<Base>(new Derived);
+return UniquePtr<Base>(new Derived);
 }
 
 

@@ -33,56 +33,56 @@ class Mesh;
 
 
 /**
- * The \p Face is an abstract element type that lives in
- * two dimensions.  A face could be a triangle, a quadrilateral,
- * a pentagon, etc...
- */
+* The \p Face is an abstract element type that lives in
+* two dimensions.  A face could be a triangle, a quadrilateral,
+* a pentagon, etc...
+*/
 class Face : public Elem
 {
 public:
 
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Face (const unsigned int nn,
-        const unsigned int ns,
-        Elem * p,
-        Elem ** elemlinkdata,
-        Node ** nodelinkdata) :
-    Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
+/**
+* Constructor.  Explicitly specifies the number of
+* nodes and neighbors for which storage will be allocated.
+*/
+Face (const unsigned int nn,
+const unsigned int ns,
+Elem * p,
+Elem ** elemlinkdata,
+Node ** nodelinkdata) :
+Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
 
-  /**
-   * @returns 2, the dimensionality of the object.
-   */
-  virtual unsigned int dim () const libmesh_override { return 2; }
+/**
+* @returns 2, the dimensionality of the object.
+*/
+virtual unsigned int dim () const libmesh_override { return 2; }
 
-  /**
-   * @returns 0.  All 2D elements have no faces, just
-   * edges.
-   */
-  virtual unsigned int n_faces() const libmesh_override { return 0; }
+/**
+* @returns 0.  All 2D elements have no faces, just
+* edges.
+*/
+virtual unsigned int n_faces() const libmesh_override { return 0; }
 
-  /**
-   * build_side and build_edge are identical for faces
-   */
-  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override
-  { return build_side(i); }
+/**
+* build_side and build_edge are identical for faces
+*/
+virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override
+{ return build_side(i); }
 
-  /*
-   * is_edge_on_side is trivial in 2D
-   */
-  virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const libmesh_override
-  { return (e == s); }
+/*
+* is_edge_on_side is trivial in 2D
+*/
+virtual bool is_edge_on_side(const unsigned int e,
+const unsigned int s) const libmesh_override
+{ return (e == s); }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  /**
-   * @returns \p false.  All classes derived from \p Face
-   * are finite elements.
-   */
-  virtual bool infinite () const libmesh_override { return false; }
+/**
+* @returns \p false.  All classes derived from \p Face
+* are finite elements.
+*/
+virtual bool infinite () const libmesh_override { return false; }
 
 #endif
 

@@ -40,44 +40,44 @@ namespace libMesh
 // typedef SerialMesh Mesh;
 
 /**
- * The \p Mesh class is a thin wrapper, around the \p SerialMesh class
- * by default.
- */
+* The \p Mesh class is a thin wrapper, around the \p SerialMesh class
+* by default.
+*/
 class Mesh : public DefaultMesh
 {
 public:
 
-  /**
-   * Constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
-   */
-  explicit
-  Mesh (const Parallel::Communicator & comm_in,
-        unsigned char dim=1)
-    : DefaultMesh(comm_in,dim) {}
+/**
+* Constructor.  Takes \p dim, the dimension of the mesh.
+* The mesh dimension can be changed (and may automatically be
+* changed by mesh generation/loading) later.
+*/
+explicit
+Mesh (const Parallel::Communicator & comm_in,
+unsigned char dim=1)
+: DefaultMesh(comm_in,dim) {}
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-  /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
-   */
-  explicit
-  Mesh (unsigned char dim=1)
-    : DefaultMesh(dim) {}
+/**
+* Deprecated constructor.  Takes \p dim, the dimension of the mesh.
+* The mesh dimension can be changed (and may automatically be
+* changed by mesh generation/loading) later.
+*/
+explicit
+Mesh (unsigned char dim=1)
+: DefaultMesh(dim) {}
 #endif
 
-  /**
-   * Copy-constructor.  This should be able to take a
-   * serial or parallel mesh.
-   */
-  Mesh (const UnstructuredMesh & other_mesh) : DefaultMesh(other_mesh) {}
+/**
+* Copy-constructor.  This should be able to take a
+* serial or parallel mesh.
+*/
+Mesh (const UnstructuredMesh & other_mesh) : DefaultMesh(other_mesh) {}
 
-  /**
-   * Destructor.
-   */
-  ~Mesh() {}
+/**
+* Destructor.
+*/
+~Mesh() {}
 };
 
 

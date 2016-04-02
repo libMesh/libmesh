@@ -32,53 +32,53 @@ namespace libMesh
 {
 
 /**
- * This class stores the set of RBTheta functor objects that define
- * the "parameter-dependent expansion" of a PDE.
- *
- * \author David J. Knezevic
- * \date 2011
- */
+* This class stores the set of RBTheta functor objects that define
+* the "parameter-dependent expansion" of a PDE.
+*
+* \author David J. Knezevic
+* \date 2011
+*/
 class TransientRBThetaExpansion : public RBThetaExpansion
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  TransientRBThetaExpansion();
+/**
+* Constructor.
+*/
+TransientRBThetaExpansion();
 
-  /**
-   * The type of the parent.
-   */
-  typedef RBThetaExpansion Parent;
+/**
+* The type of the parent.
+*/
+typedef RBThetaExpansion Parent;
 
-  /**
-   * Evaluate theta at the current parameter. Overload
-   * if the theta functions need to be treated differently
-   * in subclasses.
-   */
-  virtual Number eval_M_theta(unsigned int q,
-                              const RBParameters & mu);
+/**
+* Evaluate theta at the current parameter. Overload
+* if the theta functions need to be treated differently
+* in subclasses.
+*/
+virtual Number eval_M_theta(unsigned int q,
+const RBParameters & mu);
 
-  /**
-   * Get Q_m, the number of terms in the affine
-   * expansion for the mass operator.
-   */
-  virtual unsigned int get_n_M_terms()
-  { return cast_int<unsigned int>(_M_theta_vector.size()); }
+/**
+* Get Q_m, the number of terms in the affine
+* expansion for the mass operator.
+*/
+virtual unsigned int get_n_M_terms()
+{ return cast_int<unsigned int>(_M_theta_vector.size()); }
 
-  /**
-   * Attach a pointer to a functor object that defines one
-   * of the theta_q_m terms.
-   */
-  virtual void attach_M_theta(RBTheta * theta_q_m);
+/**
+* Attach a pointer to a functor object that defines one
+* of the theta_q_m terms.
+*/
+virtual void attach_M_theta(RBTheta * theta_q_m);
 
 private:
 
-  /**
-   * Vector storing the pointers to the RBTheta functors.
-   */
-  std::vector<RBTheta *> _M_theta_vector;
+/**
+* Vector storing the pointers to the RBTheta functors.
+*/
+std::vector<RBTheta *> _M_theta_vector;
 };
 
 }

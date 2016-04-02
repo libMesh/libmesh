@@ -29,88 +29,88 @@ namespace libMesh
 {
 
 /**
- * This class defines a theta-method Euler (defaulting to Backward
- * Euler with theta = 1.0) solver to handle
- * time integration of DifferentiableSystems.
- *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* This class defines a theta-method Euler (defaulting to Backward
+* Euler with theta = 1.0) solver to handle
+* time integration of DifferentiableSystems.
+*
+* This class is part of the new DifferentiableSystem framework,
+* which is still experimental.  Users of this framework should
+* beware of bugs and future API changes.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class EulerSolver : public FirstOrderUnsteadySolver
 {
 public:
-  /**
-   * The parent class
-   */
-  typedef FirstOrderUnsteadySolver Parent;
+/**
+* The parent class
+*/
+typedef FirstOrderUnsteadySolver Parent;
 
-  /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
-   */
-  explicit
-  EulerSolver (sys_type & s);
+/**
+* Constructor. Requires a reference to the system
+* to be solved.
+*/
+explicit
+EulerSolver (sys_type & s);
 
-  /**
-   * Destructor.
-   */
-  virtual ~EulerSolver ();
+/**
+* Destructor.
+*/
+virtual ~EulerSolver ();
 
-  /**
-   * Error convergence order: 2 for Crank-Nicolson, 1 otherwise
-   */
-  virtual Real error_order() const libmesh_override;
+/**
+* Error convergence order: 2 for Crank-Nicolson, 1 otherwise
+*/
+virtual Real error_order() const libmesh_override;
 
-  /**
-   * This method uses the DifferentiablePhysics'
-   * element_time_derivative() and element_constraint()
-   * to build a full residual on an element.  What combination
-   * it uses will depend on theta.
-   */
-  virtual bool element_residual (bool request_jacobian,
-                                 DiffContext &) libmesh_override;
+/**
+* This method uses the DifferentiablePhysics'
+* element_time_derivative() and element_constraint()
+* to build a full residual on an element.  What combination
+* it uses will depend on theta.
+*/
+virtual bool element_residual (bool request_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * This method uses the DifferentiablePhysics'
-   * side_time_derivative() and side_constraint()
-   * to build a full residual on an element's side.
-   * What combination it uses will depend on theta.
-   */
-  virtual bool side_residual (bool request_jacobian,
-                              DiffContext &) libmesh_override;
+/**
+* This method uses the DifferentiablePhysics'
+* side_time_derivative() and side_constraint()
+* to build a full residual on an element's side.
+* What combination it uses will depend on theta.
+*/
+virtual bool side_residual (bool request_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * This method uses the DifferentiablePhysics'
-   * nonlocal_time_derivative() and nonlocal_constraint()
-   * to build a full residual for non-local terms.
-   * What combination it uses will depend on theta.
-   */
-  virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext &) libmesh_override;
+/**
+* This method uses the DifferentiablePhysics'
+* nonlocal_time_derivative() and nonlocal_constraint()
+* to build a full residual for non-local terms.
+* What combination it uses will depend on theta.
+*/
+virtual bool nonlocal_residual (bool request_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * The value for the theta method to employ: 1.0 corresponds
-   * to backwards Euler, 0.0 corresponds to forwards Euler,
-   * 0.5 corresponds to Crank-Nicolson.
-   */
-  Real theta;
+/**
+* The value for the theta method to employ: 1.0 corresponds
+* to backwards Euler, 0.0 corresponds to forwards Euler,
+* 0.5 corresponds to Crank-Nicolson.
+*/
+Real theta;
 
 protected:
 
-  /**
-   * This method is the underlying implementation of the public
-   * residual methods.
-   */
-  virtual bool _general_residual (bool request_jacobian,
-                                  DiffContext &,
-                                  ResFuncType mass,
-                                  ResFuncType time_deriv,
-                                  ResFuncType constraint,
-                                  ReinitFuncType reinit);
+/**
+* This method is the underlying implementation of the public
+* residual methods.
+*/
+virtual bool _general_residual (bool request_jacobian,
+DiffContext &,
+ResFuncType mass,
+ResFuncType time_deriv,
+ResFuncType constraint,
+ReinitFuncType reinit);
 };
 
 

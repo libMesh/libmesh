@@ -36,58 +36,58 @@ template <typename T> class NumericVector;
 
 
 /**
- * Generic shell matrix, i.e. a matrix that does not define anything
- * but its action on a vector.  This class contains pure virtual
- * members that must be overloaded in derived classes.
- *
- * \author Tim Kroeger
- * \date 2008
- */
+* Generic shell matrix, i.e. a matrix that does not define anything
+* but its action on a vector.  This class contains pure virtual
+* members that must be overloaded in derived classes.
+*
+* \author Tim Kroeger
+* \date 2008
+*/
 template <typename T>
 class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >,
-                    public ParallelObject
+public ParallelObject
 {
 public:
-  /**
-   * Constructor; does nothing.
-   */
-  ShellMatrix (const Parallel::Communicator & comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+/**
+* Constructor; does nothing.
+*/
+ShellMatrix (const Parallel::Communicator & comm_in
+LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
-  /**
-   * Destructor.
-   */
-  virtual ~ShellMatrix ();
+/**
+* Destructor.
+*/
+virtual ~ShellMatrix ();
 
-  /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
-   */
-  virtual numeric_index_type m () const = 0;
+/**
+* @returns \p m, the row-dimension of the matrix where the marix is
+* \f$ M \times N \f$.
+*/
+virtual numeric_index_type m () const = 0;
 
-  /**
-   * @returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
-   */
-  virtual numeric_index_type n () const = 0;
+/**
+* @returns \p n, the column-dimension of the matrix where the marix
+* is \f$ M \times N \f$.
+*/
+virtual numeric_index_type n () const = 0;
 
-  /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
-   */
-  virtual void vector_mult (NumericVector<T> & dest,
-                            const NumericVector<T> & arg) const = 0;
+/**
+* Multiplies the matrix with \p arg and stores the result in \p
+* dest.
+*/
+virtual void vector_mult (NumericVector<T> & dest,
+const NumericVector<T> & arg) const = 0;
 
-  /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
-   */
-  virtual void vector_mult_add (NumericVector<T> & dest,
-                                const NumericVector<T> & arg) const = 0;
+/**
+* Multiplies the matrix with \p arg and adds the result to \p dest.
+*/
+virtual void vector_mult_add (NumericVector<T> & dest,
+const NumericVector<T> & arg) const = 0;
 
-  /**
-   * Copies the diagonal part of the matrix into \p dest.
-   */
-  virtual void get_diagonal (NumericVector<T> & dest) const = 0;
+/**
+* Copies the diagonal part of the matrix into \p dest.
+*/
+virtual void get_diagonal (NumericVector<T> & dest) const = 0;
 };
 
 
@@ -97,7 +97,7 @@ public:
 template <typename T>
 inline
 ShellMatrix<T>::ShellMatrix (const Parallel::Communicator & comm_in) :
-  ParallelObject(comm_in)
+ParallelObject(comm_in)
 {}
 
 

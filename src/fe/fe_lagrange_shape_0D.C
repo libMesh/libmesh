@@ -30,50 +30,50 @@ namespace libMesh
 
 template <>
 Real FE<0,LAGRANGE>::shape(const ElemType,
-                           const Order,
-                           const unsigned int libmesh_dbg_var(i),
-                           const Point &)
+const Order,
+const unsigned int libmesh_dbg_var(i),
+const Point &)
 {
-  libmesh_assert_less (i, 1);
-  return 1.;
+libmesh_assert_less (i, 1);
+return 1.;
 }
 
 
 
 template <>
 Real FE<0,LAGRANGE>::shape(const Elem *,
-                           const Order,
-                           const unsigned int libmesh_dbg_var(i),
-                           const Point &)
+const Order,
+const unsigned int libmesh_dbg_var(i),
+const Point &)
 {
-  libmesh_assert_less (i, 1);
-  return 1.;
+libmesh_assert_less (i, 1);
+return 1.;
 }
 
 
 
 template <>
 Real FE<0,LAGRANGE>::shape_deriv(const ElemType,
-                                 const Order,
-                                 const unsigned int,
-                                 const unsigned int,
-                                 const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
+libmesh_error_msg("No spatial derivatives in 0D!");
+return 0.;
 }
 
 
 
 template <>
 Real FE<0,LAGRANGE>::shape_deriv(const Elem *,
-                                 const Order,
-                                 const unsigned int,
-                                 const unsigned int,
-                                 const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
+libmesh_error_msg("No spatial derivatives in 0D!");
+return 0.;
 }
 
 
@@ -81,26 +81,26 @@ Real FE<0,LAGRANGE>::shape_deriv(const Elem *,
 
 template <>
 Real FE<0,LAGRANGE>::shape_second_deriv(const ElemType,
-                                        const Order,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
+libmesh_error_msg("No spatial derivatives in 0D!");
+return 0.;
 }
 
 
 
 template <>
 Real FE<0,LAGRANGE>::shape_second_deriv(const Elem *,
-                                        const Order,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        const Point &)
+const Order,
+const unsigned int,
+const unsigned int,
+const Point &)
 {
-  libmesh_error_msg("No spatial derivatives in 0D!");
-  return 0.;
+libmesh_error_msg("No spatial derivatives in 0D!");
+return 0.;
 }
 
 } // namespace libMesh

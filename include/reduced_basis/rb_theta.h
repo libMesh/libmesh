@@ -33,37 +33,37 @@ namespace libMesh
 class RBParameters;
 
 /**
- * This class is part of the rbOOmit framework.
- *
- * RBTheta provides a default functor class with which
- * to define the parameter-dependent functions required
- * for the PDE decomposition employed by the Reduced
- * Basis method.
- *
- * \author David J. Knezevic
- * \date 2011
- */
+* This class is part of the rbOOmit framework.
+*
+* RBTheta provides a default functor class with which
+* to define the parameter-dependent functions required
+* for the PDE decomposition employed by the Reduced
+* Basis method.
+*
+* \author David J. Knezevic
+* \date 2011
+*/
 class RBTheta : public ReferenceCountedObject<RBTheta>
 {
 public:
 
-  /**
-   * Constructor.  Initializes required
-   * data structures.
-   */
-  RBTheta () {}
+/**
+* Constructor.  Initializes required
+* data structures.
+*/
+RBTheta () {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~RBTheta () {}
+/**
+* Destructor.
+*/
+virtual ~RBTheta () {}
 
-  /**
-   * Evaluate the functor object for the given parameter.
-   * Default implementation is to return 1, overload
-   * to provide problem dependent behavior.
-   */
-  virtual Number evaluate(const RBParameters &) { return 1.; }
+/**
+* Evaluate the functor object for the given parameter.
+* Default implementation is to return 1, overload
+* to provide problem dependent behavior.
+*/
+virtual Number evaluate(const RBParameters &) { return 1.; }
 };
 
 }

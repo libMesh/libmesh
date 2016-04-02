@@ -39,10 +39,10 @@ class UnstructuredMesh;
 typedef Real REAL;
 
 /**
- * A special namespace for wrapping the standard Triangle API,
- * as well as some helper functions for initializing/destroying
- * the structs triangle uses to communicate.
- */
+* A special namespace for wrapping the standard Triangle API,
+* as well as some helper functions for initializing/destroying
+* the structs triangle uses to communicate.
+*/
 namespace TriangleWrapper
 {
 extern "C"
@@ -51,40 +51,40 @@ extern "C"
 }
 
 enum IO_Type {
-  INPUT  = 0,
-  OUTPUT = 1,
-  BOTH   = 2};
+INPUT  = 0,
+OUTPUT = 1,
+BOTH   = 2};
 
 /**
- * Initializes the fields of t to NULL/0 as necessary.
- * This is helpful for preventing the access of uninitialized
- * memory when working with C, which has no constructors or
- * destructors.
- */
+* Initializes the fields of t to NULL/0 as necessary.
+* This is helpful for preventing the access of uninitialized
+* memory when working with C, which has no constructors or
+* destructors.
+*/
 void init(triangulateio & t);
 
 /**
- * Frees any memory which has been dynamically allocated by
- * Triangle.  Note the following facts:
- * 1) Triangle does not free any memory itself
- * 2) It is always safe to call free on a NULL pointer.
- *
- * However, triangle *does* shallow-copy (for example)
- * the holelist pointer from the input to output struct **without**
- * performing a deep copy of the holelist itself.  Therefore, double-free
- * will occur without additional care!
- */
+* Frees any memory which has been dynamically allocated by
+* Triangle.  Note the following facts:
+* 1) Triangle does not free any memory itself
+* 2) It is always safe to call free on a NULL pointer.
+*
+* However, triangle *does* shallow-copy (for example)
+* the holelist pointer from the input to output struct **without**
+* performing a deep copy of the holelist itself.  Therefore, double-free
+* will occur without additional care!
+*/
 void destroy(triangulateio & t, IO_Type);
 
 /**
- * Copies triangulation data computed by triange from a triangulateio object
- * to a LibMesh mesh.   This routine is used internally by the
- * MeshTools::Generation::build_delaunay_square(...) and
- * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
- */
+* Copies triangulation data computed by triange from a triangulateio object
+* to a LibMesh mesh.   This routine is used internally by the
+* MeshTools::Generation::build_delaunay_square(...) and
+* MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
+*/
 void copy_tri_to_mesh(const triangulateio & triangle_data_input,
-                      UnstructuredMesh & mesh_output,
-                      const ElemType type);
+UnstructuredMesh & mesh_output,
+const ElemType type);
 } // namespace TriangleWrapper
 } // namespace libMesh
 

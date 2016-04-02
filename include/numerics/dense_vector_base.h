@@ -30,74 +30,74 @@ namespace libMesh
 {
 
 /**
- * Defines an abstract dense vector base class for use in
- * Finite Element-type computations. Specialized dense vectors,
- * for example DenseSubVectors, can be derived from this class.
- *
- * \author John W. Peterson
- * \date 2003
- */
+* Defines an abstract dense vector base class for use in
+* Finite Element-type computations. Specialized dense vectors,
+* for example DenseSubVectors, can be derived from this class.
+*
+* \author John W. Peterson
+* \date 2003
+*/
 template<typename T>
 class DenseVectorBase
 {
 public:
-  /**
-   * Constructor.  Empty.
-   */
-  DenseVectorBase() {}
+/**
+* Constructor.  Empty.
+*/
+DenseVectorBase() {}
 
-  /**
-   * Destructor.  Does nothing.
-   */
-  virtual ~DenseVectorBase() {}
+/**
+* Destructor.  Does nothing.
+*/
+virtual ~DenseVectorBase() {}
 
-  /**
-   * Set every element in the vector to 0.  Needs to
-   * be pure virtual since the storage method may
-   * be different in derived classes.
-   */
-  virtual void zero() = 0;
+/**
+* Set every element in the vector to 0.  Needs to
+* be pure virtual since the storage method may
+* be different in derived classes.
+*/
+virtual void zero() = 0;
 
-  /**
-   * @returns the \p (i) element of the vector.
-   */
-  virtual T el(const unsigned int i) const = 0;
+/**
+* @returns the \p (i) element of the vector.
+*/
+virtual T el(const unsigned int i) const = 0;
 
-  /**
-   * @returns the \p (i) element of the vector as a writeable reference.
-   */
-  virtual T & el(const unsigned int i) = 0;
+/**
+* @returns the \p (i) element of the vector as a writeable reference.
+*/
+virtual T & el(const unsigned int i) = 0;
 
-  /**
-   * @returns the size of the vector.
-   */
-  virtual unsigned int size() const = 0;
+/**
+* @returns the size of the vector.
+*/
+virtual unsigned int size() const = 0;
 
-  /**
-   * @returns true iff size() is 0.
-   */
-  virtual bool empty() const { return (this->size() == 0); }
+/**
+* @returns true iff size() is 0.
+*/
+virtual bool empty() const { return (this->size() == 0); }
 
-  /**
-   * Pretty-print the vector to \p stdout.
-   */
-  void print(std::ostream & os) const;
+/**
+* Pretty-print the vector to \p stdout.
+*/
+void print(std::ostream & os) const;
 
-  /**
-   * Same as above, but allows you to print using the
-   * usual stream syntax.
-   */
-  friend std::ostream & operator << (std::ostream & os, const DenseVectorBase<T> & v)
-  {
-    v.print(os);
-    return os;
-  }
+/**
+* Same as above, but allows you to print using the
+* usual stream syntax.
+*/
+friend std::ostream & operator << (std::ostream & os, const DenseVectorBase<T> & v)
+{
+v.print(os);
+return os;
+}
 
-  /**
-   * Prints the entries of the vector with additional
-   * decimal places in scientific notation.
-   */
-  void print_scientific(std::ostream & os, unsigned precision=8) const;
+/**
+* Prints the entries of the vector with additional
+* decimal places in scientific notation.
+*/
+void print_scientific(std::ostream & os, unsigned precision=8) const;
 
 };
 

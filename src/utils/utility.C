@@ -44,36 +44,36 @@ namespace libMesh
 // system without creating a perf_log object.
 std::string Utility::system_info()
 {
-  std::ostringstream oss;
+std::ostringstream oss;
 
-  std::string date = Utility::get_timestamp();
+std::string date = Utility::get_timestamp();
 
-  // Get system information
-  struct utsname sysInfo;
-  uname(&sysInfo);
+// Get system information
+struct utsname sysInfo;
+uname(&sysInfo);
 
-  // Get user information
+// Get user information
 #ifdef LIBMESH_HAVE_GETPWUID
-  struct passwd * p = getpwuid(getuid());
+struct passwd * p = getpwuid(getuid());
 #endif
 
 
-  oss << '\n'
-      << " ---------------------------------------------------------------------\n"
-      << "| Time:           " << date             << '\n'
-      << "| OS:             " << sysInfo.sysname  << '\n'
-      << "| HostName:       " << sysInfo.nodename << '\n'
-      << "| OS Release      " << sysInfo.release  << '\n'
-      << "| OS Version:     " << sysInfo.version  << '\n'
-      << "| Machine:        " << sysInfo.machine  << '\n'
+oss << '\n'
+<< " ---------------------------------------------------------------------\n"
+<< "| Time:           " << date             << '\n'
+<< "| OS:             " << sysInfo.sysname  << '\n'
+<< "| HostName:       " << sysInfo.nodename << '\n'
+<< "| OS Release      " << sysInfo.release  << '\n'
+<< "| OS Version:     " << sysInfo.version  << '\n'
+<< "| Machine:        " << sysInfo.machine  << '\n'
 #ifdef LIBMESH_HAVE_GETPWUID
-      << "| Username:       " << p->pw_name       << '\n'
+<< "| Username:       " << p->pw_name       << '\n'
 #else
-      << "| Username:       " << "Unknown"        << '\n'
+<< "| Username:       " << "Unknown"        << '\n'
 #endif
-      << " ---------------------------------------------------------------------\n";
+<< " ---------------------------------------------------------------------\n";
 
-  return oss.str();
+return oss.str();
 }
 
 
@@ -81,35 +81,35 @@ std::string Utility::system_info()
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 std::string Utility::complex_filename (const std::string & basename,
-                                       const unsigned int r_o_c)
+const unsigned int r_o_c)
 {
-  std::string name(basename);
+std::string name(basename);
 
-  if (r_o_c == 0)
-    name.append(".real");
+if (r_o_c == 0)
+name.append(".real");
 
-  else
-    name.append(".imag");
+else
+name.append(".imag");
 
-  return name;
+return name;
 }
 
 
 
 void Utility::prepare_complex_data(const std::vector<Complex> & source,
-                                   std::vector<Real> & real_part,
-                                   std::vector<Real> & imag_part)
+std::vector<Real> & real_part,
+std::vector<Real> & imag_part)
 {
-  const unsigned int len = source.size();
+const unsigned int len = source.size();
 
-  real_part.resize(len);
-  imag_part.resize(len);
+real_part.resize(len);
+imag_part.resize(len);
 
-  for (unsigned int i=0; i<len; i++)
-    {
-      real_part[i] = source[i].real();
-      imag_part[i] = source[i].imag();
-    }
+for (unsigned int i=0; i<len; i++)
+{
+real_part[i] = source[i].real();
+imag_part[i] = source[i].imag();
+}
 }
 
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS

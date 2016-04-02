@@ -40,38 +40,38 @@ class Node;
 
 
 /**
- * Data structures that enable location-based lookups
- * The key is a hash of the Point location.
- * For efficiency we will use a hashed multimap if it is
- * available, otherwise a regular multimap.
- */
+* Data structures that enable location-based lookups
+* The key is a hash of the Point location.
+* For efficiency we will use a hashed multimap if it is
+* available, otherwise a regular multimap.
+*/
 template <typename T>
 class LocationMap
 {
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<unsigned int, T *> map_type;
+typedef LIBMESH_BEST_UNORDERED_MULTIMAP<unsigned int, T *> map_type;
 public:
-  void init(MeshBase &);
+void init(MeshBase &);
 
-  void clear() { _map.clear(); }
+void clear() { _map.clear(); }
 
-  void insert(T &);
+void insert(T &);
 
-  bool empty() const { return _map.empty(); }
+bool empty() const { return _map.empty(); }
 
-  T * find(const Point &,
-           const Real tol = TOLERANCE);
+T * find(const Point &,
+const Real tol = TOLERANCE);
 
-  Point point_of(const T &) const;
+Point point_of(const T &) const;
 
 protected:
-  unsigned int key(const Point &);
+unsigned int key(const Point &);
 
-  void fill(MeshBase &);
+void fill(MeshBase &);
 
 private:
-  map_type          _map;
-  std::vector<Real> _lower_bound;
-  std::vector<Real> _upper_bound;
+map_type          _map;
+std::vector<Real> _lower_bound;
+std::vector<Real> _upper_bound;
 };
 
 } // namespace libMesh

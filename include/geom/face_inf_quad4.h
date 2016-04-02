@@ -34,133 +34,133 @@ namespace libMesh
 {
 
 /**
- * The \p INFQUAD4 is an infinite element in 2D composed of 4 nodes.
- * It is numbered like this:
- * \verbatim
- *              2           3
- *    INFQUAD4: o           o   closer to infinity
- *              |           |
- *              |           |
- *              |           |
- *              |           |
- *              |           |
- *              o-----------o   base side
- *              0           1
- * \endverbatim
- */
+* The \p INFQUAD4 is an infinite element in 2D composed of 4 nodes.
+* It is numbered like this:
+* \verbatim
+*              2           3
+*    INFQUAD4: o           o   closer to infinity
+*              |           |
+*              |           |
+*              |           |
+*              |           |
+*              |           |
+*              o-----------o   base side
+*              0           1
+* \endverbatim
+*/
 class InfQuad4 : public InfQuad
 {
 public:
 
-  /**
-   * Constructor.  By default this element has no parent.
-   */
-  explicit
-  InfQuad4 (Elem * p=libmesh_nullptr) :
-    InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
+/**
+* Constructor.  By default this element has no parent.
+*/
+explicit
+InfQuad4 (Elem * p=libmesh_nullptr) :
+InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
 
-  /**
-   * @returns 4
-   */
-  virtual unsigned int n_nodes() const libmesh_override { return 4; }
+/**
+* @returns 4
+*/
+virtual unsigned int n_nodes() const libmesh_override { return 4; }
 
-  /**
-   * @returns \p INFQUAD4
-   */
-  virtual ElemType type () const libmesh_override { return INFQUAD4; }
+/**
+* @returns \p INFQUAD4
+*/
+virtual ElemType type () const libmesh_override { return INFQUAD4; }
 
-  /**
-   * @returns 1
-   */
-  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
+/**
+* @returns 1
+*/
+virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
-  /**
-   * @returns true iff the specified (local) node number is a vertex.
-   */
-  virtual bool is_vertex(const unsigned int i) const libmesh_override;
+/**
+* @returns true iff the specified (local) node number is a vertex.
+*/
+virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
-  /**
-   * @returns true iff the specified (local) node number is an edge.
-   */
-  virtual bool is_edge(const unsigned int i) const libmesh_override;
+/**
+* @returns true iff the specified (local) node number is an edge.
+*/
+virtual bool is_edge(const unsigned int i) const libmesh_override;
 
-  /**
-   * @returns true iff the specified (local) node number is a face.
-   */
-  virtual bool is_face(const unsigned int i) const libmesh_override;
+/**
+* @returns true iff the specified (local) node number is a face.
+*/
+virtual bool is_face(const unsigned int i) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
-   */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const libmesh_override;
+/*
+* @returns true iff the specified (local) node number is on the
+* specified side
+*/
+virtual bool is_node_on_side(const unsigned int n,
+const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge (== is_node_on_side in 2D)
-   */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const libmesh_override
-  { return this->is_node_on_side(n,e); }
+/*
+* @returns true iff the specified (local) node number is on the
+* specified edge (== is_node_on_side in 2D)
+*/
+virtual bool is_node_on_edge(const unsigned int n,
+const unsigned int e) const libmesh_override
+{ return this->is_node_on_side(n,e); }
 
-  /**
-   * @returns \p FIRST
-   */
-  virtual Order default_order() const libmesh_override { return FIRST; }
+/**
+* @returns \p FIRST
+*/
+virtual Order default_order() const libmesh_override { return FIRST; }
 
-  /**
-   * Creates and returns an \p Edge2 for the base side, and an \p InfEdge2 for
-   * the sides 1, 2.
-   */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy) const libmesh_override;
+/**
+* Creates and returns an \p Edge2 for the base side, and an \p InfEdge2 for
+* the sides 1, 2.
+*/
+virtual UniquePtr<Elem> build_side (const unsigned int i,
+bool proxy) const libmesh_override;
 
-  virtual void connectivity(const unsigned int sf,
-                            const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const libmesh_override;
+virtual void connectivity(const unsigned int sf,
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const libmesh_override;
 
-  /**
-   * @returns \p true when this element contains the point
-   * \p p.  Customized for this \p InfQuad4, since knowledge
-   * about the envelope can help avoiding slightly more
-   * expensive computations.
-   */
-  virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const libmesh_override;
+/**
+* @returns \p true when this element contains the point
+* \p p.  Customized for this \p InfQuad4, since knowledge
+* about the envelope can help avoiding slightly more
+* expensive computations.
+*/
+virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const libmesh_override;
 
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
-   */
-  static const unsigned int side_nodes_map[3][2];
+/**
+* This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+* element node numbers.
+*/
+static const unsigned int side_nodes_map[3][2];
 
 
 protected:
 
-  /**
-   * Data for links to nodes
-   */
-  Node * _nodelinks_data[4];
+/**
+* Data for links to nodes
+*/
+Node * _nodelinks_data[4];
 
 
 
 #ifdef LIBMESH_ENABLE_AMR
 
-  /**
-   * Matrix used to create the elements children.
-   */
-  virtual float embedding_matrix (const unsigned int i,
-                                  const unsigned int j,
-                                  const unsigned int k) const libmesh_override
-  { return _embedding_matrix[i][j][k]; }
+/**
+* Matrix used to create the elements children.
+*/
+virtual float embedding_matrix (const unsigned int i,
+const unsigned int j,
+const unsigned int k) const libmesh_override
+{ return _embedding_matrix[i][j][k]; }
 
-  /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
-   */
-  static const float _embedding_matrix[2][4][4];
+/**
+* Matrix that computes new nodal locations/solution values
+* from current nodes/solution.
+*/
+static const float _embedding_matrix[2][4][4];
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
 #endif // LIBMESH_ENABLE_AMR
 

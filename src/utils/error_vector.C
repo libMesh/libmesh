@@ -42,48 +42,48 @@ namespace libMesh
 // ErrorVector class member functions
 ErrorVectorReal ErrorVector::minimum() const
 {
-  START_LOG ("minimum()", "ErrorVector");
+START_LOG ("minimum()", "ErrorVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
-  ErrorVectorReal min = std::numeric_limits<ErrorVectorReal>::max();
+const dof_id_type n = cast_int<dof_id_type>(this->size());
+ErrorVectorReal min = std::numeric_limits<ErrorVectorReal>::max();
 
-  for (dof_id_type i=0; i<n; i++)
-    {
-      // Only positive (or zero) values in the error vector
-      libmesh_assert_greater_equal ((*this)[i], 0.);
-      if (this->is_active_elem(i))
-        min = std::min (min, (*this)[i]);
-    }
-  STOP_LOG ("minimum()", "ErrorVector");
+for (dof_id_type i=0; i<n; i++)
+{
+// Only positive (or zero) values in the error vector
+libmesh_assert_greater_equal ((*this)[i], 0.);
+if (this->is_active_elem(i))
+min = std::min (min, (*this)[i]);
+}
+STOP_LOG ("minimum()", "ErrorVector");
 
-  // ErrorVectors are for positive values
-  libmesh_assert_greater_equal (min, 0.);
+// ErrorVectors are for positive values
+libmesh_assert_greater_equal (min, 0.);
 
-  return min;
+return min;
 }
 
 
 
 Real ErrorVector::mean() const
 {
-  START_LOG ("mean()", "ErrorVector");
+START_LOG ("mean()", "ErrorVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  Real the_mean  = 0;
-  dof_id_type nnz = 0;
+Real the_mean  = 0;
+dof_id_type nnz = 0;
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
-      {
-        the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) / (nnz + 1);
+for (dof_id_type i=0; i<n; i++)
+if (this->is_active_elem(i))
+{
+the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) / (nnz + 1);
 
-        nnz++;
-      }
+nnz++;
+}
 
-  STOP_LOG ("mean()", "ErrorVector");
+STOP_LOG ("mean()", "ErrorVector");
 
-  return the_mean;
+return the_mean;
 }
 
 
@@ -91,23 +91,23 @@ Real ErrorVector::mean() const
 
 Real ErrorVector::median()
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  if (n == 0)
-    return 0.;
+if (n == 0)
+return 0.;
 
 
-  // Build a StatisticsVector<ErrorVectorReal> containing
-  // only our active entries and take its mean
-  StatisticsVector<ErrorVectorReal> sv;
+// Build a StatisticsVector<ErrorVectorReal> containing
+// only our active entries and take its mean
+StatisticsVector<ErrorVectorReal> sv;
 
-  sv.reserve (n);
+sv.reserve (n);
 
-  for (dof_id_type i=0; i<n; i++)
-    if(this->is_active_elem(i))
-      sv.push_back((*this)[i]);
+for (dof_id_type i=0; i<n; i++)
+if(this->is_active_elem(i))
+sv.push_back((*this)[i]);
 
-  return sv.median();
+return sv.median();
 }
 
 
@@ -115,9 +115,9 @@ Real ErrorVector::median()
 
 Real ErrorVector::median() const
 {
-  ErrorVector ev = (*this);
+ErrorVector ev = (*this);
 
-  return ev.median();
+return ev.median();
 }
 
 
@@ -125,25 +125,25 @@ Real ErrorVector::median() const
 
 Real ErrorVector::variance(const Real mean_in) const
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  START_LOG ("variance()", "ErrorVector");
+START_LOG ("variance()", "ErrorVector");
 
-  Real the_variance = 0;
-  dof_id_type nnz = 0;
+Real the_variance = 0;
+dof_id_type nnz = 0;
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
-      {
-        const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
-        the_variance += (delta * delta - the_variance) / (nnz + 1);
+for (dof_id_type i=0; i<n; i++)
+if (this->is_active_elem(i))
+{
+const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
+the_variance += (delta * delta - the_variance) / (nnz + 1);
 
-        nnz++;
-      }
+nnz++;
+}
 
-  STOP_LOG ("variance()", "ErrorVector");
+STOP_LOG ("variance()", "ErrorVector");
 
-  return the_variance;
+return the_variance;
 }
 
 
@@ -151,25 +151,25 @@ Real ErrorVector::variance(const Real mean_in) const
 
 std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
 {
-  START_LOG ("cut_below()", "ErrorVector");
+START_LOG ("cut_below()", "ErrorVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+std::vector<dof_id_type> cut_indices;
+cut_indices.reserve(n/2);  // Arbitrary
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
-      {
-        if ((*this)[i] < cut)
-          {
-            cut_indices.push_back(i);
-          }
-      }
+for (dof_id_type i=0; i<n; i++)
+if (this->is_active_elem(i))
+{
+if ((*this)[i] < cut)
+{
+cut_indices.push_back(i);
+}
+}
 
-  STOP_LOG ("cut_below()", "ErrorVector");
+STOP_LOG ("cut_below()", "ErrorVector");
 
-  return cut_indices;
+return cut_indices;
 }
 
 
@@ -177,141 +177,141 @@ std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
 
 std::vector<dof_id_type> ErrorVector::cut_above(Real cut) const
 {
-  START_LOG ("cut_above()", "ErrorVector");
+START_LOG ("cut_above()", "ErrorVector");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+std::vector<dof_id_type> cut_indices;
+cut_indices.reserve(n/2);  // Arbitrary
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
-      {
-        if ((*this)[i] > cut)
-          {
-            cut_indices.push_back(i);
-          }
-      }
+for (dof_id_type i=0; i<n; i++)
+if (this->is_active_elem(i))
+{
+if ((*this)[i] > cut)
+{
+cut_indices.push_back(i);
+}
+}
 
-  STOP_LOG ("cut_above()", "ErrorVector");
+STOP_LOG ("cut_above()", "ErrorVector");
 
-  return cut_indices;
+return cut_indices;
 }
 
 
 
 bool ErrorVector::is_active_elem (dof_id_type i) const
 {
-  libmesh_assert_less (i, this->size());
+libmesh_assert_less (i, this->size());
 
-  if (_mesh)
-    {
-      libmesh_assert(_mesh->elem(i));
-      return _mesh->elem(i)->active();
-    }
-  else
-    return ((*this)[i] != 0.);
+if (_mesh)
+{
+libmesh_assert(_mesh->elem(i));
+return _mesh->elem(i)->active();
+}
+else
+return ((*this)[i] != 0.);
 }
 
 
 void ErrorVector::plot_error(const std::string & filename,
-                             const MeshBase & oldmesh) const
+const MeshBase & oldmesh) const
 {
-  UniquePtr<MeshBase> meshptr = oldmesh.clone();
-  MeshBase & mesh = *meshptr;
+UniquePtr<MeshBase> meshptr = oldmesh.clone();
+MeshBase & mesh = *meshptr;
 
-  // The all_first_order routine requires that renumbering be allowed
-  mesh.allow_renumbering(true);
-  mesh.all_first_order();
+// The all_first_order routine requires that renumbering be allowed
+mesh.allow_renumbering(true);
+mesh.all_first_order();
 
-  // We don't want p elevation when plotting a single constant value
-  // per element
-  {
-    MeshBase::element_iterator       el     =
-      mesh.elements_begin();
-    const MeshBase::element_iterator end_el =
-      mesh.elements_end();
+// We don't want p elevation when plotting a single constant value
+// per element
+{
+MeshBase::element_iterator       el     =
+mesh.elements_begin();
+const MeshBase::element_iterator end_el =
+mesh.elements_end();
 
-    for ( ; el != end_el; ++el)
-      {
-        Elem * elem = *el;
-        elem->set_p_refinement_flag(Elem::DO_NOTHING);
-        elem->set_p_level(0);
-      }
-  }
+for ( ; el != end_el; ++el)
+{
+Elem * elem = *el;
+elem->set_p_refinement_flag(Elem::DO_NOTHING);
+elem->set_p_level(0);
+}
+}
 
-  EquationSystems temp_es (mesh);
-  ExplicitSystem & error_system
-    = temp_es.add_system<ExplicitSystem> ("Error");
-  error_system.add_variable("error", CONSTANT, MONOMIAL);
-  temp_es.init();
+EquationSystems temp_es (mesh);
+ExplicitSystem & error_system
+= temp_es.add_system<ExplicitSystem> ("Error");
+error_system.add_variable("error", CONSTANT, MONOMIAL);
+temp_es.init();
 
-  const DofMap & error_dof_map = error_system.get_dof_map();
+const DofMap & error_dof_map = error_system.get_dof_map();
 
-  MeshBase::const_element_iterator       el     =
-    mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.active_local_elements_end();
-  std::vector<dof_id_type> dof_indices;
+MeshBase::const_element_iterator       el     =
+mesh.active_local_elements_begin();
+const MeshBase::const_element_iterator end_el =
+mesh.active_local_elements_end();
+std::vector<dof_id_type> dof_indices;
 
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = *el;
+for ( ; el != end_el; ++el)
+{
+const Elem * elem = *el;
 
-      error_dof_map.dof_indices(elem, dof_indices);
+error_dof_map.dof_indices(elem, dof_indices);
 
-      const dof_id_type elem_id = elem->id();
+const dof_id_type elem_id = elem->id();
 
-      //0 for the monomial basis
-      const dof_id_type solution_index = dof_indices[0];
+//0 for the monomial basis
+const dof_id_type solution_index = dof_indices[0];
 
-      // libMesh::out << "elem_number=" << elem_number << std::endl;
-      libmesh_assert_less (elem_id, (*this).size());
+// libMesh::out << "elem_number=" << elem_number << std::endl;
+libmesh_assert_less (elem_id, (*this).size());
 
-      // We may have zero error values in special circumstances
-      // libmesh_assert_greater ((*this)[elem_id], 0.);
-      error_system.solution->set(solution_index, (*this)[elem_id]);
-    }
+// We may have zero error values in special circumstances
+// libmesh_assert_greater ((*this)[elem_id], 0.);
+error_system.solution->set(solution_index, (*this)[elem_id]);
+}
 
-  error_system.solution->close();
+error_system.solution->close();
 
-  // We may have to renumber if the original numbering was not
-  // contiguous.  Since this is just a temporary mesh, that's probably
-  // fine.
-  if (mesh.max_elem_id() != mesh.n_elem() ||
-      mesh.max_node_id() != mesh.n_nodes())
-    {
-      mesh.allow_renumbering(true);
-      mesh.renumber_nodes_and_elements();
-    }
+// We may have to renumber if the original numbering was not
+// contiguous.  Since this is just a temporary mesh, that's probably
+// fine.
+if (mesh.max_elem_id() != mesh.n_elem() ||
+mesh.max_node_id() != mesh.n_nodes())
+{
+mesh.allow_renumbering(true);
+mesh.renumber_nodes_and_elements();
+}
 
-  if (filename.rfind(".gmv") < filename.size())
-    {
-      GMVIO(mesh).write_discontinuous_gmv(filename,
-                                          temp_es, false);
-    }
-  else if (filename.rfind(".plt") < filename.size())
-    {
-      TecplotIO (mesh).write_equation_systems
-        (filename, temp_es);
-    }
+if (filename.rfind(".gmv") < filename.size())
+{
+GMVIO(mesh).write_discontinuous_gmv(filename,
+temp_es, false);
+}
+else if (filename.rfind(".plt") < filename.size())
+{
+TecplotIO (mesh).write_equation_systems
+(filename, temp_es);
+}
 #ifdef LIBMESH_HAVE_EXODUS_API
-  else if( (filename.rfind(".exo") < filename.size()) ||
-           (filename.rfind(".e") < filename.size()) )
-    {
-      ExodusII_IO io(mesh);
-      io.write(filename);
-      io.write_element_data(temp_es);
-    }
+else if( (filename.rfind(".exo") < filename.size()) ||
+(filename.rfind(".e") < filename.size()) )
+{
+ExodusII_IO io(mesh);
+io.write(filename);
+io.write_element_data(temp_es);
+}
 #endif
-  else
-    {
-      libmesh_here();
-      libMesh::err << "Warning: ErrorVector::plot_error currently only"
-                   << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
-      libMesh::err << "Could not recognize filename: " << filename
-                   << std::endl;
-    }
+else
+{
+libmesh_here();
+libMesh::err << "Warning: ErrorVector::plot_error currently only"
+<< " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
+libMesh::err << "Could not recognize filename: " << filename
+<< std::endl;
+}
 }
 
 } // namespace libMesh

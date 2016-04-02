@@ -35,22 +35,22 @@ template <>
 class Packing<const Elem *>
 {
 public:
-  typedef largest_id_type buffer_type;
+typedef largest_id_type buffer_type;
 
-  template <typename OutputIter, typename Context>
-  static void pack(const Elem * const & object,
-                   OutputIter data_out,
-                   const Context * context);
+template <typename OutputIter, typename Context>
+static void pack(const Elem * const & object,
+OutputIter data_out,
+const Context * context);
 
-  template <typename Context>
-  static unsigned int packable_size(const Elem * const & object,
-                                    const Context * context);
+template <typename Context>
+static unsigned int packable_size(const Elem * const & object,
+const Context * context);
 
-  template <typename BufferIter>
-  static unsigned int packed_size(BufferIter iter);
+template <typename BufferIter>
+static unsigned int packed_size(BufferIter iter);
 
-  template <typename BufferIter, typename Context>
-  static const Elem * unpack(BufferIter in, Context * ctx);
+template <typename BufferIter, typename Context>
+static const Elem * unpack(BufferIter in, Context * ctx);
 };
 
 
@@ -58,25 +58,25 @@ template <>
 class Packing<Elem *>
 {
 public:
-  typedef largest_id_type buffer_type;
+typedef largest_id_type buffer_type;
 
-  template <typename OutputIter, typename Context>
-  static void pack(Elem * const & object,
-                   OutputIter data_out,
-                   const Context * context)
-  { return Packing<const Elem *>::pack(object, data_out, context); }
+template <typename OutputIter, typename Context>
+static void pack(Elem * const & object,
+OutputIter data_out,
+const Context * context)
+{ return Packing<const Elem *>::pack(object, data_out, context); }
 
-  template <typename Context>
-  static unsigned int packable_size(Elem * const & object,
-                                    const Context * context)
-  { return Packing<const Elem *>::packable_size(object, context); }
+template <typename Context>
+static unsigned int packable_size(Elem * const & object,
+const Context * context)
+{ return Packing<const Elem *>::packable_size(object, context); }
 
-  template <typename BufferIter>
-  static unsigned int packed_size(BufferIter iter)
-  { return Packing<const Elem *>::packed_size(iter); }
+template <typename BufferIter>
+static unsigned int packed_size(BufferIter iter)
+{ return Packing<const Elem *>::packed_size(iter); }
 
-  template <typename BufferIter, typename Context>
-  static Elem * unpack(BufferIter in, Context * ctx);
+template <typename BufferIter, typename Context>
+static Elem * unpack(BufferIter in, Context * ctx);
 };
 
 

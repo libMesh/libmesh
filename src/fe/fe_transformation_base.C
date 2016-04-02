@@ -26,43 +26,43 @@ namespace libMesh
 template< typename OutputShape >
 UniquePtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType & fe_type )
 {
-  switch (fe_type.family)
-    {
-      // H1 Conforming Elements
-    case LAGRANGE:
-    case HIERARCHIC:
-    case BERNSTEIN:
-    case SZABAB:
-    case CLOUGH: // PB: Really H2
-    case HERMITE: // PB: Really H2
-    case SUBDIVISION:
-    case LAGRANGE_VEC:
-    case MONOMIAL: // PB: Shouldn't this be L2 conforming?
-    case XYZ: // PB: Shouldn't this be L2 conforming?
-    case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
-    case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
-    case JACOBI_20_00: // PB: For infinite elements...
-    case JACOBI_30_00: // PB: For infinite elements...
-      return UniquePtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
+switch (fe_type.family)
+{
+// H1 Conforming Elements
+case LAGRANGE:
+case HIERARCHIC:
+case BERNSTEIN:
+case SZABAB:
+case CLOUGH: // PB: Really H2
+case HERMITE: // PB: Really H2
+case SUBDIVISION:
+case LAGRANGE_VEC:
+case MONOMIAL: // PB: Shouldn't this be L2 conforming?
+case XYZ: // PB: Shouldn't this be L2 conforming?
+case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
+case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
+case JACOBI_20_00: // PB: For infinite elements...
+case JACOBI_30_00: // PB: For infinite elements...
+return UniquePtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
 
-      // HCurl Conforming Elements
-    case NEDELEC_ONE:
-      return UniquePtr<FETransformationBase<OutputShape> >(new HCurlFETransformation<OutputShape>);
+// HCurl Conforming Elements
+case NEDELEC_ONE:
+return UniquePtr<FETransformationBase<OutputShape> >(new HCurlFETransformation<OutputShape>);
 
-      // HDiv Conforming Elements
-      // L2 Conforming Elements
+// HDiv Conforming Elements
+// L2 Conforming Elements
 
-      // Other...
-    case SCALAR:
-      // Should never need this for SCALARs
-      return UniquePtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
+// Other...
+case SCALAR:
+// Should never need this for SCALARs
+return UniquePtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
 
-    default:
-      libmesh_error_msg("Unknown family = " << fe_type.family);
-    }
+default:
+libmesh_error_msg("Unknown family = " << fe_type.family);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<FETransformationBase<OutputShape> >();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<FETransformationBase<OutputShape> >();
 }
 
 template class FETransformationBase<Real>;

@@ -32,22 +32,22 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tet4 class static member initializations
 const unsigned int Tet4::side_nodes_map[4][3] =
-  {
-    {0, 2, 1}, // Side 0
-    {0, 1, 3}, // Side 1
-    {1, 2, 3}, // Side 2
-    {2, 0, 3}  // Side 3
-  };
+{
+{0, 2, 1}, // Side 0
+{0, 1, 3}, // Side 1
+{1, 2, 3}, // Side 2
+{2, 0, 3}  // Side 3
+};
 
 const unsigned int Tet4::edge_nodes_map[6][2] =
-  {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {0, 2}, // Side 2
-    {0, 3}, // Side 3
-    {1, 3}, // Side 4
-    {2, 3}  // Side 5
-  };
+{
+{0, 1}, // Side 0
+{1, 2}, // Side 1
+{0, 2}, // Side 2
+{0, 3}, // Side 3
+{1, 3}, // Side 4
+{2, 3}  // Side 5
+};
 
 
 // ------------------------------------------------------------
@@ -55,27 +55,27 @@ const unsigned int Tet4::edge_nodes_map[6][2] =
 
 bool Tet4::is_vertex(const unsigned int) const
 {
-  return true;
+return true;
 }
 
 bool Tet4::is_edge(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Tet4::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Tet4::is_node_on_edge(const unsigned int n,
-                           const unsigned int e) const
+const unsigned int e) const
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (e, n_edges());
+for (unsigned int i = 0; i != 2; ++i)
+if (edge_nodes_map[e][i] == n)
+return true;
+return false;
 }
 
 
@@ -85,30 +85,30 @@ bool Tet4::is_node_on_edge(const unsigned int n,
 
 // This function only works if LIBMESH_ENABLE_AMR...
 bool Tet4::is_child_on_side(const unsigned int c,
-                            const unsigned int s) const
+const unsigned int s) const
 {
-  // OK, for the Tet4, this is pretty obvious... it is sets of nodes
-  // not equal to the current node.  But if we want this algorithm to
-  // be generic and work for Tet10 also it helps to do it this way.
-  const unsigned int nodes_opposite[4][3] =
-    {
-      {1,2,3}, // nodes opposite node 0
-      {0,2,3}, // nodes opposite node 1
-      {0,1,3}, // nodes opposite node 2
-      {0,1,2}  // nodes opposite node 3
-    };
+// OK, for the Tet4, this is pretty obvious... it is sets of nodes
+// not equal to the current node.  But if we want this algorithm to
+// be generic and work for Tet10 also it helps to do it this way.
+const unsigned int nodes_opposite[4][3] =
+{
+{1,2,3}, // nodes opposite node 0
+{0,2,3}, // nodes opposite node 1
+{0,1,3}, // nodes opposite node 2
+{0,1,2}  // nodes opposite node 3
+};
 
-  // Call the base class helper function
-  return Tet::is_child_on_side_helper(c, s, nodes_opposite);
+// Call the base class helper function
+return Tet::is_child_on_side_helper(c, s, nodes_opposite);
 }
 
 #else
 
 bool Tet4::is_child_on_side(const unsigned int /*c*/,
-                            const unsigned int /*s*/) const
+const unsigned int /*s*/) const
 {
-  libmesh_not_implemented();
-  return false;
+libmesh_not_implemented();
+return false;
 }
 
 #endif //LIBMESH_ENABLE_AMR
@@ -117,85 +117,85 @@ bool Tet4::is_child_on_side(const unsigned int /*c*/,
 
 
 bool Tet4::is_node_on_side(const unsigned int n,
-                           const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 3; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 UniquePtr<Elem> Tet4::build_side (const unsigned int i,
-                                  bool proxy) const
+bool proxy) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    return UniquePtr<Elem>(new Side<Tri3,Tet4>(this,i));
+if (proxy)
+return UniquePtr<Elem>(new Side<Tri3,Tet4>(this,i));
 
-  else
-    {
-      Elem * face = new Tri3;
-      face->subdomain_id() = this->subdomain_id();
+else
+{
+Elem * face = new Tri3;
+face->subdomain_id() = this->subdomain_id();
 
-      for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
-    }
+return UniquePtr<Elem>(face);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 UniquePtr<Elem> Tet4::build_edge (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_edges());
+libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
+return UniquePtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
 }
 
 
 void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
-                        const IOPackage iop,
-                        std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert(_nodes);
+libmesh_assert_less (sc, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn.resize(8);
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(2)+1;
-        conn[4] = this->node(3)+1;
-        conn[5] = this->node(3)+1;
-        conn[6] = this->node(3)+1;
-        conn[7] = this->node(3)+1;
-        return;
-      }
+switch (iop)
+{
+case TECPLOT:
+{
+conn.resize(8);
+conn[0] = this->node(0)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(2)+1;
+conn[3] = this->node(2)+1;
+conn[4] = this->node(3)+1;
+conn[5] = this->node(3)+1;
+conn[6] = this->node(3)+1;
+conn[7] = this->node(3)+1;
+return;
+}
 
-    case VTK:
-      {
-        conn.resize(4);
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
-        return;
-      }
+case VTK:
+{
+conn.resize(4);
+conn[0] = this->node(0);
+conn[1] = this->node(1);
+conn[2] = this->node(2);
+conn[3] = this->node(3);
+return;
+}
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 
@@ -203,79 +203,79 @@ void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Tet4::_embedding_matrix[8][4][4] =
-  {
-    // embedding matrix for child 0
-    {
-      // 0    1    2    3
-      {1.0, 0.0, 0.0, 0.0}, // 0
-      {0.5, 0.5, 0.0, 0.0}, // 1
-      {0.5, 0.0, 0.5, 0.0}, // 2
-      {0.5, 0.0, 0.0, 0.5}  // 3
-    },
+{
+// embedding matrix for child 0
+{
+// 0    1    2    3
+{1.0, 0.0, 0.0, 0.0}, // 0
+{0.5, 0.5, 0.0, 0.0}, // 1
+{0.5, 0.0, 0.5, 0.0}, // 2
+{0.5, 0.0, 0.0, 0.5}  // 3
+},
 
-    // embedding matrix for child 1
-    {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 1.0, 0.0, 0.0}, // 1
-      {0.0, 0.5, 0.5, 0.0}, // 2
-      {0.0, 0.5, 0.0, 0.5}  // 3
-    },
+// embedding matrix for child 1
+{
+// 0    1    2    3
+{0.5, 0.5, 0.0, 0.0}, // 0
+{0.0, 1.0, 0.0, 0.0}, // 1
+{0.0, 0.5, 0.5, 0.0}, // 2
+{0.0, 0.5, 0.0, 0.5}  // 3
+},
 
-    // embedding matrix for child 2
-    {
-      // 0    1    2    3
-      {0.5, 0.0, 0.5, 0.0}, // 0
-      {0.0, 0.5, 0.5, 0.0}, // 1
-      {0.0, 0.0, 1.0, 0.0}, // 2
-      {0.0, 0.0, 0.5, 0.5}  // 3
-    },
+// embedding matrix for child 2
+{
+// 0    1    2    3
+{0.5, 0.0, 0.5, 0.0}, // 0
+{0.0, 0.5, 0.5, 0.0}, // 1
+{0.0, 0.0, 1.0, 0.0}, // 2
+{0.0, 0.0, 0.5, 0.5}  // 3
+},
 
-    // embedding matrix for child 3
-    {
-      // 0    1    2    3
-      {0.5, 0.0, 0.0, 0.5}, // 0
-      {0.0, 0.5, 0.0, 0.5}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.0, 0.0, 0.0, 1.0}  // 3
-    },
+// embedding matrix for child 3
+{
+// 0    1    2    3
+{0.5, 0.0, 0.0, 0.5}, // 0
+{0.0, 0.5, 0.0, 0.5}, // 1
+{0.0, 0.0, 0.5, 0.5}, // 2
+{0.0, 0.0, 0.0, 1.0}  // 3
+},
 
-    // embedding matrix for child 4
-    {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 0.5, 0.0, 0.5}, // 1
-      {0.5, 0.0, 0.5, 0.0}, // 2
-      {0.5, 0.0, 0.0, 0.5}  // 3
-    },
+// embedding matrix for child 4
+{
+// 0    1    2    3
+{0.5, 0.5, 0.0, 0.0}, // 0
+{0.0, 0.5, 0.0, 0.5}, // 1
+{0.5, 0.0, 0.5, 0.0}, // 2
+{0.5, 0.0, 0.0, 0.5}  // 3
+},
 
-    // embedding matrix for child 5
-    {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 0.5, 0.5, 0.0}, // 1
-      {0.5, 0.0, 0.5, 0.0}, // 2
-      {0.0, 0.5, 0.0, 0.5}  // 3
-    },
+// embedding matrix for child 5
+{
+// 0    1    2    3
+{0.5, 0.5, 0.0, 0.0}, // 0
+{0.0, 0.5, 0.5, 0.0}, // 1
+{0.5, 0.0, 0.5, 0.0}, // 2
+{0.0, 0.5, 0.0, 0.5}  // 3
+},
 
-    // embedding matrix for child 6
-    {
-      // 0    1    2    3
-      {0.5, 0.0, 0.5, 0.0}, // 0
-      {0.0, 0.5, 0.5, 0.0}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.0, 0.5, 0.0, 0.5}  // 3
-    },
+// embedding matrix for child 6
+{
+// 0    1    2    3
+{0.5, 0.0, 0.5, 0.0}, // 0
+{0.0, 0.5, 0.5, 0.0}, // 1
+{0.0, 0.0, 0.5, 0.5}, // 2
+{0.0, 0.5, 0.0, 0.5}  // 3
+},
 
-    // embedding matrix for child 7
-    {
-      // 0    1    2    3
-      {0.5, 0.0, 0.5, 0.0}, // 0
-      {0.0, 0.5, 0.0, 0.5}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.5, 0.0, 0.0, 0.5}  // 3
-    }
-  };
+// embedding matrix for child 7
+{
+// 0    1    2    3
+{0.5, 0.0, 0.5, 0.0}, // 0
+{0.0, 0.5, 0.0, 0.5}, // 1
+{0.0, 0.0, 0.5, 0.5}, // 2
+{0.5, 0.0, 0.0, 0.5}  // 3
+}
+};
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
@@ -285,17 +285,17 @@ const float Tet4::_embedding_matrix[8][4][4] =
 
 Real Tet4::volume () const
 {
-  // The volume of a tetrahedron is 1/6 the box product formed
-  // by its base and apex vectors
-  Point a = point(3) - point(0);
+// The volume of a tetrahedron is 1/6 the box product formed
+// by its base and apex vectors
+Point a = point(3) - point(0);
 
-  // b is the vector pointing from 0 to 1
-  Point b = point(1) - point(0);
+// b is the vector pointing from 0 to 1
+Point b = point(1) - point(0);
 
-  // c is the vector pointing from 0 to 2
-  Point c = point(2) - point(0);
+// c is the vector pointing from 0 to 2
+Point c = point(2) - point(0);
 
-  return triple_product(a, b, c) / 6.;
+return triple_product(a, b, c) / 6.;
 }
 
 
@@ -303,24 +303,24 @@ Real Tet4::volume () const
 
 std::pair<Real, Real> Tet4::min_and_max_angle() const
 {
-  Point n[4];
+Point n[4];
 
-  // Compute the outward normal vectors on each face
-  n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
-  n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
-  n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
-  n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
+// Compute the outward normal vectors on each face
+n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
+n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
+n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
+n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
 
-  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
+Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
 
-  // Compute dihedral angles
-  for (unsigned int k=0,i=0; i<4; ++i)
-    for (unsigned int j=i+1; j<4; ++j,k+=1)
-      dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].norm() / n[j].norm()); // return value is between 0 and PI
+// Compute dihedral angles
+for (unsigned int k=0,i=0; i<4; ++i)
+for (unsigned int j=i+1; j<4; ++j,k+=1)
+dihedral_angles[k] = std::acos(n[i]*n[j] / n[i].norm() / n[j].norm()); // return value is between 0 and PI
 
-  // Return max/min dihedral angles
-  return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
-                        *std::max_element(dihedral_angles, dihedral_angles+6));
+// Return max/min dihedral angles
+return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
+*std::max_element(dihedral_angles, dihedral_angles+6));
 
 }
 
@@ -328,53 +328,53 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
 
 #ifdef LIBMESH_ENABLE_AMR
 float Tet4::embedding_matrix (const unsigned int i,
-                              const unsigned int j,
-                              const unsigned int k) const
+const unsigned int j,
+const unsigned int k) const
 {
-  // Choose an optimal diagonal, if one has not already been selected
-  this->choose_diagonal();
+// Choose an optimal diagonal, if one has not already been selected
+this->choose_diagonal();
 
-  // Permuted j and k indices
-  unsigned int
-    jp=j,
-    kp=k;
+// Permuted j and k indices
+unsigned int
+jp=j,
+kp=k;
 
-  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
-    {
-      // Just the enum value cast to an unsigned int...
-      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection);
+if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
+{
+// Just the enum value cast to an unsigned int...
+const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection);
 
-      // Permute j, k:
-      // ds==1      ds==2
-      // 0 -> 1     0 -> 2
-      // 1 -> 2     1 -> 0
-      // 2 -> 0     2 -> 1
-      if (jp != 3)
-        jp = (jp+ds)%3;
+// Permute j, k:
+// ds==1      ds==2
+// 0 -> 1     0 -> 2
+// 1 -> 2     1 -> 0
+// 2 -> 0     2 -> 1
+if (jp != 3)
+jp = (jp+ds)%3;
 
-      if (kp != 3)
-        kp = (kp+ds)%3;
-    }
+if (kp != 3)
+kp = (kp+ds)%3;
+}
 
-  // Debugging
-  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
-  // libMesh::err << "j=" << j << std::endl;
-  // libMesh::err << "k=" << k << std::endl;
-  // libMesh::err << "jp=" << jp << std::endl;
-  // libMesh::err << "kp=" << kp << std::endl;
+// Debugging
+// libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
+// libMesh::err << "j=" << j << std::endl;
+// libMesh::err << "k=" << k << std::endl;
+// libMesh::err << "jp=" << jp << std::endl;
+// libMesh::err << "kp=" << kp << std::endl;
 
-  // Call embedding matrx with permuted indices
-  return this->_embedding_matrix[i][jp][kp];
+// Call embedding matrx with permuted indices
+return this->_embedding_matrix[i][jp][kp];
 }
 
 
 
 dof_id_type Tet4::key () const
 {
-  return this->compute_key(this->node(0),
-                           this->node(1),
-                           this->node(2),
-                           this->node(3));
+return this->compute_key(this->node(0),
+this->node(1),
+this->node(2),
+this->node(3));
 }
 
 

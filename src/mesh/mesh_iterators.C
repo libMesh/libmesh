@@ -35,92 +35,92 @@ namespace libMesh
 // given the Predicate PRED, which may be passed an arbitrary number
 // of arguments.
 #define INSTANTIATE_ELEM_ACCESSORS(FUNC_PREFIX, PRED, FUNC_ARG, ...)    \
-  SerialMesh::element_iterator                                          \
-  SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG)                            \
-  {                                                                     \
-    return element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  SerialMesh::const_element_iterator                                    \
-  SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                      \
-  {                                                                     \
-    return const_element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  SerialMesh::element_iterator                                          \
-  SerialMesh::FUNC_PREFIX##_end (FUNC_ARG)                              \
-  {                                                                     \
-    return element_iterator(_elements.end(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  SerialMesh::const_element_iterator                                    \
-  SerialMesh::FUNC_PREFIX##_end (FUNC_ARG) const                        \
-  {                                                                     \
-    return const_element_iterator(_elements.end(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::element_iterator                                        \
-  ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG)                          \
-  {                                                                     \
-    return element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::const_element_iterator                                  \
-  ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                    \
-  {                                                                     \
-    return const_element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::element_iterator                                        \
-  ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG)                            \
-  {                                                                     \
-    return element_iterator(_elements.end(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::const_element_iterator                                  \
-  ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG) const                      \
-  {                                                                     \
-    return const_element_iterator(_elements.end(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
-  }
+SerialMesh::element_iterator                                          \
+SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG)                            \
+{                                                                     \
+return element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+SerialMesh::const_element_iterator                                    \
+SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                      \
+{                                                                     \
+return const_element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+SerialMesh::element_iterator                                          \
+SerialMesh::FUNC_PREFIX##_end (FUNC_ARG)                              \
+{                                                                     \
+return element_iterator(_elements.end(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+SerialMesh::const_element_iterator                                    \
+SerialMesh::FUNC_PREFIX##_end (FUNC_ARG) const                        \
+{                                                                     \
+return const_element_iterator(_elements.end(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::element_iterator                                        \
+ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG)                          \
+{                                                                     \
+return element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::const_element_iterator                                  \
+ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                    \
+{                                                                     \
+return const_element_iterator(_elements.begin(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::element_iterator                                        \
+ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG)                            \
+{                                                                     \
+return element_iterator(_elements.end(), _elements.end(), Predicates::PRED<elem_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::const_element_iterator                                  \
+ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG) const                      \
+{                                                                     \
+return const_element_iterator(_elements.end(), _elements.end(), Predicates::PRED<const_elem_iterator_imp>(__VA_ARGS__)); \
+}
 
 
 
 // This macro is similar to the one above except that it generates
 // node iterator accessor functions.
 #define INSTANTIATE_NODE_ACCESSORS(FUNC_PREFIX, PRED, FUNC_ARG, ...)    \
-  SerialMesh::node_iterator                                             \
-  SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG)                            \
-  {                                                                     \
-    return node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  SerialMesh::const_node_iterator                                       \
-  SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                      \
-  {                                                                     \
-    return const_node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  SerialMesh::node_iterator                                             \
-  SerialMesh::FUNC_PREFIX##_end (FUNC_ARG)                              \
-  {                                                                     \
-    return node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  SerialMesh::const_node_iterator                                       \
-  SerialMesh::FUNC_PREFIX##_end (FUNC_ARG) const                        \
-  {                                                                     \
-    return const_node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::node_iterator                                           \
-  ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG)                          \
-  {                                                                     \
-    return node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::const_node_iterator                                     \
-  ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                    \
-  {                                                                     \
-    return const_node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::node_iterator                                           \
-  ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG)                            \
-  {                                                                     \
-    return node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
-  }                                                                     \
-  ParallelMesh::const_node_iterator                                     \
-  ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG) const                      \
-  {                                                                     \
-    return const_node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
-  }
+SerialMesh::node_iterator                                             \
+SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG)                            \
+{                                                                     \
+return node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+SerialMesh::const_node_iterator                                       \
+SerialMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                      \
+{                                                                     \
+return const_node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+SerialMesh::node_iterator                                             \
+SerialMesh::FUNC_PREFIX##_end (FUNC_ARG)                              \
+{                                                                     \
+return node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+SerialMesh::const_node_iterator                                       \
+SerialMesh::FUNC_PREFIX##_end (FUNC_ARG) const                        \
+{                                                                     \
+return const_node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::node_iterator                                           \
+ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG)                          \
+{                                                                     \
+return node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::const_node_iterator                                     \
+ParallelMesh::FUNC_PREFIX##_begin (FUNC_ARG) const                    \
+{                                                                     \
+return const_node_iterator(_nodes.begin(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::node_iterator                                           \
+ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG)                            \
+{                                                                     \
+return node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<node_iterator_imp>(__VA_ARGS__)); \
+}                                                                     \
+ParallelMesh::const_node_iterator                                     \
+ParallelMesh::FUNC_PREFIX##_end (FUNC_ARG) const                      \
+{                                                                     \
+return const_node_iterator(_nodes.end(), _nodes.end(), Predicates::PRED<const_node_iterator_imp>(__VA_ARGS__)); \
+}
 
 // Use an empty preprocessor token to silence older compilers that
 // still warn about empty macro arguments.

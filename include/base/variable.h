@@ -34,241 +34,241 @@ namespace libMesh {
 class System;
 
 /**
- * This class defines the notion of a variable in the system.
- * A variable is one of potentially several unknowns in the
- * problem at hand.  A variable is described by a unique
- * name, a finite element approximation family, and
- * (optionally) a list of subdomains to which the
- * variable is restricted.
- */
+* This class defines the notion of a variable in the system.
+* A variable is one of potentially several unknowns in the
+* problem at hand.  A variable is described by a unique
+* name, a finite element approximation family, and
+* (optionally) a list of subdomains to which the
+* variable is restricted.
+*/
 class Variable
 {
 public:
 
-  /**
-   * Constructor.  Omits the subdomain mapping, hence this
-   * constructor creates a variable which is active on
-   * all subdomains.
-   */
-  Variable (System * sys,
-            const std::string & var_name,
-            const unsigned int var_number,
-            const unsigned int first_scalar_num,
-            const FEType & var_type) :
-    _sys(sys),
-    _name(var_name),
-    _active_subdomains(),
-    _number(var_number),
-    _first_scalar_number(first_scalar_num),
-    _type(var_type)
-  {}
+/**
+* Constructor.  Omits the subdomain mapping, hence this
+* constructor creates a variable which is active on
+* all subdomains.
+*/
+Variable (System * sys,
+const std::string & var_name,
+const unsigned int var_number,
+const unsigned int first_scalar_num,
+const FEType & var_type) :
+_sys(sys),
+_name(var_name),
+_active_subdomains(),
+_number(var_number),
+_first_scalar_number(first_scalar_num),
+_type(var_type)
+{}
 
-  /**
-   * Constructor.  Takes a set which contains the subdomain
-   * indices for which this variable is active.
-   */
-  Variable (System * sys,
-            const std::string & var_name,
-            const unsigned int var_number,
-            const unsigned int first_scalar_num,
-            const FEType & var_type,
-            const std::set<subdomain_id_type> & var_active_subdomains) :
-    _sys(sys),
-    _name(var_name),
-    _active_subdomains(var_active_subdomains),
-    _number(var_number),
-    _first_scalar_number(first_scalar_num),
-    _type(var_type)
-  {}
+/**
+* Constructor.  Takes a set which contains the subdomain
+* indices for which this variable is active.
+*/
+Variable (System * sys,
+const std::string & var_name,
+const unsigned int var_number,
+const unsigned int first_scalar_num,
+const FEType & var_type,
+const std::set<subdomain_id_type> & var_active_subdomains) :
+_sys(sys),
+_name(var_name),
+_active_subdomains(var_active_subdomains),
+_number(var_number),
+_first_scalar_number(first_scalar_num),
+_type(var_type)
+{}
 
-  /**
-   * The System this Variable is part of.
-   */
-  System * system() const
-  {
-    return _sys;
-  }
+/**
+* The System this Variable is part of.
+*/
+System * system() const
+{
+return _sys;
+}
 
-  /**
-   * Arbitrary, user-specified name of the variable.
-   */
-  const std::string & name() const
-  { return _name; }
+/**
+* Arbitrary, user-specified name of the variable.
+*/
+const std::string & name() const
+{ return _name; }
 
-  /**
-   * The rank of this variable in the system.
-   */
-  unsigned int number() const
-  { return _number; }
+/**
+* The rank of this variable in the system.
+*/
+unsigned int number() const
+{ return _number; }
 
-  /**
-   * The index of the first scalar component of this variable in the
-   * system.
-   */
-  unsigned int first_scalar_number() const
-  { return _first_scalar_number; }
+/**
+* The index of the first scalar component of this variable in the
+* system.
+*/
+unsigned int first_scalar_number() const
+{ return _first_scalar_number; }
 
-  /**
-   * The \p FEType for this variable.
-   */
-  const FEType & type() const
-  { return _type; }
+/**
+* The \p FEType for this variable.
+*/
+const FEType & type() const
+{ return _type; }
 
-  /**
-   * The number of components of this variable.
-   */
-  unsigned int n_components() const
-  { return type().family == SCALAR ? _type.order.get_order() : 1; }
+/**
+* The number of components of this variable.
+*/
+unsigned int n_components() const
+{ return type().family == SCALAR ? _type.order.get_order() : 1; }
 
-  /**
-   * \p returns \p true if this variable is active on subdomain \p sid,
-   * \p false otherwise.  Note that we interperet the special case of an
-   * empty \p _active_subdomains container as active everywhere, i.e.
-   * for all subdomains.
-   */
-  bool active_on_subdomain (subdomain_id_type sid) const
-  { return (_active_subdomains.empty() || _active_subdomains.count(sid));  }
+/**
+* \p returns \p true if this variable is active on subdomain \p sid,
+* \p false otherwise.  Note that we interperet the special case of an
+* empty \p _active_subdomains container as active everywhere, i.e.
+* for all subdomains.
+*/
+bool active_on_subdomain (subdomain_id_type sid) const
+{ return (_active_subdomains.empty() || _active_subdomains.count(sid));  }
 
-  /**
-   * \p returns \p true if this variable is active on all subdomains
-   * because it has no specified activity map.  This can be used
-   * to perform more efficient computations in some places.
-   */
-  bool implicitly_active () const
-  { return _active_subdomains.empty(); }
+/**
+* \p returns \p true if this variable is active on all subdomains
+* because it has no specified activity map.  This can be used
+* to perform more efficient computations in some places.
+*/
+bool implicitly_active () const
+{ return _active_subdomains.empty(); }
 
-  /**
-   * Returns set of subdomain ids this variable lives on
-   */
-  const std::set<subdomain_id_type> & active_subdomains() const
-  { return _active_subdomains; }
+/**
+* Returns set of subdomain ids this variable lives on
+*/
+const std::set<subdomain_id_type> & active_subdomains() const
+{ return _active_subdomains; }
 
 protected:
-  System *                _sys;
-  std::string             _name;
-  std::set<subdomain_id_type> _active_subdomains;
-  unsigned int            _number;
-  unsigned int            _first_scalar_number;
-  FEType                  _type;
+System *                _sys;
+std::string             _name;
+std::set<subdomain_id_type> _active_subdomains;
+unsigned int            _number;
+unsigned int            _first_scalar_number;
+FEType                  _type;
 };
 
 
 
 /**
- * This class defines a logically grouped set of variables in
- * the system.  \p VariableGroup is appropriate for representing
- * several unknowns in the problem that are all approximated
- * with the same finite element approximation family and
- * (optionally) a list of subdomains to which the
- * variables are restricted.
- */
+* This class defines a logically grouped set of variables in
+* the system.  \p VariableGroup is appropriate for representing
+* several unknowns in the problem that are all approximated
+* with the same finite element approximation family and
+* (optionally) a list of subdomains to which the
+* variables are restricted.
+*/
 class VariableGroup : public Variable
 {
 public:
-  /**
-   * Constructor.  Omits the subdomain mapping, hence this
-   * constructor creates a variable which is active on
-   * all subdomains.
-   */
-  VariableGroup (System * sys,
-                 const std::vector<std::string> & var_names,
-                 const unsigned int var_number,
-                 const unsigned int first_scalar_num,
-                 const FEType & var_type) :
-    Variable (sys,
-              "var_group",
-              var_number,
-              first_scalar_num,
-              var_type),
-    _names(var_names)
-  {}
+/**
+* Constructor.  Omits the subdomain mapping, hence this
+* constructor creates a variable which is active on
+* all subdomains.
+*/
+VariableGroup (System * sys,
+const std::vector<std::string> & var_names,
+const unsigned int var_number,
+const unsigned int first_scalar_num,
+const FEType & var_type) :
+Variable (sys,
+"var_group",
+var_number,
+first_scalar_num,
+var_type),
+_names(var_names)
+{}
 
 
-  /**
-   * Constructor.  Takes a set which contains the subdomain
-   * indices for which this variable is active.
-   */
-  VariableGroup (System * sys,
-                 const std::vector<std::string> & var_names,
-                 const unsigned int var_number,
-                 const unsigned int first_scalar_num,
-                 const FEType & var_type,
-                 const std::set<subdomain_id_type> & var_active_subdomains) :
+/**
+* Constructor.  Takes a set which contains the subdomain
+* indices for which this variable is active.
+*/
+VariableGroup (System * sys,
+const std::vector<std::string> & var_names,
+const unsigned int var_number,
+const unsigned int first_scalar_num,
+const FEType & var_type,
+const std::set<subdomain_id_type> & var_active_subdomains) :
 
-    Variable (sys,
-              "var_group",
-              var_number,
-              first_scalar_num,
-              var_type,
-              var_active_subdomains),
-    _names(var_names)
-  {}
+Variable (sys,
+"var_group",
+var_number,
+first_scalar_num,
+var_type,
+var_active_subdomains),
+_names(var_names)
+{}
 
-  /**
-   * The number of variables in this \p VariableGroup
-   */
-  unsigned int n_variables () const
-  { return cast_int<unsigned int>(_names.size()); }
+/**
+* The number of variables in this \p VariableGroup
+*/
+unsigned int n_variables () const
+{ return cast_int<unsigned int>(_names.size()); }
 
-  /**
-   * Construct a \p Variable object for an individual member
-   * of our group.
-   */
-  Variable variable (unsigned int v) const
-  {
-    libmesh_assert_less (v, this->n_variables());
-    return Variable (this->system(),
-                     this->name(v),
-                     this->number(v),
-                     this->first_scalar_number(v),
-                     this->type(),
-                     this->active_subdomains());
-  }
+/**
+* Construct a \p Variable object for an individual member
+* of our group.
+*/
+Variable variable (unsigned int v) const
+{
+libmesh_assert_less (v, this->n_variables());
+return Variable (this->system(),
+this->name(v),
+this->number(v),
+this->first_scalar_number(v),
+this->type(),
+this->active_subdomains());
+}
 
-  /**
-   * Support vg(v) - returns a \p Variable for v.
-   */
-  Variable operator() (unsigned int v) const
-  { return this->variable(v); }
+/**
+* Support vg(v) - returns a \p Variable for v.
+*/
+Variable operator() (unsigned int v) const
+{ return this->variable(v); }
 
-  /**
-   * Arbitrary, user-specified name of the variable.
-   */
-  const std::string & name(unsigned int v) const
-  {
-    libmesh_assert_less (v, this->n_variables());
-    return _names[v];
-  }
+/**
+* Arbitrary, user-specified name of the variable.
+*/
+const std::string & name(unsigned int v) const
+{
+libmesh_assert_less (v, this->n_variables());
+return _names[v];
+}
 
-  /**
-   * The rank of this variable in the system.
-   */
-  unsigned int number(unsigned int v) const
-  {
-    libmesh_assert_less (v, this->n_variables());
-    return _number + v;
-  }
+/**
+* The rank of this variable in the system.
+*/
+unsigned int number(unsigned int v) const
+{
+libmesh_assert_less (v, this->n_variables());
+return _number + v;
+}
 
-  /**
-   * The index of the first scalar component of this variable in the
-   * system.
-   */
-  unsigned int first_scalar_number(unsigned int v) const
-  {
-    libmesh_assert_less (v, this->n_variables());
-    return _first_scalar_number+v;
-  }
+/**
+* The index of the first scalar component of this variable in the
+* system.
+*/
+unsigned int first_scalar_number(unsigned int v) const
+{
+libmesh_assert_less (v, this->n_variables());
+return _first_scalar_number+v;
+}
 
-  /**
-   * Appends a variable to the group.  Really only can be used by \p System in
-   * a very limited window of opportunity - after the user specifies variables
-   * but before the system is initialized.
-   */
-  void append (const std::string & var_name)
-  { _names.push_back (var_name); }
+/**
+* Appends a variable to the group.  Really only can be used by \p System in
+* a very limited window of opportunity - after the user specifies variables
+* but before the system is initialized.
+*/
+void append (const std::string & var_name)
+{ _names.push_back (var_name); }
 
 protected:
-  std::vector<std::string> _names;
+std::vector<std::string> _names;
 };
 
 } // namespace libMesh

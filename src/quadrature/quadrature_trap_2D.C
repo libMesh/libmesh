@@ -26,65 +26,65 @@ namespace libMesh
 
 
 void QTrap::init_2D(const ElemType type_in,
-                    unsigned int)
+unsigned int)
 {
 #if LIBMESH_DIM > 1
 
-  //-----------------------------------------------------------------------
-  // 2D quadrature rules
-  switch (type_in)
-    {
+//-----------------------------------------------------------------------
+// 2D quadrature rules
+switch (type_in)
+{
 
 
-      //---------------------------------------------
-      // Quadrilateral quadrature rules
-    case QUAD4:
-    case QUAD8:
-    case QUAD9:
-      {
+//---------------------------------------------
+// Quadrilateral quadrature rules
+case QUAD4:
+case QUAD8:
+case QUAD9:
+{
 
-        // We compute the 2D quadrature rule as a tensor
-        // product of the 1D quadrature rule.
-        QTrap q1D(1);
-        q1D.init(EDGE2);
+// We compute the 2D quadrature rule as a tensor
+// product of the 1D quadrature rule.
+QTrap q1D(1);
+q1D.init(EDGE2);
 
-        tensor_product_quad( q1D );
+tensor_product_quad( q1D );
 
-        return;
-      }
-
-
-      //---------------------------------------------
-      // Triangle quadrature rules
-    case TRI3:
-    case TRI6:
-      {
-        _points.resize(3);
-        _weights.resize(3);
-
-        _points[0](0) = 0.;
-        _points[0](1) = 0.;
-
-        _points[1](0) = 1.;
-        _points[1](1) = 0.;
-
-        _points[2](0) = 0.;
-        _points[2](1) = 1.;
+return;
+}
 
 
-        _weights[0] = 1./6.;
-        _weights[1] = 1./6.;
-        _weights[2] = 1./6.;
+//---------------------------------------------
+// Triangle quadrature rules
+case TRI3:
+case TRI6:
+{
+_points.resize(3);
+_weights.resize(3);
 
-        return;
-      }
+_points[0](0) = 0.;
+_points[0](1) = 0.;
+
+_points[1](0) = 1.;
+_points[1](1) = 0.;
+
+_points[2](0) = 0.;
+_points[2](1) = 1.;
 
 
-      //---------------------------------------------
-      // Unsupported type
-    default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
-    }
+_weights[0] = 1./6.;
+_weights[1] = 1./6.;
+_weights[2] = 1./6.;
+
+return;
+}
+
+
+//---------------------------------------------
+// Unsupported type
+default:
+libmesh_error_msg("Element type not supported!:" << type_in);
+}
 #endif
 }
 

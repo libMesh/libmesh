@@ -8,13 +8,13 @@ namespace libMesh
 
 void NoSolutionHistory::store()
 {
-  // Do nothing
+// Do nothing
 }
 
 void NoSolutionHistory::retrieve()
 {
-  // Nothing was stored, so nothing can be retrieved
-  libmesh_not_implemented();
+// Nothing was stored, so nothing can be retrieved
+libmesh_not_implemented();
 }
 
 }

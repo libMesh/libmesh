@@ -33,7 +33,7 @@ namespace libMesh
 template <typename T>
 void EigenPreconditioner<T>::apply(const NumericVector<T> & /* x */, NumericVector<T> & /* y */)
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 }
 
 
@@ -42,7 +42,7 @@ void EigenPreconditioner<T>::apply(const NumericVector<T> & /* x */, NumericVect
 template <typename T>
 void EigenPreconditioner<T>::init ()
 {
-  libmesh_not_implemented();
+libmesh_not_implemented();
 }
 
 

@@ -33,21 +33,21 @@ namespace {
 using namespace libMesh;
 
 void indices_to_fieldsplit (const Parallel::Communicator & comm,
-                            const std::vector<dof_id_type> & indices,
-                            PC my_pc,
-                            const std::string & field_name)
+const std::vector<dof_id_type> & indices,
+PC my_pc,
+const std::string & field_name)
 {
-  const PetscInt * idx = PETSC_NULL;
-  if (!indices.empty())
-    idx = reinterpret_cast<const PetscInt *>(&indices[0]);
+const PetscInt * idx = PETSC_NULL;
+if (!indices.empty())
+idx = reinterpret_cast<const PetscInt *>(&indices[0]);
 
-  IS is;
-  int ierr = ISCreateLibMesh(comm.get(), indices.size(),
-                             idx, PETSC_COPY_VALUES, &is);
-  CHKERRABORT(comm.get(), ierr);
+IS is;
+int ierr = ISCreateLibMesh(comm.get(), indices.size(),
+idx, PETSC_COPY_VALUES, &is);
+CHKERRABORT(comm.get(), ierr);
 
-  ierr = PCFieldSplitSetIS(my_pc, field_name.c_str(), is);
-  CHKERRABORT(comm.get(), ierr);
+ierr = PCFieldSplitSetIS(my_pc, field_name.c_str(), is);
+CHKERRABORT(comm.get(), ierr);
 }
 
 }
@@ -56,56 +56,56 @@ namespace libMesh
 {
 
 void petsc_auto_fieldsplit (PC my_pc,
-                            const System & sys)
+const System & sys)
 {
-  std::string sys_prefix = "--solver_group_";
+std::string sys_prefix = "--solver_group_";
 
-  if (libMesh::on_command_line("--solver_system_names"))
-    {
-      sys_prefix = sys_prefix + sys.name() + "_";
-    }
+if (libMesh::on_command_line("--solver_system_names"))
+{
+sys_prefix = sys_prefix + sys.name() + "_";
+}
 
-  std::map<std::string, std::vector<dof_id_type> > group_indices;
+std::map<std::string, std::vector<dof_id_type> > group_indices;
 
-  if (libMesh::on_command_line("--solver_variable_names"))
-    {
-      for (unsigned int v = 0; v != sys.n_vars(); ++v)
-        {
-          const std::string & var_name = sys.variable_name(v);
+if (libMesh::on_command_line("--solver_variable_names"))
+{
+for (unsigned int v = 0; v != sys.n_vars(); ++v)
+{
+const std::string & var_name = sys.variable_name(v);
 
-          std::vector<dof_id_type> var_idx;
-          sys.get_dof_map().local_variable_indices
-            (var_idx, sys.get_mesh(), v);
+std::vector<dof_id_type> var_idx;
+sys.get_dof_map().local_variable_indices
+(var_idx, sys.get_mesh(), v);
 
-          std::string group_command = sys_prefix + var_name;
+std::string group_command = sys_prefix + var_name;
 
-          const std::string empty_string;
+const std::string empty_string;
 
-          std::string group_name = libMesh::command_line_value
-            (group_command, empty_string);
+std::string group_name = libMesh::command_line_value
+(group_command, empty_string);
 
-          if (group_name != empty_string)
-            {
-              std::vector<dof_id_type> & indices =
-                group_indices[group_name];
-              const bool prior_indices = !indices.empty();
-              indices.insert(indices.end(), var_idx.begin(),
-                             var_idx.end());
-              if (prior_indices)
-                std::sort(indices.begin(), indices.end());
-            }
-          else
-            {
-              indices_to_fieldsplit (sys.comm(), var_idx, my_pc, var_name);
-            }
-        }
-    }
+if (group_name != empty_string)
+{
+std::vector<dof_id_type> & indices =
+group_indices[group_name];
+const bool prior_indices = !indices.empty();
+indices.insert(indices.end(), var_idx.begin(),
+var_idx.end());
+if (prior_indices)
+std::sort(indices.begin(), indices.end());
+}
+else
+{
+indices_to_fieldsplit (sys.comm(), var_idx, my_pc, var_name);
+}
+}
+}
 
-  for (std::map<std::string, std::vector<dof_id_type> >::const_iterator
-         i = group_indices.begin(); i != group_indices.end(); ++i)
-    {
-      indices_to_fieldsplit(sys.comm(), i->second, my_pc, i->first);
-    }
+for (std::map<std::string, std::vector<dof_id_type> >::const_iterator
+i = group_indices.begin(); i != group_indices.end(); ++i)
+{
+indices_to_fieldsplit(sys.comm(), i->second, my_pc, i->first);
+}
 }
 
 } // namespace libMesh
@@ -116,17 +116,17 @@ void petsc_auto_fieldsplit (PC my_pc,
 namespace libMesh
 {
 void petsc_auto_fieldsplit (PC /* my_pc */,
-                            const System & /* sys */)
+const System & /* sys */)
 {
-  if (libMesh::on_command_line("--solver_variable_names"))
-    {
-      libmesh_do_once(
-                      libMesh::out << "WARNING: libMesh does not support setting field splits" <<
-                      std::endl << "with PETSc "
-                      << LIBMESH_DETECTED_PETSC_VERSION_MAJOR << '.'
-                      << LIBMESH_DETECTED_PETSC_VERSION_MINOR << '.'
-                      << LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR << std::endl;);
-    }
+if (libMesh::on_command_line("--solver_variable_names"))
+{
+libmesh_do_once(
+libMesh::out << "WARNING: libMesh does not support setting field splits" <<
+std::endl << "with PETSc "
+<< LIBMESH_DETECTED_PETSC_VERSION_MAJOR << '.'
+<< LIBMESH_DETECTED_PETSC_VERSION_MINOR << '.'
+<< LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR << std::endl;);
+}
 }
 }
 

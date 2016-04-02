@@ -32,22 +32,22 @@ namespace libMesh
 // iterator arguments.
 template <typename T>
 struct null_output_iterator
-  : std::iterator<std::output_iterator_tag, T>
+: std::iterator<std::output_iterator_tag, T>
 {
-  template <typename T2>
-  void operator=(const T2&) {}
+template <typename T2>
+void operator=(const T2&) {}
 
-  null_output_iterator & operator++() {
-    return *this;
-  }
+null_output_iterator & operator++() {
+return *this;
+}
 
-  null_output_iterator operator++(int) {
-    return null_output_iterator(*this);
-  }
+null_output_iterator operator++(int) {
+return null_output_iterator(*this);
+}
 
-  // We don't return a reference-to-T here because we don't want to
-  // construct one or have any of its methods called.
-  null_output_iterator & operator*() { return *this; }
+// We don't return a reference-to-T here because we don't want to
+// construct one or have any of its methods called.
+null_output_iterator & operator*() { return *this; }
 };
 
 } // namespace libMesh

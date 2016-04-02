@@ -32,66 +32,66 @@ namespace libMesh
 
 bool InfEdge2::is_vertex(const unsigned int i) const
 {
-  if (i)
-    return false;
-  return true;
+if (i)
+return false;
+return true;
 }
 
 bool InfEdge2::is_edge(const unsigned int i) const
 {
-  if (i)
-    return true;
-  return false;
+if (i)
+return true;
+return false;
 }
 
 bool InfEdge2::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool InfEdge2::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, 1);
-  return (s == n);
+libmesh_assert_less (s, 1);
+return (s == n);
 }
 
 bool InfEdge2::is_node_on_edge(const unsigned int,
-                               const unsigned int libmesh_dbg_var(e)) const
+const unsigned int libmesh_dbg_var(e)) const
 {
-  libmesh_assert_equal_to (e, 0);
-  return true;
+libmesh_assert_equal_to (e, 0);
+return true;
 }
 
 void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
-                            const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert_equal_to (se, 0);
-  libmesh_assert_less (se, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert_equal_to (se, 0);
+libmesh_assert_less (se, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-  conn.resize(2);
+conn.resize(2);
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        return;
-      }
+switch (iop)
+{
+case TECPLOT:
+{
+conn[0] = this->node(0)+1;
+conn[1] = this->node(1)+1;
+return;
+}
 
-    case VTK:
-      {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        return;
-      }
+case VTK:
+{
+conn[0] = this->node(0);
+conn[1] = this->node(1);
+return;
+}
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 } // namespace libMesh

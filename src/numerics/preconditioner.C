@@ -36,34 +36,34 @@ namespace libMesh
 template <typename T>
 Preconditioner<T> *
 Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
-                         const SolverPackage solver_package)
+const SolverPackage solver_package)
 {
-  // Build the appropriate solver
-  switch (solver_package)
-    {
+// Build the appropriate solver
+switch (solver_package)
+{
 
 #ifdef LIBMESH_HAVE_PETSC
-    case PETSC_SOLVERS:
-      {
-        return new PetscPreconditioner<T>(comm);
-      }
+case PETSC_SOLVERS:
+{
+return new PetscPreconditioner<T>(comm);
+}
 #endif
 
 #ifdef LIBMESH_HAVE_TRILINOS
-    case TRILINOS_SOLVERS:
-      return new TrilinosPreconditioner<T>(comm);
+case TRILINOS_SOLVERS:
+return new TrilinosPreconditioner<T>(comm);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
-    case EIGEN_SOLVERS:
-      return new EigenPreconditioner<T>(comm);
+case EIGEN_SOLVERS:
+return new EigenPreconditioner<T>(comm);
 #endif
 
-    default:
-      libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
-    }
+default:
+libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
+}
 
-  return libmesh_nullptr;
+return libmesh_nullptr;
 }
 
 

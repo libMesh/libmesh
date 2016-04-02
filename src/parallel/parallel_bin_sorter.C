@@ -36,106 +36,106 @@ namespace Parallel {
 
 template <typename KeyType, typename IdxType>
 BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator & comm_in,
-                                       const std::vector<KeyType> & d) :
-  ParallelObject(comm_in),
-  data(d)
+const std::vector<KeyType> & d) :
+ParallelObject(comm_in),
+data(d)
 {
-  // Assume (& libmesh_assert) we are working with a sorted range
+// Assume (& libmesh_assert) we are working with a sorted range
 
-  // Ah...  is_sorted is an STL extension!
-  //libmesh_assert (std::is_sorted (data.begin(), data.end()));
+// Ah...  is_sorted is an STL extension!
+//libmesh_assert (std::is_sorted (data.begin(), data.end()));
 
-  // Home-grown is_sorted
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+// Home-grown is_sorted
+libmesh_assert (Parallel::Utils::is_sorted (data));
 }
 
 
 
 template <typename KeyType, typename IdxType>
 void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
-                                          KeyType max,
-                                          KeyType min)
+KeyType max,
+KeyType min)
 {
-  libmesh_assert_less (min, max);
+libmesh_assert_less (min, max);
 
-  // Build a histogram in parallel from our data.
-  // Use this to create quasi-uniform bins.
-  Parallel::Histogram<KeyType,IdxType> phist (this->comm(), data);
-  phist.make_histogram (nbins*50, max, min);
-  phist.build_histogram ();
+// Build a histogram in parallel from our data.
+// Use this to create quasi-uniform bins.
+Parallel::Histogram<KeyType,IdxType> phist (this->comm(), data);
+phist.make_histogram (nbins*50, max, min);
+phist.build_histogram ();
 
-  const std::vector<IdxType> & histogram =
-    phist.get_histogram();
+const std::vector<IdxType> & histogram =
+phist.get_histogram();
 
 
-  // Now we will locate the bin boundaries so
-  // that each bin is roughly equal size
-  {
-    // Find the total size of the data set
-    IdxType local_data_size = cast_int<IdxType>(data.size());
-    IdxType global_data_size = cast_int<IdxType>(local_data_size);
+// Now we will locate the bin boundaries so
+// that each bin is roughly equal size
+{
+// Find the total size of the data set
+IdxType local_data_size = cast_int<IdxType>(data.size());
+IdxType global_data_size = cast_int<IdxType>(local_data_size);
 
-    this->comm().sum(global_data_size);
+this->comm().sum(global_data_size);
 
-    std::vector<IdxType> target_bin_size (nbins, global_data_size / nbins);
+std::vector<IdxType> target_bin_size (nbins, global_data_size / nbins);
 
-    // Equally distribute the remainder
-    for (IdxType i=0; i<(global_data_size % nbins); i++)
-      ++target_bin_size[i];
+// Equally distribute the remainder
+for (IdxType i=0; i<(global_data_size % nbins); i++)
+++target_bin_size[i];
 
-    // Set the iterators corresponding to the bin boundaries
-    {
-      std::vector<double> bin_bounds (nbins+1);
-      bin_iters.resize  (nbins+1, data.begin());
+// Set the iterators corresponding to the bin boundaries
+{
+std::vector<double> bin_bounds (nbins+1);
+bin_iters.resize  (nbins+1, data.begin());
 
-      // Set the minimum bin boundary iterator
-      bin_iters[0]  = data.begin();
-      bin_bounds[0] = Parallel::Utils::to_double(min);
+// Set the minimum bin boundary iterator
+bin_iters[0]  = data.begin();
+bin_bounds[0] = Parallel::Utils::to_double(min);
 
-      // The current location in the histogram
-      IdxType current_histogram_bin = 0;
+// The current location in the histogram
+IdxType current_histogram_bin = 0;
 
-      // How much above (+) or below (-) we are from the
-      // target size for the last bin.
-      // Note that when delta is (-) we will
-      // accept a slightly larger size for the next bin,
-      // the goal being to keep the whole mess average
-      int delta = 0;
+// How much above (+) or below (-) we are from the
+// target size for the last bin.
+// Note that when delta is (-) we will
+// accept a slightly larger size for the next bin,
+// the goal being to keep the whole mess average
+int delta = 0;
 
-      // Set the internal bin boundary iterators
-      for (IdxType b=0; b<nbins; ++b)
-        {
-          // The size of bin b.  We want this to
-          // be ~= target_bin_size[b]
-          int current_bin_size = 0;
+// Set the internal bin boundary iterators
+for (IdxType b=0; b<nbins; ++b)
+{
+// The size of bin b.  We want this to
+// be ~= target_bin_size[b]
+int current_bin_size = 0;
 
-          // Step through the histogram until we have the
-          // desired bin size
-          while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
-            {
-              // Don't index out of the histogram!
-              if ((current_histogram_bin+1) == phist.n_bins())
-                break;
+// Step through the histogram until we have the
+// desired bin size
+while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
+{
+// Don't index out of the histogram!
+if ((current_histogram_bin+1) == phist.n_bins())
+break;
 
-              current_bin_size += histogram[current_histogram_bin++];
-            }
+current_bin_size += histogram[current_histogram_bin++];
+}
 
-          delta += current_bin_size - target_bin_size[b];
+delta += current_bin_size - target_bin_size[b];
 
-          // Set the upper bound of the bin
-          bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
-          bin_iters[b+1] =
-            std::lower_bound(bin_iters[b], data.end(),
-                             Parallel::Utils::Convert<KeyType>::to_key_type
-                               (bin_bounds[b+1]));
-        }
+// Set the upper bound of the bin
+bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
+bin_iters[b+1] =
+std::lower_bound(bin_iters[b], data.end(),
+Parallel::Utils::Convert<KeyType>::to_key_type
+(bin_bounds[b+1]));
+}
 
-      // Just be sure the last boundary points to the right place
-      bin_iters[nbins]  = data.end();
-      // This gets destructed here anyway
-      // bin_bounds[nbins] = Parallel::Utils::to_double(max);
-    }
-  }
+// Just be sure the last boundary points to the right place
+bin_iters[nbins]  = data.end();
+// This gets destructed here anyway
+// bin_bounds[nbins] = Parallel::Utils::to_double(max);
+}
+}
 }
 
 }

@@ -30,8 +30,8 @@ namespace libMesh {
 
 
 PeriodicBoundary::PeriodicBoundary() :
-  PeriodicBoundaryBase(),
-  translation_vector()
+PeriodicBoundaryBase(),
+translation_vector()
 {
 }
 
@@ -39,21 +39,21 @@ PeriodicBoundary::PeriodicBoundary() :
 
 
 PeriodicBoundary::PeriodicBoundary(const PeriodicBoundary & o, TransformationType t) :
-  PeriodicBoundaryBase(o),
-  translation_vector(o.translation_vector)
+PeriodicBoundaryBase(o),
+translation_vector(o.translation_vector)
 {
-  if (t == INVERSE)
-    {
-      std::swap(myboundary, pairedboundary);
-      translation_vector *= -1.0;
-    }
+if (t == INVERSE)
+{
+std::swap(myboundary, pairedboundary);
+translation_vector *= -1.0;
+}
 }
 
 
 
 PeriodicBoundary::PeriodicBoundary(const RealVectorValue & vector) :
-  PeriodicBoundaryBase(),
-  translation_vector(vector)
+PeriodicBoundaryBase(),
+translation_vector(vector)
 {
 }
 
@@ -61,14 +61,14 @@ PeriodicBoundary::PeriodicBoundary(const RealVectorValue & vector) :
 
 Point PeriodicBoundary::get_corresponding_pos(const Point & pt) const
 {
-  return pt + translation_vector;
+return pt + translation_vector;
 }
 
 
 
 UniquePtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
 {
-  return UniquePtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
+return UniquePtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
 }
 
 

@@ -38,18 +38,18 @@ namespace libMesh
 namespace Utility {
 
 /**
- * Takes the string \p s and returns the matching
- * enumeration of type \p T.
- */
+* Takes the string \p s and returns the matching
+* enumeration of type \p T.
+*/
 template <typename T>
 T string_to_enum (const std::string & s);
 
 
 
 /**
- * Takes the enumeration \p e of type \p T
- * and returns the matching string.
- */
+* Takes the enumeration \p e of type \p T
+* and returns the matching string.
+*/
 template <typename T>
 std::string enum_to_string (const T e);
 }

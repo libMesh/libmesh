@@ -37,27 +37,27 @@ QoISet::QoISet(const System & sys) : _indices(sys.qoi.size(), true) {}
 
 unsigned int QoISet::size (const System & sys) const
 {
-  unsigned int qoi_count = 0;
-  for (unsigned int i=0; i != sys.qoi.size(); ++i)
-    if (this->has_index(i))
-      qoi_count++;
-  return qoi_count;
+unsigned int qoi_count = 0;
+for (unsigned int i=0; i != sys.qoi.size(); ++i)
+if (this->has_index(i))
+qoi_count++;
+return qoi_count;
 }
 
 
 
 void QoISet::add_indices(const std::vector<unsigned int> & indices)
 {
-  unsigned int max_size = 0;
-  for (std::vector<unsigned int>::const_iterator i = indices.begin();
-       i != indices.end(); ++i)
-    max_size = std::max(max_size, *i + 1);
+unsigned int max_size = 0;
+for (std::vector<unsigned int>::const_iterator i = indices.begin();
+i != indices.end(); ++i)
+max_size = std::max(max_size, *i + 1);
 
-  _indices.resize(max_size);
+_indices.resize(max_size);
 
-  for (std::vector<unsigned int>::const_iterator i = indices.begin();
-       i != indices.end(); ++i)
-    _indices[*i] = true;
+for (std::vector<unsigned int>::const_iterator i = indices.begin();
+i != indices.end(); ++i)
+_indices[*i] = true;
 }
 
 
@@ -65,9 +65,9 @@ void QoISet::add_indices(const std::vector<unsigned int> & indices)
 inline
 void QoISet::remove_indices(const std::vector<unsigned int> & indices)
 {
-  for (std::vector<unsigned int>::const_iterator i = indices.begin();
-       i != indices.end(); ++i)
-    _indices[*i] = false;
+for (std::vector<unsigned int>::const_iterator i = indices.begin();
+i != indices.end(); ++i)
+_indices[*i] = false;
 }
 
 } // namespace libMesh

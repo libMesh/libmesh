@@ -40,70 +40,70 @@ class Elem;
 namespace Trees
 {
 /**
- * \p enum defining how to build the tree.  \p NODES will populate the
- * tree with nodes and then replace the nodes with element
- * connectivity, \p ELEMENTS will populate the tree with the elements
- * directly.  LOCAL_ELEMENTS will populate the tree only with elements
- * from the current processor.  This experimental capability may be
- * useful if you do not wish to include off-processor elements in the
- * search for a Point.
- */
+* \p enum defining how to build the tree.  \p NODES will populate the
+* tree with nodes and then replace the nodes with element
+* connectivity, \p ELEMENTS will populate the tree with the elements
+* directly.  LOCAL_ELEMENTS will populate the tree only with elements
+* from the current processor.  This experimental capability may be
+* useful if you do not wish to include off-processor elements in the
+* search for a Point.
+*/
 enum BuildType {NODES=0,
-                ELEMENTS,
-                LOCAL_ELEMENTS,
-                INVALID_BUILD_TYPE };
+ELEMENTS,
+LOCAL_ELEMENTS,
+INVALID_BUILD_TYPE };
 }
 
 /**
- * This is the base class for trees, it allows pointer
- * usage of trees.
- */
+* This is the base class for trees, it allows pointer
+* usage of trees.
+*/
 class TreeBase : public ReferenceCountedObject<TreeBase>
 {
 protected:
-  /**
-   * Constructor.  Protected.
-   */
-  explicit
-  TreeBase (const MeshBase & m);
+/**
+* Constructor.  Protected.
+*/
+explicit
+TreeBase (const MeshBase & m);
 
 public:
-  /**
-   * Destructor.
-   */
-  virtual ~TreeBase() {}
+/**
+* Destructor.
+*/
+virtual ~TreeBase() {}
 
-  /**
-   * Prints the nodes.
-   */
-  virtual void print_nodes(std::ostream & out=libMesh::out) const = 0;
+/**
+* Prints the nodes.
+*/
+virtual void print_nodes(std::ostream & out=libMesh::out) const = 0;
 
-  /**
-   * Prints the nodes.
-   */
-  virtual void print_elements(std::ostream & out=libMesh::out) const = 0;
+/**
+* Prints the nodes.
+*/
+virtual void print_elements(std::ostream & out=libMesh::out) const = 0;
 
-  /**
-   * @returns the number of active bins.
-   */
-  virtual unsigned int n_active_bins() const = 0;
+/**
+* @returns the number of active bins.
+*/
+virtual unsigned int n_active_bins() const = 0;
 
-  /**
-   * @returns a pointer to the element containing point p,
-   * optionally restricted to a set of allowed subdomains,
-   * optionally using a non-zero relative tolerance for searches.
-   */
-  virtual const Elem * find_element(const Point & p,
-                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
-                                    Real relative_tol = TOLERANCE) const = 0;
+/**
+* @returns a pointer to the element containing point p,
+* optionally restricted to a set of allowed subdomains,
+* optionally using a non-zero relative tolerance for searches.
+*/
+virtual const Elem * find_element(const Point & p,
+const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+Real relative_tol = TOLERANCE) const = 0;
 
 protected:
 
-  /**
-   * Constant reference to a mesh.  Declared
-   * at construction.
-   */
-  const MeshBase & mesh;
+/**
+* Constant reference to a mesh.  Declared
+* at construction.
+*/
+const MeshBase & mesh;
 };
 
 // ------------------------------------------------------------
@@ -112,7 +112,7 @@ protected:
 // constructor
 inline
 TreeBase::TreeBase (const MeshBase & m) :
-  mesh(m)
+mesh(m)
 {
 }
 

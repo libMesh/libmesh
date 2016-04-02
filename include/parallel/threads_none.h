@@ -34,144 +34,144 @@ namespace Threads
 {
 
 /**
- * Use the non-concurrent placeholder.
- */
+* Use the non-concurrent placeholder.
+*/
 typedef NonConcurrentThread Thread;
 
 /**
- * Scheduler to manage threads.
- */
+* Scheduler to manage threads.
+*/
 class task_scheduler_init
 {
 public:
-  static const int automatic = -1;
-  explicit task_scheduler_init (int = automatic) {}
-  void initialize (int = automatic) {}
-  void terminate () {}
+static const int automatic = -1;
+explicit task_scheduler_init (int = automatic) {}
+void initialize (int = automatic) {}
+void terminate () {}
 };
 
 
 
 /**
- * Dummy "splitting object" used to distinguish splitting constructors
- * from copy constructors.
- */
+* Dummy "splitting object" used to distinguish splitting constructors
+* from copy constructors.
+*/
 class split {};
 
 
 
 /**
- * Execute the provided function object in parallel on the specified
- * range.
- */
+* Execute the provided function object in parallel on the specified
+* range.
+*/
 template <typename Range, typename Body>
 inline
 void parallel_for (const Range & range, const Body & body)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+BoolAcquire b(in_threads);
+body(range);
 }
 
 
 
 /**
- * Execute the provided function object in parallel on the specified
- * range with the specified partitioner.
- */
+* Execute the provided function object in parallel on the specified
+* range with the specified partitioner.
+*/
 template <typename Range, typename Body, typename Partitioner>
 inline
 void parallel_for (const Range & range, const Body & body, const Partitioner &)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+BoolAcquire b(in_threads);
+body(range);
 }
 
 
 
 /**
- * Execute the provided reduction operation in parallel on the specified
- * range.
- */
+* Execute the provided reduction operation in parallel on the specified
+* range.
+*/
 template <typename Range, typename Body>
 inline
 void parallel_reduce (const Range & range, Body & body)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+BoolAcquire b(in_threads);
+body(range);
 }
 
 
 
 /**
- * Execute the provided reduction operation in parallel on the specified
- * range with the specified partitioner.
- */
+* Execute the provided reduction operation in parallel on the specified
+* range with the specified partitioner.
+*/
 template <typename Range, typename Body, typename Partitioner>
 inline
 void parallel_reduce (const Range & range, Body & body, const Partitioner &)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+BoolAcquire b(in_threads);
+body(range);
 }
 
 
 
 /**
- * Spin mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
- */
+* Spin mutex.  Implements mutual exclusion by busy-waiting in user
+* space for the lock to be acquired.
+*/
 class spin_mutex
 {
 public:
-  spin_mutex() {}
-  void lock () {}
-  void unlock () {}
+spin_mutex() {}
+void lock () {}
+void unlock () {}
 
-  class scoped_lock
-  {
-  public:
-    scoped_lock () {}
-    explicit scoped_lock ( spin_mutex &  ) {}
-    void acquire ( spin_mutex & ) {}
-    void release () {}
-  };
+class scoped_lock
+{
+public:
+scoped_lock () {}
+explicit scoped_lock ( spin_mutex &  ) {}
+void acquire ( spin_mutex & ) {}
+void release () {}
+};
 };
 
 
 
 /**
- * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
- */
+* Recursive mutex.  Implements mutual exclusion by busy-waiting in user
+* space for the lock to be acquired.
+*/
 class recursive_mutex
 {
 public:
-  recursive_mutex() {}
+recursive_mutex() {}
 
-  class scoped_lock
-  {
-  public:
-    scoped_lock () {}
-    explicit scoped_lock ( recursive_mutex &  ) {}
-    void acquire ( recursive_mutex & ) {}
-    void release () {}
-  };
+class scoped_lock
+{
+public:
+scoped_lock () {}
+explicit scoped_lock ( recursive_mutex &  ) {}
+void acquire ( recursive_mutex & ) {}
+void release () {}
+};
 };
 
 
 
 /**
- * Defines atomic operations which can only be executed on a
- * single thread at a time.
- */
+* Defines atomic operations which can only be executed on a
+* single thread at a time.
+*/
 template <typename T>
 class atomic
 {
 public:
-  atomic () : _val(0) {}
-  operator T & () { return _val; }
+atomic () : _val(0) {}
+operator T & () { return _val; }
 private:
-  T _val;
+T _val;
 };
 
 } // namespace Threads

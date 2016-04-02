@@ -27,15 +27,15 @@ namespace libMesh
 template <typename T>
 numeric_index_type SumShellMatrix<T>::m () const
 {
-  libmesh_assert(!matrices.empty());
-  const numeric_index_type result = matrices[0]->m();
+libmesh_assert(!matrices.empty());
+const numeric_index_type result = matrices[0]->m();
 #ifndef NDEBUG
-  for(std::size_t i=matrices.size(); i-->1; )
-    {
-      libmesh_assert_equal_to (matrices[i]->m(), result);
-    }
+for(std::size_t i=matrices.size(); i-->1; )
+{
+libmesh_assert_equal_to (matrices[i]->m(), result);
+}
 #endif
-  return result;
+return result;
 }
 
 
@@ -43,37 +43,37 @@ numeric_index_type SumShellMatrix<T>::m () const
 template <typename T>
 numeric_index_type SumShellMatrix<T>::n () const
 {
-  libmesh_assert(!matrices.empty());
-  const numeric_index_type result = matrices[0]->n();
+libmesh_assert(!matrices.empty());
+const numeric_index_type result = matrices[0]->n();
 #ifndef NDEBUG
-  for(std::size_t i=matrices.size(); i-->1; )
-    {
-      libmesh_assert_equal_to (matrices[i]->n(), result);
-    }
+for(std::size_t i=matrices.size(); i-->1; )
+{
+libmesh_assert_equal_to (matrices[i]->n(), result);
+}
 #endif
-  return result;
+return result;
 }
 
 
 
 template <typename T>
 void SumShellMatrix<T>::vector_mult (NumericVector<T> & dest,
-                                     const NumericVector<T> & arg) const
+const NumericVector<T> & arg) const
 {
-  dest.zero();
-  this->vector_mult_add(dest,arg);
+dest.zero();
+this->vector_mult_add(dest,arg);
 }
 
 
 
 template <typename T>
 void SumShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
-                                         const NumericVector<T> & arg) const
+const NumericVector<T> & arg) const
 {
-  for(std::size_t i=matrices.size(); i-->0; )
-    {
-      matrices[i]->vector_mult_add(dest,arg);
-    }
+for(std::size_t i=matrices.size(); i-->0; )
+{
+matrices[i]->vector_mult_add(dest,arg);
+}
 }
 
 
@@ -81,13 +81,13 @@ void SumShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
 template <typename T>
 void SumShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 {
-  UniquePtr<NumericVector<T> > a = dest.clone();
-  dest.zero();
-  for(std::size_t i=matrices.size(); i-->0; )
-    {
-      matrices[i]->get_diagonal(*a);
-      dest += *a;
-    }
+UniquePtr<NumericVector<T> > a = dest.clone();
+dest.zero();
+for(std::size_t i=matrices.size(); i-->0; )
+{
+matrices[i]->get_diagonal(*a);
+dest += *a;
+}
 }
 
 

@@ -37,23 +37,23 @@ template <typename T>
 TypeVector<T> TypeVector<T>::unit() const
 {
 
-  const Real length = norm();
+const Real length = norm();
 
-  libmesh_assert_not_equal_to (length, static_cast<Real>(0.));
+libmesh_assert_not_equal_to (length, static_cast<Real>(0.));
 
 #if LIBMESH_DIM == 1
-  return TypeVector<T>(_coords[0]/length);
+return TypeVector<T>(_coords[0]/length);
 #endif
 
 #if LIBMESH_DIM == 2
-  return TypeVector<T>(_coords[0]/length,
-                       _coords[1]/length);
+return TypeVector<T>(_coords[0]/length,
+_coords[1]/length);
 #endif
 
 #if LIBMESH_DIM == 3
-  return TypeVector<T>(_coords[0]/length,
-                       _coords[1]/length,
-                       _coords[2]/length);
+return TypeVector<T>(_coords[0]/length,
+_coords[1]/length,
+_coords[2]/length);
 #endif
 
 }
@@ -65,22 +65,22 @@ void TypeVector<T>::print(std::ostream & os) const
 {
 #if LIBMESH_DIM == 1
 
-  os << "x=" << (*this)(0);
+os << "x=" << (*this)(0);
 
 #endif
 #if LIBMESH_DIM == 2
 
-  os << "(x,y)=("
-     << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ")";
+os << "(x,y)=("
+<< std::setw(8) << (*this)(0) << ", "
+<< std::setw(8) << (*this)(1) << ")";
 
 #endif
 #if LIBMESH_DIM == 3
 
-  os <<  "(x,y,z)=("
-     << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ", "
-     << std::setw(8) << (*this)(2) << ")";
+os <<  "(x,y,z)=("
+<< std::setw(8) << (*this)(0) << ", "
+<< std::setw(8) << (*this)(1) << ", "
+<< std::setw(8) << (*this)(2) << ")";
 #endif
 }
 
@@ -90,17 +90,17 @@ void TypeVector<T>::print(std::ostream & os) const
 
 template <typename T>
 void TypeVector<T>::write_unformatted (std::ostream & os,
-                                       const bool newline) const
+const bool newline) const
 {
-  libmesh_assert (os);
+libmesh_assert (os);
 
-  os << std::setiosflags(std::ios::showpoint)
-     << (*this)(0) << " "
-     << (*this)(1) << " "
-     << (*this)(2) << " ";
+os << std::setiosflags(std::ios::showpoint)
+<< (*this)(0) << " "
+<< (*this)(1) << " "
+<< (*this)(2) << " ";
 
-  if (newline)
-    os << '\n';
+if (newline)
+os << '\n';
 }
 
 
@@ -108,28 +108,28 @@ void TypeVector<T>::write_unformatted (std::ostream & os,
 template <typename T>
 bool TypeVector<T>::operator < (const TypeVector<T> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i) < rhs(i))
-        return true;
-      if ((*this)(i) > rhs(i))
-        return false;
-    }
-  return false;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i) < rhs(i))
+return true;
+if ((*this)(i) > rhs(i))
+return false;
+}
+return false;
 }
 
 
 template <typename T>
 bool TypeVector<T>::operator <= (const TypeVector<T> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i) < rhs(i))
-        return true;
-      if ((*this)(i) > rhs(i))
-        return false;
-    }
-  return true;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i) < rhs(i))
+return true;
+if ((*this)(i) > rhs(i))
+return false;
+}
+return true;
 }
 
 
@@ -137,28 +137,28 @@ bool TypeVector<T>::operator <= (const TypeVector<T> & rhs) const
 template <typename T>
 bool TypeVector<T>::operator > (const TypeVector<T> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i) > rhs(i))
-        return true;
-      if ((*this)(i) < rhs(i))
-        return false;
-    }
-  return false;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i) > rhs(i))
+return true;
+if ((*this)(i) < rhs(i))
+return false;
+}
+return false;
 }
 
 
 template <typename T>
 bool TypeVector<T>::operator >= (const TypeVector<T> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i) > rhs(i))
-        return true;
-      if ((*this)(i) < rhs(i))
-        return false;
-    }
-  return true;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i) > rhs(i))
+return true;
+if ((*this)(i) < rhs(i))
+return false;
+}
+return true;
 }
 
 
@@ -166,18 +166,18 @@ bool TypeVector<T>::operator >= (const TypeVector<T> & rhs) const
 template <>
 bool TypeVector<Complex>::operator < (const TypeVector<Complex> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i).real() < rhs(i).real())
-        return true;
-      if ((*this)(i).real() > rhs(i).real())
-        return false;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return false;
-    }
-  return false;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i).real() < rhs(i).real())
+return true;
+if ((*this)(i).real() > rhs(i).real())
+return false;
+if ((*this)(i).imag() < rhs(i).imag())
+return true;
+if ((*this)(i).imag() > rhs(i).imag())
+return false;
+}
+return false;
 }
 
 
@@ -185,18 +185,18 @@ bool TypeVector<Complex>::operator < (const TypeVector<Complex> & rhs) const
 template <>
 bool TypeVector<Complex>::operator <= (const TypeVector<Complex> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i).real() < rhs(i).real())
-        return true;
-      if ((*this)(i).real() > rhs(i).real())
-        return false;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return false;
-    }
-  return true;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i).real() < rhs(i).real())
+return true;
+if ((*this)(i).real() > rhs(i).real())
+return false;
+if ((*this)(i).imag() < rhs(i).imag())
+return true;
+if ((*this)(i).imag() > rhs(i).imag())
+return false;
+}
+return true;
 }
 
 
@@ -204,18 +204,18 @@ bool TypeVector<Complex>::operator <= (const TypeVector<Complex> & rhs) const
 template <>
 bool TypeVector<Complex>::operator > (const TypeVector<Complex> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i).real() > rhs(i).real())
-        return true;
-      if ((*this)(i).real() < rhs(i).real())
-        return false;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return false;
-    }
-  return false;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i).real() > rhs(i).real())
+return true;
+if ((*this)(i).real() < rhs(i).real())
+return false;
+if ((*this)(i).imag() > rhs(i).imag())
+return true;
+if ((*this)(i).imag() < rhs(i).imag())
+return false;
+}
+return false;
 }
 
 
@@ -223,18 +223,18 @@ bool TypeVector<Complex>::operator > (const TypeVector<Complex> & rhs) const
 template <>
 bool TypeVector<Complex>::operator >= (const TypeVector<Complex> & rhs) const
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    {
-      if ((*this)(i).real() > rhs(i).real())
-        return true;
-      if ((*this)(i).real() < rhs(i).real())
-        return false;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return false;
-    }
-  return true;
+for (unsigned int i=0; i<LIBMESH_DIM; i++)
+{
+if ((*this)(i).real() > rhs(i).real())
+return true;
+if ((*this)(i).real() < rhs(i).real())
+return false;
+if ((*this)(i).imag() > rhs(i).imag())
+return true;
+if ((*this)(i).imag() < rhs(i).imag())
+return false;
+}
+return true;
 }
 
 #endif

@@ -33,103 +33,103 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class defines a tree that may be used for fast point
- * location in space.
- *
- * \author Benjamin S. Kirk
- * \date 2002
- */
+* This class defines a tree that may be used for fast point
+* location in space.
+*
+* \author Benjamin S. Kirk
+* \date 2002
+*/
 template <unsigned int N>
 class Tree : public TreeBase
 {
 public:
-  /**
-   * Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
-   */
-  Tree (const MeshBase & m,
-        unsigned int target_bin_size,
-        Trees::BuildType bt=Trees::NODES);
+/**
+* Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
+*/
+Tree (const MeshBase & m,
+unsigned int target_bin_size,
+Trees::BuildType bt=Trees::NODES);
 
-  /**
-   * Copy-constructor.  Not currently implemented.
-   */
-  Tree (const Tree<N> & other_tree);
+/**
+* Copy-constructor.  Not currently implemented.
+*/
+Tree (const Tree<N> & other_tree);
 
-  /**
-   * Destructor.
-   */
-  ~Tree() {}
+/**
+* Destructor.
+*/
+~Tree() {}
 
-  /**
-   * Prints the nodes.
-   */
-  virtual void print_nodes(std::ostream & my_out=libMesh::out) const libmesh_override;
+/**
+* Prints the nodes.
+*/
+virtual void print_nodes(std::ostream & my_out=libMesh::out) const libmesh_override;
 
-  /**
-   * Prints the nodes.
-   */
-  virtual void print_elements(std::ostream & my_out=libMesh::out) const libmesh_override;
+/**
+* Prints the nodes.
+*/
+virtual void print_elements(std::ostream & my_out=libMesh::out) const libmesh_override;
 
-  /**
-   * @returns the number of active bins.
-   */
-  virtual unsigned int n_active_bins() const libmesh_override
-  { return root.n_active_bins(); }
+/**
+* @returns the number of active bins.
+*/
+virtual unsigned int n_active_bins() const libmesh_override
+{ return root.n_active_bins(); }
 
-  /**
-   * @returns a pointer to the element containing point p,
-   * optionally restricted to a set of allowed subdomains,
-   * optionally using a non-zero relative tolerance for searches.
-   */
-  virtual const Elem * find_element(const Point & p,
-                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
-                                    Real relative_tol = TOLERANCE) const libmesh_override;
+/**
+* @returns a pointer to the element containing point p,
+* optionally restricted to a set of allowed subdomains,
+* optionally using a non-zero relative tolerance for searches.
+*/
+virtual const Elem * find_element(const Point & p,
+const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+Real relative_tol = TOLERANCE) const libmesh_override;
 
-  /**
-   * @returns a pointer to the element containing point p,
-   * optionally restricted to a set of allowed subdomains,
-   * optionally using a non-zero relative tolerance for searches.
-   */
-  const Elem * operator() (const Point & p,
-                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
-                           Real relative_tol = TOLERANCE) const;
+/**
+* @returns a pointer to the element containing point p,
+* optionally restricted to a set of allowed subdomains,
+* optionally using a non-zero relative tolerance for searches.
+*/
+const Elem * operator() (const Point & p,
+const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+Real relative_tol = TOLERANCE) const;
 
 private:
-  /**
-   * The tree root.
-   */
-  TreeNode<N> root;
+/**
+* The tree root.
+*/
+TreeNode<N> root;
 
-  /**
-   * How the tree is built.
-   */
-  const Trees::BuildType build_type;
+/**
+* How the tree is built.
+*/
+const Trees::BuildType build_type;
 };
 
 
 
 /**
- * For convenience we define QuadTrees and OctTrees
- * explicitly.
- */
+* For convenience we define QuadTrees and OctTrees
+* explicitly.
+*/
 namespace Trees
 {
 /**
- * A BinaryTree is a tree appropriate
- * for 1D meshes.
- */
+* A BinaryTree is a tree appropriate
+* for 1D meshes.
+*/
 typedef Tree<2> BinaryTree;
 
 /**
- * A QuadTree is a tree appropriate
- * for 2D meshes.
- */
+* A QuadTree is a tree appropriate
+* for 2D meshes.
+*/
 typedef Tree<4> QuadTree;
 
 /**
- * An OctTree is a tree appropriate
- * for 3D meshes.
- */
+* An OctTree is a tree appropriate
+* for 3D meshes.
+*/
 typedef Tree<8> OctTree;
 }
 

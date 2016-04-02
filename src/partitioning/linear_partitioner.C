@@ -32,49 +32,49 @@ namespace libMesh
 // ------------------------------------------------------------
 // LinearPartitioner implementation
 void LinearPartitioner::_do_partition (MeshBase & mesh,
-                                       const unsigned int n)
+const unsigned int n)
 {
-  libmesh_assert_greater (n, 0);
+libmesh_assert_greater (n, 0);
 
-  // Check for an easy return
-  if (n == 1)
-    {
-      this->single_partition (mesh);
-      return;
-    }
+// Check for an easy return
+if (n == 1)
+{
+this->single_partition (mesh);
+return;
+}
 
-  // Create a simple linear partitioning
-  {
-    START_LOG ("partition()", "LinearPartitioner");
+// Create a simple linear partitioning
+{
+START_LOG ("partition()", "LinearPartitioner");
 
-    const dof_id_type n_active_elem = mesh.n_active_elem();
-    const dof_id_type blksize       = n_active_elem/n;
+const dof_id_type n_active_elem = mesh.n_active_elem();
+const dof_id_type blksize       = n_active_elem/n;
 
-    dof_id_type e = 0;
+dof_id_type e = 0;
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-        if ((e/blksize) < n)
-          {
-            Elem * elem = *elem_it;
-            elem->processor_id() =
-              cast_int<processor_id_type>(e/blksize);
-          }
-        else
-          {
-            Elem * elem = *elem_it;
-            elem->processor_id() = 0;
-            elem = elem->parent();
-          }
+for ( ; elem_it != elem_end; ++elem_it)
+{
+if ((e/blksize) < n)
+{
+Elem * elem = *elem_it;
+elem->processor_id() =
+cast_int<processor_id_type>(e/blksize);
+}
+else
+{
+Elem * elem = *elem_it;
+elem->processor_id() = 0;
+elem = elem->parent();
+}
 
-        e++;
-      }
+e++;
+}
 
-    STOP_LOG ("partition()", "LinearPartitioner");
-  }
+STOP_LOG ("partition()", "LinearPartitioner");
+}
 }
 
 } // namespace libMesh

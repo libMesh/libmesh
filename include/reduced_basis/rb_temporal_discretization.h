@@ -29,92 +29,92 @@ namespace libMesh
 {
 
 /**
- * Define a class that encapsulates the details of a
- * "generalized Euler" temporal discretization to be
- * used in the rbOOmit framework.
- */
+* Define a class that encapsulates the details of a
+* "generalized Euler" temporal discretization to be
+* used in the rbOOmit framework.
+*/
 class RBTemporalDiscretization
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  RBTemporalDiscretization();
+/**
+* Constructor.
+*/
+RBTemporalDiscretization();
 
-  /**
-   * Get/set delta_t, the time-step size.
-   */
-  Real get_delta_t() const;
-  void set_delta_t(const Real delta_t_in);
+/**
+* Get/set delta_t, the time-step size.
+*/
+Real get_delta_t() const;
+void set_delta_t(const Real delta_t_in);
 
-  /**
-   * Get/set euler_theta, parameter that determines
-   * the temporal discretization.
-   */
-  Real get_euler_theta() const;
-  void set_euler_theta(const Real euler_theta_in);
+/**
+* Get/set euler_theta, parameter that determines
+* the temporal discretization.
+*/
+Real get_euler_theta() const;
+void set_euler_theta(const Real euler_theta_in);
 
-  /**
-   * Get/set the current time-step.
-   */
-  unsigned int get_time_step() const;
-  void set_time_step(const unsigned int k);
+/**
+* Get/set the current time-step.
+*/
+unsigned int get_time_step() const;
+void set_time_step(const unsigned int k);
 
-  /**
-   * Get/set the total number of time-steps.
-   */
-  unsigned int get_n_time_steps() const;
-  void set_n_time_steps(const unsigned int K);
+/**
+* Get/set the total number of time-steps.
+*/
+unsigned int get_n_time_steps() const;
+void set_n_time_steps(const unsigned int K);
 
-  /**
-   * Get/set the RHS control.
-   */
-  Real get_control(const unsigned int k) const;
-  void set_control(const std::vector<Real> & control);
+/**
+* Get/set the RHS control.
+*/
+Real get_control(const unsigned int k) const;
+void set_control(const std::vector<Real> & control);
 
-  /**
-   * Read in and initialize parameters from \p parameters_filename.
-   */
-  void process_temporal_parameters_file (const std::string & parameters_filename);
+/**
+* Read in and initialize parameters from \p parameters_filename.
+*/
+void process_temporal_parameters_file (const std::string & parameters_filename);
 
-  /**
-   * Pull the temporal discretization data from \p other.
-   */
-  void pull_temporal_discretization_data(RBTemporalDiscretization & other);
+/**
+* Pull the temporal discretization data from \p other.
+*/
+void pull_temporal_discretization_data(RBTemporalDiscretization & other);
 
 private:
 
-  /**
-   * The time-step size.
-   */
-  Real _delta_t;
+/**
+* The time-step size.
+*/
+Real _delta_t;
 
-  /**
-   * The parameter that determines the generalized Euler scheme
-   * discretization that we employ.
-   * euler_theta = 0   ---> Forward Euler
-   * euler_theta = 0.5 ---> Crank-Nicolson
-   * euler_theta = 1   ---> Backward Euler
-   */
-  Real _euler_theta;
+/**
+* The parameter that determines the generalized Euler scheme
+* discretization that we employ.
+* euler_theta = 0   ---> Forward Euler
+* euler_theta = 0.5 ---> Crank-Nicolson
+* euler_theta = 1   ---> Backward Euler
+*/
+Real _euler_theta;
 
-  /**
-   * The current time-step.
-   */
-  unsigned int _current_time_step;
+/**
+* The current time-step.
+*/
+unsigned int _current_time_step;
 
-  /**
-   * The number of time-steps.
-   */
-  unsigned int _n_time_steps;
+/**
+* The number of time-steps.
+*/
+unsigned int _n_time_steps;
 
-  /**
-   * The RHS control (scalar function of time).
-   * A function h(t) that is used in the RHS as h(t)*f(x,\f$ \mu \f$).
-   * See Martin Grepl's thesis
-   */
-  std::vector<Real> _control;
+/**
+* The RHS control (scalar function of time).
+* A function h(t) that is used in the RHS as h(t)*f(x,\f$ \mu \f$).
+* See Martin Grepl's thesis
+*/
+std::vector<Real> _control;
 
 };
 

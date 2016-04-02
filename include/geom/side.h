@@ -36,122 +36,122 @@ class Node;
 
 
 /**
- * This defines the \p Side class.  A \p Side is basically a proxy
- * (or stand-in replacement) class for an element's side.  It acts
- * like a standard \p Elem, but allocates no additional memory for
- * storing connectivity.  Instead, its nodes are mapped directly from
- * the parent element (the element for which the side is created).
- * Similarly, you cannot access the neighbors of a side since it
- * does not store any.
- *
- * \author  Benjamin S. Kirk
- */
+* This defines the \p Side class.  A \p Side is basically a proxy
+* (or stand-in replacement) class for an element's side.  It acts
+* like a standard \p Elem, but allocates no additional memory for
+* storing connectivity.  Instead, its nodes are mapped directly from
+* the parent element (the element for which the side is created).
+* Similarly, you cannot access the neighbors of a side since it
+* does not store any.
+*
+* \author  Benjamin S. Kirk
+*/
 template <class SideType, class ParentType>
 class Side : public SideType
 {
 public:
 
-  /**
-   * Constructor.  Creates a side from an element.
-   */
-  Side (const Elem * parent_in,
-        const unsigned int side_in) :
-    SideType(const_cast<Elem *>(parent_in)),
-    _side_number(side_in)
-  {
-    libmesh_assert(parent_in);
-    // may not be true when building infinite element sides
-    // libmesh_assert_less (_side_number, this->parent()->n_sides());
-    libmesh_assert_equal_to ((this->dim()+1), this->parent()->dim());
+/**
+* Constructor.  Creates a side from an element.
+*/
+Side (const Elem * parent_in,
+const unsigned int side_in) :
+SideType(const_cast<Elem *>(parent_in)),
+_side_number(side_in)
+{
+libmesh_assert(parent_in);
+// may not be true when building infinite element sides
+// libmesh_assert_less (_side_number, this->parent()->n_sides());
+libmesh_assert_equal_to ((this->dim()+1), this->parent()->dim());
 
-    for (unsigned int n=0; n != this->n_nodes(); ++n)
-      this->_nodes[n] = this->parent()->get_node
-        (ParentType::side_nodes_map[_side_number][n]);
-  }
+for (unsigned int n=0; n != this->n_nodes(); ++n)
+this->_nodes[n] = this->parent()->get_node
+(ParentType::side_nodes_map[_side_number][n]);
+}
 
-  /**
-   * Setting a side node changes the node on the parent
-   */
-  virtual Node * & set_node (const unsigned int i) libmesh_override
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
-  }
+/**
+* Setting a side node changes the node on the parent
+*/
+virtual Node * & set_node (const unsigned int i) libmesh_override
+{
+libmesh_assert_less (i, this->n_nodes());
+return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
+}
 
-  /**
-   * Sides effectively do not have sides
-   */
-  virtual unsigned int n_sides () const libmesh_override
-  { return 0; }
+/**
+* Sides effectively do not have sides
+*/
+virtual unsigned int n_sides () const libmesh_override
+{ return 0; }
 
-  virtual bool is_child_on_side(const unsigned int,
-                                const unsigned int) const libmesh_override
-  { libmesh_not_implemented(); return false; }
+virtual bool is_child_on_side(const unsigned int,
+const unsigned int) const libmesh_override
+{ libmesh_not_implemented(); return false; }
 
 
 private:
 
-  /**
-   * The side on the parent element
-   */
-  const unsigned int _side_number;
+/**
+* The side on the parent element
+*/
+const unsigned int _side_number;
 };
 
 
 
 /**
- * This defines the \p SideEdge class.  Like \p Side, \p SideEdge is basically
- * a proxy (or stand-in replacement) class, this time for an element's edge.
- * It acts like a standard \p Elem, but allocates no additional memory for
- * storing connectivity.  Instead, its nodes are mapped directly from the
- * parent element (the element for which the side is created).  Similarly, you
- * cannot access the neighbors of a side since it does not store any.
- *
- * \author  Roy H. Stogner
- */
+* This defines the \p SideEdge class.  Like \p Side, \p SideEdge is basically
+* a proxy (or stand-in replacement) class, this time for an element's edge.
+* It acts like a standard \p Elem, but allocates no additional memory for
+* storing connectivity.  Instead, its nodes are mapped directly from the
+* parent element (the element for which the side is created).  Similarly, you
+* cannot access the neighbors of a side since it does not store any.
+*
+* \author  Roy H. Stogner
+*/
 template <class EdgeType, class ParentType>
 class SideEdge : public EdgeType
 {
 public:
 
-  /**
-   * Constructor.  Creates a side from an element.
-   */
-  SideEdge (const Elem * my_parent,
-            const unsigned int my_edge) :
-    EdgeType(const_cast<Elem *>(my_parent)),
-    _edge_number(my_edge)
-  {
-    libmesh_assert(my_parent);
-    libmesh_assert_less (_edge_number, this->parent()->n_edges());
-    libmesh_assert_equal_to (this->dim(), 1);
+/**
+* Constructor.  Creates a side from an element.
+*/
+SideEdge (const Elem * my_parent,
+const unsigned int my_edge) :
+EdgeType(const_cast<Elem *>(my_parent)),
+_edge_number(my_edge)
+{
+libmesh_assert(my_parent);
+libmesh_assert_less (_edge_number, this->parent()->n_edges());
+libmesh_assert_equal_to (this->dim(), 1);
 
-    for (unsigned int n=0; n != this->n_nodes(); ++n)
-      this->_nodes[n] = this->parent()->get_node
-        (ParentType::edge_nodes_map[_edge_number][n]);
-  }
+for (unsigned int n=0; n != this->n_nodes(); ++n)
+this->_nodes[n] = this->parent()->get_node
+(ParentType::edge_nodes_map[_edge_number][n]);
+}
 
-  /**
-   * Setting an edge node changes the node on the parent
-   */
-  virtual Node * & set_node (const unsigned int i) libmesh_override
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->set_node (ParentType::edge_nodes_map[_edge_number][i]);
-  }
+/**
+* Setting an edge node changes the node on the parent
+*/
+virtual Node * & set_node (const unsigned int i) libmesh_override
+{
+libmesh_assert_less (i, this->n_nodes());
+return this->parent()->set_node (ParentType::edge_nodes_map[_edge_number][i]);
+}
 
-  /**
-   * @returns 0. Edges effectively do not have sides, so
-   * don't even ask!
-   */
-  virtual unsigned int n_sides () const libmesh_override { return 0; }
+/**
+* @returns 0. Edges effectively do not have sides, so
+* don't even ask!
+*/
+virtual unsigned int n_sides () const libmesh_override { return 0; }
 
 private:
 
-  /**
-   * The side on the parent element
-   */
-  const unsigned int _edge_number;
+/**
+* The side on the parent element
+*/
+const unsigned int _edge_number;
 };
 
 

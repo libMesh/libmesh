@@ -33,27 +33,27 @@ template <typename Output=Number>
 class ConstFEMFunction : public FEMFunctionBase<Output>
 {
 public:
-  ConstFEMFunction (const Output c) : _c(c) {}
+ConstFEMFunction (const Output c) : _c(c) {}
 
-  ~ConstFEMFunction() {}
+~ConstFEMFunction() {}
 
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
-  {return UniquePtr<FEMFunctionBase<Output> >( new ConstFEMFunction(*this) ); }
+virtual UniquePtr<FEMFunctionBase<Output> > clone () const
+{return UniquePtr<FEMFunctionBase<Output> >( new ConstFEMFunction(*this) ); }
 
-  virtual Output operator() (const FEMContext &,
-                             const Point &,
-                             const Real /* time */ = 0.)
-  { return _c; }
+virtual Output operator() (const FEMContext &,
+const Point &,
+const Real /* time */ = 0.)
+{ return _c; }
 
-  virtual void operator() (const FEMContext &,
-                           const Point &,
-                           const Real,
-                           DenseVector<Output> & output)
-  {for(unsigned int i = 0; i < output.size(); i++ )
-      output(i) = _c;}
+virtual void operator() (const FEMContext &,
+const Point &,
+const Real,
+DenseVector<Output> & output)
+{for(unsigned int i = 0; i < output.size(); i++ )
+output(i) = _c;}
 
 private:
-  Output _c;
+Output _c;
 };
 
 } // namespace libMesh;

@@ -33,30 +33,30 @@ namespace libMesh
 // Hex20 class static member initializations
 
 const unsigned int Hex20::side_nodes_map[6][8] =
-  {
-    {0, 3, 2, 1, 11, 10,  9,  8}, // Side 0
-    {0, 1, 5, 4,  8, 13, 16, 12}, // Side 1
-    {1, 2, 6, 5,  9, 14, 17, 13}, // Side 2
-    {2, 3, 7, 6, 10, 15, 18, 14}, // Side 3
-    {3, 0, 4, 7, 11, 12, 19, 15}, // Side 4
-    {4, 5, 6, 7, 16, 17, 18, 19}  // Side 5
-  };
+{
+{0, 3, 2, 1, 11, 10,  9,  8}, // Side 0
+{0, 1, 5, 4,  8, 13, 16, 12}, // Side 1
+{1, 2, 6, 5,  9, 14, 17, 13}, // Side 2
+{2, 3, 7, 6, 10, 15, 18, 14}, // Side 3
+{3, 0, 4, 7, 11, 12, 19, 15}, // Side 4
+{4, 5, 6, 7, 16, 17, 18, 19}  // Side 5
+};
 
 const unsigned int Hex20::edge_nodes_map[12][3] =
-  {
-    {0, 1, 8},  // Side 0
-    {1, 2, 9},  // Side 1
-    {2, 3, 10}, // Side 2
-    {0, 3, 11}, // Side 3
-    {0, 4, 12}, // Side 4
-    {1, 5, 13}, // Side 5
-    {2, 6, 14}, // Side 6
-    {3, 7, 15}, // Side 7
-    {4, 5, 16}, // Side 8
-    {5, 6, 17}, // Side 9
-    {6, 7, 18}, // Side 10
-    {4, 7, 19}  // Side 11
-  };
+{
+{0, 1, 8},  // Side 0
+{1, 2, 9},  // Side 1
+{2, 3, 10}, // Side 2
+{0, 3, 11}, // Side 3
+{0, 4, 12}, // Side 4
+{1, 5, 13}, // Side 5
+{2, 6, 14}, // Side 6
+{3, 7, 15}, // Side 7
+{4, 5, 16}, // Side 8
+{5, 6, 17}, // Side 9
+{6, 7, 18}, // Side 10
+{4, 7, 19}  // Side 11
+};
 
 
 
@@ -65,203 +65,203 @@ const unsigned int Hex20::edge_nodes_map[12][3] =
 
 bool Hex20::is_vertex(const unsigned int i) const
 {
-  if (i < 8)
-    return true;
-  return false;
+if (i < 8)
+return true;
+return false;
 }
 
 bool Hex20::is_edge(const unsigned int i) const
 {
-  if (i > 7)
-    return true;
-  return false;
+if (i > 7)
+return true;
+return false;
 }
 
 bool Hex20::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Hex20::is_node_on_side(const unsigned int n,
-                            const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 8; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 8; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 bool Hex20::is_node_on_edge(const unsigned int n,
-                            const unsigned int e) const
+const unsigned int e) const
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (e, n_edges());
+for (unsigned int i = 0; i != 3; ++i)
+if (edge_nodes_map[e][i] == n)
+return true;
+return false;
 }
 
 
 
 bool Hex20::has_affine_map() const
 {
-  // Make sure x-edge endpoints are affine
-  Point v = this->point(1) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
-    return false;
-  // Make sure x-edges are straight
-  v /= 2;
-  if (!v.relative_fuzzy_equals(this->point(8) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(10) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(16) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(18) - this->point(7)))
-    return false;
-  // Make sure xz-faces are identical parallelograms
-  v = this->point(4) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
-    return false;
-  v /= 2;
-  if (!v.relative_fuzzy_equals(this->point(12) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(13) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(14) - this->point(2)) ||
-      !v.relative_fuzzy_equals(this->point(15) - this->point(3)))
-    return false;
-  // Make sure y-edges are straight
-  v = (this->point(3) - this->point(0))/2;
-  if (!v.relative_fuzzy_equals(this->point(11) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(9) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(17) - this->point(5)) ||
-      !v.relative_fuzzy_equals(this->point(19) - this->point(4)))
-    return false;
-  // If all the above checks out, the map is affine
-  return true;
+// Make sure x-edge endpoints are affine
+Point v = this->point(1) - this->point(0);
+if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
+!v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
+!v.relative_fuzzy_equals(this->point(6) - this->point(7)))
+return false;
+// Make sure x-edges are straight
+v /= 2;
+if (!v.relative_fuzzy_equals(this->point(8) - this->point(0)) ||
+!v.relative_fuzzy_equals(this->point(10) - this->point(3)) ||
+!v.relative_fuzzy_equals(this->point(16) - this->point(4)) ||
+!v.relative_fuzzy_equals(this->point(18) - this->point(7)))
+return false;
+// Make sure xz-faces are identical parallelograms
+v = this->point(4) - this->point(0);
+if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
+return false;
+v /= 2;
+if (!v.relative_fuzzy_equals(this->point(12) - this->point(0)) ||
+!v.relative_fuzzy_equals(this->point(13) - this->point(1)) ||
+!v.relative_fuzzy_equals(this->point(14) - this->point(2)) ||
+!v.relative_fuzzy_equals(this->point(15) - this->point(3)))
+return false;
+// Make sure y-edges are straight
+v = (this->point(3) - this->point(0))/2;
+if (!v.relative_fuzzy_equals(this->point(11) - this->point(0)) ||
+!v.relative_fuzzy_equals(this->point(9) - this->point(1)) ||
+!v.relative_fuzzy_equals(this->point(17) - this->point(5)) ||
+!v.relative_fuzzy_equals(this->point(19) - this->point(4)))
+return false;
+// If all the above checks out, the map is affine
+return true;
 }
 
 
 
 UniquePtr<Elem> Hex20::build_side (const unsigned int i,
-                                   bool proxy ) const
+bool proxy ) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    return UniquePtr<Elem>(new Side<Quad8,Hex20>(this,i));
+if (proxy)
+return UniquePtr<Elem>(new Side<Quad8,Hex20>(this,i));
 
-  else
-    {
-      Elem * face = new Quad8;
-      face->subdomain_id() = this->subdomain_id();
+else
+{
+Elem * face = new Quad8;
+face->subdomain_id() = this->subdomain_id();
 
-      for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Hex20::side_nodes_map[i][n]);
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Hex20::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
-    }
+return UniquePtr<Elem>(face);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 
 UniquePtr<Elem> Hex20::build_edge (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_edges());
+libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge3,Hex20>(this,i));
+return UniquePtr<Elem>(new SideEdge<Edge3,Hex20>(this,i));
 }
 
 
 
 void Hex20::connectivity(const unsigned int sc,
-                         const IOPackage iop,
-                         std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert(_nodes);
+libmesh_assert_less (sc, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        switch (sc)
-          {
-          case 0:
-            conn.resize(8);
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(2)+1;
-            conn[3] = this->node(3)+1;
-            conn[4] = this->node(4)+1;
-            conn[5] = this->node(5)+1;
-            conn[6] = this->node(6)+1;
-            conn[7] = this->node(7)+1;
+switch (iop)
+{
+case TECPLOT:
+{
+switch (sc)
+{
+case 0:
+conn.resize(8);
+conn[0] = this->node(0)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(2)+1;
+conn[3] = this->node(3)+1;
+conn[4] = this->node(4)+1;
+conn[5] = this->node(5)+1;
+conn[6] = this->node(6)+1;
+conn[7] = this->node(7)+1;
 
-            return;
+return;
 
-          default:
-            libmesh_error_msg("Unknown sc = " << sc);
-          }
-      }
+default:
+libmesh_error_msg("Unknown sc = " << sc);
+}
+}
 
-    case VTK:
-      {
-        switch (sc)
-          {
-          case 0:
-            conn.resize(20);
-            conn[0] = this->node(0);
-            conn[1] = this->node(1);
-            conn[2] = this->node(2);
-            conn[3] = this->node(3);
-            conn[4] = this->node(4);
-            conn[5] = this->node(5);
-            conn[6] = this->node(6);
-            conn[7] = this->node(7);
-            conn[8] = this->node(8);
-            conn[9] = this->node(9);
-            conn[10] = this->node(10);
-            conn[11] = this->node(11);
-            conn[12] = this->node(16);
-            conn[13] = this->node(17);
-            conn[14] = this->node(18);
-            conn[15] = this->node(19);
-            conn[16] = this->node(12);
-            conn[17] = this->node(13);
-            conn[18] = this->node(14);
-            conn[19] = this->node(15);
-            return;
+case VTK:
+{
+switch (sc)
+{
+case 0:
+conn.resize(20);
+conn[0] = this->node(0);
+conn[1] = this->node(1);
+conn[2] = this->node(2);
+conn[3] = this->node(3);
+conn[4] = this->node(4);
+conn[5] = this->node(5);
+conn[6] = this->node(6);
+conn[7] = this->node(7);
+conn[8] = this->node(8);
+conn[9] = this->node(9);
+conn[10] = this->node(10);
+conn[11] = this->node(11);
+conn[12] = this->node(16);
+conn[13] = this->node(17);
+conn[14] = this->node(18);
+conn[15] = this->node(19);
+conn[16] = this->node(12);
+conn[17] = this->node(13);
+conn[18] = this->node(14);
+conn[19] = this->node(15);
+return;
 
-          default:
-            libmesh_error_msg("Unknown sc = " << sc);
-          }
-      }
+default:
+libmesh_error_msg("Unknown sc = " << sc);
+}
+}
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 
 
 
 unsigned short int Hex20::second_order_adjacent_vertex (const unsigned int n,
-                                                        const unsigned int v) const
+const unsigned int v) const
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
-  libmesh_assert_less (v, 2);
-  /*
-   * the _second_order_adjacent_vertices matrix is
-   * stored in cell_hex.C, since this matrix is identical
-   * for Hex20 and Hex27 (for the first 12 higher-order nodes)
-   */
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
+libmesh_assert_greater_equal (n, this->n_vertices());
+libmesh_assert_less (n, this->n_nodes());
+libmesh_assert_less (v, 2);
+/*
+* the _second_order_adjacent_vertices matrix is
+* stored in cell_hex.C, since this matrix is identical
+* for Hex20 and Hex27 (for the first 12 higher-order nodes)
+*/
+return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 
@@ -269,169 +269,169 @@ unsigned short int Hex20::second_order_adjacent_vertex (const unsigned int n,
 std::pair<unsigned short int, unsigned short int>
 Hex20::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
-  /*
-   * the _second_order_vertex_child_* vectors are
-   * stored in cell_hex.C, since they are identical
-   * for Hex20 and Hex27 (for the first 12 higher-order nodes)
-   */
-  return std::pair<unsigned short int, unsigned short int>
-    (_second_order_vertex_child_number[n],
-     _second_order_vertex_child_index[n]);
+libmesh_assert_greater_equal (n, this->n_vertices());
+libmesh_assert_less (n, this->n_nodes());
+/*
+* the _second_order_vertex_child_* vectors are
+* stored in cell_hex.C, since they are identical
+* for Hex20 and Hex27 (for the first 12 higher-order nodes)
+*/
+return std::pair<unsigned short int, unsigned short int>
+(_second_order_vertex_child_number[n],
+_second_order_vertex_child_index[n]);
 }
 
 
 
 Real Hex20::volume () const
 {
-  // Make copies of our points.  It makes the subsequent calculations a bit
-  // shorter and avoids dereferencing the same pointer multiple times.
-  Point
-    x0 = point(0),   x1 = point(1),   x2 = point(2),   x3 = point(3),   x4 = point(4),
-    x5 = point(5),   x6 = point(6),   x7 = point(7),   x8 = point(8),   x9 = point(9),
-    x10 = point(10), x11 = point(11), x12 = point(12), x13 = point(13), x14 = point(14),
-    x15 = point(15), x16 = point(16), x17 = point(17), x18 = point(18), x19 = point(19);
+// Make copies of our points.  It makes the subsequent calculations a bit
+// shorter and avoids dereferencing the same pointer multiple times.
+Point
+x0 = point(0),   x1 = point(1),   x2 = point(2),   x3 = point(3),   x4 = point(4),
+x5 = point(5),   x6 = point(6),   x7 = point(7),   x8 = point(8),   x9 = point(9),
+x10 = point(10), x11 = point(11), x12 = point(12), x13 = point(13), x14 = point(14),
+x15 = point(15), x16 = point(16), x17 = point(17), x18 = point(18), x19 = point(19);
 
-  // The constant components of the dx/dxi vector,
-  // dx/dxi = \vec{a000} + \vec{a001}*zeta + \vec{a002}*zeta^2 + ...
-  // These were copied directly from the output of a Python script.
-  // There are at most 17 terms with total degree <=3, but only 12
-  // of them are non-zero for each direction.
-  Point dx_dxi[17] =
-    {
-      x0/8 - x1/8 - x11/4 - x12/4 + x13/4 + x14/4 - x15/4 + x17/4 - x19/4 - x2/8 + x3/8 + x4/8 - x5/8 - x6/8 + x7/8 + x9/4,
-      x11/4 + x17/4 - x19/4 - x9/4,
-      -x0/8 + x1/8 + x12/4 - x13/4 - x14/4 + x15/4 + x2/8 - x3/8 - x4/8 + x5/8 + x6/8 - x7/8,
-      x12/4 - x13/4 + x14/4 - x15/4,
-      -x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
-      x0/8 - x1/8 - x12/4 + x13/4 - x14/4 + x15/4 + x2/8 - x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
-      -x0/8 + x1/8 + x11/4 - x17/4 + x19/4 + x2/8 - x3/8 - x4/8 + x5/8 + x6/8 - x7/8 - x9/4,
-      x0/8 - x1/8 - x11/4 - x17/4 + x19/4 - x2/8 + x3/8 - x4/8 + x5/8 + x6/8 - x7/8 + x9/4,
-      x0/4 + x1/4 - x10/2 - x16/2 - x18/2 + x2/4 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x8/2,
-      -x0/4 - x1/4 + x10/2 - x16/2 - x18/2 - x2/4 - x3/4 + x4/4 + x5/4 + x6/4 + x7/4 + x8/2,
-      Point(0,0,0),
-      -x0/4 - x1/4 - x10/2 + x16/2 - x18/2 + x2/4 + x3/4 - x4/4 - x5/4 + x6/4 + x7/4 + x8/2,
-      x0/4 + x1/4 + x10/2 + x16/2 - x18/2 - x2/4 - x3/4 - x4/4 - x5/4 + x6/4 + x7/4 - x8/2,
-      Point(0,0,0),
-      Point(0,0,0),
-      Point(0,0,0),
-      Point(0,0,0)
-    };
+// The constant components of the dx/dxi vector,
+// dx/dxi = \vec{a000} + \vec{a001}*zeta + \vec{a002}*zeta^2 + ...
+// These were copied directly from the output of a Python script.
+// There are at most 17 terms with total degree <=3, but only 12
+// of them are non-zero for each direction.
+Point dx_dxi[17] =
+{
+x0/8 - x1/8 - x11/4 - x12/4 + x13/4 + x14/4 - x15/4 + x17/4 - x19/4 - x2/8 + x3/8 + x4/8 - x5/8 - x6/8 + x7/8 + x9/4,
+x11/4 + x17/4 - x19/4 - x9/4,
+-x0/8 + x1/8 + x12/4 - x13/4 - x14/4 + x15/4 + x2/8 - x3/8 - x4/8 + x5/8 + x6/8 - x7/8,
+x12/4 - x13/4 + x14/4 - x15/4,
+-x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
+x0/8 - x1/8 - x12/4 + x13/4 - x14/4 + x15/4 + x2/8 - x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
+-x0/8 + x1/8 + x11/4 - x17/4 + x19/4 + x2/8 - x3/8 - x4/8 + x5/8 + x6/8 - x7/8 - x9/4,
+x0/8 - x1/8 - x11/4 - x17/4 + x19/4 - x2/8 + x3/8 - x4/8 + x5/8 + x6/8 - x7/8 + x9/4,
+x0/4 + x1/4 - x10/2 - x16/2 - x18/2 + x2/4 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x8/2,
+-x0/4 - x1/4 + x10/2 - x16/2 - x18/2 - x2/4 - x3/4 + x4/4 + x5/4 + x6/4 + x7/4 + x8/2,
+Point(0,0,0),
+-x0/4 - x1/4 - x10/2 + x16/2 - x18/2 + x2/4 + x3/4 - x4/4 - x5/4 + x6/4 + x7/4 + x8/2,
+x0/4 + x1/4 + x10/2 + x16/2 - x18/2 - x2/4 - x3/4 - x4/4 - x5/4 + x6/4 + x7/4 - x8/2,
+Point(0,0,0),
+Point(0,0,0),
+Point(0,0,0),
+Point(0,0,0)
+};
 
-  // The constant components of the dx/deta vector. These were copied
-  // directly from the output of a Python script.  There are at most
-  // 17 terms with total degree <=3, but only 12 of them are non-zero
-  // for each direction.
-  Point dx_deta[17] =
-    {
-      x0/8 + x1/8 + x10/4 - x12/4 - x13/4 + x14/4 + x15/4 - x16/4 + x18/4 - x2/8 - x3/8 + x4/8 + x5/8 - x6/8 - x7/8 - x8/4,
-      -x10/4 - x16/4 + x18/4 + x8/4,
-      -x0/8 - x1/8 + x12/4 + x13/4 - x14/4 - x15/4 + x2/8 + x3/8 - x4/8 - x5/8 + x6/8 + x7/8,
-      x0/4 + x1/4 - x11/2 - x17/2 - x19/2 + x2/4 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x9/2,
-      -x0/4 - x1/4 + x11/2 - x17/2 - x19/2 - x2/4 - x3/4 + x4/4 + x5/4 + x6/4 + x7/4 + x9/2,
-      Point(0,0,0),
-      Point(0,0,0),
-      Point(0,0,0),
-      x12/4 - x13/4 + x14/4 - x15/4,
-      -x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
-      x0/8 - x1/8 - x12/4 + x13/4 - x14/4 + x15/4 + x2/8 - x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
-      -x0/4 + x1/4 + x11/2 - x17/2 + x19/2 + x2/4 - x3/4 - x4/4 + x5/4 + x6/4 - x7/4 - x9/2,
-      x0/4 - x1/4 - x11/2 - x17/2 + x19/2 - x2/4 + x3/4 - x4/4 + x5/4 + x6/4 - x7/4 + x9/2,
-      Point(0,0,0),
-      -x0/8 - x1/8 - x10/4 + x16/4 - x18/4 + x2/8 + x3/8 - x4/8 - x5/8 + x6/8 + x7/8 + x8/4,
-      x0/8 + x1/8 + x10/4 + x16/4 - x18/4 - x2/8 - x3/8 - x4/8 - x5/8 + x6/8 + x7/8 - x8/4,
-      Point(0,0,0)
-    };
+// The constant components of the dx/deta vector. These were copied
+// directly from the output of a Python script.  There are at most
+// 17 terms with total degree <=3, but only 12 of them are non-zero
+// for each direction.
+Point dx_deta[17] =
+{
+x0/8 + x1/8 + x10/4 - x12/4 - x13/4 + x14/4 + x15/4 - x16/4 + x18/4 - x2/8 - x3/8 + x4/8 + x5/8 - x6/8 - x7/8 - x8/4,
+-x10/4 - x16/4 + x18/4 + x8/4,
+-x0/8 - x1/8 + x12/4 + x13/4 - x14/4 - x15/4 + x2/8 + x3/8 - x4/8 - x5/8 + x6/8 + x7/8,
+x0/4 + x1/4 - x11/2 - x17/2 - x19/2 + x2/4 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4 - x9/2,
+-x0/4 - x1/4 + x11/2 - x17/2 - x19/2 - x2/4 - x3/4 + x4/4 + x5/4 + x6/4 + x7/4 + x9/2,
+Point(0,0,0),
+Point(0,0,0),
+Point(0,0,0),
+x12/4 - x13/4 + x14/4 - x15/4,
+-x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
+x0/8 - x1/8 - x12/4 + x13/4 - x14/4 + x15/4 + x2/8 - x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
+-x0/4 + x1/4 + x11/2 - x17/2 + x19/2 + x2/4 - x3/4 - x4/4 + x5/4 + x6/4 - x7/4 - x9/2,
+x0/4 - x1/4 - x11/2 - x17/2 + x19/2 - x2/4 + x3/4 - x4/4 + x5/4 + x6/4 - x7/4 + x9/2,
+Point(0,0,0),
+-x0/8 - x1/8 - x10/4 + x16/4 - x18/4 + x2/8 + x3/8 - x4/8 - x5/8 + x6/8 + x7/8 + x8/4,
+x0/8 + x1/8 + x10/4 + x16/4 - x18/4 - x2/8 - x3/8 - x4/8 - x5/8 + x6/8 + x7/8 - x8/4,
+Point(0,0,0)
+};
 
-  // The constant components of the dx/dzeta vector. These were copied
-  // directly from the output of a Python script.  There are at most
-  // 17 terms with total degree <=3, but only 12 of them are non-zero
-  // for each direction.
-  Point dx_dzeta[17] =
-    {
-      x0/8 + x1/8 - x10/4 - x11/4 + x16/4 + x17/4 + x18/4 + x19/4 + x2/8 + x3/8 - x4/8 - x5/8 - x6/8 - x7/8 - x8/4 - x9/4,
-      x0/4 + x1/4 - x12/2 - x13/2 - x14/2 - x15/2 + x2/4 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4,
-      Point(0,0,0),
-      -x10/4 - x16/4 + x18/4 + x8/4,
-      -x0/4 - x1/4 + x12/2 + x13/2 - x14/2 - x15/2 + x2/4 + x3/4 - x4/4 - x5/4 + x6/4 + x7/4,
-      Point(0,0,0),
-      -x0/8 - x1/8 + x11/4 - x17/4 - x19/4 - x2/8 - x3/8 + x4/8 + x5/8 + x6/8 + x7/8 + x9/4,
-      Point(0,0,0),
-      x11/4 + x17/4 - x19/4 - x9/4,
-      -x0/4 + x1/4 + x12/2 - x13/2 - x14/2 + x15/2 + x2/4 - x3/4 - x4/4 + x5/4 + x6/4 - x7/4,
-      Point(0,0,0),
-      -x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
-      x0/4 - x1/4 - x12/2 + x13/2 - x14/2 + x15/2 + x2/4 - x3/4 + x4/4 - x5/4 + x6/4 - x7/4,
-      x0/8 - x1/8 - x11/4 - x17/4 + x19/4 - x2/8 + x3/8 - x4/8 + x5/8 + x6/8 - x7/8 + x9/4,
-      -x0/8 - x1/8 + x10/4 - x16/4 - x18/4 - x2/8 - x3/8 + x4/8 + x5/8 + x6/8 + x7/8 + x8/4,
-      Point(0,0,0),
-      x0/8 + x1/8 + x10/4 + x16/4 - x18/4 - x2/8 - x3/8 - x4/8 - x5/8 + x6/8 + x7/8 - x8/4,
-    };
+// The constant components of the dx/dzeta vector. These were copied
+// directly from the output of a Python script.  There are at most
+// 17 terms with total degree <=3, but only 12 of them are non-zero
+// for each direction.
+Point dx_dzeta[17] =
+{
+x0/8 + x1/8 - x10/4 - x11/4 + x16/4 + x17/4 + x18/4 + x19/4 + x2/8 + x3/8 - x4/8 - x5/8 - x6/8 - x7/8 - x8/4 - x9/4,
+x0/4 + x1/4 - x12/2 - x13/2 - x14/2 - x15/2 + x2/4 + x3/4 + x4/4 + x5/4 + x6/4 + x7/4,
+Point(0,0,0),
+-x10/4 - x16/4 + x18/4 + x8/4,
+-x0/4 - x1/4 + x12/2 + x13/2 - x14/2 - x15/2 + x2/4 + x3/4 - x4/4 - x5/4 + x6/4 + x7/4,
+Point(0,0,0),
+-x0/8 - x1/8 + x11/4 - x17/4 - x19/4 - x2/8 - x3/8 + x4/8 + x5/8 + x6/8 + x7/8 + x9/4,
+Point(0,0,0),
+x11/4 + x17/4 - x19/4 - x9/4,
+-x0/4 + x1/4 + x12/2 - x13/2 - x14/2 + x15/2 + x2/4 - x3/4 - x4/4 + x5/4 + x6/4 - x7/4,
+Point(0,0,0),
+-x0/8 + x1/8 - x2/8 + x3/8 + x4/8 - x5/8 + x6/8 - x7/8,
+x0/4 - x1/4 - x12/2 + x13/2 - x14/2 + x15/2 + x2/4 - x3/4 + x4/4 - x5/4 + x6/4 - x7/4,
+x0/8 - x1/8 - x11/4 - x17/4 + x19/4 - x2/8 + x3/8 - x4/8 + x5/8 + x6/8 - x7/8 + x9/4,
+-x0/8 - x1/8 + x10/4 - x16/4 - x18/4 - x2/8 - x3/8 + x4/8 + x5/8 + x6/8 + x7/8 + x8/4,
+Point(0,0,0),
+x0/8 + x1/8 + x10/4 + x16/4 - x18/4 - x2/8 - x3/8 - x4/8 - x5/8 + x6/8 + x7/8 - x8/4,
+};
 
-  // The integer exponents for each term.
-  static const int exponents[17][3] =
-    {
-      {0, 0, 0},
-      {0, 0, 1},
-      {0, 0, 2},
-      {0, 1, 0},
-      {0, 1, 1},
-      {0, 1, 2},
-      {0, 2, 0},
-      {0, 2, 1},
-      {1, 0, 0},
-      {1, 0, 1},
-      {1, 0, 2},
-      {1, 1, 0},
-      {1, 1, 1},
-      {1, 2, 0},
-      {2, 0, 0},
-      {2, 0, 1},
-      {2, 1, 0}
-    };
-
-
-  // 3x3 quadrature, exact for bi-quintics
-  const int N = 3;
-  const Real w[N] = {5./9, 8./9, 5./9};
-
-  // Quadrature point locations raised to powers.  q[0][2] is
-  // quadrature point 0, squared, q[1][1] is quadrature point 1 to the
-  // first power, etc.
-  const Real q[N][N] =
-    {
-      //^0   ^1                 ^2
-      {  1., -std::sqrt(15)/5., 15./25},
-      {  1., 0.,                0.},
-      {  1., std::sqrt(15)/5.,  15./25}
-    };
+// The integer exponents for each term.
+static const int exponents[17][3] =
+{
+{0, 0, 0},
+{0, 0, 1},
+{0, 0, 2},
+{0, 1, 0},
+{0, 1, 1},
+{0, 1, 2},
+{0, 2, 0},
+{0, 2, 1},
+{1, 0, 0},
+{1, 0, 1},
+{1, 0, 2},
+{1, 1, 0},
+{1, 1, 1},
+{1, 2, 0},
+{2, 0, 0},
+{2, 0, 1},
+{2, 1, 0}
+};
 
 
-  Real vol = 0.;
-  for (int i=0; i<N; ++i)
-    for (int j=0; j<N; ++j)
-      for (int k=0; k<N; ++k)
-        {
-          // Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
-          Point dx_dxi_q, dx_deta_q, dx_dzeta_q;
-          for (int c=0; c<17; ++c)
-            {
-              Real coeff =
-                q[i][exponents[c][0]] *
-                q[j][exponents[c][1]] *
-                q[k][exponents[c][2]];
+// 3x3 quadrature, exact for bi-quintics
+const int N = 3;
+const Real w[N] = {5./9, 8./9, 5./9};
 
-              dx_dxi_q   += coeff * dx_dxi[c];
-              dx_deta_q  += coeff * dx_deta[c];
-              dx_dzeta_q += coeff * dx_dzeta[c];
-            }
+// Quadrature point locations raised to powers.  q[0][2] is
+// quadrature point 0, squared, q[1][1] is quadrature point 1 to the
+// first power, etc.
+const Real q[N][N] =
+{
+//^0   ^1                 ^2
+{  1., -std::sqrt(15)/5., 15./25},
+{  1., 0.,                0.},
+{  1., std::sqrt(15)/5.,  15./25}
+};
 
-          // Compute scalar triple product, multiply by weight, and accumulate volume.
-          vol += w[i] * w[j] * w[k] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
-        }
 
-  return vol;
+Real vol = 0.;
+for (int i=0; i<N; ++i)
+for (int j=0; j<N; ++j)
+for (int k=0; k<N; ++k)
+{
+// Compute dx_dxi, dx_deta, dx_dzeta at the current quadrature point.
+Point dx_dxi_q, dx_deta_q, dx_dzeta_q;
+for (int c=0; c<17; ++c)
+{
+Real coeff =
+q[i][exponents[c][0]] *
+q[j][exponents[c][1]] *
+q[k][exponents[c][2]];
+
+dx_dxi_q   += coeff * dx_dxi[c];
+dx_deta_q  += coeff * dx_deta[c];
+dx_dzeta_q += coeff * dx_dzeta[c];
+}
+
+// Compute scalar triple product, multiply by weight, and accumulate volume.
+vol += w[i] * w[j] * w[k] * triple_product(dx_dxi_q, dx_deta_q, dx_dzeta_q);
+}
+
+return vol;
 }
 
 
@@ -440,207 +440,207 @@ Real Hex20::volume () const
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Hex20::_embedding_matrix[8][20][20] =
-  {
-    // embedding matrix for child 0
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 4
-      {  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 5
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 6
-      {  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 7
-      {   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
-      {   0.375000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
-      {   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 12
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000 }, // 13
-      {  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 14
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000 }, // 15
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 16
-      {  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }, // 17
-      {  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 18
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000 }  // 19
-    },
+{
+// embedding matrix for child 0
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 4
+{  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 5
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 6
+{  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 7
+{   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
+{   0.375000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
+{   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 12
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000 }, // 13
+{  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 14
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000 }, // 15
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 16
+{  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }, // 17
+{  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 18
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000 }  // 19
+},
 
-    // embedding matrix for child 1
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
-      {    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
-      {  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 4
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 5
-      {    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 6
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 7
-      {  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
-      {    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000 }, // 12
-      {    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 13
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000 }, // 14
-      {  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 15
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 16
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 17
-      {  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 18
-      {  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }  // 19
-    },
+// embedding matrix for child 1
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
+{    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
+{  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 4
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 5
+{    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 6
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 7
+{  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
+{    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000 }, // 12
+{    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 13
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000 }, // 14
+{  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 15
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 16
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 17
+{  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 18
+{  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }  // 19
+},
 
-    // embedding matrix for child 2
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
-      {    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
-      {  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 4
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 5
-      {    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 6
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 7
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
-      {    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
-      {  -0.125000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000 }, // 12
-      {  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 13
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000 }, // 14
-      {    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 15
-      {  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 16
-      {  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }, // 17
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 18
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000 }  // 19
-    },
+// embedding matrix for child 2
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
+{    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
+{  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 4
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 5
+{    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 6
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 7
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
+{    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
+{  -0.125000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000 }, // 12
+{  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 13
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000 }, // 14
+{    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 15
+{  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 16
+{  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }, // 17
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 18
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000 }  // 19
+},
 
-    // embedding matrix for child 3
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
-      {    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 4
-      {    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 5
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 6
-      {    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 7
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
-      {    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
-      {    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
-      {  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
-      {  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 12
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000 }, // 13
-      {    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 14
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000 }, // 15
-      {  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 16
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 17
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 18
-      {  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }  // 19
-    },
+// embedding matrix for child 3
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
+{    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 4
+{    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 5
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 6
+{    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 7
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 8
+{    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 9
+{    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 10
+{  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 11
+{  -0.281250,  -0.281250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.156250,  -0.156250,   0.375000,   0.375000,   0.375000,   0.375000,   0.187500,   0.187500,   0.187500,   0.187500,   0.125000,   0.125000,   0.125000,   0.125000 }, // 12
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000 }, // 13
+{    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 14
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.250000,    0.00000 }, // 15
+{  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 16
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 17
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 18
+{  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }  // 19
+},
 
-    // embedding matrix for child 4
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
-      {  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 1
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 2
-      {  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 3
-      {    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 4
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000 }, // 5
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 6
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000 }, // 7
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 8
-      {  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }, // 9
-      {  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 10
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000 }, // 11
-      {  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 12
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 13
-      {  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 14
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000 }, // 15
-      {    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 16
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000 }, // 17
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000 }, // 18
-      {    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000 }  // 19
-    },
+// embedding matrix for child 4
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 0
+{  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 1
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 2
+{  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 3
+{    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 4
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000 }, // 5
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 6
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000 }, // 7
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 8
+{  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }, // 9
+{  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 10
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000 }, // 11
+{  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 12
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 13
+{  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 14
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000 }, // 15
+{    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 16
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000 }, // 17
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000 }, // 18
+{    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000 }  // 19
+},
 
-    // embedding matrix for child 5
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 0
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
-      {    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 2
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 3
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000 }, // 4
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 5
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000 }, // 6
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 7
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 8
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 9
-      {  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 10
-      {  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }, // 11
-      {  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 12
-      {    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 13
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 14
-      {  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 15
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 16
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 17
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000 }, // 18
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000 }  // 19
-    },
+// embedding matrix for child 5
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000 }, // 0
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 1
+{    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 2
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 3
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000 }, // 4
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 5
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000 }, // 6
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 7
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000 }, // 8
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 9
+{  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 10
+{  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500 }, // 11
+{  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 12
+{    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 13
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 14
+{  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 15
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000 }, // 16
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 17
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000 }, // 18
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,   0.375000,   0.250000,   0.375000 }  // 19
+},
 
-    // embedding matrix for child 6
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 0
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 1
-      {    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 2
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000 }, // 4
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 5
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000 }, // 6
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 7
-      {  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 8
-      {  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }, // 9
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 10
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000 }, // 11
-      {  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000 }, // 12
-      {  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 13
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 14
-      {    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 15
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000 }, // 16
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000 }, // 17
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 18
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000 }  // 19
-    },
+// embedding matrix for child 6
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000 }, // 0
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 1
+{    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 2
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 3
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000 }, // 4
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 5
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000 }, // 6
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 7
+{  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,   0.187500,   0.125000,   0.187500,   0.375000,   0.375000,   0.125000,   0.125000,   0.375000,   0.187500,   0.125000,   0.187500,   0.375000 }, // 8
+{  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }, // 9
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 10
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,   0.375000 }, // 11
+{  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000 }, // 12
+{  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 13
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 14
+{    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 15
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.250000,   0.375000,   0.750000 }, // 16
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000 }, // 17
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 18
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000 }  // 19
+},
 
-    // embedding matrix for child 7
-    {
-      //         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
-      {  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 0
-      {    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 1
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
-      {    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 3
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 4
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000 }, // 5
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 6
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000 }, // 7
-      {  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 8
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 9
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 10
-      {  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }, // 11
-      {  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 12
-      {    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 13
-      {    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 14
-      {    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 15
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000 }, // 16
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 17
-      {    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 18
-      {    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000 }  // 19
-    }
-  };
+// embedding matrix for child 7
+{
+//         0           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15          16          17          18          19
+{  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000,   0.250000 }, // 0
+{    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000 }, // 1
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 2
+{    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,  -0.250000,  -0.250000,    0.00000,    0.00000,   0.500000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,    0.00000,    0.00000,   0.500000,    0.00000 }, // 3
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.250000,  -0.250000,  -0.250000,  -0.250000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.500000,   0.500000,   0.500000,   0.500000 }, // 4
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000 }, // 5
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 6
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    1.00000,    0.00000 }, // 7
+{  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000 }, // 8
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.250000,   0.750000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000 }, // 9
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,   0.750000,   0.250000,    0.00000,    0.00000,   0.375000,    0.00000 }, // 10
+{  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,   0.125000,   0.187500,   0.375000,   0.187500,   0.125000,   0.125000,   0.375000,   0.375000,   0.125000,   0.187500,   0.375000,   0.187500 }, // 11
+{  -0.156250,  -0.156250,  -0.156250,  -0.156250,  -0.281250,  -0.281250,  -0.281250,  -0.281250,   0.125000,   0.125000,   0.125000,   0.125000,   0.187500,   0.187500,   0.187500,   0.187500,   0.375000,   0.375000,   0.375000,   0.375000 }, // 12
+{    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 13
+{    0.00000,    0.00000,  -0.125000,    0.00000,    0.00000,    0.00000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000 }, // 14
+{    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,  -0.187500,  -0.187500,    0.00000,    0.00000,   0.250000,    0.00000,    0.00000,    0.00000,   0.375000,   0.375000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 15
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,   0.750000,   0.375000,   0.250000 }, // 16
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,  -0.125000,   0.375000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000,    0.00000 }, // 17
+{    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.375000,  -0.125000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.750000,    0.00000 }, // 18
+{    0.00000,    0.00000,    0.00000,    0.00000,  -0.187500,  -0.187500,  -0.187500,  -0.187500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.250000,   0.375000,   0.750000,   0.375000 }  // 19
+}
+};
 
 #endif
 

@@ -36,285 +36,285 @@ namespace libMesh
 namespace {
 
 void bernstein_nodal_soln(const Elem * elem,
-                          const Order order,
-                          const std::vector<Number> & elem_soln,
-                          std::vector<Number> &       nodal_soln,
-                          unsigned Dim)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> &       nodal_soln,
+unsigned Dim)
 {
-  const unsigned int n_nodes = elem->n_nodes();
+const unsigned int n_nodes = elem->n_nodes();
 
-  const ElemType elem_type = elem->type();
+const ElemType elem_type = elem->type();
 
-  nodal_soln.resize(n_nodes);
+nodal_soln.resize(n_nodes);
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+const Order totalorder = static_cast<Order>(order + elem->p_level());
 
-  // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(totalorder, BERNSTEIN);
+// FEType object to be passed to various FEInterface functions below.
+FEType fe_type(totalorder, BERNSTEIN);
 
-  switch (totalorder)
-    {
-      // Constant shape functions
-    case CONSTANT:
-      {
-        libmesh_assert_equal_to (elem_soln.size(), 1);
+switch (totalorder)
+{
+// Constant shape functions
+case CONSTANT:
+{
+libmesh_assert_equal_to (elem_soln.size(), 1);
 
-        const Number val = elem_soln[0];
+const Number val = elem_soln[0];
 
-        for (unsigned int n=0; n<n_nodes; n++)
-          nodal_soln[n] = val;
+for (unsigned int n=0; n<n_nodes; n++)
+nodal_soln[n] = val;
 
-        return;
-      }
+return;
+}
 
 
-      // For other bases do interpolation at the nodes
-      // explicitly.
-    case FIRST:
-    case SECOND:
-    case THIRD:
-    case FOURTH:
-    case FIFTH:
-    case SIXTH:
-      {
+// For other bases do interpolation at the nodes
+// explicitly.
+case FIRST:
+case SECOND:
+case THIRD:
+case FOURTH:
+case FIFTH:
+case SIXTH:
+{
 
-        const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+const unsigned int n_sf =
+// FE<Dim,T>::n_shape_functions(elem_type, totalorder);
+FEInterface::n_shape_functions(Dim, fe_type, elem_type);
 
-        std::vector<Point> refspace_nodes;
-        FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-        libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+std::vector<Point> refspace_nodes;
+FEBase::get_refspace_nodes(elem_type,refspace_nodes);
+libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
-        for (unsigned int n=0; n<n_nodes; n++)
-          {
-            libmesh_assert_equal_to (elem_soln.size(), n_sf);
+for (unsigned int n=0; n<n_nodes; n++)
+{
+libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
-            // Zero before summation
-            nodal_soln[n] = 0;
+// Zero before summation
+nodal_soln[n] = 0;
 
-            // u_i = Sum (alpha_i phi_i)
-            for (unsigned int i=0; i<n_sf; i++)
-              nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, mapped_point);
-                FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
-          }
+// u_i = Sum (alpha_i phi_i)
+for (unsigned int i=0; i<n_sf; i++)
+nodal_soln[n] += elem_soln[i] *
+// FE<Dim,T>::shape(elem, order, i, mapped_point);
+FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+}
 
-        return;
-      }
+return;
+}
 
-    default:
-      libmesh_error_msg("ERROR: Invalid total order " << totalorder);
-    }
+default:
+libmesh_error_msg("ERROR: Invalid total order " << totalorder);
+}
 } //  bernstein_nodal_soln()
 
 
 
 unsigned int bernstein_n_dofs(const ElemType t, const Order o)
 {
-  switch (t)
-    {
-    case NODEELEM:
-      return 1;
-    case EDGE2:
-    case EDGE3:
-      return (o+1);
-    case QUAD4:
-      libmesh_assert_less (o, 2);
-    case QUAD8:
-      {
-        if (o == 1)
-          return 4;
-        else if (o == 2)
-          return 8;
-        else
-          libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
-      }
-    case QUAD9:
-      return ((o+1)*(o+1));
-    case HEX8:
-      libmesh_assert_less (o, 2);
-    case HEX20:
-      {
-        if (o == 1)
-          return 8;
-        else if (o == 2)
-          return 20;
-        else
-          libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
-      }
-    case HEX27:
-      return ((o+1)*(o+1)*(o+1));
-    case TRI3:
-      libmesh_assert_less (o, 2);
-    case TRI6:
-      return ((o+1)*(o+2)/2);
-    case TET4:
-      libmesh_assert_less (o, 2);
-    case TET10:
-      {
-        libmesh_assert_less (o, 3);
-        return ((o+1)*(o+2)*(o+3)/6);
-      }
-    case INVALID_ELEM:
-      return 0;
-    default:
-      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
-    }
+switch (t)
+{
+case NODEELEM:
+return 1;
+case EDGE2:
+case EDGE3:
+return (o+1);
+case QUAD4:
+libmesh_assert_less (o, 2);
+case QUAD8:
+{
+if (o == 1)
+return 4;
+else if (o == 2)
+return 8;
+else
+libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
+}
+case QUAD9:
+return ((o+1)*(o+1));
+case HEX8:
+libmesh_assert_less (o, 2);
+case HEX20:
+{
+if (o == 1)
+return 8;
+else if (o == 2)
+return 20;
+else
+libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
+}
+case HEX27:
+return ((o+1)*(o+1)*(o+1));
+case TRI3:
+libmesh_assert_less (o, 2);
+case TRI6:
+return ((o+1)*(o+2)/2);
+case TET4:
+libmesh_assert_less (o, 2);
+case TET10:
+{
+libmesh_assert_less (o, 3);
+return ((o+1)*(o+2)*(o+3)/6);
+}
+case INVALID_ELEM:
+return 0;
+default:
+libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 } // bernstein_n_dofs()
 
 
 
 
 unsigned int bernstein_n_dofs_at_node(const ElemType t,
-                                      const Order o,
-                                      const unsigned int n)
+const Order o,
+const unsigned int n)
 {
-  switch (t)
-    {
-    case NODEELEM:
-      return 1;
+switch (t)
+{
+case NODEELEM:
+return 1;
 
-    case EDGE2:
-    case EDGE3:
-      switch (n)
-        {
-        case 0:
-        case 1:
-          return 1;
-        case 2:
-          libmesh_assert (o>1);
-          return (o-1);
-        default:
-          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
-        }
-    case TRI6:
-      switch (n)
-        {
-        case 0:
-        case 1:
-        case 2:
-          return 1;
+case EDGE2:
+case EDGE3:
+switch (n)
+{
+case 0:
+case 1:
+return 1;
+case 2:
+libmesh_assert (o>1);
+return (o-1);
+default:
+libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
+}
+case TRI6:
+switch (n)
+{
+case 0:
+case 1:
+case 2:
+return 1;
 
-        case 3:
-        case 4:
-        case 5:
-          return (o-1);
-          // Internal DoFs are associated with the elem, not its nodes
-        default:
-          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
-        }
-    case QUAD8:
-      libmesh_assert_less (n, 8);
-      libmesh_assert_less (o, 3);
-    case QUAD9:
-      {
-        switch (n)
-          {
-          case 0:
-          case 1:
-          case 2:
-          case 3:
-            return 1;
+case 3:
+case 4:
+case 5:
+return (o-1);
+// Internal DoFs are associated with the elem, not its nodes
+default:
+libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+}
+case QUAD8:
+libmesh_assert_less (n, 8);
+libmesh_assert_less (o, 3);
+case QUAD9:
+{
+switch (n)
+{
+case 0:
+case 1:
+case 2:
+case 3:
+return 1;
 
-          case 4:
-          case 5:
-          case 6:
-          case 7:
-            return (o-1);
+case 4:
+case 5:
+case 6:
+case 7:
+return (o-1);
 
-            // Internal DoFs are associated with the elem, not its nodes
-          case 8:
-            return 0;
+// Internal DoFs are associated with the elem, not its nodes
+case 8:
+return 0;
 
-          default:
-            libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD9!");
-          }
-      }
-    case HEX8:
-      libmesh_assert_less (n, 8);
-      libmesh_assert_less (o, 2);
-    case HEX20:
-      libmesh_assert_less (n, 20);
-      libmesh_assert_less (o, 3);
-    case HEX27:
-      switch (n)
-        {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-          return 1;
+default:
+libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD9!");
+}
+}
+case HEX8:
+libmesh_assert_less (n, 8);
+libmesh_assert_less (o, 2);
+case HEX20:
+libmesh_assert_less (n, 20);
+libmesh_assert_less (o, 3);
+case HEX27:
+switch (n)
+{
+case 0:
+case 1:
+case 2:
+case 3:
+case 4:
+case 5:
+case 6:
+case 7:
+return 1;
 
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-        case 14:
-        case 15:
-        case 16:
-        case 17:
-        case 18:
-        case 19:
-          return (o-1);
+case 8:
+case 9:
+case 10:
+case 11:
+case 12:
+case 13:
+case 14:
+case 15:
+case 16:
+case 17:
+case 18:
+case 19:
+return (o-1);
 
-        case 20:
-        case 21:
-        case 22:
-        case 23:
-        case 24:
-        case 25:
-          return ((o-1)*(o-1));
+case 20:
+case 21:
+case 22:
+case 23:
+case 24:
+case 25:
+return ((o-1)*(o-1));
 
-          // Internal DoFs are associated with the elem, not its nodes
-        case 26:
-          return 0;
+// Internal DoFs are associated with the elem, not its nodes
+case 26:
+return 0;
 
-        default:
-          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX27!");
-        }
-    case TET4:
-      libmesh_assert_less (n, 4);
-      libmesh_assert_less (o, 2);
-    case TET10:
-      libmesh_assert_less (o, 3);
-      libmesh_assert_less (n, 10);
-      switch (n)
-        {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-          return 1;
+default:
+libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX27!");
+}
+case TET4:
+libmesh_assert_less (n, 4);
+libmesh_assert_less (o, 2);
+case TET10:
+libmesh_assert_less (o, 3);
+libmesh_assert_less (n, 10);
+switch (n)
+{
+case 0:
+case 1:
+case 2:
+case 3:
+return 1;
 
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-          return (o-1);
+case 4:
+case 5:
+case 6:
+case 7:
+case 8:
+case 9:
+return (o-1);
 
-        default:
-          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TET10!");
-        }
-    case INVALID_ELEM:
-      return 0;
-    default:
-      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
-    }
+default:
+libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TET10!");
+}
+case INVALID_ELEM:
+return 0;
+default:
+libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 } // bernstein_n_dofs_at_node()
 
 
@@ -322,42 +322,42 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
 
 unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
 {
-  switch (t)
-    {
-    case NODEELEM:
-    case EDGE2:
-    case EDGE3:
-      return 0;
-    case TRI3:
-    case QUAD4:
-      return 0;
-    case TRI6:
-      return ((o-1)*(o-2)/2);
-    case QUAD8:
-      if (o <= 2)
-        return 0;
-    case QUAD9:
-      return ((o-1)*(o-1));
-    case HEX8:
-      libmesh_assert_less (o, 2);
-    case HEX20:
-      libmesh_assert_less (o, 3);
-      return 0;
-    case HEX27:
-      return ((o-1)*(o-1)*(o-1));
-    case TET4:
-      libmesh_assert_less (o, 2);
-    case TET10:
-      libmesh_assert_less (o, 3);
-      return 0;
-    case INVALID_ELEM:
-      return 0;
-    default:
-      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
-    }
+switch (t)
+{
+case NODEELEM:
+case EDGE2:
+case EDGE3:
+return 0;
+case TRI3:
+case QUAD4:
+return 0;
+case TRI6:
+return ((o-1)*(o-2)/2);
+case QUAD8:
+if (o <= 2)
+return 0;
+case QUAD9:
+return ((o-1)*(o-1));
+case HEX8:
+libmesh_assert_less (o, 2);
+case HEX20:
+libmesh_assert_less (o, 3);
+return 0;
+case HEX27:
+return ((o-1)*(o-1)*(o-1));
+case TET4:
+libmesh_assert_less (o, 2);
+case TET10:
+libmesh_assert_less (o, 3);
+return 0;
+case INVALID_ELEM:
+return 0;
+default:
+libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 } // bernstein_n_dofs_per_elem
 
 } // anonymous namespace
@@ -365,36 +365,36 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
 
 
 
-  // Do full-specialization of nodal_soln() function for every
-  // dimension, instead of explicit instantiation at the end of this
-  // file.
-  // This could be macro-ified so that it fits on one line...
+// Do full-specialization of nodal_soln() function for every
+// dimension, instead of explicit instantiation at the end of this
+// file.
+// This could be macro-ified so that it fits on one line...
 template <>
 void FE<0,BERNSTEIN>::nodal_soln(const Elem * elem,
-                                 const Order order,
-                                 const std::vector<Number> & elem_soln,
-                                 std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
 template <>
 void FE<1,BERNSTEIN>::nodal_soln(const Elem * elem,
-                                 const Order order,
-                                 const std::vector<Number> & elem_soln,
-                                 std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
 template <>
 void FE<2,BERNSTEIN>::nodal_soln(const Elem * elem,
-                                 const Order order,
-                                 const std::vector<Number> & elem_soln,
-                                 std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
 template <>
 void FE<3,BERNSTEIN>::nodal_soln(const Elem * elem,
-                                 const Order order,
-                                 const std::vector<Number> & elem_soln,
-                                 std::vector<Number> & nodal_soln)
+const Order order,
+const std::vector<Number> & elem_soln,
+std::vector<Number> & nodal_soln)
 { bernstein_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 
@@ -432,16 +432,16 @@ template <> bool FE<3,BERNSTEIN>::is_hierarchic() const { return false; }
 // compute_constraints() specializations are only needed for 2 and 3D
 template <>
 void FE<2,BERNSTEIN>::compute_constraints (DofConstraints & constraints,
-                                           DofMap & dof_map,
-                                           const unsigned int variable_number,
-                                           const Elem * elem)
+DofMap & dof_map,
+const unsigned int variable_number,
+const Elem * elem)
 { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 
 template <>
 void FE<3,BERNSTEIN>::compute_constraints (DofConstraints & constraints,
-                                           DofMap & dof_map,
-                                           const unsigned int variable_number,
-                                           const Elem * elem)
+DofMap & dof_map,
+const unsigned int variable_number,
+const Elem * elem)
 { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

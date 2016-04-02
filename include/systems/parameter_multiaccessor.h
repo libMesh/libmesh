@@ -32,107 +32,107 @@ namespace libMesh
 {
 
 /**
- * Accessor object allowing reading and modification of the
- * independent variables in a parameter sensitivity calculation.
- *
- * This is the "default" ParameterAccessor subclass: it simply stores
- * a user-provided pointer to the parameter, and modifies the value at
- * that location in memory.
- */
+* Accessor object allowing reading and modification of the
+* independent variables in a parameter sensitivity calculation.
+*
+* This is the "default" ParameterAccessor subclass: it simply stores
+* a user-provided pointer to the parameter, and modifies the value at
+* that location in memory.
+*/
 template <typename T=Number>
 class ParameterMultiAccessor : public ParameterAccessor<T>
 {
 public:
-  /**
-   * Constructor: no parameters attached yet
-   */
-  ParameterMultiAccessor() {}
+/**
+* Constructor: no parameters attached yet
+*/
+ParameterMultiAccessor() {}
 
-  /**
-   * Constructor: take the first sub-accessor for the parameter
-   */
-  ParameterMultiAccessor(const ParameterAccessor<T> & param_accessor) :
-    _accessors(1, param_accessor.clone()) {}
+/**
+* Constructor: take the first sub-accessor for the parameter
+*/
+ParameterMultiAccessor(const ParameterAccessor<T> & param_accessor) :
+_accessors(1, param_accessor.clone()) {}
 
-  /*
-   * Destructor: delete our clones of sub-accessors
-   */
-  ~ParameterMultiAccessor() {
-    for (unsigned int i=0; i != _accessors.size(); ++i)
-      delete _accessors[i];
-  }
+/*
+* Destructor: delete our clones of sub-accessors
+*/
+~ParameterMultiAccessor() {
+for (unsigned int i=0; i != _accessors.size(); ++i)
+delete _accessors[i];
+}
 
-  /**
-   * A simple reseater won't work with a multi-accessor
-   */
-  virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) libmesh_override
-  {
-    libmesh_error();
-    return *this;
-  }
+/**
+* A simple reseater won't work with a multi-accessor
+*/
+virtual ParameterAccessor<T> &
+operator= (T * /* new_ptr */) libmesh_override
+{
+libmesh_error();
+return *this;
+}
 
-  /**
-   * Setter: change the value of the parameter we access.
-   */
-  virtual void set (const T & new_value) libmesh_override
-  {
-    libmesh_assert(!_accessors.empty());
+/**
+* Setter: change the value of the parameter we access.
+*/
+virtual void set (const T & new_value) libmesh_override
+{
+libmesh_assert(!_accessors.empty());
 #ifndef NDEBUG
-    // Compare other values to the last one we'll change
-    const T & val = _accessors.back()->get();
+// Compare other values to the last one we'll change
+const T & val = _accessors.back()->get();
 #endif
-    for (unsigned int i=0; i != _accessors.size(); ++i)
-      {
-        // If you're already using inconsistent parameters we can't
-        // help you.
-        libmesh_assert_equal_to(_accessors[i]->get(), val);
-        _accessors[i]->set(new_value);
-      }
-  }
+for (unsigned int i=0; i != _accessors.size(); ++i)
+{
+// If you're already using inconsistent parameters we can't
+// help you.
+libmesh_assert_equal_to(_accessors[i]->get(), val);
+_accessors[i]->set(new_value);
+}
+}
 
-  /**
-   * Getter: get the value of the parameter we access.
-   */
-  virtual const T & get () const libmesh_override
-  {
-    libmesh_assert(!_accessors.empty());
-    const T & val = _accessors[0]->get();
+/**
+* Getter: get the value of the parameter we access.
+*/
+virtual const T & get () const libmesh_override
+{
+libmesh_assert(!_accessors.empty());
+const T & val = _accessors[0]->get();
 #ifndef NDEBUG
-    // If you're already using inconsistent parameters we can't help
-    // you.
-    for (unsigned int i=1; i < _accessors.size(); ++i)
-      libmesh_assert_equal_to(_accessors[i]->get(), val);
+// If you're already using inconsistent parameters we can't help
+// you.
+for (unsigned int i=1; i < _accessors.size(); ++i)
+libmesh_assert_equal_to(_accessors[i]->get(), val);
 #endif
-    return val;
-  }
+return val;
+}
 
-  /**
-   * Returns a new copy of the accessor.
-   */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
-  {
-    ParameterMultiAccessor * pmp = new ParameterMultiAccessor<T>();
-    for (unsigned int i=0; i != _accessors.size(); ++i)
-      pmp->_accessors.push_back(_accessors[i]->clone().release());
+/**
+* Returns a new copy of the accessor.
+*/
+virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
+{
+ParameterMultiAccessor * pmp = new ParameterMultiAccessor<T>();
+for (unsigned int i=0; i != _accessors.size(); ++i)
+pmp->_accessors.push_back(_accessors[i]->clone().release());
 
-    return UniquePtr<ParameterAccessor<T> >(pmp);
-  }
+return UniquePtr<ParameterAccessor<T> >(pmp);
+}
 
 
-  void push_back (const ParameterAccessor<T> & new_accessor) {
-    _accessors.push_back(new_accessor.clone().release());
-  }
+void push_back (const ParameterAccessor<T> & new_accessor) {
+_accessors.push_back(new_accessor.clone().release());
+}
 
-  /**
-   * Returns the number of sub-accessors associated with this
-   * parameter.  Useful for testing if the multi-accessor is
-   * empty/invalid.
-   */
-  std::size_t size() const { return _accessors.size(); }
+/**
+* Returns the number of sub-accessors associated with this
+* parameter.  Useful for testing if the multi-accessor is
+* empty/invalid.
+*/
+std::size_t size() const { return _accessors.size(); }
 
 private:
-  std::vector<ParameterAccessor<T> *> _accessors;
+std::vector<ParameterAccessor<T> *> _accessors;
 };
 
 } // namespace libMesh

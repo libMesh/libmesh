@@ -32,62 +32,62 @@ namespace libMesh
 {
 
 /**
- * This class allows to use any SparseMatrix object as a shell matrix.
- *
- * \author Tim Kroeger
- * \date 2008
- */
+* This class allows to use any SparseMatrix object as a shell matrix.
+*
+* \author Tim Kroeger
+* \date 2008
+*/
 template <typename T>
 class SparseShellMatrix : public ShellMatrix<T>
 {
 public:
-  /**
-   * Constructor; takes references to the sparse matrix.  The sparse
-   * matrix itself has to be stored elsewhere.
-   */
-  explicit
-  SparseShellMatrix (const SparseMatrix<T> & new_m);
+/**
+* Constructor; takes references to the sparse matrix.  The sparse
+* matrix itself has to be stored elsewhere.
+*/
+explicit
+SparseShellMatrix (const SparseMatrix<T> & new_m);
 
-  /**
-   * Destructor.
-   */
-  virtual ~SparseShellMatrix ();
+/**
+* Destructor.
+*/
+virtual ~SparseShellMatrix ();
 
-  /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
-   */
-  virtual numeric_index_type m () const libmesh_override;
+/**
+* @returns \p m, the row-dimension of the matrix where the marix is
+* \f$ M \times N \f$.
+*/
+virtual numeric_index_type m () const libmesh_override;
 
-  /**
-   * @returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
-   */
-  virtual numeric_index_type n () const libmesh_override;
+/**
+* @returns \p n, the column-dimension of the matrix where the marix
+* is \f$ M \times N \f$.
+*/
+virtual numeric_index_type n () const libmesh_override;
 
-  /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
-   */
-  virtual void vector_mult (NumericVector<T> & dest,
-                            const NumericVector<T> & arg) const libmesh_override;
+/**
+* Multiplies the matrix with \p arg and stores the result in \p
+* dest.
+*/
+virtual void vector_mult (NumericVector<T> & dest,
+const NumericVector<T> & arg) const libmesh_override;
 
-  /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
-   */
-  virtual void vector_mult_add (NumericVector<T> & dest,
-                                const NumericVector<T> & arg) const libmesh_override;
+/**
+* Multiplies the matrix with \p arg and adds the result to \p dest.
+*/
+virtual void vector_mult_add (NumericVector<T> & dest,
+const NumericVector<T> & arg) const libmesh_override;
 
-  /**
-   * Copies the diagonal part of the matrix into \p dest.
-   */
-  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
+/**
+* Copies the diagonal part of the matrix into \p dest.
+*/
+virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
 protected:
-  /**
-   * The sparse matrix.
-   */
-  const SparseMatrix<T> & _m;
+/**
+* The sparse matrix.
+*/
+const SparseMatrix<T> & _m;
 };
 
 
@@ -97,8 +97,8 @@ protected:
 template <typename T>
 inline
 SparseShellMatrix<T>::SparseShellMatrix (const SparseMatrix<T> & new_m):
-  ShellMatrix<T>(new_m.comm()),
-  _m(new_m)
+ShellMatrix<T>(new_m.comm()),
+_m(new_m)
 {}
 
 
@@ -114,7 +114,7 @@ template <typename T>
 inline
 numeric_index_type SparseShellMatrix<T>::m () const
 {
-  return _m.m();
+return _m.m();
 }
 
 
@@ -123,7 +123,7 @@ template <typename T>
 inline
 numeric_index_type SparseShellMatrix<T>::n () const
 {
-  return _m.n();
+return _m.n();
 }
 
 
@@ -132,7 +132,7 @@ template <typename T>
 inline
 void SparseShellMatrix<T>::get_diagonal(NumericVector<T> & dest) const
 {
-  _m.get_diagonal(dest);
+_m.get_diagonal(dest);
 }
 
 

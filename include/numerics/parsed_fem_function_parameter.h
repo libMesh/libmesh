@@ -32,69 +32,69 @@ namespace libMesh
 template <typename T> class ParsedFEMFunction;
 
 /**
- * Accessor object allowing reading and modification of the
- * independent variables in a parameter sensitivity calculation.
- *
- * This ParameterAccessor subclass is specific to ParsedFEMFunction
- * objects: it stores a pointer to the ParsedFEMFunction and a string
- * describing the parameter (an inline variable) name to be accessed.
- */
+* Accessor object allowing reading and modification of the
+* independent variables in a parameter sensitivity calculation.
+*
+* This ParameterAccessor subclass is specific to ParsedFEMFunction
+* objects: it stores a pointer to the ParsedFEMFunction and a string
+* describing the parameter (an inline variable) name to be accessed.
+*/
 template <typename T=Number>
 class ParsedFEMFunctionParameter : public ParameterAccessor<T>
 {
 public:
-  /**
-   * Constructor: take the function to be modified and the name of the
-   * inline variable within it which represents our parameter.
-   *
-   * The restrictions of get_inline_value() and set_inline_value()
-   * in ParsedFEMFunction apply to this interface as well.
-   *
-   * Note that *only* the function referred to here is changed by
-   * set() - any clones of the function which precede the set()
-   * remain at their previous values.
-   */
-  ParsedFEMFunctionParameter(ParsedFEMFunction<T> & func_ref,
-                             const std::string & param_name) :
-    _func(func_ref), _name(param_name) {}
+/**
+* Constructor: take the function to be modified and the name of the
+* inline variable within it which represents our parameter.
+*
+* The restrictions of get_inline_value() and set_inline_value()
+* in ParsedFEMFunction apply to this interface as well.
+*
+* Note that *only* the function referred to here is changed by
+* set() - any clones of the function which precede the set()
+* remain at their previous values.
+*/
+ParsedFEMFunctionParameter(ParsedFEMFunction<T> & func_ref,
+const std::string & param_name) :
+_func(func_ref), _name(param_name) {}
 
-  /**
-   * A simple reseater won't work with a parsed function
-   */
-  virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
+/**
+* A simple reseater won't work with a parsed function
+*/
+virtual ParameterAccessor<T> &
+operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
 
-  /**
-   * Setter: change the value of the parameter we access.
-   */
-  virtual void set (const T & new_value) {
-    _func.set_inline_value(_name, new_value);
-  }
+/**
+* Setter: change the value of the parameter we access.
+*/
+virtual void set (const T & new_value) {
+_func.set_inline_value(_name, new_value);
+}
 
-  /**
-   * Getter: get the value of the parameter we access.
-   */
-  virtual const T & get () const {
-    _current_val = _func.get_inline_value(_name);
-    return _current_val;
-  }
+/**
+* Getter: get the value of the parameter we access.
+*/
+virtual const T & get () const {
+_current_val = _func.get_inline_value(_name);
+return _current_val;
+}
 
-  /**
-   * Returns a new copy of the accessor.
-   */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const {
-    return UniquePtr<ParameterAccessor<T> >
-      (new ParsedFEMFunctionParameter<T>(_func, _name));
-  }
+/**
+* Returns a new copy of the accessor.
+*/
+virtual UniquePtr<ParameterAccessor<T> > clone() const {
+return UniquePtr<ParameterAccessor<T> >
+(new ParsedFEMFunctionParameter<T>(_func, _name));
+}
 
 private:
-  ParsedFEMFunction<T> & _func;
-  std::string _name;
+ParsedFEMFunction<T> & _func;
+std::string _name;
 
-  // We need to return a reference from get().  That's a pointless
-  // pessimization for libMesh::Number but it might become worthwhile
-  // later when we handle field parameters.
-  mutable libMesh::Number _current_val;
+// We need to return a reference from get().  That's a pointless
+// pessimization for libMesh::Number but it might become worthwhile
+// later when we handle field parameters.
+mutable libMesh::Number _current_val;
 };
 
 } // namespace libMesh

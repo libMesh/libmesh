@@ -40,10 +40,10 @@ RemoteElemMutex remote_elem_mtx;
 // until after main().
 class RemoteElemSetup : public Singleton::Setup
 {
-  void setup ()
-  {
-    RemoteElem::create();
-  }
+void setup ()
+{
+RemoteElem::create();
+}
 } remote_elem_setup;
 }
 
@@ -59,26 +59,26 @@ const RemoteElem * remote_elem;
 
 RemoteElem::~RemoteElem()
 {
-  RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
 
-  remote_elem = libmesh_nullptr;
+remote_elem = libmesh_nullptr;
 }
 
 
 
 const Elem & RemoteElem::create ()
 {
-  if (remote_elem != libmesh_nullptr)
-    return *remote_elem;
+if (remote_elem != libmesh_nullptr)
+return *remote_elem;
 
-  RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
 
-  // check again - object could have been created while waiting
-  // for the lock to acquire!
-  if (remote_elem == libmesh_nullptr)
-    remote_elem = new RemoteElem;
+// check again - object could have been created while waiting
+// for the lock to acquire!
+if (remote_elem == libmesh_nullptr)
+remote_elem = new RemoteElem;
 
-  return *remote_elem;
+return *remote_elem;
 }
 
 

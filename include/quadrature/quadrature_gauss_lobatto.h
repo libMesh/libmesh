@@ -27,43 +27,43 @@ namespace libMesh
 {
 
 /**
- * This class implemenets Gauss-Lobatto quadrature for 1D elements and 2D/3D
- * tensor product elements.  Properties of Gauss-Lobatto quadrature rules:
- * .) Include the "end-points" of the domain (have points on edges/faces in 2D/3D).
- * .) Rules with n points can exactly integrate polynomials of degree 2n-3.
- * http://en.wikipedia.org/wiki/Gaussian_quadrature#Gauss.E2.80.93Lobatto_rules
- *
- * \author John W. Peterson
- * \date 2014
- */
+* This class implemenets Gauss-Lobatto quadrature for 1D elements and 2D/3D
+* tensor product elements.  Properties of Gauss-Lobatto quadrature rules:
+* .) Include the "end-points" of the domain (have points on edges/faces in 2D/3D).
+* .) Rules with n points can exactly integrate polynomials of degree 2n-3.
+* http://en.wikipedia.org/wiki/Gaussian_quadrature#Gauss.E2.80.93Lobatto_rules
+*
+* \author John W. Peterson
+* \date 2014
+*/
 class QGaussLobatto libmesh_final : public QBase
 {
 public:
 
-  /**
-   * Constructor.  Declares the order of the quadrature rule.
-   */
-  QGaussLobatto (const unsigned int _dim,
-                 const Order _order=INVALID_ORDER);
+/**
+* Constructor.  Declares the order of the quadrature rule.
+*/
+QGaussLobatto (const unsigned int _dim,
+const Order _order=INVALID_ORDER);
 
-  /**
-   * Destructor.
-   */
-  ~QGaussLobatto();
+/**
+* Destructor.
+*/
+~QGaussLobatto();
 
-  /**
-   * @returns \p QGAUSS
-   */
-  virtual QuadratureType type() const libmesh_override { return QGAUSS_LOBATTO; }
+/**
+* @returns \p QGAUSS
+*/
+virtual QuadratureType type() const libmesh_override { return QGAUSS_LOBATTO; }
 
 private:
 
-  virtual void init_1D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
-  virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
+virtual void init_1D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+virtual void init_2D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+virtual void init_3D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
 };
 
 } // namespace libMesh

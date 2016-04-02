@@ -27,13 +27,13 @@ namespace libMesh
 {
 
 void QMonomial::init_1D(const ElemType _elemtype,
-                        unsigned int p)
+unsigned int p)
 {
-  QGauss gauss_rule(1, _order);
-  gauss_rule.init(_elemtype, p);
+QGauss gauss_rule(1, _order);
+gauss_rule.init(_elemtype, p);
 
-  _points.swap(gauss_rule.get_points());
-  _weights.swap(gauss_rule.get_weights());
+_points.swap(gauss_rule.get_points());
+_weights.swap(gauss_rule.get_weights());
 }
 
 } // namespace libMesh

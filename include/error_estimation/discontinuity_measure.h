@@ -39,70 +39,70 @@ class Point;
 
 
 /**
- * This class measures discontinuities between elements
- * for debugging purposes.  It derives from ErrorEstimator
- * just in case someone finds it useful in a DG framework.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* This class measures discontinuities between elements
+* for debugging purposes.  It derives from ErrorEstimator
+* just in case someone finds it useful in a DG framework.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class DiscontinuityMeasure : public JumpErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to libmesh_nullptr.  Defaults to L2 norm; changes to system norm are
-   * ignored.
-   */
-  DiscontinuityMeasure() :
-    JumpErrorEstimator(),
-    _bc_function(libmesh_nullptr)
-  { error_norm = L2; }
+/**
+* Constructor.  Responsible for initializing the _bc_function function
+* pointer to libmesh_nullptr.  Defaults to L2 norm; changes to system norm are
+* ignored.
+*/
+DiscontinuityMeasure() :
+JumpErrorEstimator(),
+_bc_function(libmesh_nullptr)
+{ error_norm = L2; }
 
-  /**
-   * Destructor.
-   */
-  ~DiscontinuityMeasure() {}
+/**
+* Destructor.
+*/
+~DiscontinuityMeasure() {}
 
-  /**
-   * Register a user function to use in computing the essential BCs.
-   * The return value is std::pair<bool, Real>
-   */
-  void attach_essential_bc_function (std::pair<bool,Real> fptr(const System & system,
-                                                               const Point & p,
-                                                               const std::string & var_name));
+/**
+* Register a user function to use in computing the essential BCs.
+* The return value is std::pair<bool, Real>
+*/
+void attach_essential_bc_function (std::pair<bool,Real> fptr(const System & system,
+const Point & p,
+const std::string & var_name));
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return DISCONTINUITY_MEASURE;}
+virtual ErrorEstimatorType type() const libmesh_override
+{ return DISCONTINUITY_MEASURE;}
 
 protected:
 
-  /**
-   * An initialization function, for requesting specific data from the FE
-   * objects
-   */
-  virtual void init_context(FEMContext & c) libmesh_override;
+/**
+* An initialization function, for requesting specific data from the FE
+* objects
+*/
+virtual void init_context(FEMContext & c) libmesh_override;
 
-  /**
-   * The function which calculates a normal derivative jump based error
-   * term on an internal side
-   */
-  virtual void internal_side_integration() libmesh_override;
+/**
+* The function which calculates a normal derivative jump based error
+* term on an internal side
+*/
+virtual void internal_side_integration() libmesh_override;
 
-  /**
-   * The function which calculates a normal derivative jump based error
-   * term on a boundary side.
-   * Returns true if the flux bc function is in fact defined on the current side.
-   */
-  virtual bool boundary_side_integration() libmesh_override;
+/**
+* The function which calculates a normal derivative jump based error
+* term on a boundary side.
+* Returns true if the flux bc function is in fact defined on the current side.
+*/
+virtual bool boundary_side_integration() libmesh_override;
 
-  /**
-   * Pointer to function that returns BC information.
-   */
-  std::pair<bool,Real> (* _bc_function) (const System & system,
-                                         const Point & p,
-                                         const std::string & var_name);
+/**
+* Pointer to function that returns BC information.
+*/
+std::pair<bool,Real> (* _bc_function) (const System & system,
+const Point & p,
+const std::string & var_name);
 };
 
 

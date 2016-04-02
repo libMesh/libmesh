@@ -28,49 +28,49 @@ class System;
 class Node;
 
 /**
- * ElemAssembly provides a per-element (interior and boundary) assembly
- * functionality.
- *
- * \author David J. Knezevic
- * \date 2011
- */
+* ElemAssembly provides a per-element (interior and boundary) assembly
+* functionality.
+*
+* \author David J. Knezevic
+* \date 2011
+*/
 class ElemAssembly : public ReferenceCountedObject<ElemAssembly>
 {
 public:
 
-  /**
-   * Constructor.  Initializes required
-   * data structures.
-   */
-  ElemAssembly () {}
+/**
+* Constructor.  Initializes required
+* data structures.
+*/
+ElemAssembly () {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~ElemAssembly () {}
+/**
+* Destructor.
+*/
+virtual ~ElemAssembly () {}
 
-  /**
-   * Perform the element interior assembly.
-   */
-  virtual void interior_assembly(FEMContext &) { }
+/**
+* Perform the element interior assembly.
+*/
+virtual void interior_assembly(FEMContext &) { }
 
-  /**
-   * Perform the element boundary assembly.
-   */
-  virtual void boundary_assembly(FEMContext &) { }
+/**
+* Perform the element boundary assembly.
+*/
+virtual void boundary_assembly(FEMContext &) { }
 
-  /**
-   * Get values to add to the RHS vector based on \p node.
-   * This allows one to impose point loads, for example.
-   */
-  virtual void
-  get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
-                       const System &,
-                       const Node &)
-  {
-    // By default, just clear the values map
-    values.clear();
-  }
+/**
+* Get values to add to the RHS vector based on \p node.
+* This allows one to impose point loads, for example.
+*/
+virtual void
+get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
+const System &,
+const Node &)
+{
+// By default, just clear the values map
+values.clear();
+}
 };
 
 }

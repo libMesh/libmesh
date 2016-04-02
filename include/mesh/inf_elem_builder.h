@@ -42,89 +42,89 @@ class MeshBase;
 class Node;
 
 /**
- * This class is used to build infinite elements on
- * top of an existing mesh.  It only makes sense to
- * use this if LIBMESH_ENABLE_INFINITE_ELEMENTS is true.
- *
- * \author Daniel Dreyer
- * \author John W. Peterson
- * \date 2004
- */
+* This class is used to build infinite elements on
+* top of an existing mesh.  It only makes sense to
+* use this if LIBMESH_ENABLE_INFINITE_ELEMENTS is true.
+*
+* \author Daniel Dreyer
+* \author John W. Peterson
+* \date 2004
+*/
 class InfElemBuilder
 {
 public:
-  /**
-   * Constructor.
-   */
-  explicit
-  InfElemBuilder(MeshBase & mesh) : _mesh(mesh) {}
+/**
+* Constructor.
+*/
+explicit
+InfElemBuilder(MeshBase & mesh) : _mesh(mesh) {}
 
-  /**
-   * Useful typedef
-   */
-  typedef std::pair<bool, double> InfElemOriginValue;
+/**
+* Useful typedef
+*/
+typedef std::pair<bool, double> InfElemOriginValue;
 
-  /**
-   * Build infinite elements atop a volume-based mesh,
-   * determine origin automatically.  Also returns the
-   * origin as a \p const \p Point to make it more obvious that
-   * the origin should not change after the infinite elements
-   * have been built.  When symmetry planes are present, use
-   * the version with optional symmetry switches.
-   * The flag \p be_verbose enables some diagnostic output.
-   */
-  const Point build_inf_elem (const bool be_verbose = false);
+/**
+* Build infinite elements atop a volume-based mesh,
+* determine origin automatically.  Also returns the
+* origin as a \p const \p Point to make it more obvious that
+* the origin should not change after the infinite elements
+* have been built.  When symmetry planes are present, use
+* the version with optional symmetry switches.
+* The flag \p be_verbose enables some diagnostic output.
+*/
+const Point build_inf_elem (const bool be_verbose = false);
 
-  /**
-   * @returns the origin of the infinite elements.
-   * Builds infinite elements atop a volume-based mesh.
-   * Finds all faces on the outer boundary and build infinite elements
-   * on them.  Using the \p InfElemOriginValue the user can
-   * prescribe only selected origin coordinates.  The remaining
-   * coordinates are computed from the center of the bounding box
-   * of the mesh.
-   *
-   * During the search for faces on which infinite elements are built,
-   * @e interior faces that are not on symmetry planes are found, too.
-   * When an (optional) pointer to \p inner_boundary_nodes is provided,
-   * then this vector will be filled with the nodes that lie on the
-   * inner boundary.
-   *
-   * Faces which lie in at least one symmetry plane are skipped.
-   * The three optional booleans \p x_sym, \p y_sym,
-   * \p z_sym indicate symmetry planes (through the origin, obviously)
-   * perpendicular to the \p x, \p y and \p z direction,
-   * respectively.
-   * The flag \p be_verbose enables some diagnostic output.
-   */
-  const Point build_inf_elem (const InfElemOriginValue & origin_x,
-                              const InfElemOriginValue & origin_y,
-                              const InfElemOriginValue & origin_z,
-                              const bool x_sym = false,
-                              const bool y_sym = false,
-                              const bool z_sym = false,
-                              const bool be_verbose = false,
-                              std::vector<const Node *> * inner_boundary_nodes = libmesh_nullptr);
+/**
+* @returns the origin of the infinite elements.
+* Builds infinite elements atop a volume-based mesh.
+* Finds all faces on the outer boundary and build infinite elements
+* on them.  Using the \p InfElemOriginValue the user can
+* prescribe only selected origin coordinates.  The remaining
+* coordinates are computed from the center of the bounding box
+* of the mesh.
+*
+* During the search for faces on which infinite elements are built,
+* @e interior faces that are not on symmetry planes are found, too.
+* When an (optional) pointer to \p inner_boundary_nodes is provided,
+* then this vector will be filled with the nodes that lie on the
+* inner boundary.
+*
+* Faces which lie in at least one symmetry plane are skipped.
+* The three optional booleans \p x_sym, \p y_sym,
+* \p z_sym indicate symmetry planes (through the origin, obviously)
+* perpendicular to the \p x, \p y and \p z direction,
+* respectively.
+* The flag \p be_verbose enables some diagnostic output.
+*/
+const Point build_inf_elem (const InfElemOriginValue & origin_x,
+const InfElemOriginValue & origin_y,
+const InfElemOriginValue & origin_z,
+const bool x_sym = false,
+const bool y_sym = false,
+const bool z_sym = false,
+const bool be_verbose = false,
+std::vector<const Node *> * inner_boundary_nodes = libmesh_nullptr);
 
 
 
 private:
-  /**
-   * Build infinite elements atop a volume-based mesh.
-   * Actual implementation.
-   */
-  void build_inf_elem (const Point & origin,
-                       const bool x_sym = false,
-                       const bool y_sym = false,
-                       const bool z_sym = false,
-                       const bool be_verbose = false,
-                       std::set<std::pair<dof_id_type,
-                       unsigned int> > * inner_faces = libmesh_nullptr);
-  /**
-   * Reference to the mesh we're building infinite
-   * elements for.
-   */
-  MeshBase & _mesh;
+/**
+* Build infinite elements atop a volume-based mesh.
+* Actual implementation.
+*/
+void build_inf_elem (const Point & origin,
+const bool x_sym = false,
+const bool y_sym = false,
+const bool z_sym = false,
+const bool be_verbose = false,
+std::set<std::pair<dof_id_type,
+unsigned int> > * inner_faces = libmesh_nullptr);
+/**
+* Reference to the mesh we're building infinite
+* elements for.
+*/
+MeshBase & _mesh;
 };
 
 

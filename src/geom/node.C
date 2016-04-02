@@ -36,41 +36,41 @@ namespace libMesh
 
 bool Node::operator==(const Node & rhs) const
 {
-  // Explicitly calling the operator== defined in Point
-  return this->Point::operator==(rhs);
+// Explicitly calling the operator== defined in Point
+return this->Point::operator==(rhs);
 }
 
 
 
 void Node::print_info (std::ostream & os) const
 {
-  os << this->get_info()
-     << std::endl;
+os << this->get_info()
+<< std::endl;
 }
 
 
 
 std::string Node::get_info () const
 {
-  std::ostringstream oss;
+std::ostringstream oss;
 
-  oss << "  Node id()=";
+oss << "  Node id()=";
 
-  if (this->valid_id())
-    oss << this->id();
-  else
-    oss << "invalid";
+if (this->valid_id())
+oss << this->id();
+else
+oss << "invalid";
 
-  oss << ", processor_id()=" << this->processor_id() <<
-    ", Point=" << *static_cast<const Point *>(this) << '\n';
+oss << ", processor_id()=" << this->processor_id() <<
+", Point=" << *static_cast<const Point *>(this) << '\n';
 
-  oss << "    DoFs=";
-  for (unsigned int s=0; s != this->n_systems(); ++s)
-    for (unsigned int v=0; v != this->n_vars(s); ++v)
-      for (unsigned int c=0; c != this->n_comp(s,v); ++c)
-        oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
+oss << "    DoFs=";
+for (unsigned int s=0; s != this->n_systems(); ++s)
+for (unsigned int v=0; v != this->n_vars(s); ++v)
+for (unsigned int c=0; c != this->n_comp(s,v); ++c)
+oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
-  return oss.str();
+return oss.str();
 }
 
 

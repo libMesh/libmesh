@@ -38,36 +38,36 @@ namespace Parallel {
 
 template <typename KeyType, typename IdxType=unsigned int>
 /**
- * Perform a parallel sort using a bin-sort method.
- */
+* Perform a parallel sort using a bin-sort method.
+*/
 class BinSorter : public ParallelObject
 {
-  // the type of iterator we will be using is inferred from KeyType
-  typedef typename std::vector<KeyType>::const_iterator IterType;
+// the type of iterator we will be using is inferred from KeyType
+typedef typename std::vector<KeyType>::const_iterator IterType;
 
 public:
 
-  // Constructor
-  explicit
-  BinSorter (const Parallel::Communicator & comm,
-             const std::vector<KeyType> & d);
+// Constructor
+explicit
+BinSorter (const Parallel::Communicator & comm,
+const std::vector<KeyType> & d);
 
-  // The actual function which sorts the data into
-  // nbins.  Currently based on the global min and
-  // max which you must provide e.g. by using MPI.
-  void binsort (const IdxType nbins,
-                KeyType max,
-                KeyType min);
+// The actual function which sorts the data into
+// nbins.  Currently based on the global min and
+// max which you must provide e.g. by using MPI.
+void binsort (const IdxType nbins,
+KeyType max,
+KeyType min);
 
-  // Returns the size of bin b as an unsigned int.
-  IdxType sizeof_bin (const IdxType bin) const;
+// Returns the size of bin b as an unsigned int.
+IdxType sizeof_bin (const IdxType bin) const;
 
 
 private:
 
-  const std::vector<KeyType> & data;
-  std::vector<IterType>       bin_iters;   // Iterators to the bin boundaries
-                                           //  in data
+const std::vector<KeyType> & data;
+std::vector<IterType>       bin_iters;   // Iterators to the bin boundaries
+//  in data
 };
 
 
@@ -77,12 +77,12 @@ template <typename KeyType, typename IdxType>
 inline
 IdxType BinSorter<KeyType,IdxType>::sizeof_bin (const IdxType bin) const
 {
-  libmesh_assert_less ((bin+1), bin_iters.size());
+libmesh_assert_less ((bin+1), bin_iters.size());
 
-  // The size of the bin is defined by the distance between
-  // its bounding iterators
-  return cast_int<IdxType>
-    (std::distance (bin_iters[bin], bin_iters[bin+1]));
+// The size of the bin is defined by the distance between
+// its bounding iterators
+return cast_int<IdxType>
+(std::distance (bin_iters[bin], bin_iters[bin+1]));
 }
 
 }

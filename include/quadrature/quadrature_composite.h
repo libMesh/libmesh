@@ -35,78 +35,78 @@
 namespace libMesh
 {
 /**
- * This class implements generic composite quadrature rules.
- * Composite quadrature rules are constructed from any of the
- * supported rules by breaking an element into subelements and
- * applying the base rule on each subelement.  This class uses the
- * ElemCutter, which is only available if libmesh is configured with
- * --disable-strict-lgpl.
- *
- * \author Benjamin Kirk
- * \date 2013
- */
+* This class implements generic composite quadrature rules.
+* Composite quadrature rules are constructed from any of the
+* supported rules by breaking an element into subelements and
+* applying the base rule on each subelement.  This class uses the
+* ElemCutter, which is only available if libmesh is configured with
+* --disable-strict-lgpl.
+*
+* \author Benjamin Kirk
+* \date 2013
+*/
 template <class QSubCell>
 class QComposite libmesh_final : public QSubCell
 {
 public:
 
-  /**
-   * Import base class data into namespace scope.
-   */
-  using QSubCell::_dim;
-  using QSubCell::_points;
-  using QSubCell::_weights;
-  using QSubCell::init;
+/**
+* Import base class data into namespace scope.
+*/
+using QSubCell::_dim;
+using QSubCell::_points;
+using QSubCell::_weights;
+using QSubCell::init;
 
-  /**
-   * Constructor.  Declares the order of the quadrature rule.
-   */
-  QComposite (const unsigned int _dim,
-              const Order _order=INVALID_ORDER);
+/**
+* Constructor.  Declares the order of the quadrature rule.
+*/
+QComposite (const unsigned int _dim,
+const Order _order=INVALID_ORDER);
 
-  /**
-   * Destructor.
-   */
-  ~QComposite();
+/**
+* Destructor.
+*/
+~QComposite();
 
-  /**
-   * @returns \p QCOMPOSITE
-   */
-  virtual QuadratureType type() const libmesh_override { return QCOMPOSITE; }
+/**
+* @returns \p QCOMPOSITE
+*/
+virtual QuadratureType type() const libmesh_override { return QCOMPOSITE; }
 
-  /**
-   * Initializes the data structures for a specific, potentially cut
-   * element.  The array \p vertex_distance_func contains vertex
-   * values of a signed distance function that cuts the element.  This
-   * interface is indended to be extended by derived classes that can
-   * cut the element into subelements, for example, and constuct a
-   * composite quadrature rule for the cut element.
-   */
-  virtual void init (const Elem & elem,
-                     const std::vector<Real> & vertex_distance_func,
-                     unsigned int p_level=0);
+/**
+* Initializes the data structures for a specific, potentially cut
+* element.  The array \p vertex_distance_func contains vertex
+* values of a signed distance function that cuts the element.  This
+* interface is indended to be extended by derived classes that can
+* cut the element into subelements, for example, and constuct a
+* composite quadrature rule for the cut element.
+*/
+virtual void init (const Elem & elem,
+const std::vector<Real> & vertex_distance_func,
+unsigned int p_level=0);
 
 private:
 
-  /**
-   *
-   */
-  void add_subelem_values (const std::vector<Elem const *> & subelem);
+/**
+*
+*/
+void add_subelem_values (const std::vector<Elem const *> & subelem);
 
-  /**
-   * Subcell quadrature object.
-   */
-  QSubCell _q_subcell;
+/**
+* Subcell quadrature object.
+*/
+QSubCell _q_subcell;
 
-  /**
-   * ElemCutter object.
-   */
-  ElemCutter _elem_cutter;
+/**
+* ElemCutter object.
+*/
+ElemCutter _elem_cutter;
 
-  /**
-   * Lagrange FE to use for subcell mapping.
-   */
-  UniquePtr<FEBase> _lagrange_fe;
+/**
+* Lagrange FE to use for subcell mapping.
+*/
+UniquePtr<FEBase> _lagrange_fe;
 };
 
 

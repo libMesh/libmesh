@@ -33,59 +33,59 @@ namespace libMesh
 {
 
 /**
- * This utility class provides a convenient implementation for
- * building the compressed-row-storage graph required for the METIS/ParMETIS
- * graph partitioning schemes.
- */
+* This utility class provides a convenient implementation for
+* building the compressed-row-storage graph required for the METIS/ParMETIS
+* graph partitioning schemes.
+*/
 template <class IndexType>
 class METIS_CSR_Graph
 {
 public:
-  std::vector<IndexType> offsets, vals;
+std::vector<IndexType> offsets, vals;
 
-  void prep_n_nonzeros(const libMesh::dof_id_type row,
-                       const libMesh::dof_id_type n_nonzeros_in)
-  {
-    libmesh_assert_less (row+1, offsets.size());
-    offsets[row+1] = n_nonzeros_in;
-  }
-
-
-
-  libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
-  {
-    libmesh_assert_less (row+1, offsets.size());
-    return (offsets[row+1] - offsets[row]);
-  }
-
-
-  void prepare_for_use()
-  {
-    std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
-    libmesh_assert (!offsets.empty());
-    vals.resize(offsets.back());
-
-    if (vals.empty())
-      vals.push_back(0);
-  }
+void prep_n_nonzeros(const libMesh::dof_id_type row,
+const libMesh::dof_id_type n_nonzeros_in)
+{
+libmesh_assert_less (row+1, offsets.size());
+offsets[row+1] = n_nonzeros_in;
+}
 
 
 
-  IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
-  {
-    libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
-
-    return vals[offsets[row]+nonzero];
-  }
-
+libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
+{
+libmesh_assert_less (row+1, offsets.size());
+return (offsets[row+1] - offsets[row]);
+}
 
 
-  const IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
-  {
-    libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+void prepare_for_use()
+{
+std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
+libmesh_assert (!offsets.empty());
+vals.resize(offsets.back());
 
-    return vals[offsets[row]+nonzero];
-  }
+if (vals.empty())
+vals.push_back(0);
+}
+
+
+
+IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
+{
+libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+
+return vals[offsets[row]+nonzero];
+}
+
+
+
+const IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+{
+libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+
+return vals[offsets[row]+nonzero];
+}
 
 };
 

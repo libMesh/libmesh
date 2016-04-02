@@ -33,21 +33,21 @@ namespace libMesh
 
 // We need to require C++11...
 const Real Pyramid::_master_points[14][3] =
-  {
-    {-1, -1, 0},
-    {1, -1, 0},
-    {1, 1, 0},
-    {-1, 1, 0},
-    {0, 0, 1},
-    {0, -1, 0},
-    {1, 0, 0},
-    {0, 1, 0},
-    {-1, 0, 0},
-    {0, -0.5, 0.5},
-    {0.5, 0, 0.5},
-    {0, 0.5, 0.5},
-    {-0.5, 0, 0.5}
-  };
+{
+{-1, -1, 0},
+{1, -1, 0},
+{1, 1, 0},
+{-1, 1, 0},
+{0, 0, 1},
+{0, -1, 0},
+{1, 0, 0},
+{0, 1, 0},
+{-1, 0, 0},
+{0, -0.5, 0.5},
+{0.5, 0, 0.5},
+{0, 0.5, 0.5},
+{-0.5, 0, 0.5}
+};
 
 
 
@@ -56,92 +56,92 @@ const Real Pyramid::_master_points[14][3] =
 // Pyramid class member functions
 dof_id_type Pyramid::key (const unsigned int s) const
 {
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (s, this->n_sides());
 
-  switch (s)
-    {
-    case 0: // triangular face 1
-    case 1: // triangular face 2
-    case 2: // triangular face 3
-    case 3: // triangular face 4
-      return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
-                                this->node(Pyramid5::side_nodes_map[s][1]),
-                                this->node(Pyramid5::side_nodes_map[s][2]));
+switch (s)
+{
+case 0: // triangular face 1
+case 1: // triangular face 2
+case 2: // triangular face 3
+case 3: // triangular face 4
+return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
+this->node(Pyramid5::side_nodes_map[s][1]),
+this->node(Pyramid5::side_nodes_map[s][2]));
 
-    case 4:  // the quad face at z=0
-      return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
-                                this->node(Pyramid5::side_nodes_map[s][1]),
-                                this->node(Pyramid5::side_nodes_map[s][2]),
-                                this->node(Pyramid5::side_nodes_map[s][3]));
+case 4:  // the quad face at z=0
+return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
+this->node(Pyramid5::side_nodes_map[s][1]),
+this->node(Pyramid5::side_nodes_map[s][2]),
+this->node(Pyramid5::side_nodes_map[s][3]));
 
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
-    }
+default:
+libmesh_error_msg("Invalid side s = " << s);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+libmesh_error_msg("We'll never get here!");
+return 0;
 }
 
 
 
 UniquePtr<Elem> Pyramid::side (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an UniquePtr
-  Elem * face = libmesh_nullptr;
+// To be returned wrapped in an UniquePtr
+Elem * face = libmesh_nullptr;
 
-  // Set up the type of element
-  switch (i)
-    {
-    case 0: // triangular face 1
-    case 1: // triangular face 2
-    case 2: // triangular face 3
-    case 3: // triangular face 4
-      {
-        face = new Tri3;
-        break;
-      }
-    case 4:  // the quad face at z=0
-      {
-        face = new Quad4;
-        break;
-      }
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
-    }
+// Set up the type of element
+switch (i)
+{
+case 0: // triangular face 1
+case 1: // triangular face 2
+case 2: // triangular face 3
+case 3: // triangular face 4
+{
+face = new Tri3;
+break;
+}
+case 4:  // the quad face at z=0
+{
+face = new Quad4;
+break;
+}
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-  // Set the nodes
-  for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(face);
+return UniquePtr<Elem>(face);
 }
 
 
 
 bool Pyramid::is_child_on_side(const unsigned int c,
-                               const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (c, this->n_children());
+libmesh_assert_less (s, this->n_sides());
 
-  for (unsigned int i = 0; i != 4; ++i)
-    if (Pyramid5::side_nodes_map[s][i] == c)
-      return true;
-  return false;
+for (unsigned int i = 0; i != 4; ++i)
+if (Pyramid5::side_nodes_map[s][i] == c)
+return true;
+return false;
 }
 
 
 
 bool Pyramid::is_edge_on_side(const unsigned int e,
-                              const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (e, this->n_edges());
-  libmesh_assert_less (s, this->n_sides());
+libmesh_assert_less (e, this->n_edges());
+libmesh_assert_less (s, this->n_sides());
 
-  return (is_node_on_side(Pyramid5::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Pyramid5::edge_nodes_map[e][1],s));
+return (is_node_on_side(Pyramid5::edge_nodes_map[e][0],s) &&
+is_node_on_side(Pyramid5::edge_nodes_map[e][1],s));
 }
 
 

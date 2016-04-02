@@ -33,107 +33,107 @@ namespace libMesh
 
 
 /**
- * This class provides a specific system class.  It aims
- * at explicit systems, offering nothing more than just
- * the essentials needed to solve a system.  Note
- * that still additional vectors/matrices may be added,
- * as offered in the parent class \p System.
- */
+* This class provides a specific system class.  It aims
+* at explicit systems, offering nothing more than just
+* the essentials needed to solve a system.  Note
+* that still additional vectors/matrices may be added,
+* as offered in the parent class \p System.
+*/
 class ExplicitSystem : public System
 {
 public:
 
-  /**
-   * Constructor.  Optionally initializes required
-   * data structures.
-   */
-  ExplicitSystem (EquationSystems & es,
-                  const std::string & name,
-                  const unsigned int number);
+/**
+* Constructor.  Optionally initializes required
+* data structures.
+*/
+ExplicitSystem (EquationSystems & es,
+const std::string & name,
+const unsigned int number);
 
-  /**
-   * Destructor.
-   */
-  ~ExplicitSystem ();
+/**
+* Destructor.
+*/
+~ExplicitSystem ();
 
-  /**
-   * The type of system.
-   */
-  typedef ExplicitSystem sys_type;
+/**
+* The type of system.
+*/
+typedef ExplicitSystem sys_type;
 
-  /**
-   * The type of the parent
-   */
-  typedef System Parent;
+/**
+* The type of the parent
+*/
+typedef System Parent;
 
-  /**
-   * @returns a clever pointer to the system.
-   */
-  sys_type & system () { return *this; }
+/**
+* @returns a clever pointer to the system.
+*/
+sys_type & system () { return *this; }
 
-  /**
-   * Clear all the data structures associated with
-   * the system.
-   */
-  virtual void clear () libmesh_override;
+/**
+* Clear all the data structures associated with
+* the system.
+*/
+virtual void clear () libmesh_override;
 
-  /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void reinit () libmesh_override;
+/**
+* Reinitializes the member data fields associated with
+* the system, so that, e.g., \p assemble() may be used.
+*/
+virtual void reinit () libmesh_override;
 
-  /**
-   * Prepares \p qoi for quantity of interest assembly, then calls
-   * user qoi function.
-   * @e Can be overloaded in derived classes.
-   */
-  virtual void assemble_qoi (const QoISet & qoi_indices = QoISet()) libmesh_override;
+/**
+* Prepares \p qoi for quantity of interest assembly, then calls
+* user qoi function.
+* @e Can be overloaded in derived classes.
+*/
+virtual void assemble_qoi (const QoISet & qoi_indices = QoISet()) libmesh_override;
 
-  /**
-   * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
-   * then calls user qoi derivative function.
-   * @e Can be overloaded in derived classes.
-   */
-  virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
-                                        bool include_liftfunc = true,
-                                        bool apply_constraints = true) libmesh_override;
+/**
+* Prepares \p adjoint_rhs for quantity of interest derivative assembly,
+* then calls user qoi derivative function.
+* @e Can be overloaded in derived classes.
+*/
+virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
+bool include_liftfunc = true,
+bool apply_constraints = true) libmesh_override;
 
-  /**
-   * Assembles & solves the linear system Ax=b.
-   */
-  virtual void solve () libmesh_override;
+/**
+* Assembles & solves the linear system Ax=b.
+*/
+virtual void solve () libmesh_override;
 
-  /**
-   * @returns \p "Explicit".  Helps in identifying
-   * the system type in an equation system file.
-   */
-  virtual std::string system_type () const libmesh_override { return "Explicit"; }
+/**
+* @returns \p "Explicit".  Helps in identifying
+* the system type in an equation system file.
+*/
+virtual std::string system_type () const libmesh_override { return "Explicit"; }
 
-  /**
-   * The system matrix.  Implicit systems are characterized by
-   * the need to solve the linear system Ax=b.  This is the
-   * right-hand-side vector b.
-   */
-  NumericVector<Number> * rhs;
+/**
+* The system matrix.  Implicit systems are characterized by
+* the need to solve the linear system Ax=b.  This is the
+* right-hand-side vector b.
+*/
+NumericVector<Number> * rhs;
 
 
 protected:
 
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data () libmesh_override;
+/**
+* Initializes the member data fields associated with
+* the system, so that, e.g., \p assemble() may be used.
+*/
+virtual void init_data () libmesh_override;
 
 
 private:
 
-  /**
-   * Add the system right-hand-side vector to the \p _vectors data structure.
-   * Useful in initialization.
-   */
-  void add_system_rhs ();
+/**
+* Add the system right-hand-side vector to the \p _vectors data structure.
+* Useful in initialization.
+*/
+void add_system_rhs ();
 };
 
 } // namespace libMesh

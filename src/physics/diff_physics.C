@@ -25,75 +25,75 @@ namespace libMesh
 
 DifferentiablePhysics::~DifferentiablePhysics()
 {
-  DifferentiablePhysics::clear_physics();
+DifferentiablePhysics::clear_physics();
 }
 
 
 
 void DifferentiablePhysics::clear_physics ()
 {
-  _time_evolving.resize(0);
+_time_evolving.resize(0);
 }
 
 
 
 void DifferentiablePhysics::init_physics (const System & sys)
 {
-  // give us flags for every variable that might be time evolving
-  _time_evolving.resize(sys.n_vars(), false);
+// give us flags for every variable that might be time evolving
+_time_evolving.resize(sys.n_vars(), false);
 }
 
 
 
 bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
-                                                   DiffContext & c)
+DiffContext & c)
 {
-  FEMContext & context = cast_ref<FEMContext &>(c);
+FEMContext & context = cast_ref<FEMContext &>(c);
 
-  for (unsigned int var = 0; var != context.n_vars(); ++var)
-    {
-      if (!this->is_time_evolving(var))
-        continue;
+for (unsigned int var = 0; var != context.n_vars(); ++var)
+{
+if (!this->is_time_evolving(var))
+continue;
 
-      if (c.get_system().variable(var).type().family != SCALAR)
-        continue;
+if (c.get_system().variable(var).type().family != SCALAR)
+continue;
 
-      const std::vector<dof_id_type> & dof_indices =
-        context.get_dof_indices(var);
+const std::vector<dof_id_type> & dof_indices =
+context.get_dof_indices(var);
 
-      const unsigned int n_dofs = cast_int<unsigned int>
-        (dof_indices.size());
+const unsigned int n_dofs = cast_int<unsigned int>
+(dof_indices.size());
 
-      DenseSubVector<Number> & Fs = context.get_elem_residual(var);
-      DenseSubMatrix<Number> & Kss = context.get_elem_jacobian( var, var );
+DenseSubVector<Number> & Fs = context.get_elem_residual(var);
+DenseSubMatrix<Number> & Kss = context.get_elem_jacobian( var, var );
 
-      const libMesh::DenseSubVector<libMesh::Number> & Us =
-        context.get_elem_solution(var);
+const libMesh::DenseSubVector<libMesh::Number> & Us =
+context.get_elem_solution(var);
 
-      for (unsigned int i=0; i != n_dofs; ++i)
-        {
-          Fs(i) -= Us(i);
+for (unsigned int i=0; i != n_dofs; ++i)
+{
+Fs(i) -= Us(i);
 
-          if (request_jacobian)
-            Kss(i,i) -= context.elem_solution_rate_derivative;
-        }
-    }
+if (request_jacobian)
+Kss(i,i) -= context.elem_solution_rate_derivative;
+}
+}
 
-  return request_jacobian;
+return request_jacobian;
 }
 
 
 
 bool DifferentiablePhysics::_eulerian_time_deriv (bool request_jacobian,
-                                                  DiffContext & context)
+DiffContext & context)
 {
-  // For any problem we need time derivative terms
-  request_jacobian =
-    this->element_time_derivative(request_jacobian, context);
+// For any problem we need time derivative terms
+request_jacobian =
+this->element_time_derivative(request_jacobian, context);
 
-  // For a moving mesh problem we may need the pseudoconvection term too
-  return this->eulerian_residual(request_jacobian, context) &&
-    request_jacobian;
+// For a moving mesh problem we may need the pseudoconvection term too
+return this->eulerian_residual(request_jacobian, context) &&
+request_jacobian;
 }
 
 

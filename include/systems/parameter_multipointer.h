@@ -32,93 +32,93 @@ namespace libMesh
 {
 
 /**
- * Accessor object allowing reading and modification of the
- * independent variables in a parameter sensitivity calculation.
- *
- * This is a slightly flexible ParameterAccessor subclass: it stores
- * all user-provided pointers to copies of the parameter, and modifies
- * the value at each location in memory.
- */
+* Accessor object allowing reading and modification of the
+* independent variables in a parameter sensitivity calculation.
+*
+* This is a slightly flexible ParameterAccessor subclass: it stores
+* all user-provided pointers to copies of the parameter, and modifies
+* the value at each location in memory.
+*/
 template <typename T=Number>
 class ParameterMultiPointer : public ParameterAccessor<T>
 {
 public:
-  /**
-   * Constructor: no parameters attached yet
-   */
-  ParameterMultiPointer() {}
+/**
+* Constructor: no parameters attached yet
+*/
+ParameterMultiPointer() {}
 
-  /**
-   * Constructor: take the first raw pointer to the parameter
-   */
-  ParameterMultiPointer(T * param_ptr) : _ptrs(1, param_ptr) {}
+/**
+* Constructor: take the first raw pointer to the parameter
+*/
+ParameterMultiPointer(T * param_ptr) : _ptrs(1, param_ptr) {}
 
-  /**
-   * A simple reseater won't work with a multipointer
-   */
-  virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) libmesh_override
-  {
-    libmesh_error();
-    return *this;
-  }
+/**
+* A simple reseater won't work with a multipointer
+*/
+virtual ParameterAccessor<T> &
+operator= (T * /* new_ptr */) libmesh_override
+{
+libmesh_error();
+return *this;
+}
 
-  /**
-   * Setter: change the value of the parameter we access.
-   */
-  virtual void set (const T & new_value) libmesh_override
-  {
-    libmesh_assert(!_ptrs.empty());
+/**
+* Setter: change the value of the parameter we access.
+*/
+virtual void set (const T & new_value) libmesh_override
+{
+libmesh_assert(!_ptrs.empty());
 #ifndef NDEBUG
-    // Compare other values to the last one we'll change
-    const T & val = *_ptrs.back();
+// Compare other values to the last one we'll change
+const T & val = *_ptrs.back();
 #endif
-    for (unsigned int i=0; i != _ptrs.size(); ++i)
-      {
-        // If you're already using inconsistent parameters we can't
-        // help you.
-        libmesh_assert_equal_to(*_ptrs[i], val);
-        *_ptrs[i] = new_value;
-      }
-  }
+for (unsigned int i=0; i != _ptrs.size(); ++i)
+{
+// If you're already using inconsistent parameters we can't
+// help you.
+libmesh_assert_equal_to(*_ptrs[i], val);
+*_ptrs[i] = new_value;
+}
+}
 
-  /**
-   * Getter: get the value of the parameter we access.
-   */
-  virtual const T & get () const libmesh_override
-  {
-    libmesh_assert(!_ptrs.empty());
-    T & val = *_ptrs[0];
+/**
+* Getter: get the value of the parameter we access.
+*/
+virtual const T & get () const libmesh_override
+{
+libmesh_assert(!_ptrs.empty());
+T & val = *_ptrs[0];
 #ifndef NDEBUG
-    // If you're already using inconsistent parameters we can't help
-    // you.
-    for (unsigned int i=1; i < _ptrs.size(); ++i)
-      libmesh_assert_equal_to(*_ptrs[i], val);
+// If you're already using inconsistent parameters we can't help
+// you.
+for (unsigned int i=1; i < _ptrs.size(); ++i)
+libmesh_assert_equal_to(*_ptrs[i], val);
 #endif
-    return val;
-  }
+return val;
+}
 
-  /**
-   * Returns a new copy of the accessor.
-   */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
-  {
-    ParameterMultiPointer * pmp = new ParameterMultiPointer<T>();
-    pmp->_ptrs = _ptrs;
+/**
+* Returns a new copy of the accessor.
+*/
+virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
+{
+ParameterMultiPointer * pmp = new ParameterMultiPointer<T>();
+pmp->_ptrs = _ptrs;
 
-    return UniquePtr<ParameterAccessor<T> >(pmp);
-  }
+return UniquePtr<ParameterAccessor<T> >(pmp);
+}
 
-  void push_back (T * new_ptr) { _ptrs.push_back(new_ptr); }
+void push_back (T * new_ptr) { _ptrs.push_back(new_ptr); }
 
-  /**
-   * Returns the number of data associated with this parameter.
-   * Useful for testing if the multipointer is empty/invalid.
-   */
-  std::size_t size() const { return _ptrs.size(); }
+/**
+* Returns the number of data associated with this parameter.
+* Useful for testing if the multipointer is empty/invalid.
+*/
+std::size_t size() const { return _ptrs.size(); }
 
 private:
-  std::vector<T *> _ptrs;
+std::vector<T *> _ptrs;
 };
 
 } // namespace libMesh

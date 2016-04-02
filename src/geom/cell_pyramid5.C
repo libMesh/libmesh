@@ -34,25 +34,25 @@ namespace libMesh
 // ------------------------------------------------------------
 // Pyramid5 class static member initializations
 const unsigned int Pyramid5::side_nodes_map[5][4] =
-  {
-    {0, 1, 4, 99}, // Side 0
-    {1, 2, 4, 99}, // Side 1
-    {2, 3, 4, 99}, // Side 2
-    {3, 0, 4, 99}, // Side 3
-    {0, 3, 2,  1}  // Side 4
-  };
+{
+{0, 1, 4, 99}, // Side 0
+{1, 2, 4, 99}, // Side 1
+{2, 3, 4, 99}, // Side 2
+{3, 0, 4, 99}, // Side 3
+{0, 3, 2,  1}  // Side 4
+};
 
 const unsigned int Pyramid5::edge_nodes_map[8][2] =
-  {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {2, 3}, // Side 2
-    {0, 3}, // Side 3
-    {0, 4}, // Side 4
-    {1, 4}, // Side 5
-    {2, 4}, // Side 6
-    {3, 4}  // Side 7
-  };
+{
+{0, 1}, // Side 0
+{1, 2}, // Side 1
+{2, 3}, // Side 2
+{0, 3}, // Side 3
+{0, 4}, // Side 4
+{1, 4}, // Side 5
+{2, 4}, // Side 6
+{3, 4}  // Side 7
+};
 
 
 
@@ -61,182 +61,182 @@ const unsigned int Pyramid5::edge_nodes_map[8][2] =
 
 bool Pyramid5::is_vertex(const unsigned int) const
 {
-  return true;
+return true;
 }
 
 bool Pyramid5::is_edge(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Pyramid5::is_face(const unsigned int) const
 {
-  return false;
+return false;
 }
 
 bool Pyramid5::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+const unsigned int s) const
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (s, n_sides());
+for (unsigned int i = 0; i != 4; ++i)
+if (side_nodes_map[s][i] == n)
+return true;
+return false;
 }
 
 bool Pyramid5::is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const
+const unsigned int e) const
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+libmesh_assert_less (e, n_edges());
+for (unsigned int i = 0; i != 2; ++i)
+if (edge_nodes_map[e][i] == n)
+return true;
+return false;
 }
 
 
 
 bool Pyramid5::has_affine_map() const
 {
-  //  Point v = this->point(3) - this->point(0);
-  //  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
-  return false;
+//  Point v = this->point(3) - this->point(0);
+//  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
+return false;
 }
 
 
 
 UniquePtr<Elem> Pyramid5::build_side (const unsigned int i,
-                                      bool proxy) const
+bool proxy) const
 {
-  libmesh_assert_less (i, this->n_sides());
+libmesh_assert_less (i, this->n_sides());
 
-  if (proxy)
-    {
-      switch (i)
-        {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-          return UniquePtr<Elem>(new Side<Tri3,Pyramid5>(this,i));
+if (proxy)
+{
+switch (i)
+{
+case 0:
+case 1:
+case 2:
+case 3:
+return UniquePtr<Elem>(new Side<Tri3,Pyramid5>(this,i));
 
-        case 4:
-          return UniquePtr<Elem>(new Side<Quad4,Pyramid5>(this,i));
+case 4:
+return UniquePtr<Elem>(new Side<Quad4,Pyramid5>(this,i));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-    }
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
+}
 
-  else
-    {
-      // Create NULL pointer to be initialized, returned later.
-      Elem * face = libmesh_nullptr;
+else
+{
+// Create NULL pointer to be initialized, returned later.
+Elem * face = libmesh_nullptr;
 
-      switch (i)
-        {
-        case 0: // triangular face 1
-        case 1: // triangular face 2
-        case 2: // triangular face 3
-        case 3: // triangular face 4
-          {
-            face = new Tri3;
-            break;
-          }
-        case 4: // the quad face at z=0
-          {
-            face = new Quad4;
-            break;
-          }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
+switch (i)
+{
+case 0: // triangular face 1
+case 1: // triangular face 2
+case 2: // triangular face 3
+case 3: // triangular face 4
+{
+face = new Tri3;
+break;
+}
+case 4: // the quad face at z=0
+{
+face = new Quad4;
+break;
+}
+default:
+libmesh_error_msg("Invalid side i = " << i);
+}
 
-      face->subdomain_id() = this->subdomain_id();
+face->subdomain_id() = this->subdomain_id();
 
-      // Set the nodes
-      for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
+// Set the nodes
+for (unsigned n=0; n<face->n_nodes(); ++n)
+face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
-    }
+return UniquePtr<Elem>(face);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<Elem>();
 }
 
 
 
 UniquePtr<Elem> Pyramid5::build_edge (const unsigned int i) const
 {
-  libmesh_assert_less (i, this->n_edges());
+libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
+return UniquePtr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
 }
 
 
 
 void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
-                            const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const
+const IOPackage iop,
+std::vector<dof_id_type> & conn) const
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+libmesh_assert(_nodes);
+libmesh_assert_less (sc, this->n_sub_elem());
+libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn.resize(8);
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(3)+1;
-        conn[4] = this->node(4)+1;
-        conn[5] = this->node(4)+1;
-        conn[6] = this->node(4)+1;
-        conn[7] = this->node(4)+1;
-        return;
-      }
+switch (iop)
+{
+case TECPLOT:
+{
+conn.resize(8);
+conn[0] = this->node(0)+1;
+conn[1] = this->node(1)+1;
+conn[2] = this->node(2)+1;
+conn[3] = this->node(3)+1;
+conn[4] = this->node(4)+1;
+conn[5] = this->node(4)+1;
+conn[6] = this->node(4)+1;
+conn[7] = this->node(4)+1;
+return;
+}
 
-    case VTK:
-      {
-        conn.resize(5);
-        conn[0] = this->node(3);
-        conn[1] = this->node(2);
-        conn[2] = this->node(1);
-        conn[3] = this->node(0);
-        conn[4] = this->node(4);
-        return;
-      }
+case VTK:
+{
+conn.resize(5);
+conn[0] = this->node(3);
+conn[1] = this->node(2);
+conn[2] = this->node(1);
+conn[3] = this->node(0);
+conn[4] = this->node(4);
+return;
+}
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
+default:
+libmesh_error_msg("Unsupported IO package " << iop);
+}
 }
 
 
 Real Pyramid5::volume () const
 {
-  // The pyramid with a bilinear base has volume given by the
-  // formula in: "Calculation of the Volume of a General Hexahedron
-  // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
-  Point
-    x0 = point(0), x1 = point(1), x2 = point(2),
-    x3 = point(3), x4 = point(4);
+// The pyramid with a bilinear base has volume given by the
+// formula in: "Calculation of the Volume of a General Hexahedron
+// for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
+Point
+x0 = point(0), x1 = point(1), x2 = point(2),
+x3 = point(3), x4 = point(4);
 
-  // Construct various edge and diagonal vectors.
-  Point v40 = x0 - x4;
-  Point v13 = x3 - x1;
-  Point v02 = x2 - x0;
-  Point v03 = x3 - x0;
-  Point v01 = x1 - x0;
+// Construct various edge and diagonal vectors.
+Point v40 = x0 - x4;
+Point v13 = x3 - x1;
+Point v02 = x2 - x0;
+Point v03 = x3 - x0;
+Point v01 = x1 - x0;
 
-  // Finally, ready to return the volume!
-  return
-    triple_product(v40, v13, v02) / 6. +
-    triple_product(v02, v01, v03) / 12.;
+// Finally, ready to return the volume!
+return
+triple_product(v40, v13, v02) / 6. +
+triple_product(v02, v01, v03) / 12.;
 }
 
 } // namespace libMesh

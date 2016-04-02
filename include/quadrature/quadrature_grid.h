@@ -29,53 +29,53 @@ namespace libMesh
 {
 
 /**
- * This class creates quadrature points on a uniform grid, with
- * order+1 points on an edge.
- *
- * Unlike most libMesh quadrature rules, QGrid does *not* reduce
- * error exponentially on smooth functions as you increase the
- * quadrature order.  Instead, it reduces the error quadratically.
- * However, this error reduction is more reliable on non-smooth
- * functions.
- *
- * This quadrature type may be useful iff you are integrating
- * functions which have discontinuities or discontinuous derivatives
- * on scales smaller than your element size.
- *
- * \author Roy Stogner
- * \date 2005
- */
+* This class creates quadrature points on a uniform grid, with
+* order+1 points on an edge.
+*
+* Unlike most libMesh quadrature rules, QGrid does *not* reduce
+* error exponentially on smooth functions as you increase the
+* quadrature order.  Instead, it reduces the error quadratically.
+* However, this error reduction is more reliable on non-smooth
+* functions.
+*
+* This quadrature type may be useful iff you are integrating
+* functions which have discontinuities or discontinuous derivatives
+* on scales smaller than your element size.
+*
+* \author Roy Stogner
+* \date 2005
+*/
 class QGrid libmesh_final : public QBase
 {
 public:
 
-  /**
-   * Constructor.  Declares the order of the quadrature rule.
-   */
-  QGrid (const unsigned int _dim,
-         const Order _order=INVALID_ORDER) :
-    QBase(_dim, _order)
-  {}
+/**
+* Constructor.  Declares the order of the quadrature rule.
+*/
+QGrid (const unsigned int _dim,
+const Order _order=INVALID_ORDER) :
+QBase(_dim, _order)
+{}
 
-  /**
-   * Destructor.
-   */
-  ~QGrid() {}
+/**
+* Destructor.
+*/
+~QGrid() {}
 
-  /**
-   * @returns \p QGRID
-   */
-  virtual QuadratureType type() const libmesh_override { return QGRID; }
+/**
+* @returns \p QGRID
+*/
+virtual QuadratureType type() const libmesh_override { return QGRID; }
 
 
 private:
 
-  virtual void init_1D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
-  virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
-  virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
+virtual void init_1D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+virtual void init_2D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
+virtual void init_3D (const ElemType _type=INVALID_ELEM,
+unsigned int p_level=0) libmesh_override;
 };
 
 } // namespace libMesh

@@ -29,35 +29,35 @@ namespace libMesh
 {
 
 /**
- * The \p MetisPartitioner uses the Metis graph partitioner
- * to partition the elements.
- */
+* The \p MetisPartitioner uses the Metis graph partitioner
+* to partition the elements.
+*/
 class MetisPartitioner : public Partitioner
 {
 public:
 
-  /**
-   * Constructor.
-   */
-  MetisPartitioner () {}
+/**
+* Constructor.
+*/
+MetisPartitioner () {}
 
-  /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
-  {
-    return UniquePtr<Partitioner>(new MetisPartitioner());
-  }
+/**
+* Creates a new partitioner of this type and returns it in
+* an \p UniquePtr.
+*/
+virtual UniquePtr<Partitioner> clone () const libmesh_override
+{
+return UniquePtr<Partitioner>(new MetisPartitioner());
+}
 
-  virtual void attach_weights(ErrorVector * weights) libmesh_override { _weights = weights; }
+virtual void attach_weights(ErrorVector * weights) libmesh_override { _weights = weights; }
 
 protected:
-  /**
-   * Partition the \p MeshBase into \p n subdomains.
-   */
-  virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override;
+/**
+* Partition the \p MeshBase into \p n subdomains.
+*/
+virtual void _do_partition (MeshBase & mesh,
+const unsigned int n) libmesh_override;
 };
 
 

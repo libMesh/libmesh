@@ -46,29 +46,29 @@ template <>
 class StandardType<Hilbert::HilbertIndices> : public DataType
 {
 public:
-  explicit
-  StandardType(const Hilbert::HilbertIndices * =libmesh_nullptr) {
-    // _static_type never gets freed, but it only gets committed once
-    // so it's not a *huge* memory leak...
-    static DataType _static_type;
-    static bool _is_initialized = false;
-    if (!_is_initialized)
-      {
-        _static_type = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
-        _is_initialized = true;
-      }
-    _datatype = _static_type;
-  }
+explicit
+StandardType(const Hilbert::HilbertIndices * =libmesh_nullptr) {
+// _static_type never gets freed, but it only gets committed once
+// so it's not a *huge* memory leak...
+static DataType _static_type;
+static bool _is_initialized = false;
+if (!_is_initialized)
+{
+_static_type = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
+_is_initialized = true;
+}
+_datatype = _static_type;
+}
 };
 
 #endif // LIBMESH_HAVE_MPI
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  typedef
-  std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
+typedef
+std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
 #else
-  typedef
-  Hilbert::HilbertIndices DofObjectKey;
+typedef
+Hilbert::HilbertIndices DofObjectKey;
 #endif
 
 
@@ -87,11 +87,11 @@ namespace Hilbert {
 inline
 std::ostream&
 operator <<
-  (std::ostream& os,
-   const libMesh::Parallel::DofObjectKey & hilbert_pair)
+(std::ostream& os,
+const libMesh::Parallel::DofObjectKey & hilbert_pair)
 {
-  os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;
-  return os;
+os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;
+return os;
 }
 #endif
 
@@ -103,26 +103,26 @@ operator <<
 
 inline
 void dofobjectkey_max_op (libMesh::Parallel::DofObjectKey *in,
-                          libMesh::Parallel::DofObjectKey *inout,
-                          int *len, void *)
+libMesh::Parallel::DofObjectKey *inout,
+int *len, void *)
 {
-  // When (*in <= *inout), then inout already contains max(*in,*inout)
-  // Otherwise we need to copy from in.
-  for (int i=0; i<*len; i++, in++, inout++)
-    if (*inout < *in)
-      *inout = *in;
+// When (*in <= *inout), then inout already contains max(*in,*inout)
+// Otherwise we need to copy from in.
+for (int i=0; i<*len; i++, in++, inout++)
+if (*inout < *in)
+*inout = *in;
 }
 
 inline
 void dofobjectkey_min_op (libMesh::Parallel::DofObjectKey *in,
-                          libMesh::Parallel::DofObjectKey *inout,
-                          int *len, void *)
+libMesh::Parallel::DofObjectKey *inout,
+int *len, void *)
 {
-  // When (*in >= *inout), then inout already contains min(*in,*inout)
-  // Otherwise we need to copy from in.
-  for (int i=0; i<*len; i++, in++, inout++)
-    if (*in < *inout)
-      *inout = *in;
+// When (*in >= *inout), then inout already contains min(*in,*inout)
+// Otherwise we need to copy from in.
+for (int i=0; i<*len; i++, in++, inout++)
+if (*in < *inout)
+*inout = *in;
 }
 
 #endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI

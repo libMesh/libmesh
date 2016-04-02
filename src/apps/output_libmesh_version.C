@@ -19,6 +19,6 @@
 
 int main()
 {
-  libMesh::libmesh_version_stdout();
-  return 0;
+libMesh::libmesh_version_stdout();
+return 0;
 }

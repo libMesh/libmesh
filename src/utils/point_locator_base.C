@@ -34,13 +34,13 @@ namespace libMesh
 //------------------------------------------------------------------
 // PointLocatorBase methods
 PointLocatorBase::PointLocatorBase (const MeshBase & mesh,
-                                    const PointLocatorBase * master) :
-  _verbose                 (false),
-  _master                  (master),
-  _mesh                    (mesh),
-  _initialized             (false),
-  _use_close_to_point_tol  (false),
-  _close_to_point_tol      (TOLERANCE)
+const PointLocatorBase * master) :
+_verbose                 (false),
+_master                  (master),
+_mesh                    (mesh),
+_initialized             (false),
+_use_close_to_point_tol  (false),
+_close_to_point_tol      (TOLERANCE)
 {
 }
 
@@ -56,48 +56,48 @@ PointLocatorBase::~PointLocatorBase ()
 
 bool PointLocatorBase::initialized () const
 {
-  return this->_initialized;
+return this->_initialized;
 }
 
 
 
 UniquePtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
-                                                     const MeshBase & mesh,
-                                                     const PointLocatorBase * master)
+const MeshBase & mesh,
+const PointLocatorBase * master)
 {
-  switch (t)
-    {
-    case TREE:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
+switch (t)
+{
+case TREE:
+return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
 
-    case TREE_ELEMENTS:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
+case TREE_ELEMENTS:
+return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
 
-    case TREE_LOCAL_ELEMENTS:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
+case TREE_LOCAL_ELEMENTS:
+return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
 
-    case LIST:
-      return UniquePtr<PointLocatorBase>(new PointLocatorList(mesh, master));
+case LIST:
+return UniquePtr<PointLocatorBase>(new PointLocatorList(mesh, master));
 
-    default:
-      libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
-    }
+default:
+libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
+}
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<PointLocatorBase>();
+libmesh_error_msg("We'll never get here!");
+return UniquePtr<PointLocatorBase>();
 }
 
 void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)
 {
-  _use_close_to_point_tol = true;
-  _close_to_point_tol = close_to_point_tol;
+_use_close_to_point_tol = true;
+_close_to_point_tol = close_to_point_tol;
 }
 
 
 void PointLocatorBase::unset_close_to_point_tol ()
 {
-  _use_close_to_point_tol = false;
-  _close_to_point_tol = TOLERANCE;
+_use_close_to_point_tol = false;
+_close_to_point_tol = TOLERANCE;
 }
 
 } // namespace libMesh

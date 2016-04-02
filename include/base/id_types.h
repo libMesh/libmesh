@@ -31,14 +31,14 @@ namespace libMesh
 // A useful way to debug:
 #if 0
 class TestClass {
-  //int _c;
-  unsigned int _c;
+//int _c;
+unsigned int _c;
 public:
-  TestClass() : _c(0) {}
-  TestClass(unsigned int c) : _c(c) {}
-  TestClass & operator=(unsigned int c) { _c = c; return *this; }
-  bool operator<(const TestClass & l) const { return _c < l._c; }
-  operator int() const { return _c; }
+TestClass() : _c(0) {}
+TestClass(unsigned int c) : _c(c) {}
+TestClass & operator=(unsigned int c) { _c = c; return *this; }
+bool operator<(const TestClass & l) const { return _c < l._c; }
+operator int() const { return _c; }
 };
 typedef TestClass subdomain_id_type;
 #endif
@@ -113,16 +113,16 @@ typedef uint16_t processor_id_type;
 typedef uint8_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 4
 /**
- * Note: subdomain_id_types are positive integers - however limitation in the exodusII
- * API force us to use a signed integer here to represent subdomains.  This gives us 2^31
- * possible unique blocks
- */
+* Note: subdomain_id_types are positive integers - however limitation in the exodusII
+* API force us to use a signed integer here to represent subdomains.  This gives us 2^31
+* possible unique blocks
+*/
 typedef int32_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 8
 /**
- * Based on the 4-byte comment warning above, this probably doesn't
- * work with exodusII *at all*...
- */
+* Based on the 4-byte comment warning above, this probably doesn't
+* work with exodusII *at all*...
+*/
 typedef int64_t subdomain_id_type;
 #else // LIBMESH_SUBDOMAIN_ID_BYTES = 2 (default)
 typedef uint16_t subdomain_id_type;
@@ -133,16 +133,16 @@ typedef uint16_t subdomain_id_type;
 // kinds of ids together; how large a data type do we need to hold an
 // arbitrary id?
 #if (LIBMESH_BOUNDARY_ID_BYTES > 4) || (LIBMESH_DOF_ID_BYTES > 4) ||    \
-  (LIBMESH_UNIQUE_ID_BYTES > 4) || (LIBMESH_PROCESSOR_ID_BYTES > 4) ||  \
-  (LIBMESH_SUBDOMAIN_ID_BYTES > 4)
+(LIBMESH_UNIQUE_ID_BYTES > 4) || (LIBMESH_PROCESSOR_ID_BYTES > 4) ||  \
+(LIBMESH_SUBDOMAIN_ID_BYTES > 4)
 typedef uint64_t largest_id_type;
 #elif (LIBMESH_BOUNDARY_ID_BYTES > 2) || (LIBMESH_DOF_ID_BYTES > 2) ||  \
-  (LIBMESH_UNIQUE_ID_BYTES > 2) || (LIBMESH_PROCESSOR_ID_BYTES > 2) ||  \
-  (LIBMESH_SUBDOMAIN_ID_BYTES > 2)
+(LIBMESH_UNIQUE_ID_BYTES > 2) || (LIBMESH_PROCESSOR_ID_BYTES > 2) ||  \
+(LIBMESH_SUBDOMAIN_ID_BYTES > 2)
 typedef uint32_t largest_id_type;
 #elif (LIBMESH_BOUNDARY_ID_BYTES > 1) || (LIBMESH_DOF_ID_BYTES > 1) ||  \
-  (LIBMESH_UNIQUE_ID_BYTES > 1) || (LIBMESH_PROCESSOR_ID_BYTES > 1) ||  \
-  (LIBMESH_SUBDOMAIN_ID_BYTES > 1)
+(LIBMESH_UNIQUE_ID_BYTES > 1) || (LIBMESH_PROCESSOR_ID_BYTES > 1) ||  \
+(LIBMESH_SUBDOMAIN_ID_BYTES > 1)
 typedef uint16_t largest_id_type;
 #else
 typedef uint8_t largest_id_type;

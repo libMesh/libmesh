@@ -35,42 +35,42 @@ namespace libMesh
 
 void HPSingularity::select_refinement (System & system)
 {
-  START_LOG("select_refinement()", "HPSingularity");
+START_LOG("select_refinement()", "HPSingularity");
 
-  // The current mesh
-  MeshBase & mesh = system.get_mesh();
+// The current mesh
+MeshBase & mesh = system.get_mesh();
 
-  MeshBase::element_iterator       elem_it  =
-    mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end =
-    mesh.active_local_elements_end();
+MeshBase::element_iterator       elem_it  =
+mesh.active_local_elements_begin();
+const MeshBase::element_iterator elem_end =
+mesh.active_local_elements_end();
 
-  for (; elem_it != elem_end; ++elem_it)
-    {
-      Elem * elem = *elem_it;
+for (; elem_it != elem_end; ++elem_it)
+{
+Elem * elem = *elem_it;
 
-      // We're only checking elements that are already flagged for h
-      // refinement
-      if (elem->refinement_flag() != Elem::REFINE)
-        continue;
+// We're only checking elements that are already flagged for h
+// refinement
+if (elem->refinement_flag() != Elem::REFINE)
+continue;
 
-      elem->set_p_refinement_flag(Elem::REFINE);
-      elem->set_refinement_flag(Elem::DO_NOTHING);
+elem->set_p_refinement_flag(Elem::REFINE);
+elem->set_refinement_flag(Elem::DO_NOTHING);
 
-      for (std::list<Point>::iterator ppoint =
-             singular_points.begin();
-           ppoint != singular_points.end(); ++ppoint)
-        {
-          if (elem->contains_point(*ppoint))
-            {
-              elem->set_p_refinement_flag(Elem::DO_NOTHING);
-              elem->set_refinement_flag(Elem::REFINE);
-              break;
-            }
-        }
-    }
+for (std::list<Point>::iterator ppoint =
+singular_points.begin();
+ppoint != singular_points.end(); ++ppoint)
+{
+if (elem->contains_point(*ppoint))
+{
+elem->set_p_refinement_flag(Elem::DO_NOTHING);
+elem->set_refinement_flag(Elem::REFINE);
+break;
+}
+}
+}
 
-  STOP_LOG("select_refinement()", "HPSingularity");
+STOP_LOG("select_refinement()", "HPSingularity");
 }
 
 } // namespace libMesh

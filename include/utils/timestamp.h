@@ -36,7 +36,7 @@ std::string get_timestamp();
 
 inline void print_timestamp (std::ostream & target = std::cout)
 {
-  target << get_timestamp() << std::endl;
+target << get_timestamp() << std::endl;
 }
 
 }

@@ -22,34 +22,34 @@ namespace libMesh
 {
 
 DifferentiableQoI::DifferentiableQoI () :
-  assemble_qoi_sides(false),
-  assemble_qoi_internal_sides(false),
-  assemble_qoi_elements(true)
+assemble_qoi_sides(false),
+assemble_qoi_internal_sides(false),
+assemble_qoi_elements(true)
 {
 }
 
 void DifferentiableQoI::thread_join( std::vector<Number> & qoi,
-                                     const std::vector<Number> & other_qoi,
-                                     const QoISet &)
+const std::vector<Number> & other_qoi,
+const QoISet &)
 {
-  for (unsigned int i=0; i != qoi.size(); ++i)
-    qoi[i] += other_qoi[i];
+for (unsigned int i=0; i != qoi.size(); ++i)
+qoi[i] += other_qoi[i];
 
-  return;
+return;
 }
 
 void DifferentiableQoI::parallel_op(const Parallel::Communicator & communicator,
-                                    std::vector<Number> & sys_qoi,
-                                    std::vector<Number> & local_qoi,
-                                    const QoISet &)
+std::vector<Number> & sys_qoi,
+std::vector<Number> & local_qoi,
+const QoISet &)
 {
-  // Sum everything into local_qoi
-  communicator.sum(local_qoi);
+// Sum everything into local_qoi
+communicator.sum(local_qoi);
 
-  // Now put into system qoi
-  sys_qoi = local_qoi;
+// Now put into system qoi
+sys_qoi = local_qoi;
 
-  return;
+return;
 }
 
 } // namespace libMesh

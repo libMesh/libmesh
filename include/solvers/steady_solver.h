@@ -34,93 +34,93 @@ class DifferentiableSystem;
 class TimeSolver;
 
 /**
- * This class implements a TimeSolver which does a single
- * solve of the steady state problem.
- *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
- * \author Roy H. Stogner
- * \date 2006
- */
+* This class implements a TimeSolver which does a single
+* solve of the steady state problem.
+*
+* This class is part of the new DifferentiableSystem framework,
+* which is still experimental.  Users of this framework should
+* beware of bugs and future API changes.
+*
+* \author Roy H. Stogner
+* \date 2006
+*/
 class SteadySolver : public TimeSolver
 {
 public:
-  /**
-   * The type of system
-   */
-  typedef DifferentiableSystem sys_type;
+/**
+* The type of system
+*/
+typedef DifferentiableSystem sys_type;
 
-  /**
-   * The parent class
-   */
-  typedef TimeSolver Parent;
+/**
+* The parent class
+*/
+typedef TimeSolver Parent;
 
-  /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
-   */
-  explicit
-  SteadySolver (sys_type & s) : Parent(s) {}
+/**
+* Constructor. Requires a reference to the system
+* to be solved.
+*/
+explicit
+SteadySolver (sys_type & s) : Parent(s) {}
 
-  /**
-   * Destructor.
-   */
-  virtual ~SteadySolver ();
+/**
+* Destructor.
+*/
+virtual ~SteadySolver ();
 
-  /**
-   * error convergence order against deltat is
-   * not applicable to a steady problem.
-   */
-  virtual Real error_order() const { return 0.; }
+/**
+* error convergence order against deltat is
+* not applicable to a steady problem.
+*/
+virtual Real error_order() const { return 0.; }
 
-  /**
-   * This method uses the DifferentiablePhysics'
-   * element_time_derivative() and element_constraint()
-   * to build a full residual/jacobian on an element.
-   */
-  virtual bool element_residual (bool request_jacobian,
-                                 DiffContext &) libmesh_override;
+/**
+* This method uses the DifferentiablePhysics'
+* element_time_derivative() and element_constraint()
+* to build a full residual/jacobian on an element.
+*/
+virtual bool element_residual (bool request_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * This method uses the DifferentiablePhysics'
-   * side_time_derivative() and side_constraint()
-   * to build a full residual/jacobian on an element's side.
-   */
-  virtual bool side_residual (bool request_jacobian,
-                              DiffContext &) libmesh_override;
+/**
+* This method uses the DifferentiablePhysics'
+* side_time_derivative() and side_constraint()
+* to build a full residual/jacobian on an element's side.
+*/
+virtual bool side_residual (bool request_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * This method uses the DifferentiablePhysics'
-   * nonlocal_time_derivative() and nonlocal_constraint()
-   * to build a full residual/jacobian for non-local terms.
-   */
-  virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext &) libmesh_override;
+/**
+* This method uses the DifferentiablePhysics'
+* nonlocal_time_derivative() and nonlocal_constraint()
+* to build a full residual/jacobian for non-local terms.
+*/
+virtual bool nonlocal_residual (bool request_jacobian,
+DiffContext &) libmesh_override;
 
-  /**
-   * Nominally computes the size of the difference between
-   * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
-   * but for this class just returns 0.
-   */
-  virtual Real du(const SystemNorm &) const libmesh_override { return 0; }
+/**
+* Nominally computes the size of the difference between
+* successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
+* but for this class just returns 0.
+*/
+virtual Real du(const SystemNorm &) const libmesh_override { return 0; }
 
-  /**
-   * This is a steady-state solver.
-   */
-  virtual bool is_steady() const libmesh_override { return true; }
+/**
+* This is a steady-state solver.
+*/
+virtual bool is_steady() const libmesh_override { return true; }
 
 protected:
 
-  /**
-   * This method is the underlying implementation of the public
-   * residual methods.
-   */
-  virtual bool _general_residual (bool request_jacobian,
-                                  DiffContext &,
-                                  ResFuncType time_deriv,
-                                  ResFuncType constraint);
+/**
+* This method is the underlying implementation of the public
+* residual methods.
+*/
+virtual bool _general_residual (bool request_jacobian,
+DiffContext &,
+ResFuncType time_deriv,
+ResFuncType constraint);
 };
 
 

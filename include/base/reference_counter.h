@@ -34,103 +34,103 @@ namespace libMesh
 {
 
 /**
- * This is the base class for enabling reference counting.  It
- * should not be used by the user, thus it has a private constructor.
- *
- * \author Benjamin S. Kirk
- * \date 2002-2007
- */
+* This is the base class for enabling reference counting.  It
+* should not be used by the user, thus it has a private constructor.
+*
+* \author Benjamin S. Kirk
+* \date 2002-2007
+*/
 class ReferenceCounter
 {
 protected:
 
-  /**
-   * Constructor. Protected so that you cannont
-   * instantiate a \p ReferenceCounter, only derive
-   * from it.
-   */
-  ReferenceCounter ();
+/**
+* Constructor. Protected so that you cannont
+* instantiate a \p ReferenceCounter, only derive
+* from it.
+*/
+ReferenceCounter ();
 
 public:
 
-  /**
-   * Destructor.
-   */
-  ~ReferenceCounter ();
+/**
+* Destructor.
+*/
+~ReferenceCounter ();
 
-  /**
-   * Gets a string containing the reference information.
-   */
-  static std::string get_info ();
+/**
+* Gets a string containing the reference information.
+*/
+static std::string get_info ();
 
-  /**
-   * Prints the reference information, by default to \p libMesh::out.
-   */
-  static void print_info (std::ostream & out = libMesh::out);
+/**
+* Prints the reference information, by default to \p libMesh::out.
+*/
+static void print_info (std::ostream & out = libMesh::out);
 
-  /**
-   * Prints the number of outstanding (created, but not yet
-   * destroyed) objects.
-   */
-  static unsigned int n_objects ()
-  { return _n_objects; }
+/**
+* Prints the number of outstanding (created, but not yet
+* destroyed) objects.
+*/
+static unsigned int n_objects ()
+{ return _n_objects; }
 
-  /**
-   * Methods to enable/disable the reference counter output
-   * from print_info()
-   */
-  static void enable_print_counter_info();
-  static void disable_print_counter_info();
+/**
+* Methods to enable/disable the reference counter output
+* from print_info()
+*/
+static void enable_print_counter_info();
+static void disable_print_counter_info();
 
 
 protected:
 
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-  /**
-   * Increments the construction counter. Should be called in
-   * the constructor of any derived class that will be
-   * reference counted.
-   */
-  void increment_constructor_count (const std::string & name);
+/**
+* Increments the construction counter. Should be called in
+* the constructor of any derived class that will be
+* reference counted.
+*/
+void increment_constructor_count (const std::string & name);
 
-  /**
-   * Increments the destruction counter. Should be called in
-   * the destructor of any derived class that will be
-   * reference counted.
-   */
-  void increment_destructor_count (const std::string & name);
+/**
+* Increments the destruction counter. Should be called in
+* the destructor of any derived class that will be
+* reference counted.
+*/
+void increment_destructor_count (const std::string & name);
 
-  /**
-   * Data structure to log the information.  The log is
-   * identified by the class name.
-   */
-  typedef std::map<std::string, std::pair<unsigned int,
-                                          unsigned int> > Counts;
+/**
+* Data structure to log the information.  The log is
+* identified by the class name.
+*/
+typedef std::map<std::string, std::pair<unsigned int,
+unsigned int> > Counts;
 
-  /**
-   * Actually holds the data.
-   */
-  static Counts _counts;
+/**
+* Actually holds the data.
+*/
+static Counts _counts;
 
 #endif
 
-  /**
-   * The number of objects.  Print the reference count
-   * information when the number returns to 0.
-   */
-  static Threads::atomic<unsigned int> _n_objects;
+/**
+* The number of objects.  Print the reference count
+* information when the number returns to 0.
+*/
+static Threads::atomic<unsigned int> _n_objects;
 
-  /**
-   * Mutual exclusion object to enable thread-safe reference counting.
-   */
-  static Threads::spin_mutex _mutex;
+/**
+* Mutual exclusion object to enable thread-safe reference counting.
+*/
+static Threads::spin_mutex _mutex;
 
-  /**
-   * Flag to control whether reference count information
-   * is printed when print_info is called.
-   */
-  static bool _enable_print_counter;
+/**
+* Flag to control whether reference count information
+* is printed when print_info is called.
+*/
+static bool _enable_print_counter;
 };
 
 
@@ -139,14 +139,14 @@ protected:
 // ReferenceCounter class inline methods
 inline ReferenceCounter::ReferenceCounter()
 {
-  ++_n_objects;
+++_n_objects;
 }
 
 
 
 inline ReferenceCounter::~ReferenceCounter()
 {
-  --_n_objects;
+--_n_objects;
 }
 
 
@@ -158,10 +158,10 @@ inline ReferenceCounter::~ReferenceCounter()
 inline
 void ReferenceCounter::increment_constructor_count (const std::string & name)
 {
-  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-  std::pair<unsigned int, unsigned int> & p = _counts[name];
+Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+std::pair<unsigned int, unsigned int> & p = _counts[name];
 
-  p.first++;
+p.first++;
 }
 #endif
 
@@ -171,10 +171,10 @@ void ReferenceCounter::increment_constructor_count (const std::string & name)
 inline
 void ReferenceCounter::increment_destructor_count (const std::string & name)
 {
-  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-  std::pair<unsigned int, unsigned int> & p = _counts[name];
+Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+std::pair<unsigned int, unsigned int> & p = _counts[name];
 
-  p.second++;
+p.second++;
 }
 #endif
 

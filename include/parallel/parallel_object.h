@@ -37,72 +37,72 @@
 namespace libMesh
 {
 /**
- * This class forms the base class for all other classes
- * that are expected to be implemented in paralel. Each
- * \p ParalelObject *requires* a \p Parallel::Communicator object
- * for construction.
- *
- * \author Benjamin S. Kirk
- * \date 2013
- */
+* This class forms the base class for all other classes
+* that are expected to be implemented in paralel. Each
+* \p ParalelObject *requires* a \p Parallel::Communicator object
+* for construction.
+*
+* \author Benjamin S. Kirk
+* \date 2013
+*/
 class ParallelObject
 {
 public:
 
-  /**
-   * Constructor. Requires a reference to the communicator
-   * that defines the object's parallel decomposition.
-   */
-  ParallelObject (const Parallel::Communicator & comm_in) :
-    _communicator(comm_in)
-  {}
+/**
+* Constructor. Requires a reference to the communicator
+* that defines the object's parallel decomposition.
+*/
+ParallelObject (const Parallel::Communicator & comm_in) :
+_communicator(comm_in)
+{}
 
-  /**
-   * Copy Constructor.
-   */
-  ParallelObject (const ParallelObject & other) :
-    _communicator(other._communicator)
-  {}
+/**
+* Copy Constructor.
+*/
+ParallelObject (const ParallelObject & other) :
+_communicator(other._communicator)
+{}
 
-  /**
-   * "Assignment" operator.  Simply asserts our references
-   * are identical because this is the only thing that makes
-   * sense
-   */
-  ParallelObject & operator= (const ParallelObject & libmesh_dbg_var(other))
-  {
-    libmesh_assert_equal_to (&_communicator, &other._communicator);
-    return *this;
-  }
+/**
+* "Assignment" operator.  Simply asserts our references
+* are identical because this is the only thing that makes
+* sense
+*/
+ParallelObject & operator= (const ParallelObject & libmesh_dbg_var(other))
+{
+libmesh_assert_equal_to (&_communicator, &other._communicator);
+return *this;
+}
 
-  /**
-   * Destructor.  Virtual because we are a base class.
-   */
-  virtual ~ParallelObject () {}
+/**
+* Destructor.  Virtual because we are a base class.
+*/
+virtual ~ParallelObject () {}
 
-  /**
-   * @returns a reference to the \p Parallel::Communicator object
-   * used by this mesh.
-   */
-  const Parallel::Communicator & comm () const
-  { return _communicator; }
+/**
+* @returns a reference to the \p Parallel::Communicator object
+* used by this mesh.
+*/
+const Parallel::Communicator & comm () const
+{ return _communicator; }
 
-  /**
-   * @returns the number of processors in the group.
-   */
-  processor_id_type n_processors () const
-  { return cast_int<processor_id_type>(_communicator.size()); }
+/**
+* @returns the number of processors in the group.
+*/
+processor_id_type n_processors () const
+{ return cast_int<processor_id_type>(_communicator.size()); }
 
-  /**
-   * @returns the rank of this processor in the group.
-   */
-  processor_id_type processor_id () const
-  { return cast_int<processor_id_type>(_communicator.rank()); }
+/**
+* @returns the rank of this processor in the group.
+*/
+processor_id_type processor_id () const
+{ return cast_int<processor_id_type>(_communicator.rank()); }
 
 
 protected:
 
-  const Parallel::Communicator & _communicator;
+const Parallel::Communicator & _communicator;
 };
 } // namespace libMesh
 

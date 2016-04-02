@@ -27,14 +27,14 @@ namespace libMesh
 
 QuadratureType QJacobi::type() const
 {
-  if ((_alpha == 1) && (_beta == 0))
-    return QJACOBI_1_0;
+if ((_alpha == 1) && (_beta == 0))
+return QJACOBI_1_0;
 
-  else if ((_alpha == 2) && (_beta == 0))
-    return QJACOBI_2_0;
+else if ((_alpha == 2) && (_beta == 0))
+return QJACOBI_2_0;
 
-  else
-    libmesh_error_msg("Invalid Jacobi quadrature rule: alpha = " << _alpha << ", beta = " << _beta);
+else
+libmesh_error_msg("Invalid Jacobi quadrature rule: alpha = " << _alpha << ", beta = " << _beta);
 }
 
 }

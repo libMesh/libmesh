@@ -54,213 +54,213 @@ typedef NumberVectorValue   Gradient;
 
 
 /**
- * This class implements an "error estimator"
- * based on the difference between the approximate
- * and exact solution.  In theory the quadrature error
- * in this estimate should be much lower than the
- * approximation error in other estimates, so this
- * estimator can be used to calculate effectivity.
- *
- * \author Roy Stogner
- * \date 2006
- */
+* This class implements an "error estimator"
+* based on the difference between the approximate
+* and exact solution.  In theory the quadrature error
+* in this estimate should be much lower than the
+* approximation error in other estimates, so this
+* estimator can be used to calculate effectivity.
+*
+* \author Roy Stogner
+* \date 2006
+*/
 class ExactErrorEstimator : public ErrorEstimator
 {
 public:
 
-  /**
-   * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to libmesh_nullptr, and defaulting the norm type to H1.
-   */
-  ExactErrorEstimator() :
-    ErrorEstimator(),
-    _exact_value(libmesh_nullptr),
-    _exact_deriv(libmesh_nullptr),
-    _exact_hessian(libmesh_nullptr),
-    _equation_systems_fine(libmesh_nullptr),
-    _extra_order(0)
-  { error_norm = H1; }
+/**
+* Constructor.  Responsible for initializing the _bc_function function
+* pointer to libmesh_nullptr, and defaulting the norm type to H1.
+*/
+ExactErrorEstimator() :
+ErrorEstimator(),
+_exact_value(libmesh_nullptr),
+_exact_deriv(libmesh_nullptr),
+_exact_hessian(libmesh_nullptr),
+_equation_systems_fine(libmesh_nullptr),
+_extra_order(0)
+{ error_norm = H1; }
 
-  /**
-   * Destructor.
-   */
-  ~ExactErrorEstimator() {}
+/**
+* Destructor.
+*/
+~ExactErrorEstimator() {}
 
-  /**
-   * Clone and attach arbitrary functors which compute the exact
-   * values of the EquationSystems' solutions at any point.
-   */
-  void attach_exact_values (std::vector<FunctionBase<Number> *> f);
+/**
+* Clone and attach arbitrary functors which compute the exact
+* values of the EquationSystems' solutions at any point.
+*/
+void attach_exact_values (std::vector<FunctionBase<Number> *> f);
 
-  /**
-   * Clone and attach an arbitrary functor which computes the exact
-   * value of the system \p sys_num solution at any point.
-   */
-  void attach_exact_value (unsigned int sys_num,
-                           FunctionBase<Number> * f);
+/**
+* Clone and attach an arbitrary functor which computes the exact
+* value of the system \p sys_num solution at any point.
+*/
+void attach_exact_value (unsigned int sys_num,
+FunctionBase<Number> * f);
 
-  /**
-   * Attach an arbitrary function which computes the exact value of
-   * the solution at any point.
-   */
-  void attach_exact_value ( Number fptr(const Point & p,
-                                        const Parameters & Parameters,
-                                        const std::string & sys_name,
-                                        const std::string & unknown_name));
+/**
+* Attach an arbitrary function which computes the exact value of
+* the solution at any point.
+*/
+void attach_exact_value ( Number fptr(const Point & p,
+const Parameters & Parameters,
+const std::string & sys_name,
+const std::string & unknown_name));
 
-  /**
-   * Clone and attach arbitrary functors which compute the exact
-   * gradients of the EquationSystems' solutions at any point.
-   */
-  void attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g);
+/**
+* Clone and attach arbitrary functors which compute the exact
+* gradients of the EquationSystems' solutions at any point.
+*/
+void attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g);
 
-  /**
-   * Clone and attach an arbitrary functor which computes the exact
-   * gradient of the system \p sys_num solution at any point.
-   */
-  void attach_exact_deriv (unsigned int sys_num,
-                           FunctionBase<Gradient> * g);
+/**
+* Clone and attach an arbitrary functor which computes the exact
+* gradient of the system \p sys_num solution at any point.
+*/
+void attach_exact_deriv (unsigned int sys_num,
+FunctionBase<Gradient> * g);
 
-  /**
-   * Attach an arbitrary function which computes the exact gradient of
-   * the solution at any point.
-   */
-  void attach_exact_deriv ( Gradient gptr(const Point & p,
-                                          const Parameters & parameters,
-                                          const std::string & sys_name,
-                                          const std::string & unknown_name));
+/**
+* Attach an arbitrary function which computes the exact gradient of
+* the solution at any point.
+*/
+void attach_exact_deriv ( Gradient gptr(const Point & p,
+const Parameters & parameters,
+const std::string & sys_name,
+const std::string & unknown_name));
 
-  /**
-   * Clone and attach arbitrary functors which compute the exact
-   * second derivatives of the EquationSystems' solutions at any point.
-   */
-  void attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h);
+/**
+* Clone and attach arbitrary functors which compute the exact
+* second derivatives of the EquationSystems' solutions at any point.
+*/
+void attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h);
 
-  /**
-   * Clone and attach an arbitrary functor which computes the exact
-   * second derivatives of the system \p sys_num solution at any point.
-   */
-  void attach_exact_hessian (unsigned int sys_num,
-                             FunctionBase<Tensor> * h);
+/**
+* Clone and attach an arbitrary functor which computes the exact
+* second derivatives of the system \p sys_num solution at any point.
+*/
+void attach_exact_hessian (unsigned int sys_num,
+FunctionBase<Tensor> * h);
 
-  /**
-   * Attach an arbitrary function which computes the exact second
-   * derivatives of the solution at any point.
-   */
-  void attach_exact_hessian ( Tensor hptr(const Point & p,
-                                          const Parameters & parameters,
-                                          const std::string & sys_name,
-                                          const std::string & unknown_name));
+/**
+* Attach an arbitrary function which computes the exact second
+* derivatives of the solution at any point.
+*/
+void attach_exact_hessian ( Tensor hptr(const Point & p,
+const Parameters & parameters,
+const std::string & sys_name,
+const std::string & unknown_name));
 
-  /**
-   * Attach function similar to system.h which
-   * allows the user to attach a second EquationSystems
-   * object with a reference fine grid solution.
-   */
-  void attach_reference_solution (EquationSystems * es_fine);
-
-
-  /**
-   * Increases or decreases the order of the quadrature rule used for numerical
-   * integration.
-   */
-  void extra_quadrature_order (const int extraorder)
-  { _extra_order = extraorder; }
+/**
+* Attach function similar to system.h which
+* allows the user to attach a second EquationSystems
+* object with a reference fine grid solution.
+*/
+void attach_reference_solution (EquationSystems * es_fine);
 
 
-  // Bring the base class functionality into the name lookup
-  // procedure.  This allows for alternative calling formats
-  // defined in the base class.  Thanks Wolfgang.
-  // GCC 2.95.3 cannot compile such code.  Since it was not really
-  // essential to the functioning of this class, it's been removed.
-  // using ErrorEstimator::estimate_error;
+/**
+* Increases or decreases the order of the quadrature rule used for numerical
+* integration.
+*/
+void extra_quadrature_order (const int extraorder)
+{ _extra_order = extraorder; }
 
-  /**
-   * This function uses the exact solution function
-   * to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
-   */
-  virtual void estimate_error (const System & system,
-                               ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return EXACT;}
+// Bring the base class functionality into the name lookup
+// procedure.  This allows for alternative calling formats
+// defined in the base class.  Thanks Wolfgang.
+// GCC 2.95.3 cannot compile such code.  Since it was not really
+// essential to the functioning of this class, it's been removed.
+// using ErrorEstimator::estimate_error;
+
+/**
+* This function uses the exact solution function
+* to estimate the error on each cell.
+* The estimated error is output in the vector
+* \p error_per_cell
+*/
+virtual void estimate_error (const System & system,
+ErrorVector & error_per_cell,
+const NumericVector<Number> * solution_vector = libmesh_nullptr,
+bool estimate_parent_error = false) libmesh_override;
+
+virtual ErrorEstimatorType type() const libmesh_override
+{ return EXACT;}
 
 private:
 
-  /**
-   * Function pointer to user-provided function which
-   * computes the exact value of the solution.
-   */
-  Number (* _exact_value) (const Point & p,
-                           const Parameters & parameters,
-                           const std::string & sys_name,
-                           const std::string & unknown_name);
+/**
+* Function pointer to user-provided function which
+* computes the exact value of the solution.
+*/
+Number (* _exact_value) (const Point & p,
+const Parameters & parameters,
+const std::string & sys_name,
+const std::string & unknown_name);
 
-  /**
-   * Function pointer to user-provided function which
-   * computes the exact derivative of the solution.
-   */
-  Gradient (* _exact_deriv) (const Point & p,
-                             const Parameters & parameters,
-                             const std::string & sys_name,
-                             const std::string & unknown_name);
+/**
+* Function pointer to user-provided function which
+* computes the exact derivative of the solution.
+*/
+Gradient (* _exact_deriv) (const Point & p,
+const Parameters & parameters,
+const std::string & sys_name,
+const std::string & unknown_name);
 
-  /**
-   * Function pointer to user-provided function which
-   * computes the exact hessian of the solution.
-   */
-  Tensor (* _exact_hessian) (const Point & p,
-                             const Parameters & parameters,
-                             const std::string & sys_name,
-                             const std::string & unknown_name);
+/**
+* Function pointer to user-provided function which
+* computes the exact hessian of the solution.
+*/
+Tensor (* _exact_hessian) (const Point & p,
+const Parameters & parameters,
+const std::string & sys_name,
+const std::string & unknown_name);
 
-  /**
-   * User-provided functors which compute the exact value of the
-   * solution for each system.
-   */
-  std::vector<FunctionBase<Number> *> _exact_values;
+/**
+* User-provided functors which compute the exact value of the
+* solution for each system.
+*/
+std::vector<FunctionBase<Number> *> _exact_values;
 
-  /**
-   * User-provided functors which compute the exact derivative of the
-   * solution for each system.
-   */
-  std::vector<FunctionBase<Gradient> *> _exact_derivs;
+/**
+* User-provided functors which compute the exact derivative of the
+* solution for each system.
+*/
+std::vector<FunctionBase<Gradient> *> _exact_derivs;
 
-  /**
-   * User-provided functors which compute the exact hessians of the
-   * solution for each system.
-   */
-  std::vector<FunctionBase<Tensor> *> _exact_hessians;
+/**
+* User-provided functors which compute the exact hessians of the
+* solution for each system.
+*/
+std::vector<FunctionBase<Tensor> *> _exact_hessians;
 
-  /**
-   * Constant pointer to the \p EquationSystems object
-   * containing a fine grid solution.
-   */
-  EquationSystems * _equation_systems_fine;
+/**
+* Constant pointer to the \p EquationSystems object
+* containing a fine grid solution.
+*/
+EquationSystems * _equation_systems_fine;
 
-  /**
-   * Helper method for calculating on each element
-   */
-  Real find_squared_element_error (const System & system,
-                                   const std::string & var_name,
-                                   const Elem * elem,
-                                   const DenseVector<Number> & Uelem,
-                                   FEBase * fe,
-                                   MeshFunction * fine_values) const;
+/**
+* Helper method for calculating on each element
+*/
+Real find_squared_element_error (const System & system,
+const std::string & var_name,
+const Elem * elem,
+const DenseVector<Number> & Uelem,
+FEBase * fe,
+MeshFunction * fine_values) const;
 
-  /**
-   * Helper method for cleanup
-   */
-  void clear_functors ();
+/**
+* Helper method for cleanup
+*/
+void clear_functors ();
 
-  /**
-   * Extra order to use for quadrature rule
-   */
-  int _extra_order;
+/**
+* Extra order to use for quadrature rule
+*/
+int _extra_order;
 };
 
 

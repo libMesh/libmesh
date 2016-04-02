@@ -25,39 +25,39 @@ namespace libMesh
 {
 
 /**
- * 'Save nothing' subclass of Solution History, this is the default
- */
+* 'Save nothing' subclass of Solution History, this is the default
+*/
 class NoSolutionHistory : public SolutionHistory
 {
 public:
 
-  /**
-   * Constructor
-   */
-  NoSolutionHistory() : SolutionHistory() {}
+/**
+* Constructor
+*/
+NoSolutionHistory() : SolutionHistory() {}
 
-  /**
-   * Destructor
-   */
-  virtual ~NoSolutionHistory() {}
+/**
+* Destructor
+*/
+virtual ~NoSolutionHistory() {}
 
-  /**
-   * Virtual function store which we will be overriding
-   */
-  virtual void store() libmesh_override;
+/**
+* Virtual function store which we will be overriding
+*/
+virtual void store() libmesh_override;
 
-  /**
-   * Virtual function retrieve which we will be overriding
-   */
-  virtual void retrieve() libmesh_override;
+/**
+* Virtual function retrieve which we will be overriding
+*/
+virtual void retrieve() libmesh_override;
 
-  /**
-   * Definition of the clone function needed for the setter function
-   */
-  virtual UniquePtr<SolutionHistory > clone() const libmesh_override
-  {
-    return UniquePtr<SolutionHistory >(new NoSolutionHistory());
-  }
+/**
+* Definition of the clone function needed for the setter function
+*/
+virtual UniquePtr<SolutionHistory > clone() const libmesh_override
+{
+return UniquePtr<SolutionHistory >(new NoSolutionHistory());
+}
 };
 
 } // end namespace libMesh
