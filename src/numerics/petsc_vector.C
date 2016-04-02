@@ -1315,21 +1315,21 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
 template <typename T>
 void PetscVector<T>::_get_array() const
 {
-#ifndef LIBMESH_HAVE_CXX11_THREAD
+  libmesh_assert (this->initialized());
+
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  std::atomic_thread_fence(std::memory_order_acquire);
+#else
   Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
 #endif
 
-  libmesh_assert (this->initialized());
-  if(!_array_is_present)
+  if (!_array_is_present)
     {
 #ifdef LIBMESH_HAVE_CXX11_THREAD
-      std::atomic_thread_fence(std::memory_order_acquire);
+      std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
 #endif
       if (!_array_is_present)
         {
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-          std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
-#endif
           PetscErrorCode ierr=0;
           if(this->type() != GHOSTED)
             {
@@ -1387,22 +1387,21 @@ void PetscVector<T>::_get_array() const
 template <typename T>
 void PetscVector<T>::_restore_array() const
 {
-#ifndef LIBMESH_HAVE_CXX11_THREAD
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  std::atomic_thread_fence(std::memory_order_acquire);
+#else
   Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
 #endif
 
   libmesh_assert (this->initialized());
-  if(_array_is_present)
+  if (_array_is_present)
     {
 #ifdef LIBMESH_HAVE_CXX11_THREAD
-      std::atomic_thread_fence(std::memory_order_acquire);
+      std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
 #endif
 
-      if(_array_is_present)
+      if (_array_is_present)
         {
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-          std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
-#endif
           PetscErrorCode ierr=0;
           if(this->type() != GHOSTED)
             {
