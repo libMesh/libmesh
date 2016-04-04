@@ -37,8 +37,13 @@
 namespace libMesh
 {
 
-// Constructor (empty)
-FEMap::FEMap() {}
+// Constructor
+FEMap::FEMap() :
+  calculations_started(false),
+  calculate_xyz(false),
+  calculate_dxyz(false),
+  calculate_d2xyz(false)
+{}
 
 
 
