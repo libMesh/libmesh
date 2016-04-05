@@ -484,6 +484,12 @@ protected:
 #endif
 
   /**
+   * Determine which values are to be calculated, for both the FE
+   * itself and for the FEMap.
+   */
+  void determine_calculations();
+
+  /**
    * After having updated the jacobian and the transformation
    * from local to global coordinates in \p FEAbstract::compute_map(),
    * the first derivatives of the shape functions are

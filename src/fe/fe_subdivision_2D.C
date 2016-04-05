@@ -421,15 +421,6 @@ void FESubdivision::init_shape_functions(const std::vector<Point> & qp,
 
   calculations_started = true;
 
-  // If the user forgot to request anything, we'll be safe and calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!calculate_phi && !calculate_dphi && !calculate_d2phi)
-    calculate_phi = calculate_dphi = calculate_d2phi = true;
-#else
-  if (!calculate_phi && !calculate_dphi)
-    calculate_phi = calculate_dphi = true;
-#endif
-
   const unsigned int valence = sd_elem->get_ordered_valence(0);
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
   const unsigned int n_approx_shape_functions = valence + 6;
@@ -695,6 +686,9 @@ void FESubdivision::reinit(const Elem * elem,
   // check if vertices 1 and 2 are regular
   libmesh_assert_equal_to(sd_elem->get_ordered_valence(1), 6);
   libmesh_assert_equal_to(sd_elem->get_ordered_valence(2), 6);
+
+  // We're calculating now!  Time to determine what.
+  this->determine_calculations();
 
   // no custom quadrature support
   libmesh_assert(pts == libmesh_nullptr);

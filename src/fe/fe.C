@@ -120,6 +120,9 @@ void FE<Dim,T>::reinit(const Elem * elem,
   // dofs we'll still have work to do.
   // libmesh_assert(elem);
 
+  // We're calculating now!  Time to determine what.
+  this->determine_calculations();
+
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
   bool cached_nodes_still_fit = false;
@@ -280,33 +283,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // We can be called with no element.  If we're evaluating SCALAR
   // dofs we'll still have work to do.
   // libmesh_assert(elem);
-
-  this->calculations_started = true;
-
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi
-      && !this->calculate_curl_phi && !this->calculate_div_phi)
-    {
-      this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
-      if( FEInterface::field_type(T) == TYPE_VECTOR )
-        {
-          this->calculate_curl_phi = true;
-          this->calculate_div_phi  = true;
-        }
-    }
-#else
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
-    {
-      this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
-      if( FEInterface::field_type(T) == TYPE_VECTOR )
-        {
-          this->calculate_curl_phi = true;
-          this->calculate_div_phi  = true;
-        }
-    }
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Start logging the shape function initialization
   START_LOG("init_shape_functions()", "FE");
@@ -562,17 +538,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
 
 
 
-
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_base_shape_functions(const std::vector<Point> & qp,
                                           const Elem * e)
 {
-  // I don't understand infinite elements well enough to risk
-  // calculating too little.  :-(  RHS
-  this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
-
   this->elem_type = e->type();
   this->_fe_map->template init_reference_to_physical_map<Dim>(qp, e);
   init_shape_functions(qp, e);

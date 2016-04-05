@@ -690,34 +690,7 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem * elem,
   // Start logging the shape function computation
   START_LOG("compute_shape_functions()", "FE");
 
-  calculations_started = true;
-
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!calculate_phi && !calculate_dphi && !calculate_d2phi && !calculate_curl_phi && !calculate_div_phi)
-    {
-      calculate_phi = calculate_dphi = calculate_d2phi = true;
-      // Only compute curl, div for vector-valued elements
-      if( TypesEqual<OutputType,RealGradient>::value )
-        {
-          calculate_curl_phi = true;
-          calculate_div_phi  = true;
-        }
-    }
-#else
-  if (!calculate_phi && !calculate_dphi && !calculate_curl_phi && !calculate_div_phi)
-    {
-      calculate_phi = calculate_dphi = true;
-      // Only compute curl for vector-valued elements
-      if( TypesEqual<OutputType,RealGradient>::value )
-        {
-          calculate_curl_phi = true;
-          calculate_div_phi  = true;
-        }
-    }
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-
+  this->determine_calculations();
 
   if( calculate_phi )
     this->_fe_trans->map_phi( this->dim, elem, qp, (*this), this->phi );
@@ -763,6 +736,51 @@ void FEGenericBase<OutputType>::print_dphi(std::ostream & os) const
   for (unsigned int i=0; i<dphi.size(); ++i)
     for (unsigned int j=0; j<dphi[i].size(); ++j)
       os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
+}
+
+
+
+template <typename OutputType>
+void FEGenericBase<OutputType>::determine_calculations()
+{
+  this->calculations_started = true;
+
+  // If the user forgot to request anything, we'll be safe and
+  // calculate everything:
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi
+      && !this->calculate_curl_phi && !this->calculate_div_phi)
+    {
+      this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
+      if( FEInterface::field_type(fe_type.family) == TYPE_VECTOR )
+        {
+          this->calculate_curl_phi = true;
+          this->calculate_div_phi  = true;
+        }
+    }
+#else
+  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
+    {
+      this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
+      if( FEInterface::field_type(fe_type.family) == TYPE_VECTOR )
+        {
+          this->calculate_curl_phi = true;
+          this->calculate_div_phi  = true;
+        }
+    }
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+  // Request whichever terms are necessary from the FEMap
+  if( this->calculate_phi )
+    this->_fe_trans->init_map_phi(*this);
+
+  if( this->calculate_dphiref )
+    this->_fe_trans->init_map_dphi(*this);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  if( this->calculate_d2phi )
+    this->_fe_trans->init_map_d2phi(*this);
+#endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 
 
