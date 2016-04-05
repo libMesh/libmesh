@@ -325,43 +325,50 @@ public:
    * @returns the reference to physical map for the element
    */
   const std::vector<std::vector<Real> > & get_phi_map() const
-  { return phi_map; }
+  { libmesh_assert(!calculations_started || calculate_xyz);
+    calculate_xyz = true; return phi_map; }
 
   /**
    * @returns the reference to physical map derivative
    */
   const std::vector<std::vector<Real> > & get_dphidxi_map() const
-  { return dphidxi_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dphidxi_map; }
 
   /**
    * @returns the reference to physical map derivative
    */
   const std::vector<std::vector<Real> > & get_dphideta_map() const
-  { return dphideta_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dphideta_map; }
 
   /**
    * @returns the reference to physical map derivative
    */
   const std::vector<std::vector<Real> > & get_dphidzeta_map() const
-  { return dphidzeta_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dphidzeta_map; }
 
   /**
    * @returns the tangent vectors for face integration.
    */
   const std::vector<std::vector<Point> > & get_tangents() const
-  { return tangents; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return tangents; }
 
   /**
    * @returns the outward pointing normal vectors for face integration.
    */
   const std::vector<Point> & get_normals() const
-  { return normals; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return normals; }
 
   /**
    * @returns the curvatures for use in face integration.
    */
   const std::vector<Real> & get_curvatures() const
-  { return curvatures;}
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return curvatures;}
 
   /**
    * Prints the Jacobian times the weight for each quadrature point.
@@ -388,92 +395,107 @@ public:
    * @returns the reference to physical map derivative for the side/edge
    */
   std::vector<std::vector<Real> > & get_dpsidxi()
-  { return dpsidxi_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dpsidxi_map; }
 
   /**
    * @returns the reference to physical map derivative for the side/edge
    */
   std::vector<std::vector<Real> > & get_dpsideta()
-  { return dpsideta_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dpsideta_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative for the side/edge
    */
   std::vector<std::vector<Real> > & get_d2psidxi2()
-  { return d2psidxi2_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2psidxi2_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative for the side/edge
    */
   std::vector<std::vector<Real> > & get_d2psidxideta()
-  { return d2psidxideta_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2psidxideta_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative for the side/edge
    */
   std::vector<std::vector<Real> > & get_d2psideta2()
-  { return d2psideta2_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2psideta2_map; }
 
   /**
    * @returns the reference to physical map for the element
    */
   std::vector<std::vector<Real> > & get_phi_map()
-  { return phi_map; }
+  { libmesh_assert(!calculations_started || calculate_xyz);
+    calculate_xyz = true; return phi_map; }
 
   /**
    * @returns the reference to physical map derivative
    */
   std::vector<std::vector<Real> > & get_dphidxi_map()
-  { return dphidxi_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dphidxi_map; }
 
   /**
    * @returns the reference to physical map derivative
    */
   std::vector<std::vector<Real> > & get_dphideta_map()
-  { return dphideta_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dphideta_map; }
 
   /**
    * @returns the reference to physical map derivative
    */
   std::vector<std::vector<Real> > & get_dphidzeta_map()
-  { return dphidzeta_map; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return dphidzeta_map; }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * @returns the reference to physical map 2nd derivative
    */
   std::vector<std::vector<Real> > & get_d2phidxi2_map()
-  { return d2phidxi2_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2phidxi2_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative
    */
   std::vector<std::vector<Real> > & get_d2phidxideta_map()
-  { return d2phidxideta_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2phidxideta_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative
    */
   std::vector<std::vector<Real> > & get_d2phidxidzeta_map()
-  { return d2phidxidzeta_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2phidxidzeta_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative
    */
   std::vector<std::vector<Real> > & get_d2phideta2_map()
-  { return d2phideta2_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2phideta2_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative
    */
   std::vector<std::vector<Real> > & get_d2phidetadzeta_map()
-  { return d2phidetadzeta_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2phidetadzeta_map; }
 
   /**
    * @returns the reference to physical map 2nd derivative
    */
   std::vector<std::vector<Real> > & get_d2phidzeta2_map()
-  { return d2phidzeta2_map; }
+  { libmesh_assert(!calculations_started || calculate_d2xyz);
+    calculate_d2xyz = true; return d2phidzeta2_map; }
 #endif
 
   /* FIXME: PB: This function breaks encapsulation! Needed in FE<>::reinit and
@@ -483,7 +505,8 @@ public:
    * the quadrature weight for each quadrature point.
    */
   std::vector<Real> & get_JxW()
-  { return JxW; }
+  { libmesh_assert(!calculations_started || calculate_dxyz);
+    calculate_dxyz = true; return JxW; }
 
 protected:
 
