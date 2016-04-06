@@ -47,6 +47,21 @@ public:
   virtual ~H1FETransformation(){}
 
   /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const;
+
+  /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const;
+
+  /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const;
+
+  /**
    * Evaluates shape functions in physical coordinates for H1
    * conforming elements.  In this case \f$ \phi(x) = \phi(\xi) \f$
    */

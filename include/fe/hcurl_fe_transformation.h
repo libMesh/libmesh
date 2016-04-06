@@ -43,6 +43,21 @@ public:
   virtual ~HCurlFETransformation(){}
 
   /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const;
+
+  /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const;
+
+  /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const;
+
+  /**
    * Evaluates shape functions in physical coordinates for HCurl
    * conforming elements.  In this case \f$ \phi = (dx/d\xi)^{-T}
    * \hat{\phi} \f$, where \f$ (dx/d\xi)^{-T} \f$ is the

@@ -22,6 +22,31 @@ namespace libMesh
 {
 
 template< typename OutputShape >
+void HCurlFETransformation<OutputShape>::init_map_phi(const FEGenericBase<OutputShape> & fe) const
+{
+  fe.get_fe_map().get_dxidx();
+}
+
+
+
+template< typename OutputShape >
+void HCurlFETransformation<OutputShape>::init_map_dphi(const FEGenericBase<OutputShape> & fe) const
+{
+  fe.get_fe_map().get_dxidx();
+}
+
+
+
+template< typename OutputShape >
+void HCurlFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & fe) const
+{
+  fe.get_fe_map().get_dxidx();
+  fe.get_fe_map().get_d2xidxyz2();
+}
+
+
+
+template< typename OutputShape >
 void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
                                                  const Elem * const elem,
                                                  const std::vector<Point> & qp,
@@ -225,6 +250,24 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 }
 
 template class HCurlFETransformation<RealGradient>;
+
+template<>
+void HCurlFETransformation<Real>::init_map_phi(const FEGenericBase<Real> & ) const
+{
+  libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
+}
+
+template<>
+void HCurlFETransformation<Real>::init_map_dphi(const FEGenericBase<Real> & ) const
+{
+  libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
+}
+
+template<>
+void HCurlFETransformation<Real>::init_map_d2phi(const FEGenericBase<Real> & ) const
+{
+  libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
+}
 
 template<>
 void HCurlFETransformation<Real>::map_phi(const unsigned int,

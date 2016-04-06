@@ -23,6 +23,30 @@
 namespace libMesh
 {
 template< typename OutputShape >
+void H1FETransformation<OutputShape>::init_map_phi(const FEGenericBase<OutputShape> & /* fe */ ) const
+{
+  // Nothing needed
+}
+
+
+
+template< typename OutputShape >
+void H1FETransformation<OutputShape>::init_map_dphi(const FEGenericBase<OutputShape> & fe) const
+{
+  fe.get_fe_map().get_dxidx();
+}
+
+
+
+template< typename OutputShape >
+void H1FETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & fe) const
+{
+  fe.get_fe_map().get_dxidx();
+  fe.get_fe_map().get_d2xidxyz2();
+}
+
+
+template< typename OutputShape >
 void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
                                                const Elem * const elem,
                                                const std::vector<Point> & qp,
