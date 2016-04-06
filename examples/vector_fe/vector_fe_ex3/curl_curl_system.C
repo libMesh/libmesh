@@ -96,6 +96,7 @@ void CurlCurlSystem::init_context(DiffContext & context)
 
   side_fe->get_JxW();
   side_fe->get_phi();
+  side_fe->get_xyz();
 }
 
 
