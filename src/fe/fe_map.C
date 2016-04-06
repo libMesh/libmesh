@@ -71,17 +71,8 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point> & qp,
   // Start logging the reference->physical map initialization
   START_LOG("init_reference_to_physical_map()", "FEMap");
 
-  calculations_started = true;
-
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!calculate_xyz && !calculate_dxyz && !calculate_d2xyz)
-    calculate_xyz = calculate_dxyz = calculate_d2xyz = true;
-#else
-  if (!calculate_xyz && !calculate_dxyz)
-    calculate_xyz = calculate_dxyz = true;
-#endif
+  // We're calculating now!
+  this->determine_calculations();
 
   // The number of quadrature points.
   const std::size_t n_qp = qp.size();
@@ -337,6 +328,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                                      bool compute_second_derivatives)
 {
   libmesh_assert(elem);
+  libmesh_assert(calculations_started);
+
   libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
 
   switch (dim)
@@ -961,6 +954,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
 void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n_qp)
 {
+  // We're calculating now!
+  this->determine_calculations();
+
   // Resize the vectors to hold data at the quadrature points
   xyz.resize(n_qp);
   dxyzdxi_map.resize(n_qp);

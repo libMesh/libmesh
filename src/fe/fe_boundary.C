@@ -400,12 +400,15 @@ template<unsigned int Dim>
 void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
                                       const Elem * side)
 {
-  libmesh_assert(side);
-
   /**
    * Start logging the shape function initialization
    */
   START_LOG("init_face_shape_functions()", "FEMap");
+
+  libmesh_assert(side);
+
+  // We're calculating now!
+  this->determine_calculations();
 
   // The element type and order to use in
   // the map
@@ -489,12 +492,15 @@ template<unsigned int Dim>
 void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
                                       const Elem * edge)
 {
-  libmesh_assert(edge);
-
   /**
    * Start logging the shape function initialization
    */
   START_LOG("init_edge_shape_functions()", "FEMap");
+
+  libmesh_assert(edge);
+
+  // We're calculating now!
+  this->determine_calculations();
 
   // The element type and order to use in
   // the map
@@ -545,6 +551,9 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
                              const Elem * side)
 {
   libmesh_assert(side);
+
+  // We're calculating now!
+  this->determine_calculations();
 
   START_LOG("compute_face_map()", "FEMap");
 
@@ -835,6 +844,9 @@ void FEMap::compute_edge_map(int dim,
   libmesh_assert_equal_to (dim, 3);  // 1D is unnecessary and currently unsupported
 
   START_LOG("compute_edge_map()", "FEMap");
+
+  // We're calculating now!
+  this->determine_calculations();
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
