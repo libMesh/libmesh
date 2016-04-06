@@ -8,6 +8,20 @@ void LaplaceQoI::init_qoi(std::vector<Number> & sys_qoi)
   sys_qoi.resize(1);
 }
 
+void LaplaceQoI::init_context(DiffContext & context)
+{
+  FEMContext & c = cast_ref<FEMContext &>(context);
+
+  // Now make sure we have requested all the data
+  // we need to build the linear system.
+  FEBase * elem_fe = libmesh_nullptr;
+  c.get_element_fe(0, elem_fe);
+  elem_fe->get_JxW();
+  elem_fe->get_phi();
+  elem_fe->get_xyz();
+}
+
+
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
 void LaplaceQoI::element_qoi (DiffContext & context,
