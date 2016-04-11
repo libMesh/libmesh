@@ -1,9 +1,7 @@
 # --------------------------------------------------------------
-# $Id$
+# configure.ac file for libmesh.  Used by Automake to generate
+# aclocal.m4 and Makefile.in. See also: http://tinyurl.com/hatuyfn
 # --------------------------------------------------------------
-
-
-
 AC_INIT([libmesh], [1.0.0-pre], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.github.io])
 AC_PREREQ([2.69])
 
