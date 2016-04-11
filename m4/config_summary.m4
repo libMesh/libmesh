@@ -10,7 +10,7 @@
 #
 # LAST MODIFICATION
 #
-#   $Id: config_summary.m4 27667 2012-02-05 03:36:06Z benkirk $
+#   git log -n1 m4/config_summary.m4
 #
 
 AC_DEFUN([AX_SUMMARIZE_CONFIG],
