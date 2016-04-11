@@ -1272,3 +1272,51 @@ AC_DEFUN([LIBMESH_TEST_CXX11_NULLPTR],
     AM_CONDITIONAL(HAVE_CXX11_NULLPTR, test x$have_cxx11_nullptr == xyes)
     AM_CONDITIONAL(HAVE_CXX11_NULLPTR_WORKAROUND, test x$have_cxx11_nullptr_workaround == xyes)
   ])
+
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_TO_STRING],
+  [
+    have_cxx11_to_string=no
+
+    AC_MSG_CHECKING(for C++11 std::to_string() support)
+    AC_LANG_PUSH([C++])
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      @%:@include <string>
+    ]], [[
+      // tiny="0.000000".  Note: std::to_string(double) is required to produce
+      // a std::string with the same contents as std::sprintf(buf, "%f", value)
+      // would produce, given a sufficiently large buf.  This is *different* from
+      // what you get from a std::stringstream using default formatting and
+      // precision flags, i.e.
+      //   std::ostringstream oss;
+      //   oss << 1.e-40;
+      //   std::string tiny = oss.str();
+      // will produce the string "1e-40".
+      std::string tiny = std::to_string(1.e-40);
+    ]])],[
+      if (test "x$enablecxx11" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_TO_STRING, 1, [Flag indicating whether compiler supports std::to_string()])
+        have_cxx11_to_string=yes
+      else
+        AC_MSG_RESULT([yes, but disabled.])
+        AC_DEFINE(HAVE_CXX11_TO_STRING_BUT_DISABLED, 1, [Compiler supports std::to_string(), but it is disabled in libmesh])
+      fi
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_TO_STRING, test x$have_cxx11_to_string == xyes)
+  ])
