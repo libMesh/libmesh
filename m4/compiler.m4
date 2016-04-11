@@ -823,6 +823,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           # Intel ICC >= v11.x
           intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x)
               # Disable some warning messages:
+              # #161: 'unrecognized #pragma
+              #       #pragma GCC diagnostic warning "-Wdeprecated-declarations"'
+              #       I don't understand this, pragmas for other compilers should
+              #       just be silently ignored, isn't that the whole point of pragmas?
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
               #       positives with this
@@ -841,10 +845,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               #        Well, duh, when the tested value is computed...  OK when it
               #        was from an assignment.
               PROFILING_FLAGS="-p"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488"
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
