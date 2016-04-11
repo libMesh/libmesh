@@ -9170,7 +9170,7 @@ $as_echo "#define HAVE_CXX11_REGEX 1" >>confdefs.h
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
 $as_echo "yes, but disabled." >&6; }
 
-$as_echo "#define HAVE_CXX11_REGEX 1" >>confdefs.h
+$as_echo "#define HAVE_CXX11_REGEX_BUT_DISABLED 1" >>confdefs.h
 
       fi
 
