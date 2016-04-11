@@ -508,7 +508,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
         have_cxx11_regex=yes
       else
         AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_REGEX, 1, [Compiler supports std::regex, but it is disabled in libmesh])
+        AC_DEFINE(HAVE_CXX11_REGEX_BUT_DISABLED, 1, [Compiler supports std::regex, but it is disabled in libmesh])
       fi
     ],[
       AC_MSG_RESULT(no)

@@ -318,8 +318,11 @@
 /* Compiler supports range-based for loops, but it is disabled in libmesh */
 #undef HAVE_CXX11_RANGEFOR_BUT_DISABLED
 
-/* Compiler supports std::regex, but it is disabled in libmesh */
+/* Flag indicating whether compiler supports std::regex */
 #undef HAVE_CXX11_REGEX
+
+/* Compiler supports std::regex, but it is disabled in libmesh */
+#undef HAVE_CXX11_REGEX_BUT_DISABLED
 
 /* Flag indicating whether compiler supports rvalue references */
 #undef HAVE_CXX11_RVALUE_REFERENCES
