@@ -895,6 +895,8 @@ EGREP
 GREP
 SED
 LIBTOOL
+HAVE_CXX11_TO_STRING_FALSE
+HAVE_CXX11_TO_STRING_TRUE
 HAVE_CXX11_NULLPTR_WORKAROUND_FALSE
 HAVE_CXX11_NULLPTR_WORKAROUND_TRUE
 HAVE_CXX11_NULLPTR_FALSE
@@ -10528,6 +10530,91 @@ fi
 else
   HAVE_CXX11_NULLPTR_WORKAROUND_TRUE='#'
   HAVE_CXX11_NULLPTR_WORKAROUND_FALSE=
+fi
+
+
+
+    have_cxx11_to_string=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::to_string() support" >&5
+$as_echo_n "checking for C++11 std::to_string() support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      #include <string>
+
+int
+main ()
+{
+
+      // tiny="0.000000".  Note: std::to_string(double) is required to produce
+      // a std::string with the same contents as std::sprintf(buf, "%f", value)
+      // would produce, given a sufficiently large buf.  This is *different* from
+      // what you get from a std::stringstream using default formatting and
+      // precision flags, i.e.
+      //   std::ostringstream oss;
+      //   oss << 1.e-40;
+      //   std::string tiny = oss.str();
+      // will produce the string "1e-40".
+      std::string tiny = std::to_string(1.e-40);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_TO_STRING 1" >>confdefs.h
+
+        have_cxx11_to_string=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_TO_STRING_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_to_string == xyes; then
+  HAVE_CXX11_TO_STRING_TRUE=
+  HAVE_CXX11_TO_STRING_FALSE='#'
+else
+  HAVE_CXX11_TO_STRING_TRUE='#'
+  HAVE_CXX11_TO_STRING_FALSE=
 fi
 
 
@@ -42314,6 +42401,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_NULLPTR_WORKAROUND_TRUE}" && test -z "${HAVE_CXX11_NULLPTR_WORKAROUND_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_NULLPTR_WORKAROUND\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_TO_STRING_TRUE}" && test -z "${HAVE_CXX11_TO_STRING_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_TO_STRING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE}" && test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE}"; then

@@ -339,6 +339,12 @@
 /* Compiler supports std::thread, but it is disabled in libmesh */
 #undef HAVE_CXX11_THREAD_BUT_DISABLED
 
+/* Flag indicating whether compiler supports std::to_string() */
+#undef HAVE_CXX11_TO_STRING
+
+/* Compiler supports std::to_string(), but it is disabled in libmesh */
+#undef HAVE_CXX11_TO_STRING_BUT_DISABLED
+
 /* Flag indicating whether compiler supports <type_traits> */
 #undef HAVE_CXX11_TYPE_TRAITS
 
