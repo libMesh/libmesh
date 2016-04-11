@@ -11,7 +11,7 @@
 #
 # LAST MODIFICATION
 #
-#   $Id: config_environment.m4 34934 2012-11-28 18:15:04Z benkirk $
+#   git log -n1 m4/config_environment.m4
 #
 # COPYLEFT
 #

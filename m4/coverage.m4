@@ -11,7 +11,7 @@
 #
 # LAST MODIFICATION
 #
-#   $Id: coverage.m4 48028 2015-08-21 21:08:00Z roystgnr $
+#   git log -n1 m4/coverage.m4
 #
 # COPYLEFT
 #

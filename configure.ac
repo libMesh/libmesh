@@ -1,9 +1,7 @@
 # --------------------------------------------------------------
-# $Id$
+# configure.ac file for libmesh.  Used by Automake to generate
+# aclocal.m4 and Makefile.in. See also: http://tinyurl.com/hatuyfn
 # --------------------------------------------------------------
-
-
-
 AC_INIT([libmesh], [1.0.0-pre], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.github.io])
 AC_PREREQ([2.69])
 
@@ -198,6 +196,7 @@ LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS
 LIBMESH_TEST_CXX11_DELETED_FUNCTIONS
 LIBMESH_TEST_CXX11_FINAL
 LIBMESH_TEST_CXX11_NULLPTR
+LIBMESH_TEST_CXX11_TO_STRING
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
