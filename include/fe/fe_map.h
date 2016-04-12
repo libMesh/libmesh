@@ -511,6 +511,20 @@ public:
 protected:
 
   /**
+   * Determine which values are to be calculated
+   */
+  void determine_calculations() {
+    calculations_started = true;
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // Second derivative calculations currently have first derivative
+  // calculations as a prerequisite
+  if (calculate_d2xyz)
+    calculate_dxyz = true;
+#endif
+  }
+
+  /**
    * A utility function for use by compute_*_map
    */
   void resize_quadrature_map_vectors(const unsigned int dim, unsigned int n_qp);
