@@ -23,7 +23,7 @@ cat <<EOF > $output_file
       <li><a href="../index.html">Home</a></li>
       <li><a href="../support.html">About Us</a></li>
       <li><a href="../publications.html">Publications</a></li>
-      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
       <li><a href="../installation.html">Installation</a></li>
       <li><a href="../examples.html">Examples</a></li>
      <li><a href="../doxygen/index.html">Documentation</a></li>
@@ -38,7 +38,7 @@ cat <<EOF > $output_file
         <li><a href="../index.html">Home</a></li>
         <li><a href="../support.html">About Us</a></li>
         <li><a href="../publications.html">Publications</a></li>
-        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
         <li><a href="../installation.html">Installation</a></li>
         <li><a href="../examples.html">Examples</a></li>
         <li><a href="../doxygen/index.html">Documentation</a></li>
@@ -49,28 +49,19 @@ cat <<EOF > $output_file
 
 EOF
 
-# First generate the html with the nice comments in it.
-for input_file in *.h *.C ; do
-    if (test -f $input_file); then
-	echo "<a name=\"comments\"></a> "                             >> $output_file
-	echo "<br><br><br> <h1> The source file $input_file with comments: </h1> " >> $output_file
-	program2html.pl $input_file >> $output_file
-    fi
-done
+# Put a link to the lastest version of this example on GitHub.  This
+# is much easier to maintain than what we were doing previously with
+# perl, enscript, etc.
 
-# Now generate the code with no comments
-for input_file in *.h *.C ; do
-    if (test -f $input_file); then
-        # Now put some kind of separating message
-	echo "<a name=\"nocomments\"></a> "                           >> $output_file
-	echo "<br><br><br> <h1> The source file $input_file without comments: </h1> " >> $output_file
-        # Now bust out the magic.  We are going to use
-        # two perl scripts and enscript to get sweet looking
-        # C code into our html.
-	stripcomments.pl $input_file | enscript -q --header="" --pretty-print=cpp --color --title="" --language=html --output=- | stripenscript.pl >> $output_file;
-    fi
-done
+# Directory name minus the foo_ex1 bit.
+one_path_stripped=$(dirname "$orig_pwd")
 
+# Now basename returns just the last directory name, which for
+# $one_path_stripped is just the name of ".."
+last_two_paths=$(basename "$one_path_stripped")/$(basename "$orig_pwd")
+
+echo "<br> <h1> Link to the source code for this example: </h1>" >> $output_file
+echo "<a href=\"https://github.com/libMesh/libmesh/tree/master/examples/$last_two_paths\" target=\"_blank\">Open $base in new tab.</a>" >> $output_file
 
 # Now add the stdout.log if it exists
 cd $orig_pwd
@@ -118,13 +109,6 @@ cat <<EOF  >> $output_file
 </body>
 </html>
 EOF
-
-# # Put in a few emacs comments to force syntax highlighting
-# echo "<?php if (0) { ?>" >> $output_file;
-# echo "\#Local Variables:" >> $output_file;
-# echo "\#mode: html" >> $output_file;
-# echo "\#End:" >> $output_file;
-# echo "<?php } ?>" >> $output_file;
 
 # Local Variables:
 # mode: shell-script
