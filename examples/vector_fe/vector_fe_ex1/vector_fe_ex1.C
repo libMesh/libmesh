@@ -264,7 +264,7 @@ void assemble_poisson(EquationSystems & es,
   // It is smart to make this one const so that we don't accidentally
   // mess it up!  In case users later modify this program to include
   // refinement, we will be safe and will only consider the active
-  // elements; hence we use a variant of the \p active_elem_iterator.
+  // elements; hence we use a variant of the active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 

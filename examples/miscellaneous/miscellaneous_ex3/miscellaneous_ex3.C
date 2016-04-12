@@ -302,9 +302,9 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
   NonlinearImplicitSystem & system =
     es.get_system<NonlinearImplicitSystem>("Laplace-Young");
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -313,8 +313,8 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -477,9 +477,9 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
   NonlinearImplicitSystem & system =
     es.get_system<NonlinearImplicitSystem>("Laplace-Young");
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -488,8 +488,8 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 

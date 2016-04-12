@@ -108,7 +108,7 @@ int main (int argc, char ** argv)
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D.  We instruct the mesh generator
-  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+  // to build a mesh of 8x8 Quad9 elements in 2D, or Hex27
   // elements in 3D.  Building these higher-order elements allows
   // us to use higher-order approximation, as in example 3.
   if (dim == 2)

@@ -52,7 +52,7 @@ private:
 public:
 
   /**
-   * Constructor.  Requires a \p \pMeshlessInterpolation object.
+   * Constructor.  Requires a MeshlessInterpolation object.
    */
   MeshlessInterpolationFunction (const MeshfreeInterpolation & mfi,
                                  Threads::spin_mutex & mutex) :
@@ -77,8 +77,8 @@ public:
   virtual UniquePtr<FunctionBase<Number> > clone () const;
 
   /**
-   * @returns the value at point \p p and time
-   * \p time, which defaults to zero.
+   * @returns the value at point p and time
+   * time, which defaults to zero.
    */
   Number operator() (const Point & p,
                      const Real time=0.);

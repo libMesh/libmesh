@@ -27,7 +27,7 @@
 // with Infinite Elements enabled.  Otherwise, this
 // example will abort.
 // This example intends to demonstrate the similarities
-// between the \p FE and the \p InfFE classes in libMesh.
+// between the FE and the InfFE classes in libMesh.
 // The matrices are assembled according to the wave equation.
 // However, for practical applications a time integration
 // scheme (as introduced in subsequent examples) should be
@@ -131,9 +131,9 @@ int main (int argc, char ** argv)
   // automatic way.
   //
   // Right now, the simplified interface is used, automatically
-  // determining the origin.  Check \p MeshBase for a generalized
+  // determining the origin.  Check MeshBase for a generalized
   // method that can even return the element faces of interior
-  // vibrating surfaces.  The \p bool determines whether to be
+  // vibrating surfaces.  The bool determines whether to be
   // verbose.
   InfElemBuilder builder(mesh);
   builder.build_inf_elem(true);
@@ -166,9 +166,9 @@ int main (int argc, char ** argv)
   // the elements find their neighbors again.
   mesh.find_neighbors();
 
-  // Create an equation systems object, where \p ThinSystem
+  // Create an equation systems object, where ThinSystem
   // offers only the crucial functionality for solving a
-  // system.  Use \p ThinSystem when you want the sleekest
+  // system.  Use ThinSystem when you want the sleekest
   // system possible.
   EquationSystems equation_systems (mesh);
 
@@ -180,14 +180,14 @@ int main (int argc, char ** argv)
   // Create an FEType describing the approximation
   // characteristics of the InfFE object.  Note that
   // the constructor automatically defaults to some
-  // sensible values.  But use \p FIRST order
+  // sensible values.  But use FIRST order
   // approximation.
   FEType fe_type(FIRST);
 
   // Add the variable "p" to "Wave".  Note that there exist
   // various approaches in adding variables.  In example 3,
-  // \p add_variable took the order of approximation and used
-  // default values for the \p FEFamily, while here the \p FEType
+  // add_variable took the order of approximation and used
+  // default values for the FEFamily, while here the FEType
   // is used.
   equation_systems.get_system("Wave").add_variable("p", fe_type);
 
@@ -196,8 +196,8 @@ int main (int argc, char ** argv)
   equation_systems.get_system("Wave").attach_assemble_function (assemble_wave);
 
   // Set the speed of sound and fluid density
-  // as \p EquationSystems parameter,
-  // so that \p assemble_wave() can access it.
+  // as EquationSystems parameter,
+  // so that assemble_wave() can access it.
   equation_systems.parameters.set<Real>("speed")         = 1.;
   equation_systems.parameters.set<Real>("fluid density") = 1.;
 
@@ -244,7 +244,7 @@ void assemble_wave(EquationSystems & es,
   // Get a reference to the system we are solving.
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Wave");
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
   const DofMap & dof_map = system.get_dof_map();
@@ -260,8 +260,8 @@ void assemble_wave(EquationSystems & es,
   const FEType & fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  Check ex5 for details.
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // Do the same for an infinite element.
@@ -319,8 +319,8 @@ void assemble_wave(EquationSystems & es,
 
       // The mesh contains both finite and infinite elements.  These
       // elements are handled through different classes, namely
-      // \p FE and \p InfFE, respectively.  However, since both
-      // are derived from \p FEBase, they share the same interface,
+      // FE and InfFE, respectively.  However, since both
+      // are derived from FEBase, they share the same interface,
       // and overall burden of coding is @e greatly reduced through
       // using a pointer, which is adjusted appropriately to the
       // current element type.
@@ -335,16 +335,16 @@ void assemble_wave(EquationSystems & es,
       // have.  Aske the element of what type it is:
       if (elem->infinite())
         {
-          // We have an infinite element.  Let \p cfe point
-          // to our \p InfFE object.  This is handled through
-          // an UniquePtr.  Through the \p UniquePtr::get() we "borrow"
-          // the pointer, while the \p  UniquePtr \p inf_fe is
+          // We have an infinite element.  Let cfe point
+          // to our InfFE object.  This is handled through
+          // a UniquePtr.  Through the UniquePtr::get() we "borrow"
+          // the pointer, while the  UniquePtr inf_fe is
           // still in charge of memory management.
           cfe = inf_fe.get();
         }
       else
         {
-          // This is a conventional finite element.  Let \p fe handle it.
+          // This is a conventional finite element.  Let fe handle it.
           cfe = fe.get();
 
           // Boundary conditions.
@@ -374,26 +374,26 @@ void assemble_wave(EquationSystems & es,
       const std::vector<std::vector<RealGradient> > & dphi = cfe->get_dphi();
 
       // The infinite elements need more data fields than conventional FE.
-      // These are the gradients of the phase term \p dphase, an additional
-      // radial weight for the test functions \p Sobolev_weight, and its
+      // These are the gradients of the phase term dphase, an additional
+      // radial weight for the test functions Sobolev_weight, and its
       // gradient.
       //
       // Note that these data fields are also initialized appropriately by
-      // the \p FE method, so that the weak form (below) is valid for @e both
+      // the FE method, so that the weak form (below) is valid for @e both
       // finite and infinite elements.
       const std::vector<RealGradient> & dphase  = cfe->get_dphase();
       const std::vector<Real> &         weight  = cfe->get_Sobolev_weight();
       const std::vector<RealGradient> & dweight = cfe->get_Sobolev_dweight();
 
-      // Now this is all independent of whether we use an \p FE
-      // or an \p InfFE.  Nice, hm? ;-)
+      // Now this is all independent of whether we use an FE
+      // or an InfFE.  Nice, hm? ;-)
       //
       // Compute the element-specific data, as described
       // in previous examples.
       cfe->reinit (elem);
 
       // Zero the element matrices.  Boundary conditions were already
-      // processed in the \p FE-only section, see above.
+      // processed in the FE-only section, see above.
       Ke.resize (dof_indices.size(), dof_indices.size());
       Ce.resize (dof_indices.size(), dof_indices.size());
       Me.resize (dof_indices.size(), dof_indices.size());
@@ -421,8 +421,8 @@ void assemble_wave(EquationSystems & es,
           // weight, described before, is part of the trial space.
           //
           // For the finite elements, though, these matrices are symmetric
-          // just as we know them, since the additional fields \p dphase,
-          // \p weight, and \p dweight are initialized appropriately.
+          // just as we know them, since the additional fields dphase,
+          // weight, and dweight are initialized appropriately.
           //
           // test functions:    weight[qp]*phi[i][qp]
           // trial functions:   phi[j][qp]
@@ -467,7 +467,7 @@ void assemble_wave(EquationSystems & es,
 
       // The element matrices are now built for this element.
       // Collect them in Ke, and then add them to the global matrix.
-      // The \p SparseMatrix::add_matrix() member does this for us.
+      // The SparseMatrix::add_matrix() member does this for us.
       Ke.add(1./speed        , Ce);
       Ke.add(1./(speed*speed), Me);
 

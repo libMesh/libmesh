@@ -256,7 +256,7 @@ protected:
   sys_type & _system;
 
   /**
-   * An UniquePtr to a SolutionHistory object. Default is
+   * A UniquePtr to a SolutionHistory object. Default is
    * NoSolutionHistory, which the user can override by declaring a
    * different kind of SolutionHistory in the application
    */

@@ -65,7 +65,7 @@
 #include "libmesh/getpot.h"
 
 // This example will solve a linear transient system,
-// so we need to include the \p TransientLinearImplicitSystem definition.
+// so we need to include the TransientLinearImplicitSystem definition.
 #include "libmesh/transient_system.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/vector_value.h"
@@ -261,14 +261,14 @@ void assemble (EquationSystems & es,
   FEType fe_type = system.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe      (FEBase::build(dim, fe_type));
   UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
   // A Gauss quadrature rule for numerical integration.
-  // Let the \p FEType object decide what order rule is appropriate.
+  // Let the FEType object decide what order rule is appropriate.
   QGauss qrule (dim,   fe_type.default_quadrature_order());
   QGauss qface (dim-1, fe_type.default_quadrature_order());
 
@@ -293,9 +293,9 @@ void assemble (EquationSystems & es,
   // The XY locations of the quadrature points used for face integration
   //const std::vector<Point>& qface_points = fe_face->get_xyz();
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -320,7 +320,7 @@ void assemble (EquationSystems & es,
   // live on the local processor. We will compute the element
   // matrix and right-hand-side contribution.  Since the mesh
   // will be refined we want to only consider the ACTIVE elements,
-  // hence we use a variant of the \p active_elem_iterator.
+  // hence we use a variant of the active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
@@ -422,7 +422,7 @@ void assemble (EquationSystems & es,
       // solution continuity, i.e. they are not really "free".  We need
       // to constrain those DOFs in terms of non-constrained DOFs to
       // ensure a continuous solution.  The
-      // \p DofMap::constrain_element_matrix_and_vector() method does
+      // DofMap::constrain_element_matrix_and_vector() method does
       // just that.
 
       // However, constraining both the sparse matrix (and right hand
@@ -437,8 +437,8 @@ void assemble (EquationSystems & es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-      // and \p NumericVector::add_vector() members do this for us.
+      // right-hand-side vector.  The SparseMatrix::add_matrix()
+      // and NumericVector::add_vector() members do this for us.
       system.matrix->add_matrix (Ke, dof_indices);
       system.get_matrix("Preconditioner").add_matrix (Ke, dof_indices);
       system.rhs->add_vector (Fe, dof_indices);

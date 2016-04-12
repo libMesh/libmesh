@@ -193,15 +193,15 @@ int main (int argc, char** argv)
   t_system.attach_init_function      (apply_initial);
 
   // Set the time step size, and optionally the
-  // Newmark parameters, so that \p NewmarkSystem can
+  // Newmark parameters, so that NewmarkSystem can
   // compute integration constants.  Here we simply use
   // pass only the time step and use default values
-  // for \p alpha=.25  and \p delta=.5.
+  // for alpha=.25  and delta=.5.
   t_system.set_newmark_parameters(delta_t);
 
   // Set the speed of sound and fluid density
-  // as \p EquationSystems parameter,
-  // so that \p assemble_wave() can access it.
+  // as EquationSystems parameter,
+  // so that assemble_wave() can access it.
   equation_systems.parameters.set<Real>("speed")          = 1000.;
   equation_systems.parameters.set<Real>("fluid density")  = 1000.;
 
@@ -232,7 +232,7 @@ int main (int argc, char** argv)
   // Now solve for each time step.
   // For convenience, use a local buffer of the
   // current time.  But once this time is updated,
-  // also update the \p EquationSystems parameter
+  // also update the EquationSystems parameter
   // Start with t_time = 0 and write a short header
   // to the nodal result file
   res_out << "# pressure at node " << res_node_no << "\n"
@@ -243,7 +243,7 @@ int main (int argc, char** argv)
   for (unsigned int time_step=0; time_step<n_time_steps; time_step++)
     {
       // Update the time.  Both here and in the
-      // \p EquationSystems object
+      // EquationSystems object
       t_system.time += delta_t;
 
       // Update the rhs.
@@ -257,7 +257,7 @@ int main (int argc, char** argv)
       // the rhs vector is considered in each time step.
       if (time_step == 0)
         {
-          // The local function \p fill_dirichlet_bc()
+          // The local function fill_dirichlet_bc()
           // may also set Dirichlet boundary conditions for the
           // matrix.  When you set the flag as shown below,
           // the flag will return true.  If you want it to return
@@ -374,8 +374,8 @@ void assemble_wave(EquationSystems & es,
   DenseMatrix<Number> zero_matrix;
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -395,7 +395,7 @@ void assemble_wave(EquationSystems & es,
   // points.
   const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
   const DofMap & dof_map = t_system.get_dof_map();
@@ -591,10 +591,10 @@ void fill_dirichlet_bc(EquationSystems & es,
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
 
-  // Get \p libMesh's  \f$ \pi \f$
+  // Get libMesh's pi
   const Real pi = libMesh::pi;
 
-  // Ask the \p EquationSystems flag whether
+  // Ask the EquationSystems flag whether
   // we should do this also for the matrix
   const bool do_for_matrix =
     es.parameters.get<bool>("Newmark set BC for Matrix");
@@ -608,7 +608,7 @@ void fill_dirichlet_bc(EquationSystems & es,
       const Node & curr_node = mesh.node(n_cnt);
 
       // Check if Dirichlet BCs should be applied to this node.
-      // Use the \p TOLERANCE from \p mesh_common.h as tolerance.
+      // Use the TOLERANCE from mesh_common.h as tolerance.
       // Here a pressure value is applied if the z-coord.
       // is equal to 4, which corresponds to one end of the
       // pipe-mesh in this directory.

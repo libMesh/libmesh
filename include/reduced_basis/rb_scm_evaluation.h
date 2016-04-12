@@ -215,7 +215,7 @@ private:
 
   /**
    * A pointer to to the object that stores the theta expansion.
-   * This is not an UniquePtr since we may want to share it.
+   * This is not a UniquePtr since we may want to share it.
    * (Note: a shared_ptr would be a good option here.)
    */
   RBThetaExpansion * rb_theta_expansion;

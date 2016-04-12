@@ -207,9 +207,9 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
   // application.
   PerfLog perf_log ("Biharmonic Residual and Jacobian", false);
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = get_dof_map();
 
@@ -218,8 +218,8 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(_biharmonic._dim, fe_type));
 
@@ -472,8 +472,8 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-      // and \p NumericVector::add_vector() members do this for us.
+      // right-hand-side vector.  The SparseMatrix::add_matrix()
+      // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       if (R)
@@ -509,9 +509,9 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
   // application.
   PerfLog perf_log ("Biharmonic bounds", false);
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = get_dof_map();
 
@@ -520,8 +520,8 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(_biharmonic._dim, fe_type));
 

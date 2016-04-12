@@ -90,9 +90,9 @@ using namespace libMesh;
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Poisson problem.  Note that the
-// function will take the \p EquationSystems object and the
+// function will take the EquationSystems object and the
 // name of the system we are assembling as input.  From the
-// \p EquationSystems object we have acess to the \p Mesh and
+// EquationSystems object we have acess to the Mesh and
 // other objects we might need.
 void assemble_poisson(EquationSystems & es,
                       const std::string & system_name);
@@ -180,7 +180,7 @@ int main (int argc, char ** argv)
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D.  We instruct the mesh generator
-  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+  // to build a mesh of 8x8 Quad9 elements in 2D, or Hex27
   // elements in 3D.  Building these higher-order elements allows
   // us to use higher-order approximation, as in example 3.
 
@@ -337,9 +337,9 @@ void assemble_poisson(EquationSystems & es,
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Poisson");
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -348,8 +348,8 @@ void assemble_poisson(EquationSystems & es,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -545,8 +545,8 @@ void assemble_poisson(EquationSystems & es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-      // and \p NumericVector::add_vector() members do this for us.
+      // right-hand-side vector.  The SparseMatrix::add_matrix()
+      // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       perf_log.push ("matrix insertion");

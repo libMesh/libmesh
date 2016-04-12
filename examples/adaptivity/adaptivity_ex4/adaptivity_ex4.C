@@ -62,9 +62,9 @@ using namespace libMesh;
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Biharmonic problem.  Note that the
-// function will take the \p EquationSystems object and the
+// function will take the EquationSystems object and the
 // name of the system we are assembling as input.  From the
-// \p EquationSystems object we have acess to the \p Mesh and
+// EquationSystems object we have acess to the Mesh and
 // other objects we might need.
 void assemble_biharmonic(EquationSystems & es,
                          const std::string & system_name);
@@ -364,10 +364,10 @@ int main(int argc, char ** argv)
               mesh_refinement.uniformly_refine(1);
             }
 
-          // This call reinitializes the \p EquationSystems object for
+          // This call reinitializes the EquationSystems object for
           // the newly refined mesh.  One of the steps in the
-          // reinitialization is projecting the \p solution,
-          // \p old_solution, etc... vectors from the old mesh to
+          // reinitialization is projecting the solution,
+          // old_solution, etc... vectors from the old mesh to
           // the current one.
           equation_systems.reinit ();
         }
@@ -585,9 +585,9 @@ void assemble_biharmonic(EquationSystems & es,
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Biharmonic");
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -596,8 +596,8 @@ void assemble_biharmonic(EquationSystems & es,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -826,8 +826,8 @@ void assemble_biharmonic(EquationSystems & es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-      // and \p NumericVector::add_vector() members do this for us.
+      // right-hand-side vector.  The SparseMatrix::add_matrix()
+      // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       perf_log.push ("matrix insertion");
