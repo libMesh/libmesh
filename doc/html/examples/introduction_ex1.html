@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <title>libMesh - A C++ Finite Element Library</title>
-  <meta name="author" content="Benjamin S. Kirk">
+  <meta name="author" content="libMesh development team">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
   <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
@@ -14,7 +14,7 @@
       <li><a href="../index.html">Home</a></li>
       <li><a href="../support.html">About Us</a></li>
       <li><a href="../publications.html">Publications</a></li>
-      <li><a href="../developers.html">Developers</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
       <li><a href="../installation.html">Installation</a></li>
       <li><a href="../examples.html">Examples</a></li>
      <li><a href="../doxygen/index.html">Documentation</a></li>
@@ -29,7 +29,7 @@
         <li><a href="../index.html">Home</a></li>
         <li><a href="../support.html">About Us</a></li>
         <li><a href="../publications.html">Publications</a></li>
-        <li><a href="../developers.html">Developers</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
         <li><a href="../installation.html">Installation</a></li>
         <li><a href="../examples.html">Examples</a></li>
         <li><a href="../doxygen/index.html">Documentation</a></li>
@@ -38,252 +38,18 @@
 
 <div id="content">
 
-<a name="comments"></a> 
-<br><br><br> <h1> The source file introduction_ex1.C with comments: </h1> 
-<div class = "comment">
-</div>
-
-<div class ="fragment">
-<pre>
-        #include &lt;iostream&gt;
-</pre>
-</div>
-<div class = "comment">
-Functions to initialize the library.
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "libmesh/libmesh.h"
-</pre>
-</div>
-<div class = "comment">
-Basic include files needed for the mesh functionality.
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "libmesh/mesh.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Bring in everything from the libMesh namespace
-</div>
-
-<div class ="fragment">
-<pre>
-        using namespace libMesh;
-        
-        int main (int argc, char** argv)
-        {
-</pre>
-</div>
-<div class = "comment">
-Initialize the library.  This is necessary because the library
-may depend on a number of other libraries (i.e. MPI and PETSc)
-that require initialization before use.  When the LibMeshInit
-object goes out of scope, other libraries and resources are
-finalized.
-</div>
-
-<div class ="fragment">
-<pre>
-          LibMeshInit init (argc, argv);
-        
-</pre>
-</div>
-<div class = "comment">
-Check for proper usage. The program is designed to be run
-as follows:
-./ex1 -d DIM input_mesh_name [-o output_mesh_name]
-where [output_mesh_name] is an optional parameter giving
-a filename to write the mesh into.
-</div>
-
-<div class ="fragment">
-<pre>
-          if (argc &lt; 4)
-            {
-</pre>
-</div>
-<div class = "comment">
-This handy function will print the file name, line number,
-specified message, and then throw an exception.
-</div>
-
-<div class ="fragment">
-<pre>
-              libmesh_error_msg("Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2 in.mesh [-o out.mesh]");
-            }
-        
-</pre>
-</div>
-<div class = "comment">
-Get the dimensionality of the mesh from argv[2]
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int dim = std::atoi(argv[2]);
-        
-</pre>
-</div>
-<div class = "comment">
-Skip higher-dimensional examples on a lower-dimensional libMesh build
-</div>
-
-<div class ="fragment">
-<pre>
-          libmesh_example_requires(dim &lt;= LIBMESH_DIM, "2D/3D support");
-        
-</pre>
-</div>
-<div class = "comment">
-Create a mesh, with dimension to be overridden later, on the
-default MPI communicator.
-</div>
-
-<div class ="fragment">
-<pre>
-          Mesh mesh(init.comm());
-        
-</pre>
-</div>
-<div class = "comment">
-We may need XDR support compiled in to read binary .xdr files
-</div>
-
-<div class ="fragment">
-<pre>
-          std::string input_filename = argv[3];
-        #ifndef LIBMESH_HAVE_XDR
-          libmesh_example_requires(input_filename.rfind(".xdr") &gt;=
-                                 input_filename.size(), "XDR support");
-        #endif
-        
-</pre>
-</div>
-<div class = "comment">
-Read the input mesh.
-</div>
-
-<div class ="fragment">
-<pre>
-          mesh.read (argv[3]);
-        
-</pre>
-</div>
-<div class = "comment">
-Print information about the mesh to the screen.
-</div>
-
-<div class ="fragment">
-<pre>
-          mesh.print_info();
-        
-</pre>
-</div>
-<div class = "comment">
-Write the output mesh if the user specified an
-output file name.
-</div>
-
-<div class ="fragment">
-<pre>
-          if (argc &gt;= 6 && std::string("-o") == argv[4])
-            {
-</pre>
-</div>
-<div class = "comment">
-We may need XDR support compiled in to read binary .xdr files
-</div>
-
-<div class ="fragment">
-<pre>
-              std::string output_filename = argv[5];
-        #ifndef LIBMESH_HAVE_XDR
-              libmesh_example_requires(output_filename.rfind(".xdr") &gt;=
-                                     output_filename.size(), "XDR support");
-        #endif
-        
-              mesh.write (argv[5]);
-            }
-        
-</pre>
-</div>
-<div class = "comment">
-All done.  libMesh objects are destroyed here.  Because the
-LibMeshInit object was created first, its destruction occurs
-last, and it's destructor finalizes any external libraries and
-checks for leaked memory.
-</div>
-
-<div class ="fragment">
-<pre>
-          return 0;
-        }
-</pre>
-</div>
-
-<a name="nocomments"></a> 
-<br><br><br> <h1> The source file introduction_ex1.C without comments: </h1> 
-<pre> 
-  #include &lt;iostream&gt;
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
-  
-  using namespace libMesh;
-  
-  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
-  {
-    LibMeshInit init (argc, argv);
-  
-    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 4)
-      {
-        libmesh_error_msg(<B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -d 2 in.mesh [-o out.mesh]&quot;</FONT></B>);
-      }
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = std::atoi(argv[2]);
-  
-    libmesh_example_requires(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
-  
-    Mesh mesh(init.comm());
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string input_filename = argv[3];
-  #ifndef LIBMESH_HAVE_XDR
-    libmesh_example_requires(input_filename.rfind(<B><FONT COLOR="#BC8F8F">&quot;.xdr&quot;</FONT></B>) &gt;=
-                           input_filename.size(), <B><FONT COLOR="#BC8F8F">&quot;XDR support&quot;</FONT></B>);
-  #endif
-  
-    mesh.read (argv[3]);
-  
-    mesh.print_info();
-  
-    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &gt;= 6 &amp;&amp; std::string(<B><FONT COLOR="#BC8F8F">&quot;-o&quot;</FONT></B>) == argv[4])
-      {
-        <B><FONT COLOR="#5F9EA0">std</FONT></B>::string output_filename = argv[5];
-  #ifndef LIBMESH_HAVE_XDR
-        libmesh_example_requires(output_filename.rfind(<B><FONT COLOR="#BC8F8F">&quot;.xdr&quot;</FONT></B>) &gt;=
-                               output_filename.size(), <B><FONT COLOR="#BC8F8F">&quot;XDR support&quot;</FONT></B>);
-  #endif
-  
-        mesh.write (argv[5]);
-      }
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-  }
-</pre> 
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/introduction/introduction_ex1" target="_blank">Open introduction_ex1 in new tab.</a>
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 ***************************************************************
 * Running Example introduction_ex1:
-*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda 
+*   example-opt -d 3 /Users/petejw/projects/libmesh_git/build/../reference_elements/3D/one_hex27.xda
 ***************************************************************
  
  Mesh Information:
-  mesh_dimension()=3
+  elem_dimensions()={3}
   spatial_dimension()=3
   n_nodes()=27
     n_local_nodes()=27
@@ -297,23 +63,41 @@ checks for leaked memory.
   processor_id()=0
 
 
- --------------------------------------------------------------------
-| Time:           Wed Oct 22 13:38:53 2014                           |
-| OS:             Linux                                              |
-| HostName:       benkirk                                            |
-| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
-| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
-| Machine:        x86_64                                             |
-| Username:       benkirk                                            |
-| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
-|  '--enable-everything'                                             |
-|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
-|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
-|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
-|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
- --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:50:29 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.080824, Active time=0.000495                                             |
+| libMesh Performance: Alive time=0.362843, Active time=0.000411                                             |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -321,31 +105,31 @@ checks for leaked memory.
 |                                                                                                            |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()            1          0.0001      0.000056    0.0001      0.000056    11.31    11.31    |
-|   renumber_nodes_and_elem()   2          0.0000      0.000011    0.0000      0.000011    4.44     4.44     |
+|   find_neighbors()            1          0.0001      0.000062    0.0001      0.000062    15.09    15.09    |
+|   renumber_nodes_and_elem()   2          0.0000      0.000000    0.0000      0.000000    0.24     0.24     |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   set_node_processor_ids()    1          0.0000      0.000030    0.0000      0.000030    6.06     6.06     |
-|   single_partition()          1          0.0000      0.000004    0.0000      0.000004    0.81     0.81     |
+|   set_node_processor_ids()    1          0.0000      0.000039    0.0000      0.000039    9.49     9.49     |
+|   single_partition()          1          0.0000      0.000006    0.0000      0.000006    1.46     1.46     |
 |                                                                                                            |
 | XdrIO                                                                                                      |
-|   read()                      1          0.0004      0.000383    0.0004      0.000383    77.37    77.37    |
+|   read()                      1          0.0003      0.000303    0.0003      0.000303    73.72    73.72    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       6          0.0005                                          100.00            |
+| Totals:                       6          0.0004                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example introduction_ex1:
-*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda 
+*   example-opt -d 3 /Users/petejw/projects/libmesh_git/build/../reference_elements/3D/one_hex27.xda
 ***************************************************************
 ***************************************************************
 * Running Example introduction_ex1:
-*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xda 
+*   example-opt -d 3 /Users/petejw/projects/libmesh_git/build/../reference_elements/3D/one_hex27.xda -o output.xda
 ***************************************************************
  
  Mesh Information:
-  mesh_dimension()=3
+  elem_dimensions()={3}
   spatial_dimension()=3
   n_nodes()=27
     n_local_nodes()=27
@@ -359,23 +143,41 @@ checks for leaked memory.
   processor_id()=0
 
 
- --------------------------------------------------------------------
-| Time:           Wed Oct 22 13:38:54 2014                           |
-| OS:             Linux                                              |
-| HostName:       benkirk                                            |
-| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
-| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
-| Machine:        x86_64                                             |
-| Username:       benkirk                                            |
-| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
-|  '--enable-everything'                                             |
-|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
-|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
-|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
-|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
- --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:50:29 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.081955, Active time=0.000894                                             |
+| libMesh Performance: Alive time=0.004875, Active time=0.000422                                             |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -383,32 +185,33 @@ checks for leaked memory.
 |                                                                                                            |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    6.38     6.38     |
-|   renumber_nodes_and_elem()   2          0.0000      0.000012    0.0000      0.000012    2.57     2.57     |
+|   find_neighbors()            1          0.0000      0.000029    0.0000      0.000029    6.87     6.87     |
+|   renumber_nodes_and_elem()   2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   write()                     1          0.0001      0.000101    0.0002      0.000237    23.93    56.16    |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   set_node_processor_ids()    1          0.0000      0.000027    0.0000      0.000027    3.02     3.02     |
-|   single_partition()          1          0.0000      0.000004    0.0000      0.000004    0.45     0.45     |
+|   set_node_processor_ids()    1          0.0000      0.000021    0.0000      0.000021    4.98     4.98     |
+|   single_partition()          1          0.0000      0.000002    0.0000      0.000002    0.47     0.47     |
 |                                                                                                            |
 | XdrIO                                                                                                      |
-|   read()                      1          0.0004      0.000388    0.0004      0.000388    43.40    43.40    |
-|   write()                     1          0.0004      0.000395    0.0004      0.000395    44.18    44.18    |
+|   read()                      1          0.0001      0.000134    0.0001      0.000134    31.75    31.75    |
+|   write()                     1          0.0001      0.000135    0.0001      0.000135    31.99    31.99    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       7          0.0009                                          100.00            |
+| Totals:                       8          0.0004                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example introduction_ex1:
-*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xda 
+*   example-opt -d 3 /Users/petejw/projects/libmesh_git/build/../reference_elements/3D/one_hex27.xda -o output.xda
 ***************************************************************
 ***************************************************************
 * Running Example introduction_ex1:
-*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xdr 
+*   example-opt -d 3 /Users/petejw/projects/libmesh_git/build/../reference_elements/3D/one_hex27.xda -o output.xdr
 ***************************************************************
  
  Mesh Information:
-  mesh_dimension()=3
+  elem_dimensions()={3}
   spatial_dimension()=3
   n_nodes()=27
     n_local_nodes()=27
@@ -422,23 +225,41 @@ checks for leaked memory.
   processor_id()=0
 
 
- --------------------------------------------------------------------
-| Time:           Wed Oct 22 13:38:54 2014                           |
-| OS:             Linux                                              |
-| HostName:       benkirk                                            |
-| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
-| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
-| Machine:        x86_64                                             |
-| Username:       benkirk                                            |
-| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
-|  '--enable-everything'                                             |
-|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
-|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
-|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
-|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
- --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:50:29 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.081958, Active time=0.000858                                             |
+| libMesh Performance: Alive time=0.004442, Active time=0.000402                                             |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -446,24 +267,25 @@ checks for leaked memory.
 |                                                                                                            |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    6.64     6.64     |
-|   renumber_nodes_and_elem()   2          0.0000      0.000013    0.0000      0.000013    3.15     3.15     |
+|   find_neighbors()            1          0.0000      0.000029    0.0000      0.000029    7.21     7.21     |
+|   renumber_nodes_and_elem()   2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   write()                     1          0.0001      0.000098    0.0002      0.000209    24.38    51.99    |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   set_node_processor_ids()    1          0.0000      0.000028    0.0000      0.000028    3.26     3.26     |
-|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    0.35     0.35     |
+|   set_node_processor_ids()    1          0.0000      0.000019    0.0000      0.000019    4.73     4.73     |
+|   single_partition()          1          0.0000      0.000002    0.0000      0.000002    0.50     0.50     |
 |                                                                                                            |
 | XdrIO                                                                                                      |
-|   read()                      1          0.0004      0.000385    0.0004      0.000385    44.87    44.87    |
-|   write()                     1          0.0004      0.000358    0.0004      0.000358    41.72    41.72    |
+|   read()                      1          0.0001      0.000143    0.0001      0.000143    35.57    35.57    |
+|   write()                     1          0.0001      0.000111    0.0001      0.000111    27.61    27.61    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       7          0.0009                                          100.00            |
+| Totals:                       8          0.0004                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example introduction_ex1:
-*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xdr 
+*   example-opt -d 3 /Users/petejw/projects/libmesh_git/build/../reference_elements/3D/one_hex27.xda -o output.xdr
 ***************************************************************
 ***************************************************************
 * Running Example introduction_ex1:
@@ -471,7 +293,7 @@ checks for leaked memory.
 ***************************************************************
  
  Mesh Information:
-  mesh_dimension()=3
+  elem_dimensions()={3}
   spatial_dimension()=3
   n_nodes()=27
     n_local_nodes()=27
@@ -485,23 +307,41 @@ checks for leaked memory.
   processor_id()=0
 
 
- --------------------------------------------------------------------
-| Time:           Wed Oct 22 13:38:54 2014                           |
-| OS:             Linux                                              |
-| HostName:       benkirk                                            |
-| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
-| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
-| Machine:        x86_64                                             |
-| Username:       benkirk                                            |
-| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
-|  '--enable-everything'                                             |
-|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
-|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
-|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
-|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
- --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:50:30 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.081111, Active time=0.000536                                             |
+| libMesh Performance: Alive time=0.004243, Active time=0.000189                                             |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -509,17 +349,17 @@ checks for leaked memory.
 |                                                                                                            |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    10.63    10.63    |
-|   renumber_nodes_and_elem()   2          0.0000      0.000011    0.0000      0.000011    4.10     4.10     |
+|   find_neighbors()            1          0.0000      0.000028    0.0000      0.000028    14.81    14.81    |
+|   renumber_nodes_and_elem()   2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   set_node_processor_ids()    1          0.0000      0.000031    0.0000      0.000031    5.78     5.78     |
-|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    0.56     0.56     |
+|   set_node_processor_ids()    1          0.0000      0.000018    0.0000      0.000018    9.52     9.52     |
+|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    1.59     1.59     |
 |                                                                                                            |
 | XdrIO                                                                                                      |
-|   read()                      1          0.0004      0.000423    0.0004      0.000423    78.92    78.92    |
+|   read()                      1          0.0001      0.000140    0.0001      0.000140    74.07    74.07    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       6          0.0005                                          100.00            |
+| Totals:                       6          0.0002                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
@@ -533,7 +373,7 @@ checks for leaked memory.
 ***************************************************************
  
  Mesh Information:
-  mesh_dimension()=3
+  elem_dimensions()={3}
   spatial_dimension()=3
   n_nodes()=27
     n_local_nodes()=27
@@ -547,23 +387,41 @@ checks for leaked memory.
   processor_id()=0
 
 
- --------------------------------------------------------------------
-| Time:           Wed Oct 22 13:38:55 2014                           |
-| OS:             Linux                                              |
-| HostName:       benkirk                                            |
-| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
-| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
-| Machine:        x86_64                                             |
-| Username:       benkirk                                            |
-| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
-|  '--enable-everything'                                             |
-|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
-|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
-|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
-|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
- --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:50:30 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.08387, Active time=0.000386                                              |
+| libMesh Performance: Alive time=0.003693, Active time=0.00013                                              |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -571,17 +429,17 @@ checks for leaked memory.
 |                                                                                                            |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    14.77    14.77    |
-|   renumber_nodes_and_elem()   2          0.0000      0.000011    0.0000      0.000011    5.70     5.70     |
+|   find_neighbors()            1          0.0000      0.000030    0.0000      0.000030    23.08    23.08    |
+|   renumber_nodes_and_elem()   2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   set_node_processor_ids()    1          0.0000      0.000038    0.0000      0.000038    9.84     9.84     |
-|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    0.78     0.78     |
+|   set_node_processor_ids()    1          0.0000      0.000019    0.0000      0.000019    14.62    14.62    |
+|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    2.31     2.31     |
 |                                                                                                            |
 | XdrIO                                                                                                      |
-|   read()                      1          0.0003      0.000266    0.0003      0.000266    68.91    68.91    |
+|   read()                      1          0.0001      0.000078    0.0001      0.000078    60.00    60.00    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       6          0.0004                                          100.00            |
+| Totals:                       6          0.0001                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
