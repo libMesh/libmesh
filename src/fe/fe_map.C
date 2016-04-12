@@ -71,6 +71,18 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point> & qp,
   // Start logging the reference->physical map initialization
   START_LOG("init_reference_to_physical_map()", "FEMap");
 
+  calculations_started = true;
+
+  // If the user forgot to request anything, we'll be safe and
+  // calculate everything:
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  if (!calculate_xyz && !calculate_dxyz && !calculate_d2xyz)
+    calculate_xyz = calculate_dxyz = calculate_d2xyz = true;
+#else
+  if (!calculate_xyz && !calculate_dxyz)
+    calculate_xyz = calculate_dxyz = true;
+#endif
+
   // The number of quadrature points.
   const std::size_t n_qp = qp.size();
 
