@@ -142,6 +142,9 @@ void FE<Dim,T>::reinit(const Elem * elem,
   // We now do this for 1D elements!
   // libmesh_assert_not_equal_to (Dim, 1);
 
+  // We're calculating now!  Time to determine what.
+  this->determine_calculations();
+
   // Build the side of interest
   const UniquePtr<Elem> side(elem->build_side(s));
 
@@ -252,6 +255,9 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
   // We don't do this for 1D elements!
   libmesh_assert_not_equal_to (Dim, 1);
 
+  // We're calculating now!  Time to determine what.
+  this->determine_calculations();
+
   // Build the side of interest
   const UniquePtr<Elem> edge(elem->build_edge(e));
 
@@ -332,6 +338,10 @@ void FE<Dim,T>::side_map (const Elem * elem,
                           const std::vector<Point> & reference_side_points,
                           std::vector<Point> &       reference_points)
 {
+  // We're calculating mappings - we need at least first order info
+  this->calculate_phi = true;
+  this->determine_calculations();
+
   unsigned int side_p_level = elem->p_level();
   if (elem->neighbor(s) != libmesh_nullptr)
     side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
