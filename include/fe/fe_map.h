@@ -871,6 +871,12 @@ protected:
    */
   mutable bool calculate_d2xyz;
 
+  /**
+   * FE classes should be able to reset calculations_started in a few
+   * special cases.
+   */
+  template <unsigned int Dim, FEFamily T>
+  friend class FE;
 
 private:
   /**
