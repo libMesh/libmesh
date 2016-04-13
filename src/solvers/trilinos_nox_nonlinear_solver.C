@@ -34,18 +34,13 @@
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/trilinos_preconditioner.h"
 
-// ---------- Standard Includes ----------
-#include <iostream>
-#include "Epetra_Vector.h"
-#include "Epetra_Operator.h"
-#include "Epetra_RowMatrix.h"
-#include "NOX_Epetra_Interface_Required.H" // base class
-#include "NOX_Epetra_Interface_Jacobian.H" // base class
-#include "NOX_Epetra_Interface_Preconditioner.H" // base class
+// Trilinos includes
+#include "libmesh/ignore_warnings.h"
 #include "NOX_Epetra_MatrixFree.H"
 #include "NOX_Epetra_LinearSystem_AztecOO.H"
 #include "NOX_Epetra_Group.H"// class definition
 #include "NOX_Epetra_Vector.H"
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

@@ -33,10 +33,13 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
 
-// Trilinos includes
+// Trilinos includes.  Ignore many unused parameter warnings coming
+// from these headers.
+#include "libmesh/ignore_warnings.h"
 #include "Epetra_Operator.h"
 #include "Epetra_FECrsMatrix.h"
 #include "Teuchos_ParameterList.hpp"
+#include "libmesh/restore_warnings.h"
 
 // C++ includes
 #include <cstddef>
