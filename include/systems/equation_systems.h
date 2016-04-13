@@ -318,6 +318,9 @@ public:
    * If XdrMODE is omitted, it will be inferred as READ for filenames
    * containing .xda or as DECODE for filenames containing .xdr
    *
+   * @param name Name of the file to be read.
+   * @param read_flags Single flag created by bitwise-OR'ing several flags together.
+   * @param mode Controls whether reading is done in binary or ascii mode.
    * @param partition_agnostic If true then the mesh and degrees of freedom
    * will be temporarily renumbered in a partition agnostic way so that
    * files written using "n" mpi processes can be re-read on "m" mpi
@@ -362,6 +365,9 @@ public:
    * If XdrMODE is omitted, it will be inferred as WRITE for filenames
    * containing .xda or as ENCODE for filenames containing .xdr
    *
+   * @param name Name of the file to be read.
+   * @param write_flags Single flag created by bitwise-OR'ing several flags together.
+   * @param mode Controls whether reading is done in binary or ascii mode.
    * @param partition_agnostic If true then the mesh and degrees of freedom
    * will be temporarily renumbered in a partition agnostic way so that
    * files written using "n" mpi processes can be re-read on "m" mpi
@@ -479,6 +485,8 @@ private:
    * Actual read implementation.  This can be called repeatedly
    * inside a try-catch block in an attempt to read broken files.
    *
+   * @param name Name of the file to be read.
+   * @param read_flags Single flag created by bitwise-OR'ing several flags together.
    * @param partition_agnostic If true then the mesh and degrees of freedom
    * will be temporarily renumbered in a partition agnostic way so that
    * files written using "n" mpi processes can be re-read on "m" mpi

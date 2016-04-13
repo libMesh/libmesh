@@ -421,7 +421,7 @@ public:
   Order get_order()  const { return static_cast<Order>(fe_type.order + _p_level); }
 
   /**
-   * @sets the *base* FE order of the finite element.
+   * Sets the *base* FE order of the finite element.
    */
   void set_fe_order(int new_order) { fe_type.order = new_order; }
 

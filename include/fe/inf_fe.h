@@ -307,7 +307,8 @@ public:
   /**
    * @returns the number of shape functions associated with this
    * infinite element.  Currently, we have \p o_radial+1 modes in
-   * radial direction, and FE<Dim-1,T>::n_dofs(...) in the base.
+   * radial direction, and \code FE<Dim-1,T>::n_dofs(...) \endcode
+   * in the base.
    */
   static unsigned int n_dofs(const FEType & fet,
                              const ElemType inf_elem_type);

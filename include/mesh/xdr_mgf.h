@@ -202,7 +202,7 @@ protected:
 #ifdef LIBMESH_HAVE_XDR
 
   /**
-   * Pointer to the standard \p{xdr}
+   * Pointer to the standard \p xdr
    * struct.  See the standard
    * header file \p rpc/rpc.h
    * for more information.

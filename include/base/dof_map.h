@@ -89,7 +89,7 @@ typedef std::map<dof_id_type, Real,
  * The constraint matrix storage format.
  * We're using a class instead of a typedef to allow forward
  * declarations and future flexibility.  Don't delete this from
- * a pointer-to-std::map; the destructor isn't virtual!
+ * a pointer-to-std-map; the destructor isn't virtual!
  */
 class DofConstraints : public std::map<dof_id_type,
                                        DofConstraintRow,
@@ -137,7 +137,7 @@ typedef std::map<const Node *, Real,
  * The Node constraint storage format.
  * We're using a class instead of a typedef to allow forward
  * declarations and future flexibility.  Don't delete this from
- * a pointer-to-std::map; the destructor isn't virtual!
+ * a pointer-to-std-map; the destructor isn't virtual!
  */
 class NodeConstraints : public std::map<const Node *,
                                         std::pair<NodeConstraintRow,Point>,
@@ -1101,8 +1101,8 @@ private:
    * Helper function that gets the dof indices on the current element
    * for a non-SCALAR type variable.
    *
-   * @param tot_size In DEBUG mode this will add up the total number of
-   * dof indices that should have been added to di.
+   * In DEBUG mode, the tot_size parameter will add up the total
+   * number of dof indices that should have been added to di.
    */
   void _dof_indices (const Elem * const elem,
                      int p_level,

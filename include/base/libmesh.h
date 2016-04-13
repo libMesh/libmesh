@@ -51,8 +51,8 @@ namespace libMesh
  *
  * For most users, a single LibMeshInit object should be created at
  * the start of your main() function.  This object replaces the
- * previous libMesh::init()/libMesh::close() methods, which are
- * now deprecated.
+ * previous \code libMesh::init()/libMesh::close() \endcode methods,
+ * which are now deprecated.
  */
 class LibMeshInit
 {
