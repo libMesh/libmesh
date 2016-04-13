@@ -124,16 +124,16 @@ protected:
   Teuchos::ParameterList _param_list;
 
   // Epetra_Operator interface
-  virtual int SetUseTranspose(bool UseTranspose);
-  virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const;
-  virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const;
-  virtual double NormInf() const;
-  virtual const char * Label() const;
-  virtual bool UseTranspose() const;
-  virtual bool HasNormInf() const;
-  virtual const Epetra_Comm & Comm() const;
-  virtual const Epetra_Map & OperatorDomainMap() const;
-  virtual const Epetra_Map & OperatorRangeMap() const;
+  virtual int SetUseTranspose(bool UseTranspose) libmesh_override;
+  virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const libmesh_override;
+  virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const libmesh_override;
+  virtual double NormInf() const libmesh_override;
+  virtual const char * Label() const libmesh_override;
+  virtual bool UseTranspose() const libmesh_override;
+  virtual bool HasNormInf() const libmesh_override;
+  virtual const Epetra_Comm & Comm() const libmesh_override;
+  virtual const Epetra_Map & OperatorDomainMap() const libmesh_override;
+  virtual const Epetra_Map & OperatorRangeMap() const libmesh_override;
 };
 
 
