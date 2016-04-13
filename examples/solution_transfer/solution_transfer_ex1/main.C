@@ -61,7 +61,12 @@ int main(int argc, char * argv[])
 {
   LibMeshInit init (argc, argv);
 
-#ifdef LIBMESH_TRILINOS_HAVE_DTK
+#if !defined(LIBMESH_TRILINOS_HAVE_DTK)
+  // Skip this example (and use a different return code) if libMesh
+  // was compiled without Trilinos+DTK support.
+  libmesh_example_requires(false, "--enable-trilinos");
+
+#else
 
   Mesh from_mesh(init.comm());
   MeshTools::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
