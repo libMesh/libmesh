@@ -197,18 +197,14 @@ void ExactErrorEstimator::attach_reference_solution (EquationSystems * es_fine)
   this->clear_functors();
 }
 
-#ifdef LIBMESH_ENABLE_AMR
 void ExactErrorEstimator::estimate_error (const System & system,
                                           ErrorVector & error_per_cell,
                                           const NumericVector<Number> * solution_vector,
                                           bool estimate_parent_error)
-#else
-  void ExactErrorEstimator::estimate_error (const System & system,
-                                            ErrorVector & error_per_cell,
-                                            const NumericVector<Number> * solution_vector,
-                                            bool /* estimate_parent_error */ )
-#endif
 {
+  // Ignore the fact that this variable is unused when !LIBMESH_ENABLE_AMR
+  libmesh_ignore(estimate_parent_error);
+
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
 
