@@ -229,7 +229,7 @@ int main (int argc, char ** argv)
             bool node_out = false;
             for (unsigned int i=0; i<elem->n_nodes(); i++)
               {
-                double d = elem->point(i).size();
+                double d = elem->point(i).norm();
                 if (d<0.8)
                   {
                     node_in = true;
@@ -270,7 +270,7 @@ int main (int argc, char ** argv)
     for (; elem_it != elem_end; ++elem_it)
       {
         Elem * elem = *elem_it;
-        double d = elem->centroid().size();
+        double d = elem->centroid().norm();
         if (d<0.8)
           {
             elem->subdomain_id() = 1;
