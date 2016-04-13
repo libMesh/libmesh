@@ -21,6 +21,9 @@ public:
 
   virtual void init_qoi(std::vector<Number> & sys_qoi);
 
+  // Context initialization
+  virtual void init_context (DiffContext & context);
+
   virtual void postprocess() {}
 
   virtual void element_qoi_derivative(DiffContext & context, const QoISet & qois);

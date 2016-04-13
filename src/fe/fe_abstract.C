@@ -744,7 +744,6 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
 
 
 
-
 void FEAbstract::print_JxW(std::ostream & os) const
 {
   this->_fe_map->print_JxW(os);

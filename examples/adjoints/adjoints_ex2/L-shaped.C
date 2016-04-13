@@ -38,15 +38,13 @@ void LaplaceSystem::init_context(DiffContext & context)
   FEBase * elem_fe = libmesh_nullptr;
   c.get_element_fe(0, elem_fe);
   elem_fe->get_JxW();
-  elem_fe->get_phi();
   elem_fe->get_dphi();
 
   FEBase * side_fe = libmesh_nullptr;
   c.get_side_fe(0, side_fe);
-
   side_fe->get_JxW();
   side_fe->get_phi();
-  side_fe->get_dphi();
+  side_fe->get_xyz();
 }
 
 #define optassert(X) {if (!(X)) libmesh_error_msg("Assertion " #X " failed.");}

@@ -153,6 +153,15 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
   libmesh_assert(radial_qrule);
   libmesh_assert(inf_elem);
 
+  // I don't understand infinite elements well enough to risk
+  // calculating too little.  :-(  RHS
+  this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
+  this->get_xyz();
+  this->determine_calculations();
+  base_fe->calculate_phi = base_fe->calculate_dphi = base_fe->calculate_dphiref = true;
+  base_fe->get_xyz();
+  base_fe->determine_calculations();
+
   if (pts == libmesh_nullptr)
     {
       bool init_shape_functions_required = false;

@@ -141,6 +141,7 @@ public:
     elem_fe->get_JxW();
     elem_fe->get_phi();
     elem_fe->get_dphi();
+    elem_fe->get_xyz();
   }
 
   /**

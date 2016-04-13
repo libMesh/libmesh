@@ -52,6 +52,21 @@ public:
   static UniquePtr<FETransformationBase<OutputShape> > build(const FEType & type);
 
   /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const = 0;
+
+  /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const = 0;
+
+  /**
+   * Pre-requests any necessary data from FEMap
+   */
+  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const = 0;
+
+  /**
    * Evaluates shape functions in physical coordinates based on proper
    * finite element transformation.
    */

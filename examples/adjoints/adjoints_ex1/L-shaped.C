@@ -40,6 +40,7 @@ void LaplaceSystem::init_context(DiffContext & context)
   elem_fe->get_JxW();
   elem_fe->get_phi();
   elem_fe->get_dphi();
+  elem_fe->get_xyz();
 
   FEBase * side_fe = libmesh_nullptr;
   c.get_side_fe(0, side_fe);
