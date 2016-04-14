@@ -24,25 +24,11 @@
 #include "libmesh/vtk_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/equation_systems.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/edge_edge3.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_tri6.h"
-#include "libmesh/face_quad4.h"
-#include "libmesh/face_quad8.h"
-#include "libmesh/face_quad9.h"
-#include "libmesh/cell_tet4.h"
-#include "libmesh/cell_tet10.h"
-#include "libmesh/cell_prism6.h"
-#include "libmesh/cell_prism15.h"
-#include "libmesh/cell_prism18.h"
-#include "libmesh/cell_pyramid5.h"
-#include "libmesh/cell_hex8.h"
-#include "libmesh/cell_hex20.h"
-#include "libmesh/cell_hex27.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh_data.h"
+#include "libmesh/node.h"
+#include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_VTK
 
@@ -80,290 +66,23 @@
                                                        (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) && \
                                                         LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
-
-
-
-#endif //LIBMESH_HAVE_VTK
-
-namespace libMesh
-{
-
-#ifdef LIBMESH_HAVE_VTK
-vtkIdType VTKIO::get_elem_type(ElemType type)
-{
-  vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
-
-  switch(type)
-    {
-    case EDGE2:
-      celltype = VTK_LINE;
-      break;
-    case EDGE3:
-      celltype = VTK_QUADRATIC_EDGE;
-      break;// 1
-    case TRI3:
-    case TRI3SUBDIVISION:
-      celltype = VTK_TRIANGLE;
-      break;// 3
-    case TRI6:
-      celltype = VTK_QUADRATIC_TRIANGLE;
-      break;// 4
-    case QUAD4:
-      celltype = VTK_QUAD;
-      break;// 5
-    case QUAD8:
-      celltype = VTK_QUADRATIC_QUAD;
-      break;// 6
-    case TET4:
-      celltype = VTK_TETRA;
-      break;// 8
-    case TET10:
-      celltype = VTK_QUADRATIC_TETRA;
-      break;// 9
-    case HEX8:
-      celltype = VTK_HEXAHEDRON;
-      break;// 10
-    case HEX20:
-      celltype = VTK_QUADRATIC_HEXAHEDRON;
-      break;// 12
-    case HEX27:
-      celltype = VTK_TRIQUADRATIC_HEXAHEDRON;
-      break;
-    case PRISM6:
-      celltype = VTK_WEDGE;
-      break;// 13
-    case PRISM15:
-      celltype = VTK_QUADRATIC_WEDGE;
-      break;// 14
-    case PRISM18:
-      celltype = VTK_BIQUADRATIC_QUADRATIC_WEDGE;
-      break;// 15
-    case PYRAMID5:
-      celltype = VTK_PYRAMID;
-      break;// 16
-#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-    case QUAD9:
-      celltype = VTK_BIQUADRATIC_QUAD;
-      break;
-#else
-    case QUAD9:
-#endif
-    case EDGE4:
-    case INFEDGE2:
-    case INFQUAD4:
-    case INFQUAD6:
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-    case INFPRISM6:
-    case INFPRISM12:
-    case NODEELEM:
-    case INVALID_ELEM:
-    default:
-      libmesh_error_msg("Element type " << type << " not implemented.");
-    }
-  return celltype;
-}
-
-
-
-void VTKIO::nodes_to_vtk()
-{
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-  // containers for points and coordinates of points
-  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-  vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
-  pcoords->SetNumberOfComponents(LIBMESH_DIM);
-  points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
-
-  unsigned int local_node_counter = 0;
-
-  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (; nd != nd_end; nd++, ++local_node_counter)
-    {
-      Node * node = (*nd);
-
-      double pnt[LIBMESH_DIM];
-      for (unsigned int i=0; i<LIBMESH_DIM; ++i)
-        pnt[i] = (*node)(i);
-
-      // Fill mapping between global and local node numbers
-      _local_node_map[node->id()] = local_node_counter;
-
-      // add point
-      pcoords->InsertNextTupleValue(pnt);
-    }
-
-  // add coordinates to points
-  points->SetData(pcoords);
-
-  // add points to grid
-  _vtk_grid->SetPoints(points);
-}
-
-
-
-void VTKIO::cells_to_vtk()
-{
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-  vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
-
-  std::vector<int> types(mesh.n_active_local_elem());
-  unsigned active_element_counter = 0;
-
-  vtkSmartPointer<vtkIntArray> elem_id = vtkSmartPointer<vtkIntArray>::New();
-  elem_id->SetName("libmesh_elem_id");
-  elem_id->SetNumberOfComponents(1);
-
-  vtkSmartPointer<vtkIntArray> subdomain_id = vtkSmartPointer<vtkIntArray>::New();
-  subdomain_id->SetName("subdomain_id");
-  subdomain_id->SetNumberOfComponents(1);
-
-  MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-  for (; it != end; ++it, ++active_element_counter)
-    {
-      Elem * elem = *it;
-
-      pts->SetNumberOfIds(elem->n_nodes());
-
-      // get the connectivity for this element
-      std::vector<dof_id_type> conn;
-      elem->connectivity(0, VTK, conn);
-
-      for (unsigned int i=0; i<conn.size(); ++i)
-        {
-          // If the node ID is not found in the _local_node_map, we'll
-          // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
-          // I have actually enters this section of code...
-          if (_local_node_map.find(conn[i]) == _local_node_map.end())
-            {
-              dof_id_type global_node_id = elem->node(i);
-
-              const Node * the_node = mesh.node_ptr(global_node_id);
-
-              // Error checking...
-              if (the_node == libmesh_nullptr)
-                libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
-
-              // InsertNextPoint accepts either a double or float array of length 3.
-              double pt[3] = {0., 0., 0.};
-              for (unsigned int d=0; d<LIBMESH_DIM; ++d)
-                pt[d] = (*the_node)(d);
-
-              // Insert the point into the _vtk_grid
-              vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
-
-              // Update the _local_node_map with the ID returned by VTK
-              _local_node_map[global_node_id] =
-                cast_int<dof_id_type>(local);
-            }
-
-          // Otherwise, the node ID was found in the _local_node_map, so
-          // insert it into the vtkIdList.
-          pts->InsertId(i, _local_node_map[conn[i]]);
-        }
-
-      vtkIdType vtkcellid = cells->InsertNextCell(pts);
-      types[active_element_counter] =
-        cast_int<int>(this->get_elem_type(elem->type()));
-      elem_id->InsertTuple1(vtkcellid, elem->id());
-      subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
-    } // end loop over active elements
-
-  _vtk_grid->SetCells(&types[0], cells);
-  _vtk_grid->GetCellData()->AddArray(elem_id);
-  _vtk_grid->GetCellData()->AddArray(subdomain_id);
-}
-
-
-
-/*
- * FIXME: This is known to write nonsense on AMR meshes
- * and it strips the imaginary parts of complex Numbers
- */
-void VTKIO::system_vectors_to_vtk(const EquationSystems & es,
-                                  vtkUnstructuredGrid *& grid)
-{
-  if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
-    {
-      std::map<std::string, std::vector<Number> > vecs;
-      for (unsigned int i=0; i<es.n_systems(); ++i)
-        {
-          const System & sys = es.get_system(i);
-          System::const_vectors_iterator v_end = sys.vectors_end();
-          System::const_vectors_iterator it = sys.vectors_begin();
-          for (; it!= v_end; ++it)
-            {
-              // for all vectors on this system
-              std::vector<Number> values;
-              // libMesh::out<<"it "<<it->first<<std::endl;
-
-              it->second->localize_to_one(values, 0);
-              // libMesh::out<<"finish localize"<<std::endl;
-              vecs[it->first] = values;
-            }
-        }
-
-      std::map<std::string, std::vector<Number> >::iterator it = vecs.begin();
-
-      for (; it!=vecs.end(); ++it)
-        {
-          vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
-          data->SetName(it->first.c_str());
-          libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
-          data->SetNumberOfValues(it->second.size());
-
-          for (unsigned int i=0; i<it->second.size(); ++i)
-            {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-              libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-                               << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-                               << std::endl);
-              data->SetValue(i, it->second[i].real());
-#else
-              data->SetValue(i, it->second[i]);
-#endif
-
-            }
-          grid->GetPointData()->AddArray(data);
-        }
-    }
-}
-
-
-
-// write out mesh data to the VTK file, this might come in handy to display
-// boundary conditions and material data
-// void VTKIO::meshdata_to_vtk(const MeshData & meshdata,
-//                             vtkUnstructuredGrid * grid)
-// {
-//   vtkPointData* pointdata = vtkPointData::New();
-//
-//   const unsigned int n_vn = meshdata.n_val_per_node();
-//   const unsigned int n_dat = meshdata.n_node_data();
-//
-//   pointdata->SetNumberOfTuples(n_dat);
-// }
-
 #endif // LIBMESH_HAVE_VTK
 
 
 
+namespace libMesh
+{
 
 // Constructor for reading
 VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data),
-  _compress(false),
-  _local_node_map()
+  MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
+  MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
+#ifdef LIBMESH_HAVE_VTK
+  ,_vtk_grid(libmesh_nullptr)
+  ,_mesh_data(mesh_data)
+  ,_compress(false)
+#endif
 {
-  _vtk_grid = libmesh_nullptr;
   libmesh_experimental();
 }
 
@@ -371,27 +90,66 @@ VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
 
 // Constructor for writing
 VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data),
-  _compress(false),
-  _local_node_map()
+  MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
+#ifdef LIBMESH_HAVE_VTK
+  ,_vtk_grid(libmesh_nullptr)
+  ,_mesh_data(mesh_data)
+  ,_compress(false)
+#endif
 {
-  _vtk_grid = libmesh_nullptr;
   libmesh_experimental();
 }
 
 
 
-vtkUnstructuredGrid * VTKIO::get_vtk_grid()
+// Output the mesh without solutions to a .pvtu file
+void VTKIO::write (const std::string & name)
 {
-  return _vtk_grid;
+  std::vector<Number> soln;
+  std::vector<std::string> names;
+  this->write_nodal_data(name, soln, names);
 }
 
 
 
-void VTKIO::set_compression(bool b)
+// The rest of the file is wrapped in ifdef LIBMESH_HAVE_VTK except for
+// a couple of "stub" functions at the bottom.
+#ifdef LIBMESH_HAVE_VTK
+
+// Initialize the static _element_maps struct.
+VTKIO::ElementMaps VTKIO::_element_maps = VTKIO::build_element_maps();
+
+// Static function which constructs the ElementMaps object.
+VTKIO::ElementMaps VTKIO::build_element_maps()
 {
-  this->_compress = b;
+  // Object to be filled up
+  ElementMaps em;
+
+  em.associate(EDGE2, VTK_LINE);
+  em.associate(EDGE3, VTK_QUADRATIC_EDGE);
+  em.associate(TRI3, VTK_TRIANGLE);
+  em.associate(TRI6, VTK_QUADRATIC_TRIANGLE);
+  em.associate(QUAD4, VTK_QUAD);
+  em.associate(QUAD8, VTK_QUADRATIC_QUAD);
+  em.associate(TET4, VTK_TETRA);
+  em.associate(TET10, VTK_QUADRATIC_TETRA);
+  em.associate(HEX8, VTK_HEXAHEDRON);
+  em.associate(HEX20, VTK_QUADRATIC_HEXAHEDRON);
+  em.associate(HEX27, VTK_TRIQUADRATIC_HEXAHEDRON);
+  em.associate(PRISM6, VTK_WEDGE);
+  em.associate(PRISM15, VTK_QUADRATIC_WEDGE);
+  em.associate(PRISM18, VTK_BIQUADRATIC_QUADRATIC_WEDGE);
+  em.associate(PYRAMID5, VTK_PYRAMID);
+
+  // VTK_BIQUADRATIC_QUAD has been around since VTK 5.0
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  em.associate(QUAD9, VTK_BIQUADRATIC_QUAD);
+#endif
+
+  // TRI3SUBDIVISION is for writing only
+  em.writing_map[TRI3SUBDIVISION] = VTK_TRIANGLE;
+
+  return em;
 }
 
 
@@ -407,17 +165,12 @@ void VTKIO::read (const std::string & name)
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
 
-#ifndef LIBMESH_HAVE_VTK
-  libmesh_error_msg("Cannot read VTK file: " << name \
-                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
-
-#else
   // Use a typedef, because these names are just crazy
   typedef vtkSmartPointer<vtkXMLUnstructuredGridReader> MyReader;
   MyReader reader = MyReader::New();
 
   // Pass the filename along to the reader
-  reader->SetFileName( name.c_str() );
+  reader->SetFileName(name.c_str());
 
   // Force reading
   reader->Update();
@@ -457,62 +210,10 @@ void VTKIO::read (const std::string & name)
   for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
       vtkCell * cell = _vtk_grid->GetCell(i);
-      Elem * elem = libmesh_nullptr;
-      switch (cell->GetCellType())
-        {
-        case VTK_LINE:
-          elem = new Edge2;
-          break;
-        case VTK_QUADRATIC_EDGE:
-          elem = new Edge3;
-          break;
-        case VTK_TRIANGLE:
-          elem = new Tri3();
-          break;
-        case VTK_QUADRATIC_TRIANGLE:
-          elem = new Tri6();
-          break;
-        case VTK_QUAD:
-          elem = new Quad4();
-          break;
-        case VTK_QUADRATIC_QUAD:
-          elem = new Quad8();
-          break;
-#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-        case VTK_BIQUADRATIC_QUAD:
-          elem = new Quad9();
-          break;
-#endif
-        case VTK_TETRA:
-          elem = new Tet4();
-          break;
-        case VTK_QUADRATIC_TETRA:
-          elem = new Tet10();
-          break;
-        case VTK_WEDGE:
-          elem = new Prism6();
-          break;
-        case VTK_QUADRATIC_WEDGE:
-          elem = new Prism15();
-          break;
-        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
-          elem = new Prism18();
-          break;
-        case VTK_HEXAHEDRON:
-          elem = new Hex8();
-          break;
-        case VTK_QUADRATIC_HEXAHEDRON:
-          elem = new Hex20();
-          break;
-        case VTK_TRIQUADRATIC_HEXAHEDRON:
-          elem = new Hex27();
-          break;
-        case VTK_PYRAMID:
-          elem = new Pyramid5();
-          break;
-        default:
-          libmesh_error_msg("Element type not implemented in vtkinterface " << cell->GetCellType());
-        }
+
+      // Get the libMesh element type corresponding to this VTK element type.
+      ElemType libmesh_elem_type = _element_maps.find(cell->GetCellType());
+      Elem * elem = Elem::build(libmesh_elem_type).release();
 
       // get the straightforward numbering from the VTK cells
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
@@ -547,34 +248,28 @@ void VTKIO::read (const std::string & name)
                       << " mesh file when configured without "  \
                       << mesh.mesh_dimension()                  \
                       << "D support.");
-#endif
-
-#endif // LIBMESH_HAVE_VTK
+#endif // LIBMESH_DIM < 3
 }
 
 
 
 void VTKIO::write_nodal_data (const std::string & fname,
-#ifdef LIBMESH_HAVE_VTK
                               const std::vector<Number> & soln,
-                              const std::vector<std::string> & names
-#else
-                              const std::vector<Number> &,
-                              const std::vector<std::string> &
-#endif
-                              )
+                              const std::vector<std::string> & names)
 {
-#ifndef LIBMESH_HAVE_VTK
-
-  libmesh_error_msg("Cannot write VTK file: " << fname                  \
-                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
-
-#else
-
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // Is this really important?  If so, it should be more than an assert...
-  // libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
+  // Warn that the .pvtu file extension should be used.  Paraview
+  // recognizes this, and it works in both serial and parallel.  Only
+  // warn about this once.
+  if (fname.substr(fname.rfind("."), fname.size()) != ".pvtu")
+    libmesh_do_once(libMesh::err << "The .pvtu extension should be used when writing VTK files in libMesh.");
+
+  // The solution vector should not be empty, it should have been
+  // broadcast to all processors by the MeshOutput base class, since
+  // VTK is a parallel format.  Verify this before going further.
+  if (soln.empty())
+    libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
 
   // we only use Unstructured grids
   _vtk_grid = vtkUnstructuredGrid::New();
@@ -605,24 +300,18 @@ void VTKIO::write_nodal_data (const std::string & fname,
           // variable, if the node is in the current partition
           for (dof_id_type k=0; k<num_nodes; ++k)
             {
-              if (_local_node_map.find(k) == _local_node_map.end())
+              std::map<dof_id_type, dof_id_type>::iterator local_node_it = _local_node_map.find(k);
+              if (local_node_it == _local_node_map.end())
                 continue; // not a local node
 
-              if (!soln.empty())
-                {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                  libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-                                   << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-                                   << std::endl);
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
+              libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
+                               << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+                               << std::endl);
+              data->SetValue(local_node_it->second, soln[k*num_vars + variable].real());
 #else
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
+              data->SetValue(local_node_it->second, soln[k*num_vars + variable]);
 #endif
-                }
-              else
-                {
-                  data->SetValue(_local_node_map[k], 0);
-                }
             }
           _vtk_grid->GetPointData()->AddArray(data);
         }
@@ -664,18 +353,223 @@ void VTKIO::write_nodal_data (const std::string & fname,
   writer->Write();
 
   _vtk_grid->Delete();
-#endif
 }
 
 
 
-// Output the mesh without solutions to a .pvtu file
-void VTKIO::write (const std::string & name)
+vtkUnstructuredGrid * VTKIO::get_vtk_grid()
 {
-  std::vector<Number> soln;
-  std::vector<std::string> names;
-  this->write_nodal_data(name, soln, names);
+  return _vtk_grid;
 }
+
+
+
+void VTKIO::set_compression(bool b)
+{
+  this->_compress = b;
+}
+
+
+
+void VTKIO::nodes_to_vtk()
+{
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  // containers for points and coordinates of points
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+  pcoords->SetNumberOfComponents(LIBMESH_DIM);
+  points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
+
+  unsigned int local_node_counter = 0;
+
+  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
+  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
+  for (; nd != nd_end; nd++, ++local_node_counter)
+    {
+      Node & node = **nd;
+
+      double pnt[LIBMESH_DIM];
+      for (unsigned int i=0; i<LIBMESH_DIM; ++i)
+        pnt[i] = node(i);
+
+      // Fill mapping between global and local node numbers
+      _local_node_map[node.id()] = local_node_counter;
+
+      // add point
+      pcoords->InsertNextTupleValue(pnt);
+    }
+
+  // add coordinates to points
+  points->SetData(pcoords);
+
+  // add points to grid
+  _vtk_grid->SetPoints(points);
+}
+
+
+
+void VTKIO::cells_to_vtk()
+{
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
+
+  std::vector<int> types(mesh.n_active_local_elem());
+  unsigned active_element_counter = 0;
+
+  vtkSmartPointer<vtkIntArray> elem_id = vtkSmartPointer<vtkIntArray>::New();
+  elem_id->SetName("libmesh_elem_id");
+  elem_id->SetNumberOfComponents(1);
+
+  vtkSmartPointer<vtkIntArray> subdomain_id = vtkSmartPointer<vtkIntArray>::New();
+  subdomain_id->SetName("subdomain_id");
+  subdomain_id->SetNumberOfComponents(1);
+
+  vtkSmartPointer<vtkIntArray> elem_proc_id = vtkSmartPointer<vtkIntArray>::New();
+  elem_proc_id->SetName("processor_id");
+  elem_proc_id->SetNumberOfComponents(1);
+
+  MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+  for (; it != end; ++it, ++active_element_counter)
+    {
+      Elem * elem = *it;
+
+      pts->SetNumberOfIds(elem->n_nodes());
+
+      // get the connectivity for this element
+      std::vector<dof_id_type> conn;
+      elem->connectivity(0, VTK, conn);
+
+      for (unsigned int i=0; i<conn.size(); ++i)
+        {
+          // If the node ID is not found in the _local_node_map, we'll
+          // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
+          // I have actually enters this section of code...
+          if (_local_node_map.find(conn[i]) == _local_node_map.end())
+            {
+              dof_id_type global_node_id = elem->node(i);
+
+              const Node * the_node = mesh.query_node_ptr(global_node_id);
+
+              // Error checking...
+              if (the_node == libmesh_nullptr)
+                libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
+
+              // InsertNextPoint accepts either a double or float array of length 3.
+              double pt[3] = {0., 0., 0.};
+              for (unsigned int d=0; d<LIBMESH_DIM; ++d)
+                pt[d] = (*the_node)(d);
+
+              // Insert the point into the _vtk_grid
+              vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
+
+              // Update the _local_node_map with the ID returned by VTK
+              _local_node_map[global_node_id] =
+                cast_int<dof_id_type>(local);
+            }
+
+          // Otherwise, the node ID was found in the _local_node_map, so
+          // insert it into the vtkIdList.
+          pts->InsertId(i, _local_node_map[conn[i]]);
+        }
+
+      vtkIdType vtkcellid = cells->InsertNextCell(pts);
+      types[active_element_counter] = cast_int<int>(_element_maps.find(elem->type()));
+
+      elem_id->InsertTuple1(vtkcellid, elem->id());
+      subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
+      elem_proc_id->InsertTuple1(vtkcellid, elem->processor_id());
+    } // end loop over active elements
+
+  _vtk_grid->SetCells(&types[0], cells);
+  _vtk_grid->GetCellData()->AddArray(elem_id);
+  _vtk_grid->GetCellData()->AddArray(subdomain_id);
+  _vtk_grid->GetCellData()->AddArray(elem_proc_id);
+}
+
+
+
+/**
+ * FIXME: This is known to write nonsense on AMR meshes
+ * and it strips the imaginary parts of complex Numbers
+ *
+ * This function is not currently used by anything, so it is commented
+ * out, and may eventually be removed entirely.
+ */
+// void VTKIO::system_vectors_to_vtk(const EquationSystems & es,
+//                                   vtkUnstructuredGrid *& grid)
+// {
+//   if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
+//     {
+//       std::map<std::string, std::vector<Number> > vecs;
+//       for (unsigned int i=0; i<es.n_systems(); ++i)
+//         {
+//           const System & sys = es.get_system(i);
+//           System::const_vectors_iterator v_end = sys.vectors_end();
+//           System::const_vectors_iterator it = sys.vectors_begin();
+//           for (; it!= v_end; ++it)
+//             {
+//               // for all vectors on this system
+//               std::vector<Number> values;
+//               // libMesh::out<<"it "<<it->first<<std::endl;
+//
+//               it->second->localize_to_one(values, 0);
+//               // libMesh::out<<"finish localize"<<std::endl;
+//               vecs[it->first] = values;
+//             }
+//         }
+//
+//       std::map<std::string, std::vector<Number> >::iterator it = vecs.begin();
+//
+//       for (; it!=vecs.end(); ++it)
+//         {
+//           vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
+//           data->SetName(it->first.c_str());
+//           libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
+//           data->SetNumberOfValues(it->second.size());
+//
+//           for (unsigned int i=0; i<it->second.size(); ++i)
+//             {
+// #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+//               libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
+//                                << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+//                                << std::endl);
+//               data->SetValue(i, it->second[i].real());
+// #else
+//               data->SetValue(i, it->second[i]);
+// #endif
+//
+//             }
+//           grid->GetPointData()->AddArray(data);
+//         }
+//     }
+// }
+
+
+
+#else // !LIBMESH_HAVE_VTK
+
+void VTKIO::read (const std::string & name)
+{
+  libmesh_error_msg("Cannot read VTK file: " << name \
+                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
+}
+
+
+
+void VTKIO::write_nodal_data (const std::string & fname,
+                              const std::vector<Number> &,
+                              const std::vector<std::string> &)
+{
+  libmesh_error_msg("Cannot write VTK file: " << fname                  \
+                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
+}
+
+
+#endif // LIBMESH_HAVE_VTK
 
 
 

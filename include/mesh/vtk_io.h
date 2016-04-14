@@ -33,10 +33,7 @@
 #include <map>
 
 // Forward declarations
-
 class vtkUnstructuredGrid;
-class vtkPoints;
-class vtkCellArray;
 
 namespace libMesh
 {
@@ -77,6 +74,10 @@ public:
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
+   *
+   * As with other Mesh IO classes, this interface is still still
+   * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
+   * runtime error.
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
@@ -85,32 +86,35 @@ public:
   /**
    * This method implements reading a mesh from a specified file
    * in VTK format.
+   *
+   * As with other Mesh IO classes, this interface is still still
+   * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
+   * runtime error.
    */
   virtual void read (const std::string &) libmesh_override;
 
   /**
-   * Output the mesh without solutions to a .pvtu file
+   * Output the mesh without solutions to a .pvtu file.
+   *
+   * As with other Mesh IO classes, this interface is still still
+   * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
+   * runtime error.
    */
   virtual void write (const std::string &) libmesh_override;
 
-  /**
-   * Get a pointer to the VTK datastructure
-   */
-  vtkUnstructuredGrid * get_vtk_grid();
+#ifdef LIBMESH_HAVE_VTK
 
   /**
    * Setter for compression flag
    */
   void set_compression(bool b);
 
-private:
-#ifdef LIBMESH_HAVE_VTK
   /**
-   * Map libMesh element types to VTK element types
+   * Get a pointer to the VTK unstructed grid data structure.
    */
-  vtkIdType get_elem_type(ElemType type);
-#endif
+  vtkUnstructuredGrid * get_vtk_grid();
 
+private:
   /**
    * write the nodes from the mesh into a vtkUnstructuredGrid
    */
@@ -122,10 +126,13 @@ private:
   void cells_to_vtk();
 
   /**
-   * write the system vectors to vtk
+   * Write the system vectors to vtk
+   *
+   * This function is not currently used by anything, so it is commented
+   * out, and may eventually be removed entirely.
    */
-  void system_vectors_to_vtk(const EquationSystems & es,
-                             vtkUnstructuredGrid * & grid);
+  // void system_vectors_to_vtk(const EquationSystems & es,
+  //                            vtkUnstructuredGrid * & grid);
 
   /**
    * pointer to the VTK grid
@@ -147,6 +154,59 @@ private:
    * maps global node id to node id of partition
    */
   std::map<dof_id_type, dof_id_type> _local_node_map;
+
+
+  /**
+   * Helper object that holds a map from VTK to libMesh element types
+   * and vice-versa.
+   */
+  struct ElementMaps
+  {
+    // Associate libmesh_type with vtk_type (searchable in both directions).
+    void associate(ElemType libmesh_type, vtkIdType vtk_type)
+    {
+      writing_map[libmesh_type] = vtk_type;
+      reading_map[vtk_type] = libmesh_type;
+    }
+
+    // Find an entry in the writing map, or throw an error.
+    vtkIdType find(ElemType libmesh_type)
+    {
+      std::map<ElemType, vtkIdType>::iterator it = writing_map.find(libmesh_type);
+
+      if (it == writing_map.end())
+        libmesh_error_msg("Element type " << libmesh_type << " not available in VTK.");
+
+      return it->second;
+    }
+
+    // Find an entry in the reading map, or throw an error.
+    ElemType find(vtkIdType vtk_type)
+    {
+      std::map<vtkIdType, ElemType>::iterator it = reading_map.find(vtk_type);
+
+      if (it == reading_map.end())
+        libmesh_error_msg("Element type " << vtk_type << " not available in libMesh.");
+
+      return it->second;
+    }
+
+    std::map<ElemType, vtkIdType> writing_map;
+    std::map<vtkIdType, ElemType> reading_map;
+  };
+
+  /**
+   * ElementMaps object that is built statically and used by
+   * all instances of this class.
+   */
+  static ElementMaps _element_maps;
+
+  /**
+   * Static function used to construct the _element_maps struct.
+   */
+  static ElementMaps build_element_maps();
+
+#endif
 };
 
 
