@@ -45,17 +45,17 @@ public:
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const;
+  virtual void init_map_phi(const FEGenericBase<OutputShape> & fe) const libmesh_override;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const;
+  virtual void init_map_dphi(const FEGenericBase<OutputShape> & fe) const libmesh_override;
 
   /**
    * Pre-requests any necessary data from FEMap
    */
-  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const;
+  virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const libmesh_override;
 
   /**
    * Evaluates shape functions in physical coordinates for HCurl
