@@ -84,7 +84,7 @@ public:
    */
   virtual void init (const Elem & elem,
                      const std::vector<Real> & vertex_distance_func,
-                     unsigned int p_level=0);
+                     unsigned int p_level=0) libmesh_override;
 
 private:
 

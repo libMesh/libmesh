@@ -77,8 +77,6 @@ public:
 
   /**
    * Get the mesh weighting.
-   *
-   * @sect2{DEAL mesh specific get/set functions}
    */
   int  getSumWghts() const             { return m_sumWghts; }
 

@@ -25,7 +25,8 @@
 // Local includes
 #include "libmesh/nonlinear_solver.h"
 
-//trilinos includes
+// Trilinos includes
+#include "libmesh/ignore_warnings.h"
 #include "Epetra_Vector.h"
 #include "Epetra_Operator.h"
 #include "Epetra_RowMatrix.h"
@@ -33,6 +34,7 @@
 #include "NOX_Epetra_Interface_Jacobian.H" // base class
 #include "NOX_Epetra_Interface_Preconditioner.H" // base class
 #include "NOX.H"
+#include "libmesh/restore_warnings.h"
 
 // C++ includes
 #include <cstddef>

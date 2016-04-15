@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/miscellaneous/miscellaneous_ex12" target="_blank">Open miscellaneous_ex12 in new tab.</a>
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex12:
+*   example-opt -pc_type jacobi -ksp_type cg
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=3
+  n_nodes()=457
+    n_local_nodes()=457
+  n_elem()=416
+    n_local_elem()=416
+    n_active_elem()=416
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Shell"
+    Type "LinearImplicit"
+    Variables={ "u" "v" "w" "theta_x" "theta_y" "theta_z" }
+    Finite Element Types="LAGRANGE", "JACOBI_20_00"
+    Infinite Element Mapping="CARTESIAN"
+    Approximation Orders="FIRST", "THIRD"
+    n_dofs()=2742
+    n_local_dofs()=2742
+    n_constrained_dofs()=246
+    n_local_constrained_dofs()=246
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 50.744
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 66
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 246
+      Average DoF Constraint Length= 0
+
+z-displacement of the point C: 157.262
+Analytic solution: 164.24
+y-displacement of the point D: 4.06743
+Analytic solution: 4.114
+
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:37:34 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.54115, Active time=0.530828                                                   |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0002      0.000162    0.0002      0.000162    0.03     0.03     |
+|   build_constraint_matrix()        416        0.0004      0.000001    0.0004      0.000001    0.07     0.07     |
+|   build_sparsity()                 1          0.0053      0.005257    0.0055      0.005502    0.99     1.04     |
+|   constrain_elem_matrix()          416        0.0011      0.000003    0.0011      0.000003    0.20     0.20     |
+|   create_dof_constraints()         1          0.0065      0.006510    0.0077      0.007723    1.23     1.45     |
+|   distribute_dofs()                1          0.0001      0.000088    0.0004      0.000422    0.02     0.08     |
+|   dof_indices()                    10817      0.0020      0.000000    0.0020      0.000000    0.37     0.37     |
+|   prepare_send_list()              2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         1          0.0003      0.000334    0.0003      0.000334    0.06     0.06     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0012      0.001195    0.0017      0.001750    0.23     0.33     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0037      0.003726    0.0037      0.003726    0.70     0.70     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        833        0.0008      0.000001    0.0008      0.000001    0.15     0.15     |
+|   init_shape_functions()           833        0.0010      0.000001    0.0010      0.000001    0.19     0.19     |
+|   inverse_map()                    2          0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_map()                    833        0.0056      0.000007    0.0056      0.000007    1.06     1.06     |
+|   init_reference_to_physical_map() 833        0.0009      0.000001    0.0009      0.000001    0.17     0.17     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0007      0.000715    0.0007      0.000715    0.13     0.13     |
+|   renumber_nodes_and_elem()        2          0.0000      0.000009    0.0000      0.000009    0.00     0.00     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0000      0.000019    0.0055      0.005495    0.00     1.04     |
+|                                                                                                                 |
+| NameBasedIO                                                                                                     |
+|   read()                           1          0.0012      0.001201    0.0012      0.001201    0.23     0.23     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0000      0.000018    0.0000      0.000018    0.00     0.00     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.2831      0.283123    0.2831      0.283123    53.34    53.34    |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  1          0.0003      0.000252    0.0003      0.000252    0.05     0.05     |
+|   operator()                       1          0.0000      0.000018    0.0000      0.000020    0.00     0.00     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       1          0.2164      0.216382    0.2274      0.227424    40.76    42.84    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            15003      0.5308                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+
+***************************************************************
+* Done Running Example miscellaneous_ex12:
+*   example-opt -pc_type jacobi -ksp_type cg
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

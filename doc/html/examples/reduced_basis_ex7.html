@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/reduced_basis/reduced_basis_ex7" target="_blank">Open reduced_basis_ex7 in new tab.</a>
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
+<pre>
+***************************************************************
+* Running Example reduced_basis_ex7:
+*   example-opt -online_mode 0 -ksp_type preonly -pc_type lu
+***************************************************************
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Apr 14 2016 at 21:30:55 ***
+ EquationSystems
+  n_systems()=1
+   System #0, "Acoustics"
+    Type "RBConstruction"
+    Variables="p"
+    Finite Element Types="LAGRANGE", "JACOBI_20_00"
+    Infinite Element Mapping="CARTESIAN"
+    Approximation Orders="SECOND", "THIRD"
+    n_dofs()=10754
+    n_local_dofs()=10754
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 11.3072
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 31
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=10754
+    n_local_nodes()=10754
+  n_elem()=5239
+    n_local_elem()=5239
+    n_active_elem()=5239
+  n_subdomains()=6
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+Initializing training parameters with deterministic training set...
+Parameter frequency: log scaling = 0
+
+
+RBConstruction parameters:
+system name: Acoustics
+Nmax: 20
+Greedy relative error tolerance: 0.005
+Greedy absolute error tolerance: 1e-12
+Do we normalize RB error bound in greedy? 0
+Aq operators attached: 4
+Fq functions attached: 1
+n_outputs: 1
+output 0, Q_l = 1
+Number of parameters: 1
+Parameter frequency: Min = 0, Max = 2
+n_training_samples: 100
+quiet mode? 1
+
+Assembling inner product matrix
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Apr 14 2016 at 21:27:10 ***
+Assembling affine operator 1 of 4
+Assembling affine operator 2 of 4
+Assembling affine operator 3 of 4
+Assembling affine operator 4 of 4
+Assembling affine vector 1 of 1
+Assembling output vector, (1,1) of (1,1)
+Compute output dual inner products
+output_dual_innerprods[0][0] = (0.999985,0)
+
+---- Performing Greedy basis enrichment ----
+
+---- Basis dimension: 0 ----
+Performing RB solves on training set
+Maximum error bound is 3.99997
+
+Performing truth solve at parameter:
+frequency: 2.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 1 ----
+Performing RB solves on training set
+Maximum error bound is 3.4849
+
+Performing truth solve at parameter:
+frequency: 1.838384e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 2 ----
+Performing RB solves on training set
+Maximum error bound is 2.96968
+
+Performing truth solve at parameter:
+frequency: 1.636364e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 3 ----
+Performing RB solves on training set
+Maximum error bound is 2.61347
+
+Performing truth solve at parameter:
+frequency: 1.434343e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 4 ----
+Performing RB solves on training set
+Maximum error bound is 2.10863
+
+Performing truth solve at parameter:
+frequency: 1.232323e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 5 ----
+Performing RB solves on training set
+Maximum error bound is 1.72996
+
+Performing truth solve at parameter:
+frequency: 1.050505e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 6 ----
+Performing RB solves on training set
+Maximum error bound is 1.42359
+
+Performing truth solve at parameter:
+frequency: 8.686869e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum error bound is 1.0109
+
+Performing truth solve at parameter:
+frequency: 6.868687e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum error bound is 0.745944
+
+Performing truth solve at parameter:
+frequency: 1.939394e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum error bound is 0.698644
+
+Performing truth solve at parameter:
+frequency: 5.252525e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 10 ----
+Performing RB solves on training set
+Maximum error bound is 0.473206
+
+Performing truth solve at parameter:
+frequency: 3.434343e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 11 ----
+Performing RB solves on training set
+Maximum error bound is 0.352176
+
+Performing truth solve at parameter:
+frequency: 1.535354e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 12 ----
+Performing RB solves on training set
+Maximum error bound is 0.259487
+
+Performing truth solve at parameter:
+frequency: 2.020202e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 13 ----
+Performing RB solves on training set
+Maximum error bound is 0.0533705
+
+Performing truth solve at parameter:
+frequency: 1.737374e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 14 ----
+Performing RB solves on training set
+Maximum error bound is 0.0484678
+
+Performing truth solve at parameter:
+frequency: 1.333333e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 15 ----
+Performing RB solves on training set
+Maximum error bound is 0.0260765
+
+Performing truth solve at parameter:
+frequency: 1.010101e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 16 ----
+Performing RB solves on training set
+Maximum error bound is 0.0169111
+
+Relative error tolerance reached.
+(1,-3.7688e-17) (-5.53479e-16,2.94217e-15) (2.43117e-17,2.11154e-15) (3.04445e-15,1.35764e-15) (2.11496e-15,-5.5331e-16) (1.00657e-15,-2.17628e-15) (-4.90101e-16,-1.58252e-15) (-8.38705e-16,-1.90202e-16) (7.22091e-14,4.15299e-14) (4.59177e-15,7.98664e-15) (1.15005e-14,6.33855e-15) (-1.09683e-13,2.59781e-14) (-5.00367e-14,1.40117e-14) (-1.05698e-13,-2.30037e-13) (3.52801e-13,-9.17989e-14) (2.84413e-14,2.587e-14)
+(6.49733e-18,-3.03207e-15) (1,5.72367e-17) (-1.2469e-15,3.24773e-15) (1.13047e-15,1.39527e-15) (2.2989e-15,2.1845e-15) (3.12562e-15,-9.56263e-16) (1.04915e-15,-2.66282e-15) (-8.91698e-16,-1.25019e-15) (1.61313e-14,-2.34056e-14) (2.6424e-15,-1.06283e-15) (3.38174e-15,-4.93959e-15) (2.259e-14,5.51611e-14) (1.29779e-14,2.51342e-14) (-2.47131e-13,2.18916e-13) (-2.42813e-14,-4.19927e-13) (2.9019e-14,-4.0961e-14)
+(-1.14002e-16,-2.23501e-15) (-8.82604e-16,-3.26432e-15) (1,-3.87481e-17) (1.58993e-15,-1.52723e-15) (-3.11139e-16,-6.93256e-16) (-1.71984e-16,-4.81386e-16) (-1.61091e-15,-8.78797e-17) (-4.1118e-16,9.65981e-16) (9.74024e-18,-1.43597e-15) (1.6748e-15,5.80839e-16) (1.19146e-15,-1.14276e-15) (-9.54284e-15,2.54332e-14) (-8.19517e-15,1.48893e-14) (-9.02341e-14,5.40361e-14) (1.41049e-14,-2.02739e-13) (9.25222e-15,-1.538e-14)
+(1.33016e-15,-1.2534e-15) (-1.69023e-16,-2.05678e-15) (8.8418e-16,7.6766e-16) (1,-2.06004e-17) (7.73594e-16,-2.92582e-15) (-2.25815e-15,-1.61734e-15) (-2.69262e-15,1.95175e-15) (-6.86126e-16,4.29875e-15) (-4.00287e-15,3.8966e-15) (5.78111e-15,1.77695e-15) (4.65203e-15,-4.46403e-15) (9.61468e-15,-7.17829e-14) (8.25465e-15,-6.85014e-14) (6.22183e-14,1.27658e-13) (-1.35225e-13,-3.82621e-14) (-4.699e-14,-1.20726e-14)
+(2.4704e-15,9.09272e-17) (1.8638e-15,-3.28011e-15) (-5.24869e-16,5.52868e-16) (-4.45222e-16,2.157e-15) (1,1.22157e-16) (7.2523e-18,4.35913e-15) (2.4787e-15,4.08574e-15) (6.2064e-15,7.36353e-16) (4.29967e-15,-4.23697e-17) (5.45108e-15,-9.17123e-15) (-3.78592e-15,-1.08291e-14) (-1.47087e-14,-1.80674e-14) (-3.45722e-14,-2.82104e-14) (3.95263e-14,-9.29618e-16) (-1.26493e-13,-1.37489e-13) (-3.32804e-14,1.14402e-14)
+(1.4444e-15,1.45429e-15) (2.14881e-15,9.40529e-16) (-8.35864e-16,7.07847e-16) (-2.04501e-15,1.34615e-15) (-2.66352e-16,-4.52124e-15) (1,5.50319e-17) (2.50942e-15,-6.21034e-15) (-2.94014e-15,-9.89011e-15) (1.38948e-16,-3.0706e-15) (-1.41003e-14,8.83868e-16) (-7.55544e-15,1.49294e-14) (-4.54331e-15,4.0871e-14) (8.08281e-15,6.83773e-14) (-3.72047e-14,-3.68593e-14) (-2.23433e-14,1.21566e-13) (4.96148e-14,4.69599e-15)
+(-3.56721e-16,1.41595e-15) (9.98137e-16,2.3033e-15) (-1.35986e-15,-3.43031e-16) (-2.17157e-15,-2.59971e-15) (2.94388e-15,-4.54158e-15) (2.87177e-15,6.02136e-15) (1,-8.15203e-17) (3.61149e-15,-4.60969e-16) (1.97651e-15,-1.184e-15) (-5.84505e-16,-7.86254e-15) (-9.09711e-15,-4.52747e-15) (-2.02986e-14,2.14164e-15) (-4.26103e-14,1.00573e-14) (5.5029e-15,-2.06623e-14) (-4.30061e-14,-2.92722e-15) (7.23652e-15,3.11941e-14)
+(-5.99646e-16,4.77099e-16) (-9.94818e-16,1.51422e-15) (-4.37289e-16,-1.00852e-15) (-1.9339e-16,-4.2476e-15) (7.00509e-15,-6.73523e-16) (-2.37095e-15,1.02717e-14) (3.11324e-15,5.69906e-16) (1,1.25798e-16) (-1.9054e-16,-1.37144e-16) (3.78995e-15,-1.95096e-15) (2.16488e-16,-4.91817e-15) (-4.45102e-15,-6.8135e-15) (-1.12781e-14,-1.44814e-14) (1.09392e-14,-6.71135e-15) (-1.73514e-14,1.83897e-14) (7.47945e-15,-6.55561e-15)
+(7.16665e-14,-4.11157e-14) (1.63815e-14,2.345e-14) (1.96732e-16,1.26644e-15) (-4.16692e-15,-4.13174e-15) (4.16496e-15,3.29986e-16) (-1.83143e-16,3.09808e-15) (1.01428e-15,1.11794e-15) (-1.4457e-16,4.07821e-16) (1,-7.92336e-17) (-5.17575e-16,1.89542e-17) (-4.74321e-16,3.51493e-16) (3.78548e-15,-4.11454e-16) (1.55558e-15,-6.64177e-16) (-1.08376e-15,-1.08126e-14) (1.88107e-14,5.72547e-15) (-3.36909e-15,2.95088e-15)
+(4.42977e-15,-8.13965e-15) (2.12126e-15,5.13983e-16) (1.177e-15,-1.22882e-15) (5.54248e-15,-2.32531e-15) (5.16801e-15,8.63486e-15) (-1.39162e-14,-8.94552e-16) (-1.09215e-15,8.36598e-15) (3.23222e-15,2.07796e-15) (-1.41261e-16,3.1769e-16) (1,5.04283e-16) (4.74654e-16,5.66565e-15) (6.81889e-17,3.89347e-15) (1.3629e-14,1.53277e-14) (-4.30204e-15,3.18847e-15) (1.0522e-14,5.47926e-15) (1.47335e-14,-2.18825e-14)
+(1.19375e-14,-6.36405e-15) (3.45669e-15,4.9869e-15) (8.40257e-16,1.06218e-15) (4.89699e-15,4.39061e-15) (-4.03317e-15,1.03648e-14) (-7.72859e-15,-1.47419e-14) (-9.40677e-15,4.42042e-15) (1.3149e-15,4.74961e-15) (-1.54833e-16,9.49609e-17) (-1.35357e-15,-5.21351e-15) (1,1.601e-16) (1.91225e-16,-4.32956e-16) (-9.20051e-16,1.06558e-15) (-4.09671e-15,2.5026e-15) (7.14796e-16,-2.9268e-16) (-2.14025e-14,-1.37016e-15)
+(-1.09767e-13,-2.6858e-14) (2.24692e-14,-5.52109e-14) (-9.68669e-15,-2.54153e-14) (9.4398e-15,7.13194e-14) (-1.5167e-14,1.76587e-14) (-4.99231e-15,-4.08876e-14) (-2.04257e-14,-2.34297e-15) (-4.35571e-15,6.42986e-15) (3.56805e-15,4.10921e-17) (-6.34904e-16,-4.25378e-15) (2.75458e-16,4.35444e-16) (1,7.65197e-17) (8.9225e-16,-7.05611e-16) (-2.56934e-15,1.00816e-15) (1.78107e-15,-7.76424e-15) (-5.16636e-15,5.86039e-15)
+(-5.0125e-14,-1.39741e-14) (1.27092e-14,-2.54586e-14) (-8.44035e-15,-1.49152e-14) (8.19458e-15,6.84358e-14) (-3.49803e-14,2.81352e-14) (8.19017e-15,-6.80661e-14) (-4.28878e-14,-9.75064e-15) (-1.18487e-14,1.43084e-14) (1.98376e-15,7.50298e-16) (1.37049e-14,-1.5398e-14) (-1.36222e-15,-1.18651e-15) (1.30591e-15,-6.17589e-16) (1,2.39745e-16) (2.10779e-16,-3.40538e-16) (-2.31822e-15,-5.28572e-16) (6.3692e-15,8.02177e-15)
+(-1.065e-13,2.30072e-13) (-2.4704e-13,-2.19039e-13) (-9.01397e-14,-5.41412e-14) (6.26167e-14,-1.2766e-13) (3.96144e-14,6.83395e-16) (-3.69849e-14,3.68165e-14) (5.80853e-15,2.06837e-14) (1.11208e-14,6.25377e-15) (-1.18091e-15,1.08533e-14) (-4.18959e-15,-3.27783e-15) (-3.74461e-15,-2.40899e-15) (-2.15647e-15,-1.1127e-15) (-3.2326e-16,6.05078e-16) (1,-6.21205e-17) (2.88218e-15,-3.35931e-16) (7.13276e-16,-1.96427e-17)
+(3.52883e-13,9.18214e-14) (-2.43076e-14,4.19881e-13) (1.41346e-14,2.02597e-13) (-1.35345e-13,3.84544e-14) (-1.26643e-13,1.37425e-13) (-2.2298e-14,-1.2157e-13) (-4.32492e-14,2.60131e-15) (-1.75099e-14,-1.84032e-14) (1.83953e-14,-5.59717e-15) (1.02903e-14,-5.4002e-15) (5.38254e-16,2.37089e-16) (1.44225e-15,7.69761e-15) (-2.32733e-15,1.20665e-15) (2.9194e-15,4.88064e-16) (1,-8.86208e-19) (-1.14975e-16,2.82256e-16)
+(2.83577e-14,-2.58908e-14) (2.91492e-14,4.11477e-14) (8.89512e-15,1.54779e-14) (-4.71387e-14,1.20592e-14) (-3.34885e-14,-1.15592e-14) (4.97275e-14,-4.51619e-15) (7.01564e-15,-3.13032e-14) (7.54635e-15,6.50355e-15) (-3.55158e-15,-2.9346e-15) (1.48215e-14,2.18158e-14) (-2.13206e-14,7.11396e-16) (-5.42651e-15,-5.79299e-15) (6.67665e-15,-7.71624e-15) (6.76117e-16,4.60379e-17) (2.65087e-17,-4.64377e-17) (1,8.3365e-18)
+
+
+***************************************************************
+* Done Running Example reduced_basis_ex7:
+*   example-opt -online_mode 0 -ksp_type preonly -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example reduced_basis_ex7:
+*   example-opt -online_mode 1
+***************************************************************
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Apr 14 2016 at 21:30:55 ***
+ EquationSystems
+  n_systems()=1
+   System #0, "Acoustics"
+    Type "RBConstruction"
+    Variables="p"
+    Finite Element Types="LAGRANGE", "JACOBI_20_00"
+    Infinite Element Mapping="CARTESIAN"
+    Approximation Orders="SECOND", "THIRD"
+    n_dofs()=10754
+    n_local_dofs()=10754
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 11.3072
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 31
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=10754
+    n_local_nodes()=10754
+  n_elem()=5239
+    n_local_elem()=5239
+    n_active_elem()=5239
+  n_subdomains()=6
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+frequency: 2.000000e+00
+
+
+***************************************************************
+* Done Running Example reduced_basis_ex7:
+*   example-opt -online_mode 1
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

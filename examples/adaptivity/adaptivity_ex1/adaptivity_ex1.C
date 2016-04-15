@@ -204,8 +204,8 @@ void assemble_1D(EquationSystems & es,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a finite element object of the specified type. The build
-  // function dynamically allocates memory so we use an UniquePtr in this case.
-  // An UniquePtr is a pointer that cleans up after itself. See examples 3 and 4
+  // function dynamically allocates memory so we use a UniquePtr in this case.
+  // A UniquePtr is a pointer that cleans up after itself. See examples 3 and 4
   // for more details on UniquePtr.
   UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
 

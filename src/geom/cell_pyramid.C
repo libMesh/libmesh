@@ -88,7 +88,7 @@ UniquePtr<Elem> Pyramid::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an UniquePtr
+  // To be returned wrapped in a UniquePtr
   Elem * face = libmesh_nullptr;
 
   // Set up the type of element

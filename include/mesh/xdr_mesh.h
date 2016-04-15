@@ -92,6 +92,7 @@ public:
    * Read/Write a coord of appropriate size.
    *
    * \param array Pointer to an array of \p Reals
+   * \param dim The size of "array"
    * \param size Size of \p array (number of elements)
    * @return dim*size
    */

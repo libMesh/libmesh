@@ -318,8 +318,10 @@ public:
    * Same as the print method above, but allows you
    * to print to a stream in the standard syntax.
    *
+   * \code
    * template <typename U>
    * friend std::ostream & operator << (std::ostream & os, const SparseMatrix<U> & m);
+   * \endcode
    *
    * Obscure C++ note 1: the above syntax, which does not require any
    * prior declaration of operator<<, declares *any* instantiation of

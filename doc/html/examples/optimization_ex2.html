@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/optimization/optimization_ex2" target="_blank">Open optimization_ex2 in new tab.</a>
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
+<pre>
+***************************************************************
+* Running Example optimization_ex2:
+*   example-opt -tao_monitor -tao_view -tao_type ipm -pc_type jacobi -ksp_max_it 100
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=441
+    n_local_nodes()=441
+  n_elem()=100
+    n_local_elem()=100
+    n_active_elem()=100
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Optimization"
+    Type "Optimization"
+    Variables="u"
+    Finite Element Types="LAGRANGE", "JACOBI_20_00"
+    Infinite Element Mapping="CARTESIAN"
+    Approximation Orders="SECOND", "THIRD"
+    n_dofs()=441
+    n_local_dofs()=441
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=4
+    n_matrices()=2
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 14.8776
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 25
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+iter =   1, Function value: 0,  Residual: 297167
+iter =   1, Function value: 9268.21,  Residual: 46796.6
+iter =   2, Function value: 20398.4,  Residual: 48161.3
+iter =   3, Function value: 20168.2,  Residual: 47947.4
+iter =   4, Function value: 20696.5,  Residual: 47351.4
+iter =   5, Function value: 20699.9,  Residual: 47349.1
+iter =   6, Function value: 20699.9,  Residual: 47349.1
+iter =   7, Function value: 20699.9,  Residual: 47349.1
+iter =   8, Function value: 20699.9,  Residual: 47349.1
+iter =   9, Function value: 20699.9,  Residual: 47349.1
+iter =  10, Function value: 20699.9,  Residual: 47349.1
+iter =  11, Function value: 20699.9,  Residual: 47349.1
+iter =  12, Function value: 20699.9,  Residual: 47349.1
+iter =  13, Function value: 20699.9,  Residual: 47349.1
+iter =  14, Function value: 20699.9,  Residual: 47349.1
+iter =  15, Function value: 20699.9,  Residual: 47349.1
+iter =  16, Function value: 20699.9,  Residual: 47349.1
+iter =  17, Function value: 20699.9,  Residual: 47349.1
+iter =  18, Function value: 20699.9,  Residual: 47349.1
+iter =  19, Function value: 20699.9,  Residual: 47349.1
+iter =  20, Function value: 20699.9,  Residual: 47349.1
+iter =  21, Function value: 20699.9,  Residual: 47349.1
+iter =  22, Function value: 20699.9,  Residual: 47349.1
+iter =  23, Function value: 20699.9,  Residual: 47349.1
+iter =  24, Function value: 20699.9,  Residual: 47349.1
+iter =  25, Function value: 20699.9,  Residual: 47349.1
+iter =  26, Function value: 20699.9,  Residual: 47349.1
+iter =  27, Function value: 20699.9,  Residual: 47349.1
+iter =  28, Function value: 20699.9,  Residual: 47349.1
+iter =  29, Function value: 20699.9,  Residual: 47349.1
+iter =  30, Function value: 20699.9,  Residual: 47349.1
+iter =  31, Function value: 20699.9,  Residual: 47349.1
+iter =  32, Function value: 20699.9,  Residual: 47349.1
+iter =  33, Function value: 20699.9,  Residual: 47349.1
+iter =  34, Function value: 20699.9,  Residual: 47349.1
+iter =  35, Function value: 20699.9,  Residual: 47349.1
+iter =  36, Function value: 20699.9,  Residual: 47349.1
+iter =  37, Function value: 20699.9,  Residual: 47349.1
+iter =  38, Function value: 20699.9,  Residual: 47349.1
+iter =  39, Function value: 20699.9,  Residual: 47349.1
+iter =  40, Function value: 20699.9,  Residual: 47349.1
+iter =  41, Function value: 20699.9,  Residual: 47349.1
+iter =  42, Function value: 20699.9,  Residual: 47349.1
+iter =  43, Function value: 20699.9,  Residual: 47349.1
+iter =  44, Function value: 20699.9,  Residual: 47349.1
+iter =  45, Function value: 20699.9,  Residual: 47349.1
+iter =  46, Function value: 20699.9,  Residual: 47349.1
+iter =  47, Function value: 20699.9,  Residual: 47349.1
+iter =  48, Function value: 20699.9,  Residual: 47349.1
+iter =  49, Function value: 20699.9,  Residual: 47349.1
+iter =  50, Function value: 20699.9,  Residual: 47349.1
+iter =  51, Function value: 20699.9,  Residual: 47349.1
+iter =  52, Function value: 20699.9,  Residual: 47349.1
+iter =  53, Function value: 20699.9,  Residual: 47349.1
+iter =  54, Function value: 20699.9,  Residual: 47349.1
+iter =  55, Function value: 20699.9,  Residual: 47349.1
+iter =  56, Function value: 20699.9,  Residual: 47349.1
+iter =  57, Function value: 20699.9,  Residual: 47349.1
+iter =  58, Function value: 20699.9,  Residual: 47349.1
+iter =  59, Function value: 20699.9,  Residual: 47349.1
+iter =  60, Function value: 20699.9,  Residual: 47349.1
+iter =  61, Function value: 20699.9,  Residual: 47349.1
+iter =  62, Function value: 20699.9,  Residual: 47349.1
+iter =  63, Function value: 20699.9,  Residual: 47349.1
+iter =  64, Function value: 20699.9,  Residual: 47349.1
+iter =  65, Function value: 20699.9,  Residual: 47349.1
+iter =  66, Function value: 20699.9,  Residual: 47349.1
+iter =  67, Function value: 20699.9,  Residual: 47349.1
+iter =  68, Function value: 20699.9,  Residual: 47349.1
+iter =  69, Function value: 20699.9,  Residual: 47349.1
+iter =  70, Function value: 20699.9,  Residual: 47349.1
+iter =  71, Function value: 20699.9,  Residual: 47349.1
+iter =  72, Function value: 20699.9,  Residual: 47349.1
+iter =  73, Function value: 20699.9,  Residual: 47349.1
+iter =  74, Function value: 20699.9,  Residual: 47349.1
+iter =  75, Function value: 20699.9,  Residual: 47349.1
+iter =  76, Function value: 20699.9,  Residual: 47349.1
+iter =  77, Function value: 20699.9,  Residual: 47349.1
+iter =  78, Function value: 20699.9,  Residual: 47349.1
+iter =  79, Function value: 20699.9,  Residual: 47349.1
+iter =  80, Function value: 20699.9,  Residual: 47349.1
+iter =  81, Function value: 20699.9,  Residual: 47349.1
+iter =  82, Function value: 20699.9,  Residual: 47349.1
+iter =  83, Function value: 20699.9,  Residual: 47349.1
+iter =  84, Function value: 20699.9,  Residual: 47349.1
+iter =  85, Function value: 20699.9,  Residual: 47349.1
+iter =  86, Function value: 20699.9,  Residual: 47349.1
+iter =  87, Function value: 20699.9,  Residual: 47349.1
+iter =  88, Function value: 20699.9,  Residual: 47349.1
+iter =  89, Function value: 20699.9,  Residual: 47349.1
+iter =  90, Function value: 20699.9,  Residual: 47349.1
+iter =  91, Function value: 20699.9,  Residual: 47349.1
+iter =  92, Function value: 20699.9,  Residual: 47349.1
+iter =  93, Function value: 20699.9,  Residual: 47349.1
+iter =  94, Function value: 20699.9,  Residual: 47349.1
+iter =  95, Function value: 20699.9,  Residual: 47349.1
+iter =  96, Function value: 20699.9,  Residual: 47349.1
+iter =  97, Function value: 20699.9,  Residual: 47349.1
+iter =  98, Function value: 20699.9,  Residual: 47349.1
+iter =  99, Function value: 20699.9,  Residual: 47349.1
+iter = 100, Function value: 20699.9,  Residual: 47349.1
+iter = 101, Function value: 20699.9,  Residual: 47349.1
+iter = 102, Function value: 20699.9,  Residual: 47349.1
+iter = 103, Function value: 20699.9,  Residual: 47349.1
+iter = 104, Function value: 20699.9,  Residual: 47349.1
+iter = 105, Function value: 20699.9,  Residual: 47349.1
+iter = 106, Function value: 20699.9,  Residual: 47349.1
+iter = 107, Function value: 20699.9,  Residual: 47349.1
+iter = 108, Function value: 20699.9,  Residual: 47349.1
+iter = 109, Function value: 20699.9,  Residual: 47349.1
+iter = 110, Function value: 20699.9,  Residual: 47349.1
+iter = 111, Function value: 20699.9,  Residual: 47349.1
+iter = 112, Function value: 20699.9,  Residual: 47349.1
+iter = 113, Function value: 20699.9,  Residual: 47349.1
+iter = 114, Function value: 20699.9,  Residual: 47349.1
+iter = 115, Function value: 20699.9,  Residual: 47349.1
+iter = 116, Function value: 20699.9,  Residual: 47349.1
+iter = 117, Function value: 20699.9,  Residual: 47349.1
+iter = 118, Function value: 20699.9,  Residual: 47349.1
+iter = 119, Function value: 20699.9,  Residual: 47349.1
+iter = 120, Function value: 20699.9,  Residual: 47349.1
+iter = 121, Function value: 20699.9,  Residual: 47349.1
+iter = 122, Function value: 20699.9,  Residual: 47349.1
+iter = 123, Function value: 20699.9,  Residual: 47349.1
+iter = 124, Function value: 20699.9,  Residual: 47349.1
+iter = 125, Function value: 20699.9,  Residual: 47349.1
+iter = 126, Function value: 20699.9,  Residual: 47349.1
+iter = 127, Function value: 20699.9,  Residual: 47349.1
+iter = 128, Function value: 20699.9,  Residual: 47349.1
+Tao Object: 1 MPI processes
+  type: ipm
+  KSP Object:   1 MPI processes
+    type: gmres
+  total KSP iterations: 25600
+  Active Set subset type: subvec
+  convergence tolerances: fatol=0.0001,   frtol=0.0001
+  convergence tolerances: gatol=1e-08,   steptol=0,   gttol=0
+  Residual in Function/Gradient:=47349.1
+  Objective value=20699.9
+  total number of iterations=129,                          (max: 200)
+  total number of function evaluations=129,                  max: 128
+  total number of gradient evaluations=129,                  max: 128
+  total number of Hessian evaluations=129
+  total number of constraint function evaluations=258
+  Solver terminated: -5   Maximum Function Evaluations
+Tao optimization solver convergence/divergence reason: DIVERGED_LS_FAILURE
+
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:41:43 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.910295, Active time=0.902392                                                   |
+ ------------------------------------------------------------------------------------------------------------------
+| Event                               nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                  |
+|                                                                                                                  |
+| DofMap                                                                                                           |
+|   add_neighbors_to_send_list()      1          0.0000      0.000033    0.0000      0.000033    0.00     0.00     |
+|   build_sparsity()                  1          0.0003      0.000256    0.0003      0.000291    0.03     0.03     |
+|   create_dof_constraints()          1          0.0000      0.000015    0.0000      0.000015    0.00     0.00     |
+|   distribute_dofs()                 1          0.0001      0.000057    0.0002      0.000241    0.01     0.03     |
+|   dof_indices()                     200        0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   prepare_send_list()               2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                          1          0.0002      0.000183    0.0002      0.000183    0.02     0.02     |
+|                                                                                                                  |
+| FE                                                                                                               |
+|   compute_shape_functions()         100        0.0002      0.000002    0.0002      0.000002    0.02     0.02     |
+|   init_shape_functions()            1          0.0000      0.000012    0.0000      0.000012    0.00     0.00     |
+|                                                                                                                  |
+| FEMap                                                                                                            |
+|   compute_affine_map()              100        0.0001      0.000001    0.0001      0.000001    0.01     0.01     |
+|   init_reference_to_physical_map()  1          0.0000      0.000016    0.0000      0.000016    0.00     0.00     |
+|                                                                                                                  |
+| Mesh                                                                                                             |
+|   find_neighbors()                  1          0.0002      0.000180    0.0002      0.000180    0.02     0.02     |
+|   renumber_nodes_and_elem()         2          0.0000      0.000004    0.0000      0.000004    0.00     0.00     |
+|                                                                                                                  |
+| MeshTools::Generation                                                                                            |
+|   build_cube()                      1          0.0001      0.000091    0.0001      0.000091    0.01     0.01     |
+|                                                                                                                  |
+| OptimizationSystem                                                                                               |
+|   solve()                           1          0.0001      0.000051    0.9013      0.901288    0.01     99.88    |
+|                                                                                                                  |
+| Parallel                                                                                                         |
+|   allgather()                       1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                  |
+| Partitioner                                                                                                      |
+|   single_partition()                1          0.0000      0.000009    0.0000      0.000009    0.00     0.00     |
+|                                                                                                                  |
+| TaoOptimizationSolver                                                                                            |
+|   equality_constraints()            129        0.0022      0.000017    0.0022      0.000017    0.24     0.24     |
+|   equality_constraints_jacobian()   129        0.0007      0.000005    0.0007      0.000005    0.08     0.08     |
+|   get_dual_variables()              129        0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   gradient()                        129        0.0020      0.000015    0.0020      0.000015    0.22     0.22     |
+|   hessian()                         129        0.0198      0.000154    0.0198      0.000154    2.20     2.20     |
+|   inequality_constraints()          129        0.0016      0.000013    0.0016      0.000013    0.18     0.18     |
+|   inequality_constraints_jacobian() 129        0.0015      0.000011    0.0015      0.000011    0.16     0.16     |
+|   objective()                       129        0.0031      0.000024    0.0031      0.000024    0.34     0.34     |
+|   solve()                           1          0.8703      0.870275    0.9012      0.901237    96.44    99.87    |
+ ------------------------------------------------------------------------------------------------------------------
+| Totals:                             1449       0.9024                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------------
+
+
+***************************************************************
+* Done Running Example optimization_ex2:
+*   example-opt -tao_monitor -tao_view -tao_type ipm -pc_type jacobi -ksp_max_it 100
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

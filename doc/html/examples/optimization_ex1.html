@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/optimization/optimization_ex1" target="_blank">Open optimization_ex1 in new tab.</a>
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
+<pre>
+***************************************************************
+* Running Example optimization_ex1:
+*   example-opt -tao_monitor -tao_view -tao_type nls
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=441
+    n_local_nodes()=441
+  n_elem()=100
+    n_local_elem()=100
+    n_active_elem()=100
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Optimization"
+    Type "Optimization"
+    Variables="u"
+    Finite Element Types="LAGRANGE", "JACOBI_20_00"
+    Infinite Element Mapping="CARTESIAN"
+    Approximation Orders="SECOND", "THIRD"
+    n_dofs()=441
+    n_local_dofs()=441
+    n_constrained_dofs()=80
+    n_local_constrained_dofs()=80
+    n_vectors()=4
+    n_matrices()=2
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 14.8776
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 25
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 80
+      Average DoF Constraint Length= 0
+
+iter =   0, Function value: 0,  Residual: 0.217778
+iter =   1, Function value: -0.281146,  Residual: 1.41941e-06
+Tao Object: 1 MPI processes
+  type: nls
+      Rejected matrix updates: 0
+      Newton steps: 1
+      BFGS steps: 0
+      Scaled gradient steps: 0
+      Gradient steps: 0
+      nls ksp atol: 0
+      nls ksp rtol: 1
+      nls ksp ctol: 0
+      nls ksp negc: 0
+      nls ksp dtol: 0
+      nls ksp iter: 0
+      nls ksp othr: 0
+  TaoLineSearch Object:   1 MPI processes
+    type: more-thuente
+  KSP Object:   1 MPI processes
+    type: stcg
+  total KSP iterations: 28
+  convergence tolerances: fatol=1e-10,   frtol=1e-10
+  convergence tolerances: gatol=1e-08,   steptol=0,   gttol=0
+  Residual in Function/Gradient:=1.41941e-06
+  Objective value=-0.281146
+  total number of iterations=1,                          (max: 50)
+  total number of function evaluations=7,                  max: 128
+  total number of gradient evaluations=2,                  max: 128
+  total number of Hessian evaluations=1
+  Solution converged:   estimated f(x)-f(X*) <= fatol
+Tao optimization solver convergence/divergence reason: CONVERGED_FATOL
+
+ -------------------------------------------------------------------------------------------------------------------
+| Time:           Wed Apr 13 09:41:07 2016                                                                          |
+| OS:             Darwin                                                                                            |
+| HostName:       peterson-laptop.local                                                                             |
+| OS Release:     15.0.0                                                                                            |
+| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
+| Machine:        x86_64                                                                                            |
+| Username:       petejw                                                                                            |
+| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
+|  '--with-methods=opt dbg'                                                                                         |
+|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
+|  '--enable-perflog'                                                                                               |
+|  '--enable-tracefiles'                                                                                            |
+|  '--disable-blocked-storage'                                                                                      |
+|  '--enable-default-comm-world'                                                                                    |
+|  '--enable-tecio'                                                                                                 |
+|  '--enable-unique-ptr'                                                                                            |
+|  '--enable-ifem'                                                                                                  |
+|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
+|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
+|  'CPPFLAGS= '                                                                                                     |
+|  'LIBS= '                                                                                                         |
+|  'CPPFLAGS=  '                                                                                                    |
+|  'LIBS=  '                                                                                                        |
+|  '--disable-netcdf-4'                                                                                             |
+|  '--disable-testsets'                                                                                             |
+|  'CXX=mpicxx'                                                                                                     |
+|  'CC=mpicc'                                                                                                       |
+|  'F77=mpif77'                                                                                                     |
+|  'FC=mpif90'                                                                                                      |
+|  'CPPFLAGS=   '                                                                                                   |
+|  'LIBS=   '                                                                                                       |
+ -------------------------------------------------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.236581, Active time=0.01159                                                   |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0000      0.000048    0.0000      0.000048    0.41     0.41     |
+|   build_constraint_matrix()        100        0.0001      0.000001    0.0001      0.000001    0.74     0.74     |
+|   build_sparsity()                 1          0.0004      0.000395    0.0004      0.000435    3.41     3.75     |
+|   cnstrn_elem_mat_vec()            100        0.0001      0.000001    0.0001      0.000001    0.93     0.93     |
+|   create_dof_constraints()         1          0.0005      0.000500    0.0010      0.001025    4.31     8.84     |
+|   distribute_dofs()                1          0.0001      0.000083    0.0004      0.000434    0.72     3.74     |
+|   dof_indices()                    400        0.0001      0.000000    0.0001      0.000000    1.26     1.26     |
+|   enforce_constraints_exactly()    10         0.0004      0.000037    0.0004      0.000037    3.16     3.16     |
+|   prepare_send_list()              2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         1          0.0004      0.000351    0.0004      0.000351    3.03     3.03     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0002      0.000233    0.0003      0.000283    2.01     2.44     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0014      0.001368    0.0014      0.001368    11.80    11.80    |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        140        0.0003      0.000002    0.0003      0.000002    2.72     2.72     |
+|   init_shape_functions()           41         0.0000      0.000001    0.0000      0.000001    0.19     0.19     |
+|   inverse_map()                    120        0.0001      0.000001    0.0001      0.000001    1.03     1.03     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             140        0.0001      0.000001    0.0001      0.000001    1.13     1.13     |
+|   compute_face_map()               40         0.0001      0.000002    0.0002      0.000005    0.72     1.86     |
+|   init_face_shape_functions()      40         0.0000      0.000001    0.0000      0.000001    0.19     0.19     |
+|   init_reference_to_physical_map() 41         0.0002      0.000004    0.0002      0.000004    1.33     1.33     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0003      0.000258    0.0003      0.000258    2.23     2.23     |
+|   renumber_nodes_and_elem()        2          0.0000      0.000005    0.0000      0.000005    0.09     0.09     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0000      0.000018    0.0017      0.001669    0.16     14.40    |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0001      0.000131    0.0001      0.000131    1.13     1.13     |
+|                                                                                                                 |
+| OptimizationSystem                                                                                              |
+|   solve()                          1          0.0022      0.002184    0.0070      0.007001    18.84    60.41    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0000      0.000012    0.0000      0.000012    0.10     0.10     |
+|                                                                                                                 |
+| TaoOptimizationSolver                                                                                           |
+|   gradient()                       2          0.0001      0.000040    0.0001      0.000070    0.69     1.21     |
+|   hessian()                        1          0.0003      0.000297    0.0003      0.000328    2.56     2.83     |
+|   objective()                      7          0.0004      0.000056    0.0007      0.000096    3.40     5.81     |
+|   solve()                          1          0.0037      0.003674    0.0048      0.004817    31.70    41.56    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            1200       0.0116                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+
+***************************************************************
+* Done Running Example optimization_ex1:
+*   example-opt -tao_monitor -tao_view -tao_type nls
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

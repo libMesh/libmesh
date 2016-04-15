@@ -329,7 +329,7 @@ void assemble_helmholtz(EquationSystems & es,
   //
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as an UniquePtr<FEBase>.  This can be thought
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 

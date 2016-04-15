@@ -100,7 +100,7 @@ void Biharmonic::step(const Real & dt_in)
 {
   // We need to update the old solution vector.
   // The old solution vector will be the current solution vector from the
-  // previous time step. We use vector assignment.  Only \p TransientSystems
+  // previous time step. We use vector assignment.  Only TransientSystems
   // (and systems derived from them) contain old solutions.
   if (dt_in < 0)
     _dt = _dt0;

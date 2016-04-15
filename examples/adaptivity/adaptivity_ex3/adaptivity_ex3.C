@@ -80,9 +80,9 @@ using namespace libMesh;
 
 // Function prototype.  This is the function that will assemble
 // the linear system for our Laplace problem.  Note that the
-// function will take the \p EquationSystems object and the
+// function will take the EquationSystems object and the
 // name of the system we are assembling as input.  From the
-// \p EquationSystems object we have acess to the \p Mesh and
+// EquationSystems object we have acess to the Mesh and
 // other objects we might need.
 void assemble_laplace(EquationSystems & es,
                       const std::string & system_name);
@@ -314,13 +314,13 @@ int main(int argc, char ** argv)
           if (uniform_refine == 0)
             {
 
-              // The \p ErrorVector is a particular \p StatisticsVector
+              // The ErrorVector is a particular StatisticsVector
               // for computing error information on a finite element mesh.
               ErrorVector error;
 
               if (indicator_type == "exact")
                 {
-                  // The \p ErrorEstimator class interrogates a
+                  // The ErrorEstimator class interrogates a
                   // finite element solution and assigns to each
                   // element a positive error value.
                   // This value is used for deciding which elements to
@@ -385,7 +385,7 @@ int main(int argc, char ** argv)
 #endif
               error.plot_error(error_output, mesh);
 
-              // This takes the error in \p error and decides which elements
+              // This takes the error in error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
               // maximum error on any element will be refined, and any
               // element within 10% of the minimum error on any element might
@@ -439,10 +439,10 @@ int main(int argc, char ** argv)
                 mesh_refinement.uniformly_p_refine(1);
             }
 
-          // This call reinitializes the \p EquationSystems object for
+          // This call reinitializes the EquationSystems object for
           // the newly refined mesh.  One of the steps in the
-          // reinitialization is projecting the \p solution,
-          // \p old_solution, etc... vectors from the old mesh to
+          // reinitialization is projecting the solution,
+          // old_solution, etc... vectors from the old mesh to
           // the current one.
           equation_systems.reinit ();
         }
@@ -612,9 +612,9 @@ void assemble_laplace(EquationSystems & es,
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Laplace");
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -623,8 +623,8 @@ void assemble_laplace(EquationSystems & es,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe      (FEBase::build(mesh_dim, fe_type));
   UniquePtr<FEBase> fe_face (FEBase::build(mesh_dim, fe_type));
@@ -677,7 +677,7 @@ void assemble_laplace(EquationSystems & es,
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.  See
   // example 3 for a discussion of the element iterators.  Here we use
-  // the \p const_active_local_elem_iterator to indicate we only want
+  // the const_active_local_elem_iterator to indicate we only want
   // to loop over elements that are assigned to the local processor
   // which are "active" in the sense of AMR.  This allows each
   // processor to compute its components of the global matrix for
@@ -803,8 +803,8 @@ void assemble_laplace(EquationSystems & es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-      // and \p NumericVector::add_vector() members do this for us.
+      // right-hand-side vector.  The SparseMatrix::add_matrix()
+      // and NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       perf_log.push ("matrix insertion");

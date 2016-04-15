@@ -66,7 +66,7 @@ UniquePtr<Elem> InfQuad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an UniquePtr
+  // To be returned wrapped in a UniquePtr
   Elem * edge = libmesh_nullptr;
 
   switch (i)

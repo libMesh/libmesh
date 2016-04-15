@@ -45,8 +45,8 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/linear_implicit_system.h"
 
-// For systems of equations the \p DenseSubMatrix
-// and \p DenseSubVector provide convenient ways for
+// For systems of equations the DenseSubMatrix
+// and DenseSubVector provide convenient ways for
 // assembling the element matrix and vector on a
 // component-by-component basis.
 #include "libmesh/dense_submatrix.h"
@@ -84,7 +84,7 @@ int main (int argc, char ** argv)
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
-  // to build a mesh of 8x8 \p Quad9 elements.  Building these
+  // to build a mesh of 8x8 Quad9 elements.  Building these
   // higher-order elements allows us to use higher-order
   // approximation, as in example 3.
   MeshTools::Generation::build_square (mesh,
@@ -178,7 +178,7 @@ void assemble_stokes (EquationSystems & es,
   UniquePtr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
 
   // A Gauss quadrature rule for numerical integration.
-  // Let the \p FEType object decide what order rule is appropriate.
+  // Let the FEType object decide what order rule is appropriate.
   QGauss qrule (dim, fe_vel_type.default_quadrature_order());
 
   // Tell the finite element objects to use our quadrature rule.
@@ -199,9 +199,9 @@ void assemble_stokes (EquationSystems & es,
   // evaluated at the quadrature points.
   const std::vector<std::vector<Real> > & psi = fe_pres->get_phi();
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
-  // to degree of freedom numbers.  We will talk more about the \p DofMap
+  // to degree of freedom numbers.  We will talk more about the DofMap
   // in future examples.
   const DofMap & dof_map = system.get_dof_map();
 
@@ -235,7 +235,7 @@ void assemble_stokes (EquationSystems & es,
   // matrix and right-hand-side contribution.  In case users later
   // modify this program to include refinement, we will be safe and
   // will only consider the active elements; hence we use a variant of
-  // the \p active_elem_iterator.
+  // the active_elem_iterator.
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -284,10 +284,10 @@ void assemble_stokes (EquationSystems & es,
       //        | Kpu Kpv Kpp |        | Fp |
       //         -           -          -  -
       //
-      // The \p DenseSubMatrix.repostition () member takes the
+      // The DenseSubMatrix.repostition () member takes the
       // (row_offset, column_offset, row_size, column_size).
       //
-      // Similarly, the \p DenseSubVector.reposition () member
+      // Similarly, the DenseSubVector.reposition () member
       // takes the (row_offset, row_size)
       Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
       Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
@@ -406,8 +406,8 @@ void assemble_stokes (EquationSystems & es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p NumericMatrix::add_matrix()
-      // and \p NumericVector::add_vector() members do this for us.
+      // right-hand-side vector.  The NumericMatrix::add_matrix()
+      // and NumericVector::add_vector() members do this for us.
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop

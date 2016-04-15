@@ -164,7 +164,10 @@ public:
 
   /**
    * Writes out the solution at a specific timestep.
+   * @param fname Name of the file to write to
+   * @param es EquationSystems object which contains the solution vector.
    * @param timestep The timestep to write out, should be _1_ indexed.
+   * @param time The current simulation time.
    */
   void write_timestep (const std::string & fname,
                        const EquationSystems & es,

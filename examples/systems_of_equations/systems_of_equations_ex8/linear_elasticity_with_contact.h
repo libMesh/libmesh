@@ -101,8 +101,8 @@ public:
                          unsigned int l);
 
   /**
-   * Move the mesh nodes of \p input_mesh based on the displacement field
-   * in \p input_solution.
+   * Move the mesh nodes of input_mesh based on the displacement field
+   * in input_solution.
    */
   void move_mesh(MeshBase & input_mesh,
                  const NumericVector<Number> & input_solution);

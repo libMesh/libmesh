@@ -133,8 +133,8 @@ int main (int argc, char ** argv)
   eigen_system.attach_assemble_function (assemble_mass);
 
   // Set necessary parametrs used in EigenSystem::solve(),
-  // i.e. the number of requested eigenpairs \p nev and the number
-  // of basis vectors \p ncv used in the solution algorithm. Note that
+  // i.e. the number of requested eigenpairs nev and the number
+  // of basis vectors ncv used in the solution algorithm. Note that
   // ncv >= nev must hold and ncv >= 2*nev is recommended.
   equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
   equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
@@ -227,8 +227,8 @@ void assemble_mass(EquationSystems & es,
   SparseMatrix<Number> & matrix_B = *eigen_system.matrix_B;
 
   // Build a Finite Element object of the specified type.  Since the
-  // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // FEBase::build() member dynamically creates memory we will
+  // store the object as a UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -249,7 +249,7 @@ void assemble_mass(EquationSystems & es,
   // points.
   const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
   const DofMap & dof_map = eigen_system.get_dof_map();
@@ -268,7 +268,7 @@ void assemble_mass(EquationSystems & es,
   // matrix and right-hand-side contribution.  In case users
   // later modify this program to include refinement, we will
   // be safe and will only consider the active elements;
-  // hence we use a variant of the \p active_elem_iterator.
+  // hence we use a variant of the active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 

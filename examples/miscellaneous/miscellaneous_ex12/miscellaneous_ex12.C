@@ -345,7 +345,7 @@ void assemble_shell (EquationSystems & es,
   const std::vector<std::vector<Real> > & dphidxi = fe->get_dphidxi();
   const std::vector<std::vector<Real> > & dphideta = fe->get_dphideta();
 
-  // A reference to the \p DofMap object for this system.  The \p DofMap
+  // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.
   const DofMap & dof_map = system.get_dof_map();
@@ -741,7 +741,7 @@ void assemble_shell (EquationSystems & es,
             global_KIJ = TI.transpose()*full_local_KIJ*TJ;
 
             // Insert the components of the coupling stiffness
-            // matrix \p KIJ into the corresponding directional
+            // matrix KIJ into the corresponding directional
             // submatrices.
             for (unsigned int k=0;k<6;k++)
               for (unsigned int l=0;l<6;l++)
