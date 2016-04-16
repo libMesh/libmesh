@@ -100,6 +100,7 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     mRegisteredDerivatives(cpy.mRegisteredDerivatives),
     ad(new ADImplementation<Value_t>(this))
 {
+  pImmed = this->mData->mImmed.empty() ? NULL : &(this->mData->mImmed[0]);
 }
 
 template<typename Value_t>
