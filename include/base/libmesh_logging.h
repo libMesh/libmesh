@@ -26,6 +26,11 @@
 
 #include "libmesh/perf_log.h"
 
+// Two-level macro substitution trick, used to construct a unique
+// variable name for a given line.
+#define TOKENPASTE(x, y) x ## y
+#define TOKENPASTE2(x, y) TOKENPASTE(x, y)
+
 namespace libMesh
 {
 
@@ -45,6 +50,44 @@ class PerfLog;
 extern PerfLog perflog;
 
 
+/**
+ * Used for logging something that naturally lasts as long as some
+ * enclosing scope, such as the current function.  Makes it very easy
+ * to handle multiple return scenarios, since the event is popped in
+ * the destructor.  Should not be used directly, instead use the
+ * LOG_SCOPE macro, which resolves to nothing at compile time if
+ * logging is disabled.
+ *
+ * \author John Peterson
+ * \date 2016
+ */
+struct PerfItem
+{
+  PerfItem(const char * label,
+           const char * header,
+           bool enabled=true) :
+    _label(label),
+    _header(header),
+    _enabled(enabled)
+  {
+    if (_enabled)
+      libMesh::perflog.push(label, header);
+  }
+
+  ~PerfItem()
+  {
+    if (_enabled)
+      libMesh::perflog.pop(_label, _header);
+  }
+
+private:
+  const char * _label;
+  const char * _header;
+  bool _enabled;
+};
+
+
+
 } // namespace libMesh
 
 
@@ -59,6 +102,8 @@ extern PerfLog perflog;
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
 #  define PALIBMESH_USE_LOG(a,b)   { libmesh_deprecated(); }
 #  define RESTART_LOG(a,b) { libmesh_deprecated(); }
+#  define LOG_SCOPE(a,b)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b);
+#  define LOG_SCOPE_IF(a,b,enabled)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b,enabled);
 
 #else
 
@@ -66,6 +111,8 @@ extern PerfLog perflog;
 #  define STOP_LOG(a,b)    {}
 #  define PALIBMESH_USE_LOG(a,b)   {}
 #  define RESTART_LOG(a,b) {}
+#  define LOG_SCOPE(a,b)   {}
+#  define LOG_SCOPE_IF(a,b,enabled) {}
 
 #endif
 
