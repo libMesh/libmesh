@@ -107,15 +107,12 @@ Node * MeshRefinement::add_node(const Elem & parent,
                                 unsigned int node,
                                 processor_id_type proc_id)
 {
-  START_LOG("add_node()", "MeshRefinement");
+  LOG_SCOPE("add_node()", "MeshRefinement");
 
   unsigned int parent_n = parent.as_parent_node(child, node);
 
   if (parent_n != libMesh::invalid_uint)
-    {
-      STOP_LOG("add_node()", "MeshRefinement");
-      return parent.get_node(parent_n);
-    }
+    return parent.get_node(parent_n);
 
   const std::vector<std::pair<dof_id_type, dof_id_type> >
     bracketing_nodes = parent.bracketing_nodes(child, node);
@@ -129,10 +126,7 @@ Node * MeshRefinement::add_node(const Elem & parent,
 
   // Return the node if it already exists
   if (new_node_id != DofObject::invalid_id)
-    {
-      STOP_LOG("add_node()", "MeshRefinement");
-      return _mesh.node_ptr(new_node_id);
-    }
+    return _mesh.node_ptr(new_node_id);
 
   // Otherwise we need to add a new node, with a default id and the
   // requested processor_id.  Figure out where to add the point:
@@ -159,8 +153,6 @@ Node * MeshRefinement::add_node(const Elem & parent,
 
   // Add the node to the map.
   _new_nodes_map.add_node(*new_node, bracketing_nodes);
-
-  STOP_LOG("add_node()", "MeshRefinement");
 
   // Return the address of the new node
   return new_node;
@@ -835,7 +827,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
   // This function must be run on all processors at once
   parallel_object_only();
 
-  START_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
+  LOG_SCOPE ("make_flags_parallel_consistent()", "MeshRefinement");
 
   SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
                             &Elem::set_refinement_flag);
@@ -852,8 +844,6 @@ bool MeshRefinement::make_flags_parallel_consistent()
   bool parallel_consistent = hsync.parallel_consistent &&
     psync.parallel_consistent;
   this->comm().min(parallel_consistent);
-
-  STOP_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
 
   return parallel_consistent;
 }
@@ -879,7 +869,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
     point_locator = _mesh.sub_point_locator();
 #endif
 
-  START_LOG ("make_coarsening_compatible()", "MeshRefinement");
+  LOG_SCOPE ("make_coarsening_compatible()", "MeshRefinement");
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -936,8 +926,6 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // there is no work for us to do
   if (max_level == 0 && max_p_level == 0)
     {
-      STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
-
       // But we still have to check with other processors
       this->comm().min(compatible_with_refinement);
 
@@ -1193,8 +1181,6 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
         }
     }
 
-  STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
-
   // If one processor finds an incompatibility, we're globally
   // incompatible
   this->comm().min(compatible_with_refinement);
@@ -1228,7 +1214,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
     point_locator = _mesh.sub_point_locator();
 #endif
 
-  START_LOG ("make_refinement_compatible()", "MeshRefinement");
+  LOG_SCOPE ("make_refinement_compatible()", "MeshRefinement");
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -1396,8 +1382,6 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   // compatible
   this->comm().min(compatible_with_coarsening);
 
-  STOP_LOG ("make_refinement_compatible()", "MeshRefinement");
-
   return compatible_with_coarsening;
 }
 
@@ -1409,7 +1393,7 @@ bool MeshRefinement::_coarsen_elements ()
   // This function must be run on all processors at once
   parallel_object_only();
 
-  START_LOG ("_coarsen_elements()", "MeshRefinement");
+  LOG_SCOPE ("_coarsen_elements()", "MeshRefinement");
 
   // Flags indicating if this call actually changes the mesh
   bool mesh_changed = false;
@@ -1519,8 +1503,6 @@ bool MeshRefinement::_coarsen_elements ()
       MeshCommunication().make_p_levels_parallel_consistent (_mesh);
     }
 
-  STOP_LOG ("_coarsen_elements()", "MeshRefinement");
-
   return (mesh_changed || mesh_p_changed);
 }
 
@@ -1535,7 +1517,7 @@ bool MeshRefinement::_refine_elements ()
   // find nodes to connect to.
   this->update_nodes_map ();
 
-  START_LOG ("_refine_elements()", "MeshRefinement");
+  LOG_SCOPE ("_refine_elements()", "MeshRefinement");
 
   // Iterate over the elements, counting the elements
   // flagged for h refinement.
@@ -1611,8 +1593,6 @@ bool MeshRefinement::_refine_elements ()
 
   // Clear the _new_nodes_map and _unused_elements data structures.
   this->clear();
-
-  STOP_LOG ("_refine_elements()", "MeshRefinement");
 
   return (mesh_changed || mesh_p_changed);
 }

@@ -133,7 +133,7 @@ void PatchRecoveryErrorEstimator::estimate_error (const System & system,
                                                   const NumericVector<Number> * solution_vector,
                                                   bool)
 {
-  START_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
+  LOG_SCOPE("estimate_error()", "PatchRecoveryErrorEstimator");
 
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
@@ -181,8 +181,6 @@ void PatchRecoveryErrorEstimator::estimate_error (const System & system,
       newsol->swap(*sys.solution);
       sys.update();
     }
-
-  STOP_LOG("estimate_error()", "PatchRecoveryErrorEstimator");
 }
 
 

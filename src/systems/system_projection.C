@@ -241,16 +241,13 @@ public:
                        const Point & p,
                        Real /* time */ =0.)
   {
-    START_LOG ("eval_at_point()", "OldSolutionValue");
+    LOG_SCOPE ("eval_at_point()", "OldSolutionValue");
+
     if (!this->check_old_context(c, p))
-      {
-        STOP_LOG ("eval_at_point()", "OldSolutionValue");
-        return 0;
-      }
+      return 0;
 
     Output n;
     (old_context.*point_output)(i, p, n, out_of_elem_tol);
-    STOP_LOG ("eval_at_point()", "OldSolutionValue");
     return n;
   }
 
@@ -260,7 +257,7 @@ public:
                       unsigned int var,
                       std::vector<Output> & values)
   {
-    START_LOG ("eval_old_dofs()", "OldSolutionValue");
+    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
 
     this->check_old_context(c);
 
@@ -270,14 +267,12 @@ public:
     libmesh_assert_equal_to (old_dof_indices.size(), values.size());
 
     old_solution.get(old_dof_indices, values);
-
-    STOP_LOG ("eval_old_dofs()", "OldSolutionValue");
   }
 
 protected:
   void check_old_context (const FEMContext & c)
   {
-    START_LOG ("check_old_context(c)", "OldSolutionValue");
+    LOG_SCOPE ("check_old_context(c)", "OldSolutionValue");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -305,14 +300,12 @@ protected:
       {
         libmesh_assert(old_context.has_elem());
       }
-
-    STOP_LOG ("check_old_context(c)", "OldSolutionValue");
   }
 
 
   bool check_old_context (const FEMContext & c, const Point & p)
   {
-    START_LOG ("check_old_context(c,p)", "OldSolutionValue");
+    LOG_SCOPE ("check_old_context(c,p)", "OldSolutionValue");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -344,10 +337,7 @@ protected:
         else
           {
             if (!elem.old_dof_object)
-              {
-                STOP_LOG ("check_old_context(c,p)", "OldSolutionValue");
-                return false;
-              }
+              return false;
 
             old_context.pre_fe_reinit(sys, &elem);
           }
@@ -377,7 +367,6 @@ protected:
           }
       }
 
-    STOP_LOG ("check_old_context(c,p)", "OldSolutionValue");
     return true;
   }
 
@@ -415,7 +404,7 @@ OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node (const FEMConte
                                                                   const Node & n,
                                                                   Real)
 {
-  START_LOG ("Number eval_at_node()", "OldSolutionValue");
+  LOG_SCOPE ("Number eval_at_node()", "OldSolutionValue");
 
   // Optimize for the common case, where this node was part of the
   // old solution.
@@ -430,11 +419,8 @@ OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node (const FEMConte
     {
       const dof_id_type old_id =
         n.old_dof_object->dof_number(sys.number(), i, 0);
-      STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
       return old_solution(old_id);
     }
-
-  STOP_LOG ("Number eval_at_node()", "OldSolutionValue");
 
   return this->eval_at_point(c, i, n, 0);
 }
@@ -449,7 +435,7 @@ OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node (const FEM
                                                                        const Node & n,
                                                                        Real)
 {
-  START_LOG ("Gradient eval_at_node()", "OldSolutionValue");
+  LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionValue");
 
   // Optimize for the common case, where this node was part of the
   // old solution.
@@ -469,11 +455,8 @@ OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node (const FEM
             n.old_dof_object->dof_number(sys.number(), i, d+1);
           g(d) = old_solution(old_id);
         }
-      STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
       return g;
     }
-
-  STOP_LOG ("Gradient eval_at_node()", "OldSolutionValue");
 
   return this->eval_at_point(c, i, n, 0);
 }
@@ -604,7 +587,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
                              NumericVector<Number> & new_v,
                              int is_adjoint) const
 {
-  START_LOG ("project_vector(old,new)", "System");
+  LOG_SCOPE ("project_vector(old,new)", "System");
 
   /**
    * This method projects a solution from an old mesh to a current, refined
@@ -785,8 +768,6 @@ void System::project_vector (const NumericVector<Number> & old_v,
   new_v = old_v;
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
-
-  STOP_LOG("project_vector(old,new)", "System");
 }
 
 
@@ -867,7 +848,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
                              FunctionBase<Gradient> * g,
                              int is_adjoint) const
 {
-  START_LOG ("project_vector(FunctionBase)", "System");
+  LOG_SCOPE ("project_vector(FunctionBase)", "System");
 
   libmesh_assert(f);
 
@@ -881,8 +862,6 @@ void System::project_vector (NumericVector<Number> & new_vector,
     }
   else
     this->project_vector(new_vector, &f_fem, libmesh_nullptr, is_adjoint);
-
-  STOP_LOG ("project_vector(FunctionBase)", "System");
 }
 
 
@@ -895,7 +874,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
                              FEMFunctionBase<Gradient> * g,
                              int is_adjoint) const
 {
-  START_LOG ("project_fem_vector()", "System");
+  LOG_SCOPE ("project_fem_vector()", "System");
 
   libmesh_assert (f);
 
@@ -974,8 +953,6 @@ void System::project_vector (NumericVector<Number> & new_vector,
     this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
                                                             is_adjoint);
 #endif
-
-  STOP_LOG("project_fem_vector()", "System");
 }
 
 
@@ -1056,7 +1033,7 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
                                       FunctionBase<Gradient> * g,
                                       int is_adjoint) const
 {
-  START_LOG ("boundary_project_vector()", "System");
+  LOG_SCOPE ("boundary_project_vector()", "System");
 
   Threads::parallel_for
     (ConstElemRange (this->get_mesh().active_local_elements_begin(),
@@ -1078,8 +1055,6 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
     this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
                                                             is_adjoint);
 #endif
-
-  STOP_LOG("boundary_project_vector()", "System");
 }
 
 
@@ -1089,7 +1064,7 @@ template <typename FFunctor, typename GFunctor,
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   (const ConstElemRange & range) const
 {
-  START_LOG ("operator()","GenericProjector");
+  LOG_SCOPE ("operator()", "GenericProjector");
 
   ProjectionAction action(master_action);
   FFunctor f(master_f);
@@ -1244,13 +1219,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // then we can simply copy its old dof
           // values to new indices.
             {
-              START_LOG ("copy_dofs","GenericProjector");
+              LOG_SCOPE ("copy_dofs", "GenericProjector");
 
               f.eval_old_dofs(context, var_component, Ue.get_values());
 
               action.insert(context, var, Ue);
-
-              STOP_LOG ("copy_dofs","GenericProjector");
 
               continue;
             }
@@ -1934,8 +1907,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           action.insert(context, var, Ue);
         } // end variables loop
     } // end elements loop
-
-  STOP_LOG ("operator()","GenericProjector");
 }
 
 

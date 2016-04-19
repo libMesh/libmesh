@@ -56,7 +56,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
 {
   libmesh_assert (mesh.is_prepared());
 
-  START_LOG("build_sparsity()", "DofMap");
+  LOG_SCOPE("build_sparsity()", "DofMap");
 
   // Compute the sparsity structure of the global matrix.  This can be
   // fed into a PetscMatrix to allocate exacly the number of nonzeros
@@ -97,8 +97,6 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   const dof_id_type n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
 #endif
   libmesh_assert_equal_to (sp->sparsity_pattern.size(), n_dofs_on_proc);
-
-  STOP_LOG("build_sparsity()", "DofMap");
 
   // Check to see if we have any extra stuff to add to the sparsity_pattern
   if (_extra_sparsity_function)
@@ -440,7 +438,7 @@ void DofMap::reinit(MeshBase & mesh)
 {
   libmesh_assert (mesh.is_prepared());
 
-  START_LOG("reinit()", "DofMap");
+  LOG_SCOPE("reinit()", "DofMap");
 
   const unsigned int
     sys_num      = this->sys_number(),
@@ -779,8 +777,6 @@ void DofMap::reinit(MeshBase & mesh)
   // Finally, clear all the current DOF indices
   // (distribute_dofs expects them cleared!)
   this->invalidate_dofs(mesh);
-
-  STOP_LOG("reinit()", "DofMap");
 }
 
 
@@ -848,7 +844,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   parallel_object_only();
 
   // Log how long it takes to distribute the degrees of freedom
-  START_LOG("distribute_dofs()", "DofMap");
+  LOG_SCOPE("distribute_dofs()", "DofMap");
 
   libmesh_assert (mesh.is_prepared());
 
@@ -993,8 +989,6 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         _first_scalar_df[v] = current_SCALAR_dof_index;
         current_SCALAR_dof_index += this->variable(v).type().order.get_order();
       }
-
-  STOP_LOG("distribute_dofs()", "DofMap");
 
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
@@ -1401,7 +1395,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 
 void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 {
-  START_LOG("add_neighbors_to_send_list()", "DofMap");
+  LOG_SCOPE("add_neighbors_to_send_list()", "DofMap");
 
   const unsigned int sys_num = this->sys_number();
 
@@ -1550,15 +1544,13 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
               _send_list.push_back(di[j]);
         }
     }
-
-  STOP_LOG("add_neighbors_to_send_list()", "DofMap");
 }
 
 
 
 void DofMap::prepare_send_list ()
 {
-  START_LOG("prepare_send_list()", "DofMap");
+  LOG_SCOPE("prepare_send_list()", "DofMap");
 
   // Check to see if we have any extra stuff to add to the send_list
   if (_extra_send_list_function)
@@ -1589,8 +1581,6 @@ void DofMap::prepare_send_list ()
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
   std::vector<dof_id_type> (_send_list.begin(), new_end).swap (_send_list);
-
-  STOP_LOG("prepare_send_list()", "DofMap");
 }
 
 
@@ -1813,7 +1803,7 @@ void DofMap::dof_indices (const Elem * const elem,
   // active)
   libmesh_assert(!elem || elem->active());
 
-  START_LOG("dof_indices()", "DofMap");
+  LOG_SCOPE("dof_indices()", "DofMap");
 
   // Clear the DOF indices vector
   di.clear();
@@ -1860,7 +1850,6 @@ void DofMap::dof_indices (const Elem * const elem,
             }
         }
 
-      STOP_LOG("dof_indices()", "DofMap");
       return;
     }
 
@@ -1891,8 +1880,6 @@ void DofMap::dof_indices (const Elem * const elem,
 #ifdef DEBUG
   libmesh_assert_equal_to (tot_size, di.size());
 #endif
-
-  STOP_LOG("dof_indices()", "DofMap");
 }
 
 
@@ -1904,7 +1891,7 @@ void DofMap::dof_indices (const Elem * const elem,
   // We now allow elem==NULL to request just SCALAR dofs
   // libmesh_assert(elem);
 
-  START_LOG("dof_indices()", "DofMap");
+  LOG_SCOPE("dof_indices()", "DofMap");
 
   // Clear the DOF indices vector
   di.clear();
@@ -1938,7 +1925,6 @@ void DofMap::dof_indices (const Elem * const elem,
                        );
         }
 
-      STOP_LOG("dof_indices()", "DofMap");
       return;
     }
 
@@ -1967,8 +1953,6 @@ void DofMap::dof_indices (const Elem * const elem,
 #ifdef DEBUG
   libmesh_assert_equal_to (tot_size, di.size());
 #endif
-
-  STOP_LOG("dof_indices()", "DofMap");
 }
 
 
@@ -2100,7 +2084,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
 #endif
                                  ) const
 {
-  START_LOG("SCALAR_dof_indices()", "DofMap");
+  LOG_SCOPE("SCALAR_dof_indices()", "DofMap");
 
   libmesh_assert(this->variable(vn).type().family == SCALAR);
 
@@ -2123,8 +2107,6 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
   di.resize(n_dofs_vn);
   for(int i = 0; i != n_dofs_vn; ++i)
     di[i] = my_idx++;
-
-  STOP_LOG("SCALAR_dof_indices()", "DofMap");
 }
 
 
@@ -2156,7 +2138,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                               std::vector<dof_id_type> & di,
                               const unsigned int vn) const
 {
-  START_LOG("old_dof_indices()", "DofMap");
+  LOG_SCOPE("old_dof_indices()", "DofMap");
 
   libmesh_assert(elem);
 
@@ -2316,8 +2298,6 @@ void DofMap::old_dof_indices (const Elem * const elem,
                 }
             }
       } // end loop over variables
-
-  STOP_LOG("old_dof_indices()", "DofMap");
 }
 
 

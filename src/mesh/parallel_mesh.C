@@ -1235,7 +1235,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   this->libmesh_assert_valid_parallel_p_levels();
 #endif
 
-  START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
+  LOG_SCOPE("renumber_nodes_and_elements()", "ParallelMesh");
 
   std::set<dof_id_type> used_nodes;
 
@@ -1283,7 +1283,6 @@ void ParallelMesh::renumber_nodes_and_elements ()
   if (_skip_renumber_nodes_and_elements)
     {
       this->update_parallel_id_counts();
-      STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
       return;
     }
 
@@ -1316,8 +1315,6 @@ void ParallelMesh::renumber_nodes_and_elements ()
   // And make sure we've made our numbering monotonic
   MeshTools::libmesh_assert_valid_elem_ids(*this);
 #endif
-
-  STOP_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 }
 
 

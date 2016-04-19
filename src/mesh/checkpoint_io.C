@@ -76,7 +76,7 @@ CheckpointIO::~CheckpointIO ()
 
 void CheckpointIO::write (const std::string & name)
 {
-  START_LOG("write()","CheckpointIO");
+  LOG_SCOPE("write()", "CheckpointIO");
 
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -138,8 +138,6 @@ void CheckpointIO::write (const std::string & name)
     }
 
   this->comm().barrier();
-
-  STOP_LOG("write()","CheckpointIO");
 }
 
 
@@ -401,7 +399,7 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
 
 void CheckpointIO::read (const std::string & name)
 {
-  START_LOG("read()","CheckpointIO");
+  LOG_SCOPE("read()","CheckpointIO");
 
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
@@ -472,8 +470,6 @@ void CheckpointIO::read (const std::string & name)
   // If the mesh is serial then we only read it on processor 0 so we need to broadcast it
   if(!parallel_mesh)
     MeshCommunication().broadcast(mesh);
-
-  STOP_LOG("read()","CheckpointIO");
 }
 
 

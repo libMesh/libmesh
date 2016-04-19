@@ -88,7 +88,7 @@ void PointLocatorList::init ()
     {
       if (this->_master == libmesh_nullptr)
         {
-          START_LOG("init(no master)", "PointLocatorList");
+          LOG_SCOPE("init(no master)", "PointLocatorList");
 
           // We are the master, so we have to build the list.
           // First create it, then get a handy reference, and
@@ -107,8 +107,6 @@ void PointLocatorList::init ()
 
           for (; el!=end; ++el)
             my_list.push_back(std::make_pair((*el)->centroid(), *el));
-
-          STOP_LOG("init(no master)", "PointLocatorList");
         }
 
       else
@@ -139,7 +137,7 @@ const Elem * PointLocatorList::operator() (const Point & p,
 {
   libmesh_assert (this->_initialized);
 
-  START_LOG("operator()", "PointLocatorList");
+  LOG_SCOPE("operator()", "PointLocatorList");
 
   // Ask the list.  This is quite expensive, since
   // we loop through the whole list to try to find
@@ -187,8 +185,6 @@ const Elem * PointLocatorList::operator() (const Point & p,
 
     // If we found an element and have a restriction list, they better match
     libmesh_assert (!last_elem || !allowed_subdomains || allowed_subdomains->count(last_elem->subdomain_id()));
-
-    STOP_LOG("operator()", "PointLocatorList");
 
     // return the element
     return last_elem;

@@ -282,13 +282,12 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
                                     const libMesh::Parallel::MessageTag & recv_tag,
                                     const libMesh::Parallel::Communicator & comm)
 {
-  START_LOG("send_receive()", "Parallel");
+  LOG_SCOPE("send_receive()", "Parallel");
 
   if (dest_processor_id   == comm.rank() &&
       source_processor_id == comm.rank())
     {
       recv = send;
-      STOP_LOG("send_receive()", "Parallel");
       return;
     }
 
@@ -409,8 +408,6 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
     }
 
   request.wait();
-
-  STOP_LOG("send_receive()", "Parallel");
 }
 
 #endif // LIBMESH_HAVE_MPI
@@ -834,7 +831,7 @@ inline Request::~Request () {
 
 inline Status Request::wait ()
 {
-  START_LOG("wait()", "Parallel::Request");
+  LOG_SCOPE("wait()", "Parallel::Request");
 
   if (_prior_request.get())
     _prior_request->wait();
@@ -857,7 +854,6 @@ inline Status Request::wait ()
         *i = libmesh_nullptr;
       }
 
-  STOP_LOG("wait()", "Parallel::Request");
   return stat;
 }
 
@@ -940,12 +936,8 @@ inline void Communicator::barrier () const
 {
   if (this->size() > 1)
     {
-      START_LOG("barrier()", "Parallel");
-
-      libmesh_call_mpi
-        (MPI_Barrier (this->get()));
-
-      STOP_LOG("barrier()", "Parallel");
+      LOG_SCOPE("barrier()", "Parallel");
+      libmesh_call_mpi(MPI_Barrier (this->get()));
     }
 }
 #else
@@ -1519,14 +1511,12 @@ inline void Communicator::min(T & r) const
 {
   if (this->size() > 1)
     {
-      START_LOG("min(scalar)", "Parallel");
+      LOG_SCOPE("min(scalar)", "Parallel");
 
       T temp = r;
       libmesh_call_mpi
         (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp), MPI_MIN,
                         this->get()));
-
-      STOP_LOG("min(scalar)", "Parallel");
     }
 }
 
@@ -1535,7 +1525,7 @@ inline void Communicator::min(bool & r) const
 {
   if (this->size() > 1)
     {
-      START_LOG("min(bool)", "Parallel");
+      LOG_SCOPE("min(bool)", "Parallel");
 
       unsigned int tempsend = r;
       unsigned int temp;
@@ -1544,10 +1534,7 @@ inline void Communicator::min(bool & r) const
         (MPI_Allreduce (&tempsend, &temp, 1,
                         StandardType<unsigned int>(), MPI_MIN,
                         this->get()));
-
       r = temp;
-
-      STOP_LOG("min(bool)", "Parallel");
     }
 }
 
@@ -1557,7 +1544,7 @@ inline void Communicator::min(std::vector<T> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("min(vector)", "Parallel");
+      LOG_SCOPE("min(vector)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1566,8 +1553,6 @@ inline void Communicator::min(std::vector<T> & r) const
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
                         StandardType<T>(&temp[0]), MPI_MIN,
                         this->get()));
-
-      STOP_LOG("min(vector)", "Parallel");
     }
 }
 
@@ -1576,7 +1561,7 @@ inline void Communicator::min(std::vector<bool> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("min(vector<bool>)", "Parallel");
+      LOG_SCOPE("min(vector<bool>)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1589,8 +1574,6 @@ inline void Communicator::min(std::vector<bool> & r) const
                         StandardType<unsigned int>(), MPI_BAND,
                         this->get()));
       unpack_vector_bool(temp, r);
-
-      STOP_LOG("min(vector<bool>)", "Parallel");
     }
 }
 
@@ -1601,7 +1584,7 @@ inline void Communicator::minloc(T & r,
 {
   if (this->size() > 1)
     {
-      START_LOG("minloc(scalar)", "Parallel");
+      LOG_SCOPE("minloc(scalar)", "Parallel");
 
       DataPlusInt<T> in;
       in.val = r;
@@ -1612,8 +1595,6 @@ inline void Communicator::minloc(T & r,
                         MPI_MINLOC, this->get()));
       r = out.val;
       min_id = out.rank;
-
-      STOP_LOG("minloc(scalar)", "Parallel");
     }
   else
     min_id = this->rank();
@@ -1625,7 +1606,7 @@ inline void Communicator::minloc(bool & r,
 {
   if (this->size() > 1)
     {
-      START_LOG("minloc(bool)", "Parallel");
+      LOG_SCOPE("minloc(bool)", "Parallel");
 
       DataPlusInt<int> in;
       in.val = r;
@@ -1636,8 +1617,6 @@ inline void Communicator::minloc(bool & r,
                         MPI_MINLOC, this->get()));
       r = out.val;
       min_id = out.rank;
-
-      STOP_LOG("minloc(bool)", "Parallel");
     }
   else
     min_id = this->rank();
@@ -1650,7 +1629,7 @@ inline void Communicator::minloc(std::vector<T> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("minloc(vector)", "Parallel");
+      LOG_SCOPE("minloc(vector)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1670,8 +1649,6 @@ inline void Communicator::minloc(std::vector<T> & r,
           r[i]      = out[i].val;
           min_id[i] = out[i].rank;
         }
-
-      STOP_LOG("minloc(vector)", "Parallel");
     }
   else if (!r.empty())
     {
@@ -1686,7 +1663,7 @@ inline void Communicator::minloc(std::vector<bool> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("minloc(vector<bool>)", "Parallel");
+      LOG_SCOPE("minloc(vector<bool>)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1706,8 +1683,6 @@ inline void Communicator::minloc(std::vector<bool> & r,
           r[i]      = out[i].val;
           min_id[i] = out[i].rank;
         }
-
-      STOP_LOG("minloc(vector<bool>)", "Parallel");
     }
   else if (!r.empty())
     {
@@ -1722,15 +1697,13 @@ inline void Communicator::max(T & r) const
 {
   if (this->size() > 1)
     {
-      START_LOG("max(scalar)", "Parallel");
+      LOG_SCOPE("max(scalar)", "Parallel");
 
       T temp;
       libmesh_call_mpi
         (MPI_Allreduce (&r, &temp, 1, StandardType<T>(&r), MPI_MAX,
                         this->get()));
       r = temp;
-
-      STOP_LOG("max(scalar)", "Parallel");
     }
 }
 
@@ -1739,7 +1712,7 @@ inline void Communicator::max(bool & r) const
 {
   if (this->size() > 1)
     {
-      START_LOG("max(bool)", "Parallel");
+      LOG_SCOPE("max(bool)", "Parallel");
 
       unsigned int tempsend = r;
       unsigned int temp;
@@ -1748,8 +1721,6 @@ inline void Communicator::max(bool & r) const
                         StandardType<unsigned int>(), MPI_MAX,
                         this->get()));
       r = temp;
-
-      STOP_LOG("max(bool)", "Parallel");
     }
 }
 
@@ -1759,7 +1730,7 @@ inline void Communicator::max(std::vector<T> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("max(vector)", "Parallel");
+      LOG_SCOPE("max(vector)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1768,8 +1739,6 @@ inline void Communicator::max(std::vector<T> & r) const
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
                         StandardType<T>(&temp[0]), MPI_MAX,
                         this->get()));
-
-      STOP_LOG("max(vector)", "Parallel");
     }
 }
 
@@ -1778,7 +1747,7 @@ inline void Communicator::max(std::vector<bool> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("max(vector<bool>)", "Parallel");
+      LOG_SCOPE("max(vector<bool>)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1791,8 +1760,6 @@ inline void Communicator::max(std::vector<bool> & r) const
                         StandardType<unsigned int>(), MPI_BOR,
                         this->get()));
       unpack_vector_bool(temp, r);
-
-      STOP_LOG("max(vector<bool>)", "Parallel");
     }
 }
 
@@ -1803,7 +1770,7 @@ inline void Communicator::maxloc(T & r,
 {
   if (this->size() > 1)
     {
-      START_LOG("maxloc(scalar)", "Parallel");
+      LOG_SCOPE("maxloc(scalar)", "Parallel");
 
       DataPlusInt<T> in;
       in.val = r;
@@ -1814,8 +1781,6 @@ inline void Communicator::maxloc(T & r,
                         MPI_MAXLOC, this->get()));
       r = out.val;
       max_id = out.rank;
-
-      STOP_LOG("maxloc(scalar)", "Parallel");
     }
   else
     max_id = this->rank();
@@ -1827,7 +1792,7 @@ inline void Communicator::maxloc(bool & r,
 {
   if (this->size() > 1)
     {
-      START_LOG("maxloc(bool)", "Parallel");
+      LOG_SCOPE("maxloc(bool)", "Parallel");
 
       DataPlusInt<int> in;
       in.val = r;
@@ -1838,8 +1803,6 @@ inline void Communicator::maxloc(bool & r,
                         MPI_MAXLOC, this->get()));
       r = out.val;
       max_id = out.rank;
-
-      STOP_LOG("maxloc(bool)", "Parallel");
     }
   else
     max_id = this->rank();
@@ -1852,7 +1815,7 @@ inline void Communicator::maxloc(std::vector<T> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("maxloc(vector)", "Parallel");
+      LOG_SCOPE("maxloc(vector)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1872,8 +1835,6 @@ inline void Communicator::maxloc(std::vector<T> & r,
           r[i]      = out[i].val;
           max_id[i] = out[i].rank;
         }
-
-      STOP_LOG("maxloc(vector)", "Parallel");
     }
   else if (!r.empty())
     {
@@ -1888,7 +1849,7 @@ inline void Communicator::maxloc(std::vector<bool> & r,
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("maxloc(vector<bool>)", "Parallel");
+      LOG_SCOPE("maxloc(vector<bool>)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1908,8 +1869,6 @@ inline void Communicator::maxloc(std::vector<bool> & r,
           r[i]      = out[i].val;
           max_id[i] = out[i].rank;
         }
-
-      STOP_LOG("maxloc(vector<bool>)", "Parallel");
     }
   else if (!r.empty())
     {
@@ -1924,14 +1883,12 @@ inline void Communicator::sum(T & r) const
 {
   if (this->size() > 1)
     {
-      START_LOG("sum()", "Parallel");
+      LOG_SCOPE("sum()", "Parallel");
 
       T temp = r;
       libmesh_call_mpi
         (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp), MPI_SUM,
                         this->get()));
-
-      STOP_LOG("sum()", "Parallel");
     }
 }
 
@@ -1941,7 +1898,7 @@ inline void Communicator::sum(std::vector<T> & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("sum()", "Parallel");
+      LOG_SCOPE("sum()", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1950,8 +1907,6 @@ inline void Communicator::sum(std::vector<T> & r) const
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
                         StandardType<T>(&temp[0]), MPI_SUM,
                         this->get()));
-
-      STOP_LOG("sum()", "Parallel");
     }
 }
 
@@ -1963,14 +1918,12 @@ inline void Communicator::sum(std::complex<T> & r) const
 {
   if (this->size() > 1)
     {
-      START_LOG("sum()", "Parallel");
+      LOG_SCOPE("sum()", "Parallel");
 
       std::complex<T> temp(r);
       libmesh_call_mpi
         (MPI_Allreduce (&temp, &r, 2, StandardType<T>(), MPI_SUM,
                         this->get()));
-
-      STOP_LOG("sum()", "Parallel");
     }
 }
 
@@ -1980,7 +1933,7 @@ inline void Communicator::sum(std::vector<std::complex<T> > & r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-      START_LOG("sum()", "Parallel");
+      LOG_SCOPE("sum()", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1988,8 +1941,6 @@ inline void Communicator::sum(std::vector<std::complex<T> > & r) const
       libmesh_call_mpi
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size() * 2),
                         StandardType<T>(libmesh_nullptr), MPI_SUM, this->get()));
-
-      STOP_LOG("sum()", "Parallel");
     }
 }
 
@@ -2041,14 +1992,12 @@ inline void Communicator::set_union(std::map<T1,T2> & data) const
 inline status Communicator::probe (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
-  START_LOG("probe()", "Parallel");
+  LOG_SCOPE("probe()", "Parallel");
 
   status stat;
 
   libmesh_call_mpi
     (MPI_Probe (src_processor_id, tag.value(), this->get(), &stat));
-
-  STOP_LOG("probe()", "Parallel");
 
   return stat;
 }
@@ -2060,7 +2009,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 std::basic_string<T> & buf,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
 
@@ -2072,8 +2021,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                              dest_processor_id,
                              tag.value(),
                              this->get()));
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2084,7 +2031,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
 
@@ -2097,8 +2044,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                tag.value(),
                                this->get(),
                                req.get()));
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2108,7 +2053,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 T & buf,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = &buf;
 
@@ -2120,8 +2065,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                              dest_processor_id,
                              tag.value(),
                              this->get()));
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2132,7 +2075,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = &buf;
 
@@ -2145,8 +2088,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                tag.value(),
                                this->get(),
                                req.get()));
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2180,12 +2121,10 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const DataType & type,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   std::vector<T> vecbuf(buf.begin(), buf.end());
   this->send(dest_processor_id, vecbuf, type, tag);
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2197,7 +2136,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   // Allocate temporary buffer on the heap so it lives until after
   // the non-blocking send completes
@@ -2209,8 +2148,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
     (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
   this->send(dest_processor_id, *vecbuf, type, req, tag);
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2244,7 +2181,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const DataType & type,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2254,8 +2191,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                              dest_processor_id,
                              tag.value(),
                              this->get()));
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2267,7 +2202,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  START_LOG("send()", "Parallel");
+  LOG_SCOPE("send()", "Parallel");
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -2278,8 +2213,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                tag.value(),
                                this->get(),
                                req.get()));
-
-  STOP_LOG("send()", "Parallel");
 }
 
 
@@ -2442,7 +2375,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      T & buf,
                                      const MessageTag & tag) const
 {
-  START_LOG("receive()", "Parallel");
+  LOG_SCOPE("receive()", "Parallel");
 
   // Get the status of the message, explicitly provide the
   // datatype so we can later query the size
@@ -2451,8 +2384,6 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   libmesh_call_mpi
     (MPI_Recv (&buf, 1, StandardType<T>(&buf), src_processor_id,
                tag.value(), this->get(), stat.get()));
-
-  STOP_LOG("receive()", "Parallel");
 
   return stat;
 }
@@ -2465,13 +2396,11 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    Request & req,
                                    const MessageTag & tag) const
 {
-  START_LOG("receive()", "Parallel");
+  LOG_SCOPE("receive()", "Parallel");
 
   libmesh_call_mpi
     (MPI_Irecv (&buf, 1, StandardType<T>(&buf), src_processor_id,
                 tag.value(), this->get(), req.get()));
-
-  STOP_LOG("receive()", "Parallel");
 }
 
 
@@ -2506,14 +2435,12 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      const DataType & type,
                                      const MessageTag & tag) const
 {
-  START_LOG("receive()", "Parallel");
+  LOG_SCOPE("receive()", "Parallel");
 
   std::vector<T> vecbuf;
   Status stat = this->receive(src_processor_id, vecbuf, type, tag);
   buf.clear();
   buf.insert(vecbuf.begin(), vecbuf.end());
-
-  STOP_LOG("receive()", "Parallel");
 
   return stat;
 }
@@ -2527,7 +2454,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    Request & req,
                                    const MessageTag & tag) const
 {
-  START_LOG("receive()", "Parallel");
+  LOG_SCOPE("receive()", "Parallel");
 
   // Allocate temporary buffer on the heap so it lives until after
   // the non-blocking send completes
@@ -2547,8 +2474,6 @@ inline void Communicator::receive (const unsigned int src_processor_id,
     (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
   this->receive(src_processor_id, *vecbuf, type, req, tag);
-
-  STOP_LOG("receive()", "Parallel");
 }
 
 
@@ -2583,7 +2508,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      const DataType & type,
                                      const MessageTag & tag) const
 {
-  START_LOG("receive()", "Parallel");
+  LOG_SCOPE("receive()", "Parallel");
 
   // Get the status of the message, explicitly provide the
   // datatype so we can later query the size
@@ -2601,8 +2526,6 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
   libmesh_assert_equal_to (stat.size(), buf.size());
 
-  STOP_LOG("receive()", "Parallel");
-
   return stat;
 }
 
@@ -2615,14 +2538,12 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    Request & req,
                                    const MessageTag & tag) const
 {
-  START_LOG("receive()", "Parallel");
+  LOG_SCOPE("receive()", "Parallel");
 
   libmesh_call_mpi
     (MPI_Irecv (buf.empty() ? libmesh_nullptr : &buf[0],
                 cast_int<int>(buf.size()), type, src_processor_id,
                 tag.value(), this->get(), req.get()));
-
-  STOP_LOG("receive()", "Parallel");
 }
 
 
@@ -2695,13 +2616,12 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
                                        const MessageTag & send_tag,
                                        const MessageTag & recv_tag) const
 {
-  START_LOG("send_receive()", "Parallel");
+  LOG_SCOPE("send_receive()", "Parallel");
 
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
     {
       recv = sendvec;
-      STOP_LOG("send_receive()", "Parallel");
       return;
     }
 
@@ -2712,8 +2632,6 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
   this->receive (source_processor_id, recv, type2, recv_tag);
 
   req.wait();
-
-  STOP_LOG("send_receive()", "Parallel");
 }
 
 
@@ -2726,13 +2644,12 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
                                        const MessageTag & send_tag,
                                        const MessageTag & recv_tag) const
 {
-  START_LOG("send_receive()", "Parallel");
+  LOG_SCOPE("send_receive()", "Parallel");
 
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
     {
       recv = sendvec;
-      STOP_LOG("send_receive()", "Parallel");
       return;
     }
 
@@ -2753,8 +2670,6 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
                   StandardType<T2>(&recv), source_processor_id,
                   recv_tag.value(), this->get(), &stat));
 #endif
-
-  STOP_LOG("send_receive()", "Parallel");
 }
 
 
@@ -2777,9 +2692,8 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
   if (dest_processor_id   == this->rank() &&
       source_processor_id == this->rank())
     {
-      START_LOG("send_receive()", "Parallel");
+      LOG_SCOPE("send_receive()", "Parallel");
       recv = sendvec;
-      STOP_LOG("send_receive()", "Parallel");
       return;
     }
 
@@ -2867,7 +2781,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
                                          const MessageTag & send_tag,
                                          const MessageTag & recv_tag) const
 {
-  START_LOG("send_receive()", "Parallel");
+  LOG_SCOPE("send_receive()", "Parallel");
 
   Parallel::Request req;
 
@@ -2878,9 +2792,6 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
                               output_type, recv_tag);
 
   req.wait();
-
-  STOP_LOG("send_receive()", "Parallel");
-
 }
 
 
@@ -2897,7 +2808,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
   if (this->size() > 1)
     {
-      START_LOG("gather()", "Parallel");
+      LOG_SCOPE("gather()", "Parallel");
 
       StandardType<T> send_type(&sendval);
 
@@ -2905,8 +2816,6 @@ inline void Communicator::gather(const unsigned int root_id,
         (MPI_Gather(&sendval, 1, send_type,
                     recv.empty() ? libmesh_nullptr : &recv[0], 1, send_type,
                     root_id, this->get()));
-
-      STOP_LOG("gather()", "Parallel");
     }
   else
     recv[0] = sendval;
@@ -2934,7 +2843,7 @@ inline void Communicator::gather(const unsigned int root_id,
   const int mysize = static_cast<int>(r.size());
   this->allgather(mysize, sendlengths);
 
-  START_LOG("gather()", "Parallel");
+  LOG_SCOPE("gather()", "Parallel");
 
   // Find the total size of the final array and
   // set up the displacement offsets for each processor.
@@ -2947,10 +2856,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
   // Check for quick return
   if (globalsize == 0)
-    {
-      STOP_LOG("gather()", "Parallel");
-      return;
-    }
+    return;
 
   // copy the input buffer
   std::vector<T> r_src(r);
@@ -2966,8 +2872,6 @@ inline void Communicator::gather(const unsigned int root_id,
                   StandardType<T>(), r.empty() ? libmesh_nullptr : &r[0],
                   &sendlengths[0], &displacements[0],
                   StandardType<T>(), root_id, this->get()));
-
-  STOP_LOG("gather()", "Parallel");
 }
 
 
@@ -2975,7 +2879,7 @@ template <typename T>
 inline void Communicator::allgather(T sendval,
                                     std::vector<T> & recv) const
 {
-  START_LOG ("allgather()","Parallel");
+  LOG_SCOPE ("allgather()","Parallel");
 
   libmesh_assert(this->size());
   recv.resize(this->size());
@@ -2991,8 +2895,6 @@ inline void Communicator::allgather(T sendval,
     }
   else if (comm_size > 0)
     recv[0] = sendval;
-
-  STOP_LOG ("allgather()","Parallel");
 }
 
 
@@ -3004,7 +2906,7 @@ inline void Communicator::allgather(std::vector<T> & r,
   if (this->size() < 2)
     return;
 
-  START_LOG("allgather()", "Parallel");
+  LOG_SCOPE("allgather()", "Parallel");
 
   if (identical_buffer_sizes)
     {
@@ -3022,7 +2924,6 @@ inline void Communicator::allgather(std::vector<T> & r,
                         send_type, &r[0], cast_int<int>(r_src.size()),
                         send_type, this->get()));
       // libmesh_assert(this->verify(r));
-      STOP_LOG("allgather()", "Parallel");
       return;
     }
 
@@ -3044,10 +2945,7 @@ inline void Communicator::allgather(std::vector<T> & r,
 
   // Check for quick return
   if (globalsize == 0)
-    {
-      STOP_LOG("allgather()", "Parallel");
-      return;
-    }
+    return;
 
   // copy the input buffer
   std::vector<T> r_src(globalsize);
@@ -3061,8 +2959,6 @@ inline void Communicator::allgather(std::vector<T> & r,
     (MPI_Allgatherv (r_src.empty() ? libmesh_nullptr : &r_src[0], mysize,
                      send_type, &r[0], &sendlengths[0],
                      &displacements[0], send_type, this->get()));
-
-  STOP_LOG("allgather()", "Parallel");
 }
 
 
@@ -3139,7 +3035,7 @@ inline void Communicator::alltoall(std::vector<T> & buf) const
   if (this->size() < 2 || buf.empty())
     return;
 
-  START_LOG("alltoall()", "Parallel");
+  LOG_SCOPE("alltoall()", "Parallel");
 
   // the per-processor size.  this is the same for all
   // processors using MPI_Alltoall, could be variable
@@ -3158,8 +3054,6 @@ inline void Communicator::alltoall(std::vector<T> & buf) const
   libmesh_call_mpi
     (MPI_Alltoall (&tmp[0], size_per_proc, send_type, &buf[0],
                    size_per_proc, send_type, this->get()));
-
-  STOP_LOG("alltoall()", "Parallel");
 }
 
 
@@ -3176,14 +3070,12 @@ inline void Communicator::broadcast (T & data, const unsigned int root_id) const
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   // Spread data to remote processors.
   libmesh_call_mpi
     (MPI_Bcast (&data, 1, StandardType<T>(&data), root_id,
                 this->get()));
-
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 
@@ -3199,7 +3091,7 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   // We don't want to depend on MPI-2 or C++ MPI, so we don't have
   // MPI::BOOL available
@@ -3211,8 +3103,6 @@ inline void Communicator::broadcast (bool & data, const unsigned int root_id) co
                 root_id, this->get()));
 
   data = char_data;
-
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 
@@ -3229,7 +3119,7 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   std::size_t data_size = data.size();
   this->broadcast(data_size, root_id);
@@ -3251,8 +3141,6 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
   if (this->rank() == root_id)
     libmesh_assert_equal_to (data, orig);
 #endif
-
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 
@@ -3270,7 +3158,7 @@ inline void Communicator::broadcast (std::vector<T> & data,
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   // and get the data from the remote processors.
   // Pass NULL if our vector is empty.
@@ -3279,8 +3167,6 @@ inline void Communicator::broadcast (std::vector<T> & data,
   libmesh_call_mpi
     (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
                 StandardType<T>(data_ptr), root_id, this->get()));
-
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 
@@ -3297,7 +3183,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T> > & data,
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   std::size_t bufsize=0;
   if (root_id == this->rank())
@@ -3341,8 +3227,6 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T> > & data,
           iter += curr_len;
         }
     }
-
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 
@@ -3361,7 +3245,7 @@ inline void Communicator::broadcast (std::set<T> & data,
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   std::vector<T> vecdata;
   if (this->rank() == root_id)
@@ -3378,8 +3262,6 @@ inline void Communicator::broadcast (std::set<T> & data,
       data.clear();
       data.insert(vecdata.begin(), vecdata.end());
     }
-
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 
@@ -3397,7 +3279,7 @@ inline void Communicator::broadcast(std::map<T1, T2> & data,
 
   libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+  LOG_SCOPE("broadcast()", "Parallel");
 
   std::size_t data_size=data.size();
   this->broadcast(data_size, root_id);
@@ -3431,7 +3313,6 @@ inline void Communicator::broadcast(std::map<T1, T2> & data,
       for (std::size_t i=0; i<pair_first.size(); ++i)
         data[pair_first[i]] = pair_second[i];
     }
-  STOP_LOG("broadcast()", "Parallel");
 }
 
 

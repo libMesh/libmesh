@@ -70,7 +70,7 @@ void SFCPartitioner::_do_partition (MeshBase & mesh,
   // What to do if the sfcurves library IS present
 #else
 
-  START_LOG("sfc_partition()", "SFCPartitioner");
+  LOG_SCOPE("sfc_partition()", "SFCPartitioner");
 
   const dof_id_type n_active_elem = mesh.n_active_elem();
   const dof_id_type n_elem        = mesh.n_elem();
@@ -180,8 +180,6 @@ void SFCPartitioner::_do_partition (MeshBase & mesh,
           (i/blksize);
       }
   }
-
-  STOP_LOG("sfc_partition()", "SFCPartitioner");
 
 #endif
 

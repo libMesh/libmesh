@@ -208,7 +208,7 @@ PetscDiffSolver::PetscDiffSolver (sys_type & s)
 
 void PetscDiffSolver::init ()
 {
-  START_LOG("init()", "PetscDiffSolver");
+  LOG_SCOPE("init()", "PetscDiffSolver");
 
   Parent::init();
 
@@ -239,8 +239,6 @@ void PetscDiffSolver::init ()
   LIBMESH_CHKERR(ierr);
 
   petsc_auto_fieldsplit(my_pc, _system);
-
-  STOP_LOG("init()", "PetscDiffSolver");
 }
 
 
@@ -253,12 +251,10 @@ PetscDiffSolver::~PetscDiffSolver ()
 
 void PetscDiffSolver::clear()
 {
-  START_LOG("clear()", "PetscDiffSolver");
+  LOG_SCOPE("clear()", "PetscDiffSolver");
 
   int ierr = LibMeshSNESDestroy(&_snes);
   LIBMESH_CHKERR(ierr);
-
-  STOP_LOG("clear()", "PetscDiffSolver");
 }
 
 
@@ -333,7 +329,7 @@ unsigned int PetscDiffSolver::solve()
 {
   this->init();
 
-  START_LOG("solve()", "PetscDiffSolver");
+  LOG_SCOPE("solve()", "PetscDiffSolver");
 
   PetscVector<Number> & x =
     *(cast_ptr<PetscVector<Number> *>(_system.solution.get()));
@@ -358,8 +354,6 @@ unsigned int PetscDiffSolver::solve()
 
   ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
   LIBMESH_CHKERR(ierr);
-
-  STOP_LOG("solve()", "PetscDiffSolver");
 
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes, &reason);

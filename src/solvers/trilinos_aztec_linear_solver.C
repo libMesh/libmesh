@@ -107,7 +107,7 @@ AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
                              const double tol,
                              const unsigned int m_its)
 {
-  START_LOG("solve()", "AztecLinearSolver");
+  LOG_SCOPE("solve()", "AztecLinearSolver");
 
   // Make sure the data passed in are really of Epetra types
   EpetraMatrix<T> * matrix   = cast_ptr<EpetraMatrix<T> *>(&matrix_in);
@@ -132,8 +132,6 @@ AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
 
   _linear_solver->Iterate(emat, esol, erhs, m_its, tol);
 
-  STOP_LOG("solve()", "AztecLinearSolver");
-
   // return the # of its. and the final residual norm.
   return std::make_pair(_linear_solver->NumIters(), _linear_solver->TrueResidual());
 }
@@ -147,11 +145,6 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
                              NumericVector<T> &,
                              const double,
                              const unsigned int)
-//AztecLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
-//     NumericVector<T> & solution_in,
-//     NumericVector<T> & rhs_in,
-//     const double tol,
-//     const unsigned int m_its)
 {
   libmesh_not_implemented();
 }
@@ -166,12 +159,6 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
                              NumericVector<T> &,
                              const double,
                              const unsigned int)
-//AztecLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
-//     const SparseMatrix<T> & precond_matrix,
-//     NumericVector<T> & solution_in,
-//     NumericVector<T> & rhs_in,
-//     const double tol,
-//     const unsigned int m_its)
 {
   libmesh_not_implemented();
 }

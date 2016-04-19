@@ -65,11 +65,11 @@ UniquePtr<FEMap> FEMap::build( FEType fe_type )
 
 
 template<unsigned int Dim>
-void FEMap::init_reference_to_physical_map( const std::vector<Point> & qp,
-                                            const Elem * elem)
+void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
+                                           const Elem * elem)
 {
   // Start logging the reference->physical map initialization
-  START_LOG("init_reference_to_physical_map()", "FEMap");
+  LOG_SCOPE("init_reference_to_physical_map()", "FEMap");
 
   // We're calculating now!
   this->determine_calculations();
@@ -388,10 +388,6 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point> & qp,
     default:
       libmesh_error_msg("Invalid Dim = " << Dim);
     }
-
-  // Stop logging the reference->physical map initialization
-  STOP_LOG("init_reference_to_physical_map()", "FEMap");
-  return;
 }
 
 
@@ -1167,12 +1163,12 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 
 
 
-void FEMap::compute_affine_map( const unsigned int dim,
-                                const std::vector<Real> & qw,
-                                const Elem * elem )
+void FEMap::compute_affine_map(const unsigned int dim,
+                               const std::vector<Real> & qw,
+                               const Elem * elem)
 {
   // Start logging the map computation.
-  START_LOG("compute_affine_map()", "FEMap");
+  LOG_SCOPE("compute_affine_map()", "FEMap");
 
   libmesh_assert(elem);
 
@@ -1243,17 +1239,15 @@ void FEMap::compute_affine_map( const unsigned int dim,
         jac[p] = jac[0];
         JxW[p] = JxW[0] / qw[0] * qw[p];
       }
-
-  STOP_LOG("compute_affine_map()", "FEMap");
 }
 
 
 
-void FEMap::compute_null_map( const unsigned int dim,
-                              const std::vector<Real> & qw)
+void FEMap::compute_null_map(const unsigned int dim,
+                             const std::vector<Real> & qw)
 {
   // Start logging the map computation.
-  START_LOG("compute_null_map()", "FEMap");
+  LOG_SCOPE("compute_null_map()", "FEMap");
 
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
@@ -1320,8 +1314,6 @@ void FEMap::compute_null_map( const unsigned int dim,
           JxW[p] = qw[p];
         }
     }
-
-  STOP_LOG("compute_null_map()", "FEMap");
 }
 
 
@@ -1344,7 +1336,7 @@ void FEMap::compute_map(const unsigned int dim,
     }
 
   // Start logging the map computation.
-  START_LOG("compute_map()", "FEMap");
+  LOG_SCOPE("compute_map()", "FEMap");
 
   libmesh_assert(elem);
 
@@ -1373,9 +1365,6 @@ void FEMap::compute_map(const unsigned int dim,
   // Compute map at all quadrature points
   for (unsigned int p=0; p!=n_qp; p++)
     this->compute_single_point_map(dim, qw, elem, p, elem_nodes, calculate_d2phi);
-
-  // Stop logging the map computation.
-  STOP_LOG("compute_map()", "FEMap");
 }
 
 
@@ -1526,7 +1515,7 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
 
 
   // Start logging the map inversion.
-  START_LOG("inverse_map()", "FE");
+  LOG_SCOPE("inverse_map()", "FE");
 
   // How much did the point on the reference
   // element change by in this Newton step?
@@ -1813,7 +1802,6 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
               for (unsigned int i=0; i != Dim; ++i)
                 p(i) = 1e6;
 
-              STOP_LOG("inverse_map()", "FE");
               return p;
             }
         }
@@ -1861,11 +1849,6 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
     }
 
 #endif
-
-
-
-  //  Stop logging the map inversion.
-  STOP_LOG("inverse_map()", "FE");
 
   return p;
 }

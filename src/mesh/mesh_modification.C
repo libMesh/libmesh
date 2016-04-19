@@ -70,9 +70,7 @@ void MeshTools::Modification::distort (MeshBase & mesh,
   libmesh_assert (mesh.n_elem());
   libmesh_assert ((factor >= 0.) && (factor <= 1.));
 
-  START_LOG("distort()", "MeshTools::Modification");
-
-
+  LOG_SCOPE("distort()", "MeshTools::Modification");
 
   // First find nodes on the boundary and flag them
   // so that we don't move them
@@ -144,10 +142,6 @@ void MeshTools::Modification::distort (MeshBase & mesh,
             (*node)(2) += dir(2)*factor*hmin[n];
         }
   }
-
-
-  // All done
-  STOP_LOG("distort()", "MeshTools::Modification");
 }
 
 
@@ -158,7 +152,7 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
   libmesh_assert (mesh.n_nodes());
   libmesh_assert (mesh.n_elem());
 
-  START_LOG("redistribute()", "MeshTools::Modification");
+  LOG_SCOPE("redistribute()", "MeshTools::Modification");
 
   DenseVector<Real> output_vec(LIBMESH_DIM);
 
@@ -182,9 +176,6 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
       (*node)(2) = output_vec(2);
 #endif
     }
-
-  // All done
-  STOP_LOG("redistribute()", "MeshTools::Modification");
 }
 
 

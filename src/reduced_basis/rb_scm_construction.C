@@ -214,12 +214,11 @@ void RBSCMConstruction::resize_SCM_vectors()
 
 void RBSCMConstruction::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
 {
-  START_LOG("add_scaled_symm_Aq()", "RBSCMConstruction");
+  LOG_SCOPE("add_scaled_symm_Aq()", "RBSCMConstruction");
   // Load the operators from the RBConstruction
   EquationSystems & es = this->get_equation_systems();
   RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
   rb_system.add_scaled_Aq(scalar, q_a, matrix_A, true);
-  STOP_LOG("add_scaled_symm_Aq()", "RBSCMConstruction");
 }
 
 void RBSCMConstruction::load_matrix_B()
@@ -235,7 +234,7 @@ void RBSCMConstruction::load_matrix_B()
 
 void RBSCMConstruction::perform_SCM_greedy()
 {
-  START_LOG("perform_SCM_greedy()", "RBSCMConstruction");
+  LOG_SCOPE("perform_SCM_greedy()", "RBSCMConstruction");
 
   // initialize rb_scm_eval's parameters
   rb_scm_eval->initialize_parameters(*this);
@@ -292,13 +291,11 @@ void RBSCMConstruction::perform_SCM_greedy()
 
       SCM_iter++;
     }
-
-  STOP_LOG("perform_SCM_greedy()", "RBSCMConstruction");
 }
 
 void RBSCMConstruction::compute_SCM_bounding_box()
 {
-  START_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
+  LOG_SCOPE("compute_SCM_bounding_box()", "RBSCMConstruction");
 
   // Resize the bounding box vectors
   rb_scm_eval->B_min.resize(get_rb_theta_expansion().get_n_A_terms());
@@ -351,13 +348,11 @@ void RBSCMConstruction::compute_SCM_bounding_box()
       else
         libmesh_error_msg("Eigen solver for computing B_max did not converge");
     }
-
-  STOP_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
 }
 
 void RBSCMConstruction::evaluate_stability_constant()
 {
-  START_LOG("evaluate_stability_constant()", "RBSCMConstruction");
+  LOG_SCOPE("evaluate_stability_constant()", "RBSCMConstruction");
 
   // Get current index of C_J
   const unsigned int j = rb_scm_eval->C_J.size()-1;
@@ -406,8 +401,6 @@ void RBSCMConstruction::evaluate_stability_constant()
     }
   else
     libmesh_error_msg("Error: Eigensolver did not converge in evaluate_stability_constant");
-
-  STOP_LOG("evaluate_stability_constant()", "RBSCMConstruction");
 }
 
 Number RBSCMConstruction::B_inner_product(const NumericVector<Number> & v,
@@ -434,7 +427,7 @@ Number RBSCMConstruction::Aq_inner_product(unsigned int q,
 
 std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_set()
 {
-  START_LOG("compute_SCM_bounds_on_training_set()", "RBSCMConstruction");
+  LOG_SCOPE("compute_SCM_bounds_on_training_set()", "RBSCMConstruction");
 
   // Now compute the maximum bound error over training_parameters
   unsigned int new_C_J_index = 0;
@@ -461,14 +454,12 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
   std::pair<unsigned int,Real> error_pair(global_index, max_SCM_error);
   get_global_max_error_pair(this->comm(),error_pair);
 
-  STOP_LOG("compute_SCM_bounds_on_training_set()", "RBSCMConstruction");
-
   return error_pair;
 }
 
 void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 {
-  START_LOG("enrich_C_J()", "RBSCMConstruction");
+  LOG_SCOPE("enrich_C_J()", "RBSCMConstruction");
 
   set_params_from_training_set_and_broadcast(new_C_J_index);
 
@@ -492,8 +483,6 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 
   std::vector<Real> zero_vector(get_rb_theta_expansion().get_n_A_terms());
   rb_scm_eval->SCM_UB_vectors.push_back(zero_vector);
-
-  STOP_LOG("enrich_C_J()", "RBSCMConstruction");
 }
 
 

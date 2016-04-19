@@ -112,7 +112,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
                                const double tol,
                                const unsigned int m_its)
 {
-  START_LOG("solve()", "LaspackLinearSolver");
+  LOG_SCOPE("solve()", "LaspackLinearSolver");
   this->init ();
 
   // Make sure the data passed in are really in Laspack types
@@ -272,7 +272,6 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
       libmesh_error_msg("Exiting after LASPACK Error!");
     }
 
-  STOP_LOG("solve()", "LaspackLinearSolver");
   // Get the convergence step # and residual
   return std::make_pair(GetLastNoIter(), GetLastAccuracy());
 }
@@ -287,7 +286,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
                                        const double tol,
                                        const unsigned int m_its)
 {
-  START_LOG("adjoint_solve()", "LaspackLinearSolver");
+  LOG_SCOPE("adjoint_solve()", "LaspackLinearSolver");
   this->init ();
 
   // Make sure the data passed in are really in Laspack types
@@ -447,7 +446,6 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
       libmesh_error_msg("Exiting after LASPACK Error!");
     }
 
-  STOP_LOG("adjoint_solve()", "LaspackLinearSolver");
   // Get the convergence step # and residual
   return std::make_pair(GetLastNoIter(), GetLastAccuracy());
 }

@@ -191,7 +191,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
   libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
                                     mesh.unpartitioned_elements_end()) == 0);
 
-  START_LOG("redistribute()","MeshCommunication");
+  LOG_SCOPE("redistribute()", "MeshCommunication");
 
   // Get a few unique message tags to use in communications; we'll
   // default to some numbers around pi*1000
@@ -382,8 +382,6 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
 
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
-
-  STOP_LOG("redistribute()","MeshCommunication");
 }
 #endif // LIBMESH_HAVE_MPI
 
@@ -408,7 +406,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG("gather_neighboring_elements()","MeshCommunication");
+  LOG_SCOPE("gather_neighboring_elements()", "MeshCommunication");
 
   //------------------------------------------------------------------
   // The purpose of this function is to provide neighbor data structure
@@ -757,8 +755,6 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
 
   Parallel::sync_dofobject_data_by_id
     (mesh.comm(), mesh.elements_begin(), mesh.elements_end(), nsync);
-
-  STOP_LOG("gather_neighboring_elements()","MeshCommunication");
 }
 #endif // LIBMESH_HAVE_MPI
 
@@ -782,7 +778,7 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG("broadcast()","MeshCommunication");
+  LOG_SCOPE("broadcast()", "MeshCommunication");
 
   // Explicitly clear the mesh on all but processor 0.
   if (mesh.processor_id() != 0)
@@ -822,8 +818,6 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   MeshTools::libmesh_assert_valid_procids<Elem>(mesh);
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
 #endif
-
-  STOP_LOG("broadcast()","MeshCommunication");
 }
 #endif // LIBMESH_HAVE_MPI
 
@@ -850,7 +844,7 @@ void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh & 
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG("(all)gather()","MeshCommunication");
+  LOG_SCOPE("(all)gather()", "MeshCommunication");
 
   (root_id == DofObject::invalid_processor_id) ?
 
@@ -902,7 +896,6 @@ void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh & 
     mesh.find_neighbors(true);
 
   // All done!
-  STOP_LOG("(all)gather()","MeshCommunication");
 }
 #endif // LIBMESH_HAVE_MPI
 
@@ -1032,32 +1025,31 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
+  LOG_SCOPE ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
   SyncIds syncids(mesh, &MeshBase::renumber_node);
-  Parallel::sync_node_data_by_element_id
-    (mesh, mesh.elements_begin(), mesh.elements_end(), syncids);
-
-  STOP_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
+  Parallel::sync_node_data_by_element_id(mesh,
+                                         mesh.elements_begin(),
+                                         mesh.elements_end(),
+                                         syncids);
 }
 
 
 
-void MeshCommunication::make_node_unique_ids_parallel_consistent
-(MeshBase &mesh)
+void MeshCommunication::make_node_unique_ids_parallel_consistent (MeshBase &mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  START_LOG ("make_node_unique_ids_parallel_consistent()", "MeshCommunication");
+  LOG_SCOPE ("make_node_unique_ids_parallel_consistent()", "MeshCommunication");
 
   SyncUniqueIds<Node> syncuniqueids(mesh, &MeshBase::query_node_ptr);
-  Parallel::sync_dofobject_data_by_id
-    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(),
-     syncuniqueids);
+  Parallel::sync_dofobject_data_by_id(mesh.comm(),
+                                      mesh.nodes_begin(),
+                                      mesh.nodes_end(),
+                                      syncuniqueids);
 
-  STOP_LOG ("make_node_unique_ids_parallel_consistent()", "MeshCommunication");
 #endif
 }
 
@@ -1070,7 +1062,7 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
+  LOG_SCOPE ("make_elems_parallel_consistent()", "MeshCommunication");
 
   SyncIds syncids(mesh, &MeshBase::renumber_elem);
   Parallel::sync_element_data_by_parent_id
@@ -1083,8 +1075,6 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
     (mesh.comm(), mesh.active_elements_begin(),
      mesh.active_elements_end(), syncuniqueids);
 #endif
-
-  STOP_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
 }
 
 
@@ -1095,14 +1085,12 @@ void MeshCommunication::make_p_levels_parallel_consistent(MeshBase & mesh)
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG ("make_p_levels_parallel_consistent()", "MeshCommunication");
+  LOG_SCOPE ("make_p_levels_parallel_consistent()", "MeshCommunication");
 
   SyncPLevels syncplevels(mesh);
   Parallel::sync_dofobject_data_by_id
     (mesh.comm(), mesh.elements_begin(), mesh.elements_end(),
      syncplevels);
-
-  STOP_LOG ("make_p_levels_parallel_consistent()", "MeshCommunication");
 }
 
 
@@ -1155,7 +1143,7 @@ struct SyncProcIds
 // ------------------------------------------------------------
 void MeshCommunication::make_node_proc_ids_parallel_consistent(MeshBase & mesh)
 {
-  START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
+  LOG_SCOPE ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -1173,12 +1161,9 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent(MeshBase & mesh)
   // Ghost nodes touching local elements should have processor ids
   // consistent with all processors which own an element touching
   // them.
-
   SyncProcIds sync(mesh);
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(), sync);
-
-  STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 }
 
 
@@ -1230,7 +1215,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
   // The mesh should know it's about to be parallelized
   libmesh_assert (!mesh.is_serial());
 
-  START_LOG("delete_remote_elements()", "MeshCommunication");
+  LOG_SCOPE("delete_remote_elements()", "MeshCommunication");
 
 #ifdef DEBUG
   // We expect maximum ids to be in sync so we can use them to size
@@ -1408,8 +1393,6 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
-
-  STOP_LOG("delete_remote_elements()", "MeshCommunication");
 }
 
 } // namespace libMesh

@@ -679,8 +679,8 @@ FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
 
 
 template <typename OutputType>
-void FEGenericBase<OutputType> ::compute_shape_functions (const Elem * elem,
-                                                          const std::vector<Point> & qp)
+void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
+                                                         const std::vector<Point> & qp)
 {
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
@@ -688,7 +688,7 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem * elem,
   // have already been computed via init_shape_functions
 
   // Start logging the shape function computation
-  START_LOG("compute_shape_functions()", "FE");
+  LOG_SCOPE("compute_shape_functions()", "FE");
 
   this->determine_calculations();
 
@@ -713,9 +713,6 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem * elem,
   // Only compute div for vector-valued elements
   if( calculate_div_phi && TypesEqual<OutputType,RealGradient>::value )
     this->_fe_trans->map_div( this->dim, elem, qp, (*this), this->div_phi );
-
-  // Stop logging the shape function computation
-  STOP_LOG("compute_shape_functions()", "FE");
 }
 
 

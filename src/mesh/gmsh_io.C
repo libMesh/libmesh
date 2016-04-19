@@ -653,13 +653,10 @@ void GmshIO::write_nodal_data (const std::string & fname,
                                const std::vector<Number> & soln,
                                const std::vector<std::string> & names)
 {
-  START_LOG("write_nodal_data()", "GmshIO");
+  LOG_SCOPE("write_nodal_data()", "GmshIO");
 
-  //this->_binary = true;
   if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
     this->write_post  (fname, &soln, &names);
-
-  STOP_LOG("write_nodal_data()", "GmshIO");
 }
 
 

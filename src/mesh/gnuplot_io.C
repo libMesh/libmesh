@@ -49,11 +49,8 @@ void GnuPlotIO::write_nodal_data (const std::string & fname,
                                   const std::vector<Number> & soln,
                                   const std::vector<std::string> & names)
 {
-  START_LOG("write_nodal_data()", "GnuPlotIO");
-
+  LOG_SCOPE("write_nodal_data()", "GnuPlotIO");
   this->write_solution(fname, &soln, &names);
-
-  STOP_LOG("write_nodal_data()", "GnuPlotIO");
 }
 
 

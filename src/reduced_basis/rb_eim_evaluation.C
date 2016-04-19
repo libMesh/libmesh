@@ -130,7 +130,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   _previous_parameters = get_parameters();
   _previous_N = N;
 
-  START_LOG("rb_solve()", "RBEIMEvaluation");
+  LOG_SCOPE("rb_solve()", "RBEIMEvaluation");
 
   if(N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
@@ -186,14 +186,11 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
 
       Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
 
-      STOP_LOG("rb_solve()", "RBEIMEvaluation");
-
       _previous_error_bound = error_estimate;
       return error_estimate;
     }
   else // Don't evaluate an error bound
     {
-      STOP_LOG("rb_solve()", "RBEIMEvaluation");
       _previous_error_bound = -1.;
       return -1.;
     }
@@ -202,7 +199,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
 
 void RBEIMEvaluation::rb_solve(DenseVector<Number> & EIM_rhs)
 {
-  START_LOG("rb_solve()", "RBEIMEvaluation");
+  LOG_SCOPE("rb_solve()", "RBEIMEvaluation");
 
   if(EIM_rhs.size() > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
@@ -215,8 +212,6 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number> & EIM_rhs)
   interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
   interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
-
-  STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
 Real RBEIMEvaluation::get_error_bound_normalization()
@@ -251,7 +246,7 @@ UniquePtr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
 void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                          const bool read_binary_data)
 {
-  START_LOG("legacy_write_offline_data_to_files()", "RBEIMEvaluation");
+  LOG_SCOPE("legacy_write_offline_data_to_files()", "RBEIMEvaluation");
 
   Parent::legacy_write_offline_data_to_files(directory_name);
 
@@ -347,8 +342,6 @@ void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
   // Write out the elements associated with the interpolation points.
   // This uses mesh I/O, hence we have to do it on all processors.
   legacy_write_out_interpolation_points_elem(directory_name);
-
-  STOP_LOG("legacy_write_offline_data_to_files()", "RBEIMEvaluation");
 }
 
 void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::string & directory_name)
@@ -470,7 +463,7 @@ void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string & di
                                                           bool read_error_bound_data,
                                                           const bool read_binary_data)
 {
-  START_LOG("legacy_read_offline_data_from_files()", "RBEIMEvaluation");
+  LOG_SCOPE("legacy_read_offline_data_from_files()", "RBEIMEvaluation");
 
   Parent::legacy_read_offline_data_from_files(directory_name, read_error_bound_data);
 
@@ -597,8 +590,6 @@ void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   // Read in the elements corresponding to the interpolation points
   legacy_read_in_interpolation_points_elem(directory_name);
-
-  STOP_LOG("legacy_read_offline_data_from_files()", "RBEIMEvaluation");
 }
 
 void RBEIMEvaluation::legacy_read_in_interpolation_points_elem(const std::string & directory_name)

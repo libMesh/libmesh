@@ -54,7 +54,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
   libmesh_error_msg("ERROR: this functionality presently requires Eigen!");
 
 #else
-  START_LOG ("prepare_for_use()", "RadialBasisInterpolation<>");
+  LOG_SCOPE ("prepare_for_use()", "RadialBasisInterpolation<>");
 
   // Construct a bounding box for our source points
   _src_bbox.invalidate();
@@ -139,8 +139,6 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
     for (unsigned int var=0; var<n_vars; var++)
       _weights[i*n_vars + var] = x(i,var);
 
-
-  STOP_LOG  ("prepare_for_use()", "RadialBasisInterpolation<>");
 #endif
 
 }
@@ -152,7 +150,7 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
                                                                   const std::vector<Point> & tgt_pts,
                                                                   std::vector<Number> & tgt_vals) const
 {
-  START_LOG ("interpolate_field_data()", "RadialBasisInterpolation<>");
+  LOG_SCOPE ("interpolate_field_data()", "RadialBasisInterpolation<>");
 
   libmesh_experimental();
 
@@ -195,8 +193,6 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
             tgt_vals[tgt*n_vars + var] += _weights[i*n_vars + var]*phi_i;
         }
     }
-
-  STOP_LOG ("interpolate_field_data()", "RadialBasisInterpolation<>");
 }
 
 

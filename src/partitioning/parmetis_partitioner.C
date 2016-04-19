@@ -126,7 +126,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
       return;
     }
 
-  START_LOG("repartition()", "ParmetisPartitioner");
+  LOG_SCOPE("repartition()", "ParmetisPartitioner");
 
   // Initialize the data structures required by ParMETIS
   this->initialize (mesh, n_sbdmns);
@@ -147,12 +147,8 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
       {
         // FIXME: revert to METIS, although this requires a serial mesh
         MeshSerializer serialize(mesh);
-
-        STOP_LOG ("repartition()", "ParmetisPartitioner");
-
         MetisPartitioner mp;
         mp.partition (mesh, n_sbdmns);
-
         return;
       }
   }
@@ -189,9 +185,6 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 
   // Assign the returned processor ids
   this->assign_partitioning (mesh);
-
-
-  STOP_LOG ("repartition()", "ParmetisPartitioner");
 
 #endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
 

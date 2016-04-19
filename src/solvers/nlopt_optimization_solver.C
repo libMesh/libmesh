@@ -38,7 +38,7 @@ double __libmesh_nlopt_objective(unsigned n,
                                  double * gradient,
                                  void * data)
 {
-  START_LOG("objective()", "NloptOptimizationSolver");
+  LOG_SCOPE("objective()", "NloptOptimizationSolver");
 
   // ctx should be a pointer to the solver (it was passed in as void *)
   NloptOptimizationSolver<Number> * solver =
@@ -94,8 +94,6 @@ double __libmesh_nlopt_objective(unsigned n,
         libmesh_error_msg("Gradient function not defined in __libmesh_nlopt_objective");
     }
 
-  STOP_LOG("objective()", "NloptOptimizationSolver");
-
   // Increment the iteration count.
   solver->get_iteration_count()++;
 
@@ -115,7 +113,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
                                           double * gradient,
                                           void * data)
 {
-  START_LOG("equality_constraints()", "NloptOptimizationSolver");
+  LOG_SCOPE("equality_constraints()", "NloptOptimizationSolver");
 
   libmesh_assert(data);
 
@@ -192,10 +190,6 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
     }
   else
     libmesh_error_msg("Constraints function not defined in __libmesh_nlopt_equality_constraints");
-
-
-
-  STOP_LOG("equality_constraints()", "NloptOptimizationSolver");
 }
 
 
@@ -206,7 +200,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
                                             double * gradient,
                                             void * data)
 {
-  START_LOG("inequality_constraints()", "NloptOptimizationSolver");
+  LOG_SCOPE("inequality_constraints()", "NloptOptimizationSolver");
 
   libmesh_assert(data);
 
@@ -283,8 +277,6 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
     }
   else
     libmesh_error_msg("Constraints function not defined in __libmesh_nlopt_inequality_constraints");
-
-  STOP_LOG("inequality_constraints()", "NloptOptimizationSolver");
 }
 
 //---------------------------------------------------------------------
@@ -359,7 +351,7 @@ void NloptOptimizationSolver<T>::init ()
 template <typename T>
 void NloptOptimizationSolver<T>::solve ()
 {
-  START_LOG("solve()", "NloptOptimizationSolver");
+  LOG_SCOPE("solve()", "NloptOptimizationSolver");
 
   this->init ();
 
@@ -455,8 +447,6 @@ void NloptOptimizationSolver<T>::solve ()
                  << this->get_iteration_count()
                  << " iterations."
                  << std::endl;
-
-  STOP_LOG("solve()", "NloptOptimizationSolver");
 }
 
 

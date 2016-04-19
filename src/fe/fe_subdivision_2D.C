@@ -417,7 +417,7 @@ void FESubdivision::init_shape_functions(const std::vector<Point> & qp,
   libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
   const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
 
-  START_LOG("init_shape_functions()", "FESubdivision");
+  LOG_SCOPE("init_shape_functions()", "FESubdivision");
 
   calculations_started = true;
 
@@ -650,8 +650,6 @@ void FESubdivision::init_shape_functions(const std::vector<Point> & qp,
   this->_fe_map->get_d2phideta2_map()   = d2phideta2;
   this->_fe_map->get_d2phidxideta_map() = d2phidxideta;
 #endif
-
-  STOP_LOG("init_shape_functions()", "FESubdivision");
 }
 
 
@@ -678,7 +676,7 @@ void FESubdivision::reinit(const Elem * elem,
   const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
 #endif
 
-  START_LOG("reinit()", "FESubdivision");
+  LOG_SCOPE("reinit()", "FESubdivision");
 
   libmesh_assert(!sd_elem->is_ghost());
   libmesh_assert(sd_elem->is_subdivision_updated());
@@ -703,8 +701,6 @@ void FESubdivision::reinit(const Elem * elem,
 
   // Compute the map for this element.
   this->_fe_map->compute_map (this->dim, this->qrule->get_weights(), elem, this->calculate_d2phi);
-
-  STOP_LOG("reinit()", "FESubdivision");
 }
 
 

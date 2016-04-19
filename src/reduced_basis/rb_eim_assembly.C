@@ -74,7 +74,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
                                             const QBase & element_qrule,
                                             std::vector<Number> & values)
 {
-  START_LOG("evaluate_basis_function", "RBEIMAssembly");
+  LOG_SCOPE("evaluate_basis_function", "RBEIMAssembly");
 
   bool repeated_qrule = false;
   if (_qrule != libmesh_nullptr)
@@ -121,8 +121,6 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
       for (unsigned int i=0; i<dof_indices_var.size(); i++)
         values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
     }
-
-  STOP_LOG("evaluate_basis_function", "RBEIMAssembly");
 }
 
 RBEIMConstruction & RBEIMAssembly::get_rb_eim_construction()

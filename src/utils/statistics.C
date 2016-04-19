@@ -47,11 +47,9 @@ Real StatisticsVector<T>::l2_norm() const
 template <typename T>
 T StatisticsVector<T>::minimum() const
 {
-  START_LOG ("minimum()", "StatisticsVector");
+  LOG_SCOPE ("minimum()", "StatisticsVector");
 
   const T min = *(std::min_element(this->begin(), this->end()));
-
-  STOP_LOG ("minimum()", "StatisticsVector");
 
   return min;
 }
@@ -62,11 +60,9 @@ T StatisticsVector<T>::minimum() const
 template <typename T>
 T StatisticsVector<T>::maximum() const
 {
-  START_LOG ("maximum()", "StatisticsVector");
+  LOG_SCOPE ("maximum()", "StatisticsVector");
 
   const T max = *(std::max_element(this->begin(), this->end()));
-
-  STOP_LOG ("maximum()", "StatisticsVector");
 
   return max;
 }
@@ -77,7 +73,7 @@ T StatisticsVector<T>::maximum() const
 template <typename T>
 Real StatisticsVector<T>::mean() const
 {
-  START_LOG ("mean()", "StatisticsVector");
+  LOG_SCOPE ("mean()", "StatisticsVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
@@ -88,8 +84,6 @@ Real StatisticsVector<T>::mean() const
       the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) /
         static_cast<Real>(i + 1);
     }
-
-  STOP_LOG ("mean()", "StatisticsVector");
 
   return the_mean;
 }
@@ -105,7 +99,7 @@ Real StatisticsVector<T>::median()
   if (n == 0)
     return 0.;
 
-  START_LOG ("median()", "StatisticsVector");
+  LOG_SCOPE ("median()", "StatisticsVector");
 
   std::sort(this->begin(), this->end());
 
@@ -125,8 +119,6 @@ Real StatisticsVector<T>::median()
       the_median = ( static_cast<Real>((*this)[lhs]) +
                      static_cast<Real>((*this)[rhs]) ) / 2.0;
     }
-
-  STOP_LOG ("median()", "StatisticsVector");
 
   return the_median;
 }
@@ -150,7 +142,7 @@ Real StatisticsVector<T>::variance(const Real mean_in) const
 {
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  START_LOG ("variance()", "StatisticsVector");
+  LOG_SCOPE ("variance()", "StatisticsVector");
 
   Real the_variance = 0;
 
@@ -164,8 +156,6 @@ Real StatisticsVector<T>::variance(const Real mean_in) const
   if (n > 1)
     the_variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
 
-  STOP_LOG ("variance()", "StatisticsVector");
-
   return the_variance;
 }
 
@@ -177,9 +167,7 @@ void StatisticsVector<T>::normalize()
   const Real max = this->maximum();
 
   for (dof_id_type i=0; i<n; i++)
-    {
-      (*this)[i] = static_cast<T>((*this)[i] / max);
-    }
+    (*this)[i] = static_cast<T>((*this)[i] / max);
 }
 
 
@@ -203,7 +191,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
   Real max      = static_cast<Real>(this->maximum());
   Real bin_size = (max - min) / static_cast<Real>(n_bins);
 
-  START_LOG ("histogram()", "StatisticsVector");
+  LOG_SCOPE ("histogram()", "StatisticsVector");
 
   std::vector<Real> bin_bounds(n_bins+1);
   for (unsigned int i=0; i<bin_bounds.size(); i++)
@@ -272,9 +260,6 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
                    << n << "." << std::endl;
     }
 #endif
-
-
-  STOP_LOG ("histogram()", "StatisticsVector");
 }
 
 
@@ -339,7 +324,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
 template <typename T>
 std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
 {
-  START_LOG ("cut_below()", "StatisticsVector");
+  LOG_SCOPE ("cut_below()", "StatisticsVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
@@ -354,8 +339,6 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
         }
     }
 
-  STOP_LOG ("cut_below()", "StatisticsVector");
-
   return cut_indices;
 }
 
@@ -365,7 +348,7 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
 template <typename T>
 std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
 {
-  START_LOG ("cut_above()", "StatisticsVector");
+  LOG_SCOPE ("cut_above()", "StatisticsVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
@@ -373,14 +356,8 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
   cut_indices.reserve(n/2);  // Arbitrary
 
   for (dof_id_type i=0; i<n; i++)
-    {
-      if ((*this)[i] > cut)
-        {
-          cut_indices.push_back(i);
-        }
-    }
-
-  STOP_LOG ("cut_above()", "StatisticsVector");
+    if ((*this)[i] > cut)
+      cut_indices.push_back(i);
 
   return cut_indices;
 }

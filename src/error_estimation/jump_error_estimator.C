@@ -55,43 +55,43 @@ void JumpErrorEstimator::estimate_error (const System & system,
                                          const NumericVector<Number> * solution_vector,
                                          bool estimate_parent_error)
 {
-  START_LOG("estimate_error()", "JumpErrorEstimator");
-  /*
+  LOG_SCOPE("estimate_error()", "JumpErrorEstimator");
 
-    Conventions for assigning the direction of the normal:
-
-    - e & f are global element ids
-
-    Case (1.) Elements are at the same level, e<f
-    Compute the flux jump on the face and
-    add it as a contribution to error_per_cell[e]
-    and error_per_cell[f]
-
-    ----------------------
-    |           |          |
-    |           |    f     |
-    |           |          |
-    |    e      |---> n    |
-    |           |          |
-    |           |          |
-    ----------------------
-
-
-    Case (2.) The neighbor is at a higher level.
-    Compute the flux jump on e's face and
-    add it as a contribution to error_per_cell[e]
-    and error_per_cell[f]
-
-    ----------------------
-    |     |     |          |
-    |     |  e  |---> n    |
-    |     |     |          |
-    |-----------|    f     |
-    |     |     |          |
-    |     |     |          |
-    |     |     |          |
-    ----------------------
-  */
+  /**
+   * Conventions for assigning the direction of the normal:
+   *
+   * - e & f are global element ids
+   *
+   * Case (1.) Elements are at the same level, e<f
+   * Compute the flux jump on the face and
+   * add it as a contribution to error_per_cell[e]
+   * and error_per_cell[f]
+   *
+   *  ----------------------
+   * |           |          |
+   * |           |    f     |
+   * |           |          |
+   * |    e      |---> n    |
+   * |           |          |
+   * |           |          |
+   *  ----------------------
+   *
+   *
+   * Case (2.) The neighbor is at a higher level.
+   * Compute the flux jump on e's face and
+   * add it as a contribution to error_per_cell[e]
+   * and error_per_cell[f]
+   *
+   *  ----------------------
+   * |     |     |          |
+   * |     |  e  |---> n    |
+   * |     |     |          |
+   * |-----------|    f     |
+   * |     |     |          |
+   * |     |     |          |
+   * |     |     |          |
+   *  ----------------------
+   */
 
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
@@ -414,8 +414,6 @@ void JumpErrorEstimator::estimate_error (const System & system,
       newsol->swap(*sys.solution);
       sys.update();
     }
-
-  STOP_LOG("estimate_error()", "JumpErrorEstimator");
 }
 
 

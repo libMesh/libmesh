@@ -40,14 +40,12 @@ namespace {
 void bzip_file (const std::string & unzipped_name)
 {
 #ifdef LIBMESH_HAVE_BZIP
-  START_LOG("system(bzip2)", "XdrIO");
+  LOG_SCOPE("system(bzip2)", "XdrIO");
 
   std::string system_string = "bzip2 -f ";
   system_string += unzipped_name;
   if (std::system(system_string.c_str()))
     libmesh_file_error(system_string);
-
-  STOP_LOG("system(bzip2)", "XdrIO");
 #else
   libmesh_error_msg("ERROR: need bzip2/bunzip2 to create " << unzipped_name << ".bz2");
 #endif
@@ -64,12 +62,11 @@ std::string unzip_file (const std::string & name)
 #ifdef LIBMESH_HAVE_BZIP
       new_name.erase(new_name.end() - 4, new_name.end());
       new_name += pid_suffix.str();
-      START_LOG("system(bunzip2)", "XdrIO");
+      LOG_SCOPE("system(bunzip2)", "XdrIO");
       std::string system_string = "bunzip2 -f -k -c ";
       system_string += name + " > " + new_name;
       if (std::system(system_string.c_str()))
         libmesh_file_error(system_string);
-      STOP_LOG("system(bunzip2)", "XdrIO");
 #else
       libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
@@ -79,12 +76,11 @@ std::string unzip_file (const std::string & name)
 #ifdef LIBMESH_HAVE_XZ
       new_name.erase(new_name.end() - 3, new_name.end());
       new_name += pid_suffix.str();
-      START_LOG("system(xz -d)", "XdrIO");
+      LOG_SCOPE("system(xz -d)", "XdrIO");
       std::string system_string = "xz -f -d -k -c ";
       system_string += name + " > " + new_name;
       if (std::system(system_string.c_str()))
         libmesh_file_error(system_string);
-      STOP_LOG("system(xz -d)", "XdrIO");
 #else
       libmesh_error_msg("ERROR: need xz to open .xz file " << name);
 #endif
@@ -95,14 +91,12 @@ std::string unzip_file (const std::string & name)
 void xzip_file (const std::string & unzipped_name)
 {
 #ifdef LIBMESH_HAVE_XZ
-  START_LOG("system(xz)", "XdrIO");
+  LOG_SCOPE("system(xz)", "XdrIO");
 
   std::string system_string = "xz -f ";
   system_string += unzipped_name;
   if (std::system(system_string.c_str()))
     libmesh_file_error(system_string);
-
-  STOP_LOG("system(xz)", "XdrIO");
 #else
   libmesh_error_msg("ERROR: need xz to create " << unzipped_name << ".xz");
 #endif

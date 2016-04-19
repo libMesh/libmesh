@@ -73,7 +73,7 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    START_LOG("residual()", "PetscNonlinearSolver");
+    LOG_SCOPE("residual()", "PetscNonlinearSolver");
 
     PetscErrorCode ierr=0;
 
@@ -143,8 +143,6 @@ extern "C"
 
     R.close();
 
-    STOP_LOG("residual()", "PetscNonlinearSolver");
-
     return ierr;
   }
 
@@ -161,7 +159,7 @@ extern "C"
 #endif
                                 )
   {
-    START_LOG("jacobian()", "PetscNonlinearSolver");
+    LOG_SCOPE("jacobian()", "PetscNonlinearSolver");
 
     PetscErrorCode ierr=0;
 
@@ -239,7 +237,6 @@ extern "C"
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
     *msflag = SAME_NONZERO_PATTERN;
 #endif
-    STOP_LOG("jacobian()", "PetscNonlinearSolver");
 
     return ierr;
   }
@@ -262,7 +259,7 @@ extern "C"
 #endif
                                                 )
   {
-    START_LOG("postcheck()", "PetscNonlinearSolver");
+    LOG_SCOPE("postcheck()", "PetscNonlinearSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -346,8 +343,6 @@ extern "C"
         // Swap back
         petsc_w.swap(system_soln);
       }
-
-    STOP_LOG("postcheck()", "PetscNonlinearSolver");
 
     return ierr;
   }
@@ -591,7 +586,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
                                 const double,              // Stopping tolerance
                                 const unsigned int)
 {
-  START_LOG("solve()", "PetscNonlinearSolver");
+  LOG_SCOPE("solve()", "PetscNonlinearSolver");
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
@@ -714,8 +709,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   this->converged = (_reason >= 0);
 
   this->clear();
-
-  STOP_LOG("solve()", "PetscNonlinearSolver");
 
   // return the # of its. and the final residual norm.
   return std::make_pair(n_iterations, final_residual_norm);

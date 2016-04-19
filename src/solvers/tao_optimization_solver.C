@@ -48,7 +48,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_objective (Tao /*tao*/, Vec x, PetscReal * objective, void * ctx)
   {
-    START_LOG("objective()", "TaoOptimizationSolver");
+    LOG_SCOPE("objective()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -81,8 +81,6 @@ extern "C"
     else
       libmesh_error_msg("Objective function not defined in __libmesh_tao_objective");
 
-    STOP_LOG("objective()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -93,7 +91,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_gradient(Tao /*tao*/, Vec x, Vec g, void * ctx)
   {
-    START_LOG("gradient()", "TaoOptimizationSolver");
+    LOG_SCOPE("gradient()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -135,8 +133,6 @@ extern "C"
 
     gradient.close();
 
-    STOP_LOG("gradient()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -145,7 +141,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_hessian(Tao /*tao*/, Vec x, Mat h, Mat pc, void * ctx)
   {
-    START_LOG("hessian()", "TaoOptimizationSolver");
+    LOG_SCOPE("hessian()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -192,8 +188,6 @@ extern "C"
     PC.close();
     hessian.close();
 
-    STOP_LOG("hessian()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -203,7 +197,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_equality_constraints(Tao /*tao*/, Vec x, Vec ce, void * ctx)
   {
-    START_LOG("equality_constraints()", "TaoOptimizationSolver");
+    LOG_SCOPE("equality_constraints()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -245,8 +239,6 @@ extern "C"
 
     eq_constraints.close();
 
-    STOP_LOG("equality_constraints()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -256,7 +248,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_equality_constraints_jacobian(Tao /*tao*/, Vec x, Mat J, Mat Jpre, void * ctx)
   {
-    START_LOG("equality_constraints_jacobian()", "TaoOptimizationSolver");
+    LOG_SCOPE("equality_constraints_jacobian()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -296,8 +288,6 @@ extern "C"
     J_petsc.close();
     Jpre_petsc.close();
 
-    STOP_LOG("equality_constraints_jacobian()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -306,7 +296,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_inequality_constraints(Tao /*tao*/, Vec x, Vec cineq, void * ctx)
   {
-    START_LOG("inequality_constraints()", "TaoOptimizationSolver");
+    LOG_SCOPE("inequality_constraints()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -348,8 +338,6 @@ extern "C"
 
     ineq_constraints.close();
 
-    STOP_LOG("inequality_constraints()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -359,7 +347,7 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_inequality_constraints_jacobian(Tao /*tao*/, Vec x, Mat J, Mat Jpre, void * ctx)
   {
-    START_LOG("inequality_constraints_jacobian()", "TaoOptimizationSolver");
+    LOG_SCOPE("inequality_constraints_jacobian()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = 0;
 
@@ -399,8 +387,6 @@ extern "C"
     J_petsc.close();
     Jpre_petsc.close();
 
-    STOP_LOG("inequality_constraints_jacobian()", "TaoOptimizationSolver");
-
     return ierr;
   }
 
@@ -412,8 +398,7 @@ extern "C"
 //---------------------------------------------------------------------
 // TaoOptimizationSolver<> methods
 template <typename T>
-TaoOptimizationSolver<T>::TaoOptimizationSolver (OptimizationSystem & system_in)
-  :
+TaoOptimizationSolver<T>::TaoOptimizationSolver (OptimizationSystem & system_in) :
   OptimizationSolver<T>(system_in),
   _reason(TAO_CONVERGED_USER) // Arbitrary initial value...
 {
@@ -463,7 +448,7 @@ void TaoOptimizationSolver<T>::init ()
 template <typename T>
 void TaoOptimizationSolver<T>::solve ()
 {
-  START_LOG("solve()", "TaoOptimizationSolver");
+  LOG_SCOPE("solve()", "TaoOptimizationSolver");
 
   this->init ();
 
@@ -601,15 +586,13 @@ void TaoOptimizationSolver<T>::solve ()
   // Store the convergence/divergence reason
   ierr = TaoGetConvergedReason(_tao, &_reason);
   LIBMESH_CHKERR(ierr);
-
-  STOP_LOG("solve()", "TaoOptimizationSolver");
 }
 
 
 template <typename T>
 void TaoOptimizationSolver<T>::get_dual_variables()
 {
-  START_LOG("get_dual_variables()", "TaoOptimizationSolver");
+  LOG_SCOPE("get_dual_variables()", "TaoOptimizationSolver");
 
   PetscVector<T> * lambda_eq_petsc =
     cast_ptr<PetscVector<T> *>(this->system().lambda_eq.get());
@@ -624,8 +607,6 @@ void TaoOptimizationSolver<T>::get_dual_variables()
                              &lambda_eq_petsc_vec,
                              &lambda_ineq_petsc_vec);
   LIBMESH_CHKERR(ierr);
-
-  STOP_LOG("get_dual_variables()", "TaoOptimizationSolver");
 }
 
 

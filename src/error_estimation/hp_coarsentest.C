@@ -144,7 +144,7 @@ void HPCoarsenTest::add_projection(const System & system,
 
 void HPCoarsenTest::select_refinement (System & system)
 {
-  START_LOG("select_refinement()", "HPCoarsenTest");
+  LOG_SCOPE("select_refinement()", "HPCoarsenTest");
 
   // The current mesh
   MeshBase & mesh = system.get_mesh();
@@ -580,8 +580,6 @@ void HPCoarsenTest::select_refinement (System & system)
           elem->set_refinement_flag(Elem::DO_NOTHING);
         }
     }
-
-  STOP_LOG("select_refinement()", "HPCoarsenTest");
 }
 
 } // namespace libMesh

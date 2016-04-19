@@ -85,7 +85,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
                                      const double tol,         // solver tolerance
                                      const unsigned int m_its) // maximum number of iterations
 {
-  //   START_LOG("solve_standard()", "SlepcEigenSolver");
+  LOG_SCOPE("solve_standard()", "SlepcEigenSolver");
 
   this->init ();
 
@@ -94,14 +94,6 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
-
-  // just for debugging, remove this
-  //   char mat_file[] = "matA.petsc";
-  //   PetscViewer petsc_viewer;
-  //   ierr = PetscViewerBinaryOpen(this->comm().get(), mat_file, PETSC_FILE_CREATE, &petsc_viewer);
-  //          LIBMESH_CHKERR(ierr);
-  //   ierr = MatView(matrix_A->mat(),petsc_viewer);
-  //          LIBMESH_CHKERR(ierr);
 
   return _solve_standard_helper(matrix_A->mat(), nev, ncv, tol, m_its);
 }
@@ -152,7 +144,7 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
                                             const double tol,         // solver tolerance
                                             const unsigned int m_its) // maximum number of iterations
 {
-  START_LOG("solve_standard()", "SlepcEigenSolver");
+  LOG_SCOPE("solve_standard()", "SlepcEigenSolver");
 
   PetscErrorCode ierr=0;
 
@@ -262,13 +254,9 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
   LIBMESH_CHKERR(ierr);
 #endif // DEBUG
 
-
-  STOP_LOG("solve_standard()", "SlepcEigenSolver");
-
   // return the number of converged eigenpairs
   // and the number of iterations
   return std::make_pair(nconv, its);
-
 }
 
 
@@ -445,7 +433,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
                                                 const double tol,         // solver tolerance
                                                 const unsigned int m_its) // maximum number of iterations
 {
-  START_LOG("solve_generalized()", "SlepcEigenSolver");
+  LOG_SCOPE("solve_generalized()", "SlepcEigenSolver");
 
   PetscErrorCode ierr=0;
 
@@ -557,12 +545,9 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   LIBMESH_CHKERR(ierr);
 #endif // DEBUG
 
-  STOP_LOG("solve_generalized()", "SlepcEigenSolver");
-
   // return the number of converged eigenpairs
   // and the number of iterations
   return std::make_pair(nconv, its);
-
 }
 
 

@@ -120,7 +120,7 @@ void FrequencySystem::init_data ()
   LinearImplicitSystem::init_data();
 
   // Log how long initializing the system takes
-  START_LOG("init()", "FrequencySystem");
+  LOG_SCOPE("init()", "FrequencySystem");
 
   EquationSystems & es =
     this->get_equation_systems();
@@ -149,9 +149,6 @@ void FrequencySystem::init_data ()
     }
 
   _finished_init = true;
-
-  // Stop logging init()
-  STOP_LOG("init()", "FrequencySystem");
 }
 
 
@@ -164,7 +161,7 @@ void FrequencySystem::assemble ()
     libmesh_error_msg("ERROR: Matrices already assembled.");
 
   // Log how long assemble() takes
-  START_LOG("assemble()", "FrequencySystem");
+  LOG_SCOPE("assemble()", "FrequencySystem");
 
   // prepare matrix with the help of the _dof_map,
   // fill with sparsity pattern, initialize the
@@ -175,9 +172,6 @@ void FrequencySystem::assemble ()
   //rhs.print    ();
 
   _finished_assemble = true;
-
-  // Log how long assemble() takes
-  STOP_LOG("assemble()", "FrequencySystem");
 }
 
 

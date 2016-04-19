@@ -95,10 +95,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   libmesh_assert(inf_elem);
   libmesh_assert_greater_equal (tolerance, 0.);
 
-
   // Start logging the map inversion.
-  START_LOG("inverse_map()", "InfFE");
-
+  LOG_SCOPE("inverse_map()", "InfFE");
 
   // 1.)
   // build a base element to do the map inversion in the base face
@@ -607,12 +605,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
     }
   */
 #endif
-
-
-
-
-  // Stop logging the map inversion.
-  STOP_LOG("inverse_map()", "InfFE");
 
   return p;
 }

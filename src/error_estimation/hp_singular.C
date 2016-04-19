@@ -35,7 +35,7 @@ namespace libMesh
 
 void HPSingularity::select_refinement (System & system)
 {
-  START_LOG("select_refinement()", "HPSingularity");
+  LOG_SCOPE("select_refinement()", "HPSingularity");
 
   // The current mesh
   MeshBase & mesh = system.get_mesh();
@@ -69,8 +69,6 @@ void HPSingularity::select_refinement (System & system)
             }
         }
     }
-
-  STOP_LOG("select_refinement()", "HPSingularity");
 }
 
 } // namespace libMesh

@@ -327,7 +327,7 @@ void UNVIO::write_implementation (std::ostream & out_file)
 
 void UNVIO::nodes_in (std::istream & in_file)
 {
-  START_LOG("nodes_in()","UNVIO");
+  LOG_SCOPE("nodes_in()","UNVIO");
 
   if (this->verbose())
     libMesh::out << "  Reading nodes" << std::endl;
@@ -397,8 +397,6 @@ void UNVIO::nodes_in (std::istream & in_file)
       if (_mesh_data)
         _mesh_data->add_foreign_node_id (added_node, node_label);
     }
-
-  STOP_LOG("nodes_in()","UNVIO");
 }
 
 
@@ -609,7 +607,7 @@ void UNVIO::groups_in (std::istream & in_file)
 
 void UNVIO::elements_in (std::istream & in_file)
 {
-  START_LOG("elements_in()","UNVIO");
+  LOG_SCOPE("elements_in()","UNVIO");
 
   if (this->verbose())
     libMesh::out << "  Reading elements" << std::endl;
@@ -897,8 +895,6 @@ void UNVIO::elements_in (std::istream & in_file)
       // Increment the counter for the next iteration
       ctr++;
     } // end while(true)
-
-  STOP_LOG("elements_in()","UNVIO");
 }
 
 

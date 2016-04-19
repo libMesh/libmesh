@@ -53,7 +53,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
                                                     const NumericVector<Number> * solution_vector,
                                                     bool estimate_parent_error)
 {
-  START_LOG("estimate_error()", "AdjointResidualErrorEstimator");
+  LOG_SCOPE("estimate_error()", "AdjointResidualErrorEstimator");
 
   // The current mesh
   const MeshBase & mesh = _system.get_mesh();
@@ -274,8 +274,6 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
         delete dual_errors_per_cell[std::make_pair(&_system, v)];
         delete total_dual_errors_per_cell[std::make_pair(&_system, v)];
       }
-
-  STOP_LOG("estimate_error()", "AdjointResidualErrorEstimator");
 }
 
 } // namespace libMesh

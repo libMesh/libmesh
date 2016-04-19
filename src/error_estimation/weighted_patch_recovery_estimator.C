@@ -46,7 +46,7 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System & system,
                                                           const NumericVector<Number> * solution_vector,
                                                           bool)
 {
-  START_LOG("estimate_error()", "WeightedPatchRecoveryErrorEstimator");
+  LOG_SCOPE("estimate_error()", "WeightedPatchRecoveryErrorEstimator");
 
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
@@ -94,8 +94,6 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System & system,
       newsol->swap(*sys.solution);
       sys.update();
     }
-
-  STOP_LOG("estimate_error()", "WeightedPatchRecoveryErrorEstimator");
 }
 
 

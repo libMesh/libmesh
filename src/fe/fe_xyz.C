@@ -584,8 +584,7 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point> & qp,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Start logging the shape function initialization
-  START_LOG("init_shape_functions()", "FE");
-
+  LOG_SCOPE("init_shape_functions()", "FE");
 
   // The number of quadrature points.
   const std::size_t n_qp = qp.size();
@@ -673,9 +672,6 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point> & qp,
 
   }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  // Stop logging the shape function initialization
-  STOP_LOG("init_shape_functions()", "FE");
 }
 
 
@@ -693,7 +689,7 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
   // have already been computed via init_shape_functions
 
   // Start logging the shape function computation
-  START_LOG("compute_shape_functions()", "FE");
+  LOG_SCOPE("compute_shape_functions()", "FE");
 
   const std::vector<Point> & xyz_qp = this->get_xyz();
 
@@ -838,9 +834,6 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Invalid dimension " << this->dim);
     }
-
-  // Stop logging the shape function computation
-  STOP_LOG("compute_shape_functions()", "FE");
 }
 
 

@@ -31,7 +31,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
                                              const EquationSystems & es,
                                              const std::set<std::string> * system_names)
 {
-  START_LOG("write_equation_systems()", "MeshOutput");
+  LOG_SCOPE("write_equation_systems()", "MeshOutput");
 
   // We may need to gather and/or renumber a ParallelMesh to output
   // it, making that const qualifier in our constructor a dirty lie
@@ -75,8 +75,6 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
   //es.build_solution_vector (soln);
 
   this->write_nodal_data (fname, soln, names);
-
-  STOP_LOG("write_equation_systems()", "MeshOutput");
 }
 
 

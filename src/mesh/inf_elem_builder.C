@@ -300,7 +300,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   // update element neighbors
   this->_mesh.find_neighbors();
 
-  START_LOG("build_inf_elem()", "InfElemBuilder");
+  LOG_SCOPE("build_inf_elem()", "InfElemBuilder");
 
   // A set for storing element number, side number pairs.
   // pair.first == element number, pair.second == side number
@@ -650,8 +650,6 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
                  << std::endl
                  << std::endl;
 #endif
-
-  STOP_LOG("build_inf_elem()", "InfElemBuilder");
 }
 
 } // namespace libMesh

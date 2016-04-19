@@ -101,13 +101,12 @@ dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
 
 void CondensedEigenSystem::solve()
 {
-  START_LOG("solve()", "CondensedEigenSystem");
+  LOG_SCOPE("solve()", "CondensedEigenSystem");
 
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
   if(!condensed_dofs_initialized)
     {
-      STOP_LOG("solve()", "CondensedEigenSystem");
       Parent::solve();
       return;
     }
@@ -174,23 +173,18 @@ void CondensedEigenSystem::solve()
 
   set_n_converged(solve_data.first);
   set_n_iterations(solve_data.second);
-
-  STOP_LOG("solve()", "CondensedEigenSystem");
 }
 
 
 
 std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 {
-  START_LOG("get_eigenpair()", "CondensedEigenSystem");
+  LOG_SCOPE("get_eigenpair()", "CondensedEigenSystem");
 
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
-  if(!condensed_dofs_initialized)
-    {
-      STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
-      return Parent::get_eigenpair(i);
-    }
+  if (!condensed_dofs_initialized)
+    return Parent::get_eigenpair(i);
 
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
@@ -216,8 +210,6 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 
   solution->close();
   this->update();
-
-  STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
 
   return eval;
 }
