@@ -1033,15 +1033,21 @@ void FunctionParserADBase<Value_t>::Unserialize(std::istream & istr)
   std::vector<unsigned> byteCode;
   size_t byte_code_size;
   istr.read(reinterpret_cast<char *>(&byte_code_size), sizeof(byte_code_size));
-  byteCode.resize(byte_code_size);
-  istr.read(reinterpret_cast<char *>(&byteCode[0]), byte_code_size * sizeof(unsigned));
+  if (byte_code_size > 0)
+  {
+    byteCode.resize(byte_code_size);
+    istr.read(reinterpret_cast<char *>(&byteCode[0]), byte_code_size * sizeof(unsigned));
+  }
 
   // read immediates
   std::vector<Value_t> immed;
   size_t immed_size;
   istr.read(reinterpret_cast<char *>(&immed_size), sizeof(immed_size));
-  immed.resize(immed_size);
-  istr.read(reinterpret_cast<char *>(&immed[0]), immed_size * sizeof(Value_t));
+  if (immed_size > 0)
+  {
+    immed.resize(immed_size);
+    istr.read(reinterpret_cast<char *>(&immed[0]), immed_size * sizeof(Value_t));
+  }
 
   // read stacktop
   unsigned stacktop_max;
