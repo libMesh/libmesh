@@ -111,10 +111,6 @@ void LinearImplicitSystem::solve ()
     // Assemble the linear system
     this->assemble ();
 
-  // Log how long the linear solve takes.
-  // This gets done by the LinearSolver classes now [RHS]
-  // START_LOG("solve()", "System");
-
   // Get a reference to the EquationSystems
   const EquationSystems & es =
     this->get_equation_systems();
@@ -152,10 +148,6 @@ void LinearImplicitSystem::solve ()
   // solve and the final residual.
   _n_linear_iterations   = rval.first;
   _final_linear_residual = rval.second;
-
-  // Stop logging the linear solve
-  // This gets done by the LinearSolver classes now [RHS]
-  // STOP_LOG("solve()", "System");
 
   // Update the system after the solve
   this->update();
