@@ -22,8 +22,9 @@
 #ifdef LIBMESH_TRILINOS_HAVE_DTK
 
 #include "libmesh/dtk_solution_transfer.h"
-
 #include "libmesh/system.h"
+
+#include "libmesh/ignore_warnings.h"
 
 // Trilinos Includes
 #include <Teuchos_RCP.hpp>
@@ -31,7 +32,6 @@
 #include <Teuchos_Ptr.hpp>
 #include <Teuchos_DefaultMpiComm.hpp>
 #include <Teuchos_OpaqueWrapper.hpp>
-
 
 // DTK Includes
 #include <DTK_MeshManager.hpp>
@@ -41,6 +41,8 @@
 #include <DTK_FieldTools.hpp>
 #include <DTK_CommTools.hpp>
 #include <DTK_CommIndexer.hpp>
+
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

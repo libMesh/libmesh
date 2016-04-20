@@ -26,6 +26,7 @@
 
 #include "libmesh/dtk_evaluator.h"
 
+#include "libmesh/ignore_warnings.h"
 #include <DTK_MeshManager.hpp>
 #include <DTK_MeshContainer.hpp>
 #include <DTK_MeshTraits.hpp>
@@ -36,6 +37,7 @@
 
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_ArrayRCP.hpp>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

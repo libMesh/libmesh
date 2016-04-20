@@ -27,12 +27,14 @@
 
 #include "libmesh/mesh.h"
 
+#include "libmesh/ignore_warnings.h"
 #include <DTK_MeshContainer.hpp>
 #include <DTK_FieldEvaluator.hpp>
 #include <DTK_FieldContainer.hpp>
 
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_ArrayRCP.hpp>
+#include "libmesh/restore_warnings.h"
 
 #include <string>
 

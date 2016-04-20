@@ -28,8 +28,6 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/system.h"
 
-#include <string>
-
 namespace libMesh
 {
 

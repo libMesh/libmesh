@@ -29,8 +29,10 @@
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
 
+#include "libmesh/ignore_warnings.h"
 #include <DTK_MeshTypes.hpp>
 #include <Teuchos_Comm.hpp>
+#include "libmesh/restore_warnings.h"
 
 #include <vector>
 

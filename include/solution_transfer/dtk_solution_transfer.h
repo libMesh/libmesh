@@ -27,12 +27,16 @@
 #include "libmesh/solution_transfer.h"
 #include "libmesh/dtk_adapter.h"
 
+#include "libmesh/ignore_warnings.h"
+
 // Trilinos
 #include <Teuchos_CommHelpers.hpp>
 #include <Teuchos_DefaultComm.hpp>
 
 // DTK
 #include <DTK_SharedDomainMap.hpp>
+
+#include "libmesh/restore_warnings.h"
 
 #include <string>
 
