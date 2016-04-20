@@ -258,12 +258,11 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
 
 
 
-void Partitioner::set_parent_processor_ids(MeshBase &
-#ifdef LIBMESH_ENABLE_AMR
-                                           mesh
-#endif
-                                           )
-{
+void Partitioner::set_parent_processor_ids(MeshBase & mesh)
+ {
+  // Ignore the parameter when !LIBMESH_ENABLE_AMR
+  libmesh_ignore(mesh);
+
   START_LOG("set_parent_processor_ids()","Partitioner");
 
 #ifdef LIBMESH_ENABLE_AMR
