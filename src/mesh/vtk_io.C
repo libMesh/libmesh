@@ -265,10 +265,11 @@ void VTKIO::write_nodal_data (const std::string & fname,
   if (fname.substr(fname.rfind("."), fname.size()) != ".pvtu")
     libmesh_do_once(libMesh::err << "The .pvtu extension should be used when writing VTK files in libMesh.");
 
-  // The solution vector should not be empty, it should have been
-  // broadcast to all processors by the MeshOutput base class, since
-  // VTK is a parallel format.  Verify this before going further.
-  if (soln.empty())
+  // If there are variable names being written, the solution vector
+  // should not be empty, it should have been broadcast to all
+  // processors by the MeshOutput base class, since VTK is a parallel
+  // format.  Verify this before going further.
+  if (!names.empty() && soln.empty())
     libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
 
   // we only use Unstructured grids
