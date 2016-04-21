@@ -17,8 +17,9 @@ AC_DEFUN([CONFIGURE_HDF5],
     AX_PATH_HDF5(1.8.0,no)
     if (test "x$HAVE_HDF5" = "x0"); then
       enablehdf5=no
+      AC_MSG_RESULT(<<< HDF5 support not found or disabled >>>)
     else
-       AC_MSG_RESULT(<<< Configuring library with HDF5 support >>>)
+      AC_MSG_RESULT(<<< Configuring library with HDF5 support >>>)
     fi
   fi
 ])
@@ -67,22 +68,33 @@ HAVE_HDF5=0
 AC_ARG_VAR(HDF5_DIR,[root directory of HDF5 installation])
 
 AC_ARG_WITH(hdf5,
-  [AS_HELP_STRING([--with-hdf5[=DIR]],[root directory of HDF5 installation (default = HDF5_DIR)])],
-  [with_hdf5=$withval
-if test "${with_hdf5}" != yes; then
-    HDF5_PREFIX=$withval
-fi
-],[
-with_hdf5=$withval
-if test "x${HDF5_DIR}" != "x"; then
-   HDF5_PREFIX=${HDF5_DIR}
-fi
-])
+  [AS_HELP_STRING([--with-hdf5=DIR],[root directory of HDF5 installation (default = HDF5_DIR)])],
+  dnl action-if-given
+  [
+    with_hdf5=$withval
+    if test "${with_hdf5}" != yes; then
+      HDF5_PREFIX=$withval
+    fi
+  ],
+  dnl action-if-not-given
+  [
+    # This is "no" if the user did not specify --with-hdf5=foo
+    with_hdf5=$withval
+
+    # If $HDF5_DIR is set in the user's environment, then treat that
+    # as though they had said --with-hdf5=$HDF5_DIR.
+    if test "x${HDF5_DIR}" != "x"; then
+      HDF5_PREFIX=${HDF5_DIR}
+      with_hdf5=yes
+    fi
+  ])
 
 # package requirement; if not specified, the default is to assume that
 # the package is optional
 
 is_package_required=ifelse([$2], ,no, $2 )
+
+AC_MSG_RESULT([Debugging: with_hdf5 = $with_hdf5])
 
 if test "${with_hdf5}" != no ; then
 
