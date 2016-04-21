@@ -89,7 +89,7 @@ install-data-hook:
 	@if (test "x$(prefix)" != "x@prefix@") ; then \
           oldprefix="@prefix@" ; \
           newprefix="$(prefix)" ; \
-          for genfile in `find $(DESTDIR)$(prefix) -name "*.pc" -o -name Make.common -o -name libmesh-config -type f` ; do \
+          for genfile in `echo $(DESTDIR)$(prefix)/lib/pkgconfig/*.pc $(DESTDIR)$(prefix)/etc/libmesh/*.pc $(DESTDIR)$(prefix)/etc/libmesh/Make.common $(DESTDIR)$(prefix)/lib/pkgconfig/Make.common $(DESTDIR)$(prefix)/bin/libmesh-config` ; do \
             echo " " ; \
             echo " *** replacing $$oldprefix" ; \
             echo " ***      with $$newprefix" ; \
