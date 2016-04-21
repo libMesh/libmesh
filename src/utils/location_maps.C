@@ -54,7 +54,7 @@ void LocationMap<T>::init(MeshBase & mesh)
   if (!mesh.is_serial())
     libmesh_parallel_only(mesh.comm());
 
-  START_LOG("init()", "LocationMap");
+  LOG_SCOPE("init()", "LocationMap");
 
   // Clear the old map
   _map.clear();
@@ -90,8 +90,6 @@ void LocationMap<T>::init(MeshBase & mesh)
     }
 
   this->fill(mesh);
-
-  STOP_LOG("init()", "LocationMap");
 }
 
 
@@ -124,7 +122,7 @@ template <typename T>
 T * LocationMap<T>::find(const Point & p,
                          const Real tol)
 {
-  START_LOG("find()","LocationMap");
+  LOG_SCOPE("find()", "LocationMap");
 
   // Look for a likely key in the multimap
   unsigned int pointkey = this->key(p);
@@ -135,12 +133,8 @@ T * LocationMap<T>::find(const Point & p,
     pos = _map.equal_range(pointkey);
 
   while (pos.first != pos.second)
-    if (p.absolute_fuzzy_equals
-        (this->point_of(*(pos.first->second)), tol))
-      {
-        STOP_LOG("find()","LocationMap");
-        return pos.first->second;
-      }
+    if (p.absolute_fuzzy_equals(this->point_of(*(pos.first->second)), tol))
+      return pos.first->second;
     else
       ++pos.first;
 
@@ -158,19 +152,14 @@ T * LocationMap<T>::find(const Point & p,
                                            yoffset*chunkmax +
                                            zoffset);
               while (key_pos.first != key_pos.second)
-                if (p.absolute_fuzzy_equals
-                    (this->point_of(*(key_pos.first->second)), tol))
-                  {
-                    STOP_LOG("find()","LocationMap");
-                    return key_pos.first->second;
-                  }
+                if (p.absolute_fuzzy_equals(this->point_of(*(key_pos.first->second)), tol))
+                  return key_pos.first->second;
                 else
                   ++key_pos.first;
             }
         }
     }
 
-  STOP_LOG("find()","LocationMap");
   return libmesh_nullptr;
 }
 

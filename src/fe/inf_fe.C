@@ -291,12 +291,8 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem * libmesh
   libmesh_assert(radial_qrule);
   libmesh_assert(inf_elem);
 
-
-  /**
-   * Start logging the radial shape function initialization
-   */
-  START_LOG("init_radial_shape_functions()", "InfFE");
-
+  // Start logging the radial shape function initialization
+  LOG_SCOPE("init_radial_shape_functions()", "InfFE");
 
   // -----------------------------------------------------------------
   // initialize most of the things related to mapping
@@ -369,12 +365,6 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem * libmesh
         radial_map[i][p]    = InfFE<Dim,INFINITE_MAP,T_map>::eval       (radial_qp[p](0), radial_mapping_order, i);
         dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
       }
-
-  /**
-   * Stop logging the radial shape function initialization
-   */
-  STOP_LOG("init_radial_shape_functions()", "InfFE");
-
 }
 
 
@@ -386,10 +376,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem * inf_elem)
 {
   libmesh_assert(inf_elem);
 
-
   // Start logging the radial shape function initialization
-  START_LOG("init_shape_functions()", "InfFE");
-
+  LOG_SCOPE("init_shape_functions()", "InfFE");
 
   // -----------------------------------------------------------------
   // fast access to some const int's for the radial data
@@ -720,13 +708,6 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem * inf_elem)
           _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
         }
   }
-
-
-  /**
-   * Stop logging the radial shape function initialization
-   */
-  STOP_LOG("init_shape_functions()", "InfFE");
-
 }
 
 
@@ -741,12 +722,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
   // otherwise this version of computing dist would give problems
   libmesh_assert_equal_to (base_elem->type(), Base::get_elem_type(inf_elem->type()));
 
-
-  /**
-   * Start logging the combination of radial and base parts
-   */
-  START_LOG("combine_base_radial()", "InfFE");
-
+  // Start logging the combination of radial and base parts
+  LOG_SCOPE("combine_base_radial()", "InfFE");
 
   // zero  the phase, since it is to be summed up
   std::fill (dphasedxi.begin(),   dphasedxi.end(),   0.);
@@ -882,12 +859,6 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
     default:
       libmesh_error_msg("Unsupported Dim = " << Dim);
     }
-
-
-  /**
-   * Start logging the combination of radial and base parts
-   */
-  STOP_LOG("combine_base_radial()", "InfFE");
 }
 
 
@@ -902,11 +873,9 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem *,
   libmesh_assert(radial_qrule);
 
   // Start logging the overall computation of shape functions
-  START_LOG("compute_shape_functions()", "InfFE");
-
+  LOG_SCOPE("compute_shape_functions()", "InfFE");
 
   const unsigned int n_total_qp  = _n_total_qp;
-
 
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
@@ -999,9 +968,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem *,
     default:
       libmesh_error_msg("Unsupported dim = " << dim);
     }
-
-  // Stop logging the overall computation of shape functions
-  STOP_LOG("compute_shape_functions()", "InfFE");
 }
 
 

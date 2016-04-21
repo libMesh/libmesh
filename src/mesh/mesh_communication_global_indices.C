@@ -170,7 +170,7 @@ namespace libMesh
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 {
-  START_LOG ("assign_global_indices()", "MeshCommunication");
+  LOG_SCOPE ("assign_global_indices()", "MeshCommunication");
 
   // This method determines partition-agnostic global indices
   // for nodes and elements.
@@ -566,8 +566,6 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       }
     }
   }
-
-  STOP_LOG ("assign_global_indices()", "MeshCommunication");
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 void MeshCommunication::assign_global_indices (MeshBase &) const
@@ -579,7 +577,7 @@ void MeshCommunication::assign_global_indices (MeshBase &) const
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) const
 {
-  START_LOG ("check_for_duplicate_global_indices()", "MeshCommunication");
+  LOG_SCOPE ("check_for_duplicate_global_indices()", "MeshCommunication");
 
   // Global bounding box
   MeshTools::BoundingBox bbox =
@@ -662,8 +660,6 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
         }
     }
   } // done checking Hilbert keys
-
-  STOP_LOG ("check_for_duplicate_global_indices()", "MeshCommunication");
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 void MeshCommunication::check_for_duplicate_global_indices (MeshBase &) const
@@ -679,7 +675,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
                                              const ForwardIterator & end,
                                              std::vector<dof_id_type> & index_map) const
 {
-  START_LOG ("find_global_indices()", "MeshCommunication");
+  LOG_SCOPE ("find_global_indices()", "MeshCommunication");
 
   // This method determines partition-agnostic global indices
   // for nodes and elements.
@@ -705,7 +701,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
   sorted_hilbert_keys.reserve(n_objects);
   hilbert_keys.reserve(n_objects);
   {
-    START_LOG("compute_hilbert_indices()", "MeshCommunication");
+    LOG_SCOPE("compute_hilbert_indices()", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
       {
         const Parallel::DofObjectKey hi(get_hilbert_index (*it, bbox));
@@ -719,14 +715,13 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
             ((*it)->processor_id() == DofObject::invalid_processor_id))
           sorted_hilbert_keys.push_back(hi);
       }
-    STOP_LOG("compute_hilbert_indices()", "MeshCommunication");
   }
 
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
   START_LOG ("parallel_sort()", "MeshCommunication");
   Parallel::Sort<Parallel::DofObjectKey> sorter (communicator,
-                                                  sorted_hilbert_keys);
+                                                 sorted_hilbert_keys);
   sorter.sort();
   STOP_LOG ("parallel_sort()", "MeshCommunication");
   const std::vector<Parallel::DofObjectKey> & my_bin = sorter.bin();
@@ -915,8 +910,6 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
   }
 
   libmesh_assert_equal_to(index_map.size(), n_objects);
-
-  STOP_LOG ("find_global_indices()", "MeshCommunication");
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 template <typename ForwardIterator>

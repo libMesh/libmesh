@@ -84,7 +84,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
                                    const double tol,
                                    const unsigned int m_its)
 {
-  START_LOG("solve()", "EigenSparseLinearSolver");
+  LOG_SCOPE("solve()", "EigenSparseLinearSolver");
   this->init ();
 
   // Make sure the data passed in are really Eigen types
@@ -214,8 +214,6 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
 
         this->_solver_type = BICGSTAB;
 
-        STOP_LOG("solve()", "EigenSparseLinearSolver");
-
         return this->solve (matrix,
                             solution,
                             rhs,
@@ -224,7 +222,6 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
       }
     }
 
-  STOP_LOG("solve()", "EigenSparseLinearSolver");
   return retval;
 }
 
@@ -238,8 +235,7 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
                                            const double tol,
                                            const unsigned int m_its)
 {
-
-  START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
+  LOG_SCOPE("adjoint_solve()", "EigenSparseLinearSolver");
 
   libmesh_experimental();
   EigenSparseMatrix<T> mat_trans(this->comm());
@@ -250,8 +246,6 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
                                                       rhs_in,
                                                       tol,
                                                       m_its);
-
-  STOP_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
   return retval;
 }

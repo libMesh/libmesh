@@ -860,7 +860,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   else
     log_name = "assembly(get_jacobian)";
 
-  START_LOG(log_name, "FEMSystem");
+  LOG_SCOPE(log_name.c_str(), "FEMSystem");
 
   const MeshBase & mesh = this->get_mesh();
 
@@ -1042,7 +1042,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
       libMesh::out << "J = [" << *(this->matrix) << "];" << std::endl;
       libMesh::out.precision(old_precision);
     }
-  STOP_LOG(log_name, "FEMSystem");
 }
 
 
@@ -1105,7 +1104,7 @@ void FEMSystem::mesh_position_set()
 
 void FEMSystem::postprocess ()
 {
-  START_LOG("postprocess()", "FEMSystem");
+  LOG_SCOPE("postprocess()", "FEMSystem");
 
   const MeshBase & mesh = this->get_mesh();
 
@@ -1119,15 +1118,13 @@ void FEMSystem::postprocess ()
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
                         PostprocessContributions(*this));
-
-  STOP_LOG("postprocess()", "FEMSystem");
 }
 
 
 
 void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
 {
-  START_LOG("assemble_qoi()", "FEMSystem");
+  LOG_SCOPE("assemble_qoi()", "FEMSystem");
 
   const MeshBase & mesh = this->get_mesh();
 
@@ -1151,8 +1148,6 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
                            qoi_contributions);
 
   this->diff_qoi->parallel_op( this->comm(), this->qoi, qoi_contributions.qoi, qoi_indices );
-
-  STOP_LOG("assemble_qoi()", "FEMSystem");
 }
 
 
@@ -1161,7 +1156,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                          bool include_liftfunc,
                                          bool apply_constraints)
 {
-  START_LOG("assemble_qoi_derivative()", "FEMSystem");
+  LOG_SCOPE("assemble_qoi_derivative()", "FEMSystem");
 
   const MeshBase & mesh = this->get_mesh();
 
@@ -1180,8 +1175,6 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                                    *(this->diff_qoi),
                                                    include_liftfunc,
                                                    apply_constraints));
-
-  STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
 }
 
 
@@ -1298,27 +1291,24 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
 void FEMSystem::numerical_elem_jacobian (FEMContext & context) const
 {
-  START_LOG("numerical_elem_jacobian()", "FEMSystem");
+  LOG_SCOPE("numerical_elem_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::element_residual, context);
-  STOP_LOG("numerical_elem_jacobian()", "FEMSystem");
 }
 
 
 
 void FEMSystem::numerical_side_jacobian (FEMContext & context) const
 {
-  START_LOG("numerical_side_jacobian()", "FEMSystem");
+  LOG_SCOPE("numerical_side_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::side_residual, context);
-  STOP_LOG("numerical_side_jacobian()", "FEMSystem");
 }
 
 
 
 void FEMSystem::numerical_nonlocal_jacobian (FEMContext & context) const
 {
-  START_LOG("numerical_nonlocal_jacobian()", "FEMSystem");
+  LOG_SCOPE("numerical_nonlocal_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::nonlocal_residual, context);
-  STOP_LOG("numerical_nonlocal_jacobian()", "FEMSystem");
 }
 
 

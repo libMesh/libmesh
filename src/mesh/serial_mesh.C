@@ -663,8 +663,7 @@ unique_id_type SerialMesh::parallel_max_unique_id() const
 
 void SerialMesh::renumber_nodes_and_elements ()
 {
-
-  START_LOG("renumber_nodes_and_elem()", "Mesh");
+  LOG_SCOPE("renumber_nodes_and_elem()", "Mesh");
 
   // node and element id counters
   dof_id_type next_free_elem = 0;
@@ -816,8 +815,6 @@ void SerialMesh::renumber_nodes_and_elements ()
   libmesh_assert_equal_to (next_free_node, _nodes.size());
 
   this->update_parallel_id_counts();
-
-  STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
 
 
@@ -845,7 +842,7 @@ void SerialMesh::stitch_meshes (SerialMesh & other_mesh,
                                 bool use_binary_search,
                                 bool enforce_all_nodes_match_on_boundaries)
 {
-  START_LOG("stitch_meshes()", "SerialMesh");
+  LOG_SCOPE("stitch_meshes()", "SerialMesh");
   stitching_helper(&other_mesh,
                    this_mesh_boundary_id,
                    other_mesh_boundary_id,
@@ -855,7 +852,6 @@ void SerialMesh::stitch_meshes (SerialMesh & other_mesh,
                    use_binary_search,
                    enforce_all_nodes_match_on_boundaries,
                    true);
-  STOP_LOG("stitch_meshes()", "SerialMesh");
 }
 
 void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,

@@ -45,7 +45,7 @@ void LinearPartitioner::_do_partition (MeshBase & mesh,
 
   // Create a simple linear partitioning
   {
-    START_LOG ("partition()", "LinearPartitioner");
+    LOG_SCOPE ("partition()", "LinearPartitioner");
 
     const dof_id_type n_active_elem = mesh.n_active_elem();
     const dof_id_type blksize       = n_active_elem/n;
@@ -72,8 +72,6 @@ void LinearPartitioner::_do_partition (MeshBase & mesh,
 
         e++;
       }
-
-    STOP_LOG ("partition()", "LinearPartitioner");
   }
 }
 

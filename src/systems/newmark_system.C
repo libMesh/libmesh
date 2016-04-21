@@ -156,7 +156,7 @@ void NewmarkSystem::initial_conditions ()
   // libmesh_assert(init_cond_fptr);
 
   // Log how long the user's matrix assembly code takes
-  START_LOG("initial_conditions ()", "NewmarkSystem");
+  LOG_SCOPE("initial_conditions ()", "NewmarkSystem");
 
   // Set all values to 0, then
   // call the user-specified function for initial conditions.
@@ -164,9 +164,6 @@ void NewmarkSystem::initial_conditions ()
   this->get_vector("velocity").zero();
   this->get_vector("acceleration").zero();
   this->user_initialization();
-
-  // Stop logging the user code
-  STOP_LOG("initial_conditions ()", "NewmarkSystem");
 }
 
 
@@ -192,7 +189,7 @@ void NewmarkSystem::compute_matrix ()
 
 void NewmarkSystem::update_rhs ()
 {
-  START_LOG("update_rhs ()", "NewmarkSystem");
+  LOG_SCOPE("update_rhs ()", "NewmarkSystem");
 
   // zero the rhs-vector
   NumericVector<Number> & the_rhs = *this->rhs;
@@ -201,7 +198,6 @@ void NewmarkSystem::update_rhs ()
   // get writable references to some vectors
   NumericVector<Number> & rhs_m = this->get_vector("rhs_m");
   NumericVector<Number> & rhs_c = this->get_vector("rhs_c");
-
 
   // zero the vectors for matrix-vector product
   rhs_m.zero();
@@ -220,15 +216,13 @@ void NewmarkSystem::update_rhs ()
   the_rhs.add(this->get_vector("force"));
   the_rhs.add_vector(rhs_m, this->get_matrix("mass"));
   the_rhs.add_vector(rhs_c, this->get_matrix("damping"));
-
-  STOP_LOG("update_rhs ()", "NewmarkSystem");
 }
 
 
 
 void NewmarkSystem::update_u_v_a ()
 {
-  START_LOG("update_u_v_a ()", "NewmarkSystem");
+  LOG_SCOPE("update_u_v_a ()", "NewmarkSystem");
 
   // get some references for convenience
   const NumericVector<Number> &  solu = *this->solution;
@@ -253,8 +247,6 @@ void NewmarkSystem::update_u_v_a ()
   // compute the new velocity vector
   vel_vec.add(_a_6,old_acc);
   vel_vec.add(_a_7,acc_vec);
-
-  STOP_LOG("update_u_v_a ()", "NewmarkSystem");
 }
 
 

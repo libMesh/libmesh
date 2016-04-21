@@ -608,7 +608,7 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
                                     const std::vector<Number> & soln,
                                     const std::vector<std::string> & names)
 {
-  START_LOG("write_nodal_data()", "ExodusII_IO");
+  LOG_SCOPE("write_nodal_data()", "ExodusII_IO");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
@@ -635,11 +635,8 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
   this->write_nodal_data_common(fname, output_names, /*continuous=*/true);
 #endif
 
-  if(mesh.processor_id())
-    {
-      STOP_LOG("write_nodal_data()", "ExodusII_IO");
-      return;
-    }
+  if (mesh.processor_id())
+    return;
 
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
@@ -678,8 +675,6 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 #endif
 
     }
-
-  STOP_LOG("write_nodal_data()", "ExodusII_IO");
 }
 
 
@@ -811,8 +806,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
                                                   const std::vector<Number> & soln,
                                                   const std::vector<std::string> & names)
 {
-
-  START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+  LOG_SCOPE("write_nodal_data_discontinuous()", "ExodusII_IO");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
@@ -836,10 +830,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 #endif
 
   if (mesh.processor_id())
-    {
-      STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
-      return;
-    }
+    return;
 
   for (int c=0; c<num_vars; c++)
     {
@@ -867,8 +858,6 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
       exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
 #endif
     }
-
-  STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
 
 

@@ -133,7 +133,7 @@ std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & 
                                                               const unsigned int n_iter)
 {
   // Log how long the linear solve takes.
-  START_LOG("adjoint_solve()", "LinearSolver");
+  LOG_SCOPE("adjoint_solve()", "LinearSolver");
 
   // Take the discrete adjoint
   mat.close();
@@ -147,11 +147,7 @@ std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & 
   // by taking the discrete adjoint
   mat.get_transpose(mat);
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("adjoint_solve()", "LinearSolver");
-
   return totalrval;
-
 }
 
 template <typename T>

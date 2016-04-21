@@ -138,12 +138,10 @@ void MeshfreeInterpolation::gather_remote_data ()
   // This function must be run on all processors at once
   parallel_object_only();
 
-  START_LOG ("gather_remote_data()", "MeshfreeInterpolation");
+  LOG_SCOPE ("gather_remote_data()", "MeshfreeInterpolation");
 
   this->comm().allgather(_src_pts);
   this->comm().allgather(_src_vals);
-
-  STOP_LOG  ("gather_remote_data()", "MeshfreeInterpolation");
 
 #endif // LIBMESH_HAVE_MPI
 }
@@ -157,7 +155,7 @@ void InverseDistanceInterpolation<KDDim>::construct_kd_tree ()
 {
 #ifdef LIBMESH_HAVE_NANOFLANN
 
-  START_LOG ("construct_kd_tree()", "InverseDistanceInterpolation<>");
+  LOG_SCOPE ("construct_kd_tree()", "InverseDistanceInterpolation<>");
 
   // Initialize underlying KD tree
   if (_kd_tree.get() == libmesh_nullptr)
@@ -168,8 +166,6 @@ void InverseDistanceInterpolation<KDDim>::construct_kd_tree ()
   libmesh_assert (_kd_tree.get() != libmesh_nullptr);
 
   _kd_tree->buildIndex();
-
-  STOP_LOG ("construct_kd_tree()", "InverseDistanceInterpolation<>");
 #endif
 }
 
@@ -203,7 +199,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
     const_cast<InverseDistanceInterpolation<KDDim> *>(this)->construct_kd_tree();
 #endif
 
-  START_LOG ("interpolate_field_data()", "InverseDistanceInterpolation<>");
+  LOG_SCOPE ("interpolate_field_data()", "InverseDistanceInterpolation<>");
 
   libmesh_assert_equal_to (field_names.size(), this->n_field_variables());
 
@@ -255,8 +251,6 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
                     << "with nanoflann KD-Tree approximate nearest neighbor support!");
 
 #endif
-
-  STOP_LOG ("interpolate_field_data()", "InverseDistanceInterpolation<>");
 }
 
 template <unsigned int KDDim>

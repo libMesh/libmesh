@@ -42,7 +42,7 @@ namespace libMesh
 // ErrorVector class member functions
 ErrorVectorReal ErrorVector::minimum() const
 {
-  START_LOG ("minimum()", "ErrorVector");
+  LOG_SCOPE ("minimum()", "ErrorVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
   ErrorVectorReal min = std::numeric_limits<ErrorVectorReal>::max();
@@ -54,7 +54,6 @@ ErrorVectorReal ErrorVector::minimum() const
       if (this->is_active_elem(i))
         min = std::min (min, (*this)[i]);
     }
-  STOP_LOG ("minimum()", "ErrorVector");
 
   // ErrorVectors are for positive values
   libmesh_assert_greater_equal (min, 0.);
@@ -66,7 +65,7 @@ ErrorVectorReal ErrorVector::minimum() const
 
 Real ErrorVector::mean() const
 {
-  START_LOG ("mean()", "ErrorVector");
+  LOG_SCOPE ("mean()", "ErrorVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
@@ -80,8 +79,6 @@ Real ErrorVector::mean() const
 
         nnz++;
       }
-
-  STOP_LOG ("mean()", "ErrorVector");
 
   return the_mean;
 }
@@ -127,7 +124,7 @@ Real ErrorVector::variance(const Real mean_in) const
 {
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
-  START_LOG ("variance()", "ErrorVector");
+  LOG_SCOPE ("variance()", "ErrorVector");
 
   Real the_variance = 0;
   dof_id_type nnz = 0;
@@ -141,8 +138,6 @@ Real ErrorVector::variance(const Real mean_in) const
         nnz++;
       }
 
-  STOP_LOG ("variance()", "ErrorVector");
-
   return the_variance;
 }
 
@@ -151,7 +146,7 @@ Real ErrorVector::variance(const Real mean_in) const
 
 std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
 {
-  START_LOG ("cut_below()", "ErrorVector");
+  LOG_SCOPE ("cut_below()", "ErrorVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
@@ -167,8 +162,6 @@ std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
           }
       }
 
-  STOP_LOG ("cut_below()", "ErrorVector");
-
   return cut_indices;
 }
 
@@ -177,7 +170,7 @@ std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
 
 std::vector<dof_id_type> ErrorVector::cut_above(Real cut) const
 {
-  START_LOG ("cut_above()", "ErrorVector");
+  LOG_SCOPE ("cut_above()", "ErrorVector");
 
   const dof_id_type n = cast_int<dof_id_type>(this->size());
 
@@ -192,8 +185,6 @@ std::vector<dof_id_type> ErrorVector::cut_above(Real cut) const
             cut_indices.push_back(i);
           }
       }
-
-  STOP_LOG ("cut_above()", "ErrorVector");
 
   return cut_indices;
 }

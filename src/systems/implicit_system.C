@@ -304,7 +304,7 @@ std::pair<unsigned int, Real>
 ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 {
   // Log how long the linear solve takes.
-  START_LOG("sensitivity_solve()", "ImplicitSystem");
+  LOG_SCOPE("sensitivity_solve()", "ImplicitSystem");
 
   // The forward system should now already be solved.
   // Now assemble the corresponding sensitivity system.
@@ -353,9 +353,6 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   this->release_linear_solver(linear_solver);
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("sensitivity_solve()", "ImplicitSystem");
-
   return totalrval;
 }
 
@@ -365,7 +362,7 @@ std::pair<unsigned int, Real>
 ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
 {
   // Log how long the linear solve takes.
-  START_LOG("adjoint_solve()", "ImplicitSystem");
+  LOG_SCOPE("adjoint_solve()", "ImplicitSystem");
 
   if (this->assemble_before_solve)
     // Assemble the linear system
@@ -409,9 +406,6 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
         (this->get_adjoint_solution(i), i);
 #endif
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("adjoint_solve()", "ImplicitSystem");
-
   return totalrval;
 }
 
@@ -423,7 +417,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
                                                     const QoISet & qoi_indices)
 {
   // Log how long the linear solve takes.
-  START_LOG("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
+  LOG_SCOPE("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
 
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
@@ -562,9 +556,6 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
          /* homogeneous = */ true);
 #endif
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
-
   return totalrval;
 }
 
@@ -575,7 +566,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
                                             const ParameterVector & weights)
 {
   // Log how long the linear solve takes.
-  START_LOG("weighted_sensitivity_solve()", "ImplicitSystem");
+  LOG_SCOPE("weighted_sensitivity_solve()", "ImplicitSystem");
 
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
@@ -648,9 +639,6 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
     (*this, &this->get_weighted_sensitivity_solution(),
      /* homogeneous = */ true);
 #endif
-
-  // Stop logging the nonlinear solve
-  STOP_LOG("weighted_sensitivity_solve()", "ImplicitSystem");
 
   return rval;
 }

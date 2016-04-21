@@ -164,13 +164,13 @@ void NameBasedIO::read (const std::string & name)
   // Serial mesh formats
   else
     {
-      START_LOG("read()", "NameBasedIO");
-
       // Read the file based on extension.  Only processor 0
       // needs to read the mesh.  It will then broadcast it and
       // the other processors will pick it up
       if (mymesh.processor_id() == 0)
         {
+          LOG_SCOPE("read()", "NameBasedIO");
+
           std::ostringstream pid_suffix;
           pid_suffix << '_' << getpid();
           // Nasty hack for reading/writing zipped files
@@ -182,10 +182,9 @@ void NameBasedIO::read (const std::string & name)
               new_name += pid_suffix.str();
               std::string system_string = "bunzip2 -f -k -c ";
               system_string += name + " > " + new_name;
-              START_LOG("system(bunzip2)", "NameBasedIO");
+              LOG_SCOPE("system(bunzip2)", "NameBasedIO");
               if (std::system(system_string.c_str()))
                 libmesh_file_error(system_string);
-              STOP_LOG("system(bunzip2)", "NameBasedIO");
 #else
               libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
@@ -197,10 +196,9 @@ void NameBasedIO::read (const std::string & name)
               new_name += pid_suffix.str();
               std::string system_string = "xz -f -d -k -c ";
               system_string += name + " > " + new_name;
-              START_LOG("system(xz -d)", "XdrIO");
+              LOG_SCOPE("system(xz -d)", "XdrIO");
               if (std::system(system_string.c_str()))
                 libmesh_file_error(system_string);
-              STOP_LOG("system(xz -d)", "XdrIO");
 #else
               libmesh_error_msg("ERROR: need xz to open .xz file " << name);
 #endif
@@ -275,9 +273,6 @@ void NameBasedIO::read (const std::string & name)
           if (name.size() - name.rfind(".xz") == 3)
             std::remove(new_name.c_str());
         }
-
-
-      STOP_LOG("read()", "NameBasedIO");
 
       // Send the mesh & bcs (which are now only on processor 0) to the other
       // processors
@@ -407,7 +402,7 @@ void NameBasedIO::write (const std::string & name)
       // Nasty hack for reading/writing zipped files
       if (name.size() - name.rfind(".bz2") == 4)
         {
-          START_LOG("system(bzip2)", "NameBasedIO");
+          LOG_SCOPE("system(bzip2)", "NameBasedIO");
           if (mymesh.processor_id() == 0)
             {
               std::string system_string = "bzip2 -f -c ";
@@ -417,11 +412,10 @@ void NameBasedIO::write (const std::string & name)
               std::remove(new_name.c_str());
             }
           mymesh.comm().barrier();
-          STOP_LOG("system(bzip2)", "NameBasedIO");
         }
       if (name.size() - name.rfind(".xz") == 3)
         {
-          START_LOG("system(xz)", "NameBasedIO");
+          LOG_SCOPE("system(xz)", "NameBasedIO");
           if (mymesh.processor_id() == 0)
             {
               std::string system_string = "xz -f -c ";
@@ -431,7 +425,6 @@ void NameBasedIO::write (const std::string & name)
               std::remove(new_name.c_str());
             }
           mymesh.comm().barrier();
-          STOP_LOG("system(xz)", "NameBasedIO");
         }
     }
 

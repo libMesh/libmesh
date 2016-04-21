@@ -148,7 +148,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       return;
     }
 
-  START_LOG ("read()","Nemesis_IO");
+  LOG_SCOPE ("read()","Nemesis_IO");
 
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1133,8 +1133,6 @@ void Nemesis_IO::read (const std::string & base_filename)
       libMesh::out << "mesh.parallel_n_elem()=" << mesh.parallel_n_elem() << std::endl;
     }
 
-  STOP_LOG ("read()","Nemesis_IO");
-
   // For ParallelMesh, it seems that _is_serial is true by default.  A hack to
   // make the Mesh think it's parallel might be to call:
   mesh.update_post_partitioning();
@@ -1257,7 +1255,7 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
                                    const std::vector<Number> & soln,
                                    const std::vector<std::string> & names)
 {
-  START_LOG("write_nodal_data()", "Nemesis_IO");
+  LOG_SCOPE("write_nodal_data()", "Nemesis_IO");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
@@ -1309,8 +1307,6 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
     }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
-
-  STOP_LOG("write_nodal_data()", "Nemesis_IO");
 }
 
 #else

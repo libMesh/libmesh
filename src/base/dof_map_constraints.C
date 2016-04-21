@@ -1049,7 +1049,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 {
   parallel_object_only();
 
-  START_LOG("create_dof_constraints()", "DofMap");
+  LOG_SCOPE("create_dof_constraints()", "DofMap");
 
   libmesh_assert (mesh.is_prepared());
 
@@ -1090,8 +1090,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
       _node_constraints.clear();
 #endif
 
-      // make sure we stop logging though
-      STOP_LOG("create_dof_constraints()", "DofMap");
       return;
     }
 
@@ -1185,8 +1183,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
-
-  STOP_LOG("create_dof_constraints()", "DofMap");
 }
 
 
@@ -1407,7 +1403,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
 
   this->build_constraint_matrix (C, elem_dofs);
 
-  START_LOG("constrain_elem_matrix()", "DofMap");
+  LOG_SCOPE("constrain_elem_matrix()", "DofMap");
 
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
@@ -1456,8 +1452,6 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
               }
           }
     } // end if is constrained...
-
-  STOP_LOG("constrain_elem_matrix()", "DofMap");
 }
 
 
@@ -1481,7 +1475,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
 
   this->build_constraint_matrix (C, elem_dofs);
 
-  START_LOG("cnstrn_elem_mat_vec()", "DofMap");
+  LOG_SCOPE("cnstrn_elem_mat_vec()", "DofMap");
 
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
@@ -1537,8 +1531,6 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
       // compute matrix/vector product
       C.vector_mult_transpose(rhs, old_rhs);
     } // end if is constrained...
-
-  STOP_LOG("cnstrn_elem_mat_vec()", "DofMap");
 }
 
 
@@ -1564,7 +1556,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
 
   this->build_constraint_matrix_and_vector (C, H, elem_dofs, qoi_index);
 
-  START_LOG("hetero_cnstrn_elem_mat_vec()", "DofMap");
+  LOG_SCOPE("hetero_cnstrn_elem_mat_vec()", "DofMap");
 
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
@@ -1645,8 +1637,6 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
         }
 
     } // end if is constrained...
-
-  STOP_LOG("hetero_cnstrn_elem_mat_vec()", "DofMap");
 }
 
 
@@ -1672,7 +1662,7 @@ void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> 
 
   this->build_constraint_matrix_and_vector (C, H, elem_dofs, qoi_index);
 
-  START_LOG("hetero_cnstrn_elem_vec()", "DofMap");
+  LOG_SCOPE("hetero_cnstrn_elem_vec()", "DofMap");
 
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
@@ -1722,8 +1712,6 @@ void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> 
         }
 
     } // end if is constrained...
-
-  STOP_LOG("hetero_cnstrn_elem_vec()", "DofMap");
 }
 
 
@@ -1754,7 +1742,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
   this->build_constraint_matrix (R, orig_row_dofs);
   this->build_constraint_matrix (C, orig_col_dofs);
 
-  START_LOG("constrain_elem_matrix()", "DofMap");
+  LOG_SCOPE("constrain_elem_matrix()", "DofMap");
 
   row_dofs = orig_row_dofs;
   col_dofs = orig_col_dofs;
@@ -1815,8 +1803,6 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
               }
           }
     } // end if is constrained...
-
-  STOP_LOG("constrain_elem_matrix()", "DofMap");
 }
 
 
@@ -1836,7 +1822,7 @@ void DofMap::constrain_element_vector (DenseVector<Number> & rhs,
 
   this->build_constraint_matrix (R, row_dofs);
 
-  START_LOG("constrain_elem_vector()", "DofMap");
+  LOG_SCOPE("constrain_elem_vector()", "DofMap");
 
   // It is possible that the vector is not constrained at all.
   if ((R.m() == rhs.size()) &&
@@ -1857,8 +1843,6 @@ void DofMap::constrain_element_vector (DenseVector<Number> & rhs,
             rhs(i) = 0;
           }
     } // end if the RHS is constrained.
-
-  STOP_LOG("constrain_elem_vector()", "DofMap");
 }
 
 
@@ -1880,7 +1864,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number> & v,
 
   this->build_constraint_matrix (R, row_dofs);
 
-  START_LOG("cnstrn_elem_dyad_mat()", "DofMap");
+  LOG_SCOPE("cnstrn_elem_dyad_mat()", "DofMap");
 
   // It is possible that the vector is not constrained at all.
   if ((R.m() == v.size()) &&
@@ -1908,8 +1892,6 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number> & v,
             v(i) = 0;
           }
     } // end if the RHS is constrained.
-
-  STOP_LOG("cnstrn_elem_dyad_mat()", "DofMap");
 }
 
 
@@ -1937,7 +1919,7 @@ void DofMap::enforce_constraints_exactly (const System & system,
   if (!this->n_constrained_dofs())
     return;
 
-  START_LOG("enforce_constraints_exactly()","DofMap");
+  LOG_SCOPE("enforce_constraints_exactly()","DofMap");
 
   if (!v)
     v = system.solution.get();
@@ -2023,8 +2005,6 @@ void DofMap::enforce_constraints_exactly (const System & system,
       v_global->localize (*v);
     }
   v->close();
-
-  STOP_LOG("enforce_constraints_exactly()","DofMap");
 }
 
 
@@ -2037,7 +2017,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
   if (!this->n_constrained_dofs())
     return;
 
-  START_LOG("enforce_adjoint_constraints_exactly()","DofMap");
+  LOG_SCOPE("enforce_adjoint_constraints_exactly()", "DofMap");
 
   NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
   NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
@@ -2128,8 +2108,6 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
       v_global->localize (v);
     }
   v.close();
-
-  STOP_LOG("enforce_adjoint_constraints_exactly()","DofMap");
 }
 
 
@@ -2222,7 +2200,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
                                       std::vector<dof_id_type> & elem_dofs,
                                       const bool called_recursively) const
 {
-  if (!called_recursively) START_LOG("build_constraint_matrix()", "DofMap");
+  LOG_SCOPE_IF("build_constraint_matrix()", "DofMap", !called_recursively);
 
   // Create a set containing the DOFs we already depend on
   typedef std::set<dof_id_type> RCSet;
@@ -2260,10 +2238,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
   // May be safe to return at this point
   // (but remember to stop the perflog)
   if (!we_have_constraints)
-    {
-      STOP_LOG("build_constraint_matrix()", "DofMap");
-      return;
-    }
+    return;
 
   for (unsigned int i=0; i != elem_dofs.size(); ++i)
     dof_set.erase (elem_dofs[i]);
@@ -2329,8 +2304,6 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
 
       libmesh_assert_equal_to (C.n(), elem_dofs.size());
     }
-
-  if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");
 }
 
 
@@ -2341,8 +2314,7 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
                                                  int qoi_index,
                                                  const bool called_recursively) const
 {
-  if (!called_recursively)
-    START_LOG("build_constraint_matrix_and_vector()", "DofMap");
+  LOG_SCOPE_IF("build_constraint_matrix_and_vector()", "DofMap", !called_recursively);
 
   // Create a set containing the DOFs we already depend on
   typedef std::set<dof_id_type> RCSet;
@@ -2380,10 +2352,7 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
   // May be safe to return at this point
   // (but remember to stop the perflog)
   if (!we_have_constraints)
-    {
-      STOP_LOG("build_constraint_matrix_and_vector()", "DofMap");
-      return;
-    }
+    return;
 
   for (unsigned int i=0; i != elem_dofs.size(); ++i)
     dof_set.erase (elem_dofs[i]);
@@ -2477,9 +2446,6 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
 
       libmesh_assert_equal_to (C.n(), elem_dofs.size());
     }
-
-  if (!called_recursively)
-    STOP_LOG("build_constraint_matrix_and_vector()", "DofMap");
 }
 
 

@@ -41,14 +41,12 @@ void TopologyMap::init(MeshBase & mesh)
   if (!mesh.is_serial())
     libmesh_parallel_only(mesh.comm());
 
-  START_LOG("init()", "TopologyMap");
+  LOG_SCOPE("init()", "TopologyMap");
 
   // Clear the old map
   _map.clear();
 
   this->fill(mesh);
-
-  STOP_LOG("init()", "TopologyMap");
 }
 
 

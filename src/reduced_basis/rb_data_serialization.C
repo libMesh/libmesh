@@ -80,7 +80,7 @@ RBEvaluationSerialization::~RBEvaluationSerialization()
 
 void RBEvaluationSerialization::write_to_file(const std::string & path)
 {
-  START_LOG("write_to_file()", "RBEvaluationSerialization");
+  LOG_SCOPE("write_to_file()", "RBEvaluationSerialization");
 
   if(_rb_eval.comm().rank() == 0)
     {
@@ -106,8 +106,6 @@ void RBEvaluationSerialization::write_to_file(const std::string & path)
       if (error)
         libmesh_error_msg("Error closing a write-only file descriptor to " + path);
     }
-
-  STOP_LOG("write_to_file()", "RBEvaluationSerialization");
 }
 
 // ---- RBEvaluationSerialization (END) ----
@@ -127,7 +125,7 @@ TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization()
 
 void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
 {
-  START_LOG("write_to_file()", "TransientRBEvaluationSerialization");
+  LOG_SCOPE("write_to_file()", "TransientRBEvaluationSerialization");
 
   if(_trans_rb_eval.comm().rank() == 0)
     {
@@ -159,8 +157,6 @@ void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
       if (error)
         libmesh_error_msg("Error closing a write-only file descriptor to " + path);
     }
-
-  STOP_LOG("write_to_file()", "TransientRBEvaluationSerialization");
 }
 
 // ---- TransientRBEvaluationSerialization (END) ----
@@ -180,7 +176,7 @@ RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization()
 
 void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
 {
-  START_LOG("write_to_file()", "RBEIMEvaluationSerialization");
+  LOG_SCOPE("write_to_file()", "RBEIMEvaluationSerialization");
 
   if(_rb_eim_eval.comm().rank() == 0)
     {
@@ -212,8 +208,6 @@ void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
       if (error)
         libmesh_error_msg("Error closing a write-only file descriptor to " + path);
     }
-
-  STOP_LOG("write_to_file()", "RBEIMEvaluationSerialization");
 }
 
 // ---- RBEIMEvaluationSerialization (END) ----
@@ -235,7 +229,7 @@ RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization()
 
 void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
 {
-  START_LOG("write_to_file()", "RBSCMEvaluationSerialization");
+  LOG_SCOPE("write_to_file()", "RBSCMEvaluationSerialization");
 
   if(_rb_scm_eval.comm().rank() == 0)
     {
@@ -256,8 +250,6 @@ void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
       if (error)
         libmesh_error_msg("Error closing a write-only file descriptor to " + path);
     }
-
-  STOP_LOG("write_to_file()", "RBSCMEvaluationSerialization");
 }
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

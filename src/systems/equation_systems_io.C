@@ -481,7 +481,7 @@ void EquationSystems::write(const std::string & name,
     Xdr io((this->processor_id()==0) ? name : "", mode);
     libmesh_assert (io.writing());
 
-    START_LOG("write()","EquationSystems");
+    LOG_SCOPE("write()", "EquationSystems");
 
     const unsigned int proc_id = this->processor_id();
 
@@ -576,8 +576,6 @@ void EquationSystems::write(const std::string & name,
               pos->second->write_serialized_data (io,write_additional_data);
           }
       }
-
-    STOP_LOG("write()","EquationSystems");
   }
 
   // the EquationSystems::write() method should look constant,

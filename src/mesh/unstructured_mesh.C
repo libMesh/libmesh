@@ -242,7 +242,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   // This function must be run on all processors at once
   parallel_object_only();
 
-  START_LOG("find_neighbors()", "Mesh");
+  LOG_SCOPE("find_neighbors()", "Mesh");
 
   const element_iterator el_end = this->elements_end();
 
@@ -569,8 +569,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                             !reset_remote_elements);
   MeshTools::libmesh_assert_valid_amr_interior_parents(*this);
 #endif
-
-  STOP_LOG("find_neighbors()", "Mesh");
 }
 
 
@@ -618,7 +616,7 @@ void UnstructuredMesh::read (const std::string & name,
 void UnstructuredMesh::write (const std::string & name,
                               MeshData * mesh_data)
 {
-  START_LOG("write()", "Mesh");
+  LOG_SCOPE("write()", "Mesh");
 
   if (mesh_data)
     {
@@ -630,8 +628,6 @@ void UnstructuredMesh::write (const std::string & name,
     }
 
   NameBasedIO(*this).write(name);
-
-  STOP_LOG("write()", "Mesh");
 }
 
 
@@ -640,11 +636,9 @@ void UnstructuredMesh::write (const std::string & name,
                               const std::vector<Number> & v,
                               const std::vector<std::string> & vn)
 {
-  START_LOG("write()", "Mesh");
+  LOG_SCOPE("write()", "Mesh");
 
   NameBasedIO(*this).write_nodal_data(name, v, vn);
-
-  STOP_LOG("write()", "Mesh");
 }
 
 
@@ -774,7 +768,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
 #ifdef LIBMESH_ENABLE_AMR
 bool UnstructuredMesh::contract ()
 {
-  START_LOG ("contract()", "Mesh");
+  LOG_SCOPE ("contract()", "Mesh");
 
   // Flag indicating if this call actually changes the mesh
   bool mesh_changed = false;
@@ -831,8 +825,6 @@ bool UnstructuredMesh::contract ()
   // FIXME: Need to understand why deleting subactive children
   // invalidates the point locator.  For now we will clear it explicitly
   this->clear_point_locator();
-
-  STOP_LOG ("contract()", "Mesh");
 
   return mesh_changed;
 }

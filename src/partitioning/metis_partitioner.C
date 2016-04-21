@@ -87,7 +87,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
   // What to do if the Metis library IS present
 #else
 
-  START_LOG("partition()", "MetisPartitioner");
+  LOG_SCOPE("partition()", "MetisPartitioner");
 
   const dof_id_type n_active_elem = mesh.n_active_elem();
 
@@ -471,8 +471,6 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
         elem->processor_id() = elem_procid;
       }
   }
-
-  STOP_LOG("partition()", "MetisPartitioner");
 #endif
 }
 

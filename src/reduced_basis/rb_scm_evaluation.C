@@ -165,7 +165,7 @@ void RBSCMEvaluation::set_B_max(unsigned int q, Real B_max_val)
 
 Real RBSCMEvaluation::get_SCM_LB()
 {
-  START_LOG("get_SCM_LB()", "RBSCMEvaluation");
+  LOG_SCOPE("get_SCM_LB()", "RBSCMEvaluation");
 
   // Initialize the LP
   glp_prob * lp;
@@ -276,14 +276,12 @@ Real RBSCMEvaluation::get_SCM_LB()
   // Destroy the LP
   glp_delete_prob(lp);
 
-  STOP_LOG("get_SCM_LB()", "RBSCMEvaluation");
-
   return min_J_obj;
 }
 
 Real RBSCMEvaluation::get_SCM_UB()
 {
-  START_LOG("get_SCM_UB()", "RBSCMEvaluation");
+  LOG_SCOPE("get_SCM_UB()", "RBSCMEvaluation");
 
   // Add rows to the LP: corresponds to the auxiliary
   // variables that define the constraints at each
@@ -311,8 +309,6 @@ Real RBSCMEvaluation::get_SCM_UB()
         }
     }
 
-  STOP_LOG("get_SCM_UB()", "RBSCMEvaluation");
-
   return min_J_obj;
 }
 
@@ -334,7 +330,7 @@ void RBSCMEvaluation::reload_current_parameters()
 void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                          const bool write_binary_data)
 {
-  START_LOG("legacy_write_offline_data_to_files()", "RBSCMEvaluation");
+  LOG_SCOPE("legacy_write_offline_data_to_files()", "RBSCMEvaluation");
 
   if(this->processor_id() == 0)
     {
@@ -448,15 +444,13 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
         }
       SCM_UB_vectors_out.close();
     }
-
-  STOP_LOG("legacy_write_offline_data_to_files()", "RBSCMEvaluation");
 }
 
 
 void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
                                                           const bool read_binary_data)
 {
-  START_LOG("legacy_read_offline_data_from_files()", "RBSCMEvaluation");
+  LOG_SCOPE("legacy_read_offline_data_from_files()", "RBSCMEvaluation");
 
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
@@ -571,8 +565,6 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
         }
     }
   SCM_UB_vectors_in.close();
-
-  STOP_LOG("legacy_read_offline_data_from_files()", "RBSCMEvaluation");
 }
 
 } // namespace libMesh

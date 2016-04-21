@@ -334,7 +334,7 @@ void scale_mesh_and_plot(EquationSystems & es,
 
 void compute_stresses(EquationSystems & es)
 {
-  START_LOG("compute_stresses()", "main");
+  LOG_SCOPE("compute_stresses()", "main");
 
   const MeshBase & mesh = es.get_mesh();
 
@@ -449,6 +449,4 @@ void compute_stresses(EquationSystems & es)
   // Should call close and update when we set vector entries directly
   stress_system.solution->close();
   stress_system.update();
-
-  STOP_LOG("compute_stresses()", "main");
 }

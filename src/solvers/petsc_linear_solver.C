@@ -389,7 +389,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
                              const double tol,
                              const unsigned int m_its)
 {
-  START_LOG("solve()", "PetscLinearSolver");
+  LOG_SCOPE("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
@@ -656,7 +656,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       LIBMESH_CHKERR(ierr);
     }
 
-  STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
 }
@@ -669,7 +668,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
                                      const double tol,
                                      const unsigned int m_its)
 {
-  START_LOG("solve()", "PetscLinearSolver");
+  LOG_SCOPE("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
@@ -922,7 +921,6 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       LIBMESH_CHKERR(ierr);
     }
 
-  STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
 }
@@ -945,7 +943,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                       << "submatrix generation of shell matrices.");
 #endif
 
-  START_LOG("solve()", "PetscLinearSolver");
+  LOG_SCOPE("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
   PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
@@ -1191,7 +1189,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   ierr = LibMeshMatDestroy(&mat);
   LIBMESH_CHKERR(ierr);
 
-  STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
 }
@@ -1216,7 +1213,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                       << "submatrix generation of shell matrices.");
 #endif
 
-  START_LOG("solve()", "PetscLinearSolver");
+  LOG_SCOPE("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
   const PetscMatrix<T> * precond  = cast_ptr<const PetscMatrix<T> *>(&precond_matrix);
@@ -1496,7 +1493,6 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   ierr = LibMeshMatDestroy(&mat);
   LIBMESH_CHKERR(ierr);
 
-  STOP_LOG("solve()", "PetscLinearSolver");
   // return the # of its. and the final residual norm.
   return std::make_pair(its, final_resid);
 }

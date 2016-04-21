@@ -337,13 +337,11 @@ void EquationSystems::allgather ()
 
 void EquationSystems::update ()
 {
-  START_LOG("update()","EquationSystems");
+  LOG_SCOPE("update()", "EquationSystems");
 
   // Localize each system's vectors
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).update();
-
-  STOP_LOG("update()","EquationSystems");
 }
 
 
@@ -668,7 +666,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
 void EquationSystems::build_solution_vector (std::vector<Number> & soln,
                                              const std::set<std::string> * system_names) const
 {
-  START_LOG("build_solution_vector()", "EquationSystems");
+  LOG_SCOPE("build_solution_vector()", "EquationSystems");
 
   // This function must be run on all processors at once
   parallel_object_only();
@@ -871,8 +869,6 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
   parallel_soln /= repeat_count;
 
   parallel_soln.localize_to_one(soln);
-
-  STOP_LOG("build_solution_vector()", "EquationSystems");
 }
 
 
@@ -1010,7 +1006,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
 void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> & soln,
                                                            const std::set<std::string> * system_names) const
 {
-  START_LOG("build_discontinuous_solution_vector()", "EquationSystems");
+  LOG_SCOPE("build_discontinuous_solution_vector()", "EquationSystems");
 
   libmesh_assert (this->n_systems());
 
@@ -1134,8 +1130,6 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
         var_num += nv_sys;
       }
   }
-
-  STOP_LOG("build_discontinuous_solution_vector()", "EquationSystems");
 }
 
 

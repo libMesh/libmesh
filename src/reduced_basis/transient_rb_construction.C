@@ -396,7 +396,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
                                                         NumericVector<Number> & dest,
                                                         NumericVector<Number> & arg)
 {
-  START_LOG("mass_matrix_scaled_matvec()", "TransientRBConstruction");
+  LOG_SCOPE("mass_matrix_scaled_matvec()", "TransientRBConstruction");
 
   dest.zero();
 
@@ -415,13 +415,11 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
       get_M_q(q)->vector_mult(*temp_vec, arg);
       dest.add(scalar * trans_theta_expansion.eval_M_theta(q,mu), *temp_vec);
     }
-
-  STOP_LOG("mass_matrix_scaled_matvec()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::truth_assembly()
 {
-  START_LOG("truth_assembly()", "TransientRBConstruction");
+  LOG_SCOPE("truth_assembly()", "TransientRBConstruction");
 
   this->matrix->close();
 
@@ -470,8 +468,6 @@ void TransientRBConstruction::truth_assembly()
 
   this->matrix->close();
   this->rhs->close();
-
-  STOP_LOG("truth_assembly()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::set_L2_assembly(ElemAssembly & L2_assembly_in)
@@ -540,7 +536,7 @@ void TransientRBConstruction::assemble_misc_matrices()
 
 Real TransientRBConstruction::truth_solve(int write_interval)
 {
-  START_LOG("truth_solve()", "TransientRBConstruction");
+  LOG_SCOPE("truth_solve()", "TransientRBConstruction");
 
   const RBParameters & mu = get_parameters();
   const unsigned int n_time_steps = get_n_time_steps();
@@ -633,8 +629,6 @@ Real TransientRBConstruction::truth_solve(int write_interval)
   Real final_truth_L2_norm = libmesh_real(std::sqrt(inner_product_storage_vector->dot(*solution)));
 
 
-  STOP_LOG("truth_solve()", "TransientRBConstruction");
-
   return final_truth_L2_norm;
 }
 
@@ -653,7 +647,7 @@ bool TransientRBConstruction::greedy_termination_test(
 
 Number TransientRBConstruction::set_error_temporal_data()
 {
-  START_LOG("set_error_temporal_data()", "TransientRBConstruction");
+  LOG_SCOPE("set_error_temporal_data()", "TransientRBConstruction");
 
   // first compute the projection of solution onto the current
   // RB space
@@ -714,8 +708,6 @@ Number TransientRBConstruction::set_error_temporal_data()
       *(temporal_data[time_step]) = *temp;
     }
 
-  STOP_LOG("set_error_temporal_data()", "TransientRBConstruction");
-
   // return the square of the X norm of the truth solution
   inner_product_matrix->vector_mult(*inner_product_storage_vector,*solution);
 
@@ -724,13 +716,11 @@ Number TransientRBConstruction::set_error_temporal_data()
 
 const NumericVector<Number> & TransientRBConstruction::get_error_temporal_data()
 {
-  START_LOG("get_error_temporal_data()", "TransientRBConstruction");
+  LOG_SCOPE("get_error_temporal_data()", "TransientRBConstruction");
 
   const unsigned int time_step = get_time_step();
 
   return *temporal_data[time_step];
-
-  STOP_LOG("get_error_temporal_data()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::initialize_truth ()
@@ -753,7 +743,7 @@ void TransientRBConstruction::initialize_truth ()
 
 void TransientRBConstruction::add_IC_to_RB_space()
 {
-  START_LOG("add_IC_to_RB_space()", "TransientRBConstruction");
+  LOG_SCOPE("add_IC_to_RB_space()", "TransientRBConstruction");
 
   if (get_rb_evaluation().get_n_basis_functions() > 0)
     libmesh_error_msg("Error: Should not call TransientRBConstruction::add_IC_to_RB_space() " \
@@ -781,15 +771,13 @@ void TransientRBConstruction::add_IC_to_RB_space()
   set_delta_N(1);
   update_system();
   set_delta_N(saved_delta_N);
-
-  STOP_LOG("add_IC_to_RB_space()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::enrich_RB_space()
 {
   // Need SLEPc to get the POD eigenvalues
 #if defined(LIBMESH_HAVE_SLEPC)
-  START_LOG("enrich_RB_space()", "TransientRBConstruction");
+  LOG_SCOPE("enrich_RB_space()", "TransientRBConstruction");
 
   // With the "method of snapshots", the size of
   // the eigenproblem is determined by the number
@@ -945,7 +933,6 @@ void TransientRBConstruction::enrich_RB_space()
         }
     }
 
-  STOP_LOG("enrich_RB_space()", "TransientRBConstruction");
 #else
   libmesh_not_implemented();
 #endif
@@ -971,7 +958,7 @@ SparseMatrix<Number> & TransientRBConstruction::get_matrix_for_output_dual_solve
 
 void TransientRBConstruction::load_rb_solution()
 {
-  START_LOG("load_rb_solution()", "TransientRBConstruction");
+  LOG_SCOPE("load_rb_solution()", "TransientRBConstruction");
 
   solution->zero();
 
@@ -993,13 +980,11 @@ void TransientRBConstruction::load_rb_solution()
     }
 
   update();
-
-  STOP_LOG("load_rb_solution()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::update_RB_system_matrices()
 {
-  START_LOG("update_RB_system_matrices()", "TransientRBConstruction");
+  LOG_SCOPE("update_RB_system_matrices()", "TransientRBConstruction");
 
   Parent::update_RB_system_matrices();
 
@@ -1050,8 +1035,6 @@ void TransientRBConstruction::update_RB_system_matrices()
 
         }
     }
-
-  STOP_LOG("update_RB_system_matrices()", "TransientRBConstruction");
 }
 
 
@@ -1059,7 +1042,7 @@ void TransientRBConstruction::update_RB_system_matrices()
 
 void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 {
-  START_LOG("update_residual_terms()", "TransientRBConstruction");
+  LOG_SCOPE("update_residual_terms()", "TransientRBConstruction");
 
   Parent::update_residual_terms(compute_inner_products);
 
@@ -1189,14 +1172,12 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
             } // end for j
         } // end for i
     } // end if (compute_inner_products)
-
-  STOP_LOG("update_residual_terms()", "TransientRBConstruction");
 }
 
 
 void TransientRBConstruction::update_RB_initial_condition_all_N()
 {
-  START_LOG("update_RB_initial_condition_all_N()", "TransientRBConstruction");
+  LOG_SCOPE("update_RB_initial_condition_all_N()", "TransientRBConstruction");
 
   TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
 
@@ -1258,13 +1239,11 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 
       trans_rb_eval.initial_L2_error_all_N[N] = libmesh_real(std::sqrt(temp2->dot(*temp1)));
     }
-
-  STOP_LOG("update_RB_initial_condition_all_N()", "TransientRBConstruction");
 }
 
 //Real TransientRBConstruction::uncached_compute_residual_dual_norm(const unsigned int N)
 //{
-//  START_LOG("uncached_compute_residual_dual_norm()", "TransientRBConstruction");
+//   LOG_SCOPE("uncached_compute_residual_dual_norm()", "TransientRBConstruction");
 //
 //   // This is the "slow" way of computing the residual, but it is useful
 //   // for validating the "fast" way.
@@ -1336,16 +1315,13 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //
 //  Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
 //
-//
-//  STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBConstruction");
-//
 //  return libmesh_real(std::sqrt( slow_residual_norm_sq ));
 //}
 
 void TransientRBConstruction::write_riesz_representors_to_files(const std::string & riesz_representors_dir,
                                                                 const bool write_binary_residual_representors)
 {
-  START_LOG("write_riesz_representors_to_files()", "TransientRBConstruction");
+  LOG_SCOPE("write_riesz_representors_to_files()", "TransientRBConstruction");
 
   // Write out the M_q_representors.  These are useful to have when restarting,
   // so you don't have to recompute them all over again.  There should be
@@ -1389,14 +1365,12 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
           // for the system call, be sure to do it only on one processor, etc.
         }
       }
-
-  STOP_LOG("write_riesz_representors_to_files()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::read_riesz_representors_from_files(const std::string & riesz_representors_dir,
                                                                  const bool read_binary_residual_representors)
 {
-  START_LOG("read_riesz_representors_from_files()", "TransientRBConstruction");
+  LOG_SCOPE("read_riesz_representors_from_files()", "TransientRBConstruction");
 
   const std::string riesz_representor_suffix =
     (read_binary_residual_representors ? ".xdr" : ".dat");
@@ -1448,8 +1422,6 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
         //*M_q_representor[i][j] = *solution;
         trans_rb_eval.M_q_representor[i][j]->swap(*solution);
       }
-
-  STOP_LOG("read_riesz_representors_from_files()", "TransientRBConstruction");
 }
 
 } // namespace libMesh

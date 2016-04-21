@@ -79,7 +79,7 @@ void TransientRBEvaluation::clear_riesz_representors()
 void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
                                                    bool resize_error_bound_data)
 {
-  START_LOG("resize_data_structures()", "TransientRBEvaluation");
+  LOG_SCOPE("resize_data_structures()", "TransientRBEvaluation");
 
   Parent::resize_data_structures(Nmax, resize_error_bound_data);
 
@@ -160,13 +160,11 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
           M_q_representor[q_m].resize(Nmax);
         }
     }
-
-  STOP_LOG("resize_data_structures()", "TransientRBEvaluation");
 }
 
 Real TransientRBEvaluation::rb_solve(unsigned int N)
 {
-  START_LOG("rb_solve()", "TransientRBEvaluation");
+  LOG_SCOPE("rb_solve()", "TransientRBEvaluation");
 
   if(N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
@@ -359,8 +357,6 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
         }
     }
 
-  STOP_LOG("rb_solve()", "TransientRBEvaluation");
-
   _rb_solve_data_cached = true ;
 
   if(evaluate_RB_error_bound) // Calculate the error bounds
@@ -434,7 +430,7 @@ Real TransientRBEvaluation::residual_scaling_numer(Real)
 
 void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
 {
-  START_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
+  LOG_SCOPE("cache_online_residual_terms()", "TransientRBEvaluation");
 
   const RBParameters mu = get_parameters();
 
@@ -552,13 +548,11 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
           q++;
         }
     }
-
-  STOP_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
 }
 
 Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
-  START_LOG("compute_residual_dual_norm()", "TransientRBEvaluation");
+  LOG_SCOPE("compute_residual_dual_norm()", "TransientRBEvaluation");
 
   // This assembly assumes we have already called cache_online_residual_terms
   // and that the rb_solve parameter is constant in time
@@ -601,14 +595,12 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
       residual_norm_sq = std::abs(residual_norm_sq);
     }
 
-  STOP_LOG("compute_residual_dual_norm()", "TransientRBEvaluation");
-
   return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
 Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned int N)
 {
-  START_LOG("uncached_compute_residual_dual_norm()", "TransientRBEvaluation");
+  LOG_SCOPE("uncached_compute_residual_dual_norm()", "TransientRBEvaluation");
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
@@ -754,15 +746,13 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   //   libMesh::out << "slow residual_sq = " << slow_residual_norm_sq
   //                << ", fast residual_sq = " << residual_norm_sq << std::endl;
 
-  STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBEvaluation");
-
   return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
 void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                                const bool write_binary_data)
 {
-  START_LOG("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
+  LOG_SCOPE("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
 
   Parent::legacy_write_offline_data_to_files(directory_name);
 
@@ -909,15 +899,13 @@ void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string
         }
       RB_Aq_Mq_terms_out.close();
     }
-
-  STOP_LOG("legacy_write_offline_data_to_files()", "TransientRBEvaluation");
 }
 
 void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
                                                                 bool read_error_bound_data,
                                                                 const bool read_binary_data)
 {
-  START_LOG("legacy_read_offline_data_from_files()", "TransientRBEvaluation");
+  LOG_SCOPE("legacy_read_offline_data_from_files()", "TransientRBEvaluation");
 
   Parent::legacy_read_offline_data_from_files(directory_name);
 
@@ -1089,9 +1077,6 @@ void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::strin
         }
       RB_Aq_Mq_terms_in.close();
     }
-
-  STOP_LOG("legacy_read_offline_data_from_files()", "TransientRBEvaluation");
-
 }
 
 }

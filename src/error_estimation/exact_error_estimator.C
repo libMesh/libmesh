@@ -394,19 +394,15 @@ void ExactErrorEstimator::estimate_error (const System & system,
   this->reduce_error(error_per_cell, system.comm());
 
   // Compute the square-root of each component.
-  START_LOG("std::sqrt()", "ExactErrorEstimator");
-  for (dof_id_type i=0; i<error_per_cell.size(); i++)
-    {
-
+  {
+    LOG_SCOPE("std::sqrt()", "ExactErrorEstimator");
+    for (dof_id_type i=0; i<error_per_cell.size(); i++)
       if (error_per_cell[i] != 0.)
         {
           libmesh_assert_greater (error_per_cell[i], 0.);
           error_per_cell[i] = std::sqrt(error_per_cell[i]);
         }
-
-
-    }
-  STOP_LOG("std::sqrt()", "ExactErrorEstimator");
+  }
 
   // If we used a non-standard solution before, now is the time to fix
   // the current_local_solution

@@ -400,10 +400,8 @@ template<unsigned int Dim>
 void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
                                       const Elem * side)
 {
-  /**
-   * Start logging the shape function initialization
-   */
-  START_LOG("init_face_shape_functions()", "FEMap");
+  // Start logging the shape function initialization
+  LOG_SCOPE("init_face_shape_functions()", "FEMap");
 
   libmesh_assert(side);
 
@@ -501,22 +499,14 @@ void FEMap::init_face_shape_functions(const std::vector<Point> & qp,
             }
         }
     }
-
-
-  /**
-   * Stop logging the shape function initialization
-   */
-  STOP_LOG("init_face_shape_functions()", "FEMap");
 }
 
 template<unsigned int Dim>
 void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
                                       const Elem * edge)
 {
-  /**
-   * Start logging the shape function initialization
-   */
-  START_LOG("init_edge_shape_functions()", "FEMap");
+  // Start logging the shape function initialization
+  LOG_SCOPE("init_edge_shape_functions()", "FEMap");
 
   libmesh_assert(edge);
 
@@ -568,11 +558,6 @@ void FEMap::init_edge_shape_functions(const std::vector<Point> & qp,
             this->d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
         }
     }
-
-  /**
-   * Stop logging the shape function initialization
-   */
-  STOP_LOG("init_edge_shape_functions()", "FEMap");
 }
 
 
@@ -585,7 +570,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
   // We're calculating now!
   this->determine_calculations();
 
-  START_LOG("compute_face_map()", "FEMap");
+  LOG_SCOPE("compute_face_map()", "FEMap");
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
@@ -919,7 +904,6 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
     default:
       libmesh_error_msg("Invalid dimension dim = " << dim);
     }
-  STOP_LOG("compute_face_map()", "FEMap");
 }
 
 
@@ -942,7 +926,7 @@ void FEMap::compute_edge_map(int dim,
 
   libmesh_assert_equal_to (dim, 3);  // 1D is unnecessary and currently unsupported
 
-  START_LOG("compute_edge_map()", "FEMap");
+  LOG_SCOPE("compute_edge_map()", "FEMap");
 
   // We're calculating now!
   this->determine_calculations();
@@ -1021,8 +1005,6 @@ void FEMap::compute_edge_map(int dim,
 
         this->JxW[p] = the_jac*qw[p];
       }
-
-  STOP_LOG("compute_edge_map()", "FEMap");
 }
 
 

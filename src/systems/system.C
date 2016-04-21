@@ -474,13 +474,10 @@ void System::restrict_solve_to (const SystemSubset * subset,
 void System::assemble ()
 {
   // Log how long the user's assembly code takes
-  START_LOG("assemble()", "System");
+  LOG_SCOPE("assemble()", "System");
 
   // Call the user-specified assembly function
   this->user_assembly();
-
-  // Stop logging the user code
-  STOP_LOG("assemble()", "System");
 }
 
 
@@ -488,13 +485,10 @@ void System::assemble ()
 void System::assemble_qoi (const QoISet & qoi_indices)
 {
   // Log how long the user's assembly code takes
-  START_LOG("assemble_qoi()", "System");
+  LOG_SCOPE("assemble_qoi()", "System");
 
   // Call the user-specified quantity of interest function
   this->user_QOI(qoi_indices);
-
-  // Stop logging the user code
-  STOP_LOG("assemble_qoi()", "System");
 }
 
 
@@ -504,14 +498,11 @@ void System::assemble_qoi_derivative(const QoISet & qoi_indices,
                                      bool apply_constraints)
 {
   // Log how long the user's assembly code takes
-  START_LOG("assemble_qoi_derivative()", "System");
+  LOG_SCOPE("assemble_qoi_derivative()", "System");
 
   // Call the user-specified quantity of interest function
   this->user_QOI_derivative(qoi_indices, include_liftfunc,
                             apply_constraints);
-
-  // Stop logging the user code
-  STOP_LOG("assemble_qoi_derivative()", "System");
 }
 
 
@@ -1428,14 +1419,13 @@ Real System::calculate_norm(const NumericVector<Number> & v,
   // This function must be run on all processors at once
   parallel_object_only();
 
-  START_LOG ("calculate_norm()", "System");
+  LOG_SCOPE ("calculate_norm()", "System");
 
   // Zero the norm before summation
   Real v_norm = 0.;
 
   if (norm.is_discrete())
     {
-      STOP_LOG ("calculate_norm()", "System");
       //Check to see if all weights are 1.0 and all types are equal
       FEMNormType norm_type0 = norm.type(0);
       unsigned int check_var = 0;
@@ -1701,8 +1691,6 @@ Real System::calculate_norm(const NumericVector<Number> & v,
     {
       this->comm().max(v_norm);
     }
-
-  STOP_LOG ("calculate_norm()", "System");
 
   return v_norm;
 }

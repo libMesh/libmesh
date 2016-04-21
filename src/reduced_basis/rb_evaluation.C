@@ -57,7 +57,7 @@ RBEvaluation::~RBEvaluation()
 
 void RBEvaluation::clear()
 {
-  START_LOG("clear()", "RBEvaluation");
+  LOG_SCOPE("clear()", "RBEvaluation");
 
   // Clear the basis functions
   for(unsigned int i=0; i<basis_functions.size(); i++)
@@ -77,8 +77,6 @@ void RBEvaluation::clear()
   for(unsigned int i=0; i<greedy_param_list.size(); i++)
     greedy_param_list[i].clear();
   greedy_param_list.clear();
-
-  STOP_LOG("clear()", "RBEvaluation");
 }
 
 void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_in)
@@ -109,7 +107,7 @@ bool RBEvaluation::is_rb_theta_expansion_initialized() const
 void RBEvaluation::resize_data_structures(const unsigned int Nmax,
                                           bool resize_error_bound_data)
 {
-  START_LOG("resize_data_structures()", "RBEvaluation");
+  LOG_SCOPE("resize_data_structures()", "RBEvaluation");
 
   if(Nmax < this->get_n_basis_functions())
     libmesh_error_msg("Error: Cannot set Nmax to be less than the current number of basis functions.");
@@ -198,9 +196,6 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
           Aq_representor[q_a].resize(Nmax);
         }
     }
-
-
-  STOP_LOG("resize_data_structures()", "RBEvaluation");
 }
 
 NumericVector<Number> & RBEvaluation::get_basis_function(unsigned int i)
@@ -212,7 +207,7 @@ NumericVector<Number> & RBEvaluation::get_basis_function(unsigned int i)
 
 Real RBEvaluation::rb_solve(unsigned int N)
 {
-  START_LOG("rb_solve()", "RBEvaluation");
+  LOG_SCOPE("rb_solve()", "RBEvaluation");
 
   if(N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
@@ -283,13 +278,10 @@ Real RBEvaluation::rb_solve(unsigned int N)
           RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
         }
 
-      STOP_LOG("rb_solve()", "RBEvaluation");
-
       return abs_error_bound;
     }
   else // Don't calculate the error bounds
     {
-      STOP_LOG("rb_solve()", "RBEvaluation");
       // Just return -1. if we did not compute the error bound
       return -1.;
     }
@@ -308,7 +300,7 @@ Real RBEvaluation::get_error_bound_normalization()
 
 Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
-  START_LOG("compute_residual_dual_norm()", "RBEvaluation");
+  LOG_SCOPE("compute_residual_dual_norm()", "RBEvaluation");
 
   const RBParameters & mu = get_parameters();
 
@@ -378,8 +370,6 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
       residual_norm_sq = std::abs(residual_norm_sq);
     }
 
-  STOP_LOG("compute_residual_dual_norm()", "RBEvaluation");
-
   return std::sqrt( libmesh_real(residual_norm_sq) );
 }
 
@@ -435,7 +425,7 @@ void RBEvaluation::clear_riesz_representors()
 void RBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
                                                       const bool write_binary_data)
 {
-  START_LOG("legacy_write_offline_data_to_files()", "RBEvaluation");
+  LOG_SCOPE("legacy_write_offline_data_to_files()", "RBEvaluation");
 
   // Get the number of basis functions
   unsigned int n_bfs = get_n_basis_functions();
@@ -659,15 +649,13 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
       }
 
     }
-
-  STOP_LOG("legacy_write_offline_data_to_files()", "RBEvaluation");
 }
 
 void RBEvaluation::legacy_read_offline_data_from_files(const std::string & directory_name,
                                                        bool read_error_bound_data,
                                                        const bool read_binary_data)
 {
-  START_LOG("legacy_read_offline_data_from_files()", "RBEvaluation");
+  LOG_SCOPE("legacy_read_offline_data_from_files()", "RBEvaluation");
 
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
@@ -902,8 +890,6 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
         }
       basis_functions[i] = libmesh_nullptr;
     }
-
-  STOP_LOG("legacy_read_offline_data_from_files()", "RBEvaluation");
 }
 
 void RBEvaluation::assert_file_exists(const std::string & file_name)
@@ -916,15 +902,13 @@ void RBEvaluation::write_out_basis_functions(System & sys,
                                              const std::string & directory_name,
                                              const bool write_binary_basis_functions)
 {
-  START_LOG("write_out_basis_functions()", "RBEvaluation");
+  LOG_SCOPE("write_out_basis_functions()", "RBEvaluation");
 
   write_out_vectors(sys,
                     basis_functions,
                     directory_name,
                     "bf",
                     write_binary_basis_functions);
-
-  STOP_LOG("write_out_basis_functions()", "RBEvaluation");
 }
 
 void RBEvaluation::write_out_vectors(System & sys,
@@ -933,8 +917,7 @@ void RBEvaluation::write_out_vectors(System & sys,
                                      const std::string & data_name,
                                      const bool write_binary_vectors)
 {
-  START_LOG("write_out_vectors()", "RBEvaluation");
-  //libMesh::out << "Writing out the basis functions..." << std::endl;
+  LOG_SCOPE("write_out_vectors()", "RBEvaluation");
 
   if(this->processor_id() == 0)
     {
@@ -1006,23 +989,19 @@ void RBEvaluation::write_out_vectors(System & sys,
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
-
-  STOP_LOG("write_out_vectors()", "RBEvaluation");
 }
 
 void RBEvaluation::read_in_basis_functions(System & sys,
                                            const std::string & directory_name,
                                            const bool read_binary_basis_functions)
 {
-  START_LOG("read_in_basis_functions()", "RBEvaluation");
+  LOG_SCOPE("read_in_basis_functions()", "RBEvaluation");
 
   read_in_vectors(sys,
                   basis_functions,
                   directory_name,
                   "bf",
                   read_binary_basis_functions);
-
-  STOP_LOG("read_in_basis_functions()", "RBEvaluation");
 }
 
 void RBEvaluation::read_in_vectors(System & sys,
@@ -1053,7 +1032,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
                                                        const std::vector<std::string> & multiple_data_names,
                                                        const bool read_binary_vectors)
 {
-  START_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
+  LOG_SCOPE("read_in_vectors_from_multiple_files()", "RBEvaluation");
 
   unsigned int n_files = multiple_vectors.size();
   unsigned int n_directories = multiple_directory_names.size();
@@ -1142,8 +1121,6 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
-
-  STOP_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
 }
 
 std::string RBEvaluation::get_io_version_string()

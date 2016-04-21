@@ -163,7 +163,7 @@ void MeshData::translate (const MeshBase & out_mesh,
 {
   libmesh_assert (_active || _compatibility_mode);
 
-  START_LOG("translate()", "MeshData");
+  LOG_SCOPE("translate()", "MeshData");
 
   const unsigned int n_comp = this->n_val_per_node();
 
@@ -209,8 +209,6 @@ void MeshData::translate (const MeshBase & out_mesh,
         names.push_back(name_buf.str());
       }
   }
-
-  STOP_LOG("translate()", "MeshData");
 }
 
 
@@ -236,7 +234,7 @@ void MeshData::close_foreign_id_maps ()
 
 void MeshData::read (const std::string & name)
 {
-  START_LOG("read()", "MeshData");
+  LOG_SCOPE("read()", "MeshData");
 
   libmesh_assert (_active || _compatibility_mode);
 
@@ -274,8 +272,6 @@ void MeshData::read (const std::string & name)
                       << "     *.xta  -- Internal ASCII data format\n"  \
                       << "     *.xtr  -- Internal binary data format\n" \
                       << "     *.unv  -- I-deas format");
-
-  STOP_LOG("read()", "MeshData");
 }
 
 
@@ -285,7 +281,7 @@ void MeshData::read (const std::string & name)
 
 void MeshData::write (const std::string & name)
 {
-  START_LOG("write()", "MeshData");
+  LOG_SCOPE("write()", "MeshData");
 
   libmesh_assert (_active || _compatibility_mode);
 
@@ -318,7 +314,6 @@ void MeshData::write (const std::string & name)
                         << "     *.xtr  -- Internal binary data format\n" \
                         << "     *.unv  -- I-deas format");
   }
-  STOP_LOG("write()", "MeshData");
 }
 
 

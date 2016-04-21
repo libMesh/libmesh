@@ -51,7 +51,7 @@ void UniformRefinementEstimator::estimate_error (const System & _system,
                                                  const NumericVector<Number> * solution_vector,
                                                  bool estimate_parent_error)
 {
-  START_LOG("estimate_error()", "UniformRefinementEstimator");
+  LOG_SCOPE("estimate_error()", "UniformRefinementEstimator");
   std::map<const System *, const NumericVector<Number> *> solution_vectors;
   solution_vectors[&_system] = solution_vector;
   this->_estimate_error (libmesh_nullptr,
@@ -61,7 +61,6 @@ void UniformRefinementEstimator::estimate_error (const System & _system,
                          libmesh_nullptr,
                          &solution_vectors,
                          estimate_parent_error);
-  STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
@@ -70,7 +69,7 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
                                                   const std::map<const System *, const NumericVector<Number> *> * solution_vectors,
                                                   bool estimate_parent_error)
 {
-  START_LOG("estimate_errors()", "UniformRefinementEstimator");
+  LOG_SCOPE("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es,
                          libmesh_nullptr,
                          &error_per_cell,
@@ -78,7 +77,6 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
                          &error_norms,
                          solution_vectors,
                          estimate_parent_error);
-  STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
@@ -86,7 +84,7 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
                                                   const std::map<const System *, const NumericVector<Number> *> * solution_vectors,
                                                   bool estimate_parent_error)
 {
-  START_LOG("estimate_errors()", "UniformRefinementEstimator");
+  LOG_SCOPE("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es,
                          libmesh_nullptr,
                          libmesh_nullptr,
@@ -94,7 +92,6 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
                          libmesh_nullptr,
                          solution_vectors,
                          estimate_parent_error);
-  STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
@@ -683,11 +680,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       this->reduce_error(*error_per_cell, es.comm());
 
       // Compute the square-root of each component.
-      START_LOG("std::sqrt()", "UniformRefinementEstimator");
+      LOG_SCOPE("std::sqrt()", "UniformRefinementEstimator");
       for (unsigned int i=0; i<error_per_cell->size(); i++)
         if ((*error_per_cell)[i] != 0.)
           (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
-      STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
     }
   else
     {
@@ -699,11 +695,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           this->reduce_error(*e, es.comm());
 
           // Compute the square-root of each component.
-          START_LOG("std::sqrt()", "UniformRefinementEstimator");
+          LOG_SCOPE("std::sqrt()", "UniformRefinementEstimator");
           for (unsigned int i=0; i<e->size(); i++)
             if ((*e)[i] != 0.)
               (*e)[i] = std::sqrt((*e)[i]);
-          STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
         }
     }
 

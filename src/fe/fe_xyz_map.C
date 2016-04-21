@@ -25,7 +25,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
 {
   libmesh_assert(side);
 
-  START_LOG("compute_face_map()", "FEXYZMap");
+  LOG_SCOPE("compute_face_map()", "FEXYZMap");
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
@@ -213,10 +213,6 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
       libmesh_error_msg("Invalid dim = " << dim);
 
     } // switch(dim)
-
-  STOP_LOG("compute_face_map()", "FEXYZMap");
-
-  return;
 }
 
 } // namespace libMesh

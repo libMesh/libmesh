@@ -156,7 +156,7 @@ void Partitioner::repartition (MeshBase & mesh,
 
 void Partitioner::single_partition (MeshBase & mesh)
 {
-  START_LOG("single_partition()","Partitioner");
+  LOG_SCOPE("single_partition()","Partitioner");
 
   // Loop over all the elements and assign them to processor 0.
   MeshBase::element_iterator       elem_it  = mesh.elements_begin();
@@ -171,8 +171,6 @@ void Partitioner::single_partition (MeshBase & mesh)
 
   for ( ; node_it != node_end; ++node_it)
     (*node_it)->processor_id() = 0;
-
-  STOP_LOG("single_partition()","Partitioner");
 }
 
 
@@ -259,11 +257,11 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
 
 
 void Partitioner::set_parent_processor_ids(MeshBase & mesh)
- {
+{
   // Ignore the parameter when !LIBMESH_ENABLE_AMR
   libmesh_ignore(mesh);
 
-  START_LOG("set_parent_processor_ids()","Partitioner");
+  LOG_SCOPE("set_parent_processor_ids()", "Partitioner");
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -429,15 +427,13 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
     }
 
 #endif // LIBMESH_ENABLE_AMR
-
-  STOP_LOG("set_parent_processor_ids()","Partitioner");
 }
 
 
 
 void Partitioner::set_node_processor_ids(MeshBase & mesh)
 {
-  START_LOG("set_node_processor_ids()","Partitioner");
+  LOG_SCOPE("set_node_processor_ids()","Partitioner");
 
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -632,8 +628,6 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
 #endif
-
-  STOP_LOG("set_node_processor_ids()","Partitioner");
 }
 
 } // namespace libMesh

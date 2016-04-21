@@ -276,7 +276,7 @@ void NewtonSolver::reinit()
 
 unsigned int NewtonSolver::solve()
 {
-  START_LOG("solve()", "NewtonSolver");
+  LOG_SCOPE("solve()", "NewtonSolver");
 
   // Reset any prior solve result
   _solve_result = INVALID_SOLVE_RESULT;
@@ -547,8 +547,6 @@ unsigned int NewtonSolver::solve()
 
   // We may need to localize a parallel solution
   _system.update ();
-
-  STOP_LOG("solve()", "NewtonSolver");
 
   // Make sure we are returning something sensible as the
   // _solve_result, except in the edge case where we weren't really asked to

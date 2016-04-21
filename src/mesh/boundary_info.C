@@ -147,7 +147,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
                          MeshData *     boundary_mesh_data,
                          MeshData *     this_mesh_data)
 {
-  START_LOG("sync()", "BoundaryInfo");
+  LOG_SCOPE("sync()", "BoundaryInfo");
 
   boundary_mesh.clear();
 
@@ -252,8 +252,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
 
   // and finally distribute element partitioning to the nodes
   Partitioner::set_node_processor_ids(boundary_mesh);
-
-  STOP_LOG("sync()", "BoundaryInfo");
 }
 
 
@@ -262,7 +260,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
                                            std::map<dof_id_type, unsigned char> & side_id_map,
                                            Real tolerance)
 {
-  START_LOG("get_side_and_node_maps()", "BoundaryInfo");
+  LOG_SCOPE("get_side_and_node_maps()", "BoundaryInfo");
 
   node_id_map.clear();
   side_id_map.clear();
@@ -311,15 +309,13 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
         }
 
     }
-
-  STOP_LOG("get_side_and_node_maps()", "BoundaryInfo");
 }
 
 
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                                 UnstructuredMesh & boundary_mesh)
 {
-  START_LOG("add_elements()", "BoundaryInfo");
+  LOG_SCOPE("add_elements()", "BoundaryInfo");
 
   // We're not prepared to mix serial and distributed meshes in this
   // method, so make sure they match from the start.
@@ -542,8 +538,6 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     parmesh->libmesh_assert_valid_parallel_ids();
 # endif
 #endif
-
-  STOP_LOG("add_elements()", "BoundaryInfo");
 }
 
 

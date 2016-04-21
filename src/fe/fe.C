@@ -280,13 +280,8 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
                                      const Elem * elem)
 {
-  // We can be called with no element.  If we're evaluating SCALAR
-  // dofs we'll still have work to do.
-  // libmesh_assert(elem);
-
   // Start logging the shape function initialization
-  START_LOG("init_shape_functions()", "FE");
-
+  LOG_SCOPE("init_shape_functions()", "FE");
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
@@ -531,9 +526,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     default:
       libmesh_error_msg("Invalid dimension Dim = " << Dim);
     }
-
-  // Stop logging the shape function initialization
-  STOP_LOG("init_shape_functions()", "FE");
 }
 
 

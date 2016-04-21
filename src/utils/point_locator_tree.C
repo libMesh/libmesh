@@ -119,7 +119,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 
       if (this->_master == libmesh_nullptr)
         {
-          START_LOG("init(no master)", "PointLocatorTree");
+          LOG_SCOPE("init(no master)", "PointLocatorTree");
 
           if (this->_mesh.mesh_dimension() == 3)
             _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
@@ -155,8 +155,6 @@ void PointLocatorTree::init (Trees::BuildType build_type)
               _tree = new Trees::BinaryTree (this->_mesh, get_target_bin_size(), _build_type);
 #endif
             }
-
-          STOP_LOG("init(no master)", "PointLocatorTree");
         }
 
       else
@@ -194,7 +192,7 @@ const Elem * PointLocatorTree::operator() (const Point & p,
 {
   libmesh_assert (this->_initialized);
 
-  START_LOG("operator()", "PointLocatorTree");
+  LOG_SCOPE("operator()", "PointLocatorTree");
 
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
   if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = libmesh_nullptr;
@@ -219,8 +217,6 @@ const Elem * PointLocatorTree::operator() (const Point & p,
           if (_out_of_mesh_mode == false)
             {
               this->_element = this->perform_linear_search(p, allowed_subdomains, /*use_close_to_point*/ false);
-
-              STOP_LOG("operator()", "PointLocatorTree");
               return this->_element;
             }
 
@@ -243,7 +239,6 @@ const Elem * PointLocatorTree::operator() (const Point & p,
                                             /*use_close_to_point*/ true,
                                             _close_to_point_tol);
 
-              STOP_LOG("operator()", "PointLocatorTree");
               return this->_element;
             }
         }
@@ -254,8 +249,6 @@ const Elem * PointLocatorTree::operator() (const Point & p,
 
   // If we found an element and have a restriction list, they better match
   libmesh_assert (!this->_element || !allowed_subdomains || allowed_subdomains->count(this->_element->subdomain_id()));
-
-  STOP_LOG("operator()", "PointLocatorTree");
 
   // return the element
   return this->_element;
@@ -268,7 +261,7 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
                                                      bool use_close_to_point,
                                                      Real close_to_point_tolerance) const
 {
-  START_LOG("perform_linear_search", "PointLocatorTree");
+  LOG_SCOPE("perform_linear_search", "PointLocatorTree");
 
   // The type of iterator depends on the Trees::BuildType
   // used for this PointLocator.  If it's
@@ -290,23 +283,16 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
           if(!use_close_to_point)
             {
               if ((*pos)->contains_point(p))
-                {
-                  STOP_LOG("perform_linear_search", "PointLocatorTree");
-                  return (*pos);
-                }
+                return (*pos);
             }
           else
             {
               if ((*pos)->close_to_point(p, close_to_point_tolerance))
-                {
-                  STOP_LOG("perform_linear_search", "PointLocatorTree");
-                  return (*pos);
-                }
+                return (*pos);
             }
         }
     }
 
-  STOP_LOG("perform_linear_search", "PointLocatorTree");
   return libmesh_nullptr;
 }
 

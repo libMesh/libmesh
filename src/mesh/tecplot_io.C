@@ -187,7 +187,7 @@ void TecplotIO::write_nodal_data (const std::string & fname,
                                   const std::vector<Number> & soln,
                                   const std::vector<std::string> & names)
 {
-  START_LOG("write_nodal_data()", "TecplotIO");
+  LOG_SCOPE("write_nodal_data()", "TecplotIO");
 
   if (this->mesh().processor_id() == 0)
     {
@@ -196,8 +196,6 @@ void TecplotIO::write_nodal_data (const std::string & fname,
       else
         this->write_ascii  (fname, &soln, &names);
     }
-
-  STOP_LOG("write_nodal_data()", "TecplotIO");
 }
 
 
