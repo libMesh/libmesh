@@ -92,6 +92,11 @@ AC_ARG_WITH(hdf5,
 # package requirement; if not specified, the default is to assume that
 # the package is optional
 
+# GNU-m4 ifelse documentation:
+# ifelse (string-1, string-2, equal, [not-equal])
+# If string-1 and string-2 are equal (character for character),
+# expands to the string in 'equal', otherwise to the string in
+# 'not-equal'.
 is_package_required=ifelse([$2], ,no, $2 )
 
 AC_MSG_RESULT([Debugging: with_hdf5 = $with_hdf5])
