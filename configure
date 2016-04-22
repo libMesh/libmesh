@@ -33536,6 +33536,7 @@ $as_echo "<<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. 
       petsc_use_debug=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_DEBUG`
       petsc_have_superlu_dist=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_SUPERLU_DIST`
       petsc_have_mumps=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_MUMPS`
+      petsc_have_metis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_METIS`
 
       # We have had a slightly different way of checking for Hypre for
       # quite some time, see below.
@@ -38470,6 +38471,12 @@ else
   build_metis=yes
 fi
 
+
+  # If PETSc has its own METIS, default to using that one regardless
+  # of what the user specified (if anything) in --with-metis.
+  if (test $petsc_have_metis -gt 0) ; then
+    build_metis=no
+  fi
 
       if (test $enablemetis = yes); then
         if (test $build_metis = yes); then
