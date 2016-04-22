@@ -162,10 +162,15 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         unsigned int binomial_p_i = 1;
 
         // the binomial coefficient (p choose n)
+        // 13! = 6227020800 will overflow the numerator (assuming
+        // 32-bit unsigned ints) and give a bad result here, unless we
+        // use a more sophisticated algorithm to compute p choose n.
+        if (p_order > 12)
+          libmesh_error_msg("Error: 1D Bernstein polynomials are only supported up to 12th-order.");
+
         if (i>1)
           binomial_p_i = Utility::factorial(p_order)
             / (Utility::factorial(n)*Utility::factorial(p_order-n));
-
 
         switch(i)
           {
@@ -333,11 +338,15 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         unsigned int binomial_p_i = 1;
 
         // the binomial coefficient (p choose n)
+        // 13! = 6227020800 will overflow the numerator (assuming
+        // 32-bit unsigned ints) and give a bad result here, unless we
+        // use a more sophisticated algorithm to compute p choose n.
+        if (p_order > 12)
+          libmesh_error_msg("Error: 1D Bernstein polynomials are only supported up to 12th-order.");
+
         if (i>1)
           binomial_p_i = Utility::factorial(p_order)
             / (Utility::factorial(n)*Utility::factorial(p_order-n));
-
-
 
         switch(i)
           {
