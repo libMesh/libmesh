@@ -178,13 +178,13 @@ if test "${with_hdf5}" != no ; then
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <hdf5.h>
             ]], [[
-            #if H5_VERS_MAJOR > $MAJOR_VER
+            @%:@if H5_VERS_MAJOR > $MAJOR_VER
             /* Sweet nibblets */
-            #elif (H5_VERS_MAJOR >= $MAJOR_VER) && (H5_VERS_MINOR >= $MINOR_VER) && (H5_VERS_RELEASE >= $MICRO_VER)
+            @%:@elif (H5_VERS_MAJOR >= $MAJOR_VER) && (H5_VERS_MINOR >= $MINOR_VER) && (H5_VERS_RELEASE >= $MICRO_VER)
             /* Winner winner, chicken dinner */
-            #else
-            #  error HDF5 version is too old
-            #endif
+            @%:@else
+            @%:@  error HDF5 version is too old
+            @%:@endif
         ]])],[
             min_version_succeeded=yes
         ],[
@@ -195,15 +195,15 @@ if test "${with_hdf5}" != no ; then
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <hdf5.h>
             ]], [[
-            #if H5_VERS_MAJOR > $MAJOR_VER_MAX
-            #  error HDF5 version is too new
-            #elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR > $MINOR_VER_MAX)
-            #  error HDF5 version is too new
-            #elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR == $MINOR_VER_MAX) && (H5_VERS_RELEASE > $MICRO_VER_MAX)
-            #  error HDF5 version is too new
-            #else
+            @%:@if H5_VERS_MAJOR > $MAJOR_VER_MAX
+            @%:@  error HDF5 version is too new
+            @%:@elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR > $MINOR_VER_MAX)
+            @%:@  error HDF5 version is too new
+            @%:@elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR == $MINOR_VER_MAX) && (H5_VERS_RELEASE > $MICRO_VER_MAX)
+            @%:@  error HDF5 version is too new
+            @%:@else
             /* It should work */
-            #endif
+            @%:@endif
         ]])],[
             max_version_succeeded=yes
         ],[
