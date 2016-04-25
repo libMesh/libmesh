@@ -222,11 +222,27 @@ if test "${with_hdf5}" != no ; then
 
       AC_LANG_POP([C])
 
+      if (test "$min_version_succeeded" = "no" -o "$max_version_succeeded" = "no"); then
+        AC_MSG_RESULT(no)
+        if test "$is_package_required" = yes; then
+          AC_MSG_ERROR([Your HDF5 library version does not meet the minimum and maximum versioning
+                        requirements ($min_hdf5_version <= HDF5 <= $max_hdf5_version).
+                        Please use --with-hdf5 to specify the location of a valid installation.])
+        fi
+      else
+        AC_MSG_RESULT(yes)
+      fi
+
+      # Check for -lhdf5
+      AC_CHECK_LIB([hdf5],[H5Fopen],[found_library=yes],[found_library=no])
+
       # Test for the HDF5 C++ interface by trying to link a test code.
       AC_LANG_PUSH([C++])
 
-      # Make sure that we can actually link a C++ test program.  This
-      # requires linking against both the C and C++ libs.
+      AC_MSG_CHECKING([If HDF5 C++ interface is present])
+
+      # Using the C++ interface requires linking against both the C
+      # and C++ libs.
       LIBS="${HDF5_LIBS} ${HDF5_CXXLIBS}"
 
       AC_LINK_IFELSE([AC_LANG_PROGRAM([[
@@ -245,24 +261,15 @@ if test "${with_hdf5}" != no ; then
 
       AC_LANG_POP([C++])
 
-      if (test "$min_version_succeeded" = "no" -o "$max_version_succeeded" = "no"); then
-        AC_MSG_RESULT(no)
-        if test "$is_package_required" = yes; then
-          AC_MSG_ERROR([Your HDF5 library version does not meet the minimum and maximum versioning
-                        requirements ($min_hdf5_version <= HDF5 <= $max_hdf5_version).
-                        Please use --with-hdf5 to specify the location of a valid installation.])
-        fi
-      else
-        AC_MSG_RESULT(yes)
-      fi
-
-      # Don't do this print statement in between AC_MSG_CHECKING... print statements
+      # Not having the C++ interface doesn't disqualify us from using
+      # the C interface.  We'll set a define if C++ is available, so
+      # code can conditionally make use of it.
       if test "$hdf5_has_cxx" = yes; then
-        AC_MSG_RESULT([HDF5 C++ interface is present])
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_HDF5_CXX, 1, [Define if the HDF5 C++ interface is available])
+      else
+        AC_MSG_RESULT(no)
       fi
-
-      # Check for -lhdf5
-      AC_CHECK_LIB([hdf5],[H5Fopen],[found_library=yes],[found_library=no])
 
       succeeded=no
       if test "$found_header" = yes; then
