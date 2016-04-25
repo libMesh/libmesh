@@ -104,9 +104,18 @@ AC_MSG_RESULT([Debugging: with_hdf5 = $with_hdf5])
 if test "${with_hdf5}" != no ; then
 
     if test -d "${HDF5_PREFIX}/lib" ; then
-       HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5 -Wl,-rpath,${HDF5_PREFIX}/lib"
-       HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran -Wl,-rpath,${HDF5_PREFIX}/lib"
-       HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp -Wl,-rpath,${HDF5_PREFIX}/lib"
+       HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5"
+       HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran"
+       HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp"
+    fi
+
+    # If there is an "rpath" flag detected, append it to the various
+    # LIBS vars.  This avoids hard-coding -Wl,-rpath, in case that is
+    # not the right approach for some compilers.
+    if (test "x$RPATHFLAG" != "x" -a -d "${HDF5_PREFIX}/lib"); then
+      HDF5_LIBS="${HDF5_LIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
+      HDF5_FLIBS="${HDF5_FLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
+      HDF5_CXXLIBS="${HDF5_CXXLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
     fi
 
     if test -d "${HDF5_PREFIX}/include" ; then
@@ -267,6 +276,7 @@ if test "${with_hdf5}" != no ; then
       fi
     fi dnl end test if header if available
 
+    # Reset variables used by configure tests.
     CFLAGS="$ac_HDF5_save_CFLAGS"
     CPPFLAGS="$ac_HDF5_save_CPPFLAGS"
     LDFLAGS="$ac_HDF5_save_LDFLAGS"
