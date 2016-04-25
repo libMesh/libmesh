@@ -216,6 +216,27 @@ unsigned int factorial(unsigned int n)
 }
 
 
+// Simple function to compute "n choose k", aka the binomial coefficient.
+template <typename T>
+T binomial(T n, T k)
+{
+  T ret = 1;
+
+  // Binomial function is "symmetric" in k, C(n, k) = C(n, n-k).
+  if (k > n - k)
+    k = n - k;
+
+  // Compute n * (n-1) * ... * (n-k+1) / (k * (k-1) * ... * 1)
+  for (T i = 0; i < k; ++i)
+    {
+      ret *= (n - i);
+      ret /= (i + 1);
+    }
+
+  return ret;
+}
+
+
 //-------------------------------------------------------------------
 /**
  * A convenient method to truly empty a vector using the "swap trick"
