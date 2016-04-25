@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_HDF5],
                 [enablehdf5=$enableoptional])
 
   if (test $enablehdf5 = yes); then
-    AX_PATH_HDF5(1.8.0,1.8.12,no)
+    AX_PATH_HDF5(1.8.0,,no)
     if (test "x$HAVE_HDF5" = "x0"); then
       enablehdf5=no
       AC_MSG_RESULT(<<< HDF5 support not found or disabled >>>)
@@ -99,8 +99,6 @@ AC_ARG_WITH(hdf5,
 # 'not-equal'.
 is_package_required=ifelse([$3], ,no, $3)
 
-AC_MSG_RESULT([Debugging: with_hdf5 = $with_hdf5])
-
 if test "${with_hdf5}" != no ; then
 
     if test -d "${HDF5_PREFIX}/lib" ; then
@@ -138,9 +136,15 @@ if test "${with_hdf5}" != no ; then
     #------------------------------
 
     min_hdf5_version=ifelse([$1], ,1.8.0, $1)
-    max_hdf5_version=ifelse([$2], ,1.8.0, $2)
 
-    AC_MSG_CHECKING([for $min_hdf5_version <= HDF5 <= $max_hdf5_version])
+    # If a max version is not provided, set it to 0.0.0.
+    max_hdf5_version=ifelse([$2], ,0.0.0, $2)
+
+    if (test "$max_hdf5_version" != "0.0.0"); then
+      AC_MSG_CHECKING([for $min_hdf5_version <= HDF5 <= $max_hdf5_version])
+    else
+      AC_MSG_CHECKING([for HDF5 version >= $min_hdf5_version])
+    fi
 
     # Strip the major.minor.micro version numbers out of the min version string
     MAJOR_VER=`echo $min_hdf5_version | sed 's/^\([[0-9]]*\).*/\1/'`
@@ -201,24 +205,29 @@ if test "${with_hdf5}" != no ; then
             min_version_succeeded=no
         ])
 
-      # Test that HDF5 version is less than or equal to the required max version.
-      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-        @%:@include <hdf5.h>
-            ]], [[
-            @%:@if H5_VERS_MAJOR > $MAJOR_VER_MAX
-            @%:@  error HDF5 version is too new
-            @%:@elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR > $MINOR_VER_MAX)
-            @%:@  error HDF5 version is too new
-            @%:@elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR == $MINOR_VER_MAX) && (H5_VERS_RELEASE > $MICRO_VER_MAX)
-            @%:@  error HDF5 version is too new
-            @%:@else
-            /* It should work */
-            @%:@endif
-        ]])],[
-            max_version_succeeded=yes
-        ],[
-            min_version_succeeded=no
-        ])
+      # If the max version is 0.0.0, accept any version for the max and automatically pass the test.
+      if (test "$MAJOR_VER_MAX" = "0" -a "$MINOR_VER_MAX" = "0" -a "$MICRO_VER_MAX" = "0"); then
+        max_version_succeeded=yes
+      else
+        # Test that HDF5 version is less than or equal to the required max version.
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+          @%:@include <hdf5.h>
+              ]], [[
+              @%:@if H5_VERS_MAJOR > $MAJOR_VER_MAX
+              @%:@  error HDF5 version is too new
+              @%:@elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR > $MINOR_VER_MAX)
+              @%:@  error HDF5 version is too new
+              @%:@elif (H5_VERS_MAJOR == $MAJOR_VER_MAX) && (H5_VERS_MINOR == $MINOR_VER_MAX) && (H5_VERS_RELEASE > $MICRO_VER_MAX)
+              @%:@  error HDF5 version is too new
+              @%:@else
+              /* It should work */
+              @%:@endif
+          ]])],[
+              max_version_succeeded=yes
+          ],[
+              min_version_succeeded=no
+          ])
+      fi
 
       AC_LANG_POP([C])
 
