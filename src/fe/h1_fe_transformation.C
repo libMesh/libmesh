@@ -42,9 +42,10 @@ template< typename OutputShape >
 void H1FETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & fe) const
 {
   fe.get_fe_map().get_dxidx();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   fe.get_fe_map().get_d2xidxyz2();
+#endif
 }
-
 
 template< typename OutputShape >
 void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
