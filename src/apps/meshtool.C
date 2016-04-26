@@ -43,7 +43,6 @@
 #include "libmesh/elem_quality.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/inf_elem_builder.h"
-#include "libmesh/legacy_xdr_io.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_data.h"
@@ -116,10 +115,10 @@ void usage(const std::string & progName)
            << " formats.  File types are inferred from file extensions.  For example,\n"
            << " the command:\n"
            << "\n"
-           << "  ./meshtool -d 2 -i in.exd -o out.plt\n"
+           << "  ./meshtool -d 2 -i in.e -o out.plt\n"
            << "\n"
            << " will read a 2D mesh in the ExodusII format (from Cubit, for example)\n"
-           << " from the file in.exd.  It will then write the mesh in the Tecplot\n"
+           << " from the file in.e.  It will then write the mesh in the Tecplot\n"
            << " binary format to out.plt.\n"
            << "\n"
            << " and\n"
@@ -146,8 +145,7 @@ void usage(const std::string & progName)
            << " Currently this program supports the following formats:\n"
            << "\n"
            << "INPUT:\n"
-           << "     .exd -- Sandia's ExodusII binary grid format\n"
-           << "     .mgf -- MGF binary mesh format\n"
+           << "     .e   -- Sandia's ExodusII binary grid format\n"
            << "     .ucd -- AVS unstructured ASCII grid format\n"
            << "     .unv -- SDRC I-Deas Universal File ASCII format\n"
            << "     .xda -- libMesh human-readable ASCII format\n"
@@ -160,13 +158,11 @@ void usage(const std::string & progName)
            << "     .fro   -- ACDL's .fro format\n"
            << "     .gmv   -- LANL's General Mesh Viewer format\n"
            << "     .mesh  -- MEdit mesh format\n"
-           << "     .mgf   -- MGF binary mesh format\n"
            << "     .msh   -- GMSH ASCII file\n"
            << "     .plt   -- Tecplot binary format\n"
            << "     .poly  -- TetGen ASCII file\n"
            << "     .pvtu  -- Paraview VTK format\n"
            << "     .ucd   -- AVS's ASCII UCD format\n"
-           << "     .ugrid -- Kelly's DIVA ASCII format (3D only)\n"
            << "     .unv   -- I-deas Universal format\n"
            << "     .xda   -- libMesh ASCII format\n"
            << "     .xdr   -- libMesh binary format\n"
@@ -252,7 +248,7 @@ void process_cmd_line(int argc,
             if (names.empty())
               names.push_back(optarg);
             else
-              libmesh_error_msg("ERROR: Input name must preceed output name!");
+              libmesh_error_msg("ERROR: Input name must precede output name!");
             break;
           }
 
@@ -264,7 +260,7 @@ void process_cmd_line(int argc,
             if (!names.empty())
               names.push_back(optarg);
             else
-              libmesh_error_msg("ERROR: Input name must preceed output name!");
+              libmesh_error_msg("ERROR: Input name must precede output name!");
             break;
           }
 
@@ -276,7 +272,7 @@ void process_cmd_line(int argc,
             if (names.size() == 2)
               names.push_back(optarg);
             else
-              libmesh_error_msg("ERROR: Input and output names must preceed solution name!");
+              libmesh_error_msg("ERROR: Input and output names must precede solution name!");
             break;
           }
 
@@ -639,12 +635,16 @@ int main (int argc, char ** argv)
 
 
   /**
-   * Possibly read the solution
+   * Possibly read the solution (-s option).
    */
   if (names.size() == 3)
-    LegacyXdrIO(mesh,true).read_mgf_soln(names[2],
-                                         soln,
-                                         var_names);
+    {
+      // TODO: Read XDR/A mesh file, contstruct an EquationSystems
+      // object, read XDR/A solution file by calling
+      // es.read(file, READ_HEADER|READ_DATA|READ_ADDITIONAL_DATA);
+      // then store a localized copy of the solution vector into 'soln'.
+      libmesh_error_msg("Importing an XDA solution file with -s is not supported.");
+    }
 
 
 

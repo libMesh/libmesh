@@ -26,7 +26,6 @@
 
 // Local includes
 #include "libmesh/xdr_io.h"
-#include "libmesh/legacy_xdr_io.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/enum_xdr_mode.h"
 #include "libmesh/mesh_base.h"
@@ -157,15 +156,7 @@ XdrIO::~XdrIO ()
 void XdrIO::write (const std::string & name)
 {
   if (this->legacy())
-    {
-      libmesh_deprecated();
-
-      // We don't support writing parallel files in the legacy format
-      libmesh_assert(!this->_write_parallel);
-
-      LegacyXdrIO(MeshOutput<MeshBase>::mesh(), this->binary()).write(name);
-      return;
-    }
+    libmesh_error_msg("We don't support writing parallel files in the legacy format.");
 
   Xdr io ((this->processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
 
@@ -1338,11 +1329,7 @@ void XdrIO::read (const std::string & name)
 
   // Check for a legacy version format.
   if (this->legacy())
-    {
-      io.close();
-      LegacyXdrIO(mesh, this->binary()).read(name);
-      return;
-    }
+    libmesh_error_msg("We no longer support reading files in the legacy format.");
 
   START_LOG("read()","XdrIO");
 

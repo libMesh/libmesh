@@ -31,7 +31,6 @@
 
 #include "libmesh/namebased_io.h"
 
-#include "libmesh/diva_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
@@ -45,7 +44,6 @@
 #include "libmesh/gmsh_io.h"
 #include "libmesh/fro_io.h"
 #include "libmesh/xdr_io.h"
-#include "libmesh/legacy_xdr_io.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/abaqus_io.h"
 #include "libmesh/checkpoint_io.h"
@@ -215,9 +213,6 @@ void NameBasedIO::read (const std::string & name)
                    (new_name.rfind(".oogl") < new_name.size()))
             OFFIO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".mgf") < new_name.size())
-            LegacyXdrIO(mymesh,true).read_mgf (new_name);
-
           else if (new_name.rfind(".unv") < new_name.size())
             UNVIO(mymesh).read (new_name);
 
@@ -346,12 +341,8 @@ void NameBasedIO::write (const std::string & name)
               io.write (new_name);
             }
 
-        else if (new_name.rfind(".ugrid") < new_name.size())
-          DivaIO(mymesh).write(new_name);
         else if (new_name.rfind(".e") < new_name.size())
           ExodusII_IO(mymesh).write(new_name);
-        else if (new_name.rfind(".mgf")  < new_name.size())
-          LegacyXdrIO(mymesh,true).write_mgf(new_name);
 
         else if (new_name.rfind(".unv") < new_name.size())
           UNVIO(mymesh).write (new_name);
