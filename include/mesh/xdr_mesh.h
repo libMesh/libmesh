@@ -48,7 +48,7 @@ public:
    * Constructor.  Initializes
    * \p m_dim to -1.
    */
-  XdrMESH() : m_dim(-1) {}
+  XdrMESH() : m_dim(-1) { libmesh_deprecated(); }
 
   /**
    * Calls the \p init method

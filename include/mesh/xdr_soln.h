@@ -47,7 +47,7 @@ public:
    * Constructor.
    * Initializes \p m_wrtVar to -1.
    */
-  XdrSOLN() : m_wrtVar(-1) {}
+  XdrSOLN() : m_wrtVar(-1) { libmesh_deprecated(); }
 
   /**
    * Calls the \p init method

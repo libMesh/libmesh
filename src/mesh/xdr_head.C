@@ -25,6 +25,8 @@ namespace libMesh
 // XdrHEAD members
 XdrHEAD::XdrHEAD()
 {
+  libmesh_deprecated();
+
   m_wrtVar = 0;
   m_numvar = 0;
 
