@@ -154,6 +154,15 @@ void triangulate_domain(const Parallel::Communicator & comm)
   // Triangulate!
   t.triangulate();
 
+  {
+    // Test: verify that we can iterate over active *local* elements after triangulating.
+    MeshBase::element_iterator       el     = mesh.active_local_elements_begin();
+    const MeshBase::element_iterator end_el = mesh.active_local_elements_end();
+
+    for ( ; el != end_el;  ++el)
+      std::cout << "Active local element with ID: " << (*el)->id() << std::endl;
+  }
+
   // Write the result to file
   mesh.write("delaunay_l_shaped_hole.e");
 
