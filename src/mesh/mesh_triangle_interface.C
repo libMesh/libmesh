@@ -341,6 +341,10 @@ void TriangleInterface::triangulate()
   TriangleWrapper::destroy(initial,      TriangleWrapper::INPUT);
   TriangleWrapper::destroy(final,        TriangleWrapper::OUTPUT);
 
+  // Prepare the mesh for use before returning.  This ensures (among
+  // other things) that it is partitioned and therefore users can
+  // iterate over local elements, etc.
+  _mesh.prepare_for_use();
 }
 
 } // namespace libMesh
