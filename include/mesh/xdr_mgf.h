@@ -114,9 +114,20 @@ public:
    * standard C header \p rpc/rpc.h.
    */
 #ifdef LIBMESH_HAVE_XDR
-  XdrMGF() : _num_levels(0), m_type(UNKNOWN), mp_xdr_handle(0), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
+  XdrMGF() :
+    _num_levels(0),
+    m_type(UNKNOWN),
+    mp_xdr_handle(0),
+    orig_flag(LegacyXdrIO::LIBM),
+    mp_fp(0)
+  { libmesh_deprecated(); }
 #else
-  XdrMGF() : _num_levels(0), m_type(UNKNOWN), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
+  XdrMGF() :
+    _num_levels(0),
+    m_type(UNKNOWN),
+    orig_flag(LegacyXdrIO::LIBM),
+    mp_fp(0)
+  { libmesh_deprecated(); }
 #endif
 
   /**

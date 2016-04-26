@@ -31,6 +31,15 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // DivaIO class members
+inline
+DivaIO::DivaIO (const MeshBase & mesh_in) :
+  MeshOutput<MeshBase>  (mesh_in)
+{
+  libmesh_deprecated();
+}
+
+
+
 void DivaIO::write (const std::string & fname)
 {
   // We may need to gather a ParallelMesh to output it, making that

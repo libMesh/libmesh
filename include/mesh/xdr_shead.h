@@ -44,7 +44,7 @@ public:
   /**
    * Constructor.
    */
-  XdrSHEAD()                                    {}
+  XdrSHEAD() { libmesh_deprecated(); }
 
   /**
    * Destructor.

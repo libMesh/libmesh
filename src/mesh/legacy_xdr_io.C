@@ -59,6 +59,7 @@ LegacyXdrIO::LegacyXdrIO (MeshBase & mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh),
   _binary (binary_in)
 {
+  libmesh_deprecated();
 }
 
 
@@ -68,6 +69,7 @@ LegacyXdrIO::LegacyXdrIO (const MeshBase & mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh),
   _binary (binary_in)
 {
+  libmesh_deprecated();
 }
 
 
