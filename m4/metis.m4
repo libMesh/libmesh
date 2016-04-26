@@ -32,6 +32,19 @@ AC_DEFUN([CONFIGURE_METIS],
     build_metis=no
   fi
 
+  # Conversely, if:
+  # .) METIS is enabled in libmesh,
+  # .) PETSc does not have a METIS, and
+  # .) build_metis=no because user said --with-metis=PETSc,
+  # then we need to make sure that libmesh builds its own METIS!
+  if (test $enablemetis = yes) ; then
+    if (test $petsc_have_metis -eq 0) ; then
+      if (test $build_metis = no) ; then
+        build_metis=yes
+      fi
+    fi
+  fi
+
   dnl The METIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablemetis = yes); then
