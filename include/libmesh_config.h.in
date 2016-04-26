@@ -455,6 +455,9 @@
 /* Define if HDF5 is available */
 #undef HAVE_HDF5
 
+/* Define if the HDF5 C++ interface is available */
+#undef HAVE_HDF5_CXX
+
 /* Flag indicating whether the library will be compiled with Howard Hinnant's
    C++03 unique_ptr implementation */
 #undef HAVE_HINNANT_UNIQUE_PTR

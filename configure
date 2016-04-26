@@ -40508,17 +40508,23 @@ HAVE_HDF5=0
 
 # Check whether --with-hdf5 was given.
 if test "${with_hdf5+set}" = set; then :
-  withval=$with_hdf5; with_hdf5=$withval
-if test "${with_hdf5}" != yes; then
-    HDF5_PREFIX=$withval
-fi
+  withval=$with_hdf5;
+    with_hdf5=$withval
+    if test "${with_hdf5}" != yes; then
+      HDF5_PREFIX=$withval
+    fi
 
 else
 
-with_hdf5=$withval
-if test "x${HDF5_DIR}" != "x"; then
-   HDF5_PREFIX=${HDF5_DIR}
-fi
+    # This is "no" if the user did not specify --with-hdf5=foo
+    with_hdf5=$withval
+
+    # If $HDF5_DIR is set in the user's environment, then treat that
+    # as though they had said --with-hdf5=$HDF5_DIR.
+    if test "x${HDF5_DIR}" != "x"; then
+      HDF5_PREFIX=${HDF5_DIR}
+      with_hdf5=yes
+    fi
 
 fi
 
@@ -40526,14 +40532,28 @@ fi
 # package requirement; if not specified, the default is to assume that
 # the package is optional
 
+# GNU-m4 ifelse documentation:
+# ifelse (string-1, string-2, equal, [not-equal])
+# If string-1 and string-2 are equal (character for character),
+# expands to the string in 'equal', otherwise to the string in
+# 'not-equal'.
 is_package_required=no
 
 if test "${with_hdf5}" != no ; then
 
     if test -d "${HDF5_PREFIX}/lib" ; then
-       HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5 -Wl,-rpath,${HDF5_PREFIX}/lib"
-       HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran -Wl,-rpath,${HDF5_PREFIX}/lib"
-       HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp -Wl,-rpath,${HDF5_PREFIX}/lib"
+       HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5"
+       HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran"
+       HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp"
+    fi
+
+    # If there is an "rpath" flag detected, append it to the various
+    # LIBS vars.  This avoids hard-coding -Wl,-rpath, in case that is
+    # not the right approach for some compilers.
+    if (test "x$RPATHFLAG" != "x" -a -d "${HDF5_PREFIX}/lib"); then
+      HDF5_LIBS="${HDF5_LIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
+      HDF5_FLIBS="${HDF5_FLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
+      HDF5_CXXLIBS="${HDF5_CXXLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
     fi
 
     if test -d "${HDF5_PREFIX}/include" ; then
@@ -40563,17 +40583,16 @@ fi
 
 
 
-    #-----------------------
+    #----------------------
     # Minimum version check
     #----------------------
 
     min_hdf5_version=1.8.0
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for hdf5 - version >= $min_hdf5_version" >&5
-$as_echo_n "checking for hdf5 - version >= $min_hdf5_version... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for HDF5 version >= $min_hdf5_version" >&5
+$as_echo_n "checking for HDF5 version >= $min_hdf5_version... " >&6; }
 
-    # looking for major.minor.micro style versioning
-
+    # Strip the major.minor.micro version numbers out of the min version string
     MAJOR_VER=`echo $min_hdf5_version | sed 's/^\([0-9]*\).*/\1/'`
     if test "x${MAJOR_VER}" = "x" ; then
        MAJOR_VER=0
@@ -40590,7 +40609,6 @@ $as_echo_n "checking for hdf5 - version >= $min_hdf5_version... " >&6; }
     fi
 
     # begin additional test(s) if header if available
-
     succeeded=no
     ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -40600,8 +40618,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test "x${found_header}" = "xyes" ; then
-      version_succeeded=no
+      min_version_succeeded=no
+      hdf5_has_cxx=no
 
+      # Test that HDF5 version is greater than or equal to the required min version.
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -40625,14 +40645,11 @@ main ()
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-            version_succeeded=yes
+            min_version_succeeded=yes
 
 else
 
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
+            min_version_succeeded=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -40644,15 +40661,20 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-      if test "$version_succeeded" != "yes";then
+      if (test "$min_version_succeeded" = "no"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
         if test "$is_package_required" = yes; then
-          as_fn_error $? "Your HDF5 library version does not meet the minimum versioning
-                        requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
-                        of an updated installation or consider upgrading the system version." "$LINENO" 5
+          as_fn_error $? "Your HDF5 library version does not meet the minimum version
+                        requirement (HDF5 >= $min_hdf5_version).
+                        Please use --with-hdf5 to specify the location of a valid installation." "$LINENO" 5
         fi
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
       fi
 
-      # Library availability
+      # Check for -lhdf5
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for H5Fopen in -lhdf5" >&5
 $as_echo_n "checking for H5Fopen in -lhdf5... " >&6; }
 if ${ac_cv_lib_hdf5_H5Fopen+:} false; then :
@@ -40695,6 +40717,8 @@ else
   found_library=no
 fi
 
+
+      # Test for the HDF5 C++ interface by trying to link a test code.
       ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -40702,15 +40726,75 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking If HDF5 C++ interface is present" >&5
+$as_echo_n "checking If HDF5 C++ interface is present... " >&6; }
+
+      # Using the C++ interface requires linking against both the C
+      # and C++ libs.
+      LIBS="${HDF5_LIBS} ${HDF5_CXXLIBS}"
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <H5Cpp.h>
+        #ifndef H5_NO_NAMESPACE
+        using namespace H5;
+        #endif
+
+int
+main ()
+{
+
+        H5std_string  fname("test.h5");
+        H5File file (fname, H5F_ACC_TRUNC);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+            hdf5_has_cxx=yes
+
+else
+
+            hdf5_has_cxx=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+      # Not having the C++ interface doesn't disqualify us from using
+      # the C interface.  We'll set a define if C++ is available, so
+      # code can conditionally make use of it.
+      if test "$hdf5_has_cxx" = yes; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_HDF5_CXX 1" >>confdefs.h
+
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      fi
+
       succeeded=no
       if test "$found_header" = yes; then
-        if test "$version_succeeded" = yes; then
+        if test "$min_version_succeeded" = yes; then
           if test "$found_library" = yes; then
             succeeded=yes
           fi
         fi
       fi
     fi
+    # Reset variables used by configure tests.
     CFLAGS="$ac_HDF5_save_CFLAGS"
     CPPFLAGS="$ac_HDF5_save_CPPFLAGS"
     LDFLAGS="$ac_HDF5_save_LDFLAGS"
@@ -40750,14 +40834,23 @@ fi
 
     if (test "x$HAVE_HDF5" = "x0"); then
       enablehdf5=no
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< HDF5 support not found or disabled >>>" >&5
+$as_echo "<<< HDF5 support not found or disabled >>>" >&6; }
     else
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with HDF5 support >>>" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with HDF5 support >>>" >&5
 $as_echo "<<< Configuring library with HDF5 support >>>" >&6; }
     fi
   fi
 
 if (test $enablehdf5 = yes); then
   libmesh_optional_INCLUDES="$HDF5_CPPFLAGS $libmesh_optional_INCLUDES"
+
+  # If the HDF5 C++ interface was found, add the C++ library to the link line.
+  if test "$hdf5_has_cxx" = yes; then
+    libmesh_optional_LIBS="$HDF5_CXXLIBS $libmesh_optional_LIBS"
+  fi
+
+  # And add the HDF5 C library to the link line.
   libmesh_optional_LIBS="$HDF5_LIBS $libmesh_optional_LIBS"
 fi
  if test x$enablehdf5 = xyes; then
@@ -41368,7 +41461,7 @@ for ac_lib in '' dl dld; do
     ac_res=-l$ac_lib
     LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
   fi
-  if ac_fn_cxx_try_link "$LINENO"; then :
+  if ac_fn_c_try_link "$LINENO"; then :
   ac_cv_search_dlopen=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -41472,11 +41565,11 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
   fi
 
@@ -41855,7 +41948,7 @@ fi
        for ac_header in $CURL_INC/curl.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
@@ -41912,7 +42005,7 @@ return main ();
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
+if ac_fn_c_try_link "$LINENO"; then :
   ac_cv_lib_curl_main=yes
 else
   ac_cv_lib_curl_main=no

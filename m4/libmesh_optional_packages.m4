@@ -522,6 +522,13 @@ AC_CONFIG_FILES([contrib/capnproto/Makefile])
 CONFIGURE_HDF5
 if (test $enablehdf5 = yes); then
   libmesh_optional_INCLUDES="$HDF5_CPPFLAGS $libmesh_optional_INCLUDES"
+
+  # If the HDF5 C++ interface was found, add the C++ library to the link line.
+  if test "$hdf5_has_cxx" = yes; then
+    libmesh_optional_LIBS="$HDF5_CXXLIBS $libmesh_optional_LIBS"
+  fi
+
+  # And add the HDF5 C library to the link line.
   libmesh_optional_LIBS="$HDF5_LIBS $libmesh_optional_LIBS"
 fi
 AM_CONDITIONAL(LIBMESH_ENABLE_HDF5, test x$enablehdf5 = xyes)
