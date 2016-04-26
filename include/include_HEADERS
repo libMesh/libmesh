@@ -158,7 +158,6 @@ include_HEADERS =  \
         mesh/boundary_info.h \
         mesh/boundary_mesh.h \
         mesh/checkpoint_io.h \
-        mesh/diva_io.h \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
         mesh/fro_io.h \
@@ -166,7 +165,6 @@ include_HEADERS =  \
         mesh/gmv_io.h \
         mesh/gnuplot_io.h \
         mesh/inf_elem_builder.h \
-        mesh/legacy_xdr_io.h \
         mesh/matlab_io.h \
         mesh/medit_io.h \
         mesh/mesh.h \
@@ -204,13 +202,7 @@ include_HEADERS =  \
         mesh/unstructured_mesh.h \
         mesh/unv_io.h \
         mesh/vtk_io.h \
-        mesh/xdr_head.h \
         mesh/xdr_io.h \
-        mesh/xdr_mesh.h \
-        mesh/xdr_mgf.h \
-        mesh/xdr_mhead.h \
-        mesh/xdr_shead.h \
-        mesh/xdr_soln.h \
         numerics/analytic_function.h \
         numerics/composite_fem_function.h \
         numerics/composite_function.h \

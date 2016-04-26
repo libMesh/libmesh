@@ -174,7 +174,6 @@ libmesh_SOURCES =  \
         src/mesh/boundary_info.C \
         src/mesh/boundary_mesh.C \
         src/mesh/checkpoint_io.C \
-        src/mesh/diva_io.C \
         src/mesh/ensight_io.C \
         src/mesh/exodusII_io.C \
         src/mesh/exodusII_io_helper.C \
@@ -183,7 +182,6 @@ libmesh_SOURCES =  \
         src/mesh/gmv_io.C \
         src/mesh/gnuplot_io.C \
         src/mesh/inf_elem_builder.C \
-        src/mesh/legacy_xdr_io.C \
         src/mesh/matlab_io.C \
         src/mesh/medit_io.C \
         src/mesh/mesh_base.C \
@@ -226,11 +224,7 @@ libmesh_SOURCES =  \
         src/mesh/unstructured_mesh.C \
         src/mesh/unv_io.C \
         src/mesh/vtk_io.C \
-        src/mesh/xdr_head.C \
         src/mesh/xdr_io.C \
-        src/mesh/xdr_mesh.C \
-        src/mesh/xdr_mgf.C \
-        src/mesh/xdr_soln.C \
         src/numerics/analytic_function.C \
         src/numerics/coupling_matrix.C \
         src/numerics/dense_matrix.C \
