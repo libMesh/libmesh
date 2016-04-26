@@ -47,7 +47,6 @@ public:
    * Note that only writing diva files is supported since Diva is
    * not a mesh generator.
    */
-  //TODO:[JWP] figure out how to implement a const write method!
   explicit
   DivaIO (const MeshBase &);
 
@@ -65,16 +64,6 @@ private:
    */
   void write_stream(std::ostream & out);
 };
-
-
-
-
-// ------------------------------------------------------------
-// DivaIO inline members
-inline
-DivaIO::DivaIO (const MeshBase & mesh_in) :
-  MeshOutput<MeshBase>  (mesh_in)
-{}
 
 
 } // namespace libMesh
