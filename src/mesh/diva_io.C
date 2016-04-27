@@ -31,7 +31,6 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // DivaIO class members
-inline
 DivaIO::DivaIO (const MeshBase & mesh_in) :
   MeshOutput<MeshBase>  (mesh_in)
 {
