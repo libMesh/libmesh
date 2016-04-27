@@ -38,7 +38,7 @@ namespace libMesh
 
 // Forward declares
 class EquationSystems;
-
+template <typename T> class NumericVector;
 
 /**
  * This class defines an abstract interface for \p Mesh output.
@@ -94,6 +94,22 @@ public:
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
+                                 const std::vector<std::string> &)
+  { libmesh_not_implemented(); }
+
+  /**
+   * This method should be overridden by "parallel" output formats for
+   * writing nodal data.  Instead of getting a localized copy of the
+   * nodal solution vector, it is passed a NumericVector of
+   * type=PARALLEL which is in node-major order i.e.
+   * (u0,v0,w0, u1,v1,w1, u2,v2,w2, u3,v3,w3, ...)
+   * and contains n_nodes*n_vars total entries.  Then, it is up to the
+   * individual I/O class to extract the required solution values from
+   * this vector, perhaps using NumericVector::create_subvector(), in
+   * order to write chunks of the nodal solution on each processor.
+   */
+  virtual void write_nodal_data (const std::string &,
+                                 const NumericVector<Number> &,
                                  const std::vector<std::string> &)
   { libmesh_not_implemented(); }
 

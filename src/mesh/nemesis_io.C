@@ -31,6 +31,7 @@
 #include "libmesh/utility.h" // is_sorted, deallocate
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {
@@ -1315,6 +1316,84 @@ void Nemesis_IO::write_nodal_data (const std::string & ,
 
 #endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+// TODO: this will eventually replace the other version of
+// write_nodal_data() that takes a std::vector.
+void Nemesis_IO::write_nodal_data (const std::string & base_filename,
+                                   const NumericVector<Number> & parallel_soln,
+                                   const std::vector<std::string> & names)
+{
+  LOG_SCOPE("write_nodal_data()", "Nemesis_IO");
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
+
+  if (!nemhelper->opened_for_writing)
+    {
+      // If we're appending, open() the file with read_only=false,
+      // otherwise create() it and write the contents of the mesh to
+      // it.
+      if (_append)
+        {
+          nemhelper->open(nemesis_filename.c_str(), /*read_only=*/false);
+          // After opening the file, read the header so that certain
+          // fields, such as the number of nodes and the number of
+          // elements, are correctly initialized for the subsequent
+          // call to write the nodal solution.
+          nemhelper->read_header();
+        }
+      else
+        {
+          nemhelper->create(nemesis_filename);
+          nemhelper->initialize(nemesis_filename,mesh);
+          nemhelper->write_nodal_coordinates(mesh);
+          nemhelper->write_elements(mesh);
+          nemhelper->write_nodesets(mesh);
+          nemhelper->write_sidesets(mesh);
+
+          if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
+              _verbose )
+            {
+              libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                           << "are not supported by the ExodusII format."
+                           << std::endl;
+            }
+
+          // If we don't have any nodes written out on this processor,
+          // Exodus seems to like us better if we don't try to write out any
+          // variable names too...
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+
+          std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+
+          nemhelper->initialize_nodal_variables(complex_names);
+#else
+          nemhelper->initialize_nodal_variables(names);
+#endif
+        }
+    }
+
+  // Localize the parallel solution on all procs, and call the
+  // function in the helper.
+  std::vector<Number> soln;
+  parallel_soln.localize(soln);
+  nemhelper->write_nodal_solution(soln, names, _timestep);
+}
+
+#else
+
+void Nemesis_IO::write_nodal_data (const std::string &,
+                                   const NumericVector<Number> &,
+                                   const std::vector<std::string> &)
+{
+  libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
+
+#endif
 
 
 
