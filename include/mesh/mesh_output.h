@@ -136,17 +136,6 @@ private:
    * Precision to use when writing ASCII files.
    */
   unsigned int _ascii_precision;
-
-  /**
-   * A helper function which allows us to fill temporary
-   * name and solution vectors with an EquationSystems object.
-   * Only generate names and solution data corresponding to
-   * systems specified in system_names.
-   */
-  void _build_variable_names_and_solution_vector(const EquationSystems & es,
-                                                 std::vector<Number> & soln,
-                                                 std::vector<std::string> & names,
-                                                 const std::set<std::string> * system_names=libmesh_nullptr);
 };
 
 
