@@ -285,6 +285,16 @@ public:
                               const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**
+   * A version of build_solution_vector which is appropriate for
+   * "parallel" output formats like Nemesis.  Returns a UniquePtr to a
+   * node-major NumericVector of total length n_nodes*n_vars that is
+   * hopefully partitioned correctly for writing out all the values of
+   * a given variable for a given processor.
+   */
+  UniquePtr<NumericVector<Number> >
+  build_parallel_solution_vector(const std::set<std::string> * system_names=libmesh_nullptr) const;
+
+  /**
    * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
    * is populated, only the variables corresponding to those names will
    * be retrieved.  This can be used to filter which variables are retrieved.
