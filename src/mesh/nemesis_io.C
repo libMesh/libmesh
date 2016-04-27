@@ -1377,11 +1377,9 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
         }
     }
 
-  // Localize the parallel solution on all procs, and call the
-  // function in the helper.
-  std::vector<Number> soln;
-  parallel_soln.localize(soln);
-  nemhelper->write_nodal_solution(soln, names, _timestep);
+  // Call the new version of write_nodal_solution() that takes a
+  // NumericVector directly without localizing.
+  nemhelper->write_nodal_solution(parallel_soln, names, _timestep);
 }
 
 #else

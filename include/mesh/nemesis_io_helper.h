@@ -32,6 +32,9 @@
 namespace libMesh
 {
 
+// Forward declaration
+template <typename T> class NumericVector;
+
 // The Nemesis API header file.  Should already be
 // correctly extern C'd but it doesn't hurt :)
 namespace Nemesis {
@@ -299,6 +302,14 @@ public:
    * Takes a solution vector containing the solution for all variables and outputs it to the files
    */
   void write_nodal_solution(const std::vector<Number> & values,
+                            const std::vector<std::string> & names,
+                            int timestep);
+
+  /**
+   * Takes a parallel solution vector containing the node-major
+   * solution vector for all variables and outputs it to the files.
+   */
+  void write_nodal_solution(const NumericVector<Number> & parallel_soln,
                             const std::vector<std::string> & names,
                             int timestep);
 

@@ -40,6 +40,7 @@ namespace libMesh
 class EquationSystems;
 template <typename T> class NumericVector;
 
+
 /**
  * This class defines an abstract interface for \p Mesh output.
  * Specific classes derived from this class actually implement
@@ -107,11 +108,13 @@ public:
    * individual I/O class to extract the required solution values from
    * this vector, perhaps using NumericVector::create_subvector(), in
    * order to write chunks of the nodal solution on each processor.
+   *
+   * If not implemented, localizes the parallel vector into a std::vector
+   * and calls the other version of this function.
    */
   virtual void write_nodal_data (const std::string &,
                                  const NumericVector<Number> &,
-                                 const std::vector<std::string> &)
-  { libmesh_not_implemented(); }
+                                 const std::vector<std::string> &);
 
   /**
    * Return/set the precision to use when writing ASCII files.

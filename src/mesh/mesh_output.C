@@ -66,6 +66,10 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
 
   MeshSerializer serialize(const_cast<MT &>(*_obj), !_is_parallel_format);
 
+  // Build the list of variable names that will be written.
+  std::vector<std::string> names;
+  es.build_variable_names  (names, libmesh_nullptr, system_names);
+
   if (!_is_parallel_format)
     {
       // We need a serial mesh for MeshOutput for now
@@ -73,49 +77,33 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
 
       // Build the nodal solution values & get the variable
       // names from the EquationSystems object
-      std::vector<Number>      soln;
-      std::vector<std::string> names;
-
-      es.build_variable_names  (names, libmesh_nullptr, system_names);
+      std::vector<Number> soln;
       es.build_solution_vector (soln, system_names);
 
       this->write_nodal_data (fname, soln, names);
     }
   else // _is_parallel_format
     {
-      std::vector<Number>      soln;
-      std::vector<std::string> names;
-
-      es.build_variable_names  (names, libmesh_nullptr, system_names);
-
       UniquePtr<NumericVector<Number> > parallel_soln =
         es.build_parallel_solution_vector(system_names);
 
-      // Localize parallel_soln into soln.  This is a place-holder.
-      // It is exactly what's already done in
-      // es.build_solution_vector();
-      parallel_soln->localize_to_one(soln);
-
-      // For now, if we're doing a parallel format we're going to
-      // broadcast the vector from processor 0 to all of the
-      // processors to mimic what build_solution_vector used to do.
-      // this is TERRIBLE and WASTEFUL but it's only temporary until
-      // we redesign the output of build_solution_vector and the
-      // inputs to the I/O... both of which should actually be
-      // NumericVectors....
-      if (_is_parallel_format)
-        {
-          size_t size = soln.size();
-          _obj->comm().broadcast(size);
-
-          if(_obj->comm().rank())
-            soln.resize(size);
-
-          _obj->comm().broadcast(soln);
-        }
-
-      this->write_nodal_data (fname, soln, names);
+      this->write_nodal_data (fname, *parallel_soln, names);
     }
+}
+
+
+
+template <class MT>
+void MeshOutput<MT>::write_nodal_data (const std::string & fname,
+                                       const NumericVector<Number> & parallel_soln,
+                                       const std::vector<std::string> & names)
+{
+  // This is the fallback implementation for parallel I/O formats that
+  // do not yet implement proper writing in parallel, and instead rely
+  // on the full solution vector being available on all processors.
+  std::vector<Number> soln;
+  parallel_soln.localize(soln);
+  this->write_nodal_data(fname, soln, names);
 }
 
 
