@@ -590,8 +590,8 @@ public:
    * TODO: make this pure virtual with libmesh_not_implemented() in
    * derived classes where it is not yet implemented.
    */
-  virtual void localize (std::vector<T> & v_local,
-                         const std::vector<numeric_index_type> & indices) const
+  virtual void localize (std::vector<T> & /*v_local*/,
+                         const std::vector<numeric_index_type> & /*indices*/) const
   { libmesh_not_implemented(); }
 
   /**
