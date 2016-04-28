@@ -2484,7 +2484,6 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 {
   int num_vars = cast_int<int>(names.size());
 
-  // Debugging: Print out the nodes we are responsible for
   for (int c=0; c<num_vars; c++)
     {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -2496,10 +2495,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       std::vector<numeric_index_type> required_indices(num_nodes);
 
       for (int i=0; i<num_nodes; i++)
-        {
-          dof_id_type dof_needed = this->exodus_node_num_to_libmesh[i]*num_vars + c;
-          required_indices[i] = dof_needed;
-        }
+        required_indices[i] = this->exodus_node_num_to_libmesh[i]*num_vars + c;
 
       // Hard-code the scatter operation for PETSc vectors for now...
 

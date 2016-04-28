@@ -106,8 +106,7 @@ public:
    * (u0,v0,w0, u1,v1,w1, u2,v2,w2, u3,v3,w3, ...)
    * and contains n_nodes*n_vars total entries.  Then, it is up to the
    * individual I/O class to extract the required solution values from
-   * this vector, perhaps using NumericVector::create_subvector(), in
-   * order to write chunks of the nodal solution on each processor.
+   * this vector and write them in parallel.
    *
    * If not implemented, localizes the parallel vector into a std::vector
    * and calls the other version of this function.
