@@ -30,9 +30,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
 
-// Temporarily, to get PetscVec stuff working
-#include "libmesh/petsc_vector.h"
-
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
 namespace libMesh
@@ -2497,94 +2494,13 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       for (int i=0; i<num_nodes; i++)
         required_indices[i] = this->exodus_node_num_to_libmesh[i]*num_vars + c;
 
-      // Hard-code the scatter operation for PETSc vectors for now...
+      // Get the dof values required to write just our local part of
+      // the solution vector.
+      std::vector<Number> local_soln;
+      parallel_soln.localize(local_soln, required_indices);
 
-      // Create a sequential destination Vec with the right number of entries on each proc.
-      Vec dest;
-      PetscErrorCode ierr = 0;
-      ierr = VecCreateSeq(PETSC_COMM_SELF, required_indices.size(), &dest);
-      LIBMESH_CHKERR(ierr);
-
-      // Create an IS using the libmesh routine.  PETSc does not own the
-      // IS memory in this case, it is automatically cleaned up by the
-      // std::vector destructor.
-      IS is;
-      ierr = ISCreateLibMesh(parallel_soln.comm().get(),
-                             required_indices.size(),
-                             numeric_petsc_cast(&required_indices[0]),
-                             PETSC_USE_POINTER,
-                             &is);
-      LIBMESH_CHKERR(ierr);
-
-      // Cast the incoming NumericVector to a PetscVector.
-      const PetscVector<Number> * parallel_soln_as_petscvector =
-        dynamic_cast<const PetscVector<Number> *>(&parallel_soln);
-
-      if (!parallel_soln_as_petscvector)
-        libmesh_error_msg("Cast failed.");
-
-      // Get the underlying Vec. We have to cast away constness
-      // because VecScatterCreate requires a non-const Vec and the
-      // PetscVector::vec() function is non-const.
-      Vec parallel_vec = const_cast<PetscVector<Number>* >(parallel_soln_as_petscvector)->vec();
-
-      // Create VecScatter.  "NULL" means "use the identity IS".
-      VecScatter scatter;
-      ierr = VecScatterCreate(/*src vec=*/parallel_vec,
-                              /*src is=*/is,
-                              /*dest vec=*/dest,
-                              /*dest is=*/NULL,
-                              &scatter);
-      LIBMESH_CHKERR(ierr);
-
-      // Do the scatter
-      ierr = VecScatterBegin(scatter, parallel_vec, dest, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, parallel_vec, dest, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-
-      // Print the values of dest.  Hopefully they are different on each
-      // proc...  This is a sequential vector but we are passing
-      // init.comm(), which doesn't seem consistent.  Since this object
-      // is only for printing, though, who cares.
-//      {
-//        PetscVector<Number> wrapper(dest, parallel_soln.comm());
-//        for (numeric_index_type i=0; i<required_indices.size(); ++i)
-//          libMesh::out << wrapper(i) << " ";
-//        libMesh::out << std::endl;
-//      }
-
-      // Now, we want to call:
-      // write_nodal_values(c+1,cur_soln,timestep);
-      // passing a std::vector as the second argument, so make that
-      // std::vector now.
-      PetscScalar * values;
-      ierr = VecGetArray (dest, &values);
-      LIBMESH_CHKERR(ierr);
-      std::vector<Number> cur_soln(values, values+required_indices.size());
-
-//      // Debugging: make sure that worked
-//      for (numeric_index_type i=0; i<required_indices.size(); ++i)
-//        libMesh::out << cur_soln[i] << " ";
-//      libMesh::out << std::endl;
-
-      // We are supposed to restore the array when we're done, so do that.
-      ierr = VecRestoreArray (dest, &values);
-      LIBMESH_CHKERR(ierr);
-
-      // Finally, we can call the funcion that actually writes the
-      // values to the Exodus file.
-      write_nodal_values(c+1, cur_soln, timestep);
-
-      // Clean up
-      ierr = LibMeshISDestroy (&is);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = LibMeshVecScatterDestroy(&scatter);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = LibMeshVecDestroy(&dest);
-      LIBMESH_CHKERR(ierr);
+      // Call the ExodusII_IO_Helper function to write the data.
+      write_nodal_values(c+1, local_soln, timestep);
     }
 }
 
