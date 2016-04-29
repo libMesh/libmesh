@@ -377,6 +377,11 @@ public:
    */
   void debug_buffer () const;
 
+  /**
+   * Print out info for debugging.
+   */
+  void print_dof_info() const;
+
 private:
 
   /**

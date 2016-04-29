@@ -550,4 +550,26 @@ void DofObject::debug_buffer () const
 
 
 
+void DofObject::print_dof_info() const
+{
+  libMesh::out << this->id() << " [ ";
+
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {
+      libMesh::out << "s:" << s << " ";
+      for (unsigned int var=0; var<this->n_vars(s); var++)
+        {
+          libMesh::out << "v:" << var << " ";
+          for (unsigned int comp=0; comp<this->n_comp(s,var); comp++)
+            {
+              libMesh::out << "c:" << comp << " dof:" << this->dof_number(s,var,comp) << " ";
+            }
+        }
+    }
+
+  libMesh::out << "]\n";
+}
+
+
+
 } // namespace libMesh
