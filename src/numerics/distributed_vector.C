@@ -419,6 +419,101 @@ void DistributedVector<T>::localize (NumericVector<T> & v_local_in,
 
 
 template <typename T>
+void DistributedVector<T>::localize (std::vector<T> & v_local,
+                                     const std::vector<numeric_index_type> & indices) const
+{
+  // Resize v_local so there is enough room to hold all the local values.
+  v_local.resize(indices.size());
+
+  // We need to know who has the values we want, so get everyone's _local_size
+  std::vector<numeric_index_type> local_sizes;
+  this->comm().allgather (_local_size, local_sizes);
+
+  // Make a vector of partial sums of local sizes
+  std::vector<numeric_index_type> local_size_sums(this->n_processors());
+  local_size_sums[0] = local_sizes[0];
+  for (numeric_index_type i=1; i<local_sizes.size(); i++)
+    local_size_sums[i] = local_size_sums[i-1] + local_sizes[i];
+
+  // We now fill in 'requested_ids' based on the indices.  Also keep
+  // track of the local index (in the indices vector) for each of
+  // these, since we need that when unpacking.
+  std::vector<std::vector<numeric_index_type> >
+    requested_ids(this->n_processors()),
+    local_requested_ids(this->n_processors());
+
+  // We'll use this typedef a couple of times below.
+  typedef typename std::vector<numeric_index_type>::iterator iter_t;
+
+  // For each index in indices, determine which processor it is on.
+  // This is an O(N*log(p)) algorithm that uses std::upper_bound().
+  // Note: upper_bound() returns an iterator to the first entry which is
+  // greater than the given value.
+  for (numeric_index_type i=0; i<indices.size(); i++)
+    {
+      iter_t ub = std::upper_bound(local_size_sums.begin(),
+                                   local_size_sums.end(),
+                                   indices[i]);
+
+      std::iterator_traits<iter_t>::difference_type on_proc
+        = std::distance(local_size_sums.begin(), ub);
+
+      requested_ids[on_proc].push_back(indices[i]);
+      local_requested_ids[on_proc].push_back(i);
+    }
+
+  // First trade indices, then trade values with all other processors.
+  for (processor_id_type pid=0; pid<this->n_processors(); pid++)
+    {
+      // Another data structure which holds the ids that other processors request us to fill.
+      std::vector<numeric_index_type> requests_for_me_to_fill;
+
+      // Trade my requests with processor procup and procdown
+      const processor_id_type procup = (this->processor_id() + pid) % this->n_processors();
+      const processor_id_type procdown = (this->n_processors() + this->processor_id() - pid) % this->n_processors();
+
+      this->comm().send_receive (procup,   requested_ids[procup],
+                                 procdown, requests_for_me_to_fill);
+
+      // The first send/receive we did was for indices, the second one will be
+      // for corresponding floating point values, so create storage for that now...
+      std::vector<T> values_to_send(requests_for_me_to_fill.size());
+
+      for (std::size_t i=0; i<requests_for_me_to_fill.size(); i++)
+        {
+          // The index of the requested value
+          const numeric_index_type requested_index = requests_for_me_to_fill[i];
+
+          // Transform into local numbering, and get requested value.
+          values_to_send[i] = _values[requested_index - _first_local_index];
+        }
+
+      // Send the values we were supposed to send, receive the values
+      // we were supposed to receive.
+      std::vector<T> values_to_receive(requested_ids[procup].size());
+      this->comm().send_receive (procdown, values_to_send,
+                                 procup,   values_to_receive);
+
+      // Error checking: make sure that requested_ids[procup] is same
+      // length as values_to_receive.
+      if (requested_ids[procup].size() != values_to_receive.size())
+        libmesh_error_msg("Requested " << requested_ids[procup].size() << " values, but received " << values_to_receive.size() << " values.");
+
+      // Now write the received values to the appropriate place(s) in v_local
+      for (std::size_t i=0; i<values_to_receive.size(); i++)
+        {
+          // Get the index in v_local where this value needs to be inserted.
+          numeric_index_type local_requested_index = local_requested_ids[procup][i];
+
+          // Actually set the value in v_local
+          v_local[local_requested_index] = values_to_receive[i];
+        }
+   }
+}
+
+
+
+template <typename T>
 void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
                                      const numeric_index_type last_local_idx,
                                      const std::vector<numeric_index_type> & send_list)
