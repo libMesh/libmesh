@@ -283,14 +283,15 @@ AC_DEFUN([CONFIGURE_PETSC],
           CFLAGS="$saveCFLAGS"
 
           AC_LANG_POP([C])
+        fi # if (test $enablepetsc != no)
 
-        else
+        if (test $enablepetsc = no); then
           # PETSc config failed.  Try MPI, unless directed otherwise
           if (test "$enablempi" != no); then
             AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
             ACX_MPI
           fi
-        fi # if (test $enablepetsc != no)
+        fi # if (test $enablepetsc = no)
     else
         # PETSc config failed.  Try MPI, unless directed otherwise
     if (test "$enablempi" != no); then
