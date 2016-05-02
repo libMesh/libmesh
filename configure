@@ -34160,81 +34160,81 @@ $as_echo "<<< Could not find a viable PETSc Makefile to determine PETSC_CC_INCLU
         # We can skip the rest of the tests because they aren't going to pass
         if (test $enablepetsc != no) ; then
 
-        # Debugging: see what actually got set for PETSCINCLUDEDIRS
-        # echo ""
-        # echo "PETSCLINKLIBS=$PETSCLINKLIBS"
-        # echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
-        # echo ""
+          # Debugging: see what actually got set for PETSCINCLUDEDIRS
+          # echo ""
+          # echo "PETSCLINKLIBS=$PETSCLINKLIBS"
+          # echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
+          # echo ""
 
-        # We sometimes need the full CC_INCLUDES to access a
-        # PETSc-snooped MPI
-        PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
+          # We sometimes need the full CC_INCLUDES to access a
+          # PETSc-snooped MPI
+          PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
 
-        # Check for Hypre
-        if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
-          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
-        elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
-          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
-        elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
-          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
-        fi
+          # Check for Hypre
+          if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
+          elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+          elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
+          fi
 
-        if test "x$HYPRE_LIB" != x ; then
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Hypre support >>>" >&5
+          if test "x$HYPRE_LIB" != x ; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Hypre support >>>" >&5
 $as_echo "<<< Configuring library with Hypre support >>>" >&6; }
-        fi
+          fi
 
-        # Try to compile a trivial PETSc program to check our
-        # configuration... this should handle cases where we slipped
-        # by the tests above with an invalid PETSCINCLUDEDIRS
-        # variable, which happened when PETSc 3.6 came out.
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can compile a trivial PETSc program" >&5
+          # Try to compile a trivial PETSc program to check our
+          # configuration... this should handle cases where we slipped
+          # by the tests above with an invalid PETSCINCLUDEDIRS
+          # variable, which happened when PETSc 3.6 came out.
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can compile a trivial PETSc program" >&5
 $as_echo_n "checking whether we can compile a trivial PETSc program... " >&6; }
-        ac_ext=cpp
+          ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-        # Save the original CXXFLAGS contents
-        saveCXXFLAGS="$CXXFLAGS"
+          # Save the original CXXFLAGS contents
+          saveCXXFLAGS="$CXXFLAGS"
 
-        # Append PETSc include paths to the CXXFLAGS variables
-        CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS"
+          # Append PETSc include paths to the CXXFLAGS variables
+          CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS"
 
-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <petsc.h>
-        static char help[]="";
+          #include <petsc.h>
+          static char help[]="";
 
-        int main(int argc, char **argv)
-        {
-          PetscInitialize(&argc, &argv, (char*)0,help);
-          PetscFinalize();
-          return 0;
-        }
+          int main(int argc, char **argv)
+          {
+            PetscInitialize(&argc, &argv, (char*)0,help);
+            PetscFinalize();
+            return 0;
+          }
 
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 else
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-          enablepetsc=no
+            enablepetsc=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-        # Return CXXFLAGS to their original state.
-        CXXFLAGS="$saveCXXFLAGS"
+          # Return CXXFLAGS to their original state.
+          CXXFLAGS="$saveCXXFLAGS"
 
-        ac_ext=cpp
+          ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -34242,65 +34242,66 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-        # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
-        petsc_have_tao=no
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TAO support via PETSc" >&5
+          # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
+          petsc_have_tao=no
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TAO support via PETSc" >&5
 $as_echo_n "checking for TAO support via PETSc... " >&6; }
-        ac_ext=c
+          ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-        # Save the original CFLAGS contents
-        saveCFLAGS="$CFLAGS"
+          # Save the original CFLAGS contents
+          saveCFLAGS="$CFLAGS"
 
-        # Append PETSc include paths to the CFLAGS variables
-        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+          # Append PETSc include paths to the CFLAGS variables
+          CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
 
-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-        #include <petsctao.h>
-        static char help[]="";
+          #include <petsctao.h>
+          static char help[]="";
 
-        int main(int argc, char **argv)
-        {
-          Tao tao;
-          PetscInitialize(&argc, &argv, (char*)0,help);
-          TaoCreate(PETSC_COMM_WORLD,&tao);
-          TaoDestroy(&tao);
-          PetscFinalize();
-          return 0;
-        }
+          int main(int argc, char **argv)
+          {
+            Tao tao;
+            PetscInitialize(&argc, &argv, (char*)0,help);
+            TaoCreate(PETSC_COMM_WORLD,&tao);
+            TaoDestroy(&tao);
+            PetscFinalize();
+            return 0;
+          }
 
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-          petsc_have_tao=yes
+            petsc_have_tao=yes
 
 else
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-        # Return C flags to their original state.
-        CFLAGS="$saveCFLAGS"
+          # Return C flags to their original state.
+          CFLAGS="$saveCFLAGS"
 
-        ac_ext=cpp
+          ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+        fi # if (test $enablepetsc != no)
 
-        else
+        if (test $enablepetsc = no); then
           # PETSc config failed.  Try MPI, unless directed otherwise
           if (test "$enablempi" != no); then
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc disabled.  Will try configuring MPI now... >>>" >&5
@@ -34816,7 +34817,7 @@ fi
 
 
           fi
-        fi # if (test $enablepetsc != no)
+        fi # if (test $enablepetsc = no)
     else
         # PETSc config failed.  Try MPI, unless directed otherwise
     if (test "$enablempi" != no); then
