@@ -38480,12 +38480,15 @@ fi
 
   # Conversely, if:
   # .) METIS is enabled in libmesh,
-  # .) PETSc does not have a METIS, and
+  # .) PETSc does not have a METIS or we aren't using PETSc, and
   # .) build_metis=no because user said --with-metis=PETSc,
   # then we need to make sure that libmesh builds its own METIS!
   if (test $enablemetis = yes) ; then
-    if (test $petsc_have_metis -eq 0) ; then
-      if (test $build_metis = no) ; then
+    if (test $build_metis = no) ; then
+      if (test $petsc_have_metis -eq 0) ; then
+        build_metis=yes
+      fi
+      if (test $enablepetsc = no) ; then
         build_metis=yes
       fi
     fi
