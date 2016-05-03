@@ -58,8 +58,8 @@ public:
     for (unsigned int i=0; i<n_elems_per_layer; ++i)
     {
       // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
-      Elem * elem = src_mesh.elem(i);
-      elem->subdomain_id() = i;
+      Elem & elem = src_mesh.elem_ref(i);
+      elem.subdomain_id() = i;
     }
 
     SerialMesh dest_mesh(*TestCommWorld, /*dim=*/3);
@@ -77,9 +77,9 @@ public:
     for (unsigned int i=0; i<n_elems_per_layer * num_layers; ++i)
     {
       // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
-      Elem * elem = dest_mesh.elem(i);
+      Elem & elem = dest_mesh.elem_ref(i);
 
-      CPPUNIT_ASSERT_EQUAL((unsigned int)elem->subdomain_id(), i%n_elems_per_layer + i/n_elems_per_layer /* integer division */);
+      CPPUNIT_ASSERT_EQUAL((unsigned int)elem.subdomain_id(), i%n_elems_per_layer + i/n_elems_per_layer /* integer division */);
     }
   }
 };
