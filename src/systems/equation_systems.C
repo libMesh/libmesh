@@ -852,7 +852,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
               else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
                 for (unsigned int n=0; n<elem->n_nodes(); n++)
                   // Only do this if this variable has NO DoFs at this node... it might have some from an ajoining element...
-                  if(!elem->get_node(n)->n_dofs(sys_num, var))
+                  if(!elem->node_ptr(n)->n_dofs(sys_num, var))
                     for( unsigned int d=0; d < n_vec_dim; d++ )
                       repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
 

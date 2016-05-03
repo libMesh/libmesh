@@ -113,7 +113,7 @@ UniquePtr<Elem> Pyramid::side (const unsigned int i) const
 
   // Set the nodes
   for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
+    face->set_node(n) = this->node_ptr(Pyramid5::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }

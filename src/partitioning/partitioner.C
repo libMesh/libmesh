@@ -524,7 +524,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       // odd numbered".  We'd need to be careful about how that would
       // affect solution ordering for I/O, though.
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
+        elem->node_ptr(n)->processor_id() = std::min(elem->node_ptr(n)->processor_id(),
                                                      elem->processor_id());
     }
 
@@ -541,8 +541,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
-          elem->get_node(n)->processor_id() = elem->processor_id();
+        if (elem->node_ptr(n)->processor_id() == DofObject::invalid_processor_id)
+          elem->node_ptr(n)->processor_id() = elem->processor_id();
     }
 
   // Same for the inactive elements -- we will have already gotten most of these
@@ -560,8 +560,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        if (elem->get_node(n)->processor_id() == DofObject::invalid_processor_id)
-          elem->get_node(n)->processor_id() = elem->processor_id();
+        if (elem->node_ptr(n)->processor_id() == DofObject::invalid_processor_id)
+          elem->node_ptr(n)->processor_id() = elem->processor_id();
     }
 
   // We can't assert that all nodes are connected to elements, because

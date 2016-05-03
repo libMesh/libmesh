@@ -740,10 +740,10 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
 #endif
                 new_mesh.add_point (old_elem->point(n),
                                     node_id,
-                                    old_elem->get_node(n)->processor_id());
+                                    old_elem->node_ptr(n)->processor_id());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              newn->set_unique_id() = old_elem->get_node(n)->unique_id();
+              newn->set_unique_id() = old_elem->node_ptr(n)->unique_id();
 #endif
             }
 

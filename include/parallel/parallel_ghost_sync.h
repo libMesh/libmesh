@@ -482,7 +482,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->get_node(n);
+          const Node * node = elem->node_ptr(n);
 
           const processor_id_type proc_id = node->processor_id();
           if (proc_id == comm.rank() ||
@@ -531,7 +531,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->get_node(n);
+          const Node * node = elem->node_ptr(n);
           const dof_id_type node_id = node->id();
 
           const processor_id_type proc_id = node->processor_id();
@@ -587,7 +587,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
           const unsigned int n = request_to_fill_node_num[i];
           libmesh_assert_less (n, elem->n_nodes());
 
-          Node * node = elem->get_node(n);
+          Node * node = elem->node_ptr(n);
           libmesh_assert(node);
 
           // This isn't a safe assertion in the case where we're

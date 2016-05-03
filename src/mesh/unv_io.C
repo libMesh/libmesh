@@ -1195,7 +1195,7 @@ void UNVIO::elements_out(std::ostream & out_file)
           // assign_elem_nodes[j]-th node: i.e., j loops over the
           // libMesh numbering, and assign_elem_nodes[j] over the
           // UNV numbering.
-          const Node * node_in_unv_order = elem->get_node(assign_elem_nodes[j]);
+          const Node * node_in_unv_order = elem->node_ptr(assign_elem_nodes[j]);
 
           // new record after 8 id entries
           if (j==8 || j==16)

@@ -183,7 +183,7 @@ UniquePtr<Elem> InfQuad6::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(InfQuad6::side_nodes_map[i][n]);
+        edge->set_node(n) = this->node_ptr(InfQuad6::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }

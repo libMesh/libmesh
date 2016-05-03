@@ -115,7 +115,7 @@ UniquePtr<Elem> InfPrism::side (const unsigned int i) const
 
   // Set the nodes
   for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(InfPrism6::side_nodes_map[i][n]);
+    face->set_node(n) = this->node_ptr(InfPrism6::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }

@@ -368,7 +368,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
 
       for(unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
-          Node * node_ptr = old_elem->get_node(n);
+          Node * node_ptr = old_elem->node_ptr(n);
           dof_id_type old_node_id = node_ptr->id();
 
           // Check if this node has already been added. This

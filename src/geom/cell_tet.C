@@ -70,7 +70,7 @@ UniquePtr<Elem> Tet::side (const unsigned int i) const
   Elem * face = new Tri3;
 
   for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);
+    face->set_node(n) = this->node_ptr(Tet4::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }

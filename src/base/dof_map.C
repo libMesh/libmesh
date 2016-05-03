@@ -494,7 +494,7 @@ void DofMap::reinit(MeshBase & mesh)
 
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
-            Node * node = elem->get_node(n);
+            Node * node = elem->node_ptr(n);
 
             if (node->old_dof_object == libmesh_nullptr)
               if (node->has_dofs(sys_num))
@@ -613,7 +613,7 @@ void DofMap::reinit(MeshBase & mesh)
           // Allocate the vertex DOFs
           for (unsigned int n=0; n<elem->n_nodes(); n++)
             {
-              Node * node = elem->get_node(n);
+              Node * node = elem->node_ptr(n);
 
               if (elem->is_vertex(n))
                 {
@@ -673,7 +673,7 @@ void DofMap::reinit(MeshBase & mesh)
           // Allocate the edge and face DOFs
           for (unsigned int n=0; n<elem->n_nodes(); n++)
             {
-              Node * node = elem->get_node(n);
+              Node * node = elem->node_ptr(n);
 
               const unsigned int old_node_dofs =
                 node->n_comp_group(sys_num, vg);
@@ -1025,7 +1025,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           // First get any new nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
-              Node * node = elem->get_node(n);
+              Node * node = elem->node_ptr(n);
 
               if (node->processor_id() < this->processor_id())
                 continue;
@@ -1112,7 +1112,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
       // First number the nodal DOFS
       for (unsigned int n=0; n<n_nodes; n++)
         {
-          Node * node = elem->get_node(n);
+          Node * node = elem->node_ptr(n);
 
           for (unsigned vg=0; vg<n_var_groups; vg++)
             {
@@ -1283,7 +1283,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
           // First number the nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
-              Node * node = elem->get_node(n);
+              Node * node = elem->node_ptr(n);
 
               // assign dof numbers (all at once) if this is
               // our node and if they aren't already there
@@ -1451,7 +1451,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           // This is necessary in case those dofs are *not* also dofs
           // on neighbors; e.g. in the case of a HIERARCHIC's local
           // side which is only a vertex on the neighbor that owns it.
-          const Node * node = elem->get_node(n);
+          const Node * node = elem->node_ptr(n);
           const unsigned n_vars = node->n_vars(sys_num);
           for (unsigned int v=0; v != n_vars; ++v)
             {
@@ -2170,7 +2170,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
       // All other FE use only the nodes of elem itself
       elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->get_node(i);
+        elem_nodes[i] = elem->node_ptr(i);
     }
 
   // Get the dof numbers

@@ -140,7 +140,7 @@ UniquePtr<Elem> Tet4::build_side (const unsigned int i,
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);
+        face->set_node(n) = this->node_ptr(Tet4::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }
@@ -438,14 +438,14 @@ dof_id_type Tet4::key () const
 // {
 //   /* Second time, so we know now which node to
 //      use.  */
-//   child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
+//   child->set_node(nc) = this->child(n)->node_ptr(first_05_in_embedding_matrix);
 // }
 //
 //     }
 // }
 //
 //       /* Make sure that a node has been found.  */
-//       libmesh_assert(child->get_node(nc));
+//       libmesh_assert(child->node_ptr(nc));
 //     }
 // }
 //     }

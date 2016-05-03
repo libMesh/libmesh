@@ -750,12 +750,12 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                       {
                       case 0:
                         // The other node is a nodal neighbor
-                        neighbor_set.insert(elem->get_node(1));
+                        neighbor_set.insert(elem->node_ptr(1));
                         break;
 
                       case 1:
                         // The other node is a nodal neighbor
-                        neighbor_set.insert(elem->get_node(0));
+                        neighbor_set.insert(elem->node_ptr(0));
                         break;
 
                       default:
@@ -771,13 +771,13 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                         // The outside nodes have node 2 as a neighbor
                       case 0:
                       case 1:
-                        neighbor_set.insert(elem->get_node(2));
+                        neighbor_set.insert(elem->node_ptr(2));
                         break;
 
                         // The middle node has the outer nodes as neighbors
                       case 2:
-                        neighbor_set.insert(elem->get_node(0));
-                        neighbor_set.insert(elem->get_node(1));
+                        neighbor_set.insert(elem->node_ptr(0));
+                        neighbor_set.insert(elem->node_ptr(1));
                         break;
 
                       default:
@@ -792,24 +792,24 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                       {
                       case 0:
                         // The left-middle node is a nodal neighbor
-                        neighbor_set.insert(elem->get_node(2));
+                        neighbor_set.insert(elem->node_ptr(2));
                         break;
 
                       case 1:
                         // The right-middle node is a nodal neighbor
-                        neighbor_set.insert(elem->get_node(3));
+                        neighbor_set.insert(elem->node_ptr(3));
                         break;
 
                         // The left-middle node
                       case 2:
-                        neighbor_set.insert(elem->get_node(0));
-                        neighbor_set.insert(elem->get_node(3));
+                        neighbor_set.insert(elem->node_ptr(0));
+                        neighbor_set.insert(elem->node_ptr(3));
                         break;
 
                         // The right-middle node
                       case 3:
-                        neighbor_set.insert(elem->get_node(1));
-                        neighbor_set.insert(elem->get_node(2));
+                        neighbor_set.insert(elem->node_ptr(1));
+                        neighbor_set.insert(elem->node_ptr(2));
                         break;
 
                       default:
@@ -848,7 +848,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                          (elem->node(other_node_this_edge) != global_id))               // But not the original node
                       {
                         // We've found a nodal neighbor!  Save a pointer to it..
-                        node_to_save = elem->get_node(other_node_this_edge);
+                        node_to_save = elem->node_ptr(other_node_this_edge);
                         break;
                       }
 
@@ -994,7 +994,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       Elem * elem = *e_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          Node * node = elem->get_node(n);
+          Node * node = elem->node_ptr(n);
           node->invalidate_processor_id();
         }
     }
@@ -1007,7 +1007,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       processor_id_type proc_id = elem->processor_id();
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          Node * node = elem->get_node(n);
+          Node * node = elem->node_ptr(n);
           if (node->processor_id() == DofObject::invalid_processor_id ||
               node->processor_id() > proc_id)
             node->processor_id() = proc_id;
@@ -1078,9 +1078,9 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->get_node(n);
+          const Node * node = elem->node_ptr(n);
           if (node->has_dofs())
-            libmesh_assert(elem->get_node(n)->old_dof_object);
+            libmesh_assert(elem->node_ptr(n)->old_dof_object);
         }
     }
 }
@@ -1259,7 +1259,7 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
       libmesh_assert (elem);
 
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        used_nodes.insert(elem->get_node(n));
+        used_nodes.insert(elem->node_ptr(n));
     }
 
   const MeshBase::const_node_iterator node_end = mesh.nodes_end();
@@ -1465,7 +1465,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase & mesh)
 
       for (unsigned int i=0; i != elem->n_nodes(); ++i)
         {
-          const Node * node = elem->get_node(i);
+          const Node * node = elem->node_ptr(i);
           dof_id_type nodeid = node->id();
           node_touched_by_me[nodeid] = true;
         }

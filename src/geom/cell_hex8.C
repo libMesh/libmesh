@@ -131,7 +131,7 @@ UniquePtr<Elem> Hex8::build_side (const unsigned int i,
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Hex8::side_nodes_map[i][n]);
+        face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }

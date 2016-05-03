@@ -164,8 +164,8 @@ void ElemCutter::find_intersection_points(const Elem & elem,
 
       // find the element nodes el0, el1 that map
       unsigned int
-        el0 = elem.get_node_index(edge->get_node(0)),
-        el1 = elem.get_node_index(edge->get_node(1));
+        el0 = elem.get_node_index(edge->node_ptr(0)),
+        el1 = elem.get_node_index(edge->node_ptr(1));
 
       libmesh_assert (elem.is_vertex(el0));
       libmesh_assert (elem.is_vertex(el1));

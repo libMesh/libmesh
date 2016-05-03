@@ -97,7 +97,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
 
       for (unsigned int node_id=0; node_id<elem->n_nodes(); node_id++)
         {
-          Node * node = elem->get_node(node_id);
+          Node * node = elem->node_ptr(node_id);
 
           if (encountered_node_ids.find(node->id()) != encountered_node_ids.end())
             continue;

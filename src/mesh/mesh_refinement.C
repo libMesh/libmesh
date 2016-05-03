@@ -112,7 +112,7 @@ Node * MeshRefinement::add_node(const Elem & parent,
   unsigned int parent_n = parent.as_parent_node(child, node);
 
   if (parent_n != libMesh::invalid_uint)
-    return parent.get_node(parent_n);
+    return parent.node_ptr(parent_n);
 
   const std::vector<std::pair<dof_id_type, dof_id_type> >
     bracketing_nodes = parent.bracketing_nodes(child, node);

@@ -167,7 +167,7 @@ UniquePtr<Elem> Prism6::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Prism6::side_nodes_map[i][n]);
+        face->set_node(n) = this->node_ptr(Prism6::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }

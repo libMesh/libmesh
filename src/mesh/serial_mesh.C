@@ -668,7 +668,7 @@ void SerialMesh::renumber_nodes_and_elements ()
             {
               // Add this elements nodes to the connected list
               for (unsigned int n=0; n<el->n_nodes(); n++)
-                connected_nodes.insert(el->get_node(n));
+                connected_nodes.insert(el->node_ptr(n));
             }
           else  // We DO want node renumbering
             {
@@ -1260,8 +1260,8 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
           unsigned int other_n_nodes = other_elem->n_nodes();
           for (unsigned int n=0; n != other_n_nodes; ++n)
             {
-              other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n), bc_ids);
-              this->get_boundary_info().add_node(this_elem->get_node(n), bc_ids);
+              other_mesh->get_boundary_info().boundary_ids(other_elem->node_ptr(n), bc_ids);
+              this->get_boundary_info().add_node(this_elem->node_ptr(n), bc_ids);
             }
 
           // Copy edge boundary info
@@ -1311,7 +1311,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
 
           // We also need to copy over the nodeset info here,
           // because the node will get deleted below
-          this->get_boundary_info().boundary_ids(el->get_node(local_node_index), bc_ids);
+          this->get_boundary_info().boundary_ids(el->node_ptr(local_node_index), bc_ids);
           el->set_node(local_node_index) = &target_node;
           this->get_boundary_info().add_node(&target_node, bc_ids);
         }

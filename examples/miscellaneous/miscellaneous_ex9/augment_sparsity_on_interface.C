@@ -144,7 +144,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
         // These will be used to augment the sparsity patttern.
         for (unsigned int n=0; n<neighbor_elem->n_nodes(); n++)
           {
-            const dof_id_type global_dof_number = neighbor_elem->get_node(n)->dof_number(sys_num, var_num, 0);
+            const dof_id_type global_dof_number = neighbor_elem->node_ptr(n)->dof_number(sys_num, var_num, 0);
 
             // and finally insert it into one of the sets
             if ((global_dof_number <  dof_map.first_dof()) ||
@@ -164,7 +164,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
         for (unsigned int nl=0; nl<this_elem->n_nodes(); nl++)
           {
             const dof_id_type
-              global_dof_number = this_elem->get_node(nl)->dof_number(sys_num, var_num, 0),
+              global_dof_number = this_elem->node_ptr(nl)->dof_number(sys_num, var_num, 0),
               n_local_dofs      = dof_map.n_local_dofs(),
               n_remote_dofs     = dof_map.n_dofs() - n_local_dofs;
 

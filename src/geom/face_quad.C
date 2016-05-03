@@ -77,7 +77,7 @@ UniquePtr<Elem> Quad::side (const unsigned int i) const
   Elem * edge = new Edge2;
 
   for (unsigned n=0; n<edge->n_nodes(); ++n)
-    edge->set_node(n) = this->get_node(Quad4::side_nodes_map[i][n]);
+    edge->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(edge);
 }

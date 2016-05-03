@@ -141,7 +141,7 @@ void Elem::coarsen()
               //Move the existing node back into it's original location
               for(unsigned int i=0; i<LIBMESH_DIM; i++)
                 {
-                  Point & child_node = *(mychild->get_node(nc));
+                  Point & child_node = *(mychild->node_ptr(nc));
                   child_node(i)=new_pos(i);
                 }
             }

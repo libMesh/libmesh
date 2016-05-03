@@ -276,7 +276,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         for(unsigned int n=0; n != elem->n_nodes(); ++n)
           {
             // Get a pointer to the current node
-            Node * node = elem->get_node(n);
+            Node * node = elem->node_ptr(n);
 
             // Get the id of this node
             dof_id_type node_id = node->id();

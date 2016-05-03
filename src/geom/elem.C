@@ -1084,8 +1084,8 @@ void Elem::libmesh_assert_valid_node_pointers() const
   libmesh_assert(this->valid_id());
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     {
-      libmesh_assert(this->get_node(n));
-      libmesh_assert(this->get_node(n)->valid_id());
+      libmesh_assert(this->node_ptr(n));
+      libmesh_assert(this->node_ptr(n)->valid_id());
     }
 }
 
@@ -2376,7 +2376,7 @@ std::string Elem::get_info () const
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    oss << "    " << n << *this->get_node(n);
+    oss << "    " << n << *this->node_ptr(n);
 
   oss << "   n_sides()=" << this->n_sides()                        << '\n';
 

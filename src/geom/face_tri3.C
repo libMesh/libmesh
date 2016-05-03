@@ -121,7 +121,7 @@ UniquePtr<Elem> Tri3::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(Tri3::side_nodes_map[i][n]);
+        edge->set_node(n) = this->node_ptr(Tri3::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }
@@ -172,9 +172,9 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
 Real Tri3::volume () const
 {
   // 3-node triangles have the following formula for computing the area
-  Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
+  Point v10 ( *(this->node_ptr(1)) - *(this->node_ptr(0)) );
 
-  Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
+  Point v20 ( *(this->node_ptr(2)) - *(this->node_ptr(0)) );
 
   return 0.5 * (v10.cross(v20)).norm() ;
 }

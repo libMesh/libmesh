@@ -228,7 +228,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
               const Elem * elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert (elem->get_node(n));
+                connected_nodes.insert (elem->node_ptr(n));
             }
         }
 
@@ -242,7 +242,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
               const Elem * elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
-                if (connected_nodes.count(elem->get_node(n)))
+                if (connected_nodes.count(elem->node_ptr(n)))
                   {
                     elements_to_send.insert (elem);
 
@@ -268,7 +268,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
               const Elem * elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert(elem->get_node(n));
+                connected_nodes.insert(elem->node_ptr(n));
             }
         }
 
@@ -675,7 +675,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
                           elements_to_send.insert (elem);
 
                           for (unsigned int n=0; n<elem->n_nodes(); n++)
-                            connected_nodes.insert (elem->get_node(n));
+                            connected_nodes.insert (elem->node_ptr(n));
                         }
                     }
                 }

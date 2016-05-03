@@ -186,7 +186,7 @@ public:
    * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
    * to \p * this->n_vertices().  For linear elements this returns 0,0.
    * On refined second order elements, the return value will satisfy
-   * \p this->get_node(n)==this->child(c)->get_node(v)
+   * \p this->node_ptr(n)==this->child(c)->node_ptr(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const libmesh_override;

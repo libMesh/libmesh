@@ -159,7 +159,7 @@ UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(InfHex8::side_nodes_map[i][n]);
+        face->set_node(n) = this->node_ptr(InfHex8::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }

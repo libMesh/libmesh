@@ -189,7 +189,7 @@ UniquePtr<Elem> Tri6::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(Tri6::side_nodes_map[i][n]);
+        edge->set_node(n) = this->node_ptr(Tri6::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }

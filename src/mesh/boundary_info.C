@@ -440,7 +440,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           // the same local index.
           bool found_child = false;
           for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
-            if (new_elem->get_node(v) == side_parent->get_node(v))
+            if (new_elem->node_ptr(v) == side_parent->node_ptr(v))
               {
                 side_parent->add_child(new_elem, v);
                 found_child = true;
@@ -1485,7 +1485,7 @@ BoundaryInfo::build_node_list_from_side_list()
 
           // Add each node node on the side with the side's boundary id
           for (unsigned int i=0; i<side->n_nodes(); i++)
-            this->add_node(side->get_node(i), pos->second.second);
+            this->add_node(side->node_ptr(i), pos->second.second);
         }
     }
 }
@@ -1517,7 +1517,7 @@ void BoundaryInfo::build_side_list_from_node_list()
           std::map<boundary_id_type, unsigned> nodesets_node_count;
           for (unsigned node_num=0; node_num < side_elem->n_nodes(); ++node_num)
             {
-              Node * node = side_elem->get_node(node_num);
+              Node * node = side_elem->node_ptr(node_num);
               std::pair<boundary_node_iter, boundary_node_iter>
                 range = _boundary_node_id.equal_range(node);
 
@@ -1936,7 +1936,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                 UniquePtr<Elem> side (elem->build_side(s));
                 for (unsigned int n = 0; n != side->n_nodes(); ++n)
                   {
-                    Node * node = side->get_node(n);
+                    Node * node = side->node_ptr(n);
                     libmesh_assert(node);
 
                     // In parallel we don't know enough to number

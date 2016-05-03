@@ -476,7 +476,7 @@ int main (int argc, char ** argv)
           if (elem->is_node_on_side(n, side_max_x) &&
               elem->is_node_on_side(n, side_max_y) &&
               elem->is_node_on_side(n, side_max_z))
-            mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+            mesh.get_boundary_info().add_node(elem->node_ptr(n), NODE_BOUNDARY_ID);
 
 
       // If elem has sides on boundaries

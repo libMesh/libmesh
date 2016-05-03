@@ -474,7 +474,7 @@ private:
         // also independently check whether the nodes have been requested
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            boundary_info.boundary_ids (elem->get_node(n), ids_vec);
+            boundary_info.boundary_ids (elem->node_ptr(n), ids_vec);
 
             for (std::vector<boundary_id_type>::iterator bc_it = ids_vec.begin();
                  bc_it != ids_vec.end(); ++bc_it)
@@ -2523,7 +2523,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            const Node * node = elem->get_node(n);
+            const Node * node = elem->node_ptr(n);
             const unsigned int n_vars = node->n_vars(sys_num);
             for (unsigned int v=0; v != n_vars; ++v)
               {
@@ -2540,7 +2540,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
-          if (this->is_constrained_node(elem->get_node(n)))
+          if (this->is_constrained_node(elem->node_ptr(n)))
             pushed_node_ids[elem->processor_id()].insert(elem->node(n));
 #endif
       }
@@ -3731,7 +3731,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
   for (unsigned int n = 0; n != n_nodes; ++n)
     if (elem->is_node_on_side(n, s))
       {
-        const Node * const node = elem->get_node(n);
+        const Node * const node = elem->node_ptr(n);
         const unsigned int low_nc =
           FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
         const unsigned int high_nc =

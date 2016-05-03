@@ -1950,7 +1950,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                       if (!elem->is_node_on_side(n,s))
                         continue;
 
-                      const Node * my_node = elem->get_node(n);
+                      const Node * my_node = elem->node_ptr(n);
 
                       if (elem->is_vertex(n))
                         {
@@ -2088,11 +2088,11 @@ compute_periodic_constraints (DofConstraints & constraints,
                                 {
                                   if (e1 == libmesh_nullptr)
                                     {
-                                      e1 = elem->get_node(nn);
+                                      e1 = elem->node_ptr(nn);
                                     }
                                   else
                                     {
-                                      e2 = elem->get_node(nn);
+                                      e2 = elem->node_ptr(nn);
                                       break;
                                     }
                                 }

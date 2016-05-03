@@ -609,17 +609,17 @@ void assemble_shell (EquationSystems & es,
            *      n1
            */
           Node * nodes [4]; // n1, n2, n3, n4
-          nodes[1] = gh_elem->get_node(s); // n2
-          nodes[2] = gh_elem->get_node(MeshTools::Subdivision::next[s]); // n3
-          nodes[3] = gh_elem->get_node(MeshTools::Subdivision::prev[s]); // n4
+          nodes[1] = gh_elem->node_ptr(s); // n2
+          nodes[2] = gh_elem->node_ptr(MeshTools::Subdivision::next[s]); // n3
+          nodes[3] = gh_elem->node_ptr(MeshTools::Subdivision::prev[s]); // n4
 
           // The node in the interior of the domain, n1, is the
           // hardest to find.  Walk along the edges of element nb until
           // we have identified it.
           unsigned int n_int = 0;
-          nodes[0] = nb_elem->get_node(0);
+          nodes[0] = nb_elem->node_ptr(0);
           while (nodes[0]->id() == nodes[1]->id() || nodes[0]->id() == nodes[2]->id())
-            nodes[0] = nb_elem->get_node(++n_int);
+            nodes[0] = nb_elem->node_ptr(++n_int);
 
           // The penalty value.  \f$ \frac{1}{\epsilon} \f$
           const Real penalty = 1.e10;
