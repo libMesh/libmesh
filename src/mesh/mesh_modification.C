@@ -75,14 +75,14 @@ void MeshTools::Modification::distort (MeshBase & mesh,
   // First find nodes on the boundary and flag them
   // so that we don't move them
   // on_boundary holds false (not on boundary) and true (on boundary)
-  std::vector<bool> on_boundary (mesh.n_nodes(), false);
+  std::vector<bool> on_boundary (mesh.max_node_id(), false);
 
   if (!perturb_boundary) MeshTools::find_boundary_nodes (mesh, on_boundary);
 
   // Now calculate the minimum distance to
   // neighboring nodes for each node.
   // hmin holds these distances.
-  std::vector<float> hmin (mesh.n_nodes(),
+  std::vector<float> hmin (mesh.max_node_id(),
                            std::numeric_limits<float>::max());
 
   MeshBase::element_iterator       el  = mesh.active_elements_begin();
@@ -109,7 +109,7 @@ void MeshTools::Modification::distort (MeshBase & mesh,
     // then we should not move it.
     // [Note: Testing for (in)equality might be wrong
     // (different types, namely float and double)]
-    for (unsigned int n=0; n<mesh.n_nodes(); n++)
+    for (unsigned int n=0; n<mesh.max_node_id(); n++)
       if (!on_boundary[n] && (hmin[n] < 1.e20) )
         {
           // the direction, random but unit normalized
@@ -131,7 +131,7 @@ void MeshTools::Modification::distort (MeshBase & mesh,
 
           dir = dir.unit();
 
-          Node * node = mesh.node_ptr(n);
+          Node * node = mesh.query_node_ptr(n);
           if (!node)
             continue;
 
