@@ -241,7 +241,7 @@ public:
    * There is no reason for a user to ever call this function.
    *
    * This function restores a previously broken element/node numbering such that
-   * \p mesh.node(n)->id() == n.
+   * \p mesh.node_ref(n).id() == n.
    */
   virtual void fix_broken_node_and_element_numbering () libmesh_override;
 

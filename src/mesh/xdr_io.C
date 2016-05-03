@@ -1648,7 +1648,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
           if (pos.first != pos.second) // we need this node.
             {
               libmesh_assert_equal_to (*pos.first, n);
-              mesh.node(cast_int<dof_id_type>(n)) =
+              mesh.node_ref(cast_int<dof_id_type>(n)) =
                 Point (coords[idx+0],
                        coords[idx+1],
                        coords[idx+2]);
@@ -1716,10 +1716,10 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
                 {
                   libmesh_assert_equal_to (*pos.first, n);
                   if (_field_width == 8)
-                    mesh.node(cast_int<dof_id_type>(n)).set_unique_id()
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
                       = unique_64[idx];
                   else
-                    mesh.node(cast_int<dof_id_type>(n)).set_unique_id()
+                    mesh.node_ref(cast_int<dof_id_type>(n)).set_unique_id()
                       = unique_32[idx];
                 }
             }
@@ -1962,7 +1962,7 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
 #endif
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
-    conn.push_back (elem->node(n));
+    conn.push_back (elem->node_id(n));
 }
 
 } // namespace libMesh

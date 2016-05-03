@@ -61,7 +61,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
         it != semi_local_nodes.end();
         ++it)
       {
-        const Node & node = mesh.node(*it);
+        const Node & node = mesh.node_ref(*it);
 
         vertices[i] = node.id();
 
@@ -94,7 +94,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
         elements[i] = elem.id();
 
         for(unsigned int j=0; j<n_nodes_per_elem; j++)
-          connectivity[(j*n_local_elem)+i] = elem.node(j);
+          connectivity[(j*n_local_elem)+i] = elem.node_id(j);
 
         i++;
       }
@@ -214,7 +214,7 @@ DTKAdapter::update_variable_values(std::string var_name)
   for(FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
     {
       unsigned int node_num = vertices[i];
-      const Node & node = mesh.node(node_num);
+      const Node & node = mesh.node_ref(node_num);
 
       if(node.processor_id() == sys->processor_id())
         {
@@ -287,7 +287,7 @@ DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
       const Elem & elem = *(*it);
 
       for(unsigned int j=0; j<elem.n_nodes(); j++)
-        semi_local_nodes.insert(elem.node(j));
+        semi_local_nodes.insert(elem.node_id(j));
     }
 }
 

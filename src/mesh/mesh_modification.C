@@ -48,10 +48,10 @@ namespace
                             unsigned int diag_2_node_1,
                             unsigned int diag_2_node_2)
     {
-      return ((elem->node(diag_1_node_1) > elem->node(diag_2_node_1) &&
-               elem->node(diag_1_node_1) > elem->node(diag_2_node_2)) ||
-              (elem->node(diag_1_node_2) > elem->node(diag_2_node_1) &&
-               elem->node(diag_1_node_2) > elem->node(diag_2_node_2)));
+      return ((elem->node_id(diag_1_node_1) > elem->node_id(diag_2_node_1) &&
+               elem->node_id(diag_1_node_1) > elem->node_id(diag_2_node_2)) ||
+              (elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_1) &&
+               elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_2)));
     }
 
 }
@@ -90,8 +90,8 @@ void MeshTools::Modification::distort (MeshBase & mesh,
 
   for (; el!=end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-      hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
-                                      static_cast<float>((*el)->hmin()));
+      hmin[(*el)->node_id(n)] = std::min(hmin[(*el)->node_id(n)],
+                                         static_cast<float>((*el)->hmin()));
 
 
   // Now actually move the nodes
@@ -204,13 +204,13 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 //   const Real  a = alpha/180.*pi;
 //   for (unsigned int n=0; n<mesh.n_nodes(); n++)
 //     {
-//       const Point p = mesh.node(n);
+//       const Point p = mesh.node_ref(n);
 //       const Real  x = p(0);
 //       const Real  y = p(1);
 //       const Real  z = p(2);
-//       mesh.node(n) = Point(std::cos(a)*x - std::sin(a)*y,
-//                            std::sin(a)*x + std::cos(a)*y,
-//                            z);
+//       mesh.node_ref(n) = Point(std::cos(a)*x - std::sin(a)*y,
+//                                std::sin(a)*x + std::cos(a)*y,
+//                                z);
 //     }
 
 // }
@@ -381,7 +381,7 @@ void UnstructuredMesh::all_first_order ()
       for (unsigned int v=0; v < so_elem->n_vertices(); v++)
         {
           lo_elem->set_node(v) = so_elem->node_ptr(v);
-          node_touched_by_me[lo_elem->node(v)] = true;
+          node_touched_by_me[lo_elem->node_id(v)] = true;
         }
 
       /**
@@ -607,7 +607,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
           for (unsigned int v=0; v<n_adjacent_vertices; v++)
             adjacent_vertices_ids[v] =
-              so_elem->node( so_elem->second_order_adjacent_vertex(son,v) );
+              so_elem->node_id( so_elem->second_order_adjacent_vertex(son,v) );
 
           /*
            * \p adjacent_vertices_ids is now in order of the current
@@ -645,7 +645,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                */
               Node * so_node = this->add_point
                 (new_location, DofObject::invalid_id,
-                 this->node(adjacent_vertices_ids[0]).processor_id());
+                 this->node_ref(adjacent_vertices_ids[0]).processor_id());
 
               /*
                * insert the new node with its defining vertex
@@ -840,10 +840,11 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               subelem[1] = new Tri6;
 
               // Add a new node at the center (vertex average) of the element.
-              Node * new_node = mesh.add_point(.25 * (mesh.node(elem->node(0)) +
-                                                      mesh.node(elem->node(1)) +
-                                                      mesh.node(elem->node(2)) +
-                                                      mesh.node(elem->node(3))),
+              Node * new_node = mesh.add_point(.25 *
+                                               (mesh.node_ref(elem->node_id(0)) +
+                                                mesh.node_ref(elem->node_id(1)) +
+                                                mesh.node_ref(elem->node_id(2)) +
+                                                mesh.node_ref(elem->node_id(3))),
                                                DofObject::invalid_id,
                                                elem->processor_id());
 
@@ -1426,7 +1427,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                     UniquePtr<Elem> elem_side = elem->build_side(sn);
                     std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
                     for (unsigned int esn=0; esn<elem_side_nodes.size(); ++esn)
-                      elem_side_nodes[esn] = elem_side->node(esn);
+                      elem_side_nodes[esn] = elem_side->node_id(esn);
                     std::sort(elem_side_nodes.begin(), elem_side_nodes.end());
 
                     for (unsigned int i=0; i != max_subelems; ++i)
@@ -1444,7 +1445,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                               // original face will not contain the mid-edge node.
                               std::vector<dof_id_type> subside_nodes(subside_elem->n_vertices());
                               for (unsigned int ssn=0; ssn<subside_nodes.size(); ++ssn)
-                                subside_nodes[ssn] = subside_elem->node(ssn);
+                                subside_nodes[ssn] = subside_elem->node_id(ssn);
                               std::sort(subside_nodes.begin(), subside_nodes.end());
 
                               // std::includes returns true if every element of the second sorted range is
@@ -1700,7 +1701,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
              */
             for (unsigned int nid=0; nid<mesh.n_nodes(); ++nid)
               if (!on_boundary[nid] && weight[nid] > 0.)
-                mesh.node(nid) = new_positions[nid]/weight[nid];
+                mesh.node_ref(nid) = new_positions[nid]/weight[nid];
           }
 
           {
@@ -1730,7 +1731,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                       point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
 
                     const dof_id_type id = elem->node_ptr(n)->id();
-                    mesh.node(id) = point/n_adjacent_vertices;
+                    mesh.node_ref(id) = point/n_adjacent_vertices;
                   }
               }
           }

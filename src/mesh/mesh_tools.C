@@ -390,7 +390,7 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
                                      std::vector<bool> & on_boundary)
 {
   // Resize the vector which holds boundary nodes and fill with false.
-  on_boundary.resize(mesh.n_nodes());
+  on_boundary.resize(mesh.max_node_id());
   std::fill(on_boundary.begin(),
             on_boundary.end(),
             false);

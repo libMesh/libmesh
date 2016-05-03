@@ -285,7 +285,7 @@ void CheckpointIO::write_connectivity (Xdr & io) const
           std::vector<largest_id_type> conn_data(n_nodes);
 
           for(unsigned int i=0; i<n_nodes; i++)
-            conn_data[i] = elem.node(i);
+            conn_data[i] = elem.node_id(i);
 
           io.data_stream(&elem_data[0],
                          cast_int<unsigned int>(elem_data.size()),

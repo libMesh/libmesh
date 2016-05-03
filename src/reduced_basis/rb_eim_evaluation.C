@@ -414,8 +414,9 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
           // Assign all the nodes
           for(unsigned int n=0; n<new_elem->n_nodes(); n++)
             {
-              dof_id_type old_node_id = old_elem->node(n);
-              new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
+              dof_id_type old_node_id = old_elem->node_id(n);
+              new_elem->set_node(n) =
+                _interpolation_points_mesh.node_ptr( node_id_map[old_node_id] );
             }
 
           // Just set all proc_ids to 0

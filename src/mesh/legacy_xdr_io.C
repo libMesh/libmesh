@@ -728,7 +728,7 @@ void LegacyXdrIO::write_mesh (const std::string & name,
             non_subactive_weight += elem->n_nodes();
 
             for (unsigned int n=0; n<elem->n_nodes(); ++n)
-              not_subactive_node_ids.insert(elem->node(n));
+              not_subactive_node_ids.insert(elem->node_id(n));
           }
       }
 
@@ -867,14 +867,14 @@ void LegacyXdrIO::write_mesh (const std::string & name,
 
                     // old-style Libmesh and MGF meshes
                     if (orig_type != LegacyXdrIO::LIBM)
-                      connectivity_value = mesh.elem(e)->node(n-nstart);
+                      connectivity_value = mesh.elem(e)->node_id(n-nstart);
 
                     // new-style libMesh meshes: compress the connectivity entries to account for
                     // subactive nodes that will not be in the mesh we write out.
                     else
                       {
                         std::map<dof_id_type, dof_id_type>::iterator pos =
-                          node_map.find(mesh.elem(e)->node(n-nstart));
+                          node_map.find(mesh.elem(e)->node_id(n-nstart));
 
                         libmesh_assert (pos != node_map.end());
 
@@ -920,7 +920,7 @@ void LegacyXdrIO::write_mesh (const std::string & name,
     const std::map<dof_id_type,dof_id_type>::iterator end = node_map.end();
     for (; it != end; ++it)
       {
-        const Point & p = mesh.node((*it).first);
+        const Point & p = mesh.node_ref((*it).first);
 
         coords[lastIndex+0] = p(0);
         coords[lastIndex+1] = p(1);

@@ -507,7 +507,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
         else // !gauss_lobatto_grid
           {
             for (unsigned int p=0; p<mesh.n_nodes(); p++)
-              mesh.node(p)(0) = (mesh.node(p)(0))*(xmax-xmin) + xmin;
+              mesh.node_ref(p)(0) = (mesh.node_ref(p)(0))*(xmax-xmin) + xmin;
           }
 
         // Add sideset names to boundary info
@@ -807,8 +807,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           {
             for (unsigned int p=0; p<mesh.n_nodes(); p++)
               {
-                mesh.node(p)(0) = (mesh.node(p)(0))*(xmax-xmin) + xmin;
-                mesh.node(p)(1) = (mesh.node(p)(1))*(ymax-ymin) + ymin;
+                mesh.node_ref(p)(0) = (mesh.node_ref(p)(0))*(xmax-xmin) + xmin;
+                mesh.node_ref(p)(1) = (mesh.node_ref(p)(1))*(ymax-ymin) + ymin;
               }
           }
 
@@ -1261,9 +1261,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           {
             for (unsigned int p=0; p<mesh.n_nodes(); p++)
               {
-                mesh.node(p)(0) = (mesh.node(p)(0))*(xmax-xmin) + xmin;
-                mesh.node(p)(1) = (mesh.node(p)(1))*(ymax-ymin) + ymin;
-                mesh.node(p)(2) = (mesh.node(p)(2))*(zmax-zmin) + zmin;
+                mesh.node_ref(p)(0) = (mesh.node_ref(p)(0))*(xmax-xmin) + xmin;
+                mesh.node_ref(p)(1) = (mesh.node_ref(p)(1))*(ymax-ymin) + ymin;
+                mesh.node_ref(p)(2) = (mesh.node_ref(p)(2))*(zmax-zmin) + zmin;
               }
           }
 
