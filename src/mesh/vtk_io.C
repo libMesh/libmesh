@@ -453,7 +453,7 @@ void VTKIO::cells_to_vtk()
             {
               dof_id_type global_node_id = elem->node(i);
 
-              const Node & the_node = mesh.node_ref(global_node_id);
+              const Point & the_node = mesh.point(global_node_id);
 
               // InsertNextPoint accepts either a double or float array of length 3.
               double pt[3] = {0., 0., 0.};

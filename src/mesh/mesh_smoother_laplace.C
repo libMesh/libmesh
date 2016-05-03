@@ -85,10 +85,11 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                 for (unsigned j=0; j<_graph[node->id()].size(); ++j)
                   {
                     // Will these nodal positions always be available
-                    // or will they refer to remote nodes?  To be
-                    // careful, we grab a pointer and test it against
-                    // NULL.
-                    Node & connected_node = _mesh.node_ref(_graph[node->id()][j]);
+                    // or will they refer to remote nodes?  This will
+                    // fail an assertion in the latter case, which
+                    // shouldn't occur if ParallelMesh is working
+                    // correctly.
+                    const Point & connected_node = _mesh.point(_graph[node->id()][j]);
 
                     avg_position.add( connected_node );
                   } // end for(j)

@@ -18,11 +18,11 @@ void SyncNodalPositions::gather_data (const std::vector<dof_id_type> & ids,
   for (std::size_t i=0; i<ids.size(); ++i)
     {
       // Look for this node in the mesh
-      Node & node = mesh.node_ref(ids[i]);
+      const Point & pt = mesh.point(ids[i]);
 
       // Store this node's position in the data array.
       // This should call Point::op=
-      data[i] = node;
+      data[i] = pt;
     } // end for
 } // gather_data()
 

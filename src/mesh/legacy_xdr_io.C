@@ -920,7 +920,7 @@ void LegacyXdrIO::write_mesh (const std::string & name,
     const std::map<dof_id_type,dof_id_type>::iterator end = node_map.end();
     for (; it != end; ++it)
       {
-        const Point & p = mesh.node_ref((*it).first);
+        const Point & p = mesh.point((*it).first);
 
         coords[lastIndex+0] = p(0);
         coords[lastIndex+1] = p(1);
