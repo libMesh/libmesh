@@ -38,7 +38,7 @@ public:
     es->init();
 
     NumericVector<Number> & sol = *sys->solution;
-    Elem *elem = mesh->query_elem(0);
+    Elem *elem = mesh->query_elem_ptr(0);
 
     if (elem && elem->processor_id() == TestCommWorld->rank())
       {
