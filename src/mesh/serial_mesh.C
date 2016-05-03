@@ -176,11 +176,7 @@ SerialMesh::SerialMesh (const UnstructuredMesh & other_mesh) :
 
 const Point & SerialMesh::point (const dof_id_type i) const
 {
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
-
-  return (*_nodes[i]);
+  return this->node_ref(i);
 }
 
 

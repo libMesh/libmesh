@@ -290,10 +290,7 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
 
 const Point & ParallelMesh::point (const dof_id_type i) const
 {
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i);
-
-  return (*_nodes[i]);
+  return this->node_ref(i);
 }
 
 
