@@ -440,6 +440,46 @@ void EpetraVector<T>::localize (NumericVector<T> & v_local_in,
 }
 
 
+
+template <typename T>
+void EpetraVector<T>::localize (std::vector<T> & v_local,
+                                const std::vector<numeric_index_type> & indices) const
+{
+  // Create a "replicated" map for importing values.  This is
+  // equivalent to creating a general Epetra_Map with
+  // NumGlobalElements == NumMyElements.
+  Epetra_LocalMap import_map(static_cast<int>(indices.size()),
+                             /*IndexBase=*/0,
+                             _map->Comm());
+
+  // Get a pointer to the list of global elements for the map, and set
+  // all the values from indices.
+  int * import_map_global_elements = import_map.MyGlobalElements();
+  for (int i=0; i<import_map.NumMyElements(); ++i)
+    import_map_global_elements[i] = indices[i];
+
+  // Create a new EpetraVector to import values into.
+  Epetra_Vector import_vector(import_map);
+
+  // Set up an "Import" object which associates the two maps.
+  Epetra_Import import_object(import_map, *_map);
+
+  // Import the values
+  import_vector.Import(*_vec, import_object, Insert);
+
+  // Get a pointer to the imported values array and the length of the
+  // array.
+  T * values = import_vector.Values();
+  int import_vector_length = import_vector.MyLength();
+
+  // Copy the imported values into v_local
+  v_local.resize(import_vector_length);
+  for (int i=0; i<import_vector_length; ++i)
+    v_local[i] = values[i];
+}
+
+
+
 template <typename T>
 void EpetraVector<T>::localize (const numeric_index_type first_local_idx,
                                 const numeric_index_type last_local_idx,
