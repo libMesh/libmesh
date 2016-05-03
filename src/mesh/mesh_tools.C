@@ -487,21 +487,18 @@ MeshTools::BoundingBox
 MeshTools::subdomain_bounding_box (const MeshBase & mesh,
                                    const subdomain_id_type sid)
 {
-  libmesh_assert_not_equal_to (mesh.n_nodes(), 0);
+  FindBBox find_bbox;
 
-  Point min( 1.e30,  1.e30,  1.e30);
-  Point max(-1.e30, -1.e30, -1.e30);
+  Threads::parallel_reduce
+    (ConstElemRange (mesh.active_local_subdomain_elements_begin(sid),
+                     mesh.active_local_subdomain_elements_end(sid)),
+     find_bbox);
 
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem_ptr(e)->subdomain_id() == sid)
-      for (unsigned int n=0; n<mesh.elem_ptr(e)->n_nodes(); n++)
-        for (unsigned int i=0; i<LIBMESH_DIM; i++)
-          {
-            min(i) = std::min(min(i), mesh.point(mesh.elem_ptr(e)->node_id(n))(i));
-            max(i) = std::max(max(i), mesh.point(mesh.elem_ptr(e)->node_id(n))(i));
-          }
+  // Compare the bounding boxes across processors
+  mesh.comm().min(find_bbox.min());
+  mesh.comm().max(find_bbox.max());
 
-  return BoundingBox (min, max);
+  return find_bbox.bbox();
 }
 
 
