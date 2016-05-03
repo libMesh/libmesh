@@ -298,30 +298,6 @@ const Point & ParallelMesh::point (const dof_id_type i) const
 
 
 
-
-
-const Node & ParallelMesh::node (const dof_id_type i) const
-{
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i);
-
-  return (*_nodes[i]);
-}
-
-
-
-
-
-Node & ParallelMesh::node (const dof_id_type i)
-{
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i);
-
-  return (*_nodes[i]);
-}
-
-
-
 const Node * ParallelMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
@@ -376,7 +352,7 @@ Node * ParallelMesh::query_node_ptr (const dof_id_type i)
 
 
 
-const Elem * ParallelMesh::elem (const dof_id_type i) const
+const Elem * ParallelMesh::elem_ptr (const dof_id_type i) const
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -387,7 +363,7 @@ const Elem * ParallelMesh::elem (const dof_id_type i) const
 
 
 
-Elem * ParallelMesh::elem (const dof_id_type i)
+Elem * ParallelMesh::elem_ptr (const dof_id_type i)
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -398,7 +374,7 @@ Elem * ParallelMesh::elem (const dof_id_type i)
 
 
 
-const Elem * ParallelMesh::query_elem (const dof_id_type i) const
+const Elem * ParallelMesh::query_elem_ptr (const dof_id_type i) const
 {
   std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
@@ -414,7 +390,7 @@ const Elem * ParallelMesh::query_elem (const dof_id_type i) const
 
 
 
-Elem * ParallelMesh::query_elem (const dof_id_type i)
+Elem * ParallelMesh::query_elem_ptr (const dof_id_type i)
 {
   std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)

@@ -186,34 +186,6 @@ const Point & SerialMesh::point (const dof_id_type i) const
 
 
 
-
-const Node & SerialMesh::node (const dof_id_type i) const
-{
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
-
-  return (*_nodes[i]);
-}
-
-
-
-
-
-Node & SerialMesh::node (const dof_id_type i)
-{
-  if (i >= this->n_nodes())
-    libmesh_error_msg(" i=" << i << ", n_nodes()=" << this->n_nodes());
-
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
-
-  return (*_nodes[i]);
-}
-
-
-
 const Node * SerialMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_nodes());
@@ -264,7 +236,7 @@ Node * SerialMesh::query_node_ptr (const dof_id_type i)
 
 
 
-const Elem * SerialMesh::elem (const dof_id_type i) const
+const Elem * SerialMesh::elem_ptr (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_elem());
   libmesh_assert(_elements[i]);
@@ -276,7 +248,7 @@ const Elem * SerialMesh::elem (const dof_id_type i) const
 
 
 
-Elem * SerialMesh::elem (const dof_id_type i)
+Elem * SerialMesh::elem_ptr (const dof_id_type i)
 {
   libmesh_assert_less (i, this->n_elem());
   libmesh_assert(_elements[i]);
@@ -288,7 +260,7 @@ Elem * SerialMesh::elem (const dof_id_type i)
 
 
 
-const Elem * SerialMesh::query_elem (const dof_id_type i) const
+const Elem * SerialMesh::query_elem_ptr (const dof_id_type i) const
 {
   if (i >= this->n_elem())
     return libmesh_nullptr;
@@ -301,7 +273,7 @@ const Elem * SerialMesh::query_elem (const dof_id_type i) const
 
 
 
-Elem * SerialMesh::query_elem (const dof_id_type i)
+Elem * SerialMesh::query_elem_ptr (const dof_id_type i)
 {
   if (i >= this->n_elem())
     return libmesh_nullptr;
