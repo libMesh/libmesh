@@ -482,14 +482,14 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->node_ptr(n);
+          const Node & node = elem->node_ref(n);
 
-          const processor_id_type proc_id = node->processor_id();
+          const processor_id_type proc_id = node.processor_id();
           if (proc_id == comm.rank() ||
               proc_id == DofObject::invalid_processor_id)
             continue;
 
-          dof_id_type node_id = node->id();
+          dof_id_type node_id = node.id();
           if (!queried_nodes.count(node_id))
             {
               ghost_objects_from_proc[proc_id]++;
@@ -531,10 +531,10 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->node_ptr(n);
-          const dof_id_type node_id = node->id();
+          const Node & node = elem->node_ref(n);
+          const dof_id_type node_id = node.id();
 
-          const processor_id_type proc_id = node->processor_id();
+          const processor_id_type proc_id = node.processor_id();
           if (proc_id == comm.rank() ||
               proc_id == DofObject::invalid_processor_id)
             continue;
