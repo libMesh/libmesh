@@ -132,6 +132,14 @@ public:
   /**
    * @returns the global id number of local \p Node \p i.
    */
+  dof_id_type node_id (const unsigned int i) const;
+
+  /**
+   * @returns the global id number of local \p Node \p i.
+   *
+   * This method is deprecated; use the less ambiguously named
+   * node_id() instead.
+   */
   dof_id_type node (const unsigned int i) const;
 
   /**
@@ -153,6 +161,19 @@ public:
 
   /**
    * @returns the pointer to local \p Node \p i.
+   */
+  Node * node_ptr (const unsigned int i) const;
+
+  /**
+   * @returns a reference to local \p Node \p i.
+   */
+  Node & node_ref (const unsigned int i) const;
+
+  /**
+   * @returns the pointer to local \p Node \p i.
+   *
+   * This method is deprecated.  Use the more consistently and less
+   * confusingly named node_ptr() instead.
    */
   Node * get_node (const unsigned int i) const;
 
@@ -1496,13 +1517,21 @@ Point & Elem::point (const unsigned int i)
 
 
 inline
-dof_id_type Elem::node (const unsigned int i) const
+dof_id_type Elem::node_id (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
   libmesh_assert_not_equal_to (_nodes[i]->id(), Node::invalid_id);
 
   return _nodes[i]->id();
+}
+
+
+
+inline
+dof_id_type Elem::node (const unsigned int i) const
+{
+  return this->node_id(i);
 }
 
 
@@ -1528,12 +1557,28 @@ const Node * const * Elem::get_nodes () const
 
 
 inline
-Node * Elem::get_node (const unsigned int i) const
+Node * Elem::node_ptr (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
 
   return _nodes[i];
+}
+
+
+
+inline
+Node & Elem::node_ref (const unsigned int i) const
+{
+  return *this->node_ptr(i);
+}
+
+
+
+inline
+Node * Elem::get_node (const unsigned int i) const
+{
+  return this->node_ptr(i);
 }
 
 
