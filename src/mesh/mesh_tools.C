@@ -1289,7 +1289,7 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh)
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     assert_semiverify_dofobj(mesh.comm(),
-                             mesh.query_elem(i));
+                             mesh.query_elem_ptr(i));
 
   dof_id_type pmax_node_id = mesh.max_node_id();
   mesh.comm().max(pmax_node_id);
@@ -1310,7 +1310,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      const Elem *elem = mesh.query_elem(i);
+      const Elem *elem = mesh.query_elem_ptr(i);
       const unique_id_type unique_id = elem ? elem->unique_id() : 0;
       const unique_id_type * uid_ptr = elem ? &unique_id : libmesh_nullptr;
       libmesh_assert(mesh.comm().semiverify(uid_ptr));
@@ -1346,7 +1346,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase & mesh)
 
   for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
     {
-      const Elem * elem = mesh.query_elem(i);
+      const Elem * elem = mesh.query_elem_ptr(i);
 
       processor_id_type min_id =
         elem ? elem->processor_id() :
@@ -1597,7 +1597,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 
   for (dof_id_type i=0; i != mesh.max_elem_id(); ++i)
     {
-      const Elem * elem = mesh.query_elem(i);
+      const Elem * elem = mesh.query_elem_ptr(i);
 
       const unsigned int my_n_neigh = elem ? elem->n_neighbors() : 0;
       unsigned int n_neigh = my_n_neigh;

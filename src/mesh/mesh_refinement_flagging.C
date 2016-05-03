@@ -377,7 +377,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
     for (dof_id_type i=0; i != sorted_error.size(); ++i)
       {
         dof_id_type eid = sorted_error[i].second;
-        Elem * elem = _mesh.query_elem(eid);
+        Elem * elem = _mesh.query_elem_ptr(eid);
         if (elem && elem->level() < _max_h_level)
           is_refinable[eid] = true;
       }
@@ -391,7 +391,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
           break;
 
         dof_id_type eid = sorted_error[i].second;
-        Elem * elem = _mesh.query_elem(eid);
+        Elem * elem = _mesh.query_elem_ptr(eid);
         if (is_refinable[eid])
           {
             if (elem)
@@ -420,7 +420,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
             break;
 
           dof_id_type parent_id = sorted_parent_error[i].second;
-          Elem * parent = _mesh.query_elem(parent_id);
+          Elem * parent = _mesh.query_elem_ptr(parent_id);
 
           // On a ParallelMesh we skip remote elements
           if (!parent)

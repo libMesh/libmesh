@@ -485,7 +485,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
 
   for (; it!=end; ++it)
     {
-      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem(it->first);
+      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
 
       if (!elem)
         libmesh_error_msg("Error! Mesh returned NULL pointer for elem " << it->first);
