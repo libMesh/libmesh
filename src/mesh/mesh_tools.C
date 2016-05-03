@@ -994,8 +994,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       Elem * elem = *e_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          Node * node = elem->node_ptr(n);
-          node->invalidate_processor_id();
+          Node & node = elem->node_ref(n);
+          node.invalidate_processor_id();
         }
     }
 
@@ -1007,10 +1007,10 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       processor_id_type proc_id = elem->processor_id();
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          Node * node = elem->node_ptr(n);
-          if (node->processor_id() == DofObject::invalid_processor_id ||
-              node->processor_id() > proc_id)
-            node->processor_id() = proc_id;
+          Node & node = elem->node_ref(n);
+          if (node.processor_id() == DofObject::invalid_processor_id ||
+              node.processor_id() > proc_id)
+            node.processor_id() = proc_id;
         }
     }
 
@@ -1078,9 +1078,9 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->node_ptr(n);
-          if (node->has_dofs())
-            libmesh_assert(elem->node_ptr(n)->old_dof_object);
+          const Node & node = elem->node_ref(n);
+          if (node.has_dofs())
+            libmesh_assert(node.old_dof_object);
         }
     }
 }
@@ -1465,8 +1465,8 @@ void libmesh_assert_valid_procids<Node>(const MeshBase & mesh)
 
       for (unsigned int i=0; i != elem->n_nodes(); ++i)
         {
-          const Node * node = elem->node_ptr(i);
-          dof_id_type nodeid = node->id();
+          const Node & node = elem->node_ref(i);
+          dof_id_type nodeid = node.id();
           node_touched_by_me[nodeid] = true;
         }
     }

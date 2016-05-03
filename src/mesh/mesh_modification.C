@@ -1626,20 +1626,20 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                           {
                             UniquePtr<Elem> side(elem->build_side(s));
 
-                            Node * node0 = side->node_ptr(0);
-                            Node * node1 = side->node_ptr(1);
+                            Node & node0 = side->node_ref(0);
+                            Node & node1 = side->node_ref(1);
 
                             Real node_weight = 1.;
                             // calculate the weight of the nodes
                             if (power > 0)
                               {
-                                Point diff = (*node0)-(*node1);
+                                Point diff = node0-node1;
                                 node_weight = std::pow(diff.norm(), power);
                               }
 
-                            const dof_id_type id0 = node0->id(), id1 = node1->id();
-                            new_positions[id0].add_scaled( *node1, node_weight );
-                            new_positions[id1].add_scaled( *node0, node_weight );
+                            const dof_id_type id0 = node0.id(), id1 = node1.id();
+                            new_positions[id0].add_scaled( node1, node_weight );
+                            new_positions[id1].add_scaled( node0, node_weight );
                             weight[id0] += node_weight;
                             weight[id1] += node_weight;
                           }

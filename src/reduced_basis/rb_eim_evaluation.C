@@ -368,15 +368,15 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
 
       for(unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
-          Node * node_ptr = old_elem->node_ptr(n);
-          dof_id_type old_node_id = node_ptr->id();
+          Node & node_ref = old_elem->node_ref(n);
+          dof_id_type old_node_id = node_ref.id();
 
           // Check if this node has already been added. This
           // could happen if some of the elements are neighbors.
           if( node_ids.find(old_node_id) == node_ids.end() )
             {
               node_ids.insert(old_node_id);
-              _interpolation_points_mesh.add_point(*node_ptr, new_node_id, /* proc_id */ 0);
+              _interpolation_points_mesh.add_point(node_ref, new_node_id, /* proc_id */ 0);
 
               node_id_map[old_node_id] = new_node_id;
 

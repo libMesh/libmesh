@@ -88,12 +88,9 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                     // or will they refer to remote nodes?  To be
                     // careful, we grab a pointer and test it against
                     // NULL.
-                    Node * connected_node = _mesh.node_ptr(_graph[node->id()][j]);
+                    Node & connected_node = _mesh.node_ref(_graph[node->id()][j]);
 
-                    if (connected_node == libmesh_nullptr)
-                      libmesh_error_msg("Error! Libmesh returned NULL pointer for node " << _graph[connected_node->id()][j]);
-
-                    avg_position.add( *connected_node );
+                    avg_position.add( connected_node );
                   } // end for(j)
 
                 // Compute the average, store in the new_positions vector

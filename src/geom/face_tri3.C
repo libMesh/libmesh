@@ -172,9 +172,9 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
 Real Tri3::volume () const
 {
   // 3-node triangles have the following formula for computing the area
-  Point v10 ( *(this->node_ptr(1)) - *(this->node_ptr(0)) );
+  Point v10 ( this->point(1) - this->point(0) );
 
-  Point v20 ( *(this->node_ptr(2)) - *(this->node_ptr(0)) );
+  Point v20 ( this->point(2) - this->point(0) );
 
   return 0.5 * (v10.cross(v20)).norm() ;
 }

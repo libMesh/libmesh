@@ -453,16 +453,12 @@ void VTKIO::cells_to_vtk()
             {
               dof_id_type global_node_id = elem->node(i);
 
-              const Node * the_node = mesh.query_node_ptr(global_node_id);
-
-              // Error checking...
-              if (the_node == libmesh_nullptr)
-                libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
+              const Node & the_node = mesh.node_ref(global_node_id);
 
               // InsertNextPoint accepts either a double or float array of length 3.
               double pt[3] = {0., 0., 0.};
               for (unsigned int d=0; d<LIBMESH_DIM; ++d)
-                pt[d] = (*the_node)(d);
+                pt[d] = the_node(d);
 
               // Insert the point into the _vtk_grid
               vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);

@@ -1300,7 +1300,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 {
                   Ue(current_dof) = f.eval_at_node(context,
                                                    var_component,
-                                                   *elem->node_ptr(n),
+                                                   elem->node_ref(n),
                                                    system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
@@ -1311,14 +1311,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   Ue(current_dof) =
                     f.eval_at_node(context,
                                    var_component,
-                                   *elem->node_ptr(n),
+                                   elem->node_ref(n),
                                    system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
                     g->eval_at_node(context,
                                     var_component,
-                                    *elem->node_ptr(n),
+                                    elem->node_ref(n),
                                     system.time);
                   // x derivative
                   Ue(current_dof) = grad(0);
@@ -1437,14 +1437,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   libmesh_assert_equal_to (nc, 1 + dim);
                   Ue(current_dof) = f.eval_at_node(context,
                                                    var_component,
-                                                   *elem->node_ptr(n),
+                                                   elem->node_ref(n),
                                                    system.time);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
                     g->eval_at_node(context,
                                     var_component,
-                                    *elem->node_ptr(n),
+                                    elem->node_ref(n),
                                     system.time);
                   for (unsigned int i=0; i!= dim; ++i)
                     {

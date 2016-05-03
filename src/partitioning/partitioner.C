@@ -589,9 +589,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       // Fill those requests in-place
       for (std::size_t i=0; i != request_to_fill.size(); ++i)
         {
-          Node * node = mesh.node_ptr(request_to_fill[i]);
-          libmesh_assert(node);
-          const processor_id_type new_pid = node->processor_id();
+          Node & node = mesh.node_ref(request_to_fill[i]);
+          const processor_id_type new_pid = node.processor_id();
 
           // We may have an invalid processor_id() on nodes that have been
           // "detatched" from coarsened-away elements but that have not yet
@@ -610,8 +609,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       // And copy the id changes we've now been informed of
       for (std::size_t i=0; i != filled_request.size(); ++i)
         {
-          Node * node = mesh.node_ptr(requested_node_ids[procup][i]);
-          libmesh_assert(node);
+          Node & node = mesh.node_ref(requested_node_ids[procup][i]);
 
           // this is the correct test -- the number of partitions may
           // not equal the number of processors
@@ -621,7 +619,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           // that have not yet themselves been removed.
           // libmesh_assert_less (filled_request[i], mesh.n_partitions());
 
-          node->processor_id(cast_int<processor_id_type>(filled_request[i]));
+          node.processor_id(cast_int<processor_id_type>(filled_request[i]));
         }
     }
 

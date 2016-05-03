@@ -1936,16 +1936,15 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                 UniquePtr<Elem> side (elem->build_side(s));
                 for (unsigned int n = 0; n != side->n_nodes(); ++n)
                   {
-                    Node * node = side->node_ptr(n);
-                    libmesh_assert(node);
+                    Node & node = side->node_ref(n);
 
                     // In parallel we don't know enough to number
                     // others' nodes ourselves.
                     if (!hit_end_el &&
-                        (node->processor_id() != this->processor_id()))
+                        (node.processor_id() != this->processor_id()))
                       continue;
 
-                    dof_id_type node_id = node->id();
+                    dof_id_type node_id = node.id();
                     if (node_id_map && !node_id_map->count(node_id))
                       {
                         (*node_id_map)[node_id] = next_node_id;

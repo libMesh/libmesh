@@ -104,13 +104,13 @@ Real Tri::quality (const ElemQuality q) const
     case DISTORTION:
     case STRETCH:
       {
-        const Node * p1 = this->node_ptr(0);
-        const Node * p2 = this->node_ptr(1);
-        const Node * p3 = this->node_ptr(2);
+        const Point & p1 = this->point(0);
+        const Point & p2 = this->point(1);
+        const Point & p3 = this->point(2);
 
-        Point v1 = (*p2) - (*p1);
-        Point v2 = (*p3) - (*p1);
-        Point v3 = (*p3) - (*p2);
+        Point v1 = p2 - p1;
+        Point v2 = p3 - p1;
+        Point v3 = p3 - p2;
         const Real l1 = v1.norm();
         const Real l2 = v2.norm();
         const Real l3 = v3.norm();

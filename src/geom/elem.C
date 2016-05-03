@@ -2376,7 +2376,7 @@ std::string Elem::get_info () const
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    oss << "    " << n << *this->node_ptr(n);
+    oss << "    " << n << this->node_ref(n);
 
   oss << "   n_sides()=" << this->n_sides()                        << '\n';
 

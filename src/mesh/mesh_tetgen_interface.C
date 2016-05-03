@@ -371,11 +371,7 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * el
       // Get the mapped node index to ask the Mesh for
       unsigned mapped_node_id = _sequential_to_libmesh_node_map[ node_labels[j] ];
 
-      // Parallel mesh can return NULL pointers, this is bad...
       Node * current_node = this->_mesh.node_ptr( mapped_node_id );
-
-      if (current_node == libmesh_nullptr)
-        libmesh_error_msg("Error! Mesh returned NULL node pointer!");
 
       elem->set_node(j) = current_node;
     }

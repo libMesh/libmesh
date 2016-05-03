@@ -97,12 +97,12 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
 
       for (unsigned int node_id=0; node_id<elem->n_nodes(); node_id++)
         {
-          Node * node = elem->node_ptr(node_id);
+          Node & node = elem->node_ref(node_id);
 
-          if (encountered_node_ids.find(node->id()) != encountered_node_ids.end())
+          if (encountered_node_ids.find(node.id()) != encountered_node_ids.end())
             continue;
 
-          encountered_node_ids.insert(node->id());
+          encountered_node_ids.insert(node.id());
 
           std::vector<std::string> uvw_names(3);
           uvw_names[0] = "u";
@@ -142,7 +142,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
               }
 
             // Update the node's location
-            *node += uvw;
+            node += uvw;
           }
         }
     }

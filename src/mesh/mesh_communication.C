@@ -1117,10 +1117,10 @@ struct SyncProcIds
       {
         // Look for this point in the mesh
         // We'd better find every node we're asked for
-        Node * node = mesh.node_ptr(ids[i]);
+        Node & node = mesh.node_ref(ids[i]);
 
         // Return the node's correct processor id,
-        data[i] = node->processor_id();
+        data[i] = node.processor_id();
       }
   }
 
@@ -1131,8 +1131,8 @@ struct SyncProcIds
     // Set the ghost node processor ids we've now been informed of
     for (std::size_t i=0; i != ids.size(); ++i)
       {
-        Node * node = mesh.node_ptr(ids[i]);
-        node->processor_id() = proc_ids[i];
+        Node & node = mesh.node_ref(ids[i]);
+        node.processor_id() = proc_ids[i];
       }
   }
 };

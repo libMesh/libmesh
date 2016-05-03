@@ -163,7 +163,7 @@ void TopologyMap::fill(const MeshBase & mesh)
               const std::vector<std::pair<dof_id_type, dof_id_type> >
                 bracketing_nodes = elem->bracketing_nodes(c,n);
 
-              this->add_node(*elem->child(c)->node_ptr(n),
+              this->add_node(elem->child(c)->node_ref(n),
                              bracketing_nodes);
             }
         }

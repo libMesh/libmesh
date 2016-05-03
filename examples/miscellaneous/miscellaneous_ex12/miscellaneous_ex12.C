@@ -392,7 +392,7 @@ void assemble_shell (EquationSystems & es,
       // First compute element data at the nodes
       std::vector<Point> nodes;
       for (unsigned int i=0; i<elem->n_nodes(); ++i)
-        nodes.push_back(*(elem->node_ptr(i)));
+        nodes.push_back(elem->node_ref(i));
       fe->reinit (elem, &nodes);
 
       // Convenient notation for the element node positions

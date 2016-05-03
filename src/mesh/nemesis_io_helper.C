@@ -2321,7 +2321,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
   // Just loop over our list outputing the nodes the way we built the map
   for (unsigned int i=0; i<local_num_nodes; ++i)
     {
-      const Node & node = *mesh.node_ptr(this->exodus_node_num_to_libmesh[i]);
+      const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]);
       x[i]=node(0);
       y[i]=node(1);
       z[i]=node(2);

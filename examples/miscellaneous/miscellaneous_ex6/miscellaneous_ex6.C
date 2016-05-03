@@ -292,10 +292,10 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
       unsigned id = (*it).first;
 
       // Pointer to node in the cube mesh
-      Node * old_node = cube_mesh.node_ptr(id);
+      Node & old_node = cube_mesh.node_ref(id);
 
       // Add geometric point to input mesh
-      Node * new_node = mesh.add_point (*old_node);
+      Node * new_node = mesh.add_point (old_node);
 
       // Track ID value of new_node in map
       (*it).second = new_node->id();
