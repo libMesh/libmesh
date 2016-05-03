@@ -189,108 +189,109 @@ AC_DEFUN([CONFIGURE_PETSC],
         # We can skip the rest of the tests because they aren't going to pass
         if (test $enablepetsc != no) ; then
 
-        # Debugging: see what actually got set for PETSCINCLUDEDIRS
-        # echo ""
-        # echo "PETSCLINKLIBS=$PETSCLINKLIBS"
-        # echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
-        # echo ""
+          # Debugging: see what actually got set for PETSCINCLUDEDIRS
+          # echo ""
+          # echo "PETSCLINKLIBS=$PETSCLINKLIBS"
+          # echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
+          # echo ""
 
-        # We sometimes need the full CC_INCLUDES to access a
-        # PETSc-snooped MPI
-        PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
+          # We sometimes need the full CC_INCLUDES to access a
+          # PETSc-snooped MPI
+          PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
 
-        # Check for Hypre
-        if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
-          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
-        elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
-          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
-        elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
-          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
-        fi
+          # Check for Hypre
+          if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
+          elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+          elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
+          fi
 
-        if test "x$HYPRE_LIB" != x ; then
-          AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
-        fi
+          if test "x$HYPRE_LIB" != x ; then
+            AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
+          fi
 
-        # Try to compile a trivial PETSc program to check our
-        # configuration... this should handle cases where we slipped
-        # by the tests above with an invalid PETSCINCLUDEDIRS
-        # variable, which happened when PETSc 3.6 came out.
-        AC_MSG_CHECKING(whether we can compile a trivial PETSc program)
-        AC_LANG_PUSH([C++])
+          # Try to compile a trivial PETSc program to check our
+          # configuration... this should handle cases where we slipped
+          # by the tests above with an invalid PETSCINCLUDEDIRS
+          # variable, which happened when PETSc 3.6 came out.
+          AC_MSG_CHECKING(whether we can compile a trivial PETSc program)
+          AC_LANG_PUSH([C++])
 
-        # Save the original CXXFLAGS contents
-        saveCXXFLAGS="$CXXFLAGS"
+          # Save the original CXXFLAGS contents
+          saveCXXFLAGS="$CXXFLAGS"
 
-        # Append PETSc include paths to the CXXFLAGS variables
-        CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS"
+          # Append PETSc include paths to the CXXFLAGS variables
+          CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS"
 
-        AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-        @%:@include <petsc.h>
-        static char help[]="";
+          AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+          @%:@include <petsc.h>
+          static char help[]="";
 
-        int main(int argc, char **argv)
-        {
-          PetscInitialize(&argc, &argv, (char*)0,help);
-          PetscFinalize();
-          return 0;
-        }
-        ]])],[
-          AC_MSG_RESULT(yes)
-        ],[
-          AC_MSG_RESULT(no)
-          enablepetsc=no
-        ])
+          int main(int argc, char **argv)
+          {
+            PetscInitialize(&argc, &argv, (char*)0,help);
+            PetscFinalize();
+            return 0;
+          }
+          ]])],[
+            AC_MSG_RESULT(yes)
+          ],[
+            AC_MSG_RESULT(no)
+            enablepetsc=no
+          ])
 
-        # Return CXXFLAGS to their original state.
-        CXXFLAGS="$saveCXXFLAGS"
+          # Return CXXFLAGS to their original state.
+          CXXFLAGS="$saveCXXFLAGS"
 
-        AC_LANG_POP([C++])
+          AC_LANG_POP([C++])
 
 
-        # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
-        petsc_have_tao=no
-        AC_MSG_CHECKING(for TAO support via PETSc)
-        AC_LANG_PUSH([C])
+          # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
+          petsc_have_tao=no
+          AC_MSG_CHECKING(for TAO support via PETSc)
+          AC_LANG_PUSH([C])
 
-        # Save the original CFLAGS contents
-        saveCFLAGS="$CFLAGS"
+          # Save the original CFLAGS contents
+          saveCFLAGS="$CFLAGS"
 
-        # Append PETSc include paths to the CFLAGS variables
-        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+          # Append PETSc include paths to the CFLAGS variables
+          CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
 
-        AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-        @%:@include <petsctao.h>
-        static char help[]="";
+          AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+          @%:@include <petsctao.h>
+          static char help[]="";
 
-        int main(int argc, char **argv)
-        {
-          Tao tao;
-          PetscInitialize(&argc, &argv, (char*)0,help);
-          TaoCreate(PETSC_COMM_WORLD,&tao);
-          TaoDestroy(&tao);
-          PetscFinalize();
-          return 0;
-        }
-        ]])],[
-          AC_MSG_RESULT(yes)
-          petsc_have_tao=yes
-        ],[
-          AC_MSG_RESULT(no)
-        ])
+          int main(int argc, char **argv)
+          {
+            Tao tao;
+            PetscInitialize(&argc, &argv, (char*)0,help);
+            TaoCreate(PETSC_COMM_WORLD,&tao);
+            TaoDestroy(&tao);
+            PetscFinalize();
+            return 0;
+          }
+          ]])],[
+            AC_MSG_RESULT(yes)
+            petsc_have_tao=yes
+          ],[
+            AC_MSG_RESULT(no)
+          ])
 
-        # Return C flags to their original state.
-        CFLAGS="$saveCFLAGS"
+          # Return C flags to their original state.
+          CFLAGS="$saveCFLAGS"
 
-        AC_LANG_POP([C])
+          AC_LANG_POP([C])
+        fi # if (test $enablepetsc != no)
 
-        else
+        if (test $enablepetsc = no); then
           # PETSc config failed.  Try MPI, unless directed otherwise
           if (test "$enablempi" != no); then
             AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
             ACX_MPI
           fi
-        fi # if (test $enablepetsc != no)
+        fi # if (test $enablepetsc = no)
     else
         # PETSc config failed.  Try MPI, unless directed otherwise
     if (test "$enablempi" != no); then
