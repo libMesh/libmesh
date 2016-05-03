@@ -464,6 +464,10 @@ MeshTools::processor_bounding_box (const MeshBase & mesh,
                                             mesh.pid_elements_end(pid)),
                             find_bbox);
 
+  // Compare the bounding boxes across processors
+  mesh.comm().min(find_bbox.min());
+  mesh.comm().max(find_bbox.max());
+
   return find_bbox.bbox();
 }
 
