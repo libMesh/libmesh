@@ -778,12 +778,9 @@ void GmshIO::write_mesh (std::ostream & out_stream)
         // Loop over these lists, writing data to the file.
         for (unsigned idx=0; idx<element_id_list.size(); ++idx)
           {
-            const Elem * elem = mesh.elem(element_id_list[idx]);
+            const Elem & elem = mesh.elem_ref(element_id_list[idx]);
 
-            if (!elem)
-              libmesh_error_msg("Mesh returned a NULL pointer for element " << element_id_list[idx]);
-
-            UniquePtr<Elem> side = elem->build_side(side_list[idx]);
+            UniquePtr<Elem> side = elem.build_side(side_list[idx]);
 
             // Map from libmesh elem type to gmsh elem type.
             std::map<ElemType, ElementDefinition>::iterator def_it =
@@ -813,7 +810,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
             out_stream << " 3 "
                        << bc_id_list[idx]
                        << " 0 "
-                       << elem->processor_id()+1
+                       << elem.processor_id()+1
                        << " ";
 
             // if there is a node translation table, use it

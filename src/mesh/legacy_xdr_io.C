@@ -835,25 +835,25 @@ void LegacyXdrIO::write_mesh (const std::string & name,
           nn = lastConnIndex = 0;
 
           for (unsigned int e=0; e<mesh.n_elem(); e++)
-            if ((mesh.elem(e)->type()  == etypes[idx]) &&
-                (mesh.elem(e)->level() == level)       &&
-                !mesh.elem(e)->subactive())
+            if ((mesh.elem_ref(e).type()  == etypes[idx]) &&
+                (mesh.elem_ref(e).level() == level)       &&
+                !mesh.elem_ref(e).subactive())
               {
                 int nstart=0;
 
                 if (orig_type == LegacyXdrIO::DEAL)
-                  nn = mesh.elem(e)->n_nodes();
+                  nn = mesh.elem_ref(e).n_nodes();
 
                 else if (orig_type == LegacyXdrIO::MGF)
                   {
                     nstart=2; // ignore the 27 and 0 entries
-                    nn = mesh.elem(e)->n_nodes()+2;
+                    nn = mesh.elem_ref(e).n_nodes()+2;
                     conn[lastConnIndex + 0] = 27;
                     conn[lastConnIndex + 1] = 0;
                   }
 
                 else if (orig_type == LegacyXdrIO::LIBM) // LIBMESH format
-                  nn = mesh.elem(e)->n_nodes() + 2;
+                  nn = mesh.elem_ref(e).n_nodes() + 2;
 
                 else
                   libmesh_error_msg("Unrecognized orig_type = " << orig_type);
@@ -867,14 +867,14 @@ void LegacyXdrIO::write_mesh (const std::string & name,
 
                     // old-style Libmesh and MGF meshes
                     if (orig_type != LegacyXdrIO::LIBM)
-                      connectivity_value = mesh.elem(e)->node_id(n-nstart);
+                      connectivity_value = mesh.elem_ref(e).node_id(n-nstart);
 
                     // new-style libMesh meshes: compress the connectivity entries to account for
                     // subactive nodes that will not be in the mesh we write out.
                     else
                       {
                         std::map<dof_id_type, dof_id_type>::iterator pos =
-                          node_map.find(mesh.elem(e)->node_id(n-nstart));
+                          node_map.find(mesh.elem_ref(e).node_id(n-nstart));
 
                         libmesh_assert (pos != node_map.end());
 
@@ -887,10 +887,10 @@ void LegacyXdrIO::write_mesh (const std::string & name,
                 // In the case of an adaptive mesh, set last 2 entries to this ID and parent ID
                 if (orig_type == LegacyXdrIO::LIBM)
                   {
-                    int self_ID = mesh.elem(e)->id();
+                    int self_ID = mesh.elem_ref(e).id();
                     int parent_ID = -1;
                     if(level != 0)
-                      parent_ID = mesh.elem(e)->parent()->id();
+                      parent_ID = mesh.elem_ref(e).parent()->id();
 
                     // Self ID is the second-to-last entry, Parent ID is the last
                     // entry on each connectivity line

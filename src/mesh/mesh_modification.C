@@ -1940,7 +1940,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
       if (bc_id_list[idx] == old_id)
         {
           // Get the elem in question
-          const Elem * elem = mesh.elem(elem_list[idx]);
+          const Elem * elem = mesh.elem_ptr(elem_list[idx]);
 
           // The edge of the elem in question
           unsigned short int edge = edge_list[idx];
@@ -1974,7 +1974,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
       if (bc_id_list[idx] == old_id)
         {
           // Get the elem in question
-          const Elem * elem = mesh.elem(elem_list[idx]);
+          const Elem * elem = mesh.elem_ptr(elem_list[idx]);
 
           // The side of the elem in question
           unsigned short int side = side_list[idx];

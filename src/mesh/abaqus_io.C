@@ -808,11 +808,8 @@ void AbaqusIO::assign_subdomain_ids()
             // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
             dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
 
-            // Get pointer to that element
-            Elem * elem = the_mesh.elem(libmesh_elem_id);
-
-            if (elem == libmesh_nullptr)
-              libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
+            // Get reference to that element
+            Elem & elem = the_mesh.elem_ref(libmesh_elem_id);
 
             // We won't assign subdomain ids to lower-dimensional
             // elements, as they are assumed to represent boundary
@@ -820,22 +817,22 @@ void AbaqusIO::assign_subdomain_ids()
             // appear in multiple sidesets, it doesn't make sense to
             // assign them a single subdomain id... only the last one
             // assigned would actually "stick".
-            if (elem->dim() < max_dim)
+            if (elem.dim() < max_dim)
               break;
 
             // Compute the proper subdomain ID, based on the formula in the
             // documentation for this function.
             subdomain_id_type computed_id = cast_int<subdomain_id_type>
-              (elemset_id + (elem_types_map[elem->type()] * n_elemsets));
+              (elemset_id + (elem_types_map[elem.type()] * n_elemsets));
 
             // Assign this ID to the element in question
-            elem->subdomain_id() = computed_id;
+            elem.subdomain_id() = computed_id;
 
             // We will also assign a unique name to the computed_id,
             // which is created by appending the geometric element
             // name to the elset name provided by the user in the
             // Abaqus file.
-            std::string computed_name = it->first + "_" + Utility::enum_to_string(elem->type());
+            std::string computed_name = it->first + "_" + Utility::enum_to_string(elem.type());
             the_mesh.subdomain_name(computed_id) = computed_name;
           }
       }
@@ -910,21 +907,17 @@ void AbaqusIO::assign_sideset_ids()
             // Map the Abaqus element ID to LibMesh numbering
             dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 
-            // Get pointer to that element
-            Elem * elem = the_mesh.elem(libmesh_elem_id);
-
-            // Check that the pointer returned from the Mesh is non-NULL
-            if (elem == libmesh_nullptr)
-              libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
+            // Get a reference to that element
+            Elem & elem = the_mesh.elem_ref(libmesh_elem_id);
 
             // Grab a reference to the element definition for this element type
-            const ElementDefinition & eledef = eletypes[elem->type()];
+            const ElementDefinition & eledef = eletypes[elem.type()];
 
             // If the element definition was not found, the call above would have
             // created one with an uninitialized struct.  Check for that here...
             if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
               libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
-                                << Utility::enum_to_string(elem->type())  \
+                                << Utility::enum_to_string(elem.type())  \
                                 << "!");
 
             // Add this node with the current_id (which is determined by the
@@ -932,7 +925,7 @@ void AbaqusIO::assign_sideset_ids()
             // so we subtract 1 here before passing the abaqus side number to the
             // mapping array
             the_mesh.get_boundary_info().add_side
-              (elem,
+              (&elem,
                eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
                current_id);
           }
@@ -973,28 +966,25 @@ void AbaqusIO::assign_sideset_ids()
             // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
             dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
 
-            // Get pointer to that element
-            Elem * elem = the_mesh.elem(libmesh_elem_id);
-
-            if (elem == libmesh_nullptr)
-              libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
+            // Get a reference to that element
+            Elem & elem = the_mesh.elem_ref(libmesh_elem_id);
 
             // If the element dimension is equal to the maximum
             // dimension seen, we can break out of this for loop --
             // this elset does not contain sideset information.
-            if (elem->dim() == max_dim)
+            if (elem.dim() == max_dim)
               break;
 
             // We can only handle elements that are *exactly*
             // one dimension lower than the max element
             // dimension.  Not sure if "edge" BCs in 3D
             // actually make sense/are required...
-            if (elem->dim()+1 != max_dim)
-              libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem->dim());
+            if (elem.dim()+1 != max_dim)
+              libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem.dim());
 
             // Insert the current (key, pair(elem,id)) into the multimap.
-            provide_bcs.insert(std::make_pair(elem->key(),
-                                              std::make_pair(elem,
+            provide_bcs.insert(std::make_pair(elem.key(),
+                                              std::make_pair(&elem,
                                                              elemset_id)));
 
             // Associate the name of this sideset with the ID we've

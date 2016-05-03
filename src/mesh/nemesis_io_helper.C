@@ -1408,7 +1408,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase & pmesh)
 
   for ( ; it_elem != new_bndry_elem_list_end; )
     {
-      if (pmesh.elem( *it_elem )->processor_id() != this->processor_id())
+      if (pmesh.elem_ref(*it_elem).processor_id() != this->processor_id())
         {
           // Back up the new end iterators to prepare for swap
           --new_bndry_elem_list_end;
@@ -1832,8 +1832,10 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(pmesh.elem(elem_ids_this_subdomain[0])->type());
-      this->num_nodes_per_elem = pmesh.elem(elem_ids_this_subdomain[0])->n_nodes();
+      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion
+        (pmesh.elem_ref(elem_ids_this_subdomain[0]).type());
+      this->num_nodes_per_elem =
+        pmesh.elem_ref(elem_ids_this_subdomain[0]).n_nodes();
 
       // Get a reference to the connectivity vector for this subdomain.  This vector
       // is most likely empty, we are going to fill it up now.
@@ -1852,20 +1854,20 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           this->libmesh_elem_num_to_exodus[elem_id] =
             cast_int<int>(this->exodus_elem_num_to_libmesh.size());
 
-          const Elem * elem = pmesh.elem(elem_id);
+          const Elem & elem = pmesh.elem_ref(elem_id);
 
           // Exodus/Nemesis want every block to have the same element type
           // libmesh_assert_equal_to (elem->type(), conv.get_canonical_type());
 
           // But we can get away with writing e.g. HEX8 and INFHEX8 in
           // the same block...
-          libmesh_assert_equal_to (elem->n_nodes(), Elem::build(conv.get_canonical_type(), libmesh_nullptr)->n_nodes());
+          libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.get_canonical_type(), libmesh_nullptr)->n_nodes());
 
           for (unsigned int j=0; j < static_cast<unsigned int>(this->num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*this->num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_node_map(j);
-              current_block_connectivity[connect_index] = this->libmesh_node_num_to_exodus[elem->node(elem_node_index)];
+              current_block_connectivity[connect_index] = this->libmesh_node_num_to_exodus[elem.node(elem_node_index)];
             }
         } // End loop over elems in this subdomain
     } // end loop over subdomain_map
@@ -2184,7 +2186,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   for (unsigned i=0; i<bndry_elem_list.size(); ++i)
     {
       // Get pointer to current Elem
-      const Elem * elem = mesh.elem(bndry_elem_list[i]);
+      const Elem * elem = mesh.elem_ptr(bndry_elem_list[i]);
 
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -2203,12 +2205,12 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       for (unsigned int j=0; j<family.size(); ++j)
         {
           const dof_id_type f_id = family[j]->id();
-          const Elem * f = mesh.elem(f_id);
+          const Elem & f = mesh.elem_ref(f_id);
 
           // If element is local, process it
-          if (f->processor_id() == this->processor_id())
+          if (f.processor_id() == this->processor_id())
             {
-              const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(f->type());
+              const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(f.type());
 
               // Use the libmesh to exodus datastructure map to get the proper sideset IDs
               // The datastructure contains the "collapsed" contiguous ids.
@@ -2401,9 +2403,11 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
           //Note that Exodus assumes all elements in a block are of the same type!
           //We are using that same assumption here!
           const ExodusII_IO_Helper::Conversion conv =
-            em.assign_conversion(mesh.elem(elements_in_this_block[0])->type());
+            em.assign_conversion
+              (mesh.elem_ref(elements_in_this_block[0]).type());
 
-          this->num_nodes_per_elem = mesh.elem(elements_in_this_block[0])->n_nodes();
+          this->num_nodes_per_elem =
+            mesh.elem_ref(elements_in_this_block[0]).n_nodes();
 
           ex_err = exII::ex_put_elem_block(ex_id,
                                            block,

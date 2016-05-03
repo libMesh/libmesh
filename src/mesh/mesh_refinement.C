@@ -783,10 +783,10 @@ struct SyncRefinementFlags
       {
         // Look for this element in the mesh
         // We'd better find every element we're asked for
-        Elem * elem = mesh.elem(ids[i]);
+        Elem & elem = mesh.elem_ref(ids[i]);
 
         // Return the element's refinement flag
-        flags[i] = (elem->*get_flag)();
+        flags[i] = (elem.*get_flag)();
       }
   }
 
@@ -795,9 +795,9 @@ struct SyncRefinementFlags
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
-        Elem * elem = mesh.elem(ids[i]);
+        Elem & elem = mesh.elem_ref(ids[i]);
 
-        datum old_flag = (elem->*get_flag)();
+        datum old_flag = (elem.*get_flag)();
         datum & new_flag = flags[i];
 
         if (old_flag != new_flag)
@@ -811,7 +811,7 @@ struct SyncRefinementFlags
             // libmesh_assert (!(new_flag != Elem::REFINE &&
             //                   old_flag == Elem::REFINE));
             //
-            (elem->*set_flag)
+            (elem.*set_flag)
               (static_cast<Elem::RefinementState>(new_flag));
             parallel_consistent = false;
           }

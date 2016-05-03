@@ -1009,7 +1009,7 @@ Elem * Elem::topological_neighbor (const unsigned int i,
             // pointer directly from the mesh object.  Also since coarse
             // elements do not have more refined neighbors we need to make
             // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
             if (level() < neighbor_i->level())
               neighbor_i = neighbor_i->parent();
             return neighbor_i;
@@ -1047,7 +1047,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
             // pointer directly from the mesh object.  Also since coarse
             // elements do not have more refined neighbors we need to make
             // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
             if (level() < neighbor_i->level())
               neighbor_i = neighbor_i->parent();
             return neighbor_i;

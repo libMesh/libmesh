@@ -268,7 +268,7 @@ void assemble_poisson(EquationSystems & es,
                   ElementIdMap::const_iterator ltu_it =
                     lower_to_upper.find(std::make_pair(elem->id(), side));
                   dof_id_type upper_elem_id = ltu_it->second;
-                  const Elem * neighbor = mesh.elem(upper_elem_id);
+                  const Elem * neighbor = mesh.elem_ptr(upper_elem_id);
 
                   std::vector<Point> qface_neighbor_points;
                   FEInterface::inverse_map (elem->dim(), fe->get_fe_type(),

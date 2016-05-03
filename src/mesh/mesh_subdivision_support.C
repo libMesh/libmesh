@@ -247,7 +247,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
   const unsigned int n_elem = mesh.n_elem();
   for (unsigned int eid = 0; eid < n_elem; ++eid)
     {
-      Elem * elem = mesh.elem(eid);
+      Elem * elem = mesh.elem_ptr(eid);
       libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
 
       // If the triangle happens to be in a corner (two boundary

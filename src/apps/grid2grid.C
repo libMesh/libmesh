@@ -100,7 +100,8 @@ int main (int argc, char ** argv)
     for (unsigned int e=0; e<mesh_coarse.n_elem(); e++)
     {
     libMesh::out << "looking for centroid of element " << e << std::endl;
-    const Elem * elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
+    const Elem * elem =
+      octree_coarse.find_element(mesh_coarse.elem_ref(e).centroid(mesh_coarse));
 
     libmesh_assert(elem);
     }
@@ -140,14 +141,14 @@ int main (int argc, char ** argv)
     Number error = 0.;
 
     // Initial coarse element
-    Elem * coarse_element = mesh_coarse.elem(0);
+    Elem * coarse_element = mesh_coarse.elem_ptr(0);
     fe_coarse.reinit (coarse_element);
 
 
     // Loop over fine mesh elements
     for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
       {
-        const Elem * fine_element = mesh_fine.elem(e);
+        const Elem * fine_element = mesh_fine.elem_ptr(e);
 
         // Recompute the element--specific data for the current fine-mesh element.
         fe_fine.reinit(fine_element);
@@ -227,12 +228,12 @@ int main (int argc, char ** argv)
 
       std::vector<unsigned char> already_done(mesh_fine.n_nodes(), 0);
 
-      Elem * coarse_element = mesh_coarse.elem(0);
+      Elem * coarse_element = mesh_coarse.elem_ptr(0);
 
       for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
-        for (unsigned int n=0; n<mesh_fine.elem(e)->n_nodes(); n++)
+        for (unsigned int n=0; n<mesh_fine.elem_ref(e).n_nodes(); n++)
           {
-            const unsigned int gn = mesh_fine.elem(e)->node(n);
+            const unsigned int gn = mesh_fine.elem_ref(e).node(n);
 
             if (!already_done[gn])
               {

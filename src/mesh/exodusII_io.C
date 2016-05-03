@@ -306,9 +306,9 @@ void ExodusII_IO::read (const std::string & fname)
           cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
 
         // Set any relevant node/edge maps for this element
-        Elem * elem = mesh.elem(libmesh_elem_id);
+        Elem & elem = mesh.elem_ref(libmesh_elem_id);
 
-        const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem->type());
+        const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem.type());
 
         // Map the zero-based Exodus side numbering to the libmesh side numbering
         int mapped_side = conv.get_side_map(exio_helper->side_list[e]-1);
@@ -318,7 +318,7 @@ void ExodusII_IO::read (const std::string & fname)
           libmesh_error_msg("Invalid 1-based side id: "                 \
                             << exio_helper->side_list[e]                \
                             << " detected for "                         \
-                            << Utility::enum_to_string(elem->type()));
+                            << Utility::enum_to_string(elem.type()));
 
         // Add this (elem,side,id) triplet to the BoundaryInfo object.
         mesh.get_boundary_info().add_side (libmesh_elem_id,

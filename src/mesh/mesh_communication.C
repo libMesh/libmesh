@@ -87,14 +87,14 @@ struct SyncNeighbors
       {
         // Look for this element in the mesh
         // We'd better find every element we're asked for
-        const Elem * elem = mesh.elem(ids[i]);
+        const Elem & elem = mesh.elem_ref(ids[i]);
 
         // Return the element's neighbors
-        const unsigned int n_neigh = elem->n_neighbors();
+        const unsigned int n_neigh = elem.n_neighbors();
         neighbors[i].resize(n_neigh);
         for (unsigned int n = 0; n != n_neigh; ++n)
           {
-            const Elem * neigh = elem->neighbor(n);
+            const Elem * neigh = elem.neighbor(n);
             if (neigh)
               {
                 libmesh_assert_not_equal_to(neigh, remote_elem);
@@ -111,17 +111,17 @@ struct SyncNeighbors
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
-        Elem * elem = mesh.elem(ids[i]);
+        Elem & elem = mesh.elem_ref(ids[i]);
 
         datum & new_neigh = neighbors[i];
 
-        const unsigned int n_neigh = elem->n_neighbors();
+        const unsigned int n_neigh = elem.n_neighbors();
         libmesh_assert_equal_to (n_neigh, new_neigh.size());
 
         for (unsigned int n = 0; n != n_neigh; ++n)
           {
             const dof_id_type new_neigh_id = new_neigh[n];
-            const Elem * old_neigh = elem->neighbor(n);
+            const Elem * old_neigh = elem.neighbor(n);
             if (old_neigh && old_neigh != remote_elem)
               {
                 libmesh_assert_equal_to(old_neigh->id(), new_neigh_id);
@@ -132,11 +132,11 @@ struct SyncNeighbors
               }
             else
               {
-                Elem * neigh = mesh.query_elem(new_neigh_id);
+                Elem * neigh = mesh.query_elem_ptr(new_neigh_id);
                 if (neigh)
-                  elem->set_neighbor(n, neigh);
+                  elem.set_neighbor(n, neigh);
                 else
-                  elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
+                  elem.set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
               }
           }
       }
@@ -953,9 +953,9 @@ struct SyncPLevels
 
     for (unsigned int i=0; i != ids.size(); ++i)
       {
-        Elem *elem = mesh.elem(ids[i]);
+        Elem & elem = mesh.elem_ref(ids[i]);
 
-        ids_out.push_back(elem->p_level());
+        ids_out.push_back(elem.p_level());
       }
   }
 
@@ -964,9 +964,9 @@ struct SyncPLevels
   {
     for (unsigned int i=0; i != old_ids.size(); ++i)
       {
-        Elem *elem = mesh.elem(old_ids[i]);
+        Elem & elem = mesh.elem_ref(old_ids[i]);
 
-        elem->set_p_level(new_p_levels[i]);
+        elem.set_p_level(new_p_levels[i]);
       }
   }
 };

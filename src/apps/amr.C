@@ -63,7 +63,7 @@ int main (int argc, char ** argv)
 
   GMVIO(mesh).write ("out_0.gmv");
 
-  mesh.elem(0)->set_refinement_flag (Elem::REFINE);
+  mesh.elem_ref(0).set_refinement_flag (Elem::REFINE);
 
   MeshRefinement mesh_refinement (mesh);
 

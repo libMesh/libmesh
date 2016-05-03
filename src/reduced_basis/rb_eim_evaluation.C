@@ -624,12 +624,12 @@ void RBEIMEvaluation::legacy_read_in_interpolation_points_elem(const std::string
   for(unsigned int i=0; i<n_bfs; i++)
     {
       interpolation_points_elem[i] =
-        _interpolation_points_mesh.elem(interpolation_elem_ids[i]);
+        _interpolation_points_mesh.elem_ptr(interpolation_elem_ids[i]);
     }
 
   // Get the extra interpolation point
   extra_interpolation_point_elem =
-    _interpolation_points_mesh.elem(extra_interpolation_elem_id);
+    _interpolation_points_mesh.elem_ptr(extra_interpolation_elem_id);
 }
 
 }

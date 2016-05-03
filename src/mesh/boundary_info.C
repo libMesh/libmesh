@@ -82,7 +82,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
     for (; it != end; ++it)
       {
         const Elem * other_elem = it->first;
-        _boundary_edge_id.insert(std::make_pair(_mesh.elem(other_elem->id()),
+        _boundary_edge_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
                                                 it->second));
       }
   }
@@ -95,7 +95,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
     for (; it != end; ++it)
       {
         const Elem * other_elem = it->first;
-        _boundary_side_id.insert(std::make_pair(_mesh.elem(other_elem->id()),
+        _boundary_side_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
                                                 it->second));
       }
   }
@@ -393,7 +393,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     {
       const dof_id_type elem_id = it->first;
       const unsigned char s = it->second;
-      const Elem * elem = _mesh.elem(elem_id);
+      const Elem * elem = _mesh.elem_ptr(elem_id);
 
       // Build the side - do not use a "proxy" element here:
       // This will be going into the boundary_mesh and needs to
@@ -425,7 +425,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
           libmesh_assert(side_id_map.count(parent_side_pair));
 
-          Elem * side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
+          Elem * side_parent = boundary_mesh.elem_ptr(side_id_map[parent_side_pair]);
 
           libmesh_assert(side_parent);
 
@@ -630,7 +630,7 @@ void BoundaryInfo::add_edge(const dof_id_type e,
                             const unsigned short int edge,
                             const boundary_id_type id)
 {
-  this->add_edge (_mesh.elem(e), edge, id);
+  this->add_edge (_mesh.elem_ptr(e), edge, id);
 }
 
 
@@ -722,7 +722,7 @@ void BoundaryInfo::add_side(const dof_id_type e,
                             const unsigned short int side,
                             const boundary_id_type id)
 {
-  this->add_side (_mesh.elem(e), side, id);
+  this->add_side (_mesh.elem_ptr(e), side, id);
 }
 
 

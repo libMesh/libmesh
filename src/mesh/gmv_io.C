@@ -2140,7 +2140,7 @@ void GMVIO::_read_materials()
       // << GMVLib::gmv_data.longdata1[i]
       // << std::endl;
 
-      MeshInput<MeshBase>::mesh().elem(i)->processor_id() =
+      MeshInput<MeshBase>::mesh().elem_ref(i).processor_id() =
         cast_int<processor_id_type>(GMVLib::gmv_data.longdata1[i]-1);
     }
 

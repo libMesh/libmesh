@@ -1526,8 +1526,8 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 #endif
           ++it;
 
-          Elem * parent =
-            (parent_id == DofObject::invalid_id) ? libmesh_nullptr : mesh.elem(parent_id);
+          Elem * parent = (parent_id == DofObject::invalid_id) ?
+            libmesh_nullptr : mesh.elem_ptr(parent_id);
 
           Elem * elem = Elem::build (elem_type, parent).release();
 

@@ -506,9 +506,7 @@ void UNVIO::groups_in (std::istream & in_file)
                 unsigned libmesh_elem_id = it->second;
 
                 // Attempt to get a pointer to the elem listed in the group
-                Elem * group_elem = mesh.elem(libmesh_elem_id);
-                if (!group_elem)
-                  libmesh_error_msg("Group referred to non-existent element with ID " << libmesh_elem_id);
+                Elem * group_elem = mesh.elem_ptr(libmesh_elem_id);
 
                 // dim < max_dim means the Elem defines a boundary condition
                 if (group_elem->dim() < max_dim)

@@ -1011,23 +1011,17 @@ void Nemesis_IO::read (const std::string & base_filename)
   // Mesh data structure, and assign the appropriate side to the BoundaryInfo object.
   for (unsigned int e=0; e<nemhelper->elem_list.size(); e++)
     {
-      // Calling mesh.elem() feels wrong, for example, in
-      // ParallelMesh, Mesh::elem() can return NULL so we have to check for this...
+      // Calling mesh.elem_ptr() is an error if no element with that
+      // id exists on this processor...
       //
       // Perhaps we should iterate over elements and look them up in
       // the elem list instead?  Note that the IDs in elem_list are
       // not necessarily in order, so if we did instead loop over the
       // mesh, we would have to search the (unsorted) elem_list vector
       // for each entry!  We'll settle for doing some error checking instead.
-      Elem * elem = mesh.elem(my_elem_offset + (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
-
-      if (elem == libmesh_nullptr)
-        libmesh_error_msg("Mesh returned a NULL pointer when asked for element " \
-                          << my_elem_offset                           \
-                          << " + "                                    \
-                          << nemhelper->elem_list[e]                  \
-                          << " = "                                    \
-                          << my_elem_offset+nemhelper->elem_list[e]);
+      Elem * elem = mesh.elem_ptr
+        (my_elem_offset + 
+         (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
 
       // The side numberings in libmesh and exodus are not 1:1, so we need to map
       // whatever side number is stored in Exodus into a libmesh side number using

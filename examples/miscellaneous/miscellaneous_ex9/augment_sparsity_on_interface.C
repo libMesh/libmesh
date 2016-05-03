@@ -133,18 +133,18 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
         local_coupled_dofs.clear();
         remote_coupled_dofs.clear();
 
-        // get a pointer to the one of the elements on the crack
-        const Elem * this_elem = mesh.elem(it->first);
+        // get a reference to the one of the elements on the crack
+        const Elem & this_elem = mesh.elem_ref(it->first);
 
-        // get a pointer to the neighbor element on the other side
+        // get a reference to the neighbor element on the other side
         // of the "crack" in the mesh
-        const Elem * neighbor_elem = mesh.elem(it->second);
+        const Elem & neighbor_elem = mesh.elem_ref(it->second);
 
         // Now loop over the nodes and get the DoFs on neighbor_elem.
         // These will be used to augment the sparsity patttern.
-        for (unsigned int n=0; n<neighbor_elem->n_nodes(); n++)
+        for (unsigned int n=0; n<neighbor_elem.n_nodes(); n++)
           {
-            const dof_id_type global_dof_number = neighbor_elem->node_ptr(n)->dof_number(sys_num, var_num, 0);
+            const dof_id_type global_dof_number = neighbor_elem.node_ptr(n)->dof_number(sys_num, var_num, 0);
 
             // and finally insert it into one of the sets
             if ((global_dof_number <  dof_map.first_dof()) ||
@@ -161,10 +161,10 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
 
         // conservatively increase the preallocation for the implicit matrix contribution
         // to account for these dofs
-        for (unsigned int nl=0; nl<this_elem->n_nodes(); nl++)
+        for (unsigned int nl=0; nl<this_elem.n_nodes(); nl++)
           {
             const dof_id_type
-              global_dof_number = this_elem->node_ptr(nl)->dof_number(sys_num, var_num, 0),
+              global_dof_number = this_elem.node_ptr(nl)->dof_number(sys_num, var_num, 0),
               n_local_dofs      = dof_map.n_local_dofs(),
               n_remote_dofs     = dof_map.n_dofs() - n_local_dofs;
 

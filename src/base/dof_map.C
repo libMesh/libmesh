@@ -278,7 +278,7 @@ DofObject * DofMap::node_ptr(MeshBase & mesh, dof_id_type i) const
 
 DofObject * DofMap::elem_ptr(MeshBase & mesh, dof_id_type i) const
 {
-  return mesh.elem(i);
+  return mesh.elem_ptr(i);
 }
 
 
