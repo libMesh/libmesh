@@ -2474,7 +2474,6 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
 
 
 
-// TODO: this should eventually completely replace the other version of write_nodal_solution.
 void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & parallel_soln,
                                              const std::vector<std::string> & names,
                                              int timestep)

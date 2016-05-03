@@ -299,17 +299,24 @@ public:
   virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
-   * Takes a solution vector containing the solution for all variables and outputs it to the files
+   * Takes a parallel solution vector containing the node-major
+   * solution vector for all variables and outputs it to the files.
+   *
+   * Note: This version of write_nodal_solution() is called by the
+   * parallel version of Nemesis_IO::write_nodal_data(), which is
+   * called by MeshOutput::write_equation_systems() for parallel I/O
+   * formats like Nemesis.  The other version is still available to
+   * continue supporting things like NamebasedIO::write_nodal_data(),
+   * but this version should be preferred when running in parallel.
    */
-  void write_nodal_solution(const std::vector<Number> & values,
+  void write_nodal_solution(const NumericVector<Number> & parallel_soln,
                             const std::vector<std::string> & names,
                             int timestep);
 
   /**
-   * Takes a parallel solution vector containing the node-major
-   * solution vector for all variables and outputs it to the files.
+   * Takes a solution vector containing the solution for all variables and outputs it to the files
    */
-  void write_nodal_solution(const NumericVector<Number> & parallel_soln,
+  void write_nodal_solution(const std::vector<Number> & values,
                             const std::vector<std::string> & names,
                             int timestep);
 
