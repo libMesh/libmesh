@@ -35,8 +35,8 @@ void AugmentSparsityOnContact::augment_sparsity_pattern(SparsityPattern::Graph &
 
   for ( ; it != it_end; ++it)
     {
-      const Node & this_node = mesh.node(it->first);
-      const Node & other_node = mesh.node(it->second);
+      const Node & this_node = mesh.node_ref(it->first);
+      const Node & other_node = mesh.node_ref(it->second);
 
       set_sparsity_values(this_node, other_node, n_nz, n_oz);
       set_sparsity_values(other_node, this_node, n_nz, n_oz);

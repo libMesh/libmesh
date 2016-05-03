@@ -220,7 +220,7 @@ int main (int argc, char** argv)
   // get the dof_numbers for the nodes that
   // should be monitored.
   const unsigned int res_node_no = result_node;
-  const Node & res_node = mesh.node(res_node_no-1);
+  const Node & res_node = mesh.node_ref(res_node_no-1);
   unsigned int dof_no = res_node.dof_number(0, 0, 0);
 
   // Assemble the time independent system matrices and rhs.
@@ -605,7 +605,7 @@ void fill_dirichlet_bc(EquationSystems & es,
   for (unsigned int n_cnt=0; n_cnt<n_nodes; n_cnt++)
     {
       // Get a reference to the current node.
-      const Node & curr_node = mesh.node(n_cnt);
+      const Node & curr_node = mesh.node_ref(n_cnt);
 
       // Check if Dirichlet BCs should be applied to this node.
       // Use the TOLERANCE from mesh_common.h as tolerance.
