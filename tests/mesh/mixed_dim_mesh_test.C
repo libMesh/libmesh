@@ -574,7 +574,7 @@ public:
 
     // EDGE2 child elements should have the correct interior_parent
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).interior_parent(),
-                          _mesh->elem_ref(5) );
+                          _mesh->elem_ptr(5) );
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).interior_parent(),
                           _mesh->elem_ptr(6) );
 #endif
@@ -800,15 +800,15 @@ public:
 
     // EDGE2 child elements should have the correct parent
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).parent(),
-                          _mesh->elem_ref(4) );
+                          _mesh->elem_ptr(4) );
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).parent(),
-                          _mesh->elem_ref(4) );
+                          _mesh->elem_ptr(4) );
 
     // EDGE2 child elements should have the correct interior_parent
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).interior_parent(),
-                          _mesh->elem_ref(5) );
+                          _mesh->elem_ptr(5) );
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).interior_parent(),
-                          _mesh->elem_ref(6) );
+                          _mesh->elem_ptr(6) );
 
   }
 
