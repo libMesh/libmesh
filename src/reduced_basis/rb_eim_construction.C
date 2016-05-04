@@ -283,11 +283,9 @@ void RBEIMConstruction::load_rb_solution()
                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
-  for(unsigned int i=0; i<get_rb_evaluation().RB_solution.size(); i++)
-    {
-      get_explicit_system().solution->add(
-        get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
-    }
+  for (unsigned int i=0; i<get_rb_evaluation().RB_solution.size(); i++)
+    get_explicit_system().solution->add(get_rb_evaluation().RB_solution(i),
+                                        get_rb_evaluation().get_basis_function(i));
 
   get_explicit_system().update();
 }
@@ -303,8 +301,8 @@ void RBEIMConstruction::enrich_RB_space()
 
   // put solution in _ghosted_meshfunction_vector so we can access it from the mesh function
   // this allows us to compute EIM_rhs appropriately
-  get_explicit_system().solution->localize(
-    *_ghosted_meshfunction_vector, get_explicit_system().get_dof_map().get_send_list());
+  get_explicit_system().solution->localize(*_ghosted_meshfunction_vector,
+                                           get_explicit_system().get_dof_map().get_send_list());
 
   RBEIMEvaluation & eim_eval = cast_ref<RBEIMEvaluation &>(get_rb_evaluation());
 
@@ -437,13 +435,15 @@ void RBEIMConstruction::enrich_RB_space()
 
           for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
             {
-              get_explicit_sys_subvector(
-                *implicit_sys_temp1, var, *localized_new_bf);
+              get_explicit_sys_subvector(*implicit_sys_temp1,
+                                         var,
+                                         *localized_new_bf);
 
               inner_product_matrix->vector_mult(*implicit_sys_temp2, *implicit_sys_temp1);
 
-              set_explicit_sys_subvector(
-                *matrix_times_new_bf, var, *implicit_sys_temp2);
+              set_explicit_sys_subvector(*matrix_times_new_bf,
+                                         var,
+                                         *implicit_sys_temp2);
             }
 
           _matrix_times_bfs.push_back(matrix_times_new_bf);
@@ -553,11 +553,9 @@ Real RBEIMConstruction::compute_best_fit_error()
     }
 
   // load the error into solution
-  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
-    {
-      get_explicit_system().solution->add(
-        -get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
-    }
+  for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+    get_explicit_system().solution->add(-get_rb_evaluation().RB_solution(i),
+                                        get_rb_evaluation().get_basis_function(i));
 
   Real best_fit_error = get_explicit_system().solution->linfty_norm();
 
@@ -759,8 +757,7 @@ void RBEIMConstruction::update_RB_system_matrices()
             for(unsigned int var=0; var<get_explicit_system().n_vars(); var++)
               {
                 get_explicit_sys_subvector(*temp1, var, *localized_basis_function);
-                inner_product_matrix->vector_mult(
-                  *temp2, *temp1);
+                inner_product_matrix->vector_mult(*temp2, *temp1);
                 set_explicit_sys_subvector(*explicit_sys_temp, var, *temp2);
               }
 
@@ -785,8 +782,8 @@ void RBEIMConstruction::update_RB_system_matrices()
     {
       // Sample the basis functions at the
       // new interpolation point
-      get_rb_evaluation().get_basis_function(j).localize(
-        *_ghosted_meshfunction_vector, get_explicit_system().get_dof_map().get_send_list());
+      get_rb_evaluation().get_basis_function(j).localize(*_ghosted_meshfunction_vector,
+                                                         get_explicit_system().get_dof_map().get_send_list());
 
       if(!_performing_extra_greedy_step)
         {
@@ -815,8 +812,9 @@ void RBEIMConstruction::update_system()
   update_RB_system_matrices();
 }
 
-bool RBEIMConstruction::greedy_termination_test(
-  Real abs_greedy_error, Real initial_error, int)
+bool RBEIMConstruction::greedy_termination_test(Real abs_greedy_error,
+                                                Real initial_error,
+                                                int)
 {
   if(_performing_extra_greedy_step)
     {
@@ -856,8 +854,9 @@ bool RBEIMConstruction::greedy_termination_test(
   return false;
 }
 
-void RBEIMConstruction::set_explicit_sys_subvector(
-  NumericVector<Number> & dest, unsigned int var, NumericVector<Number> & source)
+void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
+                                                   unsigned int var,
+                                                   NumericVector<Number> & source)
 {
   LOG_SCOPE("set_explicit_sys_subvector()", "RBEIMConstruction");
 
@@ -873,19 +872,18 @@ void RBEIMConstruction::set_explicit_sys_subvector(
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];
 
-      if( (dest.first_local_index() <= explicit_sys_dof_index) &&
-          (explicit_sys_dof_index < dest.last_local_index()) )
-      {
-        dest.set(
-          explicit_sys_dof_index, (*localized_source)(implicit_sys_dof_index));
-      }
+      if ((dest.first_local_index() <= explicit_sys_dof_index) &&
+          (explicit_sys_dof_index < dest.last_local_index()))
+        dest.set(explicit_sys_dof_index,
+                 (*localized_source)(implicit_sys_dof_index));
     }
 
   dest.close();
 }
 
-void RBEIMConstruction::get_explicit_sys_subvector(
-  NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& localized_source)
+void RBEIMConstruction::get_explicit_sys_subvector(NumericVector<Number> & dest,
+                                                   unsigned int var,
+                                                   NumericVector<Number> & localized_source)
 {
   LOG_SCOPE("get_explicit_sys_subvector()", "RBEIMConstruction");
 
@@ -894,12 +892,10 @@ void RBEIMConstruction::get_explicit_sys_subvector(
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];
 
-      if( (dest.first_local_index() <= implicit_sys_dof_index) &&
-          (implicit_sys_dof_index < dest.last_local_index()) )
-      {
-        dest.set(
-          implicit_sys_dof_index, localized_source(explicit_sys_dof_index));
-      }
+      if ((dest.first_local_index() <= implicit_sys_dof_index) &&
+          (implicit_sys_dof_index < dest.last_local_index()))
+        dest.set(implicit_sys_dof_index,
+                 localized_source(explicit_sys_dof_index));
     }
 
   dest.close();

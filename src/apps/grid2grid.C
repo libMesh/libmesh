@@ -100,8 +100,7 @@ int main (int argc, char ** argv)
     for (unsigned int e=0; e<mesh_coarse.n_elem(); e++)
     {
     libMesh::out << "looking for centroid of element " << e << std::endl;
-    const Elem * elem =
-      octree_coarse.find_element(mesh_coarse.elem_ref(e).centroid(mesh_coarse));
+    const Elem * elem = octree_coarse.find_element(mesh_coarse.elem_ref(e).centroid(mesh_coarse));
 
     libmesh_assert(elem);
     }

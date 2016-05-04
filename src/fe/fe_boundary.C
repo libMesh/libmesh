@@ -679,7 +679,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
 
         const unsigned int n_mapping_shape_functions =
           FE<2,LAGRANGE>::n_shape_functions (side->type(),
-                                               side->default_order());
+                                             side->default_order());
 
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<n_mapping_shape_functions; i++) // sum over the nodes
@@ -813,7 +813,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
 
         const unsigned int n_mapping_shape_functions =
           FE<3,LAGRANGE>::n_shape_functions (side->type(),
-                                               side->default_order());
+                                             side->default_order());
 
         // compute x, dxdxi at the quadrature points
         for (unsigned int i=0; i<n_mapping_shape_functions; i++) // sum over the nodes

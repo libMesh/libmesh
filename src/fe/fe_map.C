@@ -192,19 +192,27 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
               {
                 if (calculate_xyz)
                   this->phi_map[i][0] =
-                    FE<Dim,LAGRANGE>::shape
-                      (mapping_elem_type, mapping_order, i, qp[0]);
+                    FE<Dim,LAGRANGE>::shape(mapping_elem_type,
+                                            mapping_order,
+                                            i,
+                                            qp[0]);
 
                 if (calculate_dxyz)
                   this->dphidxi_map[i][0] =
-                    FE<Dim,LAGRANGE>::shape_deriv
-                      (mapping_elem_type, mapping_order, i, 0, qp[0]);
+                    FE<Dim,LAGRANGE>::shape_deriv(mapping_elem_type,
+                                                  mapping_order,
+                                                  i,
+                                                  0,
+                                                  qp[0]);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 if (calculate_d2xyz)
                   this->d2phidxi2_map[i][0] =
-                    FE<Dim,LAGRANGE>::shape_second_deriv
-                      (mapping_elem_type, mapping_order, i, 0, qp[0]);
+                    FE<Dim,LAGRANGE>::shape_second_deriv(mapping_elem_type,
+                                                         mapping_order,
+                                                         i,
+                                                         0,
+                                                         qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 for (std::size_t p=1; p<n_qp; p++)
                   {

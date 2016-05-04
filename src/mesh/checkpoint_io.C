@@ -609,7 +609,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
           Elem * parent =
             (parent_id == DofObject::invalid_processor_id) ?
-             libmesh_nullptr : mesh.elem_ptr(parent_id);
+            libmesh_nullptr : mesh.elem_ptr(parent_id);
 
           // Create the element
           Elem * elem = Elem::build(elem_type, parent).release();

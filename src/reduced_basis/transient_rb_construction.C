@@ -632,8 +632,10 @@ Real TransientRBConstruction::truth_solve(int write_interval)
   return final_truth_L2_norm;
 }
 
-bool TransientRBConstruction::greedy_termination_test(
-  Real abs_greedy_error, Real initial_greedy_error, int count)
+bool
+TransientRBConstruction::greedy_termination_test(Real abs_greedy_error,
+                                                 Real initial_greedy_error,
+                                                 int count)
 {
   if ( (get_max_truth_solves()>0) && (count >= get_max_truth_solves()) )
     {

@@ -2405,8 +2405,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
           //Note that Exodus assumes all elements in a block are of the same type!
           //We are using that same assumption here!
           const ExodusII_IO_Helper::Conversion conv =
-            em.assign_conversion
-              (mesh.elem_ref(elements_in_this_block[0]).type());
+            em.assign_conversion(mesh.elem_ref(elements_in_this_block[0]).type());
 
           this->num_nodes_per_elem =
             mesh.elem_ref(elements_in_this_block[0]).n_nodes();

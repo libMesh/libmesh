@@ -1203,7 +1203,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           // If we're projecting from an old grid
           if (f.is_grid_projection() &&
-          // And either this is an unchanged element
+              // And either this is an unchanged element
               ((elem->refinement_flag() != Elem::JUST_REFINED &&
                 elem->refinement_flag() != Elem::JUST_COARSENED &&
                 elem->p_refinement_flag() != Elem::JUST_REFINED &&
@@ -1215,9 +1215,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 elem->p_level() == 0 &&
                 elem->refinement_flag() != Elem::JUST_COARSENED &&
                 elem->p_refinement_flag() != Elem::JUST_COARSENED))
-             )
-          // then we can simply copy its old dof
-          // values to new indices.
+              )
+            // then we can simply copy its old dof
+            // values to new indices.
             {
               LOG_SCOPE ("copy_dofs", "GenericProjector");
 

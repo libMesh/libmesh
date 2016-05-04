@@ -42,17 +42,17 @@
 
 namespace
 {
-  bool split_first_diagonal(const libMesh::Elem * elem,
-                            unsigned int diag_1_node_1,
-                            unsigned int diag_1_node_2,
-                            unsigned int diag_2_node_1,
-                            unsigned int diag_2_node_2)
-    {
-      return ((elem->node_id(diag_1_node_1) > elem->node_id(diag_2_node_1) &&
-               elem->node_id(diag_1_node_1) > elem->node_id(diag_2_node_2)) ||
-              (elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_1) &&
-               elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_2)));
-    }
+bool split_first_diagonal(const libMesh::Elem * elem,
+                          unsigned int diag_1_node_1,
+                          unsigned int diag_1_node_2,
+                          unsigned int diag_2_node_1,
+                          unsigned int diag_2_node_2)
+{
+  return ((elem->node_id(diag_1_node_1) > elem->node_id(diag_2_node_1) &&
+           elem->node_id(diag_1_node_1) > elem->node_id(diag_2_node_2)) ||
+          (elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_1) &&
+           elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_2)));
+}
 
 }
 
@@ -1373,8 +1373,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
           case TET4:
           case TET10:
           case INFEDGE2:
-          // No way to split infinite quad/prism elements, so
-          // hopefully no need to
+            // No way to split infinite quad/prism elements, so
+            // hopefully no need to
           case INFQUAD4:
           case INFQUAD6:
           case INFPRISM6:
