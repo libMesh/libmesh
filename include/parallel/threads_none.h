@@ -21,6 +21,10 @@
 
 // Do not try to #include this header directly, it is designed to be
 // #included directly by threads.h
+#ifndef LIBMESH_SQUASH_HEADER_WARNING
+# warning "This file is designed to be included through libmesh/threads.h"
+#else
+
 #if !defined(LIBMESH_HAVE_TBB_API) && !defined(LIBMESH_HAVE_PTHREAD)
 
 // Thread-Local-Storage macros
@@ -179,5 +183,7 @@ private:
 } // namespace libMesh
 
 #endif // !defined(LIBMESH_HAVE_TBB_API) && !defined(LIBMESH_HAVE_PTHREAD)
+
+#endif // LIBMESH_SQUASH_HEADER_WARNING
 
 #endif // LIBMESH_THREADS_NONE_H

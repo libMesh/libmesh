@@ -20,6 +20,10 @@
 
 // Do not try to #include this header directly, it is designed to be
 // #included directly by threads.h
+#ifndef LIBMESH_SQUASH_HEADER_WARNING
+# warning "This file is designed to be included through libmesh/threads.h"
+#else
+
 #ifdef LIBMESH_HAVE_PTHREAD
 
 // C++ includes
@@ -508,5 +512,7 @@ private:
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PTHREAD
+
+#endif // LIBMESH_SQUASH_HEADER_WARNING
 
 #endif // LIBMESH_THREADS_PTHREAD_H

@@ -97,6 +97,7 @@ public:
 // Include thread-model specific algorithms and objects.  These
 // headers include headers of their own and handle their own
 // namespacing.
+#define LIBMESH_SQUASH_HEADER_WARNING
 #ifdef LIBMESH_HAVE_TBB_API
 # include "libmesh/threads_tbb.h"
 #elif LIBMESH_HAVE_PTHREAD

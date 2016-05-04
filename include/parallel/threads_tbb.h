@@ -21,6 +21,10 @@
 
 // Do not try to #include this header directly, it is designed to be
 // #included directly by threads.h
+#ifndef LIBMESH_SQUASH_HEADER_WARNING
+# warning "This file is designed to be included through libmesh/threads.h"
+#else
+
 #ifdef LIBMESH_HAVE_TBB_API
 
 // libMesh includes
@@ -220,5 +224,7 @@ class atomic : public tbb::atomic<T> {};
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_TBB_API
+
+#endif // LIBMESH_SQUASH_HEADER_WARNING
 
 #endif // LIBMESH_THREADS_TBB_H
