@@ -50,8 +50,7 @@ public:
    * Constructor. Enables implicit conversion from an Order
    * enum to an OrderWrapper.
    */
-  OrderWrapper(Order order)
-  :
+  OrderWrapper(Order order) :
     _order(static_cast<int>(order))
   {}
 
@@ -59,8 +58,7 @@ public:
    * Constructor. Enables implicit conversion from an int
    * to an OrderWrapper.
    */
-  OrderWrapper(int order)
-  :
+  OrderWrapper(int order) :
     _order(order)
   {}
 

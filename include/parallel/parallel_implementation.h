@@ -40,18 +40,18 @@ namespace Parallel {
   {                                                                     \
   public:                                                               \
     explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {}       \
+      StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
   }
 
 #else
 
-#define STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                    \
-  class StandardType<cxxtype> : public DataType                 \
-  {                                                             \
-  public:                                                       \
-    explicit                                                    \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}      \
+#define STANDARD_TYPE(cxxtype,mpitype)                                  \
+  template<>                                                            \
+  class StandardType<cxxtype> : public DataType                         \
+  {                                                                     \
+  public:                                                               \
+    explicit                                                            \
+      StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
   }
 
 #endif
@@ -2698,7 +2698,7 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
     }
 
   const T* example = sendvec.empty() ?
-                     (recv.empty() ? libmesh_nullptr : &recv[0]) : &sendvec[0];
+    (recv.empty() ? libmesh_nullptr : &recv[0]) : &sendvec[0];
 
   // Call the user-defined type version with automatic
   // type conversion based on template argument:

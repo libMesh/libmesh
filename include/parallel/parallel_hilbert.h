@@ -64,11 +64,9 @@ public:
 #endif // LIBMESH_HAVE_MPI
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  typedef
-  std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
+typedef std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
 #else
-  typedef
-  Hilbert::HilbertIndices DofObjectKey;
+typedef Hilbert::HilbertIndices DofObjectKey;
 #endif
 
 
@@ -85,10 +83,8 @@ namespace Hilbert {
 // XCode didn't find it in the libMesh namespace.
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 inline
-std::ostream&
-operator <<
-  (std::ostream& os,
-   const libMesh::Parallel::DofObjectKey & hilbert_pair)
+std::ostream & operator << (std::ostream& os,
+                            const libMesh::Parallel::DofObjectKey & hilbert_pair)
 {
   os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;
   return os;

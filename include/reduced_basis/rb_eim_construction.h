@@ -194,15 +194,17 @@ public:
    * Load \p source into the subvector of \p dest corresponding
    * to var \p var.
    */
-  void set_explicit_sys_subvector(
-    NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& source);
+  void set_explicit_sys_subvector(NumericVector<Number>& dest,
+                                  unsigned int var,
+                                  NumericVector<Number>& source);
 
   /**
    * Load the subvector of \p localized_source corresponding to variable \p var into
    * \p dest. We require localized_source to be localized before we call this method.
    */
-  void get_explicit_sys_subvector(
-    NumericVector<Number>& dest, unsigned int var, NumericVector<Number>& localized_source);
+  void get_explicit_sys_subvector(NumericVector<Number>& dest,
+                                  unsigned int var,
+                                  NumericVector<Number>& localized_source);
 
   /**
    * Set up the index map between the implicit and explicit systems.
@@ -265,8 +267,9 @@ protected:
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
-  virtual bool greedy_termination_test(
-    Real abs_greedy_error, Real initial_greedy_error, int count) libmesh_override;
+  virtual bool greedy_termination_test(Real abs_greedy_error,
+                                       Real initial_greedy_error,
+                                       int count) libmesh_override;
 
   /**
    * Loop over the training set and compute the parametrized function for each
