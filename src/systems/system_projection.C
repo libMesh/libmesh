@@ -1208,8 +1208,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 elem->refinement_flag() != Elem::JUST_COARSENED &&
                 elem->p_refinement_flag() != Elem::JUST_REFINED &&
                 elem->p_refinement_flag() != Elem::JUST_COARSENED) ||
-	  // Or this is a low order monomial element which has merely
-	  // been h refined
+               // Or this is a low order monomial element which has merely
+               // been h refined
                (fe_type.family == MONOMIAL &&
                 fe_type.order == CONSTANT &&
                 elem->p_level() == 0 &&

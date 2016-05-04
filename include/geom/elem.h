@@ -2060,8 +2060,8 @@ void Elem::set_p_level(unsigned int p)
             parent_p_level = std::min(parent_p_level,
                                       this->parent()->child(c)->p_level());
 
-	  // When its children all have a higher p level, the parent's
-	  // should rise
+          // When its children all have a higher p level, the parent's
+          // should rise
           if (parent_p_level > this->parent()->p_level())
             {
               this->parent()->set_p_level(parent_p_level);
