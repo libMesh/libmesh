@@ -89,15 +89,15 @@ void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
+        conn[0] = this->node_id(0)+1;
+        conn[1] = this->node_id(1)+1;
         return;
       }
 
     case VTK:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
         return;
       }
 
@@ -118,8 +118,8 @@ Real Edge2::volume () const
 
 dof_id_type Edge2::key () const
 {
-  return this->compute_key(this->node(0),
-                           this->node(1));
+  return this->compute_key(this->node_id(0),
+                           this->node_id(1));
 }
 
 } // namespace libMesh

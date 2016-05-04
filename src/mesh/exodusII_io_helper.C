@@ -1427,7 +1427,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
               if (!use_discontinuous)
                 {
                   // The global id for the current node in libmesh.
-                  dof_id_type libmesh_node_id = elem.node(elem_node_index);
+                  dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
 
                   // Find the zero-based libmesh id in the map, this
                   // should be faster than doing linear searches on

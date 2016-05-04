@@ -1540,7 +1540,7 @@ inline
 unsigned int Elem::local_node (const dof_id_type i) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    if (this->node(n) == i)
+    if (this->node_id(n) == i)
       return n;
 
   return libMesh::invalid_uint;

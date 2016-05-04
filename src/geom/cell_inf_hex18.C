@@ -113,7 +113,7 @@ dof_id_type InfHex18::key (const unsigned int s) const
   switch (s)
     {
     case 0: // the base face
-      return this->compute_key (this->node(16));
+      return this->compute_key (this->node_id(16));
 
     case 1: // the face at y = -1
     case 2: // the face at x = 1
@@ -228,53 +228,53 @@ void InfHex18::connectivity(const unsigned int sc,
           {
           case 0:
 
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(8)+1;
-            conn[2] = this->node(16)+1;
-            conn[3] = this->node(11)+1;
-            conn[4] = this->node(4)+1;
-            conn[5] = this->node(12)+1;
-            conn[6] = this->node(17)+1;
-            conn[7] = this->node(15)+1;
+            conn[0] = this->node_id(0)+1;
+            conn[1] = this->node_id(8)+1;
+            conn[2] = this->node_id(16)+1;
+            conn[3] = this->node_id(11)+1;
+            conn[4] = this->node_id(4)+1;
+            conn[5] = this->node_id(12)+1;
+            conn[6] = this->node_id(17)+1;
+            conn[7] = this->node_id(15)+1;
 
             return;
 
           case 1:
 
-            conn[0] = this->node(8)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(9)+1;
-            conn[3] = this->node(16)+1;
-            conn[4] = this->node(12)+1;
-            conn[5] = this->node(5)+1;
-            conn[6] = this->node(13)+1;
-            conn[7] = this->node(17)+1;
+            conn[0] = this->node_id(8)+1;
+            conn[1] = this->node_id(1)+1;
+            conn[2] = this->node_id(9)+1;
+            conn[3] = this->node_id(16)+1;
+            conn[4] = this->node_id(12)+1;
+            conn[5] = this->node_id(5)+1;
+            conn[6] = this->node_id(13)+1;
+            conn[7] = this->node_id(17)+1;
 
             return;
 
           case 2:
 
-            conn[0] = this->node(11)+1;
-            conn[1] = this->node(16)+1;
-            conn[2] = this->node(10)+1;
-            conn[3] = this->node(3)+1;
-            conn[4] = this->node(15)+1;
-            conn[5] = this->node(17)+1;
-            conn[6] = this->node(14)+1;
-            conn[7] = this->node(7)+1;
+            conn[0] = this->node_id(11)+1;
+            conn[1] = this->node_id(16)+1;
+            conn[2] = this->node_id(10)+1;
+            conn[3] = this->node_id(3)+1;
+            conn[4] = this->node_id(15)+1;
+            conn[5] = this->node_id(17)+1;
+            conn[6] = this->node_id(14)+1;
+            conn[7] = this->node_id(7)+1;
 
             return;
 
           case 3:
 
-            conn[0] = this->node(16)+1;
-            conn[1] = this->node(9)+1;
-            conn[2] = this->node(2)+1;
-            conn[3] = this->node(10)+1;
-            conn[4] = this->node(17)+1;
-            conn[5] = this->node(13)+1;
-            conn[6] = this->node(6)+1;
-            conn[7] = this->node(14)+1;
+            conn[0] = this->node_id(16)+1;
+            conn[1] = this->node_id(9)+1;
+            conn[2] = this->node_id(2)+1;
+            conn[3] = this->node_id(10)+1;
+            conn[4] = this->node_id(17)+1;
+            conn[5] = this->node_id(13)+1;
+            conn[6] = this->node_id(6)+1;
+            conn[7] = this->node_id(14)+1;
 
             return;
 

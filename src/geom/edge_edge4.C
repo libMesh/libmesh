@@ -112,18 +112,18 @@ void Edge4::connectivity(const unsigned int sc,
         switch (sc)
           {
           case 0:
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(2)+1;
+            conn[0] = this->node_id(0)+1;
+            conn[1] = this->node_id(2)+1;
             return;
 
           case 1:
-            conn[0] = this->node(2)+1;
-            conn[1] = this->node(3)+1;
+            conn[0] = this->node_id(2)+1;
+            conn[1] = this->node_id(3)+1;
             return;
 
           case 2:
-            conn[0] = this->node(3)+1;
-            conn[1] = this->node(1)+1;
+            conn[0] = this->node_id(3)+1;
+            conn[1] = this->node_id(1)+1;
             return;
 
           default:
@@ -138,18 +138,18 @@ void Edge4::connectivity(const unsigned int sc,
         switch (sc)
           {
           case 0:
-            conn[0] = this->node(0);
-            conn[1] = this->node(2);
+            conn[0] = this->node_id(0);
+            conn[1] = this->node_id(2);
             return;
 
           case 1:
-            conn[0] = this->node(2);
-            conn[1] = this->node(3);
+            conn[0] = this->node_id(2);
+            conn[1] = this->node_id(3);
             return;
 
           case 2:
-            conn[0] = this->node(3);
-            conn[1] = this->node(1);
+            conn[0] = this->node_id(3);
+            conn[1] = this->node_id(1);
             return;
 
           default:
@@ -166,10 +166,10 @@ void Edge4::connectivity(const unsigned int sc,
 
 dof_id_type Edge4::key () const
 {
-  return this->compute_key(this->node(0),
-                           this->node(1),
-                           this->node(2),
-                           this->node(3));
+  return this->compute_key(this->node_id(0),
+                           this->node_id(1),
+                           this->node_id(2),
+                           this->node_id(3));
 }
 
 

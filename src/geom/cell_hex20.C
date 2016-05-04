@@ -193,14 +193,14 @@ void Hex20::connectivity(const unsigned int sc,
           {
           case 0:
             conn.resize(8);
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(2)+1;
-            conn[3] = this->node(3)+1;
-            conn[4] = this->node(4)+1;
-            conn[5] = this->node(5)+1;
-            conn[6] = this->node(6)+1;
-            conn[7] = this->node(7)+1;
+            conn[0] = this->node_id(0)+1;
+            conn[1] = this->node_id(1)+1;
+            conn[2] = this->node_id(2)+1;
+            conn[3] = this->node_id(3)+1;
+            conn[4] = this->node_id(4)+1;
+            conn[5] = this->node_id(5)+1;
+            conn[6] = this->node_id(6)+1;
+            conn[7] = this->node_id(7)+1;
 
             return;
 
@@ -215,26 +215,26 @@ void Hex20::connectivity(const unsigned int sc,
           {
           case 0:
             conn.resize(20);
-            conn[0] = this->node(0);
-            conn[1] = this->node(1);
-            conn[2] = this->node(2);
-            conn[3] = this->node(3);
-            conn[4] = this->node(4);
-            conn[5] = this->node(5);
-            conn[6] = this->node(6);
-            conn[7] = this->node(7);
-            conn[8] = this->node(8);
-            conn[9] = this->node(9);
-            conn[10] = this->node(10);
-            conn[11] = this->node(11);
-            conn[12] = this->node(16);
-            conn[13] = this->node(17);
-            conn[14] = this->node(18);
-            conn[15] = this->node(19);
-            conn[16] = this->node(12);
-            conn[17] = this->node(13);
-            conn[18] = this->node(14);
-            conn[19] = this->node(15);
+            conn[0] = this->node_id(0);
+            conn[1] = this->node_id(1);
+            conn[2] = this->node_id(2);
+            conn[3] = this->node_id(3);
+            conn[4] = this->node_id(4);
+            conn[5] = this->node_id(5);
+            conn[6] = this->node_id(6);
+            conn[7] = this->node_id(7);
+            conn[8] = this->node_id(8);
+            conn[9] = this->node_id(9);
+            conn[10] = this->node_id(10);
+            conn[11] = this->node_id(11);
+            conn[12] = this->node_id(16);
+            conn[13] = this->node_id(17);
+            conn[14] = this->node_id(18);
+            conn[15] = this->node_id(19);
+            conn[16] = this->node_id(12);
+            conn[17] = this->node_id(13);
+            conn[18] = this->node_id(14);
+            conn[19] = this->node_id(15);
             return;
 
           default:

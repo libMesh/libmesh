@@ -118,7 +118,7 @@ ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
   for(std::set<Elem *>::iterator it = other_mesh._extra_ghost_elems.begin();
       it != other_mesh._extra_ghost_elems.end();
       ++it)
-    _extra_ghost_elems.insert(elem((*it)->id()));
+    _extra_ghost_elems.insert(this->elem_ptr((*it)->id()));
 }
 
 
@@ -1222,7 +1222,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
         Elem * el = *it;
 
         for (unsigned int n=0; n != el->n_nodes(); ++n)
-          used_nodes.insert(el->node(n));
+          used_nodes.insert(el->node_id(n));
       }
   }
 

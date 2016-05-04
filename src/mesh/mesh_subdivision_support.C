@@ -405,7 +405,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               unsigned int n_nb = 0;
               while (nb1 != libmesh_nullptr && nb1->id() != elem->id())
                 {
-                  j = nb1->local_node_number(elem->node(i));
+                  j = nb1->local_node_number(elem->node_id(i));
                   nb2 = nb1;
                   nb1 = static_cast<Tri3Subdivision *>(nb1->neighbor(prev[j]));
                   libmesh_assert(nb1 == libmesh_nullptr || nb1->id() != nb2->id());
@@ -465,7 +465,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   mesh.get_boundary_info().add_node(node, 1);
 
                   nb2 = newelem;
-                  j = nb2->local_node_number(elem->node(i));
+                  j = nb2->local_node_number(elem->node_id(i));
                 }
 
               Tri3Subdivision * newelem = new Tri3Subdivision();

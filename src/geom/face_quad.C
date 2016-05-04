@@ -54,18 +54,18 @@ dof_id_type Quad::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  return this->compute_key(this->node(Quad4::side_nodes_map[s][0]),
-                           this->node(Quad4::side_nodes_map[s][1]));
+  return this->compute_key(this->node_id(Quad4::side_nodes_map[s][0]),
+                           this->node_id(Quad4::side_nodes_map[s][1]));
 }
 
 
 
 dof_id_type Quad::key () const
 {
-  return this->compute_key(this->node(0),
-                           this->node(1),
-                           this->node(2),
-                           this->node(3));
+  return this->compute_key(this->node_id(0),
+                           this->node_id(1),
+                           this->node_id(2),
+                           this->node_id(3));
 }
 
 

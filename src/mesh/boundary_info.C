@@ -225,13 +225,13 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
         {
           // Get the correct node pointer, based on the id()
           Node * new_node =
-            boundary_mesh.node_ptr(node_id_map[new_elem->node(nn)]);
+            boundary_mesh.node_ptr(node_id_map[new_elem->node_id(nn)]);
 
           // sanity check: be sure that the new Node exists and its
           // global id really matches
           libmesh_assert (new_node);
           libmesh_assert_equal_to (new_node->id(),
-                                   node_id_map[new_elem->node(nn)]);
+                                   node_id_map[new_elem->node_id(nn)]);
 
           // Assign the new node pointer
           new_elem->set_node(nn) = new_node;
@@ -302,8 +302,8 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       UniquePtr<Elem> interior_parent_side = interior_parent->build_side(interior_parent_side_index);
       for(unsigned char local_node_index=0; local_node_index<boundary_elem->n_nodes(); local_node_index++)
         {
-          dof_id_type boundary_node_id = boundary_elem->node(local_node_index);
-          dof_id_type interior_node_id = interior_parent_side->node(local_node_index);
+          dof_id_type boundary_node_id = boundary_elem->node_id(local_node_index);
+          dof_id_type interior_node_id = interior_parent_side->node_id(local_node_index);
 
           node_id_map[interior_node_id] = boundary_node_id;
         }

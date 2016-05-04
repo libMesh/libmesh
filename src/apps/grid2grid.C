@@ -165,7 +165,7 @@ int main (int argc, char ** argv)
             for (unsigned int i=0; i<fe_fine.n_shape_functions(); i++)
               {
                 const unsigned int nv = fine_var_names.size();
-                const unsigned int gn = fine_element->node(i); // Global node number
+                const unsigned int gn = fine_element->node_id(i); // Global node number
 
                 fine_soln += fine_solution[gn*nv + ivar]*phi[i][gp];
               }
@@ -199,7 +199,7 @@ int main (int argc, char ** argv)
             for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
               {
                 const unsigned int nv = coarse_var_names.size();
-                const unsigned int gn = coarse_element->node(i); // Global node number
+                const unsigned int gn = coarse_element->node_id(i); // Global node number
 
                 coarse_soln += coarse_solution[gn*nv + ivar]*fe_coarse.shape(coarse_element,
                                                                              SECOND,
@@ -233,7 +233,7 @@ int main (int argc, char ** argv)
       for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
         for (unsigned int n=0; n<mesh_fine.elem_ref(e).n_nodes(); n++)
           {
-            const unsigned int gn = mesh_fine.elem_ref(e).node(n);
+            const unsigned int gn = mesh_fine.elem_ref(e).node_id(n);
 
             if (!already_done[gn])
               {
@@ -265,7 +265,8 @@ int main (int argc, char ** argv)
 
                     // Interpolate the coarse grid solution.
                     for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
-                      coarse_soln += coarse_solution[coarse_element->node(i)*nv + c]*
+                      coarse_soln +=
+                        coarse_solution[coarse_element->node_id(i)*nv + c]*
                         fe_coarse.shape(coarse_element, SECOND, i, mapped_point);
 
                     diff_solution[gn*nv + c] = coarse_soln - fine_solution[gn*nv + c];

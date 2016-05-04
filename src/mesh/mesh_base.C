@@ -625,7 +625,7 @@ void MeshBase::detect_interior_parents()
         {
           libmesh_assert_less (elem->id(), this->max_elem_id());
 
-          node_to_elem[elem->node(n)].push_back(elem->id());
+          node_to_elem[elem->node_id(n)].push_back(elem->id());
         }
     }
 
@@ -649,12 +649,12 @@ void MeshBase::detect_interior_parents()
 
       for (dof_id_type n=0; n < element->n_vertices(); n++)
         {
-          std::vector<dof_id_type> & element_ids = node_to_elem[element->node(n)];
+          std::vector<dof_id_type> & element_ids = node_to_elem[element->node_id(n)];
           for (std::vector<dof_id_type>::iterator e_it = element_ids.begin();
                e_it != element_ids.end(); e_it++)
             {
               dof_id_type eid = *e_it;
-              if (this->elem(eid)->dim() == element->dim()+1)
+              if (this->elem_ref(eid).dim() == element->dim()+1)
                 neighbors[n].insert(eid);
             }
           if (neighbors[n].size()>0)
@@ -697,7 +697,7 @@ void MeshBase::detect_interior_parents()
                 }
               if (found_interior_parents)
                 {
-                  element->set_interior_parent(this->elem(interior_parent_id));
+                  element->set_interior_parent(this->elem_ptr(interior_parent_id));
                   break;
                 }
             }

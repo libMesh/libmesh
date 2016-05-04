@@ -127,7 +127,9 @@ void MEDITIO::write_ascii (const std::string & fname,
 
       for ( ; it != end; ++it)
         if ((*it)->type() == TRI3)
-          out_stream << (*it)->node(0)+1  << " " << (*it)->node(1)+1  << " " << (*it)->node(2)+1  << " 0\n";
+          out_stream << (*it)->node_id(0)+1  << " "
+                     << (*it)->node_id(1)+1  << " "
+                     << (*it)->node_id(2)+1  << " 0\n";
     }
 
     // Second: write out QUAD4 elements:
@@ -141,29 +143,29 @@ void MEDITIO::write_ascii (const std::string & fname,
       for ( ; it != end; ++it)
         if ((*it)->type() == QUAD4)
           {
-            out_stream << (*it)->node(0)+1  << " "
-                       << (*it)->node(1)+1  << " "
-                       << (*it)->node(2)+1  << " "
-                       << (*it)->node(3)+1  <<" 0\n";
+            out_stream << (*it)->node_id(0)+1  << " "
+                       << (*it)->node_id(1)+1  << " "
+                       << (*it)->node_id(2)+1  << " "
+                       << (*it)->node_id(3)+1  <<" 0\n";
           } // if
         else if ((*it)->type() == QUAD9)
           {
-            out_stream << (*it)->node(0)+1  << " "
-                       << (*it)->node(4)+1  << " "
-                       << (*it)->node(8)+1  << " "
-                       << (*it)->node(7)+1  <<" 0\n";
-            out_stream << (*it)->node(7)+1  << " "
-                       << (*it)->node(8)+1  << " "
-                       << (*it)->node(6)+1  << " "
-                       << (*it)->node(3)+1  <<" 0\n";
-            out_stream << (*it)->node(4)+1  << " "
-                       << (*it)->node(1)+1  << " "
-                       << (*it)->node(5)+1  << " "
-                       << (*it)->node(8)+1  <<" 0\n";
-            out_stream << (*it)->node(8)+1  << " "
-                       << (*it)->node(5)+1  << " "
-                       << (*it)->node(2)+1  << " "
-                       << (*it)->node(6)+1  <<" 0\n";
+            out_stream << (*it)->node_id(0)+1  << " "
+                       << (*it)->node_id(4)+1  << " "
+                       << (*it)->node_id(8)+1  << " "
+                       << (*it)->node_id(7)+1  <<" 0\n";
+            out_stream << (*it)->node_id(7)+1  << " "
+                       << (*it)->node_id(8)+1  << " "
+                       << (*it)->node_id(6)+1  << " "
+                       << (*it)->node_id(3)+1  <<" 0\n";
+            out_stream << (*it)->node_id(4)+1  << " "
+                       << (*it)->node_id(1)+1  << " "
+                       << (*it)->node_id(5)+1  << " "
+                       << (*it)->node_id(8)+1  <<" 0\n";
+            out_stream << (*it)->node_id(8)+1  << " "
+                       << (*it)->node_id(5)+1  << " "
+                       << (*it)->node_id(2)+1  << " "
+                       << (*it)->node_id(6)+1  <<" 0\n";
           } // if
     }
 
@@ -179,10 +181,10 @@ void MEDITIO::write_ascii (const std::string & fname,
       for ( ; it != end; ++it)
         if ((*it)->type() == TET4)
           {
-            out_stream << (*it)->node(0)+1  << " "
-                       << (*it)->node(1)+1  << " "
-                       << (*it)->node(2)+1  << " "
-                       << (*it)->node(3)+1  <<" 0\n";
+            out_stream << (*it)->node_id(0)+1  << " "
+                       << (*it)->node_id(1)+1  << " "
+                       << (*it)->node_id(2)+1  << " "
+                       << (*it)->node_id(3)+1  <<" 0\n";
           } // if
     }
 

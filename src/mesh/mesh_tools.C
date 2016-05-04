@@ -358,10 +358,10 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-        libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
+        libmesh_assert_less ((*el)->node_id(n), nodes_to_elem_map.size());
         libmesh_assert_less ((*el)->id(), mesh.n_elem());
 
-        nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
+        nodes_to_elem_map[(*el)->node_id(n)].push_back((*el)->id());
       }
 }
 
@@ -378,9 +378,9 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-        libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
+        libmesh_assert_less ((*el)->node_id(n), nodes_to_elem_map.size());
 
-        nodes_to_elem_map[(*el)->node(n)].push_back(*el);
+        nodes_to_elem_map[(*el)->node_id(n)].push_back(*el);
       }
 }
 
@@ -407,7 +407,7 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
           const UniquePtr<Elem> side((*el)->build_side(s));
 
           for (unsigned int n=0; n<side->n_nodes(); n++)
-            on_boundary[side->node(n)] = true;
+            on_boundary[side->node_id(n)] = true;
         }
 }
 
@@ -493,12 +493,12 @@ MeshTools::subdomain_bounding_box (const MeshBase & mesh,
   Point max(-1.e30, -1.e30, -1.e30);
 
   for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem(e)->subdomain_id() == sid)
-      for (unsigned int n=0; n<mesh.elem(e)->n_nodes(); n++)
+    if (mesh.elem_ptr(e)->subdomain_id() == sid)
+      for (unsigned int n=0; n<mesh.elem_ptr(e)->n_nodes(); n++)
         for (unsigned int i=0; i<LIBMESH_DIM; i++)
           {
-            min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
-            max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
+            min(i) = std::min(min(i), mesh.point(mesh.elem_ptr(e)->node_id(n))(i));
+            max(i) = std::max(max(i), mesh.point(mesh.elem_ptr(e)->node_id(n))(i));
           }
 
   return BoundingBox (min, max);
@@ -653,7 +653,7 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
       const Elem * elem = (*el);
       if(!elem->subactive())
         for (unsigned int n=0; n<elem->n_nodes(); ++n)
-          not_subactive_node_ids.insert(elem->node(n));
+          not_subactive_node_ids.insert(elem->node_id(n));
     }
 }
 
@@ -845,7 +845,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                   // Find another node in this element on this edge
                   for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
                     if ( (elem->is_node_on_edge(other_node_this_edge, current_edge)) && // On the current edge
-                         (elem->node(other_node_this_edge) != global_id))               // But not the original node
+                         (elem->node_id(other_node_this_edge) != global_id))               // But not the original node
                       {
                         // We've found a nodal neighbor!  Save a pointer to it..
                         node_to_save = elem->node_ptr(other_node_this_edge);
@@ -925,8 +925,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                       local_node2--;
 
                       //Pull out their global ids:
-                      dof_id_type node1 = elem->node(local_node1);
-                      dof_id_type node2 = elem->node(local_node2);
+                      dof_id_type node1 = elem->node_id(local_node1);
+                      dof_id_type node2 = elem->node_id(local_node2);
 
                       //Now find which node is present in the neighbor
                       //FIXME This assumes a level one rule!
@@ -936,7 +936,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                       //FIXME could be streamlined a bit
                       for(unsigned int n=0;n<neigh->n_sides();n++)
                         {
-                          if(neigh->node(n) == node1)
+                          if(neigh->node_id(n) == node1)
                             found_in_neighbor=true;
                         }
 
@@ -964,8 +964,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                       //Save them if we haven't already found the parents for this one
                       if(hanging_nodes[hanging_node].size()<2)
                         {
-                          hanging_nodes[hanging_node].push_back(neigh->node(local_node1));
-                          hanging_nodes[hanging_node].push_back(neigh->node(local_node2));
+                          hanging_nodes[hanging_node].push_back(neigh->node_id(local_node1));
+                          hanging_nodes[hanging_node].push_back(neigh->node_id(local_node2));
                         }
                     }
                 }

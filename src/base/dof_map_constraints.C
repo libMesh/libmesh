@@ -2541,7 +2541,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           if (this->is_constrained_node(elem->node_ptr(n)))
-            pushed_node_ids[elem->processor_id()].insert(elem->node(n));
+            pushed_node_ids[elem->processor_id()].insert(elem->node_id(n));
 #endif
       }
 

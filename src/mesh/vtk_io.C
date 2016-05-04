@@ -451,7 +451,7 @@ void VTKIO::cells_to_vtk()
           // I have actually enters this section of code...
           if (_local_node_map.find(conn[i]) == _local_node_map.end())
             {
-              dof_id_type global_node_id = elem->node(i);
+              dof_id_type global_node_id = elem->node_id(i);
 
               const Point & the_node = mesh.point(global_node_id);
 

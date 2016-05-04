@@ -1254,7 +1254,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
       // should be shared between processors.
       for (unsigned int node=0; node<elem->n_nodes(); ++node)
         {
-          this->nodes_attached_to_local_elems.insert(elem->node(node));
+          this->nodes_attached_to_local_elems.insert(elem->node_id(node));
         } // end loop over element's nodes
 
       // Loop over element's neighbors, see if it has a neighbor which is off-processor
@@ -1760,7 +1760,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
 
       // Grab the nodes while we're here.
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        this->nodes_attached_to_local_elems.insert( elem->node(n) );
+        this->nodes_attached_to_local_elems.insert( elem->node_id(n) );
 
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
@@ -1867,7 +1867,8 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
             {
               const unsigned int connect_index   = (i*this->num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_node_map(j);
-              current_block_connectivity[connect_index] = this->libmesh_node_num_to_exodus[elem.node(elem_node_index)];
+              current_block_connectivity[connect_index] =
+                this->libmesh_node_num_to_exodus[elem.node_id(elem_node_index)];
             }
         } // End loop over elems in this subdomain
     } // end loop over subdomain_map
@@ -1908,7 +1909,7 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
 
           // Insert all nodes touched by this element into the set
           for (unsigned int node=0; node<elem->n_nodes(); ++node)
-            set_p.insert(elem->node(node));
+            set_p.insert(elem->node_id(node));
         }
     }
 

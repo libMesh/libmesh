@@ -77,15 +77,15 @@ void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
     {
     case TECPLOT:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
+        conn[0] = this->node_id(0)+1;
+        conn[1] = this->node_id(1)+1;
         return;
       }
 
     case VTK:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
         return;
       }
 

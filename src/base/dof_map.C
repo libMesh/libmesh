@@ -1441,7 +1441,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
         {
           // Flag all the nodes of active local elements as seen, so
           // we can add nodal neighbor dofs to the send_list later.
-          node_on_processor[elem->node(n)] = true;
+          node_on_processor[elem->node_id(n)] = true;
 
           // Add all remote dofs on these nodes to the send_list.
           // This is necessary in case those dofs are *not* also dofs
@@ -1523,7 +1523,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
       // Check all the nodes of the element to see if it
       // shares a node with us
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
-        if (node_on_processor[elem->node(n)])
+        if (node_on_processor[elem->node_id(n)])
           add_elem_dofs = true;
 
       // Add the element degrees of freedom if it shares at

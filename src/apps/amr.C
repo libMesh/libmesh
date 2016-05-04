@@ -204,7 +204,7 @@ void assemble(EquationSystems & es,
           for (unsigned int i=0; i<phi.size(); ++i)
             {
               // this is tricky.  ig is the _global_ dof index corresponding
-              // to the _global_ vertex number elem->node(i).  Note that
+              // to the _global_ vertex number elem->node_id(i).  Note that
               // in general these numbers will not be the same (except for
               // the case of one unknown per node on one subdomain) so
               // we need to go through the dof_map

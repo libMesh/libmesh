@@ -190,7 +190,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
               std::vector<Number> values;
 
               // Get the global id of the node
-              dof_id_type global_id = elem->node(i);
+              dof_id_type global_id = elem->node_id(i);
 
               for(unsigned int c=0; c<n_vars; c++)
                 {

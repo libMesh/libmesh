@@ -408,16 +408,16 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                 // Grab nodes that do exist
               case 3:  // Tri
                 for (unsigned int k=0; k<elem->n_vertices(); k++)
-                  cells[i][k] = elem->node(k);
+                  cells[i][k] = elem->node_id(k);
 
                 num = elem->n_vertices();
                 break;
 
               case 4:  // Quad 4
-                cells[i][0] = elem->node(0);
-                cells[i][1] = elem->node(1);
-                cells[i][2] = elem->node(3); // Note that 2 and 3 are switched!
-                cells[i][3] = elem->node(2);
+                cells[i][0] = elem->node_id(0);
+                cells[i][1] = elem->node_id(1);
+                cells[i][2] = elem->node_id(3); // Note that 2 and 3 are switched!
+                cells[i][3] = elem->node_id(2);
                 num = 4;
                 break;
 
@@ -433,21 +433,21 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                 // Tet 4
               case 4:
                 for (unsigned int k=0; k<elem->n_vertices(); k++)
-                  cells[i][k] = elem->node(k);
+                  cells[i][k] = elem->node_id(k);
                 num = elem->n_vertices();
                 break;
 
                 // Hex 8
               case 8:
-                cells[i][0] = elem->node(0);
-                cells[i][1] = elem->node(1);
-                cells[i][2] = elem->node(3); // Note that 2 and 3 are switched!
-                cells[i][3] = elem->node(2);
+                cells[i][0] = elem->node_id(0);
+                cells[i][1] = elem->node_id(1);
+                cells[i][2] = elem->node_id(3); // Note that 2 and 3 are switched!
+                cells[i][3] = elem->node_id(2);
 
-                cells[i][4] = elem->node(4);
-                cells[i][5] = elem->node(5);
-                cells[i][6] = elem->node(7); // Note that 6 and 7 are switched!
-                cells[i][7] = elem->node(6);
+                cells[i][4] = elem->node_id(4);
+                cells[i][5] = elem->node_id(5);
+                cells[i][6] = elem->node_id(7); // Note that 6 and 7 are switched!
+                cells[i][7] = elem->node_id(6);
                 num=8;
                 break;
 

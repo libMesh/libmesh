@@ -132,7 +132,7 @@ dof_id_type Pyramid14::key (const unsigned int s) const
       return Pyramid::key(s);
 
     case 4:  // the quad face at z=0
-      return this->compute_key (this->node(13));
+      return this->compute_key (this->node_id(13));
 
     default:
       libmesh_error_msg("Invalid side s = " << s);

@@ -381,7 +381,7 @@ void FE<Dim,T>::side_map (const Elem * elem,
   elem_nodes_map.resize(side->n_nodes());
   for (unsigned int j = 0; j < side->n_nodes(); j++)
     for (unsigned int i = 0; i < elem->n_nodes(); i++)
-      if (side->node(j) == elem->node(i))
+      if (side->node_id(j) == elem->node_id(i))
         elem_nodes_map[j] = i;
   std::vector<Point> refspace_nodes;
   this->get_refspace_nodes(elem->type(), refspace_nodes);
@@ -604,11 +604,12 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
         libmesh_assert (elem);
         if (calculate_dxyz)
           {
-            if (side->node(0) == elem->node(0))
+            if (side->node_id(0) == elem->node_id(0))
               normals[0] = Point(-1.);
             else
               {
-                libmesh_assert_equal_to (side->node(0), elem->node(1));
+                libmesh_assert_equal_to (side->node_id(0),
+                                         elem->node_id(1));
                 normals[0] = Point(1.);
               }
           }

@@ -56,9 +56,9 @@ dof_id_type Tet::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  return this->compute_key(this->node(Tet4::side_nodes_map[s][0]),
-                           this->node(Tet4::side_nodes_map[s][1]),
-                           this->node(Tet4::side_nodes_map[s][2]));
+  return this->compute_key(this->node_id(Tet4::side_nodes_map[s][0]),
+                           this->node_id(Tet4::side_nodes_map[s][1]),
+                           this->node_id(Tet4::side_nodes_map[s][2]));
 }
 
 

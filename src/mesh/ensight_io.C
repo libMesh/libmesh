@@ -208,7 +208,7 @@ void EnsightIO::write_geometry_ascii()
         ensight_parts_map[elem->type()].push_back(elem);
 
         for (unsigned int i = 0; i < elem->n_nodes(); i++)
-          mesh_nodes_map[elem->node(i)] = elem->point(i);
+          mesh_nodes_map[elem->node_id(i)] = elem->point(i);
       }
   }
 
@@ -278,7 +278,7 @@ void EnsightIO::write_geometry_ascii()
                      i == 13 || i ==14 || i == 16 || i == 22))
                   continue;
 
-                mesh_stream << std::setw(10) << ensight_node_index[elem_ref[i]->node(j)];
+                mesh_stream << std::setw(10) << ensight_node_index[elem_ref[i]->node_id(j)];
               }
             mesh_stream << "\n";
           }
@@ -430,7 +430,7 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
 #endif
 
       for (unsigned int n=0; n<elem->n_nodes(); n++)
-        local_soln[elem->node(n)] = libmesh_real(nodal_soln[n]);
+        local_soln[elem->node_id(n)] = libmesh_real(nodal_soln[n]);
     }
 
   {
@@ -550,7 +550,7 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
           node_vec[2] = 0.0;
           if (dim==3)
             node_vec[2] = libmesh_real(nodal_soln_w[n]);
-          local_soln[elem->node(n)] = node_vec;
+          local_soln[elem->node_id(n)] = node_vec;
         }
     }
 

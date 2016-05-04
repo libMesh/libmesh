@@ -673,14 +673,14 @@ void SerialMesh::renumber_nodes_and_elements ()
               // position them in the _nodes vector so that they
               // are packed contiguously from the beginning.
               for (unsigned int n=0; n<el->n_nodes(); n++)
-                if (el->node(n) == next_free_node)     // don't need to process
+                if (el->node_id(n) == next_free_node)    // don't need to process
                   next_free_node++;                      // [(src == dst) below]
 
-                else if (el->node(n) > next_free_node) // need to process
+                else if (el->node_id(n) > next_free_node) // need to process
                   {
                     // The source and destination indices
                     // for this node
-                    const dof_id_type src_idx = el->node(n);
+                    const dof_id_type src_idx = el->node_id(n);
                     const dof_id_type dst_idx = next_free_node++;
 
                     // ensure we want to swap a valid nodes
@@ -906,10 +906,11 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
                     boundary_id_type node_bc_id = bc_id_list[node_index];
                     if (node_bc_id == id_array[i])
                       {
-                        dof_id_type node_id = node_id_list[node_index];
-                        set_array[i]->insert( node_id );
+                        dof_id_type this_node_id = node_id_list[node_index];
+                        set_array[i]->insert( this_node_id );
 
-                        const Elem * near_elem = (*my_locator)( mesh_array[i]->node(node_id) );
+                        const Elem * near_elem =
+                          (*my_locator)(mesh_array[i]->node_ref(this_node_id) );
                         if (near_elem == libmesh_nullptr)
                           libmesh_error_msg("Error: PointLocator failed to find a valid element");
 
@@ -938,8 +939,8 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
                           UniquePtr<Elem> side (el->build_side(side_id));
-                          for (unsigned int node_id=0; node_id<side->n_nodes(); ++node_id)
-                            set_array[i]->insert( side->node(node_id) );
+                          for (unsigned int node_i=0; node_i<side->n_nodes(); ++node_i)
+                            set_array[i]->insert( side->node_id(node_i) );
 
                           h_min = std::min(h_min, side->hmin());
                           h_min_updated = true;
@@ -977,8 +978,8 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
                               if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
                                   UniquePtr<Elem> edge (el->build_edge(edge_id));
-                                  for (unsigned int node_id=0; node_id<edge->n_nodes(); ++node_id)
-                                    set_array[i]->insert( edge->node(node_id) );
+                                  for (unsigned int node_i=0; node_i<edge->n_nodes(); ++node_i)
+                                    set_array[i]->insert( edge->node_id(node_i) );
 
                                   h_min = std::min(h_min, edge->hmin());
                                   h_min_updated = true;
@@ -1095,7 +1096,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
           for( ; set_it != set_it_end; ++set_it)
             {
               dof_id_type this_node_id = *set_it;
-              Node & this_node = this->node(this_node_id);
+              Node & this_node = this->node_ref(this_node_id);
 
               bool found_matching_nodes = false;
 
@@ -1104,7 +1105,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
               for( ; other_set_it != other_set_it_end; ++other_set_it)
                 {
                   dof_id_type other_node_id = *other_set_it;
-                  Node & other_node = other_mesh->node(other_node_id);
+                  Node & other_node = other_mesh->node_ref(other_node_id);
 
                   Real node_distance = (this_node - other_node).norm();
 
@@ -1138,7 +1139,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
             // the same time as the forward mapping.
             for (unsigned n=0; n<el->n_nodes(); ++n)
               {
-                dof_id_type other_node_id = el->node(n);
+                dof_id_type other_node_id = el->node_id(n);
                 std::map<dof_id_type, dof_id_type>::iterator it =
                   other_to_this_node_map.find(other_node_id);
 
@@ -1247,7 +1248,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
           Elem * other_elem = *elem_it;
 
           // Find the corresponding element on this mesh
-          Elem * this_elem = this->elem(other_elem->id());
+          Elem * this_elem = this->elem_ptr(other_elem->id());
 
           // Decrement elem IDs of other_mesh to return it to original state
           dof_id_type new_id = other_elem->id() - elem_delta;
@@ -1294,13 +1295,13 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
     {
       dof_id_type target_node_id = elem_map_it->first;
       dof_id_type other_node_id = node_to_node_map[target_node_id];
-      Node & target_node = this->node(target_node_id);
+      Node & target_node = this->node_ref(target_node_id);
 
       std::size_t n_elems = elem_map_it->second.size();
       for(std::size_t i=0; i<n_elems; i++)
         {
           dof_id_type elem_id = elem_map_it->second[i];
-          Elem * el = this->elem(elem_id);
+          Elem * el = this->elem_ptr(elem_id);
 
           // find the local node index that we want to update
           unsigned int local_node_index = el->local_node(other_node_id);
@@ -1322,8 +1323,8 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
       if ((this == other_mesh) && (node_map_it->second == node_map_it->first))
         continue;
 
-      dof_id_type node_id = node_map_it->second;
-      this->delete_node( this->node_ptr(node_id) );
+      dof_id_type this_node_id = node_map_it->second;
+      this->delete_node( this->node_ptr(this_node_id) );
     }
 
   // If find_neighbors() wasn't called in prepare_for_use(), we need to
@@ -1346,7 +1347,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
               dof_id_type elem_id = elem_map_it->second[i];
               if(fixed_elems.find(elem_id) == fixed_elems.end())
                 {
-                  Elem * el = this->elem(elem_id);
+                  Elem * el = this->elem_ptr(elem_id);
                   fixed_elems.insert(elem_id);
                   for(unsigned int s = 0; s < el->n_neighbors(); ++s)
                     {

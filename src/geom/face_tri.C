@@ -53,17 +53,17 @@ dof_id_type Tri::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-  return this->compute_key(this->node(Tri3::side_nodes_map[s][0]),
-                           this->node(Tri3::side_nodes_map[s][1]));
+  return this->compute_key(this->node_id(Tri3::side_nodes_map[s][0]),
+                           this->node_id(Tri3::side_nodes_map[s][1]));
 }
 
 
 
 dof_id_type Tri::key () const
 {
-  return this->compute_key(this->node(0),
-                           this->node(1),
-                           this->node(2));
+  return this->compute_key(this->node_id(0),
+                           this->node_id(1),
+                           this->node_id(2));
 }
 
 

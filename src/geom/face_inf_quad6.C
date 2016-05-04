@@ -116,7 +116,7 @@ dof_id_type InfQuad6::key (const unsigned int s) const
     {
       // Edge3 side
     case 0:
-      return this->compute_key (this->node(4));
+      return this->compute_key (this->node_id(4));
 
       // InfEdge
     case 1:
@@ -212,19 +212,19 @@ void InfQuad6::connectivity(const unsigned int sf,
           {
           case 0:
             // linear sub-quad 0
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(4)+1;
-            conn[2] = this->node(5)+1;
-            conn[3] = this->node(2)+1;
+            conn[0] = this->node_id(0)+1;
+            conn[1] = this->node_id(4)+1;
+            conn[2] = this->node_id(5)+1;
+            conn[3] = this->node_id(2)+1;
 
             return;
 
           case 1:
             // linear sub-quad 1
-            conn[0] = this->node(4)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(3)+1;
-            conn[3] = this->node(5)+1;
+            conn[0] = this->node_id(4)+1;
+            conn[1] = this->node_id(1)+1;
+            conn[2] = this->node_id(3)+1;
+            conn[3] = this->node_id(5)+1;
 
             return;
 

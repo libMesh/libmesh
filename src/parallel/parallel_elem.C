@@ -244,7 +244,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
     *data_out++ =(DofObject::invalid_id);
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
-    *data_out++ = (elem->node(n));
+    *data_out++ = (elem->node_id(n));
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
@@ -430,7 +430,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 #ifndef NDEBUG
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
-        libmesh_assert(elem->node(i) ==
+        libmesh_assert(elem->node_id(i) ==
                        cast_int<dof_id_type>(*in++));
 #else
       in += n_nodes;
@@ -590,7 +590,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           // connectivity so that parents are encountered before
           // children.  If we get here and can't find the parent that
           // is a fatal error.
-          parent = mesh->elem(parent_id);
+          parent = mesh->elem_ptr(parent_id);
         }
       // Or assert that the sending processor sees no parent
       else

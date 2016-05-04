@@ -148,15 +148,15 @@ dof_id_type Prism18::key (const unsigned int s) const
       }
     case 1:  // the quad face at y=0
       {
-        return Elem::compute_key (this->node(15));
+        return Elem::compute_key (this->node_id(15));
       }
     case 2:  // the other quad face
       {
-        return Elem::compute_key (this->node(16));
+        return Elem::compute_key (this->node_id(16));
       }
     case 3: // the quad face at x=0
       {
-        return Elem::compute_key (this->node(17));
+        return Elem::compute_key (this->node_id(17));
       }
     case 4: // the triangular face at z=1
       {
@@ -263,112 +263,112 @@ void Prism18::connectivity(const unsigned int sc,
 
           case 0:
             {
-              conn[0] = this->node(0)+1;
-              conn[1] = this->node(6)+1;
-              conn[2] = this->node(8)+1;
-              conn[3] = this->node(8)+1;
-              conn[4] = this->node(9)+1;
-              conn[5] = this->node(15)+1;
-              conn[6] = this->node(17)+1;
-              conn[7] = this->node(17)+1;
+              conn[0] = this->node_id(0)+1;
+              conn[1] = this->node_id(6)+1;
+              conn[2] = this->node_id(8)+1;
+              conn[3] = this->node_id(8)+1;
+              conn[4] = this->node_id(9)+1;
+              conn[5] = this->node_id(15)+1;
+              conn[6] = this->node_id(17)+1;
+              conn[7] = this->node_id(17)+1;
 
               return;
             }
 
           case 1:
             {
-              conn[0] = this->node(6)+1;
-              conn[1] = this->node(1)+1;
-              conn[2] = this->node(7)+1;
-              conn[3] = this->node(7)+1;
-              conn[4] = this->node(15)+1;
-              conn[5] = this->node(10)+1;
-              conn[6] = this->node(16)+1;
-              conn[7] = this->node(16)+1;
+              conn[0] = this->node_id(6)+1;
+              conn[1] = this->node_id(1)+1;
+              conn[2] = this->node_id(7)+1;
+              conn[3] = this->node_id(7)+1;
+              conn[4] = this->node_id(15)+1;
+              conn[5] = this->node_id(10)+1;
+              conn[6] = this->node_id(16)+1;
+              conn[7] = this->node_id(16)+1;
 
               return;
             }
 
           case 2:
             {
-              conn[0] = this->node(8)+1;
-              conn[1] = this->node(7)+1;
-              conn[2] = this->node(2)+1;
-              conn[3] = this->node(2)+1;
-              conn[4] = this->node(17)+1;
-              conn[5] = this->node(16)+1;
-              conn[6] = this->node(11)+1;
-              conn[7] = this->node(11)+1;
+              conn[0] = this->node_id(8)+1;
+              conn[1] = this->node_id(7)+1;
+              conn[2] = this->node_id(2)+1;
+              conn[3] = this->node_id(2)+1;
+              conn[4] = this->node_id(17)+1;
+              conn[5] = this->node_id(16)+1;
+              conn[6] = this->node_id(11)+1;
+              conn[7] = this->node_id(11)+1;
 
               return;
             }
 
           case 3:
             {
-              conn[0] = this->node(6)+1;
-              conn[1] = this->node(7)+1;
-              conn[2] = this->node(8)+1;
-              conn[3] = this->node(8)+1;
-              conn[4] = this->node(15)+1;
-              conn[5] = this->node(16)+1;
-              conn[6] = this->node(17)+1;
-              conn[7] = this->node(17)+1;
+              conn[0] = this->node_id(6)+1;
+              conn[1] = this->node_id(7)+1;
+              conn[2] = this->node_id(8)+1;
+              conn[3] = this->node_id(8)+1;
+              conn[4] = this->node_id(15)+1;
+              conn[5] = this->node_id(16)+1;
+              conn[6] = this->node_id(17)+1;
+              conn[7] = this->node_id(17)+1;
 
               return;
             }
 
           case 4:
             {
-              conn[0] = this->node(9)+1;
-              conn[1] = this->node(15)+1;
-              conn[2] = this->node(17)+1;
-              conn[3] = this->node(17)+1;
-              conn[4] = this->node(3)+1;
-              conn[5] = this->node(12)+1;
-              conn[6] = this->node(14)+1;
-              conn[7] = this->node(14)+1;
+              conn[0] = this->node_id(9)+1;
+              conn[1] = this->node_id(15)+1;
+              conn[2] = this->node_id(17)+1;
+              conn[3] = this->node_id(17)+1;
+              conn[4] = this->node_id(3)+1;
+              conn[5] = this->node_id(12)+1;
+              conn[6] = this->node_id(14)+1;
+              conn[7] = this->node_id(14)+1;
 
               return;
             }
 
           case 5:
             {
-              conn[0] = this->node(15)+1;
-              conn[1] = this->node(10)+1;
-              conn[2] = this->node(16)+1;
-              conn[3] = this->node(16)+1;
-              conn[4] = this->node(12)+1;
-              conn[5] = this->node(4)+1;
-              conn[6] = this->node(13)+1;
-              conn[7] = this->node(13)+1;
+              conn[0] = this->node_id(15)+1;
+              conn[1] = this->node_id(10)+1;
+              conn[2] = this->node_id(16)+1;
+              conn[3] = this->node_id(16)+1;
+              conn[4] = this->node_id(12)+1;
+              conn[5] = this->node_id(4)+1;
+              conn[6] = this->node_id(13)+1;
+              conn[7] = this->node_id(13)+1;
 
               return;
             }
 
           case 6:
             {
-              conn[0] = this->node(17)+1;
-              conn[1] = this->node(16)+1;
-              conn[2] = this->node(11)+1;
-              conn[3] = this->node(11)+1;
-              conn[4] = this->node(14)+1;
-              conn[5] = this->node(13)+1;
-              conn[6] = this->node(5)+1;
-              conn[7] = this->node(5)+1;
+              conn[0] = this->node_id(17)+1;
+              conn[1] = this->node_id(16)+1;
+              conn[2] = this->node_id(11)+1;
+              conn[3] = this->node_id(11)+1;
+              conn[4] = this->node_id(14)+1;
+              conn[5] = this->node_id(13)+1;
+              conn[6] = this->node_id(5)+1;
+              conn[7] = this->node_id(5)+1;
 
               return;
             }
 
           case 7:
             {
-              conn[0] = this->node(15)+1;
-              conn[1] = this->node(16)+1;
-              conn[2] = this->node(17)+1;
-              conn[3] = this->node(17)+1;
-              conn[4] = this->node(12)+1;
-              conn[5] = this->node(13)+1;
-              conn[6] = this->node(14)+1;
-              conn[7] = this->node(14)+1;
+              conn[0] = this->node_id(15)+1;
+              conn[1] = this->node_id(16)+1;
+              conn[2] = this->node_id(17)+1;
+              conn[3] = this->node_id(17)+1;
+              conn[4] = this->node_id(12)+1;
+              conn[5] = this->node_id(13)+1;
+              conn[6] = this->node_id(14)+1;
+              conn[7] = this->node_id(14)+1;
 
               return;
             }
@@ -388,17 +388,17 @@ void Prism18::connectivity(const unsigned int sc,
         // last 3 (mid-face) nodes match.  The middle and top layers
         // of mid-edge nodes are reversed from LibMesh's.
         for (unsigned i=0; i<conn.size(); ++i)
-          conn[i] = this->node(i);
+          conn[i] = this->node_id(i);
 
         // top "ring" of mid-edge nodes
-        conn[9]  = this->node(12);
-        conn[10] = this->node(13);
-        conn[11] = this->node(14);
+        conn[9]  = this->node_id(12);
+        conn[10] = this->node_id(13);
+        conn[11] = this->node_id(14);
 
         // middle "ring" of mid-edge nodes
-        conn[12] = this->node(9);
-        conn[13] = this->node(10);
-        conn[14] = this->node(11);
+        conn[12] = this->node_id(9);
+        conn[13] = this->node_id(10);
+        conn[14] = this->node_id(11);
 
         return;
 
@@ -409,96 +409,96 @@ void Prism18::connectivity(const unsigned int sc,
 
           case 0:
           {
-          conn[0] = this->node(0);
-          conn[1] = this->node(6);
-          conn[2] = this->node(8);
-          conn[3] = this->node(9);
-          conn[4] = this->node(15);
-          conn[5] = this->node(17);
+          conn[0] = this->node_id(0);
+          conn[1] = this->node_id(6);
+          conn[2] = this->node_id(8);
+          conn[3] = this->node_id(9);
+          conn[4] = this->node_id(15);
+          conn[5] = this->node_id(17);
 
           return;
           }
 
           case 1:
           {
-          conn[0] = this->node(6);
-          conn[1] = this->node(1);
-          conn[2] = this->node(7);
-          conn[3] = this->node(15);
-          conn[4] = this->node(10);
-          conn[5] = this->node(16);
+          conn[0] = this->node_id(6);
+          conn[1] = this->node_id(1);
+          conn[2] = this->node_id(7);
+          conn[3] = this->node_id(15);
+          conn[4] = this->node_id(10);
+          conn[5] = this->node_id(16);
 
           return;
           }
 
           case 2:
           {
-          conn[0] = this->node(8);
-          conn[1] = this->node(7);
-          conn[2] = this->node(2);
-          conn[3] = this->node(17);
-          conn[4] = this->node(16);
-          conn[5] = this->node(11);
+          conn[0] = this->node_id(8);
+          conn[1] = this->node_id(7);
+          conn[2] = this->node_id(2);
+          conn[3] = this->node_id(17);
+          conn[4] = this->node_id(16);
+          conn[5] = this->node_id(11);
 
           return;
           }
 
           case 3:
           {
-          conn[0] = this->node(6);
-          conn[1] = this->node(7);
-          conn[2] = this->node(8);
-          conn[3] = this->node(15);
-          conn[4] = this->node(16);
-          conn[5] = this->node(17);
+          conn[0] = this->node_id(6);
+          conn[1] = this->node_id(7);
+          conn[2] = this->node_id(8);
+          conn[3] = this->node_id(15);
+          conn[4] = this->node_id(16);
+          conn[5] = this->node_id(17);
 
           return;
           }
 
           case 4:
           {
-          conn[0] = this->node(9);
-          conn[1] = this->node(15);
-          conn[2] = this->node(17);
-          conn[3] = this->node(3);
-          conn[4] = this->node(12);
-          conn[5] = this->node(14);
+          conn[0] = this->node_id(9);
+          conn[1] = this->node_id(15);
+          conn[2] = this->node_id(17);
+          conn[3] = this->node_id(3);
+          conn[4] = this->node_id(12);
+          conn[5] = this->node_id(14);
 
           return;
           }
 
           case 5:
           {
-          conn[0] = this->node(15);
-          conn[1] = this->node(10);
-          conn[2] = this->node(16);
-          conn[3] = this->node(12);
-          conn[4] = this->node(4);
-          conn[5] = this->node(13);
+          conn[0] = this->node_id(15);
+          conn[1] = this->node_id(10);
+          conn[2] = this->node_id(16);
+          conn[3] = this->node_id(12);
+          conn[4] = this->node_id(4);
+          conn[5] = this->node_id(13);
 
           return;
           }
 
           case 6:
           {
-          conn[0] = this->node(17);
-          conn[1] = this->node(16);
-          conn[2] = this->node(11);
-          conn[3] = this->node(14);
-          conn[4] = this->node(13);
-          conn[5] = this->node(5);
+          conn[0] = this->node_id(17);
+          conn[1] = this->node_id(16);
+          conn[2] = this->node_id(11);
+          conn[3] = this->node_id(14);
+          conn[4] = this->node_id(13);
+          conn[5] = this->node_id(5);
 
           return;
           }
 
           case 7:
           {
-          conn[0] = this->node(15);
-          conn[1] = this->node(16);
-          conn[2] = this->node(17);
-          conn[3] = this->node(12);
-          conn[4] = this->node(13);
-          conn[5] = this->node(14);
+          conn[0] = this->node_id(15);
+          conn[1] = this->node_id(16);
+          conn[2] = this->node_id(17);
+          conn[3] = this->node_id(12);
+          conn[4] = this->node_id(13);
+          conn[5] = this->node_id(14);
 
           return;
           }

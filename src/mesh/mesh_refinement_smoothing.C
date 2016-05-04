@@ -66,7 +66,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         // Set the max_level at each node
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
-            const dof_id_type node_number = elem->node(n);
+            const dof_id_type node_number = elem->node_id(n);
 
             libmesh_assert_less (node_number, max_level_at_node.size());
 
@@ -104,7 +104,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         // Loop over the nodes, check for possible mismatch
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
-            const dof_id_type node_number = elem->node(n);
+            const dof_id_type node_number = elem->node_id(n);
 
             // Flag the element for refinement if it violates
             // the requested level mismatch
@@ -168,16 +168,16 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         for (unsigned int n=0; n<elem->n_edges(); n++)
           {
             UniquePtr<Elem> edge = elem->build_edge(n);
-            dof_id_type childnode0 = edge->node(0);
-            dof_id_type childnode1 = edge->node(1);
+            dof_id_type childnode0 = edge->node_id(0);
+            dof_id_type childnode1 = edge->node_id(1);
             if (childnode1 < childnode0)
               std::swap(childnode0, childnode1);
 
             for (const Elem * p = elem; p != libmesh_nullptr; p = p->parent())
               {
                 UniquePtr<Elem> pedge = p->build_edge(n);
-                dof_id_type node0 = pedge->node(0);
-                dof_id_type node1 = pedge->node(1);
+                dof_id_type node0 = pedge->node_id(0);
+                dof_id_type node1 = pedge->node_id(1);
 
                 if (node1 < node0)
                   std::swap(node0, node1);
@@ -238,8 +238,8 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         for (unsigned int n=0; n<elem->n_edges(); n++)
           {
             UniquePtr<Elem> edge = elem->build_edge(n);
-            dof_id_type node0 = edge->node(0);
-            dof_id_type node1 = edge->node(1);
+            dof_id_type node0 = edge->node_id(0);
+            dof_id_type node1 = edge->node_id(1);
             if (node1 < node0)
               std::swap(node0, node1);
 

@@ -202,7 +202,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
           {
             // We need to get the sequential index of elem->node_ptr(j), but
             // it should already be stored in _sequential_to_libmesh_node_map...
-            unsigned libmesh_node_id = elem->node(j);
+            unsigned libmesh_node_id = elem->node_id(j);
 
             // The libmesh node IDs may not be sequential, but can we assume
             // they are at least in order???  We will do so here.

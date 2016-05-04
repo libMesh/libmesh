@@ -86,12 +86,12 @@ void FroIO::write (const std::string & fname)
           out_stream << ++e << " \t";
 
           for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-            out_stream << (*it)->node(n)+1 << " \t";
+            out_stream << (*it)->node_id(n)+1 << " \t";
 
           //   // LHS -> RHS Mapping, for inverted triangles
-          //   out_stream << (*it)->node(0)+1 << " \t";
-          //   out_stream << (*it)->node(2)+1 << " \t";
-          //   out_stream << (*it)->node(1)+1 << " \t";
+          //   out_stream << (*it)->node_id(0)+1 << " \t";
+          //   out_stream << (*it)->node_id(2)+1 << " \t";
+          //   out_stream << (*it)->node_id(1)+1 << " \t";
 
           out_stream << "1\n";
         }
@@ -142,8 +142,8 @@ void FroIO::write (const std::string & fname)
                     the_mesh.elem_ref(el[e]).build_side(sl[e]);
 
                   const dof_id_type
-                    n0 = side->node(0),
-                    n1 = side->node(1);
+                    n0 = side->node_id(0),
+                    n1 = side->node_id(1);
 
                   // insert into forward-edge set
                   forward_edges.insert (std::make_pair(n0, n1));
