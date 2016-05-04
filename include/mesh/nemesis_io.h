@@ -94,6 +94,13 @@ public:
                                  const std::vector<std::string> & names) libmesh_override;
 
   /**
+   * Output a nodal solution in parallel, without localizing the soln vector.
+   */
+  virtual void write_nodal_data (const std::string & fname,
+                                 const NumericVector<Number> & parallel_soln,
+                                 const std::vector<std::string> & names) libmesh_override;
+
+  /**
    * Set the flag indicationg if we should be verbose.
    */
   void verbose (bool set_verbosity);
@@ -129,6 +136,14 @@ private:
    * rather than created from scratch when writing.
    */
   bool _append;
+
+  /**
+   * Helper function containing code shared between the two different
+   * versions of write_nodal_data which take std::vector and
+   * NumericVector, respectively.
+   */
+  void prepare_to_write_nodal_data (const std::string & fname,
+                                    const std::vector<std::string> & names);
 };
 
 

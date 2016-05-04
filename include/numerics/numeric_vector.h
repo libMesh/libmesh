@@ -562,6 +562,35 @@ public:
                          const std::vector<numeric_index_type> & send_list) const = 0;
 
   /**
+   * Fill in the local std::vector "v_local" with the global indices
+   * given in "indices".  Note that indices can be different on every
+   * processor, and the same index can be localized to more than one
+   * processor.  The resulting v_local can be shorter than the
+   * original, and the entries will be in the order specified by
+   * indices.
+   *
+   * Example:
+   *   On 4 procs *this = {a, b, c, d, e, f, g, h, i} is a parallel vector.
+   *   On each proc, the indices arrays are set up as:
+   *   proc0, indices = {1,2,4,5}
+   *   proc1, indices = {2,5,6,8}
+   *   proc2, indices = {2,3,6,7}
+   *   proc3, indices = {0,1,2,3}
+   *
+   *   After calling this version of localize, the v_local vectors are:
+   *   proc0, v_local = {b,c,e,f}
+   *   proc1, v_local = {c,f,g,i}
+   *   proc2, v_local = {c,d,g,h}
+   *   proc3, v_local = {a,b,c,d}
+   *
+   * This function is useful in parallel I/O routines, when you have a
+   * parallel vector of solution values which you want to write a
+   * subset of.
+   */
+  virtual void localize (std::vector<T> & /*v_local*/,
+                         const std::vector<numeric_index_type> & /*indices*/) const = 0;
+
+  /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */

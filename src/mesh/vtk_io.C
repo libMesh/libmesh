@@ -83,6 +83,8 @@ VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
   ,_compress(false)
 #endif
 {
+  // Ignore unused parameters when !LIBMESH_HAVE_VTK
+  libmesh_ignore(mesh_data);
   libmesh_experimental();
 }
 
@@ -97,6 +99,8 @@ VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
   ,_compress(false)
 #endif
 {
+  // Ignore unused parameters when !LIBMESH_HAVE_VTK
+  libmesh_ignore(mesh_data);
   libmesh_experimental();
 }
 

@@ -352,6 +352,19 @@ void EigenSparseVector<T>::localize (NumericVector<T> & v_local_in,
 
 
 template <typename T>
+void EigenSparseVector<T>::localize (std::vector<T> & v_local,
+                                     const std::vector<numeric_index_type> & indices) const
+{
+  // EigenSparseVectors are serial, so we can just copy values
+  v_local.resize(indices.size());
+
+  for (numeric_index_type i=0; i<v_local.size(); i++)
+    v_local[i] = (*this)(indices[i]);
+}
+
+
+
+template <typename T>
 void EigenSparseVector<T>::localize (const numeric_index_type libmesh_dbg_var(first_local_idx),
                                      const numeric_index_type libmesh_dbg_var(last_local_idx),
                                      const std::vector<numeric_index_type> & libmesh_dbg_var(send_list))

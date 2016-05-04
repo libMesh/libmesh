@@ -38,6 +38,7 @@ namespace libMesh
 
 // Forward declares
 class EquationSystems;
+template <typename T> class NumericVector;
 
 
 /**
@@ -98,6 +99,23 @@ public:
   { libmesh_not_implemented(); }
 
   /**
+   * This method should be overridden by "parallel" output formats for
+   * writing nodal data.  Instead of getting a localized copy of the
+   * nodal solution vector, it is passed a NumericVector of
+   * type=PARALLEL which is in node-major order i.e.
+   * (u0,v0,w0, u1,v1,w1, u2,v2,w2, u3,v3,w3, ...)
+   * and contains n_nodes*n_vars total entries.  Then, it is up to the
+   * individual I/O class to extract the required solution values from
+   * this vector and write them in parallel.
+   *
+   * If not implemented, localizes the parallel vector into a std::vector
+   * and calls the other version of this function.
+   */
+  virtual void write_nodal_data (const std::string &,
+                                 const NumericVector<Number> &,
+                                 const std::vector<std::string> &);
+
+  /**
    * Return/set the precision to use when writing ASCII files.
    *
    * By default we use numeric_limits<Real>::digits10 + 2, which
@@ -136,17 +154,6 @@ private:
    * Precision to use when writing ASCII files.
    */
   unsigned int _ascii_precision;
-
-  /**
-   * A helper function which allows us to fill temporary
-   * name and solution vectors with an EquationSystems object.
-   * Only generate names and solution data corresponding to
-   * systems specified in system_names.
-   */
-  void _build_variable_names_and_solution_vector(const EquationSystems & es,
-                                                 std::vector<Number> & soln,
-                                                 std::vector<std::string> & names,
-                                                 const std::set<std::string> * system_names=libmesh_nullptr);
 };
 
 

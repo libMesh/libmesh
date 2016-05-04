@@ -833,6 +833,75 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
 }
 
 
+
+template <typename T>
+void PetscVector<T>::localize (std::vector<T> & v_local,
+                               const std::vector<numeric_index_type> & indices) const
+{
+  // Error code used to check the status of all PETSc function calls.
+  PetscErrorCode ierr = 0;
+
+  // Create a sequential destination Vec with the right number of entries on each proc.
+  Vec dest;
+  ierr = VecCreateSeq(PETSC_COMM_SELF, indices.size(), &dest);
+  LIBMESH_CHKERR(ierr);
+
+  // Create an IS using the libmesh routine.  PETSc does not own the
+  // IS memory in this case, it is automatically cleaned up by the
+  // std::vector destructor.
+  IS is;
+  ierr = ISCreateLibMesh(this->comm().get(),
+                         indices.size(),
+                         numeric_petsc_cast(&indices[0]),
+                         PETSC_USE_POINTER,
+                         &is);
+  LIBMESH_CHKERR(ierr);
+
+  // Create the VecScatter object.  "NULL" means "use the identity IS".
+  VecScatter scatter;
+  ierr = VecScatterCreate(_vec,
+                          /*src is=*/is,
+                          /*dest vec=*/dest,
+                          /*dest is=*/NULL,
+                          &scatter);
+  LIBMESH_CHKERR(ierr);
+
+  // Do the scatter
+  ierr = VecScatterBegin(scatter, _vec, dest, INSERT_VALUES, SCATTER_FORWARD);
+  LIBMESH_CHKERR(ierr);
+
+  ierr = VecScatterEnd(scatter, _vec, dest, INSERT_VALUES, SCATTER_FORWARD);
+  LIBMESH_CHKERR(ierr);
+
+  // Get access to the values stored in dest.
+  PetscScalar * values;
+  ierr = VecGetArray (dest, &values);
+  LIBMESH_CHKERR(ierr);
+
+  // Store values into the provided v_local. Make sure there is enough
+  // space reserved and then clear out any existing entries before
+  // inserting.
+  v_local.reserve(indices.size());
+  v_local.clear();
+  v_local.insert(v_local.begin(), values, values+indices.size());
+
+  // We are done using it, so restore the array.
+  ierr = VecRestoreArray (dest, &values);
+  LIBMESH_CHKERR(ierr);
+
+  // Clean up PETSc data structures.
+  ierr = LibMeshVecScatterDestroy(&scatter);
+  LIBMESH_CHKERR(ierr);
+
+  ierr = LibMeshISDestroy (&is);
+  LIBMESH_CHKERR(ierr);
+
+  ierr = LibMeshVecDestroy(&dest);
+  LIBMESH_CHKERR(ierr);
+}
+
+
+
 template <typename T>
 void PetscVector<T>::localize (const numeric_index_type first_local_idx,
                                const numeric_index_type last_local_idx,

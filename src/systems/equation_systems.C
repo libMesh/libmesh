@@ -663,10 +663,10 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
 
 
 
-void EquationSystems::build_solution_vector (std::vector<Number> & soln,
-                                             const std::set<std::string> * system_names) const
+UniquePtr<NumericVector<Number> >
+EquationSystems::build_parallel_solution_vector(const std::set<std::string> * system_names) const
 {
-  LOG_SCOPE("build_solution_vector()", "EquationSystems");
+  LOG_SCOPE("build_parallel_solution_vector()", "EquationSystems");
 
   // This function must be run on all processors at once
   parallel_object_only();
@@ -868,8 +868,24 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
   // Divide to get the average value at the nodes
   parallel_soln /= repeat_count;
 
-  parallel_soln.localize_to_one(soln);
+  return parallel_soln_ptr;
 }
+
+
+
+void EquationSystems::build_solution_vector (std::vector<Number> & soln,
+                                             const std::set<std::string> * system_names) const
+{
+  LOG_SCOPE("build_solution_vector()", "EquationSystems");
+
+  // Call the parallel implementation
+  UniquePtr<NumericVector<Number> > parallel_soln =
+    this->build_parallel_solution_vector(system_names);
+
+  // Localize the NumericVector into the provided std::vector.
+  parallel_soln->localize_to_one(soln);
+}
+
 
 
 void EquationSystems::get_solution (std::vector<Number> & soln,

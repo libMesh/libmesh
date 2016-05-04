@@ -375,6 +375,13 @@ public:
                          const std::vector<numeric_index_type> & send_list) const libmesh_override;
 
   /**
+   * Fill in the local std::vector "v_local" with the global indices
+   * given in "indices".  See numeric_vector.h for more details.
+   */
+  virtual void localize (std::vector<T> & v_local,
+                         const std::vector<numeric_index_type> & indices) const libmesh_override;
+
+  /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */

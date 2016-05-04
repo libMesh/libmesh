@@ -1243,17 +1243,16 @@ void Nemesis_IO::write_timestep (const std::string &,
 
 #endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
+
+
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
-void Nemesis_IO::write_nodal_data (const std::string & base_filename,
-                                   const std::vector<Number> & soln,
-                                   const std::vector<std::string> & names)
+void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
+                                              const std::vector<std::string> & names)
 {
-  LOG_SCOPE("write_nodal_data()", "Nemesis_IO");
-
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
+  std::string nemesis_filename = nemhelper->construct_nemesis_filename(fname);
 
   if (!nemhelper->opened_for_writing)
     {
@@ -1299,22 +1298,71 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
 #endif
         }
     }
+}
+
+#else
+
+void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
+                                              const std::vector<std::string> & names)
+{
+  libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
+
+#endif
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_nodal_data (const std::string & base_filename,
+                                   const NumericVector<Number> & parallel_soln,
+                                   const std::vector<std::string> & names)
+{
+  LOG_SCOPE("write_nodal_data(parallel)", "Nemesis_IO");
+
+  this->prepare_to_write_nodal_data(base_filename, names);
+
+  // Call the new version of write_nodal_solution() that takes a
+  // NumericVector directly without localizing.
+  nemhelper->write_nodal_solution(parallel_soln, names, _timestep);
+}
+
+#else
+
+void Nemesis_IO::write_nodal_data (const std::string &,
+                                   const NumericVector<Number> &,
+                                   const std::vector<std::string> &)
+{
+  libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
+
+#endif
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_nodal_data (const std::string & base_filename,
+                                   const std::vector<Number> & soln,
+                                   const std::vector<std::string> & names)
+{
+  LOG_SCOPE("write_nodal_data(serialized)", "Nemesis_IO");
+
+  this->prepare_to_write_nodal_data(base_filename, names);
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
 }
 
 #else
 
-void Nemesis_IO::write_nodal_data (const std::string & ,
-                                   const std::vector<Number> & ,
-                                   const std::vector<std::string> & )
+void Nemesis_IO::write_nodal_data (const std::string &,
+                                   const std::vector<Number> &,
+                                   const std::vector<std::string> &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
 
-
-#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-
+#endif
 
 
 

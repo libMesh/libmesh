@@ -28,6 +28,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/parallel.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
@@ -2469,6 +2470,72 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
       write_nodal_values(c+1,cur_soln,timestep);
 #endif
     }
+}
+
+
+
+void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & parallel_soln,
+                                             const std::vector<std::string> & names,
+                                             int timestep)
+{
+  int num_vars = cast_int<int>(names.size());
+
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+
+  for (int c=0; c<num_vars; c++)
+    {
+      // Fill up a std::vector with the dofs for the current variable
+      std::vector<numeric_index_type> required_indices(num_nodes);
+
+      for (int i=0; i<num_nodes; i++)
+        required_indices[i] = this->exodus_node_num_to_libmesh[i]*num_vars + c;
+
+      // Get the dof values required to write just our local part of
+      // the solution vector.
+      std::vector<Number> local_soln;
+      parallel_soln.localize(local_soln, required_indices);
+
+      // Call the ExodusII_IO_Helper function to write the data.
+      write_nodal_values(c+1, local_soln, timestep);
+    }
+
+#else // LIBMESH_USE_COMPLEX_NUMBERS
+
+  for (int c=0; c<num_vars; c++)
+    {
+      // Fill up a std::vector with the dofs for the current variable
+      std::vector<numeric_index_type> required_indices(num_nodes);
+
+      for (int i=0; i<num_nodes; i++)
+        required_indices[i] = this->exodus_node_num_to_libmesh[i]*num_vars + c;
+
+      // Get the dof values required to write just our local part of
+      // the solution vector.
+      std::vector<Number> local_soln;
+      parallel_soln.localize(local_soln, required_indices);
+
+      // We have the local (complex) values. Now extract the real,
+      // imaginary, and magnitude values from them.
+      std::vector<Real> real_parts(num_nodes);
+      std::vector<Real> imag_parts(num_nodes);
+      std::vector<Real> magnitudes(num_nodes);
+
+      for (int i=0; i<num_nodes; ++i)
+        {
+          real_parts[i] = local_soln[i].real();
+          imag_parts[i] = local_soln[i].imag();
+          magnitudes[i] = std::abs(local_soln[i]);
+        }
+
+      // Write the real, imaginary, and magnitude values to file.
+      write_nodal_values(3*c+1, real_parts, timestep);
+      write_nodal_values(3*c+2, imag_parts, timestep);
+      write_nodal_values(3*c+3, magnitudes, timestep);
+    }
+
+#endif
+
+
 }
 
 

@@ -32,6 +32,9 @@
 namespace libMesh
 {
 
+// Forward declaration
+template <typename T> class NumericVector;
+
 // The Nemesis API header file.  Should already be
 // correctly extern C'd but it doesn't hurt :)
 namespace Nemesis {
@@ -294,6 +297,21 @@ public:
    * also writes global initial data to file.
    */
   virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false);
+
+  /**
+   * Takes a parallel solution vector containing the node-major
+   * solution vector for all variables and outputs it to the files.
+   *
+   * Note: This version of write_nodal_solution() is called by the
+   * parallel version of Nemesis_IO::write_nodal_data(), which is
+   * called by MeshOutput::write_equation_systems() for parallel I/O
+   * formats like Nemesis.  The other version is still available to
+   * continue supporting things like NamebasedIO::write_nodal_data(),
+   * but this version should be preferred when running in parallel.
+   */
+  void write_nodal_solution(const NumericVector<Number> & parallel_soln,
+                            const std::vector<std::string> & names,
+                            int timestep);
 
   /**
    * Takes a solution vector containing the solution for all variables and outputs it to the files
