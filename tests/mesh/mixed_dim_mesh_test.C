@@ -117,22 +117,22 @@ public:
 
     /* The nodes for the EDGE2 element should have the same global ids
        as the bottom edge of the top QUAD4 element */
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(2)->node(0), _mesh->elem(0)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(2)->node(1), _mesh->elem(0)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(2).node_id(0), _mesh->elem_ref(0).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(2).node_id(1), _mesh->elem_ref(0).node_id(1) );
 
     /* The nodes for the EDGE2 element should have the same global ids
        as the top edge of the bottom QUAD4 element */
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(2)->node(0), _mesh->elem(1)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(2)->node(1), _mesh->elem(1)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(2).node_id(0), _mesh->elem_ref(1).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(2).node_id(1), _mesh->elem_ref(1).node_id(2) );
 
     /* The nodes for the bottom edge of the top QUAD4 element should have
        the same global ids as the top edge of the bottom QUAD4 element */
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(0)->node(0), _mesh->elem(1)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(0)->node(1), _mesh->elem(1)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(0).node_id(0), _mesh->elem_ref(1).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(0).node_id(1), _mesh->elem_ref(1).node_id(2) );
 
     // We didn't set an interior_parent on the edge element, so it
     // should default to NULL
-    CPPUNIT_ASSERT( _mesh->elem(2)->interior_parent() );
+    CPPUNIT_ASSERT( _mesh->elem_ref(2).interior_parent() );
   }
 
   void testDofOrdering()
@@ -146,9 +146,9 @@ public:
 
     std::vector<dof_id_type> top_quad_dof_indices, bottom_quad_dof_indices, edge_dof_indices;
 
-    dof_map.dof_indices( _mesh->elem(0), top_quad_dof_indices );
-    dof_map.dof_indices( _mesh->elem(1), bottom_quad_dof_indices );
-    dof_map.dof_indices( _mesh->elem(2), edge_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(0), top_quad_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(1), bottom_quad_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(2), edge_dof_indices );
 
     /* The dofs for the EDGE2 element should be the same
        as the bottom edge of the top QUAD4 dofs */
@@ -283,31 +283,44 @@ public:
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_nodes() );
 
     // EDGE2,id=11 should have same nodes of bottom of QUAD4, id=3
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(0), _mesh->elem(3)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(1), _mesh->elem(3)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).node_id(0),
+                          _mesh->elem_ref(3).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).node_id(1),
+                          _mesh->elem_ref(3).node_id(1) );
 
     // EDGE2,id=12 should have same nodes of bottom of QUAD4, id=4
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->node(0), _mesh->elem(4)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->node(1), _mesh->elem(4)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(12).node_id(0),
+                          _mesh->elem_ref(4).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(12).node_id(1),
+                          _mesh->elem_ref(4).node_id(1) );
 
     // EDGE2,id=11 should have same nodes of top of QUAD4, id=9
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(0), _mesh->elem(9)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(1), _mesh->elem(9)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).node_id(0),
+                          _mesh->elem_ref(9).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).node_id(1),
+                          _mesh->elem_ref(9).node_id(2) );
 
     // EDGE2,id=12 should have same nodes of top of QUAD4, id=10
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->node(0), _mesh->elem(10)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->node(1), _mesh->elem(10)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(12).node_id(0),
+                          _mesh->elem_ref(10).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(12).node_id(1),
+                          _mesh->elem_ref(10).node_id(2) );
 
     // Shared node between the EDGE2 elements should have the same global id
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(1), _mesh->elem(12)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).node_id(1),
+                          _mesh->elem_ref(12).node_id(0) );
 
     // EDGE2 child elements should have the correct parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->parent(), _mesh->elem(2) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->parent(), _mesh->elem(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).parent(),
+                          _mesh->elem_ptr(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(12).parent(),
+                          _mesh->elem_ptr(2) );
 
     // EDGE2 child elements should have the correct interior_parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->interior_parent(), _mesh->elem(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(12)->interior_parent(), _mesh->elem(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).interior_parent(),
+                          _mesh->elem_ptr(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(12).interior_parent(),
+                          _mesh->elem_ptr(4) );
 #endif
   }
 
@@ -325,12 +338,12 @@ public:
     std::vector<dof_id_type> bottom_quad9_dof_indices, bottom_quad10_dof_indices;
     std::vector<dof_id_type> edge11_dof_indices, edge12_dof_indices;
 
-    dof_map.dof_indices( _mesh->elem(3), top_quad3_dof_indices );
-    dof_map.dof_indices( _mesh->elem(4), top_quad4_dof_indices );
-    dof_map.dof_indices( _mesh->elem(9), bottom_quad9_dof_indices );
-    dof_map.dof_indices( _mesh->elem(10), bottom_quad10_dof_indices );
-    dof_map.dof_indices( _mesh->elem(11), edge11_dof_indices );
-    dof_map.dof_indices( _mesh->elem(12), edge12_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(3), top_quad3_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(4), top_quad4_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(9), bottom_quad9_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(10), bottom_quad10_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(11), edge11_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(12), edge12_dof_indices );
 
     // EDGE2,id=11 should have same dofs as of bottom of QUAD4, id=3
     CPPUNIT_ASSERT_EQUAL( edge11_dof_indices[0], top_quad3_dof_indices[0] );
@@ -498,7 +511,7 @@ protected:
 
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement
-    _mesh->elem(0)->set_refinement_flag(Elem::REFINE);
+    _mesh->elem_ref(0).set_refinement_flag(Elem::REFINE);
     MeshRefinement(*_mesh).refine_and_coarsen_elements();
 #endif
 
@@ -526,31 +539,44 @@ public:
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)19, _mesh->n_nodes() );
 
     // EDGE2,id=13 should have same nodes of bottom of QUAD4, id=5
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(5)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(5)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(0),
+                          _mesh->elem_ref(5).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(5).node_id(1) );
 
     // EDGE2,id=14 should have same nodes of bottom of QUAD4, id=6
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(6)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(6)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(0),
+                          _mesh->elem_ref(6).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(1),
+                          _mesh->elem_ref(6).node_id(1) );
 
     // EDGE2,id=13 should have same nodes of top of QUAD4, id=11
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(11)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(11)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(0),
+                          _mesh->elem_ref(11).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(11).node_id(2) );
 
     // EDGE2,id=14 should have same nodes of top of QUAD4, id=12
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(12)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(12)->node(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(0),
+                          _mesh->elem_ref(12).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(1),
+                          _mesh->elem_ref(12).node_id(2) );
 
     // Shared node between the EDGE2 elements should have the same global id
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(14)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(14).node_id(0) );
 
     // EDGE2 child elements should have the correct parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->parent(), _mesh->elem(4) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->parent(), _mesh->elem(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).parent(),
+                          _mesh->elem_ptr(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).parent(),
+                          _mesh->elem_ptr(4) );
 
     // EDGE2 child elements should have the correct interior_parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->interior_parent(), _mesh->elem(5) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->interior_parent(), _mesh->elem(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).interior_parent(),
+                          _mesh->elem_ptr(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).interior_parent(),
+                          _mesh->elem_ptr(6) );
 #endif
   }
 
@@ -568,12 +594,12 @@ public:
     std::vector<dof_id_type> bottom_quad11_dof_indices, bottom_quad12_dof_indices;
     std::vector<dof_id_type> edge13_dof_indices, edge14_dof_indices;
 
-    dof_map.dof_indices( _mesh->elem(5),  top_quad5_dof_indices );
-    dof_map.dof_indices( _mesh->elem(6),  top_quad6_dof_indices );
-    dof_map.dof_indices( _mesh->elem(11), bottom_quad11_dof_indices );
-    dof_map.dof_indices( _mesh->elem(12), bottom_quad12_dof_indices );
-    dof_map.dof_indices( _mesh->elem(13), edge13_dof_indices );
-    dof_map.dof_indices( _mesh->elem(14), edge14_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(5),  top_quad5_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(6),  top_quad6_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(11), bottom_quad11_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(12), bottom_quad12_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(13), edge13_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(14), edge14_dof_indices );
 
     // EDGE2,id=13 should have same dofs as of bottom of QUAD4, id=5
     CPPUNIT_ASSERT_EQUAL( edge13_dof_indices[0], top_quad5_dof_indices[0] );
@@ -707,7 +733,7 @@ protected:
 
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement
-    _mesh->elem(4)->set_refinement_flag(Elem::REFINE);
+    _mesh->elem_ref(4).set_refinement_flag(Elem::REFINE);
     MeshRefinement(*_mesh).refine_and_coarsen_elements();
 #endif
   }
@@ -733,39 +759,56 @@ public:
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)11, _mesh->n_nodes() );
 
     // EDGE2,id=13 should have same nodes of the base of TRI3, id=5
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(5)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(5)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(0),
+                          _mesh->elem_ref(5).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(5).node_id(1) );
 
     // EDGE2,id=13 should have same nodes of the base of TRI3, id=10
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(0), _mesh->elem(10)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(10)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(0),
+                          _mesh->elem_ref(10).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(10).node_id(0) );
 
     // EDGE2,id=13 should have same node as the tip of TRI3, id=8 and id=12
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(8)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(12)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(8).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(12).node_id(0) );
 
     // EDGE2,id=14 should have same nodes of the base of TRI3, id=6
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(6)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(6)->node(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(0),
+                          _mesh->elem_ref(6).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(1),
+                          _mesh->elem_ref(6).node_id(1) );
 
     // EDGE2,id=14 should have same nodes of the base of TRI3, id=9
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(9)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(1), _mesh->elem(9)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(0),
+                          _mesh->elem_ref(9).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(1),
+                          _mesh->elem_ref(9).node_id(0) );
 
     // EDGE2,id=14 should have same node as the tip of TRI3, id=8 and id=12
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(8)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->node(0), _mesh->elem(12)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(0),
+                          _mesh->elem_ref(8).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).node_id(0),
+                          _mesh->elem_ref(12).node_id(0) );
 
     // Shared node between the EDGE2 elements should have the same global id
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->node(1), _mesh->elem(14)->node(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(1),
+                          _mesh->elem_ref(14).node_id(0) );
 
     // EDGE2 child elements should have the correct parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->parent(), _mesh->elem(4) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->parent(), _mesh->elem(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).parent(),
+                          _mesh->elem_ptr(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).parent(),
+                          _mesh->elem_ptr(4) );
 
     // EDGE2 child elements should have the correct interior_parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(13)->interior_parent(), _mesh->elem(5) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(14)->interior_parent(), _mesh->elem(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).interior_parent(),
+                          _mesh->elem_ptr(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).interior_parent(),
+                          _mesh->elem_ptr(6) );
 
   }
 
@@ -787,14 +830,14 @@ public:
     //EDGE2 Elements
     std::vector<dof_id_type> elem13_dof_indices, elem14_dof_indices;
 
-    dof_map.dof_indices( _mesh->elem(5), elem5_dof_indices );
-    dof_map.dof_indices( _mesh->elem(6), elem6_dof_indices );
-    dof_map.dof_indices( _mesh->elem(8), elem8_dof_indices );
-    dof_map.dof_indices( _mesh->elem(9), elem9_dof_indices );
-    dof_map.dof_indices( _mesh->elem(10), elem10_dof_indices );
-    dof_map.dof_indices( _mesh->elem(12), elem12_dof_indices );
-    dof_map.dof_indices( _mesh->elem(13), elem13_dof_indices );
-    dof_map.dof_indices( _mesh->elem(14), elem14_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(5), elem5_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(6), elem6_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(8), elem8_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(9), elem9_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(10), elem10_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(12), elem12_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(13), elem13_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(14), elem14_dof_indices );
 
     /* The dofs for the EDGE2 (id = 13 and id =14) element should be the same
        as the bottom edge of the top TRI3 (id=5 and id=6) and the tip of
@@ -908,7 +951,7 @@ protected:
 
 #ifdef LIBMESH_ENABLE_AMR
     //Flag the bottom element for refinement
-    _mesh->elem(13)->set_refinement_flag(Elem::REFINE);
+    _mesh->elem_ref(13).set_refinement_flag(Elem::REFINE);
     MeshRefinement(*_mesh).refine_and_coarsen_elements();
 #endif
   }
@@ -935,74 +978,122 @@ public:
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)113, _mesh->n_nodes() );
 
     // QUAD4,id=53 should have same nodes as a face in HEX8, id=39
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(0), _mesh->elem(41)->node(4) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(1), _mesh->elem(41)->node(5) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(41)->node(6) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(3), _mesh->elem(41)->node(7) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(0),
+                          _mesh->elem_ref(41).node_id(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(1),
+                          _mesh->elem_ref(41).node_id(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(2),
+                          _mesh->elem_ref(41).node_id(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(3),
+                          _mesh->elem_ref(41).node_id(7) );
 
     // QUAD4,id=53 should have same nodes as a face in HEX8, id=45
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(0), _mesh->elem(45)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(1), _mesh->elem(45)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(45)->node(2) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(3), _mesh->elem(45)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(0),
+                          _mesh->elem_ref(45).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(1),
+                          _mesh->elem_ref(45).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(2),
+                          _mesh->elem_ref(45).node_id(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(3),
+                          _mesh->elem_ref(45).node_id(3) );
 
     // QUAD4,id=54 should have same nodes as a face in HEX8, id=42
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(0), _mesh->elem(42)->node(4) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(1), _mesh->elem(42)->node(5) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(2), _mesh->elem(42)->node(6) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(3), _mesh->elem(42)->node(7) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(0),
+                          _mesh->elem_ref(42).node_id(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(1),
+                          _mesh->elem_ref(42).node_id(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(2),
+                          _mesh->elem_ref(42).node_id(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(3),
+                          _mesh->elem_ref(42).node_id(7) );
 
     // QUAD4,id=54 should have same nodes as a face in HEX8, id=46
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(0), _mesh->elem(46)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(1), _mesh->elem(46)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(2), _mesh->elem(46)->node(2) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(3), _mesh->elem(46)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(0),
+                          _mesh->elem_ref(46).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(1),
+                          _mesh->elem_ref(46).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(2),
+                          _mesh->elem_ref(46).node_id(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(3),
+                          _mesh->elem_ref(46).node_id(3) );
 
     // QUAD4,id=55 should have same nodes as a face in HEX8, id=43
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(0), _mesh->elem(43)->node(4) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(1), _mesh->elem(43)->node(5) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(2), _mesh->elem(43)->node(6) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(3), _mesh->elem(43)->node(7) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(0),
+                          _mesh->elem_ref(43).node_id(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(1),
+                          _mesh->elem_ref(43).node_id(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(2),
+                          _mesh->elem_ref(43).node_id(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(3),
+                          _mesh->elem_ref(43).node_id(7) );
 
     // QUAD4,id=55 should have same nodes as a face in HEX8, id=47
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(0), _mesh->elem(47)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(1), _mesh->elem(47)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(2), _mesh->elem(47)->node(2) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(3), _mesh->elem(47)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(0),
+                          _mesh->elem_ref(47).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(1),
+                          _mesh->elem_ref(47).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(2),
+                          _mesh->elem_ref(47).node_id(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(3),
+                          _mesh->elem_ref(47).node_id(3) );
 
     // QUAD4,id=56 should have same nodes as a face in HEX8, id=44
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(0), _mesh->elem(44)->node(4) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(1), _mesh->elem(44)->node(5) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(2), _mesh->elem(44)->node(6) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(3), _mesh->elem(44)->node(7) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(0),
+                          _mesh->elem_ref(44).node_id(4) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(1),
+                          _mesh->elem_ref(44).node_id(5) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(2),
+                          _mesh->elem_ref(44).node_id(6) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(3),
+                          _mesh->elem_ref(44).node_id(7) );
 
     // QUAD4,id=56 should have same nodes as a face in HEX8, id=48
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(0), _mesh->elem(48)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(1), _mesh->elem(48)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(2), _mesh->elem(48)->node(2) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->node(3), _mesh->elem(48)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(0),
+                          _mesh->elem_ref(48).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(1),
+                          _mesh->elem_ref(48).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(2),
+                          _mesh->elem_ref(48).node_id(2) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).node_id(3),
+                          _mesh->elem_ref(48).node_id(3) );
 
     // Shared node between the QUAD4 elements should have the same global id
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(1), _mesh->elem(54)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(54)->node(3) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(3), _mesh->elem(55)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->node(2), _mesh->elem(55)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(3), _mesh->elem(56)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->node(2), _mesh->elem(56)->node(1) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(1), _mesh->elem(56)->node(0) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->node(2), _mesh->elem(56)->node(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(1),
+                          _mesh->elem_ref(54).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(2),
+                          _mesh->elem_ref(54).node_id(3) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(3),
+                          _mesh->elem_ref(55).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(2),
+                          _mesh->elem_ref(55).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(3),
+                          _mesh->elem_ref(56).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).node_id(2),
+                          _mesh->elem_ref(56).node_id(1) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(1),
+                          _mesh->elem_ref(56).node_id(0) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).node_id(2),
+                          _mesh->elem_ref(56).node_id(3) );
 
     // QUAD4 child elements should have the correct parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->parent(), _mesh->elem(36) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->parent(), _mesh->elem(36) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->parent(), _mesh->elem(36) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->parent(), _mesh->elem(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).parent(),
+                          _mesh->elem_ptr(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).parent(),
+                          _mesh->elem_ptr(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).parent(),
+                          _mesh->elem_ptr(36) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).parent(),
+                          _mesh->elem_ptr(36) );
 
     // QUAD4 child elements should have the correct interior_parent
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(53)->interior_parent(), _mesh->elem(41) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(54)->interior_parent(), _mesh->elem(42) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(55)->interior_parent(), _mesh->elem(43) );
-    CPPUNIT_ASSERT_EQUAL( _mesh->elem(56)->interior_parent(), _mesh->elem(44) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).interior_parent(),
+                          _mesh->elem_ptr(41) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(54).interior_parent(),
+                          _mesh->elem_ptr(42) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(55).interior_parent(),
+                          _mesh->elem_ptr(43) );
+    CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(56).interior_parent(),
+                          _mesh->elem_ptr(44) );
 
 #endif
   }
@@ -1024,18 +1115,18 @@ public:
     //QUAD4 elements
     std::vector<dof_id_type> elem53_dof_indices, elem54_dof_indices, elem55_dof_indices, elem56_dof_indices;
 
-    dof_map.dof_indices( _mesh->elem(41), elem41_dof_indices );
-    dof_map.dof_indices( _mesh->elem(42), elem42_dof_indices );
-    dof_map.dof_indices( _mesh->elem(43), elem43_dof_indices );
-    dof_map.dof_indices( _mesh->elem(44), elem44_dof_indices );
-    dof_map.dof_indices( _mesh->elem(45), elem45_dof_indices );
-    dof_map.dof_indices( _mesh->elem(46), elem46_dof_indices );
-    dof_map.dof_indices( _mesh->elem(47), elem47_dof_indices );
-    dof_map.dof_indices( _mesh->elem(48), elem48_dof_indices );
-    dof_map.dof_indices( _mesh->elem(53), elem53_dof_indices );
-    dof_map.dof_indices( _mesh->elem(54), elem54_dof_indices );
-    dof_map.dof_indices( _mesh->elem(55), elem55_dof_indices );
-    dof_map.dof_indices( _mesh->elem(56), elem56_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(41), elem41_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(42), elem42_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(43), elem43_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(44), elem44_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(45), elem45_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(46), elem46_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(47), elem47_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(48), elem48_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(53), elem53_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(54), elem54_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(55), elem55_dof_indices );
+    dof_map.dof_indices( _mesh->elem_ptr(56), elem56_dof_indices );
 
     /* The dofs for the QUAD4 (ids = 53, 54, 55, and 56) element should be the same
        as the face of the HEX8 elements HEX8 (id=41, 42, 43, and 44) left of the

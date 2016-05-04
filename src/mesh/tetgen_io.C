@@ -303,9 +303,9 @@ void TetGenIO::write (const std::string & fname)
     for ( ; it != end; ++it)
       out_stream << "1\n3 " // no. of facet polygons
         //  << (*it)->n_nodes() << " "
-                 << (*it)->node(0)   << " "
-                 << (*it)->node(1)   << " "
-                 << (*it)->node(2)   << "\n";
+                 << (*it)->node_id(0)   << " "
+                 << (*it)->node_id(1)   << " "
+                 << (*it)->node_id(2)   << "\n";
   }
 
   // end of the file

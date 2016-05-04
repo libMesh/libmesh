@@ -127,7 +127,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         const Elem * old = *it;
         //Build a new element
         Elem * newparent = old->parent() ?
-          this->elem(old->parent()->id()) : libmesh_nullptr;
+          this->elem_ptr(old->parent()->id()) : libmesh_nullptr;
         UniquePtr<Elem> ap = Elem::build(old->type(), newparent);
         Elem * el = ap.release();
 
@@ -162,7 +162,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
         //Assign all the nodes
         for(unsigned int i=0;i<el->n_nodes();i++)
-          el->set_node(i) = &this->node(old->node(i));
+          el->set_node(i) = this->node_ptr(old->node_id(i));
 
         // And start it off in the same subdomain
         el->processor_id() = old->processor_id();
@@ -730,25 +730,25 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
       // Loop over the nodes on this element.
       for (unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
-          const dof_id_type node_id = old_elem->node(n);
+          const dof_id_type this_node_id = old_elem->node_id(n);
 
           // Add this node to the new mesh if it's not there already
-          if (!new_mesh.query_node_ptr(node_id))
+          if (!new_mesh.query_node_ptr(this_node_id))
             {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
               Node *newn =
 #endif
                 new_mesh.add_point (old_elem->point(n),
-                                    node_id,
-                                    old_elem->get_node(n)->processor_id());
+                                    this_node_id,
+                                    old_elem->node_ptr(n)->processor_id());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              newn->set_unique_id() = old_elem->get_node(n)->unique_id();
+              newn->set_unique_id() = old_elem->node_ptr(n)->unique_id();
 #endif
             }
 
           // Define this element's connectivity on the new mesh
-          new_elem->set_node(n) = new_mesh.node_ptr(node_id);
+          new_elem->set_node(n) = new_mesh.node_ptr(this_node_id);
         }
 
       // Maybe add boundary conditions for this element

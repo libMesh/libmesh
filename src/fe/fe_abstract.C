@@ -831,10 +831,10 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
           parent_nodes.reserve (n_side_nodes);
 
           for (unsigned int n=0; n != n_side_nodes; ++n)
-            my_nodes.push_back(my_side->get_node(n));
+            my_nodes.push_back(my_side->node_ptr(n));
 
           for (unsigned int n=0; n != n_side_nodes; ++n)
-            parent_nodes.push_back(parent_side->get_node(n));
+            parent_nodes.push_back(parent_side->node_ptr(n));
 
           for (unsigned int my_side_n=0;
                my_side_n < n_side_nodes;
@@ -995,10 +995,10 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                   neigh_nodes.reserve (n_side_nodes);
 
                   for (unsigned int n=0; n != n_side_nodes; ++n)
-                    my_nodes.push_back(my_side->get_node(n));
+                    my_nodes.push_back(my_side->node_ptr(n));
 
                   for (unsigned int n=0; n != n_side_nodes; ++n)
-                    neigh_nodes.push_back(neigh_side->get_node(n));
+                    neigh_nodes.push_back(neigh_side->node_ptr(n));
 
                   // Make sure we're not adding recursive constraints
                   // due to the redundancy in the way we add periodic

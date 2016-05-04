@@ -82,7 +82,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
     for (; it != end; ++it)
       {
         const Elem * other_elem = it->first;
-        _boundary_edge_id.insert(std::make_pair(_mesh.elem(other_elem->id()),
+        _boundary_edge_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
                                                 it->second));
       }
   }
@@ -95,7 +95,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
     for (; it != end; ++it)
       {
         const Elem * other_elem = it->first;
-        _boundary_side_id.insert(std::make_pair(_mesh.elem(other_elem->id()),
+        _boundary_side_id.insert(std::make_pair(_mesh.elem_ptr(other_elem->id()),
                                                 it->second));
       }
   }
@@ -225,13 +225,13 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
         {
           // Get the correct node pointer, based on the id()
           Node * new_node =
-            boundary_mesh.node_ptr(node_id_map[new_elem->node(nn)]);
+            boundary_mesh.node_ptr(node_id_map[new_elem->node_id(nn)]);
 
           // sanity check: be sure that the new Node exists and its
           // global id really matches
           libmesh_assert (new_node);
           libmesh_assert_equal_to (new_node->id(),
-                                   node_id_map[new_elem->node(nn)]);
+                                   node_id_map[new_elem->node_id(nn)]);
 
           // Assign the new node pointer
           new_elem->set_node(nn) = new_node;
@@ -302,8 +302,8 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       UniquePtr<Elem> interior_parent_side = interior_parent->build_side(interior_parent_side_index);
       for(unsigned char local_node_index=0; local_node_index<boundary_elem->n_nodes(); local_node_index++)
         {
-          dof_id_type boundary_node_id = boundary_elem->node(local_node_index);
-          dof_id_type interior_node_id = interior_parent_side->node(local_node_index);
+          dof_id_type boundary_node_id = boundary_elem->node_id(local_node_index);
+          dof_id_type interior_node_id = interior_parent_side->node_id(local_node_index);
 
           node_id_map[interior_node_id] = boundary_node_id;
         }
@@ -393,7 +393,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     {
       const dof_id_type elem_id = it->first;
       const unsigned char s = it->second;
-      const Elem * elem = _mesh.elem(elem_id);
+      const Elem * elem = _mesh.elem_ptr(elem_id);
 
       // Build the side - do not use a "proxy" element here:
       // This will be going into the boundary_mesh and needs to
@@ -425,7 +425,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
           libmesh_assert(side_id_map.count(parent_side_pair));
 
-          Elem * side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
+          Elem * side_parent = boundary_mesh.elem_ptr(side_id_map[parent_side_pair]);
 
           libmesh_assert(side_parent);
 
@@ -440,7 +440,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           // the same local index.
           bool found_child = false;
           for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
-            if (new_elem->get_node(v) == side_parent->get_node(v))
+            if (new_elem->node_ptr(v) == side_parent->node_ptr(v))
               {
                 side_parent->add_child(new_elem, v);
                 found_child = true;
@@ -630,7 +630,7 @@ void BoundaryInfo::add_edge(const dof_id_type e,
                             const unsigned short int edge,
                             const boundary_id_type id)
 {
-  this->add_edge (_mesh.elem(e), edge, id);
+  this->add_edge (_mesh.elem_ptr(e), edge, id);
 }
 
 
@@ -722,7 +722,7 @@ void BoundaryInfo::add_side(const dof_id_type e,
                             const unsigned short int side,
                             const boundary_id_type id)
 {
-  this->add_side (_mesh.elem(e), side, id);
+  this->add_side (_mesh.elem_ptr(e), side, id);
 }
 
 
@@ -1485,7 +1485,7 @@ BoundaryInfo::build_node_list_from_side_list()
 
           // Add each node node on the side with the side's boundary id
           for (unsigned int i=0; i<side->n_nodes(); i++)
-            this->add_node(side->get_node(i), pos->second.second);
+            this->add_node(side->node_ptr(i), pos->second.second);
         }
     }
 }
@@ -1517,7 +1517,7 @@ void BoundaryInfo::build_side_list_from_node_list()
           std::map<boundary_id_type, unsigned> nodesets_node_count;
           for (unsigned node_num=0; node_num < side_elem->n_nodes(); ++node_num)
             {
-              Node * node = side_elem->get_node(node_num);
+              Node * node = side_elem->node_ptr(node_num);
               std::pair<boundary_node_iter, boundary_node_iter>
                 range = _boundary_node_id.equal_range(node);
 
@@ -1936,16 +1936,15 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                 UniquePtr<Elem> side (elem->build_side(s));
                 for (unsigned int n = 0; n != side->n_nodes(); ++n)
                   {
-                    Node * node = side->get_node(n);
-                    libmesh_assert(node);
+                    Node & node = side->node_ref(n);
 
                     // In parallel we don't know enough to number
                     // others' nodes ourselves.
                     if (!hit_end_el &&
-                        (node->processor_id() != this->processor_id()))
+                        (node.processor_id() != this->processor_id()))
                       continue;
 
-                    dof_id_type node_id = node->id();
+                    dof_id_type node_id = node.id();
                     if (node_id_map && !node_id_map->count(node_id))
                       {
                         (*node_id_map)[node_id] = next_node_id;

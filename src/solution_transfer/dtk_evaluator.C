@@ -54,7 +54,7 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int> & elements,
 
   for(unsigned int i=0; i<num_values; i++)
     {
-      Elem * elem = mesh.elem(elements[i]);
+      Elem * elem = mesh.elem_ptr(elements[i]);
 
       Point p;
 

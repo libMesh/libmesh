@@ -139,7 +139,7 @@ UniquePtr<Elem> Quad4::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(Quad4::side_nodes_map[i][n]);
+        edge->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }
@@ -166,19 +166,19 @@ void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
     {
     case TECPLOT:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(3)+1;
+        conn[0] = this->node_id(0)+1;
+        conn[1] = this->node_id(1)+1;
+        conn[2] = this->node_id(2)+1;
+        conn[3] = this->node_id(3)+1;
         return;
       }
 
     case VTK:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
+        conn[2] = this->node_id(2);
+        conn[3] = this->node_id(3);
         return;
       }
 

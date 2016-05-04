@@ -127,20 +127,17 @@ public:
 
   virtual const Point & point (const dof_id_type i) const libmesh_override;
 
-  virtual const Node &  node  (const dof_id_type i) const libmesh_override;
-  virtual Node & node (const dof_id_type i) libmesh_override;
-
   virtual const Node * node_ptr (const dof_id_type i) const libmesh_override;
   virtual Node * node_ptr (const dof_id_type i) libmesh_override;
 
   virtual const Node * query_node_ptr (const dof_id_type i) const libmesh_override;
   virtual Node * query_node_ptr (const dof_id_type i) libmesh_override;
 
-  virtual const Elem * elem (const dof_id_type i) const libmesh_override;
-  virtual Elem * elem (const dof_id_type i) libmesh_override;
+  virtual const Elem * elem_ptr (const dof_id_type i) const libmesh_override;
+  virtual Elem * elem_ptr (const dof_id_type i) libmesh_override;
 
-  virtual const Elem * query_elem (const dof_id_type i) const libmesh_override;
-  virtual Elem * query_elem (const dof_id_type i) libmesh_override;
+  virtual const Elem * query_elem_ptr (const dof_id_type i) const libmesh_override;
+  virtual Elem * query_elem_ptr (const dof_id_type i) libmesh_override;
 
   /**
    * functions for adding /deleting nodes elements.
@@ -174,7 +171,7 @@ public:
    * There is no reason for a user to ever call this function.
    *
    * This function restores a previously broken element/node numbering such that
-   * \p mesh.node(n)->id() == n.
+   * \p mesh.node_ref(n).id() == n.
    */
   virtual void fix_broken_node_and_element_numbering () libmesh_override;
 

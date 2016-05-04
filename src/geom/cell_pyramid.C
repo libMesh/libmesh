@@ -64,15 +64,15 @@ dof_id_type Pyramid::key (const unsigned int s) const
     case 1: // triangular face 2
     case 2: // triangular face 3
     case 3: // triangular face 4
-      return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
-                                this->node(Pyramid5::side_nodes_map[s][1]),
-                                this->node(Pyramid5::side_nodes_map[s][2]));
+      return this->compute_key (this->node_id(Pyramid5::side_nodes_map[s][0]),
+                                this->node_id(Pyramid5::side_nodes_map[s][1]),
+                                this->node_id(Pyramid5::side_nodes_map[s][2]));
 
     case 4:  // the quad face at z=0
-      return this->compute_key (this->node(Pyramid5::side_nodes_map[s][0]),
-                                this->node(Pyramid5::side_nodes_map[s][1]),
-                                this->node(Pyramid5::side_nodes_map[s][2]),
-                                this->node(Pyramid5::side_nodes_map[s][3]));
+      return this->compute_key (this->node_id(Pyramid5::side_nodes_map[s][0]),
+                                this->node_id(Pyramid5::side_nodes_map[s][1]),
+                                this->node_id(Pyramid5::side_nodes_map[s][2]),
+                                this->node_id(Pyramid5::side_nodes_map[s][3]));
 
     default:
       libmesh_error_msg("Invalid side s = " << s);
@@ -113,7 +113,7 @@ UniquePtr<Elem> Pyramid::side (const unsigned int i) const
 
   // Set the nodes
   for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(Pyramid5::side_nodes_map[i][n]);
+    face->set_node(n) = this->node_ptr(Pyramid5::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }

@@ -1180,7 +1180,7 @@ void FEMap::compute_affine_map(const unsigned int dim,
   // Determine the nodes contributing to element elem
   std::vector<Node *> elem_nodes(elem->n_nodes(), libmesh_nullptr);
   for (unsigned int i=0; i<elem->n_nodes(); i++)
-    elem_nodes[i] = elem->get_node(i);
+    elem_nodes[i] = elem->node_ptr(i);
 
   // Compute map at quadrature point 0
   this->compute_single_point_map(dim, qw, elem, 0, elem_nodes, /*compute_second_derivatives=*/false);
@@ -1359,7 +1359,7 @@ void FEMap::compute_map(const unsigned int dim,
       // All other FE use only the nodes of elem itself
       elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->get_node(i);
+        elem_nodes[i] = elem->node_ptr(i);
     }
 
   // Compute map at all quadrature points

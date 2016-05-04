@@ -308,9 +308,9 @@ void HPCoarsenTest::select_refinement (System & system)
                 if (elem->is_vertex(n))
                   {
                     n_vertices++;
-                    const Node * const node = elem->get_node(n);
+                    const Node & node = elem->node_ref(n);
                     average_val += system.current_solution
-                      (node->dof_number(sys_num,var,0));
+                      (node.dof_number(sys_num,var,0));
                   }
               average_val /= n_vertices;
             }

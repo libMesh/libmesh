@@ -75,10 +75,10 @@ dof_id_type InfHex::key (const unsigned int s) const
 
   // The order of the node ids does not matter, they are sorted by the
   // compute_key() function.
-  return this->compute_key(this->node(InfHex8::side_nodes_map[s][0]),
-                           this->node(InfHex8::side_nodes_map[s][1]),
-                           this->node(InfHex8::side_nodes_map[s][2]),
-                           this->node(InfHex8::side_nodes_map[s][3]));
+  return this->compute_key(this->node_id(InfHex8::side_nodes_map[s][0]),
+                           this->node_id(InfHex8::side_nodes_map[s][1]),
+                           this->node_id(InfHex8::side_nodes_map[s][2]),
+                           this->node_id(InfHex8::side_nodes_map[s][3]));
 }
 
 
@@ -126,7 +126,7 @@ UniquePtr<Elem> InfHex::side (const unsigned int i) const
 
   // Set the nodes
   for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(InfHex8::side_nodes_map[i][n]);
+    face->set_node(n) = this->node_ptr(InfHex8::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }

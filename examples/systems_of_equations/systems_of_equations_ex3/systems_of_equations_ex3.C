@@ -628,7 +628,7 @@ void assemble_stokes (EquationSystems & es,
                   // the side.  That defined where in the element matrix
                   // the boundary condition will be applied.
                   for (unsigned int n=0; n<elem->n_nodes(); n++)
-                    if (elem->node(n) == side->node(ns))
+                    if (elem->node_id(n) == side->node_id(ns))
                       {
                         // Matrix contribution.
                         Kuu(n,n) += penalty;

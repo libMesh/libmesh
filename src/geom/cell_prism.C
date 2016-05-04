@@ -68,17 +68,17 @@ dof_id_type Prism::key (const unsigned int s) const
     {
     case 0: // the triangular face at z=0
     case 4: // the triangular face at z=1
-      return this->compute_key (this->node(Prism6::side_nodes_map[s][0]),
-                                this->node(Prism6::side_nodes_map[s][1]),
-                                this->node(Prism6::side_nodes_map[s][2]));
+      return this->compute_key (this->node_id(Prism6::side_nodes_map[s][0]),
+                                this->node_id(Prism6::side_nodes_map[s][1]),
+                                this->node_id(Prism6::side_nodes_map[s][2]));
 
     case 1: // the quad face at y=0
     case 2: // the other quad face
     case 3: // the quad face at x=0
-      return this->compute_key (this->node(Prism6::side_nodes_map[s][0]),
-                                this->node(Prism6::side_nodes_map[s][1]),
-                                this->node(Prism6::side_nodes_map[s][2]),
-                                this->node(Prism6::side_nodes_map[s][3]));
+      return this->compute_key (this->node_id(Prism6::side_nodes_map[s][0]),
+                                this->node_id(Prism6::side_nodes_map[s][1]),
+                                this->node_id(Prism6::side_nodes_map[s][2]),
+                                this->node_id(Prism6::side_nodes_map[s][3]));
 
     default:
       libmesh_error_msg("Invalid side " << s);
@@ -118,7 +118,7 @@ UniquePtr<Elem> Prism::side (const unsigned int i) const
 
   // Set the nodes
   for (unsigned n=0; n<face->n_nodes(); ++n)
-    face->set_node(n) = this->get_node(Prism6::side_nodes_map[i][n]);
+    face->set_node(n) = this->node_ptr(Prism6::side_nodes_map[i][n]);
 
   return UniquePtr<Elem>(face);
 }

@@ -275,11 +275,11 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         // Loop over the nodes in the element
         for(unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            // Get a pointer to the current node
-            Node * node = elem->get_node(n);
+            // Get a reference to the current node
+            Node & node = elem->node_ref(n);
 
             // Get the id of this node
-            dof_id_type node_id = node->id();
+            dof_id_type node_id = node.id();
 
             // If we havent already processed this node, do so now
             if(processed_node_ids.find(node_id) == processed_node_ids.end())
@@ -288,7 +288,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                 std::set<const Elem *> fine_grid_neighbor_set;
 
                 // Call find_point_neighbors to fill the neighbor_set
-                elem->find_point_neighbors(*node, fine_grid_neighbor_set);
+                elem->find_point_neighbors(node, fine_grid_neighbor_set);
 
                 // A vector to hold the coarse grid parents neighbors
                 std::vector<dof_id_type> coarse_grid_neighbors;

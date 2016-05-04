@@ -306,9 +306,9 @@ void ExodusII_IO::read (const std::string & fname)
           cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
 
         // Set any relevant node/edge maps for this element
-        Elem * elem = mesh.elem(libmesh_elem_id);
+        Elem & elem = mesh.elem_ref(libmesh_elem_id);
 
-        const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem->type());
+        const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem.type());
 
         // Map the zero-based Exodus side numbering to the libmesh side numbering
         int mapped_side = conv.get_side_map(exio_helper->side_list[e]-1);
@@ -318,7 +318,7 @@ void ExodusII_IO::read (const std::string & fname)
           libmesh_error_msg("Invalid 1-based side id: "                 \
                             << exio_helper->side_list[e]                \
                             << " detected for "                         \
-                            << Utility::enum_to_string(elem->type()));
+                            << Utility::enum_to_string(elem.type()));
 
         // Add this (elem,side,id) triplet to the BoundaryInfo object.
         mesh.get_boundary_info().add_side (libmesh_elem_id,
@@ -441,14 +441,11 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   for (unsigned int i=0; i<exio_helper->nodal_var_values.size(); ++i)
     {
-      const Node * node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
+      const Node & node = MeshInput<MeshBase>::mesh().node_ref(i);
 
-      if (!node)
-        libmesh_error_msg("Error! Mesh returned NULL pointer for node " << i);
-
-      if (node->n_comp(system.number(), var_num) > 0)
+      if (node.n_comp(system.number(), var_num) > 0)
         {
-          dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
+          dof_id_type dof_index = node.dof_number(system.number(), var_num, 0);
 
           // If the dof_index is local to this processor, set the value
           if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
@@ -488,7 +485,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
 
   for (; it!=end; ++it)
     {
-      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem(it->first);
+      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
 
       if (!elem)
         libmesh_error_msg("Error! Mesh returned NULL pointer for elem " << it->first);

@@ -197,8 +197,7 @@ bool ErrorVector::is_active_elem (dof_id_type i) const
 
   if (_mesh)
     {
-      libmesh_assert(_mesh->elem(i));
-      return _mesh->elem(i)->active();
+      return _mesh->elem_ptr(i)->active();
     }
   else
     return ((*this)[i] != 0.);

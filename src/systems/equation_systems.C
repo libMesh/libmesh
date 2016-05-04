@@ -656,7 +656,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
   //       // Copy the nodal solution over into the correct place in
   //       // the global soln vector which will be returned to the user.
   //       for (unsigned int n=0; n<elem->n_nodes(); n++)
-  // soln[elem->node(n)] = nodal_soln[n];
+  // soln[elem->node_id(n)] = nodal_soln[n];
   //     }
 }
 
@@ -841,10 +841,10 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
                             {
                               // For vector-valued elements, all components are in nodal_soln. For each
                               // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
-                              parallel_soln.add(nv*(elem->node(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
+                              parallel_soln.add(nv*(elem->node_id(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
 
                               // Increment the repeat count for this position
-                              repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
+                              repeat_count.add(nv*(elem->node_id(n)) + (var+d + var_num), 1);
                             }
                         }
                     }
@@ -852,9 +852,9 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
               else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
                 for (unsigned int n=0; n<elem->n_nodes(); n++)
                   // Only do this if this variable has NO DoFs at this node... it might have some from an ajoining element...
-                  if(!elem->get_node(n)->n_dofs(sys_num, var))
+                  if(!elem->node_ptr(n)->n_dofs(sys_num, var))
                     for( unsigned int d=0; d < n_vec_dim; d++ )
-                      repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
+                      repeat_count.add(nv*(elem->node_id(n)) + (var+d + var_num), 1);
 
             } // end loop over elements
         } // end loop on variables in this system

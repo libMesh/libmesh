@@ -131,7 +131,7 @@ public:
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
   virtual dof_id_type key (const unsigned int s) const libmesh_override
-  { return this->compute_key(this->node(s)); }
+  { return this->compute_key(this->node_id(s)); }
 
   /**
    * The \p Elem::side() member returns

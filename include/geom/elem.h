@@ -132,6 +132,14 @@ public:
   /**
    * @returns the global id number of local \p Node \p i.
    */
+  dof_id_type node_id (const unsigned int i) const;
+
+  /**
+   * @returns the global id number of local \p Node \p i.
+   *
+   * This method is deprecated; use the less ambiguously named
+   * node_id() instead.
+   */
   dof_id_type node (const unsigned int i) const;
 
   /**
@@ -153,6 +161,19 @@ public:
 
   /**
    * @returns the pointer to local \p Node \p i.
+   */
+  Node * node_ptr (const unsigned int i) const;
+
+  /**
+   * @returns a reference to local \p Node \p i.
+   */
+  Node & node_ref (const unsigned int i) const;
+
+  /**
+   * @returns the pointer to local \p Node \p i.
+   *
+   * This method is deprecated.  Use the more consistently and less
+   * confusingly named node_ptr() instead.
    */
   Node * get_node (const unsigned int i) const;
 
@@ -853,7 +874,7 @@ public:
    * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
    * to \p * this->n_vertices().  For linear elements this returns 0,0.
    * On refined second order elements, the return value will satisfy
-   * \p this->get_node(n)==this->child(c)->get_node(v)
+   * \p this->node_ptr(n)==this->child(c)->node_ptr(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const;
@@ -1496,7 +1517,7 @@ Point & Elem::point (const unsigned int i)
 
 
 inline
-dof_id_type Elem::node (const unsigned int i) const
+dof_id_type Elem::node_id (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1508,10 +1529,18 @@ dof_id_type Elem::node (const unsigned int i) const
 
 
 inline
+dof_id_type Elem::node (const unsigned int i) const
+{
+  return this->node_id(i);
+}
+
+
+
+inline
 unsigned int Elem::local_node (const dof_id_type i) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    if (this->node(n) == i)
+    if (this->node_id(n) == i)
       return n;
 
   return libMesh::invalid_uint;
@@ -1528,12 +1557,28 @@ const Node * const * Elem::get_nodes () const
 
 
 inline
-Node * Elem::get_node (const unsigned int i) const
+Node * Elem::node_ptr (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
 
   return _nodes[i];
+}
+
+
+
+inline
+Node & Elem::node_ref (const unsigned int i) const
+{
+  return *this->node_ptr(i);
+}
+
+
+
+inline
+Node * Elem::get_node (const unsigned int i) const
+{
+  return this->node_ptr(i);
 }
 
 

@@ -450,7 +450,7 @@ const Elem * MeshData::foreign_id_to_elem (const unsigned int fid) const
   else if (_compatibility_mode)
     // when only in compatibility mode,
     // return element using the libMesh id
-    return this->_mesh.elem(fid);
+    return this->_mesh.elem_ptr(fid);
 
   libmesh_error_msg("We'll never get here!");
   return libmesh_nullptr;

@@ -411,7 +411,7 @@ void RBEIMConstruction::enrich_RB_space()
     {
       eim_eval.interpolation_points.push_back(optimal_point);
       eim_eval.interpolation_points_var.push_back(optimal_var);
-      Elem * elem_ptr = mesh.elem(optimal_elem_id);
+      Elem * elem_ptr = mesh.elem_ptr(optimal_elem_id);
       eim_eval.interpolation_points_elem.push_back( elem_ptr );
 
       NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
@@ -453,7 +453,7 @@ void RBEIMConstruction::enrich_RB_space()
     {
       eim_eval.extra_interpolation_point = optimal_point;
       eim_eval.extra_interpolation_point_var = optimal_var;
-      eim_eval.extra_interpolation_point_elem = mesh.elem(optimal_elem_id);
+      eim_eval.extra_interpolation_point_elem = mesh.elem_ptr(optimal_elem_id);
     }
 }
 

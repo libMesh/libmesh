@@ -122,14 +122,14 @@ void GnuPlotIO::write_solution(const std::string & fname,
           // if el is the left edge of the mesh, print its left node position
           if(el->neighbor(0) == libmesh_nullptr)
             {
-              x_min = (*(el->get_node(0)))(0);
+              x_min = (el->point(0))(0);
               xtics_stream << "\"\" " << x_min << ", \\\n";
             }
           if(el->neighbor(1) == libmesh_nullptr)
             {
-              x_max = (*(el->get_node(1)))(0);
+              x_max = (el->point(1))(0);
             }
-          xtics_stream << "\"\" " << (*(el->get_node(1)))(0);
+          xtics_stream << "\"\" " << (el->point(1))(0);
 
           if(count+1 != n_active_elem)
             {
@@ -190,7 +190,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
               std::vector<Number> values;
 
               // Get the global id of the node
-              dof_id_type global_id = elem->node(i);
+              dof_id_type global_id = elem->node_id(i);
 
               for(unsigned int c=0; c<n_vars; c++)
                 {

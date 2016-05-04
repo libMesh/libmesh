@@ -1366,15 +1366,16 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       // Skip infinite element-blocks; they can not be viewed in most visualization software
       // as paraview.
-      if (mesh.elem(tmp_vec[0])->infinite())
+      if (mesh.elem_ref(tmp_vec[0]).infinite())
         continue;
 #endif
 
       //Use the first element in this block to get representative information.
       //Note that Exodus assumes all elements in a block are of the same type!
       //We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
-      num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();
+      const ExodusII_IO_Helper::Conversion conv =
+        em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
+      num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
       ex_err = exII::ex_put_elem_block(ex_id,
                                        (*it).first,
@@ -1392,7 +1393,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           unsigned int elem_id = tmp_vec[i];
           libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
 
-          const Elem * elem = mesh.elem(elem_id);
+          const Elem & elem = mesh.elem_ref(elem_id);
 
           // We *might* be able to get away with writing mixed element
           // types which happen to have the same number of nodes, but
@@ -1404,10 +1405,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           // This needs to be more than an assert so we don't fail
           // with a mysterious segfault while trying to write mixed
           // element meshes in optimized mode.
-          if (elem->type() != conv.get_canonical_type())
+          if (elem.type() != conv.get_canonical_type())
             libmesh_error_msg("Error: Exodus requires all elements with a given subdomain ID to be the same type.\n" \
                               << "Can't write both "                  \
-                              << Utility::enum_to_string(elem->type()) \
+                              << Utility::enum_to_string(elem.type()) \
                               << " and "                              \
                               << Utility::enum_to_string(conv.get_canonical_type()) \
                               << " in the same block!");
@@ -1426,7 +1427,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
               if (!use_discontinuous)
                 {
                   // The global id for the current node in libmesh.
-                  dof_id_type libmesh_node_id = elem->node(elem_node_index);
+                  dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
 
                   // Find the zero-based libmesh id in the map, this
                   // should be faster than doing linear searches on
@@ -1515,14 +1516,15 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
        * We need to build up active elements if AMR is enabled and add
        * them to the exodus sidesets instead of the potentially inactive "parent" elements
        */
-      mesh.elem(el[i])->active_family_tree_by_side(family, sl[i], false);
+      mesh.elem_ref(el[i]).active_family_tree_by_side(family, sl[i], false);
 #else
-      family.push_back(mesh.elem(el[i]));
+      family.push_back(mesh.elem_ptr(el[i]));
 #endif
 
       for (unsigned int j=0; j<family.size(); ++j)
         {
-          const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(family[j]->id())->type());
+          const ExodusII_IO_Helper::Conversion conv =
+            em.assign_conversion(mesh.elem_ptr(family[j]->id())->type());
 
           // Use the libmesh to exodus datastructure map to get the proper sideset IDs
           // The datastructure contains the "collapsed" contiguous ids

@@ -38,48 +38,48 @@ public:
     es->init();
 
     NumericVector<Number> & sol = *sys->solution;
-    Elem *elem = mesh->query_elem(0);
+    Elem *elem = mesh->query_elem_ptr(0);
 
     if (elem && elem->processor_id() == TestCommWorld->rank())
       {
         // Set x2 = 2*x
-        sol.set(elem->get_node(1)->dof_number(0,0,0), 2);
-        sol.set(elem->get_node(2)->dof_number(0,0,0), 2);
-        sol.set(elem->get_node(5)->dof_number(0,0,0), 2);
-        sol.set(elem->get_node(6)->dof_number(0,0,0), 2);
+        sol.set(elem->node_ref(1).dof_number(0,0,0), 2);
+        sol.set(elem->node_ref(2).dof_number(0,0,0), 2);
+        sol.set(elem->node_ref(5).dof_number(0,0,0), 2);
+        sol.set(elem->node_ref(6).dof_number(0,0,0), 2);
 
         // Set x3 = 3*x
-        sol.set(elem->get_node(1)->dof_number(0,1,0), 3);
-        sol.set(elem->get_node(2)->dof_number(0,1,0), 3);
-        sol.set(elem->get_node(5)->dof_number(0,1,0), 3);
-        sol.set(elem->get_node(6)->dof_number(0,1,0), 3);
+        sol.set(elem->node_ref(1).dof_number(0,1,0), 3);
+        sol.set(elem->node_ref(2).dof_number(0,1,0), 3);
+        sol.set(elem->node_ref(5).dof_number(0,1,0), 3);
+        sol.set(elem->node_ref(6).dof_number(0,1,0), 3);
 
         // Set c05 = 0.5
-        sol.set(elem->get_node(0)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(1)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(2)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(3)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(4)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(5)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(6)->dof_number(0,2,0), 0.5);
-        sol.set(elem->get_node(7)->dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(0).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(1).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(2).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(3).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(4).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(5).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(6).dof_number(0,2,0), 0.5);
+        sol.set(elem->node_ref(7).dof_number(0,2,0), 0.5);
 
         // Set y4 = 4*y
-        sol.set(elem->get_node(2)->dof_number(0,3,0), 4);
-        sol.set(elem->get_node(3)->dof_number(0,3,0), 4);
-        sol.set(elem->get_node(6)->dof_number(0,3,0), 4);
-        sol.set(elem->get_node(7)->dof_number(0,3,0), 4);
+        sol.set(elem->node_ref(2).dof_number(0,3,0), 4);
+        sol.set(elem->node_ref(3).dof_number(0,3,0), 4);
+        sol.set(elem->node_ref(6).dof_number(0,3,0), 4);
+        sol.set(elem->node_ref(7).dof_number(0,3,0), 4);
 
         // Set xy = x*y
-        sol.set(elem->get_node(2)->dof_number(0,4,0), 1);
-        sol.set(elem->get_node(6)->dof_number(0,4,0), 1);
+        sol.set(elem->node_ref(2).dof_number(0,4,0), 1);
+        sol.set(elem->node_ref(6).dof_number(0,4,0), 1);
 
         // Set yz = y*z
-        sol.set(elem->get_node(6)->dof_number(0,5,0), 1);
-        sol.set(elem->get_node(7)->dof_number(0,5,0), 1);
+        sol.set(elem->node_ref(6).dof_number(0,5,0), 1);
+        sol.set(elem->node_ref(7).dof_number(0,5,0), 1);
 
         // Set xyz = x*y*z
-        sol.set(elem->get_node(6)->dof_number(0,6,0), 1);
+        sol.set(elem->node_ref(6).dof_number(0,6,0), 1);
       }
 
     sol.close();

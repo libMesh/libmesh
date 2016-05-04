@@ -100,7 +100,8 @@ int main (int argc, char ** argv)
     for (unsigned int e=0; e<mesh_coarse.n_elem(); e++)
     {
     libMesh::out << "looking for centroid of element " << e << std::endl;
-    const Elem * elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
+    const Elem * elem =
+      octree_coarse.find_element(mesh_coarse.elem_ref(e).centroid(mesh_coarse));
 
     libmesh_assert(elem);
     }
@@ -140,14 +141,14 @@ int main (int argc, char ** argv)
     Number error = 0.;
 
     // Initial coarse element
-    Elem * coarse_element = mesh_coarse.elem(0);
+    Elem * coarse_element = mesh_coarse.elem_ptr(0);
     fe_coarse.reinit (coarse_element);
 
 
     // Loop over fine mesh elements
     for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
       {
-        const Elem * fine_element = mesh_fine.elem(e);
+        const Elem * fine_element = mesh_fine.elem_ptr(e);
 
         // Recompute the element--specific data for the current fine-mesh element.
         fe_fine.reinit(fine_element);
@@ -164,7 +165,7 @@ int main (int argc, char ** argv)
             for (unsigned int i=0; i<fe_fine.n_shape_functions(); i++)
               {
                 const unsigned int nv = fine_var_names.size();
-                const unsigned int gn = fine_element->node(i); // Global node number
+                const unsigned int gn = fine_element->node_id(i); // Global node number
 
                 fine_soln += fine_solution[gn*nv + ivar]*phi[i][gp];
               }
@@ -198,7 +199,7 @@ int main (int argc, char ** argv)
             for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
               {
                 const unsigned int nv = coarse_var_names.size();
-                const unsigned int gn = coarse_element->node(i); // Global node number
+                const unsigned int gn = coarse_element->node_id(i); // Global node number
 
                 coarse_soln += coarse_solution[gn*nv + ivar]*fe_coarse.shape(coarse_element,
                                                                              SECOND,
@@ -227,12 +228,12 @@ int main (int argc, char ** argv)
 
       std::vector<unsigned char> already_done(mesh_fine.n_nodes(), 0);
 
-      Elem * coarse_element = mesh_coarse.elem(0);
+      Elem * coarse_element = mesh_coarse.elem_ptr(0);
 
       for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
-        for (unsigned int n=0; n<mesh_fine.elem(e)->n_nodes(); n++)
+        for (unsigned int n=0; n<mesh_fine.elem_ref(e).n_nodes(); n++)
           {
-            const unsigned int gn = mesh_fine.elem(e)->node(n);
+            const unsigned int gn = mesh_fine.elem_ref(e).node_id(n);
 
             if (!already_done[gn])
               {
@@ -264,7 +265,8 @@ int main (int argc, char ** argv)
 
                     // Interpolate the coarse grid solution.
                     for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
-                      coarse_soln += coarse_solution[coarse_element->node(i)*nv + c]*
+                      coarse_soln +=
+                        coarse_solution[coarse_element->node_id(i)*nv + c]*
                         fe_coarse.shape(coarse_element, SECOND, i, mapped_point);
 
                     diff_solution[gn*nv + c] = coarse_soln - fine_solution[gn*nv + c];

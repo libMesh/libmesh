@@ -468,7 +468,7 @@ dof_id_type Elem::key () const
   std::vector<dof_id_type> node_ids(this->n_nodes());
 
   for (unsigned n=0; n<this->n_nodes(); n++)
-    node_ids[n] = this->node(n);
+    node_ids[n] = this->node_id(n);
 
   // Always sort, so that different local node numberings hash to the
   // same value.
@@ -493,8 +493,8 @@ bool Elem::operator == (const Elem & rhs) const
 
   for (unsigned n=0; n<this->n_nodes(); n++)
     {
-      this_ids[n] = this->node(n);
-      rhs_ids[n] = rhs.node(n);
+      this_ids[n] = this->node_id(n);
+      rhs_ids[n] = rhs.node_id(n);
     }
 
   // Sort the vectors to rule out different local node numberings.
@@ -1009,7 +1009,7 @@ Elem * Elem::topological_neighbor (const unsigned int i,
             // pointer directly from the mesh object.  Also since coarse
             // elements do not have more refined neighbors we need to make
             // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
             if (level() < neighbor_i->level())
               neighbor_i = neighbor_i->parent();
             return neighbor_i;
@@ -1047,7 +1047,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
             // pointer directly from the mesh object.  Also since coarse
             // elements do not have more refined neighbors we need to make
             // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
             if (level() < neighbor_i->level())
               neighbor_i = neighbor_i->parent();
             return neighbor_i;
@@ -1084,8 +1084,8 @@ void Elem::libmesh_assert_valid_node_pointers() const
   libmesh_assert(this->valid_id());
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     {
-      libmesh_assert(this->get_node(n));
-      libmesh_assert(this->get_node(n)->valid_id());
+      libmesh_assert(this->node_ptr(n));
+      libmesh_assert(this->node_ptr(n)->valid_id());
     }
 }
 
@@ -1398,7 +1398,7 @@ void Elem::write_connectivity (std::ostream & out_stream,
     case UCD:
       {
         for (unsigned int i=0; i<this->n_nodes(); i++)
-          out_stream << this->node(i)+1 << "\t";
+          out_stream << this->node_id(i)+1 << "\t";
 
         out_stream << '\n';
         return;
@@ -1538,8 +1538,8 @@ bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
 
   // We're assuming that an overlapping child edge has the same
   // number and orientation as its parent
-  return (child_edge->node(0) == my_edge->node(0) ||
-          child_edge->node(1) == my_edge->node(1));
+  return (child_edge->node_id(0) == my_edge->node_id(0) ||
+          child_edge->node_id(1) == my_edge->node_id(1));
 }
 
 
@@ -2125,7 +2125,8 @@ Elem::bracketing_nodes(unsigned int child,
     {
       if (pbc[i].first < this->n_nodes() &&
           pbc[i].second < this->n_nodes())
-        returnval.push_back(std::make_pair(this->node(pbc[i].first), this->node(pbc[i].second)));
+        returnval.push_back(std::make_pair(this->node_id(pbc[i].first),
+                                           this->node_id(pbc[i].second)));
       else
         {
           // We must be on a non-full-order higher order element...
@@ -2163,9 +2164,9 @@ Elem::bracketing_nodes(unsigned int child,
                     // We should be consistent
                     if (pt1 != DofObject::invalid_id)
                       libmesh_assert_equal_to
-                        (pt1, this->child(c)->node(n));
+                        (pt1, this->child(c)->node_id(n));
 
-                    pt1 = this->child(c)->node(n);
+                    pt1 = this->child(c)->node_id(n);
                   }
 
                 if (pbc[i].second == full_elem->as_parent_node(c,n))
@@ -2173,9 +2174,9 @@ Elem::bracketing_nodes(unsigned int child,
                     // We should be consistent
                     if (pt2 != DofObject::invalid_id)
                       libmesh_assert_equal_to
-                        (pt2, this->child(c)->node(n));
+                        (pt2, this->child(c)->node_id(n));
 
-                    pt2 = this->child(c)->node(n);
+                    pt2 = this->child(c)->node_id(n);
                   }
               }
 
@@ -2376,7 +2377,7 @@ std::string Elem::get_info () const
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    oss << "    " << n << *this->get_node(n);
+    oss << "    " << n << this->node_ref(n);
 
   oss << "   n_sides()=" << this->n_sides()                        << '\n';
 

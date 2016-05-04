@@ -140,7 +140,7 @@ UniquePtr<Elem> Tet4::build_side (const unsigned int i,
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Tet4::side_nodes_map[i][n]);
+        face->set_node(n) = this->node_ptr(Tet4::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }
@@ -172,24 +172,24 @@ void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
     case TECPLOT:
       {
         conn.resize(8);
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(2)+1;
-        conn[4] = this->node(3)+1;
-        conn[5] = this->node(3)+1;
-        conn[6] = this->node(3)+1;
-        conn[7] = this->node(3)+1;
+        conn[0] = this->node_id(0)+1;
+        conn[1] = this->node_id(1)+1;
+        conn[2] = this->node_id(2)+1;
+        conn[3] = this->node_id(2)+1;
+        conn[4] = this->node_id(3)+1;
+        conn[5] = this->node_id(3)+1;
+        conn[6] = this->node_id(3)+1;
+        conn[7] = this->node_id(3)+1;
         return;
       }
 
     case VTK:
       {
         conn.resize(4);
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
+        conn[2] = this->node_id(2);
+        conn[3] = this->node_id(3);
         return;
       }
 
@@ -371,10 +371,10 @@ float Tet4::embedding_matrix (const unsigned int i,
 
 dof_id_type Tet4::key () const
 {
-  return this->compute_key(this->node(0),
-                           this->node(1),
-                           this->node(2),
-                           this->node(3));
+  return this->compute_key(this->node_id(0),
+                           this->node_id(1),
+                           this->node_id(2),
+                           this->node_id(3));
 }
 
 
@@ -438,14 +438,14 @@ dof_id_type Tet4::key () const
 // {
 //   /* Second time, so we know now which node to
 //      use.  */
-//   child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
+//   child->set_node(nc) = this->child(n)->node_ptr(first_05_in_embedding_matrix);
 // }
 //
 //     }
 // }
 //
 //       /* Make sure that a node has been found.  */
-//       libmesh_assert(child->get_node(nc));
+//       libmesh_assert(child->node_ptr(nc));
 //     }
 // }
 //     }

@@ -87,14 +87,14 @@ struct SyncNeighbors
       {
         // Look for this element in the mesh
         // We'd better find every element we're asked for
-        const Elem * elem = mesh.elem(ids[i]);
+        const Elem & elem = mesh.elem_ref(ids[i]);
 
         // Return the element's neighbors
-        const unsigned int n_neigh = elem->n_neighbors();
+        const unsigned int n_neigh = elem.n_neighbors();
         neighbors[i].resize(n_neigh);
         for (unsigned int n = 0; n != n_neigh; ++n)
           {
-            const Elem * neigh = elem->neighbor(n);
+            const Elem * neigh = elem.neighbor(n);
             if (neigh)
               {
                 libmesh_assert_not_equal_to(neigh, remote_elem);
@@ -111,17 +111,17 @@ struct SyncNeighbors
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
-        Elem * elem = mesh.elem(ids[i]);
+        Elem & elem = mesh.elem_ref(ids[i]);
 
         datum & new_neigh = neighbors[i];
 
-        const unsigned int n_neigh = elem->n_neighbors();
+        const unsigned int n_neigh = elem.n_neighbors();
         libmesh_assert_equal_to (n_neigh, new_neigh.size());
 
         for (unsigned int n = 0; n != n_neigh; ++n)
           {
             const dof_id_type new_neigh_id = new_neigh[n];
-            const Elem * old_neigh = elem->neighbor(n);
+            const Elem * old_neigh = elem.neighbor(n);
             if (old_neigh && old_neigh != remote_elem)
               {
                 libmesh_assert_equal_to(old_neigh->id(), new_neigh_id);
@@ -132,11 +132,11 @@ struct SyncNeighbors
               }
             else
               {
-                Elem * neigh = mesh.query_elem(new_neigh_id);
+                Elem * neigh = mesh.query_elem_ptr(new_neigh_id);
                 if (neigh)
-                  elem->set_neighbor(n, neigh);
+                  elem.set_neighbor(n, neigh);
                 else
-                  elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
+                  elem.set_neighbor(n, const_cast<RemoteElem *>(remote_elem));
               }
           }
       }
@@ -228,7 +228,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
               const Elem * elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert (elem->get_node(n));
+                connected_nodes.insert (elem->node_ptr(n));
             }
         }
 
@@ -242,7 +242,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
               const Elem * elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
-                if (connected_nodes.count(elem->get_node(n)))
+                if (connected_nodes.count(elem->node_ptr(n)))
                   {
                     elements_to_send.insert (elem);
 
@@ -268,7 +268,7 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
               const Elem * elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert(elem->get_node(n));
+                connected_nodes.insert(elem->node_ptr(n));
             }
         }
 
@@ -490,7 +490,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
                   UniquePtr<Elem> side(elem->build_side(s));
 
                   for (unsigned int n=0; n<side->n_vertices(); n++)
-                    my_interface_node_set.insert (side->node(n));
+                    my_interface_node_set.insert (side->node_id(n));
                 }
           }
       }
@@ -645,7 +645,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
               for (unsigned int n=0; n<elem->n_vertices(); n++)
                 if (std::binary_search (common_interface_node_list.begin(),
                                         common_interface_node_list.end(),
-                                        elem->node(n)))
+                                        elem->node_id(n)))
                   {
                     n_shared_nodes++;
 
@@ -675,7 +675,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
                           elements_to_send.insert (elem);
 
                           for (unsigned int n=0; n<elem->n_nodes(); n++)
-                            connected_nodes.insert (elem->get_node(n));
+                            connected_nodes.insert (elem->node_ptr(n));
                         }
                     }
                 }
@@ -953,9 +953,9 @@ struct SyncPLevels
 
     for (unsigned int i=0; i != ids.size(); ++i)
       {
-        Elem *elem = mesh.elem(ids[i]);
+        Elem & elem = mesh.elem_ref(ids[i]);
 
-        ids_out.push_back(elem->p_level());
+        ids_out.push_back(elem.p_level());
       }
   }
 
@@ -964,9 +964,9 @@ struct SyncPLevels
   {
     for (unsigned int i=0; i != old_ids.size(); ++i)
       {
-        Elem *elem = mesh.elem(old_ids[i]);
+        Elem & elem = mesh.elem_ref(old_ids[i]);
 
-        elem->set_p_level(new_p_levels[i]);
+        elem.set_p_level(new_p_levels[i]);
       }
   }
 };
@@ -1070,7 +1070,7 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
      mesh.active_elements_end(), syncids);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  SyncUniqueIds<Elem> syncuniqueids(mesh, &MeshBase::query_elem);
+  SyncUniqueIds<Elem> syncuniqueids(mesh, &MeshBase::query_elem_ptr);
   Parallel::sync_dofobject_data_by_id
     (mesh.comm(), mesh.active_elements_begin(),
      mesh.active_elements_end(), syncuniqueids);
@@ -1117,10 +1117,10 @@ struct SyncProcIds
       {
         // Look for this point in the mesh
         // We'd better find every node we're asked for
-        Node * node = mesh.node_ptr(ids[i]);
+        Node & node = mesh.node_ref(ids[i]);
 
         // Return the node's correct processor id,
-        data[i] = node->processor_id();
+        data[i] = node.processor_id();
       }
   }
 
@@ -1131,8 +1131,8 @@ struct SyncProcIds
     // Set the ghost node processor ids we've now been informed of
     for (std::size_t i=0; i != ids.size(); ++i)
       {
-        Node * node = mesh.node_ptr(ids[i]);
-        node->processor_id() = proc_ids[i];
+        Node & node = mesh.node_ref(ids[i]);
+        node.processor_id() = proc_ids[i];
       }
   }
 };
@@ -1254,7 +1254,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
       const Elem * elem = *l_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          dof_id_type nodeid = elem->node(n);
+          dof_id_type nodeid = elem->node_id(n);
           libmesh_assert_less (nodeid, local_nodes.size());
           local_nodes[nodeid] = true;
         }
@@ -1273,7 +1273,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
           semilocal_elems[elemid] = true;
 
           for (unsigned int n=0; n != elem->n_nodes(); ++n)
-            semilocal_nodes[elem->node(n)] = true;
+            semilocal_nodes[elem->node_id(n)] = true;
 
           const Elem * parent = elem->parent();
           // Don't proceed from a boundary mesh to an interior mesh
@@ -1294,13 +1294,13 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
     {
       const Elem * elem = *u_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        local_nodes[elem->node(n)] = true;
+        local_nodes[elem->node_id(n)] = true;
       while (elem)
         {
           semilocal_elems[elem->id()] = true;
 
           for (unsigned int n=0; n != elem->n_nodes(); ++n)
-            semilocal_nodes[elem->node(n)] = true;
+            semilocal_nodes[elem->node_id(n)] = true;
 
           const Elem * parent = elem->parent();
           // Don't proceed from a boundary mesh to an interior mesh
@@ -1319,14 +1319,14 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
     {
       const Elem * elem = *nl_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        if (local_nodes[elem->node(n)])
+        if (local_nodes[elem->node_id(n)])
           {
             while (elem)
               {
                 semilocal_elems[elem->id()] = true;
 
                 for (unsigned int nn=0; nn != elem->n_nodes(); ++nn)
-                  semilocal_nodes[elem->node(nn)] = true;
+                  semilocal_nodes[elem->node_id(nn)] = true;
 
                 const Elem * parent = elem->parent();
                 // Don't proceed from a boundary mesh to an interior mesh
@@ -1347,7 +1347,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::s
       const Elem * elem = *it;
       semilocal_elems[elem->id()] = true;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        semilocal_nodes[elem->node(n)] = true;
+        semilocal_nodes[elem->node_id(n)] = true;
     }
 
   // Delete all the elements we have no reason to save,

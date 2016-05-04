@@ -152,17 +152,17 @@ dof_id_type Tri6::key (const unsigned int s) const
     case 0:
 
       return
-        this->compute_key (this->node(3));
+        this->compute_key (this->node_id(3));
 
     case 1:
 
       return
-        this->compute_key (this->node(4));
+        this->compute_key (this->node_id(4));
 
     case 2:
 
       return
-        this->compute_key (this->node(5));
+        this->compute_key (this->node_id(5));
 
     default:
       libmesh_error_msg("Invalid side s = " << s);
@@ -189,7 +189,7 @@ UniquePtr<Elem> Tri6::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(Tri6::side_nodes_map[i][n]);
+        edge->set_node(n) = this->node_ptr(Tri6::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }
@@ -215,37 +215,37 @@ void Tri6::connectivity(const unsigned int sf,
           {
           case 0:
             // linear sub-triangle 0
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(3)+1;
-            conn[2] = this->node(5)+1;
-            conn[3] = this->node(5)+1;
+            conn[0] = this->node_id(0)+1;
+            conn[1] = this->node_id(3)+1;
+            conn[2] = this->node_id(5)+1;
+            conn[3] = this->node_id(5)+1;
 
             return;
 
           case 1:
             // linear sub-triangle 1
-            conn[0] = this->node(3)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(4)+1;
-            conn[3] = this->node(4)+1;
+            conn[0] = this->node_id(3)+1;
+            conn[1] = this->node_id(1)+1;
+            conn[2] = this->node_id(4)+1;
+            conn[3] = this->node_id(4)+1;
 
             return;
 
           case 2:
             // linear sub-triangle 2
-            conn[0] = this->node(5)+1;
-            conn[1] = this->node(4)+1;
-            conn[2] = this->node(2)+1;
-            conn[3] = this->node(2)+1;
+            conn[0] = this->node_id(5)+1;
+            conn[1] = this->node_id(4)+1;
+            conn[2] = this->node_id(2)+1;
+            conn[3] = this->node_id(2)+1;
 
             return;
 
           case 3:
             // linear sub-triangle 3
-            conn[0] = this->node(3)+1;
-            conn[1] = this->node(4)+1;
-            conn[2] = this->node(5)+1;
-            conn[3] = this->node(5)+1;
+            conn[0] = this->node_id(3)+1;
+            conn[1] = this->node_id(4)+1;
+            conn[2] = this->node_id(5)+1;
+            conn[3] = this->node_id(5)+1;
 
             return;
 
@@ -258,12 +258,12 @@ void Tri6::connectivity(const unsigned int sf,
       {
         // VTK_QUADRATIC_TRIANGLE has same numbering as libmesh TRI6
         conn.resize(6);
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
-        conn[4] = this->node(4);
-        conn[5] = this->node(5);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
+        conn[2] = this->node_id(2);
+        conn[3] = this->node_id(3);
+        conn[4] = this->node_id(4);
+        conn[5] = this->node_id(5);
         return;
 
         // Used to write out linear sub-triangles for VTK...
@@ -273,33 +273,33 @@ void Tri6::connectivity(const unsigned int sf,
           {
           case 0:
           // linear sub-triangle 0
-          conn[0] = this->node(0);
-          conn[1] = this->node(3);
-          conn[2] = this->node(5);
+          conn[0] = this->node_id(0);
+          conn[1] = this->node_id(3);
+          conn[2] = this->node_id(5);
 
           return;
 
           case 1:
           // linear sub-triangle 1
-          conn[0] = this->node(3);
-          conn[1] = this->node(1);
-          conn[2] = this->node(4);
+          conn[0] = this->node_id(3);
+          conn[1] = this->node_id(1);
+          conn[2] = this->node_id(4);
 
           return;
 
           case 2:
           // linear sub-triangle 2
-          conn[0] = this->node(5);
-          conn[1] = this->node(4);
-          conn[2] = this->node(2);
+          conn[0] = this->node_id(5);
+          conn[1] = this->node_id(4);
+          conn[2] = this->node_id(2);
 
           return;
 
           case 3:
           // linear sub-triangle 3
-          conn[0] = this->node(3);
-          conn[1] = this->node(4);
-          conn[2] = this->node(5);
+          conn[0] = this->node_id(3);
+          conn[1] = this->node_id(4);
+          conn[2] = this->node_id(5);
 
           return;
 

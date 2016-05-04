@@ -368,15 +368,15 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
 
       for(unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
-          Node * node_ptr = old_elem->get_node(n);
-          dof_id_type old_node_id = node_ptr->id();
+          Node & node_ref = old_elem->node_ref(n);
+          dof_id_type old_node_id = node_ref.id();
 
           // Check if this node has already been added. This
           // could happen if some of the elements are neighbors.
           if( node_ids.find(old_node_id) == node_ids.end() )
             {
               node_ids.insert(old_node_id);
-              _interpolation_points_mesh.add_point(*node_ptr, new_node_id, /* proc_id */ 0);
+              _interpolation_points_mesh.add_point(node_ref, new_node_id, /* proc_id */ 0);
 
               node_id_map[old_node_id] = new_node_id;
 
@@ -414,8 +414,9 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
           // Assign all the nodes
           for(unsigned int n=0; n<new_elem->n_nodes(); n++)
             {
-              dof_id_type old_node_id = old_elem->node(n);
-              new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
+              dof_id_type old_node_id = old_elem->node_id(n);
+              new_elem->set_node(n) =
+                _interpolation_points_mesh.node_ptr( node_id_map[old_node_id] );
             }
 
           // Just set all proc_ids to 0
@@ -623,12 +624,12 @@ void RBEIMEvaluation::legacy_read_in_interpolation_points_elem(const std::string
   for(unsigned int i=0; i<n_bfs; i++)
     {
       interpolation_points_elem[i] =
-        _interpolation_points_mesh.elem(interpolation_elem_ids[i]);
+        _interpolation_points_mesh.elem_ptr(interpolation_elem_ids[i]);
     }
 
   // Get the extra interpolation point
   extra_interpolation_point_elem =
-    _interpolation_points_mesh.elem(extra_interpolation_elem_id);
+    _interpolation_points_mesh.elem_ptr(extra_interpolation_elem_id);
 }
 
 }

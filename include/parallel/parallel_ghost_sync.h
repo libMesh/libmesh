@@ -419,10 +419,9 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
       std::vector<dof_id_type> request_to_fill_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          Elem * parent = mesh.elem(request_to_fill_parent_id[i]);
-          libmesh_assert(parent);
-          libmesh_assert(parent->has_children());
-          Elem * child = parent->child(request_to_fill_child_num[i]);
+          Elem & parent = mesh.elem_ref(request_to_fill_parent_id[i]);
+          libmesh_assert(parent.has_children());
+          Elem * child = parent.child(request_to_fill_child_num[i]);
           libmesh_assert(child);
           libmesh_assert(child->active());
           request_to_fill_id[i] = child->id();
@@ -482,14 +481,14 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->get_node(n);
+          const Node & node = elem->node_ref(n);
 
-          const processor_id_type proc_id = node->processor_id();
+          const processor_id_type proc_id = node.processor_id();
           if (proc_id == comm.rank() ||
               proc_id == DofObject::invalid_processor_id)
             continue;
 
-          dof_id_type node_id = node->id();
+          dof_id_type node_id = node.id();
           if (!queried_nodes.count(node_id))
             {
               ghost_objects_from_proc[proc_id]++;
@@ -531,10 +530,10 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          const Node * node = elem->get_node(n);
-          const dof_id_type node_id = node->id();
+          const Node & node = elem->node_ref(n);
+          const dof_id_type node_id = node.id();
 
-          const processor_id_type proc_id = node->processor_id();
+          const processor_id_type proc_id = node.processor_id();
           if (proc_id == comm.rank() ||
               proc_id == DofObject::invalid_processor_id)
             continue;
@@ -581,20 +580,18 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
       std::vector<dof_id_type> request_to_fill_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          const Elem * elem = mesh.elem(request_to_fill_elem_id[i]);
-          libmesh_assert(elem);
+          const Elem & elem = mesh.elem_ref(request_to_fill_elem_id[i]);
 
           const unsigned int n = request_to_fill_node_num[i];
-          libmesh_assert_less (n, elem->n_nodes());
+          libmesh_assert_less (n, elem.n_nodes());
 
-          Node * node = elem->get_node(n);
-          libmesh_assert(node);
+          Node & node = elem.node_ref(n);
 
           // This isn't a safe assertion in the case where we're
           // synching processor ids
           // libmesh_assert_equal_to (node->processor_id(), comm.rank());
 
-          request_to_fill_id[i] = node->id();
+          request_to_fill_id[i] = node.id();
         }
 
       // Gather whatever data the user wants

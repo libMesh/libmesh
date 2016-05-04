@@ -534,7 +534,7 @@ void GmshIO::read_mesh(std::istream & in)
                             // lower-dimensional element's subdomain
                             // ID.
                             for (unsigned n=0; n<elem->n_nodes(); n++)
-                              mesh.get_boundary_info().add_node(elem->node(n),
+                              mesh.get_boundary_info().add_node(elem->node_id(n),
                                                                 elem->subdomain_id());
 
                             // Store this elem in a quickly-searchable
@@ -687,10 +687,10 @@ void GmshIO::write_mesh (std::ostream & out_stream)
   out_stream << mesh.n_nodes() << '\n';
 
   for (unsigned int v=0; v<mesh.n_nodes(); v++)
-    out_stream << mesh.node(v).id()+1 << " "
-               << mesh.node(v)(0) << " "
-               << mesh.node(v)(1) << " "
-               << mesh.node(v)(2) << '\n';
+    out_stream << mesh.node_ref(v).id()+1 << " "
+               << mesh.node_ref(v)(0) << " "
+               << mesh.node_ref(v)(1) << " "
+               << mesh.node_ref(v)(2) << '\n';
   out_stream << "$EndNodes\n";
 
   {
@@ -743,11 +743,11 @@ void GmshIO::write_mesh (std::ostream & out_stream)
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out_stream << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
+            out_stream << elem->node_id(eletype.nodes[i])+1 << " "; // gmsh is 1-based
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out_stream << elem->node(i)+1 << " ";                  // gmsh is 1-based
+            out_stream << elem->node_id(i)+1 << " ";                  // gmsh is 1-based
         out_stream << "\n";
       } // element loop
   }
@@ -778,12 +778,9 @@ void GmshIO::write_mesh (std::ostream & out_stream)
         // Loop over these lists, writing data to the file.
         for (unsigned idx=0; idx<element_id_list.size(); ++idx)
           {
-            const Elem * elem = mesh.elem(element_id_list[idx]);
+            const Elem & elem = mesh.elem_ref(element_id_list[idx]);
 
-            if (!elem)
-              libmesh_error_msg("Mesh returned a NULL pointer for element " << element_id_list[idx]);
-
-            UniquePtr<Elem> side = elem->build_side(side_list[idx]);
+            UniquePtr<Elem> side = elem.build_side(side_list[idx]);
 
             // Map from libmesh elem type to gmsh elem type.
             std::map<ElemType, ElementDefinition>::iterator def_it =
@@ -813,18 +810,18 @@ void GmshIO::write_mesh (std::ostream & out_stream)
             out_stream << " 3 "
                        << bc_id_list[idx]
                        << " 0 "
-                       << elem->processor_id()+1
+                       << elem.processor_id()+1
                        << " ";
 
             // if there is a node translation table, use it
             if (eletype.nodes.size() > 0)
               for (unsigned int i=0; i < side->n_nodes(); i++)
-                out_stream << side->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
+                out_stream << side->node_id(eletype.nodes[i])+1 << " "; // gmsh is 1-based
 
             // otherwise keep the same node order
             else
               for (unsigned int i=0; i < side->n_nodes(); i++)
-                out_stream << side->node(i)+1 << " ";                // gmsh is 1-based
+                out_stream << side->node_id(i)+1 << " ";                // gmsh is 1-based
 
             // Go to the next line
             out_stream << "\n";
@@ -1049,7 +1046,7 @@ void GmshIO::write_post (const std::string & fname,
                                  << "complex numbers. Will only write the real part of "
                                  << "variable " << varname << std::endl;
 #endif
-                    double tmp = libmesh_real((*v)[elem->node(i)*n_vars + ivar]);
+                    double tmp = libmesh_real((*v)[elem->node_id(i)*n_vars + ivar]);
                     std::memcpy(buf, &tmp, sizeof(double));
                     out_stream.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }
@@ -1060,7 +1057,7 @@ void GmshIO::write_post (const std::string & fname,
                                  << "complex numbers. Will only write the real part of "
                                  << "variable " << varname << std::endl;
 #endif
-                    out_stream << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
+                    out_stream << libmesh_real((*v)[elem->node_id(i)*n_vars + ivar]) << "\n";
                   }
             }
           if (this->binary())

@@ -132,7 +132,7 @@ dof_id_type Pyramid14::key (const unsigned int s) const
       return Pyramid::key(s);
 
     case 4:  // the quad face at z=0
-      return this->compute_key (this->node(13));
+      return this->compute_key (this->node_id(13));
 
     default:
       libmesh_error_msg("Invalid side s = " << s);
@@ -194,7 +194,7 @@ UniquePtr<Elem> Pyramid14::build_side (const unsigned int i, bool proxy) const
 
       // Set the nodes
       for (unsigned n=0; n<face->n_nodes(); ++n)
-        face->set_node(n) = this->get_node(Pyramid14::side_nodes_map[i][n]);
+        face->set_node(n) = this->node_ptr(Pyramid14::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(face);
     }

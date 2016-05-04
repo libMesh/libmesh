@@ -278,7 +278,7 @@ DofObject * DofMap::node_ptr(MeshBase & mesh, dof_id_type i) const
 
 DofObject * DofMap::elem_ptr(MeshBase & mesh, dof_id_type i) const
 {
-  return mesh.elem(i);
+  return mesh.elem_ptr(i);
 }
 
 
@@ -494,11 +494,11 @@ void DofMap::reinit(MeshBase & mesh)
 
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
-            Node * node = elem->get_node(n);
+            Node & node = elem->node_ref(n);
 
-            if (node->old_dof_object == libmesh_nullptr)
-              if (node->has_dofs(sys_num))
-                node->set_old_dof_object();
+            if (node.old_dof_object == libmesh_nullptr)
+              if (node.has_dofs(sys_num))
+                node.set_old_dof_object();
           }
 
         libmesh_assert (!elem->old_dof_object);
@@ -613,12 +613,12 @@ void DofMap::reinit(MeshBase & mesh)
           // Allocate the vertex DOFs
           for (unsigned int n=0; n<elem->n_nodes(); n++)
             {
-              Node * node = elem->get_node(n);
+              Node & node = elem->node_ref(n);
 
               if (elem->is_vertex(n))
                 {
                   const unsigned int old_node_dofs =
-                    node->n_comp_group(sys_num, vg);
+                    node.n_comp_group(sys_num, vg);
 
                   const unsigned int vertex_dofs =
                     std::max(FEInterface::n_dofs_at_node(dim, fe_type,
@@ -628,23 +628,23 @@ void DofMap::reinit(MeshBase & mesh)
                   // Some discontinuous FEs have no vertex dofs
                   if (vertex_dofs > old_node_dofs)
                     {
-                      node->set_n_comp_group(sys_num, vg,
-                                             vertex_dofs);
+                      node.set_n_comp_group(sys_num, vg,
+                                            vertex_dofs);
 
                       // Abusing dof_number to set a "this is a
                       // vertex" flag
-                      node->set_vg_dof_base(sys_num, vg,
-                                            vertex_dofs);
+                      node.set_vg_dof_base(sys_num, vg,
+                                           vertex_dofs);
 
                       // libMesh::out << "sys_num,vg,old_node_dofs,vertex_dofs="
                       //       << sys_num << ","
                       //       << vg << ","
                       //       << old_node_dofs << ","
                       //       << vertex_dofs << '\n',
-                      // node->debug_buffer();
+                      // node.debug_buffer();
 
-                      // libmesh_assert_equal_to (vertex_dofs, node->n_comp(sys_num, vg));
-                      // libmesh_assert_equal_to (vertex_dofs, node->vg_dof_base(sys_num, vg));
+                      // libmesh_assert_equal_to (vertex_dofs, node.n_comp(sys_num, vg));
+                      // libmesh_assert_equal_to (vertex_dofs, node.vg_dof_base(sys_num, vg));
                     }
                 }
             }
@@ -673,13 +673,13 @@ void DofMap::reinit(MeshBase & mesh)
           // Allocate the edge and face DOFs
           for (unsigned int n=0; n<elem->n_nodes(); n++)
             {
-              Node * node = elem->get_node(n);
+              Node & node = elem->node_ref(n);
 
               const unsigned int old_node_dofs =
-                node->n_comp_group(sys_num, vg);
+                node.n_comp_group(sys_num, vg);
 
               const unsigned int vertex_dofs = old_node_dofs?
-                cast_int<unsigned int>(node->vg_dof_base (sys_num,vg)):0;
+                cast_int<unsigned int>(node.vg_dof_base (sys_num,vg)):0;
 
               const unsigned int new_node_dofs =
                 FEInterface::n_dofs_at_node(dim, fe_type, type, n);
@@ -695,7 +695,7 @@ void DofMap::reinit(MeshBase & mesh)
                   //                << old_node_dofs << ","
                   //                << vertex_dofs << ","
                   //                << new_node_dofs << '\n',
-                  //     node->debug_buffer();
+                  //     node.debug_buffer();
 
                   libmesh_assert_greater_equal (vertex_dofs,   new_node_dofs);
                 }
@@ -706,13 +706,12 @@ void DofMap::reinit(MeshBase & mesh)
                   // dofs, so we just give it edge or face dofs
                   if (!old_node_dofs)
                     {
-                      node->set_n_comp_group(sys_num, vg,
-                                             new_node_dofs);
+                      node.set_n_comp_group(sys_num, vg,
+                                            new_node_dofs);
                       // Abusing dof_number to set a "this has no
                       // vertex dofs" flag
                       if (new_node_dofs)
-                        node->set_vg_dof_base(sys_num, vg,
-                                              0);
+                        node.set_vg_dof_base(sys_num, vg, 0);
                     }
 
                   // If this has dofs, but has no vertex dofs,
@@ -722,11 +721,11 @@ void DofMap::reinit(MeshBase & mesh)
                     {
                       if (new_node_dofs > old_node_dofs)
                         {
-                          node->set_n_comp_group(sys_num, vg,
-                                                 new_node_dofs);
+                          node.set_n_comp_group(sys_num, vg,
+                                                new_node_dofs);
 
-                          node->set_vg_dof_base(sys_num, vg,
-                                                vertex_dofs);
+                          node.set_vg_dof_base(sys_num, vg,
+                                               vertex_dofs);
                         }
                     }
                   // If this is another element's vertex,
@@ -736,11 +735,11 @@ void DofMap::reinit(MeshBase & mesh)
                     {
                       if (new_node_dofs > old_node_dofs - vertex_dofs)
                         {
-                          node->set_n_comp_group(sys_num, vg,
-                                                 vertex_dofs + new_node_dofs);
+                          node.set_n_comp_group(sys_num, vg,
+                                                vertex_dofs + new_node_dofs);
 
-                          node->set_vg_dof_base(sys_num, vg,
-                                                vertex_dofs);
+                          node.set_vg_dof_base(sys_num, vg,
+                                               vertex_dofs);
                         }
                     }
                   // If this is another element's vertex, add any
@@ -750,11 +749,11 @@ void DofMap::reinit(MeshBase & mesh)
                       libmesh_assert_greater_equal (old_node_dofs, vertex_dofs);
                       if (new_node_dofs > old_node_dofs)
                         {
-                          node->set_n_comp_group(sys_num, vg,
-                                                 new_node_dofs);
+                          node.set_n_comp_group(sys_num, vg,
+                                                new_node_dofs);
 
-                          node->set_vg_dof_base (sys_num, vg,
-                                                 vertex_dofs);
+                          node.set_vg_dof_base (sys_num, vg,
+                                                vertex_dofs);
                         }
                     }
                 }
@@ -1025,15 +1024,15 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           // First get any new nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
-              Node * node = elem->get_node(n);
+              Node & node = elem->node_ref(n);
 
-              if (node->processor_id() < this->processor_id())
+              if (node.processor_id() < this->processor_id())
                 continue;
 
-              const unsigned int n_comp = node->n_comp(sys_num, var_num);
+              const unsigned int n_comp = node.n_comp(sys_num, var_num);
               for(unsigned int i=0; i<n_comp; i++)
                 {
-                  const dof_id_type index = node->dof_number(sys_num,var_num,i);
+                  const dof_id_type index = node.dof_number(sys_num,var_num,i);
                   libmesh_assert_greater_equal (index, this->first_dof());
                   libmesh_assert_less (index, this->end_dof());
 
@@ -1112,7 +1111,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
       // First number the nodal DOFS
       for (unsigned int n=0; n<n_nodes; n++)
         {
-          Node * node = elem->get_node(n);
+          Node & node = elem->node_ref(n);
 
           for (unsigned vg=0; vg<n_var_groups; vg++)
             {
@@ -1123,17 +1122,16 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
                 {
                   // assign dof numbers (all at once) if this is
                   // our node and if they aren't already there
-                  if ((node->n_comp_group(sys_num,vg) > 0) &&
-                      (node->processor_id() == this->processor_id()) &&
-                      (node->vg_dof_base(sys_num,vg) ==
+                  if ((node.n_comp_group(sys_num,vg) > 0) &&
+                      (node.processor_id() == this->processor_id()) &&
+                      (node.vg_dof_base(sys_num,vg) ==
                        DofObject::invalid_id))
                     {
-                      node->set_vg_dof_base(sys_num,
-                                            vg,
-                                            next_free_dof);
+                      node.set_vg_dof_base(sys_num, vg,
+                                           next_free_dof);
                       next_free_dof += (vg_description.n_variables()*
-                                        node->n_comp_group(sys_num,vg));
-                      //node->debug_buffer();
+                                        node.n_comp_group(sys_num,vg));
+                      //node.debug_buffer();
                     }
                 }
             }
@@ -1283,21 +1281,19 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
           // First number the nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
-              Node * node = elem->get_node(n);
+              Node & node = elem->node_ref(n);
 
               // assign dof numbers (all at once) if this is
               // our node and if they aren't already there
-              if ((node->n_comp_group(sys_num,vg) > 0) &&
-                  (node->processor_id() == this->processor_id()) &&
-                  (node->vg_dof_base(sys_num,vg) ==
+              if ((node.n_comp_group(sys_num,vg) > 0) &&
+                  (node.processor_id() == this->processor_id()) &&
+                  (node.vg_dof_base(sys_num,vg) ==
                    DofObject::invalid_id))
                 {
-                  node->set_vg_dof_base(sys_num,
-                                        vg,
-                                        next_free_dof);
+                  node.set_vg_dof_base(sys_num, vg, next_free_dof);
 
                   next_free_dof += (n_vars_in_group*
-                                    node->n_comp_group(sys_num,vg));
+                                    node.n_comp_group(sys_num,vg));
                 }
             }
 
@@ -1445,20 +1441,20 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
         {
           // Flag all the nodes of active local elements as seen, so
           // we can add nodal neighbor dofs to the send_list later.
-          node_on_processor[elem->node(n)] = true;
+          node_on_processor[elem->node_id(n)] = true;
 
           // Add all remote dofs on these nodes to the send_list.
           // This is necessary in case those dofs are *not* also dofs
           // on neighbors; e.g. in the case of a HIERARCHIC's local
           // side which is only a vertex on the neighbor that owns it.
-          const Node * node = elem->get_node(n);
-          const unsigned n_vars = node->n_vars(sys_num);
+          const Node & node = elem->node_ref(n);
+          const unsigned n_vars = node.n_vars(sys_num);
           for (unsigned int v=0; v != n_vars; ++v)
             {
-              const unsigned int n_comp = node->n_comp(sys_num, v);
+              const unsigned int n_comp = node.n_comp(sys_num, v);
               for (unsigned int c=0; c != n_comp; ++c)
                 {
-                  const dof_id_type dof_index = node->dof_number(sys_num, v, c);
+                  const dof_id_type dof_index = node.dof_number(sys_num, v, c);
                   if (dof_index < this->first_dof() || dof_index >= this->end_dof())
                     {
                       _send_list.push_back(dof_index);
@@ -1468,7 +1464,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
                       // << v << ", "
                       // << c << ", "
                       // << dof_index << '\n';
-                      // node->debug_buffer();
+                      // node.debug_buffer();
                     }
                 }
             }
@@ -1527,7 +1523,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
       // Check all the nodes of the element to see if it
       // shares a node with us
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
-        if (node_on_processor[elem->node(n)])
+        if (node_on_processor[elem->node_id(n)])
           add_elem_dofs = true;
 
       // Add the element degrees of freedom if it shares at
@@ -2170,7 +2166,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
       // All other FE use only the nodes of elem itself
       elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->get_node(i);
+        elem_nodes[i] = elem->node_ptr(i);
     }
 
   // Get the dof numbers

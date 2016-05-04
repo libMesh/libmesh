@@ -207,11 +207,11 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
           std::pair<dof_id_type,unsigned int> p = *face_it;
 
           // build a full-ordered side element to get _all_ the base nodes
-          UniquePtr<Elem> side( this->_mesh.elem(p.first)->build_side(p.second) );
+          UniquePtr<Elem> side( this->_mesh.elem_ref(p.first).build_side(p.second) );
 
           // insert all the node numbers in inner_boundary_node_numbers
           for (unsigned int n=0; n< side->n_nodes(); n++)
-            inner_boundary_node_numbers.push_back(side->node(n));
+            inner_boundary_node_numbers.push_back(side->node_id(n));
         }
 
 
@@ -242,8 +242,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       std::vector<dof_id_type>::iterator pos_it = inner_boundary_node_numbers.begin();
       for (; pos_it != unique_end; ++pos_it)
         {
-          const Node & node = this->_mesh.node(*pos_it);
-          inner_boundary_nodes->push_back(&node);
+          const Node * node = this->_mesh.node_ptr(*pos_it);
+          inner_boundary_nodes->push_back(node);
         }
 
       if (be_verbose)
@@ -340,7 +340,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
         for (unsigned int s=0; s<elem->n_neighbors(); s++)
           {
-            // check if elem(e) is on the boundary
+            // check if element e is on the boundary
             if (elem->neighbor(s) == libmesh_nullptr)
               {
                 // note that it is safe to use the Elem::side() method,
@@ -358,7 +358,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
                 // and therefore sufficient to use a non-full-ordered side element
                 for(unsigned int n=0; n<side->n_nodes(); n++)
                   {
-                    const Point dist_from_origin = this->_mesh.point(side->node(n)) - origin;
+                    const Point dist_from_origin =
+                      this->_mesh.point(side->node_id(n)) - origin;
 
                     if(x_sym)
                       if( std::abs(dist_from_origin(0)) > 1.e-3 )
@@ -390,7 +391,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
                     if (r > max_r)
                       {
                         max_r = r;
-                        max_r_node=side->node(n);
+                        max_r_node=side->node_id(n);
                       }
 
                   }
@@ -434,11 +435,11 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
       // This has to be a full-ordered side element,
       // since we need the correct n_nodes,
-      UniquePtr<Elem> side(this->_mesh.elem(p.first)->build_side(p.second));
+      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side(p.second));
 
       bool found=false;
       for(unsigned int sn=0; sn<side->n_nodes(); sn++)
-        if(onodes.count(side->node(sn)))
+        if(onodes.count(side->node_id(sn)))
           {
             found=true;
             break;
@@ -449,7 +450,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       if(found)
         {
           for(unsigned int sn=0; sn<side->n_nodes(); sn++)
-            onodes.insert(side->node(sn));
+            onodes.insert(side->node_id(sn));
 
           ofaces.insert(p);
           ++face_it; // iteration is done here
@@ -515,7 +516,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       else
         {
           // Pick a unique id in parallel
-          Node & bnode = _mesh.node(*on_it);
+          Node & bnode = _mesh.node_ref(*on_it);
           dof_id_type new_id = bnode.id() + old_max_node_id;
           outer_nodes[*on_it] =
             this->_mesh.add_point(p, new_id,
@@ -538,7 +539,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       std::pair<dof_id_type,unsigned int> p = *face_it;
 
       // build a full-ordered side element to get the base nodes
-      UniquePtr<Elem> side(this->_mesh.elem(p.first)->build_side(p.second));
+      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side(p.second));
 
       // create cell depending on side type, assign nodes,
       // use braces to force scope.
@@ -574,8 +575,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // the method of assigning nodes (which follows below)
           // omits in the case of QUAD9 the bubble node; therefore
           // we assign these first by hand here.
-          el->set_node(16) = side->get_node(8);
-          el->set_node(17) = outer_nodes[side->node(8)];
+          el->set_node(16) = side->node_ptr(8);
+          el->set_node(17) = outer_nodes[side->node_id(8)];
           is_higher_order_elem=true;
           break;
 
@@ -586,7 +587,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
         case EDGE3:
           el=new InfQuad6;
-          el->set_node(4) = side->get_node(2);
+          el->set_node(4) = side->node_ptr(2);
           break;
 
           // 1D infinite elements not supported
@@ -600,18 +601,18 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       // In parallel, assign unique ids to the new element
       if (!_mesh.is_serial())
         {
-          Elem * belem = _mesh.elem(p.first);
-          el->processor_id() = belem->processor_id();
+          Elem & belem = _mesh.elem_ref(p.first);
+          el->processor_id() = belem.processor_id();
           // We'd better not have elements with more than 6 sides
-          el->set_id (belem->id() * 6 + p.second + old_max_elem_id);
+          el->set_id (belem.id() * 6 + p.second + old_max_elem_id);
         }
 
       // assign vertices to the new infinite element
       const unsigned int n_base_vertices = side->n_vertices();
       for(unsigned int i=0; i<n_base_vertices; i++)
         {
-          el->set_node(i                ) = side->get_node(i);
-          el->set_node(i+n_base_vertices) = outer_nodes[side->node(i)];
+          el->set_node(i                ) = side->node_ptr(i);
+          el->set_node(i+n_base_vertices) = outer_nodes[side->node_id(i)];
         }
 
 
@@ -627,8 +628,9 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
           for(unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
             {
-              el->set_node(i+n_base_vertices)   = side->get_node(i);
-              el->set_node(i+n_safe_base_nodes) = outer_nodes[side->node(i)];
+              el->set_node(i+n_base_vertices)   = side->node_ptr(i);
+              el->set_node(i+n_safe_base_nodes) =
+                outer_nodes[side->node_id(i)];
             }
         }
 

@@ -177,17 +177,19 @@ public:
 
     /* The middle nodes should still be distinct between the top and
      * bottom elements */
-    if (_mesh->query_elem(0) && _mesh->query_elem(1))
-      CPPUNIT_ASSERT( _mesh->elem(0)->node(1) != _mesh->elem(1)->node(2) );
-    if (_mesh->query_elem(2) && _mesh->query_elem(3))
-      CPPUNIT_ASSERT( _mesh->elem(2)->node(0) != _mesh->elem(3)->node(3) );
+    if (_mesh->query_elem_ptr(0) && _mesh->query_elem_ptr(1))
+      CPPUNIT_ASSERT( _mesh->elem_ref(0).node_id(1) != _mesh->elem_ref(1).node_id(2) );
+    if (_mesh->query_elem_ptr(2) && _mesh->query_elem_ptr(3))
+      CPPUNIT_ASSERT( _mesh->elem_ref(2).node_id(0) != _mesh->elem_ref(3).node_id(3) );
 
     /* The middle nodes should still be shared between left and right
      * elements on top and bottom */
-    if (_mesh->query_elem(0) && _mesh->query_elem(2))
-      CPPUNIT_ASSERT_EQUAL( _mesh->elem(0)->node(1), _mesh->elem(2)->node(0) );
-    if (_mesh->query_elem(1) && _mesh->query_elem(3))
-      CPPUNIT_ASSERT_EQUAL( _mesh->elem(1)->node(2), _mesh->elem(3)->node(3) );
+    if (_mesh->query_elem_ptr(0) && _mesh->query_elem_ptr(2))
+      CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(0).node_id(1),
+                            _mesh->elem_ref(2).node_id(0) );
+    if (_mesh->query_elem_ptr(1) && _mesh->query_elem_ptr(3))
+      CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(1).node_id(2),
+                            _mesh->elem_ref(3).node_id(3) );
   }
 
 };

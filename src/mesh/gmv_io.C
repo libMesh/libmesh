@@ -320,7 +320,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
 
         out_stream << ele.label << "\n";
         for (unsigned int i=0; i < ele.node_map.size(); i++)
-          out_stream << elem->node(ele.node_map[i])+1 << " ";
+          out_stream << elem->node_id(ele.node_map[i])+1 << " ";
         out_stream << "\n";
       }
     out_stream << "\n";
@@ -652,7 +652,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                        lo_elem->set_node(i) = (*it)->get_node(i);
+                        lo_elem->set_node(i) = (*it)->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                     }
                   for (unsigned int i=0; i<conn.size(); i++)
@@ -722,7 +722,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                        lo_elem->set_node(i) = (*it)->get_node(i);
+                        lo_elem->set_node(i) = (*it)->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
                       for (unsigned int i=0; i<conn.size(); i++)
@@ -739,7 +739,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                        lo_elem->set_node(i) = (*it)->get_node(i);
+                        lo_elem->set_node(i) = (*it)->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "tri 3\n";
                       for (unsigned int i=0; i<3; i++)
@@ -771,26 +771,26 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     else if ((*it)->type() == HEX20)
                       {
                         out_stream << "phex20 20\n";
-                        out_stream << (*it)->node(0)+1  << " "
-                                   << (*it)->node(1)+1  << " "
-                                   << (*it)->node(2)+1  << " "
-                                   << (*it)->node(3)+1  << " "
-                                   << (*it)->node(4)+1  << " "
-                                   << (*it)->node(5)+1  << " "
-                                   << (*it)->node(6)+1  << " "
-                                   << (*it)->node(7)+1  << " "
-                                   << (*it)->node(8)+1  << " "
-                                   << (*it)->node(9)+1  << " "
-                                   << (*it)->node(10)+1 << " "
-                                   << (*it)->node(11)+1 << " "
-                                   << (*it)->node(16)+1 << " "
-                                   << (*it)->node(17)+1 << " "
-                                   << (*it)->node(18)+1 << " "
-                                   << (*it)->node(19)+1 << " "
-                                   << (*it)->node(12)+1 << " "
-                                   << (*it)->node(13)+1 << " "
-                                   << (*it)->node(14)+1 << " "
-                                   << (*it)->node(15)+1 << " ";
+                        out_stream << (*it)->node_id(0)+1  << " "
+                                   << (*it)->node_id(1)+1  << " "
+                                   << (*it)->node_id(2)+1  << " "
+                                   << (*it)->node_id(3)+1  << " "
+                                   << (*it)->node_id(4)+1  << " "
+                                   << (*it)->node_id(5)+1  << " "
+                                   << (*it)->node_id(6)+1  << " "
+                                   << (*it)->node_id(7)+1  << " "
+                                   << (*it)->node_id(8)+1  << " "
+                                   << (*it)->node_id(9)+1  << " "
+                                   << (*it)->node_id(10)+1 << " "
+                                   << (*it)->node_id(11)+1 << " "
+                                   << (*it)->node_id(16)+1 << " "
+                                   << (*it)->node_id(17)+1 << " "
+                                   << (*it)->node_id(18)+1 << " "
+                                   << (*it)->node_id(19)+1 << " "
+                                   << (*it)->node_id(12)+1 << " "
+                                   << (*it)->node_id(13)+1 << " "
+                                   << (*it)->node_id(14)+1 << " "
+                                   << (*it)->node_id(15)+1 << " ";
                       }
 #else
                     /*
@@ -862,7 +862,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                 {
                   UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
                   for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                    lo_elem->set_node(i) = (*it)->get_node(i);
+                    lo_elem->set_node(i) = (*it)->node_ptr(i);
                   if ((lo_elem->type() == HEX8)
 #ifdef  LIBMESH_ENABLE_INFINITE_ELEMENTS
                       || (lo_elem->type() == HEX27)
@@ -2140,7 +2140,7 @@ void GMVIO::_read_materials()
       // << GMVLib::gmv_data.longdata1[i]
       // << std::endl;
 
-      MeshInput<MeshBase>::mesh().elem(i)->processor_id() =
+      MeshInput<MeshBase>::mesh().elem_ref(i).processor_id() =
         cast_int<processor_id_type>(GMVLib::gmv_data.longdata1[i]-1);
     }
 

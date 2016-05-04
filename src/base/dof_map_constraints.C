@@ -474,7 +474,7 @@ private:
         // also independently check whether the nodes have been requested
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            boundary_info.boundary_ids (elem->get_node(n), ids_vec);
+            boundary_info.boundary_ids (elem->node_ptr(n), ids_vec);
 
             for (std::vector<boundary_id_type>::iterator bc_it = ids_vec.begin();
                  bc_it != ids_vec.end(); ++bc_it)
@@ -2523,15 +2523,15 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
-            const Node * node = elem->get_node(n);
-            const unsigned int n_vars = node->n_vars(sys_num);
+            const Node & node = elem->node_ref(n);
+            const unsigned int n_vars = node.n_vars(sys_num);
             for (unsigned int v=0; v != n_vars; ++v)
               {
-                const unsigned int n_comp = node->n_comp(sys_num,v);
+                const unsigned int n_comp = node.n_comp(sys_num,v);
                 for (unsigned int c=0; c != n_comp; ++c)
                   {
                     const unsigned int id =
-                      node->dof_number(sys_num,v,c);
+                      node.dof_number(sys_num,v,c);
                     if (this->is_constrained_dof(id))
                       pushed_ids[elem->processor_id()].insert(id);
                   }
@@ -2540,8 +2540,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
         for (unsigned int n=0; n != elem->n_nodes(); ++n)
-          if (this->is_constrained_node(elem->get_node(n)))
-            pushed_node_ids[elem->processor_id()].insert(elem->node(n));
+          if (this->is_constrained_node(elem->node_ptr(n)))
+            pushed_node_ids[elem->processor_id()].insert(elem->node_id(n));
 #endif
       }
 
@@ -3490,7 +3490,6 @@ void DofMap::scatter_constraints(MeshBase & mesh)
               for (std::size_t j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
                 {
                   const Node * key_node = mesh.node_ptr(pushed_node_keys_to_me[i][j]);
-                  libmesh_assert(key_node);
                   row[key_node] = pushed_node_vals_to_me[i][j];
                 }
               _node_constraints[constrained].second = pushed_node_offsets_to_me[i];
@@ -3731,7 +3730,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
   for (unsigned int n = 0; n != n_nodes; ++n)
     if (elem->is_node_on_side(n, s))
       {
-        const Node * const node = elem->get_node(n);
+        const Node & node = elem->node_ref(n);
         const unsigned int low_nc =
           FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
         const unsigned int high_nc =
@@ -3748,21 +3747,21 @@ void DofMap::constrain_p_dofs (unsigned int var,
             // dofs
             for (unsigned int i = low_nc; i != high_nc; ++i)
               {
-                _dof_constraints[node->dof_number(sys_num,var,i)].clear();
-                _primal_constraint_values.erase(node->dof_number(sys_num,var,i));
+                _dof_constraints[node.dof_number(sys_num,var,i)].clear();
+                _primal_constraint_values.erase(node.dof_number(sys_num,var,i));
               }
           }
         else
           {
-            const unsigned int total_dofs = node->n_comp(sys_num, var);
+            const unsigned int total_dofs = node.n_comp(sys_num, var);
             libmesh_assert_greater_equal (total_dofs, high_nc);
             // Add "this is zero" constraint rows for high p
             // non-vertex dofs, which are numbered in reverse
             for (unsigned int j = low_nc; j != high_nc; ++j)
               {
                 const unsigned int i = total_dofs - j - 1;
-                _dof_constraints[node->dof_number(sys_num,var,i)].clear();
-                _primal_constraint_values.erase(node->dof_number(sys_num,var,i));
+                _dof_constraints[node.dof_number(sys_num,var,i)].clear();
+                _primal_constraint_values.erase(node.dof_number(sys_num,var,i));
               }
           }
       }

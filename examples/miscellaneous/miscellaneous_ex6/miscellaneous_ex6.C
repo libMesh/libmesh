@@ -279,7 +279,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
               UniquePtr<Elem> side = elem->side(s);
 
               for (unsigned n=0; n<side->n_nodes(); ++n)
-                node_id_map.insert(std::make_pair(side->node(n), /*dummy_value=*/0));
+                node_id_map.insert(std::make_pair(side->node_id(n), /*dummy_value=*/0));
             }
       }
   }
@@ -292,10 +292,10 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
       unsigned id = (*it).first;
 
       // Pointer to node in the cube mesh
-      Node * old_node = cube_mesh.node_ptr(id);
+      Node & old_node = cube_mesh.node_ref(id);
 
       // Add geometric point to input mesh
-      Node * new_node = mesh.add_point (*old_node);
+      Node * new_node = mesh.add_point (old_node);
 
       // Track ID value of new_node in map
       (*it).second = new_node->id();
@@ -321,11 +321,11 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
             for (unsigned i=0; i<old_elem->n_nodes(); ++i)
               {
                 // Locate old node ID in the map
-                iterator it = node_id_map.find(old_elem->node(i));
+                iterator it = node_id_map.find(old_elem->node_id(i));
 
                 // Check for not found
                 if (it == node_id_map.end())
-                  libmesh_error_msg("Node id " << old_elem->node(i) << " not found in map!");
+                  libmesh_error_msg("Node id " << old_elem->node_id(i) << " not found in map!");
 
                 // Mapping to node ID in input mesh
                 unsigned new_node_id = (*it).second;

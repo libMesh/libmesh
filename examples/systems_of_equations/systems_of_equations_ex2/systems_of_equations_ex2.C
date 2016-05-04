@@ -620,7 +620,7 @@ void assemble_stokes (EquationSystems & es,
                   // the side.  That defined where in the element matrix
                   // the boundary condition will be applied.
                   for (unsigned int n=0; n<elem->n_nodes(); n++)
-                    if (elem->node(n) == side->node(ns))
+                    if (elem->node_id(n) == side->node_id(ns))
                       {
                         // Matrix contribution.
                         Kuu(n,n) += penalty;
@@ -642,7 +642,7 @@ void assemble_stokes (EquationSystems & es,
             const unsigned int pressure_node = 0;
             const Real p_value               = 0.0;
             for (unsigned int c=0; c<elem->n_nodes(); c++)
-              if (elem->node(c) == pressure_node)
+              if (elem->node_id(c) == pressure_node)
                 {
                   Kpp(c,c) += penalty;
                   Fp(c)    += penalty*p_value;

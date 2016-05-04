@@ -785,7 +785,7 @@ void add_elem_to_builder(const libMesh::Elem & elem, RBData::MeshElem::Builder m
 
   for(unsigned int j=0; j < n_points; ++j)
     {
-      add_point_to_builder(*elem.get_node(j), mesh_elem_point_list[j]);
+      add_point_to_builder(elem.node_ref(j), mesh_elem_point_list[j]);
     }
 }
 

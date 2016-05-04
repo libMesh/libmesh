@@ -93,16 +93,16 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
   for ( ; el != end_el; ++el)
     {
       Elem * elem = *el;
-      Elem * orig_elem = _sys.get_mesh().elem(elem->id());
+      Elem * orig_elem = _sys.get_mesh().elem_ptr(elem->id());
 
       for (unsigned int node_id=0; node_id<elem->n_nodes(); node_id++)
         {
-          Node * node = elem->get_node(node_id);
+          Node & node = elem->node_ref(node_id);
 
-          if (encountered_node_ids.find(node->id()) != encountered_node_ids.end())
+          if (encountered_node_ids.find(node.id()) != encountered_node_ids.end())
             continue;
 
-          encountered_node_ids.insert(node->id());
+          encountered_node_ids.insert(node.id());
 
           std::vector<std::string> uvw_names(3);
           uvw_names[0] = "u";
@@ -142,7 +142,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
               }
 
             // Update the node's location
-            *node += uvw;
+            node += uvw;
           }
         }
     }
@@ -182,11 +182,11 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
                     if (elem->is_node_on_side(node_index, side))
                       {
                         if (on_lower_contact_surface)
-                          nodes_on_lower_surface.push_back(elem->node(node_index));
+                          nodes_on_lower_surface.push_back(elem->node_id(node_index));
                         else
                           {
-                            _lambdas[elem->node(node_index)] = 0.;
-                            nodes_on_upper_surface.push_back(elem->node(node_index));
+                            _lambdas[elem->node_id(node_index)] = 0.;
+                            nodes_on_upper_surface.push_back(elem->node_id(node_index));
                           }
                       }
                 }
@@ -365,7 +365,7 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
       Point upper_to_lower;
       {
         Point lower_node_moved = mesh_clone->point(lower_point_id);
-        Point upper_node_moved = mesh_clone->node(upper_point_id);
+        Point upper_node_moved = mesh_clone->point(upper_point_id);
 
         upper_to_lower = (lower_node_moved - upper_node_moved);
       }
@@ -391,8 +391,8 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
       // Store lambda_plus_penalty, we'll need to use it later to update _lambdas
       _lambda_plus_penalty_values[upper_point_id] = lambda_plus_penalty;
 
-      const Node & lower_node = mesh.node(lower_point_id);
-      const Node & upper_node = mesh.node(upper_point_id);
+      const Node & lower_node = mesh.node_ref(lower_point_id);
+      const Node & upper_node = mesh.node_ref(upper_point_id);
 
       std::vector<dof_id_type> dof_indices_on_lower_node(3);
       std::vector<dof_id_type> dof_indices_on_upper_node(3);
@@ -646,7 +646,7 @@ std::pair<Real, Real> LinearElasticityWithContact::get_least_and_max_gap_functio
       Point upper_to_lower;
       {
         Point lower_node_moved = mesh_clone->point(lower_point_id);
-        Point upper_node_moved = mesh_clone->node(upper_point_id);
+        Point upper_node_moved = mesh_clone->point(upper_point_id);
 
         upper_to_lower = (lower_node_moved - upper_node_moved);
       }

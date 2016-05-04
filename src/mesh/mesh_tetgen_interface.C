@@ -200,9 +200,9 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 
         for (unsigned int j=0; j<elem->n_nodes(); ++j)
           {
-            // We need to get the sequential index of elem->get_node(j), but
+            // We need to get the sequential index of elem->node_ptr(j), but
             // it should already be stored in _sequential_to_libmesh_node_map...
-            unsigned libmesh_node_id = elem->node(j);
+            unsigned libmesh_node_id = elem->node_id(j);
 
             // The libmesh node IDs may not be sequential, but can we assume
             // they are at least in order???  We will do so here.
@@ -371,11 +371,7 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * el
       // Get the mapped node index to ask the Mesh for
       unsigned mapped_node_id = _sequential_to_libmesh_node_map[ node_labels[j] ];
 
-      // Parallel mesh can return NULL pointers, this is bad...
       Node * current_node = this->_mesh.node_ptr( mapped_node_id );
-
-      if (current_node == libmesh_nullptr)
-        libmesh_error_msg("Error! Mesh returned NULL node pointer!");
 
       elem->set_node(j) = current_node;
     }

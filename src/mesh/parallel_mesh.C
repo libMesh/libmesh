@@ -118,7 +118,7 @@ ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
   for(std::set<Elem *>::iterator it = other_mesh._extra_ghost_elems.begin();
       it != other_mesh._extra_ghost_elems.end();
       ++it)
-    _extra_ghost_elems.insert(elem((*it)->id()));
+    _extra_ghost_elems.insert(this->elem_ptr((*it)->id()));
 }
 
 
@@ -290,34 +290,7 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
 
 const Point & ParallelMesh::point (const dof_id_type i) const
 {
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i);
-
-  return (*_nodes[i]);
-}
-
-
-
-
-
-const Node & ParallelMesh::node (const dof_id_type i) const
-{
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i);
-
-  return (*_nodes[i]);
-}
-
-
-
-
-
-Node & ParallelMesh::node (const dof_id_type i)
-{
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i);
-
-  return (*_nodes[i]);
+  return this->node_ref(i);
 }
 
 
@@ -376,7 +349,7 @@ Node * ParallelMesh::query_node_ptr (const dof_id_type i)
 
 
 
-const Elem * ParallelMesh::elem (const dof_id_type i) const
+const Elem * ParallelMesh::elem_ptr (const dof_id_type i) const
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -387,7 +360,7 @@ const Elem * ParallelMesh::elem (const dof_id_type i) const
 
 
 
-Elem * ParallelMesh::elem (const dof_id_type i)
+Elem * ParallelMesh::elem_ptr (const dof_id_type i)
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -398,7 +371,7 @@ Elem * ParallelMesh::elem (const dof_id_type i)
 
 
 
-const Elem * ParallelMesh::query_elem (const dof_id_type i) const
+const Elem * ParallelMesh::query_elem_ptr (const dof_id_type i) const
 {
   std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
@@ -414,7 +387,7 @@ const Elem * ParallelMesh::query_elem (const dof_id_type i) const
 
 
 
-Elem * ParallelMesh::query_elem (const dof_id_type i)
+Elem * ParallelMesh::query_elem_ptr (const dof_id_type i)
 {
   std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
@@ -1249,7 +1222,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
         Elem * el = *it;
 
         for (unsigned int n=0; n != el->n_nodes(); ++n)
-          used_nodes.insert(el->node(n));
+          used_nodes.insert(el->node_id(n));
       }
   }
 

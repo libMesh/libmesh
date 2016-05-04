@@ -1950,7 +1950,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                       if (!elem->is_node_on_side(n,s))
                         continue;
 
-                      const Node * my_node = elem->get_node(n);
+                      const Node & my_node = elem->node_ref(n);
 
                       if (elem->is_vertex(n))
                         {
@@ -1982,7 +1982,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                           // See if this vertex has point neighbors to
                           // defer to
                           if (primary_boundary_point_neighbor
-                              (elem, *my_node, mesh.get_boundary_info(), point_bcids)
+                              (elem, my_node, mesh.get_boundary_info(), point_bcids)
                               != elem)
                             continue;
 
@@ -1999,8 +1999,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                           // What do we want to constrain against?
                           const Elem * primary_elem = libmesh_nullptr;
                           const Elem * main_neigh = libmesh_nullptr;
-                          Point main_pt = *my_node,
-                            primary_pt = *my_node;
+                          Point main_pt = my_node,
+                            primary_pt = my_node;
 
                           for (std::set<boundary_id_type>::const_iterator i =
                                  point_bcids.begin(); i != point_bcids.end(); ++i)
@@ -2011,13 +2011,13 @@ compute_periodic_constraints (DofConstraints & constraints,
                               const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
 
                               const Point neigh_pt =
-                                new_periodic->get_corresponding_pos(*my_node);
+                                new_periodic->get_corresponding_pos(my_node);
 
                               // If the point is getting constrained
                               // to itself by this PBC then we don't
                               // generate any constraints
                               if (neigh_pt.absolute_fuzzy_equals
-                                  (*my_node, primary_hmin*TOLERANCE))
+                                  (my_node, primary_hmin*TOLERANCE))
                                 continue;
 
                               // Otherwise we'll have a constraint in
@@ -2088,11 +2088,11 @@ compute_periodic_constraints (DofConstraints & constraints,
                                 {
                                   if (e1 == libmesh_nullptr)
                                     {
-                                      e1 = elem->get_node(nn);
+                                      e1 = elem->node_ptr(nn);
                                     }
                                   else
                                     {
-                                      e2 = elem->get_node(nn);
+                                      e2 = elem->node_ptr(nn);
                                       break;
                                     }
                                 }
@@ -2239,8 +2239,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                           if (neigh == elem)
                             {
                               const Point neigh_pt =
-                                periodic->get_corresponding_pos(*my_node);
-                              if (neigh_pt > *my_node)
+                                periodic->get_corresponding_pos(my_node);
+                              if (neigh_pt > my_node)
                                 continue;
                             }
 
@@ -2263,11 +2263,11 @@ compute_periodic_constraints (DofConstraints & constraints,
                       // should be constrained by this element's
                       // calculations.
                       const unsigned int n_comp =
-                        my_node->n_comp(sys_number, variable_number);
+                        my_node.n_comp(sys_number, variable_number);
 
                       for (unsigned int i=0; i != n_comp; ++i)
                         my_constrained_dofs.insert
-                          (my_node->dof_number
+                          (my_node.dof_number
                            (sys_number, variable_number, i));
                     }
 

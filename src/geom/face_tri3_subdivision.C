@@ -58,10 +58,10 @@ void Tri3Subdivision::prepare_subdivision_properties()
   unsigned int irregular_idx = 0;
   for (unsigned int i = 0; i < 3; ++i)
     {
-      if (this->get_node(i)->valence() != 6)
+      if (this->node_ptr(i)->valence() != 6)
         {
           irregular_idx = i;
-          if (this->get_node(MeshTools::Subdivision::next[i])->valence() != 6 || this->get_node(MeshTools::Subdivision::prev[i])->valence() != 6)
+          if (this->node_ptr(MeshTools::Subdivision::next[i])->valence() != 6 || this->node_ptr(MeshTools::Subdivision::prev[i])->valence() != 6)
             libmesh_error_msg("Error: The mesh contains elements with more than one irregular vertex!");
         }
     }
@@ -74,19 +74,19 @@ void Tri3Subdivision::prepare_subdivision_properties()
   switch (irregular_idx)
     {
     case 0:
-      _ordered_nodes[0] = this->get_node(0);
-      _ordered_nodes[1] = this->get_node(1);
-      _ordered_nodes[2] = this->get_node(2);
+      _ordered_nodes[0] = this->node_ptr(0);
+      _ordered_nodes[1] = this->node_ptr(1);
+      _ordered_nodes[2] = this->node_ptr(2);
       break;
     case 1:
-      _ordered_nodes[0] = this->get_node(1);
-      _ordered_nodes[1] = this->get_node(2);
-      _ordered_nodes[2] = this->get_node(0);
+      _ordered_nodes[0] = this->node_ptr(1);
+      _ordered_nodes[1] = this->node_ptr(2);
+      _ordered_nodes[2] = this->node_ptr(0);
       break;
     case 2:
-      _ordered_nodes[0] = this->get_node(2);
-      _ordered_nodes[1] = this->get_node(0);
-      _ordered_nodes[2] = this->get_node(1);
+      _ordered_nodes[0] = this->node_ptr(2);
+      _ordered_nodes[1] = this->node_ptr(0);
+      _ordered_nodes[2] = this->node_ptr(1);
       break;
     default:
       libmesh_error_msg("Unrecognized irregular_idx = " << irregular_idx);

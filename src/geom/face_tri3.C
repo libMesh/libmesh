@@ -121,7 +121,7 @@ UniquePtr<Elem> Tri3::build_side (const unsigned int i,
 
       // Set the nodes
       for (unsigned n=0; n<edge->n_nodes(); ++n)
-        edge->set_node(n) = this->get_node(Tri3::side_nodes_map[i][n]);
+        edge->set_node(n) = this->node_ptr(Tri3::side_nodes_map[i][n]);
 
       return UniquePtr<Elem>(edge);
     }
@@ -143,19 +143,19 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
     case TECPLOT:
       {
         conn.resize(4);
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(2)+1;
+        conn[0] = this->node_id(0)+1;
+        conn[1] = this->node_id(1)+1;
+        conn[2] = this->node_id(2)+1;
+        conn[3] = this->node_id(2)+1;
         return;
       }
 
     case VTK:
       {
         conn.resize(3);
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
+        conn[2] = this->node_id(2);
         return;
       }
 
@@ -172,9 +172,9 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
 Real Tri3::volume () const
 {
   // 3-node triangles have the following formula for computing the area
-  Point v10 ( *(this->get_node(1)) - *(this->get_node(0)) );
+  Point v10 ( this->point(1) - this->point(0) );
 
-  Point v20 ( *(this->get_node(2)) - *(this->get_node(0)) );
+  Point v20 ( this->point(2) - this->point(0) );
 
   return 0.5 * (v10.cross(v20)).norm() ;
 }

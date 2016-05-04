@@ -655,7 +655,7 @@ int main (int argc, char ** argv)
       libMesh::out << "Quality type is: " << Quality::name(quality_type) << std::endl;
 
       // What are the quality bounds for this element?
-      std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(quality_type);
+      std::pair<Real, Real> bounds = mesh.elem_ref(0).qual_bounds(quality_type);
       libMesh::out << "Quality bounds for this element type are: ("
                    << bounds.first
                    << ", "
@@ -823,22 +823,22 @@ int main (int argc, char ** argv)
     const Point p(x,y);
 
     for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem(e)->active())
-    mesh.elem(e)->set_refinement_flag() = -1;
+    if (mesh.elem_ref(e).active())
+    mesh.elem_ref(e).set_refinement_flag() = -1;
 
 
 
     for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem(e)->active())
+    if (mesh.elem_ref(e).active())
     {
-    const Point diff = mesh.elem(e)->centroid(mesh) - p;
+    const Point diff = mesh.elem_ref(e).centroid(mesh) - p;
 
     if (diff.size() < .5)
     {
-    if (mesh.elem(e)->level() < 4)
-    mesh.elem(e)->set_refinement_flag() = 1;
-    else if (mesh.elem(e)->level() == 4)
-    mesh.elem(e)->set_refinement_flag() = 0;
+    if (mesh.elem_ref(e).level() < 4)
+    mesh.elem_ref(e).set_refinement_flag() = 1;
+    else if (mesh.elem_ref(e).level() == 4)
+    mesh.elem_ref(e).set_refinement_flag() = 0;
     }
     }
 

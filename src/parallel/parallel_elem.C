@@ -244,7 +244,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
     *data_out++ =(DofObject::invalid_id);
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
-    *data_out++ = (elem->node(n));
+    *data_out++ = (elem->node_id(n));
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
@@ -410,7 +410,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   // plus the real data header
   libmesh_assert_equal_to (in - original_in, header_size + 1);
 
-  Elem * elem = mesh->query_elem(id);
+  Elem * elem = mesh->query_elem_ptr(id);
 
   // if we already have this element, make sure its
   // properties match, and update any missing neighbor
@@ -430,7 +430,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 #ifndef NDEBUG
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
-        libmesh_assert(elem->node(i) ==
+        libmesh_assert(elem->node_id(i) ==
                        cast_int<dof_id_type>(*in++));
 #else
       in += n_nodes;
@@ -473,7 +473,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           }
         else
           {
-            Elem * ip = mesh->query_elem(interior_parent_id);
+            Elem * ip = mesh->query_elem_ptr(interior_parent_id);
 
             // The sending processor sees an interior parent here, so
             // if we don't have that interior element, then we'd
@@ -529,7 +529,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
                 continue;
               }
 
-            Elem * neigh = mesh->query_elem(neighbor_id);
+            Elem * neigh = mesh->query_elem_ptr(neighbor_id);
 
             // The sending processor sees a neighbor here, so if we
             // don't have that neighboring element, then we'd better
@@ -590,7 +590,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           // connectivity so that parents are encountered before
           // children.  If we get here and can't find the parent that
           // is a fatal error.
-          parent = mesh->elem(parent_id);
+          parent = mesh->elem_ptr(parent_id);
         }
       // Or assert that the sending processor sees no parent
       else
@@ -660,7 +660,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           {
             // If we don't have the interior parent element, then it's
             // a remote_elem until we get it.
-            Elem * ip = mesh->query_elem(interior_parent_id);
+            Elem * ip = mesh->query_elem_ptr(interior_parent_id);
             if (!ip )
               elem->set_interior_parent
                 (const_cast<RemoteElem *>(remote_elem));
@@ -690,7 +690,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
           // If we don't have the neighbor element, then it's a
           // remote_elem until we get it.
-          Elem * neigh = mesh->query_elem(neighbor_id);
+          Elem * neigh = mesh->query_elem_ptr(neighbor_id);
           if (!neigh)
             {
               elem->set_neighbor(n, const_cast<RemoteElem *>(remote_elem));

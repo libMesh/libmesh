@@ -176,7 +176,7 @@ void clough_compute_coefs(const Elem * elem)
   N21x /= Nlength; N21y /= Nlength;
 
   //  for (int i=0; i != 6; ++i) {
-  //    libMesh::err << elem->node(i) << ' ';
+  //    libMesh::err << elem->node_id(i) << ' ';
   //  }
   //  libMesh::err << std::endl;
 
@@ -191,9 +191,9 @@ void clough_compute_coefs(const Elem * elem)
 
   if (elem->point(2) < elem->point(1))
     {
-      //      libMesh::err << "Flipping nodes " << elem->node(2);
-      //      libMesh::err << " and " << elem->node(1);
-      //      libMesh::err << " around node " << elem->node(4);
+      //      libMesh::err << "Flipping nodes " << elem->node_id(2);
+      //      libMesh::err << " and " << elem->node_id(1);
+      //      libMesh::err << " around node " << elem->node_id(4);
       //      libMesh::err << std::endl;
       N1x = -N1x; N1y = -N1y;
       N12x = -N12x; N12y = -N12y;
@@ -201,16 +201,16 @@ void clough_compute_coefs(const Elem * elem)
     }
   else
     {
-      //      libMesh::err << "Not flipping nodes " << elem->node(2);
-      //      libMesh::err << " and " << elem->node(1);
-      //      libMesh::err << " around node " << elem->node(4);
+      //      libMesh::err << "Not flipping nodes " << elem->node_id(2);
+      //      libMesh::err << " and " << elem->node_id(1);
+      //      libMesh::err << " around node " << elem->node_id(4);
       //      libMesh::err << std::endl;
     }
   if (elem->point(0) < elem->point(2))
     {
-      //      libMesh::err << "Flipping nodes " << elem->node(0);
-      //      libMesh::err << " and " << elem->node(2);
-      //      libMesh::err << " around node " << elem->node(5);
+      //      libMesh::err << "Flipping nodes " << elem->node_id(0);
+      //      libMesh::err << " and " << elem->node_id(2);
+      //      libMesh::err << " around node " << elem->node_id(5);
       //      libMesh::err << std::endl;
       //      libMesh::err << N2x << ' ' << N2y << std::endl;
       N2x = -N2x; N2y = -N2y;
@@ -220,16 +220,16 @@ void clough_compute_coefs(const Elem * elem)
     }
   else
     {
-      //      libMesh::err << "Not flipping nodes " << elem->node(0);
-      //      libMesh::err << " and " << elem->node(2);
-      //      libMesh::err << " around node " << elem->node(5);
+      //      libMesh::err << "Not flipping nodes " << elem->node_id(0);
+      //      libMesh::err << " and " << elem->node_id(2);
+      //      libMesh::err << " around node " << elem->node_id(5);
       //      libMesh::err << std::endl;
     }
   if (elem->point(1) < elem->point(0))
     {
-      //      libMesh::err << "Flipping nodes " << elem->node(1);
-      //      libMesh::err << " and " << elem->node(0);
-      //      libMesh::err << " around node " << elem->node(3);
+      //      libMesh::err << "Flipping nodes " << elem->node_id(1);
+      //      libMesh::err << " and " << elem->node_id(0);
+      //      libMesh::err << " around node " << elem->node_id(3);
       //      libMesh::err << std::endl;
       N3x = -N3x;
       N3y = -N3y;
@@ -238,9 +238,9 @@ void clough_compute_coefs(const Elem * elem)
     }
   else
     {
-      //      libMesh::err << "Not flipping nodes " << elem->node(1);
-      //      libMesh::err << " and " << elem->node(0);
-      //      libMesh::err << " around node " << elem->node(3);
+      //      libMesh::err << "Not flipping nodes " << elem->node_id(1);
+      //      libMesh::err << " and " << elem->node_id(0);
+      //      libMesh::err << " around node " << elem->node_id(3);
       //      libMesh::err << std::endl;
     }
 
