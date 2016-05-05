@@ -1512,19 +1512,13 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
 
       // Prepare finite elements for each dimension present in the mesh
-      for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-           d_it != elem_dims.end(); ++d_it )
+      for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
+           d_it != elem_dims.end(); ++d_it)
         {
-          if(skip_dimensions)
-          {
-            if(skip_dimensions->find(*d_it) != skip_dimensions->end())
-            {
-              continue;
-            }
-          }
+          if (skip_dimensions && skip_dimensions->find(*d_it) != skip_dimensions->end())
+            continue;
 
           q_rules[*d_it] =
-
             fe_type.default_quadrature_rule (*d_it).release();
 
           // Construct finite element object
@@ -1548,13 +1542,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           const Elem * elem = *el;
           const unsigned int dim = elem->dim();
 
-          if(skip_dimensions)
-          {
-            if(skip_dimensions->find(dim) != skip_dimensions->end())
-            {
-              continue;
-            }
-          }
+          if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
+            continue;
 
           FEBase * fe = fe_ptrs[dim];
           QBase * qrule = q_rules[dim];

@@ -204,7 +204,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   // Fix up node unique ids in case mesh generation code didn't take
   // exceptional care to do so.
-//  MeshCommunication().make_node_unique_ids_parallel_consistent(*this);
+  //  MeshCommunication().make_node_unique_ids_parallel_consistent(*this);
 
   // We're going to still require that mesh generation code gets
   // element unique ids consistent.

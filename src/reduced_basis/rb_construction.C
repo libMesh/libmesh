@@ -226,15 +226,15 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
   unsigned int training_parameters_random_seed_in =
     static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
-                                               training_parameters_random_seed_in);
+                                              training_parameters_random_seed_in);
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
   const unsigned int Nmax_in = infile("Nmax", Nmax);
   const Real rel_training_tolerance_in = infile("rel_training_tolerance",
-                                                 rel_training_tolerance);
+                                                rel_training_tolerance);
   const Real abs_training_tolerance_in = infile("abs_training_tolerance",
-                                                 abs_training_tolerance);
+                                                abs_training_tolerance);
   const bool normalize_rb_bound_in_greedy_in = infile("normalize_rb_bound_in_greedy",
-                                                       normalize_rb_bound_in_greedy_in);
+                                                      normalize_rb_bound_in_greedy_in);
 
   // Read in the parameters from the input file too
   unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
@@ -1052,18 +1052,16 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
           libMesh::out << "Maximum error bound is " << training_greedy_error << std::endl << std::endl;
 
           // record the initial error
-          if(!initial_greedy_error_initialized)
-          {
-            initial_greedy_error = training_greedy_error;
-            initial_greedy_error_initialized = true;
-          }
+          if (!initial_greedy_error_initialized)
+            {
+              initial_greedy_error = training_greedy_error;
+              initial_greedy_error_initialized = true;
+            }
 
           // Break out of training phase if we have reached Nmax
           // or if the training_tolerance is satisfied.
-          if( greedy_termination_test(training_greedy_error, initial_greedy_error, count) )
-            {
-              break;
-            }
+          if (greedy_termination_test(training_greedy_error, initial_greedy_error, count))
+            break;
         }
 
       libMesh::out << "Performing truth solve at parameter:" << std::endl;
@@ -1089,8 +1087,9 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
   return training_greedy_error;
 }
 
-bool RBConstruction::greedy_termination_test(
-  Real abs_greedy_error, Real initial_error, int)
+bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
+                                             Real initial_error,
+                                             int)
 {
   if(abs_greedy_error < this->abs_training_tolerance)
     {
@@ -1265,22 +1264,20 @@ Real RBConstruction::get_RB_error_bound()
 
   Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
 
-  if(normalize_rb_bound_in_greedy)
-  {
-    Real error_bound_normalization = get_rb_evaluation().get_error_bound_normalization();
+  if (normalize_rb_bound_in_greedy)
+    {
+      Real error_bound_normalization = get_rb_evaluation().get_error_bound_normalization();
 
-    if( (error_bound < abs_training_tolerance) ||
-        (error_bound_normalization < abs_training_tolerance) )
-    {
-      // We don't want to normalize this error bound if the bound or the
-      // normalization value are below the absolute tolerance. Hence do nothing
-      // in this case.
+      if ((error_bound < abs_training_tolerance) ||
+          (error_bound_normalization < abs_training_tolerance))
+        {
+          // We don't want to normalize this error bound if the bound or the
+          // normalization value are below the absolute tolerance. Hence do nothing
+          // in this case.
+        }
+      else
+        error_bound /= error_bound_normalization;
     }
-    else
-    {
-      error_bound /= error_bound_normalization;
-    }
-  }
 
   return error_bound;
 }

@@ -517,10 +517,10 @@ protected:
     calculations_started = true;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  // Second derivative calculations currently have first derivative
-  // calculations as a prerequisite
-  if (calculate_d2xyz)
-    calculate_dxyz = true;
+    // Second derivative calculations currently have first derivative
+    // calculations as a prerequisite
+    if (calculate_d2xyz)
+      calculate_dxyz = true;
 #endif
   }
 

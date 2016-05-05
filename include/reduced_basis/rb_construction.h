@@ -556,8 +556,9 @@ protected:
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
-  virtual bool greedy_termination_test(
-    Real abs_greedy_error, Real initial_greedy_error, int count);
+  virtual bool greedy_termination_test(Real abs_greedy_error,
+                                       Real initial_greedy_error,
+                                       int count);
 
   /**
    * Update the list of Greedily chosen parameters with

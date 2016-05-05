@@ -42,8 +42,7 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
 }
 
 void
-CondensedEigenSystem::initialize_condensed_dofs
-  (const std::set<dof_id_type> & global_dirichlet_dofs_set)
+CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & global_dirichlet_dofs_set)
 {
   const DofMap & dof_map = this->get_dof_map();
 

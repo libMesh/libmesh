@@ -34,8 +34,11 @@ class ConstFunction : public FunctionBase<Output>
 {
 public:
   explicit
-  ConstFunction (const Output & c) : _c(c) { this->_initialized = true;
-                                             this->_is_time_dependent = false;}
+  ConstFunction (const Output & c) : _c(c)
+  {
+    this->_initialized = true;
+    this->_is_time_dependent = false;
+  }
 
   virtual Output operator() (const Point &,
                              const Real = 0) libmesh_override

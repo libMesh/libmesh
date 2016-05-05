@@ -110,7 +110,7 @@ template <>
 template <>
 unsigned int
 Packing<const Node *>::packable_size (const Node * const & node,
-                                     const ParallelMesh * mesh)
+                                      const ParallelMesh * mesh)
 {
   return packable_size(node, static_cast<const MeshBase *>(mesh));
 }

@@ -508,7 +508,7 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
           // Actually set the value in v_local
           v_local[local_requested_index] = values_to_receive[i];
         }
-   }
+    }
 }
 
 

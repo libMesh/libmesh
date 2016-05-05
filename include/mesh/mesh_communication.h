@@ -183,7 +183,7 @@ public:
    */
   void make_node_ids_parallel_consistent (MeshBase &);
 
- /**
+  /**
    * Assuming all unique_ids on local nodes are globally unique, and
    * assuming all processor ids are parallel consistent, this function makes
    * all ghost unique_ids parallel consistent.

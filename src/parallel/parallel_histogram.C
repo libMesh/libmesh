@@ -78,8 +78,7 @@ void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
 
       bin_iters[b] =
         std::lower_bound (bin_iters[b-1], data.end(),
-                          Parallel::Utils::Convert<KeyType>::to_key_type
-                            (bin_bounds[b]));
+                          Parallel::Utils::Convert<KeyType>::to_key_type(bin_bounds[b]));
     }
 
   bin_iters[nbins]  = data.end();

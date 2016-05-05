@@ -300,7 +300,7 @@ void parallel_for (const Range & range, const Body & body)
   // behavior and optimization.
   // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
   for (int i=0; i<static_cast<int>(n_threads); i++)
-      pthread_join(threads[i], libmesh_nullptr);
+    pthread_join(threads[i], libmesh_nullptr);
 #endif
 
   // Clean up
@@ -403,7 +403,7 @@ void parallel_reduce (const Range & range, Body & body)
 #if !LIBMESH_HAVE_OPENMP
   // Wait for them to finish
   for (unsigned int i=0; i<n_threads; i++)
-      pthread_join(threads[i], libmesh_nullptr);
+    pthread_join(threads[i], libmesh_nullptr);
 #endif
 
   // Join them all down to the original Body

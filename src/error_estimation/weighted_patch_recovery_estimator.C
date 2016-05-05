@@ -197,7 +197,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                  (error_estimator.error_norm.type(var-1) == L_INF ||
                   error_estimator.error_norm.type(var-1) == W1_INF_SEMINORM ||
                   error_estimator.error_norm.type(var-1) == W2_INF_SEMINORM));
-                libmesh_assert (is_valid_norm_type);
+              libmesh_assert (is_valid_norm_type);
             }
 #endif // DEBUG
 

@@ -126,8 +126,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
           bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
           bin_iters[b+1] =
             std::lower_bound(bin_iters[b], data.end(),
-                             Parallel::Utils::Convert<KeyType>::to_key_type
-                               (bin_bounds[b+1]));
+                             Parallel::Utils::Convert<KeyType>::to_key_type(bin_bounds[b+1]));
         }
 
       // Just be sure the last boundary points to the right place
