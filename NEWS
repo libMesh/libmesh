@@ -1,3 +1,76 @@
+0.9.5 -> 1.0.0
+  * Add parallel I/O for Nemesis format, solution vector is no longer broadcast.
+  * Elem: add node_ref(), node_ptr(), node_id().
+  * Mesh: add node_ref(), elem_ref(), elem_ptr().
+  * Deprecate DivaIO, Xdr{MESH,MGF,SOLN,MHEAD,SHEAD,HEAD}, LegacyXdrIO classes.
+  * Improve HDF5 configure tests, link against -lhdf5_cpp when available.
+  * Use PETSc's METIS, if available and PETSc is enabled.
+  * Add RAII-based performance logging macro, LOG_SCOPE.
+  * VTKIO is a "parallel" I/O format, it is now marked as such.
+  * Optimize FEMap calculations, standardize get_foo() usage.
+  * Configure with --enable-unique-ptr by default.
+  * CondensedEigenSystem: condense out constrained dofs to avoid spurious eigenvalues.
+  * Add OrderWrapper shim class, we are no longer limited by Order enum.
+  * Free communicators created by a split().
+  * Add --with-thread-model configure flag, split threads.h into separate files.
+  * Make adaptivity_ex3 use HIERARCHIC elements by default, test p and hp refinement.
+  * hp-adaptivity/coarsening fixes for ParallelMesh.
+  * Fixes for infinite elements in misc_ex1, ExodusII_IO.
+  * Add C++03/11 appropriate locking to PetscVector::_get_array().
+  * FEMContext: Don't increment hardest_fe_type order for SCALARs.
+  * Add SPARSELU SolverType for Eigen.
+  * Add misc_ex12 demonstrating the MITC4 element.
+  * Bugfix for DofMap::constrain_element_matrix().
+  * Add Type{Vector,Tensor}::norm(), norm_sq() replacing size(), size_sq().
+  * Allow KSP tolerances to be set from the command line.
+  * Remove PETSc < 2.3.3 code paths.
+  * Add triple_product(a,b,c) for TypeVectors.
+  * Fix EIM truth_solve on hybrid meshes.
+  * Optimize EIM by storing inner_product * basis functions
+  * Add method to plot EIM parameterized functions.
+  * Add notion of time-dependence to FunctionBase.
+  * Replace NULL usage with backwards-compatible libmesh_nullptr.
+  * Optimized memory usage in EIM construction.
+  * Add optimized Elem::volume() implementations for all Elem types.
+  * Refactor EnsightIO object to use C++ I/O and string handling.
+  * Mulitple re-optimizations of new GenericProjector codepath.
+  * Mark various leaf classes as "libmesh_final".
+  * Redesign Parallel packed_range functions.
+  * Add GMRES support to EigenSparseLinearSolver.
+  * MeshBase::spatial_dimension() is no longer simply LIBMESH_DIM.
+  * Add unit test of refining a slit mesh.
+  * NewmarkSolver: fix cache w/o restore bug.
+  * Fix dimension==0 issue in MeshTools::Generation::build_sphere() after clearing mesh.
+  * Add EigenSparseMatrix::l1_norm(), linfty_norm().
+  * Fix memory leak in vector_fe_ex{2,3,4}.
+  * Generalize build_cube() Gauss-Lobatto grid using redistribute().
+  * PointLocatorList class deprecated.
+  * Set preprocessor tokens when PETSc has SuperLU_dist and/or MUMPS support.
+  * Make System::calculate_norm() work on mixed-dimension meshes.
+  * Add support for writing NodeElems in Exodus using "SPHERE" elements.
+  * MeshTools::Modification::all_tri() generalized to work with Prisms, Hexes.
+  * Use unique_ids to disambiguate Hilbert orderings with overlapping nodes.
+  * Fixes for unique_ids with ParallelMesh.
+  * Unify spacing around pointer/reference declarations, establish coding convention.
+  * Many configure tests added for C++11 features.  Test regardless of --enable/--disable-cxx11.
+  * Fix for writing Exodus files with non-contiguous node numberings.
+  * Add BounaryInfo::remove_id().
+  * Fix misc. Doxygen warnings, simplify examples documentation generation.
+  * Misc. updates/fixes to FParser AD and JIT capabilities.
+  * Check for consistency between libMesh and PETSc scalar and index types.
+  * Add DenseMatrix::svd_solve().
+  * Fix DenseMatrix::svd(sigma, U, VT) in rectangular case.
+  * Refactor Elem::side() functions to use existing "sides_node_map" arrays.
+  * Add Elem::key() interface, consistent with Elem::key(side) on lower-dimensional elements.
+  * PETSc/TAO interface updates for PETSc 3.7.0.
+  * Detect and workaround TRI3 numbering inconsistency in Cubit 14 and 15.
+  * Update bundled automake from 1.12.5 -> 1.15.
+  * Update bundled libtool from 2.4.2 -> 2.4.6.
+  * Make header/forward declaration fixes suggested by cppclean.
+  * Deprecate BoundaryInfo::add_{side,node,edge}() which returned result by value.
+  * Replace deprecated BoundaryInfo functions with versions taking a vector by reference.
+  * Refactor/update the UCDIO class.
+
 0.9.4 -> 0.9.5
   * Add interface to SLEPc's solver for generalized indefinite Hermitian eigenvalue problems (GHIEP).
   * Refactor NumericVector::insert(), add PetscVector<T>::insert() specializations.
