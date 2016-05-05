@@ -138,6 +138,12 @@ public:
   void write_element_data (const EquationSystems & es);
 
   /**
+   * Bring in base class functionality for name resolution and to
+   * avoid warnings about hidden overloaded virtual functions.
+   */
+  using MeshOutput<MeshBase>::write_nodal_data;
+
+  /**
    * Write out a nodal solution.
    */
   virtual void write_nodal_data (const std::string &,

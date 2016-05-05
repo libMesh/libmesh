@@ -61,6 +61,12 @@ public:
   virtual void write (const std::string &) libmesh_override;
 
   /**
+   * Bring in base class functionality for name resolution and to
+   * avoid warnings about hidden overloaded virtual functions.
+   */
+  using MeshOutput<MeshBase>::write_nodal_data;
+
+  /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
