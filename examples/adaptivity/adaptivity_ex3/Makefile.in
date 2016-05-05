@@ -644,8 +644,8 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = lshaped.e biquadratic_h_adaptive.m error_*.e \
-	$(am__append_1) $(example_name).html stdout.log
+CLEANFILES = lshaped.e *.m error_*.e $(am__append_1) \
+	$(example_name).html stdout.log
 
 # need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
