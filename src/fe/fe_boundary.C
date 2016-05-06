@@ -36,27 +36,21 @@ namespace libMesh
 
 //-------------------------------------------------------
 // Full specializations for useless methods in 0D, 1D
-#define REINIT_ERROR(_dim, _type, _func)                                \
-  template <>                                                           \
-  void FE<_dim,_type>::_func(const Elem *,                              \
-                             const unsigned int,                        \
-                             const Real,                                \
-                             const std::vector<Point> * const,          \
-                             const std::vector<Real> * const)           \
-  {                                                                     \
-    libmesh_error_msg("ERROR: This method makes no sense for low-D elements!"); \
-  }
+#define REINIT_ERROR(_dim, _type, _func)                        \
+  template <>                                                   \
+  void FE<_dim,_type>::_func(const Elem *,                      \
+                             const unsigned int,                \
+                             const Real,                        \
+                             const std::vector<Point> * const,  \
+                             const std::vector<Real> * const)
 
-#define SIDEMAP_ERROR(_dim, _type, _func)                               \
-  template <>                                                           \
-  void FE<_dim,_type>::_func(const Elem *,                              \
-                             const Elem *,                              \
-                             const unsigned int,                        \
-                             const std::vector<Point> &,                \
-                             std::vector<Point> &)                      \
-  {                                                                     \
-    libmesh_error_msg("ERROR: This method makes no sense for low-D elements!"); \
-  }
+#define SIDEMAP_ERROR(_dim, _type, _func)                       \
+  template <>                                                   \
+  void FE<_dim,_type>::_func(const Elem *,                      \
+                             const Elem *,                      \
+                             const unsigned int,                \
+                             const std::vector<Point> &,        \
+                             std::vector<Point> &)
 
 #define FACE_EDGE_SHAPE_ERROR(_dim, _func)                              \
   template <>                                                           \
@@ -67,64 +61,78 @@ namespace libMesh
   }
 
 
-REINIT_ERROR(0, CLOUGH, reinit)
-REINIT_ERROR(0, CLOUGH, edge_reinit)
-SIDEMAP_ERROR(0, CLOUGH, side_map)
-REINIT_ERROR(0, HERMITE, reinit)
-REINIT_ERROR(0, HERMITE, edge_reinit)
-SIDEMAP_ERROR(0, HERMITE, side_map)
-REINIT_ERROR(0, HIERARCHIC, reinit)
-REINIT_ERROR(0, HIERARCHIC, edge_reinit)
-SIDEMAP_ERROR(0, HIERARCHIC, side_map)
-REINIT_ERROR(0, L2_HIERARCHIC, reinit)
-REINIT_ERROR(0, L2_HIERARCHIC, edge_reinit)
-SIDEMAP_ERROR(0, L2_HIERARCHIC, side_map)
-REINIT_ERROR(0, LAGRANGE, reinit)
-REINIT_ERROR(0, LAGRANGE, edge_reinit)
-SIDEMAP_ERROR(0, LAGRANGE, side_map)
-REINIT_ERROR(0, LAGRANGE_VEC, reinit)
-REINIT_ERROR(0, LAGRANGE_VEC, edge_reinit)
-SIDEMAP_ERROR(0, LAGRANGE_VEC, side_map)
-REINIT_ERROR(0, L2_LAGRANGE, reinit)
-REINIT_ERROR(0, L2_LAGRANGE, edge_reinit)
-SIDEMAP_ERROR(0, L2_LAGRANGE, side_map)
-REINIT_ERROR(0, MONOMIAL, reinit)
-REINIT_ERROR(0, MONOMIAL, edge_reinit)
-SIDEMAP_ERROR(0, MONOMIAL, side_map)
-REINIT_ERROR(0, SCALAR, reinit)
-REINIT_ERROR(0, SCALAR, edge_reinit)
-SIDEMAP_ERROR(0, SCALAR, side_map)
-REINIT_ERROR(0, XYZ, reinit)
-REINIT_ERROR(0, XYZ, edge_reinit)
-SIDEMAP_ERROR(0, XYZ, side_map)
-REINIT_ERROR(0, NEDELEC_ONE, reinit)
-REINIT_ERROR(0, NEDELEC_ONE, edge_reinit)
-SIDEMAP_ERROR(0, NEDELEC_ONE, side_map)
+// 0D error instantiations
+REINIT_ERROR(0, CLOUGH, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D CLOUGH elements!");      }
+REINIT_ERROR(0, CLOUGH, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D CLOUGH elements!"); }
+SIDEMAP_ERROR(0, CLOUGH, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D CLOUGH elements!"); }
+
+REINIT_ERROR(0, HERMITE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D HERMITE elements!"); }
+REINIT_ERROR(0, HERMITE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D HERMITE elements!"); }
+SIDEMAP_ERROR(0, HERMITE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D HERMITE elements!"); }
+
+REINIT_ERROR(0, HIERARCHIC, reinit)       { libmesh_error_msg("ERROR: Cannot reinit 0D HIERARCHIC elements!"); }
+REINIT_ERROR(0, HIERARCHIC, edge_reinit)  { libmesh_error_msg("ERROR: Cannot edge_reinit 0D HIERARCHIC elements!"); }
+SIDEMAP_ERROR(0, HIERARCHIC, side_map)    { libmesh_error_msg("ERROR: Cannot side_map 0D HIERARCHIC elements!"); }
+
+REINIT_ERROR(0, L2_HIERARCHIC, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D L2_HIERARCHIC elements!"); }
+REINIT_ERROR(0, L2_HIERARCHIC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D L2_HIERARCHIC elements!"); }
+SIDEMAP_ERROR(0, L2_HIERARCHIC, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D L2_HIERARCHIC elements!"); }
+
+REINIT_ERROR(0, LAGRANGE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D LAGRANGE elements!"); }
+REINIT_ERROR(0, LAGRANGE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D LAGRANGE elements!"); }
+SIDEMAP_ERROR(0, LAGRANGE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map LAGRANGE elements!"); }
+
+REINIT_ERROR(0, LAGRANGE_VEC, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D LAGRANGE_VEC elements!"); }
+REINIT_ERROR(0, LAGRANGE_VEC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D LAGRANGE_VEC elements!"); }
+SIDEMAP_ERROR(0, LAGRANGE_VEC, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D LAGRANGE_VEC elements!"); }
+
+REINIT_ERROR(0, L2_LAGRANGE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D L2_LAGRANGE elements!"); }
+REINIT_ERROR(0, L2_LAGRANGE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D L2_LAGRANGE elements!"); }
+SIDEMAP_ERROR(0, L2_LAGRANGE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D L2_LAGRANGE elements!"); }
+
+REINIT_ERROR(0, MONOMIAL, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D MONOMIAL elements!"); }
+REINIT_ERROR(0, MONOMIAL, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D MONOMIAL elements!"); }
+SIDEMAP_ERROR(0, MONOMIAL, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D MONOMIAL elements!"); }
+
+REINIT_ERROR(0, SCALAR, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D SCALAR elements!"); }
+REINIT_ERROR(0, SCALAR, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D SCALAR elements!"); }
+SIDEMAP_ERROR(0, SCALAR, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D SCALAR elements!"); }
+
+REINIT_ERROR(0, XYZ, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D XYZ elements!"); }
+REINIT_ERROR(0, XYZ, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D XYZ elements!"); }
+SIDEMAP_ERROR(0, XYZ, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D XYZ elements!"); }
+
+REINIT_ERROR(0, NEDELEC_ONE, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D NEDELEC_ONE elements!"); }
+REINIT_ERROR(0, NEDELEC_ONE, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D NEDELEC_ONE elements!"); }
+SIDEMAP_ERROR(0, NEDELEC_ONE, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D NEDELEC_ONE elements!"); }
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-REINIT_ERROR(0, BERNSTEIN, reinit)
-REINIT_ERROR(0, BERNSTEIN, edge_reinit)
-SIDEMAP_ERROR(0, BERNSTEIN, side_map)
-REINIT_ERROR(0, SZABAB, reinit)
-REINIT_ERROR(0, SZABAB, edge_reinit)
-SIDEMAP_ERROR(0, SZABAB, side_map)
+REINIT_ERROR(0, BERNSTEIN, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D BERNSTEIN elements!"); }
+REINIT_ERROR(0, BERNSTEIN, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D BERNSTEIN elements!"); }
+SIDEMAP_ERROR(0, BERNSTEIN, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D BERNSTEIN elements!"); }
+
+REINIT_ERROR(0, SZABAB, reinit)      { libmesh_error_msg("ERROR: Cannot reinit 0D SZABAB elements!"); }
+REINIT_ERROR(0, SZABAB, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 0D SZABAB elements!"); }
+SIDEMAP_ERROR(0, SZABAB, side_map)   { libmesh_error_msg("ERROR: Cannot side_map 0D SZABAB elements!"); }
 #endif
 
-REINIT_ERROR(1, CLOUGH, edge_reinit)
-REINIT_ERROR(1, HERMITE, edge_reinit)
-REINIT_ERROR(1, HIERARCHIC, edge_reinit)
-REINIT_ERROR(1, L2_HIERARCHIC, edge_reinit)
-REINIT_ERROR(1, LAGRANGE, edge_reinit)
-REINIT_ERROR(1, LAGRANGE_VEC, edge_reinit)
-REINIT_ERROR(1, L2_LAGRANGE, edge_reinit)
-REINIT_ERROR(1, XYZ, edge_reinit)
-REINIT_ERROR(1, MONOMIAL, edge_reinit)
-REINIT_ERROR(1, SCALAR, edge_reinit)
-REINIT_ERROR(1, NEDELEC_ONE, reinit)
-REINIT_ERROR(1, NEDELEC_ONE, edge_reinit)
-SIDEMAP_ERROR(1, NEDELEC_ONE, side_map)
+// 1D error instantiations
+REINIT_ERROR(1, CLOUGH, edge_reinit)        { libmesh_error_msg("ERROR: Cannot edge_reinit 1D CLOUGH elements!"); }
+REINIT_ERROR(1, HERMITE, edge_reinit)       { libmesh_error_msg("ERROR: Cannot edge_reinit 1D HERMITE elements!"); }
+REINIT_ERROR(1, HIERARCHIC, edge_reinit)    { libmesh_error_msg("ERROR: Cannot edge_reinit 1D HIERARCHIC elements!"); }
+REINIT_ERROR(1, L2_HIERARCHIC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 1D L2_HIERARCHIC elements!"); }
+REINIT_ERROR(1, LAGRANGE, edge_reinit)      { libmesh_error_msg("ERROR: Cannot edge_reinit 1D LAGRANGE elements!"); }
+REINIT_ERROR(1, LAGRANGE_VEC, edge_reinit)  { libmesh_error_msg("ERROR: Cannot edge_reinit 1D LAGRANGE_VEC elements!"); }
+REINIT_ERROR(1, L2_LAGRANGE, edge_reinit)   { libmesh_error_msg("ERROR: Cannot edge_reinit 1D L2_LAGRANGE elements!"); }
+REINIT_ERROR(1, XYZ, edge_reinit)           { libmesh_error_msg("ERROR: Cannot edge_reinit 1D XYZ elements!"); }
+REINIT_ERROR(1, MONOMIAL, edge_reinit)      { libmesh_error_msg("ERROR: Cannot edge_reinit 1D MONOMIAL elements!"); }
+REINIT_ERROR(1, SCALAR, edge_reinit)        { libmesh_error_msg("ERROR: Cannot edge_reinit 1D SCALAR elements!"); }
+REINIT_ERROR(1, NEDELEC_ONE, reinit)        { libmesh_error_msg("ERROR: Cannot reinit 1D NEDELEC_ONE elements!"); }
+REINIT_ERROR(1, NEDELEC_ONE, edge_reinit)   { libmesh_error_msg("ERROR: Cannot edge_reinit 1D NEDELEC_ONE elements!"); }
+SIDEMAP_ERROR(1, NEDELEC_ONE, side_map)     { libmesh_error_msg("ERROR: Cannot side_map 1D NEDELEC_ONE elements!"); }
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-REINIT_ERROR(1, BERNSTEIN, edge_reinit)
-REINIT_ERROR(1, SZABAB, edge_reinit)
+REINIT_ERROR(1, BERNSTEIN, edge_reinit)     { libmesh_error_msg("ERROR: Cannot edge_reinit 1D BERNSTEIN elements!"); }
+REINIT_ERROR(1, SZABAB, edge_reinit)        { libmesh_error_msg("ERROR: Cannot edge_reinit 1D SZABAB elements!"); }
 #endif
 
 
