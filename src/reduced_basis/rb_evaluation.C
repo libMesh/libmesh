@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 namespace libMesh
 {
