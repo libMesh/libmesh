@@ -1228,7 +1228,7 @@ MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *
                     const IterType & e,
                     const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Elem *>(d,e,p) {}
+                            Elem *>(d,e,p) {}
 };
 
 
@@ -1285,7 +1285,7 @@ MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
                  const IterType & e,
                  const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Node *>(d,e,p) {}
+                            Node *>(d,e,p) {}
 };
 
 
@@ -1307,18 +1307,18 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
                        const IterType & e,
                        const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate,
-    Node * const,
-    Node * const &,
-    Node * const *>(d,e,p)  {}
+                            Node * const,
+                            Node * const &,
+                            Node * const *>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
   const_node_iterator (const MeshBase::node_iterator & rhs) :
     variant_filter_iterator<Predicate,
-    Node * const,
-    Node * const &,
-    Node * const *>(rhs)
+                            Node * const,
+                            Node * const &,
+                            Node * const *>(rhs)
   {
     // libMesh::out << "Called node_iterator conversion-to-const ctor." << std::endl;
   }

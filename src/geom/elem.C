@@ -1917,8 +1917,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
 {
   // Indexed first by embedding matrix type, then by child id, then by
   // child node, then by bracketing pair
-  std::vector<std::vector<std::vector<std::vector<
-                                        std::pair<unsigned char, unsigned char> > > > > &
+  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > &
     cached_bracketing_nodes = this->_get_bracketing_node_cache();
 
   const unsigned int em_vers = this->embedding_matrix_version();
