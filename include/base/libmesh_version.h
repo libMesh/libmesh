@@ -18,18 +18,6 @@
 #ifndef LIBMESH_LIBMESH_VERSION_H
 #define LIBMESH_LIBMESH_VERSION_H
 
-// #define LIBMESH_MAJOR_VERSION  @GENERIC_MAJOR_VERSION@
-// #define LIBMESH_MINOR_VERSION  @GENERIC_MINOR_VERSION@
-// #define LIBMESH_MICRO_VERSION  @GENERIC_MICRO_VERSION@
-
-// #define LIBMESH_LIB_VERSION    "@VERSION@"
-// #define LIBMESH_LIB_RELEASE    "@BUILD_DEVSTATUS@"
-
-// #define LIBMESH_CXX            "@CXX@"
-// #define LIBMESH_CXXFLAGS       "@CXXFLAGS@"
-
-// #define LIBMESH_IO_COMPATIBILITY_VERSION "0.7.4"
-
 #include "libmesh_config.h"
 #include <iostream>
 #include <iomanip>
