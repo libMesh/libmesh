@@ -100,31 +100,31 @@ inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return
 
 // First disambiguate everything that would be ambiguated by the
 // subsequent disambiguations
-#define OrderWrapperOperators(comparisontype) \
-inline bool operator==(comparisontype lhs, Order rhs) \
-{ return lhs == static_cast<comparisontype>(rhs); } \
-inline bool operator==(Order lhs, comparisontype rhs) \
-{ return static_cast<comparisontype>(lhs) == rhs; } \
-inline bool operator!=(comparisontype lhs, Order rhs) \
-{ return !(lhs == rhs); } \
-inline bool operator!=(Order lhs, comparisontype rhs) \
-{ return !(lhs == rhs); } \
-inline bool operator< (comparisontype lhs, Order rhs) \
-{ return lhs < static_cast<comparisontype>(rhs); } \
-inline bool operator< (Order lhs, comparisontype rhs) \
-{ return static_cast<comparisontype>(lhs) < rhs; } \
-inline bool operator> (comparisontype lhs, Order rhs) \
-{ return rhs < lhs; } \
-inline bool operator> (Order lhs, comparisontype rhs) \
-{ return rhs < lhs; } \
-inline bool operator<=(comparisontype lhs, Order rhs) \
-{ return !(lhs > rhs); } \
-inline bool operator<=(Order lhs, comparisontype rhs) \
-{ return !(lhs > rhs); } \
-inline bool operator>=(comparisontype lhs, Order rhs) \
-{ return !(lhs < rhs); } \
-inline bool operator>=(Order lhs, comparisontype rhs) \
-{ return !(lhs < rhs); }
+#define OrderWrapperOperators(comparisontype)           \
+  inline bool operator==(comparisontype lhs, Order rhs) \
+  { return lhs == static_cast<comparisontype>(rhs); }   \
+  inline bool operator==(Order lhs, comparisontype rhs) \
+  { return static_cast<comparisontype>(lhs) == rhs; }   \
+  inline bool operator!=(comparisontype lhs, Order rhs) \
+  { return !(lhs == rhs); }                             \
+  inline bool operator!=(Order lhs, comparisontype rhs) \
+  { return !(lhs == rhs); }                             \
+  inline bool operator< (comparisontype lhs, Order rhs) \
+  { return lhs < static_cast<comparisontype>(rhs); }    \
+  inline bool operator< (Order lhs, comparisontype rhs) \
+  { return static_cast<comparisontype>(lhs) < rhs; }    \
+  inline bool operator> (comparisontype lhs, Order rhs) \
+  { return rhs < lhs; }                                 \
+  inline bool operator> (Order lhs, comparisontype rhs) \
+  { return rhs < lhs; }                                 \
+  inline bool operator<=(comparisontype lhs, Order rhs) \
+  { return !(lhs > rhs); }                              \
+  inline bool operator<=(Order lhs, comparisontype rhs) \
+  { return !(lhs > rhs); }                              \
+  inline bool operator>=(comparisontype lhs, Order rhs) \
+  { return !(lhs < rhs); }                              \
+  inline bool operator>=(Order lhs, comparisontype rhs) \
+  { return !(lhs < rhs); }
 
 OrderWrapperOperators(int)
 OrderWrapperOperators(unsigned int)

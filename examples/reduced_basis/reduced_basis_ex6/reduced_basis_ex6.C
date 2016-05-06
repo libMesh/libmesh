@@ -234,10 +234,10 @@ int main (int argc, char ** argv)
       if (store_basis_functions)
         {
           // Write out the basis functions
-          eim_construction.get_rb_evaluation().write_out_basis_functions(
-            eim_construction.get_explicit_system(), "eim_data");
-          rb_construction.get_rb_evaluation().write_out_basis_functions(
-            rb_construction, "rb_data");
+          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction.get_explicit_system(),
+                                                                         "eim_data");
+          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,
+                                                                        "rb_data");
         }
     }
   else // Perform the Online stage of the RB method
@@ -278,7 +278,7 @@ int main (int argc, char ** argv)
         {
           // read in the data from files
           eim_rb_eval.read_in_basis_functions(
-            eim_construction.get_explicit_system(), "eim_data");
+                                              eim_construction.get_explicit_system(), "eim_data");
           rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
           eim_construction.load_rb_solution();
