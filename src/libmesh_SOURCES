@@ -7,6 +7,7 @@ libmesh_SOURCES =  \
         src/base/libmesh_common.C \
         src/base/libmesh_isnan.c \
         src/base/libmesh_singleton.C \
+        src/base/libmesh_version.C \
         src/base/periodic_boundaries.C \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
@@ -403,7 +404,6 @@ libmesh_SOURCES =  \
         src/systems/transient_system.C \
         src/utils/error_vector.C \
         src/utils/hashword.C \
-        src/utils/libmesh_version.C \
         src/utils/location_maps.C \
         src/utils/number_lookups.C \
         src/utils/perf_log.C \

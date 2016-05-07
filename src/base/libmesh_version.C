@@ -17,6 +17,9 @@
 
 #include "libmesh/libmesh_version.h"
 
+#include <iostream>
+#include <iomanip>
+
 void libMesh::libmesh_version_stdout()
 {
   std::cout << "--------------------------------------------------------" << std::endl;
