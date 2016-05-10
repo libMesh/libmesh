@@ -32,7 +32,6 @@ namespace
 {
 using namespace libMesh;
 
-#ifdef LIBMESH_HAVE_MPI
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 static const unsigned int header_size = 3;
 #else
@@ -44,14 +43,11 @@ static const unsigned int idtypes_per_Real =
   (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
 static const largest_id_type node_magic_header = 1234567890;
-#endif
 }
 
 
 namespace libMesh
 {
-
-#ifdef LIBMESH_HAVE_MPI
 
 namespace Parallel
 {
@@ -302,7 +298,5 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 }
 
 } // namespace Parallel
-
-#endif // #ifdef LIBMESH_HAVE_MPI
 
 } // namespace libMesh
