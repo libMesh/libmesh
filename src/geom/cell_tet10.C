@@ -615,6 +615,64 @@ const float Tet10::_embedding_matrix[8][10][10] =
 
 
 
+float Tet10::embedding_matrix (const unsigned int i,
+                               const unsigned int j,
+                               const unsigned int k) const
+{
+  // Choose an optimal diagonal, if one has not already been selected
+  this->choose_diagonal();
+
+  // Permuted j and k indices
+  unsigned int
+    jp=j,
+    kp=k;
+
+  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
+    {
+      // Just the enum value cast to an unsigned int...
+      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection); // == 1 or 2
+
+      // Instead of doing a lot of arithmetic, use these
+      // straightforward arrays for the permutations.  Note that 3 ->
+      // 3, and the first array consists of "forward" permutations of
+      // the sets {0,1,2}, {4,5,6}, and {7,8,9} while the second array
+      // consists of "reverse" permutations of the same sets.
+      const unsigned int perms[2][10] =
+        {
+          {1, 2, 0, 3, 5, 6, 4, 8, 9, 7},
+          {2, 0, 1, 3, 6, 4, 5, 9, 7, 8}
+        };
+
+      // Permute j
+      jp = perms[ds-1][j];
+      //      if (jp<3)
+      //        jp = (jp+ds)%3;
+      //      else if (jp>3)
+      //        jp = (jp-1+ds)%3 + 1 + 3*((jp-1)/3);
+
+      // Permute k
+      kp = perms[ds-1][k];
+      //      if (kp<3)
+      //        kp = (kp+ds)%3;
+      //      else if (kp>3)
+      //        kp = (kp-1+ds)%3 + 1 + 3*((kp-1)/3);
+    }
+
+  // Debugging:
+  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
+  // libMesh::err << "j=" << j << std::endl;
+  // libMesh::err << "k=" << k << std::endl;
+  // libMesh::err << "jp=" << jp << std::endl;
+  // libMesh::err << "kp=" << kp << std::endl;
+
+  // Call embedding matrx with permuted indices
+  return this->_embedding_matrix[i][jp][kp];
+}
+
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
+
+
 Real Tet10::volume () const
 {
   // Make copies of our points.  It makes the subsequent calculations a bit
@@ -723,61 +781,5 @@ Real Tet10::volume () const
 }
 
 
-
-float Tet10::embedding_matrix (const unsigned int i,
-                               const unsigned int j,
-                               const unsigned int k) const
-{
-  // Choose an optimal diagonal, if one has not already been selected
-  this->choose_diagonal();
-
-  // Permuted j and k indices
-  unsigned int
-    jp=j,
-    kp=k;
-
-  if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
-    {
-      // Just the enum value cast to an unsigned int...
-      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection); // == 1 or 2
-
-      // Instead of doing a lot of arithmetic, use these
-      // straightforward arrays for the permutations.  Note that 3 ->
-      // 3, and the first array consists of "forward" permutations of
-      // the sets {0,1,2}, {4,5,6}, and {7,8,9} while the second array
-      // consists of "reverse" permutations of the same sets.
-      const unsigned int perms[2][10] =
-        {
-          {1, 2, 0, 3, 5, 6, 4, 8, 9, 7},
-          {2, 0, 1, 3, 6, 4, 5, 9, 7, 8}
-        };
-
-      // Permute j
-      jp = perms[ds-1][j];
-      //      if (jp<3)
-      //        jp = (jp+ds)%3;
-      //      else if (jp>3)
-      //        jp = (jp-1+ds)%3 + 1 + 3*((jp-1)/3);
-
-      // Permute k
-      kp = perms[ds-1][k];
-      //      if (kp<3)
-      //        kp = (kp+ds)%3;
-      //      else if (kp>3)
-      //        kp = (kp-1+ds)%3 + 1 + 3*((kp-1)/3);
-    }
-
-  // Debugging:
-  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
-  // libMesh::err << "j=" << j << std::endl;
-  // libMesh::err << "k=" << k << std::endl;
-  // libMesh::err << "jp=" << jp << std::endl;
-  // libMesh::err << "kp=" << kp << std::endl;
-
-  // Call embedding matrx with permuted indices
-  return this->_embedding_matrix[i][jp][kp];
-}
-
-#endif // #ifdef LIBMESH_ENABLE_AMR
 
 } // namespace libMesh

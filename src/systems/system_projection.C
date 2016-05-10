@@ -175,6 +175,7 @@ private:
 };
 
 
+#ifdef LIBMESH_ENABLE_AMR
 template <typename Output,
           void (FEMContext::*point_output) (unsigned int,
                                             const Point &,
@@ -503,6 +504,7 @@ public:
   std::vector<dof_id_type> send_list;
 };
 
+#endif // LIBMESH_ENABLE_AMR
 
 
 /**
@@ -585,7 +587,11 @@ void System::project_vector (NumericVector<Number> & vector,
  */
 void System::project_vector (const NumericVector<Number> & old_v,
                              NumericVector<Number> & new_v,
-                             int is_adjoint) const
+                             int
+#ifdef LIBMESH_ENABLE_AMR
+                             is_adjoint
+#endif
+                             ) const
 {
   LOG_SCOPE ("project_vector(old,new)", "System");
 
@@ -1154,6 +1160,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
       context.pre_fe_reinit(system, elem);
 
+// If we're doing AMR, this might be a grid projection with a cheap
+// early exit.
+#ifdef LIBMESH_ENABLE_AMR
       // If this element doesn't have an old_dof_object, but it
       // wasn't just refined or just coarsened into activity, then
       // it must be newly added, so the user is responsible for
@@ -1163,6 +1172,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           elem->refinement_flag() != Elem::JUST_COARSENED &&
           f.is_grid_projection())
         continue;
+#endif // LIBMESH_ENABLE_AMR
 
       // Loop over all the variables we've been requested to project, to
       // do the projection
@@ -1202,6 +1212,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           Ue.resize (n_dofs); Ue.zero();
 
           // If we're projecting from an old grid
+#ifdef LIBMESH_ENABLE_AMR
           if (f.is_grid_projection() &&
               // And either this is an unchanged element
               ((elem->refinement_flag() != Elem::JUST_REFINED &&
@@ -1227,6 +1238,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
               continue;
             }
+#endif // LIBMESH_ENABLE_AMR
 
           FEBase * fe = libmesh_nullptr;
           FEBase * side_fe = libmesh_nullptr;
@@ -1469,27 +1481,39 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
               const std::vector<Point> & xyz_values =
-                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                edge_fe->get_xyz() : fe->get_xyz();
+#ifdef LIBMESH_ENABLE_AMR
+                (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                fe->get_xyz() :
+#endif
+                edge_fe->get_xyz();
               const std::vector<Real> & JxW =
-                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                edge_fe->get_JxW() : fe->get_JxW();
+#ifdef LIBMESH_ENABLE_AMR
+                (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                fe->get_JxW() :
+#endif
+                edge_fe->get_JxW();
 
               const std::vector<std::vector<Real> > & phi =
-                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                edge_fe->get_phi() : fe->get_phi();
+#ifdef LIBMESH_ENABLE_AMR
+                (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                fe->get_phi() :
+#endif
+                edge_fe->get_phi();
               const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
               if (cont == C_ONE)
-                dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                  &(edge_fe->get_dphi()) : &(fe->get_dphi());
+                dphi =
+#ifdef LIBMESH_ENABLE_AMR
+                  (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                  &(fe->get_dphi()) :
+#endif
+                  &(edge_fe->get_dphi());
 
               for (unsigned char e=0; e != elem->n_edges(); ++e)
                 {
                   context.edge = e;
 
-                  if (elem->refinement_flag() != Elem::JUST_COARSENED)
-                    context.edge_fe_reinit();
-                  else
+#ifdef LIBMESH_ENABLE_AMR
+                  if (elem->refinement_flag() == Elem::JUST_COARSENED)
                     {
                       std::vector<Point> fine_points;
 
@@ -1521,6 +1545,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
                       context.elem_fe_reinit(&fine_qp);
                     }
+                  else
+#endif // LIBMESH_ENABLE_AMR
+                    context.edge_fe_reinit();
 
                   const unsigned int n_qp = xyz_values.size();
 
@@ -1626,19 +1653,30 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard side FE
               const std::vector<Point> & xyz_values =
-                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                side_fe->get_xyz() : fe->get_xyz();
+#ifdef LIBMESH_ENABLE_AMR
+                (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                fe->get_xyz() :
+#endif // LIBMESH_ENABLE_AMR
+                side_fe->get_xyz();
               const std::vector<Real> & JxW =
-                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                side_fe->get_JxW() : fe->get_JxW();
-
+#ifdef LIBMESH_ENABLE_AMR
+                (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                fe->get_JxW() :
+#endif // LIBMESH_ENABLE_AMR
+                side_fe->get_JxW();
               const std::vector<std::vector<Real> > & phi =
-                (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                side_fe->get_phi() : fe->get_phi();
+#ifdef LIBMESH_ENABLE_AMR
+                (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                fe->get_phi() :
+#endif // LIBMESH_ENABLE_AMR
+                side_fe->get_phi();
               const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
               if (cont == C_ONE)
+#ifdef LIBMESH_ENABLE_AMR
                 dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                  &(side_fe->get_dphi()) : &(fe->get_dphi());
+                &(fe->get_dphi()) :
+#endif // LIBMESH_ENABLE_AMR
+                &(side_fe->get_dphi());
 
               for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {
@@ -1663,9 +1701,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
                   context.side = s;
 
-                  if (elem->refinement_flag() != Elem::JUST_COARSENED)
-                    context.side_fe_reinit();
-                  else
+#ifdef LIBMESH_ENABLE_AMR
+                  if (elem->refinement_flag() == Elem::JUST_COARSENED)
                     {
                       std::vector<Point> fine_points;
 
@@ -1697,6 +1734,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
                       context.elem_fe_reinit(&fine_qp);
                     }
+                  else
+#endif // LIBMESH_ENABLE_AMR
+                    context.side_fe_reinit();
 
                   const unsigned int n_qp = xyz_values.size();
 
@@ -1795,9 +1835,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               if (cont == C_ONE)
                 dphi = &(fe->get_dphi());
 
-              if (elem->refinement_flag() != Elem::JUST_COARSENED)
-                context.elem_fe_reinit();
-              else
+#ifdef LIBMESH_ENABLE_AMR
+              if (elem->refinement_flag() == Elem::JUST_COARSENED)
                 {
                   std::vector<Point> fine_points;
 
@@ -1826,6 +1865,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
                   context.elem_fe_reinit(&fine_qp);
                 }
+              else
+#endif // LIBMESH_ENABLE_AMR
+                context.elem_fe_reinit();
 
               const unsigned int n_qp = xyz_values.size();
 
@@ -1911,6 +1953,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
 void BuildProjectionList::unique()
 {
   // Sort the send list.  After this duplicated
@@ -1931,12 +1974,6 @@ void BuildProjectionList::unique()
 
 
 
-#ifndef LIBMESH_ENABLE_AMR
-void BuildProjectionList::operator()(const ConstElemRange &)
-{
-  libmesh_not_implemented();
-}
-#else
 void BuildProjectionList::operator()(const ConstElemRange & range)
 {
   // The DofMap for this system
@@ -2026,7 +2063,6 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
           this->send_list.push_back(di[i]);
     }  // end elem loop
 }
-#endif // LIBMESH_ENABLE_AMR
 
 
 
@@ -2037,6 +2073,7 @@ void BuildProjectionList::join(const BuildProjectionList & other)
                          other.send_list.begin(),
                          other.send_list.end());
 }
+#endif // LIBMESH_ENABLE_AMR
 
 
 

@@ -936,6 +936,7 @@ struct SyncIds
 };
 
 
+#ifdef LIBMESH_ENABLE_AMR
 struct SyncPLevels
 {
   typedef unsigned char datum;
@@ -970,6 +971,7 @@ struct SyncPLevels
       }
   }
 };
+#endif // LIBMESH_ENABLE_AMR
 
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -1080,6 +1082,7 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
 
 
 // ------------------------------------------------------------
+#ifdef LIBMESH_ENABLE_AMR
 void MeshCommunication::make_p_levels_parallel_consistent(MeshBase & mesh)
 {
   // This function must be run on all processors at once
@@ -1092,6 +1095,7 @@ void MeshCommunication::make_p_levels_parallel_consistent(MeshBase & mesh)
     (mesh.comm(), mesh.elements_begin(), mesh.elements_end(),
      syncplevels);
 }
+#endif // LIBMESH_ENABLE_AMR
 
 
 

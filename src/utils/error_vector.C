@@ -214,6 +214,7 @@ void ErrorVector::plot_error(const std::string & filename,
   mesh.allow_renumbering(true);
   mesh.all_first_order();
 
+#ifdef LIBMESH_ENABLE_AMR
   // We don't want p elevation when plotting a single constant value
   // per element
   {
@@ -229,6 +230,7 @@ void ErrorVector::plot_error(const std::string & filename,
         elem->set_p_level(0);
       }
   }
+#endif // LIBMESH_ENABLE_AMR
 
   EquationSystems temp_es (mesh);
   ExplicitSystem & error_system
