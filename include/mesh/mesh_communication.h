@@ -171,10 +171,12 @@ public:
    */
   void make_elems_parallel_consistent (MeshBase &);
 
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Copy p levels of ghost elements from their local processors.
    */
   void make_p_levels_parallel_consistent (MeshBase &);
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * Assuming all ids on local nodes are globally unique, and
