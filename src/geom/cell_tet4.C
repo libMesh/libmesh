@@ -326,6 +326,16 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
 
 
 
+dof_id_type Tet4::key () const
+{
+  return this->compute_key(this->node_id(0),
+                           this->node_id(1),
+                           this->node_id(2),
+                           this->node_id(3));
+}
+
+
+
 #ifdef LIBMESH_ENABLE_AMR
 float Tet4::embedding_matrix (const unsigned int i,
                               const unsigned int j,
@@ -365,16 +375,6 @@ float Tet4::embedding_matrix (const unsigned int i,
 
   // Call embedding matrx with permuted indices
   return this->_embedding_matrix[i][jp][kp];
-}
-
-
-
-dof_id_type Tet4::key () const
-{
-  return this->compute_key(this->node_id(0),
-                           this->node_id(1),
-                           this->node_id(2),
-                           this->node_id(3));
 }
 
 
