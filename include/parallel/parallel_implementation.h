@@ -2238,10 +2238,16 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
   while (range_begin != range_end)
     {
+      libmesh_assert_greater (std::distance(range_begin, range_end), 0);
+
       std::vector<typename Parallel::Packing<T>::buffer_type> buffer;
 
-      range_begin = Parallel::pack_range
+      const Iter next_range_begin = Parallel::pack_range
         (context, range_begin, range_end, buffer);
+
+      libmesh_assert_greater (std::distance(range_begin, next_range_begin), 0);
+
+      range_begin = next_range_begin;
 
 #ifdef DEBUG
       used_buffer_size += buffer.size();
@@ -2295,13 +2301,17 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 
   while (range_begin != range_end)
     {
+      libmesh_assert_greater (std::distance(range_begin, range_end), 0);
+
       std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
 
-      range_begin =
-        Parallel::pack_range(context,
-                             range_begin,
-                             range_end,
+      const Iter next_range_begin =
+	Parallel::pack_range(context, range_begin, range_end,
                              *buffer);
+
+      libmesh_assert_greater (std::distance(range_begin, next_range_begin), 0);
+
+      range_begin = next_range_begin;
 
 #ifdef DEBUG
       used_buffer_size += buffer->size();
