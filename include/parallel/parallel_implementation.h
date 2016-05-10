@@ -2962,73 +2962,6 @@ inline void Communicator::allgather(std::vector<T> & r,
 }
 
 
-template <typename Context, typename Iter, typename OutputIter>
-inline void Communicator::gather_packed_range(const unsigned int root_id,
-                                              Context * context,
-                                              Iter range_begin,
-                                              const Iter range_end,
-                                              OutputIter out) const
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
-
-  bool nonempty_range = (range_begin != range_end);
-  this->max(nonempty_range);
-
-  while (nonempty_range)
-    {
-      // We will serialize variable size objects from *range_begin to
-      // *range_end as a sequence of ints in this buffer
-      std::vector<buffer_t> buffer;
-
-      range_begin = Parallel::pack_range
-        (context, range_begin, range_end, buffer);
-
-      this->gather(root_id, buffer);
-
-      Parallel::unpack_range
-        (buffer, context, out, (T*)(libmesh_nullptr));
-
-      nonempty_range = (range_begin != range_end);
-      this->max(nonempty_range);
-    }
-}
-
-
-template <typename Context, typename Iter, typename OutputIter>
-inline void Communicator::allgather_packed_range(Context * context,
-                                                 Iter range_begin,
-                                                 const Iter range_end,
-                                                 OutputIter out) const
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
-
-  bool nonempty_range = (range_begin != range_end);
-  this->max(nonempty_range);
-
-  while (nonempty_range)
-    {
-      // We will serialize variable size objects from *range_begin to
-      // *range_end as a sequence of ints in this buffer
-      std::vector<buffer_t> buffer;
-
-      range_begin = Parallel::pack_range
-        (context, range_begin, range_end, buffer);
-
-      this->allgather(buffer, false);
-
-      libmesh_assert(buffer.size());
-
-      Parallel::unpack_range
-        (buffer, context, out, (T*)libmesh_nullptr);
-
-      nonempty_range = (range_begin != range_end);
-      this->max(nonempty_range);
-    }
-}
-
-
 template <typename T>
 inline void Communicator::alltoall(std::vector<T> & buf) const
 {
@@ -3516,22 +3449,52 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
 /**
  * Send-receive range-of-pointers from one processor.
  *
- * We do not currently support this operation on one processor without MPI.
+ * If you call this without MPI you might be making a mistake, but
+ * we'll support it.
  */
 template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter, typename T>
 inline void
-Communicator::send_receive_packed_range (const unsigned int /* dest_processor_id */,
-                                         const Context1 *,
-                                         RangeIter /* send_begin */,
-                                         const RangeIter /* send_end */,
-                                         const unsigned int /* source_processor_id */,
-                                         Context2 *,
-                                         OutputIter /* out */,
-                                         const T * /* output_type */,
+Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
+                                         const Context1 * context1,
+                                         RangeIter send_begin,
+                                         const RangeIter send_end,
+                                         const unsigned int source_processor_id,
+                                         Context2 * context2,
+                                         OutputIter out,
+                                         const T * output_type,
                                          const MessageTag &,
                                          const MessageTag &) const
-{ libmesh_not_implemented(); }
+{
+  // This makes no sense on one processor unless we're deliberately
+  // sending to ourself.
+  libmesh_assert_equal_to(dest_processor_id, 0);
+  libmesh_assert_equal_to(source_processor_id, 0);
+
+  // On one processor, we just need to pack the range and then unpack
+  // it again.
+  typedef typename std::iterator_traits<RangeIter>::value_type T1;
+  typedef typename Parallel::Packing<T1>::buffer_type buffer_t;
+
+  while (send_begin != send_end)
+    {
+      libmesh_assert_greater (std::distance(send_begin, send_end), 0);
+
+      // We will serialize variable size objects from *range_begin to
+      // *range_end as a sequence of ints in this buffer
+      std::vector<buffer_t> buffer;
+
+      const RangeIter next_send_begin = Parallel::pack_range
+        (context1, send_begin, send_end, buffer);
+
+      libmesh_assert_greater (std::distance(send_begin, next_send_begin), 0);
+
+      send_begin = next_send_begin;
+
+      Parallel::unpack_range
+        (buffer, context2, out, output_type);
+    }
+}
 
 /**
  * Gather-to-root on one processor.
@@ -3572,6 +3535,77 @@ inline void Communicator::broadcast (T &,
 { libmesh_assert_equal_to(root_id, 0); }
 
 #endif // LIBMESH_HAVE_MPI
+
+// Some of our methods are implemented indirectly via other
+// MPI-encapsulated methods and the implementation works with or
+// without MPI.
+
+template <typename Context, typename Iter, typename OutputIter>
+inline void Communicator::gather_packed_range(const unsigned int root_id,
+                                              Context * context,
+                                              Iter range_begin,
+                                              const Iter range_end,
+                                              OutputIter out) const
+{
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
+
+  bool nonempty_range = (range_begin != range_end);
+  this->max(nonempty_range);
+
+  while (nonempty_range)
+    {
+      // We will serialize variable size objects from *range_begin to
+      // *range_end as a sequence of ints in this buffer
+      std::vector<buffer_t> buffer;
+
+      range_begin = Parallel::pack_range
+        (context, range_begin, range_end, buffer);
+
+      this->gather(root_id, buffer);
+
+      Parallel::unpack_range
+        (buffer, context, out, (T*)(libmesh_nullptr));
+
+      nonempty_range = (range_begin != range_end);
+      this->max(nonempty_range);
+    }
+}
+
+
+template <typename Context, typename Iter, typename OutputIter>
+inline void Communicator::allgather_packed_range(Context * context,
+                                                 Iter range_begin,
+                                                 const Iter range_end,
+                                                 OutputIter out) const
+{
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::Packing<T>::buffer_type buffer_t;
+
+  bool nonempty_range = (range_begin != range_end);
+  this->max(nonempty_range);
+
+  while (nonempty_range)
+    {
+      // We will serialize variable size objects from *range_begin to
+      // *range_end as a sequence of ints in this buffer
+      std::vector<buffer_t> buffer;
+
+      range_begin = Parallel::pack_range
+        (context, range_begin, range_end, buffer);
+
+      this->allgather(buffer, false);
+
+      libmesh_assert(buffer.size());
+
+      Parallel::unpack_range
+        (buffer, context, out, (T*)libmesh_nullptr);
+
+      nonempty_range = (range_begin != range_end);
+      this->max(nonempty_range);
+    }
+}
+
 
 } // namespace Parallel
 
