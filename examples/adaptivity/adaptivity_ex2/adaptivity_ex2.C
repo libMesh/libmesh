@@ -78,8 +78,10 @@ using namespace libMesh;
 // In subsequent examples we will employ adaptive mesh refinement,
 // and with a changing mesh it will be necessary to rebuild the
 // system matrix.
+#ifdef LIBMESH_ENABLE_AMR
 void assemble_cd (EquationSystems & es,
                   const std::string & system_name);
+#endif
 
 // Function prototype.  This function will initialize the system.
 // Initialization functions are optional for systems.  They allow
@@ -469,10 +471,10 @@ void init_cd (EquationSystems & es,
 // will be called at each time step.  It is responsible
 // for computing the proper matrix entries for the
 // element stiffness matrices and right-hand sides.
+#ifdef LIBMESH_ENABLE_AMR
 void assemble_cd (EquationSystems & es,
                   const std::string & system_name)
 {
-#ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Convection-Diffusion");
@@ -704,5 +706,5 @@ void assemble_cd (EquationSystems & es,
 
     }
   // Finished computing the sytem matrix and right-hand side.
-#endif // #ifdef LIBMESH_ENABLE_AMR
 }
+#endif // #ifdef LIBMESH_ENABLE_AMR
