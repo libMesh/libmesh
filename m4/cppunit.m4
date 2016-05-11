@@ -74,6 +74,53 @@ AC_ARG_WITH(cppunit-exec-prefix,[  --with-cppunit-exec-prefix=PFX  Exec prefix w
       AC_MSG_RESULT(no)
       no_cppunit=yes
     fi
+
+    if test "x$no_cppunit" = x ; then
+      saveCXXFLAGS="$CXXFLAGS"
+      CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
+      AC_LANG_PUSH([C++])
+      AC_CHECK_HEADER(cppunit/TestCase.h,
+                      [],
+                      [no_cppunit=no])
+      AC_LANG_POP
+      CXXFLAGS="$saveCXXFLAGS"
+    fi
+
+    # CppUnit uses lots of C++ features, linking of which might be
+    # broken by the C++11 ABI changes, so let's make sure we can link
+    # with it.
+    if test "x$no_cppunit" = x ; then
+      AC_MSG_CHECKING(whether we can build a trivial CppUnit program)
+      AC_LANG_PUSH([C++])
+      saveCXXFLAGS="$CXXFLAGS"
+      CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
+      saveLIBS="$LIBS"
+      LIBS="$CPPUNIT_LIBS $saveLIBS"
+
+      AC_LINK_IFELSE([AC_LANG_SOURCE([[
+      @%:@include <cppunit/ui/text/TestRunner.h>
+      int main( int argc, char **argv)
+      {
+        CppUnit::TextUi::TestRunner runner;
+
+	// We don't actually run this, but we should try to link to a
+        // CppUnit method.
+        if (runner.run())
+          return 0;
+
+        return 1;
+      }
+      ]])],[
+        AC_MSG_RESULT(yes)
+      ],[
+        AC_MSG_RESULT(no)
+        no_cppunit=yes
+      ])
+
+      AC_LANG_POP
+      LIBS="$saveLIBS"
+      CXXFLAGS="$saveCXXFLAGS"
+    fi
   fi
 
   if test "x$no_cppunit" = x ; then
