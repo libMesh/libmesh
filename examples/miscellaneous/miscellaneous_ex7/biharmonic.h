@@ -10,10 +10,13 @@
 // Just the bits we're using, since this is a header.
 using libMesh::EquationSystems;
 using libMesh::ExodusII_IO;
-using libMesh::MeshRefinement;
 using libMesh::Point;
 using libMesh::Real;
 using libMesh::UnstructuredMesh;
+
+#ifdef LIBMESH_ENABLE_AMR
+using libMesh::MeshRefinement;
+#endif
 
 /**
  * The Biharmonic class encapsulates most of the data structures
@@ -115,7 +118,9 @@ private:
   friend class JR;
   class JR;       // forward
   UnstructuredMesh * _mesh;
+#ifdef LIBMESH_ENABLE_AMR
   MeshRefinement * _meshRefinement;
+#endif
   JR * _jr;
 };
 
