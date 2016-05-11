@@ -33,7 +33,6 @@ namespace
 {
 using namespace libMesh;
 
-#ifdef LIBMESH_HAVE_MPI
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 static const unsigned int header_size = 12;
 #else
@@ -41,14 +40,11 @@ static const unsigned int header_size = 11;
 #endif
 
 static const largest_id_type elem_magic_header = 987654321;
-#endif
 }
 
 
 namespace libMesh
 {
-
-#ifdef LIBMESH_HAVE_MPI
 
 namespace Parallel
 {
@@ -751,7 +747,5 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 }
 
 } // namespace Parallel
-
-#endif // LIBMESH_HAVE_MPI
 
 } // namespace libMesh
