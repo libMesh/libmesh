@@ -161,6 +161,17 @@ template <>
 template <>
 unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
+                                      const DistributedMesh * mesh)
+{
+  return packable_size(elem, static_cast<const MeshBase *>(mesh));
+}
+
+
+
+template <>
+template <>
+unsigned int
+Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const ParallelMesh * mesh)
 {
   return packable_size(elem, static_cast<const MeshBase *>(mesh));
@@ -281,6 +292,18 @@ Packing<const Elem *>::pack (const Elem * const & elem,
             *data_out++ =(*bc_it);
         }
     }
+}
+
+
+
+template <>
+template <>
+void
+Packing<const Elem *>::pack (const Elem * const & elem,
+                             std::back_insert_iterator<std::vector<largest_id_type> > data_out,
+                             const DistributedMesh * mesh)
+{
+  pack(elem, data_out, static_cast<const MeshBase*>(mesh));
 }
 
 
@@ -735,6 +758,17 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
   // Return the new element
   return elem;
+}
+
+
+
+template <>
+template <>
+Elem *
+Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
+                         DistributedMesh * mesh)
+{
+  return unpack(in, static_cast<MeshBase*>(mesh));
 }
 
 

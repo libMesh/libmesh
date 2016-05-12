@@ -95,12 +95,12 @@ public:
    * to satisfy data dependencies. This method can be invoked after a
    * partitioning step to affect the new partitioning.
    */
-  void redistribute (ParallelMesh &) const;
+  void redistribute (DistributedMesh &) const;
 
   /**
    *
    */
-  void gather_neighboring_elements (ParallelMesh &) const;
+  void gather_neighboring_elements (DistributedMesh &) const;
 
   /**
    * This method takes an input \p DistributedMesh which may be
@@ -112,7 +112,7 @@ public:
    * case of \p root_id equal to \p DofObject::invalid_processor_id
    * this function performs an allgather.
    */
-  void gather (const processor_id_type root_id, ParallelMesh &) const;
+  void gather (const processor_id_type root_id, DistributedMesh &) const;
 
   /**
    * This method takes an input \p DistributedMesh which may be
@@ -122,7 +122,7 @@ public:
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (ParallelMesh & mesh) const
+  void allgather (DistributedMesh & mesh) const
   { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**
@@ -139,7 +139,7 @@ public:
    * to delete.  These will be left on the current processor along with
    * local elements and ghosted neighbors.
    */
-  void delete_remote_elements (ParallelMesh &, const std::set<Elem *> &) const;
+  void delete_remote_elements (DistributedMesh &, const std::set<Elem *> &) const;
 
   /**
    * This method assigns globally unique, partition-agnostic

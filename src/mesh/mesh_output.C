@@ -112,6 +112,6 @@ void MeshOutput<MT>::write_nodal_data (const std::string & fname,
 // move any functions in this file to the header file instead.
 template class MeshOutput<MeshBase>;
 template class MeshOutput<UnstructuredMesh>;
-template class MeshOutput<ParallelMesh>;
+template class MeshOutput<DistributedMesh>;
 
 } // namespace libMesh

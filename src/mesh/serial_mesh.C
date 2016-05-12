@@ -117,9 +117,9 @@ namespace libMesh
 {
 
 // ------------------------------------------------------------
-// SerialMesh class member functions
-SerialMesh::SerialMesh (const Parallel::Communicator & comm_in,
-                        unsigned char d) :
+// ReplicatedMesh class member functions
+ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
+                                unsigned char d) :
   UnstructuredMesh (comm_in,d)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -133,7 +133,7 @@ SerialMesh::SerialMesh (const Parallel::Communicator & comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-SerialMesh::SerialMesh (unsigned char d) :
+ReplicatedMesh::ReplicatedMesh (unsigned char d) :
   UnstructuredMesh (d)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -146,7 +146,7 @@ SerialMesh::SerialMesh (unsigned char d) :
 #endif
 
 
-SerialMesh::~SerialMesh ()
+ReplicatedMesh::~ReplicatedMesh ()
 {
   this->clear();  // Free nodes and elements
 }
@@ -155,7 +155,7 @@ SerialMesh::~SerialMesh ()
 // This might be specialized later, but right now it's just here to
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
-SerialMesh::SerialMesh (const SerialMesh & other_mesh) :
+ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
   UnstructuredMesh (other_mesh)
 {
   this->copy_nodes_and_elements(other_mesh);
@@ -166,7 +166,7 @@ SerialMesh::SerialMesh (const SerialMesh & other_mesh) :
 }
 
 
-SerialMesh::SerialMesh (const UnstructuredMesh & other_mesh) :
+ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
   UnstructuredMesh (other_mesh)
 {
   this->copy_nodes_and_elements(other_mesh);
@@ -174,7 +174,7 @@ SerialMesh::SerialMesh (const UnstructuredMesh & other_mesh) :
 }
 
 
-const Point & SerialMesh::point (const dof_id_type i) const
+const Point & ReplicatedMesh::point (const dof_id_type i) const
 {
   return this->node_ref(i);
 }
@@ -182,7 +182,7 @@ const Point & SerialMesh::point (const dof_id_type i) const
 
 
 
-const Node * SerialMesh::node_ptr (const dof_id_type i) const
+const Node * ReplicatedMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -194,7 +194,7 @@ const Node * SerialMesh::node_ptr (const dof_id_type i) const
 
 
 
-Node * SerialMesh::node_ptr (const dof_id_type i)
+Node * ReplicatedMesh::node_ptr (const dof_id_type i)
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -206,7 +206,7 @@ Node * SerialMesh::node_ptr (const dof_id_type i)
 
 
 
-const Node * SerialMesh::query_node_ptr (const dof_id_type i) const
+const Node * ReplicatedMesh::query_node_ptr (const dof_id_type i) const
 {
   if (i >= this->n_nodes())
     return libmesh_nullptr;
@@ -219,7 +219,7 @@ const Node * SerialMesh::query_node_ptr (const dof_id_type i) const
 
 
 
-Node * SerialMesh::query_node_ptr (const dof_id_type i)
+Node * ReplicatedMesh::query_node_ptr (const dof_id_type i)
 {
   if (i >= this->n_nodes())
     return libmesh_nullptr;
@@ -232,7 +232,7 @@ Node * SerialMesh::query_node_ptr (const dof_id_type i)
 
 
 
-const Elem * SerialMesh::elem_ptr (const dof_id_type i) const
+const Elem * ReplicatedMesh::elem_ptr (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_elem());
   libmesh_assert(_elements[i]);
@@ -244,7 +244,7 @@ const Elem * SerialMesh::elem_ptr (const dof_id_type i) const
 
 
 
-Elem * SerialMesh::elem_ptr (const dof_id_type i)
+Elem * ReplicatedMesh::elem_ptr (const dof_id_type i)
 {
   libmesh_assert_less (i, this->n_elem());
   libmesh_assert(_elements[i]);
@@ -256,7 +256,7 @@ Elem * SerialMesh::elem_ptr (const dof_id_type i)
 
 
 
-const Elem * SerialMesh::query_elem_ptr (const dof_id_type i) const
+const Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i) const
 {
   if (i >= this->n_elem())
     return libmesh_nullptr;
@@ -269,7 +269,7 @@ const Elem * SerialMesh::query_elem_ptr (const dof_id_type i) const
 
 
 
-Elem * SerialMesh::query_elem_ptr (const dof_id_type i)
+Elem * ReplicatedMesh::query_elem_ptr (const dof_id_type i)
 {
   if (i >= this->n_elem())
     return libmesh_nullptr;
@@ -282,11 +282,11 @@ Elem * SerialMesh::query_elem_ptr (const dof_id_type i)
 
 
 
-Elem * SerialMesh::add_elem (Elem * e)
+Elem * ReplicatedMesh::add_elem (Elem * e)
 {
   libmesh_assert(e);
 
-  // We no longer merely append elements with SerialMesh
+  // We no longer merely append elements with ReplicatedMesh
 
   // If the user requests a valid id that doesn't correspond to an
   // existing element, let's give them that id, resizing the elements
@@ -318,7 +318,7 @@ Elem * SerialMesh::add_elem (Elem * e)
 
 
 
-Elem * SerialMesh::insert_elem (Elem * e)
+Elem * ReplicatedMesh::insert_elem (Elem * e)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!e->valid_unique_id())
@@ -342,7 +342,7 @@ Elem * SerialMesh::insert_elem (Elem * e)
 
 
 
-void SerialMesh::delete_elem(Elem * e)
+void ReplicatedMesh::delete_elem(Elem * e)
 {
   libmesh_assert(e);
 
@@ -384,7 +384,7 @@ void SerialMesh::delete_elem(Elem * e)
 
 
 
-void SerialMesh::renumber_elem(const dof_id_type old_id,
+void ReplicatedMesh::renumber_elem(const dof_id_type old_id,
                                const dof_id_type new_id)
 {
   // This doesn't get used in serial yet
@@ -399,11 +399,11 @@ void SerialMesh::renumber_elem(const dof_id_type old_id,
 
 
 
-Node * SerialMesh::add_point (const Point & p,
-                              const dof_id_type id,
-                              const processor_id_type proc_id)
+Node * ReplicatedMesh::add_point (const Point & p,
+                                  const dof_id_type id,
+                                  const processor_id_type proc_id)
 {
-  //   // We only append points with SerialMesh
+  //   // We only append points with ReplicatedMesh
   //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
   //   Node *n = Node::build(p, _nodes.size()).release();
   //   n->processor_id() = proc_id;
@@ -452,10 +452,10 @@ Node * SerialMesh::add_point (const Point & p,
 
 
 
-Node * SerialMesh::add_node (Node * n)
+Node * ReplicatedMesh::add_node (Node * n)
 {
   libmesh_assert(n);
-  // We only append points with SerialMesh
+  // We only append points with ReplicatedMesh
   libmesh_assert(!n->valid_id() || n->id() == _nodes.size());
 
   n->set_id (cast_int<dof_id_type>(_nodes.size()));
@@ -472,7 +472,7 @@ Node * SerialMesh::add_node (Node * n)
 
 
 
-Node * SerialMesh::insert_node(Node * n)
+Node * ReplicatedMesh::insert_node(Node * n)
 {
   if (!n)
     libmesh_error_msg("Error, attempting to insert NULL node.");
@@ -515,7 +515,7 @@ Node * SerialMesh::insert_node(Node * n)
 
 
 
-void SerialMesh::delete_node(Node * n)
+void ReplicatedMesh::delete_node(Node * n)
 {
   libmesh_assert(n);
   libmesh_assert_less (n->id(), _nodes.size());
@@ -554,8 +554,8 @@ void SerialMesh::delete_node(Node * n)
 
 
 
-void SerialMesh::renumber_node(const dof_id_type old_id,
-                               const dof_id_type new_id)
+void ReplicatedMesh::renumber_node(const dof_id_type old_id,
+                                   const dof_id_type new_id)
 {
   // This doesn't get used in serial yet
   Node * nd = _nodes[old_id];
@@ -569,7 +569,7 @@ void SerialMesh::renumber_node(const dof_id_type old_id,
 
 
 
-void SerialMesh::clear ()
+void ReplicatedMesh::clear ()
 {
   // Call parent clear function
   MeshBase::clear();
@@ -606,7 +606,7 @@ void SerialMesh::clear ()
 
 
 
-void SerialMesh::update_parallel_id_counts()
+void ReplicatedMesh::update_parallel_id_counts()
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = this->parallel_max_unique_id();
@@ -616,7 +616,7 @@ void SerialMesh::update_parallel_id_counts()
 
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-unique_id_type SerialMesh::parallel_max_unique_id() const
+unique_id_type ReplicatedMesh::parallel_max_unique_id() const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -629,7 +629,7 @@ unique_id_type SerialMesh::parallel_max_unique_id() const
 
 
 
-void SerialMesh::renumber_nodes_and_elements ()
+void ReplicatedMesh::renumber_nodes_and_elements ()
 {
   LOG_SCOPE("renumber_nodes_and_elem()", "Mesh");
 
@@ -787,7 +787,7 @@ void SerialMesh::renumber_nodes_and_elements ()
 
 
 
-void SerialMesh::fix_broken_node_and_element_numbering ()
+void ReplicatedMesh::fix_broken_node_and_element_numbering ()
 {
   // Nodes first
   for (dof_id_type n=0; n<this->_nodes.size(); n++)
@@ -801,16 +801,16 @@ void SerialMesh::fix_broken_node_and_element_numbering ()
 }
 
 
-void SerialMesh::stitch_meshes (SerialMesh & other_mesh,
-                                boundary_id_type this_mesh_boundary_id,
-                                boundary_id_type other_mesh_boundary_id,
-                                Real tol,
-                                bool clear_stitched_boundary_ids,
-                                bool verbose,
-                                bool use_binary_search,
-                                bool enforce_all_nodes_match_on_boundaries)
+void ReplicatedMesh::stitch_meshes (ReplicatedMesh & other_mesh,
+                                    boundary_id_type this_mesh_boundary_id,
+                                    boundary_id_type other_mesh_boundary_id,
+                                    Real tol,
+                                    bool clear_stitched_boundary_ids,
+                                    bool verbose,
+                                    bool use_binary_search,
+                                    bool enforce_all_nodes_match_on_boundaries)
 {
-  LOG_SCOPE("stitch_meshes()", "SerialMesh");
+  LOG_SCOPE("stitch_meshes()", "ReplicatedMesh");
   stitching_helper(&other_mesh,
                    this_mesh_boundary_id,
                    other_mesh_boundary_id,
@@ -822,13 +822,13 @@ void SerialMesh::stitch_meshes (SerialMesh & other_mesh,
                    true);
 }
 
-void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
-                                  boundary_id_type boundary_id_2,
-                                  Real tol,
-                                  bool clear_stitched_boundary_ids,
-                                  bool verbose,
-                                  bool use_binary_search,
-                                  bool enforce_all_nodes_match_on_boundaries)
+void ReplicatedMesh::stitch_surfaces (boundary_id_type boundary_id_1,
+                                      boundary_id_type boundary_id_2,
+                                      Real tol,
+                                      bool clear_stitched_boundary_ids,
+                                      bool verbose,
+                                      bool use_binary_search,
+                                      bool enforce_all_nodes_match_on_boundaries)
 {
   stitching_helper(libmesh_nullptr,
                    boundary_id_1,
@@ -841,15 +841,15 @@ void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                    true);
 }
 
-void SerialMesh::stitching_helper (SerialMesh * other_mesh,
-                                   boundary_id_type this_mesh_boundary_id,
-                                   boundary_id_type other_mesh_boundary_id,
-                                   Real tol,
-                                   bool clear_stitched_boundary_ids,
-                                   bool verbose,
-                                   bool use_binary_search,
-                                   bool enforce_all_nodes_match_on_boundaries,
-                                   bool skip_find_neighbors)
+void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
+                                       boundary_id_type this_mesh_boundary_id,
+                                       boundary_id_type other_mesh_boundary_id,
+                                       Real tol,
+                                       bool clear_stitched_boundary_ids,
+                                       bool verbose,
+                                       bool use_binary_search,
+                                       bool enforce_all_nodes_match_on_boundaries,
+                                       bool skip_find_neighbors)
 {
   std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
   std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
@@ -882,7 +882,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
         // Make temporary fixed-size arrays for loop
         boundary_id_type id_array[2]        = {this_mesh_boundary_id, other_mesh_boundary_id};
         std::set<dof_id_type> * set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-        SerialMesh * mesh_array[2]           = {this, other_mesh};
+        ReplicatedMesh * mesh_array[2]           = {this, other_mesh};
 
         for (unsigned i=0; i<2; ++i)
           {
@@ -993,7 +993,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
 
       if (verbose)
         {
-          libMesh::out << "In SerialMesh::stitch_meshes:\n"
+          libMesh::out << "In ReplicatedMesh::stitch_meshes:\n"
                        << "This mesh has "  << this_boundary_node_ids.size()
                        << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
                        << "Other mesh has " << other_boundary_node_ids.size()
@@ -1026,7 +1026,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
           // Create and sort the vectors we will use to do the geometric searching
           {
             std::set<dof_id_type> * set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-            SerialMesh * mesh_array[2]           = {this, other_mesh};
+            ReplicatedMesh * mesh_array[2]           = {this, other_mesh};
             PointVector * vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
 
             for (unsigned i=0; i<2; ++i)
@@ -1154,7 +1154,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
 
       if(verbose)
         {
-          libMesh::out << "In SerialMesh::stitch_meshes:\n"
+          libMesh::out << "In ReplicatedMesh::stitch_meshes:\n"
                        << "Found " << node_to_node_map.size()
                        << " matching nodes.\n"
                        << std::endl;
@@ -1174,7 +1174,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
     {
       if(verbose)
         {
-          libMesh::out << "Skip node merging in SerialMesh::stitch_meshes:" << std::endl;
+          libMesh::out << "Skip node merging in ReplicatedMesh::stitch_meshes:" << std::endl;
         }
     }
 
@@ -1456,7 +1456,7 @@ void SerialMesh::stitching_helper (SerialMesh * other_mesh,
 }
 
 
-dof_id_type SerialMesh::n_active_elem () const
+dof_id_type ReplicatedMesh::n_active_elem () const
 {
   return static_cast<dof_id_type>(std::distance (this->active_elements_begin(),
                                                  this->active_elements_end()));

@@ -96,7 +96,7 @@ public:
   /**
    * Get a writable reference to the interpolation points mesh.
    */
-  SerialMesh & get_interpolation_points_mesh();
+  ReplicatedMesh & get_interpolation_points_mesh();
 
   /**
    * @return the value of the parametrized function that is being
@@ -260,7 +260,7 @@ private:
    * Mesh object that we use to store copies of the elements associated with
    * interpolation points.
    */
-  SerialMesh _interpolation_points_mesh;
+  ReplicatedMesh _interpolation_points_mesh;
 
 };
 

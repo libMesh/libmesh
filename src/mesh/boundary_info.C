@@ -533,7 +533,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   // Make sure we didn't add ids inconsistently
 #ifdef DEBUG
 # ifdef LIBMESH_HAVE_RTTI
-  ParallelMesh * parmesh = dynamic_cast<ParallelMesh *>(&boundary_mesh);
+  DistributedMesh * parmesh = dynamic_cast<DistributedMesh *>(&boundary_mesh);
   if (parmesh)
     parmesh->libmesh_assert_valid_parallel_ids();
 # endif

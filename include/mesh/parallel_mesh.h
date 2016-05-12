@@ -37,13 +37,12 @@ class Node;
 
 
 /**
- * The \p ParallelMesh class is derived from the \p MeshBase class,
+ * The \p DistributedMesh class is derived from the \p MeshBase class,
  * and is intended to provide identical functionality to the user
- * but be fully parallelized in memory.
- * By "is intended" I mean that it doesn't work that way yet.  Don't
- * use this class unless you're developing or debugging it.
+ * but be distributed rather than replicated across distributed-memory
+ * systems.
  */
-class ParallelMesh : public UnstructuredMesh
+class DistributedMesh : public UnstructuredMesh
 {
 public:
 
@@ -53,7 +52,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  ParallelMesh (const Parallel::Communicator & comm_in,
+  DistributedMesh (const Parallel::Communicator & comm_in,
                 unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -63,32 +62,32 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  ParallelMesh (unsigned char dim=1);
+  DistributedMesh (unsigned char dim=1);
 #endif
 
 
   /**
    * Copy-constructor.  This should be able to take a
-   * serial or parallel mesh.
+   * replicated or distributed mesh.
    */
-  ParallelMesh (const UnstructuredMesh & other_mesh);
+  DistributedMesh (const UnstructuredMesh & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
-   * parallel mesh.
+   * distributed mesh.
    */
-  ParallelMesh (const ParallelMesh & other_mesh);
+  DistributedMesh (const DistributedMesh & other_mesh);
 
   /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual UniquePtr<MeshBase> clone () const libmesh_override
-  { return UniquePtr<MeshBase>(new ParallelMesh(*this)); }
+  { return UniquePtr<MeshBase>(new DistributedMesh(*this)); }
 
   /**
    * Destructor.
    */
-  virtual ~ParallelMesh();
+  virtual ~DistributedMesh();
 
   /**
    * Clear all internal data.
@@ -468,6 +467,34 @@ private:
   typedef mapvector<Node *, dof_id_type>::const_veclike_iterator const_node_iterator_imp;
 };
 
+
+
+
+// For backwards compatibility with our original name, users can still
+// refer to a DistributedMesh as a ParallelMesh.
+//
+// This has to be a class rather than a typedef so that forward
+// declarations still work.
+struct ParallelMesh : public DistributedMesh
+{
+  explicit
+  ParallelMesh (const Parallel::Communicator & comm_in,
+        unsigned char dim=1)
+    : DistributedMesh(comm_in,dim) {}
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  explicit
+  ParallelMesh (unsigned char dim=1)
+    : DistributedMesh(dim) {}
+#endif
+
+  ParallelMesh (const UnstructuredMesh & other_mesh) : DistributedMesh(other_mesh) {}
+
+  virtual UniquePtr<MeshBase> clone () const libmesh_override
+  { return UniquePtr<MeshBase>(new ParallelMesh(*this)); }
+
+  ~ParallelMesh() {}
+};
 
 } // namespace libMesh
 

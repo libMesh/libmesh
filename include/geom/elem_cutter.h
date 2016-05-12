@@ -154,10 +154,10 @@ protected:
   std::vector<Elem const *> _inside_elem;
   std::vector<Elem const *> _outside_elem;
 
-  UniquePtr<SerialMesh> _inside_mesh_2D;
-  UniquePtr<SerialMesh> _outside_mesh_2D;
-  UniquePtr<SerialMesh> _inside_mesh_3D;
-  UniquePtr<SerialMesh> _outside_mesh_3D;
+  UniquePtr<ReplicatedMesh> _inside_mesh_2D;
+  UniquePtr<ReplicatedMesh> _outside_mesh_2D;
+  UniquePtr<ReplicatedMesh> _inside_mesh_3D;
+  UniquePtr<ReplicatedMesh> _outside_mesh_3D;
 
   Parallel::Communicator _comm_self; // defaults to MPI_COMM_SELF
 

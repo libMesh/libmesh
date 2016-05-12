@@ -24,12 +24,12 @@
 #ifdef LIBMESH_ENABLE_PARMESH
 #include "libmesh/parallel_mesh.h"
 namespace libMesh {
-typedef ParallelMesh DefaultMesh;
+typedef DistributedMesh DefaultMesh;
 }
 #else
 #include "libmesh/serial_mesh.h"
 namespace libMesh {
-typedef SerialMesh DefaultMesh;
+typedef ReplicatedMesh DefaultMesh;
 }
 #endif
 

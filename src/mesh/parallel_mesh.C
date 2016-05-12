@@ -30,9 +30,9 @@ namespace libMesh
 {
 
 // ------------------------------------------------------------
-// ParallelMesh class member functions
-ParallelMesh::ParallelMesh (const Parallel::Communicator & comm_in,
-                            unsigned char d) :
+// DistributedMesh class member functions
+DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
+                                  unsigned char d) :
   UnstructuredMesh (comm_in,d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -54,8 +54,8 @@ ParallelMesh::ParallelMesh (const Parallel::Communicator & comm_in,
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
 // ------------------------------------------------------------
-// ParallelMesh class member functions
-ParallelMesh::ParallelMesh (unsigned char d) :
+// DistributedMesh class member functions
+DistributedMesh::DistributedMesh (unsigned char d) :
   UnstructuredMesh (d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -76,7 +76,7 @@ ParallelMesh::ParallelMesh (unsigned char d) :
 #endif
 
 
-ParallelMesh::~ParallelMesh ()
+DistributedMesh::~DistributedMesh ()
 {
   this->clear();  // Free nodes and elements
 }
@@ -85,7 +85,7 @@ ParallelMesh::~ParallelMesh ()
 // This might be specialized later, but right now it's just here to
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
-ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
+DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -123,7 +123,7 @@ ParallelMesh::ParallelMesh (const ParallelMesh & other_mesh) :
 
 
 
-ParallelMesh::ParallelMesh (const UnstructuredMesh & other_mesh) :
+DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -145,7 +145,7 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh & other_mesh) :
 // from one processor without bothering the rest, but
 // we may need to update those caches before doing a full
 // renumbering
-void ParallelMesh::update_parallel_id_counts()
+void DistributedMesh::update_parallel_id_counts()
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -187,7 +187,7 @@ void ParallelMesh::update_parallel_id_counts()
 
 // Or in debug mode we may want to test the uncached values without
 // changing the cache
-dof_id_type ParallelMesh::parallel_n_elem() const
+dof_id_type DistributedMesh::parallel_n_elem() const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -200,7 +200,7 @@ dof_id_type ParallelMesh::parallel_n_elem() const
 
 
 
-dof_id_type ParallelMesh::parallel_max_elem_id() const
+dof_id_type DistributedMesh::parallel_max_elem_id() const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -231,7 +231,7 @@ dof_id_type ParallelMesh::parallel_max_elem_id() const
 
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-unique_id_type ParallelMesh::parallel_max_unique_id() const
+unique_id_type DistributedMesh::parallel_max_unique_id() const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -245,7 +245,7 @@ unique_id_type ParallelMesh::parallel_max_unique_id() const
 
 
 
-dof_id_type ParallelMesh::parallel_n_nodes() const
+dof_id_type DistributedMesh::parallel_n_nodes() const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -258,7 +258,7 @@ dof_id_type ParallelMesh::parallel_n_nodes() const
 
 
 
-dof_id_type ParallelMesh::parallel_max_node_id() const
+dof_id_type DistributedMesh::parallel_max_node_id() const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -288,14 +288,14 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
 
 
 
-const Point & ParallelMesh::point (const dof_id_type i) const
+const Point & DistributedMesh::point (const dof_id_type i) const
 {
   return this->node_ref(i);
 }
 
 
 
-const Node * ParallelMesh::node_ptr (const dof_id_type i) const
+const Node * DistributedMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -306,7 +306,7 @@ const Node * ParallelMesh::node_ptr (const dof_id_type i) const
 
 
 
-Node * ParallelMesh::node_ptr (const dof_id_type i)
+Node * DistributedMesh::node_ptr (const dof_id_type i)
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -317,7 +317,7 @@ Node * ParallelMesh::node_ptr (const dof_id_type i)
 
 
 
-const Node * ParallelMesh::query_node_ptr (const dof_id_type i) const
+const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
 {
   std::map<dof_id_type, Node *>::const_iterator it = _nodes.find(i);
   if (it != _nodes.end().it)
@@ -333,7 +333,7 @@ const Node * ParallelMesh::query_node_ptr (const dof_id_type i) const
 
 
 
-Node * ParallelMesh::query_node_ptr (const dof_id_type i)
+Node * DistributedMesh::query_node_ptr (const dof_id_type i)
 {
   std::map<dof_id_type, Node *>::const_iterator it = _nodes.find(i);
   if (it != _nodes.end().it)
@@ -349,7 +349,7 @@ Node * ParallelMesh::query_node_ptr (const dof_id_type i)
 
 
 
-const Elem * ParallelMesh::elem_ptr (const dof_id_type i) const
+const Elem * DistributedMesh::elem_ptr (const dof_id_type i) const
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -360,7 +360,7 @@ const Elem * ParallelMesh::elem_ptr (const dof_id_type i) const
 
 
 
-Elem * ParallelMesh::elem_ptr (const dof_id_type i)
+Elem * DistributedMesh::elem_ptr (const dof_id_type i)
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -371,7 +371,7 @@ Elem * ParallelMesh::elem_ptr (const dof_id_type i)
 
 
 
-const Elem * ParallelMesh::query_elem_ptr (const dof_id_type i) const
+const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
 {
   std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
@@ -387,7 +387,7 @@ const Elem * ParallelMesh::query_elem_ptr (const dof_id_type i) const
 
 
 
-Elem * ParallelMesh::query_elem_ptr (const dof_id_type i)
+Elem * DistributedMesh::query_elem_ptr (const dof_id_type i)
 {
   std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
@@ -403,7 +403,7 @@ Elem * ParallelMesh::query_elem_ptr (const dof_id_type i)
 
 
 
-Elem * ParallelMesh::add_elem (Elem * e)
+Elem * DistributedMesh::add_elem (Elem * e)
 {
   // Don't try to add NULLs!
   libmesh_assert(e);
@@ -500,7 +500,7 @@ Elem * ParallelMesh::add_elem (Elem * e)
 
 
 
-Elem * ParallelMesh::insert_elem (Elem * e)
+Elem * DistributedMesh::insert_elem (Elem * e)
 {
   if (_elements[e->id()])
     this->delete_elem(_elements[e->id()]);
@@ -534,7 +534,7 @@ Elem * ParallelMesh::insert_elem (Elem * e)
 
 
 
-void ParallelMesh::delete_elem(Elem * e)
+void DistributedMesh::delete_elem(Elem * e)
 {
   libmesh_assert (e);
 
@@ -562,8 +562,8 @@ void ParallelMesh::delete_elem(Elem * e)
 
 
 
-void ParallelMesh::renumber_elem(const dof_id_type old_id,
-                                 const dof_id_type new_id)
+void DistributedMesh::renumber_elem(const dof_id_type old_id,
+                                    const dof_id_type new_id)
 {
   Elem * el = _elements[old_id];
   libmesh_assert (el);
@@ -577,9 +577,9 @@ void ParallelMesh::renumber_elem(const dof_id_type old_id,
 
 
 
-Node * ParallelMesh::add_point (const Point & p,
-                                const dof_id_type id,
-                                const processor_id_type proc_id)
+Node * DistributedMesh::add_point (const Point & p,
+                                   const dof_id_type id,
+                                   const processor_id_type proc_id)
 {
   if (_nodes.count(id))
     {
@@ -596,12 +596,12 @@ Node * ParallelMesh::add_point (const Point & p,
   Node * n = Node::build(p, id).release();
   n->processor_id() = proc_id;
 
-  return ParallelMesh::add_node(n);
+  return DistributedMesh::add_node(n);
 }
 
 
 
-Node * ParallelMesh::add_node (Node * n)
+Node * DistributedMesh::add_node (Node * n)
 {
   // Don't try to add NULLs!
   libmesh_assert(n);
@@ -699,14 +699,14 @@ Node * ParallelMesh::add_node (Node * n)
 
 
 
-Node * ParallelMesh::insert_node(Node * n)
+Node * DistributedMesh::insert_node(Node * n)
 {
-  return ParallelMesh::add_node(n);
+  return DistributedMesh::add_node(n);
 }
 
 
 
-void ParallelMesh::delete_node(Node * n)
+void DistributedMesh::delete_node(Node * n)
 {
   libmesh_assert(n);
   libmesh_assert(_nodes[n->id()]);
@@ -735,8 +735,8 @@ void ParallelMesh::delete_node(Node * n)
 
 
 
-void ParallelMesh::renumber_node(const dof_id_type old_id,
-                                 const dof_id_type new_id)
+void DistributedMesh::renumber_node(const dof_id_type old_id,
+                                    const dof_id_type new_id)
 {
   Node * nd = _nodes[old_id];
   libmesh_assert (nd);
@@ -770,7 +770,7 @@ void ParallelMesh::renumber_node(const dof_id_type old_id,
 
 
 
-void ParallelMesh::clear ()
+void DistributedMesh::clear ()
 {
   // Call parent clear function
   MeshBase::clear();
@@ -820,7 +820,7 @@ void ParallelMesh::clear ()
 
 
 
-void ParallelMesh::redistribute ()
+void DistributedMesh::redistribute ()
 {
   // If this is a truly parallel mesh, go through the redistribution/gather/delete remote steps
   if (!this->is_serial())
@@ -850,7 +850,7 @@ void ParallelMesh::redistribute ()
 
 
 
-void ParallelMesh::update_post_partitioning ()
+void DistributedMesh::update_post_partitioning ()
 {
   // this->recalculate_n_partitions();
 
@@ -861,7 +861,7 @@ void ParallelMesh::update_post_partitioning ()
 
 
 template <typename T>
-void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *, dof_id_type> & objects) const
+void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *, dof_id_type> & objects) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -915,7 +915,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *,
 
 
 
-void ParallelMesh::libmesh_assert_valid_parallel_ids () const
+void DistributedMesh::libmesh_assert_valid_parallel_ids () const
 {
   this->libmesh_assert_valid_parallel_object_ids (this->_elements);
   this->libmesh_assert_valid_parallel_object_ids (this->_nodes);
@@ -923,7 +923,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_ids () const
 
 
 
-void ParallelMesh::libmesh_assert_valid_parallel_p_levels () const
+void DistributedMesh::libmesh_assert_valid_parallel_p_levels () const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -944,7 +944,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_p_levels () const
 
 
 
-void ParallelMesh::libmesh_assert_valid_parallel_flags () const
+void DistributedMesh::libmesh_assert_valid_parallel_flags () const
 {
 #ifdef LIBMESH_ENABLE_AMR
   // This function must be run on all processors at once
@@ -974,7 +974,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
 template <typename T>
 dof_id_type
-ParallelMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
+DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1197,7 +1197,7 @@ ParallelMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
 }
 
 
-void ParallelMesh::renumber_nodes_and_elements ()
+void DistributedMesh::renumber_nodes_and_elements ()
 {
   parallel_object_only();
 
@@ -1208,7 +1208,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   this->libmesh_assert_valid_parallel_p_levels();
 #endif
 
-  LOG_SCOPE("renumber_nodes_and_elements()", "ParallelMesh");
+  LOG_SCOPE("renumber_nodes_and_elements()", "DistributedMesh");
 
   std::set<dof_id_type> used_nodes;
 
@@ -1292,7 +1292,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 
 
-void ParallelMesh::fix_broken_node_and_element_numbering ()
+void DistributedMesh::fix_broken_node_and_element_numbering ()
 {
   // We need access to iterators for the underlying containers,
   // not the mapvector<> reimplementations.
@@ -1324,7 +1324,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
 
 
-dof_id_type ParallelMesh::n_active_elem () const
+dof_id_type DistributedMesh::n_active_elem () const
 {
   parallel_object_only();
 
@@ -1345,7 +1345,7 @@ dof_id_type ParallelMesh::n_active_elem () const
 
 
 
-void ParallelMesh::delete_remote_elements()
+void DistributedMesh::delete_remote_elements()
 {
 #ifdef DEBUG
   // Make sure our neighbor links are all fine
@@ -1412,7 +1412,7 @@ void ParallelMesh::delete_remote_elements()
 }
 
 
-void ParallelMesh::add_extra_ghost_elem(Elem * e)
+void DistributedMesh::add_extra_ghost_elem(Elem * e)
 {
   // First add the elem like normal
   add_elem(e);
@@ -1423,7 +1423,7 @@ void ParallelMesh::add_extra_ghost_elem(Elem * e)
 }
 
 
-void ParallelMesh::allgather()
+void DistributedMesh::allgather()
 {
   if (_is_serial)
     return;
