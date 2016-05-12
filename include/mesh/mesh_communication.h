@@ -33,6 +33,10 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
+class DistributedMesh;
+
+// This is for backwards compatibility, but if your code relies on
+// forward declarations in our headers then fix it.
 class ParallelMesh;
 
 /**
