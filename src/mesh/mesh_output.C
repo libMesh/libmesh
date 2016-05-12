@@ -34,7 +34,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
 {
   LOG_SCOPE("write_equation_systems()", "MeshOutput");
 
-  // We may need to gather and/or renumber a ParallelMesh to output
+  // We may need to gather and/or renumber a DistributedMesh to output
   // it, making that const qualifier in our constructor a dirty lie
   MT & my_mesh = const_cast<MT &>(*_obj);
 

@@ -565,7 +565,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
     }
 
   // We can't assert that all nodes are connected to elements, because
-  // a ParallelMesh with NodeConstraints might have pulled in some
+  // a DistributedMesh with NodeConstraints might have pulled in some
   // remote nodes solely for evaluating those constraints.
   // MeshTools::libmesh_assert_connected_nodes(mesh);
 

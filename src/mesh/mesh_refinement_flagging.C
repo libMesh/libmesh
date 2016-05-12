@@ -285,7 +285,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
 
   sorted_error.reserve (n_active_elem);
 
-  // On a ParallelMesh, we need to communicate to know which remote ids
+  // On a DistributedMesh, we need to communicate to know which remote ids
   // correspond to active elements.
   {
     std::vector<bool> is_active(max_elem_id, false);
@@ -368,7 +368,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
       refine_count++;
     }
 
-  // On a ParallelMesh, we need to communicate to know which remote ids
+  // On a DistributedMesh, we need to communicate to know which remote ids
   // correspond to refinable elements
   dof_id_type successful_refine_count = 0;
   {
@@ -422,7 +422,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
           dof_id_type parent_id = sorted_parent_error[i].second;
           Elem * parent = _mesh.query_elem_ptr(parent_id);
 
-          // On a ParallelMesh we skip remote elements
+          // On a DistributedMesh we skip remote elements
           if (!parent)
             continue;
 

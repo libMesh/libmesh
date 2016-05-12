@@ -29,7 +29,8 @@ namespace libMesh
 /**
  * This \p mapvector templated class is intended to provide the
  * performance characteristics of a std::map with an interface more
- * closely resembling that of a std::vector, for use with ParallelMesh.
+ * closely resembling that of a std::vector, for use with
+ * DistributedMesh.
  *
  * \author  Roy H. Stogner
  */

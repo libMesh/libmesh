@@ -99,10 +99,10 @@ public:
   void gather_neighboring_elements (ParallelMesh &) const;
 
   /**
-   * This method takes an input \p ParallelMesh which may be
+   * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor then
    * sends its local nodes and elements to processor \p root_id.
-   * The end result is that a previously distributed \p ParallelMesh
+   * The end result is that a previously distributed \p DistributedMesh
    * will be serialized on processor \p root_id.  Since this method is
    * collective it must be called by all processors. For the special
    * case of \p root_id equal to \p DofObject::invalid_processor_id
@@ -111,10 +111,10 @@ public:
   void gather (const processor_id_type root_id, ParallelMesh &) const;
 
   /**
-   * This method takes an input \p ParallelMesh which may be
+   * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor then
    * sends its local nodes and elements to the other processors.
-   * The end result is that a previously distributed \p ParallelMesh
+   * The end result is that a previously distributed \p DistributedMesh
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
@@ -122,12 +122,12 @@ public:
   { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**
-   * This method takes an input \p ParallelMesh which may be
+   * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor
    * deletes all elements which are neither local elements nor "ghost"
    * elements which touch local elements, and deletes all nodes which
    * are not contained in local or ghost elements.
-   * The end result is that a previously serial \p ParallelMesh
+   * The end result is that a previously serial \p DistributedMesh
    * will be distributed between processors.  Since this method is
    * collective it must be called by all processors.
    *

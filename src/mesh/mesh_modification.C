@@ -712,7 +712,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   STOP_LOG("all_second_order()", "Mesh");
 
-  // In a ParallelMesh our ghost node processor ids may be bad,
+  // In a DistributedMesh our ghost node processor ids may be bad,
   // the ids of nodes touching remote elements may be inconsistent,
   // and unique_ids of newly added non-local nodes remain unset.
   // make_nodes_parallel_consistent() will fix all this.
@@ -762,7 +762,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   std::vector<boundary_id_type> new_bndry_ids;
 
   // We may need to add new points if we run into a 1.5th order
-  // element; if we do that on a ParallelMesh in a ghost element then
+  // element; if we do that on a DistributedMesh in a ghost element then
   // we will need to fix their ids / unique_ids
   bool added_new_ghost_point = false;
 
@@ -1541,7 +1541,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                                           new_bndry_ids[s]);
     }
 
-  // In a ParallelMesh any newly added ghost node ids may be
+  // In a DistributedMesh any newly added ghost node ids may be
   // inconsistent, and unique_ids of newly added ghost nodes remain
   // unset.
   // make_nodes_parallel_consistent() will fix all this.
@@ -1797,7 +1797,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
         copy->set_unique_id() = elem->unique_id();
 #endif
 
-        // This element could have boundary info or ParallelMesh
+        // This element could have boundary info or DistributedMesh
         // remote_elem links as well.  We need to save the (elem,
         // side, bc_id) triples and those links
         for (unsigned short s=0; s<elem->n_sides(); s++)

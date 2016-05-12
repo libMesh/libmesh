@@ -395,7 +395,7 @@ void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
  * A function for verifying that all nodes are connected to at least
  * one element.
  *
- * This will fail in the most general case.  When ParallelMesh and
+ * This will fail in the most general case.  When DistributedMesh and
  * NodeConstraints are enabled, we expect the possibility that a
  * processor will be given remote nodes to satisfy node constraints
  * without also being given the remote elements connected to those

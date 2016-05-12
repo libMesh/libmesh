@@ -1564,7 +1564,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       // Build a circle or hollow sphere in two dimensions
     case 2:
       {
-        // For ParallelMesh, if we don't specify node IDs the Mesh
+        // For DistributedMesh, if we don't specify node IDs the Mesh
         // will try to pick an appropriate (unique) one for us.  But
         // since we are adding these nodes on all processors, we want
         // to be sure they have consistent IDs across all processors.
@@ -1734,7 +1734,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
         // (Temporary) convenient storage for node pointers
         std::vector<Node *> nodes(16);
 
-        // For ParallelMesh, if we don't specify node IDs the Mesh
+        // For DistributedMesh, if we don't specify node IDs the Mesh
         // will try to pick an appropriate (unique) one for us.  But
         // since we are adding these nodes on all processors, we want
         // to be sure they have consistent IDs across all processors.

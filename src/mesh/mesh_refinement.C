@@ -38,7 +38,7 @@
 #include "libmesh/remote_elem.h"
 
 #ifdef DEBUG
-// Some extra validation for ParallelMesh
+// Some extra validation for DistributedMesh
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel_mesh.h"
 #endif // DEBUG
@@ -1474,7 +1474,7 @@ bool MeshRefinement::_coarsen_elements ()
   this->comm().max(mesh_changed);
   this->comm().max(mesh_p_changed);
 
-  // And we may need to update ParallelMesh values reflecting the changes
+  // And we may need to update DistributedMesh values reflecting the changes
   if (mesh_changed)
     _mesh.update_parallel_id_counts();
 
@@ -1573,7 +1573,7 @@ bool MeshRefinement::_refine_elements ()
   this->comm().max(mesh_changed);
   this->comm().max(mesh_p_changed);
 
-  // And we may need to update ParallelMesh values reflecting the changes
+  // And we may need to update DistributedMesh values reflecting the changes
   if (mesh_changed)
     _mesh.update_parallel_id_counts();
 

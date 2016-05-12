@@ -59,7 +59,7 @@ public:
 
   /**
    * Constructor.  Initializes pointer data
-   * without requiring a full \p SerialMesh in this header file.
+   * without requiring a full \p ReplicatedMesh in this header file.
    */
   ElemCutter();
 

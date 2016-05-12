@@ -30,7 +30,7 @@ namespace libMesh
 class MeshBase;
 
 /**
- * Temporarily serialize a ParallelMesh for output; a distributed
+ * Temporarily serialize a DistributedMesh for output; a distributed
  * mesh is allgathered by the MeshSerializer constructor if
  * need_serial is true, then remote elements are deleted again by the
  * destructor.

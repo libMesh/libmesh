@@ -37,11 +37,11 @@ namespace libMesh
 {
 
 // Forward declarations don't like typedefs...
-// typedef SerialMesh Mesh;
+// typedef ReplicatedMesh Mesh;
 
 /**
- * The \p Mesh class is a thin wrapper, around the \p SerialMesh class
- * by default.
+ * The \p Mesh class is a thin wrapper, around the \p ReplicatedMesh
+ * class by default.
  */
 class Mesh : public DefaultMesh
 {
