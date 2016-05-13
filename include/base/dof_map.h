@@ -742,7 +742,7 @@ public:
    * Prints (from processor 0) all DoF and Node constraints.  If \p
    * print_nonlocal is true, then each constraint is printed once for
    * each processor that knows about it, which may be useful for \p
-   * ParallelMesh debugging.
+   * DistributedMesh debugging.
    */
   void print_dof_constraints(std::ostream & os=libMesh::out,
                              bool print_nonlocal=false) const;

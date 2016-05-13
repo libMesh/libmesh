@@ -31,12 +31,14 @@ namespace libMesh
 {
 
 /**
- * The \p SerialMesh class is derived from the \p MeshBase class,
- * and currently represents the default Mesh implementation.
+ * The \p ReplicatedMesh class is derived from the \p MeshBase class,
+ * and is used to store identical copies of a full mesh data
+ * structure on each processor.
+ *
  * Most methods for this class are found in MeshBase, and most
  * implementation details are found in UnstructuredMesh.
  */
-class SerialMesh : public UnstructuredMesh
+class ReplicatedMesh : public UnstructuredMesh
 {
 public:
 
@@ -46,7 +48,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  SerialMesh (const Parallel::Communicator & comm_in,
+  ReplicatedMesh (const Parallel::Communicator & comm_in,
               unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
@@ -56,7 +58,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  SerialMesh (unsigned char dim=1);
+  ReplicatedMesh (unsigned char dim=1);
 #endif
 
 
@@ -64,24 +66,24 @@ public:
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  SerialMesh (const UnstructuredMesh & other_mesh);
+  ReplicatedMesh (const UnstructuredMesh & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
    * serial mesh.
    */
-  SerialMesh (const SerialMesh & other_mesh);
+  ReplicatedMesh (const ReplicatedMesh & other_mesh);
 
   /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual UniquePtr<MeshBase> clone () const libmesh_override
-  { return UniquePtr<MeshBase>(new SerialMesh(*this)); }
+  { return UniquePtr<MeshBase>(new ReplicatedMesh(*this)); }
 
   /**
    * Destructor.
    */
-  virtual ~SerialMesh();
+  virtual ~ReplicatedMesh();
 
   /**
    * Clear all internal data.
@@ -154,7 +156,7 @@ public:
    * .) n->id() == DofObject::invalid_id
    * .) A node already exists in position n->id().
    *
-   * This function differs from the SerialMesh::add_node() function,
+   * This function differs from the ReplicatedMesh::add_node() function,
    * which is only capable of appending nodes at the end of the nodes
    * storage.
    */
@@ -193,7 +195,7 @@ public:
    * neighbors for each elements are copied as well and patched, without calling the time-consuming
    * find_neighbors() function.
    */
-  void stitch_meshes (SerialMesh & other_mesh,
+  void stitch_meshes (ReplicatedMesh & other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
@@ -393,7 +395,7 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  void stitching_helper (SerialMesh * other_mesh,
+  void stitching_helper (ReplicatedMesh * other_mesh,
                          boundary_id_type boundary_id_1,
                          boundary_id_type boundary_id_2,
                          Real tol,
@@ -419,6 +421,32 @@ private:
 };
 
 
+
+// For backwards compatibility with our original name, users can still
+// refer to a ReplicatedMesh as a SerialMesh.
+//
+// This has to be a shim class rather than a typedef so that forward
+// declarations still work.
+struct SerialMesh : public ReplicatedMesh
+{
+  explicit
+  SerialMesh (const Parallel::Communicator & comm_in,
+        unsigned char dim=1)
+    : ReplicatedMesh(comm_in,dim) {}
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  explicit
+  SerialMesh (unsigned char dim=1)
+    : ReplicatedMesh(dim) {}
+#endif
+
+  SerialMesh (const UnstructuredMesh & other_mesh) : ReplicatedMesh(other_mesh) {}
+
+  virtual UniquePtr<MeshBase> clone () const libmesh_override
+  { return UniquePtr<MeshBase>(new SerialMesh(*this)); }
+
+  ~SerialMesh() {}
+};
 
 } // namespace libMesh
 

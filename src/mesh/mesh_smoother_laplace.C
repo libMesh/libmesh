@@ -87,7 +87,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                     // Will these nodal positions always be available
                     // or will they refer to remote nodes?  This will
                     // fail an assertion in the latter case, which
-                    // shouldn't occur if ParallelMesh is working
+                    // shouldn't occur if DistributedMesh is working
                     // correctly.
                     const Point & connected_node = _mesh.point(_graph[node->id()][j]);
 

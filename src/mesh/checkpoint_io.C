@@ -81,10 +81,10 @@ void CheckpointIO::write (const std::string & name)
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // Try to dynamic cast the mesh to see if it's a ParallelMesh object
+  // Try to dynamic cast the mesh to see if it's a DistributedMesh object
   // Note: Just using is_serial() is not good enough because the Mesh won't
   // have been prepared yet when is when that flag gets set to false... sigh.
-  bool parallel_mesh = dynamic_cast<const ParallelMesh *>(&mesh);
+  bool parallel_mesh = dynamic_cast<const DistributedMesh *>(&mesh);
 
   // If this is a serial mesh then we're only going to write it on processor 0
   if(parallel_mesh || this->processor_id() == 0)
@@ -403,10 +403,10 @@ void CheckpointIO::read (const std::string & name)
 
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-  // Try to dynamic cast the mesh to see if it's a ParallelMesh object
+  // Try to dynamic cast the mesh to see if it's a DistributedMesh object
   // Note: Just using is_serial() is not good enough because the Mesh won't
   // have been prepared yet when is when that flag gets set to false... sigh.
-  bool parallel_mesh = dynamic_cast<ParallelMesh *>(&mesh);
+  bool parallel_mesh = dynamic_cast<DistributedMesh *>(&mesh);
 
   // If this is a serial mesh then we're going to only read it on processor 0 and broadcast it
   if(parallel_mesh || this->processor_id() == 0)

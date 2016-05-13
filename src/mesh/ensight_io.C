@@ -134,7 +134,7 @@ void EnsightIO::add_scalar(const std::string & system_name,
 // the MeshOutput base class.
 void EnsightIO::write (const std::string & name)
 {
-  // We may need to gather a ParallelMesh to output it, making that
+  // We may need to gather a DistributedMesh to output it, making that
   // const qualifier in our constructor a dirty lie
   MeshSerializer serialize(const_cast<MeshBase &>(this->mesh()), !_is_parallel_format);
 

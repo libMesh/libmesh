@@ -1103,7 +1103,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
                         mesh.local_elements_end());
 
   // Global computation fails if we're using a FEMFunctionBase BC on a
-  // SerialMesh in parallel
+  // ReplicatedMesh in parallel
   // ConstElemRange range (mesh.elements_begin(),
   //                       mesh.elements_end());
 

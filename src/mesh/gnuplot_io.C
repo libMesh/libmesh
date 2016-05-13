@@ -60,7 +60,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
                                const std::vector<Number> * soln,
                                const std::vector<std::string> * names)
 {
-  // Even when writing on a serialized ParallelMesh, we expect
+  // Even when writing on a serialized DistributedMesh, we expect
   // non-proc-0 help with calls like n_active_elem
   // libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 

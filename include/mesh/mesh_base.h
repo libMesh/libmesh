@@ -659,7 +659,7 @@ public:
   /**
    * Redistribute elements between processors.  This gets called
    * automatically by the Partitioner, and is a no-op in the case of a
-   * SerialMesh or serialized ParallelMesh
+   * ReplicatedMesh or serialized DistributedMesh
    */
   virtual void redistribute () {}
 
@@ -829,7 +829,7 @@ public:
    * Verify id and processor_id consistency of our elements and
    * nodes containers.
    * Calls libmesh_assert() on each possible failure.
-   * Currently only implemented on ParallelMesh; a serial data
+   * Currently only implemented on DistributedMesh; a serial data
    * structure is much harder to get out of sync.
    */
   virtual void libmesh_assert_valid_parallel_ids() const {}

@@ -428,7 +428,7 @@ void Nemesis_IO::read (const std::string & base_filename)
                  << my_node_offset
                  << std::endl;
 
-  // Add internal nodes to the ParallelMesh, using the node ID offset we
+  // Add internal nodes to the DistributedMesh, using the node ID offset we
   // computed and the current processor's ID.
   for (unsigned int i=0; i<to_uint(nemhelper->num_internal_nodes); ++i)
     {
@@ -1127,19 +1127,19 @@ void Nemesis_IO::read (const std::string & base_filename)
       libMesh::out << "mesh.parallel_n_elem()=" << mesh.parallel_n_elem() << std::endl;
     }
 
-  // For ParallelMesh, it seems that _is_serial is true by default.  A hack to
+  // For DistributedMesh, it seems that _is_serial is true by default.  A hack to
   // make the Mesh think it's parallel might be to call:
   mesh.update_post_partitioning();
   MeshCommunication().make_node_unique_ids_parallel_consistent(mesh);
   mesh.delete_remote_elements();
 
   // And if that didn't work, then we're actually reading into a
-  // SerialMesh, so forget about gathering neighboring elements
+  // ReplicatedMesh, so forget about gathering neighboring elements
   if (mesh.is_serial())
     return;
 
   // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
-  MeshCommunication().gather_neighboring_elements(cast_ref<ParallelMesh &>(mesh));
+  MeshCommunication().gather_neighboring_elements(cast_ref<DistributedMesh &>(mesh));
 }
 
 #else

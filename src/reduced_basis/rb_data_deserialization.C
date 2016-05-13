@@ -705,7 +705,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   // Interpolation elements (including the "extra one")
   {
     libMesh::dof_id_type elem_id = 0;
-    libMesh::SerialMesh & interpolation_points_mesh =
+    libMesh::ReplicatedMesh & interpolation_points_mesh =
       rb_eim_evaluation.get_interpolation_points_mesh();
     interpolation_points_mesh.clear();
 
@@ -855,7 +855,7 @@ void load_point(RBData::Point3D::Reader point_reader, Point & point)
 
 void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
                          libMesh::Elem * elem,
-                         libMesh::SerialMesh & mesh)
+                         libMesh::ReplicatedMesh & mesh)
 {
   auto mesh_elem_point_list = mesh_elem_reader.getPoints();
   unsigned int n_points = mesh_elem_point_list.size();

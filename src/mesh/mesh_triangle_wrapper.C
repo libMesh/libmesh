@@ -112,7 +112,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
   // Node information
   for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
     {
-      // Specify ID when adding point, otherwise, if this is ParallelMesh,
+      // Specify ID when adding point, otherwise, if this is DistributedMesh,
       // it might add points with a non-sequential numbering...
       mesh_output.add_point( Point(triangle_data_input.pointlist[i],
                                    triangle_data_input.pointlist[i+1]),
