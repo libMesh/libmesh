@@ -1677,6 +1677,9 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
       std::vector<uint32_t> unique_32;
       std::vector<uint64_t> unique_64;
 
+      // We're starting over from node 0 again
+      pos.first = needed_nodes.begin();
+
       for (std::size_t blk=0, first_node=0, last_node=0; last_node<n_nodes; blk++)
         {
           first_node = blk*io_blksize;
