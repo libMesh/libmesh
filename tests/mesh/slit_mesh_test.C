@@ -368,6 +368,10 @@ public:
     const std::vector<Point> & xyz = fe->get_xyz();
     fe->get_phi();
 
+    // While we're in the middle of a unique id based test case, let's
+    // make sure our unique ids were all read in correctly too.
+    UniquePtr<PointLocatorBase> locator = _mesh->sub_point_locator();
+
     MeshBase::const_element_iterator       el     =
       mesh2.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el =
@@ -376,6 +380,22 @@ public:
     for (; el != end_el; ++el)
       {
         const Elem * elem = *el;
+
+        const Elem * mesh1_elem = (*locator)(elem->centroid());
+        if (mesh1_elem)
+          {
+            CPPUNIT_ASSERT_EQUAL( elem->unique_id(),
+                                  mesh1_elem->unique_id() );
+
+            for (unsigned int n=0; n != elem->n_nodes(); ++n)
+              {
+                Node & node       = elem->node_ref(n);
+                Node & mesh1_node = mesh1_elem->node_ref(n);
+                CPPUNIT_ASSERT_EQUAL( node.unique_id(),
+                                      mesh1_node.unique_id() );
+              }
+          }
+
         context.pre_fe_reinit(sys2, elem);
         context.elem_fe_reinit();
 
