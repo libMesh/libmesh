@@ -349,9 +349,11 @@ int main (int argc, char ** argv)
   // Print convergence information
   system.optimization_solver->print_converged_reason();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   std::stringstream filename;
   ExodusII_IO (mesh).write_equation_systems("optimization_soln.exo",
                                             equation_systems);
+#endif
 
   return 0;
 }
