@@ -247,6 +247,10 @@ int main (int argc, char ** argv)
 
   libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support");
 
+#elif !defined(LIBMESH_ENABLE_GHOSTED)
+
+  libmesh_example_requires(false, "--enable-ghosted");
+
 #elif LIBMESH_USE_COMPLEX_NUMBERS
 
   // According to
