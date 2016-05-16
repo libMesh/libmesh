@@ -78,6 +78,11 @@ int main (int argc, char ** argv)
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
 
+  // Our input mesh here is in ExodusII format
+#ifndef LIBMESH_HAVE_EXODUS_API
+  libmesh_example_requires (false, "ExodusII support");
+#endif
+
   // This example does a bunch of linear algebra during assembly, and
   // therefore requires Eigen.
 #ifndef LIBMESH_HAVE_EIGEN
