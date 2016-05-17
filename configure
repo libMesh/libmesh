@@ -41849,7 +41849,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
       saveCXXFLAGS="$CXXFLAGS"
       CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
       saveLIBS="$LIBS"
-      LIBS="$saveLIBS $CPPUNIT_LIBS"
+      LIBS="$CPPUNIT_LIBS $saveLIBS"
 
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
