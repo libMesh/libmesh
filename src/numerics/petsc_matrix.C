@@ -603,8 +603,14 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
                                    &petsc_viewer);
       LIBMESH_CHKERR(ierr);
 
+#if PETSC_VERSION_LESS_THAN(3,7,0)
       ierr = PetscViewerSetFormat (petsc_viewer,
                                    PETSC_VIEWER_ASCII_MATLAB);
+#else
+      ierr = PetscViewerPushFormat (petsc_viewer,
+                                    PETSC_VIEWER_ASCII_MATLAB);
+#endif
+
       LIBMESH_CHKERR(ierr);
 
       ierr = MatView (_mat, petsc_viewer);
@@ -616,8 +622,14 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
    */
   else
     {
+#if PETSC_VERSION_LESS_THAN(3,7,0)
       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
                                    PETSC_VIEWER_ASCII_MATLAB);
+#else
+      ierr = PetscViewerPushFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                    PETSC_VIEWER_ASCII_MATLAB);
+#endif
+
       LIBMESH_CHKERR(ierr);
 
       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
