@@ -921,8 +921,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
               }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-          }
+
 #endif // LIBMESH_DIM == 3
+          }
         // done computing the map
         break;
       }
