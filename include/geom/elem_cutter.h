@@ -46,7 +46,7 @@ class TetGenMeshInterface;
 
 // This is for backwards compatibility, but if your code relies on
 // forward declarations in our headers then fix it.
-class SerialMesh;
+struct SerialMesh;
 
 /**
  * This class implements cutting a single element into a collection
