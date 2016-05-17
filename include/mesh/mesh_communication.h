@@ -37,7 +37,7 @@ class DistributedMesh;
 
 // This is for backwards compatibility, but if your code relies on
 // forward declarations in our headers then fix it.
-struct ParallelMesh;
+class ParallelMesh;
 
 /**
  * This is the \p MeshCommunication class.  It handles all the details

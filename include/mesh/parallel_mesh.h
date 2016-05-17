@@ -475,8 +475,9 @@ private:
 //
 // This has to be a class rather than a typedef so that forward
 // declarations still work.
-struct ParallelMesh : public DistributedMesh
+class ParallelMesh : public DistributedMesh
 {
+public:
   explicit
   ParallelMesh (const Parallel::Communicator & comm_in,
                 unsigned char dim=1)

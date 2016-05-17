@@ -427,8 +427,9 @@ private:
 //
 // This has to be a shim class rather than a typedef so that forward
 // declarations still work.
-struct SerialMesh : public ReplicatedMesh
+class SerialMesh : public ReplicatedMesh
 {
+public:
   explicit
   SerialMesh (const Parallel::Communicator & comm_in,
               unsigned char dim=1)
