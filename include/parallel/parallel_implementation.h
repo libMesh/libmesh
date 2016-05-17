@@ -233,19 +233,19 @@ namespace {
 // Internal helper function to create vector<something_useable> from
 // vector<bool> for compatibility with MPI bitwise operations
 template <typename T>
-inline void pack_vector_bool(const std::vector<bool> & in,
-                             std::vector<T> & out)
+inline void pack_vector_bool(const std::vector<bool> & vec_in,
+                             std::vector<T> & vec_out)
 {
   unsigned int data_bits = 8*sizeof(T);
-  std::size_t in_size = in.size();
+  std::size_t in_size = vec_in.size();
   std::size_t out_size = in_size/data_bits + ((in_size%data_bits)?1:0);
-  out.clear();
-  out.resize(out_size);
+  vec_out.clear();
+  vec_out.resize(out_size);
   for (std::size_t i=0; i != in_size; ++i)
     {
       std::size_t index = i/data_bits;
       std::size_t offset = i%data_bits;
-      out[index] += (in[i]?1:0) << offset;
+      vec_out[index] += (vec_in[i]?1:0) << offset;
     }
 }
 
@@ -253,19 +253,20 @@ inline void pack_vector_bool(const std::vector<bool> & in,
 // vector<something usable> for compatibility with MPI byte
 // operations
 template <typename T>
-inline void unpack_vector_bool(const std::vector<T> & in,
-                               std::vector<bool> & out)
+inline void unpack_vector_bool(const std::vector<T> & vec_in,
+                               std::vector<bool> & vec_out)
 {
   unsigned int data_bits = 8*sizeof(T);
   // We need the output vector to already be properly sized
-  std::size_t out_size = out.size();
-  libmesh_assert_equal_to (out_size/data_bits + (out_size%data_bits?1:0), in.size());
+  std::size_t out_size = vec_out.size();
+  libmesh_assert_equal_to
+    (out_size/data_bits + (out_size%data_bits?1:0), vec_in.size());
 
   for (std::size_t i=0; i != out_size; ++i)
     {
       std::size_t index = i/data_bits;
       std::size_t offset = i%data_bits;
-      out[i] = in[index] << (data_bits-1-offset) >> (data_bits-1);
+      vec_out[i] = vec_in[index] << (data_bits-1-offset) >> (data_bits-1);
     }
 }
 
@@ -521,7 +522,7 @@ template <typename Context, typename buffertype,
           typename OutputIter, typename T>
 inline void unpack_range (const std::vector<buffertype> & buffer,
                           Context * context,
-                          OutputIter out,
+                          OutputIter out_iter,
                           const T * /* output_type */)
 {
   // Loop through the buffer and unpack each object, returning the
@@ -531,7 +532,7 @@ inline void unpack_range (const std::vector<buffertype> & buffer,
 
   while (next_object_start < buffer.end())
     {
-      *out++ = Parallel::Packing<T>::unpack(next_object_start, context);
+      *out_iter++ = Parallel::Packing<T>::unpack(next_object_start, context);
       next_object_start +=
         Parallel::Packing<T>::packed_size(next_object_start);
     }
@@ -1106,23 +1107,23 @@ inline void receive (const unsigned int src_processor_id,
 template <typename Context, typename OutputIter, typename T>
 inline void receive_packed_range (const unsigned int src_processor_id,
                                   Context * context,
-                                  OutputIter out,
+                                  OutputIter out_iter,
                                   const T * output_type,
                                   const MessageTag & tag=any_tag,
                                   const Communicator & comm = Communicator_World)
 {
-  comm.receive_packed_range (src_processor_id, context, out,
+  comm.receive_packed_range (src_processor_id, context, out_iter,
                              output_type, tag);
 }
 
 // template <typename Context, typename OutputIter>
 // inline void receive_packed_range (const unsigned int src_processor_id,
 //                                   Context * context,
-//                                   OutputIter out,
+//                                   OutputIter out_iter,
 //                                   Request & req,
 //                                   const MessageTag & tag=any_tag,
 //                                   const Communicator & comm = Communicator_World)
-// { comm.receive_packed_range (src_processor_id, context, out, req, tag); }
+// { comm.receive_packed_range (src_processor_id, context, out_iter, req, tag); }
 
 template <typename T>
 inline void nonblocking_receive (const unsigned int src_processor_id,
@@ -1160,7 +1161,7 @@ inline void send_receive_packed_range(const unsigned int dest_processor_id,
                                       const RangeIter send_end,
                                       const unsigned int source_processor_id,
                                       Context2 * context2,
-                                      OutputIter out,
+                                      OutputIter out_iter,
                                       const T * output_type,
                                       const MessageTag & send_tag = no_tag,
                                       const MessageTag & recv_tag = any_tag,
@@ -1168,8 +1169,9 @@ inline void send_receive_packed_range(const unsigned int dest_processor_id,
 {
   comm.send_receive_packed_range(dest_processor_id, context1,
                                  send_begin, send_end,
-                                 source_processor_id, context2, out,
-                                 output_type, send_tag, recv_tag);
+                                 source_processor_id, context2,
+                                 out_iter, output_type,
+                                 send_tag, recv_tag);
 }
 
 template <typename T1, typename T2>
@@ -1215,17 +1217,17 @@ inline void gather_packed_range (const unsigned int root_id,
                                  Context * context,
                                  Iter range_begin,
                                  const Iter range_end,
-                                 OutputIter out,
+                                 OutputIter out_iter,
                                  const Communicator & comm = Communicator_World)
-{ comm.gather_packed_range(root_id, context, range_begin, range_end, out); }
+{ comm.gather_packed_range(root_id, context, range_begin, range_end, out_iter); }
 
 template <typename Context, typename Iter, typename OutputIter>
 inline void allgather_packed_range (Context * context,
                                     Iter range_begin,
                                     const Iter range_end,
-                                    OutputIter out,
+                                    OutputIter out_iter,
                                     const Communicator & comm = Communicator_World)
-{ comm.allgather_packed_range(context, range_begin, range_end, out); }
+{ comm.allgather_packed_range(context, range_begin, range_end, out_iter); }
 
 template <typename T>
 inline void alltoall(std::vector<T> & r,
@@ -1243,10 +1245,10 @@ inline void broadcast_packed_range (const Context * context1,
                                     Iter range_begin,
                                     const Iter range_end,
                                     OutputContext * context2,
-                                    OutputIter out,
+                                    OutputIter out_iter,
                                     const unsigned int root_id = 0,
                                     const Communicator & comm = Communicator_World)
-{ comm.broadcast_packed_range(context1, range_begin, range_end, context2, out, root_id); }
+{ comm.broadcast_packed_range(context1, range_begin, range_end, context2, out_iter, root_id); }
 
 #endif // #ifndef LIBMESH_DISABLE_COMMWORLD
 
@@ -1586,15 +1588,15 @@ inline void Communicator::minloc(T & r,
     {
       LOG_SCOPE("minloc(scalar)", "Parallel");
 
-      DataPlusInt<T> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<T> out;
+      DataPlusInt<T> data_in;
+      data_in.val = r;
+      data_in.rank = this->rank();
+      DataPlusInt<T> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&in, &out, 1, dataplusint_type<T>(),
+        (MPI_Allreduce (&data_in, &data_out, 1, dataplusint_type<T>(),
                         MPI_MINLOC, this->get()));
-      r = out.val;
-      min_id = out.rank;
+      r = data_out.val;
+      min_id = data_out.rank;
     }
   else
     min_id = this->rank();
@@ -1608,15 +1610,16 @@ inline void Communicator::minloc(bool & r,
     {
       LOG_SCOPE("minloc(bool)", "Parallel");
 
-      DataPlusInt<int> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<int> out;
+      DataPlusInt<int> data_in;
+      data_in.val = r;
+      data_in.rank = this->rank();
+      DataPlusInt<int> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&in, &out, 1, dataplusint_type<int>(),
+        (MPI_Allreduce (&data_in, &data_out, 1,
+                        dataplusint_type<int>(),
                         MPI_MINLOC, this->get()));
-      r = out.val;
-      min_id = out.rank;
+      r = data_out.val;
+      min_id = data_out.rank;
     }
   else
     min_id = this->rank();
@@ -1633,21 +1636,22 @@ inline void Communicator::minloc(std::vector<T> & r,
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<DataPlusInt<T> > in(r.size());
+      std::vector<DataPlusInt<T> > data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
+          data_in[i].val  = r[i];
+          data_in[i].rank = this->rank();
         }
-      std::vector<DataPlusInt<T> > out(r.size());
+      std::vector<DataPlusInt<T> > data_out(r.size());
       libmesh_call_mpi
-        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+        (MPI_Allreduce (&data_in[0], &data_out[0],
+                        cast_int<int>(r.size()),
                         dataplusint_type<T>(), MPI_MINLOC,
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          r[i]      = out[i].val;
-          min_id[i] = out[i].rank;
+          r[i]      = data_out[i].val;
+          min_id[i] = data_out[i].rank;
         }
     }
   else if (!r.empty())
@@ -1667,21 +1671,22 @@ inline void Communicator::minloc(std::vector<bool> & r,
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<DataPlusInt<int> > in(r.size());
+      std::vector<DataPlusInt<int> > data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
+          data_in[i].val  = r[i];
+          data_in[i].rank = this->rank();
         }
-      std::vector<DataPlusInt<int> > out(r.size());
+      std::vector<DataPlusInt<int> > data_out(r.size());
       libmesh_call_mpi
-        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+        (MPI_Allreduce (&data_in[0], &data_out[0],
+                        cast_int<int>(r.size()),
                         StandardType<int>(), MPI_MINLOC,
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          r[i]      = out[i].val;
-          min_id[i] = out[i].rank;
+          r[i]      = data_out[i].val;
+          min_id[i] = data_out[i].rank;
         }
     }
   else if (!r.empty())
@@ -1772,15 +1777,16 @@ inline void Communicator::maxloc(T & r,
     {
       LOG_SCOPE("maxloc(scalar)", "Parallel");
 
-      DataPlusInt<T> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<T> out;
+      DataPlusInt<T> data_in;
+      data_in.val = r;
+      data_in.rank = this->rank();
+      DataPlusInt<T> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&in, &out, 1, dataplusint_type<T>(),
+        (MPI_Allreduce (&data_in, &data_out, 1,
+                        dataplusint_type<T>(),
                         MPI_MAXLOC, this->get()));
-      r = out.val;
-      max_id = out.rank;
+      r = data_out.val;
+      max_id = data_out.rank;
     }
   else
     max_id = this->rank();
@@ -1794,15 +1800,16 @@ inline void Communicator::maxloc(bool & r,
     {
       LOG_SCOPE("maxloc(bool)", "Parallel");
 
-      DataPlusInt<int> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<int> out;
+      DataPlusInt<int> data_in;
+      data_in.val = r;
+      data_in.rank = this->rank();
+      DataPlusInt<int> data_out;
       libmesh_call_mpi
-        (MPI_Allreduce (&in, &out, 1, dataplusint_type<int>(),
+        (MPI_Allreduce (&data_in, &data_out, 1,
+                        dataplusint_type<int>(),
                         MPI_MAXLOC, this->get()));
-      r = out.val;
-      max_id = out.rank;
+      r = data_out.val;
+      max_id = data_out.rank;
     }
   else
     max_id = this->rank();
@@ -1819,21 +1826,22 @@ inline void Communicator::maxloc(std::vector<T> & r,
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<DataPlusInt<T> > in(r.size());
+      std::vector<DataPlusInt<T> > data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
+          data_in[i].val  = r[i];
+          data_in[i].rank = this->rank();
         }
-      std::vector<DataPlusInt<T> > out(r.size());
+      std::vector<DataPlusInt<T> > data_out(r.size());
       libmesh_call_mpi
-        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+        (MPI_Allreduce (&data_in[0], &data_out[0],
+                        cast_int<int>(r.size()),
                         dataplusint_type<T>(), MPI_MAXLOC,
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          r[i]      = out[i].val;
-          max_id[i] = out[i].rank;
+          r[i]      = data_out[i].val;
+          max_id[i] = data_out[i].rank;
         }
     }
   else if (!r.empty())
@@ -1853,21 +1861,22 @@ inline void Communicator::maxloc(std::vector<bool> & r,
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<DataPlusInt<int> > in(r.size());
+      std::vector<DataPlusInt<int> > data_in(r.size());
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
+          data_in[i].val  = r[i];
+          data_in[i].rank = this->rank();
         }
-      std::vector<DataPlusInt<int> > out(r.size());
+      std::vector<DataPlusInt<int> > data_out(r.size());
       libmesh_call_mpi
-        (MPI_Allreduce (&in[0], &out[0], cast_int<int>(r.size()),
+        (MPI_Allreduce (&data_in[0], &data_out[0],
+                        cast_int<int>(r.size()),
                         StandardType<int>(), MPI_MAXLOC,
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
-          r[i]      = out[i].val;
-          max_id[i] = out[i].rank;
+          r[i]      = data_out[i].val;
+          max_id[i] = data_out[i].rank;
         }
     }
   else if (!r.empty())
@@ -2560,7 +2569,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 template <typename Context, typename OutputIter, typename T>
 inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
                                                 Context * context,
-                                                OutputIter out,
+                                                OutputIter out_iter,
                                                 const T * output_type,
                                                 const MessageTag & tag) const
 {
@@ -2581,7 +2590,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
       this->receive(stat.source(), buffer, MessageTag(stat.tag()));
       received_buffer_size += buffer.size();
       Parallel::unpack_range
-        (buffer, context, out, output_type);
+        (buffer, context, out_iter, output_type);
     }
 }
 
@@ -2590,7 +2599,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 // template <typename Context, typename OutputIter>
 // inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
 //                                                 Context * context,
-//                                                 OutputIter out,
+//                                                 OutputIter out_iter,
 //                                                 Request & req,
 //                                                 const MessageTag & tag) const
 // {
@@ -2607,7 +2616,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
 //   // Make the Request::wait() handle unpacking the buffer
 //   req.add_post_wait_work
 //     (new Parallel::PostWaitUnpackBuffer<std::vector<buffer_t>, Context, OutputIter>
-//      (buffer, context, out));
+//      (buffer, context, out_iter));
 //
 //   // Make the Request::wait() then handle deleting the buffer
 //   req.add_post_wait_work
@@ -2786,7 +2795,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
                                          const RangeIter send_end,
                                          const unsigned int source_processor_id,
                                          Context2 * context2,
-                                         OutputIter out,
+                                         OutputIter out_iter,
                                          const T * output_type,
                                          const MessageTag & send_tag,
                                          const MessageTag & recv_tag) const
@@ -2798,7 +2807,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
   this->send_packed_range (dest_processor_id, context1, send_begin, send_end,
                            req, send_tag);
 
-  this->receive_packed_range (source_processor_id, context2, out,
+  this->receive_packed_range (source_processor_id, context2, out_iter,
                               output_type, recv_tag);
 
   req.wait();
@@ -3266,7 +3275,7 @@ inline void Communicator::broadcast_packed_range(const Context * context1,
                                                  Iter range_begin,
                                                  const Iter range_end,
                                                  OutputContext * context2,
-                                                 OutputIter out,
+                                                 OutputIter out_iter,
                                                  const unsigned int root_id) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
@@ -3298,7 +3307,7 @@ inline void Communicator::broadcast_packed_range(const Context * context1,
 
       if (this->rank() != root_id)
         Parallel::unpack_range
-          (buffer, context2, out, (T*)libmesh_nullptr);
+          (buffer, context2, out_iter, (T*)libmesh_nullptr);
     } while (true);  // break above when we reach buffer_size==0
 }
 
@@ -3471,7 +3480,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
                                          const RangeIter send_end,
                                          const unsigned int source_processor_id,
                                          Context2 * context2,
-                                         OutputIter out,
+                                         OutputIter out_iter,
                                          const T * output_type,
                                          const MessageTag &,
                                          const MessageTag &) const
@@ -3502,7 +3511,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
       send_begin = next_send_begin;
 
       Parallel::unpack_range
-        (buffer, context2, out, output_type);
+        (buffer, context2, out_iter, output_type);
     }
 }
 
@@ -3555,7 +3564,7 @@ inline void Communicator::gather_packed_range(const unsigned int root_id,
                                               Context * context,
                                               Iter range_begin,
                                               const Iter range_end,
-                                              OutputIter out) const
+                                              OutputIter out_iter) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::Packing<T>::buffer_type buffer_t;
@@ -3575,7 +3584,7 @@ inline void Communicator::gather_packed_range(const unsigned int root_id,
       this->gather(root_id, buffer);
 
       Parallel::unpack_range
-        (buffer, context, out, (T*)(libmesh_nullptr));
+        (buffer, context, out_iter, (T*)(libmesh_nullptr));
 
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
@@ -3587,7 +3596,7 @@ template <typename Context, typename Iter, typename OutputIter>
 inline void Communicator::allgather_packed_range(Context * context,
                                                  Iter range_begin,
                                                  const Iter range_end,
-                                                 OutputIter out) const
+                                                 OutputIter out_iter) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::Packing<T>::buffer_type buffer_t;
@@ -3609,7 +3618,7 @@ inline void Communicator::allgather_packed_range(Context * context,
       libmesh_assert(buffer.size());
 
       Parallel::unpack_range
-        (buffer, context, out, (T*)libmesh_nullptr);
+        (buffer, context, out_iter, (T*)libmesh_nullptr);
 
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
