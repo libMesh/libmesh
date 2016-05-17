@@ -49,7 +49,7 @@ public:
    */
   explicit
   ReplicatedMesh (const Parallel::Communicator & comm_in,
-              unsigned char dim=1);
+                  unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -431,7 +431,7 @@ struct SerialMesh : public ReplicatedMesh
 {
   explicit
   SerialMesh (const Parallel::Communicator & comm_in,
-        unsigned char dim=1)
+              unsigned char dim=1)
     : ReplicatedMesh(comm_in,dim) {}
 
 #ifndef LIBMESH_DISABLE_COMMWORLD

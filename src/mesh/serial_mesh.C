@@ -385,7 +385,7 @@ void ReplicatedMesh::delete_elem(Elem * e)
 
 
 void ReplicatedMesh::renumber_elem(const dof_id_type old_id,
-                               const dof_id_type new_id)
+                                   const dof_id_type new_id)
 {
   // This doesn't get used in serial yet
   Elem * el = _elements[old_id];

@@ -53,7 +53,7 @@ public:
    */
   explicit
   DistributedMesh (const Parallel::Communicator & comm_in,
-                unsigned char dim=1);
+                   unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -479,7 +479,7 @@ struct ParallelMesh : public DistributedMesh
 {
   explicit
   ParallelMesh (const Parallel::Communicator & comm_in,
-        unsigned char dim=1)
+                unsigned char dim=1)
     : DistributedMesh(comm_in,dim) {}
 
 #ifndef LIBMESH_DISABLE_COMMWORLD

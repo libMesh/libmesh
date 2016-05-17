@@ -1214,9 +1214,9 @@ void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
 
 
 // ------------------------------------------------------------
-void MeshCommunication::delete_remote_elements
-  (DistributedMesh & mesh,
-   const std::set<Elem *> & extra_ghost_elem_ids) const
+void
+MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
+                                           const std::set<Elem *> & extra_ghost_elem_ids) const
 {
   // The mesh should know it's about to be parallelized
   libmesh_assert (!mesh.is_serial());
