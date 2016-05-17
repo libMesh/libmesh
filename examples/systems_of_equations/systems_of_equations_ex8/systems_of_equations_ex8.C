@@ -61,6 +61,11 @@ int main (int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
+  // This example uses an ExodusII input file
+#ifndef LIBMESH_HAVE_EXODUS_API
+  libmesh_example_requires(false, "--enable-exodus");
+#endif
+
   // This example requires the PETSc nonlinear solvers
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
