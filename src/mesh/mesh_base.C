@@ -575,6 +575,7 @@ void MeshBase::cache_elem_dims()
         {
           Node & node = **node_it;
 
+#if LIBMESH_DIM > 1
           // Note: the exact floating point comparison is intentional,
           // we don't want to get tripped up by tolerances.
           if (node(1) != 0.)
@@ -587,6 +588,7 @@ void MeshBase::cache_elem_dims()
               break;
 #endif
             }
+#endif
 
 #if LIBMESH_DIM > 2
           if (node(2) != 0.)
