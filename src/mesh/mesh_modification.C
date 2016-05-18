@@ -840,11 +840,10 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               subelem[1] = new Tri6;
 
               // Add a new node at the center (vertex average) of the element.
-              Node * new_node = mesh.add_point(.25 *
-                                               (mesh.point(elem->node_id(0)) +
+              Node * new_node = mesh.add_point((mesh.point(elem->node_id(0)) +
                                                 mesh.point(elem->node_id(1)) +
                                                 mesh.point(elem->node_id(2)) +
-                                                mesh.point(elem->node_id(3))),
+                                                mesh.point(elem->node_id(3)))/4,
                                                DofObject::invalid_id,
                                                elem->processor_id());
 

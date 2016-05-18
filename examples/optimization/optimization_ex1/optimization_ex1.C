@@ -260,6 +260,8 @@ int main (int argc, char ** argv)
 
 #endif
 
+  // We use a 2D domain.
+  libmesh_example_requires(LIBMESH_DIM > 1, "--disable-1D-only");
 
   if (libMesh::on_command_line ("--use-eigen"))
     {

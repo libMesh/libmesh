@@ -425,6 +425,8 @@ int main (int argc, char ** argv)
 
 #endif
 
+  // We use a 2D domain.
+  libmesh_example_requires(LIBMESH_DIM > 1, "--disable-1D-only");
 
   GetPot infile("optimization_ex2.in");
   const std::string approx_order = infile("approx_order", "FIRST");
