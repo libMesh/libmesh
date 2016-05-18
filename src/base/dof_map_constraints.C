@@ -1158,6 +1158,10 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
          i = _dirichlet_boundaries->begin();
        i != _dirichlet_boundaries->end(); ++i, range.reset())
     {
+      // Sanity check that the boundary ids associated with the DirichletBoundary
+      // objects are actually present in the mesh
+      this->check_dirichlet_bcid_consistency(mesh,**i);
+
       Threads::parallel_for
         (range,
          ConstrainDirichlet(*this, mesh, time, **i,
@@ -1174,6 +1178,10 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
            i != _adjoint_dirichlet_boundaries[qoi_index]->end();
            ++i, range.reset())
         {
+          // Sanity check that the boundary ids associated with the DirichletBoundary
+          // objects are actually present in the mesh
+          this->check_dirichlet_bcid_consistency(mesh,**i);
+
           Threads::parallel_for
             (range,
              ConstrainDirichlet(*this, mesh, time, **i,
@@ -3871,6 +3879,18 @@ DirichletBoundaries::~DirichletBoundaries()
 {
   for (std::vector<DirichletBoundary *>::iterator it = begin(); it != end(); ++it)
     delete *it;
+}
+
+void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
+                                               const DirichletBoundary & boundary) const
+{
+  const std::set<boundary_id_type>& mesh_bcids = mesh.get_boundary_info().get_boundary_ids();
+  const std::set<boundary_id_type>& dbc_bcids = boundary.b;
+
+  for (std::set<boundary_id_type>::const_iterator bid = dbc_bcids.begin();
+       bid != dbc_bcids.end(); ++bid)
+    if (mesh_bcids.find(*bid) == mesh_bcids.end())
+      libmesh_error_msg("Could not find Dirichlet boundary id " << *bid << " in mesh!");
 }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
