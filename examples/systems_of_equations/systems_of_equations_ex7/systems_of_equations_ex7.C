@@ -540,6 +540,9 @@ int main (int argc, char ** argv)
   // This example requires the PETSc nonlinear solvers
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
+  // We use a 3D domain.
+  libmesh_example_requires(LIBMESH_DIM > 2, "--disable-1D-only --disable-2D-only");
+
   GetPot infile("systems_of_equations_ex7.in");
   const Real x_length = infile("x_length", 0.);
   const Real y_length = infile("y_length", 0.);

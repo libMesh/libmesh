@@ -66,6 +66,9 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-exodus");
 #endif
 
+  // We use a 3D domain.
+  libmesh_example_requires(LIBMESH_DIM > 2, "--disable-1D-only --disable-2D-only");
+
   // This example requires the PETSc nonlinear solvers
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
