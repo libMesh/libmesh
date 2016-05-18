@@ -58,7 +58,9 @@ FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
 
   system_types(0),
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   periodic_boundaries(0),
+#endif
 
   run_simulation(true), run_postprocess(false),
 
@@ -268,6 +270,7 @@ void FEMParameters::read(GetPot & input,
     }
 
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   GETPOT_REGISTER(periodic_boundaries);
   const unsigned int n_periodic_bcs =
     input.vector_variable_size("periodic_boundaries");
@@ -329,6 +332,7 @@ void FEMParameters::read(GetPot & input,
           periodic_boundaries[i].pairedboundary = pairedboundary;
         }
     }
+#endif // LIBMESH_ENABLE_PERIODIC
 
   // Use std::string inputs so GetPot doesn't have to make a bunch
   // of internal C string copies

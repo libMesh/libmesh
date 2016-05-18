@@ -274,6 +274,16 @@ uint16_t hashword(const uint16_t * k, size_t length)
   return static_cast<uint16_t>(c);
 }
 
+
+// Calls function above with slightly more convenient std::vector interface.
+inline
+uint16_t hashword(const std::vector<uint16_t> & keys)
+{
+  return hashword(&keys[0], keys.size());
+}
+
+
+
 } // end Utility namespace
 } // end libMesh namespace
 

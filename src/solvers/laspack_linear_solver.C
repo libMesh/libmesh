@@ -514,7 +514,15 @@ void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 template <typename T>
 void LaspackLinearSolver<T>::print_converged_reason() const
 {
-  libMesh::out << "print_converged_reason() is currently only supported"
+  switch (LASResult())
+    {
+    case LASOK :
+      libMesh::out << "Laspack converged.\n";
+      break;
+    default    :
+      libMesh::out << "Laspack diverged.\n";
+    }
+  libMesh::out << "Detailed reporting is currently only supported"
                << "with Petsc 2.3.1 and later." << std::endl;
 }
 
@@ -523,7 +531,11 @@ void LaspackLinearSolver<T>::print_converged_reason() const
 template <typename T>
 LinearConvergenceReason LaspackLinearSolver<T>::get_converged_reason() const
 {
-  libmesh_not_implemented();
+  switch (LASResult())
+    {
+    case LASOK : return CONVERGED_RTOL_NORMAL;
+    default    : return DIVERGED_NULL;
+    }
 }
 
 

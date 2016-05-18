@@ -661,9 +661,11 @@ int main (int argc, char ** argv)
 
       lde.compute_stresses();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
       std::stringstream filename;
       filename << "solution_" << count << ".exo";
       ExodusII_IO (mesh).write_equation_systems(filename.str(), equation_systems);
+#endif
     }
 
   return 0;

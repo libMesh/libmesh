@@ -77,7 +77,9 @@ public:
 
   //   Boundary and initial conditions
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   std::vector<libMesh::PeriodicBoundary> periodic_boundaries;
+#endif
 
   std::map<libMesh::subdomain_id_type, libMesh::FunctionBase<libMesh::Number> *>
   initial_conditions;
