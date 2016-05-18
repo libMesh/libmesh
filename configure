@@ -2043,7 +2043,7 @@ Optional Packages:
                           bytes of storage per element used to store the
                           subdomain_id [2]
   --with-unique-id-bytes=<1|2|4|8>
-                          bytes used per unique id [4]
+                          bytes used per unique id [8]
   --with-boost[=ARG]      use Boost library from a standard location
                           (ARG=yes), from the specified location (ARG=<path>),
                           or disable it (ARG=no) [ARG=yes]

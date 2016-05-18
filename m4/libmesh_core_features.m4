@@ -301,7 +301,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_WITH([unique_id_bytes],
             AS_HELP_STRING([--with-unique-id-bytes=<1|2|4|8>],
-                           [bytes used per unique id [4]]),
+                           [bytes used per unique id [8]]),
             [unique_bytes="$withval"],
             [unique_bytes=8])
 
