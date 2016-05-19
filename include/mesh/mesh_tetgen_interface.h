@@ -44,7 +44,7 @@ class Elem;
  * Class \p TetGenMeshInterface provides an interface for
  * tetrahedrization of meshes using the TetGen library.  For
  * information about TetGen cf.
- * <a href="http://tetgen.berlios.de/">TetGen home page</a>.
+ * <a href="http://tetgen.org/">TetGen home page</a>.
  *
  * \author Steffen Petersen
  * \date 2004
