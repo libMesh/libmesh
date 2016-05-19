@@ -219,6 +219,12 @@
 /* Compiler supports auto keyword, but it is disabled in libmesh */
 #undef HAVE_CXX11_AUTO_BUT_DISABLED
 
+/* Flag indicating whether compiler supports std::condition_variable */
+#undef HAVE_CXX11_CONDITION_VARIABLE
+
+/* Compiler supports std::condition_variable, but it is disabled in libmesh */
+#undef HAVE_CXX11_CONDITION_VARIABLE_BUT_DISABLED
+
 /* Flag indicating whether compiler supports constexpr */
 #undef HAVE_CXX11_CONSTEXPR
 
