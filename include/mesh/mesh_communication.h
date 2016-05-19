@@ -33,6 +33,10 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
+class DistributedMesh;
+
+// This is for backwards compatibility, but if your code relies on
+// forward declarations in our headers then fix it.
 class ParallelMesh;
 
 /**
@@ -91,43 +95,43 @@ public:
    * to satisfy data dependencies. This method can be invoked after a
    * partitioning step to affect the new partitioning.
    */
-  void redistribute (ParallelMesh &) const;
+  void redistribute (DistributedMesh &) const;
 
   /**
    *
    */
-  void gather_neighboring_elements (ParallelMesh &) const;
+  void gather_neighboring_elements (DistributedMesh &) const;
 
   /**
-   * This method takes an input \p ParallelMesh which may be
+   * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor then
    * sends its local nodes and elements to processor \p root_id.
-   * The end result is that a previously distributed \p ParallelMesh
+   * The end result is that a previously distributed \p DistributedMesh
    * will be serialized on processor \p root_id.  Since this method is
    * collective it must be called by all processors. For the special
    * case of \p root_id equal to \p DofObject::invalid_processor_id
    * this function performs an allgather.
    */
-  void gather (const processor_id_type root_id, ParallelMesh &) const;
+  void gather (const processor_id_type root_id, DistributedMesh &) const;
 
   /**
-   * This method takes an input \p ParallelMesh which may be
+   * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor then
    * sends its local nodes and elements to the other processors.
-   * The end result is that a previously distributed \p ParallelMesh
+   * The end result is that a previously distributed \p DistributedMesh
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (ParallelMesh & mesh) const
+  void allgather (DistributedMesh & mesh) const
   { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**
-   * This method takes an input \p ParallelMesh which may be
+   * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor
    * deletes all elements which are neither local elements nor "ghost"
    * elements which touch local elements, and deletes all nodes which
    * are not contained in local or ghost elements.
-   * The end result is that a previously serial \p ParallelMesh
+   * The end result is that a previously serial \p DistributedMesh
    * will be distributed between processors.  Since this method is
    * collective it must be called by all processors.
    *
@@ -135,7 +139,7 @@ public:
    * to delete.  These will be left on the current processor along with
    * local elements and ghosted neighbors.
    */
-  void delete_remote_elements (ParallelMesh &, const std::set<Elem *> &) const;
+  void delete_remote_elements (DistributedMesh &, const std::set<Elem *> &) const;
 
   /**
    * This method assigns globally unique, partition-agnostic
@@ -171,10 +175,12 @@ public:
    */
   void make_elems_parallel_consistent (MeshBase &);
 
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Copy p levels of ghost elements from their local processors.
    */
   void make_p_levels_parallel_consistent (MeshBase &);
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * Assuming all ids on local nodes are globally unique, and

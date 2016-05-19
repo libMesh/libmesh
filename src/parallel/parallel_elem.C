@@ -33,7 +33,6 @@ namespace
 {
 using namespace libMesh;
 
-#ifdef LIBMESH_HAVE_MPI
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 static const unsigned int header_size = 12;
 #else
@@ -41,14 +40,11 @@ static const unsigned int header_size = 11;
 #endif
 
 static const largest_id_type elem_magic_header = 987654321;
-#endif
 }
 
 
 namespace libMesh
 {
-
-#ifdef LIBMESH_HAVE_MPI
 
 namespace Parallel
 {
@@ -157,6 +153,17 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
     header_size + elem->n_nodes() +
     elem->n_neighbors() +
     elem->packed_indexing_size() + total_packed_bcs;
+}
+
+
+
+template <>
+template <>
+unsigned int
+Packing<const Elem *>::packable_size (const Elem * const & elem,
+                                      const DistributedMesh * mesh)
+{
+  return packable_size(elem, static_cast<const MeshBase *>(mesh));
 }
 
 
@@ -285,6 +292,18 @@ Packing<const Elem *>::pack (const Elem * const & elem,
             *data_out++ =(*bc_it);
         }
     }
+}
+
+
+
+template <>
+template <>
+void
+Packing<const Elem *>::pack (const Elem * const & elem,
+                             std::back_insert_iterator<std::vector<largest_id_type> > data_out,
+                             const DistributedMesh * mesh)
+{
+  pack(elem, data_out, static_cast<const MeshBase*>(mesh));
 }
 
 
@@ -567,11 +586,13 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // doing a projection on this inactive element on this
       // processor, so we won't need correct p settings.  Couldn't
       // hurt to update, though.
+#ifdef LIBMESH_ENABLE_AMR
       if (elem->processor_id() != mesh->processor_id())
         {
           elem->hack_p_level(p_level);
           elem->set_p_refinement_flag(p_refinement_flag);
         }
+#endif // LIBMESH_ENABLE_AMR
 
       // FIXME: We should add some debug mode tests to ensure that the
       // encoded indexing and boundary conditions are consistent.
@@ -745,13 +766,22 @@ template <>
 template <>
 Elem *
 Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
+                         DistributedMesh * mesh)
+{
+  return unpack(in, static_cast<MeshBase*>(mesh));
+}
+
+
+
+template <>
+template <>
+Elem *
+Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
                          ParallelMesh * mesh)
 {
   return unpack(in, static_cast<MeshBase*>(mesh));
 }
 
 } // namespace Parallel
-
-#endif // LIBMESH_HAVE_MPI
 
 } // namespace libMesh

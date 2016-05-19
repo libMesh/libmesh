@@ -909,7 +909,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
 
   //------------------------------------------------------------
   // At this point, all n_comp and dof_number values on local
-  // DofObjects should be correct, but a ParallelMesh might have
+  // DofObjects should be correct, but a DistributedMesh might have
   // incorrect values on non-local DofObjects.  Let's request the
   // correct values from each other processor.
 

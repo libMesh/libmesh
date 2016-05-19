@@ -563,7 +563,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
   // if (!mesh.is_serial())
   //   {
   //     if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
-  //       libMesh::err << "Error: GMVIO cannot yet write a ParallelMesh solution"
+  //       libMesh::err << "Error: GMVIO cannot yet write a DistributedMesh solution"
   //                     << std::endl;
   //     return;
   //   }

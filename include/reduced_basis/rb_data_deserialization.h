@@ -238,7 +238,7 @@ void load_point(RBData::Point3D::Reader point_reader, Point & point);
  */
 void load_elem_into_mesh(RBData::MeshElem::Reader mesh_elem_reader,
                          libMesh::Elem * elem,
-                         libMesh::SerialMesh & mesh);
+                         libMesh::ReplicatedMesh & mesh);
 
 } // namespace RBDataDeserialization
 

@@ -118,7 +118,7 @@ public:
 
   /**
    * Insist that we should write parallel files if and only if the
-   * mesh is an already distributed ParallelMesh.
+   * mesh is an already distributed DistributedMesh.
    */
   void set_auto_parallel ();
 

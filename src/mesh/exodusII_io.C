@@ -512,13 +512,13 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   if (MeshOutput<MeshBase>::mesh().processor_id() == 0 && !exio_helper->opened_for_writing)
     libmesh_error_msg("ERROR, ExodusII file must be initialized before outputting element variables.");
 
-  // This function currently only works on SerialMeshes. We rely on
-  // having a reference to a non-const MeshBase object from our
+  // This function currently only works on serialized meshes. We rely
+  // on having a reference to a non-const MeshBase object from our
   // MeshInput parent class to construct a MeshSerializer object,
   // similar to what is done in ExodusII_IO::write().  Note that
   // calling ExodusII_IO::write_timestep() followed by
   // ExodusII_IO::write_element_data() when the underlying Mesh is a
-  // ParallelMesh will result in an unnecessary additional
+  // DistributedMesh will result in an unnecessary additional
   // serialization/re-parallelization step.
   MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format);
 
@@ -763,7 +763,7 @@ void ExodusII_IO::write (const std::string & fname)
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // We may need to gather a ParallelMesh to output it, making that
+  // We may need to gather a DistributedMesh to output it, making that
   // const qualifier in our constructor a dirty lie
   MeshSerializer serialize(const_cast<MeshBase &>(mesh), !MeshOutput<MeshBase>::_is_parallel_format);
 

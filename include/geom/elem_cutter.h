@@ -40,9 +40,13 @@ namespace libMesh
 
 // Forward declarations
 class Elem;
-class SerialMesh;
+class ReplicatedMesh;
 class TriangleInterface;
 class TetGenMeshInterface;
+
+// This is for backwards compatibility, but if your code relies on
+// forward declarations in our headers then fix it.
+class SerialMesh;
 
 /**
  * This class implements cutting a single element into a collection
@@ -59,7 +63,7 @@ public:
 
   /**
    * Constructor.  Initializes pointer data
-   * without requiring a full \p SerialMesh in this header file.
+   * without requiring a full \p ReplicatedMesh in this header file.
    */
   ElemCutter();
 
@@ -150,10 +154,10 @@ protected:
   std::vector<Elem const *> _inside_elem;
   std::vector<Elem const *> _outside_elem;
 
-  UniquePtr<SerialMesh> _inside_mesh_2D;
-  UniquePtr<SerialMesh> _outside_mesh_2D;
-  UniquePtr<SerialMesh> _inside_mesh_3D;
-  UniquePtr<SerialMesh> _outside_mesh_3D;
+  UniquePtr<ReplicatedMesh> _inside_mesh_2D;
+  UniquePtr<ReplicatedMesh> _outside_mesh_2D;
+  UniquePtr<ReplicatedMesh> _inside_mesh_3D;
+  UniquePtr<ReplicatedMesh> _outside_mesh_3D;
 
   Parallel::Communicator _comm_self; // defaults to MPI_COMM_SELF
 

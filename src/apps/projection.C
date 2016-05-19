@@ -119,7 +119,7 @@ int main(int argc, char ** argv)
   // Load the old mesh from --inmesh filename.
   // Keep it serialized; we don't want elements on the new mesh to be
   // looking for data on old mesh elements that live off-processor.
-  SerialMesh old_mesh(init.comm(), requested_dim);
+  ReplicatedMesh old_mesh(init.comm(), requested_dim);
 
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string("mesh.xda"));

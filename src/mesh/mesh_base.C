@@ -215,7 +215,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // Partition the mesh.
   this->partition();
 
-  // If we're using ParallelMesh, we'll want it parallelized.
+  // If we're using DistributedMesh, we'll want it parallelized.
   this->delete_remote_elements();
 
   if(!_skip_renumber_nodes_and_elements)

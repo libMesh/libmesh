@@ -161,14 +161,14 @@ void MeshCommunication::clear ()
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-void MeshCommunication::redistribute (ParallelMesh &) const
+void MeshCommunication::redistribute (DistributedMesh &) const
 {
   // no MPI == one processor, no redistribution
   return;
 }
 #else
 // ------------------------------------------------------------
-void MeshCommunication::redistribute (ParallelMesh & mesh) const
+void MeshCommunication::redistribute (DistributedMesh & mesh) const
 {
   // This method will be called after a new partitioning has been
   // assigned to the elements.  This partitioning was defined in
@@ -389,14 +389,14 @@ void MeshCommunication::redistribute (ParallelMesh & mesh) const
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-void MeshCommunication::gather_neighboring_elements (ParallelMesh &) const
+void MeshCommunication::gather_neighboring_elements (DistributedMesh &) const
 {
   // no MPI == one processor, no need for this method...
   return;
 }
 #else
 // ------------------------------------------------------------
-void MeshCommunication::gather_neighboring_elements (ParallelMesh & mesh) const
+void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) const
 {
   // Don't need to do anything if there is
   // only one processor.
@@ -825,14 +825,14 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-void MeshCommunication::gather (const processor_id_type, ParallelMesh &) const
+void MeshCommunication::gather (const processor_id_type, DistributedMesh &) const
 {
   // no MPI == one processor, no need for this method...
   return;
 }
 #else
 // ------------------------------------------------------------
-void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh & mesh) const
+void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh & mesh) const
 {
   // The mesh should know it's about to be serialized
   libmesh_assert (mesh.is_serial());
@@ -936,6 +936,7 @@ struct SyncIds
 };
 
 
+#ifdef LIBMESH_ENABLE_AMR
 struct SyncPLevels
 {
   typedef unsigned char datum;
@@ -970,6 +971,7 @@ struct SyncPLevels
       }
   }
 };
+#endif // LIBMESH_ENABLE_AMR
 
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -1080,6 +1082,7 @@ void MeshCommunication::make_elems_parallel_consistent(MeshBase & mesh)
 
 
 // ------------------------------------------------------------
+#ifdef LIBMESH_ENABLE_AMR
 void MeshCommunication::make_p_levels_parallel_consistent(MeshBase & mesh)
 {
   // This function must be run on all processors at once
@@ -1092,6 +1095,7 @@ void MeshCommunication::make_p_levels_parallel_consistent(MeshBase & mesh)
     (mesh.comm(), mesh.elements_begin(), mesh.elements_end(),
      syncplevels);
 }
+#endif // LIBMESH_ENABLE_AMR
 
 
 
@@ -1210,7 +1214,9 @@ void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
 
 
 // ------------------------------------------------------------
-void MeshCommunication::delete_remote_elements(ParallelMesh & mesh, const std::set<Elem *> & extra_ghost_elem_ids) const
+void
+MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
+                                           const std::set<Elem *> & extra_ghost_elem_ids) const
 {
   // The mesh should know it's about to be parallelized
   libmesh_assert (!mesh.is_serial());

@@ -2043,7 +2043,7 @@ Optional Packages:
                           bytes of storage per element used to store the
                           subdomain_id [2]
   --with-unique-id-bytes=<1|2|4|8>
-                          bytes used per unique id [4]
+                          bytes used per unique id [8]
   --with-boost[=ARG]      use Boost library from a standard location
                           (ARG=yes), from the specified location (ARG=<path>),
                           or disable it (ARG=no) [ARG=yes]
@@ -41806,6 +41806,91 @@ $as_echo "$cppunit_major_version.$cppunit_minor_version.$cppunit_micro_version" 
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
       no_cppunit=yes
+    fi
+
+    if test "x$no_cppunit" = x ; then
+      saveCXXFLAGS="$CXXFLAGS"
+      CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+      ac_fn_cxx_check_header_mongrel "$LINENO" "cppunit/TestCase.h" "ac_cv_header_cppunit_TestCase_h" "$ac_includes_default"
+if test "x$ac_cv_header_cppunit_TestCase_h" = xyes; then :
+
+else
+  no_cppunit=no
+fi
+
+
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      CXXFLAGS="$saveCXXFLAGS"
+    fi
+
+    # CppUnit uses lots of C++ features, linking of which might be
+    # broken by the C++11 ABI changes, so let's make sure we can link
+    # with it.
+    if test "x$no_cppunit" = x ; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can build a trivial CppUnit program" >&5
+$as_echo_n "checking whether we can build a trivial CppUnit program... " >&6; }
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+      saveCXXFLAGS="$CXXFLAGS"
+      CXXFLAGS="$saveCXXFLAGS $CPPUNIT_CFLAGS"
+      saveLIBS="$LIBS"
+      LIBS="$CPPUNIT_LIBS $saveLIBS"
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      #include <cppunit/ui/text/TestRunner.h>
+      int main( int argc, char **argv)
+      {
+        CppUnit::TextUi::TestRunner runner;
+
+	// We don't actually run this, but we should try to link to a
+        // CppUnit method.
+        if (runner.run())
+          return 0;
+
+        return 1;
+      }
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        no_cppunit=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      LIBS="$saveLIBS"
+      CXXFLAGS="$saveCXXFLAGS"
     fi
   fi
 

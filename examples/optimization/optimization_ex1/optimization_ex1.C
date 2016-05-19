@@ -247,6 +247,10 @@ int main (int argc, char ** argv)
 
   libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support");
 
+#elif !defined(LIBMESH_ENABLE_GHOSTED)
+
+  libmesh_example_requires(false, "--enable-ghosted");
+
 #elif LIBMESH_USE_COMPLEX_NUMBERS
 
   // According to
@@ -349,9 +353,11 @@ int main (int argc, char ** argv)
   // Print convergence information
   system.optimization_solver->print_converged_reason();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   std::stringstream filename;
   ExodusII_IO (mesh).write_equation_systems("optimization_soln.exo",
                                             equation_systems);
+#endif
 
   return 0;
 }

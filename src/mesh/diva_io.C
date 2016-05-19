@@ -41,7 +41,7 @@ DivaIO::DivaIO (const MeshBase & mesh_in) :
 
 void DivaIO::write (const std::string & fname)
 {
-  // We may need to gather a ParallelMesh to output it, making that
+  // We may need to gather a DistributedMesh to output it, making that
   // const qualifier in our constructor a dirty lie
   MeshSerializer serialize(const_cast<MeshBase &>(this->mesh()), !_is_parallel_format);
 

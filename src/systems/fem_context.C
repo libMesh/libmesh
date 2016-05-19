@@ -1588,6 +1588,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
         sys.get_dof_map().dof_indices (libmesh_nullptr, this->get_dof_indices());
     }
+#ifdef LIBMESH_ENABLE_AMR
   else if (algebraic_type() == OLD)
     {
       // Initialize the per-element data for elem.
@@ -1597,6 +1598,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
         sys.get_dof_map().old_dof_indices (libmesh_nullptr, this->get_dof_indices());
     }
+#endif // LIBMESH_ENABLE_AMR
 
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices().size());
@@ -1659,6 +1661,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
               sys.get_dof_map().dof_indices (libmesh_nullptr, this->get_dof_indices(i), i);
           }
+#ifdef LIBMESH_ENABLE_AMR
         else if (algebraic_type() == OLD)
           {
             if(this->has_elem())
@@ -1667,6 +1670,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
               sys.get_dof_map().old_dof_indices (libmesh_nullptr, this->get_dof_indices(i), i);
           }
+#endif // LIBMESH_ENABLE_AMR
 
         if (this->algebraic_type() != NONE &&
             this->algebraic_type() != DOFS_ONLY)
@@ -1806,6 +1810,7 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   // everywhere.
   libmesh_assert(this->has_elem() || fe_type.family == SCALAR);
 
+#ifdef LIBMESH_ENABLE_AMR
   if ((algebraic_type() == OLD) &&
       this->has_elem())
     {
@@ -1814,6 +1819,7 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
       else if (this->get_elem().p_refinement_flag() == Elem::JUST_COARSENED)
         fe_type.order = static_cast<Order>(fe_type.order + 1);
     }
+#endif // LIBMESH_ENABLE_AMR
 
   unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
 

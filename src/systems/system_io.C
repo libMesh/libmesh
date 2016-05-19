@@ -1998,6 +1998,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
               this->comm().receive (id_status.source(), ids,  id_tag);
 #else
               std::vector<dof_id_type> & ids (recv_ids[0]);
+              ids = xfer_ids[blk];
 #endif
 
               // note its possible we didn't receive values for objects in

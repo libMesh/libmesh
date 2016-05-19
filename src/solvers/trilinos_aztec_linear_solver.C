@@ -183,11 +183,51 @@ Real AztecLinearSolver<T>::get_initial_residual()
 
 
 template <typename T>
+void AztecLinearSolver<T>::print_converged_reason() const
+{
+  const double *status = _linear_solver->GetAztecStatus();
+
+  switch (static_cast<int>(status[AZ_why]))
+    {
+    case AZ_normal :
+      libMesh::out << "AztecOO converged.\n";
+      break;
+    case AZ_maxits :
+      libMesh::out << "AztecOO failed to converge within maximum iterations.\n";
+      break;
+    case AZ_param :
+      libMesh::out << "AztecOO failed to support a user-requested parameter.\n";
+      break;
+    case AZ_breakdown :
+      libMesh::out << "AztecOO encountered numerical breakdown.\n";
+      break;
+    case AZ_loss :
+      libMesh::out << "AztecOO encountered numerical loss of precision.\n";
+      break;
+    case AZ_ill_cond :
+      libMesh::out << "AztecOO encountered an ill-conditioned GMRES Hessian.\n";
+      break;
+    default:
+      libMesh::out << "AztecOO reported an unrecognized condition.\n";
+      break;
+    }
+}
+
+
+
+template <typename T>
 LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
 {
-  libmesh_not_implemented();
+  const double *status = _linear_solver->GetAztecStatus();
 
-  return UNKNOWN_FLAG;
+  switch (static_cast<int>(status[AZ_why]))
+    {
+    case AZ_normal :
+      return CONVERGED_RTOL_NORMAL;
+    case AZ_maxits :
+      return DIVERGED_ITS;
+    }
+  return DIVERGED_NULL;
 }
 
 

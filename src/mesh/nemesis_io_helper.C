@@ -746,8 +746,8 @@ void Nemesis_IO_Helper::create(std::string filename)
 
 void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, bool /*use_discontinuous*/)
 {
-  // Make sure that the reference passed in is really a ParallelMesh
-  // const ParallelMesh & pmesh = cast_ref<const ParallelMesh &>(mesh);
+  // Make sure that the reference passed in is really a DistributedMesh
+  // const DistributedMesh & pmesh = cast_ref<const DistributedMesh &>(mesh);
   const MeshBase & pmesh = mesh;
 
   // According to Nemesis documentation, first call when writing should be to
@@ -2312,8 +2312,8 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
 void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
-  // Make sure that the reference passed in is really a ParallelMesh
-  // const ParallelMesh & pmesh = cast_ref<const ParallelMesh &>(mesh);
+  // Make sure that the reference passed in is really a DistributedMesh
+  // const DistributedMesh & pmesh = cast_ref<const DistributedMesh &>(mesh);
 
   unsigned local_num_nodes =
     cast_int<unsigned int>(this->exodus_node_num_to_libmesh.size());

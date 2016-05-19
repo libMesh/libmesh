@@ -459,7 +459,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
       new_elem->set_interior_parent (const_cast<Elem *>(elem));
 
-      // On non-local elements on ParallelMesh we might have
+      // On non-local elements on DistributedMesh we might have
       // RemoteElem neighbor links to construct
       if (!_mesh.is_serial() &&
           (elem->processor_id() != this->processor_id()))
@@ -533,7 +533,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   // Make sure we didn't add ids inconsistently
 #ifdef DEBUG
 # ifdef LIBMESH_HAVE_RTTI
-  ParallelMesh * parmesh = dynamic_cast<ParallelMesh *>(&boundary_mesh);
+  DistributedMesh * parmesh = dynamic_cast<DistributedMesh *>(&boundary_mesh);
   if (parmesh)
     parmesh->libmesh_assert_valid_parallel_ids();
 # endif
@@ -1834,7 +1834,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                                  dof_id_type first_free_elem_id,
                                  std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
 {
-  // We'll do the same modulus trick that ParallelMesh uses to avoid
+  // We'll do the same modulus trick that DistributedMesh uses to avoid
   // id conflicts between different processors
   dof_id_type
     next_node_id = first_free_node_id + this->processor_id(),

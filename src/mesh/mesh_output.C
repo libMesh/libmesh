@@ -34,7 +34,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
 {
   LOG_SCOPE("write_equation_systems()", "MeshOutput");
 
-  // We may need to gather and/or renumber a ParallelMesh to output
+  // We may need to gather and/or renumber a DistributedMesh to output
   // it, making that const qualifier in our constructor a dirty lie
   MT & my_mesh = const_cast<MT &>(*_obj);
 
@@ -112,6 +112,6 @@ void MeshOutput<MT>::write_nodal_data (const std::string & fname,
 // move any functions in this file to the header file instead.
 template class MeshOutput<MeshBase>;
 template class MeshOutput<UnstructuredMesh>;
-template class MeshOutput<ParallelMesh>;
+template class MeshOutput<DistributedMesh>;
 
 } // namespace libMesh

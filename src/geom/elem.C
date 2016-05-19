@@ -1442,7 +1442,7 @@ bool Elem::ancestor() const
 {
 #ifdef LIBMESH_ENABLE_AMR
 
-  // Use a fast, ParallelMesh-safe definition
+  // Use a fast, DistributedMesh-safe definition
   const bool is_ancestor =
     !this->active() && !this->subactive();
 

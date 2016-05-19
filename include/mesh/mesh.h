@@ -24,12 +24,12 @@
 #ifdef LIBMESH_ENABLE_PARMESH
 #include "libmesh/parallel_mesh.h"
 namespace libMesh {
-typedef ParallelMesh DefaultMesh;
+typedef DistributedMesh DefaultMesh;
 }
 #else
 #include "libmesh/serial_mesh.h"
 namespace libMesh {
-typedef SerialMesh DefaultMesh;
+typedef ReplicatedMesh DefaultMesh;
 }
 #endif
 
@@ -37,11 +37,11 @@ namespace libMesh
 {
 
 // Forward declarations don't like typedefs...
-// typedef SerialMesh Mesh;
+// typedef ReplicatedMesh Mesh;
 
 /**
- * The \p Mesh class is a thin wrapper, around the \p SerialMesh class
- * by default.
+ * The \p Mesh class is a thin wrapper, around the \p ReplicatedMesh
+ * class by default.
  */
 class Mesh : public DefaultMesh
 {
