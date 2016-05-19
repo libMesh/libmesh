@@ -711,6 +711,71 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX11_CONDITION_VARIABLE],
+  [
+    have_cxx11_condition_variable=no
+
+    AC_MSG_CHECKING(for C++11 <condition_variable> support)
+    AC_LANG_PUSH([C++])
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    # Test code is from the accepted answer on:
+    # http://stackoverflow.com/questions/16350473/why-do-i-need-stdcondition-variable
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      @%:@include <iostream>
+      @%:@include <condition_variable>
+      @%:@include <mutex>
+      @%:@include <thread>
+      @%:@include <chrono>
+
+      bool is_ready = false;
+      std::mutex m;
+      std::condition_variable cv;
+
+      void
+      test()
+      {
+        std::this_thread::sleep_for(std::chrono::seconds(30));
+        std::unique_lock<std::mutex> ulock(m);
+        is_ready = true;
+        cv.notify_one();
+      }
+    ]], [[
+      std::thread t(test);
+      std::unique_lock<std::mutex> ulock(m);
+      while (!is_ready)
+        {
+          cv.wait(ulock);
+          if (!is_ready)
+            std::cout << "Spurious wake up!\n";
+        }
+      t.join();
+    ]])],[
+      if (test "x$enablecxx11" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_CONDITION_VARIABLE, 1, [Flag indicating whether compiler supports std::condition_variable])
+        have_cxx11_condition_variable=yes
+      else
+        AC_MSG_RESULT([yes, but disabled.])
+        AC_DEFINE(HAVE_CXX11_CONDITION_VARIABLE_BUT_DISABLED, 1, [Compiler supports std::condition_variable, but it is disabled in libmesh])
+      fi
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_CONDITION_VARIABLE, test x$have_cxx11_condition_variable == xyes)
+  ])
+
+
 AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
   [
     # This is designed to be an exhaustive test of the capabilities of
