@@ -322,12 +322,12 @@ Real Tri6::volume () const
   // \vec{x}_{\xi}  = \vec{a1}*xi + \vec{b1}*eta + \vec{c1}
   // \vec{x}_{\eta} = \vec{a2}*xi + \vec{b2}*eta + \vec{c2}
   Point
-    a1 =  4.*point(0) + 4.*point(1) - 8.*point(3),
-    b1 =  4.*point(0) - 4.*point(3) + 4.*point(4) - 4.*point(5),
-    c1 = -3.*point(0) - 1.*point(1) + 4.*point(3),
+    a1 =  4*point(0) + 4*point(1) - 8*point(3),
+    b1 =  4*point(0) - 4*point(3) + 4*point(4) - 4*point(5),
+    c1 = -3*point(0) - 1*point(1) + 4*point(3),
     a2 =  b1,
-    b2 =  4.*point(0) + 4.*point(2) - 8.*point(5),
-    c2 = -3.*point(0) - 1.*point(2) + 4.*point(5);
+    b2 =  4*point(0) + 4*point(2) - 8*point(5),
+    c2 = -3*point(0) - 1*point(2) + 4*point(5);
 
   // If a1 == b1 == a2 == b2 == 0, this is a TRI6 with straight sides,
   // and we can use the TRI3 formula to compute the volume.
