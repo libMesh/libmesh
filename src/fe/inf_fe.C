@@ -209,6 +209,12 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
                                              base_elem);
 
+          //compute the shape functions and map functions of base_fe
+          // before using them later in combine_base_radial.
+          base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(), 
+                                               base_elem, base_fe->calculate_d2phi);
+          base_fe->compute_shape_functions(base_elem, base_fe->qrule->get_points());
+
           init_shape_functions_required=true;
         }
 
@@ -255,9 +261,15 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
         base_fe = ap_fb.release();
       }
 
-      // inite base shapes
+      // init base shapes 
       base_fe->init_base_shape_functions(*pts,
                                          base_elem);
+
+      //compute the shape functions and map functions of base_fe
+      // before using them later in combine_base_radial.
+      base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(), 
+                                               base_elem, base_fe->calculate_d2phi);
+      base_fe->compute_shape_functions(base_elem, base_fe->qrule->get_points());
 
       this->init_shape_functions (inf_elem);
 
