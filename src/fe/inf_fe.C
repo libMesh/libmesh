@@ -156,11 +156,11 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
   // I don't understand infinite elements well enough to risk
   // calculating too little.  :-(  RHS
   this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
-  this->get_xyz(); 
-  this->determine_calculations(); 
+  this->get_xyz();
+  this->determine_calculations();
   base_fe->calculate_phi = base_fe->calculate_dphi = base_fe->calculate_dphiref = true;
-  base_fe->get_xyz(); 
-  base_fe->determine_calculations(); 
+  base_fe->get_xyz();
+  base_fe->determine_calculations();
 
   if (pts == libmesh_nullptr)
     {
@@ -261,7 +261,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
         base_fe = ap_fb.release();
       }
 
-      // inite base shapes // is this where fe_base->phi should be computed?
+      // init base shapes 
       base_fe->init_base_shape_functions(*pts,
                                          base_elem);
 
