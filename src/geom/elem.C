@@ -123,6 +123,8 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     1,  // NODEELEM
 
     3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -252,6 +254,11 @@ UniquePtr<Elem> Elem::build(const ElemType type,
         elem = new Tri3(p);
         break;
       }
+    case TRISHELL3:
+      {
+        elem = new TriShell3(p);
+        break;
+      }
     case TRI3SUBDIVISION:
       {
         elem = new Tri3Subdivision(p);
@@ -265,6 +272,11 @@ UniquePtr<Elem> Elem::build(const ElemType type,
     case QUAD4:
       {
         elem = new Quad4(p);
+        break;
+      }
+    case QUADSHELL4:
+      {
+        elem = new QuadShell4(p);
         break;
       }
     case QUAD8:
