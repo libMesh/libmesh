@@ -156,11 +156,11 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
   // I don't understand infinite elements well enough to risk
   // calculating too little.  :-(  RHS
   this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
-  this->get_xyz();
-  this->determine_calculations();
+  this->get_xyz(); 
+  this->determine_calculations(); 
   base_fe->calculate_phi = base_fe->calculate_dphi = base_fe->calculate_dphiref = true;
-  base_fe->get_xyz();
-  base_fe->determine_calculations();
+  base_fe->get_xyz(); 
+  base_fe->determine_calculations(); 
 
   if (pts == libmesh_nullptr)
     {
@@ -209,6 +209,12 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
                                              base_elem);
 
+          //compute the shape functions and map functions of base_fe
+          // before using them later in combine_base_radial.
+          base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(), 
+                                               base_elem, base_fe->calculate_d2phi);
+          base_fe->compute_shape_functions(base_elem, base_fe->qrule->get_points());
+
           init_shape_functions_required=true;
         }
 
@@ -255,9 +261,15 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
         base_fe = ap_fb.release();
       }
 
-      // inite base shapes
+      // inite base shapes // is this where fe_base->phi should be computed?
       base_fe->init_base_shape_functions(*pts,
                                          base_elem);
+
+      //compute the shape functions and map functions of base_fe
+      // before using them later in combine_base_radial.
+      base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(), 
+                                               base_elem, base_fe->calculate_d2phi);
+      base_fe->compute_shape_functions(base_elem, base_fe->qrule->get_points());
 
       this->init_shape_functions (inf_elem);
 
