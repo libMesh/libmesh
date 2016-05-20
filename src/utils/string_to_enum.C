@@ -111,11 +111,13 @@ void init_elem_type_to_enum ()
 
       elem_type_to_enum["TRI"            ]=TRI3;
       elem_type_to_enum["TRI3"           ]=TRI3;
+      elem_type_to_enum["TRISHELL3"      ]=TRISHELL3;
       elem_type_to_enum["TRI3SUBDIVISION"]=TRI3SUBDIVISION;
       elem_type_to_enum["TRI6"           ]=TRI6;
 
       elem_type_to_enum["QUAD"           ]=QUAD4;
       elem_type_to_enum["QUAD4"          ]=QUAD4;
+      elem_type_to_enum["QUADSHELL4"     ]=QUADSHELL4;
       elem_type_to_enum["QUAD8"          ]=QUAD8;
       elem_type_to_enum["QUAD9"          ]=QUAD9;
 

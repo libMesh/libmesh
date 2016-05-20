@@ -159,6 +159,27 @@ protected:
 
 };
 
+class QuadShell4 : public Quad4
+{
+public:
+
+  // QuadShell4 is almost identical to Quad4. The only difference
+  // is with the type of boundary data we store for this case.
+
+  /**
+   * Constructor.  By default this element has no parent.
+   */
+  explicit
+  QuadShell4 (Elem * p=libmesh_nullptr) :
+    Quad4(p) {}
+
+  /**
+   * @returns \p QUADSHELL4
+   */
+  virtual ElemType type () const libmesh_override { return QUADSHELL4; }
+
+};
+
 
 } // namespace libMesh
 

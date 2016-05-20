@@ -349,11 +349,13 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 2;
 
           case TRI3:
+          case TRISHELL3:
           case TRI3SUBDIVISION:
           case TRI6:
             return 3;
 
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             return 4;
@@ -495,6 +497,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
             }
 
           case TRI3:
+          case TRISHELL3:
           case TRI3SUBDIVISION:
           case TRI6:
             {
@@ -511,6 +514,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
             }
 
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
