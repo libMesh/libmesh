@@ -5043,7 +5043,12 @@ DirichletBoundaries::~DirichletBoundaries()
 void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
                                                const DirichletBoundary & boundary) const
 {
-  const std::set<boundary_id_type>& mesh_bcids = mesh.get_boundary_info().get_boundary_ids();
+  const std::set<boundary_id_type>& mesh_side_bcids =
+    mesh.get_boundary_info().get_boundary_ids();
+  const std::set<boundary_id_type>& mesh_edge_bcids =
+    mesh.get_boundary_info().get_edge_boundary_ids();
+  const std::set<boundary_id_type>& mesh_node_bcids =
+    mesh.get_boundary_info().get_node_boundary_ids();
   const std::set<boundary_id_type>& dbc_bcids = boundary.b;
 
   // DirichletBoundary id sets should be consistent across all ranks
@@ -5054,7 +5059,9 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
       // DirichletBoundary id sets should be consistent across all ranks
       libmesh_assert(mesh.comm().verify(bc_id));
 
-      bool found_bcid = (mesh_bcids.find(bc_id) != mesh_bcids.end());
+      bool found_bcid = (mesh_side_bcids.find(bc_id) != mesh_side_bcids.end() ||
+                         mesh_edge_bcids.find(bc_id) != mesh_edge_bcids.end() ||
+                         mesh_node_bcids.find(bc_id) != mesh_node_bcids.end());
 
       // On a distributed mesh, boundary id sets may *not* be
       // consistent across all ranks, since not all ranks see all
