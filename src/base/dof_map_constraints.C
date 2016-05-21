@@ -3889,8 +3889,12 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
 
   for (std::set<boundary_id_type>::const_iterator bid = dbc_bcids.begin();
        bid != dbc_bcids.end(); ++bid)
-    if (mesh_bcids.find(*bid) == mesh_bcids.end())
-      libmesh_error_msg("Could not find Dirichlet boundary id " << *bid << " in mesh!");
+    {
+      bool found_bcid = (mesh_bcids.find(*bid) != mesh_bcids.end());
+      mesh.comm().max(found_bcid);
+      if (!found_bcid)
+        libmesh_error_msg("Could not find Dirichlet boundary id " << *bid << " in mesh!");
+    }
 }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
