@@ -512,29 +512,34 @@ public:
                         std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
-   * @returns the user-specified boundary ids.
+   * @returns a set of the boundary ids which exist on semilocal parts
+   * of the mesh.
+   *
+   * ParallelMesh-compatible code may need a set_union or other
+   * manipulations to work with sets of boundary ids which include ids
+   * on remote parts of the mesh.
    */
   const std::set<boundary_id_type> & get_boundary_ids () const
   { return _boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs
-   * specified on sides.
+   * Returns a reference to the set of the boundary IDs specified on
+   * sides of semilocal mesh elements.
    */
   const std::set<boundary_id_type> & get_side_boundary_ids () const
   { return _side_boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs
-   * specified on edges.
+   * Returns a reference to the set of all boundary IDs specified on
+   * edges of semilocal mesh elements.
    * Edge-based boundary IDs should only be used in 3D.
    */
   const std::set<boundary_id_type> & get_edge_boundary_ids () const
   { return _edge_boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs
-   * specified on nodes.
+   * Returns a reference to the set of all boundary IDs specified on
+   * semilocal mesh nodes.
    */
   const std::set<boundary_id_type> & get_node_boundary_ids () const
   { return _node_boundary_ids; }
