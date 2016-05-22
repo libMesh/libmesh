@@ -39,6 +39,7 @@ void QGauss::init_2D(const ElemType type_in,
       //---------------------------------------------
       // Quadrilateral quadrature rules
     case QUAD4:
+    case QUADSHELL4:
     case QUAD8:
     case QUAD9:
       {
@@ -67,6 +68,7 @@ void QGauss::init_2D(const ElemType type_in,
       //---------------------------------------------
       // Triangle quadrature rules
     case TRI3:
+    case TRISHELL3:
     case TRI3SUBDIVISION:
     case TRI6:
       {
