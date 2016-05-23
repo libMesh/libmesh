@@ -36,6 +36,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_inserter_iterator.h"
+#include "libmesh/mesh_tools.h" // for libmesh_assert_valid_boundary_ids()
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
@@ -1052,6 +1053,13 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   LOG_SCOPE("create_dof_constraints()", "DofMap");
 
   libmesh_assert (mesh.is_prepared());
+
+  // The user might have set boundary conditions after the mesh was
+  // prepared; we should double-check that those boundary conditions
+  // are still consistent.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_boundary_ids(mesh);
+#endif
 
   // We might get constraint equations from AMR hanging nodes in 2D/3D
   // or from boundary conditions in any dimension
