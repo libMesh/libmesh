@@ -524,7 +524,8 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
 	elem_cutter.h elem_hash.h elem_quality.h elem_range.h face.h \
 	face_inf_quad.h face_inf_quad4.h face_inf_quad6.h face_quad.h \
-	face_quad4.h face_quad8.h face_quad9.h face_tri.h face_tri3.h \
+	face_quad4.h face_quad4_shell.h face_quad8.h face_quad9.h \
+	face_tri.h face_tri3.h face_tri3_shell.h \
 	face_tri3_subdivision.h face_tri6.h node.h node_elem.h \
 	node_range.h plane.h point.h reference_elem.h remote_elem.h \
 	side.h sphere.h stored_range.h surface.h abaqus_io.h \
@@ -1224,6 +1225,9 @@ face_quad.h: $(top_srcdir)/include/geom/face_quad.h
 face_quad4.h: $(top_srcdir)/include/geom/face_quad4.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+face_quad4_shell.h: $(top_srcdir)/include/geom/face_quad4_shell.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 face_quad8.h: $(top_srcdir)/include/geom/face_quad8.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1234,6 +1238,9 @@ face_tri.h: $(top_srcdir)/include/geom/face_tri.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3.h: $(top_srcdir)/include/geom/face_tri3.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri3_shell.h: $(top_srcdir)/include/geom/face_tri3_shell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
