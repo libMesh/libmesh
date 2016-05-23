@@ -266,7 +266,7 @@ void EigenSystem::assemble ()
 }
 
 
-std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
+std::pair<Real, Real> EigenSystem::get_eigenpair (dof_id_type i)
 {
   // call the eigen_solver get_eigenpair method
   return eigen_solver->get_eigenpair (i, *solution);

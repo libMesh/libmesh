@@ -654,7 +654,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 
 
 template <typename T>
-std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
+std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(dof_id_type i,
                                                          NumericVector<T> & solution_in)
 {
   PetscErrorCode ierr=0;
@@ -685,7 +685,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
 
 
 template <typename T>
-std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(unsigned int i)
+std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(dof_id_type i)
 {
   PetscErrorCode ierr=0;
 
