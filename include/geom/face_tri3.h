@@ -175,28 +175,6 @@ protected:
 
 };
 
-class TriShell3 : public Tri3
-{
-public:
-
-  // TriShell3 is almost identical to Tri3. The only difference
-  // is with the type of boundary data we store for this case.
-
-  /**
-   * Constructor.  By default this element has no parent.
-   */
-  explicit
-  TriShell3 (Elem * p=libmesh_nullptr) :
-    Tri3(p) {}
-
-  /**
-   * @returns \p TRISHELL3
-   */
-  virtual ElemType type () const libmesh_override { return TRISHELL3; }
-
-};
-
-
 } // namespace libMesh
 
 #endif // LIBMESH_FACE_TRI3_H
