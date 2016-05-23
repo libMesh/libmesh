@@ -404,6 +404,12 @@ void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
 void libmesh_assert_connected_nodes (const MeshBase & mesh);
 
 /**
+ * A function for verifying that boundary condition ids match
+ * across processors.
+ */
+void libmesh_assert_valid_boundary_ids (const MeshBase & mesh);
+
+/**
  * A function for verifying that degree of freedom indexing matches
  * across processors.
  */
