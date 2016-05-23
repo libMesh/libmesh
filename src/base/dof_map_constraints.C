@@ -3887,10 +3887,25 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
   const std::set<boundary_id_type>& mesh_bcids = mesh.get_boundary_info().get_boundary_ids();
   const std::set<boundary_id_type>& dbc_bcids = boundary.b;
 
+  // DirichletBoundary id sets should be consistent across all ranks
+  mesh.comm().verify(dbc_bcids.size());
+
   for (std::set<boundary_id_type>::const_iterator bid = dbc_bcids.begin();
        bid != dbc_bcids.end(); ++bid)
-    if (mesh_bcids.find(*bid) == mesh_bcids.end())
-      libmesh_error_msg("Could not find Dirichlet boundary id " << *bid << " in mesh!");
+    {
+      // DirichletBoundary id sets should be consistent across all ranks
+      mesh.comm().verify(*bid);
+
+      bool found_bcid = (mesh_bcids.find(*bid) != mesh_bcids.end());
+
+      // On a distributed mesh, boundary id sets may *not* be
+      // consistent across all ranks, since not all ranks see all
+      // boundaries
+      mesh.comm().max(found_bcid);
+
+      if (!found_bcid)
+        libmesh_error_msg("Could not find Dirichlet boundary id " << *bid << " in mesh!");
+    }
 }
 
 #endif // LIBMESH_ENABLE_DIRICHLET

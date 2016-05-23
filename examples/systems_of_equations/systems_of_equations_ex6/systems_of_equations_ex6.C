@@ -427,8 +427,10 @@ int main (int argc, char ** argv)
   mesh.print_info();
 
   // Let's add some node and edge boundary conditions
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  // Each processor should know about each boundary condition it can
+  // see, so we loop over all elements, not just local elements.
+  MeshBase::const_element_iterator       el     = mesh.elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.elements_end();
   for ( ; el != end_el; ++el)
     {
       const Elem * elem = *el;

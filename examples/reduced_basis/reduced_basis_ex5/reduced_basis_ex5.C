@@ -128,9 +128,12 @@ int main(int argc, char ** argv)
                                      0., z_size,
                                      HEX8);
 
-  // Let's add a some node boundary condition so that we can impose a point load
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  // Let's add a node boundary condition so that we can impose a point
+  // load.
+  // Each processor should know about each boundary condition it can
+  // see, so we loop over all elements, not just local elements.
+  MeshBase::const_element_iterator       el     = mesh.elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.elements_end();
   for ( ; el != end_el; ++el)
     {
       const Elem * elem = *el;
