@@ -2503,10 +2503,14 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case TRI3:
     case TRI6:
       return TRI3;
+    case TRISHELL3:
+      return TRISHELL3;
     case QUAD4:
     case QUAD8:
     case QUAD9:
       return QUAD4;
+    case QUADSHELL4:
+      return QUADSHELL4;
     case TET4:
     case TET10:
       return TET4;

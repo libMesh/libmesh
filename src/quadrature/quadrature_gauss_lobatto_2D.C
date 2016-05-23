@@ -29,6 +29,7 @@ void QGaussLobatto::init_2D(const ElemType type_in,
   switch (type_in)
     {
     case QUAD4:
+    case QUADSHELL4:
     case QUAD8:
     case QUAD9:
       {
