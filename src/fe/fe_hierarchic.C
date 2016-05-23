@@ -111,6 +111,7 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     case EDGE3:
       return (o+1);
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (o, 2);
     case QUAD8:
     case QUAD9:
@@ -176,6 +177,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
         }
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (n, 4);
       libmesh_assert_less (o, 2);
     case QUAD8:
@@ -275,7 +277,9 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
     case EDGE3:
       return (o-1);
     case TRI3:
+    case TRISHELL3:
     case QUAD4:
+    case QUADSHELL4:
       return 0;
     case TRI6:
       return ((o-1)*(o-2)/2);

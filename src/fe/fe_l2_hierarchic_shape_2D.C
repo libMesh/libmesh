@@ -54,6 +54,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
   switch (elem->type())
     {
     case TRI3:
+    case TRISHELL3:
     case TRI6:
       {
         const Real zeta1 = p(0);
@@ -154,6 +155,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
 
       // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (totalorder, 2);
     case QUAD8:
     case QUAD9:
@@ -255,6 +257,7 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
     {
       // 1st & 2nd-order Hierarchics.
     case TRI3:
+    case TRISHELL3:
     case TRI6:
       {
         const Real eps = 1.e-6;
@@ -290,6 +293,7 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
       }
 
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (totalorder, 2);
     case QUAD8:
     case QUAD9:

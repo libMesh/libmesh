@@ -307,10 +307,12 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
             return 2;
 
           case TRI3:
+          case TRISHELL3:
           case TRI6:
             return 3;
 
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             return 4;

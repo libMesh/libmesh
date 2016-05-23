@@ -92,6 +92,7 @@ unsigned int hermite_n_dofs(const ElemType t, const Order o)
       return (o+1);
 
     case QUAD4:
+    case QUADSHELL4:
     case QUAD8:
       libmesh_assert_less (o, 4);
     case QUAD9:
@@ -146,6 +147,7 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
       }
 
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (o, 4);
     case QUAD8:
     case QUAD9:
@@ -249,6 +251,7 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
     case EDGE3:
       return (o-3);
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (o, 4);
     case QUAD8:
     case QUAD9:
