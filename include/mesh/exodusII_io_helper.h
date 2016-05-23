@@ -996,8 +996,8 @@ public:
   /**
    * Maps the Exodus edge numbering for "shell quads". In this case
    * we have "6 sides", where the the first two sides correspond to
-   * the triangle faces and are mapped to "shell face" boundary conditions.
-   * The remaining three sides are mapped to edge boundary conditions.
+   * the quad faces and are mapped to "shell face" boundary conditions.
+   * The remaining four sides are mapped to edge boundary conditions.
    */
   static const int quadshell4_edge_map[6];
   static const int quadshell4_inverse_edge_map[4];

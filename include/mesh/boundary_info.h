@@ -385,7 +385,7 @@ public:
 
   /**
    * Returns the list of raw boundary ids associated with the \p edge
-   * edge of element \p elem.  These ids are ``raw'' because they
+   * edge of element \p elem.  These ids are "raw" because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    * Edge-based boundary IDs should only be used in 3D.
@@ -398,7 +398,7 @@ public:
 
   /**
    * Returns the list of raw boundary ids associated with the \p edge
-   * edge of element \p elem.  These ids are ``raw'' because they
+   * edge of element \p elem.  These ids are "raw" because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    * Edge-based boundary IDs should only be used in 3D.
@@ -426,7 +426,7 @@ public:
 
   /**
    * Returns the list of raw boundary ids associated with the specified shell face
-   * of element \p elem.  These ids are ``raw'' because they
+   * of element \p elem.  These ids are "raw" because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    * This is only relevant for shell elements.
@@ -482,7 +482,7 @@ public:
 
   /**
    * Returns the list of raw boundary ids associated with the \p side
-   * side of element \p elem.  These ids are ``raw'' because they
+   * side of element \p elem.  These ids are "raw" because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    *
@@ -494,7 +494,7 @@ public:
 
   /**
    * Returns the list of raw boundary ids associated with the \p side
-   * side of element \p elem.  These ids are ``raw'' because they
+   * side of element \p elem.  These ids are "raw" because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    *
