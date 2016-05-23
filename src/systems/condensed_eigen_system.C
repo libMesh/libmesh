@@ -176,7 +176,7 @@ void CondensedEigenSystem::solve()
 
 
 
-std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
+std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 {
   LOG_SCOPE("get_eigenpair()", "CondensedEigenSystem");
 

@@ -184,14 +184,14 @@ public:
    * entries the eigenpair may be complex values.
    */
   virtual std::pair<Real, Real>
-  get_eigenpair (unsigned int i,
+  get_eigenpair (dof_id_type i,
                  NumericVector<T> & solution_in) libmesh_override;
 
   /**
    * Same as above, but does not copy the eigenvector.
    */
   virtual std::pair<Real, Real>
-  get_eigenvalue (unsigned int i) libmesh_override;
+  get_eigenvalue (dof_id_type i) libmesh_override;
 
   /**
    * @returns the relative error ||A*x-lambda*x||/|lambda*x|

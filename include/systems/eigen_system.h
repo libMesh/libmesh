@@ -103,7 +103,7 @@ public:
    * Returns real and imaginary part of the ith eigenvalue and copies
    * the respective eigen vector to the solution vector.
    */
-  virtual std::pair<Real, Real> get_eigenpair (unsigned int i);
+  virtual std::pair<Real, Real> get_eigenpair (dof_id_type i);
 
   /**
    * @returns \p "Eigen".  Helps in identifying
