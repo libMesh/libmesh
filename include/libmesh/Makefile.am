@@ -124,10 +124,12 @@ BUILT_SOURCES = \
         face_inf_quad6.h \
         face_quad.h \
         face_quad4.h \
+        face_quad4_shell.h \
         face_quad8.h \
         face_quad9.h \
         face_tri.h \
         face_tri3.h \
+        face_tri3_shell.h \
         face_tri3_subdivision.h \
         face_tri6.h \
         node.h \
@@ -879,6 +881,9 @@ face_quad.h: $(top_srcdir)/include/geom/face_quad.h
 face_quad4.h: $(top_srcdir)/include/geom/face_quad4.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+face_quad4_shell.h: $(top_srcdir)/include/geom/face_quad4_shell.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 face_quad8.h: $(top_srcdir)/include/geom/face_quad8.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -889,6 +894,9 @@ face_tri.h: $(top_srcdir)/include/geom/face_tri.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3.h: $(top_srcdir)/include/geom/face_tri3.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri3_shell.h: $(top_srcdir)/include/geom/face_tri3_shell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
