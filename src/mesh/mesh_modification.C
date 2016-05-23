@@ -399,6 +399,12 @@ void UnstructuredMesh::all_first_order ()
           this->get_boundary_info().add_side (lo_elem, s, bndry_ids);
         }
 
+      for (unsigned short e=0; e<so_elem->n_edges(); e++)
+        {
+          this->get_boundary_info().raw_edge_boundary_ids (so_elem, e, bndry_ids);
+          this->get_boundary_info().add_edge (lo_elem, e, bndry_ids);
+        }
+
       /*
        * The new first-order element is ready.
        * Inserting it into the mesh will replace and delete
