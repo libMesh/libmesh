@@ -240,7 +240,7 @@ void XdrIO::write (const std::string & name)
       io.data (write_p_level      ? write_size : zero_size, "# p-level size");
       // Boundary Condition sizes
       io.data (write_bcs          ? write_size : zero_size, "# eid size");   // elem id
-      io.data (write_bcs          ? write_size : zero_size, "# side size "); // side number
+      io.data (write_bcs          ? write_size : zero_size, "# side size");  // side number
       io.data (write_bcs          ? write_size : zero_size, "# bid size");   // boundary id
     }
 
@@ -1264,7 +1264,7 @@ void XdrIO::read (const std::string & name)
           io.data (meta_data[pos++], "# p-level size");
           // Boundary Condition sizes
           io.data (meta_data[pos++], "# eid size");   // elem id
-          io.data (meta_data[pos++], "# side size "); // side number
+          io.data (meta_data[pos++], "# side size");  // side number
           io.data (meta_data[pos++], "# bid size");   // boundary id
         }
     }
