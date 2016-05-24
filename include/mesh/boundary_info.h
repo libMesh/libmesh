@@ -504,6 +504,15 @@ public:
                          const unsigned short int side,
                          std::vector<boundary_id_type> & vec_to_fill) const;
 
+  /*
+   * Copy boundary ids associated with old_elem (but not its nodes)
+   * from old_boundary_info (which may be this) into this boundary
+   * info, associating them with new_elem.
+   */
+  void copy_boundary_ids (const Elem * const new_elem,
+                          const Elem * const old_elem,
+                          const BoundaryInfo &old_boundary_info);
+
   /**
    * Returns a side of element \p elem whose associated boundary id is
    * \p boundary_id if such a side exists.
