@@ -15,39 +15,39 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef LIBMESH_FACE_TRI3_SHELL_H
+#define LIBMESH_FACE_TRI3_SHELL_H
 
-
-// Local includes
-#include "libmesh/quadrature_gauss_lobatto.h"
+#include "face_tri3.h"
 
 namespace libMesh
 {
 
-void QGaussLobatto::init_2D(const ElemType type_in,
-                            unsigned int p)
+/**
+ * TriShell3 is almost identical to Tri3. The only difference is with
+ * the type of boundary data we store for this case.  We need this
+ * "stub" class in order to differentiate between this class and other
+ * classes when reading/writing Mesh files.
+ *
+ * \author David Knezevic
+ * \date 2016
+ */
+class TriShell3 : public Tri3
 {
-  switch (type_in)
-    {
-    case QUAD4:
-    case QUADSHELL4:
-    case QUAD8:
-    case QUAD9:
-      {
-        // We compute the 2D quadrature rule as a tensor
-        // product of the 1D quadrature rule.
-        QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, p);
-        tensor_product_quad(q1D);
-        return;
-      }
+public:
+  /**
+   * Constructor.  By default this element has no parent.
+   */
+  explicit
+  TriShell3 (Elem * p=libmesh_nullptr) :
+    Tri3(p) {}
 
-      // We *could* fall back to a Gauss type rule for other types
-      // elements, but the assumption here is that the user has asked
-      // for a Gauss-Lobatto rule, i.e. a rule with integration points
-      // on the element boundary, for a reason.
-    default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
-    }
-}
+  /**
+   * @returns \p TRISHELL3
+   */
+  virtual ElemType type () const libmesh_override { return TRISHELL3; }
+};
 
 } // namespace libMesh
+
+#endif

@@ -70,8 +70,10 @@ enum ElemType {EDGE2=0,         // 0
                REMOTEELEM,      // 28
 
                TRI3SUBDIVISION, // 29
+               TRISHELL3,       // 30
+               QUADSHELL4,      // 31
 
-               INVALID_ELEM};   // 30 - should always be last
+               INVALID_ELEM};   // 32 - should always be last
 }
 
 #endif // LIBMESH_ENUM_ELEM_TYPE_H

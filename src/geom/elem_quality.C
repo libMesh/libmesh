@@ -333,6 +333,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
       }
 
     case TRI3:
+    case TRISHELL3:
     case TRI6:
       {
         v.resize(7);
@@ -347,6 +348,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
       }
 
     case QUAD4:
+    case QUADSHELL4:
     case QUAD8:
     case QUAD9:
       {

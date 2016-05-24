@@ -120,6 +120,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
     case EDGE3:
       return (o+1);
     case QUAD4:
+    case QUADSHELL4:
       libmesh_assert_less (o, 2);
     case QUAD8:
       {
@@ -146,6 +147,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
     case TRI3:
+    case TRISHELL3:
       libmesh_assert_less (o, 2);
     case TRI6:
       return ((o+1)*(o+2)/2);

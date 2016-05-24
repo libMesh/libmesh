@@ -1028,10 +1028,12 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE4:
           return 3;
         case TRI3:
+        case TRISHELL3:
           return 1;
         case TRI6:
           return 2;
         case QUAD4:
+        case QUADSHELL4:
           return 1;
         case QUAD8:
         case QUAD9:
@@ -1066,8 +1068,10 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE3:
         case EDGE4:
         case TRI3:
+        case TRISHELL3:
         case TRI6:
         case QUAD4:
+        case QUADSHELL4:
         case QUAD8:
         case QUAD9:
         case TET4:
@@ -1095,10 +1099,12 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE4:
           return unlimited;
         case TRI3:
+        case TRISHELL3:
           return 0;
         case TRI6:
           return 6;
         case QUAD4:
+        case QUADSHELL4:
           return 0;
         case QUAD8:
         case QUAD9:
@@ -1132,10 +1138,12 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE4:
           return 7;
         case TRI3:
+        case TRISHELL3:
           return 0;
         case TRI6:
           return 7;
         case QUAD4:
+        case QUADSHELL4:
           return 0;
         case QUAD8:
         case QUAD9:
@@ -1164,8 +1172,10 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE3:
         case EDGE4:
         case TRI3:
+        case TRISHELL3:
         case TRI6:
         case QUAD4:
+        case QUADSHELL4:
         case QUAD8:
         case QUAD9:
         case TET4:
@@ -1192,10 +1202,12 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 3;
         case EDGE4:
         case TRI3:
+        case TRISHELL3:
           return 0;
         case TRI6:
           return 3;
         case QUAD4:
+        case QUADSHELL4:
         case QUAD8:
         case QUAD9:
         case TET4:
@@ -1222,9 +1234,11 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unlimited;
         case EDGE4:
         case TRI3:
+        case TRISHELL3:
         case TRI6:
           return 0;
         case QUAD4:
+        case QUADSHELL4:
           return 3;
         case QUAD8:
         case QUAD9:
@@ -1256,10 +1270,12 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE4:
           return unlimited;
         case TRI3:
+        case TRISHELL3:
           return 1;
         case TRI6:
           return unlimited;
         case QUAD4:
+        case QUADSHELL4:
           return 1;
         case QUAD8:
         case QUAD9:
@@ -1291,10 +1307,12 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE4:
           return unlimited;
         case TRI3:
+        case TRISHELL3:
           return 1;
         case TRI6:
           return unlimited;
         case QUAD4:
+        case QUADSHELL4:
           return 1;
         case QUAD8:
         case QUAD9:

@@ -34,6 +34,7 @@ void QMonomial::init_2D(const ElemType type_in,
       //---------------------------------------------
       // Quadrilateral quadrature rules
     case QUAD4:
+    case QUADSHELL4:
     case QUAD8:
     case QUAD9:
       {

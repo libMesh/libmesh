@@ -44,6 +44,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
         switch (type)
           {
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
@@ -62,6 +63,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
             }
 
           case TRI3:
+          case TRISHELL3:
           case TRI6:
             {
               const Real zeta1 = p(0);
@@ -238,6 +240,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
         switch (type)
           {
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
@@ -269,6 +272,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
             }
 
           case TRI3:
+          case TRISHELL3:
           case TRI6:
             {
               libmesh_assert_less (i, 3);
@@ -586,6 +590,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
         switch (type)
           {
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
@@ -620,6 +625,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
             }
 
           case TRI3:
+          case TRISHELL3:
           case TRI6:
             {
               // All second derivatives for linear triangles are zero.

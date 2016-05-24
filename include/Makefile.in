@@ -703,10 +703,12 @@ include_HEADERS = \
         geom/face_inf_quad6.h \
         geom/face_quad.h \
         geom/face_quad4.h \
+        geom/face_quad4_shell.h \
         geom/face_quad8.h \
         geom/face_quad9.h \
         geom/face_tri.h \
         geom/face_tri3.h \
+        geom/face_tri3_shell.h \
         geom/face_tri3_subdivision.h \
         geom/face_tri6.h \
         geom/node.h \

@@ -44,6 +44,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
         switch (type)
           {
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
@@ -237,6 +238,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
         switch (type)
           {
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
@@ -582,6 +584,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
         switch (type)
           {
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {

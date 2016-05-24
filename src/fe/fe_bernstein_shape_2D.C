@@ -62,6 +62,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
     {
       // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
+    case QUADSHELL4:
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
@@ -142,6 +143,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
       }
 
     case TRI3:
+    case TRISHELL3:
       libmesh_assert_less (totalorder, 2);
     case TRI6:
       switch (totalorder)

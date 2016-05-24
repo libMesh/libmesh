@@ -35,8 +35,10 @@
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri3_subdivision.h"
+#include "libmesh/face_tri3_shell.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/face_quad4.h"
+#include "libmesh/face_quad4_shell.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_inf_quad4.h"
@@ -123,6 +125,8 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     1,  // NODEELEM
 
     3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -252,6 +256,11 @@ UniquePtr<Elem> Elem::build(const ElemType type,
         elem = new Tri3(p);
         break;
       }
+    case TRISHELL3:
+      {
+        elem = new TriShell3(p);
+        break;
+      }
     case TRI3SUBDIVISION:
       {
         elem = new Tri3Subdivision(p);
@@ -265,6 +274,11 @@ UniquePtr<Elem> Elem::build(const ElemType type,
     case QUAD4:
       {
         elem = new Quad4(p);
+        break;
+      }
+    case QUADSHELL4:
+      {
+        elem = new QuadShell4(p);
         break;
       }
     case QUAD8:
@@ -2489,10 +2503,14 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case TRI3:
     case TRI6:
       return TRI3;
+    case TRISHELL3:
+      return TRISHELL3;
     case QUAD4:
     case QUAD8:
     case QUAD9:
       return QUAD4;
+    case QUADSHELL4:
+      return QUADSHELL4;
     case TET4:
     case TET10:
       return TET4;
