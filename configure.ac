@@ -167,7 +167,11 @@ AC_ARG_ENABLE(cxx11-required,
 # flag for the current compiler.  Adds the result to CXXFLAGS if
 # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
 # --------------------------------------------------------------
-AX_CXX_COMPILE_STDCXX_11([],[optional])
+if (test $cxx11required = yes); then
+  AX_CXX_COMPILE_STDCXX_11([],[mandatory])
+else
+  AX_CXX_COMPILE_STDCXX_11([],[optional])
+fi
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
