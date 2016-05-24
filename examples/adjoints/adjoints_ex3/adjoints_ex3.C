@@ -702,8 +702,8 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-amr");
 #else
 
-  // This doesn't converge with Eigen BICGSTAB for some reason...
-  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+  // This doesn't converge with Eigen BICGSTAB or with Trilinos for some reason...
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   libMesh::out << "Started " << argv[0] << std::endl;
 
