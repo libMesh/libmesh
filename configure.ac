@@ -143,6 +143,25 @@ AC_ARG_ENABLE(cxx11,
                    esac],
                    [enablecxx11=yes])
 
+
+# --------------------------------------------------------------
+# Setting --enable-cxx11-required causes an error to be emitted during
+# configure if the compiler does not support a specific subset of
+# C++11 features.  This is useful for app codes which require C++11,
+# since it prevents situations where libmesh is built without C++11
+# support (which may take a very long time), and then the app fails to
+# compile, requiring you to redo everything.
+# --------------------------------------------------------------
+AC_ARG_ENABLE(cxx11-required,
+              AC_HELP_STRING([--enable-cxx11-required],
+                             [Error if compiler does not support C++11]),
+                             [case "${enableval}" in
+                   yes) cxx11required=yes ;;
+                   no)  cxx11required=no ;;
+                   *)   AC_MSG_ERROR(bad value ${enableval} for --enable-cxx11-required) ;;
+                   esac],
+                   [cxx11required=no])
+
 # --------------------------------------------------------------
 # Standard autoconf macro for determining the proper -std=c++11
 # flag for the current compiler.  Adds the result to CXXFLAGS if
