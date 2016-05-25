@@ -240,7 +240,7 @@ void XdrIO::write (const std::string & name)
       io.data (write_p_level      ? write_size : zero_size, "# p-level size");
       // Boundary Condition sizes
       io.data (write_bcs          ? write_size : zero_size, "# eid size");   // elem id
-      io.data (write_bcs          ? write_size : zero_size, "# side size "); // side number
+      io.data (write_bcs          ? write_size : zero_size, "# side size");  // side number
       io.data (write_bcs          ? write_size : zero_size, "# bid size");   // boundary id
     }
 
@@ -455,21 +455,35 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
             for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
               {
                 output_buffer.clear();
-                const xdr_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
-                output_buffer.push_back(*recv_conn_iter);     /* type       */ ++recv_conn_iter;
 
+                // n. nodes
+                const xdr_id_type n_nodes = *recv_conn_iter;
+                ++recv_conn_iter;
+
+                // type
+                output_buffer.push_back(*recv_conn_iter);
+                ++recv_conn_iter;
+
+                // unique_id
                 if (_write_unique_id)
-                  output_buffer.push_back(*recv_conn_iter);   /* unique_id  */ ++recv_conn_iter;
+                  output_buffer.push_back(*recv_conn_iter);
+                ++recv_conn_iter;
 
+                // processor id
                 if (write_partitioning)
-                  output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
+                  output_buffer.push_back(*recv_conn_iter);
+                ++recv_conn_iter;
 
+                // subdomain id
                 if (write_subdomain_id)
-                  output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
+                  output_buffer.push_back(*recv_conn_iter);
+                ++recv_conn_iter;
 
 #ifdef LIBMESH_ENABLE_AMR
+                // p level
                 if (write_p_level)
-                  output_buffer.push_back(*recv_conn_iter); /* p level      */ ++recv_conn_iter;
+                  output_buffer.push_back(*recv_conn_iter);
+                ++recv_conn_iter;
 #endif
                 for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                   output_buffer.push_back(*recv_conn_iter);
@@ -566,24 +580,44 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
                 for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
                   {
                     output_buffer.clear();
-                    const xdr_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
-                    output_buffer.push_back(*recv_conn_iter);                   /* type          */ ++recv_conn_iter;
-                    if (_write_unique_id)
-                      output_buffer.push_back(*recv_conn_iter);                 /* unique_id     */ ++recv_conn_iter;
 
-                    const xdr_id_type parent_local_id = *recv_conn_iter; ++recv_conn_iter;
-                    const xdr_id_type parent_pid      = *recv_conn_iter; ++recv_conn_iter;
+                    // n. nodes
+                    const xdr_id_type n_nodes = *recv_conn_iter;
+                    ++recv_conn_iter;
+
+                    // type
+                    output_buffer.push_back(*recv_conn_iter);
+                    ++recv_conn_iter;
+
+                    // unique_id
+                    if (_write_unique_id)
+                      output_buffer.push_back(*recv_conn_iter);
+                    ++recv_conn_iter;
+
+                    // parent local id
+                    const xdr_id_type parent_local_id = *recv_conn_iter;
+                    ++recv_conn_iter;
+
+                    // parent processor id
+                    const xdr_id_type parent_pid = *recv_conn_iter;
+                    ++recv_conn_iter;
 
                     output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
+                    // processor id
                     if (write_partitioning)
-                      output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
+                      output_buffer.push_back(*recv_conn_iter);
+                    ++recv_conn_iter;
 
+                    // subdomain id
                     if (write_subdomain_id)
-                      output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
+                      output_buffer.push_back(*recv_conn_iter);
+                    ++recv_conn_iter;
 
+                    // p level
                     if (write_p_level)
-                      output_buffer.push_back(*recv_conn_iter); /* p level       */ ++recv_conn_iter;
+                      output_buffer.push_back(*recv_conn_iter);
+                    ++recv_conn_iter;
 
                     for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                       output_buffer.push_back(*recv_conn_iter);
@@ -658,7 +692,8 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
           }
         // overwrite the parent_id_map with the child_id_map, but
         // use std::map::swap() for efficiency.
-        parent_id_map.swap(child_id_map); /**/ child_id_map.clear();
+        parent_id_map.swap(child_id_map);
+        child_id_map.clear();
       }
     }
 #endif // LIBMESH_ENABLE_AMR
@@ -1264,7 +1299,7 @@ void XdrIO::read (const std::string & name)
           io.data (meta_data[pos++], "# p-level size");
           // Boundary Condition sizes
           io.data (meta_data[pos++], "# eid size");   // elem id
-          io.data (meta_data[pos++], "# side size "); // side number
+          io.data (meta_data[pos++], "# side size");  // side number
           io.data (meta_data[pos++], "# bid size");   // boundary id
         }
     }
@@ -1769,7 +1804,8 @@ void XdrIO::read_serialized_bcs (Xdr & io, T)
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
-      dof_bc_data.clear(); /**/ dof_bc_data.reserve (input_buffer.size()/3);
+      dof_bc_data.clear();
+      dof_bc_data.reserve (input_buffer.size()/3);
 
       // convert the input_buffer to DofBCData to facilitate searching
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
@@ -1848,7 +1884,8 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
                         cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
-      node_bc_data.clear(); /**/ node_bc_data.reserve (input_buffer.size()/2);
+      node_bc_data.clear();
+      node_bc_data.reserve (input_buffer.size()/2);
 
       // convert the input_buffer to DofBCData to facilitate searching
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)

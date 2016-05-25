@@ -747,7 +747,14 @@ void Xdr::data (T & a, const char * comment_in)
              << std::setprecision(16);
 
         this->do_write(a);
-        *out << "\t " << comment_in << '\n';
+
+        // If there's a comment provided, write a tab character and
+        // then the comment.
+        if (std::string(comment_in) != "")
+          *out << "\t " << comment_in;
+
+        // Go to the next line.
+        *out << '\n';
 
         return;
       }
@@ -871,14 +878,19 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
             }
         else
           {
+            const unsigned imax = std::min(line_break, len);
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                for (unsigned int i=0; i<imax; i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
-                    *out << val[cnt++] << " ";
+                    *out << val[cnt++];
+
+                    // Write a space unless this is the last character on the current line.
+                    if (i+1 != imax)
+                      *out << " ";
                   }
                 libmesh_assert(out.get());
                 libmesh_assert (out->good());
@@ -963,14 +975,19 @@ void Xdr::data_stream (double * val, const unsigned int len, const unsigned int 
             }
         else
           {
+            const unsigned imax = std::min(line_break, len);
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                for (unsigned int i=0; i<imax; i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
-                    *out << val[cnt++] << ' ';
+                    *out << val[cnt++];
+
+                    // Write a space unless this is the last character on the current line.
+                    if (i+1 != imax)
+                      *out << " ";
                   }
                 libmesh_assert(out.get());
                 libmesh_assert (out->good());
@@ -1057,14 +1074,19 @@ void Xdr::data_stream (float * val, const unsigned int len, const unsigned int l
             }
         else
           {
+            const unsigned imax = std::min(line_break, len);
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                for (unsigned int i=0; i<imax; i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
-                    *out << val[cnt++] << ' ';
+                    *out << val[cnt++];
+
+                    // Write a space unless this is the last character on the current line.
+                    if (i+1 != imax)
+                      *out << " ";
                   }
                 libmesh_assert(out.get());
                 libmesh_assert (out->good());
@@ -1177,14 +1199,19 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
             }
         else
           {
+            const unsigned imax = std::min(line_break, len);
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                for (unsigned int i=0; i<imax; i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
-                    *out << val[cnt++] << ' ';
+                    *out << val[cnt++];
+
+                    // Write a space unless this is the last character on the current line.
+                    if (i+1 != imax)
+                      *out << " ";
                   }
                 libmesh_assert(out.get());
                 libmesh_assert (out->good());
@@ -1296,16 +1323,21 @@ void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const
             }
         else
           {
+            const unsigned imax = std::min(line_break, len);
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                for (unsigned int i=0; i<imax; i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
                     *out << val[cnt].real() << ' ';
-                    *out << val[cnt].imag() << ' ';
+                    *out << val[cnt].imag();
                     cnt++;
+
+                    // Write a space unless this is the last character on the current line.
+                    if (i+1 != imax)
+                      *out << " ";
                   }
                 libmesh_assert(out.get());
                 libmesh_assert (out->good());
@@ -1423,15 +1455,20 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
             }
         else
           {
+            const unsigned imax = std::min(line_break, len);
             unsigned int cnt=0;
             while (cnt < len)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                for (unsigned int i=0; i<imax; i++)
                   {
                     libmesh_assert(out.get());
                     libmesh_assert (out->good());
-                    *out << val[cnt].real() << ' ' << val[cnt].imag() << ' ';
+                    *out << val[cnt].real() << ' ' << val[cnt].imag();
                     cnt++;
+
+                    // Write a space unless this is the last character on the current line.
+                    if (i+1 != imax)
+                      *out << " ";
                   }
                 libmesh_assert(out.get());
                 libmesh_assert (out->good());
@@ -1503,7 +1540,7 @@ template void Xdr::data<long double>                      (long double &,       
 template void Xdr::data<std::complex<float> >             (std::complex<float> &,             const char *);
 template void Xdr::data<std::complex<double> >            (std::complex<double> &,            const char *);
 template void Xdr::data<std::complex<long double> >       (std::complex<long double> &,       const char *);
-template void Xdr::data<std::string>                      (std::string &,                      const char *);
+template void Xdr::data<std::string>                      (std::string &,                     const char *);
 template void Xdr::data<std::vector<int> >                (std::vector<int> &,                const char *);
 template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int> &,       const char *);
 template void Xdr::data<std::vector<short int> >          (std::vector<short int> &,          const char *);
