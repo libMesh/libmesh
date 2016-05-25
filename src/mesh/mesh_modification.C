@@ -384,26 +384,24 @@ void UnstructuredMesh::all_first_order ()
           node_touched_by_me[lo_elem->node_id(v)] = true;
         }
 
+      /*
+       * find_neighbors relies on remote_elem neighbor links being
+       * properly maintained.
+       */
+      for (unsigned short s=0; s<so_elem->n_sides(); s++)
+        {
+          if (so_elem->neighbor(s) == remote_elem)
+            lo_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+        }
+
       /**
        * If the second order element had any boundary conditions they
        * should be transfered to the first-order element.  The old
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
        */
-      libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
-
-      std::vector<boundary_id_type> bndry_ids;
-      for (unsigned short s=0; s<so_elem->n_sides(); s++)
-        {
-          this->get_boundary_info().raw_boundary_ids (so_elem, s, bndry_ids);
-          this->get_boundary_info().add_side (lo_elem, s, bndry_ids);
-        }
-
-      for (unsigned short e=0; e<so_elem->n_edges(); e++)
-        {
-          this->get_boundary_info().raw_edge_boundary_ids (so_elem, e, bndry_ids);
-          this->get_boundary_info().add_edge (lo_elem, e, bndry_ids);
-        }
+      this->get_boundary_info().copy_boundary_ids
+        (lo_elem, so_elem, this->get_boundary_info());
 
       /*
        * The new first-order element is ready.
@@ -674,6 +672,15 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
             }
         }
 
+      /*
+       * find_neighbors relies on remote_elem neighbor links being
+       * properly maintained.
+       */
+      for (unsigned short s=0; s<lo_elem->n_sides(); s++)
+        {
+          if (lo_elem->neighbor(s) == remote_elem)
+            so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+        }
 
       /**
        * If the linear element had any boundary conditions they
@@ -686,17 +693,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * mesh, they need to be preserved.  We do that in the same loop
        * here.
        */
-      libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
-
-      std::vector<boundary_id_type> bndry_ids;
-      for (unsigned short s=0; s<lo_elem->n_sides(); s++)
-        {
-          this->get_boundary_info().raw_boundary_ids (lo_elem, s, bndry_ids);
-          this->get_boundary_info().add_side (so_elem, s, bndry_ids);
-
-          if (lo_elem->neighbor(s) == remote_elem)
-            so_elem->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
-        }
+      this->get_boundary_info().copy_boundary_ids
+        (so_elem, lo_elem, this->get_boundary_info());
 
       /*
        * The new second-order element is ready.
