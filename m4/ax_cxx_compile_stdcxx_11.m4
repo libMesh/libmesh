@@ -153,7 +153,14 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
 
   if test x$ax_cxx_compile_cxx11_required = xtrue; then
     if test x$ac_success = xno; then
-      AC_MSG_ERROR([*** A compiler with support for C++11 language features is required.])
+      dnl We return error code 2 here, since 0 means success and 1 is
+      dnl indistinguishable from other errors.  Ideally, all of the
+      dnl AC_MSG_ERROR calls in our m4 files would return a different
+      dnl error code, but currently this is not implemented.
+      AC_MSG_ERROR([*** A compiler with support for C++11 language features is required.], 2)
+    else
+      HAVE_CXX11=1
+      AC_DEFINE(HAVE_CXX11, 1, [define if the compiler supports basic C++11 syntax])
     fi
   else
     if test x$ac_success = xno; then
