@@ -299,7 +299,7 @@ public:
    * if necessary.
    * The processor_id is assigned to any newly created node.
    */
-  Node * add_node (const Elem & parent,
+  Node * add_node (Elem & parent,
                    unsigned int child,
                    unsigned int node,
                    processor_id_type proc_id);

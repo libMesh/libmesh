@@ -102,7 +102,7 @@ void MeshRefinement::clear ()
 
 
 
-Node * MeshRefinement::add_node(const Elem & parent,
+Node * MeshRefinement::add_node(Elem & parent,
                                 unsigned int child,
                                 unsigned int node,
                                 processor_id_type proc_id)
