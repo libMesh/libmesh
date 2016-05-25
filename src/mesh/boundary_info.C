@@ -755,6 +755,9 @@ void BoundaryInfo::add_shellface(const Elem * elem,
   // Only add BCs for level-0 elements.
   libmesh_assert_equal_to (elem->level(), 0);
 
+  // Shells only have 2 faces
+  libmesh_assert_less(shellface, 2);
+
   if (id == invalid_id)
     libmesh_error_msg("ERROR: You may not set a boundary ID of "        \
                       << invalid_id                                     \
@@ -786,6 +789,9 @@ void BoundaryInfo::add_shellface(const Elem * elem,
 
   // Only add BCs for level-0 elements.
   libmesh_assert_equal_to (elem->level(), 0);
+
+  // Shells only have 2 faces
+  libmesh_assert_less(shellface, 2);
 
   // Don't add the same ID twice
   std::pair<boundary_shellface_iter, boundary_shellface_iter> pos = _boundary_shellface_id.equal_range(elem);
@@ -1092,6 +1098,9 @@ void BoundaryInfo::shellface_boundary_ids (const Elem * const elem,
 {
   libmesh_assert(elem);
 
+  // Shells only have 2 faces
+  libmesh_assert_less(shellface, 2);
+
   // Clear out any previous contents
   vec_to_fill.clear();
 
@@ -1135,6 +1144,9 @@ void BoundaryInfo::raw_shellface_boundary_ids (const Elem * const elem,
                                                std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
+
+  // Shells only have 2 faces
+  libmesh_assert_less(shellface, 2);
 
   // Clear out any previous contents
   vec_to_fill.clear();
@@ -1408,6 +1420,9 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
   // id
   libmesh_assert_equal_to (elem->level(), 0);
 
+  // Shells only have 2 faces
+  libmesh_assert_less(shellface, 2);
+
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
   std::pair<erase_iter, erase_iter>
@@ -1439,6 +1454,9 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
   // The user shouldn't be trying to remove only one child's boundary
   // id
   libmesh_assert_equal_to (elem->level(), 0);
+
+  // Shells only have 2 faces
+  libmesh_assert_less(shellface, 2);
 
   // Some older compilers don't support erasing from a map with
   // const_iterators, so we explicitly use non-const iterators here.
