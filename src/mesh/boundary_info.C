@@ -1306,6 +1306,12 @@ void BoundaryInfo::copy_boundary_ids
       old_boundary_info.raw_edge_boundary_ids (old_elem, e, bndry_ids);
       this->add_edge (new_elem, e, bndry_ids);
     }
+
+  for (unsigned short sf=0; sf != 2; sf++)
+    {
+      old_boundary_info.raw_shellface_boundary_ids (old_elem, sf, bndry_ids);
+      this->add_shellface (new_elem, sf, bndry_ids);
+    }
 }
 
 
