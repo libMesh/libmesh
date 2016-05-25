@@ -1286,9 +1286,9 @@ void BoundaryInfo::raw_boundary_ids (const Elem * const elem,
 
 
 void BoundaryInfo::copy_boundary_ids
-  (const Elem * const new_elem,
+  (const BoundaryInfo &old_boundary_info,
    const Elem * const old_elem,
-   const BoundaryInfo &old_boundary_info)
+   const Elem * const new_elem)
 {
   libmesh_assert_equal_to (old_elem->n_sides(), new_elem->n_sides());
   libmesh_assert_equal_to (old_elem->n_edges(), new_elem->n_edges());

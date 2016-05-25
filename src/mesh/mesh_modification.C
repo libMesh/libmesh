@@ -401,7 +401,7 @@ void UnstructuredMesh::all_first_order ()
        * data structure by insert_elem.
        */
       this->get_boundary_info().copy_boundary_ids
-        (lo_elem, so_elem, this->get_boundary_info());
+        (this->get_boundary_info(), so_elem, lo_elem);
 
       /*
        * The new first-order element is ready.
@@ -694,7 +694,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * here.
        */
       this->get_boundary_info().copy_boundary_ids
-        (so_elem, lo_elem, this->get_boundary_info());
+        (this->get_boundary_info(), lo_elem, so_elem);
 
       /*
        * The new second-order element is ready.
