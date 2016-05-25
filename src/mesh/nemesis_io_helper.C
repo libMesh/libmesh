@@ -1222,7 +1222,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 
   // Will be used to create conversion objects capable of mapping libmesh
   // element numberings into Nemesis numberings.
-  ExodusII_IO_Helper::ElementMaps element_mapper(*this);
+  ExodusII_IO_Helper::ElementMaps element_mapper;
 
   MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
   MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
@@ -1828,7 +1828,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       if (elem_ids_this_subdomain.size() == 0)
         libmesh_error_msg("Error, no element IDs found in subdomain " << (*it).first);
 
-      ExodusII_IO_Helper::ElementMaps em(*this);
+      ExodusII_IO_Helper::ElementMaps em;
 
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
@@ -2174,7 +2174,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   std::map<boundary_id_type, std::vector<int> > local_elem_boundary_id_side_lists;
   typedef std::map<boundary_id_type, std::vector<int> >::iterator local_elem_boundary_id_lists_iterator;
 
-  ExodusII_IO_Helper::ElementMaps em(*this);
+  ExodusII_IO_Helper::ElementMaps em;
 
   // FIXME: We already built this list once, we should reuse that information!
   std::vector< dof_id_type > bndry_elem_list;
@@ -2399,7 +2399,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
           std::vector<int> & this_block_connectivity = (*it).second;
           std::vector<unsigned int> & elements_in_this_block = subdomain_map[block];
 
-          ExodusII_IO_Helper::ElementMaps em(*this);
+          ExodusII_IO_Helper::ElementMaps em;
 
           //Use the first element in this block to get representative information.
           //Note that Exodus assumes all elements in a block are of the same type!

@@ -1362,7 +1362,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Get a reference to a vector of element IDs for this subdomain.
       subdomain_map_type::mapped_type & tmp_vec = (*it).second;
 
-      ExodusII_IO_Helper::ElementMaps em(*this);
+      ExodusII_IO_Helper::ElementMaps em;
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       // Skip infinite element-blocks; they can not be viewed in most visualization software
       // as paraview.
@@ -1495,7 +1495,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ExodusII_IO_Helper::ElementMaps em(*this);
+  ExodusII_IO_Helper::ElementMaps em;
 
   // Maps from sideset id to the element and sides
   std::map<int, std::vector<int> > elem;
