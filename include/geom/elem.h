@@ -160,14 +160,24 @@ public:
   const Node * const * get_nodes () const;
 
   /**
-   * @returns the pointer to local \p Node \p i.
+   * @returns a const pointer to local \p Node \p i.
    */
-  Node * node_ptr (const unsigned int i) const;
+  const Node * node_ptr (const unsigned int i) const;
 
   /**
-   * @returns a reference to local \p Node \p i.
+   * @returns a non-const pointer to local \p Node \p i.
    */
-  Node & node_ref (const unsigned int i) const;
+  Node * node_ptr (const unsigned int i);
+
+  /**
+   * @returns a const reference to local \p Node \p i.
+   */
+  const Node & node_ref (const unsigned int i) const;
+
+  /**
+   * @returns a writable reference to local \p Node \p i.
+   */
+  Node & node_ref (const unsigned int i);
 
   /**
    * @returns the pointer to local \p Node \p i.
@@ -1557,7 +1567,7 @@ const Node * const * Elem::get_nodes () const
 
 
 inline
-Node * Elem::node_ptr (const unsigned int i) const
+const Node * Elem::node_ptr (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1568,7 +1578,26 @@ Node * Elem::node_ptr (const unsigned int i) const
 
 
 inline
-Node & Elem::node_ref (const unsigned int i) const
+Node * Elem::node_ptr (const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+
+  return _nodes[i];
+}
+
+
+
+inline
+const Node & Elem::node_ref (const unsigned int i) const
+{
+  return *this->node_ptr(i);
+}
+
+
+
+inline
+Node & Elem::node_ref (const unsigned int i)
 {
   return *this->node_ptr(i);
 }
@@ -1578,7 +1607,13 @@ Node & Elem::node_ref (const unsigned int i) const
 inline
 Node * Elem::get_node (const unsigned int i) const
 {
-  return this->node_ptr(i);
+  // This const function has incorrectly returned a non-const pointer
+  // for years.  Now that it is reimplemented in terms of the new
+  // interface which does return a const pointer, we need to use a
+  // const_cast to mimic the old (incorrect) behavior.  This function
+  // will be officially deprecated (hopefully soon) and eventually
+  // removed entirely, obviating the need for this ugly cast.
+  return const_cast<Node *>(this->node_ptr(i));
 }
 
 
