@@ -58,7 +58,7 @@ public:
                                 const std::vector<Real> & qw,
                                 const Elem * elem,
                                 unsigned int p,
-                                const std::vector<Node *> & elem_nodes,
+                                const std::vector<const Node *> & elem_nodes,
                                 bool compute_second_derivatives);
 
   /**

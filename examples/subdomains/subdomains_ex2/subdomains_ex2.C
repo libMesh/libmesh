@@ -538,8 +538,8 @@ void assemble_poisson(EquationSystems & es,
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (unsigned int side=0; side<elem->n_sides(); side++)
-          if ((elem->neighbor(side) == libmesh_nullptr) ||
-              (elem->neighbor(side)->subdomain_id() != elem->subdomain_id()))
+          if ((elem->neighbor_ptr(side) == libmesh_nullptr) ||
+              (elem->neighbor_ptr(side)->subdomain_id() != elem->subdomain_id()))
             {
 
               // The penalty value.  \frac{1}{\epsilon}

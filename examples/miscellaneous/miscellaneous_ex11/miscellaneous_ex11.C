@@ -589,7 +589,7 @@ void assemble_shell (EquationSystems & es,
       // that is, the boundary of the original mesh without ghosts.
       for (unsigned int s=0; s<elem->n_sides(); ++s)
         {
-          const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor(s));
+          const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor_ptr(s));
           if (nb_elem == libmesh_nullptr || nb_elem->is_ghost())
             continue;
 
@@ -608,7 +608,7 @@ void assemble_shell (EquationSystems & es,
            *     \  /
            *      n1
            */
-          Node * nodes [4]; // n1, n2, n3, n4
+          const Node * nodes [4]; // n1, n2, n3, n4
           nodes[1] = gh_elem->node_ptr(s); // n2
           nodes[2] = gh_elem->node_ptr(MeshTools::Subdivision::next[s]); // n3
           nodes[3] = gh_elem->node_ptr(MeshTools::Subdivision::prev[s]); // n4

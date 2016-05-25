@@ -586,7 +586,7 @@ void UNVIO::groups_in (std::istream & in_file)
                      iter != range.second; ++iter)
                   {
                     // Build a side to confirm the hash mapped to the correct side.
-                    UniquePtr<Elem> side (elem->build_side(sn));
+                    UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
                     // Get a pointer to the lower-dimensional element
                     Elem * lower_dim_elem = iter->second;

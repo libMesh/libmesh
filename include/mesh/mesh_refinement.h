@@ -706,9 +706,9 @@ private:
    * Local dispatch function for checking the correct has_neighbor
    * function from the Elem class
    */
-  bool has_topological_neighbor (Elem * elem,
+  bool has_topological_neighbor (const Elem * elem,
                                  const PointLocatorBase * point_locator,
-                                 Elem * neighbor);
+                                 const Elem * neighbor);
 
   /**
    * Data structure that holds the new nodes information.

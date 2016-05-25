@@ -249,7 +249,7 @@ public:
         g_vec(2) = -1.;
         {
           for (unsigned int side=0; side<elem->n_sides(); side++)
-            if (elem->neighbor(side) == libmesh_nullptr)
+            if (elem->neighbor_ptr(side) == libmesh_nullptr)
               {
                 const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
                 const std::vector<Real> & JxW_face = fe_face->get_JxW();

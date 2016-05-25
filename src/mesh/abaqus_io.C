@@ -1022,7 +1022,7 @@ void AbaqusIO::assign_sideset_ids()
                        s_it != range.second; ++s_it)
                     {
                       // We'll need to compare the lower dimensional element against the current side.
-                      UniquePtr<Elem> side (elem->build_side(sn));
+                      UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
                       // Get the value mapped by the iterator.
                       std::pair<Elem *, boundary_id_type> p = s_it->second;

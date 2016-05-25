@@ -239,7 +239,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem * elem)
   for (unsigned int ns=0; ns<elem->n_sides(); ++ns)
     {
       // Build the quadratic side
-      UniquePtr<Elem> side = elem->build_side(ns);
+      UniquePtr<const Elem> side = elem->build_side_ptr(ns);
 
       // Be sure it's quadratic (Edge2).  Eventually we could
       // handle cubic elements as well...

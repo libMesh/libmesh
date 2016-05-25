@@ -159,13 +159,13 @@ void FE<Dim,T>::reinit(const Elem * elem,
   this->determine_calculations();
 
   // Build the side of interest
-  const UniquePtr<Elem> side(elem->build_side(s));
+  const UniquePtr<const Elem> side(elem->build_side_ptr(s));
 
   // Find the max p_level to select
   // the right quadrature rule for side integration
   unsigned int side_p_level = elem->p_level();
-  if (elem->neighbor(s) != libmesh_nullptr)
-    side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
+  if (elem->neighbor_ptr(s) != libmesh_nullptr)
+    side_p_level = std::max(side_p_level, elem->neighbor_ptr(s)->p_level());
 
   // Initialize the shape functions at the user-specified
   // points
@@ -277,7 +277,7 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
   this->determine_calculations();
 
   // Build the side of interest
-  const UniquePtr<Elem> edge(elem->build_edge(e));
+  const UniquePtr<const Elem> edge(elem->build_edge_ptr(e));
 
   // Initialize the shape functions at the user-specified
   // points
@@ -361,8 +361,8 @@ void FE<Dim,T>::side_map (const Elem * elem,
   this->determine_calculations();
 
   unsigned int side_p_level = elem->p_level();
-  if (elem->neighbor(s) != libmesh_nullptr)
-    side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
+  if (elem->neighbor_ptr(s) != libmesh_nullptr)
+    side_p_level = std::max(side_p_level, elem->neighbor_ptr(s)->p_level());
 
   if (side->type() != last_side ||
       side_p_level != this->_p_level ||

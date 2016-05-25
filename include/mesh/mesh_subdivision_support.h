@@ -63,7 +63,8 @@ namespace Subdivision
  *        5--4--3
  * \endverbatim
  */
-void find_one_ring(const Tri3Subdivision * elem, std::vector<Node *> & nodes);
+void find_one_ring(const Tri3Subdivision * elem,
+                   std::vector<const Node *> & nodes);
 
 /**
  * Turns a triangulated \p mesh into a subdivision mesh. This

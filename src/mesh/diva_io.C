@@ -158,9 +158,9 @@ void DivaIO::write_stream (std::ostream & out_file)
         const Elem & elem = the_mesh.elem_ref(e);
         if (elem.active())
           for (unsigned int s=0; s<elem.n_sides(); s++)
-            if (elem.neighbor(s) == libmesh_nullptr)
+            if (elem.neighbor_ptr(s) == libmesh_nullptr)
               {
-                const UniquePtr<Elem> side(elem.build_side(s));
+                const UniquePtr<const Elem> side(elem.build_side_ptr(s));
 
                 if (side->type() == TRI3)
                   {
@@ -198,9 +198,9 @@ void DivaIO::write_stream (std::ostream & out_file)
         const Elem & elem = the_mesh.elem_ref(e);
         if (elem.active())
           for (unsigned int s=0; s<elem.n_sides(); s++)
-            if (elem.neighbor(s) == libmesh_nullptr)
+            if (elem.neighbor_ptr(s) == libmesh_nullptr)
               {
-                const UniquePtr<Elem> side(elem.build_side(s));
+                const UniquePtr<const Elem> side(elem.build_side_ptr(s));
 
                 if ((side->type() == QUAD4) ||
                     (side->type() == QUAD8)  )
@@ -250,9 +250,9 @@ void DivaIO::write_stream (std::ostream & out_file)
         const Elem & elem = the_mesh.elem_ref(e);
         if (elem.active())
           for (unsigned short s=0; s<elem.n_sides(); s++)
-            if (elem.neighbor(s) == libmesh_nullptr)
+            if (elem.neighbor_ptr(s) == libmesh_nullptr)
               {
-                const UniquePtr<Elem> side(elem.build_side(s));
+                const UniquePtr<const Elem> side(elem.build_side_ptr(s));
 
                 if ((side->type() == TRI3) ||
                     (side->type() == TRI6)  )
@@ -271,9 +271,9 @@ void DivaIO::write_stream (std::ostream & out_file)
         const Elem & elem = the_mesh.elem_ref(e);
         if (elem.active())
           for (unsigned short s=0; s<elem.n_sides(); s++)
-            if (elem.neighbor(s) == libmesh_nullptr)
+            if (elem.neighbor_ptr(s) == libmesh_nullptr)
               {
-                const UniquePtr<Elem> side(elem.build_side(s));
+                const UniquePtr<const Elem> side(elem.build_side_ptr(s));
 
                 if ((side->type() == QUAD4) ||
                     (side->type() == QUAD8) ||

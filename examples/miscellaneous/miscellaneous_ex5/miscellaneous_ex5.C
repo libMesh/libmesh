@@ -279,12 +279,12 @@ void assemble_ellipticdg(EquationSystems & es,
       // side MUST live on a boundary of the domain.
       for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if (elem->neighbor(side) == libmesh_nullptr)
+          if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
               // Pointer to the element face
               fe_elem_face->reinit(elem, side);
 
-              UniquePtr<Elem> elem_side (elem->build_side(side));
+              UniquePtr<const Elem> elem_side (elem->build_side_ptr(side));
               // h elemet dimension to compute the interior penalty penalty parameter
               const unsigned int elem_b_order = static_cast<unsigned int> (fe_elem_face->get_order());
               const double h_elem = elem->volume()/elem_side->volume() * 1./pow(elem_b_order, 2.);
@@ -325,7 +325,7 @@ void assemble_ellipticdg(EquationSystems & es,
             {
               // Store a pointer to the neighbor we are currently
               // working on.
-              const Elem * neighbor = elem->neighbor(side);
+              const Elem * neighbor = elem->neighbor_ptr(side);
 
               // Get the global id of the element and the neighbor
               const unsigned int elem_id = elem->id();
@@ -342,7 +342,7 @@ void assemble_ellipticdg(EquationSystems & es,
                   (neighbor->level() < elem->level()))
                 {
                   // Pointer to the element side
-                  UniquePtr<Elem> elem_side (elem->build_side(side));
+                  UniquePtr<const Elem> elem_side (elem->build_side_ptr(side));
 
                   // h dimension to compute the interior penalty penalty parameter
                   const unsigned int elem_b_order = static_cast<unsigned int>(fe_elem_face->get_order());

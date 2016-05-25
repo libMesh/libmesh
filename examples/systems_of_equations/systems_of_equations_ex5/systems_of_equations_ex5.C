@@ -325,7 +325,7 @@ void assemble_elasticity(EquationSystems & es,
       {
         std::vector<boundary_id_type> bc_ids;
         for (unsigned int side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == libmesh_nullptr)
+          if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
               mesh.get_boundary_info().boundary_ids (elem, side, bc_ids);
 

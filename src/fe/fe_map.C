@@ -404,7 +404,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                                      const std::vector<Real> & qw,
                                      const Elem * elem,
                                      unsigned int p,
-                                     const std::vector<Node *> & elem_nodes,
+                                     const std::vector<const Node *> & elem_nodes,
                                      bool compute_second_derivatives)
 {
   libmesh_assert(elem);
@@ -1235,7 +1235,7 @@ void FEMap::compute_affine_map(const unsigned int dim,
   this->resize_quadrature_map_vectors(dim, n_qp);
 
   // Determine the nodes contributing to element elem
-  std::vector<Node *> elem_nodes(elem->n_nodes(), libmesh_nullptr);
+  std::vector<const Node *> elem_nodes(elem->n_nodes(), libmesh_nullptr);
   for (unsigned int i=0; i<elem->n_nodes(); i++)
     elem_nodes[i] = elem->node_ptr(i);
 
@@ -1403,7 +1403,7 @@ void FEMap::compute_map(const unsigned int dim,
   this->resize_quadrature_map_vectors(dim, n_qp);
 
   // Determine the nodes contributing to element elem
-  std::vector<Node *> elem_nodes;
+  std::vector<const Node *> elem_nodes;
   if (elem->type() == TRI3SUBDIVISION)
     {
       // Subdivision surface FE require the 1-ring around elem

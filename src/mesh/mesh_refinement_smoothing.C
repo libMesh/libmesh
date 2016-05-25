@@ -167,7 +167,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         // Set the max_level at each edge
         for (unsigned int n=0; n<elem->n_edges(); n++)
           {
-            UniquePtr<Elem> edge = elem->build_edge(n);
+            UniquePtr<const Elem> edge = elem->build_edge_ptr(n);
             dof_id_type childnode0 = edge->node_id(0);
             dof_id_type childnode1 = edge->node_id(1);
             if (childnode1 < childnode0)
@@ -175,7 +175,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
             for (const Elem * p = elem; p != libmesh_nullptr; p = p->parent())
               {
-                UniquePtr<Elem> pedge = p->build_edge(n);
+                UniquePtr<const Elem> pedge = p->build_edge_ptr(n);
                 dof_id_type node0 = pedge->node_id(0);
                 dof_id_type node1 = pedge->node_id(1);
 
@@ -237,7 +237,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         // Loop over the nodes, check for possible mismatch
         for (unsigned int n=0; n<elem->n_edges(); n++)
           {
-            UniquePtr<Elem> edge = elem->build_edge(n);
+            UniquePtr<Elem> edge = elem->build_edge_ptr(n);
             dof_id_type node0 = edge->node_id(0);
             dof_id_type node1 = edge->node_id(1);
             if (node1 < node0)
@@ -470,7 +470,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       // Check all the element neighbors
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
-          const Elem * neighbor = elem->neighbor(n);
+          const Elem * neighbor = elem->neighbor_ptr(n);
           // Quit if the element is on a local boundary
           if (neighbor == libmesh_nullptr || neighbor == remote_elem)
             {
@@ -550,9 +550,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             {
               for (unsigned int c=0; c<elem->n_children(); c++)
                 {
-                  libmesh_assert_equal_to (elem->child(c)->refinement_flag(),
+                  libmesh_assert_equal_to (elem->child_ptr(c)->refinement_flag(),
                                            Elem::COARSEN);
-                  elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
+                  elem->child_ptr(c)->set_refinement_flag(Elem::DO_NOTHING);
                 }
               elem->set_refinement_flag(Elem::INACTIVE);
             }

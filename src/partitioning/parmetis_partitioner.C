@@ -489,7 +489,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
       // adjacency corresponds to a face neighbor
       for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
         {
-          const Elem * neighbor = elem->neighbor(ms);
+          const Elem * neighbor = elem->neighbor_ptr(ms);
 
           if (neighbor != libmesh_nullptr)
             {
@@ -542,7 +542,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
                       // This does not assume a level-1 mesh.
                       // Note that since children have sides numbered
                       // coincident with the parent then this is a sufficient test.
-                      if (child->neighbor(ns) == elem)
+                      if (child->neighbor_ptr(ns) == elem)
                         {
                           libmesh_assert (child->active());
                           libmesh_assert (_global_index_by_pid_map.count(child->id()));

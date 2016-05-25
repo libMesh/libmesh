@@ -1472,17 +1472,17 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
       // Loop over the neighbors of those elements
       for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        if (elem->neighbor(s) != libmesh_nullptr)
+        if (elem->neighbor_ptr(s) != libmesh_nullptr)
           {
             family.clear();
 
             // Find all the active elements that neighbor elem
 #ifdef LIBMESH_ENABLE_AMR
-            if (!elem->neighbor(s)->active())
-              elem->neighbor(s)->active_family_tree_by_neighbor(family, elem);
+            if (!elem->neighbor_ptr(s)->active())
+              elem->neighbor_ptr(s)->active_family_tree_by_neighbor(family, elem);
             else
 #endif
-              family.push_back(elem->neighbor(s));
+              family.push_back(elem->neighbor_ptr(s));
 
             for (dof_id_type i=0; i!=family.size(); ++i)
               // If the neighbor lives on a different processor
@@ -1820,7 +1820,7 @@ void DofMap::dof_indices (const Elem * const elem,
       if (!sd_elem->is_ghost())
         {
           // Determine the nodes contributing to element elem
-          std::vector<Node *> elem_nodes;
+          std::vector<const Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
           // Get the dof numbers
@@ -1910,7 +1910,7 @@ void DofMap::dof_indices (const Elem * const elem,
       if (!sd_elem->is_ghost())
         {
           // Determine the nodes contributing to element elem
-          std::vector<Node *> elem_nodes;
+          std::vector<const Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
           _dof_indices(elem, p_level, di, vn, &elem_nodes[0],
@@ -2154,7 +2154,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
   di.clear();
 
   // Determine the nodes contributing to element elem
-  std::vector<Node *> elem_nodes;
+  std::vector<const Node *> elem_nodes;
   if (elem->type() == TRI3SUBDIVISION)
     {
       // Subdivision surface FE require the 1-ring around elem
@@ -2560,9 +2560,9 @@ void SparsityPattern::Build::operator()(const ConstElemRange & range)
               // TODO:[BSK] optimize this like above!
               if (implicit_neighbor_dofs)
                 for (unsigned int s=0; s<elem->n_sides(); s++)
-                  if (elem->neighbor(s) != libmesh_nullptr)
+                  if (elem->neighbor_ptr(s) != libmesh_nullptr)
                     {
-                      const Elem * const neighbor_0 = elem->neighbor(s);
+                      const Elem * const neighbor_0 = elem->neighbor_ptr(s);
 #ifdef LIBMESH_ENABLE_AMR
                       neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
 #else
@@ -2748,9 +2748,9 @@ void SparsityPattern::Build::operator()(const ConstElemRange & range)
                         // TODO:[BSK] optimize this like above!
                         if (implicit_neighbor_dofs)
                           for (unsigned int s=0; s<elem->n_sides(); s++)
-                            if (elem->neighbor(s) != libmesh_nullptr)
+                            if (elem->neighbor_ptr(s) != libmesh_nullptr)
                               {
-                                const Elem * const neighbor_0 = elem->neighbor(s);
+                                const Elem * const neighbor_0 = elem->neighbor_ptr(s);
 #ifdef LIBMESH_ENABLE_AMR
                                 neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
 #else

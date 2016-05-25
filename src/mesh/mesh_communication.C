@@ -94,7 +94,7 @@ struct SyncNeighbors
         neighbors[i].resize(n_neigh);
         for (unsigned int n = 0; n != n_neigh; ++n)
           {
-            const Elem * neigh = elem.neighbor(n);
+            const Elem * neigh = elem.neighbor_ptr(n);
             if (neigh)
               {
                 libmesh_assert_not_equal_to(neigh, remote_elem);
@@ -121,7 +121,7 @@ struct SyncNeighbors
         for (unsigned int n = 0; n != n_neigh; ++n)
           {
             const dof_id_type new_neigh_id = new_neigh[n];
-            const Elem * old_neigh = elem.neighbor(n);
+            const Elem * old_neigh = elem.neighbor_ptr(n);
             if (old_neigh && old_neigh != remote_elem)
               {
                 libmesh_assert_equal_to(old_neigh->id(), new_neigh_id);
@@ -485,9 +485,9 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             my_interface_elements.push_back(elem); // add the element, but only once, even
             // if there are multiple NULL neighbors
             for (unsigned int s=0; s<elem->n_sides(); s++)
-              if (elem->neighbor(s) == libmesh_nullptr)
+              if (elem->neighbor_ptr(s) == libmesh_nullptr)
                 {
-                  UniquePtr<Elem> side(elem->build_side(s));
+                  UniquePtr<const Elem> side(elem->build_side_ptr(s));
 
                   for (unsigned int n=0; n<side->n_vertices(); n++)
                     my_interface_node_set.insert (side->node_id(n));
@@ -1267,7 +1267,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
       for (unsigned int s=0; s != elem->n_sides(); ++s)
         {
-          const Elem * neighbor = elem->neighbor(s);
+          const Elem * neighbor = elem->neighbor_ptr(s);
           if (neighbor)
             semilocal_elems[neighbor->id()] = true;
         }

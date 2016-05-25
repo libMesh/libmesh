@@ -406,7 +406,7 @@ float Tet4::embedding_matrix (const unsigned int i,
 //  available.  */
 //       for (unsigned int c=4; c<this->n_children(); c++)
 // {
-//   Elem * child = this->child(c);
+//   Elem * child = this->child_ptr(c);
 //   for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 //     {
 //       /* Unassign the current node.  */
@@ -438,7 +438,7 @@ float Tet4::embedding_matrix (const unsigned int i,
 // {
 //   /* Second time, so we know now which node to
 //      use.  */
-//   child->set_node(nc) = this->child(n)->node_ptr(first_05_in_embedding_matrix);
+//   child->set_node(nc) = this->child_ptr(n)->node_ptr(first_05_in_embedding_matrix);
 // }
 //
 //     }

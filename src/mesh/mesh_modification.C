@@ -339,7 +339,7 @@ void UnstructuredMesh::all_first_order ()
          (so_elem->type()), so_elem->parent()).release();
 
       for (unsigned int s=0; s != so_elem->n_sides(); ++s)
-        if (so_elem->neighbor(s) == remote_elem)
+        if (so_elem->neighbor_ptr(s) == remote_elem)
           lo_elem->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -349,8 +349,8 @@ void UnstructuredMesh::all_first_order ()
       if (so_elem->has_children())
         for (unsigned int c=0; c != so_elem->n_children(); ++c)
           {
-            so_elem->child(c)->set_parent(lo_elem);
-            lo_elem->add_child(so_elem->child(c), c);
+            so_elem->child_ptr(c)->set_parent(lo_elem);
+            lo_elem->add_child(so_elem->child_ptr(c), c);
           }
 
       /*
@@ -1427,7 +1427,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                       continue;
 
                     // Make a sorted list of node ids for elem->side(sn)
-                    UniquePtr<Elem> elem_side = elem->build_side(sn);
+                    UniquePtr<Elem> elem_side = elem->build_side_ptr(sn);
                     std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
                     for (unsigned int esn=0; esn<elem_side_nodes.size(); ++esn)
                       elem_side_nodes[esn] = elem_side->node_id(esn);
@@ -1438,7 +1438,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                         {
                           for (unsigned int subside=0; subside < subelem[i]->n_sides(); ++subside)
                             {
-                              UniquePtr<Elem> subside_elem = subelem[i]->build_side(subside);
+                              UniquePtr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
 
                               // Make a list of *vertex* node ids for this subside, see if they are all present
                               // in elem->side(sn).  Note 1: we can't just compare elem->key(sn) to
@@ -1465,7 +1465,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
                                   // If the original element had a RemoteElem neighbor on side 'sn',
                                   // then the subelem has one on side 'subside'.
-                                  if (elem->neighbor(sn) == remote_elem)
+                                  if (elem->neighbor_ptr(sn) == remote_elem)
                                     subelem[i]->set_neighbor(subside, const_cast<RemoteElem*>(remote_elem));
                                 }
                             }
@@ -1625,13 +1625,13 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                          * id is greater than its neighbor's.
                          * Sides get only built once.
                          */
-                        if ((elem->neighbor(s) != libmesh_nullptr) &&
-                            (elem->id() > elem->neighbor(s)->id()) )
+                        if ((elem->neighbor_ptr(s) != libmesh_nullptr) &&
+                            (elem->id() > elem->neighbor_ptr(s)->id()))
                           {
-                            UniquePtr<Elem> side(elem->build_side(s));
+                            UniquePtr<const Elem> side(elem->build_side_ptr(s));
 
-                            Node & node0 = side->node_ref(0);
-                            Node & node1 = side->node_ref(1);
+                            const Node & node0 = side->node_ref(0);
+                            const Node & node1 = side->node_ref(1);
 
                             Real node_weight = 1.;
                             // calculate the weight of the nodes
@@ -1665,7 +1665,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                      */
                     for (unsigned int c=0; c < parent->n_children(); c++)
                       {
-                        if (parent->child(c) == elem)
+                        if (parent->child_ptr(c) == elem)
                           {
                             /*
                              *loop over the childs (that is, the current elements) nodes
@@ -1805,7 +1805,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
         // side, bc_id) triples and those links
         for (unsigned short s=0; s<elem->n_sides(); s++)
           {
-            if (elem->neighbor(s) == remote_elem)
+            if (elem->neighbor_ptr(s) == remote_elem)
               copy->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
             mesh.get_boundary_info().boundary_ids(elem, s, bc_ids);

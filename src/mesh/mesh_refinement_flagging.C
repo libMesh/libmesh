@@ -429,7 +429,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
           libmesh_assert(parent->has_children());
           for (unsigned int c=0; c != parent->n_children(); ++c)
             {
-              Elem * elem = parent->child(c);
+              Elem * elem = parent->child_ptr(c);
               if (elem && elem != remote_elem)
                 {
                   libmesh_assert(elem->active());

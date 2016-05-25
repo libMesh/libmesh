@@ -353,7 +353,7 @@ public:
 
   /**
    * This function tells you which side the boundary element \p e is.
-   * I.e. if e = a->build_side(s) or e = a->side(s); then
+   * I.e. if e = a->build_side_ptr(s) or e = a->side_ptr(s); then
    * a->which_side_am_i(e) will be s.
    *
    * Returns \p invalid_uint if \p e is not a side of \p this
@@ -657,7 +657,7 @@ public:
   /**
    * Creates an element coincident with side \p i. The element returned is
    * full-ordered, in contrast to the side method.  For example, calling
-   * build_side(0) on a 20-noded hex will build a 8-noded quadrilateral
+   * build_side_ptr(0) on a 20-noded hex will build a 8-noded quadrilateral
    * coincident with face 0 and pass back the pointer.
    *
    * A \p UniquePtr<Elem> is returned to prevent a memory leak.
@@ -685,7 +685,7 @@ public:
 
   /**
    * Creates an element coincident with edge \p i. The element returned is
-   * full-ordered.  For example, calling build_edge(0) on a 20-noded hex will
+   * full-ordered.  For example, calling build_edge_ptr(0) on a 20-noded hex will
    * build a 3-noded edge coincident with edge 0 and pass back the pointer.
    *
    * A \p UniquePtr<Elem> is returned to prevent a memory leak.
@@ -925,10 +925,10 @@ public:
    * @returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  Note that
    * the return values are always less \p this->n_children() and
-   * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
+   * \p this->child_ptr(c)->n_vertices(), while \p n has to be greater or equal
    * to \p * this->n_vertices().  For linear elements this returns 0,0.
    * On refined second order elements, the return value will satisfy
-   * \p this->node_ptr(n)==this->child(c)->node_ptr(v)
+   * \p this->node_ptr(n)==this->child_ptr(c)->node_ptr(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const;
@@ -1023,7 +1023,7 @@ public:
   /**
    * This function tells you which child you \p (e) are.
    * I.e. if c = a->which_child_am_i(e); then
-   * a->child(c) will be e;
+   * a->child_ptr(c) will be e;
    */
   unsigned int which_child_am_i(const Elem * e) const;
 
@@ -1757,7 +1757,7 @@ inline
 bool Elem::has_neighbor (const Elem * elem) const
 {
   for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->neighbor(n) == elem)
+    if (this->neighbor_ptr(n) == elem)
       return true;
 
   return false;
@@ -1769,9 +1769,9 @@ inline
 Elem * Elem::child_neighbor (Elem * elem)
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor(n) &&
-        elem->neighbor(n)->parent() == this)
-      return elem->neighbor(n);
+    if (elem->neighbor_ptr(n) &&
+        elem->neighbor_ptr(n)->parent() == this)
+      return elem->neighbor_ptr(n);
 
   return libmesh_nullptr;
 }
@@ -1782,9 +1782,9 @@ inline
 const Elem * Elem::child_neighbor (const Elem * elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor(n) &&
-        elem->neighbor(n)->parent() == this)
-      return elem->neighbor(n);
+    if (elem->neighbor_ptr(n) &&
+        elem->neighbor_ptr(n)->parent() == this)
+      return elem->neighbor_ptr(n);
 
   return libmesh_nullptr;
 }
@@ -1885,7 +1885,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
     }
 
   for (unsigned int s=0; s<this->n_neighbors(); s++)
-    if (this->neighbor(s) == eparent)
+    if (this->neighbor_ptr(s) == eparent)
       return s;
 
   return libMesh::invalid_uint;
@@ -2004,7 +2004,7 @@ bool Elem::has_ancestor_children() const
     return false;
   else
     for (unsigned int c=0; c != this->n_children(); c++)
-      if (this->child(c)->has_children())
+      if (this->child_ptr(c)->has_children())
         return true;
 #endif
   return false;
@@ -2169,7 +2169,7 @@ unsigned int Elem::which_child_am_i (const Elem * e) const
   libmesh_assert (this->has_children());
 
   for (unsigned int c=0; c<this->n_children(); c++)
-    if (this->child(c) == e)
+    if (this->child_ptr(c) == e)
       return c;
 
   libmesh_error_msg("ERROR:  which_child_am_i() was called with a non-child!");
@@ -2227,7 +2227,7 @@ unsigned int Elem::max_descendant_p_level () const
   unsigned int max_p_level = _p_level;
   for (unsigned int c=0; c != this->n_children(); c++)
     max_p_level = std::max(max_p_level,
-                           this->child(c)->max_descendant_p_level());
+                           this->child_ptr(c)->max_descendant_p_level());
   return max_p_level;
 }
 
@@ -2258,7 +2258,7 @@ void Elem::set_p_level(unsigned int p)
           parent_p_level = cast_int<unsigned char>(p);
           for (unsigned int c=0; c != this->parent()->n_children(); c++)
             parent_p_level = std::min(parent_p_level,
-                                      this->parent()->child(c)->p_level());
+                                      this->parent()->child_ptr(c)->p_level());
 
           // When its children all have a higher p level, the parent's
           // should rise
@@ -2453,7 +2453,7 @@ public:
   // this could possibly change in the future?
   bool side_on_boundary() const
   {
-    return this->_parent->neighbor(_side_number) == libmesh_nullptr;
+    return this->_parent->neighbor_ptr(_side_number) == libmesh_nullptr;
   }
 
 private:
@@ -2462,7 +2462,7 @@ private:
   void _update_side_ptr() const
   {
     // Construct new side, store in UniquePtr
-    this->_side = this->_parent->build_side(this->_side_number);
+    this->_side = this->_parent->build_side_ptr(this->_side_number);
 
     // Also set our internal naked pointer.  Memory is still owned
     // by the UniquePtr.

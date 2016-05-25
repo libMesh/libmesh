@@ -477,7 +477,7 @@ void assemble_wave(EquationSystems & es,
         // don't do this for any side
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (!true)
-            // if (elem->neighbor(side) == libmesh_nullptr)
+            // if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
               // Declare a special finite element object for
               // boundary integration.
@@ -519,7 +519,7 @@ void assemble_wave(EquationSystems & es,
                         *phi_face[i][qp]*JxW_face[qp];
                     }
                 } // end face quadrature point loop
-            } // end if (elem->neighbor(side) == libmesh_nullptr)
+            } // end if (elem->neighbor_ptr(side) == libmesh_nullptr)
 
         // In this example the Dirichlet boundary conditions will be
         // imposed via panalty method after the

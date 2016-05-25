@@ -927,14 +927,14 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                 // Now check whether elem has a face on the specified boundary
                 for (unsigned char side_id=0; side_id<el->n_sides(); ++side_id)
-                  if (el->neighbor(side_id) == libmesh_nullptr)
+                  if (el->neighbor_ptr(side_id) == libmesh_nullptr)
                     {
                       // Get *all* boundary IDs on this side, not just the first one!
                       mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
 
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
-                          UniquePtr<Elem> side (el->build_side(side_id));
+                          UniquePtr<Elem> side (el->build_side_ptr(side_id));
                           for (unsigned int node_i=0; node_i<side->n_nodes(); ++node_i)
                             set_array[i]->insert( side->node_id(node_i) );
 
@@ -973,7 +973,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                               if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
-                                  UniquePtr<Elem> edge (el->build_edge(edge_id));
+                                  UniquePtr<Elem> edge (el->build_edge_ptr(edge_id));
                                   for (unsigned int node_i=0; node_i<edge->n_nodes(); ++node_i)
                                     set_array[i]->insert( edge->node_id(node_i) );
 
@@ -1355,7 +1355,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                   fixed_elems.insert(elem_id);
                   for(unsigned int s = 0; s < el->n_neighbors(); ++s)
                     {
-                      if(el->neighbor(s) == libmesh_nullptr)
+                      if (el->neighbor_ptr(s) == libmesh_nullptr)
                         {
                           key_type key = el->key(s);
                           typedef map_type::iterator key_val_it_type;
@@ -1365,7 +1365,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                           if(bounds.first != bounds.second)
                             {
                               // Get the side for this element
-                              const UniquePtr<Elem> my_side(el->side(s));
+                              const UniquePtr<Elem> my_side(el->side_ptr(s));
 
                               // Look at all the entries with an equivalent key
                               while (bounds.first != bounds.second)
@@ -1375,7 +1375,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
-                                  const UniquePtr<Elem> their_side(neighbor->side(ns));
+                                  const UniquePtr<Elem> their_side(neighbor->side_ptr(ns));
                                   //libmesh_assert(my_side.get());
                                   //libmesh_assert(their_side.get());
 
@@ -1444,7 +1444,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
           for (unsigned short side_id=0; side_id<el->n_sides(); side_id++)
             {
-              if (el->neighbor(side_id) != libmesh_nullptr)
+              if (el->neighbor_ptr(side_id) != libmesh_nullptr)
                 {
                   // Completely remove the side from the boundary_info object if it has either
                   // this_mesh_boundary_id or other_mesh_boundary_id.

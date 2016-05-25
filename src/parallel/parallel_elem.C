@@ -269,7 +269,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
-      const Elem * neigh = elem->neighbor(n);
+      const Elem * neigh = elem->neighbor_ptr(n);
       if (neigh)
         *data_out++ = (neigh->id());
       else
@@ -494,7 +494,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
       libmesh_assert (!level || elem->parent() != libmesh_nullptr);
       libmesh_assert (!level || elem->parent()->id() == parent_id);
-      libmesh_assert (!level || elem->parent()->child(which_child_am_i) == elem);
+      libmesh_assert (!level || elem->parent()->child_ptr(which_child_am_i) == elem);
 #endif
       // Our interior_parent link should be "close to" correct - we
       // may have to update it, but we can check for some
@@ -560,7 +560,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             // we'd better agree.
             if (neighbor_id == DofObject::invalid_id)
               {
-                libmesh_assert (!(elem->neighbor(n)));
+                libmesh_assert (!(elem->neighbor_ptr(n)));
                 continue;
               }
 
@@ -569,7 +569,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             // boundary.
             if (neighbor_id == remote_elem->id())
               {
-                libmesh_assert(elem->neighbor(n));
+                libmesh_assert(elem->neighbor_ptr(n));
                 continue;
               }
 
@@ -580,7 +580,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             // have a remote_elem signifying that fact.
             if (!neigh)
               {
-                libmesh_assert_equal_to (elem->neighbor(n), remote_elem);
+                libmesh_assert_equal_to (elem->neighbor_ptr(n), remote_elem);
                 continue;
               }
 
@@ -589,13 +589,13 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             // linking to it.  Perhaps we initially received both elem
             // and neigh from processors on which their mutual link was
             // remote?
-            libmesh_assert(elem->neighbor(n) == neigh ||
-                           elem->neighbor(n) == remote_elem);
+            libmesh_assert(elem->neighbor_ptr(n) == neigh ||
+                           elem->neighbor_ptr(n) == remote_elem);
 
             // If the link was originally remote, we should update it,
             // and make sure the appropriate parts of its family link
             // back to us.
-            if (elem->neighbor(n) == remote_elem)
+            if (elem->neighbor_ptr(n) == remote_elem)
               {
                 elem->set_neighbor(n, neigh);
 
@@ -654,7 +654,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
         {
           // Since this is a newly created element, the parent must
           // have previously thought of this child as a remote element.
-          libmesh_assert_equal_to (parent->child(which_child_am_i), remote_elem);
+          libmesh_assert_equal_to (parent->child_ptr(which_child_am_i), remote_elem);
 
           parent->add_child(elem, which_child_am_i);
         }

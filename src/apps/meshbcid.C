@@ -148,7 +148,7 @@ int main(int argc, char ** argv)
       unsigned int n_sides = elem->n_sides();
       for (unsigned short s=0; s != n_sides; ++s)
         {
-          if (elem->neighbor(s))
+          if (elem->neighbor_ptr(s))
             continue;
 
           fe->reinit(elem,s);

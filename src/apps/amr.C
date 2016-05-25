@@ -236,7 +236,7 @@ void assemble(EquationSystems & es,
       if (dim == 3)
         {
           for (unsigned int side=0; side<elem->n_sides(); side++)
-            if (elem->neighbor(side) == libmesh_nullptr)
+            if (elem->neighbor_ptr(side) == libmesh_nullptr)
               {
                 fe_face->reinit (elem, side);
 

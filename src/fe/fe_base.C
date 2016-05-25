@@ -92,7 +92,7 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
           if (!on_relevant_boundary)
             continue;
 
-          if (!pt_neighbor->build_side(ns)->contains_point(p))
+          if (!pt_neighbor->build_side_ptr(ns)->contains_point(p))
             continue;
 
           vertex_on_periodic_side = true;
@@ -156,7 +156,7 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
           if (!on_relevant_boundary)
             continue;
 
-          UniquePtr<Elem> periodic_side = e_neighbor->build_side(ns);
+          UniquePtr<const Elem> periodic_side = e_neighbor->build_side_ptr(ns);
           if (!(periodic_side->contains_point(p1) &&
                 periodic_side->contains_point(p2)))
             continue;
@@ -921,11 +921,11 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
         // where p refinement creates more vertex dofs; we have
         // no such elements yet.
         /*
-          if (elem->child(n)->p_level() < elem->p_level())
+          if (elem->child_ptr(n)->p_level() < elem->p_level())
           {
           temp_fe_type.order =
           static_cast<Order>(temp_fe_type.order +
-          elem->child(n)->p_level());
+          elem->child_ptr(n)->p_level());
           }
         */
         const unsigned int nc =
@@ -967,7 +967,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
           {
             if (!elem->is_child_on_edge(c,e))
               continue;
-            Elem * child = elem->child(c);
+            const Elem * child = elem->child_ptr(c);
 
             std::vector<dof_id_type> child_dof_indices;
             if (use_old_dof_indices)
@@ -1110,7 +1110,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
           {
             if (!elem->is_child_on_side(c,s))
               continue;
-            Elem * child = elem->child(c);
+            const Elem * child = elem->child_ptr(c);
 
             std::vector<dof_id_type> child_dof_indices;
             if (use_old_dof_indices)
@@ -1242,7 +1242,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   // Add projection terms from each child
   for (unsigned int c=0; c != elem->n_children(); ++c)
     {
-      Elem * child = elem->child(c);
+      const Elem * child = elem->child_ptr(c);
 
       std::vector<dof_id_type> child_dof_indices;
       if (use_old_dof_indices)
@@ -1449,10 +1449,10 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != libmesh_nullptr)
+    if (elem->neighbor_ptr(s) != libmesh_nullptr)
       {
         // Get pointers to the element's neighbor.
-        const Elem * neigh = elem->neighbor(s);
+        const Elem * neigh = elem->neighbor_ptr(s);
 
         // h refinement constraints:
         // constrain dofs shared between
@@ -1746,7 +1746,7 @@ compute_periodic_constraints (DofConstraints & constraints,
   // build constraints.
   for (unsigned short int s=0; s<elem->n_sides(); s++)
     {
-      if (elem->neighbor(s))
+      if (elem->neighbor_ptr(s))
         continue;
 
       mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
@@ -2076,7 +2076,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                           libmesh_assert_less (e, elem->n_edges());
 
                           // Find the edge end nodes
-                          Node
+                          const Node
                             * e1 = libmesh_nullptr,
                             * e2 = libmesh_nullptr;
                           for (unsigned int nn = 0; nn != elem->n_nodes(); ++nn)

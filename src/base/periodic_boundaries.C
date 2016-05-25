@@ -67,7 +67,7 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
 {
   // Find a point on that side (and only that side)
 
-  Point p = e->build_side(side)->centroid();
+  Point p = e->build_side_ptr(side)->centroid();
 
   const PeriodicBoundaryBase * b = this->boundary(boundary_id);
   libmesh_assert (b);

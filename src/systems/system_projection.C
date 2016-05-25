@@ -326,9 +326,9 @@ protected:
             const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
 
             for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child(c)->close_to_point(p, master_tol))
+              if (elem.child_ptr(c)->close_to_point(p, master_tol))
                 {
-                  old_context.pre_fe_reinit(sys, elem.child(c));
+                  old_context.pre_fe_reinit(sys, elem.child_ptr(c));
                   break;
                 }
 
@@ -357,9 +357,9 @@ protected:
               (elem.refinement_flag(), Elem::JUST_COARSENED);
 
             for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child(c)->close_to_point(p, master_tol))
+              if (elem.child_ptr(c)->close_to_point(p, master_tol))
                 {
-                  old_context.pre_fe_reinit(sys, elem.child(c));
+                  old_context.pre_fe_reinit(sys, elem.child_ptr(c));
                   break;
                 }
 
@@ -1533,7 +1533,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           if (!elem->is_child_on_edge(c, e))
                             continue;
 
-                          fine_fe->edge_reinit(elem->child(c), e);
+                          fine_fe->edge_reinit(elem->child_ptr(c), e);
                           fine_points.insert(fine_points.end(),
                                              child_xyz.begin(),
                                              child_xyz.end());
@@ -1722,7 +1722,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           if (!elem->is_child_on_side(c, s))
                             continue;
 
-                          fine_fe->reinit(elem->child(c), s);
+                          fine_fe->reinit(elem->child_ptr(c), s);
                           fine_points.insert(fine_points.end(),
                                              child_xyz.begin(),
                                              child_xyz.end());
@@ -1853,7 +1853,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int c = 0;
                        c != elem->n_children(); ++c)
                     {
-                      fine_fe->reinit(elem->child(c));
+                      fine_fe->reinit(elem->child_ptr(c));
                       fine_points.insert(fine_points.end(),
                                          child_xyz.begin(),
                                          child_xyz.end());
@@ -2051,7 +2051,7 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
           di.clear();
           for (unsigned int c=0; c != elem->n_children(); ++c)
             {
-              dof_map.old_dof_indices (elem->child(c), di_child);
+              dof_map.old_dof_indices (elem->child_ptr(c), di_child);
               di.insert(di.end(), di_child.begin(), di_child.end());
             }
         }

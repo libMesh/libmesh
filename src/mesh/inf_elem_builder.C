@@ -207,7 +207,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
           std::pair<dof_id_type,unsigned int> p = *face_it;
 
           // build a full-ordered side element to get _all_ the base nodes
-          UniquePtr<Elem> side( this->_mesh.elem_ref(p.first).build_side(p.second) );
+          UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
           // insert all the node numbers in inner_boundary_node_numbers
           for (unsigned int n=0; n< side->n_nodes(); n++)
@@ -345,7 +345,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
               {
                 // note that it is safe to use the Elem::side() method,
                 // which gives a non-full-ordered element
-                UniquePtr<Elem> side(elem->build_side(s));
+                UniquePtr<Elem> side(elem->build_side_ptr(s));
 
                 // bool flags for symmetry detection
                 bool sym_side=false;
@@ -435,7 +435,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
       // This has to be a full-ordered side element,
       // since we need the correct n_nodes,
-      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side(p.second));
+      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
       bool found=false;
       for(unsigned int sn=0; sn<side->n_nodes(); sn++)
@@ -539,7 +539,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       std::pair<dof_id_type,unsigned int> p = *face_it;
 
       // build a full-ordered side element to get the base nodes
-      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side(p.second));
+      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
       // create cell depending on side type, assign nodes,
       // use braces to force scope.

@@ -811,10 +811,10 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != libmesh_nullptr &&
-        elem->neighbor(s) != remote_elem)
-      if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
-        {                                                     // this element and ones coarser
+    if (elem->neighbor_ptr(s) != libmesh_nullptr &&
+        elem->neighbor_ptr(s) != remote_elem)
+      if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
+        {                                                 // this element and ones coarser
           // than this element.
           // Get pointers to the elements of interest and its parent.
           const Elem * parent = elem->parent();
@@ -824,8 +824,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
           // level than their neighbors!
           libmesh_assert(parent);
 
-          const UniquePtr<Elem> my_side     (elem->build_side(s));
-          const UniquePtr<Elem> parent_side (parent->build_side(s));
+          const UniquePtr<const Elem> my_side     (elem->build_side_ptr(s));
+          const UniquePtr<const Elem> parent_side (parent->build_side_ptr(s));
 
           const unsigned int n_side_nodes = my_side->n_nodes();
 
@@ -959,7 +959,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
   std::vector<boundary_id_type> bc_ids;
   for (unsigned short int s=0; s<elem->n_sides(); s++)
     {
-      if (elem->neighbor(s))
+      if (elem->neighbor_ptr(s))
         continue;
 
       mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
@@ -988,8 +988,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
                   libmesh_assert(neigh->active());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-                  const UniquePtr<Elem> my_side    (elem->build_side(s));
-                  const UniquePtr<Elem> neigh_side (neigh->build_side(s_neigh));
+                  const UniquePtr<const Elem> my_side    (elem->build_side_ptr(s));
+                  const UniquePtr<const Elem> neigh_side (neigh->build_side_ptr(s_neigh));
 
                   const unsigned int n_side_nodes = my_side->n_nodes();
 

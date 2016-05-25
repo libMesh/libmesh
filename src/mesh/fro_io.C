@@ -138,8 +138,8 @@ void FroIO::write (const std::string & fname)
                   // "backward_edges" map n1-->n0
                   // and then start with one chain link, and add on...
                   //
-                  UniquePtr<Elem> side =
-                    the_mesh.elem_ref(el[e]).build_side(sl[e]);
+                  UniquePtr<const Elem> side =
+                    the_mesh.elem_ref(el[e]).build_side_ptr(sl[e]);
 
                   const dof_id_type
                     n0 = side->node_id(0),

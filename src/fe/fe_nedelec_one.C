@@ -407,8 +407,8 @@ void nedelec_one_compute_constraints (DofConstraints & /*constraints*/,
   // level than their neighbors!
   libmesh_assert(parent);
 
-  const UniquePtr<Elem> my_side     (elem->build_side(s));
-  const UniquePtr<Elem> parent_side (parent->build_side(s));
+  const UniquePtr<const Elem> my_side     (elem->build_side_ptr(s));
+  const UniquePtr<const Elem> parent_side (parent->build_side_ptr(s));
 
   // This function gets called element-by-element, so there
   // will be a lot of memory allocation going on.  We can

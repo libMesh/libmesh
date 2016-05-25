@@ -238,7 +238,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
             // adjacency corresponds to a face neighbor
             for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
               {
-                const Elem * neighbor = elem->neighbor(ms);
+                const Elem * neighbor = elem->neighbor_ptr(ms);
 
                 if (neighbor != libmesh_nullptr)
                   {
@@ -284,7 +284,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                             // This does not assume a level-1 mesh.
                             // Note that since children have sides numbered
                             // coincident with the parent then this is a sufficient test.
-                            if (child->neighbor(ns) == elem)
+                            if (child->neighbor_ptr(ns) == elem)
                               {
                                 libmesh_assert (child->active());
                                 num_neighbors++;
@@ -338,7 +338,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
             // adjacency corresponds to a face neighbor
             for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
               {
-                const Elem * neighbor = elem->neighbor(ms);
+                const Elem * neighbor = elem->neighbor_ptr(ms);
 
                 if (neighbor != libmesh_nullptr)
                   {
@@ -375,7 +375,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                             // This does not assume a level-1 mesh.
                             // Note that since children have sides numbered
                             // coincident with the parent then this is a sufficient test.
-                            if (child->neighbor(ns) == elem)
+                            if (child->neighbor_ptr(ns) == elem)
                               {
                                 libmesh_assert (child->active());
 

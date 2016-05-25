@@ -52,7 +52,7 @@ void HPCoarsenTest::add_projection(const System & system,
     {
       libmesh_assert(!elem->subactive());
       for (unsigned int c = 0; c != elem->n_children(); ++c)
-        this->add_projection(system, elem->child(c), var);
+        this->add_projection(system, elem->child_ptr(c), var);
       return;
     }
 
