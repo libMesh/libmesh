@@ -105,6 +105,15 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
+
+      for (unsigned short sf=0; sf != 2; ++sf)
+        {
+          const int n_bcs = cast_int<int>
+            (*(in + pre_indexing_size + indexing_size +
+               total_packed_bc_data++));
+          libmesh_assert_greater_equal (n_bcs, 0);
+          total_packed_bc_data += n_bcs;
+        }
     }
 
   return
@@ -144,6 +153,11 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         total_packed_bcs +=
           mesh->get_boundary_info().n_edge_boundary_ids(elem,e);
+
+      total_packed_bcs += 2; // shellfaces
+      for (unsigned short sf=0; sf != 2; ++sf)
+        total_packed_bcs +=
+          mesh->get_boundary_info().n_shellface_boundary_ids(elem,sf);
     }
 
   return
@@ -284,6 +298,17 @@ Packing<const Elem *>::pack (const Elem * const & elem,
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
           mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs);
+
+          *data_out++ =(bcs.size());
+
+          for (std::vector<boundary_id_type>::iterator bc_it=bcs.begin();
+               bc_it != bcs.end(); ++bc_it)
+            *data_out++ =(*bc_it);
+        }
+
+      for (unsigned short sf=0; sf != 2; ++sf)
+        {
+          mesh->get_boundary_info().shellface_boundary_ids(elem, sf, bcs);
 
           *data_out++ =(bcs.size());
 
@@ -753,6 +778,16 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
             mesh->get_boundary_info().add_edge
               (elem, e, cast_int<boundary_id_type>(*in++));
+        }
+
+      for (unsigned short sf=0; sf != 2; ++sf)
+        {
+          const boundary_id_type num_bcs =
+            cast_int<boundary_id_type>(*in++);
+
+          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+            mesh->get_boundary_info().add_shellface
+              (elem, sf, cast_int<boundary_id_type>(*in++));
         }
     }
 
