@@ -1540,7 +1540,7 @@ template void Xdr::data<long double>                      (long double &,       
 template void Xdr::data<std::complex<float> >             (std::complex<float> &,             const char *);
 template void Xdr::data<std::complex<double> >            (std::complex<double> &,            const char *);
 template void Xdr::data<std::complex<long double> >       (std::complex<long double> &,       const char *);
-template void Xdr::data<std::string>                      (std::string &,                      const char *);
+template void Xdr::data<std::string>                      (std::string &,                     const char *);
 template void Xdr::data<std::vector<int> >                (std::vector<int> &,                const char *);
 template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int> &,       const char *);
 template void Xdr::data<std::vector<short int> >          (std::vector<short int> &,          const char *);
