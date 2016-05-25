@@ -117,6 +117,9 @@ int main(int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // Single precision is inadequate for p refinement
+  libmesh_example_requires(sizeof(Real) > 4, "--disable-singleprecision");
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_requires(false, "--enable-amr");
