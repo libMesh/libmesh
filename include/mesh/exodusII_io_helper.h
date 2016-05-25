@@ -984,7 +984,7 @@ public:
    * the triangle faces and are mapped to "shell face" boundary conditions.
    * The remaining three sides are mapped to edge boundary conditions.
    */
-  static const int trishell3_edge_map[5];
+  static const int trishell3_edge_map[3];
   static const int trishell3_inverse_edge_map[3];
 
   /**
@@ -999,7 +999,7 @@ public:
    * the quad faces and are mapped to "shell face" boundary conditions.
    * The remaining four sides are mapped to edge boundary conditions.
    */
-  static const int quadshell4_edge_map[6];
+  static const int quadshell4_edge_map[4];
   static const int quadshell4_inverse_edge_map[4];
 
   /**

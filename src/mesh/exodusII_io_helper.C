@@ -173,8 +173,8 @@ const int ExodusII_IO_Helper::ElementMaps::tri6_node_map[6]  = {0, 1, 2, 3, 4, 5
 // 2D edge map definitions
 const int ExodusII_IO_Helper::ElementMaps::tri_edge_map[3] = {0, 1, 2};
 const int ExodusII_IO_Helper::ElementMaps::quad_edge_map[4] = {0, 1, 2, 3};
-const int ExodusII_IO_Helper::ElementMaps::trishell3_edge_map[5] = {0, 1, 0, 1, 2};
-const int ExodusII_IO_Helper::ElementMaps::quadshell4_edge_map[6] = {0, 1, 0, 1, 2, 3};
+const int ExodusII_IO_Helper::ElementMaps::trishell3_edge_map[3] = {0, 1, 2};
+const int ExodusII_IO_Helper::ElementMaps::quadshell4_edge_map[4] = {0, 1, 2, 3};
 
 //These take a libMesh ID and turn it into an Exodus ID
 const int ExodusII_IO_Helper::ElementMaps::tri_inverse_edge_map[3] = {1, 2, 3};
