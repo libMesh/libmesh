@@ -982,10 +982,23 @@ public:
                          INVALID_REFINEMENTSTATE };
 
   /**
-   * @returns a pointer to the \f$ i^{th} \f$ child for this element.
+   * @returns a constant pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
    */
+  const Elem * child_ptr (unsigned int i) const;
+
+  /**
+   * @returns a non-constant pointer to the \f$ i^{th} \f$ child for this element.
+   * Do not call if this element has no children, i.e. is active.
+   */
+  Elem * child_ptr (unsigned int i);
+
+  /**
+   * This function is now deprecated, use the more accurately-named and
+   * const correct child_ptr() function instead.
+   */
   Elem * child (const unsigned int i) const;
+
 
 private:
   /**
@@ -2079,12 +2092,30 @@ unsigned int Elem::p_level() const
 #ifdef LIBMESH_ENABLE_AMR
 
 inline
-Elem * Elem::child (const unsigned int i) const
+const Elem * Elem::child_ptr (unsigned int i) const
 {
   libmesh_assert(_children);
   libmesh_assert(_children[i]);
 
   return _children[i];
+}
+
+inline
+Elem * Elem::child_ptr (unsigned int i)
+{
+  libmesh_assert(_children);
+  libmesh_assert(_children[i]);
+
+  return _children[i];
+}
+
+
+inline
+Elem * Elem::child (const unsigned int i) const
+{
+  // Support the deprecated interface by calling the new,
+  // const-correct interface and casting the result to an Elem *.
+  return const_cast<Elem *>(this->child_ptr(i));
 }
 
 
