@@ -54,6 +54,7 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/libmesh_nullptr.h"
+#include "libmesh/getpot.h"
 
 // Eigen includes
 #ifdef LIBMESH_HAVE_EIGEN
@@ -88,6 +89,12 @@ int main (int argc, char ** argv)
 #ifndef LIBMESH_HAVE_EIGEN
   libmesh_example_requires(false, "--enable-eigen");
 #endif
+
+  // Read the "distributed_load" flag from the command line
+  GetPot command_line (argc, argv);
+  int distributed_load = 0;
+  if (command_line.search(1, "-distributed_load"))
+    distributed_load = command_line.next(distributed_load);
 
   // Create a mesh distributed across the default MPI communicator.
   Mesh mesh (init.comm(), 3);
@@ -129,6 +136,7 @@ int main (int argc, char ** argv)
   equation_systems.parameters.set<Real> ("young's modulus") = E;
   equation_systems.parameters.set<Real> ("poisson ratio")   = nu;
   equation_systems.parameters.set<Real> ("point load")    = q;
+  equation_systems.parameters.set<bool>("distributed load")  = (distributed_load != 0);
 
   // Dirichlet conditions for the pinched cylinder problem.
   // Only one 8th of the cylinder is considered using symmetry considerations.
@@ -203,77 +211,81 @@ int main (int argc, char ** argv)
   // Paraview.
   ExodusII_IO(mesh).write_equation_systems ("out.e", equation_systems);
 
-  // Find the node nearest point C.
-  Node * node_C = libmesh_nullptr;
-  Point point_C(0, 3, 3);
-  {
-    Real nearest_dist_sq = std::numeric_limits<Real>::max();
-
-    // Find the closest local node.  On a ParallelMesh we may not even
-    // know about the existence of closer non-local nodes.
-    libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
-    const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
-    for (; it != end; ++it)
+  // Compare with analytical solution for point load
+  if (distributed_load==0)
+    {
+      // Find the node nearest point C.
+      Node * node_C = libmesh_nullptr;
+      Point point_C(0, 3, 3);
       {
-        Node *n = *it;
-        const Real dist_sq = (*n-point_C).norm_sq();
-        if (dist_sq < nearest_dist_sq)
+        Real nearest_dist_sq = std::numeric_limits<Real>::max();
+
+        // Find the closest local node.  On a ParallelMesh we may not even
+        // know about the existence of closer non-local nodes.
+        libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
+        const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
+        for (; it != end; ++it)
           {
-            nearest_dist_sq = dist_sq;
-            node_C = n;
+            Node *n = *it;
+            const Real dist_sq = (*n-point_C).norm_sq();
+            if (dist_sq < nearest_dist_sq)
+              {
+                nearest_dist_sq = dist_sq;
+                node_C = n;
+              }
           }
+
+        // Check with other processors to see if any found a closer node
+        unsigned int minrank = 0;
+        system.comm().minloc(nearest_dist_sq, minrank);
+
+        // Broadcast the ID of the closest node, so every processor can
+        // see for certain whether they have it or not.
+        dof_id_type nearest_node_id;
+        if (system.processor_id() == minrank)
+          nearest_node_id = node_C->id();
+        system.comm().broadcast(nearest_node_id, minrank);
+        node_C = mesh.query_node_ptr(nearest_node_id);
       }
 
-    // Check with other processors to see if any found a closer node
-    unsigned int minrank = 0;
-    system.comm().minloc(nearest_dist_sq, minrank);
+      // Evaluate the z-displacement "w" at the node nearest C.
+      Number w = 0;
 
-    // Broadcast the ID of the closest node, so every processor can
-    // see for certain whether they have it or not.
-    dof_id_type nearest_node_id;
-    if (system.processor_id() == minrank)
-      nearest_node_id = node_C->id();
-    system.comm().broadcast(nearest_node_id, minrank);
-    node_C = mesh.query_node_ptr(nearest_node_id);
-  }
+      // If we know about the closest node, and if we also own the DoFs
+      // on that node, then we can evaluate the solution at that node.
+      if (node_C)
+        {
+          const unsigned int w_var = system.variable_number ("w");
+          dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
+          if (w_dof >= system.get_dof_map().first_dof() &&
+              w_dof < system.get_dof_map().end_dof())
+            w = system.current_solution(w_dof);
+        }
+      system.comm().sum(w);
 
-  // Evaluate the z-displacement "w" at the node nearest C.
-  Number w = 0;
 
-  // If we know about the closest node, and if we also own the DoFs
-  // on that node, then we can evaluate the solution at that node.
-  if (node_C)
-    {
-      const unsigned int w_var = system.variable_number ("w");
-      dof_id_type w_dof = node_C->dof_number (system.number(), w_var, 0);
-      if (w_dof >= system.get_dof_map().first_dof() &&
-          w_dof < system.get_dof_map().end_dof())
-        w = system.current_solution(w_dof);
+      Real w_C_bar = -E*h*w/q;
+      const Real w_C_bar_analytic = 164.24;
+
+      // Print the finite element solution and the analytic
+      // prediction to the screen.
+      libMesh::out << "z-displacement of the point C: " << w_C_bar << std::endl;
+      libMesh::out << "Analytic solution: " << w_C_bar_analytic << std::endl;
+
+      // Evaluate the y-displacement "v" at point D.  This time we'll
+      // evaluate at the exact point, not just the closest node.
+      Point point_D(0, 0, 3);
+      const unsigned int v_var = system.variable_number ("v");
+      Number v = system.point_value(v_var, point_D);
+
+      Real v_D_bar = E*h*v/q;
+      const Real v_D_bar_analytic = 4.114;
+
+      // Print the finite element solution and the analytic
+      // prediction to the screen.
+      libMesh::out << "y-displacement of the point D: " << v_D_bar << std::endl;
+      libMesh::out << "Analytic solution: " << v_D_bar_analytic << std::endl;
     }
-  system.comm().sum(w);
-
-
-  Number w_C_bar = -E*h*w/q;
-  const Real w_C_bar_analytic = 164.24;
-
-  // Print the finite element solution and the analytic
-  // prediction to the screen.
-  libMesh::out << "z-displacement of the point C: " << w_C_bar << std::endl;
-  libMesh::out << "Analytic solution: " << w_C_bar_analytic << std::endl;
-
-  // Evaluate the y-displacement "v" at point D.  This time we'll
-  // evaluate at the exact point, not just the closest node.
-  Point point_D(0, 0, 3);
-  const unsigned int v_var = system.variable_number ("v");
-  Number v = system.point_value(v_var, point_D);
-
-  Number v_D_bar = E*h*v/q;
-  const Real v_D_bar_analytic = 4.114;
-
-  // Print the finite element solution and the analytic
-  // prediction to the screen.
-  libMesh::out << "y-displacement of the point D: " << v_D_bar << std::endl;
-  libMesh::out << "Analytic solution: " << v_D_bar_analytic << std::endl;
 
   // All done.
   return 0;
@@ -305,6 +317,7 @@ void assemble_shell (EquationSystems & es,
   const Real E  = es.parameters.get<Real> ("young's modulus");
   const Real nu = es.parameters.get<Real> ("poisson ratio");
   const Real q  = es.parameters.get<Real> ("point load");
+  const bool distributed_load  = es.parameters.get<bool> ("distributed load");
 
   // The membrane elastic matrix.
   Eigen::Matrix3d Hm;
@@ -349,6 +362,7 @@ void assemble_shell (EquationSystems & es,
   const std::vector<RealGradient> & d2xyzdxideta = fe->get_d2xyzdxideta();
   const std::vector<std::vector<Real> > & dphidxi = fe->get_dphidxi();
   const std::vector<std::vector<Real> > & dphideta = fe->get_dphideta();
+  const std::vector<std::vector<Real> > & phi = fe->get_phi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
@@ -372,6 +386,10 @@ void assemble_shell (EquationSystems & es,
       {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke),
        DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)}
     };
+
+  // Define data structures to contain the element rhs vector.
+  DenseVector<Number> Fe;
+  DenseSubVector<Number> Fe_w(Fe);
 
   std::vector<dof_id_type> dof_indices;
   std::vector< std::vector<dof_id_type> > dof_indices_var(6);
@@ -397,14 +415,14 @@ void assemble_shell (EquationSystems & es,
       // First compute element data at the nodes
       std::vector<Point> nodes;
       for (unsigned int i=0; i<elem->n_nodes(); ++i)
-        nodes.push_back(elem->node_ref(i));
+        nodes.push_back(elem->reference_elem()->node_ref(i));
       fe->reinit (elem, &nodes);
 
       // Convenient notation for the element node positions
-      Eigen::Vector3d X1(nodes[0](0), nodes[0](1), nodes[0](2));
-      Eigen::Vector3d X2(nodes[1](0), nodes[1](1), nodes[1](2));
-      Eigen::Vector3d X3(nodes[2](0), nodes[2](1), nodes[2](2));
-      Eigen::Vector3d X4(nodes[3](0), nodes[3](1), nodes[3](2));
+      Eigen::Vector3d X1(elem->node_ref(0)(0), elem->node_ref(0)(1), elem->node_ref(0)(2));
+      Eigen::Vector3d X2(elem->node_ref(1)(0), elem->node_ref(1)(1), elem->node_ref(1)(2));
+      Eigen::Vector3d X3(elem->node_ref(2)(0), elem->node_ref(2)(1), elem->node_ref(2)(2));
+      Eigen::Vector3d X4(elem->node_ref(3)(0), elem->node_ref(3)(1), elem->node_ref(3)(2));
 
       //Store covariant basis and local orthonormal basis at the nodes
       std::vector<Eigen::Matrix3d> F0node;
@@ -452,6 +470,9 @@ void assemble_shell (EquationSystems & es,
       for (unsigned int var_i=0; var_i<6; var_i++)
         for (unsigned int var_j=0; var_j<6; var_j++)
           Ke_var[var_i][var_j].reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
+
+      Fe.resize(n_dofs);
+      Fe_w.reposition(2*n_var_dofs,n_var_dofs);
 
       // Reinit element data at the regular Gauss quadrature points
       fe->reinit (elem);
@@ -733,7 +754,7 @@ void assemble_shell (EquationSystems & es,
                   full_local_KIJ.block<5,5>(0,0)=local_KIJ;
 
                   // Drilling dof stiffness contribution
-                  full_local_KIJ(5,5) = 1e-7*Hf(0,0)*JxW[qp]*BdI.transpose()*BdJ;
+                  full_local_KIJ(5,5) = Hf(0,0)*JxW[qp]*BdI.transpose()*BdJ;
 
                   // Transform the stiffness matrix to global coordinates
                   Eigen::MatrixXd global_KIJ(6,6);
@@ -756,28 +777,50 @@ void assemble_shell (EquationSystems & es,
 
         } // end of the quadrature point qp-loop
 
+      if (distributed_load)
+      {
+        //Loop on shell faces
+        for (unsigned int shellface=0; shellface<2; shellface++)
+          {
+            std::vector<boundary_id_type> bids;
+            mesh.get_boundary_info().shellface_boundary_ids(elem,shellface,bids);
+
+            for (unsigned int k=0;k<bids.size();k++)
+              if(bids[k]==11) //sideset id for surface load
+                for (unsigned int qp=0; qp<qrule.n_points(); ++qp)
+                  for (unsigned int i=0; i<n_var_dofs; ++i)
+                    Fe_w(i) -= JxW[qp] * phi[i][qp];
+          }
+      }
+
       // The element matrix is now built for this element.
       // Add it to the global matrix.
 
-      dof_map.constrain_element_matrix (Ke,dof_indices);
+      dof_map.constrain_element_matrix_and_vector (Ke,Fe,dof_indices);
 
       system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
+
     }
 
-  //Adding point load to the RHS
-
-  //Pinch position
-  Point C(0, 3, 3);
-
-  MeshBase::const_node_iterator nodeit = mesh.nodes_begin();
-  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-
-  for ( ; nodeit!=node_end; ++nodeit)
+  if (!distributed_load)
     {
-      Node & node = **nodeit;
-      if ((node-C).norm() < 1e-3)
-        system.rhs->set(node.dof_number(0, 2, 0), -q/4);
+      //Adding point load to the RHS
+
+      //Pinch position
+      Point C(0, 3, 3);
+
+      MeshBase::const_node_iterator nodeit = mesh.nodes_begin();
+      const MeshBase::const_node_iterator node_end = mesh.nodes_end();
+
+      for ( ; nodeit!=node_end; ++nodeit)
+        {
+          Node & node = **nodeit;
+          if ((node-C).norm() < 1e-3)
+            system.rhs->set(node.dof_number(0, 2, 0), -q/4);
+        }
     }
+
 #else
   // Avoid compiler warnings
   libmesh_ignore(es);
