@@ -253,13 +253,25 @@ public:
   bool operator == (const Elem & rhs) const;
 
   /**
-   * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
+   * @returns a const pointer to the \f$ i^{th} \f$ neighbor of this element.
    * If \p MeshBase::find_neighbors() has not been called this
    * simply returns \p NULL.  If \p MeshBase::find_neighbors()
    * has been called and this returns \p NULL then the side is on
    * a boundary of the domain.
    */
+  const Elem * neighbor_ptr (unsigned int i) const;
+
+  /**
+   * @returns a non-const pointer to the \f$ i^{th} \f$ neighbor of this element.
+   */
+  Elem * neighbor_ptr (unsigned int i);
+
+  /**
+   * This function is deprecated.  Use the more specifically named and
+   * const-correct neighbor_ptr() functions instead.
+   */
   Elem * neighbor (const unsigned int i) const;
+
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -1702,11 +1714,31 @@ subdomain_id_type & Elem::subdomain_id ()
 
 
 inline
-Elem * Elem::neighbor (const unsigned int i) const
+const Elem * Elem::neighbor_ptr (unsigned int i) const
 {
   libmesh_assert_less (i, this->n_neighbors());
 
   return _elemlinks[i+1];
+}
+
+
+
+inline
+Elem * Elem::neighbor_ptr (unsigned int i)
+{
+  libmesh_assert_less (i, this->n_neighbors());
+
+  return _elemlinks[i+1];
+}
+
+
+
+inline
+Elem * Elem::neighbor (const unsigned int i) const
+{
+  // Support the deprecated interface by calling the new,
+  // const-correct interface and casting the result to an Elem *.
+  return const_cast<Elem *>(this->neighbor_ptr(i));
 }
 
 
