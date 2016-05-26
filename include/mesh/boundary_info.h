@@ -509,7 +509,7 @@ public:
    * from old_boundary_info (which may be this) into this boundary
    * info, associating them with new_elem.
    */
-  void copy_boundary_ids (const BoundaryInfo &old_boundary_info,
+  void copy_boundary_ids (const BoundaryInfo & old_boundary_info,
                           const Elem * const old_elem,
                           const Elem * const new_elem);
 
