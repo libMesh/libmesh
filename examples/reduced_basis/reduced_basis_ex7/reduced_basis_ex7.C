@@ -159,7 +159,7 @@ int main (int argc, char** argv)
                        << "Try running with -ksp_type preonly -pc_type lu instead.\n"
                        << "********************************************************************************"
                        << std::endl;
-          return 1;
+          return 77;
         }
 #endif
 
