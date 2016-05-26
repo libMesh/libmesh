@@ -90,6 +90,9 @@ void usage(const std::string & progName)
            << "                                  boundary with the correct node ids)\n"
            << "    -v                            Verbose\n"
            << "    -q <metric>                   Evaluates the named element quality metric\n"
+           << "    -1                            Converts a mesh of higher order elements\n"
+           << "                                  to their first-order counterparts:\n"
+           << "                                  Quad8 -> Quad4, Tet10 -> Tet4 etc\n"
            << "    -2                            Converts a mesh of linear elements\n"
            << "                                  to their second-order counterparts:\n"
            << "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
@@ -185,6 +188,7 @@ void process_cmd_line(int argc,
                       double & dist_fact,
                       bool & verbose,
                       BoundaryMeshWriteMode & write_bndry,
+                      bool & convert_first_order,
                       unsigned int & convert_second_order,
                       bool & triangulate,
                       bool & do_quality,
@@ -216,12 +220,12 @@ void process_cmd_line(int argc,
   x_sym           = y_sym           = z_sym           = false;
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:tbB23vlLm?h";
+    "i:o:s:d:D:r:p:tbB123vlLm?h";
 
 #else
 
   char optionStr[] =
-    "i:o:q:s:d:D:r:p:tbB23a::x:y:z:XYZvlLm?h";
+    "i:o:q:s:d:D:r:p:tbB123a::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -368,6 +372,16 @@ void process_cmd_line(int argc,
             break;
           }
 
+          /**
+           * Convert elements to first-order
+           * counterparts
+           */
+        case '1':
+          {
+            convert_first_order = true;
+            break;
+          }
+
 
           /**
            * Convert elements to second-order
@@ -488,6 +502,7 @@ int main (int argc, char ** argv)
   double dist_fact = 0.;
   bool verbose = false;
   BoundaryMeshWriteMode write_bndry = BM_DISABLED;
+  bool convert_first_order = false;
   unsigned int convert_second_order = 0;
   bool addinfelems = false;
   bool triangulate = false;
@@ -512,6 +527,7 @@ int main (int argc, char ** argv)
   process_cmd_line(argc, argv, names,
                    n_subdomains, n_rsteps, dim,
                    dist_fact, verbose, write_bndry,
+                   convert_first_order,
                    convert_second_order,
 
                    triangulate,
@@ -733,6 +749,24 @@ int main (int argc, char ** argv)
         }
     }
 
+
+  /**
+   * Possibly convert all linear
+   * elements to second-order counterparts
+   */
+  if (convert_first_order)
+    {
+      if (verbose)
+        libMesh::out << "Converting elements to first order counterparts\n";
+
+      mesh.all_first_order();
+
+      if (verbose)
+        {
+          mesh.print_info();
+          mesh.get_boundary_info().print_summary();
+        }
+    }
 
   /**
    * Possibly convert all linear
