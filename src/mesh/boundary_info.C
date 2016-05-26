@@ -1285,6 +1285,36 @@ void BoundaryInfo::raw_boundary_ids (const Elem * const elem,
 
 
 
+void BoundaryInfo::copy_boundary_ids (const BoundaryInfo & old_boundary_info,
+                                      const Elem * const old_elem,
+                                      const Elem * const new_elem)
+{
+  libmesh_assert_equal_to (old_elem->n_sides(), new_elem->n_sides());
+  libmesh_assert_equal_to (old_elem->n_edges(), new_elem->n_edges());
+
+  std::vector<boundary_id_type> bndry_ids;
+
+  for (unsigned short s=0; s<old_elem->n_sides(); s++)
+    {
+      old_boundary_info.raw_boundary_ids (old_elem, s, bndry_ids);
+      this->add_side (new_elem, s, bndry_ids);
+    }
+
+  for (unsigned short e=0; e<old_elem->n_edges(); e++)
+    {
+      old_boundary_info.raw_edge_boundary_ids (old_elem, e, bndry_ids);
+      this->add_edge (new_elem, e, bndry_ids);
+    }
+
+  for (unsigned short sf=0; sf != 2; sf++)
+    {
+      old_boundary_info.raw_shellface_boundary_ids (old_elem, sf, bndry_ids);
+      this->add_shellface (new_elem, sf, bndry_ids);
+    }
+}
+
+
+
 void BoundaryInfo::remove (const Node * node)
 {
   libmesh_assert(node);
