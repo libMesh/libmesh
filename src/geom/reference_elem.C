@@ -247,14 +247,14 @@ const Elem & get (const ElemType Type)
 {
   libmesh_assert_less (Type, INVALID_ELEM);
 
-  ElemType BaseType = Type ;
+  ElemType BaseType = Type;
 
   // For shell elements, use non shell type as the base type
   if (Type == TRISHELL3)
-    BaseType = TRI3 ;
+    BaseType = TRI3;
 
   if (Type == QUADSHELL4)
-    BaseType = QUAD4 ;
+    BaseType = QUAD4;
 
   init_ref_elem_table();
 

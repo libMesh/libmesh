@@ -264,7 +264,7 @@ int main (int argc, char ** argv)
       system.comm().sum(w);
 
 
-      Real w_C_bar = -E*h*w/q;
+      Number w_C_bar = -E*h*w/q;
       const Real w_C_bar_analytic = 164.24;
 
       // Print the finite element solution and the analytic
@@ -278,7 +278,7 @@ int main (int argc, char ** argv)
       const unsigned int v_var = system.variable_number ("v");
       Number v = system.point_value(v_var, point_D);
 
-      Real v_D_bar = E*h*v/q;
+      Number v_D_bar = E*h*v/q;
       const Real v_D_bar_analytic = 4.114;
 
       // Print the finite element solution and the analytic
