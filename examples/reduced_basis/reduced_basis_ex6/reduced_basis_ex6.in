@@ -1,7 +1,7 @@
 # ========= Main function parameters =========
 
-n_elem_xy = 10
-n_elem_z  = 50
+n_elem_xy = 8
+n_elem_z  = 40
 
 store_basis_functions = true
 online_N = 20

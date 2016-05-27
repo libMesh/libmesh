@@ -77,9 +77,9 @@ int main (int argc, char ** argv)
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
   MeshTools::Generation::build_cube (mesh,
-                                     40,
-                                     10,
-                                     5,
+                                     32,
+                                     8,
+                                     4,
                                      0., 1.*x_scaling,
                                      0., 0.3,
                                      0., 0.1,

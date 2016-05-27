@@ -12,9 +12,9 @@ x_size  = 1.
 y_size = 0.3
 z_size = 0.1
 
-n_elem_x = 40
-n_elem_y = 8
-n_elem_z = 4
+n_elem_x = 32
+n_elem_y = 6
+n_elem_z = 3
 
 store_basis_functions = true                # Do we store the basis functions in the offline_data directory once Offline finishes?
 
