@@ -1344,6 +1344,7 @@ void BoundaryInfo::remove (const Elem * elem)
   // Erase everything associated with elem
   _boundary_edge_id.erase (elem);
   _boundary_side_id.erase (elem);
+  _boundary_shellface_id.erase (elem);
 }
 
 
