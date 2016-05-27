@@ -8,6 +8,8 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/serial_mesh.h>
+#include <libmesh/mesh_function.h>
+#include <libmesh/numeric_vector.h>
 
 #include "test_comm.h"
 
@@ -34,6 +36,7 @@ public:
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
   CPPUNIT_TEST( testProjectHierarchicTri6 );
   CPPUNIT_TEST( testProjectHierarchicHex27 );
+  CPPUNIT_TEST( testProjectMeshFunctionHex27 );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -129,10 +132,69 @@ public:
           }
   }
 
+  void testProjectCubeWithMeshFunction(const ElemType elem_type)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", THIRD, HIERARCHIC);
+
+    MeshTools::Generation::build_cube (mesh,
+                                      3, 3, 3,
+                                      0., 1., 0., 1., 0., 1.,
+                                      elem_type);
+
+    es.init();
+    sys.project_solution(cubic_test, NULL, es.parameters);
+
+    std::vector<unsigned int> variables;
+    sys.get_all_variable_numbers(variables);
+    std::sort(variables.begin(),variables.end());
+
+    UniquePtr< NumericVector<Number> > mesh_function_vector =
+      NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize( *mesh_function_vector );
+
+    MeshFunction mesh_function(
+      es,
+      *mesh_function_vector,
+      sys.get_dof_map(),
+      variables);
+    mesh_function.init();
+
+    // Make a second system and project onto it using a MeshFunction
+    Mesh proj_mesh(*TestCommWorld);
+    EquationSystems proj_es(proj_mesh);
+
+    System &proj_sys = proj_es.add_system<System> ("ProjectionSystem");
+    proj_sys.add_variable("u", SECOND, LAGRANGE);
+
+    MeshTools::Generation::build_cube (proj_mesh,
+                                      5, 5, 5,
+                                      0., 1., 0., 1., 0., 1.,
+                                      elem_type);
+
+    proj_es.init();
+    proj_sys.project_solution(&mesh_function);
+
+    for (Real x = 0.1; x < 1; x += 0.2)
+      for (Real y = 0.1; y < 1; y += 0.2)
+        for (Real z = 0.1; z < 1; z += 0.2)
+          {
+            Point p(x,y,z);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(proj_sys.point_value(0,p)),
+                                         libmesh_real(cubic_test(p,es.parameters,"","")),
+                                         TOLERANCE*TOLERANCE);
+          }
+  }
+
   void testProjectHierarchicEdge3() { testProjectLine(EDGE3); }
   void testProjectHierarchicQuad9() { testProjectSquare(QUAD9); }
   void testProjectHierarchicTri6()  { testProjectSquare(TRI6); }
   void testProjectHierarchicHex27() { testProjectCube(HEX27); }
+  void testProjectMeshFunctionHex27() { testProjectCubeWithMeshFunction(HEX27); }
 
 };
 
