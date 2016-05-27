@@ -9,7 +9,7 @@ example_dir=examples/adaptivity/$example_name
 
 run_example "$example_name" refinement_type=h
 run_example "$example_name" refinement_type=p
-run_example "$example_name" refinement_type=hp
 
-# Solvers still give us trouble with too much matchedhp?
-run_example "$example_name" refinement_type=matchedhp max_r_steps=5
+# Some solvers still give us trouble with too much hp
+run_example "$example_name" refinement_type=hp max_r_steps=8
+run_example "$example_name" refinement_type=matchedhp max_r_steps=4
