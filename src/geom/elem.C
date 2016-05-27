@@ -124,6 +124,8 @@ const unsigned int Elem::type_to_n_nodes_map [] =
 
     1,  // NODEELEM
 
+    0,  // REMOTEELEM
+
     3,  // TRI3SUBDIVISION
     3,  // TRISHELL3
     4,  // QUADSHELL4
@@ -170,6 +172,12 @@ const unsigned int Elem::type_to_n_sides_map [] =
     4,  // INFPRISM12
 
     0,  // NODEELEM
+
+    0,  // REMOTEELEM
+
+    3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -213,6 +221,12 @@ const unsigned int Elem::type_to_n_edges_map [] =
     6,  // INFPRISM12
 
     0,  // NODEELEM
+
+    0,  // REMOTEELEM
+
+    3,  // TRI3SUBDIVISION
+    3,  // TRISHELL3
+    4,  // QUADSHELL4
   };
 
 // ------------------------------------------------------------
