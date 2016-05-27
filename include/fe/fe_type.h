@@ -128,8 +128,9 @@ inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return
 
 OrderWrapperOperators(int)
 OrderWrapperOperators(unsigned int)
-OrderWrapperOperators(std::size_t)
-
+#if LIBMESH_SIZEOF_SIZE_T != LIBMESH_SIZEOF_UNSIGNED_INT
+  OrderWrapperOperators(std::size_t)
+#endif
 
 // Now disambiguate all the things
 inline bool operator==(int lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
