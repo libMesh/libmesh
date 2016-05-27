@@ -100,7 +100,7 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
         Real min_val = *std::min_element(it->second.begin(), it->second.end());
         Real max_val = *std::max_element(it->second.begin(), it->second.end());
 
-        libmesh_assert(min_val > max_val);
+        libmesh_assert_less_equal(min_val,max_val);
 
         parameters_min.set_value(it->first, min_val);
         parameters_max.set_value(it->first, max_val);
