@@ -810,6 +810,9 @@ void assemble_shell (EquationSystems & es,
       //Pinch position
       Point C(0, 3, 3);
 
+      //Finish assembling rhs so we can set one value
+      system.rhs->close();
+
       MeshBase::const_node_iterator nodeit = mesh.nodes_begin();
       const MeshBase::const_node_iterator node_end = mesh.nodes_end();
 
