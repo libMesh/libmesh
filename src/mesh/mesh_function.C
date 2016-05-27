@@ -166,9 +166,13 @@ MeshFunction::clear ()
 
 UniquePtr<FunctionBase<Number> > MeshFunction::clone () const
 {
-  return UniquePtr<FunctionBase<Number> >
-    (new MeshFunction
-     (_eqn_systems, _vector, _dof_map, _system_vars, this));
+  FunctionBase<Number> * mf_clone =
+    new MeshFunction(_eqn_systems, _vector, _dof_map, _system_vars, this);
+
+  if(this->initialized())
+    mf_clone->init();
+
+  return UniquePtr< FunctionBase<Number> >(mf_clone);
 }
 
 
