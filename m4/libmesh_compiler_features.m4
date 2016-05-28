@@ -123,6 +123,7 @@ fi
 AC_CHECK_SIZEOF(short int)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(unsigned int)
+AC_CHECK_SIZEOF(size_t)
 AC_CHECK_SIZEOF(long int)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
