@@ -2075,10 +2075,6 @@ void Elem::set_p_level(unsigned int p)
         }
     }
 
-  if (p == 0)
-    libmesh_assert_not_equal_to
-      (this->p_refinement_flag(), Elem::JUST_REFINED);
-
   _p_level = cast_int<unsigned char>(p);
 }
 
