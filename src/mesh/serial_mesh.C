@@ -891,10 +891,6 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
             // nodeset.
             if(mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
               {
-                // We need to find an element that contains boundary nodes in order
-                // to update hmin.
-                UniquePtr<PointLocatorBase> my_locator = mesh_array[i]->sub_point_locator();
-
                 std::vector<numeric_index_type> node_id_list;
                 std::vector<boundary_id_type> bc_id_list;
 
@@ -909,12 +905,12 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                         dof_id_type this_node_id = node_id_list[node_index];
                         set_array[i]->insert( this_node_id );
 
-                        const Elem * near_elem =
-                          (*my_locator)(mesh_array[i]->node_ref(this_node_id) );
-                        if (near_elem == libmesh_nullptr)
-                          libmesh_error_msg("Error: PointLocator failed to find a valid element");
-
-                        h_min = std::min(h_min, near_elem->hmin());
+                        // We need to set h_min to some value. It's too expensive to
+                        // search for the element that actually contains this node,
+                        // since that would require a PointLocator. As a result, we
+                        // just use the first element in the mesh to give us hmin.
+                        const Elem * first_active_elem = *mesh_array[i]->active_elements_begin();
+                        h_min = first_active_elem->hmin();
                         h_min_updated = true;
                       }
                   }
