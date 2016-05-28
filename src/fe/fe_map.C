@@ -497,7 +497,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 if (!failing)
                   {
                     failing = true;
-                    elem->print_info();
+                    elem->print_info(libMesh::err);
                     libmesh_error_msg("ERROR: negative Jacobian " \
                                       << jac[p] \
                                       << " at point " \
@@ -559,7 +559,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 if (!failing)
                   {
                     failing = true;
-                    elem->print_info();
+                    elem->print_info(libMesh::err);
                     libmesh_error_msg("Encountered invalid 1D element!");
                   }
                 else
@@ -605,7 +605,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 if (!failing)
                   {
                     failing = true;
-                    elem->print_info();
+                    elem->print_info(libMesh::err);
                     libmesh_error_msg("Encountered invalid 1D element!");
                   }
                 else
@@ -728,7 +728,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 if (!failing)
                   {
                     failing = true;
-                    elem->print_info();
+                    elem->print_info(libMesh::err);
                     libmesh_error_msg("ERROR: negative Jacobian " \
                                       << jac[p] \
                                       << " at point " \
@@ -813,7 +813,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 if (!failing)
                   {
                     failing = true;
-                    elem->print_info();
+                    elem->print_info(libMesh::err);
                     libmesh_error_msg("ERROR: negative Jacobian " \
                                       << det \
                                       << " at point " \
@@ -1033,7 +1033,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 if (!failing)
                   {
                     failing = true;
-                    elem->print_info();
+                    elem->print_info(libMesh::err);
                     if (calculate_xyz)
                       libmesh_error_msg("ERROR: negative Jacobian " \
                                         << jac[p]
