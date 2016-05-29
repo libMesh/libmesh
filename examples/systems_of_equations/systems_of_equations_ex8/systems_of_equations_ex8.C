@@ -190,9 +190,16 @@ int main (int argc, char ** argv)
 
   Real current_max_gap_function = std::numeric_limits<Real>::max();
 
-  unsigned int outer_iteration = 0;
-  while (current_max_gap_function > gap_function_tol)
+  const unsigned int max_outer_iterations = 10;
+  for (unsigned int outer_iteration = 0;
+       outer_iteration != max_outer_iterations; ++outer_iteration)
     {
+      if (current_max_gap_function <= gap_function_tol)
+        {
+          libMesh::out << "Outer iterative loop converged!" << std::endl;
+          break;
+        }
+
       libMesh::out << "Starting outer iteration " << outer_iteration << std::endl;
 
       // Perform inner iteration (i.e. Newton's method loop)
